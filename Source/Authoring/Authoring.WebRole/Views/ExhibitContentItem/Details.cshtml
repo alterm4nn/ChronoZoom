@@ -1,0 +1,30 @@
+﻿@model Authoring.WebRole.Models.ExhibitContentItem
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>ExhibitContentItem - Details</h2>
+
+<fieldset>
+    <legend>ExhibitContentItem</legend>
+
+    <div class="display-label">Exhibit</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Exhibit.Title)
+    </div>
+
+    <div class="display-label">ContentItem</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.ContentItem.Title)
+    </div>
+
+    <div class="display-label">Order</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Order)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.ExhibitContentItemID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

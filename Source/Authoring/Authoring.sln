@@ -1,0 +1,47 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authoring.Tests", "Authoring.Tests\Authoring.Tests.csproj", "{03CAA822-F970-4851-9997-5EE7EBC5E00A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authoring.WebRole", "Authoring.WebRole\Authoring.WebRole.csproj", "{C0CD99A0-5D3D-465C-8CF3-459199C0DAB6}"
+EndProject
+Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "Authoring.Azure", "Authoring.Azure\Authoring.Azure.ccproj", "{BD60A6DD-00CA-4641-B6C2-AC350431FBB1}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 4
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = http://vstfpg05:8080/tfs/pg05
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = Authoring.Tests\\Authoring.Tests.csproj
+		SccProjectName1 = Authoring.Tests
+		SccLocalPath1 = Authoring.Tests
+		SccProjectUniqueName2 = Authoring.WebRole\\Authoring.WebRole.csproj
+		SccProjectName2 = Authoring.WebRole
+		SccLocalPath2 = Authoring.WebRole
+		SccProjectUniqueName3 = Authoring.Azure\\Authoring.Azure.ccproj
+		SccProjectName3 = Authoring.Azure
+		SccLocalPath3 = Authoring.Azure
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{03CAA822-F970-4851-9997-5EE7EBC5E00A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03CAA822-F970-4851-9997-5EE7EBC5E00A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03CAA822-F970-4851-9997-5EE7EBC5E00A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03CAA822-F970-4851-9997-5EE7EBC5E00A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0CD99A0-5D3D-465C-8CF3-459199C0DAB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0CD99A0-5D3D-465C-8CF3-459199C0DAB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0CD99A0-5D3D-465C-8CF3-459199C0DAB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0CD99A0-5D3D-465C-8CF3-459199C0DAB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD60A6DD-00CA-4641-B6C2-AC350431FBB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD60A6DD-00CA-4641-B6C2-AC350431FBB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD60A6DD-00CA-4641-B6C2-AC350431FBB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD60A6DD-00CA-4641-B6C2-AC350431FBB1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

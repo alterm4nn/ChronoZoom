@@ -1,0 +1,746 @@
+﻿.czz-main
+{
+    background-color: #000000;
+    color: #FFFFFF;
+}
+
+*.unselectable {
+   -moz-user-select: -moz-none;
+   -khtml-user-select: none;
+   -webkit-user-select: none;
+   -o-user-select: none;
+   user-select: none;
+}
+
+*.text-selectable {
+   -moz-user-select: text;
+   -khtml-user-select: text;
+   -webkit-user-select: text;
+   -o-user-select: text;
+   user-select: text;
+}
+
+A
+{
+    color: #DBDBDB;
+    font-family: Arial;
+    text-decoration: none;
+}
+
+A:hover
+{
+    color: White;
+    font-family: Arial;
+    text-decoration: underline;
+}
+
+.virtualCanvas
+{
+    border-width: 1px;
+    border-style: solid;
+    background-color: Black;
+    position: relative;
+}
+.virtualCanvasLayerDiv
+{
+    overflow: hidden;
+    position: absolute;
+    z-index: 0;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+.virtualCanvasLayerSvg
+{
+}
+.virtualCanvasLayerCanvas
+{
+    position: absolute;
+    z-index: 0;
+    left: 0px;
+}
+
+.regimes_titles
+{
+    position: absolute;
+    color: #BFBFBF;
+    font-family: Arial;
+    font-size: 11.5px;
+    cursor: pointer;
+}
+
+.regimes_title
+{
+    right: 0px;
+    white-space: nowrap;
+    text-align: right;
+}
+
+.regimes_title:hover
+{
+    color: White;
+}
+
+.bread_crumbs
+{
+    position: absolute;
+    left: 20px;
+    color: #DDDDDD;
+    font-family: Arial;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.bread_crumbs span
+{
+    font-family: Arial;
+    font-weight: bold;
+    font-size: 13px;
+    color: #BFBFBF;
+    cursor: pointer;
+}
+
+.bread_crumbs span:hover
+{
+    color:White;
+}
+
+.contentItemDescription
+{
+    font-family: Arial;
+    font-size: 10px;
+    color: rgb(232,232,232);
+    background-color: transparent;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+
+.contentItemDescription .text
+{
+    height: inherit;
+    overflow: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative;
+}
+
+
+.textDivElement
+{
+    color: white;
+    -ms-transform: scale(1,1);
+}
+
+.tour_control
+{
+    width: 190px;
+    cursor: pointer;
+}
+
+.biblBack
+{
+    width: 100%;
+    height: 100%;
+    z-index: 5000;
+    background-color: rgba(255,255,255,0.2);
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.biblOuterWindow
+{
+    background-color: rgba(0,0,0,0.6);
+    width: 788px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    border-radius: 8px;
+    cursor: default;
+}
+
+.biblWindow
+{
+    font-family: Arial;
+    font-size: 18.5px;
+    color: White;
+    background-color: #434343;
+    width: 738px;
+    height: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    vertical-align: middle;
+    position: relative;
+    border-radius: 8px;
+    cursor: default;
+    overflow: hidden;
+}
+
+.biblWindow .closeButton
+{
+    background-image: "Images/close.png";
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    width: 30px;
+    height: 30px;
+    z-index: 5005;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+
+.biblWindow .title
+{
+    font-family: Arial;
+    font-size: 18px;
+    font-weight: bold;
+    color: White;
+    padding-top: 22px;
+    padding-bottom: 7px;
+    margin-right: 60px;
+    margin-left: 32px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-bottom: 1px solid #DBDBDB;
+    cursor: default;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+
+.biblWindow .sources
+{
+    display: block;
+    position: absolute;
+    height: auto;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin-left: 32px;
+    margin-right: 20px;
+    margin-top: 55px;
+    margin-bottom: 13px;
+    padding-right: 23px;
+    height: auto;
+    overflow: auto; /* scroll bars */
+    overflow-x: hidden;
+}
+
+.biblWindow .sources .source
+{
+    padding-left: 4px;
+    padding-right: 5px;
+    padding-bottom: 0px;
+    padding-top: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    border-bottom: 1px solid #DBDBDB;
+}
+
+.biblWindow .sources .sectionTitle
+{
+    color: White;
+    font-size: 18px;
+    text-align: left;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 0px;
+    padding-left: 0px;
+    padding-bottom: 0px;
+    padding-top: 20px;
+    cursor: default;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-bottom: 1px solid #DBDBDB;
+}
+
+
+.biblWindow .sources .source .sourceName
+{
+    color: #DBDBDB;
+    font-size: 18px;
+    text-align: left;
+    margin-left: 0px;
+    margin-right: 50px;
+    margin-top: 0px;
+    padding-left: 0px;
+    padding-bottom: 12px;
+    padding-top: 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.biblWindow .sources .source .sourceDescr
+{
+    background-color: #DBDBDB;
+    color: #424242;
+    font-size: 15px;
+    text-align: left;
+    padding: 12px;
+    margin-left: 12px;
+    margin-right: 50px;
+    margin-bottom: 25px;
+    cursor: auto;
+    border-radius: 8px;
+}
+
+
+
+.czWindow
+{
+    font-family: Arial;
+    font-size: 14.5px;
+    color: #BFBFBF;
+    background-color: #424242;
+    z-index: 2000;
+    position: absolute;
+    left: 0px;
+    top: 144px;
+    width: 220px;
+    margin-left: 0px;
+    margin-bottom: 0px;
+    border-bottom-right-radius: 8px;
+}
+
+.czWindow .header
+{
+    font-size: 19px;
+    color: #424242;
+    background: #515151; /* for non-css3 browsers */
+    background: -moz-linear-gradient(left, #FDFDFD, #515151); /* Mozilla: */
+    background: -webkit-gradient(linear, left top, right top, from(#FDFDFD), to(#424242)); /* Chrome, Safari:*/
+    filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#FDFDFD', EndColorStr='#424242', GradientType=1); /* MSIE */
+    width: 167px;
+    vertical-align: middle;
+    padding-top: 4px;
+    padding-bottom: 2px;
+    padding-left: 14px;
+    cursor: default;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+
+.czWindow .czTextBox
+{
+    font-family: Arial;
+    font-size: 12px;
+    color: White;
+    background-color: #424242;
+    height: 20px;
+    margin: 3px 5px 3px 5px;
+    border: 1px solid #BFBFBF;
+}
+
+.czWindow .czTextBox:focus
+{
+    border: 1px solid White;
+}
+
+.czWindow .emptyTextBox
+{
+    font-family: Arial;
+    font-size: 12px;
+    font-style: italic;
+    color: #BFBFBF;
+}
+
+.czWindow .narration
+{
+    font-size: 13px;
+    text-align: center;
+    margin-left: 5px;
+    margin-right: 15px;
+    padding-bottom: 0px;
+    padding-top: 10px;
+    border-bottom: none; /*1px solid #424242;*/
+    width: 181px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+
+.czWindow .narration-selected
+{
+    color: White;
+}
+
+
+.czWindow .content
+{
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 13px;
+    margin-bottom: 0px;
+    width: 196px;
+    border-bottom: 1px solid #424242;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+
+.czWindow .content .category
+{
+    vertical-align: middle;
+    margin-left: 0px;
+    margin-right: 13px;
+    margin-bottom: 10px;
+    width: 196px;
+    cursor: pointer;
+    border-bottom: 2px solid #BFBFBF;
+}
+
+.czWindow .content .category:hover
+{
+    color: White;
+}
+
+
+.czWindow .content .collapseButton
+{
+    left: 194px;
+    position: absolute;
+}
+
+
+
+.czWindow .content .categorySelected
+{
+    vertical-align: middle;
+    margin-left: 0px;
+    margin-right: 13px;
+    margin-bottom: 10px;
+    width: 196px;
+    cursor: pointer;
+    border-bottom: none;
+}
+
+.czWindow .content .categorySelected:hover
+{
+    color: White;
+}
+
+.czWindow .content .itemContainer
+{
+    margin-left: 5px;
+    margin-right: 15px;
+    padding-bottom: 10px;
+    border-bottom: none; /*1px solid #424242;*/
+    width: 181px;
+}
+
+
+.czWindow .content .itemContainer .item
+{
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.czWindow .content .itemContainer .item:hover
+{
+    color: White;
+}
+
+.czWindow .content .itemContainer .touritem-selected
+{
+    color: White;
+}
+
+.czWindow .searchResults
+{
+    margin-left: 10px;
+    margin-right: 15px;
+    padding-bottom: 10px;
+    border-bottom: none; /*1px solid #424242;*/
+    overflow: auto; /* scroll bars */
+    height: 104px;
+    overflow-x: hidden;
+}
+
+.czWindow .searchResults .searchResultSection
+{
+    font-size: 13px;
+    text-align: left;
+    margin-left: 0px;
+    margin-right: 10px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    padding-bottom: 0px;
+    padding-top: 0px;
+    cursor: default;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+    border-bottom: 1px solid #BFBFBF;
+}
+
+.czWindow .searchResults .searchResult
+{
+    font-size: 13px;
+    text-align: left;
+    margin-left: 7px;
+    margin-right: 10px;
+    padding-bottom: 0px;
+    padding-top: 0px;
+    border-bottom: none; /*1px solid #424242;*/
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+
+.czWindow .searchResults .searchResult:hover
+{
+    color: White;
+}
+
+.czWindow .searchResults .searchNoResult
+{
+    font-style:italic;
+    font-size: 13px;
+    text-align: left;
+    margin-left: 0px;
+    margin-right: 10px;
+    padding-bottom: 0px;
+    padding-top: 0px;
+    border-bottom: none; /*1px solid #424242;*/
+    cursor: default;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+
+
+.bookmarksWindow
+{
+    font-family: Arial;
+    font-size: 14.5px;
+    color: #BFBFBF;
+    background-color: #424242;
+    z-index: 1999;
+    position: absolute;
+    left: 0px;
+    bottom: 44px;
+    width: 200px;
+    max-height: 409px;
+    margin-left: 0px;
+    border-top-right-radius: 8px;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+
+.bookmarksWindow .header
+{
+    font-size: 14.5px;
+    color: White;
+    padding-top: 10px;
+    padding-bottom: 9px;
+    padding-left: 5px;
+    padding-right: 6px;
+    margin-left: 10px;
+    margin-right: 23px;
+    cursor: default;
+    border-bottom: 2px solid #BFBFBF;
+}
+
+.bookmarksWindow .headerButton
+{
+    position: absolute;
+    right: 12px;
+    top: 9px;
+}
+
+.bookmarksWindow .slideHeader
+{
+    font-size: 14.5px;
+    color: White;
+    padding-top: 5px;
+    padding-bottom: 10px;
+    padding-left: 4px;
+    padding-right: 6px;
+    margin-left: 10px;
+    margin-right: 19px;
+    cursor: default;
+}
+
+.bookmarksWindow .slideText
+{
+    font-size: 13px;
+    color: #BFBFBF;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 3px;
+    padding-right: 3px;
+    margin-left: 15px;
+    margin-right: 19px;
+    max-height: 250px;
+    overflow: auto;
+    overflow-x: hidden;
+}
+
+.bookmarksWindow .slideFooter
+{
+    font-size: 12px;
+    color: White;
+    text-align: right;
+    padding-top: 5px;
+    padding-bottom: 13px;
+    padding-left: 4px;
+    padding-right: 0px;
+    margin-top: 20px;
+    margin-left: 10px;
+    margin-right: 19px;
+    cursor: default;
+    height: 15px;
+    border-top: 1px solid #BFBFBF;
+}
+
+.footerLeftText
+{
+    position: absolute;
+    color: #BFBFBF;
+    font-family: Arial;
+    font-size: 11.5px;
+    text-align: left;
+    margin-left: 0px;
+    margin-right: 5px;
+    left: 0px;
+    bottom: 0px; 
+    top: 5px;
+    white-space: nowrap;
+}
+
+.footerLeftTextMRC
+{
+    position: absolute;
+    color: #BFBFBF;
+    font-family: Arial;
+    font-size: 11.5px;
+    text-align: left;
+    margin-left: 0px;
+    margin-right: 5px;
+    left: 75px;
+    bottom: 0px; 
+    top: 5px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.footerLeftTextUC
+{
+    position: absolute;
+    color: #BFBFBF;
+    font-family: Arial;
+    font-size: 11.5px;
+    text-align: left;
+    margin-left: 0px;
+    margin-right: 5px;
+    left: 145px;
+    bottom: 0px; 
+    top: 5px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.footerLeftTextMSU
+{
+    position: absolute;
+    color: #BFBFBF;
+    font-family: Arial;
+    font-size: 11.5px;
+    text-align: left;
+    margin-left: 0px;
+    margin-right: 5px;
+    left: 245px;
+    bottom: 0px; 
+    top: 5px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.footerText
+{
+    position: relative;
+    color: #BFBFBF;
+    font-family: Arial;
+    font-size: 11.5px;
+    cursor: pointer;
+    text-align: right;
+    margin-left: 5px;
+    margin-right: 5px;
+    right: 0px;
+    bottom: 0px; 
+    top: 5px;
+    white-space: nowrap;
+}
+
+.footerText:hover
+{
+    color: White;
+}
+
+
+.pipeText
+{
+    position: relative;
+    color: #BFBFBF;
+    font-family: Arial;
+    font-size: 11.5px;
+    cursor: pointer;
+    text-align: right;
+    margin-left: 5px;
+    margin-right: 5px;
+    right: 0px;
+    bottom: 0px; 
+    top: 5px;
+    white-space: nowrap;
+}

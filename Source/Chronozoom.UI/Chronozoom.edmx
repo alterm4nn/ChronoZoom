@@ -1,0 +1,2681 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="ChronozoomModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityContainer Name="ChronozoomModelStoreContainer">
+          <EntitySet Name="Prod_BibliographyView" EntityType="ChronozoomModel.Store.Prod_BibliographyView" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Prod_ContentItemView" EntityType="ChronozoomModel.Store.Prod_ContentItemView" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Prod_ExhibitContentItemInfo" EntityType="ChronozoomModel.Store.Prod_ExhibitContentItemInfo" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Prod_ExhibitInfo" EntityType="ChronozoomModel.Store.Prod_ExhibitInfo" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Prod_ExhibitReferenceInfo" EntityType="ChronozoomModel.Store.Prod_ExhibitReferenceInfo" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Prod_ExhibitView" EntityType="ChronozoomModel.Store.Prod_ExhibitView" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Prod_ThresholdView" EntityType="ChronozoomModel.Store.Prod_ThresholdView" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Prod_TimelineInfo" EntityType="ChronozoomModel.Store.Prod_TimelineInfo" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Prod_TimelineView" EntityType="ChronozoomModel.Store.Prod_TimelineView" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Prod_TourBookmarkView" EntityType="ChronozoomModel.Store.Prod_TourBookmarkView" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Prod_TourView" EntityType="ChronozoomModel.Store.Prod_TourView" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Staging_BibliographyView" EntityType="ChronozoomModel.Store.Staging_BibliographyView" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Staging_ContentItemView" EntityType="ChronozoomModel.Store.Staging_ContentItemView" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Staging_ExhibitContentItemInfo" EntityType="ChronozoomModel.Store.Staging_ExhibitContentItemInfo" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Staging_ExhibitInfo" EntityType="ChronozoomModel.Store.Staging_ExhibitInfo" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Staging_ExhibitReferenceInfo" EntityType="ChronozoomModel.Store.Staging_ExhibitReferenceInfo" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Staging_ExhibitView" EntityType="ChronozoomModel.Store.Staging_ExhibitView" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Staging_ThresholdView" EntityType="ChronozoomModel.Store.Staging_ThresholdView" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Staging_TimelineInfo" EntityType="ChronozoomModel.Store.Staging_TimelineInfo" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Staging_TimelineView" EntityType="ChronozoomModel.Store.Staging_TimelineView" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Staging_TourBookmarkView" EntityType="ChronozoomModel.Store.Staging_TourBookmarkView" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Staging_TourView" EntityType="ChronozoomModel.Store.Staging_TourView" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Auth_BibliographyView" EntityType="ChronozoomModel.Store.Auth_BibliographyView" store:Type="Views" store:Schema="dbo" store:Name="Auth_BibliographyView">
+            <DefiningQuery>SELECT 
+      [Auth_BibliographyView].[ExhibitID] AS [ExhibitID], 
+      [Auth_BibliographyView].[IsDeleted] AS [IsDeleted], 
+      [Auth_BibliographyView].[ID] AS [ID], 
+      [Auth_BibliographyView].[Title] AS [Title], 
+      [Auth_BibliographyView].[Authors] AS [Authors], 
+      [Auth_BibliographyView].[BookChapters] AS [BookChapters], 
+      [Auth_BibliographyView].[CitationType] AS [CitationType], 
+      [Auth_BibliographyView].[PageNumbers] AS [PageNumbers], 
+      [Auth_BibliographyView].[Publication] AS [Publication], 
+      [Auth_BibliographyView].[PublicationDates] AS [PublicationDates], 
+      [Auth_BibliographyView].[Source] AS [Source], 
+      [Auth_BibliographyView].[CurrVersion] AS [CurrVersion]
+      FROM [dbo].[Auth_BibliographyView] AS [Auth_BibliographyView]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="Auth_ContentItemsView" EntityType="ChronozoomModel.Store.Auth_ContentItemsView" store:Type="Views" store:Schema="dbo" store:Name="Auth_ContentItemsView">
+            <DefiningQuery>SELECT 
+      [Auth_ContentItemsView].[ID] AS [ID], 
+      [Auth_ContentItemsView].[Title] AS [Title], 
+      [Auth_ContentItemsView].[Caption] AS [Caption], 
+      [Auth_ContentItemsView].[Topic] AS [Topic], 
+      [Auth_ContentItemsView].[MediaTypeID] AS [MediaTypeID], 
+      [Auth_ContentItemsView].[ThresholdID] AS [ThresholdID], 
+      [Auth_ContentItemsView].[RegimeID] AS [RegimeID], 
+      [Auth_ContentItemsView].[MediaBlobURL] AS [MediaBlobURL], 
+      [Auth_ContentItemsView].[TimeUnitID] AS [TimeUnitID], 
+      [Auth_ContentItemsView].[ContentDate] AS [ContentDate], 
+      [Auth_ContentItemsView].[ContentYear] AS [ContentYear], 
+      [Auth_ContentItemsView].[MediaSource] AS [MediaSource], 
+      [Auth_ContentItemsView].[Attribution] AS [Attribution], 
+      [Auth_ContentItemsView].[LicenseTypeID] AS [LicenseTypeID], 
+      [Auth_ContentItemsView].[CreatedOn] AS [CreatedOn], 
+      [Auth_ContentItemsView].[CreatedBy] AS [CreatedBy], 
+      [Auth_ContentItemsView].[ModifiedOn] AS [ModifiedOn], 
+      [Auth_ContentItemsView].[ModifiedBy] AS [ModifiedBy], 
+      [Auth_ContentItemsView].[IsVisible] AS [IsVisible], 
+      [Auth_ContentItemsView].[IsDeleted] AS [IsDeleted], 
+      [Auth_ContentItemsView].[UniqueID] AS [UniqueID], 
+      [Auth_ContentItemsView].[CurrVersion] AS [CurrVersion]
+      FROM [dbo].[Auth_ContentItemsView] AS [Auth_ContentItemsView]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="Auth_ExhibitContentItemInfoView" EntityType="ChronozoomModel.Store.Auth_ExhibitContentItemInfoView" store:Type="Views" store:Schema="dbo" store:Name="Auth_ExhibitContentItemInfoView">
+            <DefiningQuery>SELECT 
+      [Auth_ExhibitContentItemInfoView].[ID] AS [ID], 
+      [Auth_ExhibitContentItemInfoView].[ExhibitID] AS [ExhibitID], 
+      [Auth_ExhibitContentItemInfoView].[Title] AS [Title], 
+      [Auth_ExhibitContentItemInfoView].[Caption] AS [Caption], 
+      [Auth_ExhibitContentItemInfoView].[Threshold] AS [Threshold], 
+      [Auth_ExhibitContentItemInfoView].[Regime] AS [Regime], 
+      [Auth_ExhibitContentItemInfoView].[TimeUnit] AS [TimeUnit], 
+      [Auth_ExhibitContentItemInfoView].[ContentDate] AS [ContentDate], 
+      [Auth_ExhibitContentItemInfoView].[ContentYear] AS [ContentYear], 
+      [Auth_ExhibitContentItemInfoView].[MediaType] AS [MediaType], 
+      [Auth_ExhibitContentItemInfoView].[MediaBlobURL] AS [MediaBlobURL], 
+      [Auth_ExhibitContentItemInfoView].[MediaSource] AS [MediaSource], 
+      [Auth_ExhibitContentItemInfoView].[Attribution] AS [Attribution], 
+      [Auth_ExhibitContentItemInfoView].[UniqueID] AS [UniqueID], 
+      [Auth_ExhibitContentItemInfoView].[Order] AS [Order], 
+      [Auth_ExhibitContentItemInfoView].[HasBibliography] AS [HasBibliography], 
+      [Auth_ExhibitContentItemInfoView].[CurrVersion] AS [CurrVersion]
+      FROM [dbo].[Auth_ExhibitContentItemInfoView] AS [Auth_ExhibitContentItemInfoView]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="Auth_ExhibitInfoView" EntityType="ChronozoomModel.Store.Auth_ExhibitInfoView" store:Type="Views" store:Schema="dbo" store:Name="Auth_ExhibitInfoView">
+            <DefiningQuery>SELECT 
+      [Auth_ExhibitInfoView].[ID] AS [ID], 
+      [Auth_ExhibitInfoView].[TimelineID] AS [TimelineID], 
+      [Auth_ExhibitInfoView].[Title] AS [Title], 
+      [Auth_ExhibitInfoView].[Threshold] AS [Threshold], 
+      [Auth_ExhibitInfoView].[Regime] AS [Regime], 
+      [Auth_ExhibitInfoView].[TimeUnit] AS [TimeUnit], 
+      [Auth_ExhibitInfoView].[ContentDate] AS [ContentDate], 
+      [Auth_ExhibitInfoView].[ContentYear] AS [ContentYear], 
+      [Auth_ExhibitInfoView].[UniqueID] AS [UniqueID], 
+      [Auth_ExhibitInfoView].[Sequence] AS [Sequence], 
+      [Auth_ExhibitInfoView].[CurrVersion] AS [CurrVersion]
+      FROM [dbo].[Auth_ExhibitInfoView] AS [Auth_ExhibitInfoView]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="Auth_ExhibitReferenceInfoView" EntityType="ChronozoomModel.Store.Auth_ExhibitReferenceInfoView" store:Type="Views" store:Schema="dbo" store:Name="Auth_ExhibitReferenceInfoView">
+            <DefiningQuery>SELECT 
+      [Auth_ExhibitReferenceInfoView].[ID] AS [ID], 
+      [Auth_ExhibitReferenceInfoView].[ExhibitID] AS [ExhibitID], 
+      [Auth_ExhibitReferenceInfoView].[Title] AS [Title], 
+      [Auth_ExhibitReferenceInfoView].[Authors] AS [Authors], 
+      [Auth_ExhibitReferenceInfoView].[BookChapters] AS [BookChapters], 
+      [Auth_ExhibitReferenceInfoView].[CitationType] AS [CitationType], 
+      [Auth_ExhibitReferenceInfoView].[PageNumbers] AS [PageNumbers], 
+      [Auth_ExhibitReferenceInfoView].[Publication] AS [Publication], 
+      [Auth_ExhibitReferenceInfoView].[PublicationDates] AS [PublicationDates], 
+      [Auth_ExhibitReferenceInfoView].[Source] AS [Source], 
+      [Auth_ExhibitReferenceInfoView].[CurrVersion] AS [CurrVersion]
+      FROM [dbo].[Auth_ExhibitReferenceInfoView] AS [Auth_ExhibitReferenceInfoView]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="Auth_ExhibitView" EntityType="ChronozoomModel.Store.Auth_ExhibitView" store:Type="Views" store:Schema="dbo" store:Name="Auth_ExhibitView">
+            <DefiningQuery>SELECT 
+      [Auth_ExhibitView].[ID] AS [ID], 
+      [Auth_ExhibitView].[Title] AS [Title], 
+      [Auth_ExhibitView].[ThresholdID] AS [ThresholdID], 
+      [Auth_ExhibitView].[RegimeID] AS [RegimeID], 
+      [Auth_ExhibitView].[ContentDate] AS [ContentDate], 
+      [Auth_ExhibitView].[ContentYear] AS [ContentYear], 
+      [Auth_ExhibitView].[CreatedOn] AS [CreatedOn], 
+      [Auth_ExhibitView].[CreatedBy] AS [CreatedBy], 
+      [Auth_ExhibitView].[ModifiedOn] AS [ModifiedOn], 
+      [Auth_ExhibitView].[ModifiedBy] AS [ModifiedBy], 
+      [Auth_ExhibitView].[IsVisible] AS [IsVisible], 
+      [Auth_ExhibitView].[IsDeleted] AS [IsDeleted], 
+      [Auth_ExhibitView].[TimeUnitID] AS [TimeUnitID], 
+      [Auth_ExhibitView].[UniqueID] AS [UniqueID], 
+      [Auth_ExhibitView].[Sequence] AS [Sequence], 
+      [Auth_ExhibitView].[CurrVersion] AS [CurrVersion]
+      FROM [dbo].[Auth_ExhibitView] AS [Auth_ExhibitView]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="Auth_ThresholdView" EntityType="ChronozoomModel.Store.Auth_ThresholdView" store:Type="Views" store:Schema="dbo" store:Name="Auth_ThresholdView">
+            <DefiningQuery>SELECT 
+      [Auth_ThresholdView].[ID] AS [ID], 
+      [Auth_ThresholdView].[Threshold] AS [Threshold], 
+      [Auth_ThresholdView].[IsDeleted] AS [IsDeleted], 
+      [Auth_ThresholdView].[Timeunit] AS [Timeunit], 
+      [Auth_ThresholdView].[ThresholdDate] AS [ThresholdDate], 
+      [Auth_ThresholdView].[ThresholdYear] AS [ThresholdYear], 
+      [Auth_ThresholdView].[ShortDescription] AS [ShortDescription], 
+      [Auth_ThresholdView].[URL] AS [URL], 
+      [Auth_ThresholdView].[CurrVersion] AS [CurrVersion]
+      FROM [dbo].[Auth_ThresholdView] AS [Auth_ThresholdView]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="Auth_TimelineInfoView" EntityType="ChronozoomModel.Store.Auth_TimelineInfoView" store:Type="Views" store:Schema="dbo" store:Name="Auth_TimelineInfoView">
+            <DefiningQuery>SELECT 
+      [Auth_TimelineInfoView].[TimelineID] AS [TimelineID], 
+      [Auth_TimelineInfoView].[Title] AS [Title], 
+      [Auth_TimelineInfoView].[Threshold] AS [Threshold], 
+      [Auth_TimelineInfoView].[Regime] AS [Regime], 
+      [Auth_TimelineInfoView].[FromTimeUnit] AS [FromTimeUnit], 
+      [Auth_TimelineInfoView].[FromContentDate] AS [FromContentDate], 
+      [Auth_TimelineInfoView].[FromContentYear] AS [FromContentYear], 
+      [Auth_TimelineInfoView].[ToTimeUnit] AS [ToTimeUnit], 
+      [Auth_TimelineInfoView].[ToContentDate] AS [ToContentDate], 
+      [Auth_TimelineInfoView].[ToContentYear] AS [ToContentYear], 
+      [Auth_TimelineInfoView].[TimelineUniqueID] AS [TimelineUniqueID], 
+      [Auth_TimelineInfoView].[TimelineSequence] AS [TimelineSequence], 
+      [Auth_TimelineInfoView].[Height] AS [Height], 
+      [Auth_TimelineInfoView].[ParentTimelineID] AS [ParentTimelineID], 
+      [Auth_TimelineInfoView].[HasChildren] AS [HasChildren], 
+      [Auth_TimelineInfoView].[CurrVersion] AS [CurrVersion]
+      FROM [dbo].[Auth_TimelineInfoView] AS [Auth_TimelineInfoView]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="Auth_TimelineView" EntityType="ChronozoomModel.Store.Auth_TimelineView" store:Type="Views" store:Schema="dbo" store:Name="Auth_TimelineView">
+            <DefiningQuery>SELECT 
+      [Auth_TimelineView].[ID] AS [ID], 
+      [Auth_TimelineView].[Title] AS [Title], 
+      [Auth_TimelineView].[ThresholdID] AS [ThresholdID], 
+      [Auth_TimelineView].[RegimeID] AS [RegimeID], 
+      [Auth_TimelineView].[FromContentDate] AS [FromContentDate], 
+      [Auth_TimelineView].[FromContentYear] AS [FromContentYear], 
+      [Auth_TimelineView].[ToContentDate] AS [ToContentDate], 
+      [Auth_TimelineView].[ToContentYear] AS [ToContentYear], 
+      [Auth_TimelineView].[ParentTimelineID] AS [ParentTimelineID], 
+      [Auth_TimelineView].[CreatedOn] AS [CreatedOn], 
+      [Auth_TimelineView].[CreatedBy] AS [CreatedBy], 
+      [Auth_TimelineView].[ModifiedOn] AS [ModifiedOn], 
+      [Auth_TimelineView].[ModifiedBy] AS [ModifiedBy], 
+      [Auth_TimelineView].[IsVisible] AS [IsVisible], 
+      [Auth_TimelineView].[IsDeleted] AS [IsDeleted], 
+      [Auth_TimelineView].[FromTimeUnit] AS [FromTimeUnit], 
+      [Auth_TimelineView].[ToTimeUnit] AS [ToTimeUnit], 
+      [Auth_TimelineView].[SourceURL] AS [SourceURL], 
+      [Auth_TimelineView].[Attribution] AS [Attribution], 
+      [Auth_TimelineView].[UniqueID] AS [UniqueID], 
+      [Auth_TimelineView].[Sequence] AS [Sequence], 
+      [Auth_TimelineView].[Height] AS [Height], 
+      [Auth_TimelineView].[CurrVersion] AS [CurrVersion]
+      FROM [dbo].[Auth_TimelineView] AS [Auth_TimelineView]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="Auth_TourBookmarkView" EntityType="ChronozoomModel.Store.Auth_TourBookmarkView" store:Type="Views" store:Schema="dbo" store:Name="Auth_TourBookmarkView">
+            <DefiningQuery>SELECT 
+      [Auth_TourBookmarkView].[Name] AS [Name], 
+      [Auth_TourBookmarkView].[LapseTime] AS [LapseTime], 
+      [Auth_TourBookmarkView].[Description] AS [Description], 
+      [Auth_TourBookmarkView].[URL] AS [URL], 
+      [Auth_TourBookmarkView].[ID] AS [ID], 
+      [Auth_TourBookmarkView].[Bookmark_IsDeleted] AS [Bookmark_IsDeleted], 
+      [Auth_TourBookmarkView].[TourBookmark_IsDeleted] AS [TourBookmark_IsDeleted], 
+      [Auth_TourBookmarkView].[TourID] AS [TourID], 
+      [Auth_TourBookmarkView].[CurrVersion] AS [CurrVersion]
+      FROM [dbo].[Auth_TourBookmarkView] AS [Auth_TourBookmarkView]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="Auth_TourView" EntityType="ChronozoomModel.Store.Auth_TourView" store:Type="Views" store:Schema="dbo" store:Name="Auth_TourView">
+            <DefiningQuery>SELECT 
+      [Auth_TourView].[ID] AS [ID], 
+      [Auth_TourView].[Name] AS [Name], 
+      [Auth_TourView].[CreatedBy] AS [CreatedBy], 
+      [Auth_TourView].[ModifiedBy] AS [ModifiedBy], 
+      [Auth_TourView].[CreatedOn] AS [CreatedOn], 
+      [Auth_TourView].[ModifiedOn] AS [ModifiedOn], 
+      [Auth_TourView].[IsDeleted] AS [IsDeleted], 
+      [Auth_TourView].[UniqueID] AS [UniqueID], 
+      [Auth_TourView].[AudioBlobUrl] AS [AudioBlobUrl], 
+      [Auth_TourView].[Category] AS [Category], 
+      [Auth_TourView].[Sequence] AS [Sequence], 
+      [Auth_TourView].[CurrVersion] AS [CurrVersion], 
+      [Auth_TourView].[IsVisible] AS [IsVisible]
+      FROM [dbo].[Auth_TourView] AS [Auth_TourView]</DefiningQuery>
+          </EntitySet>
+        </EntityContainer>
+        <EntityType Name="Prod_BibliographyView">
+          <Key>
+            <PropertyRef Name="BibliographyView" />
+          </Key>
+          <Property Name="ExhibitID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="IsDeleted" Type="bit" />
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="Authors" Type="nvarchar" Nullable="false" MaxLength="500" />
+          <Property Name="BookChapters" Type="nvarchar" Nullable="false" MaxLength="300" />
+          <Property Name="CitationType" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="PageNumbers" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="Publication" Type="nvarchar" Nullable="false" MaxLength="300" />
+          <Property Name="PublicationDates" Type="nvarchar" Nullable="false" MaxLength="300" />
+          <Property Name="Source" Type="nvarchar" Nullable="false" MaxLength="200" />
+          <Property Name="CurrVersion" Type="int" />
+          <Property Name="IncludeInVersion" Type="int" />
+          <Property Name="BibliographyView" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Prod_ContentItemView">
+          <Key>
+            <PropertyRef Name="ContentItemViewID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="200" />
+          <Property Name="Caption" Type="nvarchar" Nullable="false" MaxLength="1000" />
+          <Property Name="Topic" Type="nvarchar" Nullable="false" MaxLength="200" />
+          <Property Name="MediaTypeID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ThresholdID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="RegimeID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="MediaBlobURL" Type="nvarchar" Nullable="false" MaxLength="500" />
+          <Property Name="TimeUnitID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ContentDate" Type="datetimeoffset" />
+          <Property Name="ContentYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="MediaSource" Type="nvarchar" MaxLength="300" />
+          <Property Name="Attribution" Type="nvarchar" MaxLength="200" />
+          <Property Name="LicenseTypeID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="CreatedOn" Type="smalldatetime" />
+          <Property Name="CreatedBy" Type="uniqueidentifier" />
+          <Property Name="ModifiedOn" Type="smalldatetime" />
+          <Property Name="ModifiedBy" Type="uniqueidentifier" />
+          <Property Name="IsVisible" Type="bit" />
+          <Property Name="IsDeleted" Type="bit" />
+          <Property Name="UniqueID" Type="int" Nullable="false" />
+          <Property Name="CurrVersion" Type="int" />
+          <Property Name="Version_ContentItemID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="IncludeInVersion" Type="int" />
+          <Property Name="ContentItemViewID" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Prod_ExhibitContentItemInfo">
+          <Key>
+            <PropertyRef Name="ExhibitContentItemInfoID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ExhibitID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="200" />
+          <Property Name="Caption" Type="nvarchar" Nullable="false" MaxLength="1000" />
+          <Property Name="Threshold" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="Regime" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="TimeUnit" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="ContentDate" Type="datetimeoffset" />
+          <Property Name="ContentYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="MediaType" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="MediaBlobURL" Type="nvarchar" Nullable="false" MaxLength="500" />
+          <Property Name="MediaSource" Type="nvarchar" MaxLength="300" />
+          <Property Name="Attribution" Type="nvarchar" MaxLength="200" />
+          <Property Name="UniqueID" Type="int" Nullable="false" />
+          <Property Name="Order" Type="smallint" />
+          <Property Name="HasBibliography" Type="bit" />
+          <Property Name="CurrVersion" Type="int" />
+          <Property Name="IncludeInVersion" Type="int" />
+          <Property Name="ExhibitContentItemInfoID" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Prod_ExhibitInfo">
+          <Key>
+            <PropertyRef Name="Prod_ExhibitInfoID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="TimelineID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="Threshold" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="Regime" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="TimeUnit" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="ContentDate" Type="datetimeoffset" />
+          <Property Name="ContentYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="UniqueID" Type="int" Nullable="false" />
+          <Property Name="Sequence" Type="int" />
+          <Property Name="CurrVersion" Type="int" />
+          <Property Name="IncludeInVersion" Type="int" />
+          <Property Name="Prod_ExhibitInfoID" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Prod_ExhibitReferenceInfo">
+          <Key>
+            <PropertyRef Name="Prod_ExhibitReferenceInfoID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ExhibitID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="Authors" Type="nvarchar" Nullable="false" MaxLength="500" />
+          <Property Name="BookChapters" Type="nvarchar" MaxLength="300" />
+          <Property Name="CitationType" Type="nvarchar" MaxLength="50" />
+          <Property Name="PageNumbers" Type="nvarchar" MaxLength="100" />
+          <Property Name="Publication" Type="nvarchar" MaxLength="300" />
+          <Property Name="PublicationDates" Type="nvarchar" MaxLength="300" />
+          <Property Name="Source" Type="nvarchar" Nullable="false" MaxLength="200" />
+          <Property Name="CurrVersion" Type="int" />
+          <Property Name="IncludeInVersion" Type="int" />
+          <Property Name="Prod_ExhibitReferenceInfoID" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Prod_ExhibitView">
+          <Key>
+            <PropertyRef Name="ExhibitViewID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="ThresholdID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="RegimeID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ContentDate" Type="datetimeoffset" />
+          <Property Name="ContentYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="CreatedOn" Type="smalldatetime" />
+          <Property Name="CreatedBy" Type="uniqueidentifier" />
+          <Property Name="ModifiedOn" Type="smalldatetime" />
+          <Property Name="ModifiedBy" Type="uniqueidentifier" />
+          <Property Name="IsVisible" Type="bit" />
+          <Property Name="IsDeleted" Type="bit" />
+          <Property Name="TimeUnitID" Type="uniqueidentifier" />
+          <Property Name="UniqueID" Type="int" Nullable="false" />
+          <Property Name="Sequence" Type="int" />
+          <Property Name="CurrVersion" Type="int" />
+          <Property Name="Version_ExhibitID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="IncludeInVersion" Type="int" />
+          <Property Name="ExhibitViewID" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Prod_ThresholdView">
+          <Key>
+            <PropertyRef Name="ThresholdViewID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Threshold" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="IsDeleted" Type="bit" />
+          <Property Name="Timeunit" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="ThresholdDate" Type="datetimeoffset" />
+          <Property Name="ThresholdYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="ShortDescription" Type="nvarchar" MaxLength="200" />
+          <Property Name="URL" Type="nvarchar" Nullable="false" MaxLength="300" />
+          <Property Name="CurrVersion" Type="int" />
+          <Property Name="IncludeInVersion" Type="int" />
+          <Property Name="ThresholdViewID" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Prod_TimelineInfo">
+          <Key>
+            <PropertyRef Name="TimelineInfoID" />
+          </Key>
+          <Property Name="TimelineID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="Threshold" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="Regime" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="FromTimeUnit" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="FromContentDate" Type="datetimeoffset" />
+          <Property Name="FromContentYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="ToTimeUnit" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="ToContentDate" Type="datetimeoffset" />
+          <Property Name="ToContentYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="TimelineUniqueID" Type="int" Nullable="false" />
+          <Property Name="TimelineSequence" Type="int" />
+          <Property Name="Height" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="ParentTimelineID" Type="uniqueidentifier" />
+          <Property Name="HasChildren" Type="int" />
+          <Property Name="CurrVersion" Type="int" />
+          <Property Name="IncludeInVersion" Type="int" />
+          <Property Name="TimelineInfoID" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Prod_TimelineView">
+          <Key>
+            <PropertyRef Name="TimelineView" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="ThresholdID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="RegimeID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="FromContentDate" Type="datetimeoffset" />
+          <Property Name="FromContentYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="ToContentDate" Type="datetimeoffset" />
+          <Property Name="ToContentYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="ParentTimelineID" Type="uniqueidentifier" />
+          <Property Name="CreatedOn" Type="smalldatetime" />
+          <Property Name="CreatedBy" Type="uniqueidentifier" />
+          <Property Name="ModifiedOn" Type="smalldatetime" />
+          <Property Name="ModifiedBy" Type="uniqueidentifier" />
+          <Property Name="IsVisible" Type="bit" />
+          <Property Name="IsDeleted" Type="bit" />
+          <Property Name="FromTimeUnit" Type="uniqueidentifier" />
+          <Property Name="ToTimeUnit" Type="uniqueidentifier" />
+          <Property Name="SourceURL" Type="nvarchar" MaxLength="500" />
+          <Property Name="Attribution" Type="nvarchar" MaxLength="500" />
+          <Property Name="UniqueID" Type="int" Nullable="false" />
+          <Property Name="Sequence" Type="int" />
+          <Property Name="Height" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="CurrVersion" Type="int" />
+          <Property Name="Version_TimelineID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="IncludeInVersion" Type="int" />
+          <Property Name="TimelineView" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Prod_TourBookmarkView">
+          <Key>
+            <PropertyRef Name="TourBookmarkViewID" />
+          </Key>
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="LapseTime" Type="int" />
+          <Property Name="Description" Type="nvarchar" MaxLength="300" />
+          <Property Name="URL" Type="nvarchar" Nullable="false" MaxLength="300" />
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Bookmark_IsDeleted" Type="bit" />
+          <Property Name="TourBookmark_IsDeleted" Type="bit" />
+          <Property Name="TourID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="CurrVersion" Type="int" />
+          <Property Name="IncludeInVersion" Type="int" />
+          <Property Name="TourBookmarkViewID" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Prod_TourView">
+          <Key>
+            <PropertyRef Name="TourViewID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="CreatedBy" Type="uniqueidentifier" />
+          <Property Name="ModifiedBy" Type="uniqueidentifier" />
+          <Property Name="CreatedOn" Type="smalldatetime" />
+          <Property Name="ModifiedOn" Type="smalldatetime" />
+          <Property Name="IsDeleted" Type="bit" />
+          <Property Name="UniqueID" Type="int" Nullable="false" />
+          <Property Name="AudioBlobUrl" Type="nvarchar" MaxLength="300" />
+          <Property Name="Category" Type="nvarchar" MaxLength="100" />
+          <Property Name="Sequence" Type="int" />
+          <Property Name="CurrVersion" Type="int" />
+          <Property Name="Version_TourID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="IncludeInVersion" Type="int" />
+          <Property Name="TourViewID" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Staging_BibliographyView">
+          <Key>
+            <PropertyRef Name="BibliographyView" />
+          </Key>
+          <Property Name="ExhibitID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="IsDeleted" Type="bit" />
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="Authors" Type="nvarchar" Nullable="false" MaxLength="500" />
+          <Property Name="BookChapters" Type="nvarchar" Nullable="false" MaxLength="300" />
+          <Property Name="CitationType" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="PageNumbers" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="Publication" Type="nvarchar" Nullable="false" MaxLength="300" />
+          <Property Name="PublicationDates" Type="nvarchar" Nullable="false" MaxLength="300" />
+          <Property Name="Source" Type="nvarchar" Nullable="false" MaxLength="200" />
+          <Property Name="CurrVersion" Type="int" />
+          <Property Name="IncludeInVersion" Type="int" />
+          <Property Name="BibliographyView" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Staging_ContentItemView">
+          <Key>
+            <PropertyRef Name="ContentItemViewID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="200" />
+          <Property Name="Caption" Type="nvarchar" Nullable="false" MaxLength="1000" />
+          <Property Name="Topic" Type="nvarchar" Nullable="false" MaxLength="200" />
+          <Property Name="MediaTypeID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ThresholdID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="RegimeID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="MediaBlobURL" Type="nvarchar" Nullable="false" MaxLength="500" />
+          <Property Name="TimeUnitID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ContentDate" Type="datetimeoffset" />
+          <Property Name="ContentYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="MediaSource" Type="nvarchar" MaxLength="300" />
+          <Property Name="Attribution" Type="nvarchar" MaxLength="200" />
+          <Property Name="LicenseTypeID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="CreatedOn" Type="smalldatetime" />
+          <Property Name="CreatedBy" Type="uniqueidentifier" />
+          <Property Name="ModifiedOn" Type="smalldatetime" />
+          <Property Name="ModifiedBy" Type="uniqueidentifier" />
+          <Property Name="IsVisible" Type="bit" />
+          <Property Name="IsDeleted" Type="bit" />
+          <Property Name="UniqueID" Type="int" Nullable="false" />
+          <Property Name="CurrVersion" Type="int" />
+          <Property Name="Version_ContentItemID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="IncludeInVersion" Type="int" />
+          <Property Name="ContentItemViewID" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Staging_ExhibitContentItemInfo">
+          <Key>
+            <PropertyRef Name="ExhibitContentItemInfoID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ExhibitID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="200" />
+          <Property Name="Caption" Type="nvarchar" Nullable="false" MaxLength="1000" />
+          <Property Name="Threshold" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="Regime" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="TimeUnit" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="ContentDate" Type="datetimeoffset" />
+          <Property Name="ContentYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="MediaType" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="MediaBlobURL" Type="nvarchar" Nullable="false" MaxLength="500" />
+          <Property Name="MediaSource" Type="nvarchar" MaxLength="300" />
+          <Property Name="Attribution" Type="nvarchar" MaxLength="200" />
+          <Property Name="UniqueID" Type="int" Nullable="false" />
+          <Property Name="Order" Type="smallint" />
+          <Property Name="HasBibliography" Type="bit" />
+          <Property Name="CurrVersion" Type="int" />
+          <Property Name="IncludeInVersion" Type="int" />
+          <Property Name="ExhibitContentItemInfoID" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Staging_ExhibitInfo">
+          <Key>
+            <PropertyRef Name="ExhibitInfoID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="TimelineID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="Threshold" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="Regime" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="TimeUnit" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="ContentDate" Type="datetimeoffset" />
+          <Property Name="ContentYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="UniqueID" Type="int" Nullable="false" />
+          <Property Name="Sequence" Type="int" />
+          <Property Name="CurrVersion" Type="int" />
+          <Property Name="IncludeInVersion" Type="int" />
+          <Property Name="ExhibitInfoID" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Staging_ExhibitReferenceInfo">
+          <Key>
+            <PropertyRef Name="ExhibitReferenceInfoID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ExhibitID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="Authors" Type="nvarchar" Nullable="false" MaxLength="500" />
+          <Property Name="BookChapters" Type="nvarchar" MaxLength="300" />
+          <Property Name="CitationType" Type="nvarchar" MaxLength="50" />
+          <Property Name="PageNumbers" Type="nvarchar" MaxLength="100" />
+          <Property Name="Publication" Type="nvarchar" MaxLength="300" />
+          <Property Name="PublicationDates" Type="nvarchar" MaxLength="300" />
+          <Property Name="Source" Type="nvarchar" Nullable="false" MaxLength="200" />
+          <Property Name="CurrVersion" Type="int" />
+          <Property Name="IncludeInVersion" Type="int" />
+          <Property Name="ExhibitReferenceInfoID" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Staging_ExhibitView">
+          <Key>
+            <PropertyRef Name="ExhibitViewID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="ThresholdID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="RegimeID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ContentDate" Type="datetimeoffset" />
+          <Property Name="ContentYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="CreatedOn" Type="smalldatetime" />
+          <Property Name="CreatedBy" Type="uniqueidentifier" />
+          <Property Name="ModifiedOn" Type="smalldatetime" />
+          <Property Name="ModifiedBy" Type="uniqueidentifier" />
+          <Property Name="IsVisible" Type="bit" />
+          <Property Name="IsDeleted" Type="bit" />
+          <Property Name="TimeUnitID" Type="uniqueidentifier" />
+          <Property Name="UniqueID" Type="int" Nullable="false" />
+          <Property Name="Sequence" Type="int" />
+          <Property Name="CurrVersion" Type="int" />
+          <Property Name="Version_ExhibitID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="IncludeInVersion" Type="int" />
+          <Property Name="ExhibitViewID" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Staging_ThresholdView">
+          <Key>
+            <PropertyRef Name="ThresholdViewID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Threshold" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="IsDeleted" Type="bit" />
+          <Property Name="Timeunit" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="ThresholdDate" Type="datetimeoffset" />
+          <Property Name="ThresholdYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="ShortDescription" Type="nvarchar" MaxLength="200" />
+          <Property Name="URL" Type="nvarchar" Nullable="false" MaxLength="300" />
+          <Property Name="CurrVersion" Type="int" />
+          <Property Name="IncludeInVersion" Type="int" />
+          <Property Name="ThresholdViewID" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Staging_TimelineInfo">
+          <Key>
+            <PropertyRef Name="TimelineInfoID" />
+          </Key>
+          <Property Name="TimelineID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="Threshold" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="Regime" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="FromTimeUnit" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="FromContentDate" Type="datetimeoffset" />
+          <Property Name="FromContentYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="ToTimeUnit" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="ToContentDate" Type="datetimeoffset" />
+          <Property Name="ToContentYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="TimelineUniqueID" Type="int" Nullable="false" />
+          <Property Name="TimelineSequence" Type="int" />
+          <Property Name="Height" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="ParentTimelineID" Type="uniqueidentifier" />
+          <Property Name="HasChildren" Type="int" />
+          <Property Name="CurrVersion" Type="int" />
+          <Property Name="IncludeInVersion" Type="int" />
+          <Property Name="TimelineInfoID" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Staging_TimelineView">
+          <Key>
+            <PropertyRef Name="TimelineView" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="ThresholdID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="RegimeID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="FromContentDate" Type="datetimeoffset" />
+          <Property Name="FromContentYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="ToContentDate" Type="datetimeoffset" />
+          <Property Name="ToContentYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="ParentTimelineID" Type="uniqueidentifier" />
+          <Property Name="CreatedOn" Type="smalldatetime" />
+          <Property Name="CreatedBy" Type="uniqueidentifier" />
+          <Property Name="ModifiedOn" Type="smalldatetime" />
+          <Property Name="ModifiedBy" Type="uniqueidentifier" />
+          <Property Name="IsVisible" Type="bit" />
+          <Property Name="IsDeleted" Type="bit" />
+          <Property Name="FromTimeUnit" Type="uniqueidentifier" />
+          <Property Name="ToTimeUnit" Type="uniqueidentifier" />
+          <Property Name="SourceURL" Type="nvarchar" MaxLength="500" />
+          <Property Name="Attribution" Type="nvarchar" MaxLength="500" />
+          <Property Name="UniqueID" Type="int" Nullable="false" />
+          <Property Name="Sequence" Type="int" />
+          <Property Name="Height" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="CurrVersion" Type="int" />
+          <Property Name="Version_TimelineID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="IncludeInVersion" Type="int" />
+          <Property Name="TimelineView" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Staging_TourBookmarkView">
+          <Key>
+            <PropertyRef Name="TourBookmarkViewID" />
+          </Key>
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="LapseTime" Type="int" />
+          <Property Name="Description" Type="nvarchar" MaxLength="300" />
+          <Property Name="URL" Type="nvarchar" Nullable="false" MaxLength="300" />
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Bookmark_IsDeleted" Type="bit" />
+          <Property Name="TourBookmark_IsDeleted" Type="bit" />
+          <Property Name="TourID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="CurrVersion" Type="int" />
+          <Property Name="IncludeInVersion" Type="int" />
+          <Property Name="TourBookmarkViewID" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Staging_TourView">
+          <Key>
+            <PropertyRef Name="TourViewID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="CreatedBy" Type="uniqueidentifier" />
+          <Property Name="ModifiedBy" Type="uniqueidentifier" />
+          <Property Name="CreatedOn" Type="smalldatetime" />
+          <Property Name="ModifiedOn" Type="smalldatetime" />
+          <Property Name="IsDeleted" Type="bit" />
+          <Property Name="UniqueID" Type="int" Nullable="false" />
+          <Property Name="AudioBlobUrl" Type="nvarchar" MaxLength="300" />
+          <Property Name="Category" Type="nvarchar" MaxLength="100" />
+          <Property Name="Sequence" Type="int" />
+          <Property Name="CurrVersion" Type="int" />
+          <Property Name="Version_TourID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="IncludeInVersion" Type="int" />
+          <Property Name="TourViewID" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+      warning 6002: The table/view 'Chronozoom.dbo.Auth_BibliographyView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+        <EntityType Name="Auth_BibliographyView">
+          <Key>
+            <PropertyRef Name="ExhibitID" />
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="Title" />
+            <PropertyRef Name="Authors" />
+            <PropertyRef Name="CitationType" />
+            <PropertyRef Name="Source" />
+          </Key>
+          <Property Name="ExhibitID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="IsDeleted" Type="bit" />
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="Authors" Type="nvarchar" Nullable="false" MaxLength="500" />
+          <Property Name="BookChapters" Type="nvarchar" MaxLength="300" />
+          <Property Name="CitationType" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="PageNumbers" Type="nvarchar" MaxLength="100" />
+          <Property Name="Publication" Type="nvarchar" MaxLength="300" />
+          <Property Name="PublicationDates" Type="nvarchar" MaxLength="300" />
+          <Property Name="Source" Type="nvarchar" Nullable="false" MaxLength="200" />
+          <Property Name="CurrVersion" Type="int" />
+        </EntityType>
+        <!--Errors Found During Generation:
+      warning 6002: The table/view 'Chronozoom.dbo.Auth_ContentItemsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+        <EntityType Name="Auth_ContentItemsView">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="Title" />
+            <PropertyRef Name="Caption" />
+            <PropertyRef Name="Topic" />
+            <PropertyRef Name="MediaTypeID" />
+            <PropertyRef Name="ThresholdID" />
+            <PropertyRef Name="RegimeID" />
+            <PropertyRef Name="MediaBlobURL" />
+            <PropertyRef Name="TimeUnitID" />
+            <PropertyRef Name="LicenseTypeID" />
+            <PropertyRef Name="UniqueID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="200" />
+          <Property Name="Caption" Type="nvarchar" Nullable="false" MaxLength="1000" />
+          <Property Name="Topic" Type="nvarchar" Nullable="false" MaxLength="200" />
+          <Property Name="MediaTypeID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ThresholdID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="RegimeID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="MediaBlobURL" Type="nvarchar" Nullable="false" MaxLength="500" />
+          <Property Name="TimeUnitID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ContentDate" Type="datetimeoffset" />
+          <Property Name="ContentYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="MediaSource" Type="nvarchar" MaxLength="300" />
+          <Property Name="Attribution" Type="nvarchar" MaxLength="200" />
+          <Property Name="LicenseTypeID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="CreatedOn" Type="smalldatetime" />
+          <Property Name="CreatedBy" Type="uniqueidentifier" />
+          <Property Name="ModifiedOn" Type="smalldatetime" />
+          <Property Name="ModifiedBy" Type="uniqueidentifier" />
+          <Property Name="IsVisible" Type="bit" />
+          <Property Name="IsDeleted" Type="bit" />
+          <Property Name="UniqueID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="CurrVersion" Type="int" />
+        </EntityType>
+        <!--Errors Found During Generation:
+      warning 6002: The table/view 'Chronozoom.dbo.Auth_ExhibitContentItemInfoView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+        <EntityType Name="Auth_ExhibitContentItemInfoView">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="ExhibitID" />
+            <PropertyRef Name="Title" />
+            <PropertyRef Name="Caption" />
+            <PropertyRef Name="Threshold" />
+            <PropertyRef Name="Regime" />
+            <PropertyRef Name="TimeUnit" />
+            <PropertyRef Name="MediaType" />
+            <PropertyRef Name="MediaBlobURL" />
+            <PropertyRef Name="UniqueID" />
+            <PropertyRef Name="HasBibliography" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ExhibitID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="200" />
+          <Property Name="Caption" Type="nvarchar" Nullable="false" MaxLength="1000" />
+          <Property Name="Threshold" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="Regime" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="TimeUnit" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="ContentDate" Type="datetimeoffset" />
+          <Property Name="ContentYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="MediaType" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="MediaBlobURL" Type="nvarchar" Nullable="false" MaxLength="500" />
+          <Property Name="MediaSource" Type="nvarchar" MaxLength="300" />
+          <Property Name="Attribution" Type="nvarchar" MaxLength="200" />
+          <Property Name="UniqueID" Type="int" Nullable="false" />
+          <Property Name="Order" Type="smallint" />
+          <Property Name="HasBibliography" Type="int" Nullable="false" />
+          <Property Name="CurrVersion" Type="int" />
+        </EntityType>
+        <!--Errors Found During Generation:
+      warning 6002: The table/view 'Chronozoom.dbo.Auth_ExhibitInfoView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+        <EntityType Name="Auth_ExhibitInfoView">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="TimelineID" />
+            <PropertyRef Name="Title" />
+            <PropertyRef Name="Threshold" />
+            <PropertyRef Name="Regime" />
+            <PropertyRef Name="TimeUnit" />
+            <PropertyRef Name="UniqueID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="TimelineID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="Threshold" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="Regime" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="TimeUnit" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="ContentDate" Type="datetimeoffset" />
+          <Property Name="ContentYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="UniqueID" Type="int" Nullable="false" />
+          <Property Name="Sequence" Type="int" />
+          <Property Name="CurrVersion" Type="int" />
+        </EntityType>
+        <!--Errors Found During Generation:
+      warning 6002: The table/view 'Chronozoom.dbo.Auth_ExhibitReferenceInfoView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+        <EntityType Name="Auth_ExhibitReferenceInfoView">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="ExhibitID" />
+            <PropertyRef Name="Title" />
+            <PropertyRef Name="Authors" />
+            <PropertyRef Name="CitationType" />
+            <PropertyRef Name="Source" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ExhibitID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="Authors" Type="nvarchar" Nullable="false" MaxLength="500" />
+          <Property Name="BookChapters" Type="nvarchar" MaxLength="300" />
+          <Property Name="CitationType" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="PageNumbers" Type="nvarchar" MaxLength="100" />
+          <Property Name="Publication" Type="nvarchar" MaxLength="300" />
+          <Property Name="PublicationDates" Type="nvarchar" MaxLength="300" />
+          <Property Name="Source" Type="nvarchar" Nullable="false" MaxLength="200" />
+          <Property Name="CurrVersion" Type="int" />
+        </EntityType>
+        <!--Errors Found During Generation:
+      warning 6002: The table/view 'Chronozoom.dbo.Auth_ExhibitView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+        <EntityType Name="Auth_ExhibitView">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="Title" />
+            <PropertyRef Name="ThresholdID" />
+            <PropertyRef Name="RegimeID" />
+            <PropertyRef Name="UniqueID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="ThresholdID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="RegimeID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ContentDate" Type="datetimeoffset" />
+          <Property Name="ContentYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="CreatedOn" Type="smalldatetime" />
+          <Property Name="CreatedBy" Type="uniqueidentifier" />
+          <Property Name="ModifiedOn" Type="smalldatetime" />
+          <Property Name="ModifiedBy" Type="uniqueidentifier" />
+          <Property Name="IsVisible" Type="bit" />
+          <Property Name="IsDeleted" Type="bit" />
+          <Property Name="TimeUnitID" Type="uniqueidentifier" />
+          <Property Name="UniqueID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Sequence" Type="int" />
+          <Property Name="CurrVersion" Type="int" />
+        </EntityType>
+        <!--Errors Found During Generation:
+      warning 6002: The table/view 'Chronozoom.dbo.Auth_ThresholdView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+        <EntityType Name="Auth_ThresholdView">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="Threshold" />
+            <PropertyRef Name="Timeunit" />
+            <PropertyRef Name="URL" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Threshold" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="IsDeleted" Type="bit" />
+          <Property Name="Timeunit" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="ThresholdDate" Type="datetimeoffset" />
+          <Property Name="ThresholdYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="ShortDescription" Type="nvarchar" MaxLength="200" />
+          <Property Name="URL" Type="nvarchar" Nullable="false" MaxLength="300" />
+          <Property Name="CurrVersion" Type="int" />
+        </EntityType>
+        <!--Errors Found During Generation:
+      warning 6002: The table/view 'Chronozoom.dbo.Auth_TimelineInfoView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+        <EntityType Name="Auth_TimelineInfoView">
+          <Key>
+            <PropertyRef Name="TimelineID" />
+            <PropertyRef Name="Title" />
+            <PropertyRef Name="Threshold" />
+            <PropertyRef Name="Regime" />
+            <PropertyRef Name="FromTimeUnit" />
+            <PropertyRef Name="ToTimeUnit" />
+            <PropertyRef Name="TimelineUniqueID" />
+          </Key>
+          <Property Name="TimelineID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="Threshold" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="Regime" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="FromTimeUnit" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="FromContentDate" Type="datetimeoffset" />
+          <Property Name="FromContentYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="ToTimeUnit" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="ToContentDate" Type="datetimeoffset" />
+          <Property Name="ToContentYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="TimelineUniqueID" Type="int" Nullable="false" />
+          <Property Name="TimelineSequence" Type="int" />
+          <Property Name="Height" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="ParentTimelineID" Type="uniqueidentifier" />
+          <Property Name="HasChildren" Type="int" />
+          <Property Name="CurrVersion" Type="int" />
+        </EntityType>
+        <!--Errors Found During Generation:
+      warning 6002: The table/view 'Chronozoom.dbo.Auth_TimelineView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+        <EntityType Name="Auth_TimelineView">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="Title" />
+            <PropertyRef Name="ThresholdID" />
+            <PropertyRef Name="RegimeID" />
+            <PropertyRef Name="UniqueID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="ThresholdID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="RegimeID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="FromContentDate" Type="datetimeoffset" />
+          <Property Name="FromContentYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="ToContentDate" Type="datetimeoffset" />
+          <Property Name="ToContentYear" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="ParentTimelineID" Type="uniqueidentifier" />
+          <Property Name="CreatedOn" Type="smalldatetime" />
+          <Property Name="CreatedBy" Type="uniqueidentifier" />
+          <Property Name="ModifiedOn" Type="smalldatetime" />
+          <Property Name="ModifiedBy" Type="uniqueidentifier" />
+          <Property Name="IsVisible" Type="bit" />
+          <Property Name="IsDeleted" Type="bit" />
+          <Property Name="FromTimeUnit" Type="uniqueidentifier" />
+          <Property Name="ToTimeUnit" Type="uniqueidentifier" />
+          <Property Name="SourceURL" Type="nvarchar" MaxLength="500" />
+          <Property Name="Attribution" Type="nvarchar" MaxLength="500" />
+          <Property Name="UniqueID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Sequence" Type="int" />
+          <Property Name="Height" Type="decimal" Precision="8" Scale="4" />
+          <Property Name="CurrVersion" Type="int" />
+        </EntityType>
+        <!--Errors Found During Generation:
+      warning 6002: The table/view 'Chronozoom.dbo.Auth_TourBookmarkView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+        <EntityType Name="Auth_TourBookmarkView">
+          <Key>
+            <PropertyRef Name="Name" />
+            <PropertyRef Name="URL" />
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="TourID" />
+          </Key>
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="LapseTime" Type="int" />
+          <Property Name="Description" Type="nvarchar" MaxLength="300" />
+          <Property Name="URL" Type="nvarchar" Nullable="false" MaxLength="300" />
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Bookmark_IsDeleted" Type="bit" />
+          <Property Name="TourBookmark_IsDeleted" Type="bit" />
+          <Property Name="TourID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="CurrVersion" Type="int" />
+        </EntityType>
+        <!--Errors Found During Generation:
+      warning 6002: The table/view 'Chronozoom.dbo.Auth_TourView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+        <EntityType Name="Auth_TourView">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="Name" />
+            <PropertyRef Name="UniqueID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="CreatedBy" Type="uniqueidentifier" />
+          <Property Name="ModifiedBy" Type="uniqueidentifier" />
+          <Property Name="CreatedOn" Type="smalldatetime" />
+          <Property Name="ModifiedOn" Type="smalldatetime" />
+          <Property Name="IsDeleted" Type="bit" />
+          <Property Name="UniqueID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="AudioBlobUrl" Type="nvarchar" MaxLength="300" />
+          <Property Name="Category" Type="nvarchar" MaxLength="100" />
+          <Property Name="Sequence" Type="int" />
+          <Property Name="CurrVersion" Type="int" />
+          <Property Name="IsVisible" Type="bit" />
+        </EntityType>
+        <Function Name="spGetVisibleTimelines" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="spGetVisibleTimelinesForSearch" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="environment" Type="int" Mode="In" />
+        </Function>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="ChronoZoomModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityContainer Name="ChronoZoomEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Prod_BibliographyView" EntityType="ChronoZoomModel.Prod_BibliographyView" />
+          <EntitySet Name="Prod_ContentItemView" EntityType="ChronoZoomModel.Prod_ContentItemView" />
+          <EntitySet Name="Prod_ExhibitContentItemInfo" EntityType="ChronoZoomModel.Prod_ExhibitContentItemInfo" />
+          <EntitySet Name="Prod_ExhibitInfo" EntityType="ChronoZoomModel.Prod_ExhibitInfo" />
+          <EntitySet Name="Prod_ExhibitReferenceInfo" EntityType="ChronoZoomModel.Prod_ExhibitReferenceInfo" />
+          <EntitySet Name="Prod_ExhibitView" EntityType="ChronoZoomModel.Prod_ExhibitView" />
+          <EntitySet Name="Prod_ThresholdView" EntityType="ChronoZoomModel.Prod_ThresholdView" />
+          <EntitySet Name="Prod_TimelineInfo" EntityType="ChronoZoomModel.Prod_TimelineInfo" />
+          <EntitySet Name="Prod_TimelineView" EntityType="ChronoZoomModel.Prod_TimelineView" />
+          <EntitySet Name="Prod_TourBookmarkView" EntityType="ChronoZoomModel.Prod_TourBookmarkView" />
+          <EntitySet Name="Prod_TourView" EntityType="ChronoZoomModel.Prod_TourView" />
+          <EntitySet Name="Staging_BibliographyView" EntityType="ChronoZoomModel.Staging_BibliographyView" />
+          <EntitySet Name="Staging_ContentItemView" EntityType="ChronoZoomModel.Staging_ContentItemView" />
+          <EntitySet Name="Staging_ExhibitContentItemInfo" EntityType="ChronoZoomModel.Staging_ExhibitContentItemInfo" />
+          <EntitySet Name="Staging_ExhibitInfo" EntityType="ChronoZoomModel.Staging_ExhibitInfo" />
+          <EntitySet Name="Staging_ExhibitReferenceInfo" EntityType="ChronoZoomModel.Staging_ExhibitReferenceInfo" />
+          <EntitySet Name="Staging_ExhibitView" EntityType="ChronoZoomModel.Staging_ExhibitView" />
+          <EntitySet Name="Staging_ThresholdView" EntityType="ChronoZoomModel.Staging_ThresholdView" />
+          <EntitySet Name="Staging_TimelineInfo" EntityType="ChronoZoomModel.Staging_TimelineInfo" />
+          <EntitySet Name="Staging_TimelineView" EntityType="ChronoZoomModel.Staging_TimelineView" />
+          <EntitySet Name="Staging_TourBookmarkView" EntityType="ChronoZoomModel.Staging_TourBookmarkView" />
+          <EntitySet Name="Staging_TourView" EntityType="ChronoZoomModel.Staging_TourView" />
+          <EntitySet Name="Auth_BibliographyView" EntityType="ChronoZoomModel.Auth_BibliographyView" />
+          <EntitySet Name="Auth_ContentItemsView" EntityType="ChronoZoomModel.Auth_ContentItemsView" />
+          <EntitySet Name="Auth_ExhibitContentItemInfoView" EntityType="ChronoZoomModel.Auth_ExhibitContentItemInfoView" />
+          <EntitySet Name="Auth_ExhibitInfoView" EntityType="ChronoZoomModel.Auth_ExhibitInfoView" />
+          <EntitySet Name="Auth_ExhibitReferenceInfoView" EntityType="ChronoZoomModel.Auth_ExhibitReferenceInfoView" />
+          <EntitySet Name="Auth_ExhibitView" EntityType="ChronoZoomModel.Auth_ExhibitView" />
+          <EntitySet Name="Auth_ThresholdView" EntityType="ChronoZoomModel.Auth_ThresholdView" />
+          <EntitySet Name="Auth_TimelineInfoView" EntityType="ChronoZoomModel.Auth_TimelineInfoView" />
+          <EntitySet Name="Auth_TimelineView" EntityType="ChronoZoomModel.Auth_TimelineView" />
+          <EntitySet Name="Auth_TourBookmarkView" EntityType="ChronoZoomModel.Auth_TourBookmarkView" />
+          <EntitySet Name="Auth_TourView" EntityType="ChronoZoomModel.Auth_TourView" />
+          <FunctionImport Name="spGetVisibleTimelinesForSearch" ReturnType="Collection(ChronoZoomModel.TimelineInfo)">
+          <Parameter Name="environment" Mode="In" Type="Int32" />
+          </FunctionImport>
+        </EntityContainer>
+        <EntityType Name="Prod_BibliographyView">
+          <Key>
+            <PropertyRef Name="BibliographyView" />
+          </Key>
+          <Property Type="Guid" Name="ExhibitID" Nullable="false" />
+          <Property Type="Boolean" Name="IsDeleted" />
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Authors" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="BookChapters" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="CitationType" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="PageNumbers" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Publication" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="PublicationDates" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Source" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="CurrVersion" />
+          <Property Type="Guid" Name="BibliographyView" Nullable="false" />
+          <Property Type="Int32" Name="IncludeInVersion" />
+        </EntityType>
+        <EntityType Name="Prod_ContentItemView">
+          <Key>
+            <PropertyRef Name="ContentItemViewID" />
+          </Key>
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Caption" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Topic" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Type="Guid" Name="MediaTypeID" Nullable="false" />
+          <Property Type="Guid" Name="ThresholdID" Nullable="false" />
+          <Property Type="Guid" Name="RegimeID" Nullable="false" />
+          <Property Type="String" Name="MediaBlobURL" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Type="Guid" Name="TimeUnitID" Nullable="false" />
+          <Property Type="DateTimeOffset" Name="ContentDate" />
+          <Property Type="Decimal" Name="ContentYear" Precision="8" Scale="4" />
+          <Property Type="String" Name="MediaSource" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Attribution" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Type="Guid" Name="LicenseTypeID" Nullable="false" />
+          <Property Type="DateTime" Name="CreatedOn" />
+          <Property Type="Guid" Name="CreatedBy" />
+          <Property Type="DateTime" Name="ModifiedOn" />
+          <Property Type="Guid" Name="ModifiedBy" />
+          <Property Type="Boolean" Name="IsVisible" />
+          <Property Type="Boolean" Name="IsDeleted" />
+          <Property Type="Int32" Name="UniqueID" Nullable="false" />
+          <Property Type="Int32" Name="CurrVersion" />
+          <Property Type="Guid" Name="Version_ContentItemID" Nullable="false" />
+          <Property Type="Guid" Name="ContentItemViewID" Nullable="false" />
+          <Property Type="Int32" Name="IncludeInVersion" />
+        </EntityType>
+        <EntityType Name="Prod_ExhibitContentItemInfo">
+          <Key>
+            <PropertyRef Name="ExhibitContentItemInfoID" />
+          </Key>
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="Guid" Name="ExhibitID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Caption" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Threshold" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Regime" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="TimeUnit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="DateTimeOffset" Name="ContentDate" />
+          <Property Type="Decimal" Name="ContentYear" Precision="8" Scale="4" />
+          <Property Type="String" Name="MediaType" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="MediaBlobURL" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="MediaSource" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Attribution" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="UniqueID" Nullable="false" />
+          <Property Type="Int16" Name="Order" />
+          <Property Type="Boolean" Name="HasBibliography" />
+          <Property Type="Int32" Name="CurrVersion" />
+          <Property Type="Guid" Name="ExhibitContentItemInfoID" Nullable="false" />
+          <Property Type="Int32" Name="IncludeInVersion" />
+        </EntityType>
+        <EntityType Name="Prod_ExhibitInfo">
+          <Key>
+            <PropertyRef Name="Prod_ExhibitInfoID" />
+          </Key>
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="Guid" Name="TimelineID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Threshold" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Regime" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="TimeUnit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="DateTimeOffset" Name="ContentDate" />
+          <Property Type="Decimal" Name="ContentYear" Precision="8" Scale="4" />
+          <Property Type="Int32" Name="UniqueID" Nullable="false" />
+          <Property Type="Int32" Name="Sequence" />
+          <Property Type="Int32" Name="CurrVersion" />
+          <Property Type="Guid" Name="Prod_ExhibitInfoID" Nullable="false" />
+          <Property Type="Int32" Name="IncludeInVersion" />
+        </EntityType>
+        <EntityType Name="Prod_ExhibitReferenceInfo">
+          <Key>
+            <PropertyRef Name="Prod_ExhibitReferenceInfoID" />
+          </Key>
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="Guid" Name="ExhibitID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Authors" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="BookChapters" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="CitationType" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="PageNumbers" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Publication" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="PublicationDates" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Source" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="CurrVersion" />
+          <Property Type="Guid" Name="Prod_ExhibitReferenceInfoID" Nullable="false" />
+          <Property Type="Int32" Name="IncludeInVersion" />
+        </EntityType>
+        <EntityType Name="Prod_ExhibitView">
+          <Key>
+            <PropertyRef Name="ExhibitViewID" />
+          </Key>
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="Guid" Name="ThresholdID" Nullable="false" />
+          <Property Type="Guid" Name="RegimeID" Nullable="false" />
+          <Property Type="DateTimeOffset" Name="ContentDate" />
+          <Property Type="Decimal" Name="ContentYear" Precision="8" Scale="4" />
+          <Property Type="DateTime" Name="CreatedOn" />
+          <Property Type="Guid" Name="CreatedBy" />
+          <Property Type="DateTime" Name="ModifiedOn" />
+          <Property Type="Guid" Name="ModifiedBy" />
+          <Property Type="Boolean" Name="IsVisible" />
+          <Property Type="Boolean" Name="IsDeleted" />
+          <Property Type="Guid" Name="TimeUnitID" />
+          <Property Type="Int32" Name="UniqueID" Nullable="false" />
+          <Property Type="Int32" Name="Sequence" />
+          <Property Type="Int32" Name="CurrVersion" />
+          <Property Type="Guid" Name="Version_ExhibitID" Nullable="false" />
+          <Property Type="Guid" Name="ExhibitViewID" Nullable="false" />
+          <Property Type="Int32" Name="IncludeInVersion" />
+        </EntityType>
+        <EntityType Name="Prod_ThresholdView">
+          <Key>
+            <PropertyRef Name="ThresholdViewID" />
+          </Key>
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Threshold" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="Boolean" Name="IsDeleted" />
+          <Property Type="String" Name="Timeunit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="DateTimeOffset" Name="ThresholdDate" />
+          <Property Type="Decimal" Name="ThresholdYear" Precision="8" Scale="4" />
+          <Property Type="String" Name="ShortDescription" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="URL" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="CurrVersion" />
+          <Property Type="Guid" Name="ThresholdViewID" Nullable="false" />
+          <Property Type="Int32" Name="IncludeInVersion" />
+        </EntityType>
+        <EntityType Name="Prod_TimelineInfo">
+          <Key>
+            <PropertyRef Name="TimelineInfoID" />
+          </Key>
+          <Property Type="Guid" Name="TimelineID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Threshold" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Regime" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="FromTimeUnit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="DateTimeOffset" Name="FromContentDate" />
+          <Property Type="Decimal" Name="FromContentYear" Precision="8" Scale="4" />
+          <Property Type="String" Name="ToTimeUnit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="DateTimeOffset" Name="ToContentDate" />
+          <Property Type="Decimal" Name="ToContentYear" Precision="8" Scale="4" />
+          <Property Type="Int32" Name="TimelineUniqueID" Nullable="false" />
+          <Property Type="Int32" Name="TimelineSequence" />
+          <Property Type="Decimal" Name="Height" Precision="8" Scale="4" />
+          <Property Type="Guid" Name="ParentTimelineID" />
+          <Property Type="Int32" Name="HasChildren" />
+          <Property Type="Int32" Name="CurrVersion" />
+          <Property Type="Guid" Name="TimelineInfoID" Nullable="false" />
+          <Property Type="Int32" Name="IncludeInVersion" />
+        </EntityType>
+        <EntityType Name="Prod_TimelineView">
+          <Key>
+            <PropertyRef Name="TimelineView" />
+          </Key>
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="Guid" Name="ThresholdID" Nullable="false" />
+          <Property Type="Guid" Name="RegimeID" Nullable="false" />
+          <Property Type="DateTimeOffset" Name="FromContentDate" />
+          <Property Type="Decimal" Name="FromContentYear" Precision="8" Scale="4" />
+          <Property Type="DateTimeOffset" Name="ToContentDate" />
+          <Property Type="Decimal" Name="ToContentYear" Precision="8" Scale="4" />
+          <Property Type="Guid" Name="ParentTimelineID" />
+          <Property Type="DateTime" Name="CreatedOn" />
+          <Property Type="Guid" Name="CreatedBy" />
+          <Property Type="DateTime" Name="ModifiedOn" />
+          <Property Type="Guid" Name="ModifiedBy" />
+          <Property Type="Boolean" Name="IsVisible" />
+          <Property Type="Boolean" Name="IsDeleted" />
+          <Property Type="Guid" Name="FromTimeUnit" />
+          <Property Type="Guid" Name="ToTimeUnit" />
+          <Property Type="String" Name="SourceURL" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Attribution" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="UniqueID" Nullable="false" />
+          <Property Type="Int32" Name="Sequence" />
+          <Property Type="Decimal" Name="Height" Precision="8" Scale="4" />
+          <Property Type="Int32" Name="CurrVersion" />
+          <Property Type="Guid" Name="Version_TimelineID" Nullable="false" />
+          <Property Type="Guid" Name="TimelineView" Nullable="false" />
+          <Property Type="Int32" Name="IncludeInVersion" />
+        </EntityType>
+        <EntityType Name="Prod_TourBookmarkView">
+          <Key>
+            <PropertyRef Name="TourBookmarkViewID" />
+          </Key>
+          <Property Type="String" Name="Name" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="LapseTime" />
+          <Property Type="String" Name="Description" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="URL" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="Boolean" Name="Bookmark_IsDeleted" />
+          <Property Type="Boolean" Name="TourBookmark_IsDeleted" />
+          <Property Type="Guid" Name="TourID" Nullable="false" />
+          <Property Type="Int32" Name="CurrVersion" />
+          <Property Type="Guid" Name="TourBookmarkViewID" Nullable="false" />
+          <Property Type="Int32" Name="IncludeInVersion" />
+        </EntityType>
+        <EntityType Name="Prod_TourView">
+          <Key>
+            <PropertyRef Name="TourViewID" />
+          </Key>
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Name" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="Guid" Name="CreatedBy" />
+          <Property Type="Guid" Name="ModifiedBy" />
+          <Property Type="DateTime" Name="CreatedOn" />
+          <Property Type="DateTime" Name="ModifiedOn" />
+          <Property Type="Boolean" Name="IsDeleted" />
+          <Property Type="Int32" Name="UniqueID" Nullable="false" />
+          <Property Type="String" Name="AudioBlobUrl" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Category" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="Sequence" />
+          <Property Type="Int32" Name="CurrVersion" />
+          <Property Type="Guid" Name="Version_TourID" Nullable="false" />
+          <Property Type="Guid" Name="TourViewID" Nullable="false" />
+          <Property Type="Int32" Name="IncludeInVersion" />
+        </EntityType>
+        <EntityType Name="Staging_BibliographyView">
+          <Key>
+            <PropertyRef Name="BibliographyView" />
+          </Key>
+          <Property Type="Guid" Name="ExhibitID" Nullable="false" />
+          <Property Type="Boolean" Name="IsDeleted" />
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Authors" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="BookChapters" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="CitationType" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="PageNumbers" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Publication" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="PublicationDates" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Source" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="CurrVersion" />
+          <Property Type="Guid" Name="BibliographyView" Nullable="false" />
+          <Property Type="Int32" Name="IncludeInVersion" />
+        </EntityType>
+        <EntityType Name="Staging_ContentItemView">
+          <Key>
+            <PropertyRef Name="ContentItemViewID" />
+          </Key>
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Caption" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Topic" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Type="Guid" Name="MediaTypeID" Nullable="false" />
+          <Property Type="Guid" Name="ThresholdID" Nullable="false" />
+          <Property Type="Guid" Name="RegimeID" Nullable="false" />
+          <Property Type="String" Name="MediaBlobURL" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Type="Guid" Name="TimeUnitID" Nullable="false" />
+          <Property Type="DateTimeOffset" Name="ContentDate" />
+          <Property Type="Decimal" Name="ContentYear" Precision="8" Scale="4" />
+          <Property Type="String" Name="MediaSource" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Attribution" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Type="Guid" Name="LicenseTypeID" Nullable="false" />
+          <Property Type="DateTime" Name="CreatedOn" />
+          <Property Type="Guid" Name="CreatedBy" />
+          <Property Type="DateTime" Name="ModifiedOn" />
+          <Property Type="Guid" Name="ModifiedBy" />
+          <Property Type="Boolean" Name="IsVisible" />
+          <Property Type="Boolean" Name="IsDeleted" />
+          <Property Type="Int32" Name="UniqueID" Nullable="false" />
+          <Property Type="Int32" Name="CurrVersion" />
+          <Property Type="Guid" Name="Version_ContentItemID" Nullable="false" />
+          <Property Type="Guid" Name="ContentItemViewID" Nullable="false" />
+          <Property Type="Int32" Name="IncludeInVersion" />
+        </EntityType>
+        <EntityType Name="Staging_ExhibitContentItemInfo">
+          <Key>
+            <PropertyRef Name="ExhibitContentItemInfoID" />
+          </Key>
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="Guid" Name="ExhibitID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Caption" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Threshold" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Regime" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="TimeUnit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="DateTimeOffset" Name="ContentDate" />
+          <Property Type="Decimal" Name="ContentYear" Precision="8" Scale="4" />
+          <Property Type="String" Name="MediaType" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="MediaBlobURL" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="MediaSource" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Attribution" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="UniqueID" Nullable="false" />
+          <Property Type="Int16" Name="Order" />
+          <Property Type="Boolean" Name="HasBibliography" />
+          <Property Type="Int32" Name="CurrVersion" />
+          <Property Type="Guid" Name="ExhibitContentItemInfoID" Nullable="false" />
+          <Property Type="Int32" Name="IncludeInVersion" />
+        </EntityType>
+        <EntityType Name="Staging_ExhibitInfo">
+          <Key>
+            <PropertyRef Name="ExhibitInfoID" />
+          </Key>
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="Guid" Name="TimelineID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Threshold" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Regime" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="TimeUnit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="DateTimeOffset" Name="ContentDate" />
+          <Property Type="Decimal" Name="ContentYear" Precision="8" Scale="4" />
+          <Property Type="Int32" Name="UniqueID" Nullable="false" />
+          <Property Type="Int32" Name="Sequence" />
+          <Property Type="Int32" Name="CurrVersion" />
+          <Property Type="Guid" Name="ExhibitInfoID" Nullable="false" />
+          <Property Type="Int32" Name="IncludeInVersion" />
+        </EntityType>
+        <EntityType Name="Staging_ExhibitReferenceInfo">
+          <Key>
+            <PropertyRef Name="ExhibitReferenceInfoID" />
+          </Key>
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="Guid" Name="ExhibitID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Authors" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="BookChapters" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="CitationType" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="PageNumbers" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Publication" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="PublicationDates" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Source" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="CurrVersion" />
+          <Property Type="Guid" Name="ExhibitReferenceInfoID" Nullable="false" />
+          <Property Type="Int32" Name="IncludeInVersion" />
+        </EntityType>
+        <EntityType Name="Staging_ExhibitView">
+          <Key>
+            <PropertyRef Name="ExhibitViewID" />
+          </Key>
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="Guid" Name="ThresholdID" Nullable="false" />
+          <Property Type="Guid" Name="RegimeID" Nullable="false" />
+          <Property Type="DateTimeOffset" Name="ContentDate" />
+          <Property Type="Decimal" Name="ContentYear" Precision="8" Scale="4" />
+          <Property Type="DateTime" Name="CreatedOn" />
+          <Property Type="Guid" Name="CreatedBy" />
+          <Property Type="DateTime" Name="ModifiedOn" />
+          <Property Type="Guid" Name="ModifiedBy" />
+          <Property Type="Boolean" Name="IsVisible" />
+          <Property Type="Boolean" Name="IsDeleted" />
+          <Property Type="Guid" Name="TimeUnitID" />
+          <Property Type="Int32" Name="UniqueID" Nullable="false" />
+          <Property Type="Int32" Name="Sequence" />
+          <Property Type="Int32" Name="CurrVersion" />
+          <Property Type="Guid" Name="Version_ExhibitID" Nullable="false" />
+          <Property Type="Guid" Name="ExhibitViewID" Nullable="false" />
+          <Property Type="Int32" Name="IncludeInVersion" />
+        </EntityType>
+        <EntityType Name="Staging_ThresholdView">
+          <Key>
+            <PropertyRef Name="ThresholdViewID" />
+          </Key>
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Threshold" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="Boolean" Name="IsDeleted" />
+          <Property Type="String" Name="Timeunit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="DateTimeOffset" Name="ThresholdDate" />
+          <Property Type="Decimal" Name="ThresholdYear" Precision="8" Scale="4" />
+          <Property Type="String" Name="ShortDescription" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="URL" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="CurrVersion" />
+          <Property Type="Guid" Name="ThresholdViewID" Nullable="false" />
+          <Property Type="Int32" Name="IncludeInVersion" />
+        </EntityType>
+        <EntityType Name="Staging_TimelineInfo">
+          <Key>
+            <PropertyRef Name="TimelineInfoID" />
+          </Key>
+          <Property Type="Guid" Name="TimelineID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Threshold" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Regime" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="FromTimeUnit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="DateTimeOffset" Name="FromContentDate" />
+          <Property Type="Decimal" Name="FromContentYear" Precision="8" Scale="4" />
+          <Property Type="String" Name="ToTimeUnit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="DateTimeOffset" Name="ToContentDate" />
+          <Property Type="Decimal" Name="ToContentYear" Precision="8" Scale="4" />
+          <Property Type="Int32" Name="TimelineUniqueID" Nullable="false" />
+          <Property Type="Int32" Name="TimelineSequence" />
+          <Property Type="Decimal" Name="Height" Precision="8" Scale="4" />
+          <Property Type="Guid" Name="ParentTimelineID" />
+          <Property Type="Int32" Name="HasChildren" />
+          <Property Type="Int32" Name="CurrVersion" />
+          <Property Type="Guid" Name="TimelineInfoID" Nullable="false" />
+          <Property Type="Int32" Name="IncludeInVersion" />
+        </EntityType>
+        <EntityType Name="Staging_TimelineView">
+          <Key>
+            <PropertyRef Name="TimelineView" />
+          </Key>
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="Guid" Name="ThresholdID" Nullable="false" />
+          <Property Type="Guid" Name="RegimeID" Nullable="false" />
+          <Property Type="DateTimeOffset" Name="FromContentDate" />
+          <Property Type="Decimal" Name="FromContentYear" Precision="8" Scale="4" />
+          <Property Type="DateTimeOffset" Name="ToContentDate" />
+          <Property Type="Decimal" Name="ToContentYear" Precision="8" Scale="4" />
+          <Property Type="Guid" Name="ParentTimelineID" />
+          <Property Type="DateTime" Name="CreatedOn" />
+          <Property Type="Guid" Name="CreatedBy" />
+          <Property Type="DateTime" Name="ModifiedOn" />
+          <Property Type="Guid" Name="ModifiedBy" />
+          <Property Type="Boolean" Name="IsVisible" />
+          <Property Type="Boolean" Name="IsDeleted" />
+          <Property Type="Guid" Name="FromTimeUnit" />
+          <Property Type="Guid" Name="ToTimeUnit" />
+          <Property Type="String" Name="SourceURL" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Attribution" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="UniqueID" Nullable="false" />
+          <Property Type="Int32" Name="Sequence" />
+          <Property Type="Decimal" Name="Height" Precision="8" Scale="4" />
+          <Property Type="Int32" Name="CurrVersion" />
+          <Property Type="Guid" Name="Version_TimelineID" Nullable="false" />
+          <Property Type="Guid" Name="TimelineView" Nullable="false" />
+          <Property Type="Int32" Name="IncludeInVersion" />
+        </EntityType>
+        <EntityType Name="Staging_TourBookmarkView">
+          <Key>
+            <PropertyRef Name="TourBookmarkViewID" />
+          </Key>
+          <Property Type="String" Name="Name" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="LapseTime" />
+          <Property Type="String" Name="Description" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="URL" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="Boolean" Name="Bookmark_IsDeleted" />
+          <Property Type="Boolean" Name="TourBookmark_IsDeleted" />
+          <Property Type="Guid" Name="TourID" Nullable="false" />
+          <Property Type="Int32" Name="CurrVersion" />
+          <Property Type="Guid" Name="TourBookmarkViewID" Nullable="false" />
+          <Property Type="Int32" Name="IncludeInVersion" />
+        </EntityType>
+        <EntityType Name="Staging_TourView">
+          <Key>
+            <PropertyRef Name="TourViewID" />
+          </Key>
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Name" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="Guid" Name="CreatedBy" />
+          <Property Type="Guid" Name="ModifiedBy" />
+          <Property Type="DateTime" Name="CreatedOn" />
+          <Property Type="DateTime" Name="ModifiedOn" />
+          <Property Type="Boolean" Name="IsDeleted" />
+          <Property Type="Int32" Name="UniqueID" Nullable="false" />
+          <Property Type="String" Name="AudioBlobUrl" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Category" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="Sequence" />
+          <Property Type="Int32" Name="CurrVersion" />
+          <Property Type="Guid" Name="Version_TourID" Nullable="false" />
+          <Property Type="Guid" Name="TourViewID" Nullable="false" />
+          <Property Type="Int32" Name="IncludeInVersion" />
+        </EntityType>
+        <EntityType Name="Auth_BibliographyView">
+          <Key>
+            <PropertyRef Name="ExhibitID" />
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="Title" />
+            <PropertyRef Name="Authors" />
+            <PropertyRef Name="CitationType" />
+            <PropertyRef Name="Source" />
+          </Key>
+          <Property Type="Guid" Name="ExhibitID" Nullable="false" />
+          <Property Type="Boolean" Name="IsDeleted" />
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Authors" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="BookChapters" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="CitationType" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="PageNumbers" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Publication" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="PublicationDates" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Source" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="CurrVersion" />
+        </EntityType>
+        <EntityType Name="Auth_ContentItemsView">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="Title" />
+            <PropertyRef Name="Caption" />
+            <PropertyRef Name="Topic" />
+            <PropertyRef Name="MediaTypeID" />
+            <PropertyRef Name="ThresholdID" />
+            <PropertyRef Name="RegimeID" />
+            <PropertyRef Name="MediaBlobURL" />
+            <PropertyRef Name="TimeUnitID" />
+            <PropertyRef Name="LicenseTypeID" />
+            <PropertyRef Name="UniqueID" />
+          </Key>
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Caption" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Topic" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Type="Guid" Name="MediaTypeID" Nullable="false" />
+          <Property Type="Guid" Name="ThresholdID" Nullable="false" />
+          <Property Type="Guid" Name="RegimeID" Nullable="false" />
+          <Property Type="String" Name="MediaBlobURL" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Type="Guid" Name="TimeUnitID" Nullable="false" />
+          <Property Type="DateTimeOffset" Name="ContentDate" />
+          <Property Type="Decimal" Name="ContentYear" Precision="8" Scale="4" />
+          <Property Type="String" Name="MediaSource" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Attribution" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Type="Guid" Name="LicenseTypeID" Nullable="false" />
+          <Property Type="DateTime" Name="CreatedOn" />
+          <Property Type="Guid" Name="CreatedBy" />
+          <Property Type="DateTime" Name="ModifiedOn" />
+          <Property Type="Guid" Name="ModifiedBy" />
+          <Property Type="Boolean" Name="IsVisible" />
+          <Property Type="Boolean" Name="IsDeleted" />
+          <Property Type="Int32" Name="UniqueID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="CurrVersion" />
+        </EntityType>
+        <EntityType Name="Auth_ExhibitContentItemInfoView">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="ExhibitID" />
+            <PropertyRef Name="Title" />
+            <PropertyRef Name="Caption" />
+            <PropertyRef Name="Threshold" />
+            <PropertyRef Name="Regime" />
+            <PropertyRef Name="TimeUnit" />
+            <PropertyRef Name="MediaType" />
+            <PropertyRef Name="MediaBlobURL" />
+            <PropertyRef Name="UniqueID" />
+            <PropertyRef Name="HasBibliography" />
+          </Key>
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="Guid" Name="ExhibitID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Caption" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Threshold" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Regime" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="TimeUnit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="DateTimeOffset" Name="ContentDate" />
+          <Property Type="Decimal" Name="ContentYear" Precision="8" Scale="4" />
+          <Property Type="String" Name="MediaType" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="MediaBlobURL" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="MediaSource" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Attribution" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="UniqueID" Nullable="false" />
+          <Property Type="Int16" Name="Order" />
+          <Property Type="Int32" Name="HasBibliography" Nullable="false" />
+          <Property Type="Int32" Name="CurrVersion" />
+        </EntityType>
+        <EntityType Name="Auth_ExhibitInfoView">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="TimelineID" />
+            <PropertyRef Name="Title" />
+            <PropertyRef Name="Threshold" />
+            <PropertyRef Name="Regime" />
+            <PropertyRef Name="TimeUnit" />
+            <PropertyRef Name="UniqueID" />
+          </Key>
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="Guid" Name="TimelineID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Threshold" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Regime" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="TimeUnit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="DateTimeOffset" Name="ContentDate" />
+          <Property Type="Decimal" Name="ContentYear" Precision="8" Scale="4" />
+          <Property Type="Int32" Name="UniqueID" Nullable="false" />
+          <Property Type="Int32" Name="Sequence" />
+          <Property Type="Int32" Name="CurrVersion" />
+        </EntityType>
+        <EntityType Name="Auth_ExhibitReferenceInfoView">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="ExhibitID" />
+            <PropertyRef Name="Title" />
+            <PropertyRef Name="Authors" />
+            <PropertyRef Name="CitationType" />
+            <PropertyRef Name="Source" />
+          </Key>
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="Guid" Name="ExhibitID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Authors" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="BookChapters" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="CitationType" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="PageNumbers" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Publication" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="PublicationDates" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Source" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="CurrVersion" />
+        </EntityType>
+        <EntityType Name="Auth_ExhibitView">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="Title" />
+            <PropertyRef Name="ThresholdID" />
+            <PropertyRef Name="RegimeID" />
+            <PropertyRef Name="UniqueID" />
+          </Key>
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="Guid" Name="ThresholdID" Nullable="false" />
+          <Property Type="Guid" Name="RegimeID" Nullable="false" />
+          <Property Type="DateTimeOffset" Name="ContentDate" />
+          <Property Type="Decimal" Name="ContentYear" Precision="8" Scale="4" />
+          <Property Type="DateTime" Name="CreatedOn" />
+          <Property Type="Guid" Name="CreatedBy" />
+          <Property Type="DateTime" Name="ModifiedOn" />
+          <Property Type="Guid" Name="ModifiedBy" />
+          <Property Type="Boolean" Name="IsVisible" />
+          <Property Type="Boolean" Name="IsDeleted" />
+          <Property Type="Guid" Name="TimeUnitID" />
+          <Property Type="Int32" Name="UniqueID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="Sequence" />
+          <Property Type="Int32" Name="CurrVersion" />
+        </EntityType>
+        <EntityType Name="Auth_ThresholdView">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="Threshold" />
+            <PropertyRef Name="Timeunit" />
+            <PropertyRef Name="URL" />
+          </Key>
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Threshold" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="Boolean" Name="IsDeleted" />
+          <Property Type="String" Name="Timeunit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="DateTimeOffset" Name="ThresholdDate" />
+          <Property Type="Decimal" Name="ThresholdYear" Precision="8" Scale="4" />
+          <Property Type="String" Name="ShortDescription" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="URL" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="CurrVersion" />
+        </EntityType>
+        <EntityType Name="Auth_TimelineInfoView">
+          <Key>
+            <PropertyRef Name="TimelineID" />
+            <PropertyRef Name="Title" />
+            <PropertyRef Name="Threshold" />
+            <PropertyRef Name="Regime" />
+            <PropertyRef Name="FromTimeUnit" />
+            <PropertyRef Name="ToTimeUnit" />
+            <PropertyRef Name="TimelineUniqueID" />
+          </Key>
+          <Property Type="Guid" Name="TimelineID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Threshold" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Regime" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="FromTimeUnit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="DateTimeOffset" Name="FromContentDate" />
+          <Property Type="Decimal" Name="FromContentYear" Precision="8" Scale="4" />
+          <Property Type="String" Name="ToTimeUnit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="DateTimeOffset" Name="ToContentDate" />
+          <Property Type="Decimal" Name="ToContentYear" Precision="8" Scale="4" />
+          <Property Type="Int32" Name="TimelineUniqueID" Nullable="false" />
+          <Property Type="Int32" Name="TimelineSequence" />
+          <Property Type="Decimal" Name="Height" Precision="8" Scale="4" />
+          <Property Type="Guid" Name="ParentTimelineID" />
+          <Property Type="Int32" Name="HasChildren" />
+          <Property Type="Int32" Name="CurrVersion" />
+        </EntityType>
+        <EntityType Name="Auth_TimelineView">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="Title" />
+            <PropertyRef Name="ThresholdID" />
+            <PropertyRef Name="RegimeID" />
+            <PropertyRef Name="UniqueID" />
+          </Key>
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="Guid" Name="ThresholdID" Nullable="false" />
+          <Property Type="Guid" Name="RegimeID" Nullable="false" />
+          <Property Type="DateTimeOffset" Name="FromContentDate" />
+          <Property Type="Decimal" Name="FromContentYear" Precision="8" Scale="4" />
+          <Property Type="DateTimeOffset" Name="ToContentDate" />
+          <Property Type="Decimal" Name="ToContentYear" Precision="8" Scale="4" />
+          <Property Type="Guid" Name="ParentTimelineID" />
+          <Property Type="DateTime" Name="CreatedOn" />
+          <Property Type="Guid" Name="CreatedBy" />
+          <Property Type="DateTime" Name="ModifiedOn" />
+          <Property Type="Guid" Name="ModifiedBy" />
+          <Property Type="Boolean" Name="IsVisible" />
+          <Property Type="Boolean" Name="IsDeleted" />
+          <Property Type="Guid" Name="FromTimeUnit" />
+          <Property Type="Guid" Name="ToTimeUnit" />
+          <Property Type="String" Name="SourceURL" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Attribution" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="UniqueID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="Sequence" />
+          <Property Type="Decimal" Name="Height" Precision="8" Scale="4" />
+          <Property Type="Int32" Name="CurrVersion" />
+        </EntityType>
+        <EntityType Name="Auth_TourBookmarkView">
+          <Key>
+            <PropertyRef Name="Name" />
+            <PropertyRef Name="URL" />
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="TourID" />
+          </Key>
+          <Property Type="String" Name="Name" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="LapseTime" />
+          <Property Type="String" Name="Description" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="URL" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="Boolean" Name="Bookmark_IsDeleted" />
+          <Property Type="Boolean" Name="TourBookmark_IsDeleted" />
+          <Property Type="Guid" Name="TourID" Nullable="false" />
+          <Property Type="Int32" Name="CurrVersion" />
+        </EntityType>
+        <EntityType Name="Auth_TourView">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="Name" />
+            <PropertyRef Name="UniqueID" />
+          </Key>
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Name" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="Guid" Name="CreatedBy" />
+          <Property Type="Guid" Name="ModifiedBy" />
+          <Property Type="DateTime" Name="CreatedOn" />
+          <Property Type="DateTime" Name="ModifiedOn" />
+          <Property Type="Boolean" Name="IsDeleted" />
+          <Property Type="Int32" Name="UniqueID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="String" Name="AudioBlobUrl" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Category" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="Sequence" />
+          <Property Type="Int32" Name="CurrVersion" />
+          <Property Type="Boolean" Name="IsVisible" />
+        </EntityType>
+        <ComplexType Name="TimelineView">
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="100" />
+          <Property Type="Guid" Name="ThresholdID" Nullable="false" />
+          <Property Type="Guid" Name="RegimeID" Nullable="false" />
+          <Property Type="DateTimeOffset" Name="FromContentDate" Nullable="true" />
+          <Property Type="Decimal" Name="FromContentYear" Nullable="true" Precision="8" Scale="4" />
+          <Property Type="DateTimeOffset" Name="ToContentDate" Nullable="true" />
+          <Property Type="Decimal" Name="ToContentYear" Nullable="true" Precision="8" Scale="4" />
+          <Property Type="Guid" Name="ParentTimelineID" Nullable="true" />
+          <Property Type="DateTime" Name="CreatedOn" Nullable="true" Precision="16" />
+          <Property Type="Guid" Name="CreatedBy" Nullable="true" />
+          <Property Type="DateTime" Name="ModifiedOn" Nullable="true" Precision="16" />
+          <Property Type="Guid" Name="ModifiedBy" Nullable="true" />
+          <Property Type="Boolean" Name="IsVisible" Nullable="true" />
+          <Property Type="Boolean" Name="IsDeleted" Nullable="true" />
+          <Property Type="Guid" Name="FromTimeUnit" Nullable="true" />
+          <Property Type="Guid" Name="ToTimeUnit" Nullable="true" />
+          <Property Type="String" Name="SourceURL" Nullable="true" MaxLength="500" />
+          <Property Type="String" Name="Attribution" Nullable="true" MaxLength="500" />
+          <Property Type="Int32" Name="UniqueID" Nullable="false" />
+          <Property Type="Int32" Name="Sequence" Nullable="true" />
+          <Property Type="Decimal" Name="Height" Nullable="true" Precision="8" Scale="4" />
+          <Property Type="Int32" Name="CurrVersion" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="TimelineInfo">
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="100" />
+          <Property Type="Guid" Name="ThresholdID" Nullable="false" />
+          <Property Type="Guid" Name="RegimeID" Nullable="false" />
+          <Property Type="DateTimeOffset" Name="FromContentDate" Nullable="true" />
+          <Property Type="Decimal" Name="FromContentYear" Nullable="true" Precision="8" Scale="4" />
+          <Property Type="DateTimeOffset" Name="ToContentDate" Nullable="true" />
+          <Property Type="Decimal" Name="ToContentYear" Nullable="true" Precision="8" Scale="4" />
+          <Property Type="Guid" Name="ParentTimelineID" Nullable="true" />
+          <Property Type="DateTime" Name="CreatedOn" Nullable="true" Precision="16" />
+          <Property Type="Guid" Name="CreatedBy" Nullable="true" />
+          <Property Type="DateTime" Name="ModifiedOn" Nullable="true" Precision="16" />
+          <Property Type="Guid" Name="ModifiedBy" Nullable="true" />
+          <Property Type="Boolean" Name="IsVisible" Nullable="true" />
+          <Property Type="Boolean" Name="IsDeleted" Nullable="true" />
+          <Property Type="Guid" Name="FromTimeUnit" Nullable="true" />
+          <Property Type="Guid" Name="ToTimeUnit" Nullable="true" />
+          <Property Type="String" Name="SourceURL" Nullable="true" MaxLength="500" />
+          <Property Type="String" Name="Attribution" Nullable="true" MaxLength="500" />
+          <Property Type="Int32" Name="UniqueID" Nullable="false" />
+          <Property Type="Int32" Name="Sequence" Nullable="true" />
+          <Property Type="Decimal" Name="Height" Nullable="true" Precision="8" Scale="4" />
+          <Property Type="Int32" Name="CurrVersion" Nullable="true" />
+        </ComplexType>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="ChronozoomModelStoreContainer" CdmEntityContainer="ChronoZoomEntities">
+          <EntitySetMapping Name="Prod_BibliographyView">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Prod_BibliographyView">
+              <MappingFragment StoreEntitySet="Prod_BibliographyView">
+                <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+                <ScalarProperty Name="BibliographyView" ColumnName="BibliographyView" />
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="Source" ColumnName="Source" />
+                <ScalarProperty Name="PublicationDates" ColumnName="PublicationDates" />
+                <ScalarProperty Name="Publication" ColumnName="Publication" />
+                <ScalarProperty Name="PageNumbers" ColumnName="PageNumbers" />
+                <ScalarProperty Name="CitationType" ColumnName="CitationType" />
+                <ScalarProperty Name="BookChapters" ColumnName="BookChapters" />
+                <ScalarProperty Name="Authors" ColumnName="Authors" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="ExhibitID" ColumnName="ExhibitID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Prod_ContentItemView">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Prod_ContentItemView">
+              <MappingFragment StoreEntitySet="Prod_ContentItemView">
+                <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+                <ScalarProperty Name="ContentItemViewID" ColumnName="ContentItemViewID" />
+                <ScalarProperty Name="Version_ContentItemID" ColumnName="Version_ContentItemID" />
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="LicenseTypeID" ColumnName="LicenseTypeID" />
+                <ScalarProperty Name="Attribution" ColumnName="Attribution" />
+                <ScalarProperty Name="MediaSource" ColumnName="MediaSource" />
+                <ScalarProperty Name="ContentYear" ColumnName="ContentYear" />
+                <ScalarProperty Name="ContentDate" ColumnName="ContentDate" />
+                <ScalarProperty Name="TimeUnitID" ColumnName="TimeUnitID" />
+                <ScalarProperty Name="MediaBlobURL" ColumnName="MediaBlobURL" />
+                <ScalarProperty Name="RegimeID" ColumnName="RegimeID" />
+                <ScalarProperty Name="ThresholdID" ColumnName="ThresholdID" />
+                <ScalarProperty Name="MediaTypeID" ColumnName="MediaTypeID" />
+                <ScalarProperty Name="Topic" ColumnName="Topic" />
+                <ScalarProperty Name="Caption" ColumnName="Caption" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Prod_ExhibitContentItemInfo">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Prod_ExhibitContentItemInfo">
+              <MappingFragment StoreEntitySet="Prod_ExhibitContentItemInfo">
+                <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+                <ScalarProperty Name="ExhibitContentItemInfoID" ColumnName="ExhibitContentItemInfoID" />
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="HasBibliography" ColumnName="HasBibliography" />
+                <ScalarProperty Name="Order" ColumnName="Order" />
+                <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+                <ScalarProperty Name="Attribution" ColumnName="Attribution" />
+                <ScalarProperty Name="MediaSource" ColumnName="MediaSource" />
+                <ScalarProperty Name="MediaBlobURL" ColumnName="MediaBlobURL" />
+                <ScalarProperty Name="MediaType" ColumnName="MediaType" />
+                <ScalarProperty Name="ContentYear" ColumnName="ContentYear" />
+                <ScalarProperty Name="ContentDate" ColumnName="ContentDate" />
+                <ScalarProperty Name="TimeUnit" ColumnName="TimeUnit" />
+                <ScalarProperty Name="Regime" ColumnName="Regime" />
+                <ScalarProperty Name="Threshold" ColumnName="Threshold" />
+                <ScalarProperty Name="Caption" ColumnName="Caption" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="ExhibitID" ColumnName="ExhibitID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Prod_ExhibitInfo">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Prod_ExhibitInfo">
+              <MappingFragment StoreEntitySet="Prod_ExhibitInfo">
+                <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+                <ScalarProperty Name="Prod_ExhibitInfoID" ColumnName="Prod_ExhibitInfoID" />
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+                <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+                <ScalarProperty Name="ContentYear" ColumnName="ContentYear" />
+                <ScalarProperty Name="ContentDate" ColumnName="ContentDate" />
+                <ScalarProperty Name="TimeUnit" ColumnName="TimeUnit" />
+                <ScalarProperty Name="Regime" ColumnName="Regime" />
+                <ScalarProperty Name="Threshold" ColumnName="Threshold" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="TimelineID" ColumnName="TimelineID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Prod_ExhibitReferenceInfo">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Prod_ExhibitReferenceInfo">
+              <MappingFragment StoreEntitySet="Prod_ExhibitReferenceInfo">
+                <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+                <ScalarProperty Name="Prod_ExhibitReferenceInfoID" ColumnName="Prod_ExhibitReferenceInfoID" />
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="Source" ColumnName="Source" />
+                <ScalarProperty Name="PublicationDates" ColumnName="PublicationDates" />
+                <ScalarProperty Name="Publication" ColumnName="Publication" />
+                <ScalarProperty Name="PageNumbers" ColumnName="PageNumbers" />
+                <ScalarProperty Name="CitationType" ColumnName="CitationType" />
+                <ScalarProperty Name="BookChapters" ColumnName="BookChapters" />
+                <ScalarProperty Name="Authors" ColumnName="Authors" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="ExhibitID" ColumnName="ExhibitID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Prod_ExhibitView">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Prod_ExhibitView">
+              <MappingFragment StoreEntitySet="Prod_ExhibitView">
+                <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+                <ScalarProperty Name="ExhibitViewID" ColumnName="ExhibitViewID" />
+                <ScalarProperty Name="Version_ExhibitID" ColumnName="Version_ExhibitID" />
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+                <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+                <ScalarProperty Name="TimeUnitID" ColumnName="TimeUnitID" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="ContentYear" ColumnName="ContentYear" />
+                <ScalarProperty Name="ContentDate" ColumnName="ContentDate" />
+                <ScalarProperty Name="RegimeID" ColumnName="RegimeID" />
+                <ScalarProperty Name="ThresholdID" ColumnName="ThresholdID" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Prod_ThresholdView">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Prod_ThresholdView">
+              <MappingFragment StoreEntitySet="Prod_ThresholdView">
+                <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+                <ScalarProperty Name="ThresholdViewID" ColumnName="ThresholdViewID" />
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="URL" ColumnName="URL" />
+                <ScalarProperty Name="ShortDescription" ColumnName="ShortDescription" />
+                <ScalarProperty Name="ThresholdYear" ColumnName="ThresholdYear" />
+                <ScalarProperty Name="ThresholdDate" ColumnName="ThresholdDate" />
+                <ScalarProperty Name="Timeunit" ColumnName="Timeunit" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="Threshold" ColumnName="Threshold" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Prod_TimelineInfo">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Prod_TimelineInfo">
+              <MappingFragment StoreEntitySet="Prod_TimelineInfo">
+                <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+                <ScalarProperty Name="TimelineInfoID" ColumnName="TimelineInfoID" />
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="HasChildren" ColumnName="HasChildren" />
+                <ScalarProperty Name="ParentTimelineID" ColumnName="ParentTimelineID" />
+                <ScalarProperty Name="Height" ColumnName="Height" />
+                <ScalarProperty Name="TimelineSequence" ColumnName="TimelineSequence" />
+                <ScalarProperty Name="TimelineUniqueID" ColumnName="TimelineUniqueID" />
+                <ScalarProperty Name="ToContentYear" ColumnName="ToContentYear" />
+                <ScalarProperty Name="ToContentDate" ColumnName="ToContentDate" />
+                <ScalarProperty Name="ToTimeUnit" ColumnName="ToTimeUnit" />
+                <ScalarProperty Name="FromContentYear" ColumnName="FromContentYear" />
+                <ScalarProperty Name="FromContentDate" ColumnName="FromContentDate" />
+                <ScalarProperty Name="FromTimeUnit" ColumnName="FromTimeUnit" />
+                <ScalarProperty Name="Regime" ColumnName="Regime" />
+                <ScalarProperty Name="Threshold" ColumnName="Threshold" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="TimelineID" ColumnName="TimelineID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Prod_TimelineView">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Prod_TimelineView">
+              <MappingFragment StoreEntitySet="Prod_TimelineView">
+                <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+                <ScalarProperty Name="TimelineView" ColumnName="TimelineView" />
+                <ScalarProperty Name="Version_TimelineID" ColumnName="Version_TimelineID" />
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="Height" ColumnName="Height" />
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+                <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+                <ScalarProperty Name="Attribution" ColumnName="Attribution" />
+                <ScalarProperty Name="SourceURL" ColumnName="SourceURL" />
+                <ScalarProperty Name="ToTimeUnit" ColumnName="ToTimeUnit" />
+                <ScalarProperty Name="FromTimeUnit" ColumnName="FromTimeUnit" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="ParentTimelineID" ColumnName="ParentTimelineID" />
+                <ScalarProperty Name="ToContentYear" ColumnName="ToContentYear" />
+                <ScalarProperty Name="ToContentDate" ColumnName="ToContentDate" />
+                <ScalarProperty Name="FromContentYear" ColumnName="FromContentYear" />
+                <ScalarProperty Name="FromContentDate" ColumnName="FromContentDate" />
+                <ScalarProperty Name="RegimeID" ColumnName="RegimeID" />
+                <ScalarProperty Name="ThresholdID" ColumnName="ThresholdID" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Prod_TourBookmarkView">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Prod_TourBookmarkView">
+              <MappingFragment StoreEntitySet="Prod_TourBookmarkView">
+                <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+                <ScalarProperty Name="TourBookmarkViewID" ColumnName="TourBookmarkViewID" />
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="TourID" ColumnName="TourID" />
+                <ScalarProperty Name="TourBookmark_IsDeleted" ColumnName="TourBookmark_IsDeleted" />
+                <ScalarProperty Name="Bookmark_IsDeleted" ColumnName="Bookmark_IsDeleted" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="URL" ColumnName="URL" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="LapseTime" ColumnName="LapseTime" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Prod_TourView">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Prod_TourView">
+              <MappingFragment StoreEntitySet="Prod_TourView">
+                <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+                <ScalarProperty Name="TourViewID" ColumnName="TourViewID" />
+                <ScalarProperty Name="Version_TourID" ColumnName="Version_TourID" />
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+                <ScalarProperty Name="Category" ColumnName="Category" />
+                <ScalarProperty Name="AudioBlobUrl" ColumnName="AudioBlobUrl" />
+                <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Staging_BibliographyView">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Staging_BibliographyView">
+              <MappingFragment StoreEntitySet="Staging_BibliographyView">
+                <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+                <ScalarProperty Name="BibliographyView" ColumnName="BibliographyView" />
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="Source" ColumnName="Source" />
+                <ScalarProperty Name="PublicationDates" ColumnName="PublicationDates" />
+                <ScalarProperty Name="Publication" ColumnName="Publication" />
+                <ScalarProperty Name="PageNumbers" ColumnName="PageNumbers" />
+                <ScalarProperty Name="CitationType" ColumnName="CitationType" />
+                <ScalarProperty Name="BookChapters" ColumnName="BookChapters" />
+                <ScalarProperty Name="Authors" ColumnName="Authors" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="ExhibitID" ColumnName="ExhibitID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Staging_ContentItemView">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Staging_ContentItemView">
+              <MappingFragment StoreEntitySet="Staging_ContentItemView">
+                <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+                <ScalarProperty Name="ContentItemViewID" ColumnName="ContentItemViewID" />
+                <ScalarProperty Name="Version_ContentItemID" ColumnName="Version_ContentItemID" />
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="LicenseTypeID" ColumnName="LicenseTypeID" />
+                <ScalarProperty Name="Attribution" ColumnName="Attribution" />
+                <ScalarProperty Name="MediaSource" ColumnName="MediaSource" />
+                <ScalarProperty Name="ContentYear" ColumnName="ContentYear" />
+                <ScalarProperty Name="ContentDate" ColumnName="ContentDate" />
+                <ScalarProperty Name="TimeUnitID" ColumnName="TimeUnitID" />
+                <ScalarProperty Name="MediaBlobURL" ColumnName="MediaBlobURL" />
+                <ScalarProperty Name="RegimeID" ColumnName="RegimeID" />
+                <ScalarProperty Name="ThresholdID" ColumnName="ThresholdID" />
+                <ScalarProperty Name="MediaTypeID" ColumnName="MediaTypeID" />
+                <ScalarProperty Name="Topic" ColumnName="Topic" />
+                <ScalarProperty Name="Caption" ColumnName="Caption" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Staging_ExhibitContentItemInfo">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Staging_ExhibitContentItemInfo">
+              <MappingFragment StoreEntitySet="Staging_ExhibitContentItemInfo">
+                <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+                <ScalarProperty Name="ExhibitContentItemInfoID" ColumnName="ExhibitContentItemInfoID" />
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="HasBibliography" ColumnName="HasBibliography" />
+                <ScalarProperty Name="Order" ColumnName="Order" />
+                <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+                <ScalarProperty Name="Attribution" ColumnName="Attribution" />
+                <ScalarProperty Name="MediaSource" ColumnName="MediaSource" />
+                <ScalarProperty Name="MediaBlobURL" ColumnName="MediaBlobURL" />
+                <ScalarProperty Name="MediaType" ColumnName="MediaType" />
+                <ScalarProperty Name="ContentYear" ColumnName="ContentYear" />
+                <ScalarProperty Name="ContentDate" ColumnName="ContentDate" />
+                <ScalarProperty Name="TimeUnit" ColumnName="TimeUnit" />
+                <ScalarProperty Name="Regime" ColumnName="Regime" />
+                <ScalarProperty Name="Threshold" ColumnName="Threshold" />
+                <ScalarProperty Name="Caption" ColumnName="Caption" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="ExhibitID" ColumnName="ExhibitID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Staging_ExhibitInfo">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Staging_ExhibitInfo">
+              <MappingFragment StoreEntitySet="Staging_ExhibitInfo">
+                <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+                <ScalarProperty Name="ExhibitInfoID" ColumnName="ExhibitInfoID" />
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+                <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+                <ScalarProperty Name="ContentYear" ColumnName="ContentYear" />
+                <ScalarProperty Name="ContentDate" ColumnName="ContentDate" />
+                <ScalarProperty Name="TimeUnit" ColumnName="TimeUnit" />
+                <ScalarProperty Name="Regime" ColumnName="Regime" />
+                <ScalarProperty Name="Threshold" ColumnName="Threshold" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="TimelineID" ColumnName="TimelineID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Staging_ExhibitReferenceInfo">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Staging_ExhibitReferenceInfo">
+              <MappingFragment StoreEntitySet="Staging_ExhibitReferenceInfo">
+                <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+                <ScalarProperty Name="ExhibitReferenceInfoID" ColumnName="ExhibitReferenceInfoID" />
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="Source" ColumnName="Source" />
+                <ScalarProperty Name="PublicationDates" ColumnName="PublicationDates" />
+                <ScalarProperty Name="Publication" ColumnName="Publication" />
+                <ScalarProperty Name="PageNumbers" ColumnName="PageNumbers" />
+                <ScalarProperty Name="CitationType" ColumnName="CitationType" />
+                <ScalarProperty Name="BookChapters" ColumnName="BookChapters" />
+                <ScalarProperty Name="Authors" ColumnName="Authors" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="ExhibitID" ColumnName="ExhibitID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Staging_ExhibitView">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Staging_ExhibitView">
+              <MappingFragment StoreEntitySet="Staging_ExhibitView">
+                <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+                <ScalarProperty Name="ExhibitViewID" ColumnName="ExhibitViewID" />
+                <ScalarProperty Name="Version_ExhibitID" ColumnName="Version_ExhibitID" />
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+                <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+                <ScalarProperty Name="TimeUnitID" ColumnName="TimeUnitID" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="ContentYear" ColumnName="ContentYear" />
+                <ScalarProperty Name="ContentDate" ColumnName="ContentDate" />
+                <ScalarProperty Name="RegimeID" ColumnName="RegimeID" />
+                <ScalarProperty Name="ThresholdID" ColumnName="ThresholdID" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Staging_ThresholdView">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Staging_ThresholdView">
+              <MappingFragment StoreEntitySet="Staging_ThresholdView">
+                <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+                <ScalarProperty Name="ThresholdViewID" ColumnName="ThresholdViewID" />
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="URL" ColumnName="URL" />
+                <ScalarProperty Name="ShortDescription" ColumnName="ShortDescription" />
+                <ScalarProperty Name="ThresholdYear" ColumnName="ThresholdYear" />
+                <ScalarProperty Name="ThresholdDate" ColumnName="ThresholdDate" />
+                <ScalarProperty Name="Timeunit" ColumnName="Timeunit" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="Threshold" ColumnName="Threshold" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Staging_TimelineInfo">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Staging_TimelineInfo">
+              <MappingFragment StoreEntitySet="Staging_TimelineInfo">
+                <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+                <ScalarProperty Name="TimelineInfoID" ColumnName="TimelineInfoID" />
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="HasChildren" ColumnName="HasChildren" />
+                <ScalarProperty Name="ParentTimelineID" ColumnName="ParentTimelineID" />
+                <ScalarProperty Name="Height" ColumnName="Height" />
+                <ScalarProperty Name="TimelineSequence" ColumnName="TimelineSequence" />
+                <ScalarProperty Name="TimelineUniqueID" ColumnName="TimelineUniqueID" />
+                <ScalarProperty Name="ToContentYear" ColumnName="ToContentYear" />
+                <ScalarProperty Name="ToContentDate" ColumnName="ToContentDate" />
+                <ScalarProperty Name="ToTimeUnit" ColumnName="ToTimeUnit" />
+                <ScalarProperty Name="FromContentYear" ColumnName="FromContentYear" />
+                <ScalarProperty Name="FromContentDate" ColumnName="FromContentDate" />
+                <ScalarProperty Name="FromTimeUnit" ColumnName="FromTimeUnit" />
+                <ScalarProperty Name="Regime" ColumnName="Regime" />
+                <ScalarProperty Name="Threshold" ColumnName="Threshold" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="TimelineID" ColumnName="TimelineID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Staging_TimelineView">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Staging_TimelineView">
+              <MappingFragment StoreEntitySet="Staging_TimelineView">
+                <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+                <ScalarProperty Name="TimelineView" ColumnName="TimelineView" />
+                <ScalarProperty Name="Version_TimelineID" ColumnName="Version_TimelineID" />
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="Height" ColumnName="Height" />
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+                <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+                <ScalarProperty Name="Attribution" ColumnName="Attribution" />
+                <ScalarProperty Name="SourceURL" ColumnName="SourceURL" />
+                <ScalarProperty Name="ToTimeUnit" ColumnName="ToTimeUnit" />
+                <ScalarProperty Name="FromTimeUnit" ColumnName="FromTimeUnit" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="ParentTimelineID" ColumnName="ParentTimelineID" />
+                <ScalarProperty Name="ToContentYear" ColumnName="ToContentYear" />
+                <ScalarProperty Name="ToContentDate" ColumnName="ToContentDate" />
+                <ScalarProperty Name="FromContentYear" ColumnName="FromContentYear" />
+                <ScalarProperty Name="FromContentDate" ColumnName="FromContentDate" />
+                <ScalarProperty Name="RegimeID" ColumnName="RegimeID" />
+                <ScalarProperty Name="ThresholdID" ColumnName="ThresholdID" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Staging_TourBookmarkView">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Staging_TourBookmarkView">
+              <MappingFragment StoreEntitySet="Staging_TourBookmarkView">
+                <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+                <ScalarProperty Name="TourBookmarkViewID" ColumnName="TourBookmarkViewID" />
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="TourID" ColumnName="TourID" />
+                <ScalarProperty Name="TourBookmark_IsDeleted" ColumnName="TourBookmark_IsDeleted" />
+                <ScalarProperty Name="Bookmark_IsDeleted" ColumnName="Bookmark_IsDeleted" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="URL" ColumnName="URL" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="LapseTime" ColumnName="LapseTime" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Staging_TourView">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Staging_TourView">
+              <MappingFragment StoreEntitySet="Staging_TourView">
+                <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+                <ScalarProperty Name="TourViewID" ColumnName="TourViewID" />
+                <ScalarProperty Name="Version_TourID" ColumnName="Version_TourID" />
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+                <ScalarProperty Name="Category" ColumnName="Category" />
+                <ScalarProperty Name="AudioBlobUrl" ColumnName="AudioBlobUrl" />
+                <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Auth_BibliographyView">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Auth_BibliographyView">
+              <MappingFragment StoreEntitySet="Auth_BibliographyView">
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="Source" ColumnName="Source" />
+                <ScalarProperty Name="PublicationDates" ColumnName="PublicationDates" />
+                <ScalarProperty Name="Publication" ColumnName="Publication" />
+                <ScalarProperty Name="PageNumbers" ColumnName="PageNumbers" />
+                <ScalarProperty Name="CitationType" ColumnName="CitationType" />
+                <ScalarProperty Name="BookChapters" ColumnName="BookChapters" />
+                <ScalarProperty Name="Authors" ColumnName="Authors" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="ExhibitID" ColumnName="ExhibitID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Auth_ContentItemsView">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Auth_ContentItemsView">
+              <MappingFragment StoreEntitySet="Auth_ContentItemsView">
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="LicenseTypeID" ColumnName="LicenseTypeID" />
+                <ScalarProperty Name="Attribution" ColumnName="Attribution" />
+                <ScalarProperty Name="MediaSource" ColumnName="MediaSource" />
+                <ScalarProperty Name="ContentYear" ColumnName="ContentYear" />
+                <ScalarProperty Name="ContentDate" ColumnName="ContentDate" />
+                <ScalarProperty Name="TimeUnitID" ColumnName="TimeUnitID" />
+                <ScalarProperty Name="MediaBlobURL" ColumnName="MediaBlobURL" />
+                <ScalarProperty Name="RegimeID" ColumnName="RegimeID" />
+                <ScalarProperty Name="ThresholdID" ColumnName="ThresholdID" />
+                <ScalarProperty Name="MediaTypeID" ColumnName="MediaTypeID" />
+                <ScalarProperty Name="Topic" ColumnName="Topic" />
+                <ScalarProperty Name="Caption" ColumnName="Caption" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Auth_ExhibitContentItemInfoView">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Auth_ExhibitContentItemInfoView">
+              <MappingFragment StoreEntitySet="Auth_ExhibitContentItemInfoView">
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="HasBibliography" ColumnName="HasBibliography" />
+                <ScalarProperty Name="Order" ColumnName="Order" />
+                <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+                <ScalarProperty Name="Attribution" ColumnName="Attribution" />
+                <ScalarProperty Name="MediaSource" ColumnName="MediaSource" />
+                <ScalarProperty Name="MediaBlobURL" ColumnName="MediaBlobURL" />
+                <ScalarProperty Name="MediaType" ColumnName="MediaType" />
+                <ScalarProperty Name="ContentYear" ColumnName="ContentYear" />
+                <ScalarProperty Name="ContentDate" ColumnName="ContentDate" />
+                <ScalarProperty Name="TimeUnit" ColumnName="TimeUnit" />
+                <ScalarProperty Name="Regime" ColumnName="Regime" />
+                <ScalarProperty Name="Threshold" ColumnName="Threshold" />
+                <ScalarProperty Name="Caption" ColumnName="Caption" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="ExhibitID" ColumnName="ExhibitID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Auth_ExhibitInfoView">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Auth_ExhibitInfoView">
+              <MappingFragment StoreEntitySet="Auth_ExhibitInfoView">
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+                <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+                <ScalarProperty Name="ContentYear" ColumnName="ContentYear" />
+                <ScalarProperty Name="ContentDate" ColumnName="ContentDate" />
+                <ScalarProperty Name="TimeUnit" ColumnName="TimeUnit" />
+                <ScalarProperty Name="Regime" ColumnName="Regime" />
+                <ScalarProperty Name="Threshold" ColumnName="Threshold" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="TimelineID" ColumnName="TimelineID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Auth_ExhibitReferenceInfoView">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Auth_ExhibitReferenceInfoView">
+              <MappingFragment StoreEntitySet="Auth_ExhibitReferenceInfoView">
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="Source" ColumnName="Source" />
+                <ScalarProperty Name="PublicationDates" ColumnName="PublicationDates" />
+                <ScalarProperty Name="Publication" ColumnName="Publication" />
+                <ScalarProperty Name="PageNumbers" ColumnName="PageNumbers" />
+                <ScalarProperty Name="CitationType" ColumnName="CitationType" />
+                <ScalarProperty Name="BookChapters" ColumnName="BookChapters" />
+                <ScalarProperty Name="Authors" ColumnName="Authors" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="ExhibitID" ColumnName="ExhibitID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Auth_ExhibitView">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Auth_ExhibitView">
+              <MappingFragment StoreEntitySet="Auth_ExhibitView">
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+                <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+                <ScalarProperty Name="TimeUnitID" ColumnName="TimeUnitID" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="ContentYear" ColumnName="ContentYear" />
+                <ScalarProperty Name="ContentDate" ColumnName="ContentDate" />
+                <ScalarProperty Name="RegimeID" ColumnName="RegimeID" />
+                <ScalarProperty Name="ThresholdID" ColumnName="ThresholdID" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Auth_ThresholdView">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Auth_ThresholdView">
+              <MappingFragment StoreEntitySet="Auth_ThresholdView">
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="URL" ColumnName="URL" />
+                <ScalarProperty Name="ShortDescription" ColumnName="ShortDescription" />
+                <ScalarProperty Name="ThresholdYear" ColumnName="ThresholdYear" />
+                <ScalarProperty Name="ThresholdDate" ColumnName="ThresholdDate" />
+                <ScalarProperty Name="Timeunit" ColumnName="Timeunit" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="Threshold" ColumnName="Threshold" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Auth_TimelineInfoView">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Auth_TimelineInfoView">
+              <MappingFragment StoreEntitySet="Auth_TimelineInfoView">
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="HasChildren" ColumnName="HasChildren" />
+                <ScalarProperty Name="ParentTimelineID" ColumnName="ParentTimelineID" />
+                <ScalarProperty Name="Height" ColumnName="Height" />
+                <ScalarProperty Name="TimelineSequence" ColumnName="TimelineSequence" />
+                <ScalarProperty Name="TimelineUniqueID" ColumnName="TimelineUniqueID" />
+                <ScalarProperty Name="ToContentYear" ColumnName="ToContentYear" />
+                <ScalarProperty Name="ToContentDate" ColumnName="ToContentDate" />
+                <ScalarProperty Name="ToTimeUnit" ColumnName="ToTimeUnit" />
+                <ScalarProperty Name="FromContentYear" ColumnName="FromContentYear" />
+                <ScalarProperty Name="FromContentDate" ColumnName="FromContentDate" />
+                <ScalarProperty Name="FromTimeUnit" ColumnName="FromTimeUnit" />
+                <ScalarProperty Name="Regime" ColumnName="Regime" />
+                <ScalarProperty Name="Threshold" ColumnName="Threshold" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="TimelineID" ColumnName="TimelineID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Auth_TimelineView">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Auth_TimelineView">
+              <MappingFragment StoreEntitySet="Auth_TimelineView">
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="Height" ColumnName="Height" />
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+                <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+                <ScalarProperty Name="Attribution" ColumnName="Attribution" />
+                <ScalarProperty Name="SourceURL" ColumnName="SourceURL" />
+                <ScalarProperty Name="ToTimeUnit" ColumnName="ToTimeUnit" />
+                <ScalarProperty Name="FromTimeUnit" ColumnName="FromTimeUnit" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="ParentTimelineID" ColumnName="ParentTimelineID" />
+                <ScalarProperty Name="ToContentYear" ColumnName="ToContentYear" />
+                <ScalarProperty Name="ToContentDate" ColumnName="ToContentDate" />
+                <ScalarProperty Name="FromContentYear" ColumnName="FromContentYear" />
+                <ScalarProperty Name="FromContentDate" ColumnName="FromContentDate" />
+                <ScalarProperty Name="RegimeID" ColumnName="RegimeID" />
+                <ScalarProperty Name="ThresholdID" ColumnName="ThresholdID" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Auth_TourBookmarkView">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Auth_TourBookmarkView">
+              <MappingFragment StoreEntitySet="Auth_TourBookmarkView">
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="TourID" ColumnName="TourID" />
+                <ScalarProperty Name="TourBookmark_IsDeleted" ColumnName="TourBookmark_IsDeleted" />
+                <ScalarProperty Name="Bookmark_IsDeleted" ColumnName="Bookmark_IsDeleted" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="URL" ColumnName="URL" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="LapseTime" ColumnName="LapseTime" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Auth_TourView">
+            <EntityTypeMapping TypeName="ChronoZoomModel.Auth_TourView">
+              <MappingFragment StoreEntitySet="Auth_TourView">
+                <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+                <ScalarProperty Name="Category" ColumnName="Category" />
+                <ScalarProperty Name="AudioBlobUrl" ColumnName="AudioBlobUrl" />
+                <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="spGetVisibleTimelinesForSearch" FunctionName="ChronozoomModel.Store.spGetVisibleTimelinesForSearch">
+          <ResultMapping>
+              <ComplexTypeMapping TypeName="ChronoZoomModel.TimelineInfo">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="ThresholdID" ColumnName="ThresholdID" />
+                <ScalarProperty Name="RegimeID" ColumnName="RegimeID" />
+                <ScalarProperty Name="FromContentDate" ColumnName="FromContentDate" />
+                <ScalarProperty Name="FromContentYear" ColumnName="FromContentYear" />
+                <ScalarProperty Name="ToContentDate" ColumnName="ToContentDate" />
+                <ScalarProperty Name="ToContentYear" ColumnName="ToContentYear" />
+                <ScalarProperty Name="ParentTimelineID" ColumnName="ParentTimelineID" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="FromTimeUnit" ColumnName="FromTimeUnit" />
+                <ScalarProperty Name="ToTimeUnit" ColumnName="ToTimeUnit" />
+                <ScalarProperty Name="SourceURL" ColumnName="SourceURL" />
+                <ScalarProperty Name="Attribution" ColumnName="Attribution" />
+                <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+                <ScalarProperty Name="Height" ColumnName="Height" />
+                <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="True" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams>
+      <Diagram Name="ChronoZoom">
+        <EntityTypeShape EntityType="ChronoZoomModel.Prod_BibliographyView" Width="1.5" PointX="0.75" PointY="0.75" Height="3.5186979166666674" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Prod_ContentItemView" Width="1.5" PointX="2.75" PointY="0.75" Height="5.63401367187501" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Prod_ExhibitContentItemInfo" Width="1.5" PointX="4.75" PointY="0.75" Height="4.48020507812501" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Prod_ExhibitInfo" Width="1.5" PointX="6.75" PointY="0.75" Height="3.3263964843750102" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Prod_ExhibitReferenceInfo" Width="1.5" PointX="4.75" PointY="6.75" Height="3.3263964843750102" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Prod_ExhibitView" Width="1.5" PointX="6.75" PointY="5.75" Height="4.48020507812501" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Prod_ThresholdView" Width="1.5" PointX="0.75" PointY="7.75" Height="2.9417936197916674" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Prod_TimelineInfo" Width="1.5" PointX="8.75" PointY="0.75" Height="4.2879036458333246" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Prod_TimelineView" Width="1.5" PointX="8.75" PointY="6.75" Height="5.8263151041666674" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Prod_TourBookmarkView" Width="1.5" PointX="10.75" PointY="0.75" Height="2.9417936197916674" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Prod_TourView" Width="1.5" PointX="10.75" PointY="4.75" Height="3.7109993489583246" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Staging_BibliographyView" Width="1.5" PointX="10.75" PointY="9.75" Height="3.5186979166666674" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Staging_ContentItemView" Width="1.5" PointX="0.75" PointY="11.75" Height="5.6340136718749818" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Staging_ExhibitContentItemInfo" Width="1.5" PointX="2.75" PointY="11.75" Height="4.4802050781249818" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Staging_ExhibitInfo" Width="1.5" PointX="4.75" PointY="11.75" Height="3.3263964843749818" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Staging_ExhibitReferenceInfo" Width="1.5" PointX="12.75" PointY="0.75" Height="3.3263964843749818" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Staging_ExhibitView" Width="1.5" PointX="12.75" PointY="5.75" Height="4.4802050781249818" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Staging_ThresholdView" Width="1.5" PointX="12.75" PointY="11.75" Height="2.9417936197916674" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Staging_TimelineInfo" Width="1.5" PointX="6.75" PointY="13.75" Height="4.2879036458333246" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Staging_TimelineView" Width="1.5" PointX="14.75" PointY="0.75" Height="5.8263151041666674" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Staging_TourBookmarkView" Width="1.5" PointX="14.75" PointY="7.75" Height="2.9417936197916674" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Staging_TourView" Width="1.5" PointX="8.75" PointY="14.75" Height="3.7109993489583246" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Auth_BibliographyView" Width="1.5" PointX="14.75" PointY="11.75" Height="3.3263964843749818" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Auth_ContentItemsView" Width="1.5" PointX="10.75" PointY="15.75" Height="5.2494108072916674" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Auth_ExhibitContentItemInfoView" Width="1.5" PointX="16.75" PointY="0.75" Height="4.2879036458333246" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Auth_ExhibitInfoView" Width="1.5" PointX="16.75" PointY="6.75" Height="3.1340950520833246" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Auth_ExhibitReferenceInfoView" Width="1.5" PointX="16.75" PointY="10.75" Height="3.1340950520833246" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Auth_ExhibitView" Width="1.5" PointX="12.75" PointY="16.75" Height="4.0956022135416674" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Auth_ThresholdView" Width="1.5" PointX="16.75" PointY="14.75" Height="2.7494921874999818" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Auth_TimelineInfoView" Width="1.5" PointX="2.75" PointY="17.75" Height="4.0956022135416674" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Auth_TimelineView" Width="1.5" PointX="18.75" PointY="0.75" Height="5.4417122395833246" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Auth_TourBookmarkView" Width="1.5" PointX="18.75" PointY="7.75" Height="2.7494921874999818" />
+        <EntityTypeShape EntityType="ChronoZoomModel.Auth_TourView" Width="1.5" PointX="18.75" PointY="11.75" Height="3.3263964843749818" />
+      </Diagram>
+    </Diagrams>
+  </Designer>
+</edmx:Edmx>

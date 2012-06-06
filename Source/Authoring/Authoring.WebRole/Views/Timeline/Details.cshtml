@@ -1,0 +1,85 @@
+﻿@model Authoring.WebRole.Models.Timeline
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Timeline - Details</h2>
+
+<fieldset>
+    <legend>Timeline</legend>
+
+    <div class="display-label">Title</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Title)
+    </div>
+
+    <div class="display-label">Threshold</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Threshold.Threshold1)
+    </div>
+
+    <div class="display-label">Regime</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Regime.Regime1)
+    </div>
+    
+    <div class="display-label">Height</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Height)
+    </div>
+
+    <div class="display-label">FromContentDate</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.FromContentDate)
+    </div>
+
+    <div class="display-label">FromContentYear</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.FromContentYear)
+    </div>
+
+    <div class="display-label">FromTimeUnit</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.TimeUnit.TimeUnit1)
+    </div>
+
+    <div class="display-label">ToContentDate</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.ToContentDate)
+    </div>
+
+    <div class="display-label">ToContentYear</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.ToContentYear)
+    </div>
+
+    <div class="display-label">ToTimeUnit</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.TimeUnit1.TimeUnit1)
+    </div>
+
+    <div class="display-label">Timeline2</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Timeline2.Title)
+    </div>
+
+    <div class="display-label">IsVisible</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.IsVisible)
+    </div>
+
+    <div class="display-label">SourceURL</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.SourceURL)
+    </div>
+
+    <div class="display-label">Attribution</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Attribution)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

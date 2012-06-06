@@ -1,0 +1,1820 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="ChronozoomModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+  <EntityContainer Name="ChronozoomModelStoreContainer">
+    <EntitySet Name="AuthoringTable" EntityType="ChronozoomModel.Store.AuthoringTable" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="AuthoringTableRolePermission" EntityType="ChronozoomModel.Store.AuthoringTableRolePermission" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="BookMark" EntityType="ChronozoomModel.Store.BookMark" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="CitationType" EntityType="ChronozoomModel.Store.CitationType" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="ContentItem" EntityType="ChronozoomModel.Store.ContentItem" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="ContentKeyword" EntityType="ChronozoomModel.Store.ContentKeyword" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="CZSystemVersion" EntityType="ChronozoomModel.Store.CZSystemVersion" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="CZVersion" EntityType="ChronozoomModel.Store.CZVersion" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Exhibit" EntityType="ChronozoomModel.Store.Exhibit" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="ExhibitContentItem" EntityType="ChronozoomModel.Store.ExhibitContentItem" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="ExhibitKeyword" EntityType="ChronozoomModel.Store.ExhibitKeyword" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="ExhibitReference" EntityType="ChronozoomModel.Store.ExhibitReference" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Keyword" EntityType="ChronozoomModel.Store.Keyword" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="LicenseType" EntityType="ChronozoomModel.Store.LicenseType" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="MediaType" EntityType="ChronozoomModel.Store.MediaType" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Permission" EntityType="ChronozoomModel.Store.Permission" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Reference" EntityType="ChronozoomModel.Store.Reference" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="ReferenceKeyword" EntityType="ChronozoomModel.Store.ReferenceKeyword" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Regime" EntityType="ChronozoomModel.Store.Regime" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Role" EntityType="ChronozoomModel.Store.Role" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Threshold" EntityType="ChronozoomModel.Store.Threshold" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Timeline" EntityType="ChronozoomModel.Store.Timeline" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="TimelineExhibit" EntityType="ChronozoomModel.Store.TimelineExhibit" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="TimeUnit" EntityType="ChronozoomModel.Store.TimeUnit" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Tour" EntityType="ChronozoomModel.Store.Tour" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="TourBookmark" EntityType="ChronozoomModel.Store.TourBookmark" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="User" EntityType="ChronozoomModel.Store.User" store:Type="Tables" Schema="dbo" />
+    <AssociationSet Name="FK_AuthoringTable_User" Association="ChronozoomModel.Store.FK_AuthoringTable_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="AuthoringTable" EntitySet="AuthoringTable" />
+    </AssociationSet>
+    <AssociationSet Name="FK_AuthoringTable_User1" Association="ChronozoomModel.Store.FK_AuthoringTable_User1">
+      <End Role="User" EntitySet="User" />
+      <End Role="AuthoringTable" EntitySet="AuthoringTable" />
+    </AssociationSet>
+    <AssociationSet Name="FK_AuthoringTableRolePermission_AuthoringTable" Association="ChronozoomModel.Store.FK_AuthoringTableRolePermission_AuthoringTable">
+      <End Role="AuthoringTable" EntitySet="AuthoringTable" />
+      <End Role="AuthoringTableRolePermission" EntitySet="AuthoringTableRolePermission" />
+    </AssociationSet>
+    <AssociationSet Name="FK_AuthoringTableRolePermission_Role" Association="ChronozoomModel.Store.FK_AuthoringTableRolePermission_Role">
+      <End Role="Role" EntitySet="Role" />
+      <End Role="AuthoringTableRolePermission" EntitySet="AuthoringTableRolePermission" />
+    </AssociationSet>
+    <AssociationSet Name="FK_AuthoringTableRolePermission_User" Association="ChronozoomModel.Store.FK_AuthoringTableRolePermission_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="AuthoringTableRolePermission" EntitySet="AuthoringTableRolePermission" />
+    </AssociationSet>
+    <AssociationSet Name="FK_AuthoringTableRolePermission_User1" Association="ChronozoomModel.Store.FK_AuthoringTableRolePermission_User1">
+      <End Role="User" EntitySet="User" />
+      <End Role="AuthoringTableRolePermission" EntitySet="AuthoringTableRolePermission" />
+    </AssociationSet>
+    <AssociationSet Name="FK_BookMark_User" Association="ChronozoomModel.Store.FK_BookMark_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="BookMark" EntitySet="BookMark" />
+    </AssociationSet>
+    <AssociationSet Name="FK_BookMark_User1" Association="ChronozoomModel.Store.FK_BookMark_User1">
+      <End Role="User" EntitySet="User" />
+      <End Role="BookMark" EntitySet="BookMark" />
+    </AssociationSet>
+    <AssociationSet Name="FK_CitationType_User" Association="ChronozoomModel.Store.FK_CitationType_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="CitationType" EntitySet="CitationType" />
+    </AssociationSet>
+    <AssociationSet Name="FK_CitationType_User1" Association="ChronozoomModel.Store.FK_CitationType_User1">
+      <End Role="User" EntitySet="User" />
+      <End Role="CitationType" EntitySet="CitationType" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ContentItem_LicenseType" Association="ChronozoomModel.Store.FK_ContentItem_LicenseType">
+      <End Role="LicenseType" EntitySet="LicenseType" />
+      <End Role="ContentItem" EntitySet="ContentItem" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ContentItem_MediaType" Association="ChronozoomModel.Store.FK_ContentItem_MediaType">
+      <End Role="MediaType" EntitySet="MediaType" />
+      <End Role="ContentItem" EntitySet="ContentItem" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ContentItem_Regime" Association="ChronozoomModel.Store.FK_ContentItem_Regime">
+      <End Role="Regime" EntitySet="Regime" />
+      <End Role="ContentItem" EntitySet="ContentItem" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ContentItem_Threshold" Association="ChronozoomModel.Store.FK_ContentItem_Threshold">
+      <End Role="Threshold" EntitySet="Threshold" />
+      <End Role="ContentItem" EntitySet="ContentItem" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ContentItem_TimeUnit" Association="ChronozoomModel.Store.FK_ContentItem_TimeUnit">
+      <End Role="TimeUnit" EntitySet="TimeUnit" />
+      <End Role="ContentItem" EntitySet="ContentItem" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ContentItem_User" Association="ChronozoomModel.Store.FK_ContentItem_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="ContentItem" EntitySet="ContentItem" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ContentItem_User1" Association="ChronozoomModel.Store.FK_ContentItem_User1">
+      <End Role="User" EntitySet="User" />
+      <End Role="ContentItem" EntitySet="ContentItem" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ContentKeyword_ContentItem" Association="ChronozoomModel.Store.FK_ContentKeyword_ContentItem">
+      <End Role="ContentItem" EntitySet="ContentItem" />
+      <End Role="ContentKeyword" EntitySet="ContentKeyword" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ContentKeyword_Keyword" Association="ChronozoomModel.Store.FK_ContentKeyword_Keyword">
+      <End Role="Keyword" EntitySet="Keyword" />
+      <End Role="ContentKeyword" EntitySet="ContentKeyword" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ContentKeyword_User" Association="ChronozoomModel.Store.FK_ContentKeyword_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="ContentKeyword" EntitySet="ContentKeyword" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ContentKeyword_User1" Association="ChronozoomModel.Store.FK_ContentKeyword_User1">
+      <End Role="User" EntitySet="User" />
+      <End Role="ContentKeyword" EntitySet="ContentKeyword" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Exhibit_Regime" Association="ChronozoomModel.Store.FK_Exhibit_Regime">
+      <End Role="Regime" EntitySet="Regime" />
+      <End Role="Exhibit" EntitySet="Exhibit" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Exhibit_Threshold" Association="ChronozoomModel.Store.FK_Exhibit_Threshold">
+      <End Role="Threshold" EntitySet="Threshold" />
+      <End Role="Exhibit" EntitySet="Exhibit" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Exhibit_TimeUnit" Association="ChronozoomModel.Store.FK_Exhibit_TimeUnit">
+      <End Role="TimeUnit" EntitySet="TimeUnit" />
+      <End Role="Exhibit" EntitySet="Exhibit" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Exhibit_User" Association="ChronozoomModel.Store.FK_Exhibit_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="Exhibit" EntitySet="Exhibit" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Exhibit_User1" Association="ChronozoomModel.Store.FK_Exhibit_User1">
+      <End Role="User" EntitySet="User" />
+      <End Role="Exhibit" EntitySet="Exhibit" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ExhibitContentItem_ContentItem" Association="ChronozoomModel.Store.FK_ExhibitContentItem_ContentItem">
+      <End Role="ContentItem" EntitySet="ContentItem" />
+      <End Role="ExhibitContentItem" EntitySet="ExhibitContentItem" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ExhibitContentItem_Exhibit" Association="ChronozoomModel.Store.FK_ExhibitContentItem_Exhibit">
+      <End Role="Exhibit" EntitySet="Exhibit" />
+      <End Role="ExhibitContentItem" EntitySet="ExhibitContentItem" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ExhibitContentItem_User" Association="ChronozoomModel.Store.FK_ExhibitContentItem_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="ExhibitContentItem" EntitySet="ExhibitContentItem" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ExhibitContentItem_User1" Association="ChronozoomModel.Store.FK_ExhibitContentItem_User1">
+      <End Role="User" EntitySet="User" />
+      <End Role="ExhibitContentItem" EntitySet="ExhibitContentItem" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ExhibitKeyword_Exhibit" Association="ChronozoomModel.Store.FK_ExhibitKeyword_Exhibit">
+      <End Role="Exhibit" EntitySet="Exhibit" />
+      <End Role="ExhibitKeyword" EntitySet="ExhibitKeyword" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ExhibitKeyword_Keyword" Association="ChronozoomModel.Store.FK_ExhibitKeyword_Keyword">
+      <End Role="Keyword" EntitySet="Keyword" />
+      <End Role="ExhibitKeyword" EntitySet="ExhibitKeyword" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ExhibitKeyword_User" Association="ChronozoomModel.Store.FK_ExhibitKeyword_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="ExhibitKeyword" EntitySet="ExhibitKeyword" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ExhibitKeyword_User1" Association="ChronozoomModel.Store.FK_ExhibitKeyword_User1">
+      <End Role="User" EntitySet="User" />
+      <End Role="ExhibitKeyword" EntitySet="ExhibitKeyword" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ExhibitReference_Exhibit" Association="ChronozoomModel.Store.FK_ExhibitReference_Exhibit">
+      <End Role="Exhibit" EntitySet="Exhibit" />
+      <End Role="ExhibitReference" EntitySet="ExhibitReference" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ExhibitReference_Reference" Association="ChronozoomModel.Store.FK_ExhibitReference_Reference">
+      <End Role="Reference" EntitySet="Reference" />
+      <End Role="ExhibitReference" EntitySet="ExhibitReference" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ExhibitReference_User" Association="ChronozoomModel.Store.FK_ExhibitReference_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="ExhibitReference" EntitySet="ExhibitReference" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ExhibitReference_User1" Association="ChronozoomModel.Store.FK_ExhibitReference_User1">
+      <End Role="User" EntitySet="User" />
+      <End Role="ExhibitReference" EntitySet="ExhibitReference" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Keyword_User" Association="ChronozoomModel.Store.FK_Keyword_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="Keyword" EntitySet="Keyword" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Keyword_User1" Association="ChronozoomModel.Store.FK_Keyword_User1">
+      <End Role="User" EntitySet="User" />
+      <End Role="Keyword" EntitySet="Keyword" />
+    </AssociationSet>
+    <AssociationSet Name="FK_LicenseType_User" Association="ChronozoomModel.Store.FK_LicenseType_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="LicenseType" EntitySet="LicenseType" />
+    </AssociationSet>
+    <AssociationSet Name="FK_LicenseType_User1" Association="ChronozoomModel.Store.FK_LicenseType_User1">
+      <End Role="User" EntitySet="User" />
+      <End Role="LicenseType" EntitySet="LicenseType" />
+    </AssociationSet>
+    <AssociationSet Name="FK_MediaType_User" Association="ChronozoomModel.Store.FK_MediaType_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="MediaType" EntitySet="MediaType" />
+    </AssociationSet>
+    <AssociationSet Name="FK_MediaType_User1" Association="ChronozoomModel.Store.FK_MediaType_User1">
+      <End Role="User" EntitySet="User" />
+      <End Role="MediaType" EntitySet="MediaType" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Permission_User" Association="ChronozoomModel.Store.FK_Permission_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="Permission" EntitySet="Permission" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Permission_User1" Association="ChronozoomModel.Store.FK_Permission_User1">
+      <End Role="User" EntitySet="User" />
+      <End Role="Permission" EntitySet="Permission" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Reference_CitationType" Association="ChronozoomModel.Store.FK_Reference_CitationType">
+      <End Role="CitationType" EntitySet="CitationType" />
+      <End Role="Reference" EntitySet="Reference" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Reference_User" Association="ChronozoomModel.Store.FK_Reference_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="Reference" EntitySet="Reference" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Reference_User1" Association="ChronozoomModel.Store.FK_Reference_User1">
+      <End Role="User" EntitySet="User" />
+      <End Role="Reference" EntitySet="Reference" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ReferenceKeyword_Keyword" Association="ChronozoomModel.Store.FK_ReferenceKeyword_Keyword">
+      <End Role="Keyword" EntitySet="Keyword" />
+      <End Role="ReferenceKeyword" EntitySet="ReferenceKeyword" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ReferenceKeyword_Reference" Association="ChronozoomModel.Store.FK_ReferenceKeyword_Reference">
+      <End Role="Reference" EntitySet="Reference" />
+      <End Role="ReferenceKeyword" EntitySet="ReferenceKeyword" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ReferenceKeyword_User" Association="ChronozoomModel.Store.FK_ReferenceKeyword_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="ReferenceKeyword" EntitySet="ReferenceKeyword" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ReferenceKeyword_User1" Association="ChronozoomModel.Store.FK_ReferenceKeyword_User1">
+      <End Role="User" EntitySet="User" />
+      <End Role="ReferenceKeyword" EntitySet="ReferenceKeyword" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Regime_User" Association="ChronozoomModel.Store.FK_Regime_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="Regime" EntitySet="Regime" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Regime_User1" Association="ChronozoomModel.Store.FK_Regime_User1">
+      <End Role="User" EntitySet="User" />
+      <End Role="Regime" EntitySet="Regime" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Role_User" Association="ChronozoomModel.Store.FK_Role_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="Role" EntitySet="Role" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Role_User1" Association="ChronozoomModel.Store.FK_Role_User1">
+      <End Role="User" EntitySet="User" />
+      <End Role="Role" EntitySet="Role" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Threshold_Bookmark" Association="ChronozoomModel.Store.FK_Threshold_Bookmark">
+      <End Role="BookMark" EntitySet="BookMark" />
+      <End Role="Threshold" EntitySet="Threshold" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Threshold_TimeUnit" Association="ChronozoomModel.Store.FK_Threshold_TimeUnit">
+      <End Role="TimeUnit" EntitySet="TimeUnit" />
+      <End Role="Threshold" EntitySet="Threshold" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Threshold_User" Association="ChronozoomModel.Store.FK_Threshold_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="Threshold" EntitySet="Threshold" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Threshold_User1" Association="ChronozoomModel.Store.FK_Threshold_User1">
+      <End Role="User" EntitySet="User" />
+      <End Role="Threshold" EntitySet="Threshold" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Timeline_FromTimeUnit" Association="ChronozoomModel.Store.FK_Timeline_FromTimeUnit">
+      <End Role="TimeUnit" EntitySet="TimeUnit" />
+      <End Role="Timeline" EntitySet="Timeline" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Timeline_Regime" Association="ChronozoomModel.Store.FK_Timeline_Regime">
+      <End Role="Regime" EntitySet="Regime" />
+      <End Role="Timeline" EntitySet="Timeline" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Timeline_Threshold" Association="ChronozoomModel.Store.FK_Timeline_Threshold">
+      <End Role="Threshold" EntitySet="Threshold" />
+      <End Role="Timeline" EntitySet="Timeline" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Timeline_Timeline" Association="ChronozoomModel.Store.FK_Timeline_Timeline">
+      <End Role="Timeline" EntitySet="Timeline" />
+      <End Role="Timeline1" EntitySet="Timeline" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Timeline_ToTimeUnit" Association="ChronozoomModel.Store.FK_Timeline_ToTimeUnit">
+      <End Role="TimeUnit" EntitySet="TimeUnit" />
+      <End Role="Timeline" EntitySet="Timeline" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Timeline_User" Association="ChronozoomModel.Store.FK_Timeline_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="Timeline" EntitySet="Timeline" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Timeline_User1" Association="ChronozoomModel.Store.FK_Timeline_User1">
+      <End Role="User" EntitySet="User" />
+      <End Role="Timeline" EntitySet="Timeline" />
+    </AssociationSet>
+    <AssociationSet Name="FK_TimelineExhibit_Exhibit" Association="ChronozoomModel.Store.FK_TimelineExhibit_Exhibit">
+      <End Role="Exhibit" EntitySet="Exhibit" />
+      <End Role="TimelineExhibit" EntitySet="TimelineExhibit" />
+    </AssociationSet>
+    <AssociationSet Name="FK_TimelineExhibit_Timeline" Association="ChronozoomModel.Store.FK_TimelineExhibit_Timeline">
+      <End Role="Timeline" EntitySet="Timeline" />
+      <End Role="TimelineExhibit" EntitySet="TimelineExhibit" />
+    </AssociationSet>
+    <AssociationSet Name="FK_TimelineExhibit_User" Association="ChronozoomModel.Store.FK_TimelineExhibit_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="TimelineExhibit" EntitySet="TimelineExhibit" />
+    </AssociationSet>
+    <AssociationSet Name="FK_TimelineExhibit_User1" Association="ChronozoomModel.Store.FK_TimelineExhibit_User1">
+      <End Role="User" EntitySet="User" />
+      <End Role="TimelineExhibit" EntitySet="TimelineExhibit" />
+    </AssociationSet>
+    <AssociationSet Name="FK_TimeUnit_User" Association="ChronozoomModel.Store.FK_TimeUnit_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="TimeUnit" EntitySet="TimeUnit" />
+    </AssociationSet>
+    <AssociationSet Name="FK_TimeUnit_User1" Association="ChronozoomModel.Store.FK_TimeUnit_User1">
+      <End Role="User" EntitySet="User" />
+      <End Role="TimeUnit" EntitySet="TimeUnit" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Tour_User" Association="ChronozoomModel.Store.FK_Tour_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="Tour" EntitySet="Tour" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Tour_User1" Association="ChronozoomModel.Store.FK_Tour_User1">
+      <End Role="User" EntitySet="User" />
+      <End Role="Tour" EntitySet="Tour" />
+    </AssociationSet>
+    <AssociationSet Name="FK_TourBookmark_Bookmark" Association="ChronozoomModel.Store.FK_TourBookmark_Bookmark">
+      <End Role="BookMark" EntitySet="BookMark" />
+      <End Role="TourBookmark" EntitySet="TourBookmark" />
+    </AssociationSet>
+    <AssociationSet Name="FK_TourBookmark_Tour" Association="ChronozoomModel.Store.FK_TourBookmark_Tour">
+      <End Role="Tour" EntitySet="Tour" />
+      <End Role="TourBookmark" EntitySet="TourBookmark" />
+    </AssociationSet>
+    <AssociationSet Name="FK_TourBookmark_User" Association="ChronozoomModel.Store.FK_TourBookmark_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="TourBookmark" EntitySet="TourBookmark" />
+    </AssociationSet>
+    <AssociationSet Name="FK_TourBookmark_User1" Association="ChronozoomModel.Store.FK_TourBookmark_User1">
+      <End Role="User" EntitySet="User" />
+      <End Role="TourBookmark" EntitySet="TourBookmark" />
+    </AssociationSet>
+    <AssociationSet Name="FK_User_Role" Association="ChronozoomModel.Store.FK_User_Role">
+      <End Role="Role" EntitySet="Role" />
+      <End Role="User" EntitySet="User" />
+    </AssociationSet>
+    <AssociationSet Name="FK_User_User" Association="ChronozoomModel.Store.FK_User_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="User1" EntitySet="User" />
+    </AssociationSet>
+    <AssociationSet Name="FK_User_User1" Association="ChronozoomModel.Store.FK_User_User1">
+      <End Role="User" EntitySet="User" />
+      <End Role="User1" EntitySet="User" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="AuthoringTable">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="AuthoringTable" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <EntityType Name="AuthoringTableRolePermission">
+    <Key>
+      <PropertyRef Name="AuthoringTableRolePermissionID" />
+    </Key>
+    <Property Name="AuthoringTableRolePermissionID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="AuthoringTableID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="RoleID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Permission" Type="tinyint" Nullable="false" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <EntityType Name="BookMark">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="URL" Type="nvarchar" Nullable="false" MaxLength="300" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="LapseTime" Type="int" />
+    <Property Name="Description" Type="nvarchar" MaxLength="300" />
+    <Property Name="CurrVersion" Type="int" />
+    <Property Name="IsVisible" Type="bit" />
+  </EntityType>
+  <EntityType Name="CitationType">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="CitationType" Type="nvarchar" Nullable="false" MaxLength="50" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <EntityType Name="ContentItem">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="200" />
+    <Property Name="Caption" Type="nvarchar" Nullable="false" MaxLength="1000" />
+    <Property Name="Topic" Type="nvarchar" Nullable="false" MaxLength="200" />
+    <Property Name="MediaTypeID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ThresholdID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="RegimeID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="MediaBlobURL" Type="nvarchar" Nullable="false" MaxLength="500" />
+    <Property Name="TimeUnitID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ContentDate" Type="datetimeoffset" />
+    <Property Name="ContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="MediaSource" Type="nvarchar" MaxLength="300" />
+    <Property Name="Attribution" Type="nvarchar" MaxLength="200" />
+    <Property Name="LicenseTypeID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="IsVisible" Type="bit" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="UniqueID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <EntityType Name="ContentKeyword">
+    <Key>
+      <PropertyRef Name="ContentKeywordID" />
+    </Key>
+    <Property Name="ContentKeywordID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ContentID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="KeywordID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <EntityType Name="CZSystemVersion">
+    <Key>
+      <PropertyRef Name="CZSystemVersionID" />
+    </Key>
+    <Property Name="StagingVersion" Type="int" />
+    <Property Name="ProdVersion" Type="int" />
+    <Property Name="CZSystemVersionID" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <!--Errors Found During Generation:
+      warning 6035: The relationship 'FK__Authoring__CurrV__047AA831' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+      warning 6035: The relationship 'FK__Authoring__CurrV__056ECC6A' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+      warning 6035: The relationship 'FK__BookMark__CurrVe__0662F0A3' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+      warning 6035: The relationship 'FK__CitationT__CurrV__075714DC' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+      warning 6035: The relationship 'FK__ContentIt__CurrV__084B3915' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+      warning 6035: The relationship 'FK__ContentKe__CurrV__093F5D4E' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+      warning 6035: The relationship 'FK__Exhibit__CurrVer__0A338187' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+      warning 6035: The relationship 'FK__ExhibitCo__CurrV__0B27A5C0' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+      warning 6035: The relationship 'FK__ExhibitKe__CurrV__0C1BC9F9' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+      warning 6035: The relationship 'FK__ExhibitRe__CurrV__0D0FEE32' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+      warning 6035: The relationship 'FK__Keyword__CurrVer__0E04126B' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+      warning 6035: The relationship 'FK__LicenseTy__CurrV__0EF836A4' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+      warning 6035: The relationship 'FK__MediaType__CurrV__0FEC5ADD' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+      warning 6035: The relationship 'FK__Permissio__CurrV__10E07F16' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+      warning 6035: The relationship 'FK__Reference__CurrV__11D4A34F' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+      warning 6035: The relationship 'FK__Reference__CurrV__12C8C788' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+      warning 6035: The relationship 'FK__Regime__CurrVers__13BCEBC1' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+      warning 6035: The relationship 'FK__Role__CurrVersio__14B10FFA' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+      warning 6035: The relationship 'FK__Threshold__CurrV__15A53433' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+      warning 6035: The relationship 'FK__Timeline__CurrVe__1699586C' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+      warning 6035: The relationship 'FK__TimelineE__CurrV__178D7CA5' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+      warning 6035: The relationship 'FK__TimeUnit__CurrVe__1881A0DE' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+      warning 6035: The relationship 'FK__Tour__CurrVersio__1975C517' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+      warning 6035: The relationship 'FK__TourBookm__CurrV__1A69E950' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+      warning 6035: The relationship 'FK__User__CurrVersio__1B5E0D89' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+      -->
+  <EntityType Name="CZVersion">
+    <Key>
+      <PropertyRef Name="CZVersionID" />
+    </Key>
+    <Property Name="VersionNumber" Type="int" Nullable="false" />
+    <Property Name="CreatedDate" Type="datetime" Nullable="false" />
+    <Property Name="PublishDate" Type="datetime" />
+    <Property Name="UserID" Type="uniqueidentifier" />
+    <Property Name="IsDeleted" Type="bit" Nullable="false" />
+    <Property Name="CZVersionID" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Exhibit">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="ThresholdID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="RegimeID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ContentDate" Type="datetimeoffset" />
+    <Property Name="ContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="IsVisible" Type="bit" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="TimeUnitID" Type="uniqueidentifier" />
+    <Property Name="UniqueID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="Sequence" Type="int" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <EntityType Name="ExhibitContentItem">
+    <Key>
+      <PropertyRef Name="ExhibitContentItemID" />
+    </Key>
+    <Property Name="ExhibitContentItemID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ExhibitID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ContentItemID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Order" Type="smallint" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <EntityType Name="ExhibitKeyword">
+    <Key>
+      <PropertyRef Name="ExhibitKeywordID" />
+    </Key>
+    <Property Name="ExhibitKeywordID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ExhibitID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="KeywordID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <EntityType Name="ExhibitReference">
+    <Key>
+      <PropertyRef Name="ExhibitReferenceID" />
+    </Key>
+    <Property Name="ExhibitReferenceID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ExhibitID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ReferenceID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Order" Type="smallint" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <EntityType Name="Keyword">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Keyword" Type="nvarchar" Nullable="false" MaxLength="50" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="DoNotDisplay" Type="bit" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <EntityType Name="LicenseType">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="LicenseType" Type="nvarchar" Nullable="false" MaxLength="200" />
+    <Property Name="LicenseURL" Type="nvarchar" Nullable="false" MaxLength="300" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <EntityType Name="MediaType">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="MediaType" Type="nvarchar" Nullable="false" MaxLength="50" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <EntityType Name="Permission">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Permission" Type="nvarchar" Nullable="false" MaxLength="50" />
+    <Property Name="IntRepresentation" Type="tinyint" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <EntityType Name="Reference">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Authors" Type="nvarchar" Nullable="false" MaxLength="500" />
+    <Property Name="BookChapters" Type="nvarchar" MaxLength="300" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="CitationTypeID" Type="uniqueidentifier" />
+    <Property Name="PageNumbers" Type="nvarchar" MaxLength="100" />
+    <Property Name="Publication" Type="nvarchar" MaxLength="300" />
+    <Property Name="PublicationDates" Type="nvarchar" MaxLength="300" />
+    <Property Name="Source" Type="nvarchar" Nullable="false" MaxLength="200" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="IsVisible" Type="bit" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <EntityType Name="ReferenceKeyword">
+    <Key>
+      <PropertyRef Name="ReferenceKeywordID" />
+    </Key>
+    <Property Name="ReferenceKeywordID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ReferenceID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="KeywordID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <EntityType Name="Regime">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Regime" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="DoNotDisplay" Type="bit" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <EntityType Name="Role">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Role" Type="nvarchar" Nullable="false" MaxLength="50" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <EntityType Name="Threshold">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Threshold" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="ShortDescription" Type="nvarchar" MaxLength="200" />
+    <Property Name="ThresholdDate" Type="datetimeoffset" />
+    <Property Name="ThresholdYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="ThresholdTimeUnit" Type="uniqueidentifier" />
+    <Property Name="BookmarkID" Type="uniqueidentifier" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <EntityType Name="Timeline">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="ThresholdID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="RegimeID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="FromContentDate" Type="datetimeoffset" />
+    <Property Name="FromContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="ToContentDate" Type="datetimeoffset" />
+    <Property Name="ToContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="ParentTimelineID" Type="uniqueidentifier" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="IsVisible" Type="bit" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="FromTimeUnit" Type="uniqueidentifier" />
+    <Property Name="ToTimeUnit" Type="uniqueidentifier" />
+    <Property Name="SourceURL" Type="nvarchar" MaxLength="500" />
+    <Property Name="Attribution" Type="nvarchar" MaxLength="500" />
+    <Property Name="UniqueID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="Sequence" Type="int" />
+    <Property Name="Height" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <EntityType Name="TimelineExhibit">
+    <Key>
+      <PropertyRef Name="TimelineExhibitID" />
+    </Key>
+    <Property Name="TimelineExhibitID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="TimelineID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ExhibitID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <EntityType Name="TimeUnit">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="TimeUnit" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <EntityType Name="Tour">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="UniqueID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="AudioBlobUrl" Type="nvarchar" MaxLength="300" />
+    <Property Name="Category" Type="nvarchar" MaxLength="100" />
+    <Property Name="Sequence" Type="int" />
+    <Property Name="CurrVersion" Type="int" />
+    <Property Name="IsVisible" Type="bit" />
+  </EntityType>
+  <EntityType Name="TourBookmark">
+    <Key>
+      <PropertyRef Name="TourBookmarkID" />
+    </Key>
+    <Property Name="TourBookmarkID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="TourID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="BookmarkID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="SequenceNumber" Type="smallint" Nullable="false" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="CurrVersion" Type="int" />
+    <Property Name="IsVisible" Type="bit" />
+  </EntityType>
+  <EntityType Name="User">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="UserName" Type="nvarchar" Nullable="false" MaxLength="50" />
+    <Property Name="Password" Type="nvarchar" Nullable="false" MaxLength="200" />
+    <Property Name="FirstName" Type="nvarchar" Nullable="false" MaxLength="200" />
+    <Property Name="LastName" Type="nvarchar" Nullable="false" MaxLength="200" />
+    <Property Name="EmailAddress" Type="nvarchar" Nullable="false" MaxLength="500" />
+    <Property Name="RoleID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <Association Name="FK_AuthoringTable_User">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="AuthoringTable" Type="ChronozoomModel.Store.AuthoringTable" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="AuthoringTable">
+        <PropertyRef Name="CreatedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_AuthoringTable_User1">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="AuthoringTable" Type="ChronozoomModel.Store.AuthoringTable" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="AuthoringTable">
+        <PropertyRef Name="ModifiedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_AuthoringTableRolePermission_AuthoringTable">
+    <End Role="AuthoringTable" Type="ChronozoomModel.Store.AuthoringTable" Multiplicity="1" />
+    <End Role="AuthoringTableRolePermission" Type="ChronozoomModel.Store.AuthoringTableRolePermission" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="AuthoringTable">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="AuthoringTableRolePermission">
+        <PropertyRef Name="AuthoringTableID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_AuthoringTableRolePermission_Role">
+    <End Role="Role" Type="ChronozoomModel.Store.Role" Multiplicity="1" />
+    <End Role="AuthoringTableRolePermission" Type="ChronozoomModel.Store.AuthoringTableRolePermission" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Role">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="AuthoringTableRolePermission">
+        <PropertyRef Name="RoleID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_AuthoringTableRolePermission_User">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="AuthoringTableRolePermission" Type="ChronozoomModel.Store.AuthoringTableRolePermission" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="AuthoringTableRolePermission">
+        <PropertyRef Name="CreatedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_AuthoringTableRolePermission_User1">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="AuthoringTableRolePermission" Type="ChronozoomModel.Store.AuthoringTableRolePermission" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="AuthoringTableRolePermission">
+        <PropertyRef Name="ModifiedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_BookMark_User">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="BookMark" Type="ChronozoomModel.Store.BookMark" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="BookMark">
+        <PropertyRef Name="CreatedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_BookMark_User1">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="BookMark" Type="ChronozoomModel.Store.BookMark" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="BookMark">
+        <PropertyRef Name="ModifiedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_CitationType_User">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="CitationType" Type="ChronozoomModel.Store.CitationType" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="CitationType">
+        <PropertyRef Name="CreatedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_CitationType_User1">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="CitationType" Type="ChronozoomModel.Store.CitationType" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="CitationType">
+        <PropertyRef Name="ModifiedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ContentItem_LicenseType">
+    <End Role="LicenseType" Type="ChronozoomModel.Store.LicenseType" Multiplicity="1" />
+    <End Role="ContentItem" Type="ChronozoomModel.Store.ContentItem" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="LicenseType">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ContentItem">
+        <PropertyRef Name="LicenseTypeID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ContentItem_MediaType">
+    <End Role="MediaType" Type="ChronozoomModel.Store.MediaType" Multiplicity="1" />
+    <End Role="ContentItem" Type="ChronozoomModel.Store.ContentItem" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="MediaType">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ContentItem">
+        <PropertyRef Name="MediaTypeID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ContentItem_Regime">
+    <End Role="Regime" Type="ChronozoomModel.Store.Regime" Multiplicity="1" />
+    <End Role="ContentItem" Type="ChronozoomModel.Store.ContentItem" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Regime">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ContentItem">
+        <PropertyRef Name="RegimeID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ContentItem_Threshold">
+    <End Role="Threshold" Type="ChronozoomModel.Store.Threshold" Multiplicity="1" />
+    <End Role="ContentItem" Type="ChronozoomModel.Store.ContentItem" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Threshold">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ContentItem">
+        <PropertyRef Name="ThresholdID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ContentItem_TimeUnit">
+    <End Role="TimeUnit" Type="ChronozoomModel.Store.TimeUnit" Multiplicity="1" />
+    <End Role="ContentItem" Type="ChronozoomModel.Store.ContentItem" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="TimeUnit">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ContentItem">
+        <PropertyRef Name="TimeUnitID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ContentItem_User">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="ContentItem" Type="ChronozoomModel.Store.ContentItem" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ContentItem">
+        <PropertyRef Name="CreatedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ContentItem_User1">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="ContentItem" Type="ChronozoomModel.Store.ContentItem" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ContentItem">
+        <PropertyRef Name="ModifiedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ContentKeyword_ContentItem">
+    <End Role="ContentItem" Type="ChronozoomModel.Store.ContentItem" Multiplicity="1" />
+    <End Role="ContentKeyword" Type="ChronozoomModel.Store.ContentKeyword" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="ContentItem">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ContentKeyword">
+        <PropertyRef Name="ContentID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ContentKeyword_Keyword">
+    <End Role="Keyword" Type="ChronozoomModel.Store.Keyword" Multiplicity="1" />
+    <End Role="ContentKeyword" Type="ChronozoomModel.Store.ContentKeyword" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Keyword">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ContentKeyword">
+        <PropertyRef Name="KeywordID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ContentKeyword_User">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="ContentKeyword" Type="ChronozoomModel.Store.ContentKeyword" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ContentKeyword">
+        <PropertyRef Name="CreatedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ContentKeyword_User1">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="ContentKeyword" Type="ChronozoomModel.Store.ContentKeyword" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ContentKeyword">
+        <PropertyRef Name="ModifiedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Exhibit_Regime">
+    <End Role="Regime" Type="ChronozoomModel.Store.Regime" Multiplicity="1" />
+    <End Role="Exhibit" Type="ChronozoomModel.Store.Exhibit" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Regime">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Exhibit">
+        <PropertyRef Name="RegimeID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Exhibit_Threshold">
+    <End Role="Threshold" Type="ChronozoomModel.Store.Threshold" Multiplicity="1" />
+    <End Role="Exhibit" Type="ChronozoomModel.Store.Exhibit" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Threshold">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Exhibit">
+        <PropertyRef Name="ThresholdID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Exhibit_TimeUnit">
+    <End Role="TimeUnit" Type="ChronozoomModel.Store.TimeUnit" Multiplicity="0..1" />
+    <End Role="Exhibit" Type="ChronozoomModel.Store.Exhibit" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="TimeUnit">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Exhibit">
+        <PropertyRef Name="TimeUnitID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Exhibit_User">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="Exhibit" Type="ChronozoomModel.Store.Exhibit" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Exhibit">
+        <PropertyRef Name="CreatedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Exhibit_User1">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="Exhibit" Type="ChronozoomModel.Store.Exhibit" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Exhibit">
+        <PropertyRef Name="ModifiedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ExhibitContentItem_ContentItem">
+    <End Role="ContentItem" Type="ChronozoomModel.Store.ContentItem" Multiplicity="1" />
+    <End Role="ExhibitContentItem" Type="ChronozoomModel.Store.ExhibitContentItem" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="ContentItem">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ExhibitContentItem">
+        <PropertyRef Name="ContentItemID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ExhibitContentItem_Exhibit">
+    <End Role="Exhibit" Type="ChronozoomModel.Store.Exhibit" Multiplicity="1" />
+    <End Role="ExhibitContentItem" Type="ChronozoomModel.Store.ExhibitContentItem" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Exhibit">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ExhibitContentItem">
+        <PropertyRef Name="ExhibitID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ExhibitContentItem_User">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="ExhibitContentItem" Type="ChronozoomModel.Store.ExhibitContentItem" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ExhibitContentItem">
+        <PropertyRef Name="CreatedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ExhibitContentItem_User1">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="ExhibitContentItem" Type="ChronozoomModel.Store.ExhibitContentItem" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ExhibitContentItem">
+        <PropertyRef Name="ModifiedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ExhibitKeyword_Exhibit">
+    <End Role="Exhibit" Type="ChronozoomModel.Store.Exhibit" Multiplicity="1" />
+    <End Role="ExhibitKeyword" Type="ChronozoomModel.Store.ExhibitKeyword" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Exhibit">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ExhibitKeyword">
+        <PropertyRef Name="ExhibitID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ExhibitKeyword_Keyword">
+    <End Role="Keyword" Type="ChronozoomModel.Store.Keyword" Multiplicity="1" />
+    <End Role="ExhibitKeyword" Type="ChronozoomModel.Store.ExhibitKeyword" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Keyword">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ExhibitKeyword">
+        <PropertyRef Name="KeywordID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ExhibitKeyword_User">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="ExhibitKeyword" Type="ChronozoomModel.Store.ExhibitKeyword" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ExhibitKeyword">
+        <PropertyRef Name="CreatedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ExhibitKeyword_User1">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="ExhibitKeyword" Type="ChronozoomModel.Store.ExhibitKeyword" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ExhibitKeyword">
+        <PropertyRef Name="ModifiedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ExhibitReference_Exhibit">
+    <End Role="Exhibit" Type="ChronozoomModel.Store.Exhibit" Multiplicity="1" />
+    <End Role="ExhibitReference" Type="ChronozoomModel.Store.ExhibitReference" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Exhibit">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ExhibitReference">
+        <PropertyRef Name="ExhibitID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ExhibitReference_Reference">
+    <End Role="Reference" Type="ChronozoomModel.Store.Reference" Multiplicity="1" />
+    <End Role="ExhibitReference" Type="ChronozoomModel.Store.ExhibitReference" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Reference">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ExhibitReference">
+        <PropertyRef Name="ReferenceID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ExhibitReference_User">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="ExhibitReference" Type="ChronozoomModel.Store.ExhibitReference" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ExhibitReference">
+        <PropertyRef Name="CreatedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ExhibitReference_User1">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="ExhibitReference" Type="ChronozoomModel.Store.ExhibitReference" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ExhibitReference">
+        <PropertyRef Name="ModifiedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Keyword_User">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="Keyword" Type="ChronozoomModel.Store.Keyword" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Keyword">
+        <PropertyRef Name="CreatedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Keyword_User1">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="Keyword" Type="ChronozoomModel.Store.Keyword" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Keyword">
+        <PropertyRef Name="ModifiedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_LicenseType_User">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="LicenseType" Type="ChronozoomModel.Store.LicenseType" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="LicenseType">
+        <PropertyRef Name="CreatedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_LicenseType_User1">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="LicenseType" Type="ChronozoomModel.Store.LicenseType" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="LicenseType">
+        <PropertyRef Name="ModifiedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_MediaType_User">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="MediaType" Type="ChronozoomModel.Store.MediaType" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="MediaType">
+        <PropertyRef Name="CreatedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_MediaType_User1">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="MediaType" Type="ChronozoomModel.Store.MediaType" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="MediaType">
+        <PropertyRef Name="ModifiedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Permission_User">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="Permission" Type="ChronozoomModel.Store.Permission" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Permission">
+        <PropertyRef Name="CreatedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Permission_User1">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="Permission" Type="ChronozoomModel.Store.Permission" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Permission">
+        <PropertyRef Name="ModifiedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Reference_CitationType">
+    <End Role="CitationType" Type="ChronozoomModel.Store.CitationType" Multiplicity="0..1" />
+    <End Role="Reference" Type="ChronozoomModel.Store.Reference" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="CitationType">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Reference">
+        <PropertyRef Name="CitationTypeID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Reference_User">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="Reference" Type="ChronozoomModel.Store.Reference" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Reference">
+        <PropertyRef Name="CreatedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Reference_User1">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="Reference" Type="ChronozoomModel.Store.Reference" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Reference">
+        <PropertyRef Name="ModifiedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ReferenceKeyword_Keyword">
+    <End Role="Keyword" Type="ChronozoomModel.Store.Keyword" Multiplicity="1" />
+    <End Role="ReferenceKeyword" Type="ChronozoomModel.Store.ReferenceKeyword" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Keyword">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ReferenceKeyword">
+        <PropertyRef Name="KeywordID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ReferenceKeyword_Reference">
+    <End Role="Reference" Type="ChronozoomModel.Store.Reference" Multiplicity="1" />
+    <End Role="ReferenceKeyword" Type="ChronozoomModel.Store.ReferenceKeyword" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Reference">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ReferenceKeyword">
+        <PropertyRef Name="ReferenceID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ReferenceKeyword_User">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="ReferenceKeyword" Type="ChronozoomModel.Store.ReferenceKeyword" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ReferenceKeyword">
+        <PropertyRef Name="CreatedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ReferenceKeyword_User1">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="ReferenceKeyword" Type="ChronozoomModel.Store.ReferenceKeyword" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ReferenceKeyword">
+        <PropertyRef Name="ModifiedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Regime_User">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="Regime" Type="ChronozoomModel.Store.Regime" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Regime">
+        <PropertyRef Name="CreatedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Regime_User1">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="Regime" Type="ChronozoomModel.Store.Regime" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Regime">
+        <PropertyRef Name="ModifiedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Role_User">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="Role" Type="ChronozoomModel.Store.Role" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Role">
+        <PropertyRef Name="CreatedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Role_User1">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="Role" Type="ChronozoomModel.Store.Role" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Role">
+        <PropertyRef Name="ModifiedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Threshold_Bookmark">
+    <End Role="BookMark" Type="ChronozoomModel.Store.BookMark" Multiplicity="0..1" />
+    <End Role="Threshold" Type="ChronozoomModel.Store.Threshold" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="BookMark">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Threshold">
+        <PropertyRef Name="BookmarkID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Threshold_TimeUnit">
+    <End Role="TimeUnit" Type="ChronozoomModel.Store.TimeUnit" Multiplicity="0..1" />
+    <End Role="Threshold" Type="ChronozoomModel.Store.Threshold" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="TimeUnit">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Threshold">
+        <PropertyRef Name="ThresholdTimeUnit" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Threshold_User">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="Threshold" Type="ChronozoomModel.Store.Threshold" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Threshold">
+        <PropertyRef Name="CreatedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Threshold_User1">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="Threshold" Type="ChronozoomModel.Store.Threshold" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Threshold">
+        <PropertyRef Name="ModifiedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Timeline_FromTimeUnit">
+    <End Role="TimeUnit" Type="ChronozoomModel.Store.TimeUnit" Multiplicity="0..1" />
+    <End Role="Timeline" Type="ChronozoomModel.Store.Timeline" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="TimeUnit">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Timeline">
+        <PropertyRef Name="FromTimeUnit" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Timeline_Regime">
+    <End Role="Regime" Type="ChronozoomModel.Store.Regime" Multiplicity="1" />
+    <End Role="Timeline" Type="ChronozoomModel.Store.Timeline" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Regime">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Timeline">
+        <PropertyRef Name="RegimeID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Timeline_Threshold">
+    <End Role="Threshold" Type="ChronozoomModel.Store.Threshold" Multiplicity="1" />
+    <End Role="Timeline" Type="ChronozoomModel.Store.Timeline" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Threshold">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Timeline">
+        <PropertyRef Name="ThresholdID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Timeline_Timeline">
+    <End Role="Timeline" Type="ChronozoomModel.Store.Timeline" Multiplicity="0..1" />
+    <End Role="Timeline1" Type="ChronozoomModel.Store.Timeline" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Timeline">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Timeline1">
+        <PropertyRef Name="ParentTimelineID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Timeline_ToTimeUnit">
+    <End Role="TimeUnit" Type="ChronozoomModel.Store.TimeUnit" Multiplicity="0..1" />
+    <End Role="Timeline" Type="ChronozoomModel.Store.Timeline" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="TimeUnit">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Timeline">
+        <PropertyRef Name="ToTimeUnit" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Timeline_User">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="Timeline" Type="ChronozoomModel.Store.Timeline" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Timeline">
+        <PropertyRef Name="CreatedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Timeline_User1">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="Timeline" Type="ChronozoomModel.Store.Timeline" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Timeline">
+        <PropertyRef Name="ModifiedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_TimelineExhibit_Exhibit">
+    <End Role="Exhibit" Type="ChronozoomModel.Store.Exhibit" Multiplicity="1" />
+    <End Role="TimelineExhibit" Type="ChronozoomModel.Store.TimelineExhibit" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Exhibit">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="TimelineExhibit">
+        <PropertyRef Name="ExhibitID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_TimelineExhibit_Timeline">
+    <End Role="Timeline" Type="ChronozoomModel.Store.Timeline" Multiplicity="1" />
+    <End Role="TimelineExhibit" Type="ChronozoomModel.Store.TimelineExhibit" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Timeline">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="TimelineExhibit">
+        <PropertyRef Name="TimelineID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_TimelineExhibit_User">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="TimelineExhibit" Type="ChronozoomModel.Store.TimelineExhibit" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="TimelineExhibit">
+        <PropertyRef Name="CreatedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_TimelineExhibit_User1">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="TimelineExhibit" Type="ChronozoomModel.Store.TimelineExhibit" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="TimelineExhibit">
+        <PropertyRef Name="ModifiedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_TimeUnit_User">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="TimeUnit" Type="ChronozoomModel.Store.TimeUnit" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="TimeUnit">
+        <PropertyRef Name="CreatedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_TimeUnit_User1">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="TimeUnit" Type="ChronozoomModel.Store.TimeUnit" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="TimeUnit">
+        <PropertyRef Name="ModifiedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Tour_User">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="Tour" Type="ChronozoomModel.Store.Tour" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Tour">
+        <PropertyRef Name="CreatedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Tour_User1">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="Tour" Type="ChronozoomModel.Store.Tour" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Tour">
+        <PropertyRef Name="ModifiedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_TourBookmark_Bookmark">
+    <End Role="BookMark" Type="ChronozoomModel.Store.BookMark" Multiplicity="1" />
+    <End Role="TourBookmark" Type="ChronozoomModel.Store.TourBookmark" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="BookMark">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="TourBookmark">
+        <PropertyRef Name="BookmarkID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_TourBookmark_Tour">
+    <End Role="Tour" Type="ChronozoomModel.Store.Tour" Multiplicity="1" />
+    <End Role="TourBookmark" Type="ChronozoomModel.Store.TourBookmark" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Tour">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="TourBookmark">
+        <PropertyRef Name="TourID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_TourBookmark_User">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="TourBookmark" Type="ChronozoomModel.Store.TourBookmark" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="TourBookmark">
+        <PropertyRef Name="CreatedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_TourBookmark_User1">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="TourBookmark" Type="ChronozoomModel.Store.TourBookmark" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="TourBookmark">
+        <PropertyRef Name="ModifiedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_User_Role">
+    <End Role="Role" Type="ChronozoomModel.Store.Role" Multiplicity="1" />
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Role">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="User">
+        <PropertyRef Name="RoleID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_User_User">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="User1" Type="ChronozoomModel.Store.User" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="User1">
+        <PropertyRef Name="CreatedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_User_User1">
+    <End Role="User" Type="ChronozoomModel.Store.User" Multiplicity="0..1" />
+    <End Role="User1" Type="ChronozoomModel.Store.User" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="User1">
+        <PropertyRef Name="ModifiedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Function Name="GenerateVersion" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+  <Function Name="Publish" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="StagingVersion" Type="int" Mode="In" />
+    <Parameter Name="IsStaging" Type="int" Mode="In" />
+  </Function>
+  <Function Name="RollToVersion" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="VersionNumber" Type="int" Mode="In" />
+  </Function>
+</Schema>

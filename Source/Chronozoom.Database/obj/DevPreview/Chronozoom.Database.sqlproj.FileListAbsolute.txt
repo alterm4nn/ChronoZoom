@@ -1,0 +1,16 @@
+C:\Chronozoom\Main\Source\Chronozoom.Database\sql\devpreview\Chronozoom.Database.sqlx
+C:\Chronozoom\Main\Source\Chronozoom.Database\sql\devpreview\Chronozoom.Database.dll
+C:\Chronozoom\Main\Source\Chronozoom.Database\obj\DevPreview\ResolveAssemblyReference.cache
+C:\Chronozoom\Main\Source\Chronozoom.Database\obj\DevPreview\Chronozoom.Database.Model.xml
+C:\Chronozoom\Main\Source\Chronozoom.Database\obj\DevPreview\Chronozoom.Database.Manifest.xml
+C:\Chronozoom\Main\Source\Chronozoom.Database\obj\DevPreview\PreDeploy.sql
+C:\Chronozoom\Main\Source\Chronozoom.Database\obj\DevPreview\PostDeploy.sql
+C:\Chronozoom\Main\Source\Chronozoom.Database\obj\DevPreview\Chronozoom.Database.dll
+C:\CZCodeplex\Source\Chronozoom.Database\sql\devpreview\Chronozoom.Database.sqlx
+C:\CZCodeplex\Source\Chronozoom.Database\sql\devpreview\Chronozoom.Database.dll
+C:\CZCodeplex\Source\Chronozoom.Database\obj\DevPreview\ResolveAssemblyReference.cache
+C:\CZCodeplex\Source\Chronozoom.Database\obj\DevPreview\Chronozoom.Database.Model.xml
+C:\CZCodeplex\Source\Chronozoom.Database\obj\DevPreview\Chronozoom.Database.Manifest.xml
+C:\CZCodeplex\Source\Chronozoom.Database\obj\DevPreview\PreDeploy.sql
+C:\CZCodeplex\Source\Chronozoom.Database\obj\DevPreview\PostDeploy.sql
+C:\CZCodeplex\Source\Chronozoom.Database\obj\DevPreview\Chronozoom.Database.dll

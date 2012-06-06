@@ -1,0 +1,55 @@
+﻿@model Authoring.WebRole.Models.ExhibitReferenceEntity
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>ExhibitReference - Details</h2>
+
+<fieldset>
+    <legend>ExhibitReferenceEntity</legend>
+
+    <div class="display-label">Exhibit</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Exhibit.Title)
+    </div>
+
+    <div class="display-label">Reference</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Reference.Authors)
+    </div>
+
+    <div class="display-label">Order</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Order)
+    </div>
+
+    <div class="display-label">CreatedOn</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.CreatedOn)
+    </div>
+
+    <div class="display-label">CreatedBy</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.User.UserName)
+    </div>
+
+    <div class="display-label">ModifiedOn</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.ModifiedOn)
+    </div>
+
+    <div class="display-label">ModifiedBy</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.User1.UserName)
+    </div>
+
+    <div class="display-label">IsDeleted</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.IsDeleted)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.ExhibitReferenceID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

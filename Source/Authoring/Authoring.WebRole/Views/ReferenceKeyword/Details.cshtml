@@ -1,0 +1,25 @@
+﻿@model Authoring.WebRole.Models.ReferenceKeyword
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>ReferenceKeyword - Details</h2>
+
+<fieldset>
+    <legend>ReferenceKeyword</legend>
+
+    <div class="display-label">Reference</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Reference.Authors)
+    </div>
+
+    <div class="display-label">Keyword</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Keyword.Keyword1)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.ReferenceKeywordID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

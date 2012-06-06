@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<TestLists xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <TestList name="GeneratingVideoThumbnails" id="25c3c496-b1d3-4c47-a201-b9789495c301" parentListId="8c43106b-9dc1-4907-a29f-aa66a61bf5b6">
+    <TestLinks>
+      <TestLink id="f1362871-7896-3cc9-374f-5653d18163b7" name="VimeoVideoThumbnailGeneration" storage="..\..\test\thumbgen.test\bin\debug\thumbgen.test.dll" type="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestElement, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+      <TestLink id="62f0c2ad-9644-095b-ce9b-249f0e291935" name="YouTubeVideoThumbnailGeneration" storage="..\..\test\thumbgen.test\bin\debug\thumbgen.test.dll" type="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestElement, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+      <TestLink id="7b526754-8cb6-7893-3a3c-a3efbe34ee49" name="ImageThumbnailGeneration" storage="..\..\test\thumbgen.test\bin\debug\thumbgen.test.dll" type="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestElement, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    </TestLinks>
+  </TestList>
+  <TestList name="Lists of Tests" id="8c43106b-9dc1-4907-a29f-aa66a61bf5b6">
+    <RunConfiguration id="599f5afa-6e1e-4190-8e77-c5c7a8438040" name="ThumbGen" storage="thumbgen.testsettings" type="Microsoft.VisualStudio.TestTools.Common.TestRunConfiguration, Microsoft.VisualStudio.QualityTools.Common, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  </TestList>
+  <TestList name="PublicMethods" id="d3c835cb-13d7-43fb-9cb4-c3ed697ef8ea" parentListId="8c43106b-9dc1-4907-a29f-aa66a61bf5b6" />
+</TestLists>

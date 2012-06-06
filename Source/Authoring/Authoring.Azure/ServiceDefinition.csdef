@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ServiceDefinition name="ContentAuthoring" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceDefinition">
+  <WebRole name="Authoring.WebRole" vmsize="Small">
+    <Sites>
+      <Site name="Web">
+        <Bindings>
+          <Binding name="Endpoint1" endpointName="Endpoint1" />
+        </Bindings>
+      </Site>
+    </Sites>
+    <Endpoints>
+      <InputEndpoint name="Endpoint1" protocol="https" port="443" />
+    </Endpoints>
+    <Imports>
+      <Import moduleName="Diagnostics" />
+    </Imports>
+    <ConfigurationSettings>
+      <Setting name="BlobConnectionString" />
+      <Setting name="ExcelDataContainerName" />
+      <Setting name="ImageContainerName" />
+      <Setting name="AudioContainerName" />
+    </ConfigurationSettings>
+    <LocalResources>
+      <LocalStorage name="ExcelStorage" cleanOnRoleRecycle="true" />
+    </LocalResources>
+  </WebRole>
+</ServiceDefinition>

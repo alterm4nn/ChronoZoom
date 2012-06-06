@@ -1,0 +1,75 @@
+﻿@model IEnumerable<Authoring.WebRole.Models.AuthoringTableRolePermission>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>AuthoringRolePermissions - Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table>
+    <tr>
+        <th>
+            AuthoringTable
+        </th>
+        <th>
+            Role
+        </th>
+        <th>
+            Permission
+        </th>
+        <th>
+            CreatedOn
+        </th>
+        <th>
+            CreatedBy
+        </th>
+        <th>
+            ModifiedOn
+        </th>
+        <th>
+            ModifiedBy
+        </th>
+        <th>
+            IsDeleted
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.AuthoringTable.AuthoringTable1)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Role.Role1)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Permission)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.CreatedOn)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.User.UserName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ModifiedOn)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.User1.UserName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IsDeleted)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.AuthoringTableRolePermissionID }) |
+            @Html.ActionLink("Details", "Details", new { id=item.AuthoringTableRolePermissionID }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.AuthoringTableRolePermissionID })
+        </td>
+    </tr>
+}
+
+</table>

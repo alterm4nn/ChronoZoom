@@ -1,0 +1,25 @@
+﻿@model Authoring.WebRole.Models.TimelineExhibit
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>TimelineExhibit - Details</h2>
+
+<fieldset>
+    <legend>TimelineExhibit</legend>
+
+    <div class="display-label">Timeline</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Timeline.Title)
+    </div>
+
+    <div class="display-label">Exhibit</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Exhibit.Title)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.TimelineExhibitID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

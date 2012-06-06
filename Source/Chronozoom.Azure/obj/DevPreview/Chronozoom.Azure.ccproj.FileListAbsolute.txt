@@ -1,0 +1,15 @@
+C:\Chronozoom\Main\Source\Chronozoom.Azure\bin\DevPreview\ServiceConfiguration.cscfg
+C:\Chronozoom\Main\Source\Chronozoom.Azure\obj\DevPreview\Chronozoom.UI\bin\Chronozoom.Entities.dll
+C:\Chronozoom\Main\Source\Chronozoom.Azure\obj\DevPreview\Chronozoom.UI\bin\Chronozoom.Entities.pdb
+C:\Chronozoom\Main\Source\Chronozoom.Azure\obj\DevPreview\Chronozoom.UI\bin\Images\chronozoom_title.png
+C:\Chronozoom\Main\Source\Chronozoom.Azure\obj\DevPreview\Chronozoom.UI\bin\Images\regimes.png
+C:\Chronozoom\Main\Source\Chronozoom.Azure\obj\DevPreview\Chronozoom.UI\bin\Microsoft.WindowsAzure.Diagnostics.dll
+C:\Chronozoom\Main\Source\Chronozoom.Azure\obj\DevPreview\Chronozoom.UI\bin\Microsoft.WindowsAzure.Diagnostics.xml
+C:\Chronozoom\Main\Source\Chronozoom.Azure\obj\DevPreview\Chronozoom.UI\bin\Microsoft.WindowsAzure.StorageClient.dll
+C:\Chronozoom\Main\Source\Chronozoom.Azure\obj\DevPreview\Chronozoom.UI\bin\Microsoft.WindowsAzure.StorageClient.xml
+C:\Chronozoom\Main\Source\Chronozoom.Azure\obj\DevPreview\Chronozoom.UI\bin\ResponseDumpThresholds.txt
+C:\Chronozoom\Main\Source\Chronozoom.Azure\obj\DevPreview\Chronozoom.UI\bin\testVCTree.htm
+C:\Chronozoom\Main\Source\Chronozoom.Azure\obj\DevPreview\Chronozoom.UI\bin\testVirtualCanvasPrimitives.htm
+C:\Chronozoom\Main\Source\Chronozoom.Azure\obj\DevPreview\Chronozoom.UI\bin\UI.dll
+C:\Chronozoom\Main\Source\Chronozoom.Azure\obj\DevPreview\Chronozoom.UI\bin\UI.pdb
+C:\CZCodeplex\Source\Chronozoom.Azure\bin\DevPreview\ServiceConfiguration.cscfg

@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RoleModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="Chronozoom.UI" version="1.6.21103.1459" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceDefinition">
+  <Startup>
+    <Task commandLine="DiagnosticsAgent.exe" taskType="background" relativePath="plugins\Diagnostics">
+      <Environment>
+        <Variable name="RdModuleName" value="Diagnostics" />
+        <Variable name="WaRoleType" value="IISWebRole" />
+      </Environment>
+    </Task>
+    <Task commandLine="DiagnosticsAgent.exe /blockStartup" relativePath="plugins\Diagnostics">
+      <Environment>
+        <Variable name="RdModuleName" value="Diagnostics" />
+        <Variable name="WaRoleType" value="IISWebRole" />
+      </Environment>
+    </Task>
+  </Startup>
+  <Runtime>
+    <EntryPoint>
+      <NetFxEntryPoint assemblyName="UI.dll" />
+    </EntryPoint>
+  </Runtime>
+  <ConfigurationSettings>
+    <Setting name="ConnectionString" nameSpace="Microsoft.WindowsAzure.Plugins.Diagnostics" />
+  </ConfigurationSettings>
+  <Properties>
+    <Property name="RoleType" value="Web" />
+    <Property name="RoleName" value="Chronozoom.UI" />
+    <Property name="ProjectName" value="Chronozoom.UI" />
+    <Property name="Configuration" value="DevPreview" />
+    <Property name="Platform" value="AnyCPU" />
+    <Property name="OutputDir" value="C:\Chronozoom\Main\Source\Chronozoom.Azure\obj\DevPreview\Chronozoom.UI\" />
+    <Property name="EntryPoint" value="UI.dll" />
+    <Property name="SourceDir" value="C:\Chronozoom\Main\Source\Chronozoom.UI\" />
+    <Property name="RoleTargetFramework" value="v4.0" />
+    <Property name="SitePhysicalPath" value="C:\Chronozoom\Main\Source\Chronozoom.UI\" />
+    <Property name="OriginalItemSpec" value="C:\Chronozoom\Main\Source\Chronozoom.Azure\Chronozoom.Azure.ccproj" />
+    <Property name="MSBuildSourceProjectFile" value="C:\Chronozoom\Main\Source\Chronozoom.Azure\Chronozoom.Azure.ccproj" />
+    <Property name="MSBuildSourceTargetName" value="ResolveSingleWebRoleReference" />
+    <Property name="TargetFrameworkVersion" value="v4.0" />
+    <Property name="TargetRuntimeVersion" value="v4.0" />
+  </Properties>
+  <Sites>
+    <Site name="Web" physicalDirectory="C:\Chronozoom\Main\Source\Chronozoom.UI\">
+      <Bindings>
+        <Binding name="Endpoint1" endpointName="Endpoint1" />
+      </Bindings>
+    </Site>
+  </Sites>
+</RoleModel>

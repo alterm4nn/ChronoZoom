@@ -1,0 +1,68 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThumbGenLib", "ThumbGenLib\ThumbGenLib.csproj", "{5B3FB17F-E68B-467D-861B-0CF5C91C2AA7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThumbGenApp", "ThumbGenApp\ThumbGenApp.csproj", "{7801AD45-318D-4942-8759-3D1C1CAD1E06}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThumbGen.Test", "..\..\Test\ThumbGen.Test\ThumbGen.Test.csproj", "{5B095FD5-E4BA-416B-B061-88BECCEA30CA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A500AFE5-8D2F-4E82-90B3-3E479AA94D8E}"
+	ProjectSection(SolutionItems) = preProject
+		ThumbGen.testsettings = ThumbGen.testsettings
+		ThumbGen.vsmdi = ThumbGen.vsmdi
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 4
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = http://vstfpg05:8080/tfs/pg05
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = ThumbGenLib\\ThumbGenLib.csproj
+		SccProjectName1 = ThumbGenLib
+		SccLocalPath1 = ThumbGenLib
+		SccProjectUniqueName2 = ThumbGenApp\\ThumbGenApp.csproj
+		SccProjectName2 = ThumbGenApp
+		SccLocalPath2 = ThumbGenApp
+		SccProjectUniqueName3 = ..\\..\\Test\\ThumbGen.Test\\ThumbGen.Test.csproj
+		SccProjectName3 = ../../Test/ThumbGen.Test
+		SccLocalPath3 = ..\\..\\Test\\ThumbGen.Test
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = ThumbGen.vsmdi
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5B3FB17F-E68B-467D-861B-0CF5C91C2AA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B3FB17F-E68B-467D-861B-0CF5C91C2AA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B3FB17F-E68B-467D-861B-0CF5C91C2AA7}.Debug|x86.ActiveCfg = Debug|x86
+		{5B3FB17F-E68B-467D-861B-0CF5C91C2AA7}.Debug|x86.Build.0 = Debug|x86
+		{5B3FB17F-E68B-467D-861B-0CF5C91C2AA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B3FB17F-E68B-467D-861B-0CF5C91C2AA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B3FB17F-E68B-467D-861B-0CF5C91C2AA7}.Release|x86.ActiveCfg = Release|x86
+		{5B3FB17F-E68B-467D-861B-0CF5C91C2AA7}.Release|x86.Build.0 = Release|x86
+		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Debug|x86.ActiveCfg = Debug|x86
+		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Debug|x86.Build.0 = Debug|x86
+		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Release|x86.ActiveCfg = Release|x86
+		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Release|x86.Build.0 = Release|x86
+		{5B095FD5-E4BA-416B-B061-88BECCEA30CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B095FD5-E4BA-416B-B061-88BECCEA30CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B095FD5-E4BA-416B-B061-88BECCEA30CA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5B095FD5-E4BA-416B-B061-88BECCEA30CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B095FD5-E4BA-416B-B061-88BECCEA30CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B095FD5-E4BA-416B-B061-88BECCEA30CA}.Release|x86.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

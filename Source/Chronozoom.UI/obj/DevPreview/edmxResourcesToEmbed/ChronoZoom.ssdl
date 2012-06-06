@@ -1,0 +1,1017 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="ChronozoomModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+  <EntityContainer Name="ChronozoomModelStoreContainer">
+    <EntitySet Name="Prod_BibliographyView" EntityType="ChronozoomModel.Store.Prod_BibliographyView" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Prod_ContentItemView" EntityType="ChronozoomModel.Store.Prod_ContentItemView" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Prod_ExhibitContentItemInfo" EntityType="ChronozoomModel.Store.Prod_ExhibitContentItemInfo" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Prod_ExhibitInfo" EntityType="ChronozoomModel.Store.Prod_ExhibitInfo" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Prod_ExhibitReferenceInfo" EntityType="ChronozoomModel.Store.Prod_ExhibitReferenceInfo" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Prod_ExhibitView" EntityType="ChronozoomModel.Store.Prod_ExhibitView" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Prod_ThresholdView" EntityType="ChronozoomModel.Store.Prod_ThresholdView" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Prod_TimelineInfo" EntityType="ChronozoomModel.Store.Prod_TimelineInfo" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Prod_TimelineView" EntityType="ChronozoomModel.Store.Prod_TimelineView" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Prod_TourBookmarkView" EntityType="ChronozoomModel.Store.Prod_TourBookmarkView" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Prod_TourView" EntityType="ChronozoomModel.Store.Prod_TourView" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Staging_BibliographyView" EntityType="ChronozoomModel.Store.Staging_BibliographyView" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Staging_ContentItemView" EntityType="ChronozoomModel.Store.Staging_ContentItemView" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Staging_ExhibitContentItemInfo" EntityType="ChronozoomModel.Store.Staging_ExhibitContentItemInfo" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Staging_ExhibitInfo" EntityType="ChronozoomModel.Store.Staging_ExhibitInfo" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Staging_ExhibitReferenceInfo" EntityType="ChronozoomModel.Store.Staging_ExhibitReferenceInfo" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Staging_ExhibitView" EntityType="ChronozoomModel.Store.Staging_ExhibitView" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Staging_ThresholdView" EntityType="ChronozoomModel.Store.Staging_ThresholdView" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Staging_TimelineInfo" EntityType="ChronozoomModel.Store.Staging_TimelineInfo" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Staging_TimelineView" EntityType="ChronozoomModel.Store.Staging_TimelineView" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Staging_TourBookmarkView" EntityType="ChronozoomModel.Store.Staging_TourBookmarkView" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Staging_TourView" EntityType="ChronozoomModel.Store.Staging_TourView" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Auth_BibliographyView" EntityType="ChronozoomModel.Store.Auth_BibliographyView" store:Type="Views" store:Schema="dbo" store:Name="Auth_BibliographyView">
+      <DefiningQuery>SELECT 
+      [Auth_BibliographyView].[ExhibitID] AS [ExhibitID], 
+      [Auth_BibliographyView].[IsDeleted] AS [IsDeleted], 
+      [Auth_BibliographyView].[ID] AS [ID], 
+      [Auth_BibliographyView].[Title] AS [Title], 
+      [Auth_BibliographyView].[Authors] AS [Authors], 
+      [Auth_BibliographyView].[BookChapters] AS [BookChapters], 
+      [Auth_BibliographyView].[CitationType] AS [CitationType], 
+      [Auth_BibliographyView].[PageNumbers] AS [PageNumbers], 
+      [Auth_BibliographyView].[Publication] AS [Publication], 
+      [Auth_BibliographyView].[PublicationDates] AS [PublicationDates], 
+      [Auth_BibliographyView].[Source] AS [Source], 
+      [Auth_BibliographyView].[CurrVersion] AS [CurrVersion]
+      FROM [dbo].[Auth_BibliographyView] AS [Auth_BibliographyView]</DefiningQuery>
+    </EntitySet>
+    <EntitySet Name="Auth_ContentItemsView" EntityType="ChronozoomModel.Store.Auth_ContentItemsView" store:Type="Views" store:Schema="dbo" store:Name="Auth_ContentItemsView">
+      <DefiningQuery>SELECT 
+      [Auth_ContentItemsView].[ID] AS [ID], 
+      [Auth_ContentItemsView].[Title] AS [Title], 
+      [Auth_ContentItemsView].[Caption] AS [Caption], 
+      [Auth_ContentItemsView].[Topic] AS [Topic], 
+      [Auth_ContentItemsView].[MediaTypeID] AS [MediaTypeID], 
+      [Auth_ContentItemsView].[ThresholdID] AS [ThresholdID], 
+      [Auth_ContentItemsView].[RegimeID] AS [RegimeID], 
+      [Auth_ContentItemsView].[MediaBlobURL] AS [MediaBlobURL], 
+      [Auth_ContentItemsView].[TimeUnitID] AS [TimeUnitID], 
+      [Auth_ContentItemsView].[ContentDate] AS [ContentDate], 
+      [Auth_ContentItemsView].[ContentYear] AS [ContentYear], 
+      [Auth_ContentItemsView].[MediaSource] AS [MediaSource], 
+      [Auth_ContentItemsView].[Attribution] AS [Attribution], 
+      [Auth_ContentItemsView].[LicenseTypeID] AS [LicenseTypeID], 
+      [Auth_ContentItemsView].[CreatedOn] AS [CreatedOn], 
+      [Auth_ContentItemsView].[CreatedBy] AS [CreatedBy], 
+      [Auth_ContentItemsView].[ModifiedOn] AS [ModifiedOn], 
+      [Auth_ContentItemsView].[ModifiedBy] AS [ModifiedBy], 
+      [Auth_ContentItemsView].[IsVisible] AS [IsVisible], 
+      [Auth_ContentItemsView].[IsDeleted] AS [IsDeleted], 
+      [Auth_ContentItemsView].[UniqueID] AS [UniqueID], 
+      [Auth_ContentItemsView].[CurrVersion] AS [CurrVersion]
+      FROM [dbo].[Auth_ContentItemsView] AS [Auth_ContentItemsView]</DefiningQuery>
+    </EntitySet>
+    <EntitySet Name="Auth_ExhibitContentItemInfoView" EntityType="ChronozoomModel.Store.Auth_ExhibitContentItemInfoView" store:Type="Views" store:Schema="dbo" store:Name="Auth_ExhibitContentItemInfoView">
+      <DefiningQuery>SELECT 
+      [Auth_ExhibitContentItemInfoView].[ID] AS [ID], 
+      [Auth_ExhibitContentItemInfoView].[ExhibitID] AS [ExhibitID], 
+      [Auth_ExhibitContentItemInfoView].[Title] AS [Title], 
+      [Auth_ExhibitContentItemInfoView].[Caption] AS [Caption], 
+      [Auth_ExhibitContentItemInfoView].[Threshold] AS [Threshold], 
+      [Auth_ExhibitContentItemInfoView].[Regime] AS [Regime], 
+      [Auth_ExhibitContentItemInfoView].[TimeUnit] AS [TimeUnit], 
+      [Auth_ExhibitContentItemInfoView].[ContentDate] AS [ContentDate], 
+      [Auth_ExhibitContentItemInfoView].[ContentYear] AS [ContentYear], 
+      [Auth_ExhibitContentItemInfoView].[MediaType] AS [MediaType], 
+      [Auth_ExhibitContentItemInfoView].[MediaBlobURL] AS [MediaBlobURL], 
+      [Auth_ExhibitContentItemInfoView].[MediaSource] AS [MediaSource], 
+      [Auth_ExhibitContentItemInfoView].[Attribution] AS [Attribution], 
+      [Auth_ExhibitContentItemInfoView].[UniqueID] AS [UniqueID], 
+      [Auth_ExhibitContentItemInfoView].[Order] AS [Order], 
+      [Auth_ExhibitContentItemInfoView].[HasBibliography] AS [HasBibliography], 
+      [Auth_ExhibitContentItemInfoView].[CurrVersion] AS [CurrVersion]
+      FROM [dbo].[Auth_ExhibitContentItemInfoView] AS [Auth_ExhibitContentItemInfoView]</DefiningQuery>
+    </EntitySet>
+    <EntitySet Name="Auth_ExhibitInfoView" EntityType="ChronozoomModel.Store.Auth_ExhibitInfoView" store:Type="Views" store:Schema="dbo" store:Name="Auth_ExhibitInfoView">
+      <DefiningQuery>SELECT 
+      [Auth_ExhibitInfoView].[ID] AS [ID], 
+      [Auth_ExhibitInfoView].[TimelineID] AS [TimelineID], 
+      [Auth_ExhibitInfoView].[Title] AS [Title], 
+      [Auth_ExhibitInfoView].[Threshold] AS [Threshold], 
+      [Auth_ExhibitInfoView].[Regime] AS [Regime], 
+      [Auth_ExhibitInfoView].[TimeUnit] AS [TimeUnit], 
+      [Auth_ExhibitInfoView].[ContentDate] AS [ContentDate], 
+      [Auth_ExhibitInfoView].[ContentYear] AS [ContentYear], 
+      [Auth_ExhibitInfoView].[UniqueID] AS [UniqueID], 
+      [Auth_ExhibitInfoView].[Sequence] AS [Sequence], 
+      [Auth_ExhibitInfoView].[CurrVersion] AS [CurrVersion]
+      FROM [dbo].[Auth_ExhibitInfoView] AS [Auth_ExhibitInfoView]</DefiningQuery>
+    </EntitySet>
+    <EntitySet Name="Auth_ExhibitReferenceInfoView" EntityType="ChronozoomModel.Store.Auth_ExhibitReferenceInfoView" store:Type="Views" store:Schema="dbo" store:Name="Auth_ExhibitReferenceInfoView">
+      <DefiningQuery>SELECT 
+      [Auth_ExhibitReferenceInfoView].[ID] AS [ID], 
+      [Auth_ExhibitReferenceInfoView].[ExhibitID] AS [ExhibitID], 
+      [Auth_ExhibitReferenceInfoView].[Title] AS [Title], 
+      [Auth_ExhibitReferenceInfoView].[Authors] AS [Authors], 
+      [Auth_ExhibitReferenceInfoView].[BookChapters] AS [BookChapters], 
+      [Auth_ExhibitReferenceInfoView].[CitationType] AS [CitationType], 
+      [Auth_ExhibitReferenceInfoView].[PageNumbers] AS [PageNumbers], 
+      [Auth_ExhibitReferenceInfoView].[Publication] AS [Publication], 
+      [Auth_ExhibitReferenceInfoView].[PublicationDates] AS [PublicationDates], 
+      [Auth_ExhibitReferenceInfoView].[Source] AS [Source], 
+      [Auth_ExhibitReferenceInfoView].[CurrVersion] AS [CurrVersion]
+      FROM [dbo].[Auth_ExhibitReferenceInfoView] AS [Auth_ExhibitReferenceInfoView]</DefiningQuery>
+    </EntitySet>
+    <EntitySet Name="Auth_ExhibitView" EntityType="ChronozoomModel.Store.Auth_ExhibitView" store:Type="Views" store:Schema="dbo" store:Name="Auth_ExhibitView">
+      <DefiningQuery>SELECT 
+      [Auth_ExhibitView].[ID] AS [ID], 
+      [Auth_ExhibitView].[Title] AS [Title], 
+      [Auth_ExhibitView].[ThresholdID] AS [ThresholdID], 
+      [Auth_ExhibitView].[RegimeID] AS [RegimeID], 
+      [Auth_ExhibitView].[ContentDate] AS [ContentDate], 
+      [Auth_ExhibitView].[ContentYear] AS [ContentYear], 
+      [Auth_ExhibitView].[CreatedOn] AS [CreatedOn], 
+      [Auth_ExhibitView].[CreatedBy] AS [CreatedBy], 
+      [Auth_ExhibitView].[ModifiedOn] AS [ModifiedOn], 
+      [Auth_ExhibitView].[ModifiedBy] AS [ModifiedBy], 
+      [Auth_ExhibitView].[IsVisible] AS [IsVisible], 
+      [Auth_ExhibitView].[IsDeleted] AS [IsDeleted], 
+      [Auth_ExhibitView].[TimeUnitID] AS [TimeUnitID], 
+      [Auth_ExhibitView].[UniqueID] AS [UniqueID], 
+      [Auth_ExhibitView].[Sequence] AS [Sequence], 
+      [Auth_ExhibitView].[CurrVersion] AS [CurrVersion]
+      FROM [dbo].[Auth_ExhibitView] AS [Auth_ExhibitView]</DefiningQuery>
+    </EntitySet>
+    <EntitySet Name="Auth_ThresholdView" EntityType="ChronozoomModel.Store.Auth_ThresholdView" store:Type="Views" store:Schema="dbo" store:Name="Auth_ThresholdView">
+      <DefiningQuery>SELECT 
+      [Auth_ThresholdView].[ID] AS [ID], 
+      [Auth_ThresholdView].[Threshold] AS [Threshold], 
+      [Auth_ThresholdView].[IsDeleted] AS [IsDeleted], 
+      [Auth_ThresholdView].[Timeunit] AS [Timeunit], 
+      [Auth_ThresholdView].[ThresholdDate] AS [ThresholdDate], 
+      [Auth_ThresholdView].[ThresholdYear] AS [ThresholdYear], 
+      [Auth_ThresholdView].[ShortDescription] AS [ShortDescription], 
+      [Auth_ThresholdView].[URL] AS [URL], 
+      [Auth_ThresholdView].[CurrVersion] AS [CurrVersion]
+      FROM [dbo].[Auth_ThresholdView] AS [Auth_ThresholdView]</DefiningQuery>
+    </EntitySet>
+    <EntitySet Name="Auth_TimelineInfoView" EntityType="ChronozoomModel.Store.Auth_TimelineInfoView" store:Type="Views" store:Schema="dbo" store:Name="Auth_TimelineInfoView">
+      <DefiningQuery>SELECT 
+      [Auth_TimelineInfoView].[TimelineID] AS [TimelineID], 
+      [Auth_TimelineInfoView].[Title] AS [Title], 
+      [Auth_TimelineInfoView].[Threshold] AS [Threshold], 
+      [Auth_TimelineInfoView].[Regime] AS [Regime], 
+      [Auth_TimelineInfoView].[FromTimeUnit] AS [FromTimeUnit], 
+      [Auth_TimelineInfoView].[FromContentDate] AS [FromContentDate], 
+      [Auth_TimelineInfoView].[FromContentYear] AS [FromContentYear], 
+      [Auth_TimelineInfoView].[ToTimeUnit] AS [ToTimeUnit], 
+      [Auth_TimelineInfoView].[ToContentDate] AS [ToContentDate], 
+      [Auth_TimelineInfoView].[ToContentYear] AS [ToContentYear], 
+      [Auth_TimelineInfoView].[TimelineUniqueID] AS [TimelineUniqueID], 
+      [Auth_TimelineInfoView].[TimelineSequence] AS [TimelineSequence], 
+      [Auth_TimelineInfoView].[Height] AS [Height], 
+      [Auth_TimelineInfoView].[ParentTimelineID] AS [ParentTimelineID], 
+      [Auth_TimelineInfoView].[HasChildren] AS [HasChildren], 
+      [Auth_TimelineInfoView].[CurrVersion] AS [CurrVersion]
+      FROM [dbo].[Auth_TimelineInfoView] AS [Auth_TimelineInfoView]</DefiningQuery>
+    </EntitySet>
+    <EntitySet Name="Auth_TimelineView" EntityType="ChronozoomModel.Store.Auth_TimelineView" store:Type="Views" store:Schema="dbo" store:Name="Auth_TimelineView">
+      <DefiningQuery>SELECT 
+      [Auth_TimelineView].[ID] AS [ID], 
+      [Auth_TimelineView].[Title] AS [Title], 
+      [Auth_TimelineView].[ThresholdID] AS [ThresholdID], 
+      [Auth_TimelineView].[RegimeID] AS [RegimeID], 
+      [Auth_TimelineView].[FromContentDate] AS [FromContentDate], 
+      [Auth_TimelineView].[FromContentYear] AS [FromContentYear], 
+      [Auth_TimelineView].[ToContentDate] AS [ToContentDate], 
+      [Auth_TimelineView].[ToContentYear] AS [ToContentYear], 
+      [Auth_TimelineView].[ParentTimelineID] AS [ParentTimelineID], 
+      [Auth_TimelineView].[CreatedOn] AS [CreatedOn], 
+      [Auth_TimelineView].[CreatedBy] AS [CreatedBy], 
+      [Auth_TimelineView].[ModifiedOn] AS [ModifiedOn], 
+      [Auth_TimelineView].[ModifiedBy] AS [ModifiedBy], 
+      [Auth_TimelineView].[IsVisible] AS [IsVisible], 
+      [Auth_TimelineView].[IsDeleted] AS [IsDeleted], 
+      [Auth_TimelineView].[FromTimeUnit] AS [FromTimeUnit], 
+      [Auth_TimelineView].[ToTimeUnit] AS [ToTimeUnit], 
+      [Auth_TimelineView].[SourceURL] AS [SourceURL], 
+      [Auth_TimelineView].[Attribution] AS [Attribution], 
+      [Auth_TimelineView].[UniqueID] AS [UniqueID], 
+      [Auth_TimelineView].[Sequence] AS [Sequence], 
+      [Auth_TimelineView].[Height] AS [Height], 
+      [Auth_TimelineView].[CurrVersion] AS [CurrVersion]
+      FROM [dbo].[Auth_TimelineView] AS [Auth_TimelineView]</DefiningQuery>
+    </EntitySet>
+    <EntitySet Name="Auth_TourBookmarkView" EntityType="ChronozoomModel.Store.Auth_TourBookmarkView" store:Type="Views" store:Schema="dbo" store:Name="Auth_TourBookmarkView">
+      <DefiningQuery>SELECT 
+      [Auth_TourBookmarkView].[Name] AS [Name], 
+      [Auth_TourBookmarkView].[LapseTime] AS [LapseTime], 
+      [Auth_TourBookmarkView].[Description] AS [Description], 
+      [Auth_TourBookmarkView].[URL] AS [URL], 
+      [Auth_TourBookmarkView].[ID] AS [ID], 
+      [Auth_TourBookmarkView].[Bookmark_IsDeleted] AS [Bookmark_IsDeleted], 
+      [Auth_TourBookmarkView].[TourBookmark_IsDeleted] AS [TourBookmark_IsDeleted], 
+      [Auth_TourBookmarkView].[TourID] AS [TourID], 
+      [Auth_TourBookmarkView].[CurrVersion] AS [CurrVersion]
+      FROM [dbo].[Auth_TourBookmarkView] AS [Auth_TourBookmarkView]</DefiningQuery>
+    </EntitySet>
+    <EntitySet Name="Auth_TourView" EntityType="ChronozoomModel.Store.Auth_TourView" store:Type="Views" store:Schema="dbo" store:Name="Auth_TourView">
+      <DefiningQuery>SELECT 
+      [Auth_TourView].[ID] AS [ID], 
+      [Auth_TourView].[Name] AS [Name], 
+      [Auth_TourView].[CreatedBy] AS [CreatedBy], 
+      [Auth_TourView].[ModifiedBy] AS [ModifiedBy], 
+      [Auth_TourView].[CreatedOn] AS [CreatedOn], 
+      [Auth_TourView].[ModifiedOn] AS [ModifiedOn], 
+      [Auth_TourView].[IsDeleted] AS [IsDeleted], 
+      [Auth_TourView].[UniqueID] AS [UniqueID], 
+      [Auth_TourView].[AudioBlobUrl] AS [AudioBlobUrl], 
+      [Auth_TourView].[Category] AS [Category], 
+      [Auth_TourView].[Sequence] AS [Sequence], 
+      [Auth_TourView].[CurrVersion] AS [CurrVersion], 
+      [Auth_TourView].[IsVisible] AS [IsVisible]
+      FROM [dbo].[Auth_TourView] AS [Auth_TourView]</DefiningQuery>
+    </EntitySet>
+  </EntityContainer>
+  <EntityType Name="Prod_BibliographyView">
+    <Key>
+      <PropertyRef Name="BibliographyView" />
+    </Key>
+    <Property Name="ExhibitID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="Authors" Type="nvarchar" Nullable="false" MaxLength="500" />
+    <Property Name="BookChapters" Type="nvarchar" Nullable="false" MaxLength="300" />
+    <Property Name="CitationType" Type="nvarchar" Nullable="false" MaxLength="50" />
+    <Property Name="PageNumbers" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="Publication" Type="nvarchar" Nullable="false" MaxLength="300" />
+    <Property Name="PublicationDates" Type="nvarchar" Nullable="false" MaxLength="300" />
+    <Property Name="Source" Type="nvarchar" Nullable="false" MaxLength="200" />
+    <Property Name="CurrVersion" Type="int" />
+    <Property Name="IncludeInVersion" Type="int" />
+    <Property Name="BibliographyView" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Prod_ContentItemView">
+    <Key>
+      <PropertyRef Name="ContentItemViewID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="200" />
+    <Property Name="Caption" Type="nvarchar" Nullable="false" MaxLength="1000" />
+    <Property Name="Topic" Type="nvarchar" Nullable="false" MaxLength="200" />
+    <Property Name="MediaTypeID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ThresholdID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="RegimeID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="MediaBlobURL" Type="nvarchar" Nullable="false" MaxLength="500" />
+    <Property Name="TimeUnitID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ContentDate" Type="datetimeoffset" />
+    <Property Name="ContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="MediaSource" Type="nvarchar" MaxLength="300" />
+    <Property Name="Attribution" Type="nvarchar" MaxLength="200" />
+    <Property Name="LicenseTypeID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="IsVisible" Type="bit" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="UniqueID" Type="int" Nullable="false" />
+    <Property Name="CurrVersion" Type="int" />
+    <Property Name="Version_ContentItemID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="IncludeInVersion" Type="int" />
+    <Property Name="ContentItemViewID" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Prod_ExhibitContentItemInfo">
+    <Key>
+      <PropertyRef Name="ExhibitContentItemInfoID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ExhibitID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="200" />
+    <Property Name="Caption" Type="nvarchar" Nullable="false" MaxLength="1000" />
+    <Property Name="Threshold" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="Regime" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="TimeUnit" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="ContentDate" Type="datetimeoffset" />
+    <Property Name="ContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="MediaType" Type="nvarchar" Nullable="false" MaxLength="50" />
+    <Property Name="MediaBlobURL" Type="nvarchar" Nullable="false" MaxLength="500" />
+    <Property Name="MediaSource" Type="nvarchar" MaxLength="300" />
+    <Property Name="Attribution" Type="nvarchar" MaxLength="200" />
+    <Property Name="UniqueID" Type="int" Nullable="false" />
+    <Property Name="Order" Type="smallint" />
+    <Property Name="HasBibliography" Type="bit" />
+    <Property Name="CurrVersion" Type="int" />
+    <Property Name="IncludeInVersion" Type="int" />
+    <Property Name="ExhibitContentItemInfoID" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Prod_ExhibitInfo">
+    <Key>
+      <PropertyRef Name="Prod_ExhibitInfoID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="TimelineID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="Threshold" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="Regime" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="TimeUnit" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="ContentDate" Type="datetimeoffset" />
+    <Property Name="ContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="UniqueID" Type="int" Nullable="false" />
+    <Property Name="Sequence" Type="int" />
+    <Property Name="CurrVersion" Type="int" />
+    <Property Name="IncludeInVersion" Type="int" />
+    <Property Name="Prod_ExhibitInfoID" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Prod_ExhibitReferenceInfo">
+    <Key>
+      <PropertyRef Name="Prod_ExhibitReferenceInfoID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ExhibitID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="Authors" Type="nvarchar" Nullable="false" MaxLength="500" />
+    <Property Name="BookChapters" Type="nvarchar" MaxLength="300" />
+    <Property Name="CitationType" Type="nvarchar" MaxLength="50" />
+    <Property Name="PageNumbers" Type="nvarchar" MaxLength="100" />
+    <Property Name="Publication" Type="nvarchar" MaxLength="300" />
+    <Property Name="PublicationDates" Type="nvarchar" MaxLength="300" />
+    <Property Name="Source" Type="nvarchar" Nullable="false" MaxLength="200" />
+    <Property Name="CurrVersion" Type="int" />
+    <Property Name="IncludeInVersion" Type="int" />
+    <Property Name="Prod_ExhibitReferenceInfoID" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Prod_ExhibitView">
+    <Key>
+      <PropertyRef Name="ExhibitViewID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="ThresholdID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="RegimeID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ContentDate" Type="datetimeoffset" />
+    <Property Name="ContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="IsVisible" Type="bit" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="TimeUnitID" Type="uniqueidentifier" />
+    <Property Name="UniqueID" Type="int" Nullable="false" />
+    <Property Name="Sequence" Type="int" />
+    <Property Name="CurrVersion" Type="int" />
+    <Property Name="Version_ExhibitID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="IncludeInVersion" Type="int" />
+    <Property Name="ExhibitViewID" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Prod_ThresholdView">
+    <Key>
+      <PropertyRef Name="ThresholdViewID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Threshold" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="Timeunit" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="ThresholdDate" Type="datetimeoffset" />
+    <Property Name="ThresholdYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="ShortDescription" Type="nvarchar" MaxLength="200" />
+    <Property Name="URL" Type="nvarchar" Nullable="false" MaxLength="300" />
+    <Property Name="CurrVersion" Type="int" />
+    <Property Name="IncludeInVersion" Type="int" />
+    <Property Name="ThresholdViewID" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Prod_TimelineInfo">
+    <Key>
+      <PropertyRef Name="TimelineInfoID" />
+    </Key>
+    <Property Name="TimelineID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="Threshold" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="Regime" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="FromTimeUnit" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="FromContentDate" Type="datetimeoffset" />
+    <Property Name="FromContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="ToTimeUnit" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="ToContentDate" Type="datetimeoffset" />
+    <Property Name="ToContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="TimelineUniqueID" Type="int" Nullable="false" />
+    <Property Name="TimelineSequence" Type="int" />
+    <Property Name="Height" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="ParentTimelineID" Type="uniqueidentifier" />
+    <Property Name="HasChildren" Type="int" />
+    <Property Name="CurrVersion" Type="int" />
+    <Property Name="IncludeInVersion" Type="int" />
+    <Property Name="TimelineInfoID" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Prod_TimelineView">
+    <Key>
+      <PropertyRef Name="TimelineView" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="ThresholdID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="RegimeID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="FromContentDate" Type="datetimeoffset" />
+    <Property Name="FromContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="ToContentDate" Type="datetimeoffset" />
+    <Property Name="ToContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="ParentTimelineID" Type="uniqueidentifier" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="IsVisible" Type="bit" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="FromTimeUnit" Type="uniqueidentifier" />
+    <Property Name="ToTimeUnit" Type="uniqueidentifier" />
+    <Property Name="SourceURL" Type="nvarchar" MaxLength="500" />
+    <Property Name="Attribution" Type="nvarchar" MaxLength="500" />
+    <Property Name="UniqueID" Type="int" Nullable="false" />
+    <Property Name="Sequence" Type="int" />
+    <Property Name="Height" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="CurrVersion" Type="int" />
+    <Property Name="Version_TimelineID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="IncludeInVersion" Type="int" />
+    <Property Name="TimelineView" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Prod_TourBookmarkView">
+    <Key>
+      <PropertyRef Name="TourBookmarkViewID" />
+    </Key>
+    <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="LapseTime" Type="int" />
+    <Property Name="Description" Type="nvarchar" MaxLength="300" />
+    <Property Name="URL" Type="nvarchar" Nullable="false" MaxLength="300" />
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Bookmark_IsDeleted" Type="bit" />
+    <Property Name="TourBookmark_IsDeleted" Type="bit" />
+    <Property Name="TourID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="CurrVersion" Type="int" />
+    <Property Name="IncludeInVersion" Type="int" />
+    <Property Name="TourBookmarkViewID" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Prod_TourView">
+    <Key>
+      <PropertyRef Name="TourViewID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="UniqueID" Type="int" Nullable="false" />
+    <Property Name="AudioBlobUrl" Type="nvarchar" MaxLength="300" />
+    <Property Name="Category" Type="nvarchar" MaxLength="100" />
+    <Property Name="Sequence" Type="int" />
+    <Property Name="CurrVersion" Type="int" />
+    <Property Name="Version_TourID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="IncludeInVersion" Type="int" />
+    <Property Name="TourViewID" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Staging_BibliographyView">
+    <Key>
+      <PropertyRef Name="BibliographyView" />
+    </Key>
+    <Property Name="ExhibitID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="Authors" Type="nvarchar" Nullable="false" MaxLength="500" />
+    <Property Name="BookChapters" Type="nvarchar" Nullable="false" MaxLength="300" />
+    <Property Name="CitationType" Type="nvarchar" Nullable="false" MaxLength="50" />
+    <Property Name="PageNumbers" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="Publication" Type="nvarchar" Nullable="false" MaxLength="300" />
+    <Property Name="PublicationDates" Type="nvarchar" Nullable="false" MaxLength="300" />
+    <Property Name="Source" Type="nvarchar" Nullable="false" MaxLength="200" />
+    <Property Name="CurrVersion" Type="int" />
+    <Property Name="IncludeInVersion" Type="int" />
+    <Property Name="BibliographyView" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Staging_ContentItemView">
+    <Key>
+      <PropertyRef Name="ContentItemViewID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="200" />
+    <Property Name="Caption" Type="nvarchar" Nullable="false" MaxLength="1000" />
+    <Property Name="Topic" Type="nvarchar" Nullable="false" MaxLength="200" />
+    <Property Name="MediaTypeID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ThresholdID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="RegimeID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="MediaBlobURL" Type="nvarchar" Nullable="false" MaxLength="500" />
+    <Property Name="TimeUnitID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ContentDate" Type="datetimeoffset" />
+    <Property Name="ContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="MediaSource" Type="nvarchar" MaxLength="300" />
+    <Property Name="Attribution" Type="nvarchar" MaxLength="200" />
+    <Property Name="LicenseTypeID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="IsVisible" Type="bit" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="UniqueID" Type="int" Nullable="false" />
+    <Property Name="CurrVersion" Type="int" />
+    <Property Name="Version_ContentItemID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="IncludeInVersion" Type="int" />
+    <Property Name="ContentItemViewID" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Staging_ExhibitContentItemInfo">
+    <Key>
+      <PropertyRef Name="ExhibitContentItemInfoID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ExhibitID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="200" />
+    <Property Name="Caption" Type="nvarchar" Nullable="false" MaxLength="1000" />
+    <Property Name="Threshold" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="Regime" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="TimeUnit" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="ContentDate" Type="datetimeoffset" />
+    <Property Name="ContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="MediaType" Type="nvarchar" Nullable="false" MaxLength="50" />
+    <Property Name="MediaBlobURL" Type="nvarchar" Nullable="false" MaxLength="500" />
+    <Property Name="MediaSource" Type="nvarchar" MaxLength="300" />
+    <Property Name="Attribution" Type="nvarchar" MaxLength="200" />
+    <Property Name="UniqueID" Type="int" Nullable="false" />
+    <Property Name="Order" Type="smallint" />
+    <Property Name="HasBibliography" Type="bit" />
+    <Property Name="CurrVersion" Type="int" />
+    <Property Name="IncludeInVersion" Type="int" />
+    <Property Name="ExhibitContentItemInfoID" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Staging_ExhibitInfo">
+    <Key>
+      <PropertyRef Name="ExhibitInfoID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="TimelineID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="Threshold" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="Regime" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="TimeUnit" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="ContentDate" Type="datetimeoffset" />
+    <Property Name="ContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="UniqueID" Type="int" Nullable="false" />
+    <Property Name="Sequence" Type="int" />
+    <Property Name="CurrVersion" Type="int" />
+    <Property Name="IncludeInVersion" Type="int" />
+    <Property Name="ExhibitInfoID" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Staging_ExhibitReferenceInfo">
+    <Key>
+      <PropertyRef Name="ExhibitReferenceInfoID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ExhibitID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="Authors" Type="nvarchar" Nullable="false" MaxLength="500" />
+    <Property Name="BookChapters" Type="nvarchar" MaxLength="300" />
+    <Property Name="CitationType" Type="nvarchar" MaxLength="50" />
+    <Property Name="PageNumbers" Type="nvarchar" MaxLength="100" />
+    <Property Name="Publication" Type="nvarchar" MaxLength="300" />
+    <Property Name="PublicationDates" Type="nvarchar" MaxLength="300" />
+    <Property Name="Source" Type="nvarchar" Nullable="false" MaxLength="200" />
+    <Property Name="CurrVersion" Type="int" />
+    <Property Name="IncludeInVersion" Type="int" />
+    <Property Name="ExhibitReferenceInfoID" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Staging_ExhibitView">
+    <Key>
+      <PropertyRef Name="ExhibitViewID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="ThresholdID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="RegimeID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ContentDate" Type="datetimeoffset" />
+    <Property Name="ContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="IsVisible" Type="bit" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="TimeUnitID" Type="uniqueidentifier" />
+    <Property Name="UniqueID" Type="int" Nullable="false" />
+    <Property Name="Sequence" Type="int" />
+    <Property Name="CurrVersion" Type="int" />
+    <Property Name="Version_ExhibitID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="IncludeInVersion" Type="int" />
+    <Property Name="ExhibitViewID" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Staging_ThresholdView">
+    <Key>
+      <PropertyRef Name="ThresholdViewID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Threshold" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="Timeunit" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="ThresholdDate" Type="datetimeoffset" />
+    <Property Name="ThresholdYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="ShortDescription" Type="nvarchar" MaxLength="200" />
+    <Property Name="URL" Type="nvarchar" Nullable="false" MaxLength="300" />
+    <Property Name="CurrVersion" Type="int" />
+    <Property Name="IncludeInVersion" Type="int" />
+    <Property Name="ThresholdViewID" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Staging_TimelineInfo">
+    <Key>
+      <PropertyRef Name="TimelineInfoID" />
+    </Key>
+    <Property Name="TimelineID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="Threshold" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="Regime" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="FromTimeUnit" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="FromContentDate" Type="datetimeoffset" />
+    <Property Name="FromContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="ToTimeUnit" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="ToContentDate" Type="datetimeoffset" />
+    <Property Name="ToContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="TimelineUniqueID" Type="int" Nullable="false" />
+    <Property Name="TimelineSequence" Type="int" />
+    <Property Name="Height" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="ParentTimelineID" Type="uniqueidentifier" />
+    <Property Name="HasChildren" Type="int" />
+    <Property Name="CurrVersion" Type="int" />
+    <Property Name="IncludeInVersion" Type="int" />
+    <Property Name="TimelineInfoID" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Staging_TimelineView">
+    <Key>
+      <PropertyRef Name="TimelineView" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="ThresholdID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="RegimeID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="FromContentDate" Type="datetimeoffset" />
+    <Property Name="FromContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="ToContentDate" Type="datetimeoffset" />
+    <Property Name="ToContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="ParentTimelineID" Type="uniqueidentifier" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="IsVisible" Type="bit" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="FromTimeUnit" Type="uniqueidentifier" />
+    <Property Name="ToTimeUnit" Type="uniqueidentifier" />
+    <Property Name="SourceURL" Type="nvarchar" MaxLength="500" />
+    <Property Name="Attribution" Type="nvarchar" MaxLength="500" />
+    <Property Name="UniqueID" Type="int" Nullable="false" />
+    <Property Name="Sequence" Type="int" />
+    <Property Name="Height" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="CurrVersion" Type="int" />
+    <Property Name="Version_TimelineID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="IncludeInVersion" Type="int" />
+    <Property Name="TimelineView" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Staging_TourBookmarkView">
+    <Key>
+      <PropertyRef Name="TourBookmarkViewID" />
+    </Key>
+    <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="LapseTime" Type="int" />
+    <Property Name="Description" Type="nvarchar" MaxLength="300" />
+    <Property Name="URL" Type="nvarchar" Nullable="false" MaxLength="300" />
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Bookmark_IsDeleted" Type="bit" />
+    <Property Name="TourBookmark_IsDeleted" Type="bit" />
+    <Property Name="TourID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="CurrVersion" Type="int" />
+    <Property Name="IncludeInVersion" Type="int" />
+    <Property Name="TourBookmarkViewID" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Staging_TourView">
+    <Key>
+      <PropertyRef Name="TourViewID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="UniqueID" Type="int" Nullable="false" />
+    <Property Name="AudioBlobUrl" Type="nvarchar" MaxLength="300" />
+    <Property Name="Category" Type="nvarchar" MaxLength="100" />
+    <Property Name="Sequence" Type="int" />
+    <Property Name="CurrVersion" Type="int" />
+    <Property Name="Version_TourID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="IncludeInVersion" Type="int" />
+    <Property Name="TourViewID" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <!--Errors Found During Generation:
+      warning 6002: The table/view 'Chronozoom.dbo.Auth_BibliographyView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+  <EntityType Name="Auth_BibliographyView">
+    <Key>
+      <PropertyRef Name="ExhibitID" />
+      <PropertyRef Name="ID" />
+      <PropertyRef Name="Title" />
+      <PropertyRef Name="Authors" />
+      <PropertyRef Name="CitationType" />
+      <PropertyRef Name="Source" />
+    </Key>
+    <Property Name="ExhibitID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="Authors" Type="nvarchar" Nullable="false" MaxLength="500" />
+    <Property Name="BookChapters" Type="nvarchar" MaxLength="300" />
+    <Property Name="CitationType" Type="nvarchar" Nullable="false" MaxLength="50" />
+    <Property Name="PageNumbers" Type="nvarchar" MaxLength="100" />
+    <Property Name="Publication" Type="nvarchar" MaxLength="300" />
+    <Property Name="PublicationDates" Type="nvarchar" MaxLength="300" />
+    <Property Name="Source" Type="nvarchar" Nullable="false" MaxLength="200" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <!--Errors Found During Generation:
+      warning 6002: The table/view 'Chronozoom.dbo.Auth_ContentItemsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+  <EntityType Name="Auth_ContentItemsView">
+    <Key>
+      <PropertyRef Name="ID" />
+      <PropertyRef Name="Title" />
+      <PropertyRef Name="Caption" />
+      <PropertyRef Name="Topic" />
+      <PropertyRef Name="MediaTypeID" />
+      <PropertyRef Name="ThresholdID" />
+      <PropertyRef Name="RegimeID" />
+      <PropertyRef Name="MediaBlobURL" />
+      <PropertyRef Name="TimeUnitID" />
+      <PropertyRef Name="LicenseTypeID" />
+      <PropertyRef Name="UniqueID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="200" />
+    <Property Name="Caption" Type="nvarchar" Nullable="false" MaxLength="1000" />
+    <Property Name="Topic" Type="nvarchar" Nullable="false" MaxLength="200" />
+    <Property Name="MediaTypeID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ThresholdID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="RegimeID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="MediaBlobURL" Type="nvarchar" Nullable="false" MaxLength="500" />
+    <Property Name="TimeUnitID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ContentDate" Type="datetimeoffset" />
+    <Property Name="ContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="MediaSource" Type="nvarchar" MaxLength="300" />
+    <Property Name="Attribution" Type="nvarchar" MaxLength="200" />
+    <Property Name="LicenseTypeID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="IsVisible" Type="bit" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="UniqueID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <!--Errors Found During Generation:
+      warning 6002: The table/view 'Chronozoom.dbo.Auth_ExhibitContentItemInfoView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+  <EntityType Name="Auth_ExhibitContentItemInfoView">
+    <Key>
+      <PropertyRef Name="ID" />
+      <PropertyRef Name="ExhibitID" />
+      <PropertyRef Name="Title" />
+      <PropertyRef Name="Caption" />
+      <PropertyRef Name="Threshold" />
+      <PropertyRef Name="Regime" />
+      <PropertyRef Name="TimeUnit" />
+      <PropertyRef Name="MediaType" />
+      <PropertyRef Name="MediaBlobURL" />
+      <PropertyRef Name="UniqueID" />
+      <PropertyRef Name="HasBibliography" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ExhibitID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="200" />
+    <Property Name="Caption" Type="nvarchar" Nullable="false" MaxLength="1000" />
+    <Property Name="Threshold" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="Regime" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="TimeUnit" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="ContentDate" Type="datetimeoffset" />
+    <Property Name="ContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="MediaType" Type="nvarchar" Nullable="false" MaxLength="50" />
+    <Property Name="MediaBlobURL" Type="nvarchar" Nullable="false" MaxLength="500" />
+    <Property Name="MediaSource" Type="nvarchar" MaxLength="300" />
+    <Property Name="Attribution" Type="nvarchar" MaxLength="200" />
+    <Property Name="UniqueID" Type="int" Nullable="false" />
+    <Property Name="Order" Type="smallint" />
+    <Property Name="HasBibliography" Type="int" Nullable="false" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <!--Errors Found During Generation:
+      warning 6002: The table/view 'Chronozoom.dbo.Auth_ExhibitInfoView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+  <EntityType Name="Auth_ExhibitInfoView">
+    <Key>
+      <PropertyRef Name="ID" />
+      <PropertyRef Name="TimelineID" />
+      <PropertyRef Name="Title" />
+      <PropertyRef Name="Threshold" />
+      <PropertyRef Name="Regime" />
+      <PropertyRef Name="TimeUnit" />
+      <PropertyRef Name="UniqueID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="TimelineID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="Threshold" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="Regime" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="TimeUnit" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="ContentDate" Type="datetimeoffset" />
+    <Property Name="ContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="UniqueID" Type="int" Nullable="false" />
+    <Property Name="Sequence" Type="int" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <!--Errors Found During Generation:
+      warning 6002: The table/view 'Chronozoom.dbo.Auth_ExhibitReferenceInfoView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+  <EntityType Name="Auth_ExhibitReferenceInfoView">
+    <Key>
+      <PropertyRef Name="ID" />
+      <PropertyRef Name="ExhibitID" />
+      <PropertyRef Name="Title" />
+      <PropertyRef Name="Authors" />
+      <PropertyRef Name="CitationType" />
+      <PropertyRef Name="Source" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ExhibitID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="Authors" Type="nvarchar" Nullable="false" MaxLength="500" />
+    <Property Name="BookChapters" Type="nvarchar" MaxLength="300" />
+    <Property Name="CitationType" Type="nvarchar" Nullable="false" MaxLength="50" />
+    <Property Name="PageNumbers" Type="nvarchar" MaxLength="100" />
+    <Property Name="Publication" Type="nvarchar" MaxLength="300" />
+    <Property Name="PublicationDates" Type="nvarchar" MaxLength="300" />
+    <Property Name="Source" Type="nvarchar" Nullable="false" MaxLength="200" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <!--Errors Found During Generation:
+      warning 6002: The table/view 'Chronozoom.dbo.Auth_ExhibitView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+  <EntityType Name="Auth_ExhibitView">
+    <Key>
+      <PropertyRef Name="ID" />
+      <PropertyRef Name="Title" />
+      <PropertyRef Name="ThresholdID" />
+      <PropertyRef Name="RegimeID" />
+      <PropertyRef Name="UniqueID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="ThresholdID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="RegimeID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ContentDate" Type="datetimeoffset" />
+    <Property Name="ContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="IsVisible" Type="bit" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="TimeUnitID" Type="uniqueidentifier" />
+    <Property Name="UniqueID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="Sequence" Type="int" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <!--Errors Found During Generation:
+      warning 6002: The table/view 'Chronozoom.dbo.Auth_ThresholdView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+  <EntityType Name="Auth_ThresholdView">
+    <Key>
+      <PropertyRef Name="ID" />
+      <PropertyRef Name="Threshold" />
+      <PropertyRef Name="Timeunit" />
+      <PropertyRef Name="URL" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Threshold" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="Timeunit" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="ThresholdDate" Type="datetimeoffset" />
+    <Property Name="ThresholdYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="ShortDescription" Type="nvarchar" MaxLength="200" />
+    <Property Name="URL" Type="nvarchar" Nullable="false" MaxLength="300" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <!--Errors Found During Generation:
+      warning 6002: The table/view 'Chronozoom.dbo.Auth_TimelineInfoView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+  <EntityType Name="Auth_TimelineInfoView">
+    <Key>
+      <PropertyRef Name="TimelineID" />
+      <PropertyRef Name="Title" />
+      <PropertyRef Name="Threshold" />
+      <PropertyRef Name="Regime" />
+      <PropertyRef Name="FromTimeUnit" />
+      <PropertyRef Name="ToTimeUnit" />
+      <PropertyRef Name="TimelineUniqueID" />
+    </Key>
+    <Property Name="TimelineID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="Threshold" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="Regime" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="FromTimeUnit" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="FromContentDate" Type="datetimeoffset" />
+    <Property Name="FromContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="ToTimeUnit" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="ToContentDate" Type="datetimeoffset" />
+    <Property Name="ToContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="TimelineUniqueID" Type="int" Nullable="false" />
+    <Property Name="TimelineSequence" Type="int" />
+    <Property Name="Height" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="ParentTimelineID" Type="uniqueidentifier" />
+    <Property Name="HasChildren" Type="int" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <!--Errors Found During Generation:
+      warning 6002: The table/view 'Chronozoom.dbo.Auth_TimelineView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+  <EntityType Name="Auth_TimelineView">
+    <Key>
+      <PropertyRef Name="ID" />
+      <PropertyRef Name="Title" />
+      <PropertyRef Name="ThresholdID" />
+      <PropertyRef Name="RegimeID" />
+      <PropertyRef Name="UniqueID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="ThresholdID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="RegimeID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="FromContentDate" Type="datetimeoffset" />
+    <Property Name="FromContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="ToContentDate" Type="datetimeoffset" />
+    <Property Name="ToContentYear" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="ParentTimelineID" Type="uniqueidentifier" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="IsVisible" Type="bit" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="FromTimeUnit" Type="uniqueidentifier" />
+    <Property Name="ToTimeUnit" Type="uniqueidentifier" />
+    <Property Name="SourceURL" Type="nvarchar" MaxLength="500" />
+    <Property Name="Attribution" Type="nvarchar" MaxLength="500" />
+    <Property Name="UniqueID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="Sequence" Type="int" />
+    <Property Name="Height" Type="decimal" Precision="8" Scale="4" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <!--Errors Found During Generation:
+      warning 6002: The table/view 'Chronozoom.dbo.Auth_TourBookmarkView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+  <EntityType Name="Auth_TourBookmarkView">
+    <Key>
+      <PropertyRef Name="Name" />
+      <PropertyRef Name="URL" />
+      <PropertyRef Name="ID" />
+      <PropertyRef Name="TourID" />
+    </Key>
+    <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="LapseTime" Type="int" />
+    <Property Name="Description" Type="nvarchar" MaxLength="300" />
+    <Property Name="URL" Type="nvarchar" Nullable="false" MaxLength="300" />
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Bookmark_IsDeleted" Type="bit" />
+    <Property Name="TourBookmark_IsDeleted" Type="bit" />
+    <Property Name="TourID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="CurrVersion" Type="int" />
+  </EntityType>
+  <!--Errors Found During Generation:
+      warning 6002: The table/view 'Chronozoom.dbo.Auth_TourView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+  <EntityType Name="Auth_TourView">
+    <Key>
+      <PropertyRef Name="ID" />
+      <PropertyRef Name="Name" />
+      <PropertyRef Name="UniqueID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="CreatedBy" Type="uniqueidentifier" />
+    <Property Name="ModifiedBy" Type="uniqueidentifier" />
+    <Property Name="CreatedOn" Type="smalldatetime" />
+    <Property Name="ModifiedOn" Type="smalldatetime" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="UniqueID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="AudioBlobUrl" Type="nvarchar" MaxLength="300" />
+    <Property Name="Category" Type="nvarchar" MaxLength="100" />
+    <Property Name="Sequence" Type="int" />
+    <Property Name="CurrVersion" Type="int" />
+    <Property Name="IsVisible" Type="bit" />
+  </EntityType>
+  <Function Name="spGetVisibleTimelines" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+  <Function Name="spGetVisibleTimelinesForSearch" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="environment" Type="int" Mode="In" />
+  </Function>
+</Schema>

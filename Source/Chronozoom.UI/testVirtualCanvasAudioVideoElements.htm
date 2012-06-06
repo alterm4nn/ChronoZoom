@@ -1,0 +1,182 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <link href="Styles/cz.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="Scripts/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-ui-1.8.16.custom.min.js"></script>
+    <script type="text/javascript" src="Scripts/rx.js"></script>
+    <script type="text/javascript" src="Scripts/rx.jQuery.js"></script>
+    <script type="text/javascript" src="Scripts/common.js"></script>
+    <script type="text/javascript" src="Scripts/cz.settings.js"></script>
+    <script type="text/javascript" src="Scripts/vccontent.js"></script>
+    <script type="text/javascript" src="Scripts/viewport.js"></script>
+    <script type="text/javascript" src="Scripts/virtualCanvas.js"></script>
+    <script type="text/javascript" src="Scripts/mouseWheelPlugin.js"></script>
+    <script type="text/javascript" src="Scripts/gestures.js"></script>
+    <script type="text/javascript" src="Scripts/viewportAnimation.js"></script>
+    <script type="text/javascript" src="Scripts/viewportController.js"></script>
+    <script type="text/javascript">
+        var maxPermitedVerticalRange = { top: -10000000, bottom: 10000000 };
+
+        var t1, t2;
+        var infodot1;
+        var k = 100;
+
+        function checkInfodot1Thumbnail() {
+            if (infodot1.children.length != 1) // DLOD element
+                throw "No dynamic LOD element";
+
+            if (infodot1.children[0].children.length != 1 // thumbnail image
+                || !("img" in infodot1.children[0].children[0]))
+                throw "Infodot must contain sigle image";
+
+            return 1;
+        }
+
+        function checkInfodot1HasContent() {
+            if (infodot1.children.length != 1) // DLOD element
+                throw "No dynamic LOD element";
+
+            if (infodot1.children[0].children.length <= 1 // content items
+                )
+                throw "Infodot must contain items";
+
+            return 1;
+        }
+
+        function checkTimelines() {
+            if (infodot1.children.length != 1) // DLOD element
+                throw "No dynamic LOD element";
+
+            checkTimeline(t1, "Cosmos", -13.7 * k, 13.7 * k, 0, 5 * k, "rgba(100, 30, 30, 0.5)");
+            checkTimeline(t2, "Life", -5.7 * k, 5.7 * k, 0.1 * k, 2 * k, "rgba(30, 100, 30, 0.5)");
+            checkTimeline(getChild(t1, "t2"), "Life", -5.7 * k, 5.7 * k, 0.1 * k, 2 * k, "rgba(30, 100, 30, 0.5)");
+            return 1;
+        }
+
+        function checkTimeline(timeline, text, timeLeft, timeSpan, top, height, fillStyle) {
+            if ("layerTimelines" != timeline["layerid"]
+                || timeLeft != timeline["x"]
+                || top != timeline["y"]
+                || timeSpan != timeline["width"]
+                || height != timeline["height"])
+                throw "Timeline basic properties are incorrect";
+
+            var settings = timeline.settings;
+            if (timelineStrokeStyle != settings["strokeStyle"]
+                || timelineLineWidth != settings["lineWidth"]
+                || fillStyle != settings["fillStyle"]);
+
+            var textElement = timeline.children[0];
+            checkText(textElement, text);
+        }
+
+        function checkText(element, text) {
+            if (text != element["text"]) throw "Text is incorrect";
+        }
+
+        $(document).ready(function () {
+            var vc = $("#vc");
+            vc.virtualCanvas();
+
+            k = 200;
+
+            var root = vc.virtualCanvas("getLayerContent");
+            root.beginEdit();
+            t1 = addTimeline(root, "layerTimelines", "t1",
+                {
+                    timeStart: -13.7 * k, timeEnd: -4.0,
+                    top: 0, height: 5 * k,
+                    header: "Cosmos",
+                    fillStyle: "rgba(100, 30, 30, 0.5)"
+                });
+
+              //  var rec21 = addVideo(t1, "layerInfodots", "v11", "http://www.youtube.com/embed/7hqX8ljEP34", -12 * k, 2.0 * k, 0.9 * k, 0.9 * k, 20);
+
+                //var rect1 = addRectangle(t1, "layerInfodots", "v1", -12 * k, 2.0 * k, 0.9 * k, 0.9 * k, { strokeStyle: 'rgb(240,240,240)', lineWidth: 2, fillStyle: 'rgba(140,140,140,0.5)' });
+
+       
+
+            var infodot02 = addInfodot(t1, "layerInfodots", "infodot02",
+                -12 * k, 2.0 * k, 0.9 * k,
+                [
+                { id:"id_sound",title: 'Space like infinity',
+                    description: 'The Universe was once in an extremely hot and dense state which expanded rapidly.',
+                    mediaUrl: "rihard_shtraus_zaratustra.mp3",
+                    mediaType: 'audio'
+                },
+                 { id: "i1_text2", title: 'Space like infinity',
+                     description: 'The Universe was once in an extremely hot and dense state which expanded rapidly.',
+                     mediaUrl:
+                    'The Universe is commonly defined as the totality of everything that exists, including all matter and energy, the planets, stars, galaxies, and the contents of intergalactic space. Definitions and usage vary and similar terms include the cosmos, the world and nature. Scientific observation of earlier stages in the development of the Universe, which can be seen at great distances, suggests that the Universe has been governed by the same physical laws and constants throughout most of its extent and history. There are various multiverse theories, in which physicists have suggested that our universe is one among many universes that likewise exist. (From Wikipedia, the free Encyclopedia)',
+                     mediaType: 'multiline'
+                 }
+
+                ]);
+            var infodot01 = addInfodot(t1, "layerInfodots", "infodot01",
+                -10 * k, 2.0 * k, 0.9 * k,
+                [
+                { id: "i1_text1", title: 'Space like infinity',
+                    description: 'The Universe was once in an extremely hot and dense state which expanded rapidly.',
+                    mediaUrl:
+                    'The Universe is commonly defined as the totality of everything that exists, including all matter and energy, the planets, stars, galaxies, and the contents of intergalactic space. Definitions and usage vary and similar terms include the cosmos, the world and nature. Scientific observation of earlier stages in the development of the Universe, which can be seen at great distances, suggests that the Universe has been governed by the same physical laws and constants throughout most of its extent and history. There are various multiverse theories, in which physicists have suggested that our universe is one among many universes that likewise exist. (From Wikipedia, the free Encyclopedia)',
+                    mediaType: 'scroll'
+                }
+
+                ]);
+
+            var infodot0 = addInfodot(t1, "layerInfodots", "infodot0",
+                -8 * k, 2.0 * k, 0.9 * k,
+                [{ id: "i1_video", title: 'Space like infinity',
+                    description: 'The Universe was once in an extremely hot and dense state which expanded rapidly.',
+                    mediaUrl: 'http://player.vimeo.com/video/31911961?title=0&amp;byline=0&amp;portrait=0',
+                    mediaType: 'video'
+                },
+                 { id: "i1_text",
+                 title: 'Space like infinity',
+                     description: 'The Universe was once in an extremely hot and dense state which expanded rapidly.',
+                     mediaUrl:
+                    'The Universe is commonly defined as the totality of everything that exists, including all matter and energy, the planets, stars, galaxies, and the contents of intergalactic space. Definitions and usage vary and similar terms include the cosmos, the world and nature. Scientific observation of earlier stages in the development of the Universe, which can be seen at great distances, suggests that the Universe has been governed by the same physical laws and constants throughout most of its extent and history. There are various multiverse theories, in which physicists have suggested that our universe is one among many universes that likewise exist. (From Wikipedia, the free Encyclopedia)',
+                     mediaType: 'multiline'
+                 }
+
+                ]);
+
+
+            root.endEdit(true);
+
+            controller = new ViewportController(
+                            function (visible) {
+                                vc.virtualCanvas("setVisible", visible, controller.activeAnimation);
+                            },
+                            function () {
+                                return vc.virtualCanvas("getViewport");
+                            },
+                            getGesturesStream(vc));
+
+            vc.virtualCanvas("setVisible", new VisibleRegion2d(-7.0 * k, 2.5 * k, 14.0 * k / 1024.0));
+            UpdateLayout();
+        });
+
+        function UpdateLayout() {
+            document.getElementById("vc").style.height = (window.innerHeight - 20) + "px";
+            $("#vc").virtualCanvas("updateViewport");
+        }
+
+        $(window).bind('resize', function () {
+            UpdateLayout();
+        });
+
+    </script>
+    <title>Virtual Canvas Primitives</title>
+</head>
+<body style="background-color: Black">
+    <div id="vc" style="width: 100%; height: auto; overflow: hidden; background-image: url('Images/background.jpg');
+        background-size: cover">
+        <div id="layerTimelines">
+        </div>
+        <div id="layerInfodots">
+        </div>
+    </div>
+</body>
+</html>

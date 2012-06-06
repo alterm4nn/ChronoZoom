@@ -1,0 +1,165 @@
+﻿@model Authoring.WebRole.Models.ContentItem
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>ContentItem - Edit</h2>
+
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+<script type="text/javascript">
+    function toggleVisibility(controlId, hideControlId, dropdownControlId) {
+        var control = document.getElementById(controlId);
+        var imageControl = document.getElementById(hideControlId);
+        var sourceControl = document.getElementById(dropdownControlId);
+        var index = sourceControl.selectedIndex;
+        if (sourceControl.options[index].text == "Picture") {
+            control.style.visibility = "hidden";
+            imageControl.style.visibility = "visible";
+        }
+        else {
+            control.style.visibility = "visible";
+            imageControl.style.visibility = "hidden";
+        }
+    }
+    function fillTextValue(controlId) {
+        var control = document.getElementById(controlId);
+        control.value = "picture";
+    }    
+
+</script>
+
+@using (Html.BeginForm("Edit", "ContentItem", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.ValidationSummary(true)
+    <fieldset>
+        <legend>ContentItem</legend>
+
+        @Html.HiddenFor(model => model.ID)
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Title)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Title)
+            @Html.ValidationMessageFor(model => model.Title)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Caption)
+        </div>
+        <div class="editor-field">
+            @Html.TextAreaFor(model => model.Caption, 5, 100, null) 
+            @Html.ValidationMessageFor(model => model.Caption)
+        </div>
+
+        <div class="editor-label">
+            ID Number
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Topic)
+            @Html.ValidationMessageFor(model => model.Topic)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.MediaTypeID, "MediaType")
+        </div>
+        <div class="editor-field">
+             @Html.DropDownList("MediaTypeIDList", ViewBag.MediaTypeID as SelectList, new { onchange = "toggleVisibility('MediaBlobURL', 'imageFile', 'MediaTypeIDList');" })
+            @Html.ValidationMessageFor(model => model.MediaTypeID)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.ThresholdID, "Threshold")
+        </div>
+        <div class="editor-field">
+            @Html.DropDownList("ThresholdID", String.Empty)
+            @Html.ValidationMessageFor(model => model.ThresholdID)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.RegimeID, "Regime")
+        </div>
+        <div class="editor-field">
+            @Html.DropDownList("RegimeID", String.Empty)
+            @Html.ValidationMessageFor(model => model.RegimeID)
+        </div>
+
+        <div class="editor-label">
+            Azure Storage Explorer uri
+        </div>
+        <div class="editor-field">
+            <input type="file" id="imageFile" name="imageFile" onchange="fillTextValue('MediaBlobURL');" />
+            <br />
+          @Html.EditorFor(model => model.MediaBlobURL)
+            @Html.ValidationMessageFor(model => model.MediaBlobURL)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.TimeUnitID, "TimeUnit")
+        </div>
+        <div class="editor-field">
+            @Html.DropDownList("TimeUnitID", String.Empty)
+            @Html.ValidationMessageFor(model => model.TimeUnitID)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.ContentDate)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.ContentDate)
+            @Html.ValidationMessageFor(model => model.ContentDate)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.ContentYear)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.ContentYear)
+            @Html.ValidationMessageFor(model => model.ContentYear)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.MediaSource)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.MediaSource)
+            @Html.ValidationMessageFor(model => model.MediaSource)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Attribution)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Attribution)
+            @Html.ValidationMessageFor(model => model.Attribution)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.LicenseTypeID, "LicenseType")
+        </div>
+        <div class="editor-field">
+            @Html.DropDownList("LicenseTypeID", String.Empty)
+            @Html.ValidationMessageFor(model => model.LicenseTypeID)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.IsVisible)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.IsVisible)
+            @Html.ValidationMessageFor(model => model.IsVisible)
+        </div>
+        <p>
+            I confirm that the content I submit does not infringe the copyrights, publicity rights, privacy rights, or other intellectual property or proprietary rights of others.
+        </p>
+        <p>
+            <input type="submit" value="Save" />
+        </p>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>

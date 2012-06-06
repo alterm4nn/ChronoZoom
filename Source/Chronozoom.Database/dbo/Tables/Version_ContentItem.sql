@@ -1,0 +1,27 @@
+﻿CREATE TABLE [dbo].[Version_ContentItem] (
+    [ID]                    UNIQUEIDENTIFIER   NOT NULL,
+    [Title]                 NVARCHAR (200)     NOT NULL,
+    [Caption]               NVARCHAR (1000)    NOT NULL,
+    [Topic]                 NVARCHAR (200)     NOT NULL,
+    [MediaTypeID]           UNIQUEIDENTIFIER   NOT NULL,
+    [ThresholdID]           UNIQUEIDENTIFIER   NOT NULL,
+    [RegimeID]              UNIQUEIDENTIFIER   NOT NULL,
+    [MediaBlobURL]          NVARCHAR (500)     NOT NULL,
+    [TimeUnitID]            UNIQUEIDENTIFIER   NOT NULL,
+    [ContentDate]           DATETIMEOFFSET (7) NULL,
+    [ContentYear]           DECIMAL (8, 4)     NULL,
+    [MediaSource]           NVARCHAR (300)     NULL,
+    [Attribution]           NVARCHAR (200)     NULL,
+    [LicenseTypeID]         UNIQUEIDENTIFIER   NOT NULL,
+    [CreatedOn]             SMALLDATETIME      NULL,
+    [CreatedBy]             UNIQUEIDENTIFIER   NULL,
+    [ModifiedOn]            SMALLDATETIME      NULL,
+    [ModifiedBy]            UNIQUEIDENTIFIER   NULL,
+    [IsVisible]             BIT                NULL,
+    [IsDeleted]             BIT                NULL,
+    [UniqueID]              INT                NOT NULL,
+    [CurrVersion]           INT                NULL,
+    [Version_ContentItemID] UNIQUEIDENTIFIER   DEFAULT (newid()) NOT NULL,
+    PRIMARY KEY CLUSTERED ([Version_ContentItemID] ASC)
+);
+

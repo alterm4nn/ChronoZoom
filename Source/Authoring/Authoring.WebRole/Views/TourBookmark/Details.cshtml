@@ -1,0 +1,33 @@
+﻿@model Authoring.WebRole.Models.TourBookmark
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>TourBookmark - Details</h2>
+
+<fieldset>
+    <legend>TourBookmark</legend>
+
+    <div class="display-label">Tour</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Tour.Name)
+    </div>
+
+    <div class="display-label">BookMark</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.BookMark.Name)
+    </div>
+
+    <div class="display-label">SequenceNumber</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.SequenceNumber)
+    </div>
+   <div class="display-label">IsVisible</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.IsVisible)
+    </div></fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.TourBookmarkID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

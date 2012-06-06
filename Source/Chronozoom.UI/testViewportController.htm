@@ -1,0 +1,236 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Test Viewport Controller</title>
+    
+    <meta http-equiv='cache-control' content='no-cache'/>
+    <meta http-equiv='expires' content='0'/>
+    <meta http-equiv='pragma' content='no-cache'/>
+
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+    
+    <link type="text/css" rel="stylesheet" href="Styles/cz.css"/>
+    <link type="text/css" rel="stylesheet" href="Styles/axis.css"/>
+
+    <script type="text/javascript" src="Scripts/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-ui-1.8.16.custom.min.js"></script>
+
+    <script type="text/javascript" src="Scripts/rx.js"></script>
+    <script type="text/javascript" src="Scripts/rx.jQuery.js"></script>
+
+    <script type="text/javascript" src="Scripts/axis.js"></script>
+    <script type="text/javascript" src="Scripts/common.js"></script>
+    <script type="text/javascript" src="Scripts/cz.settings.js"></script>
+    <script type="text/javascript" src="Scripts/vccontent.js"></script>
+    <script type="text/javascript" src="Scripts/viewport.js"></script>
+    <script type="text/javascript" src="Scripts/virtualCanvas.js"></script>
+    <script type="text/javascript" src="Scripts/mouseWheelPlugin.js"></script>
+    <script type="text/javascript" src="Scripts/gestures.js"></script>
+    <script type="text/javascript" src="Scripts/viewportAnimation.js"></script>
+    <script type="text/javascript" src="Scripts/viewportController.js"></script>
+    
+    <script type="text/javascript">
+        var Ga = 1e9; // 1 Gigaannum
+
+        var pos;
+
+        var vc;
+        var ax;
+
+        var root;
+        var controller;
+
+        var interruptedIds = [];
+        var completedIds = [];
+
+        var isAxisFreezed = true;
+
+        var zoomHandled = false;
+        var panHandled = false;
+        var pinHandled = false;
+        var offset = { "xOffset": 0, "yOffset": 0 };
+        var scale = { "xOrigin": 0, "yOrigin": 0, "scaleFactor": 0 };
+        var maxPermitedVerticalRange = { top: -10 * Ga, bottom: 10 * Ga };
+        var maxPermitedScale = 1000000;
+
+        $(document).ready(function () {
+            /*
+            pos = $("#pos");
+            pos.css("position", "absolute");
+            pos.css("top", (($(window).height() - pos.outerHeight()) / 2) + $(window).scrollTop() + "px");
+            pos.css("left", (($(window).width() - pos.outerWidth()) / 2) + $(window).scrollLeft() + "px");
+            */
+
+            ax = $("#axis");
+            ax.axis();
+
+            vc = $("#vc");
+            vc.virtualCanvas();
+
+            root = vc.virtualCanvas("getLayerContent");
+
+            // Gesture stream for zoom by double click.
+            vc.mousewheel(function (objEvent, intDelta) {
+                var event = jQuery.Event("xbrowserwheel");
+                event.delta = intDelta;
+                event.origin = getXBrowserMouseOrigin(vc, objEvent);
+                vc.trigger(event);
+            });
+
+            var mouseWheel = vc.toObservable("xbrowserwheel");
+
+            var mouseWheels = mouseWheel.Zip(mouseWheel, function (arg) {
+                return new ZoomGesture(arg.origin.x, arg.origin.y, arg.delta > 0 ? 1 / zoomLevelFactor : zoomLevelFactor);
+            });
+
+            var mousedblclick = vc.toObservable("dblclick");
+
+            var mousedblclicks = mousedblclick.Zip(mousedblclick, function (event) {
+                var origin = getXBrowserMouseOrigin(vc, event);
+                return new ZoomGesture(origin.x, origin.y, 1 / zoomLevelFactor);
+            });
+
+            var panController = createPanSubject(vc);
+            var pinController = createPinSubject(vc);
+            var zoomController = mouseWheels.Merge(mousedblclicks);
+
+            var newGesturesStream = pinController.Merge(panController.Merge(zoomController));
+
+            newGesturesStream.Subscribe(function (gesture) {
+                switch (gesture.Type) {
+                    case "Zoom":
+                        zoomHandled = true;
+                        scale.xOrigin = gesture.xOrigin;
+                        scale.yOrigin = gesture.yOrigin;
+                        scale.scaleFactor = gesture.scaleFactor;
+                        break;
+                    case "Pan":
+                        panHandled = true;
+                        offset.xOffset += gesture.xOffset;
+                        offset.yOffset += gesture.yOffset;
+                        break;
+                    case "Pin": pinHandled = true;
+                }
+            });
+
+            controller = new ViewportController(
+                                function (visible) {
+                                    vc.virtualCanvas("setVisible", visible, controller.activeAnimation);
+                                    if (isAxisFreezed) updateAxis();
+                                },
+                                function () {
+                                    return vc.virtualCanvas("getViewport");
+                                },
+                                newGesturesStream);
+
+            controller.onAnimationComplete.push(
+                                function (id)
+                                { completedIds.push(id) }
+            );
+
+            controller.onAnimationUpdated.push(
+                                function (oldId, newId) {
+                                    interruptedIds.push({ o: oldId, n: newId });
+                                }
+            );
+
+            vc.virtualCanvas("setVisible", new VisibleRegion2d(-7 * Ga, 0 * Ga, 0.13 * Ga / vc.get(0).clientWidth));
+
+            root.beginEdit();
+            addRectangle(root, "layerContents", "rec", -7 * Ga, 0 * Ga, 0.01 * Ga, 0.01 * Ga, { strokeStyle: 'white', lineWidth: 2, fillStyle: 'rgba(140,140,140,0.5)' });
+            root.endEdit(true);
+
+            updateLayout();
+        });
+
+        $(window).bind('resize', function () {
+            updateLayout();
+        });
+
+        function updateLayout() {
+            vc.virtualCanvas("updateViewport");
+            updateAxis();
+        }
+
+        function updateAxis() {
+            ax.axis("updateWidth");
+            var vp = vc.virtualCanvas("getViewport");
+            var lt = vp.pointScreenToVirtual(0, 0);
+            var rb = vp.pointScreenToVirtual(vp.width, vp.height);
+            ax.axis("setRange", lt.x, rb.x);
+        }
+
+        function setZoomIn() {
+            window.zoomLevelFactor = 1.4;
+        }
+
+        function setZoomOut() {
+            window.zoomLevelFactor = 0.67;
+        }
+    </script>
+</head>
+<body>
+    <div id="axis" style="width: 800px; height: 60px; background-color: black; border-style: solid; border-width: 1px">
+    </div>
+    <div id="vc" style="background-image:url('Images/Blueprint_Paper.jpg'); width: 800px; height: 540px;">
+        <div id="layerContents">
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+
+
+<!--
+
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml">
+        <head>
+            <link href="Styles/cz.css" rel="stylesheet" type="text/css" />
+            <script type="text/javascript" src="Scripts/jquery-1.6.2.min.js"></script>
+            <script type="text/javascript" src="Scripts/jquery-ui-1.8.16.custom.min.js"></script>
+            <script type="text/javascript" src="Scripts/rx.js"></script>
+            <script type="text/javascript" src="Scripts/rx.jQuery.js"></script>    
+            <script type="text/javascript" src="Scripts/common.js"></script>
+            <script type="text/javascript" src="Scripts/cz.settings.js"></script>
+            <script type="text/javascript" src="Scripts/viewport.js"></script>
+            <script type="text/javascript" src="Scripts/vccontent.js"></script>
+            <script type="text/javascript" src="Scripts/virtualCanvas.js"></script>
+            <script type="text/javascript" src="Scripts/mouseWheelPlugin.js"></script>
+            <script type="text/javascript" src="Scripts/gestures.js"></script>
+            <script type="text/javascript" src="Scripts/viewportAnimation.js"></script>
+            <script type="text/javascript" src="Scripts/viewportController.js"></script>
+            <script type="text/javascript">
+                var controller;
+
+                $(document).ready(function () {
+
+                    var vc = $("#vc");
+                    vc.virtualCanvas();
+
+                    controller = new ViewportController(
+                        function (visible) {
+                            vc.virtualCanvas("setVisible", visible, controller.activeAnimation);
+                        },
+                        function () {
+                            return vc.virtualCanvas("getViewport");
+                        },
+                        getGesturesStream(vc));
+                });
+            </script>
+            <title>ViewportController Test Page</title>
+        </head>
+        <body style="background-color: Black">
+            <div id="vc" style="width: 100%; height: auto; overflow: hidden; background-image: url('Images/background.jpg'); background-size: cover">
+                <div id="layer1">
+                </div>
+                <div id="layer2">
+                </div>
+            </div>
+        </body>
+    </html>
+
+-->

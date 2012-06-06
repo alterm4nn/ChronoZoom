@@ -1,0 +1,40 @@
+﻿@model Authoring.WebRole.Models.Tour
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Tour - Details</h2>
+
+<fieldset>
+    <legend>Tour</legend>
+
+    <div class="display-label">Name</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Name)
+    </div>
+
+    <div class="display-label">Category</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Category)
+    </div>
+
+    <div class="display-label">Sequence</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Sequence)
+    </div>
+
+    <div class="display-label">AudioBlobUrl</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.AudioBlobUrl)
+    </div>
+
+    <div class="display-label">IsVisible</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.IsVisible)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

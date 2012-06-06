@@ -1,0 +1,10 @@
+C:\Chronozoom\Main\Source\Chronozoom.Entities\bin\DevPreview\Chronozoom.Entities.dll
+C:\Chronozoom\Main\Source\Chronozoom.Entities\bin\DevPreview\Chronozoom.Entities.pdb
+C:\Chronozoom\Main\Source\Chronozoom.Entities\obj\DevPreview\ResolveAssemblyReference.cache
+C:\Chronozoom\Main\Source\Chronozoom.Entities\obj\DevPreview\Chronozoom.Entities.dll
+C:\Chronozoom\Main\Source\Chronozoom.Entities\obj\DevPreview\Chronozoom.Entities.pdb
+C:\CZCodeplex\Source\Chronozoom.Entities\bin\DevPreview\Chronozoom.Entities.dll
+C:\CZCodeplex\Source\Chronozoom.Entities\bin\DevPreview\Chronozoom.Entities.pdb
+C:\CZCodeplex\Source\Chronozoom.Entities\obj\DevPreview\ResolveAssemblyReference.cache
+C:\CZCodeplex\Source\Chronozoom.Entities\obj\DevPreview\Chronozoom.Entities.dll
+C:\CZCodeplex\Source\Chronozoom.Entities\obj\DevPreview\Chronozoom.Entities.pdb

@@ -1,0 +1,23 @@
+﻿@model Authoring.WebRole.Models.CitationType
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>CitationType - Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<fieldset>
+    <legend>CitationType</legend>
+
+    <div class="display-label">CitationType1</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.CitationType1)
+    </div>
+</fieldset>
+@using (Html.BeginForm()) {
+    <p>
+        <input type="submit" value="Delete" /> |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+}

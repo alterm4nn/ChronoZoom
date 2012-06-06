@@ -1,0 +1,60 @@
+﻿@model Authoring.WebRole.Models.Reference
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Reference - Details</h2>
+
+<fieldset>
+    <legend>Reference</legend>
+
+    <div class="display-label">Authors</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Authors)
+    </div>
+
+    <div class="display-label">BookChapters</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.BookChapters)
+    </div>
+
+    <div class="display-label">Title</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Title)
+    </div>
+
+    <div class="display-label">CitationType</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.CitationType.CitationType1)
+    </div>
+
+    <div class="display-label">PageNumbers</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.PageNumbers)
+    </div>
+
+    <div class="display-label">Publication</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Publication)
+    </div>
+
+    <div class="display-label">PublicationDates</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.PublicationDates)
+    </div>
+
+    <div class="display-label">Source</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Source)
+    </div>
+
+    <div class="display-label">IsVisible</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.IsVisible)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

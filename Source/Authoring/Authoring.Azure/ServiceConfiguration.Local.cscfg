@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ServiceConfiguration serviceName="ContentAuthoring" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceConfiguration" osFamily="1" osVersion="*">
+  <Role name="Authoring.WebRole">
+    <Instances count="1" />
+    <ConfigurationSettings>
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=1" />
+      <Setting name="BlobConnectionString" value="UseDevelopmentStorage=true" />
+      <Setting name="ExcelDataContainerName" value="bulkuploadcontent" />
+      <Setting name="ImageContainerName" value="images" />
+      <Setting name="AudioContainerName" value="audio" />
+    </ConfigurationSettings>
+  </Role>
+</ServiceConfiguration>

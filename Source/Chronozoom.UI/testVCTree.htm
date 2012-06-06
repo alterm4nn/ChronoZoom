@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <link href="Styles/cz.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="Scripts/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-ui-1.8.16.custom.min.js"></script>
+    <script type="text/javascript" src="Scripts/rx.js"></script>
+    <script type="text/javascript" src="Scripts/rx.jQuery.js"></script>
+    <script type="text/javascript" src="Scripts/common.js"></script>
+    <script type="text/javascript" src="Scripts/cz.settings.js"></script>
+    <script type="text/javascript" src="Scripts/vccontent.js"></script>
+    <script type="text/javascript" src="Scripts/viewport.js"></script>
+    <script type="text/javascript" src="Scripts/virtualCanvas.js"></script>
+    <script type="text/javascript" src="Scripts/mouseWheelPlugin.js"></script>
+    <script type="text/javascript" src="Scripts/gestures.js"></script>
+    <script type="text/javascript" src="Scripts/viewportAnimation.js"></script>
+    <script type="text/javascript" src="Scripts/viewportController.js"></script>
+    <script type="text/javascript">
+        var maxPermitedVerticalRange = { top: -10000000, bottom: 10000000 };
+
+        var k = 100000;
+        var r1, r11, r2, r21;
+        var onIsRendered_1 = false;
+        var onIsRendered_11 = false;
+        var onIsRendered_2 = false;
+        var onIsRendered_21 = false;
+
+        function getOnIsRendered() {
+            var r = { r1: onIsRendered_1, r11: onIsRendered_11, r2: onIsRendered_2, r21: onIsRendered_21 };
+            onIsRendered_1 = false;
+            onIsRendered_11 = false;
+            onIsRendered_2 = false;
+            onIsRendered_21 = false;
+            return r;
+        }
+
+        function getIsRendered() {
+            var r = { r1: r1.isRendered, r11: r11.isRendered, r2: r2.isRendered, r21: r21.isRendered };
+            return r;
+        }
+
+        $(document).ready(function () {
+            var vc = $("#vc");
+            vc.virtualCanvas();
+
+            var root = vc.virtualCanvas("getLayerContent");
+            root.beginEdit();
+
+            r1 = addRectangle(root, "layer1", "1", -400 * k, -100 * k, 200 * k, 100 * k, { strokeStyle: 'white', lineWidth: 1 });
+            r11 = addRectangle(r1, "layer1", "11", -350 * k, -80 * k, 80 * k, 40 * k, { strokeStyle: 'gray', lineWidth: 1 });
+
+            r2 = addRectangle(root, "layer1", "2", -400 * k, 10 * k, 200 * k, 100 * k, { strokeStyle: 'white', lineWidth: 1 });
+            r21 = addRectangle(r2, "layer1", "21", -350 * k, 30 * k, 80 * k, 40 * k, { strokeStyle: 'gray', lineWidth: 1 });
+
+            r1.onIsRenderedChanged = function () {
+                onIsRendered_1 = true;
+            };
+            r11.onIsRenderedChanged = function () { onIsRendered_11 = true; };
+            r2.onIsRenderedChanged = function () { onIsRendered_2 = true; };
+            r21.onIsRenderedChanged = function () { onIsRendered_21 = true; };
+
+            root.endEdit(true);
+
+            controller = new ViewportController(
+                            function (visible) {
+                                vc.virtualCanvas("setVisible", visible, controller.activeAnimation);
+                            },
+                            function () {
+                                return vc.virtualCanvas("getViewport");
+                            },
+                            getGesturesStream(vc));
+
+            vc.virtualCanvas("setVisible", new VisibleRegion2d(//-310 * k, 50 * k, 50.0 * k / 800.0));
+                             -300 * k, 0, 400.0 * k / 800.0));
+        });
+
+        $(window).bind('resize', function () {
+            UpdateLayout();
+        });
+
+    </script>
+    <title>Virtual Canvas Primitives</title>
+</head>
+<body style="background-color: Black">
+    <div id="vc" style="width: 800px; height: 600px; overflow: hidden; background-image: url('Images/background.jpg');
+        background-size: cover">
+        <div id="layer1">
+        </div>
+    </div>
+    <hr />
+    <button onclick='$("#vc").virtualCanvas("setVisible", new VisibleRegion2d(-300 * k, -50 * k, 150.0 * k / 800.0));'>
+        V1</button>
+</body>
+</html>

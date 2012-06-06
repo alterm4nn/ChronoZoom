@@ -1,0 +1,88 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <title>AxisWidgetSample</title>
+
+    <link rel="stylesheet" type="text/css" href="Styles/axis.css" />
+    <script type="text/javascript" src="Scripts/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-ui-1.8.16.custom.min.js"></script>
+    <script type="text/javascript" src="Scripts/rx.js"></script>
+    <script type="text/javascript" src="Scripts/rx.jQuery.js"></script>
+
+    <script type="text/javascript" src="Scripts/cz.settings.js"></script>
+    <script type="text/javascript" src="Scripts/common.js"></script>
+    <script type="text/javascript" src="Scripts/axis.js"></script>
+    <script type="text/javascript">
+    
+        $(document).ready(function () {
+            $("#axis").axis();
+
+            var _div = $("#axis").first();
+            // Connect RX to axis
+            // get the stream of events from the mousedown, mousemove and mouseup events
+            var mouseDown = _div.toObservable("mousedown"),
+            mouseMove = _div.toObservable("mousemove"),
+            mouseUp = _div.toObservable("mouseup"),
+            mouseWheel = _div.toObservable("mousewheel");
+
+            // get the changes in the X and Y direction as the mouse moves
+            var mouseMoves = mouseMove.Skip(1).Zip(mouseMove, function (left, right) {
+                return {
+                    xChange: left.clientX - right.clientX,
+                    yChange: left.clientY - right.clientY
+                };
+            });
+
+            // for each mouse down event, get all the subsequent changes in the clientX and
+            // clientY values resulting from the mouse move events until mouse up event occurs
+            var mouseDrags = mouseDown.SelectMany(function (md) {
+                return mouseMoves.TakeUntil(mouseUp);
+            });
+
+            mouseDrags.Subscribe(function (mouseEvent) {
+                var range = $("#axis").axis("getRange");
+                var change = mouseEvent.xChange * (range.right - range.left) / 800.0;
+                range.left -= change;
+                range.right -= change;
+                $("#axis").axis("setRange", range.left, range.right);
+            });
+
+            var mouseWheels = mouseWheel.Zip(mouseWheel, function (event) {
+                var factor = 0;
+                if (!event) event = window.event;
+                if (event.wheelDelta) {
+                    factor = event.wheelDelta / 120;
+                }
+                else if (event.detail) {
+                    factor = -event.detail / 3;
+                }
+                return factor < 0 ? 1.2 : 1 / 1.2;
+            });
+
+            mouseWheels.Subscribe(function (factor) {
+                var range = $("#axis").axis("getRange");
+
+                var delta = (range.right - range.left) / 2;
+                var center = (range.left + range.right) / 2;
+
+                var min = center - delta * factor;
+                var max = center + delta * factor;
+
+                $("#axis").axis("setRange", min, max);
+            });
+
+            $(window).bind('resize', function () {
+                $("#axis").axis("updateWidth");
+            });
+        });
+
+    </script>
+</head>
+
+<body style="background-color: Black">
+    <div id="axis" style="width: 1024px; height: 83px; overflow: hidden; margin: 10px">
+    </div>
+</body>
+</html>

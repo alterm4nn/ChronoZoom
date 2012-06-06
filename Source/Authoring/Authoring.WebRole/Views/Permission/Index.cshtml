@@ -1,0 +1,69 @@
+﻿@model IEnumerable<Authoring.WebRole.Models.Permission>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Permissions - Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table>
+    <tr>
+         <th></th>
+       <th>
+            Permission
+        </th>
+        <th>
+            Value
+        </th>
+        <th>
+            CreatedBy
+        </th>
+        <th>
+            ModifiedBy
+        </th>
+        <th>
+            CreatedOn
+        </th>
+        <th>
+            ModifiedOn
+        </th>
+        <th>
+            IsDeleted
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+         <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.ID }) |
+            @Html.ActionLink("Details", "Details", new { id=item.ID }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.ID })
+        </td>
+       <td>
+            @Html.DisplayFor(modelItem => item.Permission1)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IntRepresentation)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.User.UserName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.User1.UserName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.CreatedOn)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ModifiedOn)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IsDeleted)
+        </td>
+    </tr>
+}
+
+</table>

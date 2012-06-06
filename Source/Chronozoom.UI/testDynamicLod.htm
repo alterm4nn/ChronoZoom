@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <link href="Styles/cz.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="Scripts/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-ui-1.8.16.custom.min.js"></script>
+    <script type="text/javascript" src="Scripts/rx.js"></script>
+    <script type="text/javascript" src="Scripts/rx.jQuery.js"></script>
+    <script type="text/javascript" src="Scripts/common.js"></script>
+    <script type="text/javascript" src="Scripts/cz.settings.js"></script>
+    <script type="text/javascript" src="Scripts/vccontent.js"></script>
+    <script type="text/javascript" src="Scripts/viewport.js"></script>
+    <script type="text/javascript" src="Scripts/virtualCanvas.js"></script>
+    <script type="text/javascript" src="Scripts/mouseWheelPlugin.js"></script>
+    <script type="text/javascript" src="Scripts/gestures.js"></script>
+    <script type="text/javascript" src="Scripts/viewportAnimation.js"></script>
+    <script type="text/javascript" src="Scripts/viewportController.js"></script>
+    <script type="text/javascript">
+        var maxPermitedVerticalRange = { top: -10000000, bottom: 10000000 };
+
+        $(document).ready(function () {
+            var vc = $("#vc");
+            vc.virtualCanvas();
+
+            var root = vc.virtualCanvas("getLayerContent");
+            root.beginEdit();
+
+            rect = addRectangle(root, "layer1", "r", -100, -50, 200, 100, { strokeStyle: 'rgb(240,240,240)', lineWidth: 2, fillStyle: 'rgba(140,140,140,0.5)' });
+            image = addLodImage(rect, "layer2", "i", -25, -25, 50, 50, 
+                [ { zoomLevel:4, imageSource: "Images/flower16x16.png" },
+                { zoomLevel: 5, imageSource: "Images/flower.png" },
+                { zoomLevel: 9, imageSource: "Images/4.png"}], 
+                function () { vc.virtualCanvas("invalidate"); });
+
+            root.endEdit(true);
+
+            controller = new ViewportController(
+                            function (visible) {
+                                vc.virtualCanvas("setVisible", visible, controller.activeAnimation);
+                            },
+                            function () {
+                                return vc.virtualCanvas("getViewport");
+                            },
+                            getGesturesStream(vc));
+
+            vc.virtualCanvas("setVisible", new VisibleRegion2d(0, 0, 50.0 / 256.0));
+            UpdateLayout();
+        });
+
+        function UpdateLayout() {
+            document.getElementById("vc").style.height = (window.innerHeight - 20) + "px";
+            $("#vc").virtualCanvas("updateViewport");
+        }
+
+        $(window).bind('resize', function () {
+            UpdateLayout();
+        });
+
+    </script>
+    <title>Virtual Canvas Primitives</title>
+</head>
+<body style="background-color: Black">
+    <div id="vc" style="width: 100%; height: auto; overflow: hidden; background-image: url('Images/background.jpg');
+        background-size: cover">
+        <div id="layer1">
+        </div>
+        <div id="layer2">
+        </div>
+    </div>
+</body>
+</html>

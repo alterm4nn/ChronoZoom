@@ -1,0 +1,373 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">DevPreview</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1A1F34C7-6E40-41C1-9ADB-D374DBAF7C50}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>UI</RootNamespace>
+    <AssemblyName>UI</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <UseIISExpress>false</UseIISExpress>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'DevPreview|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Production|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Sandbox|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisLogFile>bin\UI.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+    <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Staging|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisLogFile>bin\UI.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.WindowsAzure.Diagnostics" />
+    <Reference Include="Microsoft.WindowsAzure.ServiceRuntime" />
+    <Reference Include="Microsoft.WindowsAzure.StorageClient" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="BehindTheScenes.htm" />
+    <Content Include="favicon.ico" />
+    <Content Include="Images\A.png" />
+    <Content Include="Images\about-chronozoom.png" />
+    <Content Include="Images\berkeley-logo-17-86.png" />
+    <Content Include="Images\bg.png" />
+    <Content Include="Images\chronozoom-content.png" />
+    <Content Include="Images\Chronozoom-project-advisors.png" />
+    <Content Include="Images\chronzoom-200px-white.png" />
+    <Content Include="Images\corporate-and-institutional-support.png" />
+    <Content Include="Images\Credits.png" />
+    <Content Include="Images\developers-and-testers.png" />
+    <Content Include="Images\frequently-asked-questions.png" />
+    <Content Include="Images\header.png" />
+    <Content Include="Images\help-chronozoom-grow.png" />
+    <Content Include="Images\inspiration.png" />
+    <Content Include="Images\mrclogo-17x53.png" />
+    <Content Include="Images\MSU_logo-white17x74.png" />
+    <Content Include="Images\new-logo-white-for-canvas.png" />
+    <Content Include="Images\OuterCurve_Logo_17x68.png" />
+    <Content Include="Images\product-management-and-community-outreach.png" />
+    <Content Include="Images\program-managers.png" />
+    <Content Include="Images\Q.png" />
+    <Content Include="Images\right-column.png" />
+    <Content Include="Images\the-journey-to-the-chronozoom-beta.png" />
+    <Content Include="Images\Unsupported-Browser.jpg" />
+    <Content Include="Images\UX-and-collateral.png" />
+    <Content Include="Images\we-need-your-feedback.png" />
+    <Content Include="Images\whats-next.png" />
+    <Content Include="Privacy.htm" />
+    <Content Include="ResponseDump.txt" />
+    <Content Include="Trademark_Copyright.htm" />
+    <Content Include="TermsOfUse.htm" />
+    <Content Include="cztransfer.htm" />
+    <Content Include="Images\03cztitle_beta_grey_bold_italic.png" />
+    <Content Include="Images\1280px-CMB_Timeline300_no_WMAP.jpg" />
+    <Content Include="Images\bkmrk_off.jpg" />
+    <Content Include="Images\bkmrk_on.jpg" />
+    <Content Include="Images\Blueprint_Paper.jpg" />
+    <Content Include="Images\close_off.png" />
+    <Content Include="Images\close_on.png" />
+    <Content Include="Images\collapse-down.png" />
+    <Content Include="Images\collapse-left.png" />
+    <Content Include="Images\collapse-up.png" />
+    <Content Include="Images\collapse.png" />
+    <Content Include="Images\expand-right.png" />
+    <Content Include="Images\expand.png" />
+    <Content Include="Images\fullscreen_off.jpg" />
+    <Content Include="Images\LOGO_beta_below.png" />
+    <Content Include="Images\search_off.jpg" />
+    <Content Include="Images\search_on.jpg" />
+    <Content Include="Images\Temp-Thumbnail2.png" />
+    <Content Include="Images\tour_exit_off.jpg" />
+    <Content Include="Images\tour_exit_on.jpg" />
+    <Content Include="Images\tour_next_off.jpg" />
+    <Content Include="Images\tour_next_on.jpg" />
+    <Content Include="Images\tour_off.jpg" />
+    <Content Include="Images\tour_on.jpg" />
+    <Content Include="Images\tour_pause_off.jpg" />
+    <Content Include="Images\tour_pause_on.jpg" />
+    <Content Include="Images\tour_play_off.jpg" />
+    <Content Include="Images\tour_play_on.jpg" />
+    <Content Include="Images\tour_prev_off.jpg" />
+    <Content Include="Images\tour_prev_on.jpg" />
+    <Content Include="Scripts\bibliography.js" />
+    <Content Include="Scripts\search.js" />
+    <Content Include="testAudio.htm" />
+    <Content Include="Account\ChangePassword.aspx" />
+    <Content Include="Account\ChangePasswordSuccess.aspx" />
+    <Content Include="Account\Login.aspx" />
+    <Content Include="Account\Register.aspx" />
+    <Content Include="Bibliography.htm" />
+    <Content Include="testFallBackPage.htm" />
+    <Content Include="testTour.htm" />
+    <Content Include="testAudioPlayback.htm" />
+    <Content Include="Scripts\tours.js" />
+    <Content Include="testAsyncImageLoad.htm" />
+    <Content Include="testInfodotContent.htm" />
+    <Content Include="testVirtualCanvasAudioVideoElements.htm" />
+    <Content Include="axis.htm" />
+    <Content Include="Chronozoom.svc" />
+    <Content Include="Scripts\urlnav.js" />
+    <Content Include="testUrlNav.htm" />
+    <Content Include="Images\chronozoom_title.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\regimes.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="testVCTree.htm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="cz.htm" />
+    <Content Include="Images\4.png" />
+    <Content Include="Images\flower16x16.png" />
+    <Content Include="Scripts\layout.js" />
+    <Content Include="testDynamicLod.htm" />
+    <Content Include="testGestures.htm" />
+    <Content Include="testVirtualCanvasLayout.htm" />
+    <Content Include="testVirtualCanvasOpacity.htm" />
+    <Content Include="css\ui-lightness\images\ui-bg_diagonals-thick_18_b81900_40x40.png" />
+    <Content Include="css\ui-lightness\images\ui-bg_diagonals-thick_20_666666_40x40.png" />
+    <Content Include="css\ui-lightness\images\ui-bg_flat_10_000000_40x100.png" />
+    <Content Include="css\ui-lightness\images\ui-bg_glass_100_f6f6f6_1x400.png" />
+    <Content Include="css\ui-lightness\images\ui-bg_glass_100_fdf5ce_1x400.png" />
+    <Content Include="css\ui-lightness\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="css\ui-lightness\images\ui-bg_gloss-wave_35_f6a828_500x100.png" />
+    <Content Include="css\ui-lightness\images\ui-bg_highlight-soft_100_eeeeee_1x100.png" />
+    <Content Include="css\ui-lightness\images\ui-bg_highlight-soft_75_ffe45c_1x100.png" />
+    <Content Include="css\ui-lightness\images\ui-icons_222222_256x240.png" />
+    <Content Include="css\ui-lightness\images\ui-icons_228ef1_256x240.png" />
+    <Content Include="css\ui-lightness\images\ui-icons_ef8c08_256x240.png" />
+    <Content Include="css\ui-lightness\images\ui-icons_ffd27a_256x240.png" />
+    <Content Include="css\ui-lightness\images\ui-icons_ffffff_256x240.png" />
+    <Content Include="css\ui-lightness\jquery-ui-1.8.16.custom.css" />
+    <Content Include="Global.asax" />
+    <Content Include="Images\background.jpg" />
+    <Content Include="Images\flower.png" />
+    <Content Include="Scripts\axis.js" />
+    <Content Include="Scripts\common.js" />
+    <Content Include="Scripts\cz.settings.js" />
+    <Content Include="Scripts\gestures.js" />
+    <Content Include="Scripts\jquery-1.6.2.min.js" />
+    <Content Include="Scripts\jquery-ui-1.8.16.custom.min.js" />
+    <Content Include="Scripts\mouseWheelPlugin.js" />
+    <Content Include="Scripts\rx.jQuery.js" />
+    <Content Include="Scripts\rx.js" />
+    <Content Include="Scripts\vccontent.js" />
+    <Content Include="Scripts\viewport.js" />
+    <Content Include="Scripts\viewportAnimation.js" />
+    <Content Include="Scripts\viewportController.js" />
+    <Content Include="Scripts\virtualCanvas.js" />
+    <Content Include="Styles\axis.css" />
+    <Content Include="Styles\cz.css" />
+    <Content Include="Styles\Site.css" />
+    <Content Include="Scripts\jquery-1.4.1-vsdoc.js" />
+    <Content Include="Scripts\jquery-1.4.1.js" />
+    <Content Include="Scripts\jquery-1.4.1.min.js" />
+    <Content Include="testFunctions.htm" />
+    <Content Include="testViewportController.htm" />
+    <Content Include="testVirtualCanvas.htm" />
+    <Content Include="testVirtualCanvasAdvancedElements.htm" />
+    <Content Include="testVirtualCanvasPrimitives.htm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="toursDump.txt" />
+    <Content Include="Web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Account\ChangePassword.aspx.cs">
+      <DependentUpon>ChangePassword.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Account\ChangePassword.aspx.designer.cs">
+      <DependentUpon>ChangePassword.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Account\ChangePasswordSuccess.aspx.cs">
+      <DependentUpon>ChangePasswordSuccess.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Account\ChangePasswordSuccess.aspx.designer.cs">
+      <DependentUpon>ChangePasswordSuccess.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Account\Login.aspx.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Account\Login.aspx.designer.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Account\Register.aspx.cs">
+      <DependentUpon>Register.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Account\Register.aspx.designer.cs">
+      <DependentUpon>Register.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="ChonozoomEDMtoEntityFactory.cs" />
+    <Compile Include="ChronoZoom.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ChronoZoom.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Chronozoom.svc.cs">
+      <DependentUpon>Chronozoom.svc</DependentUpon>
+    </Compile>
+    <Compile Include="ChronozoomRelay.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\DataExtensions.cs" />
+    <Compile Include="Data\DataInterfaces.cs" />
+    <Compile Include="EDMInfoLoader.cs" />
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Site.Master.cs">
+      <DependentUpon>Site.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Site.Master.designer.cs">
+      <DependentUpon>Site.Master</DependentUpon>
+    </Compile>
+    <Compile Include="WebRole.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Site.Master" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Account\Web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Chronozoom.Entities\Chronozoom.Entities.csproj">
+      <Project>{B995D3CF-E31F-4986-A7F7-77988EA275D3}</Project>
+      <Name>Chronozoom.Entities</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Web.Staging.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Web.DevPreview.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Web.Production.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <EntityDeploy Include="ChronoZoom.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>ChronoZoom.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>False</AutoAssignPort>
+          <DevelopmentServerPort>4949</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>
+          </IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

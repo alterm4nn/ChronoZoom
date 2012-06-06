@@ -1,0 +1,179 @@
+﻿@model Authoring.WebRole.Models.Timeline
+
+@{
+    ViewBag.Title = "Create New From Copy";
+}
+
+<h2>Timeline - Create New From Copy</h2>
+
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+
+@using (Html.BeginForm("Create", "Timeline", FormMethod.Post)) {
+    @Html.ValidationSummary(true)
+    <fieldset>
+        <legend>Timeline</legend>
+
+        @Html.HiddenFor(model => model.ID)
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Title)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Title)
+            @Html.ValidationMessageFor(model => model.Title)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.ThresholdID, "Threshold")
+        </div>
+        <div class="editor-field">
+            @Html.DropDownList("ThresholdID", String.Empty)
+            @Html.ValidationMessageFor(model => model.ThresholdID)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.RegimeID, "Regime")
+        </div>
+        <div class="editor-field">
+            @Html.DropDownList("RegimeID", String.Empty)
+            @Html.ValidationMessageFor(model => model.RegimeID)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Height, "Height")
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Height)
+            @Html.ValidationMessageFor(model => model.Height)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.FromContentDate)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.FromContentDate)
+            @Html.ValidationMessageFor(model => model.FromContentDate)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.FromContentYear)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.FromContentYear)
+            @Html.ValidationMessageFor(model => model.FromContentYear)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.FromTimeUnit)
+        </div>
+        <div class="editor-field">
+            @Html.DropDownList("FromTimeUnit", String.Empty)
+            @Html.ValidationMessageFor(model => model.FromTimeUnit)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.ToContentDate)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.ToContentDate)
+            @Html.ValidationMessageFor(model => model.ToContentDate)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.ToContentYear)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.ToContentYear)
+            @Html.ValidationMessageFor(model => model.ToContentYear)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.ToTimeUnit)
+        </div>
+        <div class="editor-field">
+            @Html.DropDownList("ToTimeUnit", String.Empty)
+            @Html.ValidationMessageFor(model => model.ToTimeUnit)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.ParentTimelineID, "Timeline2")
+        </div>
+        <div class="editor-field">
+            @Html.DropDownList("ParentTimelineID", String.Empty)
+            @Html.ValidationMessageFor(model => model.ParentTimelineID)
+        </div>
+
+        <div class="editor-label" style="display:none;">
+            @Html.LabelFor(model => model.CreatedOn)
+        </div>
+        <div class="editor-field" style="display:none;">
+            @Html.EditorFor(model => model.CreatedOn)
+            @Html.ValidationMessageFor(model => model.CreatedOn)
+        </div>
+
+        <div class="editor-label" style="display:none;">
+            @Html.LabelFor(model => model.CreatedBy, "User")
+        </div>
+        <div class="editor-field" style="display:none;">
+            @Html.DropDownList("CreatedBy", String.Empty)
+            @Html.ValidationMessageFor(model => model.CreatedBy)
+        </div>
+
+        <div class="editor-label" style="display:none;">
+            @Html.LabelFor(model => model.ModifiedOn)
+        </div>
+        <div class="editor-field" style="display:none;">
+            @Html.EditorFor(model => model.ModifiedOn)
+            @Html.ValidationMessageFor(model => model.ModifiedOn)
+        </div>
+
+        <div class="editor-label" style="display:none;">
+            @Html.LabelFor(model => model.ModifiedBy, "User1")
+        </div>
+        <div class="editor-field" style="display:none;">
+            @Html.DropDownList("ModifiedBy", String.Empty)
+            @Html.ValidationMessageFor(model => model.ModifiedBy)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.IsVisible)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.IsVisible)
+            @Html.ValidationMessageFor(model => model.IsVisible)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.SourceURL)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.SourceURL)
+            @Html.ValidationMessageFor(model => model.SourceURL)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Attribution)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Attribution)
+            @Html.ValidationMessageFor(model => model.Attribution)
+        </div>
+
+        <div class="editor-label" style="display:none;">
+            @Html.LabelFor(model => model.IsDeleted)
+        </div>
+        <div class="editor-field" style="display:none;">
+            @Html.EditorFor(model => model.IsDeleted)
+            @Html.ValidationMessageFor(model => model.IsDeleted)
+        </div>
+
+        <p>
+            <input type="submit" value="Save" />
+        </p>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>

@@ -1,0 +1,759 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="ChronozoomModelStoreContainer" CdmEntityContainer="ChronoZoomEntities">
+    <EntitySetMapping Name="Prod_BibliographyView">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Prod_BibliographyView">
+        <MappingFragment StoreEntitySet="Prod_BibliographyView">
+          <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+          <ScalarProperty Name="BibliographyView" ColumnName="BibliographyView" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="Source" ColumnName="Source" />
+          <ScalarProperty Name="PublicationDates" ColumnName="PublicationDates" />
+          <ScalarProperty Name="Publication" ColumnName="Publication" />
+          <ScalarProperty Name="PageNumbers" ColumnName="PageNumbers" />
+          <ScalarProperty Name="CitationType" ColumnName="CitationType" />
+          <ScalarProperty Name="BookChapters" ColumnName="BookChapters" />
+          <ScalarProperty Name="Authors" ColumnName="Authors" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="ExhibitID" ColumnName="ExhibitID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Prod_ContentItemView">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Prod_ContentItemView">
+        <MappingFragment StoreEntitySet="Prod_ContentItemView">
+          <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+          <ScalarProperty Name="ContentItemViewID" ColumnName="ContentItemViewID" />
+          <ScalarProperty Name="Version_ContentItemID" ColumnName="Version_ContentItemID" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="LicenseTypeID" ColumnName="LicenseTypeID" />
+          <ScalarProperty Name="Attribution" ColumnName="Attribution" />
+          <ScalarProperty Name="MediaSource" ColumnName="MediaSource" />
+          <ScalarProperty Name="ContentYear" ColumnName="ContentYear" />
+          <ScalarProperty Name="ContentDate" ColumnName="ContentDate" />
+          <ScalarProperty Name="TimeUnitID" ColumnName="TimeUnitID" />
+          <ScalarProperty Name="MediaBlobURL" ColumnName="MediaBlobURL" />
+          <ScalarProperty Name="RegimeID" ColumnName="RegimeID" />
+          <ScalarProperty Name="ThresholdID" ColumnName="ThresholdID" />
+          <ScalarProperty Name="MediaTypeID" ColumnName="MediaTypeID" />
+          <ScalarProperty Name="Topic" ColumnName="Topic" />
+          <ScalarProperty Name="Caption" ColumnName="Caption" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Prod_ExhibitContentItemInfo">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Prod_ExhibitContentItemInfo">
+        <MappingFragment StoreEntitySet="Prod_ExhibitContentItemInfo">
+          <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+          <ScalarProperty Name="ExhibitContentItemInfoID" ColumnName="ExhibitContentItemInfoID" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="HasBibliography" ColumnName="HasBibliography" />
+          <ScalarProperty Name="Order" ColumnName="Order" />
+          <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+          <ScalarProperty Name="Attribution" ColumnName="Attribution" />
+          <ScalarProperty Name="MediaSource" ColumnName="MediaSource" />
+          <ScalarProperty Name="MediaBlobURL" ColumnName="MediaBlobURL" />
+          <ScalarProperty Name="MediaType" ColumnName="MediaType" />
+          <ScalarProperty Name="ContentYear" ColumnName="ContentYear" />
+          <ScalarProperty Name="ContentDate" ColumnName="ContentDate" />
+          <ScalarProperty Name="TimeUnit" ColumnName="TimeUnit" />
+          <ScalarProperty Name="Regime" ColumnName="Regime" />
+          <ScalarProperty Name="Threshold" ColumnName="Threshold" />
+          <ScalarProperty Name="Caption" ColumnName="Caption" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="ExhibitID" ColumnName="ExhibitID" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Prod_ExhibitInfo">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Prod_ExhibitInfo">
+        <MappingFragment StoreEntitySet="Prod_ExhibitInfo">
+          <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+          <ScalarProperty Name="Prod_ExhibitInfoID" ColumnName="Prod_ExhibitInfoID" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+          <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+          <ScalarProperty Name="ContentYear" ColumnName="ContentYear" />
+          <ScalarProperty Name="ContentDate" ColumnName="ContentDate" />
+          <ScalarProperty Name="TimeUnit" ColumnName="TimeUnit" />
+          <ScalarProperty Name="Regime" ColumnName="Regime" />
+          <ScalarProperty Name="Threshold" ColumnName="Threshold" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="TimelineID" ColumnName="TimelineID" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Prod_ExhibitReferenceInfo">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Prod_ExhibitReferenceInfo">
+        <MappingFragment StoreEntitySet="Prod_ExhibitReferenceInfo">
+          <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+          <ScalarProperty Name="Prod_ExhibitReferenceInfoID" ColumnName="Prod_ExhibitReferenceInfoID" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="Source" ColumnName="Source" />
+          <ScalarProperty Name="PublicationDates" ColumnName="PublicationDates" />
+          <ScalarProperty Name="Publication" ColumnName="Publication" />
+          <ScalarProperty Name="PageNumbers" ColumnName="PageNumbers" />
+          <ScalarProperty Name="CitationType" ColumnName="CitationType" />
+          <ScalarProperty Name="BookChapters" ColumnName="BookChapters" />
+          <ScalarProperty Name="Authors" ColumnName="Authors" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="ExhibitID" ColumnName="ExhibitID" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Prod_ExhibitView">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Prod_ExhibitView">
+        <MappingFragment StoreEntitySet="Prod_ExhibitView">
+          <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+          <ScalarProperty Name="ExhibitViewID" ColumnName="ExhibitViewID" />
+          <ScalarProperty Name="Version_ExhibitID" ColumnName="Version_ExhibitID" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+          <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+          <ScalarProperty Name="TimeUnitID" ColumnName="TimeUnitID" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="ContentYear" ColumnName="ContentYear" />
+          <ScalarProperty Name="ContentDate" ColumnName="ContentDate" />
+          <ScalarProperty Name="RegimeID" ColumnName="RegimeID" />
+          <ScalarProperty Name="ThresholdID" ColumnName="ThresholdID" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Prod_ThresholdView">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Prod_ThresholdView">
+        <MappingFragment StoreEntitySet="Prod_ThresholdView">
+          <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+          <ScalarProperty Name="ThresholdViewID" ColumnName="ThresholdViewID" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="URL" ColumnName="URL" />
+          <ScalarProperty Name="ShortDescription" ColumnName="ShortDescription" />
+          <ScalarProperty Name="ThresholdYear" ColumnName="ThresholdYear" />
+          <ScalarProperty Name="ThresholdDate" ColumnName="ThresholdDate" />
+          <ScalarProperty Name="Timeunit" ColumnName="Timeunit" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="Threshold" ColumnName="Threshold" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Prod_TimelineInfo">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Prod_TimelineInfo">
+        <MappingFragment StoreEntitySet="Prod_TimelineInfo">
+          <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+          <ScalarProperty Name="TimelineInfoID" ColumnName="TimelineInfoID" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="HasChildren" ColumnName="HasChildren" />
+          <ScalarProperty Name="ParentTimelineID" ColumnName="ParentTimelineID" />
+          <ScalarProperty Name="Height" ColumnName="Height" />
+          <ScalarProperty Name="TimelineSequence" ColumnName="TimelineSequence" />
+          <ScalarProperty Name="TimelineUniqueID" ColumnName="TimelineUniqueID" />
+          <ScalarProperty Name="ToContentYear" ColumnName="ToContentYear" />
+          <ScalarProperty Name="ToContentDate" ColumnName="ToContentDate" />
+          <ScalarProperty Name="ToTimeUnit" ColumnName="ToTimeUnit" />
+          <ScalarProperty Name="FromContentYear" ColumnName="FromContentYear" />
+          <ScalarProperty Name="FromContentDate" ColumnName="FromContentDate" />
+          <ScalarProperty Name="FromTimeUnit" ColumnName="FromTimeUnit" />
+          <ScalarProperty Name="Regime" ColumnName="Regime" />
+          <ScalarProperty Name="Threshold" ColumnName="Threshold" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="TimelineID" ColumnName="TimelineID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Prod_TimelineView">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Prod_TimelineView">
+        <MappingFragment StoreEntitySet="Prod_TimelineView">
+          <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+          <ScalarProperty Name="TimelineView" ColumnName="TimelineView" />
+          <ScalarProperty Name="Version_TimelineID" ColumnName="Version_TimelineID" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="Height" ColumnName="Height" />
+          <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+          <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+          <ScalarProperty Name="Attribution" ColumnName="Attribution" />
+          <ScalarProperty Name="SourceURL" ColumnName="SourceURL" />
+          <ScalarProperty Name="ToTimeUnit" ColumnName="ToTimeUnit" />
+          <ScalarProperty Name="FromTimeUnit" ColumnName="FromTimeUnit" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="ParentTimelineID" ColumnName="ParentTimelineID" />
+          <ScalarProperty Name="ToContentYear" ColumnName="ToContentYear" />
+          <ScalarProperty Name="ToContentDate" ColumnName="ToContentDate" />
+          <ScalarProperty Name="FromContentYear" ColumnName="FromContentYear" />
+          <ScalarProperty Name="FromContentDate" ColumnName="FromContentDate" />
+          <ScalarProperty Name="RegimeID" ColumnName="RegimeID" />
+          <ScalarProperty Name="ThresholdID" ColumnName="ThresholdID" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Prod_TourBookmarkView">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Prod_TourBookmarkView">
+        <MappingFragment StoreEntitySet="Prod_TourBookmarkView">
+          <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+          <ScalarProperty Name="TourBookmarkViewID" ColumnName="TourBookmarkViewID" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="TourID" ColumnName="TourID" />
+          <ScalarProperty Name="TourBookmark_IsDeleted" ColumnName="TourBookmark_IsDeleted" />
+          <ScalarProperty Name="Bookmark_IsDeleted" ColumnName="Bookmark_IsDeleted" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="URL" ColumnName="URL" />
+          <ScalarProperty Name="Description" ColumnName="Description" />
+          <ScalarProperty Name="LapseTime" ColumnName="LapseTime" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Prod_TourView">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Prod_TourView">
+        <MappingFragment StoreEntitySet="Prod_TourView">
+          <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+          <ScalarProperty Name="TourViewID" ColumnName="TourViewID" />
+          <ScalarProperty Name="Version_TourID" ColumnName="Version_TourID" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+          <ScalarProperty Name="Category" ColumnName="Category" />
+          <ScalarProperty Name="AudioBlobUrl" ColumnName="AudioBlobUrl" />
+          <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Staging_BibliographyView">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Staging_BibliographyView">
+        <MappingFragment StoreEntitySet="Staging_BibliographyView">
+          <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+          <ScalarProperty Name="BibliographyView" ColumnName="BibliographyView" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="Source" ColumnName="Source" />
+          <ScalarProperty Name="PublicationDates" ColumnName="PublicationDates" />
+          <ScalarProperty Name="Publication" ColumnName="Publication" />
+          <ScalarProperty Name="PageNumbers" ColumnName="PageNumbers" />
+          <ScalarProperty Name="CitationType" ColumnName="CitationType" />
+          <ScalarProperty Name="BookChapters" ColumnName="BookChapters" />
+          <ScalarProperty Name="Authors" ColumnName="Authors" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="ExhibitID" ColumnName="ExhibitID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Staging_ContentItemView">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Staging_ContentItemView">
+        <MappingFragment StoreEntitySet="Staging_ContentItemView">
+          <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+          <ScalarProperty Name="ContentItemViewID" ColumnName="ContentItemViewID" />
+          <ScalarProperty Name="Version_ContentItemID" ColumnName="Version_ContentItemID" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="LicenseTypeID" ColumnName="LicenseTypeID" />
+          <ScalarProperty Name="Attribution" ColumnName="Attribution" />
+          <ScalarProperty Name="MediaSource" ColumnName="MediaSource" />
+          <ScalarProperty Name="ContentYear" ColumnName="ContentYear" />
+          <ScalarProperty Name="ContentDate" ColumnName="ContentDate" />
+          <ScalarProperty Name="TimeUnitID" ColumnName="TimeUnitID" />
+          <ScalarProperty Name="MediaBlobURL" ColumnName="MediaBlobURL" />
+          <ScalarProperty Name="RegimeID" ColumnName="RegimeID" />
+          <ScalarProperty Name="ThresholdID" ColumnName="ThresholdID" />
+          <ScalarProperty Name="MediaTypeID" ColumnName="MediaTypeID" />
+          <ScalarProperty Name="Topic" ColumnName="Topic" />
+          <ScalarProperty Name="Caption" ColumnName="Caption" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Staging_ExhibitContentItemInfo">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Staging_ExhibitContentItemInfo">
+        <MappingFragment StoreEntitySet="Staging_ExhibitContentItemInfo">
+          <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+          <ScalarProperty Name="ExhibitContentItemInfoID" ColumnName="ExhibitContentItemInfoID" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="HasBibliography" ColumnName="HasBibliography" />
+          <ScalarProperty Name="Order" ColumnName="Order" />
+          <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+          <ScalarProperty Name="Attribution" ColumnName="Attribution" />
+          <ScalarProperty Name="MediaSource" ColumnName="MediaSource" />
+          <ScalarProperty Name="MediaBlobURL" ColumnName="MediaBlobURL" />
+          <ScalarProperty Name="MediaType" ColumnName="MediaType" />
+          <ScalarProperty Name="ContentYear" ColumnName="ContentYear" />
+          <ScalarProperty Name="ContentDate" ColumnName="ContentDate" />
+          <ScalarProperty Name="TimeUnit" ColumnName="TimeUnit" />
+          <ScalarProperty Name="Regime" ColumnName="Regime" />
+          <ScalarProperty Name="Threshold" ColumnName="Threshold" />
+          <ScalarProperty Name="Caption" ColumnName="Caption" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="ExhibitID" ColumnName="ExhibitID" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Staging_ExhibitInfo">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Staging_ExhibitInfo">
+        <MappingFragment StoreEntitySet="Staging_ExhibitInfo">
+          <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+          <ScalarProperty Name="ExhibitInfoID" ColumnName="ExhibitInfoID" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+          <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+          <ScalarProperty Name="ContentYear" ColumnName="ContentYear" />
+          <ScalarProperty Name="ContentDate" ColumnName="ContentDate" />
+          <ScalarProperty Name="TimeUnit" ColumnName="TimeUnit" />
+          <ScalarProperty Name="Regime" ColumnName="Regime" />
+          <ScalarProperty Name="Threshold" ColumnName="Threshold" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="TimelineID" ColumnName="TimelineID" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Staging_ExhibitReferenceInfo">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Staging_ExhibitReferenceInfo">
+        <MappingFragment StoreEntitySet="Staging_ExhibitReferenceInfo">
+          <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+          <ScalarProperty Name="ExhibitReferenceInfoID" ColumnName="ExhibitReferenceInfoID" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="Source" ColumnName="Source" />
+          <ScalarProperty Name="PublicationDates" ColumnName="PublicationDates" />
+          <ScalarProperty Name="Publication" ColumnName="Publication" />
+          <ScalarProperty Name="PageNumbers" ColumnName="PageNumbers" />
+          <ScalarProperty Name="CitationType" ColumnName="CitationType" />
+          <ScalarProperty Name="BookChapters" ColumnName="BookChapters" />
+          <ScalarProperty Name="Authors" ColumnName="Authors" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="ExhibitID" ColumnName="ExhibitID" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Staging_ExhibitView">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Staging_ExhibitView">
+        <MappingFragment StoreEntitySet="Staging_ExhibitView">
+          <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+          <ScalarProperty Name="ExhibitViewID" ColumnName="ExhibitViewID" />
+          <ScalarProperty Name="Version_ExhibitID" ColumnName="Version_ExhibitID" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+          <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+          <ScalarProperty Name="TimeUnitID" ColumnName="TimeUnitID" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="ContentYear" ColumnName="ContentYear" />
+          <ScalarProperty Name="ContentDate" ColumnName="ContentDate" />
+          <ScalarProperty Name="RegimeID" ColumnName="RegimeID" />
+          <ScalarProperty Name="ThresholdID" ColumnName="ThresholdID" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Staging_ThresholdView">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Staging_ThresholdView">
+        <MappingFragment StoreEntitySet="Staging_ThresholdView">
+          <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+          <ScalarProperty Name="ThresholdViewID" ColumnName="ThresholdViewID" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="URL" ColumnName="URL" />
+          <ScalarProperty Name="ShortDescription" ColumnName="ShortDescription" />
+          <ScalarProperty Name="ThresholdYear" ColumnName="ThresholdYear" />
+          <ScalarProperty Name="ThresholdDate" ColumnName="ThresholdDate" />
+          <ScalarProperty Name="Timeunit" ColumnName="Timeunit" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="Threshold" ColumnName="Threshold" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Staging_TimelineInfo">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Staging_TimelineInfo">
+        <MappingFragment StoreEntitySet="Staging_TimelineInfo">
+          <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+          <ScalarProperty Name="TimelineInfoID" ColumnName="TimelineInfoID" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="HasChildren" ColumnName="HasChildren" />
+          <ScalarProperty Name="ParentTimelineID" ColumnName="ParentTimelineID" />
+          <ScalarProperty Name="Height" ColumnName="Height" />
+          <ScalarProperty Name="TimelineSequence" ColumnName="TimelineSequence" />
+          <ScalarProperty Name="TimelineUniqueID" ColumnName="TimelineUniqueID" />
+          <ScalarProperty Name="ToContentYear" ColumnName="ToContentYear" />
+          <ScalarProperty Name="ToContentDate" ColumnName="ToContentDate" />
+          <ScalarProperty Name="ToTimeUnit" ColumnName="ToTimeUnit" />
+          <ScalarProperty Name="FromContentYear" ColumnName="FromContentYear" />
+          <ScalarProperty Name="FromContentDate" ColumnName="FromContentDate" />
+          <ScalarProperty Name="FromTimeUnit" ColumnName="FromTimeUnit" />
+          <ScalarProperty Name="Regime" ColumnName="Regime" />
+          <ScalarProperty Name="Threshold" ColumnName="Threshold" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="TimelineID" ColumnName="TimelineID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Staging_TimelineView">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Staging_TimelineView">
+        <MappingFragment StoreEntitySet="Staging_TimelineView">
+          <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+          <ScalarProperty Name="TimelineView" ColumnName="TimelineView" />
+          <ScalarProperty Name="Version_TimelineID" ColumnName="Version_TimelineID" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="Height" ColumnName="Height" />
+          <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+          <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+          <ScalarProperty Name="Attribution" ColumnName="Attribution" />
+          <ScalarProperty Name="SourceURL" ColumnName="SourceURL" />
+          <ScalarProperty Name="ToTimeUnit" ColumnName="ToTimeUnit" />
+          <ScalarProperty Name="FromTimeUnit" ColumnName="FromTimeUnit" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="ParentTimelineID" ColumnName="ParentTimelineID" />
+          <ScalarProperty Name="ToContentYear" ColumnName="ToContentYear" />
+          <ScalarProperty Name="ToContentDate" ColumnName="ToContentDate" />
+          <ScalarProperty Name="FromContentYear" ColumnName="FromContentYear" />
+          <ScalarProperty Name="FromContentDate" ColumnName="FromContentDate" />
+          <ScalarProperty Name="RegimeID" ColumnName="RegimeID" />
+          <ScalarProperty Name="ThresholdID" ColumnName="ThresholdID" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Staging_TourBookmarkView">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Staging_TourBookmarkView">
+        <MappingFragment StoreEntitySet="Staging_TourBookmarkView">
+          <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+          <ScalarProperty Name="TourBookmarkViewID" ColumnName="TourBookmarkViewID" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="TourID" ColumnName="TourID" />
+          <ScalarProperty Name="TourBookmark_IsDeleted" ColumnName="TourBookmark_IsDeleted" />
+          <ScalarProperty Name="Bookmark_IsDeleted" ColumnName="Bookmark_IsDeleted" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="URL" ColumnName="URL" />
+          <ScalarProperty Name="Description" ColumnName="Description" />
+          <ScalarProperty Name="LapseTime" ColumnName="LapseTime" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Staging_TourView">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Staging_TourView">
+        <MappingFragment StoreEntitySet="Staging_TourView">
+          <ScalarProperty Name="IncludeInVersion" ColumnName="IncludeInVersion" />
+          <ScalarProperty Name="TourViewID" ColumnName="TourViewID" />
+          <ScalarProperty Name="Version_TourID" ColumnName="Version_TourID" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+          <ScalarProperty Name="Category" ColumnName="Category" />
+          <ScalarProperty Name="AudioBlobUrl" ColumnName="AudioBlobUrl" />
+          <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Auth_BibliographyView">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Auth_BibliographyView">
+        <MappingFragment StoreEntitySet="Auth_BibliographyView">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="Source" ColumnName="Source" />
+          <ScalarProperty Name="PublicationDates" ColumnName="PublicationDates" />
+          <ScalarProperty Name="Publication" ColumnName="Publication" />
+          <ScalarProperty Name="PageNumbers" ColumnName="PageNumbers" />
+          <ScalarProperty Name="CitationType" ColumnName="CitationType" />
+          <ScalarProperty Name="BookChapters" ColumnName="BookChapters" />
+          <ScalarProperty Name="Authors" ColumnName="Authors" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="ExhibitID" ColumnName="ExhibitID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Auth_ContentItemsView">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Auth_ContentItemsView">
+        <MappingFragment StoreEntitySet="Auth_ContentItemsView">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="LicenseTypeID" ColumnName="LicenseTypeID" />
+          <ScalarProperty Name="Attribution" ColumnName="Attribution" />
+          <ScalarProperty Name="MediaSource" ColumnName="MediaSource" />
+          <ScalarProperty Name="ContentYear" ColumnName="ContentYear" />
+          <ScalarProperty Name="ContentDate" ColumnName="ContentDate" />
+          <ScalarProperty Name="TimeUnitID" ColumnName="TimeUnitID" />
+          <ScalarProperty Name="MediaBlobURL" ColumnName="MediaBlobURL" />
+          <ScalarProperty Name="RegimeID" ColumnName="RegimeID" />
+          <ScalarProperty Name="ThresholdID" ColumnName="ThresholdID" />
+          <ScalarProperty Name="MediaTypeID" ColumnName="MediaTypeID" />
+          <ScalarProperty Name="Topic" ColumnName="Topic" />
+          <ScalarProperty Name="Caption" ColumnName="Caption" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Auth_ExhibitContentItemInfoView">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Auth_ExhibitContentItemInfoView">
+        <MappingFragment StoreEntitySet="Auth_ExhibitContentItemInfoView">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="HasBibliography" ColumnName="HasBibliography" />
+          <ScalarProperty Name="Order" ColumnName="Order" />
+          <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+          <ScalarProperty Name="Attribution" ColumnName="Attribution" />
+          <ScalarProperty Name="MediaSource" ColumnName="MediaSource" />
+          <ScalarProperty Name="MediaBlobURL" ColumnName="MediaBlobURL" />
+          <ScalarProperty Name="MediaType" ColumnName="MediaType" />
+          <ScalarProperty Name="ContentYear" ColumnName="ContentYear" />
+          <ScalarProperty Name="ContentDate" ColumnName="ContentDate" />
+          <ScalarProperty Name="TimeUnit" ColumnName="TimeUnit" />
+          <ScalarProperty Name="Regime" ColumnName="Regime" />
+          <ScalarProperty Name="Threshold" ColumnName="Threshold" />
+          <ScalarProperty Name="Caption" ColumnName="Caption" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="ExhibitID" ColumnName="ExhibitID" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Auth_ExhibitInfoView">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Auth_ExhibitInfoView">
+        <MappingFragment StoreEntitySet="Auth_ExhibitInfoView">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+          <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+          <ScalarProperty Name="ContentYear" ColumnName="ContentYear" />
+          <ScalarProperty Name="ContentDate" ColumnName="ContentDate" />
+          <ScalarProperty Name="TimeUnit" ColumnName="TimeUnit" />
+          <ScalarProperty Name="Regime" ColumnName="Regime" />
+          <ScalarProperty Name="Threshold" ColumnName="Threshold" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="TimelineID" ColumnName="TimelineID" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Auth_ExhibitReferenceInfoView">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Auth_ExhibitReferenceInfoView">
+        <MappingFragment StoreEntitySet="Auth_ExhibitReferenceInfoView">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="Source" ColumnName="Source" />
+          <ScalarProperty Name="PublicationDates" ColumnName="PublicationDates" />
+          <ScalarProperty Name="Publication" ColumnName="Publication" />
+          <ScalarProperty Name="PageNumbers" ColumnName="PageNumbers" />
+          <ScalarProperty Name="CitationType" ColumnName="CitationType" />
+          <ScalarProperty Name="BookChapters" ColumnName="BookChapters" />
+          <ScalarProperty Name="Authors" ColumnName="Authors" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="ExhibitID" ColumnName="ExhibitID" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Auth_ExhibitView">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Auth_ExhibitView">
+        <MappingFragment StoreEntitySet="Auth_ExhibitView">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+          <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+          <ScalarProperty Name="TimeUnitID" ColumnName="TimeUnitID" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="ContentYear" ColumnName="ContentYear" />
+          <ScalarProperty Name="ContentDate" ColumnName="ContentDate" />
+          <ScalarProperty Name="RegimeID" ColumnName="RegimeID" />
+          <ScalarProperty Name="ThresholdID" ColumnName="ThresholdID" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Auth_ThresholdView">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Auth_ThresholdView">
+        <MappingFragment StoreEntitySet="Auth_ThresholdView">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="URL" ColumnName="URL" />
+          <ScalarProperty Name="ShortDescription" ColumnName="ShortDescription" />
+          <ScalarProperty Name="ThresholdYear" ColumnName="ThresholdYear" />
+          <ScalarProperty Name="ThresholdDate" ColumnName="ThresholdDate" />
+          <ScalarProperty Name="Timeunit" ColumnName="Timeunit" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="Threshold" ColumnName="Threshold" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Auth_TimelineInfoView">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Auth_TimelineInfoView">
+        <MappingFragment StoreEntitySet="Auth_TimelineInfoView">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="HasChildren" ColumnName="HasChildren" />
+          <ScalarProperty Name="ParentTimelineID" ColumnName="ParentTimelineID" />
+          <ScalarProperty Name="Height" ColumnName="Height" />
+          <ScalarProperty Name="TimelineSequence" ColumnName="TimelineSequence" />
+          <ScalarProperty Name="TimelineUniqueID" ColumnName="TimelineUniqueID" />
+          <ScalarProperty Name="ToContentYear" ColumnName="ToContentYear" />
+          <ScalarProperty Name="ToContentDate" ColumnName="ToContentDate" />
+          <ScalarProperty Name="ToTimeUnit" ColumnName="ToTimeUnit" />
+          <ScalarProperty Name="FromContentYear" ColumnName="FromContentYear" />
+          <ScalarProperty Name="FromContentDate" ColumnName="FromContentDate" />
+          <ScalarProperty Name="FromTimeUnit" ColumnName="FromTimeUnit" />
+          <ScalarProperty Name="Regime" ColumnName="Regime" />
+          <ScalarProperty Name="Threshold" ColumnName="Threshold" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="TimelineID" ColumnName="TimelineID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Auth_TimelineView">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Auth_TimelineView">
+        <MappingFragment StoreEntitySet="Auth_TimelineView">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="Height" ColumnName="Height" />
+          <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+          <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+          <ScalarProperty Name="Attribution" ColumnName="Attribution" />
+          <ScalarProperty Name="SourceURL" ColumnName="SourceURL" />
+          <ScalarProperty Name="ToTimeUnit" ColumnName="ToTimeUnit" />
+          <ScalarProperty Name="FromTimeUnit" ColumnName="FromTimeUnit" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="ParentTimelineID" ColumnName="ParentTimelineID" />
+          <ScalarProperty Name="ToContentYear" ColumnName="ToContentYear" />
+          <ScalarProperty Name="ToContentDate" ColumnName="ToContentDate" />
+          <ScalarProperty Name="FromContentYear" ColumnName="FromContentYear" />
+          <ScalarProperty Name="FromContentDate" ColumnName="FromContentDate" />
+          <ScalarProperty Name="RegimeID" ColumnName="RegimeID" />
+          <ScalarProperty Name="ThresholdID" ColumnName="ThresholdID" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Auth_TourBookmarkView">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Auth_TourBookmarkView">
+        <MappingFragment StoreEntitySet="Auth_TourBookmarkView">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="TourID" ColumnName="TourID" />
+          <ScalarProperty Name="TourBookmark_IsDeleted" ColumnName="TourBookmark_IsDeleted" />
+          <ScalarProperty Name="Bookmark_IsDeleted" ColumnName="Bookmark_IsDeleted" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="URL" ColumnName="URL" />
+          <ScalarProperty Name="Description" ColumnName="Description" />
+          <ScalarProperty Name="LapseTime" ColumnName="LapseTime" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Auth_TourView">
+      <EntityTypeMapping TypeName="ChronoZoomModel.Auth_TourView">
+        <MappingFragment StoreEntitySet="Auth_TourView">
+          <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+          <ScalarProperty Name="Category" ColumnName="Category" />
+          <ScalarProperty Name="AudioBlobUrl" ColumnName="AudioBlobUrl" />
+          <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <FunctionImportMapping FunctionImportName="spGetVisibleTimelinesForSearch" FunctionName="ChronozoomModel.Store.spGetVisibleTimelinesForSearch">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="ChronoZoomModel.TimelineInfo">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="ThresholdID" ColumnName="ThresholdID" />
+          <ScalarProperty Name="RegimeID" ColumnName="RegimeID" />
+          <ScalarProperty Name="FromContentDate" ColumnName="FromContentDate" />
+          <ScalarProperty Name="FromContentYear" ColumnName="FromContentYear" />
+          <ScalarProperty Name="ToContentDate" ColumnName="ToContentDate" />
+          <ScalarProperty Name="ToContentYear" ColumnName="ToContentYear" />
+          <ScalarProperty Name="ParentTimelineID" ColumnName="ParentTimelineID" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="FromTimeUnit" ColumnName="FromTimeUnit" />
+          <ScalarProperty Name="ToTimeUnit" ColumnName="ToTimeUnit" />
+          <ScalarProperty Name="SourceURL" ColumnName="SourceURL" />
+          <ScalarProperty Name="Attribution" ColumnName="Attribution" />
+          <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+          <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+          <ScalarProperty Name="Height" ColumnName="Height" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+  </EntityContainerMapping>
+</Mapping>

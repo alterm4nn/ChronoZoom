@@ -1,0 +1,45 @@
+﻿@model Authoring.WebRole.Models.Keyword
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Keyword - Details</h2>
+
+<fieldset>
+    <legend>Keyword</legend>
+
+    <div class="display-label">Keyword1</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Keyword1)
+    </div>
+
+    @*<div class="display-label">CreatedBy</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.User.UserName)
+    </div>
+
+    <div class="display-label">ModifiedBy</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.User1.UserName)
+    </div>
+
+    <div class="display-label">CreatedOn</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.CreatedOn)
+    </div>
+
+    <div class="display-label">ModifiedOn</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.ModifiedOn)
+    </div>
+
+    <div class="display-label">IsDeleted</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.IsDeleted)
+    </div>*@
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

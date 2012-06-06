@@ -1,0 +1,149 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <link href="Styles/cz.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="Scripts/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-ui-1.8.16.custom.min.js"></script>
+    <script type="text/javascript" src="Scripts/rx.js"></script>
+    <script type="text/javascript" src="Scripts/rx.jQuery.js"></script>    
+    <script type="text/javascript" src="Scripts/common.js"></script>
+    <script type="text/javascript" src="Scripts/cz.settings.js"></script>
+    <script type="text/javascript" src="Scripts/vccontent.js"></script>
+    <script type="text/javascript" src="Scripts/viewport.js"></script>
+    <script type="text/javascript" src="Scripts/virtualCanvas.js"></script>
+    <script type="text/javascript" src="Scripts/mouseWheelPlugin.js"></script>
+    <script type="text/javascript" src="Scripts/gestures.js"></script>
+    <script type="text/javascript" src="Scripts/viewportAnimation.js"></script>
+    <script type="text/javascript" src="Scripts/viewportController.js"></script>
+    <script type="text/javascript">
+        var maxPermitedVerticalRange = { top: -10000000, bottom: 10000000 };
+
+        var item;
+        var root;
+        var vc;
+        $(document).ready(function () {
+            vc = $("#vc");
+            vc.virtualCanvas();
+
+            root = vc.virtualCanvas("getLayerContent");
+            root.beginEdit();
+
+            add_Text = function (id, text) {
+                item = addText(root, "layer1", id, -25, 3, 15, 15, text, { fontName: contentItemHeaderFontName, 
+                    fillStyle: contentItemHeaderFontColor, textBaseline: 'middle', textAlign: 'center',
+                    wrapText: true, numberOfLines: 1 }, 15);
+                vc.virtualCanvas("invalidate");
+            }
+
+            add_Circle = function (id) {
+                item = addCircle(root, "layer2", id, -12, 3, 1.7, { strokeStyle: 'white', lineWidth: 2, fillStyle: 'rgba(240,240,240,0.2)' });
+                vc.virtualCanvas("invalidate");
+            }
+
+            add_Image = function (id) {
+                item = addImage(root, "layer2", id, -11.5, -3, 2, 2, 'Images/flower.png', function () { vc.virtualCanvas("invalidate"); });
+            }
+
+            add_Rectangle = function (id) {
+                item = addRectangle(root, "layer1", id, -15, -5, 10, 10, { strokeStyle: 'rgb(240,240,240)', lineWidth: 2, fillStyle: 'rgba(140,140,140,0.5)' });
+                vc.virtualCanvas("invalidate");
+            }
+
+            add_Video = function (id1, id2) {
+                addVideo(root, "layer2", id1, "http://www.youtube.com/embed/7hqX8ljEP34", -13, -4.5, 1, 1);
+                addVideo(root, "layer2", id2, "http://player.vimeo.com/video/31911961?title=0&amp;byline=0&amp;portrait=0", -13, -3.4, 1, 1);
+                vc.virtualCanvas("invalidate");
+            }
+
+            add_Audio = function (id) {
+                addAudio(root, "layer2", id, "rihard_shtraus_zaratustra.mp3", -13, -2.3, 1, 1);
+                vc.virtualCanvas("invalidate");
+            }
+
+            add_MultiText = function (id1, id2, text) {
+                addMultiLineText(root, "layer2", id1, -9, -3, 0.1, text, 40, { fillStyle: 'yellow', strokeStyle: 'yellow', lineWidth: 5 });
+                addMultiLineText(root, "layer2", id2, -9, 0, 0.1, text, 15, { fillStyle: 'yellow', strokeStyle: 'yellow', lineWidth: 5 });
+                vc.virtualCanvas("invalidate");
+            }
+
+            get_Child = function (id) {
+                try {
+                    getChild(root, id);
+                }
+                catch (ex) {
+                    //window.alert(ex.toString());
+                    return ex.toString();
+                }
+                return "True";
+            }
+
+            remove_Child = function (id) {
+                try {
+                    removeChild(root, id);
+                    vc.virtualCanvas("invalidate");
+                }
+                catch (ex) {
+                    //window.alert(ex.toString());
+                    return false;
+                }
+                return true;
+            }
+
+            changeSettings = function (id, settings) {
+                var elem = getChild(root, id);
+                elem.settings = settings;
+                vc.virtualCanvas("invalidate");
+            }
+
+            root.endEdit(true);
+
+            controller = new ViewportController(
+                            function (visible) {
+                                vc.virtualCanvas("setVisible", visible, controller.activeAnimation);
+                            },
+                            function () {
+                                return vc.virtualCanvas("getViewport");
+                            },
+                            getGesturesStream(vc));
+
+            vc.virtualCanvas("setVisible", new VisibleRegion2d(-10, 0, 10.0 / 256.0));
+            UpdateLayout();
+        });
+
+        function UpdateLayout() {
+            document.getElementById("vc").style.height = (window.innerHeight - 70) + "px";
+            $("#vc").virtualCanvas("updateViewport");
+        }
+
+        $(window).bind('resize', function () {
+            UpdateLayout();
+        });
+
+    </script>
+    <title>Virtual Canvas Primitives</title>
+</head>
+<body style="background-color: Black">
+    <button onclick="add_Rectangle('testRectangle')">Add rectangle</button>
+    <button onclick="add_Circle('testCircle')">Add circle</button>
+    <button onclick="add_Image('testImage')">Add image</button>
+    <button onclick="add_Text('testText', 'Hello, ChronoZoom!')">Add text</button>
+    <button onclick="add_Video('testYoutube', 'testVimeo')">Add video</button>
+    <button onclick="add_Audio('testAudio')">Add audio</button>
+    <button onclick="add_MultiText('mtext', 'mtext2','The Universe is commonly defined as the totality of everything that exists, including all matter and energy, the planets, stars, galaxies, and the contents of intergalactic space. Definitions and usage vary and similar terms include the cosmos, the world and nature. Scientific observation of earlier stages in the development of the Universe, which can be seen at great distances, suggests that the Universe has been governed by the same physical laws and constants throughout most of its extent and history. There are various multiverse theories, in which physicists have suggested that our universe is one among many universes that likewise exist. (From Wikipedia, the free Encyclopedia)')">Add multi-line text</button>
+    <button onclick="remove_Child('testRectangle')">Remove rectangle</button>
+    <button onclick="remove_Child('testCircle')">Remove circle</button>
+    <button onclick="remove_Child('testImage')">Remove image</button>
+    <button onclick="remove_Child('testYoutube')">Remove youtube video</button>
+    <button onclick="remove_Child('testVimeo')">Remove vimeo video</button>
+    <button onclick="remove_Child('testAudio')">Remove audio</button>
+    <button onclick="remove_Child('mtext')">Remove multi-line text</button>
+
+    <div id="vc" style="width: 100%; height: auto; overflow: hidden; background-image: url('Images/background.jpg');
+        background-size: cover">
+        <div id="layer1">
+        </div>
+        <div id="layer2">
+        </div>
+    </div>
+</body>
+</html>

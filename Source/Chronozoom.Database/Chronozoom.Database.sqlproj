@@ -1,0 +1,259 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <PostConversionRemoveFromScc>
+    </PostConversionRemoveFromScc>
+    <PostConversionAddToScc>
+    </PostConversionAddToScc>
+    <GenerateDac>False</GenerateDac>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">DevPreview</Configuration>
+    <Name>Chronozoom.Database</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.0</ProjectVersion>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.SqlAzureDatabaseSchemaProvider</DSP>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <ShowWizard>True</ShowWizard>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <IncludeSchemaNameInFileName>False</IncludeSchemaNameInFileName>
+    <ModelCollation>1033,CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <LoadSqlClrTypes>True</LoadSqlClrTypes>
+    <RootNamespace>Chronozoom</RootNamespace>
+    <DefaultSchema>dbo</DefaultSchema>
+    <PreviousProjectVersion>4.0</PreviousProjectVersion>
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+    <ValidateCasingOnIdentifiers>False</ValidateCasingOnIdentifiers>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{aee07a15-6b8f-445d-82ac-051e4c2c56cb}</ProjectGuid>
+    <GenerateDatabaseFile>False</GenerateDatabaseFile>
+    <GenerateCreateScript>False</GenerateCreateScript>
+    <SqlServerVerification>True</SqlServerVerification>
+    <TargetLanguage>CS</TargetLanguage>
+    <AllowSnapshotIsolation>True</AllowSnapshotIsolation>
+    <AnsiNullDefault>False</AnsiNullDefault>
+    <AnsiNulls>False</AnsiNulls>
+    <AnsiPadding>False</AnsiPadding>
+    <AnsiWarnings>False</AnsiWarnings>
+    <ArithAbort>False</ArithAbort>
+    <AutoClose>False</AutoClose>
+    <AutoCreateStatistics>True</AutoCreateStatistics>
+    <AutoShrink>False</AutoShrink>
+    <AutoUpdateStatistics>True</AutoUpdateStatistics>
+    <AutoUpdateStatisticsAsynchronously>False</AutoUpdateStatisticsAsynchronously>
+    <ChangeTrackingRetentionPeriod>2</ChangeTrackingRetentionPeriod>
+    <ChangeTrackingRetentionUnit>Days</ChangeTrackingRetentionUnit>
+    <CloseCursorOnCommitEnabled>False</CloseCursorOnCommitEnabled>
+    <CompatibilityMode>100</CompatibilityMode>
+    <ConcatNullYieldsNull>False</ConcatNullYieldsNull>
+    <DatabaseAccess>MULTI_USER</DatabaseAccess>
+    <DatabaseChaining>False</DatabaseChaining>
+    <DatabaseState>ONLINE</DatabaseState>
+    <DateCorrelationOptimizationOn>False</DateCorrelationOptimizationOn>
+    <DefaultCollation>SQL_Latin1_General_CP1_CI_AS</DefaultCollation>
+    <DefaultCursor>GLOBAL</DefaultCursor>
+    <DefaultFilegroup>
+    </DefaultFilegroup>
+    <EnableFullTextSearch>False</EnableFullTextSearch>
+    <IsBrokerPriorityHonored>False</IsBrokerPriorityHonored>
+    <IsChangeTrackingAutoCleanupOn>True</IsChangeTrackingAutoCleanupOn>
+    <IsChangeTrackingOn>False</IsChangeTrackingOn>
+    <IsEncryptionOn>False</IsEncryptionOn>
+    <NumericRoundAbort>False</NumericRoundAbort>
+    <PageVerify>CHECKSUM</PageVerify>
+    <Parameterization>SIMPLE</Parameterization>
+    <QuotedIdentifier>False</QuotedIdentifier>
+    <ReadCommittedSnapshot>True</ReadCommittedSnapshot>
+    <Recovery>FULL</Recovery>
+    <RecursiveTriggersEnabled>False</RecursiveTriggersEnabled>
+    <ServiceBrokerOption>DisableBroker</ServiceBrokerOption>
+    <SupplementalLoggingOn>False</SupplementalLoggingOn>
+    <TornPageDetection>False</TornPageDetection>
+    <Trustworthy>False</Trustworthy>
+    <UpdateOptions>READ_WRITE</UpdateOptions>
+    <VardecimalStorageFormatOn>True</VardecimalStorageFormatOn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Production|AnyCPU' ">
+    <OutputPath>.\sql\production\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TargetDatabase>Chronozoom</TargetDatabase>
+    <TreatTSqlWarningsAsErrors>False</TreatTSqlWarningsAsErrors>
+    <SuppressTSqlWarnings />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'DevPreview|AnyCPU' ">
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TargetDatabase>Chronozoom</TargetDatabase>
+    <TreatTSqlWarningsAsErrors>False</TreatTSqlWarningsAsErrors>
+    <SuppressTSqlWarnings />
+    <OutputPath>.\sql\devpreview\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Sandbox|AnyCPU' ">
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TargetDatabase>Chronozoom</TargetDatabase>
+    <TreatTSqlWarningsAsErrors>False</TreatTSqlWarningsAsErrors>
+    <SuppressTSqlWarnings />
+    <OutputPath>.\sql\sandbox\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Staging|AnyCPU' ">
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TargetDatabase>Chronozoom</TargetDatabase>
+    <TreatTSqlWarningsAsErrors>False</TreatTSqlWarningsAsErrors>
+    <SuppressTSqlWarnings />
+    <OutputPath>.\sql\staging\</OutputPath>
+  </PropertyGroup>
+  <!--Import the settings-->
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Scripts" />
+    <Folder Include="Scripts\Pre-Deployment" />
+    <Folder Include="Scripts\Post-Deployment" />
+    <Folder Include="Data Generation Plans" />
+    <Folder Include="Properties\" />
+    <Folder Include="dbo\" />
+    <Folder Include="dbo\Tables\" />
+    <Folder Include="dbo\Views\" />
+    <Folder Include="dbo\Stored Procedures\" />
+  </ItemGroup>
+  <ItemGroup>
+    <BuildContributorArgument Include="OutDir=$(OutDir)" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="Permissions.sql" />
+    <Build Include="dbo\Tables\ExhibitKeyword.sql" />
+    <Build Include="dbo\Tables\CZSystemVersion.sql" />
+    <Build Include="dbo\Tables\ExhibitContentItem.sql" />
+    <Build Include="dbo\Tables\Version_BookMark.sql" />
+    <Build Include="dbo\Tables\Version_Tour.sql" />
+    <Build Include="dbo\Tables\ContentItem.sql" />
+    <Build Include="dbo\Tables\Threshold.sql" />
+    <Build Include="dbo\Tables\Role.sql" />
+    <Build Include="dbo\Tables\User.sql" />
+    <Build Include="dbo\Tables\Regime.sql" />
+    <Build Include="dbo\Tables\MediaType.sql" />
+    <Build Include="dbo\Tables\LicenseType.sql" />
+    <Build Include="dbo\Tables\Version_AuthoringTable.sql" />
+    <Build Include="dbo\Tables\Keyword.sql" />
+    <Build Include="dbo\Tables\Version_AuthoringTableRolePermission.sql" />
+    <Build Include="dbo\Tables\TimeUnit.sql" />
+    <Build Include="dbo\Tables\AuthoringTable.sql" />
+    <Build Include="dbo\Tables\Version_CitationType.sql" />
+    <Build Include="dbo\Tables\Version_ContentItem.sql" />
+    <Build Include="dbo\Tables\Version_ContentKeyword.sql" />
+    <Build Include="dbo\Tables\Version_Exhibit.sql" />
+    <Build Include="dbo\Tables\ContentKeyword.sql" />
+    <Build Include="dbo\Tables\Version_ExhibitContentItem.sql" />
+    <Build Include="dbo\Tables\Tour.sql" />
+    <Build Include="dbo\Tables\Version_ExhibitKeyword.sql" />
+    <Build Include="dbo\Tables\Version_ExhibitReference.sql" />
+    <Build Include="dbo\Tables\AuthoringTableRolePermission.sql" />
+    <Build Include="dbo\Tables\Version_Keyword.sql" />
+    <Build Include="dbo\Tables\Staging_TourView.sql" />
+    <Build Include="dbo\Tables\BookMark.sql" />
+    <Build Include="dbo\Tables\Version_LicenseType.sql" />
+    <Build Include="dbo\Tables\Staging_TourBookmarkView.sql" />
+    <Build Include="dbo\Tables\TourBookmark.sql" />
+    <Build Include="dbo\Tables\Staging_TimelineView.sql" />
+    <Build Include="dbo\Tables\Version_MediaType.sql" />
+    <Build Include="dbo\Tables\Staging_TimelineInfo.sql" />
+    <Build Include="dbo\Tables\Version_Permission.sql" />
+    <Build Include="dbo\Tables\Staging_ExhibitView.sql" />
+    <Build Include="dbo\Tables\Version_Reference.sql" />
+    <Build Include="dbo\Tables\Staging_ExhibitReferenceInfo.sql" />
+    <Build Include="dbo\Tables\Version_ReferenceKeyword.sql" />
+    <Build Include="dbo\Tables\Staging_ExhibitInfo.sql" />
+    <Build Include="dbo\Tables\Staging_ExhibitContentItemInfo.sql" />
+    <Build Include="dbo\Tables\Version_Regime.sql" />
+    <Build Include="dbo\Tables\Staging_ContentItemView.sql" />
+    <Build Include="dbo\Tables\Version_Role.sql" />
+    <Build Include="dbo\Tables\Staging_BibliographyView.sql" />
+    <Build Include="dbo\Tables\Prod_TourView.sql" />
+    <Build Include="dbo\Tables\Version_Threshold.sql" />
+    <Build Include="dbo\Tables\Prod_TourBookmarkView.sql" />
+    <Build Include="dbo\Tables\Version_Timeline.sql" />
+    <Build Include="dbo\Tables\Prod_TimelineView.sql" />
+    <Build Include="dbo\Tables\Version_TimelineExhibit.sql" />
+    <Build Include="dbo\Tables\Prod_TimelineInfo.sql" />
+    <Build Include="dbo\Tables\ExhibitReference.sql" />
+    <Build Include="dbo\Tables\Prod_ThresholdView.sql" />
+    <Build Include="dbo\Tables\Version_TimeUnit.sql" />
+    <Build Include="dbo\Tables\Prod_ExhibitView.sql" />
+    <Build Include="dbo\Tables\Prod_ExhibitReferenceInfo.sql" />
+    <Build Include="dbo\Tables\Prod_ExhibitInfo.sql" />
+    <Build Include="dbo\Tables\Prod_ExhibitContentItemInfo.sql" />
+    <Build Include="dbo\Tables\Version_User.sql" />
+    <Build Include="dbo\Tables\Prod_ContentItemView.sql" />
+    <Build Include="dbo\Tables\Permission.sql" />
+    <Build Include="dbo\Tables\Prod_BibliographyView.sql" />
+    <Build Include="dbo\Tables\Staging_ThresholdView.sql" />
+    <Build Include="dbo\Tables\Timeline.sql" />
+    <Build Include="dbo\Tables\CitationType.sql" />
+    <Build Include="dbo\Tables\Reference.sql" />
+    <Build Include="dbo\Tables\Version_TourBookmark.sql" />
+    <Build Include="dbo\Tables\ReferenceKeyword.sql" />
+    <Build Include="dbo\Tables\Exhibit.sql" />
+    <Build Include="dbo\Tables\CZVersion.sql" />
+    <Build Include="dbo\Tables\TimelineExhibit.sql" />
+    <Build Include="dbo\Views\ContentItemsView.sql" />
+    <Build Include="dbo\Views\Auth_TimelineInfoView.sql" />
+    <Build Include="dbo\Views\Auth_ExhibitContentItemInfoView.sql" />
+    <Build Include="dbo\Views\Auth_ExhibitInfoView.sql" />
+    <Build Include="dbo\Views\Auth_BibliographyView.sql" />
+    <Build Include="dbo\Views\Auth_TourView.sql" />
+    <Build Include="dbo\Views\BookmarkView.sql" />
+    <Build Include="dbo\Views\Auth_TimelineView.sql" />
+    <Build Include="dbo\Views\Auth_ThresholdView.sql" />
+    <Build Include="dbo\Views\Auth_ExhibitView.sql" />
+    <Build Include="dbo\Views\Auth_ExhibitReferenceInfoView.sql" />
+    <Build Include="dbo\Views\Auth_ContentItemsView.sql" />
+    <Build Include="dbo\Views\Auth_TourBookmarkView.sql" />
+    <Build Include="dbo\Views\BibliographyView.sql" />
+    <Build Include="dbo\Views\ExhibitContentItemInfo.sql" />
+    <Build Include="dbo\Views\ExhibitContentItemInfoView.sql" />
+    <Build Include="dbo\Views\ExhibitInfo.sql" />
+    <Build Include="dbo\Views\ExhibitInfoView.sql" />
+    <Build Include="dbo\Views\ExhibitReferenceInfo.sql" />
+    <Build Include="dbo\Views\ExhibitReferenceInfoView.sql" />
+    <Build Include="dbo\Views\ExhibitView.sql" />
+    <Build Include="dbo\Views\ThresholdView.sql" />
+    <Build Include="dbo\Views\TimelineInfo.sql" />
+    <Build Include="dbo\Views\TimelineInfoView.sql" />
+    <Build Include="dbo\Views\TimelineView.sql" />
+    <Build Include="dbo\Views\TourBookmarkView.sql" />
+    <Build Include="dbo\Views\TourView.sql" />
+    <Build Include="dbo\Stored Procedures\spGetVisibleTimelines.sql" />
+    <Build Include="dbo\Stored Procedures\spGetVisibleTimelinesForSearch.sql" />
+    <Build Include="dbo\Stored Procedures\GenerateExhibitContentItemInfoVersion.sql" />
+    <Build Include="dbo\Stored Procedures\GenerateTourBookmarkViewVersion.sql" />
+    <Build Include="dbo\Stored Procedures\GenerateTourViewVersion.sql" />
+    <Build Include="dbo\Stored Procedures\GenerateExhibitInfoViewVersion.sql" />
+    <Build Include="dbo\Stored Procedures\GenerateExhibitReferenceInfoViewVersion.sql" />
+    <Build Include="dbo\Stored Procedures\GenerateTimelineInfoViewVersion.sql" />
+    <Build Include="dbo\Stored Procedures\GenerateBibliographyViewVersion.sql" />
+    <Build Include="dbo\Stored Procedures\GenerateExhibitViewVersion.sql" />
+    <Build Include="dbo\Stored Procedures\GenerateThresholdViewVersion.sql" />
+    <Build Include="dbo\Stored Procedures\CreateColumnListForTableInsert.sql" />
+    <Build Include="dbo\Stored Procedures\GenerateTimelineViewVersion.sql" />
+    <Build Include="dbo\Stored Procedures\GenerateVersion.sql" />
+    <Build Include="dbo\Stored Procedures\GenerateContentItemsViewVersion.sql" />
+    <Build Include="dbo\Stored Procedures\Publish.sql" />
+    <Build Include="dbo\Stored Procedures\RollToVersion.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Debug.publish.xml" />
+    <None Include="Release.publish.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <PreDeploy Include="Scripts\Pre-Deployment\Script.PreDeployment.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="Scripts\Post-Deployment\Script.PostDeployment.sql" />
+  </ItemGroup>
+</Project>

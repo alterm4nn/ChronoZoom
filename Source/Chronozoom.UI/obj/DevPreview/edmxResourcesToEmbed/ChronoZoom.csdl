@@ -1,0 +1,841 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="ChronoZoomModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+  <EntityContainer Name="ChronoZoomEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Prod_BibliographyView" EntityType="ChronoZoomModel.Prod_BibliographyView" />
+    <EntitySet Name="Prod_ContentItemView" EntityType="ChronoZoomModel.Prod_ContentItemView" />
+    <EntitySet Name="Prod_ExhibitContentItemInfo" EntityType="ChronoZoomModel.Prod_ExhibitContentItemInfo" />
+    <EntitySet Name="Prod_ExhibitInfo" EntityType="ChronoZoomModel.Prod_ExhibitInfo" />
+    <EntitySet Name="Prod_ExhibitReferenceInfo" EntityType="ChronoZoomModel.Prod_ExhibitReferenceInfo" />
+    <EntitySet Name="Prod_ExhibitView" EntityType="ChronoZoomModel.Prod_ExhibitView" />
+    <EntitySet Name="Prod_ThresholdView" EntityType="ChronoZoomModel.Prod_ThresholdView" />
+    <EntitySet Name="Prod_TimelineInfo" EntityType="ChronoZoomModel.Prod_TimelineInfo" />
+    <EntitySet Name="Prod_TimelineView" EntityType="ChronoZoomModel.Prod_TimelineView" />
+    <EntitySet Name="Prod_TourBookmarkView" EntityType="ChronoZoomModel.Prod_TourBookmarkView" />
+    <EntitySet Name="Prod_TourView" EntityType="ChronoZoomModel.Prod_TourView" />
+    <EntitySet Name="Staging_BibliographyView" EntityType="ChronoZoomModel.Staging_BibliographyView" />
+    <EntitySet Name="Staging_ContentItemView" EntityType="ChronoZoomModel.Staging_ContentItemView" />
+    <EntitySet Name="Staging_ExhibitContentItemInfo" EntityType="ChronoZoomModel.Staging_ExhibitContentItemInfo" />
+    <EntitySet Name="Staging_ExhibitInfo" EntityType="ChronoZoomModel.Staging_ExhibitInfo" />
+    <EntitySet Name="Staging_ExhibitReferenceInfo" EntityType="ChronoZoomModel.Staging_ExhibitReferenceInfo" />
+    <EntitySet Name="Staging_ExhibitView" EntityType="ChronoZoomModel.Staging_ExhibitView" />
+    <EntitySet Name="Staging_ThresholdView" EntityType="ChronoZoomModel.Staging_ThresholdView" />
+    <EntitySet Name="Staging_TimelineInfo" EntityType="ChronoZoomModel.Staging_TimelineInfo" />
+    <EntitySet Name="Staging_TimelineView" EntityType="ChronoZoomModel.Staging_TimelineView" />
+    <EntitySet Name="Staging_TourBookmarkView" EntityType="ChronoZoomModel.Staging_TourBookmarkView" />
+    <EntitySet Name="Staging_TourView" EntityType="ChronoZoomModel.Staging_TourView" />
+    <EntitySet Name="Auth_BibliographyView" EntityType="ChronoZoomModel.Auth_BibliographyView" />
+    <EntitySet Name="Auth_ContentItemsView" EntityType="ChronoZoomModel.Auth_ContentItemsView" />
+    <EntitySet Name="Auth_ExhibitContentItemInfoView" EntityType="ChronoZoomModel.Auth_ExhibitContentItemInfoView" />
+    <EntitySet Name="Auth_ExhibitInfoView" EntityType="ChronoZoomModel.Auth_ExhibitInfoView" />
+    <EntitySet Name="Auth_ExhibitReferenceInfoView" EntityType="ChronoZoomModel.Auth_ExhibitReferenceInfoView" />
+    <EntitySet Name="Auth_ExhibitView" EntityType="ChronoZoomModel.Auth_ExhibitView" />
+    <EntitySet Name="Auth_ThresholdView" EntityType="ChronoZoomModel.Auth_ThresholdView" />
+    <EntitySet Name="Auth_TimelineInfoView" EntityType="ChronoZoomModel.Auth_TimelineInfoView" />
+    <EntitySet Name="Auth_TimelineView" EntityType="ChronoZoomModel.Auth_TimelineView" />
+    <EntitySet Name="Auth_TourBookmarkView" EntityType="ChronoZoomModel.Auth_TourBookmarkView" />
+    <EntitySet Name="Auth_TourView" EntityType="ChronoZoomModel.Auth_TourView" />
+    <FunctionImport Name="spGetVisibleTimelinesForSearch" ReturnType="Collection(ChronoZoomModel.TimelineInfo)">
+      <Parameter Name="environment" Mode="In" Type="Int32" />
+    </FunctionImport>
+  </EntityContainer>
+  <EntityType Name="Prod_BibliographyView">
+    <Key>
+      <PropertyRef Name="BibliographyView" />
+    </Key>
+    <Property Type="Guid" Name="ExhibitID" Nullable="false" />
+    <Property Type="Boolean" Name="IsDeleted" />
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Authors" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="BookChapters" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="CitationType" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="PageNumbers" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Publication" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="PublicationDates" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Source" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="CurrVersion" />
+    <Property Type="Guid" Name="BibliographyView" Nullable="false" />
+    <Property Type="Int32" Name="IncludeInVersion" />
+  </EntityType>
+  <EntityType Name="Prod_ContentItemView">
+    <Key>
+      <PropertyRef Name="ContentItemViewID" />
+    </Key>
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Caption" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Topic" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Type="Guid" Name="MediaTypeID" Nullable="false" />
+    <Property Type="Guid" Name="ThresholdID" Nullable="false" />
+    <Property Type="Guid" Name="RegimeID" Nullable="false" />
+    <Property Type="String" Name="MediaBlobURL" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Type="Guid" Name="TimeUnitID" Nullable="false" />
+    <Property Type="DateTimeOffset" Name="ContentDate" />
+    <Property Type="Decimal" Name="ContentYear" Precision="8" Scale="4" />
+    <Property Type="String" Name="MediaSource" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Attribution" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Type="Guid" Name="LicenseTypeID" Nullable="false" />
+    <Property Type="DateTime" Name="CreatedOn" />
+    <Property Type="Guid" Name="CreatedBy" />
+    <Property Type="DateTime" Name="ModifiedOn" />
+    <Property Type="Guid" Name="ModifiedBy" />
+    <Property Type="Boolean" Name="IsVisible" />
+    <Property Type="Boolean" Name="IsDeleted" />
+    <Property Type="Int32" Name="UniqueID" Nullable="false" />
+    <Property Type="Int32" Name="CurrVersion" />
+    <Property Type="Guid" Name="Version_ContentItemID" Nullable="false" />
+    <Property Type="Guid" Name="ContentItemViewID" Nullable="false" />
+    <Property Type="Int32" Name="IncludeInVersion" />
+  </EntityType>
+  <EntityType Name="Prod_ExhibitContentItemInfo">
+    <Key>
+      <PropertyRef Name="ExhibitContentItemInfoID" />
+    </Key>
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="Guid" Name="ExhibitID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Caption" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Threshold" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Regime" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="TimeUnit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="DateTimeOffset" Name="ContentDate" />
+    <Property Type="Decimal" Name="ContentYear" Precision="8" Scale="4" />
+    <Property Type="String" Name="MediaType" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="MediaBlobURL" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="MediaSource" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Attribution" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="UniqueID" Nullable="false" />
+    <Property Type="Int16" Name="Order" />
+    <Property Type="Boolean" Name="HasBibliography" />
+    <Property Type="Int32" Name="CurrVersion" />
+    <Property Type="Guid" Name="ExhibitContentItemInfoID" Nullable="false" />
+    <Property Type="Int32" Name="IncludeInVersion" />
+  </EntityType>
+  <EntityType Name="Prod_ExhibitInfo">
+    <Key>
+      <PropertyRef Name="Prod_ExhibitInfoID" />
+    </Key>
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="Guid" Name="TimelineID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Threshold" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Regime" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="TimeUnit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="DateTimeOffset" Name="ContentDate" />
+    <Property Type="Decimal" Name="ContentYear" Precision="8" Scale="4" />
+    <Property Type="Int32" Name="UniqueID" Nullable="false" />
+    <Property Type="Int32" Name="Sequence" />
+    <Property Type="Int32" Name="CurrVersion" />
+    <Property Type="Guid" Name="Prod_ExhibitInfoID" Nullable="false" />
+    <Property Type="Int32" Name="IncludeInVersion" />
+  </EntityType>
+  <EntityType Name="Prod_ExhibitReferenceInfo">
+    <Key>
+      <PropertyRef Name="Prod_ExhibitReferenceInfoID" />
+    </Key>
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="Guid" Name="ExhibitID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Authors" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="BookChapters" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="CitationType" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="PageNumbers" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Publication" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="PublicationDates" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Source" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="CurrVersion" />
+    <Property Type="Guid" Name="Prod_ExhibitReferenceInfoID" Nullable="false" />
+    <Property Type="Int32" Name="IncludeInVersion" />
+  </EntityType>
+  <EntityType Name="Prod_ExhibitView">
+    <Key>
+      <PropertyRef Name="ExhibitViewID" />
+    </Key>
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="Guid" Name="ThresholdID" Nullable="false" />
+    <Property Type="Guid" Name="RegimeID" Nullable="false" />
+    <Property Type="DateTimeOffset" Name="ContentDate" />
+    <Property Type="Decimal" Name="ContentYear" Precision="8" Scale="4" />
+    <Property Type="DateTime" Name="CreatedOn" />
+    <Property Type="Guid" Name="CreatedBy" />
+    <Property Type="DateTime" Name="ModifiedOn" />
+    <Property Type="Guid" Name="ModifiedBy" />
+    <Property Type="Boolean" Name="IsVisible" />
+    <Property Type="Boolean" Name="IsDeleted" />
+    <Property Type="Guid" Name="TimeUnitID" />
+    <Property Type="Int32" Name="UniqueID" Nullable="false" />
+    <Property Type="Int32" Name="Sequence" />
+    <Property Type="Int32" Name="CurrVersion" />
+    <Property Type="Guid" Name="Version_ExhibitID" Nullable="false" />
+    <Property Type="Guid" Name="ExhibitViewID" Nullable="false" />
+    <Property Type="Int32" Name="IncludeInVersion" />
+  </EntityType>
+  <EntityType Name="Prod_ThresholdView">
+    <Key>
+      <PropertyRef Name="ThresholdViewID" />
+    </Key>
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Threshold" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="Boolean" Name="IsDeleted" />
+    <Property Type="String" Name="Timeunit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="DateTimeOffset" Name="ThresholdDate" />
+    <Property Type="Decimal" Name="ThresholdYear" Precision="8" Scale="4" />
+    <Property Type="String" Name="ShortDescription" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="URL" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="CurrVersion" />
+    <Property Type="Guid" Name="ThresholdViewID" Nullable="false" />
+    <Property Type="Int32" Name="IncludeInVersion" />
+  </EntityType>
+  <EntityType Name="Prod_TimelineInfo">
+    <Key>
+      <PropertyRef Name="TimelineInfoID" />
+    </Key>
+    <Property Type="Guid" Name="TimelineID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Threshold" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Regime" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="FromTimeUnit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="DateTimeOffset" Name="FromContentDate" />
+    <Property Type="Decimal" Name="FromContentYear" Precision="8" Scale="4" />
+    <Property Type="String" Name="ToTimeUnit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="DateTimeOffset" Name="ToContentDate" />
+    <Property Type="Decimal" Name="ToContentYear" Precision="8" Scale="4" />
+    <Property Type="Int32" Name="TimelineUniqueID" Nullable="false" />
+    <Property Type="Int32" Name="TimelineSequence" />
+    <Property Type="Decimal" Name="Height" Precision="8" Scale="4" />
+    <Property Type="Guid" Name="ParentTimelineID" />
+    <Property Type="Int32" Name="HasChildren" />
+    <Property Type="Int32" Name="CurrVersion" />
+    <Property Type="Guid" Name="TimelineInfoID" Nullable="false" />
+    <Property Type="Int32" Name="IncludeInVersion" />
+  </EntityType>
+  <EntityType Name="Prod_TimelineView">
+    <Key>
+      <PropertyRef Name="TimelineView" />
+    </Key>
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="Guid" Name="ThresholdID" Nullable="false" />
+    <Property Type="Guid" Name="RegimeID" Nullable="false" />
+    <Property Type="DateTimeOffset" Name="FromContentDate" />
+    <Property Type="Decimal" Name="FromContentYear" Precision="8" Scale="4" />
+    <Property Type="DateTimeOffset" Name="ToContentDate" />
+    <Property Type="Decimal" Name="ToContentYear" Precision="8" Scale="4" />
+    <Property Type="Guid" Name="ParentTimelineID" />
+    <Property Type="DateTime" Name="CreatedOn" />
+    <Property Type="Guid" Name="CreatedBy" />
+    <Property Type="DateTime" Name="ModifiedOn" />
+    <Property Type="Guid" Name="ModifiedBy" />
+    <Property Type="Boolean" Name="IsVisible" />
+    <Property Type="Boolean" Name="IsDeleted" />
+    <Property Type="Guid" Name="FromTimeUnit" />
+    <Property Type="Guid" Name="ToTimeUnit" />
+    <Property Type="String" Name="SourceURL" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Attribution" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="UniqueID" Nullable="false" />
+    <Property Type="Int32" Name="Sequence" />
+    <Property Type="Decimal" Name="Height" Precision="8" Scale="4" />
+    <Property Type="Int32" Name="CurrVersion" />
+    <Property Type="Guid" Name="Version_TimelineID" Nullable="false" />
+    <Property Type="Guid" Name="TimelineView" Nullable="false" />
+    <Property Type="Int32" Name="IncludeInVersion" />
+  </EntityType>
+  <EntityType Name="Prod_TourBookmarkView">
+    <Key>
+      <PropertyRef Name="TourBookmarkViewID" />
+    </Key>
+    <Property Type="String" Name="Name" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="LapseTime" />
+    <Property Type="String" Name="Description" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="URL" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="Boolean" Name="Bookmark_IsDeleted" />
+    <Property Type="Boolean" Name="TourBookmark_IsDeleted" />
+    <Property Type="Guid" Name="TourID" Nullable="false" />
+    <Property Type="Int32" Name="CurrVersion" />
+    <Property Type="Guid" Name="TourBookmarkViewID" Nullable="false" />
+    <Property Type="Int32" Name="IncludeInVersion" />
+  </EntityType>
+  <EntityType Name="Prod_TourView">
+    <Key>
+      <PropertyRef Name="TourViewID" />
+    </Key>
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Name" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="Guid" Name="CreatedBy" />
+    <Property Type="Guid" Name="ModifiedBy" />
+    <Property Type="DateTime" Name="CreatedOn" />
+    <Property Type="DateTime" Name="ModifiedOn" />
+    <Property Type="Boolean" Name="IsDeleted" />
+    <Property Type="Int32" Name="UniqueID" Nullable="false" />
+    <Property Type="String" Name="AudioBlobUrl" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Category" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="Sequence" />
+    <Property Type="Int32" Name="CurrVersion" />
+    <Property Type="Guid" Name="Version_TourID" Nullable="false" />
+    <Property Type="Guid" Name="TourViewID" Nullable="false" />
+    <Property Type="Int32" Name="IncludeInVersion" />
+  </EntityType>
+  <EntityType Name="Staging_BibliographyView">
+    <Key>
+      <PropertyRef Name="BibliographyView" />
+    </Key>
+    <Property Type="Guid" Name="ExhibitID" Nullable="false" />
+    <Property Type="Boolean" Name="IsDeleted" />
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Authors" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="BookChapters" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="CitationType" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="PageNumbers" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Publication" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="PublicationDates" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Source" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="CurrVersion" />
+    <Property Type="Guid" Name="BibliographyView" Nullable="false" />
+    <Property Type="Int32" Name="IncludeInVersion" />
+  </EntityType>
+  <EntityType Name="Staging_ContentItemView">
+    <Key>
+      <PropertyRef Name="ContentItemViewID" />
+    </Key>
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Caption" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Topic" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Type="Guid" Name="MediaTypeID" Nullable="false" />
+    <Property Type="Guid" Name="ThresholdID" Nullable="false" />
+    <Property Type="Guid" Name="RegimeID" Nullable="false" />
+    <Property Type="String" Name="MediaBlobURL" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Type="Guid" Name="TimeUnitID" Nullable="false" />
+    <Property Type="DateTimeOffset" Name="ContentDate" />
+    <Property Type="Decimal" Name="ContentYear" Precision="8" Scale="4" />
+    <Property Type="String" Name="MediaSource" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Attribution" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Type="Guid" Name="LicenseTypeID" Nullable="false" />
+    <Property Type="DateTime" Name="CreatedOn" />
+    <Property Type="Guid" Name="CreatedBy" />
+    <Property Type="DateTime" Name="ModifiedOn" />
+    <Property Type="Guid" Name="ModifiedBy" />
+    <Property Type="Boolean" Name="IsVisible" />
+    <Property Type="Boolean" Name="IsDeleted" />
+    <Property Type="Int32" Name="UniqueID" Nullable="false" />
+    <Property Type="Int32" Name="CurrVersion" />
+    <Property Type="Guid" Name="Version_ContentItemID" Nullable="false" />
+    <Property Type="Guid" Name="ContentItemViewID" Nullable="false" />
+    <Property Type="Int32" Name="IncludeInVersion" />
+  </EntityType>
+  <EntityType Name="Staging_ExhibitContentItemInfo">
+    <Key>
+      <PropertyRef Name="ExhibitContentItemInfoID" />
+    </Key>
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="Guid" Name="ExhibitID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Caption" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Threshold" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Regime" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="TimeUnit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="DateTimeOffset" Name="ContentDate" />
+    <Property Type="Decimal" Name="ContentYear" Precision="8" Scale="4" />
+    <Property Type="String" Name="MediaType" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="MediaBlobURL" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="MediaSource" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Attribution" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="UniqueID" Nullable="false" />
+    <Property Type="Int16" Name="Order" />
+    <Property Type="Boolean" Name="HasBibliography" />
+    <Property Type="Int32" Name="CurrVersion" />
+    <Property Type="Guid" Name="ExhibitContentItemInfoID" Nullable="false" />
+    <Property Type="Int32" Name="IncludeInVersion" />
+  </EntityType>
+  <EntityType Name="Staging_ExhibitInfo">
+    <Key>
+      <PropertyRef Name="ExhibitInfoID" />
+    </Key>
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="Guid" Name="TimelineID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Threshold" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Regime" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="TimeUnit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="DateTimeOffset" Name="ContentDate" />
+    <Property Type="Decimal" Name="ContentYear" Precision="8" Scale="4" />
+    <Property Type="Int32" Name="UniqueID" Nullable="false" />
+    <Property Type="Int32" Name="Sequence" />
+    <Property Type="Int32" Name="CurrVersion" />
+    <Property Type="Guid" Name="ExhibitInfoID" Nullable="false" />
+    <Property Type="Int32" Name="IncludeInVersion" />
+  </EntityType>
+  <EntityType Name="Staging_ExhibitReferenceInfo">
+    <Key>
+      <PropertyRef Name="ExhibitReferenceInfoID" />
+    </Key>
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="Guid" Name="ExhibitID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Authors" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="BookChapters" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="CitationType" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="PageNumbers" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Publication" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="PublicationDates" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Source" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="CurrVersion" />
+    <Property Type="Guid" Name="ExhibitReferenceInfoID" Nullable="false" />
+    <Property Type="Int32" Name="IncludeInVersion" />
+  </EntityType>
+  <EntityType Name="Staging_ExhibitView">
+    <Key>
+      <PropertyRef Name="ExhibitViewID" />
+    </Key>
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="Guid" Name="ThresholdID" Nullable="false" />
+    <Property Type="Guid" Name="RegimeID" Nullable="false" />
+    <Property Type="DateTimeOffset" Name="ContentDate" />
+    <Property Type="Decimal" Name="ContentYear" Precision="8" Scale="4" />
+    <Property Type="DateTime" Name="CreatedOn" />
+    <Property Type="Guid" Name="CreatedBy" />
+    <Property Type="DateTime" Name="ModifiedOn" />
+    <Property Type="Guid" Name="ModifiedBy" />
+    <Property Type="Boolean" Name="IsVisible" />
+    <Property Type="Boolean" Name="IsDeleted" />
+    <Property Type="Guid" Name="TimeUnitID" />
+    <Property Type="Int32" Name="UniqueID" Nullable="false" />
+    <Property Type="Int32" Name="Sequence" />
+    <Property Type="Int32" Name="CurrVersion" />
+    <Property Type="Guid" Name="Version_ExhibitID" Nullable="false" />
+    <Property Type="Guid" Name="ExhibitViewID" Nullable="false" />
+    <Property Type="Int32" Name="IncludeInVersion" />
+  </EntityType>
+  <EntityType Name="Staging_ThresholdView">
+    <Key>
+      <PropertyRef Name="ThresholdViewID" />
+    </Key>
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Threshold" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="Boolean" Name="IsDeleted" />
+    <Property Type="String" Name="Timeunit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="DateTimeOffset" Name="ThresholdDate" />
+    <Property Type="Decimal" Name="ThresholdYear" Precision="8" Scale="4" />
+    <Property Type="String" Name="ShortDescription" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="URL" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="CurrVersion" />
+    <Property Type="Guid" Name="ThresholdViewID" Nullable="false" />
+    <Property Type="Int32" Name="IncludeInVersion" />
+  </EntityType>
+  <EntityType Name="Staging_TimelineInfo">
+    <Key>
+      <PropertyRef Name="TimelineInfoID" />
+    </Key>
+    <Property Type="Guid" Name="TimelineID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Threshold" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Regime" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="FromTimeUnit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="DateTimeOffset" Name="FromContentDate" />
+    <Property Type="Decimal" Name="FromContentYear" Precision="8" Scale="4" />
+    <Property Type="String" Name="ToTimeUnit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="DateTimeOffset" Name="ToContentDate" />
+    <Property Type="Decimal" Name="ToContentYear" Precision="8" Scale="4" />
+    <Property Type="Int32" Name="TimelineUniqueID" Nullable="false" />
+    <Property Type="Int32" Name="TimelineSequence" />
+    <Property Type="Decimal" Name="Height" Precision="8" Scale="4" />
+    <Property Type="Guid" Name="ParentTimelineID" />
+    <Property Type="Int32" Name="HasChildren" />
+    <Property Type="Int32" Name="CurrVersion" />
+    <Property Type="Guid" Name="TimelineInfoID" Nullable="false" />
+    <Property Type="Int32" Name="IncludeInVersion" />
+  </EntityType>
+  <EntityType Name="Staging_TimelineView">
+    <Key>
+      <PropertyRef Name="TimelineView" />
+    </Key>
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="Guid" Name="ThresholdID" Nullable="false" />
+    <Property Type="Guid" Name="RegimeID" Nullable="false" />
+    <Property Type="DateTimeOffset" Name="FromContentDate" />
+    <Property Type="Decimal" Name="FromContentYear" Precision="8" Scale="4" />
+    <Property Type="DateTimeOffset" Name="ToContentDate" />
+    <Property Type="Decimal" Name="ToContentYear" Precision="8" Scale="4" />
+    <Property Type="Guid" Name="ParentTimelineID" />
+    <Property Type="DateTime" Name="CreatedOn" />
+    <Property Type="Guid" Name="CreatedBy" />
+    <Property Type="DateTime" Name="ModifiedOn" />
+    <Property Type="Guid" Name="ModifiedBy" />
+    <Property Type="Boolean" Name="IsVisible" />
+    <Property Type="Boolean" Name="IsDeleted" />
+    <Property Type="Guid" Name="FromTimeUnit" />
+    <Property Type="Guid" Name="ToTimeUnit" />
+    <Property Type="String" Name="SourceURL" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Attribution" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="UniqueID" Nullable="false" />
+    <Property Type="Int32" Name="Sequence" />
+    <Property Type="Decimal" Name="Height" Precision="8" Scale="4" />
+    <Property Type="Int32" Name="CurrVersion" />
+    <Property Type="Guid" Name="Version_TimelineID" Nullable="false" />
+    <Property Type="Guid" Name="TimelineView" Nullable="false" />
+    <Property Type="Int32" Name="IncludeInVersion" />
+  </EntityType>
+  <EntityType Name="Staging_TourBookmarkView">
+    <Key>
+      <PropertyRef Name="TourBookmarkViewID" />
+    </Key>
+    <Property Type="String" Name="Name" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="LapseTime" />
+    <Property Type="String" Name="Description" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="URL" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="Boolean" Name="Bookmark_IsDeleted" />
+    <Property Type="Boolean" Name="TourBookmark_IsDeleted" />
+    <Property Type="Guid" Name="TourID" Nullable="false" />
+    <Property Type="Int32" Name="CurrVersion" />
+    <Property Type="Guid" Name="TourBookmarkViewID" Nullable="false" />
+    <Property Type="Int32" Name="IncludeInVersion" />
+  </EntityType>
+  <EntityType Name="Staging_TourView">
+    <Key>
+      <PropertyRef Name="TourViewID" />
+    </Key>
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Name" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="Guid" Name="CreatedBy" />
+    <Property Type="Guid" Name="ModifiedBy" />
+    <Property Type="DateTime" Name="CreatedOn" />
+    <Property Type="DateTime" Name="ModifiedOn" />
+    <Property Type="Boolean" Name="IsDeleted" />
+    <Property Type="Int32" Name="UniqueID" Nullable="false" />
+    <Property Type="String" Name="AudioBlobUrl" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Category" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="Sequence" />
+    <Property Type="Int32" Name="CurrVersion" />
+    <Property Type="Guid" Name="Version_TourID" Nullable="false" />
+    <Property Type="Guid" Name="TourViewID" Nullable="false" />
+    <Property Type="Int32" Name="IncludeInVersion" />
+  </EntityType>
+  <EntityType Name="Auth_BibliographyView">
+    <Key>
+      <PropertyRef Name="ExhibitID" />
+      <PropertyRef Name="ID" />
+      <PropertyRef Name="Title" />
+      <PropertyRef Name="Authors" />
+      <PropertyRef Name="CitationType" />
+      <PropertyRef Name="Source" />
+    </Key>
+    <Property Type="Guid" Name="ExhibitID" Nullable="false" />
+    <Property Type="Boolean" Name="IsDeleted" />
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Authors" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="BookChapters" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="CitationType" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="PageNumbers" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Publication" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="PublicationDates" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Source" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="CurrVersion" />
+  </EntityType>
+  <EntityType Name="Auth_ContentItemsView">
+    <Key>
+      <PropertyRef Name="ID" />
+      <PropertyRef Name="Title" />
+      <PropertyRef Name="Caption" />
+      <PropertyRef Name="Topic" />
+      <PropertyRef Name="MediaTypeID" />
+      <PropertyRef Name="ThresholdID" />
+      <PropertyRef Name="RegimeID" />
+      <PropertyRef Name="MediaBlobURL" />
+      <PropertyRef Name="TimeUnitID" />
+      <PropertyRef Name="LicenseTypeID" />
+      <PropertyRef Name="UniqueID" />
+    </Key>
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Caption" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Topic" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Type="Guid" Name="MediaTypeID" Nullable="false" />
+    <Property Type="Guid" Name="ThresholdID" Nullable="false" />
+    <Property Type="Guid" Name="RegimeID" Nullable="false" />
+    <Property Type="String" Name="MediaBlobURL" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Type="Guid" Name="TimeUnitID" Nullable="false" />
+    <Property Type="DateTimeOffset" Name="ContentDate" />
+    <Property Type="Decimal" Name="ContentYear" Precision="8" Scale="4" />
+    <Property Type="String" Name="MediaSource" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Attribution" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Type="Guid" Name="LicenseTypeID" Nullable="false" />
+    <Property Type="DateTime" Name="CreatedOn" />
+    <Property Type="Guid" Name="CreatedBy" />
+    <Property Type="DateTime" Name="ModifiedOn" />
+    <Property Type="Guid" Name="ModifiedBy" />
+    <Property Type="Boolean" Name="IsVisible" />
+    <Property Type="Boolean" Name="IsDeleted" />
+    <Property Type="Int32" Name="UniqueID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="CurrVersion" />
+  </EntityType>
+  <EntityType Name="Auth_ExhibitContentItemInfoView">
+    <Key>
+      <PropertyRef Name="ID" />
+      <PropertyRef Name="ExhibitID" />
+      <PropertyRef Name="Title" />
+      <PropertyRef Name="Caption" />
+      <PropertyRef Name="Threshold" />
+      <PropertyRef Name="Regime" />
+      <PropertyRef Name="TimeUnit" />
+      <PropertyRef Name="MediaType" />
+      <PropertyRef Name="MediaBlobURL" />
+      <PropertyRef Name="UniqueID" />
+      <PropertyRef Name="HasBibliography" />
+    </Key>
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="Guid" Name="ExhibitID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Caption" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Threshold" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Regime" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="TimeUnit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="DateTimeOffset" Name="ContentDate" />
+    <Property Type="Decimal" Name="ContentYear" Precision="8" Scale="4" />
+    <Property Type="String" Name="MediaType" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="MediaBlobURL" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="MediaSource" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Attribution" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="UniqueID" Nullable="false" />
+    <Property Type="Int16" Name="Order" />
+    <Property Type="Int32" Name="HasBibliography" Nullable="false" />
+    <Property Type="Int32" Name="CurrVersion" />
+  </EntityType>
+  <EntityType Name="Auth_ExhibitInfoView">
+    <Key>
+      <PropertyRef Name="ID" />
+      <PropertyRef Name="TimelineID" />
+      <PropertyRef Name="Title" />
+      <PropertyRef Name="Threshold" />
+      <PropertyRef Name="Regime" />
+      <PropertyRef Name="TimeUnit" />
+      <PropertyRef Name="UniqueID" />
+    </Key>
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="Guid" Name="TimelineID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Threshold" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Regime" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="TimeUnit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="DateTimeOffset" Name="ContentDate" />
+    <Property Type="Decimal" Name="ContentYear" Precision="8" Scale="4" />
+    <Property Type="Int32" Name="UniqueID" Nullable="false" />
+    <Property Type="Int32" Name="Sequence" />
+    <Property Type="Int32" Name="CurrVersion" />
+  </EntityType>
+  <EntityType Name="Auth_ExhibitReferenceInfoView">
+    <Key>
+      <PropertyRef Name="ID" />
+      <PropertyRef Name="ExhibitID" />
+      <PropertyRef Name="Title" />
+      <PropertyRef Name="Authors" />
+      <PropertyRef Name="CitationType" />
+      <PropertyRef Name="Source" />
+    </Key>
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="Guid" Name="ExhibitID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Authors" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="BookChapters" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="CitationType" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="PageNumbers" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Publication" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="PublicationDates" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Source" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="CurrVersion" />
+  </EntityType>
+  <EntityType Name="Auth_ExhibitView">
+    <Key>
+      <PropertyRef Name="ID" />
+      <PropertyRef Name="Title" />
+      <PropertyRef Name="ThresholdID" />
+      <PropertyRef Name="RegimeID" />
+      <PropertyRef Name="UniqueID" />
+    </Key>
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="Guid" Name="ThresholdID" Nullable="false" />
+    <Property Type="Guid" Name="RegimeID" Nullable="false" />
+    <Property Type="DateTimeOffset" Name="ContentDate" />
+    <Property Type="Decimal" Name="ContentYear" Precision="8" Scale="4" />
+    <Property Type="DateTime" Name="CreatedOn" />
+    <Property Type="Guid" Name="CreatedBy" />
+    <Property Type="DateTime" Name="ModifiedOn" />
+    <Property Type="Guid" Name="ModifiedBy" />
+    <Property Type="Boolean" Name="IsVisible" />
+    <Property Type="Boolean" Name="IsDeleted" />
+    <Property Type="Guid" Name="TimeUnitID" />
+    <Property Type="Int32" Name="UniqueID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="Sequence" />
+    <Property Type="Int32" Name="CurrVersion" />
+  </EntityType>
+  <EntityType Name="Auth_ThresholdView">
+    <Key>
+      <PropertyRef Name="ID" />
+      <PropertyRef Name="Threshold" />
+      <PropertyRef Name="Timeunit" />
+      <PropertyRef Name="URL" />
+    </Key>
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Threshold" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="Boolean" Name="IsDeleted" />
+    <Property Type="String" Name="Timeunit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="DateTimeOffset" Name="ThresholdDate" />
+    <Property Type="Decimal" Name="ThresholdYear" Precision="8" Scale="4" />
+    <Property Type="String" Name="ShortDescription" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="URL" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="CurrVersion" />
+  </EntityType>
+  <EntityType Name="Auth_TimelineInfoView">
+    <Key>
+      <PropertyRef Name="TimelineID" />
+      <PropertyRef Name="Title" />
+      <PropertyRef Name="Threshold" />
+      <PropertyRef Name="Regime" />
+      <PropertyRef Name="FromTimeUnit" />
+      <PropertyRef Name="ToTimeUnit" />
+      <PropertyRef Name="TimelineUniqueID" />
+    </Key>
+    <Property Type="Guid" Name="TimelineID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Threshold" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Regime" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="FromTimeUnit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="DateTimeOffset" Name="FromContentDate" />
+    <Property Type="Decimal" Name="FromContentYear" Precision="8" Scale="4" />
+    <Property Type="String" Name="ToTimeUnit" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="DateTimeOffset" Name="ToContentDate" />
+    <Property Type="Decimal" Name="ToContentYear" Precision="8" Scale="4" />
+    <Property Type="Int32" Name="TimelineUniqueID" Nullable="false" />
+    <Property Type="Int32" Name="TimelineSequence" />
+    <Property Type="Decimal" Name="Height" Precision="8" Scale="4" />
+    <Property Type="Guid" Name="ParentTimelineID" />
+    <Property Type="Int32" Name="HasChildren" />
+    <Property Type="Int32" Name="CurrVersion" />
+  </EntityType>
+  <EntityType Name="Auth_TimelineView">
+    <Key>
+      <PropertyRef Name="ID" />
+      <PropertyRef Name="Title" />
+      <PropertyRef Name="ThresholdID" />
+      <PropertyRef Name="RegimeID" />
+      <PropertyRef Name="UniqueID" />
+    </Key>
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="Guid" Name="ThresholdID" Nullable="false" />
+    <Property Type="Guid" Name="RegimeID" Nullable="false" />
+    <Property Type="DateTimeOffset" Name="FromContentDate" />
+    <Property Type="Decimal" Name="FromContentYear" Precision="8" Scale="4" />
+    <Property Type="DateTimeOffset" Name="ToContentDate" />
+    <Property Type="Decimal" Name="ToContentYear" Precision="8" Scale="4" />
+    <Property Type="Guid" Name="ParentTimelineID" />
+    <Property Type="DateTime" Name="CreatedOn" />
+    <Property Type="Guid" Name="CreatedBy" />
+    <Property Type="DateTime" Name="ModifiedOn" />
+    <Property Type="Guid" Name="ModifiedBy" />
+    <Property Type="Boolean" Name="IsVisible" />
+    <Property Type="Boolean" Name="IsDeleted" />
+    <Property Type="Guid" Name="FromTimeUnit" />
+    <Property Type="Guid" Name="ToTimeUnit" />
+    <Property Type="String" Name="SourceURL" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Attribution" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="UniqueID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="Sequence" />
+    <Property Type="Decimal" Name="Height" Precision="8" Scale="4" />
+    <Property Type="Int32" Name="CurrVersion" />
+  </EntityType>
+  <EntityType Name="Auth_TourBookmarkView">
+    <Key>
+      <PropertyRef Name="Name" />
+      <PropertyRef Name="URL" />
+      <PropertyRef Name="ID" />
+      <PropertyRef Name="TourID" />
+    </Key>
+    <Property Type="String" Name="Name" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="LapseTime" />
+    <Property Type="String" Name="Description" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="URL" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="Boolean" Name="Bookmark_IsDeleted" />
+    <Property Type="Boolean" Name="TourBookmark_IsDeleted" />
+    <Property Type="Guid" Name="TourID" Nullable="false" />
+    <Property Type="Int32" Name="CurrVersion" />
+  </EntityType>
+  <EntityType Name="Auth_TourView">
+    <Key>
+      <PropertyRef Name="ID" />
+      <PropertyRef Name="Name" />
+      <PropertyRef Name="UniqueID" />
+    </Key>
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Name" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="Guid" Name="CreatedBy" />
+    <Property Type="Guid" Name="ModifiedBy" />
+    <Property Type="DateTime" Name="CreatedOn" />
+    <Property Type="DateTime" Name="ModifiedOn" />
+    <Property Type="Boolean" Name="IsDeleted" />
+    <Property Type="Int32" Name="UniqueID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="String" Name="AudioBlobUrl" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="Category" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="Sequence" />
+    <Property Type="Int32" Name="CurrVersion" />
+    <Property Type="Boolean" Name="IsVisible" />
+  </EntityType>
+  <ComplexType Name="TimelineView">
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="100" />
+    <Property Type="Guid" Name="ThresholdID" Nullable="false" />
+    <Property Type="Guid" Name="RegimeID" Nullable="false" />
+    <Property Type="DateTimeOffset" Name="FromContentDate" Nullable="true" />
+    <Property Type="Decimal" Name="FromContentYear" Nullable="true" Precision="8" Scale="4" />
+    <Property Type="DateTimeOffset" Name="ToContentDate" Nullable="true" />
+    <Property Type="Decimal" Name="ToContentYear" Nullable="true" Precision="8" Scale="4" />
+    <Property Type="Guid" Name="ParentTimelineID" Nullable="true" />
+    <Property Type="DateTime" Name="CreatedOn" Nullable="true" Precision="16" />
+    <Property Type="Guid" Name="CreatedBy" Nullable="true" />
+    <Property Type="DateTime" Name="ModifiedOn" Nullable="true" Precision="16" />
+    <Property Type="Guid" Name="ModifiedBy" Nullable="true" />
+    <Property Type="Boolean" Name="IsVisible" Nullable="true" />
+    <Property Type="Boolean" Name="IsDeleted" Nullable="true" />
+    <Property Type="Guid" Name="FromTimeUnit" Nullable="true" />
+    <Property Type="Guid" Name="ToTimeUnit" Nullable="true" />
+    <Property Type="String" Name="SourceURL" Nullable="true" MaxLength="500" />
+    <Property Type="String" Name="Attribution" Nullable="true" MaxLength="500" />
+    <Property Type="Int32" Name="UniqueID" Nullable="false" />
+    <Property Type="Int32" Name="Sequence" Nullable="true" />
+    <Property Type="Decimal" Name="Height" Nullable="true" Precision="8" Scale="4" />
+    <Property Type="Int32" Name="CurrVersion" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="TimelineInfo">
+    <Property Type="Guid" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="false" MaxLength="100" />
+    <Property Type="Guid" Name="ThresholdID" Nullable="false" />
+    <Property Type="Guid" Name="RegimeID" Nullable="false" />
+    <Property Type="DateTimeOffset" Name="FromContentDate" Nullable="true" />
+    <Property Type="Decimal" Name="FromContentYear" Nullable="true" Precision="8" Scale="4" />
+    <Property Type="DateTimeOffset" Name="ToContentDate" Nullable="true" />
+    <Property Type="Decimal" Name="ToContentYear" Nullable="true" Precision="8" Scale="4" />
+    <Property Type="Guid" Name="ParentTimelineID" Nullable="true" />
+    <Property Type="DateTime" Name="CreatedOn" Nullable="true" Precision="16" />
+    <Property Type="Guid" Name="CreatedBy" Nullable="true" />
+    <Property Type="DateTime" Name="ModifiedOn" Nullable="true" Precision="16" />
+    <Property Type="Guid" Name="ModifiedBy" Nullable="true" />
+    <Property Type="Boolean" Name="IsVisible" Nullable="true" />
+    <Property Type="Boolean" Name="IsDeleted" Nullable="true" />
+    <Property Type="Guid" Name="FromTimeUnit" Nullable="true" />
+    <Property Type="Guid" Name="ToTimeUnit" Nullable="true" />
+    <Property Type="String" Name="SourceURL" Nullable="true" MaxLength="500" />
+    <Property Type="String" Name="Attribution" Nullable="true" MaxLength="500" />
+    <Property Type="Int32" Name="UniqueID" Nullable="false" />
+    <Property Type="Int32" Name="Sequence" Nullable="true" />
+    <Property Type="Decimal" Name="Height" Nullable="true" Precision="8" Scale="4" />
+    <Property Type="Int32" Name="CurrVersion" Nullable="true" />
+  </ComplexType>
+</Schema>

@@ -1,0 +1,21 @@
+﻿@model Authoring.WebRole.Models.CitationType
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>CitationType - Details</h2>
+
+<fieldset>
+    <legend>CitationType</legend>
+
+    <div class="display-label">CitationType1</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.CitationType1)
+    </div>
+
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

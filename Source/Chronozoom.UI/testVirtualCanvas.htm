@@ -1,0 +1,142 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <link href="Styles/cz.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="Scripts/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-ui-1.8.16.custom.min.js"></script>
+    <script type="text/javascript" src="Scripts/rx.js"></script>
+    <script type="text/javascript" src="Scripts/rx.jQuery.js"></script>
+    <script type="text/javascript" src="Scripts/common.js"></script>
+    <script type="text/javascript" src="Scripts/cz.settings.js"></script>
+    <script type="text/javascript" src="Scripts/vccontent.js"></script>
+    <script type="text/javascript" src="Scripts/viewport.js"></script>
+    <script type="text/javascript" src="Scripts/virtualCanvas.js"></script>
+    <script type="text/javascript" src="Scripts/mouseWheelPlugin.js"></script>
+    <script type="text/javascript" src="Scripts/gestures.js"></script>
+    <script type="text/javascript" src="Scripts/viewportAnimation.js"></script>
+    <script type="text/javascript" src="Scripts/viewportController.js"></script>
+    <script type="text/javascript">
+        var maxPermitedVerticalRange = { top: -10000000, bottom: 10000000 };
+
+        var rectCenterX = 0.6;
+        var scale = 1.0 / 256;
+
+
+        $(document).ready(function () {
+            var vc = $("#vc");
+            vc.virtualCanvas();
+
+            var root = vc.virtualCanvas("getLayerContent");
+
+            root.beginEdit();
+            addRectangle(root, "layerTimelines", "rectTimeline", -1.5, -0.25, 3, 0.5, { strokeStyle: 'rgb(240,240,240)', lineWidth: 2, fillStyle: 'rgba(140,140,140,0.5)' });
+            root.endEdit(true);
+
+            controller = new ViewportController(
+                function (visible) {
+                    vc.virtualCanvas("setVisible", visible, controller.activeAnimation);
+                },
+                function () {
+                    return vc.virtualCanvas("getViewport");
+                },
+                getGesturesStream(vc));
+
+            vc.virtualCanvas("setVisible", new VisibleRegion2d(0, 0, scale));
+            UpdateLayout();
+
+            TestMouseMoveAndClick();
+            TestRectMouseMoveAndClick();
+        });
+
+        function UpdateLayout() {
+            document.getElementById("vc").style.height = (window.innerHeight - 20) + "px";
+            $("#vc").virtualCanvas("updateViewport");
+        }
+
+        $(window).bind('resize', function () {
+            UpdateLayout();
+        });
+
+        var isMovedIn, isMovedOut, isClicked;
+        function TestMouseMoveAndClick() {
+            isMovedIn = false;
+            isMovedOut = false;
+            isClicked = false;
+
+            var vc = $("#vc");
+            var root = vc.virtualCanvas("getLayerContent");
+            vc.virtualCanvas("setVisible", new VisibleRegion2d(0, 0, scale));
+            root.beginEdit();
+            var circle = addCircle(root, "layerTimelines", "circle", 0, 0, 0.2, { strokeStyle: 'blue', lineWidth: 1, fillStyle: 'rgba(0,140,140,0.5)' });
+
+            circle.reactsOnMouse = true;
+            circle.onmouseenter = function (e) {
+                this.settings.strokeStyle = 'orange';
+                this.settings.lineWidth = 5;
+                this.vc.invalidate();
+                isMovedIn = true;
+            };
+            circle.onmouseleave = function (e) {
+                this.settings.strokeStyle = 'blue';
+                this.settings.lineWidth = 1;
+                this.vc.invalidate();
+                isMovedOut = true;
+            };
+            circle.onmouseclick = function (e) {
+                this.settings.strokeStyle = 'green';
+                this.settings.lineWidth = 1;
+                this.vc.invalidate();
+                isClicked = true;
+            };
+
+            root.endEdit();
+        }
+
+
+        var isRectMovedIn, isRectMovedOut, isRectClicked;
+        function TestRectMouseMoveAndClick() {
+            isRectMovedIn = false;
+            isRectMovedOut = false;
+            isRectClicked = false;
+
+            var vc = $("#vc");
+            var root = vc.virtualCanvas("getLayerContent");
+            vc.virtualCanvas("setVisible", new VisibleRegion2d(0, 0, scale));
+            root.beginEdit();
+            var rect = addRectangle(root, "layerTimelines", "rect", rectCenterX - 0.1, -0.1, 0.3, 0.2, { strokeStyle: 'blue', lineWidth: 1, fillStyle: 'rgba(0,140,140,0.5)' });
+
+            rect.reactsOnMouse = true;
+            rect.onmouseenter = function (e) {
+                this.settings.strokeStyle = 'orange';
+                this.settings.lineWidth = 5;
+                this.vc.invalidate();
+                isRectMovedIn = true;
+            };
+            rect.onmouseleave = function (e) {
+                this.settings.strokeStyle = 'blue';
+                this.settings.lineWidth = 1;
+                this.vc.invalidate();
+                isRectMovedOut = true;
+            };
+            rect.onmouseclick = function (e) {
+                this.settings.strokeStyle = 'green';
+                this.settings.lineWidth = 1;
+                this.vc.invalidate();
+                isRectClicked = true;
+            };
+
+            root.endEdit();
+        }
+    </script>
+    <title>Virtual Canvas Test Page</title>
+</head>
+<body>
+    <div id="vc" style="width: 100%; height: auto; overflow: hidden; background-image: url('Images/background.jpg');
+        background-size: cover" onselectstart="return false">
+        <div id="layerTimelines">
+        </div>
+        <div id="layerInfodots">
+        </div>
+    </div>
+</body>
+</html>

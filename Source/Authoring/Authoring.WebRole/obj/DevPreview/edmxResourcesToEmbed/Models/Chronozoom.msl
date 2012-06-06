@@ -1,0 +1,460 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="ChronozoomModelStoreContainer" CdmEntityContainer="ChronozoomEntities">
+    <EntitySetMapping Name="AuthoringTables">
+      <EntityTypeMapping TypeName="ChronozoomModel.AuthoringTable">
+        <MappingFragment StoreEntitySet="AuthoringTable">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="AuthoringTable1" ColumnName="AuthoringTable" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="AuthoringTableRolePermissions">
+      <EntityTypeMapping TypeName="ChronozoomModel.AuthoringTableRolePermission">
+        <MappingFragment StoreEntitySet="AuthoringTableRolePermission">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="Permission" ColumnName="Permission" />
+          <ScalarProperty Name="RoleID" ColumnName="RoleID" />
+          <ScalarProperty Name="AuthoringTableID" ColumnName="AuthoringTableID" />
+          <ScalarProperty Name="AuthoringTableRolePermissionID" ColumnName="AuthoringTableRolePermissionID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ContentItems">
+      <EntityTypeMapping TypeName="ChronozoomModel.ContentItem">
+        <MappingFragment StoreEntitySet="ContentItem">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="LicenseTypeID" ColumnName="LicenseTypeID" />
+          <ScalarProperty Name="Attribution" ColumnName="Attribution" />
+          <ScalarProperty Name="MediaSource" ColumnName="MediaSource" />
+          <ScalarProperty Name="ContentYear" ColumnName="ContentYear" />
+          <ScalarProperty Name="ContentDate" ColumnName="ContentDate" />
+          <ScalarProperty Name="TimeUnitID" ColumnName="TimeUnitID" />
+          <ScalarProperty Name="MediaBlobURL" ColumnName="MediaBlobURL" />
+          <ScalarProperty Name="RegimeID" ColumnName="RegimeID" />
+          <ScalarProperty Name="ThresholdID" ColumnName="ThresholdID" />
+          <ScalarProperty Name="MediaTypeID" ColumnName="MediaTypeID" />
+          <ScalarProperty Name="Topic" ColumnName="Topic" />
+          <ScalarProperty Name="Caption" ColumnName="Caption" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ContentKeywords">
+      <EntityTypeMapping TypeName="ChronozoomModel.ContentKeyword">
+        <MappingFragment StoreEntitySet="ContentKeyword">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="KeywordID" ColumnName="KeywordID" />
+          <ScalarProperty Name="ContentID" ColumnName="ContentID" />
+          <ScalarProperty Name="ContentKeywordID" ColumnName="ContentKeywordID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Keywords">
+      <EntityTypeMapping TypeName="ChronozoomModel.Keyword">
+        <MappingFragment StoreEntitySet="Keyword">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="DoNotDisplay" ColumnName="DoNotDisplay" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="Keyword1" ColumnName="Keyword" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="LicenseTypes">
+      <EntityTypeMapping TypeName="ChronozoomModel.LicenseType">
+        <MappingFragment StoreEntitySet="LicenseType">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="LicenseURL" ColumnName="LicenseURL" />
+          <ScalarProperty Name="LicenseType1" ColumnName="LicenseType" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="MediaTypes">
+      <EntityTypeMapping TypeName="ChronozoomModel.MediaType">
+        <MappingFragment StoreEntitySet="MediaType">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="MediaType1" ColumnName="MediaType" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Permissions">
+      <EntityTypeMapping TypeName="ChronozoomModel.Permission">
+        <MappingFragment StoreEntitySet="Permission">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="IntRepresentation" ColumnName="IntRepresentation" />
+          <ScalarProperty Name="Permission1" ColumnName="Permission" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Regimes">
+      <EntityTypeMapping TypeName="ChronozoomModel.Regime">
+        <MappingFragment StoreEntitySet="Regime">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="DoNotDisplay" ColumnName="DoNotDisplay" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="Regime1" ColumnName="Regime" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Roles">
+      <EntityTypeMapping TypeName="ChronozoomModel.Role">
+        <MappingFragment StoreEntitySet="Role">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="Role1" ColumnName="Role" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Thresholds">
+      <EntityTypeMapping TypeName="ChronozoomModel.Threshold">
+        <MappingFragment StoreEntitySet="Threshold">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="BookmarkID" ColumnName="BookmarkID" />
+          <ScalarProperty Name="ShortDescription" ColumnName="ShortDescription" />
+          <ScalarProperty Name="ThresholdTimeUnit" ColumnName="ThresholdTimeUnit" />
+          <ScalarProperty Name="ThresholdYear" ColumnName="ThresholdYear" />
+          <ScalarProperty Name="ThresholdDate" ColumnName="ThresholdDate" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="Threshold1" ColumnName="Threshold" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="TimeUnits">
+      <EntityTypeMapping TypeName="ChronozoomModel.TimeUnit">
+        <MappingFragment StoreEntitySet="TimeUnit">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="TimeUnit1" ColumnName="TimeUnit" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Users">
+      <EntityTypeMapping TypeName="ChronozoomModel.User">
+        <MappingFragment StoreEntitySet="User">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="RoleID" ColumnName="RoleID" />
+          <ScalarProperty Name="EmailAddress" ColumnName="EmailAddress" />
+          <ScalarProperty Name="LastName" ColumnName="LastName" />
+          <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+          <ScalarProperty Name="Password" ColumnName="Password" />
+          <ScalarProperty Name="UserName" ColumnName="UserName" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="CitationTypes">
+      <EntityTypeMapping TypeName="ChronozoomModel.CitationType">
+        <MappingFragment StoreEntitySet="CitationType">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="CitationType1" ColumnName="CitationType" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Exhibits">
+      <EntityTypeMapping TypeName="ChronozoomModel.Exhibit">
+        <MappingFragment StoreEntitySet="Exhibit">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+          <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+          <ScalarProperty Name="TimeUnitID" ColumnName="TimeUnitID" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="ContentYear" ColumnName="ContentYear" />
+          <ScalarProperty Name="ContentDate" ColumnName="ContentDate" />
+          <ScalarProperty Name="RegimeID" ColumnName="RegimeID" />
+          <ScalarProperty Name="ThresholdID" ColumnName="ThresholdID" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ExhibitContentItems">
+      <EntityTypeMapping TypeName="ChronozoomModel.ExhibitContentItem">
+        <MappingFragment StoreEntitySet="ExhibitContentItem">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="Order" ColumnName="Order" />
+          <ScalarProperty Name="ContentItemID" ColumnName="ContentItemID" />
+          <ScalarProperty Name="ExhibitID" ColumnName="ExhibitID" />
+          <ScalarProperty Name="ExhibitContentItemID" ColumnName="ExhibitContentItemID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ExhibitKeywords">
+      <EntityTypeMapping TypeName="ChronozoomModel.ExhibitKeyword">
+        <MappingFragment StoreEntitySet="ExhibitKeyword">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="KeywordID" ColumnName="KeywordID" />
+          <ScalarProperty Name="ExhibitID" ColumnName="ExhibitID" />
+          <ScalarProperty Name="ExhibitKeywordID" ColumnName="ExhibitKeywordID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="References">
+      <EntityTypeMapping TypeName="ChronozoomModel.Reference">
+        <MappingFragment StoreEntitySet="Reference">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="Source" ColumnName="Source" />
+          <ScalarProperty Name="PublicationDates" ColumnName="PublicationDates" />
+          <ScalarProperty Name="Publication" ColumnName="Publication" />
+          <ScalarProperty Name="PageNumbers" ColumnName="PageNumbers" />
+          <ScalarProperty Name="CitationTypeID" ColumnName="CitationTypeID" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="BookChapters" ColumnName="BookChapters" />
+          <ScalarProperty Name="Authors" ColumnName="Authors" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ReferenceKeywords">
+      <EntityTypeMapping TypeName="ChronozoomModel.ReferenceKeyword">
+        <MappingFragment StoreEntitySet="ReferenceKeyword">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="KeywordID" ColumnName="KeywordID" />
+          <ScalarProperty Name="ReferenceID" ColumnName="ReferenceID" />
+          <ScalarProperty Name="ReferenceKeywordID" ColumnName="ReferenceKeywordID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Timelines">
+      <EntityTypeMapping TypeName="ChronozoomModel.Timeline">
+        <MappingFragment StoreEntitySet="Timeline">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="Height" ColumnName="Height" />
+          <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+          <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+          <ScalarProperty Name="Attribution" ColumnName="Attribution" />
+          <ScalarProperty Name="SourceURL" ColumnName="SourceURL" />
+          <ScalarProperty Name="ToTimeUnit" ColumnName="ToTimeUnit" />
+          <ScalarProperty Name="FromTimeUnit" ColumnName="FromTimeUnit" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="ParentTimelineID" ColumnName="ParentTimelineID" />
+          <ScalarProperty Name="ToContentYear" ColumnName="ToContentYear" />
+          <ScalarProperty Name="ToContentDate" ColumnName="ToContentDate" />
+          <ScalarProperty Name="FromContentYear" ColumnName="FromContentYear" />
+          <ScalarProperty Name="FromContentDate" ColumnName="FromContentDate" />
+          <ScalarProperty Name="RegimeID" ColumnName="RegimeID" />
+          <ScalarProperty Name="ThresholdID" ColumnName="ThresholdID" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="TimelineExhibits">
+      <EntityTypeMapping TypeName="ChronozoomModel.TimelineExhibit">
+        <MappingFragment StoreEntitySet="TimelineExhibit">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="ExhibitID" ColumnName="ExhibitID" />
+          <ScalarProperty Name="TimelineID" ColumnName="TimelineID" />
+          <ScalarProperty Name="TimelineExhibitID" ColumnName="TimelineExhibitID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="BookMarks">
+      <EntityTypeMapping TypeName="ChronozoomModel.BookMark">
+        <MappingFragment StoreEntitySet="BookMark">
+          <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="Description" ColumnName="Description" />
+          <ScalarProperty Name="LapseTime" ColumnName="LapseTime" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="URL" ColumnName="URL" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Tours">
+      <EntityTypeMapping TypeName="ChronozoomModel.Tour">
+        <MappingFragment StoreEntitySet="Tour">
+          <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+          <ScalarProperty Name="Category" ColumnName="Category" />
+          <ScalarProperty Name="AudioBlobUrl" ColumnName="AudioBlobUrl" />
+          <ScalarProperty Name="UniqueID" ColumnName="UniqueID" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="TourBookmarks">
+      <EntityTypeMapping TypeName="ChronozoomModel.TourBookmark">
+        <MappingFragment StoreEntitySet="TourBookmark">
+          <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="SequenceNumber" ColumnName="SequenceNumber" />
+          <ScalarProperty Name="BookmarkID" ColumnName="BookmarkID" />
+          <ScalarProperty Name="TourID" ColumnName="TourID" />
+          <ScalarProperty Name="TourBookmarkID" ColumnName="TourBookmarkID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ExhibitReferenceEntities">
+      <EntityTypeMapping TypeName="ChronozoomModel.ExhibitReferenceEntity">
+        <MappingFragment StoreEntitySet="ExhibitReference">
+          <ScalarProperty Name="CurrVersion" ColumnName="CurrVersion" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+          <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+          <ScalarProperty Name="Order" ColumnName="Order" />
+          <ScalarProperty Name="ReferenceID" ColumnName="ReferenceID" />
+          <ScalarProperty Name="ExhibitID" ColumnName="ExhibitID" />
+          <ScalarProperty Name="ExhibitReferenceID" ColumnName="ExhibitReferenceID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <FunctionImportMapping FunctionImportName="GenerateVersion" FunctionName="ChronozoomModel.Store.GenerateVersion" />
+    <FunctionImportMapping FunctionImportName="Publish" FunctionName="ChronozoomModel.Store.Publish" />
+    <FunctionImportMapping FunctionImportName="RollToVersion" FunctionName="ChronozoomModel.Store.RollToVersion" />
+    <EntitySetMapping Name="CZSystemVersions">
+      <EntityTypeMapping TypeName="ChronozoomModel.CZSystemVersion">
+        <MappingFragment StoreEntitySet="CZSystemVersion">
+          <ScalarProperty Name="CZSystemVersionID" ColumnName="CZSystemVersionID" />
+          <ScalarProperty Name="ProdVersion" ColumnName="ProdVersion" />
+          <ScalarProperty Name="StagingVersion" ColumnName="StagingVersion" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="CZVersions">
+      <EntityTypeMapping TypeName="ChronozoomModel.CZVersion">
+        <MappingFragment StoreEntitySet="CZVersion">
+          <ScalarProperty Name="CZVersionID" ColumnName="CZVersionID" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="UserID" ColumnName="UserID" />
+          <ScalarProperty Name="PublishDate" ColumnName="PublishDate" />
+          <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+          <ScalarProperty Name="VersionNumber" ColumnName="VersionNumber" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>

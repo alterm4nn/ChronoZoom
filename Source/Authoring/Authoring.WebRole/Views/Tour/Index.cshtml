@@ -1,0 +1,99 @@
+﻿@model IEnumerable<Authoring.WebRole.Models.Tour>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Tour - Index</h2>
+
+<p>
+    @if (ViewBag.write)
+    {
+        @Html.ActionLink("Create New", "Create")
+    }
+</p>
+<table>
+    <tr>
+        <th></th>
+        <th>
+            Name
+        </th>
+         <th>
+            Category
+        </th>
+        <th>
+            Sequence
+        </th>
+       <th>
+            AudioBlobUrl
+        </th>
+       <th>
+            IsVisible
+        </th>
+       <th>
+            CreatedBy
+        </th>
+        <th>
+            CreatedOn
+        </th>
+        <th>
+            ModifiedBy
+        </th>
+         <th>
+            ModifiedOn
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+      <td>
+        @if(ViewBag.delete) 
+        {
+            @Html.ActionLink("Edit", "Edit", new { id=item.ID })  
+            @String.Format("{0}", "|");
+            @Html.ActionLink("Details", "Details", new { id=item.ID }) 
+            @String.Format("{0}", "|");
+            @Html.ActionLink("Delete", "Delete", new { id = item.ID })
+        }
+        else if (ViewBag.write)
+        {
+            @Html.ActionLink("Edit", "Edit", new { id = item.ID }) 
+            @String.Format("{0}", "|");
+            @Html.ActionLink("Details", "Details", new { id = item.ID })
+        }
+        else if (ViewBag.read)
+        { 
+            @Html.ActionLink("Details", "Details", new { id = item.ID })
+        }            
+      </td>
+      <td>
+            @Html.DisplayFor(modelItem => item.Name)
+        </td>
+         <td>
+            @Html.DisplayFor(modelItem => item.Category)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Sequence)
+        </td>
+       <td>
+            @Html.DisplayFor(modelItem => item.AudioBlobUrl)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IsVisible)
+        </td>
+         <td>
+            @Html.DisplayFor(modelItem => item.User.UserName)
+        </td>
+         <td>
+            @Html.DisplayFor(modelItem => item.CreatedOn)
+        </td>
+         <td>
+            @Html.DisplayFor(modelItem => item.User1.UserName)
+        </td>
+         <td>
+            @Html.DisplayFor(modelItem => item.ModifiedOn)
+        </td>
+   </tr>
+}
+
+</table>

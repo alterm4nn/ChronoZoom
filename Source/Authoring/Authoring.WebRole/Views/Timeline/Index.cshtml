@@ -1,0 +1,170 @@
+﻿@model IEnumerable<Authoring.WebRole.Models.Timeline>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Timeline - Index</h2>
+    @if (ViewBag.write)
+    {
+        <p>To mass upload Timeline data, please select the excel file and click the "Upload!" button.</p>
+        using (@Html.BeginForm("UploadTimeline", "Upload", FormMethod.Post, new Dictionary<string, object> { { "enctype", "multipart/form-data" } }))
+        {
+            <input type="file" id="excelFile" name="excelFile" />
+            <input type="submit" value="Upload!" />
+        }
+        if (ViewBag.ExcelUploadError != null && !string.IsNullOrEmpty(ViewBag.ExcelUploadError))
+        {
+            <p style="color:red">
+            The following rows failed to upload:
+            @ViewBag.ExcelUploadError;
+            </p>
+        }
+        <p>
+                @Html.ActionLink("Create New", "Create")
+        </p>
+    }
+<table>
+    <tr style="width:700px;">
+        <th></th>
+        <th>
+            IsVisible
+        </th>
+        <th>
+            Title
+        </th>
+        <th>
+            Threshold
+        </th>
+        <th>
+            Regime
+        </th>
+        <th>
+            Height
+        </th>
+        <th>
+            FromContentDate
+        </th>
+        <th>
+            FromContentYear
+        </th>
+        <th>
+            FromTimeUnit
+        </th>
+        <th>
+            ToContentDate
+        </th>
+        <th>
+            ToContentYear
+        </th>
+        <th>
+            ToTimeUnit
+        </th>
+        <th>
+            Timeline2
+        </th>
+        <th>
+            SourceURL
+        </th>
+        <th>
+            Attribution
+        </th>
+       <th>
+            CreatedBy
+        </th>
+        <th>
+            CreatedOn
+        </th>
+        <th>
+            ModifiedBy
+        </th>
+         <th>
+            ModifiedOn
+        </th>
+</tr>
+
+@foreach (var item in Model)
+{
+    <tr style="width:700px;">
+        <td>
+        @if (ViewBag.delete)
+        {
+            @Html.ActionLink("Edit", "Edit", new { id = item.ID })  
+            @String.Format("{0}", "|");
+            @Html.ActionLink("Copy", "CreateFromCopy", new { id = item.ID }) 
+            @String.Format("{0}", "|");
+            @Html.ActionLink("Details", "Details", new { id = item.ID }) 
+            @String.Format("{0}", "|");
+            @Html.ActionLink("Delete", "Delete", new { id = item.ID })
+        }
+        else if (ViewBag.write)
+        {
+            @Html.ActionLink("Edit", "Edit", new { id = item.ID }) 
+            @String.Format("{0}", "|");
+            @Html.ActionLink("Copy", "CreateFromCopy", new { id = item.ID }) 
+            @String.Format("{0}", "|");
+            @Html.ActionLink("Details", "Details", new { id = item.ID })
+        }
+        else if (ViewBag.read)
+        { 
+            @Html.ActionLink("Details", "Details", new { id = item.ID })
+        }            
+        </td>
+         <td>
+            @Html.DisplayFor(modelItem => item.IsVisible)
+        </td>
+       <td>
+            @Html.DisplayFor(modelItem => item.Title)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Threshold.Threshold1)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Regime.Regime1)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Height)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.FromContentDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.FromContentYear)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.TimeUnit.TimeUnit1)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ToContentDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ToContentYear)
+        </td>
+         <td>
+            @Html.DisplayFor(modelItem => item.TimeUnit1.TimeUnit1)
+        </td>
+       <td>
+            @Html.DisplayFor(modelItem => item.Timeline2.Title)
+        </td>
+         <td>
+         <a href="@(item.SourceURL)" target="_blank" >@item.SourceURL</a>
+        </td>    
+         <td>
+            @Html.DisplayFor(modelItem => item.Attribution)
+        </td>
+         <td>
+            @Html.DisplayFor(modelItem => item.User.UserName)
+        </td>
+         <td>
+            @Html.DisplayFor(modelItem => item.CreatedOn)
+        </td>
+         <td>
+            @Html.DisplayFor(modelItem => item.User1.UserName)
+        </td>
+         <td>
+            @Html.DisplayFor(modelItem => item.ModifiedOn)
+        </td>
+  </tr>
+}
+
+</table>

@@ -1,0 +1,73 @@
+﻿+@model Authoring.WebRole.Models.Keyword
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Keyword - Create</h2>
+
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+    <fieldset>
+        <legend>Keyword</legend>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Keyword1)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Keyword1)
+            @Html.ValidationMessageFor(model => model.Keyword1)
+        </div>
+
+        <div class="editor-label" style="display:none;">
+            @Html.LabelFor(model => model.CreatedBy, "User")
+        </div>
+        <div class="editor-field" style="display:none;">
+            @Html.DropDownList("CreatedBy", String.Empty)
+            @Html.ValidationMessageFor(model => model.CreatedBy)
+        </div>
+
+        <div class="editor-label" style="display:none;">
+            @Html.LabelFor(model => model.ModifiedBy, "User1")
+        </div>
+        <div class="editor-field" style="display:none;">
+            @Html.DropDownList("ModifiedBy", String.Empty)
+            @Html.ValidationMessageFor(model => model.ModifiedBy)
+        </div>
+
+        <div class="editor-label" style="display:none;">
+            @Html.LabelFor(model => model.CreatedOn)
+        </div>
+        <div class="editor-field" style="display:none;">
+            @Html.EditorFor(model => model.CreatedOn)
+            @Html.ValidationMessageFor(model => model.CreatedOn)
+        </div>
+
+        <div class="editor-label" style="display:none;">
+            @Html.LabelFor(model => model.ModifiedOn)
+        </div>
+        <div class="editor-field" style="display:none;">
+            @Html.EditorFor(model => model.ModifiedOn)
+            @Html.ValidationMessageFor(model => model.ModifiedOn)
+        </div>
+
+        <div class="editor-label" style="display:none;">
+            @Html.LabelFor(model => model.IsDeleted)
+        </div>
+        <div class="editor-field" style="display:none;">
+            @Html.EditorFor(model => model.IsDeleted)
+            @Html.ValidationMessageFor(model => model.IsDeleted)
+        </div>
+
+        <p>
+            <input type="submit" value="Create" />
+        </p>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>

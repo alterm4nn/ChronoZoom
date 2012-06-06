@@ -1,0 +1,28 @@
+﻿@model Authoring.WebRole.Models.Tour
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Tour - Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<fieldset>
+    <legend>Tour</legend>
+
+    <div class="display-label">Name</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Name)
+    </div>
+
+    <div class="display-label">AudioBlobUrl</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.AudioBlobUrl)
+    </div>
+</fieldset>
+@using (Html.BeginForm()) {
+    <p>
+        <input type="submit" value="Delete" /> |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+}
