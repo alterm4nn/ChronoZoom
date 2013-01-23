@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2010
+# Visual Studio 2012
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{985BCC3A-CD3E-4FCC-AAC4-754EB0192EC8}"
 	ProjectSection(SolutionItems) = preProject
 		Chronozoom.vsmdi = Chronozoom.vsmdi
@@ -28,7 +28,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThumbGenApp", "ThumbGen\Thu
 EndProject
 Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "Chronozoom.Azure", "Chronozoom.Azure\Chronozoom.Azure.ccproj", "{8E338D8F-37D9-43BA-A72A-CDA37FED0EAF}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "ThumbGenInstaller", "ThumbGenInstaller\ThumbGenInstaller.vdproj", "{382A1E3B-D8BC-496C-8078-1A37CCCE6221}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{83B2C810-867C-4DE4-9F2A-50DA4944E555}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
@@ -296,12 +301,12 @@ Global
 		{5B3FB17F-E68B-467D-861B-0CF5C91C2AA7}.Staging|Mixed Platforms.Build.0 = Staging|x86
 		{5B3FB17F-E68B-467D-861B-0CF5C91C2AA7}.Staging|x86.ActiveCfg = Staging|x86
 		{5B3FB17F-E68B-467D-861B-0CF5C91C2AA7}.Staging|x86.Build.0 = Staging|x86
-		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Debug|x86.ActiveCfg = Debug|x86
-		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Debug|x86.Build.0 = Debug|x86
+		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Debug|Any CPU.ActiveCfg = DevPreview|Any CPU
+		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Debug|Any CPU.Build.0 = DevPreview|Any CPU
+		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Debug|Mixed Platforms.ActiveCfg = DevPreview|x86
+		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Debug|Mixed Platforms.Build.0 = DevPreview|x86
+		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Debug|x86.ActiveCfg = DevPreview|x86
+		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Debug|x86.Build.0 = DevPreview|x86
 		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.DevPreview|Any CPU.ActiveCfg = DevPreview|Any CPU
 		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.DevPreview|Any CPU.Build.0 = DevPreview|Any CPU
 		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.DevPreview|Mixed Platforms.ActiveCfg = DevPreview|Any CPU
@@ -314,12 +319,12 @@ Global
 		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Production|Mixed Platforms.Build.0 = Production|Any CPU
 		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Production|x86.ActiveCfg = Production|x86
 		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Production|x86.Build.0 = Production|x86
-		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Release|Any CPU.Build.0 = Debug|Any CPU
-		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Release|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Release|Mixed Platforms.Build.0 = Debug|Any CPU
-		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Release|x86.ActiveCfg = Debug|x86
-		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Release|x86.Build.0 = Debug|x86
+		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Release|Any CPU.ActiveCfg = Staging|Any CPU
+		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Release|Any CPU.Build.0 = Staging|Any CPU
+		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Release|Mixed Platforms.ActiveCfg = Staging|x86
+		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Release|Mixed Platforms.Build.0 = Staging|x86
+		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Release|x86.ActiveCfg = Staging|x86
+		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Release|x86.Build.0 = Staging|x86
 		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Sandbox|Any CPU.ActiveCfg = Sandbox|Any CPU
 		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Sandbox|Mixed Platforms.ActiveCfg = Sandbox|Any CPU
 		{7801AD45-318D-4942-8759-3D1C1CAD1E06}.Sandbox|Mixed Platforms.Build.0 = Sandbox|Any CPU
@@ -361,24 +366,6 @@ Global
 		{8E338D8F-37D9-43BA-A72A-CDA37FED0EAF}.Staging|Mixed Platforms.ActiveCfg = Staging|Any CPU
 		{8E338D8F-37D9-43BA-A72A-CDA37FED0EAF}.Staging|Mixed Platforms.Build.0 = Staging|Any CPU
 		{8E338D8F-37D9-43BA-A72A-CDA37FED0EAF}.Staging|x86.ActiveCfg = Staging|Any CPU
-		{382A1E3B-D8BC-496C-8078-1A37CCCE6221}.Debug|Any CPU.ActiveCfg = Debug
-		{382A1E3B-D8BC-496C-8078-1A37CCCE6221}.Debug|Mixed Platforms.ActiveCfg = Debug
-		{382A1E3B-D8BC-496C-8078-1A37CCCE6221}.Debug|x86.ActiveCfg = Debug
-		{382A1E3B-D8BC-496C-8078-1A37CCCE6221}.DevPreview|Any CPU.ActiveCfg = Debug
-		{382A1E3B-D8BC-496C-8078-1A37CCCE6221}.DevPreview|Mixed Platforms.ActiveCfg = Debug
-		{382A1E3B-D8BC-496C-8078-1A37CCCE6221}.DevPreview|x86.ActiveCfg = Debug
-		{382A1E3B-D8BC-496C-8078-1A37CCCE6221}.Production|Any CPU.ActiveCfg = Release
-		{382A1E3B-D8BC-496C-8078-1A37CCCE6221}.Production|Mixed Platforms.ActiveCfg = Release
-		{382A1E3B-D8BC-496C-8078-1A37CCCE6221}.Production|x86.ActiveCfg = Release
-		{382A1E3B-D8BC-496C-8078-1A37CCCE6221}.Release|Any CPU.ActiveCfg = Release
-		{382A1E3B-D8BC-496C-8078-1A37CCCE6221}.Release|Mixed Platforms.ActiveCfg = Release
-		{382A1E3B-D8BC-496C-8078-1A37CCCE6221}.Release|x86.ActiveCfg = Release
-		{382A1E3B-D8BC-496C-8078-1A37CCCE6221}.Sandbox|Any CPU.ActiveCfg = Release
-		{382A1E3B-D8BC-496C-8078-1A37CCCE6221}.Sandbox|Mixed Platforms.ActiveCfg = Release
-		{382A1E3B-D8BC-496C-8078-1A37CCCE6221}.Sandbox|x86.ActiveCfg = Release
-		{382A1E3B-D8BC-496C-8078-1A37CCCE6221}.Staging|Any CPU.ActiveCfg = Release
-		{382A1E3B-D8BC-496C-8078-1A37CCCE6221}.Staging|Mixed Platforms.ActiveCfg = Release
-		{382A1E3B-D8BC-496C-8078-1A37CCCE6221}.Staging|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
