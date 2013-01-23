@@ -43,7 +43,7 @@ namespace Chronozoom.Test.TourTests
             IJavaScriptExecutor js = Driver as IJavaScriptExecutor;
 
             Thread.Sleep(2000);
-            js.ExecuteScript("activateTour(tours[0]);"); // running test tour
+            js.ExecuteScript("activateTour(tours[3]);"); // running test tour
             Thread.Sleep(500);
 
             var state1 = js.ExecuteScript("return {state: tour.state};") as Dictionary<string, object>;
@@ -76,7 +76,7 @@ namespace Chronozoom.Test.TourTests
         {
             IJavaScriptExecutor js = Driver as IJavaScriptExecutor;
 
-            js.ExecuteScript("activateTour(tours[0]);"); // running test tour
+            js.ExecuteScript("activateTour(tours[3]);"); // running test tour
             Thread.Sleep(500);
 
             js.ExecuteScript("tourPause()"); // pausing tour
@@ -125,15 +125,17 @@ namespace Chronozoom.Test.TourTests
         public void TestTourTextOnOff()
         {
             IJavaScriptExecutor js = Driver as IJavaScriptExecutor;
-            if (js == null) throw (new NullReferenceException());
+            if (js == null) Assert.Fail("err: Cannot start selenium.");
             Thread.Sleep(2000);
 
             // On tour start, show bookmark info window
-            js.ExecuteScript("activateTour(tours[1], true);");
+            js.ExecuteScript("onTourClicked();");
+            // Start Life Tour with narration
+            js.ExecuteScript("activateTour(tours[$('.item').filter(function(idx) { return this.innerHTML == 'Life Tour'; }).attr('tour')], true);");
             Thread.Sleep(2000);
 
             var state = js.ExecuteScript("return {isVisible: isBookmarksWindowVisible};") as Dictionary<string, object>;
-            if (state == null) throw (new NullReferenceException());
+            if (state == null) Assert.Fail("err: Cannot find property 'isBookmarksWindowVisible'.");
 
             Assert.AreEqual(true, Convert.ToBoolean(state["isVisible"]), "err: Tour caption not visible on tour start.");
 
@@ -142,7 +144,7 @@ namespace Chronozoom.Test.TourTests
             Thread.Sleep(2000);
 
             state = js.ExecuteScript("return {isExpanded: isBookmarksWindowExpanded};") as Dictionary<string, object>;
-            if (state == null) throw (new NullReferenceException());
+            if (state == null) Assert.Fail("err: Cannot find property 'isBookmarksWindowExpanded'.");
 
             Assert.AreEqual(false, Convert.ToBoolean(state["isExpanded"]), "err: Tour caption cannot be collapsed.");
 
@@ -151,7 +153,7 @@ namespace Chronozoom.Test.TourTests
             Thread.Sleep(2000);
 
             state = js.ExecuteScript("return {isExpanded: isBookmarksWindowExpanded};") as Dictionary<string, object>;
-            if (state == null) throw (new NullReferenceException());
+            if (state == null) Assert.Fail("err: Cannot find property 'isBookmarksWindowExpanded'.");
 
             Assert.AreEqual(true, Convert.ToBoolean(state["isExpanded"]), "err: Tour caption cannot be expanded.");
 
@@ -160,7 +162,7 @@ namespace Chronozoom.Test.TourTests
             Thread.Sleep(2000);
 
             state = js.ExecuteScript("return {isVisible: isBookmarksWindowVisible};") as Dictionary<string, object>;
-            if (state == null) throw (new NullReferenceException());
+            if (state == null) Assert.Fail("err: Cannot find property 'isBookmarksWindowVisible'.");
 
             Assert.AreEqual(false, Convert.ToBoolean(state["isVisible"]), "err: Tour caption not hidden on tour end.");
         }

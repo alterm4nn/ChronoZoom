@@ -13,6 +13,8 @@ var tourBookmarkTransitionInterrupted;
 
 var pauseTourAtAnyAnimation = false;
 
+var bookmarkAnimation; // current animation of bookmark' description text sliding
+
 var isToursDebugEnabled = false; // enables rebug output
 
 /* TourBookmark represents a place in the virtual space with associated audio.
@@ -77,9 +79,7 @@ function Tour(title, bookmarks, zoomTo, vc, category, audioBlobUrl, sequenceNum)
         return b1.lapseTime - b2.lapseTime;
     });
 
-    var audio;
-
-    ReinitializeAudio();
+    var audio; // audio element of this tour
 
     isTourPlayRequested = false;
 
@@ -92,14 +92,17 @@ function Tour(title, bookmarks, zoomTo, vc, category, audioBlobUrl, sequenceNum)
 
     var timerOnBookmarkIsOver;  // timer id which is set for bookmark complete event (stored to be able to cancel it if paused)
 
-    var onBookmarkIsOver = function (goBack) { // bookmark playback is over
-        // the function is called only when state is play and currentPlace is bookmark.        
+    /*
+    Raises that bookmark playback is over. Called only if state is "play" and currentPlace is bookmark
+    @param goBack (boolen) specifies the direction to move (prev - true, next - false)
+    */
+    var onBookmarkIsOver = function (goBack) {    
 
-        var bookmark = self.bookmarks[self.currentPlace.bookmark];
-        bookmark.elapsed = 0;
+        self.bookmarks[self.currentPlace.bookmark].elapsed = 0; // reset bookmark's playback progress
 
         // Going to the next bookmark if we are not at the end
         if ((self.currentPlace.bookmark == self.bookmarks.length - 1) && !goBack) {
+            // reset tour state
             self.state = 'pause';
             self.currentPlace = { type: 'goto', bookmark: 0 };
             RaiseTourFinished();
@@ -114,38 +117,47 @@ function Tour(title, bookmarks, zoomTo, vc, category, audioBlobUrl, sequenceNum)
     @param isOn (Boolean) whether the audio is enabled
     */
     this.toggleAudio = function (isOn) {
-        if (isOn) {
+        if (isOn)
             isAudioEnabled = true;
-        }
         else
             isAudioEnabled = false;
     }
 
-    function ReinitializeAudio() {
+    this.ReinitializeAudio = function () {
+        // stop audio playback and clear audio element
         if (audio) {
             audio.pause();
         }
         audio = undefined;
+
         isAudioLoaded = false;
+        // reinitialize audio element
         audio = document.createElement('audio');
-        audio.onloadedmetadata = function () {
+
+        audio.addEventListener("loadedmetadata", function () {
             if (audio.duration != Infinity)
                 bookmarks[bookmarks.length - 1].duration = audio.duration - bookmarks[bookmarks.length - 1].lapseTime; //overriding the last bookmark duration
             if (isToursDebugEnabled && window.console && console.log("Tour " + self.title + " metadata loaded (readystate 1)"));
-        }
-        audio.oncanplaythrough = function () {
+        });
+        audio.addEventListener("canplaythrough", function () {
+            // audio track is fully loaded
+            self.isAudioLoaded = true;
+
             if (isToursDebugEnabled && window.console && console.log("Tour " + self.title + " readystate 4"));
-        }
-        audio.onprogress = function () {
+        });
+        audio.addEventListener("progress", function () {
             if (audio.buffered.length > 0)
                 if (isToursDebugEnabled && window.console && console.log("Tour " + self.title + " downloaded " + (audio.buffered.end(audio.buffered.length - 1) / audio.duration)));
-        }
+        });
 
         audio.controls = false;
         audio.autoplay = false;
         audio.loop = false;
         audio.volume = 1;
 
+        audio.preload = "none";
+
+        // add audio sources of different audio file extensions for audio element
         var blobPrefix = audioBlobUrl.substring(0, audioBlobUrl.length - 3);
         for (var i = 0; i < toursAudioFormats.length; i++) {
             var audioSource = document.createElement("Source");
@@ -155,43 +167,65 @@ function Tour(title, bookmarks, zoomTo, vc, category, audioBlobUrl, sequenceNum)
             audio.appendChild(audioSource);
         }
 
-        audio.preload = "auto";
         audio.load();
         if (isToursDebugEnabled && window.console && console.log("Loading of tour " + self.title + " is queued"));
     }
 
 
     /*
-    Moves the tour to the next or to the rev bookmark activating elliptical zoom
-    @param goBack (boolen) specifies the direction to move
+    Moves the tour to the next or to the prev bookmark activating elliptical zoom
+    @param goBack (boolen) specifies the direction to move (prev - true, next - false)
     */
     var goToTheNextBookmark = function (goBack) {
         var newBookmark = self.currentPlace.bookmark;
         var oldBookmark = newBookmark;
+        
+        // calculate index of new bookmark in array of bookmarks
         if (goBack) {
             newBookmark = Math.max(0, newBookmark - 1);
         }
         else {
             newBookmark = Math.min(self.bookmarks.length - 1, newBookmark + 1);
         }
-        self.currentPlace = { type: 'goto', bookmark: newBookmark };
 
+        // raise bookmark finished callback functions
         RaiseBookmarkFinished(oldBookmark);
 
-        bookmark = self.bookmarks[self.currentPlace.bookmark]; // next bookmark
-        if (isAudioEnabled && newBookmark != 0 && self.state === 'play') {
-            startBookmarkAudio(bookmark);
+        // change current position in tour and start EllipticalZoom animation
+        self.currentPlace = { type: 'goto', bookmark: newBookmark };
+
+        var bookmark = self.bookmarks[self.currentPlace.bookmark]; // next bookmark
+
+        // activate bookmark & audio naration if required
+        if (newBookmark != 0){
+            RaiseBookmarkStarted(bookmark);
+
+            // start audio narration
+            if (isAudioEnabled && self.state === 'play' && self.isAudioLoaded == true)
+                startBookmarkAudio(bookmark);
+            
         }
-        if (self.state != 'pause')
+
+        // initialize bookmark's timer
+        if (self.state != 'pause' && self.isAudioLoaded == true)
             setTimer(bookmark);
 
         if (isToursDebugEnabled && window.console && console.log("Transitioning to the bm index " + newBookmark));
+
+        // start new EllipticalZoom animation if needed
         self.currentPlace.animationID = zoomTo(getBookmarkVisible(bookmark), onGoToSuccess, onGoToFailure, bookmark.url);
     }
 
+    /*
+    Resumes/starts audio narration for bookmark.
+    @param bookmark         (bookmark) bookmark which audio narration part should be played.
+    */
     function startBookmarkAudio(bookmark) {
         if (isToursDebugEnabled && window.console && console.log("playing source: " + audio.currentSrc));
+
         audio.pause();
+
+        // set audio track's time to time when this bookmark was paused (beginning of bookmark if it wasn't paused)
         try {
             audio.currentTime = bookmark.lapseTime + bookmark.elapsed;
             if (isToursDebugEnabled && window.console && console.log("audio currentTime is set to " + (bookmark.lapseTime + bookmark.elapsed)));
@@ -199,25 +233,33 @@ function Tour(title, bookmarks, zoomTo, vc, category, audioBlobUrl, sequenceNum)
         catch (ex) {
             if (window.console && console.error("currentTime assignment: " + ex));
         }
-        //if (audio.paused || audio.ended) {
+
         if (isToursDebugEnabled && window.console && console.log("audio element is forced to play"));
+
         audio.play();
-        //}
     }
 
     /*
-    sets up the transition to the next bookmark timer. resets the currently active one
+    Sets up the transition to the next bookmark timer. Resets the currently active one.
     */
     function setTimer(bookmark) {
+        // clear active timer
         if (timerOnBookmarkIsOver) {
-            clearTimeout(timerOnBookmarkIsOver);            
+            clearTimeout(timerOnBookmarkIsOver);
         }
+
+        // calculate time to the end of active bookmark
         var duration = bookmark.duration;
         if (bookmark.elapsed != 0) {
             duration = Math.max(duration - bookmark.elapsed, 0);
         }
+
+        // save start time
         self.currentPlace.startTime = new Date().getTime();
+
         if (isToursDebugEnabled && window.console && console.log("transition to next bookmark will be in " + duration + " seconds"));
+
+        // activate new timer
         timerOnBookmarkIsOver = setTimeout(onBookmarkIsOver, duration * 1000 /* ms */);
     }
 
@@ -227,23 +269,35 @@ function Tour(title, bookmarks, zoomTo, vc, category, audioBlobUrl, sequenceNum)
         if (!self.currentPlace || self.currentPlace.animationID == undefined || self.currentPlace.animationID != animationID) // callback is obsolete
             return;
 
-        if (self.state === 'pause') {
-            var bookmark = self.bookmarks[self.currentPlace.bookmark];
-            RaiseBookmarkStarted(bookmark);
-            return;
-        }
-        self.currentPlace = { type: 'bookmark', bookmark: self.currentPlace.bookmark };
+        var curURL = getURL();
+        if (typeof curURL.hash.params == 'undefined')
+            curURL.hash.params = new Array();
+        curURL.hash.params["tour"] = tour.sequenceNum;
+        //curURL.hash.params["bookmark"] = self.currentPlace.bookmark+1;
 
-        var bookmark = self.bookmarks[self.currentPlace.bookmark];
+        //This flag is used to overcome hashchange event handler
+        hashHandle = false;
+        setURL(curURL);
 
         if (isToursDebugEnabled && window.console && console.log("reached the bookmark index " + self.currentPlace.bookmark));
-        RaiseBookmarkStarted(bookmark);
 
-        if (self.currentPlace.bookmark == 0) //start the audio after the transition to the first bookmark
-        {
-            setTimer(bookmark);
-            if (isAudioEnabled)
-                startBookmarkAudio(bookmark);
+        self.currentPlace = { type: 'bookmark', bookmark: self.currentPlace.bookmark };
+
+        //start the audio after the transition to the first bookmark if not paused
+        if (self.currentPlace.bookmark == 0) {
+            // raise bookmark started callback functions
+            var bookmark = self.bookmarks[self.currentPlace.bookmark];
+            RaiseBookmarkStarted(bookmark);
+
+            if (self.state != 'pause') {
+                if (self.isAudioLoaded != true) // stop tour if audio is not ready yet
+                    tourPause();
+                else { // audio is ready
+                    setTimer(bookmark);
+                    if (isAudioEnabled)
+                        startBookmarkAudio(bookmark);
+                }
+            }
         }
 
     };
@@ -252,11 +306,10 @@ function Tour(title, bookmarks, zoomTo, vc, category, audioBlobUrl, sequenceNum)
         // the function is called only when state is play and currentPlace is goto, otherwise we are paused
         if (!self.currentPlace || self.currentPlace.animationID == undefined || self.currentPlace.animationID != animationID) // callback is obsolete
             return;
-        self.state = 'pause';
-        if (isAudioEnabled) {
-            if (isToursDebugEnabled && window.console && console.log("audio element is forced to pause"));
-            audio.pause();
-        }
+
+        // pause tour
+        self.pause();
+
         if (isToursDebugEnabled && window.console && console.log("tour interrupted by user during transition"));
     };
 
@@ -269,18 +322,51 @@ function Tour(title, bookmarks, zoomTo, vc, category, audioBlobUrl, sequenceNum)
         // first we go to the bookmark and then continue play it
         if (isToursDebugEnabled && window.console && console.log("tour playback activated"));
         this.state = 'play';
-        this.currentPlace = { type: 'goto', bookmark: this.currentPlace.bookmark };
+
+        var visible = vc.virtualCanvas("getViewport").visible;
+
+        if (this.currentPlace != null && this.currentPlace.bookmark != null && compareVisibles(visible, getBookmarkVisible(this.bookmarks[this.currentPlace.bookmark])))
+        // current visible is equal to visible of bookmark
+            this.currentPlace = { type: 'bookmark', bookmark: this.currentPlace.bookmark };
+        else
+        // current visible is not equal to visible of bookmark, animation is required
+            this.currentPlace = { type: 'goto', bookmark: this.currentPlace.bookmark };
+
         var bookmark = this.bookmarks[this.currentPlace.bookmark];
+
+        // indicates if animation to first bookmark is required
         var isInTransitionToFirstBookmark = (this.currentPlace.bookmark == 0 && this.currentPlace.type == 'goto');
-        if (!isInTransitionToFirstBookmark) {
-            setTimer(bookmark);
-            if (isAudioEnabled)
-                startBookmarkAudio(bookmark); //resuming the audio if the tour was paused not in the transition to the first bookmark
+
+        // transition to bookmark is over OR not in process of transition to first bookmark => start bookmark
+        if (this.currentPlace.type == 'bookmark' || this.currentPlace.bookmark != 0) { 
+            RaiseBookmarkStarted(bookmark);
+            
+            // start bookmark' timer & audio narration if audio is ready
+            if (this.isAudioLoaded == true) {
+                setTimer(bookmark);
+                if (isAudioEnabled)
+                    startBookmarkAudio(bookmark);
+            }
         }
+
         this.currentPlace.animationID = zoomTo(getBookmarkVisible(bookmark), onGoToSuccess, onGoToFailure, bookmark.url);
 
+        // raise tourStarted callback functions
         if (this.currentPlace.bookmark === 0 && isInTransitionToFirstBookmark) {
             RaiseTourStarted();
+        }
+
+        var curURL = getURL();
+        if (typeof curURL.hash.params == 'undefined') {
+            curURL.hash.params = new Array();
+        }
+
+        if (typeof curURL.hash.params["tour"] == 'undefined') {
+            curURL.hash.params["tour"] = tour.sequenceNum;
+
+            //This flag is used to overcome hashchange event handler
+            hashHandle = false;
+            setURL(curURL);
         }
     };
 
@@ -291,51 +377,51 @@ function Tour(title, bookmarks, zoomTo, vc, category, audioBlobUrl, sequenceNum)
         if (isAudioEnabled && isTourPlayRequested)
             isTourPlayRequested = false;
 
+        // clear active bookmark timer
         if (timerOnBookmarkIsOver) {
             clearTimeout(timerOnBookmarkIsOver);
             timerOnBookmarkIsOver = undefined;
         }
+
         this.state = 'pause';
         if (isAudioEnabled) {
             audio.pause();
             if (isToursDebugEnabled && window.console && console.log("audio element is forced to pause"));
         }
+
         var bookmark = this.bookmarks[this.currentPlace.bookmark];
+        // save the time when bookmark was paused
         if (this.currentPlace.startTime)
             bookmark.elapsed += (new Date().getTime() - this.currentPlace.startTime) / 1000; // sec
     };
 
     this.next = function () { // goes to the next bookmark
+        // ignore if last bookmark
         if (self.currentPlace.bookmark != bookmarks.length - 1) {
             if (this.state === 'play') {
+                // clear active bookmark timer
                 if (timerOnBookmarkIsOver) clearTimeout(timerOnBookmarkIsOver);
-                timerOnBookmarkIsOver = undefined;     
+                timerOnBookmarkIsOver = undefined;
             }
-            else // 'pause'
-            {
-                var bookmark = this.bookmarks[this.currentPlace.bookmark];
-                bookmark.elapsed = 0;
-            }
+
             onBookmarkIsOver(false); // goes to the next bookmark            
         }
     };
 
     this.prev = function () { // goes to the previous bookmark
-        if (self.currentPlace.bookmark == 0) // this was the final bookmark
+        // ignore if first bookmark
+        if (self.currentPlace.bookmark == 0)
         {
             //self.currentPlace = { type: 'goto', bookmark: 0, animationID: self.currentPlace.animationID };
             return;
         }
         if (this.state === 'play') {
+            // clear active bookmark timer
             if (timerOnBookmarkIsOver) clearTimeout(timerOnBookmarkIsOver);
             timerOnBookmarkIsOver = undefined;
         }
-        else // 'paused'
-        {
-            var bookmark = this.bookmarks[this.currentPlace.bookmark];
-            bookmark.elapsed = 0;
-        }
-        onBookmarkIsOver(true); // goes to the next bookmark
+        
+        onBookmarkIsOver(true); // goes to the prev bookmark
     };
 
     // public properties
@@ -343,6 +429,7 @@ function Tour(title, bookmarks, zoomTo, vc, category, audioBlobUrl, sequenceNum)
         return this.bookmarks[this.currentPlace.bookmark];
     };
 
+    // calls every bookmarkStarted callback function
     function RaiseBookmarkStarted(bookmark) {
         if (self.tour_BookmarkStarted.length > 0) {
             for (var i = 0; i < self.tour_BookmarkStarted.length; i++)
@@ -350,6 +437,7 @@ function Tour(title, bookmarks, zoomTo, vc, category, audioBlobUrl, sequenceNum)
         }
     }
 
+    // calls every bookmarkFinished callback function
     function RaiseBookmarkFinished(bookmark) {
         if (self.tour_BookmarkFinished.length > 0) {
             for (var i = 0; i < self.tour_BookmarkFinished.length; i++)
@@ -357,6 +445,7 @@ function Tour(title, bookmarks, zoomTo, vc, category, audioBlobUrl, sequenceNum)
         }
     }
 
+    // calls every tourStarted callback function
     function RaiseTourStarted() {
         if (self.tour_TourStarted.length > 0) {
             for (var i = 0; i < self.tour_TourStarted.length; i++)
@@ -364,6 +453,7 @@ function Tour(title, bookmarks, zoomTo, vc, category, audioBlobUrl, sequenceNum)
         }
     }
 
+    // calls every tourFinished callback function
     function RaiseTourFinished() {
         if (self.tour_TourFinished.length > 0) {
             for (var i = 0; i < self.tour_TourFinished.length; i++)
@@ -382,33 +472,54 @@ function activateTour(newTour, isAudioEnabled) {
         var tourControlDiv = document.getElementById("tour_control");
         tourControlDiv.style.display = "block";
         tour = newTour;
+        
+        // add new tourFinished callback function
         tour.tour_TourFinished.push(function (tour) {
             hideBookmark(tour);
             tourPause();
             hideBookmarks();
         });
+
         tour.toggleAudio(isAudioEnabled);
+
+        // reset pause time for every bookmark
         for (var i = 0; i < tour.bookmarks.length; i++)
             tour.bookmarks[i].elapsed = 0;
+
+        // reset active tour' bookmark
         tour.currentPlace.bookmark = 0;
+
+        // don't need to load audio if audio narration is off
+        if (isAudioEnabled == true) {
+            tour.ReinitializeAudio();
+            tour.isAudioLoaded = true;
+        }
+        // start a tour
         tourResume();
     }
 }
 
 /*
-Diactivates a tour. Removes all controlls
+Diactivates a tour. Removes all tour controlls.
 */
-function stopTour() {
+function removeActiveTour() {
+    // stop active tour
     tourPause();
     isTourPlayRequested = false;
+
+    // hide tour' UI
     var tourControlDiv = document.getElementById("tour_control");
     tourControlDiv.style.display = "none";
     if (tour) {
         hideBookmarks();
         $("#bookmarks .header").html("");
+
+        // remove audio track
         if (tour.audio)
             tour.audio = undefined;
     }
+
+    // reset active tour
     tour = undefined;
 }
 
@@ -436,8 +547,12 @@ switch the tour in the paused state
 function tourPause() {
     if (tour != undefined) {
         $("#tour_playpause").attr("src", "Images/tour_play_off.jpg");
+
+        // pause tour
         tour.pause();
+        // stop active animation
         controller.stopAnimation();
+        // remove animation callbacks
         tourBookmarkTransitionInterrupted = undefined;
         tourBookmarkTransitionCompleted = undefined;
     }
@@ -462,16 +577,30 @@ function tourPlayPause() {
         else if (tour.state == "play") {
             tourPause();
         }
+
+        //        var curURL = getURL();
+        //        if (typeof curURL.hash.params == 'undefined')
+        //            curURL.hash.params = new Array();
+        //        curURL.hash.params["tour"] = tour.sequenceNum;
+        //        curURL.hash.params["bookmark"] = tour.currentPlace.bookmark + 1;
+        //        setURL(curURL);
+
     }
 }
 
 /*
-Handling of close button click in UI
+Handling of close button click in UI.
 */
 function tourAbort() {
-    stopTour();
+    // close tour and hide all tour' UI elements
+    removeActiveTour();
     $("#bookmarks").hide();
     isBookmarksWindowVisible = false;
+
+    var curURL = getURL();
+    delete curURL.hash.params["tour"];
+    delete curURL.hash.params["bookmark"];
+    setURL(curURL);
 }
 
 
@@ -491,18 +620,27 @@ function initializeToursContent() {
     tours.sort(function (u, v) { return u.sequenceNum - v.sequenceNum });
     var category = null;
     var categoryContent;
+
+    // add every tour in a categoried list in tours panel
     for (var i = 0; i < tours.length; i++) {
         var tour = tours[i];
+
+        // add new bookmarkStarted callback function
         tour.tour_BookmarkStarted.push(function (t, bookmark) {
             showBookmark(t, bookmark);
         });
 
+        // add new bookmarkFinished callback function
         tour.tour_BookmarkFinished.push(function (t, bookmark) {
             hideBookmark(t, bookmark);
         });
 
+        
+        // add new category to tours menu
         if (tour.category !== category) {
             var cat = $('<div class="category">' + tour.category + '</div>').appendTo(toursUI);
+            
+            // add category' UI
             var img = $('<img src="Images/collapse-down.png" class="collapseButton" />').appendTo(cat);
             if (i == 0) {
                 cat.removeClass('category').addClass('categorySelected');
@@ -511,27 +649,37 @@ function initializeToursContent() {
             categoryContent = $('<div class="itemContainer"></div>').appendTo(toursUI);
             category = tour.category;
         }
+
+        // add tour element into category
         $('<div class="item" tour="' + i + '">' + tour.title + '</div>').appendTo(categoryContent)
-                    .click(function () {
-                        stopTour();
+                    .click(function () { // click event handler for added tour element
+                        // close active tour                            
+                        removeActiveTour();
+                        
+                        // hide tour UI
                         $("#tours").hide('slide', {}, 'slow');
                         toggleOffImage('tours_index');
                         isTourWindowVisible = false;
 
+                        // activate selected tour  
                         var mytour = tours[this.getAttribute("tour")];
-
                         activateTour(mytour, isNarrationOn);
+
+                        // deselect previously active tour in tours panel
                         $(".touritem-selected").removeClass("touritem-selected", "slow");
+                        // mark this tour as selected in tours panel
                         $(this).addClass("touritem-selected", "slow");
                     });
     }
 
+    // create jquery widget for category' content sliding
     $("#tours-content").accordion({
         fillSpace: false,
         collapsible: true,
         autoHeight: false
     });
 
+    // binding click at the tour category' expand button
     $("#tours-content").bind("accordionchangestart", function (event, ui) {
         if (ui.newHeader) {
             ui.newHeader.removeClass('category');
@@ -550,14 +698,28 @@ function initializeToursContent() {
     });
 }
 
+/*
+Hides bookmark description text.
+*/
 function hideBookmark(tour) {
     if (isBookmarksWindowExpanded && isBookmarksTextShown) {
-        $("#bookmarks .slideText").hide("drop", {}, 'slow');
+        // end active sliding animation
+        if (bookmarkAnimation)
+            bookmarkAnimation.stop(true, true);
+        
+        // start new animation
+        bookmarkAnimation = $("#bookmarks .slideText").hide("drop", {}, 'slow', function () {
+            bookmarkAnimation = undefined;
+        });
+
         $("#bookmarks .slideHeader").html("");
         isBookmarksTextShown = false;
     }
 }
 
+/*
+Shows bookmark description text.
+*/
 function showBookmark(tour, bookmark) {
     if (!isBookmarksWindowVisible) {
         isBookmarksWindowVisible = true;
@@ -573,7 +735,15 @@ function showBookmark(tour, bookmark) {
     if (isBookmarksWindowExpanded) {
         $("#bookmarks .slideText").html(bookmark.text);
         if (!isBookmarksTextShown) {
-            $("#bookmarks .slideText").show("drop", {}, 'slow');
+
+            // stop active sliding animation
+            if (bookmarkAnimation)
+                bookmarkAnimation.stop(true, true);
+
+            // start new animation
+            bookmarkAnimation = $("#bookmarks .slideText").show("drop", {}, 'slow', function () {
+                bookmarkAnimation = undefined;
+            });
             isBookmarksTextShown = true;
         }
     } else {
@@ -581,11 +751,17 @@ function showBookmark(tour, bookmark) {
     }
 }
 
+/*
+Closes bookmark description window.
+*/
 function hideBookmarks() {
     $("#bookmarks").hide();
     isBookmarksWindowVisible = false;
 }
 
+/*
+Tours button handler.
+*/
 function onTourClicked() {
     if (isSearchWindowVisible)
         onSearchClicked();
@@ -612,6 +788,9 @@ function tourButtonHighlight(isOn) {
     }
 }
 
+/*
+Collapses bookmark description window. 
+*/
 function collapseBookmarks() {
     if (!isBookmarksWindowExpanded) return;
     isBookmarksWindowExpanded = false;
@@ -623,6 +802,9 @@ function collapseBookmarks() {
     $("#bookmarksCollapse").attr("src", "Images/expand-right.png");
 }
 
+/*
+Expands bookmark description window. 
+*/
 function expandBookmarks() {
     if (isBookmarksWindowExpanded) return;
     isBookmarksWindowExpanded = true;
@@ -639,6 +821,9 @@ function expandBookmarks() {
 
 }
 
+/*
+Collapses/expands bookmark description window.
+*/
 function onBookmarksCollapse() {
     if (!isBookmarksWindowExpanded) {
         expandBookmarks();
@@ -647,6 +832,9 @@ function onBookmarksCollapse() {
     }
 }
 
+/*
+Handles click in tour narration window.
+*/
 function onNarrationClick() {
     if (isNarrationOn) {
         $("#tours-narration-on").removeClass("narration-selected", "slow");
@@ -659,12 +847,19 @@ function onNarrationClick() {
 }
 
 
-
+/*
+Called after successful response from tours request.
+@param content      (array) an array of tours that were returned by request 
+*/
 function parseTours(content) {
     tours = new Array();
+
+    // build array of tours that could be played
     for (var i = 0; i < content.d.length; i++) {
-        var areBookmarksValid = true;
+        var areBookmarksValid = true; // indicates whether all bookmarks are correct or not
         var tourString = content.d[i];
+
+        // skip tours with invalid parameters
         if ((typeof tourString.bookmarks == 'undefined') ||
                     (typeof tourString.AudioBlobUrl == 'undefined') ||
                     (tourString.AudioBlobUrl == undefined) ||
@@ -673,10 +868,14 @@ function parseTours(content) {
                     (typeof tourString.Name == 'undefined') ||
                     (typeof tourString.Sequence == 'undefined'))
             continue;
+
+        // build array of bookmarks of current tour
         var tourBookmarks = new Array();
-        var addedBookmarksCount = 0;
+
         for (var j = 0; j < tourString.bookmarks.length; j++) {
             var bmString = tourString.bookmarks[j];
+
+            // break if at least one bookmarks has invalid parameters
             if ((typeof bmString.Description == 'undefined') ||
                     (typeof bmString.LapseTime == 'undefined') ||
                     (typeof bmString.Name == 'undefined') ||
@@ -685,31 +884,83 @@ function parseTours(content) {
                 break;
             }
 
-            var bm = bmString.URL;
-            if (bm.indexOf("#") != -1) {
-                bm = bm.substring(bm.indexOf("#") + 1);
+            // cut unnecessary part of bookmark's URL
+            var bmURL = bmString.URL;
+            if (bmURL.indexOf("#") != -1) {
+                bmURL = bmURL.substring(bmURL.indexOf("#") + 1);
             }
-            tourBookmarks.push(new TourBookmark(bm, bmString.Name, bmString.LapseTime, bmString.Description));
+            tourBookmarks.push(new TourBookmark(bmURL, bmString.Name, bmString.LapseTime, bmString.Description));
         }
+
+        // skip tour with broken bookmarks
         if (!areBookmarksValid)
             continue;
 
+        // tour is correct and can be played
         tours.push(new Tour(tourString.Name, tourBookmarks, bookmarkTransition, vc, tourString.Category, tourString.AudioBlobUrl, tourString.Sequence));
     }
 }
 
 
 /*
-bookmark transition function to be passed to tours
+Bookmark' transition handler function to be passed to tours.
 */
 function bookmarkTransition(visible, onCompleted, onInterrupted, bookmark) {
-    tourBookmarkTransitionCompleted = onCompleted;
-    tourBookmarkTransitionInterrupted = onInterrupted;
+    tourBookmarkTransitionCompleted = onCompleted; // reinitialize animation completed handler for bookmark' transition
+    tourBookmarkTransitionInterrupted = onInterrupted; // reinitialize animation interrupted handler for bookmark' transition
+
     pauseTourAtAnyAnimation = false;
+
+    // id of this bookmark' transition animation
     var animId = setVisible(visible);
+
     if (animId && bookmark) {
         setNavigationStringTo = { bookmark: bookmark, id: animId };
     }
     return animId;
 }
 
+function loadTourFromURL() {
+    var curURL = getURL();
+    if ((typeof curURL.hash.params !== 'undefined') && (curURL.hash.params["tour"] > tours.length))
+        return;
+
+    if (typeof curURL.hash.params !== 'undefined' && typeof curURL.hash.params["tour"] !== 'undefined') {
+        if (tours == null)
+            initializeToursContent();
+
+        if (isTourWindowVisible) {
+            onTourClicked();
+        }
+
+        //var mytour = tours[curURL.hash.params["tour"] - 1];
+        tour = tours[curURL.hash.params["tour"] - 1];
+
+        $(".touritem-selected").removeClass("touritem-selected", "slow");
+
+        activateTour(tour, true);
+
+        if (tour.audio) {   
+            // pause unwanted audio playback
+            tour.audio.pause();
+            // prohibit unwated audio playback after loading of audio
+            tour.audio.preload = "none";
+        }
+        tourPause();  
+
+        //        var tourControlDiv = document.getElementById("tour_control");
+        //        tourControlDiv.style.display = "block";
+        //        tour.tour_TourFinished.push(function (tour) {
+        //            hideBookmark(tour);
+        //            tourPause();
+        //            hideBookmarks();
+        //        });
+        //tour.toggleAudio(true);
+        //tour.currentPlace = { type: 'goto', bookmark: 0 };
+
+
+        //showBookmark(tour, 0);
+        //$("#tour_playpause").attr("src", "Images/tour_play_off.jpg");
+
+    }
+}

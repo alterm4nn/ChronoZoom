@@ -6,11 +6,13 @@ using System;
 using System.Collections.Generic;
 using Chronozoom.Test.JsTypes;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Diagnostics;
 
 namespace Chronozoom.Test.GeneralTests
 {
     [TestClass]
-    [TestPage("testUrlNav.htm")]
+    [TestPage("cz.htm")]
     public abstract class UrlNavTests : CzTestBase
     {
         private Random rnd = new Random();
@@ -34,7 +36,9 @@ namespace Chronozoom.Test.GeneralTests
             }
         }
 
-        //Obselete. Url nav spec have chageded. Cannot specify scale 's'.
+        #region Obsolete Tests
+
+        //Obselete. Url nav spec have chageded.F Cannot specify scale 's'.
         [Ignore]
         [TestMethod]
         // Sets page URL to 1920CE and checks if page objects are updated correctly
@@ -88,6 +92,8 @@ namespace Chronozoom.Test.GeneralTests
 
             Assert.AreEqual(visibleAfter, urlVisible);
         }
+
+        #endregion
 
         [TestMethod]
         public void TestUrlNavigation_Pan_UrlChanges()
@@ -220,6 +226,65 @@ namespace Chronozoom.Test.GeneralTests
             Assert.AreEqual(viewportCenterY, bookmarkItemCenterY, 1);
         }
 
+        /* Opens bibliography window for random exhibit and shares it to another window.
+         * Checks that share was sucessful.
+         */
+        [TestMethod]
+        public void TestUrlNavigation_SharingOfBibliographyWindow_BibliographyWindowOpened()
+        {
+            /* Arrange
+             * Select a random exhibit.
+             * Generate absolute bookmark url.
+             */
+            string entityType = "infodot";
+            var l = getEntityIds(entityType);
+            string id = l[rnd.Next(l.Count)];
+
+            // get relative bookmark url of the exhibit
+            var js = Driver as IJavaScriptExecutor;
+            // TODO: Remove '@' at the end of this string aftre it will be fixed in scripts of cz
+            var bookmarkUrl = js.ExecuteScript("return vcelementToNavString(vc.virtualCanvas('findElement', '" + id + "'));");
+
+            // update viewport according to the choosen exhibit 
+            GoToUrl(this.StartPage + "#" + bookmarkUrl);
+            vcPageObj = new VirtualCanvasComponent(Driver);
+            vcPageObj.WaitContentLoading();
+
+            var bibliography = id + "__bibliography";
+
+            // get screen coordinates of 
+            var visible = GetVisibleForCanvasElement(js, bibliography);
+            var canvasElement = Driver.FindElement(By.Id("vc"));
+            var biblWindowElement = Driver.FindElement(By.Id("bibliographyBack"));
+
+            // check that bibliography window is hidden at this moment
+            string windowDisplay = biblWindowElement.GetCssValue("display");
+            Assert.AreEqual(windowDisplay, "none", "ERROR: Bibliography window is visible but it shouldn't.");
+
+            var action = new ActionsExtension(Driver);
+            action.MoveToElement(canvasElement, Convert.ToInt32(visible["x"]) + 5, Convert.ToInt32(visible["y"]) + 5)
+                .Click()
+                .Perform();
+
+            // check that bibliography window is visible now
+            windowDisplay = canvasElement.GetCssValue("display");
+            Assert.AreNotEqual(windowDisplay, "none", "ERROR: Bibliography window is not visible but it should.");
+            var URL = Driver.Url;
+
+            // change URL to reload page
+            GoToUrl(this.StartPage);
+            vcPageObj.WaitContentLoading();
+
+            // open shared bibliography link
+            GoToUrl(URL);
+            vcPageObj.WaitContentLoading();
+
+            // check that bibliography window is visible now
+            biblWindowElement = Driver.FindElement(By.Id("bibliographyBack"));
+            windowDisplay = biblWindowElement.GetCssValue("display");
+            Assert.AreNotEqual(windowDisplay, "none", "ERROR: Share failed. Bibliography window is not visible but it should.");
+        }
+
 
         private List<string> getEntityIds(string entityType)
         {
@@ -244,6 +309,14 @@ namespace Chronozoom.Test.GeneralTests
             for (int i = 0; i < ids.Count; i++)
                 lst.Add(ids[i]);
             return lst;
+        }
+
+        private Dictionary<string, object> GetVisibleForCanvasElement(IJavaScriptExecutor js, string id)
+        {
+            return js.ExecuteScript(@"
+                var elem = vc.virtualCanvas('findElement', '" + id + @"'); 
+                var vp = vc.virtualCanvas('getViewport');
+                return vp.pointVirtualToScreen(elem.x, elem.y);") as Dictionary<string, object>;
         }
 
         /*
@@ -295,4 +368,3 @@ namespace Chronozoom.Test.GeneralTests
         }
     }
 }
-

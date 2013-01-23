@@ -1,0 +1,37 @@
+<html>
+	<head>
+		<script src="http://demos.mootools.net/demos/mootools.js"></script>     
+		<script src="..\rx.js"></script>
+		<script src="..\rx.mootools.js"></script>
+		<script>
+
+		window.addEvent('domready', function() {
+
+			var liveEvent = new Rx.MutableDisposable();
+			Rx.Observable.FromMooToolsEvent($("bind"),"click")
+				.Subscribe(function () {
+					$("theone").set("html","can click...");
+
+					liveEvent.Replace(Rx.Observable.FromMooToolsEvent($("theone"),"click")
+						.Subscribe(function() {
+							alert('hello');  }));
+					});
+
+			Rx.Observable.FromMooToolsEvent($("unbind"), "click")
+				.Subscribe(function () {
+						$("theone").set("html", "Does nothing...");
+						liveEvent.Dispose();
+						liveEvent = new Rx.MutableDisposable();
+					});
+		});
+	</script>
+
+</head>
+<body>
+	<button id="theone">Does nothing...</button>
+	<button id="bind">Bind Click</button>
+	<button id="unbind">Unbind Click</button>
+</body>
+</html>
+
+

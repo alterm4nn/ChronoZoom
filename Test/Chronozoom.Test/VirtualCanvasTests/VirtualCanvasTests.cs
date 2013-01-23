@@ -18,12 +18,22 @@ namespace Chronozoom.Test.VirtualCanvasTests
     public abstract class VirtualCanvasTests : CzTestBase
     {
         private VirtualCanvasComponent vcPage;
+        private ActionsExtension actions;
 
         [TestInitialize]
         public void TestInitialize()
         {
             GoToUrl();
             vcPage = new VirtualCanvasComponent(Driver);
+        }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            if (actions != null)
+            {
+                actions.SetDefault();
+            }
         }
 
         [TestMethod]
@@ -77,15 +87,12 @@ namespace Chronozoom.Test.VirtualCanvasTests
             GoToUrl();
 
             IWebElement vc = Driver.FindElement(By.Id("vc"));
-            IWebElement button = Driver.FindElement(By.Id("button"));
 
-            Actions actions = new Actions(Driver);
+            actions = new ActionsExtension(Driver);
             // building mouse moves on the virtual canvas element
-            actions.Build();
             actions.MoveToElement(vc, vc.Size.Width / 2, vc.Size.Height / 2);
             actions.Click();
-            actions.MoveToElement(button, 0, 0);
-            actions.Release();
+            actions.MoveByOffset(-100, -100);
             actions.Perform();
 
             var res = (Driver as IJavaScriptExecutor).ExecuteScript("return isMovedIn;");
@@ -102,18 +109,15 @@ namespace Chronozoom.Test.VirtualCanvasTests
             GoToUrl();
 
             IWebElement vc = Driver.FindElement(By.Id("vc"));
-            IWebElement button = Driver.FindElement(By.Id("button"));
 
             var rectCenterX = Convert.ToDouble((Driver as IJavaScriptExecutor).ExecuteScript("return rectCenterX;"));
             var scale = Convert.ToDouble((Driver as IJavaScriptExecutor).ExecuteScript("return scale;"));
 
-            Actions actions = new Actions(Driver);
+            actions = new ActionsExtension(Driver);
             // building mouse moves on the virtual canvas element
-            actions.Build();
             actions.MoveToElement(vc, vc.Size.Width / 2 + (int)(rectCenterX / scale), vc.Size.Height / 2);
             actions.Click();
-            actions.MoveToElement(button, 0, 0);
-            actions.Release();
+            actions.MoveByOffset(-100, -100);
             actions.Perform();
 
             var res = (Driver as IJavaScriptExecutor).ExecuteScript("return isRectMovedIn;");

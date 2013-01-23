@@ -15,11 +15,21 @@ using Chronozoom.Test.JsTypes;
 
 namespace Chronozoom.Test.Components
 {
+    /// <summary>
+    /// This is the Page Object for main functionality of Virtual Canvas.
+    /// </summary>
     class VirtualCanvasComponent
     {
+        #region Constants
+
         public const string VirtualCanvasCssClass = "virtualCanvas";
         public const string VirtualCanvasLayerDivCssClass = "virtualCanvasLayerDiv";
         public const string VirtualCanvasLayerCanvasCssClass = "virtualCanvasLayerCanvas";
+
+        #endregion Constants
+
+        // Using PageFactory class to autoassign fields in constructor.
+        #region Fields
 
         private readonly IWebDriver virtualCanvasPage;
         private readonly IJavaScriptExecutor jsExecutor;
@@ -57,6 +67,23 @@ namespace Chronozoom.Test.Components
         [FindsBy(How = How.XPath, Using = ".//*[@class = 'regimes_titles']/div[5]/div")]
         private readonly IWebElement cosmosLink;
 
+        [FindsBy(How = How.Id, Using = "human_rect")]
+        private readonly IWebElement humanityBar;
+
+        [FindsBy(How = How.Id, Using = "prehuman_rect")]
+        private readonly IWebElement prehistoryBar;
+
+        [FindsBy(How = How.Id, Using = "life_rect")]
+        private readonly IWebElement lifeBar;
+
+        [FindsBy(How = How.Id, Using = "earth_rect")]
+        private readonly IWebElement earthBar;
+
+        [FindsBy(How = How.Id, Using = "cosmos_rect")]
+        private readonly IWebElement cosmosBar;
+
+        #endregion Fields
+
         public VirtualCanvasComponent(IWebDriver driver)
         {
             virtualCanvasPage = driver;
@@ -72,8 +99,15 @@ namespace Chronozoom.Test.Components
             lifeLink = null;
             earthLink = null;
             cosmosLink = null;
+            humanityBar = null;
+            prehistoryBar = null;
+            lifeBar = null;
+            earthBar = null;
+            cosmosBar = null;
             PageFactory.InitElements(virtualCanvasPage, this);
         }
+
+        #region Properties
 
         public IWebElement VirtualCanvas { get { return virtualCanvas; } }
         public IWebElement SearchButton { get { return searchButton; } }
@@ -85,6 +119,16 @@ namespace Chronozoom.Test.Components
         public IWebElement LifeLink { get { return lifeLink; } }
         public IWebElement EarthLink { get { return earthLink; } }
         public IWebElement CosmosLink { get { return cosmosLink; } }
+        public IWebElement HumanityBar { get { return humanityBar; } }
+        public IWebElement PrehistoryBar { get { return prehistoryBar; } }
+        public IWebElement LifeBar { get { return lifeBar; } }
+        public IWebElement EarthBar { get { return earthBar; } }
+        public IWebElement CosmosBar { get { return cosmosBar; } }
+
+        #endregion Properties
+
+        // Methods to perform user actions on the page.
+        #region High Level Functionality Methods
 
         public void EnterSearchQuery(string query)
         {
@@ -95,6 +139,11 @@ namespace Chronozoom.Test.Components
         {
             searchTextBox.Clear();
         }
+
+        #endregion High Level Functionality Methods
+
+        // Methods, which call corresponding javascript function.
+        #region Low Level Functionality Methods
 
         public void ResizeVirtualCanvas(int height)
         {
@@ -210,6 +259,21 @@ namespace Chronozoom.Test.Components
             return (JsCoordinates)JSONHelper.Parse(typeof(JsCoordinates), json);
         }
 
+        public object FindElement(string id)
+        {
+            // return vc.virtualCanvas('findElement', 'id');
+            StringBuilder script = new StringBuilder("$('#");
+            script.Append(virtualCanvas.GetAttribute("id"));
+            script.Append("').virtualCanvas('findElement', '");
+            script.Append(id).Append("');");
+
+            return jsExecutor.ExecuteScript(script.ToString());
+        }
+
+        #endregion Low Level Functionality Methods
+
+        #region Auxiliary Methods
+
         public void WaitAnimation()
         {
             const int DelayMs = 100;
@@ -257,5 +321,7 @@ namespace Chronozoom.Test.Components
                 throw new Exception("Too long loading.");
             }
         }
+
+        #endregion Auxiliary Methods
     }
 }

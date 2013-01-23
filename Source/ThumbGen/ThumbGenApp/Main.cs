@@ -19,7 +19,8 @@ namespace ThumbGen
                 ControllerSettings cs = new ControllerSettings(Properties.Settings.Default.InitialSize,
                     Properties.Settings.Default.SourceConnectionString,
                     Properties.Settings.Default.AzureBlobUrl,
-                    Properties.Settings.Default.AzureConnectionString);
+                    Properties.Settings.Default.AzureAccountName,
+                    Properties.Settings.Default.AccessKeyToBlob);
 
                 Controller ctrl = new Controller();
                 ctrl.SetControllerSettings(cs);

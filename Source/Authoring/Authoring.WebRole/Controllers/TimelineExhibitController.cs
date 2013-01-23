@@ -19,10 +19,10 @@ namespace Authoring.WebRole.Controllers
         private string delete = Permission.delete.ToString();
         private string admin = Permission.admin.ToString();
 
-        private const decimal GA = 1000000000;
-        private const decimal MA = 1000000;
-        private const decimal KA = 1000;
-        private const decimal BCE = 100;
+        private const decimal GA = -1000000000;
+        private const decimal MA = -1000000;
+        private const decimal KA = -1000;
+        private const decimal BCE = -1;
         private const decimal CE = 1;
 
         public TimelineExhibitController()
@@ -224,18 +224,11 @@ namespace Authoring.WebRole.Controllers
             decimal parentTime = timeline.FromContentYear * determineFactor(parentFromTimeUnit);
             decimal childTime = exhibit.ContentYear.Value * determineFactor(childTimeUnit);
 
-            //if both the timeunits are CE then the totime must be greater than the from time. Otherwise its vice versa
-            if (parentFromTimeUnit == "CE" && childTimeUnit == "CE")
+            if (childTime < parentTime)
             {
-                if (childTime < parentTime)
-                    isYearValid = false;
+                isYearValid = false;
             }
-            else
-            {
-                if (childTime > parentTime)
-                    isYearValid = false;
-            }
-
+            
             if (!isYearValid)
             {
                 ModelState.AddModelError("ExhibitID", "Exhibit ContentYear and Timeunit must be within the bounds of the timeline");
@@ -245,15 +238,10 @@ namespace Authoring.WebRole.Controllers
             if (!(timeline.ToContentYear == 0 && (parentToTimeUnit == "GA" || parentToTimeUnit == "MA" || parentToTimeUnit  == "KA"))) //if 0 then its today
             {
                 parentTime = timeline.ToContentYear * determineFactor(parentToTimeUnit);
-                if (parentToTimeUnit == "CE" && parentToTimeUnit == "CE")
+
+                if (childTime > parentTime)
                 {
-                    if (childTime > parentTime)
-                        isYearValid = false;
-                }
-                else
-                {
-                    if (childTime < parentTime)
-                        isYearValid = false;
+                    isYearValid = false;
                 }
             }
 
@@ -264,7 +252,6 @@ namespace Authoring.WebRole.Controllers
             }
 
             return true;
-
         }
 
         private decimal determineFactor(string timeUnit)

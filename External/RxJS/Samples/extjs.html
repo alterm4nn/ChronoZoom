@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+    <head>
+	        <script type="text/javascript" src="http://extjs-public.googlecode.com/svn/tags/extjs-3.1.1/release//adapter/ext/ext-base.js"></script>
+	        <script type="text/javascript" src="http://extjs-public.googlecode.com/svn/tags/extjs-3.1.1/release//ext-all.js"></script>
+		<script src="../rx.js" type="text/javascript"></script>
+		<script src="../rx.extjs.js" type="text/javascript"></script>
+		<script type="text/javascript">
+
+		Ext.onReady(function() {
+
+			var liveEvent = new Rx.MutableDisposable();
+
+			Ext.get("bind")
+				.ToObservable("click")
+				.Subscribe(function () {
+					Ext.get("theone").update("can click...");
+
+					liveEvent.Replace(Ext.get("theone")
+						.ToObservable("click")
+						.Subscribe(function() {
+							alert('hello');  }));
+					});
+
+			Ext.get("unbind")
+				.ToObservable("click")
+				.Subscribe(function () {
+						Ext.get("theone").update("Does nothing...");						
+						liveEvent.Dispose();
+						liveEvent = new Rx.MutableDisposable();
+					});
+		});
+	</script>
+
+</head>
+<body>
+	<button id="theone">Does nothing...</button>
+	<button id="bind">Bind Click</button>
+	<button id="unbind">Unbind Click</button>
+</body>
+</html>
+
+

@@ -19,10 +19,10 @@ namespace Authoring.WebRole.Controllers
         private string delete = Permission.delete.ToString();
         private string admin = Permission.admin.ToString();
 
-        private const decimal GA = 1000000000;
-        private const decimal MA = 1000000;
-        private const decimal KA = 1000;
-        private const decimal BCE = 100;
+        private const decimal GA = -1000000000;
+        private const decimal MA = -1000000;
+        private const decimal KA = -1000;
+        private const decimal BCE = -1;
         private const decimal CE = 1;
 
         public TimelineController()
@@ -285,27 +285,18 @@ namespace Authoring.WebRole.Controllers
 
             fromTime = timeline.FromContentYear * determineFactor(fromTimeUnitValue);
             toTime = timeline.ToContentYear * determineFactor(toTimeUnitValue);
-             //if both the timeunits are CE then the totime must be greater than the from time. Otherwise its vice versa
-            if (fromTimeUnitValue == "CE" && toTimeUnitValue == "CE")
+
+            if (toTime < fromTime)
             {
-               if (toTime < fromTime)
-                {
-                    ModelState.AddModelError("ToContentYear", "ToContent year must be greater than the fromContent year.");
-                    return false;
-                }
+                ModelState.AddModelError("ToContentYear", "ToContent year must be greater than the fromContent year.");
+                return false;
             }
-            else
-            {
-                if (toTime > fromTime)
-                {
-                    ModelState.AddModelError("ToContentYear", "ToContent year must be less than the fromContent year.");
-                    return false;
-                }
-            }
+            
             if (parentTimeline != null)
             {
                 return isInBoundsWithParent(timeline, parentTimeline, fromTimeUnit, toTimeUnit);
             }
+
             return true;
         }
 
@@ -365,18 +356,12 @@ namespace Authoring.WebRole.Controllers
 
             parentTime = parentTimeline.FromContentYear * determineFactor(parentFromTimeUnit);
             childTime = timeline.FromContentYear * determineFactor(childFromTimeUnit);
-            //if both the timeunits are CE then the totime must be greater than the from time. Otherwise its vice versa
-            if (parentFromTimeUnit == "CE" && childFromTimeUnit == "CE")
-            {
-                if (childTime < parentTime)
-                    isYearValid = false;
-            }
-            else
-            {
-                if (childTime > parentTime)
-                    isYearValid = false;
-            }
 
+            if (childTime < parentTime)
+            {
+                isYearValid = false;
+            }
+            
             if (!isYearValid)
             {
                 ModelState.AddModelError("FromContentYear", "Child timeline must be within the bounds of the parent timeline");
@@ -387,15 +372,10 @@ namespace Authoring.WebRole.Controllers
             {
                 parentTime = parentTimeline.ToContentYear * determineFactor(parentToTimeUnit);
                 childTime = timeline.ToContentYear * determineFactor(childToTimeUnit);
-                if (parentToTimeUnit == "CE" && childToTimeUnit == "CE")
+                
+                if (childTime > parentTime)
                 {
-                    if (childTime > parentTime)
-                        isYearValid = false;
-                }
-                else
-                {
-                    if (childTime < parentTime)
-                        isYearValid = false;
+                    isYearValid = false;
                 }
             }
 
@@ -406,7 +386,6 @@ namespace Authoring.WebRole.Controllers
             }
 
             return true;
-
         }
 
         private decimal determineFactor(string timeUnit)

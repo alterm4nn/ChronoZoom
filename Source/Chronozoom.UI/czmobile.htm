@@ -1,0 +1,529 @@
+﻿
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta name="Description" content="ChronoZoom is an open-source community project dedicated to visualizing the history of everything." />
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, maximum-scale=1.0" />
+   <script type="text/javascript">
+       // Invoke timings.show() to get timings
+       var timings = new Object();
+       timings.parseStarted = new Date();
+       timings.show = function () {
+           var msg =
+                "External scripts loading: " + (timings.scriptsLoaded - timings.parseStarted) +
+                " ms\nDocument ready handler: " + (timings.readyStarted - timings.scriptsLoaded) +
+                " ms\n\nRequesting server for timelines data: " + (timings.wcfRequestCompleted - timings.wcfRequestStarted) +
+                " ms\nLayout algorithm: " + (timings.layoutCompleted - timings.wcfRequestCompleted) +
+                " ms\nPopulating virtual canvas: " + (timings.canvasInited - timings.layoutCompleted) + " ms";
+           alert(msg);
+       }
+
+       var _gaq = _gaq || [];
+       _gaq.push(['_setAccount', 'UA-29180487-2']);
+       _gaq.push(['_setDomainName', 'chronozoomproject.org']);
+       _gaq.push(['_setAllowLinker', true]);
+       _gaq.push(['_trackPageview']);
+       (function () {
+           var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+           ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+           var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+       })();
+</script>
+
+    <link rel="stylesheet" type="text/css" href="Styles/cz.css" />
+    <link rel="stylesheet" type="text/css" href="Styles/axis.css" />
+
+    <script type="text/javascript" src="Scripts/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-ui-1.8.16.custom.min.js"></script>
+    <script type="text/javascript" src="Scripts/rx.js"></script>
+    <script type="text/javascript" src="Scripts/rx.jQuery.js"></script>
+    <script type="text/javascript" src="Scripts/seadragon-min.js"></script>
+    <script type="text/javascript" src="ScriptsMobile/cz.settings.mobile.js"></script>
+    <script type="text/javascript" src="Scripts/common.js"></script>
+    <script type="text/javascript" src="Scripts/viewport.js"></script>
+    <script type="text/javascript" src="Scripts/viewportAnimation.js"></script>
+    <script type="text/javascript" src="Scripts/mouseWheelPlugin.js"></script>
+    <script type="text/javascript" src="Scripts/gestures.js"></script>
+    <script type="text/javascript" src="ScriptsMobile/virtualCanvas.mobile.js"></script>
+    <script type="text/javascript" src="ScriptsMobile/vccontent.mobile.js"></script>
+    <script type="text/javascript" src="Scripts/viewportController.js"></script>
+    <script type="text/javascript" src="ScriptsMobile/axis.mobile.js"></script>
+    <script type="text/javascript" src="Scripts/urlnav.js"></script>
+    <script type="text/javascript" src="Scripts/layout.js"></script>
+    <script type="text/javascript" src="Scripts/search.js"></script>
+    <script type="text/javascript" src="Scripts/tours.js"></script>  
+    <script type="text/javascript" src="Scripts/bibliography.js"></script>
+    <script type="text/javascript">
+
+        timings.scriptsLoaded = new Date();
+        var ax, vc;
+        var visReg;
+        var cosmosVisible, earthVisible, lifeVisible, prehistoryVisible, humanityVisible;
+        var content;
+
+        var regimes = new Array();
+        var regimeNavigator;
+        
+        var k = 1000000000;
+        var setNavigationStringTo; // { element or bookmark, id } identifies that we zoom into this element and when (if) finish the zoom, we should put the element's path into navigation string
+
+        var regimesRatio;
+
+        var hashHandle = true; // Handle hash change event
+
+        var firstmotion = false; //needed for orientation events
+        var FirstModeIsHorizontal = false; //needed for orientation events
+
+        function hideAddressBar() {
+            if (navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
+                if (document.height < window.outerHeight) {
+                    document.body.style.height = (window.outerHeight + 50) + 'px';
+                }
+
+                setTimeout(function () { window.scrollTo(0, 1); }, 50);
+            }
+        }
+
+        function updateAxis(vc, ax) {
+            var vp = vc.virtualCanvas("getViewport");
+            var lt = vp.pointScreenToVirtual(0, 0);
+            var rb = vp.pointScreenToVirtual(vp.width, vp.height);
+            ax.axis("setRange", lt.x, rb.x);
+        }
+
+        var controller; //a controller to perform smooth navigation
+        var isAxisFreezed = true; //indicates whether the axis moves together with canvas during navigation or not
+        var startHash;
+
+        $(document).ready(function () {
+            if (navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
+                // Suppress the default iOS elastic pan/zoom actions.
+                document.addEventListener('touchmove', function (e) { e.preventDefault(); });
+            }
+
+            // init seadragon. set path to image resources for nav buttons 
+            Seadragon.Config.imagePath = seadragonImagePath;
+
+            maxPermitedVerticalRange = { top: 0, bottom: 10000000 }; //temporary value until there is no data
+            timings.readyStarted = new Date();
+
+            ax = $("#axis");
+            ax.axis();
+
+            vc = $("#vc");
+            vc.virtualCanvas();
+
+            if (window.innerHeight > window.innerWidth - 20) {
+                $("#vc").css("height", (window.innerHeight - 100) + "px");
+                $("#vc").css("width", window.innerWidth - 10 + "px");
+                $("#vc").css("left", 0 + "px");
+
+                $("#axis").css("height", (50) + "px");
+                $("#axis").css("width", window.innerWidth - 10 + "px");
+                $("#axis").css("left", 0 + "px");
+            }
+
+            $("#DownDiv").css("height", (20) + "px");
+            if (window.innerHeight < window.innerWidth - 20) {
+                FirstModeIsHorizontal = true;
+                firstmotion = true;
+                if (navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
+                    $("#vc").css("height", (0.9 * window.innerHeight) + "px");
+                } else {
+                    $("#vc").css("height", (0.5 * window.innerHeight) + "px");
+                }
+                hideAddressBar();
+            }
+
+
+            if (window.location.hash)
+                startHash = window.location.hash; // to be processes after the data is loaded
+            loadData(); //retrieving the data
+
+            initializeBibliography();
+
+            var canvasGestures = getGesturesStream(vc); //gesture sequence of the virtual canvas
+            var axisGestures = applyAxisBehavior(getGesturesStream(ax)); //gesture sequence of axis (tranformed according to axis behavior logic)
+            var jointGesturesStream = canvasGestures.Merge(axisGestures);
+
+            controller = new ViewportController(
+                            function (visible) {
+                                var vp = vc.virtualCanvas("getViewport");
+
+                                vc.virtualCanvas("setVisible", visible, controller.activeAnimation);
+                                updateAxis(vc, ax);
+                                vp = vc.virtualCanvas("getViewport");
+
+                                var hoveredInfodot = vc.virtualCanvas("getHoveredInfodot");
+                                var actAni = controller.activeAnimation != undefined;
+
+                            },
+                            function () {
+                                return vc.virtualCanvas("getViewport");
+                            },
+                            jointGesturesStream);
+
+            var hashChangeFromOutside = true; // True if url is changed externally
+
+            // URL Nav: update URL when animation is complete
+            controller.onAnimationComplete.push(function (id) {
+                hashChangeFromOutside = false;
+                if (setNavigationStringTo && setNavigationStringTo.bookmark) { // go to search result
+                    navigationAnchor = navStringTovcElement(setNavigationStringTo.bookmark, vc.virtualCanvas("getLayerContent"));
+                    window.location.hash = setNavigationStringTo.bookmark;
+                }
+                else {
+                    if (setNavigationStringTo && setNavigationStringTo.id == id)
+                        navigationAnchor = setNavigationStringTo.element;
+
+                    var vp = vc.virtualCanvas("getViewport");
+                    window.location.hash = vcelementToNavString(navigationAnchor, vp);
+                }
+                setNavigationStringTo = null;
+            });
+
+            // URL Nav: handle URL changes from outside
+            window.addEventListener("hashchange", function () {
+                if (window.location.hash && hashChangeFromOutside && hashHandle) {
+                    var hash = window.location.hash;
+                    var visReg = navStringToVisible(window.location.hash.substring(1), vc);
+                    if (visReg) {
+                        isAxisFreezed = true;
+                        controller.moveToVisible(visReg, true);
+                        // to make sure that the hash is correct (it can be incorrectly changed in onCurrentlyObservedInfodotChanged)
+                        if (window.location.hash != hash) {
+                            hashChangeFromOutside = false;
+                            window.location.hash = hash;
+                        }
+                    }
+                    hashHandle = true;
+                } else
+                    hashChangeFromOutside = true;
+            });
+
+
+            // Axis: enable showing thresholds
+            controller.onAnimationComplete.push(function () {
+                ax.axis("enableThresholds", false);
+                //if (window.console && console.log("thresholds enabled"));
+            });
+            //Axis: disable showing thresholds
+            controller.onAnimationStarted.push(function () {
+                ax.axis("enableThresholds", false);
+                //if (window.console && console.log("thresholds disabled"));
+            });
+            // Axis: enable showing thresholds
+            controller.onAnimationUpdated.push(function (oldId, newId) {
+                if (oldId != undefined && newId == undefined) { // animation interrupted
+                    setTimeout(function () {
+                        ax.axis("enableThresholds", false);
+                        //if (window.console && console.log("thresholds enabled"));
+                    }, 500);
+                }
+            });
+
+
+
+            updateLayout();
+
+            vc.bind("elementclick", function (e) {
+                navigateToElement(e);
+            });
+
+
+            ax.bind('thresholdBookmarkChanged', function (thresholdBookmark) {
+                var bookmark = navStringToVisible(thresholdBookmark.Bookmark, vc);
+                if (bookmark != undefined) {
+                    controller.moveToVisible(bookmark, false);
+                }
+            });
+
+            // Reacting on the event when one of the infodot exploration causes inner zoom constraint
+            vc.bind("innerZoomConstraintChenged", function (constraint) {
+                controller.effectiveExplorationZoomConstraint = constraint.zoomValue; // applying the constraint
+                //ax.axis("allowMarkerMovesOnHover", !constraint.zoomValue);
+            });
+
+            timings.readyFinished = new Date();
+            var vp = vc.virtualCanvas("getViewport");
+            vc.virtualCanvas("setVisible", getVisibleForElement({ x: -13700000000, y: 0, width: 13700000000, height: 5535444444.444445 }, 1.0, vp));
+            updateAxis(vc, ax);
+        });
+
+          //loading the data from the service
+        function loadData() {
+            timings.wcfRequestStarted = new Date();
+            var url;
+            switch (czDataSource) {
+                case 'db': url = "Chronozoom.svc/get";
+                    break;
+                case 'relay': url = "ChronozoomRelay";
+                    break;
+                case 'dump': url = "ResponseDump.txt";
+                    break;
+            }
+
+            $.ajax({ //main content fetching
+                cache: false,
+                type: "GET",
+                async: true,
+                dataType: "json",
+                url: url,
+                success: function (result) {
+                    content = result;
+                    ProcessContent(result);
+                },
+                error: function (xhr) {
+                    timings.RequestCompleted = new Date();
+                    alert("Error connecting to service: " + xhr.responseText);
+                }
+            });
+        }
+
+        function ProcessContent(content) {
+            timings.wcfRequestCompleted = new Date();
+            Load(vc, content.d);
+            timings.layoutCompleted = new Date();
+            if (startHash) { // restoring the window's hash as it was on the page loading
+                visReg = navStringToVisible(startHash.substring(1), vc);
+            }
+
+            InitializeRegimes();
+            if (!visReg && cosmosVisible) {
+                window.location.hash = cosmosVisible;
+                visReg = navStringToVisible(cosmosVisible, vc);
+            }
+            if (visReg) {
+                vc.virtualCanvas("setVisible", visReg);
+                updateAxis(vc, ax);
+                var vp = vc.virtualCanvas("getViewport");
+
+                if (startHash && window.location.hash !== startHash) {
+                    hashChangeFromOutside = false;
+                    window.location.hash = startHash; // synchronizing
+                }
+            }
+            timings.canvasInited = new Date();
+        }
+
+        function InitializeRegimes() {
+            if (content) {
+                if (content.d.length > 0) {
+                    var f = function (timeline) {
+                        if (!timeline) return null;
+                        var v = vc.virtualCanvas("findElement", 't' + timeline.UniqueID);
+                        regimes.push(v);
+                        if (v) v = vcelementToNavString(v);
+                        return v;
+                    }
+
+                    var cosmosTimeline = content.d[0];
+                    cosmosVisible = f(cosmosTimeline);
+                    navigationAnchor = vc.virtualCanvas("findElement", 't' + cosmosTimeline.UniqueID);
+
+                    var earthTimeline = FindChildTimeline(cosmosTimeline, earthTimelineID);
+                    earthVisible = f(earthTimeline);
+                    var lifeTimeline = FindChildTimeline(earthTimeline, lifeTimelineID);
+                    lifeVisible = f(lifeTimeline);
+                    var prehistoryTimeline = FindChildTimeline(lifeTimeline, prehistoryTimelineID);
+                    prehistoryVisible = f(prehistoryTimeline);
+                    var humanityTimeline = FindChildTimeline(prehistoryTimeline, humanityTimelineID, true);
+                    humanityVisible = f(humanityTimeline);
+
+                    maxPermitedVerticalRange = {    //setting top and bottom observation constraints according to cosmos timeline
+                        top: cosmosTimeline.y,
+                        bottom: cosmosTimeline.y + cosmosTimeline.height
+                    };
+
+                    maxPermitedScale = navStringToVisible(cosmosVisible, vc).scale * 1.1;
+                }
+            }
+        }
+
+        $(window).bind('resize', function () {
+            updateLayout();
+        });
+
+        function updateLayout() {
+            //document.getElementById("vc").style.height = (window.innerHeight - 150) + "px";
+            //vertical regime
+               
+            var height = window.innerHeight;
+            var offset = height - 187;
+            // todo: use axis' height instead of constants
+            document.getElementById("bibliographyBack").style.height = window.innerHeight + "px";
+            document.getElementById("bibliographyOut").style.top = (150) + "px";
+            document.getElementById("bibliographyOut").style.height = offset + "px";
+            document.getElementById("bibliographyOut").style.top = (150) + "px";
+            document.getElementById("bibliography").style.height = (offset - 50) + "px";
+            document.getElementById("bibliography").style.top = (25) + "px";
+
+            vc.virtualCanvas("updateViewport");
+            ax.axis("updateWidth");
+            updateAxis(vc, ax);
+    
+        }
+
+
+        var supportsOrientationChange = "onorientationchange" in window,
+            orientationEvent = supportsOrientationChange ? "orientationchange" : "resize";
+        window.addEventListener(orientationEvent, function () {
+            var vp = vc.virtualCanvas("getViewport");
+            visReg = navStringToVisible(window.location.hash, vc);
+            if (visReg)
+                vc.virtualCanvas("setVisible", visReg);
+
+            if (navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
+                $("#vc").css("height", (window.innerHeight - 100) + "px");
+                $("#vc").css("width", window.innerWidth - 10 + "px");
+                $("#vc").css("left", 0 + "px");
+
+                $("#axis").css("height", (50) + "px");
+                $("#axis").css("width", window.innerWidth - 10 + "px");
+                $("#axis").css("left", 0 + "px");
+
+                if (window.innerHeight > window.innerWidth - 20) {
+                    if (FirstModeIsHorizontal == true) {
+                        hideAddressBar();
+                        $("#DownDiv").css("width", window.innerWidth - 10 + "px");
+                    }
+                    $("#DownDiv").css("height", (20) + "px");
+                }
+                //horizontal regime
+                if (window.innerHeight < window.innerWidth - 20) {
+                    if (!firstmotion) {
+                        $("#vc").css("height", (window.innerHeight - 40) + "px"); firstmotion = true;
+                    } else {
+                        $("#vc").css("height", (window.innerHeight - 70) + "px");
+                        if (FirstModeIsHorizontal == true) $("#vc").css("height", (window.innerHeight - 100) + "px");
+                    }
+                    hideAddressBar();
+                }
+            } else {
+                $("#vc").css("height", (window.innerHeight - 100) + "px");
+                $("#vc").css("width", window.innerWidth - 10 + "px");
+                $("#vc").css("left", 0 + "px");
+
+                $("#axis").css("height", (50) + "px");
+                $("#axis").css("width", window.innerWidth - 10 + "px");
+                $("#axis").css("left", 0 + "px");
+
+                if (window.innerHeight > window.innerWidth - 20) {
+                    if (FirstModeIsHorizontal == true) {
+                        hideAddressBar();
+                        $("#DownDiv").css("width", window.innerWidth - 10 + "px");
+                    }
+                    $("#DownDiv").css("height", (20) + "px");
+                }
+                //horizontal regime
+                if (window.innerHeight < window.innerWidth - 20) {
+                    $("#vc").css("height", (window.innerHeight - 170) + "px");
+                    hideAddressBar();
+                }
+            }
+            updateLayout();
+
+        });
+
+           
+        /*
+        Is called by direct user actions like links, bread crumbs clicking, etc.
+        */
+        function setVisibleByUserDirectly(visible) {
+            pauseTourAtAnyAnimation = false;
+            if (tour != undefined && tour.state == "play")
+                tourPause();
+            return setVisible(visible);
+        }
+
+        function setVisible(visible) {
+            if (visible) {
+                ax.axis("enableThresholds", false);
+                return controller.moveToVisible(visible);
+            }
+        }
+
+        function navigateToElement(e) {
+            var animId = setVisibleByUserDirectly(e.newvisible);
+            if (animId) {
+                setNavigationStringTo = { element: e.element, id: animId };
+            }
+        }
+     
+
+	</script>
+    <title>ChronoZoom</title>
+</head>
+<body style="background-color: Black" >
+	
+      <div id="axis" style="width: 100%; height: 47px; overflow: hidden" onselectstart="return false;">
+    </div>
+    <div id="vc" style="width: 100%; height: auto; overflow: hidden; background-image: url('Images/background.jpg');
+        background-repeat: no-repeat; background-attachment: fixed; background-position: center center;
+        background-size: cover">
+        <div id="layerTimelines" onselectstart="return false;">
+        </div>
+        <!--//////////-->
+        <div id="layerInfodots" onselectstart="return false;">
+        </div>
+        <div id="iframe_layer" onselectstart="return false;">
+        </div>
+    </div>
+
+    <div id="bibliographyBack" class="biblBack" style="display: none">
+        <div id="bibliographyOut" class="biblOuterWindow">
+            <div id="bibliography" class="biblWindow">
+                <img class="closeButton" id="biblCloseButton" src="Images/close_off.png" onmouseover="toggleOnImage('biblCloseButton', 'png');"
+                    onmouseout="toggleOffImage('biblCloseButton', 'png');" alt="Close" onselectstart="return false;" />
+                <div class="title" onselectstart="return false;">
+                    <span>Infodot name</span> &gt; Bibliography
+                </div>
+                <div class="sources">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+
+     <div id = "DownDiv" style="position: relative; text-align: right;" >
+                <div id="cosmos_rect"; class="regime_rect" style="margin: 0 0 0 0; font-family: Arial;
+                    height: 20px; text-align: center; width: 30px; background-color: rgba(152, 108, 157, 1.0); cursor: pointer;float: left" onclick="navigateToBookmark(cosmosVisible);">
+                    C
+                </div>
+
+                 <div id="earth_rect"; class="regime_rect" style="margin: 0 0 0 10px;font-family: Arial;
+                    height: 20px; text-align: center; width: 30px; background-color: rgba(81, 127, 149, 1.0); cursor: pointer;float: left" onclick="navigateToBookmark(earthVisible);">
+                    E
+                </div>
+
+                 <div id="life_rect"; class="regime_rect" style="margin: 0 0 0 10px;font-family: Arial;
+                    height: 20px; text-align: center; width: 30px; background-color: rgba(73, 150, 73, 1.0); cursor: pointer;float: left" onclick="navigateToBookmark(lifeVisible);">
+                    L
+                </div>
+
+                 <div id="prehuman_rect"; class="regime_rect" style="margin: 0 0 0 10px;font-family: Arial;
+                    height: 20px; text-align: center; width: 30px; background-color: rgba(237, 145, 50, 1.0); cursor: pointer;float: left" onclick="navigateToBookmark(prehistoryVisible);">
+                    P
+                </div>
+
+                 <div id="human_rect"; class="regime_rect" style="margin: 0 0 0 10px;font-family: Arial;
+                    height: 20px; text-align: center; width: 30px; background-color: rgba(212, 92, 70, 1.0); cursor: pointer;float: left" onclick="navigateToBookmark(humanityVisible);">
+                    H
+                </div>
+
+            
+
+     <span id="Span" class="footerText" style="float: left;" onclick="javascript: window.open('cz.htm');">
+      Go to full version
+     </span> 
+
+       <img  id = "Czpicture" style="float: left" title="ChronoZoom"  src="Images/chronzoom-200px-white-mob.png" />
+  
+     </div>
+
+     
+ 
+</body>
+</html>

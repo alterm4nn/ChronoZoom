@@ -35,6 +35,7 @@
         showThresholds: null, // value indicating should thresholds be rendered or not
         animation: false, // true when thresholds start showing or closing, false when animation is completed
         hideAllTimeout: undefined, // Timeout to hide bunch of visible thresholds
+        highlighted_num: 0,
 
         _create: function () {
             // background canvas
@@ -62,11 +63,20 @@
             this.width = canvas.width;
             this.height = canvas.height;
 
-            this.showThresholds = true;
+            if (czVersion == "mobile") this.showThresholds = false
+            else
+                if (czVersion == "main") this.showThresholds = true;
+
             this._loadThresholds();
             if (this.thresholds != null) this._setThresholdsVisibility();
 
             var self = this;
+            self.element.mouseup(function (e) {
+                switch (e.which) {
+                    case 1: self._mouseUp(e);       //means that only left click will be interpreted
+                        break;
+                }
+            });
             self.element.mousemove(function (e) { self._mouseMove(e) });
             self.element.mouseleave(function () { self._mouseLeave() });
 
@@ -78,8 +88,7 @@
         */
         allowMarkerMovesOnHover: function (e) {
             this.doesMarkerMovesOnHover = e;
-        }
-        ,
+        },
         _init: function () {
         },
         _destroy: function () {
@@ -123,7 +132,8 @@
             var isValid = true;
             for (var i = 0; i < this.numberOfThresholds; i++) {
                 GenerateProperty(content.d[i], "ThresholdTimeUnit", "ThresholdYear", "ThresholdMonth", "ThresholdDay", "time");
-                this.thresholds[i] = { 'title': content.d[i].Title, 'description': (content.d[i].Description == null ? '' : content.d[i].Description),
+                this.thresholds[i] = {
+                    'title': content.d[i].Title, 'description': (content.d[i].Description == null ? '' : content.d[i].Description),
                     'time': content.d[i].time, 'bookmark': content.d[i].BookmarkRelativePath,
                     'color': thresholdColors[i % thresholdColors.length], 'textColor': thresholdTextColors[i % thresholdTextColors.length],
                     'isVisible': false, 'showing': 'left', 'coordinate': 0
@@ -131,7 +141,7 @@
             }
         },
 
-        _mouseMove: function (e) {
+        _mouseUp: function (e) {
             if (this.showThresholds) {
                 if (this.doesMarkerMovesOnHover) {
                     // show active marker when mouse is over axis
@@ -140,107 +150,98 @@
                     var time = this.options.range.right - k * (this.width - point.x);
                     this.setTimeMarker(time);
                 }
-
                 var x = 0;
                 var number = 0;
+                var leftEps = 2;
+                var rightEps = 10;      //are not the same with leftEps, because this.thresholds[i].coordinate defines left corner of the threshold
+                var verticalEps = 0;
+                var downEps = 10;
                 var shift = axisHeight - gapLabelTick;
                 var self = this;
                 var top = this.element[0].offsetTop + shift;
-
-                if (this.thresholdVisibility == "no" && this.thresholds) {
+                var To_Avoid_Overlap = false;
+                if (this.thresholds) {
                     // no thresholds are currently visible -> show all
                     var canvas = this.thresholdCanvas[0];
                     var ctx = canvas.getContext("2d");
                     ctx.font = (axisTextSize - 1) + " " + axisTextFont;
                     var visible = false;
-                    for (var i = 0; i < this.thresholds.length; i++) {
-                        // for each thresholds that can be visible
-                        if (this.thresholds[i].isVisible) {
-                            x = this.thresholds[i].coordinate;
-
-                            // creating temporary div for threshold
-                            $('<div id="threshold' + i + '" style="color:' + this.thresholds[i].textColor + '">' +
-                          '<div id="num" style="left: 5px; top: 5px; position: absolute">Threshold ' + (i + 1) + ':' + '</div>' +
-                          '<div id="title" style="left: 15px; top: 17px; position: absolute; color: White; cursor: pointer;">' + this.thresholds[i].title + '</div>' +
-                          '</div>').appendTo(this.element).addClass("smallThresholdDiv").css({
-                              'background-color': this.thresholds[i].color,
-                              'left': this.element[0].offsetLeft + x,
-                              'width': Math.max(ctx.measureText('Threshold ' + (i + 1) + ':').width, ctx.measureText(this.thresholds[i].title).width) + 21
-                          });
-                            if (ctx.measureText(this.thresholds[i].title).width < $('#threshold' + i + ' #title').width()) {
-                                $('#threshold' + i).css('width', Math.max($('#threshold' + i + ' #num').width(), $('#threshold' + i + ' #title').width()) + 21);
-                            }
-                            // thresholds should open from right to left if they are near right side of page
-                            if ($('#threshold' + i).position().left + $('#threshold' + i).width() >= this.width) {
-                                this.thresholds[i].showing = 'right';
-                                $('#threshold' + i).css('left', this.element[0].offsetLeft + x - $('#threshold' + i).width() + thresholdWidth);
-                            }
-                            else {
-                                this.thresholds[i].showing = 'left';
-                            }
-                            // set vertical position (to avoid overlay of thresholds)
-                            if (i > 0 && this.thresholds[i - 1].isVisible && x < this.thresholds[i - 1].coordinate + $('#threshold' + (i - 1)).width()) {
-                                top += $('#threshold' + (i - 1)).height() + 5;
-                                $('#threshold' + i).css('top', top);
-                            }
-                            else {
-                                top = this.element[0].offsetTop + shift + thresholdHeight;
-                                $('#threshold' + i).css('top', top);
-                            }
-
-                            // line to connect threshold with axis
-                            $('<div id="line' + i + '">').appendTo(this.element).addClass("thresholdLine").css({
-                                'width': thresholdWidth,
-                                'left': this.element[0].offsetLeft + x,
-                                'top': this.element[0].offsetTop + shift,
-                                'background-color': this.thresholds[i].color,
-                                'height': top - (this.element[0].offsetTop + shift)
-                            });
-                            // event to expand threshold
-                            $('#threshold' + i)[0].addEventListener('mouseup', function () {
-                                var num = parseFloat(this.id.substring(9));
-                                self._onExpandThreshold(num);
-                            }, false);
-                            // stop mouse at time of threshold if mouse is over expanded threshold or line to it
-                            $('#threshold' + i)[0].addEventListener('mousemove', function () {
-                                var num = parseFloat(this.id.substring(9));
-                                var e = window.event;
-                                if (e) preventbubble(e);
-                                self.setTimeMarker(self.thresholds[num].time);
-                                if (self.hideAllTimeout) {
-                                    clearTimeout(self.hideAllTimeout);
-                                    self.hideAllTimeout = undefined;
+                    if (this.thresholds != null) {
+                        for (var i = 0; i < this.thresholds.length; i++) {
+                            // for each thresholds that can be visible
+                            if (this.thresholds[i].isVisible) {
+                                x = this.thresholds[i].coordinate;
+                                var point = getXBrowserMouseOrigin(this.element, e);
+                                if ((point.x >= x - leftEps) && (point.x <= x + rightEps) && (point.y >= axisHeight - strokeWidth - downEps) && (point.y <= axisHeight - strokeWidth + verticalEps) && (To_Avoid_Overlap != true)) {
+                                    // creating temporary div for threshold                
+                                    var temp = 0;
+                                    if (this.thresholdVisibility == "no") {
+                                        temp = 1;
+                                        if (!$("div").is('#threshold' + i)) {
+                                            self._onExpandThreshold(i);
+                                        }
+                                    }
+                                    if ((this.thresholdVisibility == "one") && (temp == 0)) {
+                                        self._onThresholdsClear(false);
+                                        this.thresholdVisibility = "no";
+                                        //if this elem doesn't exist
+                                        if (!$("div").is('#threshold' + i)) {
+                                            self._onExpandThreshold(i);
+                                        }
+                                    }
+                                    To_Avoid_Overlap = true;
+                                    if (visible) {
+                                        this.thresholdVisibility = "one";
+                                    }
                                 }
-                            }, false);
-                            $('#line' + i)[0].addEventListener('mousemove', function () {
-                                var num = parseFloat(this.id.substring(4));
-                                var e = window.event;
-                                if (e) preventbubble(e);
-                                self.setTimeMarker(self.thresholds[num].time);
-                                if (self.hideAllTimeout) {
-                                    clearTimeout(self.hideAllTimeout);
-                                    self.hideAllTimeout = undefined;
-                                }
-                            }, false);
-                            $('#threshold' + i).hide();
-
-                            // starting showing lines and thresholds
-                            this.animation = true;
-                            $('#line' + i).slideDown(thresholdsAnimationTime, function () {
-                                var num = parseFloat(this.id.substring(4));
-                                self._showThreshold(num);
-                            });
-                            if (!visible) visible = true;
-                        }
-                        if (visible) {
-                            // all thresholds are now visible
-                            this.thresholdVisibility = "all";
+                            }
                         }
                     }
                 }
             }
         },
 
+        _mouseMove: function (e) {
+            if (this.doesMarkerMovesOnHover) {
+                // show active marker when mouse is over axis
+                var point = getXBrowserMouseOrigin(this.element, e);
+                var k = (this.options.range.right - this.options.range.left) / this.width;
+                var time = this.options.range.right - k * (this.width - point.x);
+                this.setTimeMarker(time);
+            }
+            var To_Avoid_Overlap = false;
+            var leftEps = 2;
+            var rightEps = 10;      //are not the same with leftEps, because this.thresholds[i].coordinate defines left corner of the threshold
+            var verticalEps = 10;
+            var self = this;
+            if (this.thresholds != null) {
+                for (var i = 0; i < this.thresholds.length; i++) {
+                    x = this.thresholds[i].coordinate;
+                    if ((point.x >= x - leftEps) && (point.x <= x + rightEps) && (point.y >= axisHeight - strokeWidth - verticalEps) && (point.y <= axisHeight - strokeWidth + verticalEps) && (To_Avoid_Overlap != true)) {
+                        this.highlighted_num = i;
+                        To_Avoid_Overlap = true;
+                        //to delete marker when hover on collapsed threshold
+                        var canvas = this.mouseMarkCanvas[0];
+                        var ctx = canvas.getContext("2d");
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        self._drawHighlightedCollapsedThreshold(i);
+                    } else {
+                        if ((point.x >= x - 10 * leftEps) && (point.x <= x + 2 * rightEps) && (point.y >= axisHeight - strokeWidth - 2 * verticalEps) && (point.y <= axisHeight - strokeWidth + 2 * verticalEps))
+                            self._drawCollapsedThreshold(i);
+                    }
+                }
+            }
+        },
+
+        // function to perform after mouse leaves axis
+        _mouseLeave: function () {
+            var self = this;
+            if (this.thresholds != null) {
+                for (var i = 0; i < this.thresholds.length; i++) {
+                    self._drawCollapsedThreshold(i);
+                }
+            }
+        },
         // method to show a threshold after showing line
         _showThreshold: function (i) {
             var self = this;
@@ -250,14 +251,14 @@
         // is called after threshold is hidden to hide a line
         _hideThresholdCompleted: function () {
             var self = this;
-            $('#line').slideUp(thresholdsAnimationTime, function () {
+            $('#line' + i).slideUp(thresholdsAnimationTime, function () {
                 self._hideLineCompleted();
             });
-            $('#threshold').remove();
+            $('#threshold' + i).remove();
         },
         // is called after line is hidden to clear everything
         _hideLineCompleted: function () {
-            $('#line').remove();
+            $('#line' + i).remove();
             this._onThresholdsClearCompleted();
         },
         _hideThresholdsCompleted: function (i, toExpand) {
@@ -268,9 +269,20 @@
             });
             $('#threshold' + i).remove();
         },
+        _hideThresholdsCompletedSpecific: function (i, toExpand) {
+            var self = this;
+            $('#line' + i).slideUp(thresholdsAnimationTime, function () {
+                var num = parseFloat(this.id.substring(4));
+                self._hideLinesCompletedSpecific(num, toExpand);
+            });
+            $('#threshold' + i).remove();
+        },
         _hideLinesCompleted: function (i, toExpand) {
             $('#line' + i).remove();
             if (!toExpand) this._onThresholdsClearCompleted();
+        },
+        _hideLinesCompletedSpecific: function (i, toExpand) {
+            $('#line' + i).remove();
         },
 
         // enables or disables showing thresholds
@@ -283,9 +295,7 @@
 
         // function called when user clicks on one of thresholds to expand it
         _onExpandThreshold: function (i) {
-            // remove all shown small thresholds
-            this._onThresholdsClear(true);
-
+            // remove shown threshold
             var self = this;
             var shift = this.element[0].offsetTop + axisHeight - gapLabelTick;
             var x = this.thresholds[i].coordinate;
@@ -293,7 +303,7 @@
             this.currentThreshold = i;
 
             // line to connect threshold with axis
-            $('<div id="line">').appendTo(this.element).addClass("thresholdLine").css({
+            $('<div id="line' + i + '">').appendTo(this.element).addClass("thresholdLine").css({
                 'width': thresholdWidth,
                 'left': this.element[0].offsetLeft + x,
                 'top': shift,
@@ -302,54 +312,54 @@
             });
 
             // creating temporary div for particular threshold
-            $('<div id="threshold" style="color:' + this.thresholds[i].textColor + '">' +
+            $('<div id="threshold' + i + '" style="color:' + this.thresholds[i].textColor + '">' +
               '<div style="left: 5px; top: 5px; position: absolute">Threshold ' + (i + 1) + ':' + '</div>' +
               '<div id="title" style="left: 15px; top: 17px; position: absolute; color: White;">' + this.thresholds[i].title + '</div>' +
               '<div id="desc" style="left: 10px; right: 10px; position: absolute">' + this.thresholds[i].description + '</div>' +
               '<div id="bookmark" style="right: 13px; bottom: 25px; position: absolute; color: White; cursor: pointer;">Jump To Threshold -> </div>' +
+              '<div id="bookmark2" style="right: 13px; bottom: 8px; position: absolute; color: White; cursor: pointer;">Close Threshold </div>' +
               '</div>').appendTo(this.element).addClass("thresholdDiv").css({
                   'background-color': this.thresholds[i].color,
                   'top': shift + thresholdHeight,
                   'left': this.element[0].offsetLeft + x
               });
 
-            $('#threshold #desc').css('top', $('#threshold #title').height() + 22);
-            $('#threshold').css('height', $('#threshold #desc').height() + 96);
+            $('#threshold' + i + ' #desc').css('top', $('#threshold' + i + ' #title').height() + 22);
+            $('#threshold' + i).css('height', $('#threshold' + i + ' #desc').height() + 96);
 
             // thresholds should open from right to left if they are near right side of page
-            if ($('#threshold').position().left + $('#threshold').width() >= this.width) {
-                $('#threshold').css('left', this.element[0].offsetLeft + x - $('#threshold').width() + thresholdWidth);
+            if ($('#threshold' + i).position().left + $('#threshold' + i).width() >= this.width - 450) {
+                this.thresholds[i].showing = 'right';
+                $('#threshold' + i).css('left', this.element[0].offsetLeft + x - $('#threshold' + i).width() + thresholdWidth);
+            } else {
+                this.thresholds[i].showing = 'left';
             }
-            // event for clicking a bookmark
-            $('#threshold #bookmark')[0].addEventListener('mouseup', function () {
+
+            // event for clicking a 'Jump to threshold' bookmark
+            $('#threshold' + i + ' #bookmark')[0].addEventListener('mouseup', function () {
                 if (self.currentThreshold != -1) self._onThresholdMouseClick();
             }, false);
+            // event for clicking a 'close' bookmark
+            $('#threshold' + i + ' #bookmark2')[0].addEventListener('mouseup', function () {
+                if (self.currentThreshold != -1) self._onThresholdsClear(false);
+            }, false);
             // stop mouse at time of threshold if mouse is over expanded threshold or line to it
-            $('#threshold')[0].addEventListener('mousemove', function () {
+            $('#threshold' + i)[0].addEventListener('mousemove', function () {
                 var e = window.event;
                 if (e) preventbubble(e);
+                self.setTimeMarker(self.thresholds[self.currentThreshold].time);
                 if (self.currentThreshold != -1) self.setTimeMarker(self.thresholds[self.currentThreshold].time);
             }, false);
-            $('#threshold').show('slide', { direction: this.thresholds[i].showing }, 'slow');
-            // only one threshold is visible now
-            this.thresholdVisibility = "one";
+            $('#threshold' + i).show('slide', { direction: this.thresholds[i].showing }, 'slow');
+            self.thresholdVisibility = "one";
+            // only one threshold is visible now    
         },
 
-        // function to perform after mouse leaves axis
-        _mouseLeave: function () {
-            var self = this;
-            // remove all currently visible shown thresholds
-            self.hideAllTimeout = setTimeout(function () {
-                self._onThresholdsClear(false);
-            }, thresholdsDelayTime);
-        },
-
-        // method that is called for visible threshold to remove it
+        // method that is called for visible threshold to remove it, threshold visibility changaes on 'no' after the animation
         _onThresholdsClear: function (toExpand) {
             // remove all visible thresholds and lines
             var self = this;
-            if (this.thresholdVisibility == "all") {
-                // if all small thresholds are visible
+            if (this.thresholdVisibility == "one") {
                 for (var i = 0; i < this.thresholds.length; i++) {
                     if (this.thresholds[i].isVisible) {
                         if (this.animation) {
@@ -362,29 +372,16 @@
                             // hide small thresholds and lines
                             $('#threshold' + i).slideUp(thresholdsAnimationTime, function () {
                                 var num = parseFloat(this.id.substring(9));
-                                self._hideThresholdsCompleted(num, toExpand);
+                                self._hideThresholdsCompletedSpecific(num, toExpand);
                             });
+
                         }
                     }
                 }
             }
-            else if (this.thresholdVisibility == "one") {
-                // if there is one expanded threshold
-                if (this.animation) {
-                    // if animation is already in progress, remove expanded threshold
-                    $('#threshold').remove();
-                    $('#line').remove();
-                    this._onThresholdsClearCompleted();
-                }
-                else {
-                    // hide expanded threshold
-                    var self = this;
-                    $('#threshold').slideUp(thresholdsAnimationTime, function () {
-                        self._hideThresholdCompleted();
-                    });
-                }
-            }
+
         },
+
         _onThresholdsClearCompleted: function () {
             // no threshold will be visible after removing current
             this.currentThreshold = -1;
@@ -427,6 +424,115 @@
             ctx.stroke();
         },
 
+        // render thresholds in collapsed view in calculated places
+        // thresholds are rounded rectangles
+        _drawCollapsedThresholds: function () {
+            var self = this;
+            if ((this.thresholds != null) && (this.showThresholds != false)) {
+                for (var i = 0; i < this.thresholds.length; i++) {
+                    self._drawCollapsedThreshold(i);
+                }
+            }
+        },
+        // render threshold in collapsed view in calculated place
+        // thresholds are rounded rectangles
+        _drawCollapsedThreshold: function (i) {
+            var canvas = this.ticksCanvas[0];
+            var ctx = canvas.getContext("2d");
+
+            if ((this.thresholds != null) && (this.showThresholds != false)) {
+                if (this.thresholds[i].isVisible) {
+                    x = this.thresholds[i].coordinate;
+                    ctx.fillStyle = this.thresholds[i].color;
+                    ctx.strokeStyle = "black";
+                    ctx.beginPath();
+                    ctx.moveTo(x, axisHeight - strokeWidth);
+                    ctx.lineTo(x + thresholdWidth, axisHeight - strokeWidth);
+                    ctx.lineTo(x + thresholdWidth, axisHeight - strokeWidth - (thresholdHeight - rectangleRadius));
+                    ctx.quadraticCurveTo(x + thresholdWidth, axisHeight - strokeWidth - thresholdHeight, x + thresholdWidth - rectangleRadius, axisHeight - strokeWidth - thresholdHeight);
+                    ctx.lineTo(x + rectangleRadius, axisHeight - strokeWidth - thresholdHeight);
+                    ctx.quadraticCurveTo(x, axisHeight - strokeWidth - thresholdHeight, x, axisHeight - strokeWidth - (thresholdHeight - rectangleRadius));
+                    ctx.lineTo(x, axisHeight - strokeWidth);
+                    ctx.closePath();
+                    ctx.lineWidth = 1;
+                    ctx.fill();
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+            }
+        },
+        // render highlighted threshold in collapsed view in calculated place
+        // thresholds are rounded rectangles
+        _drawHighlightedCollapsedThreshold: function (i) {
+            var canvas = this.ticksCanvas[0];
+            var ctx = canvas.getContext("2d");
+
+            if ((this.thresholds != null) && (this.showThresholds != false)) {
+                if (this.thresholds[i].isVisible) {
+                    x = this.thresholds[i].coordinate;
+                    ctx.fillStyle = this.thresholds[i].color;
+                    ctx.strokeStyle = "white";
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(x, axisHeight - strokeWidth);
+                    ctx.lineTo(x + thresholdWidth, axisHeight - strokeWidth);
+                    ctx.lineTo(x + thresholdWidth, axisHeight - strokeWidth - (thresholdHeight - rectangleRadius));
+                    ctx.quadraticCurveTo(x + thresholdWidth, axisHeight - strokeWidth - thresholdHeight, x + thresholdWidth - rectangleRadius, axisHeight - strokeWidth - thresholdHeight);
+                    ctx.lineTo(x + rectangleRadius, axisHeight - strokeWidth - thresholdHeight);
+                    ctx.quadraticCurveTo(x, axisHeight - strokeWidth - thresholdHeight, x, axisHeight - strokeWidth - (thresholdHeight - rectangleRadius));
+                    ctx.lineTo(x, axisHeight - strokeWidth);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                }
+
+            }
+        },
+
+        // render threshold in not collapsed view in calculated places
+        // thresholds are rounded rectangles,constants like 5 and 7 are defined "on eye"
+        _drawNotCollapsedThresholds: function () {
+            var canvas = this.ticksCanvas[0];
+            var ctx = canvas.getContext("2d");
+            ctx.lineWidth = 2;
+            if (this.thresholds != null) {
+                for (var i = 0; i < this.thresholds.length; i++) {
+                    if (this.thresholds[i].isVisible) {
+                        if ($("div").is('#threshold' + i)) {
+                            var x = this.thresholds[i].coordinate;
+                            $('#line' + i).css('left', this.element[0].offsetLeft + x);
+                            if (this.thresholds[i].showing == 'right') {
+                                if (($('#threshold' + i).position().left >= 0) && (($('#threshold' + i).position().left + $('#threshold' + i).width() <= this.width + 5))) {
+                                    $('#threshold' + i).css('left', this.element[0].offsetLeft + x - $('#threshold' + i).width() + thresholdWidth);
+                                } else {
+                                    var self = this;
+                                    $('#threshold' + i).remove();
+                                    $('#line' + i).remove();
+                                    self._hideThresholdsCompleted(i, false);
+                                }
+                            } else {
+                                if ($('#threshold' + i).position().left + $('#threshold' + i).width() <= this.width - 7) {
+                                    $('#threshold' + i).css('left', this.element[0].offsetLeft + x);
+                                } else {
+                                    var self = this;
+                                    $('#threshold' + i).remove();
+                                    $('#line' + i).remove();
+                                    self._hideThresholdsCompleted(i, false);
+                                }
+                            }
+                        }
+                    } else {
+                        if ($("div").is('#threshold' + i)) {
+                            var self = this;
+                            $('#threshold' + i).remove();
+                            $('#line' + i).remove();
+                            self._hideThresholdsCompleted(i, false);
+                        }
+                    }
+                }
+            }
+        },
+
         // creates and renders ticks
         _drawTicks: function () {
             var canvas = this.ticksCanvas[0];
@@ -464,27 +570,6 @@
                 text = (this.beta <= -2 ? months[this.endDate.month] + ", " : "") + (this.endDate.year > 0 ? (this.endDate.year) + " CE" : -this.endDate.year + (this.endDate.year == 0 ? 1 : 0) + " BCE");
                 measuredText2 = ctx.measureText(text).width + 5;
                 ctx.strokeText(text, this.width - measuredText2, verticalTextMargin * 2);
-            }
-
-            // render threshold in collapsed view in calculated places
-            // thresholds are rounded rectangles
-            if (this.thresholds != null) {
-                for (var i = 0; i < this.thresholds.length; i++) {
-                    if (this.thresholds[i].isVisible) {
-                        x = this.thresholds[i].coordinate;
-                        ctx.fillStyle = this.thresholds[i].color;
-                        ctx.beginPath();
-                        ctx.moveTo(x, axisHeight - strokeWidth);
-                        ctx.lineTo(x + thresholdWidth, axisHeight - strokeWidth);
-                        ctx.lineTo(x + thresholdWidth, axisHeight - strokeWidth - (thresholdHeight - rectangleRadius));
-                        ctx.quadraticCurveTo(x + thresholdWidth, axisHeight - strokeWidth - thresholdHeight, x + thresholdWidth - rectangleRadius, axisHeight - strokeWidth - thresholdHeight);
-                        ctx.lineTo(x + rectangleRadius, axisHeight - strokeWidth - thresholdHeight);
-                        ctx.quadraticCurveTo(x, axisHeight - strokeWidth - thresholdHeight, x, axisHeight - strokeWidth - (thresholdHeight - rectangleRadius));
-                        ctx.lineTo(x, axisHeight - strokeWidth);
-                        ctx.closePath();
-                        ctx.fill();
-                    }
-                }
             }
 
             var k = this.width / (this.options.range.right - this.options.range.left);
@@ -984,9 +1069,7 @@
 
             // find mode of axis by range and present date
             this._setMode();
-
             if (this.thresholds != null) {
-                this._onThresholdsClear();
                 this._setThresholdsVisibility();
             }
 
@@ -998,8 +1081,11 @@
             this.minorTicks = this._createMinorTicks(this.ticks);
             // render ticks for new range
             this._drawTicks();
+            this._drawCollapsedThresholds();
+            this._drawNotCollapsedThresholds();
             this._renderMarker();
         },
+
 
         _setThresholdsVisibility: function () {
             var k = this.width / (this.options.range.right - this.options.range.left);
@@ -1029,28 +1115,22 @@
             }
 
             if (this.thresholdVisibility == 'one') {
-                $('#threshold').css('left', this.element[0].offsetLeft + this.thresholds[this.currentThreshold].coordinate);
-                $('#line').css('left', this.element[0].offsetLeft + this.thresholds[this.currentThreshold].coordinate);
-            }
-            else if (this.thresholdVisibility == 'all') {
-                for (var i = 0; i < this.thresholds.length; i++) {
-                    if (this.thresholds[i].isVisible) {
-                        $('#threshold' + i).css('left', this.element[0].offsetLeft + this.thresholds[i].coordinate);
-                        $('#line' + i).css('left', this.element[0].offsetLeft + this.thresholds[i].coordinate);
-                    }
-                }
+                $('#threshold' + i).css('left', this.element[0].offsetLeft + this.thresholds[this.currentThreshold].coordinate);
+                $('#line' + i).css('left', this.element[0].offsetLeft + this.thresholds[this.currentThreshold].coordinate);
             }
         },
         /*
         Renders a marker with value
         */
         _renderMarker: function () {
+
             x = this.markerPosition;
             var canvas = this.mouseMarkCanvas[0];
             var ctx = canvas.getContext("2d");
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            if (x >= maxPermitedTimeRange.left && x <= maxPermitedTimeRange.right) {
+
+            if ((x >= maxPermitedTimeRange.left && x <= maxPermitedTimeRange.right)) {
                 var k = this.width / (this.options.range.right - this.options.range.left);
                 x = k * (x - this.options.range.left);
                 this.mousePosition = x;
@@ -1162,6 +1242,8 @@
 
             this._drawBackground();
             this._drawTicks();
+            this._drawCollapsedThresholds();
+            this._drawNotCollapsedThresholds();
         },
 
         // axis options: 

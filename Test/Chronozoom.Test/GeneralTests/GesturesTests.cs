@@ -270,6 +270,9 @@ namespace Chronozoom.Test.GeneralTests
 
             JsVisible visibleBefore = vcPageObj.GetViewport();
 
+            // Enable onmouseclick handler.
+            ExecuteScript("timelineClickOn();");
+
             action = new ActionsExtension(Driver);
             action.MoveToElement(vcPageObj.VirtualCanvas, (int)offsetScreen.X, (int)offsetScreen.Y).Perform();
             action.Click().Perform();
@@ -399,67 +402,71 @@ namespace Chronozoom.Test.GeneralTests
         }
 
 
-
-        double Ga = 1e9; //  1.0 Gigaannum
-                         // 13.7 Gigaannum - Age of universe
-
         [TestMethod]
         public void TestGesture_PanWithInertialMotion_ViewportUpdatesCorrectly()
         {
             IWebElement vcElem = Driver.FindElement(By.Id("vc"));
-            int width = vcElem.Size.Width;
-            int height = vcElem.Size.Height;
+            Assert.IsNotNull(vcElem, "err: cannot find canvas element");
+            Assert.IsTrue(vcElem.Size.Width > 10 && vcElem.Size.Height > 10, "err: canvas size should be atleast (10px,10px) to run test");
 
-            // center infodot as reference
-            var vc = new VirtualCanvasComponent(Driver);
+            int width = vcElem.Size.Width - 10; // assuming a max border width of 5px on each side
+            int height = vcElem.Size.Height - 10;
+           
+            VirtualCanvasComponent vc = new VirtualCanvasComponent(Driver);
             vc.SetVisible(new JsVisible(-3194.8898068225376, 401.0288546497742, 0.38537988462392836));
             vc.UpdateViewport();
 
             Random rnd = new Random();
-            Point panStart = new Point(rnd.Next(0, width), rnd.Next(0, height));
-            Point panEnd = new Point(rnd.Next(0, width), rnd.Next(0, height));
+            Point panStart = new Point(rnd.Next(width), rnd.Next(height));
+            panStart.Offset(5, 5);
+            Point panEnd = new Point(rnd.Next(width), rnd.Next(height));
+            panEnd.Offset(5, 5);
             Vector pan = new Vector(panEnd.X - panStart.X, panEnd.Y - panStart.Y);
 
             JsCoordinates p1 = vc.PointScreenToVirtual(new JsCoordinates(panStart.X, panStart.Y));
-
-            ActionsExtension act = new ActionsExtension(Driver);
-            act.MoveToElement(vcElem, panStart.X, panStart.Y);
-            act.ClickAndHold();
-            act.MoveByOffset(Convert.ToInt32(pan.X), Convert.ToInt32(pan.Y));
-            act.Release();
-            act.Perform();
+            
+            action = new ActionsExtension(Driver);
+            action.MoveToElement(vcElem, panStart.X, panStart.Y);
+            action.ClickAndHold();
+            action.MoveByOffset(Convert.ToInt32(pan.X), Convert.ToInt32(pan.Y));
+            action.Release();
+            action.Perform();
             vc.WaitAnimation();
-
+            
             JsCoordinates p2 = vc.PointVirtualToScreen(p1);
 
             // Assert that start-pt wrt the newViewport corresponds to end-pt in the oldViewport           
             Assert.AreEqual(panEnd.X, p2.X, 5);
             Assert.AreEqual(panEnd.Y, p2.Y, 5);
+
         }
 
         [TestMethod]
         public void TestGesture_ZoomWithInertialMotion_ViewportUpdatesCorrectly()
         {
             IWebElement vcElem = Driver.FindElement(By.Id("vc"));
-            int width = vcElem.Size.Width;
-            int height = vcElem.Size.Height;
+            Assert.IsNotNull(vcElem, "err: cannot find canvas element");
+            Assert.IsTrue(vcElem.Size.Width > 10 && vcElem.Size.Height > 10, "err: canvas size should be atleast (10px,10px) to run test");
 
-            // center infodot as reference
-            var vc = new VirtualCanvasComponent(Driver);
+            int width = vcElem.Size.Width - 10; // assuming a max border width of 5px on each side
+            int height = vcElem.Size.Height - 10;
+
+            VirtualCanvasComponent vc = new VirtualCanvasComponent(Driver);
             vc.SetVisible(new JsVisible(-3194.8898068225376, 401.0288546497742, 0.38537988462392836));
             vc.UpdateViewport();
 
             Random rnd = new Random();
             Point zoomPt = new Point(rnd.Next(0, width), rnd.Next(0, height));
+            zoomPt.Offset(5, 5);
 
             JsCoordinates p1 = vc.PointScreenToVirtual(new JsCoordinates(zoomPt.X, zoomPt.Y));
-
-            ActionsExtension act = new ActionsExtension(Driver);
-            act.MoveToElement(vcElem, Convert.ToInt32(zoomPt.X), Convert.ToInt32(zoomPt.Y));
-            act.DoubleClick();
-            act.Perform();
+            
+            action = new ActionsExtension(Driver);
+            action.MoveToElement(vcElem, Convert.ToInt32(zoomPt.X), Convert.ToInt32(zoomPt.Y));
+            action.DoubleClick();
+            action.Perform();
             vc.WaitAnimation();
-
+            
             JsCoordinates p2 = vc.PointVirtualToScreen(p1);
 
             // Assert that the zoom-pt remains fixed after zooming.       

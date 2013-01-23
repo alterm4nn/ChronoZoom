@@ -6,6 +6,7 @@
     <script type="text/javascript" src="Scripts/jquery-ui-1.8.16.custom.min.js"></script>
     <script type="text/javascript" src="Scripts/rx.js"></script>
     <script type="text/javascript" src="Scripts/rx.jQuery.js"></script>
+    <script type="text/javascript" src="Scripts/seadragon-min.js"></script>
     <script type="text/javascript" src="Scripts/common.js"></script>
     <script type="text/javascript" src="Scripts/cz.settings.js"></script>
     <script type="text/javascript" src="Scripts/vccontent.js"></script>
@@ -15,6 +16,7 @@
     <script type="text/javascript" src="Scripts/gestures.js"></script>
     <script type="text/javascript" src="Scripts/viewportAnimation.js"></script>
     <script type="text/javascript" src="Scripts/viewportController.js"></script>
+    <script type="text/javascript" src="Scripts/urlnav.js"></script>
     <script type="text/javascript">
         var maxPermitedVerticalRange = { top: -10000000, bottom: 10000000 };
 
@@ -80,7 +82,7 @@
                     description: 'Audio.',
                     mediaUrl: "rihard_shtraus_zaratustra.mp3",
                     mediaType: 'audio'
-                }]);
+                }], { title: "audioInfodot" });
 
             addInfodot(t1, "layerInfodots", "vimeoInfodot",
                 -8 * k, 2.0 * k, 0.9 * k,
@@ -88,7 +90,7 @@
                     description: 'Vidmeo Video.',
                     mediaUrl: 'http://player.vimeo.com/video/31911961?title=0&amp;byline=0&amp;portrait=0',
                     mediaType: 'video'
-                }]);
+                }], { title: "vimeoInfodot" });
 
             addInfodot(t1, "layerInfodots", "multitextInfodot",
                 -6 * k, 2.0 * k, 0.9 * k,
@@ -98,7 +100,7 @@
                     mediaUrl:
                     'The Universe is commonly defined as the totality of everything that exists, including all matter and energy, the planets, stars, galaxies, and the contents of intergalactic space. Definitions and usage vary and similar terms include the cosmos, the world and nature. Scientific observation of earlier stages in the development of the Universe, which can be seen at great distances, suggests that the Universe has been governed by the same physical laws and constants throughout most of its extent and history. There are various multiverse theories, in which physicists have suggested that our universe is one among many universes that likewise exist. (From Wikipedia, the free Encyclopedia)',
                     mediaType: 'multiline'
-                }]);
+                }], { title: "multitextInfodot" });
 
             addInfodot(t1, "layerInfodots", "ci1",
                 -3.0 * k, 2.0 * k, 0.2 * k,
@@ -109,7 +111,7 @@
                     mediaType: 'image'
                 },
                 addContentItem(1)
-                ]);
+                ], { title: "ci1" });
 
             addInfodot(t1, "layerInfodots", "ci2",
                 -2.5 * k, 2.0 * k, 0.2 * k,
@@ -120,7 +122,7 @@
                     mediaType: 'image'
                 },
                 addContentItem(1), addContentItem(2)
-                ]);
+                ], { title: "ci2" });
 
             addInfodot(t1, "layerInfodots", "ci3",
                 -2.0 * k, 2.0 * k, 0.2 * k,
@@ -131,7 +133,7 @@
                     mediaType: 'image'
                 },
                 addContentItem(1), addContentItem(2), addContentItem(3)
-                ]);
+                ], { title: "ci3" });
 
             addInfodot(t1, "layerInfodots", "ci4",
                 -1.5 * k, 2.0 * k, 0.2 * k,
@@ -142,7 +144,7 @@
                     mediaType: 'image'
                 },
                 addContentItem(1), addContentItem(2), addContentItem(3), addContentItem(4)
-                ]);
+                ], { title: "ci4" });
 
             addInfodot(t1, "layerInfodots", "ci5",
                 -3.0 * k, 2.5 * k, 0.2 * k,
@@ -154,7 +156,7 @@
                 },
                 addContentItem(1), addContentItem(2), addContentItem(3), addContentItem(4),
                 addContentItem(5)
-                ]);
+                ], { title: "ci5" });
 
             addInfodot(t1, "layerInfodots", "ci6",
                 -2.5 * k, 2.5 * k, 0.2 * k,
@@ -166,7 +168,7 @@
                 },
                 addContentItem(1), addContentItem(2), addContentItem(3), addContentItem(4),
                 addContentItem(5), addContentItem(6)
-                ]);
+                ], { title: "ci6" });
 
             addInfodot(t1, "layerInfodots", "ci7",
                 -2.0 * k, 2.5 * k, 0.2 * k,
@@ -178,7 +180,7 @@
                 },
                 addContentItem(1), addContentItem(2), addContentItem(3), addContentItem(4),
                 addContentItem(5), addContentItem(6), addContentItem(7)
-                ]);
+                ], { title: "ci7" });
 
             addInfodot(t1, "layerInfodots", "ci8",
                 -1.5 * k, 2.5 * k, 0.2 * k,
@@ -190,7 +192,7 @@
                 },
                 addContentItem(1), addContentItem(2), addContentItem(3), addContentItem(4),
                 addContentItem(5), addContentItem(6), addContentItem(7), addContentItem(8)
-                ]);
+                ], { title: "ci8" });
 
             addInfodot(t1, "layerInfodots", "ci9",
                 -3.0 * k, 3.0 * k, 0.2 * k,
@@ -203,7 +205,7 @@
                 addContentItem(1), addContentItem(2), addContentItem(3), addContentItem(4),
                 addContentItem(5), addContentItem(6), addContentItem(7), addContentItem(8),
                 addContentItem(9)
-                ]);
+                ], { title: "ci9" });
 
             addInfodot(t1, "layerInfodots", "ci10",
                 -2.5 * k, 3.0 * k, 0.2 * k,
@@ -216,7 +218,7 @@
                 addContentItem(1), addContentItem(2), addContentItem(3), addContentItem(4),
                 addContentItem(5), addContentItem(6), addContentItem(7), addContentItem(8),
                 addContentItem(9), addContentItem(10)
-                ]);
+                ], { title: "ci10" });
 
             addInfodot(t1, "layerInfodots", "ci11",
                 -2.0 * k, 3.0 * k, 0.2 * k,
@@ -229,7 +231,7 @@
                 addContentItem(1), addContentItem(2), addContentItem(3), addContentItem(4),
                 addContentItem(5), addContentItem(6), addContentItem(7), addContentItem(8),
                 addContentItem(9), addContentItem(10), addContentItem(11)
-                ]);
+                ], { title: "ci11" });
 
             addInfodot(t1, "layerInfodots", "ci12",
                 -1.5 * k, 3.0 * k, 0.2 * k,
@@ -242,7 +244,7 @@
                 addContentItem(1), addContentItem(2), addContentItem(3), addContentItem(4),
                 addContentItem(5), addContentItem(6), addContentItem(7), addContentItem(8),
                 addContentItem(9), addContentItem(10), addContentItem(11), addContentItem(12)
-                ]);
+                ], { title: "ci12" });
 
             getInfodotContent = function (infodotID, contentItemID) {
                 try { var dlod = getChild(demoItem, infodotID); }
@@ -276,8 +278,9 @@
                 var item;
                 var vp = vc.virtualCanvas("getViewport");
                 var sz = vp.vectorVirtualToScreen(demoItem.width, demoItem.height);
+
                 var a = dlod.changeZoomLevel(demoItem.zoomLevel, getZoomLevel(sz));
-                try { a.content.img.src; }
+                try { a.content.img.src }
                 catch (ex) {
                     return "not visible";
                 }

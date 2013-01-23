@@ -1,0 +1,1721 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>RxJS</name>
+    </assembly>
+    <members>
+        <member name="T:Rx.BooleanDisposable">
+            <summary>
+            Represents an IDisposable that can be checked for status.
+            </summary>
+        </member>
+        <member name="M:Rx.BooleanDisposable.#ctor">
+            <summary>
+            Constructs a new undisposed BooleanDisposable. 
+            </summary>
+        </member>
+        <member name="M:Rx.BooleanDisposable.Dispose">
+            <summary>
+            Sets the status to Disposed.
+            </summary>
+        </member>
+        <member name="M:Rx.BooleanDisposable.GetIsDisposed">
+            <summary>
+            Gets a value indicating whether the object is disposed.
+            </summary>
+        </member>
+        <member name="T:Rx.AsyncSubject">
+            <summary>
+            Represents the result of an asynchronous operation.
+            </summary>
+        </member>
+        <member name="T:Rx.Observable">
+            <summary>
+            Represents a push-style collection.
+            </summary>
+        </member>
+        <member name="T:Rx.IObservable">
+            <summary>
+            Represents a push-style collection.
+            </summary>
+        </member>
+        <member name="M:Rx.IObservable.Subscribe(Rx.IObserver)">
+            <summary>
+            Subscribes an observer to the observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Subscribe">
+            <summary>
+            Subscribes to the observable sequence for its side-effects.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Subscribe(Rx.IObserver)">
+            <summary>
+            Subscribes an observer to the observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Subscribe(System.ActionObject)">
+            <summary>
+            Subscribes an observer to the observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Subscribe(System.ActionObject,System.ActionObject)">
+            <summary>
+            Subscribes an observer to the observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Subscribe(System.ActionObject,System.ActionObject,System.Action)">
+            <summary>
+            Subscribes an observer to the observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.CreateWithDisposable(System.FuncObserverIDisposable)">
+            <summary>
+            Creates an observable sequence from the subscribe implementation.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Create(System.FuncObserverAction)">
+            <summary>
+            Creates an observable sequence from the subscribe implementation.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Select(System.FuncObjectObject)">
+            <summary>
+            Projects each value of an observable sequence into a new form.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Select(System.FuncObjectInt32Object)">
+            <summary>
+            Projects each value of an observable sequence into a new form by incorporating the element's index.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Let(System.FuncObservableObservable)">
+            <summary>
+            Bind the source to the parameter without sharing subscription side-effects.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Let(System.FuncObservableObservable,System.FuncISubject)">
+            <summary>
+            Bind the source to the parameter so that it can be used multiple
+            times without duplication of subscription side-effects.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.MergeObservable">
+            <summary>
+            Merges an observable sequence of observable sequences into an observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Concat(Rx.Observable)">
+            <summary>
+            Concatenates all the observable sequences.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Concat(Rx.Observable,Rx.Observable)">
+            <summary>
+            Concatenates all the observable sequences.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Concat(Rx.Observable,Rx.Observable,Rx.Observable)">
+            <summary>
+            Concatenates all the observable sequences.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Concat(Rx.Observable,Rx.Observable,Rx.Observable,Rx.Observable)">
+            <summary>
+            Concatenates all the observable sequences.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Merge(Rx.Observable)">
+            <summary>
+            Merges all the observable sequences into a single observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Merge(Rx.Observable,Rx.Observable)">
+            <summary>
+            Merges all the observable sequences into a single observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Merge(Rx.Observable,Rx.Observable,Rx.Observable)">
+            <summary>
+            Merges all the observable sequences into a single observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Merge(Rx.Observable,Rx.Observable,Rx.Observable,Rx.Observable)">
+            <summary>
+            Merges all the observable sequences into a single observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Catch(Rx.Observable)">
+            <summary>
+            Continues an observable sequence that is terminated by an exception with the next observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Catch(Rx.Observable,Rx.Observable)">
+            <summary>
+            Continues an observable sequence that is terminated by an exception with the next observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Catch(Rx.Observable,Rx.Observable,Rx.Observable)">
+            <summary>
+            Continues an observable sequence that is terminated by an exception with the next observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Catch(Rx.Observable,Rx.Observable,Rx.Observable,Rx.Observable)">
+            <summary>
+            Continues an observable sequence that is terminated by an exception with the next observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.OnErrorResumeNext(Rx.Observable)">
+            <summary>
+            Continues an observable sequence that is terminated normally or by an exception with the next observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.OnErrorResumeNext(Rx.Observable,Rx.Observable)">
+            <summary>
+            Continues an observable sequence that is terminated normally or by an exception with the next observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.OnErrorResumeNext(Rx.Observable,Rx.Observable,Rx.Observable)">
+            <summary>
+            Continues an observable sequence that is terminated normally or by an exception with the next observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.OnErrorResumeNext(Rx.Observable,Rx.Observable,Rx.Observable,Rx.Observable)">
+            <summary>
+            Continues an observable sequence that is terminated normally or by an exception with the next observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Zip(Rx.Observable,System.FuncObjectObjectObject)">
+            <summary>
+            Merges two observable sequences into one observable sequence by using the selector function.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.CombineLatest(Rx.Observable,System.FuncObjectObjectObject)">
+            <summary>
+            Merges two observable sequences into one observable sequence by using the selector function
+            whenever one of the observable sequences has a new value.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Switch">
+            <summary>
+            Transforms an observable sequence of observable sequences into an observable sequence producing values only from the most recent observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.TakeUntil(Rx.Observable)">
+            <summary>
+            Returns the values from the source observable sequence until the other observable sequence produces a value.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.SkipUntil(Rx.Observable)">
+            <summary>
+            Returns the values from the source observable sequence only after the other observable sequence produces a value.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Scan1(System.FuncObjectObjectObject)">
+            <summary>
+            Applies an accumulator function over an observable sequence and returns each intermediate result.  
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Scan(System.Object,System.FuncObjectObjectObject)">
+            <summary>
+            Applies an accumulator function over an observable sequence and returns each intermediate result.  
+            The specified seed value is used as the initial accumulator value.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Scan0(System.Object,System.FuncObjectObjectObject)">
+            <summary>
+            Applies an accumulator function over an observable sequence and returns each intermediate result.  
+            The specified seed value is prepended to the sequence once a message comes in.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Finally(System.Action)">
+            <summary>
+            Invokes finallyAction after source observable sequence terminates normally or by an exception.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Do(System.ActionObject)">
+            <summary>
+            Invokes the action for its side-effects on each value in the observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Do(System.ActionObject,System.ActionObject)">
+            <summary>
+            Invokes the action for its side-effects on each value in the observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Do(System.ActionObject,System.ActionObject,System.Action)">
+            <summary>
+            Invokes the action for its side-effects on each value in the observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Do(Rx.Observer)">
+            <summary>
+            Invokes the observer for its side-effects on each value in the observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Where(System.FuncObjectBoolean)">
+            <summary>
+            Filters the values of an observable sequence based on a predicate.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Where(System.FuncObjectInt32Boolean)">
+            <summary>
+            Filters the values of an observable sequence based on a predicate by incorporating the element's index.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Take(System.Int32)">
+            <summary>
+            Returns a specified number of contiguous values from the start of an observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Take(System.Int32,Rx.Scheduler)">
+            <summary>
+            Returns a specified number of contiguous values from the start of an observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Skip(System.Int32)">
+            <summary>
+            Bypasses a specified number of values in an observable sequence and then returns the remaining values.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.GroupBy(System.FuncObjectObject)">
+            <summary>
+            Groups the elements of an observable sequence according to a specified key selector function.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.GroupBy(System.FuncObjectObject,System.FuncObjectObject)">
+            <summary>
+            Groups the elements of an observable sequence and selects the resulting elements by using a specified function.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.GroupBy(System.FuncObjectObject,System.FuncObjectObject,System.FuncObjectString)">
+            <summary>
+            Groups the elements of an observable sequence according to a specified key selector function and keySerializer and selects the resulting elements by using a specified function.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.TakeWhile(System.FuncObjectBoolean)">
+            <summary>
+            Returns values from an observable sequence as long as a specified condition is true, and then skips the remaining values.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.SkipWhile(System.FuncObjectBoolean)">
+            <summary>
+            Bypasses values in an observable sequence as long as a specified condition is true and then returns the remaining values.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.SelectMany(System.FuncObjectObservable)">
+            <summary>
+            Projects each value of an observable sequence to an observable sequence and flattens the resulting observable sequences into one observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.TimeInterval">
+            <summary>
+            Records the time interval for each value of an observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.TimeInterval(Rx.Scheduler)">
+            <summary>
+            Records the time interval for each value of an observable sequence according to the scheduler's notion of time.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.RemoveInterval">
+            <summary>
+            Removes the timestamp from each value of an observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Timestamp">
+            <summary>
+            Records the timestamp for each value of an observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Timestamp(Rx.Scheduler)">
+            <summary>
+            Records the timestamp for each value of an observable sequence according to the scheduler's notion of time.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.RemoveTimestamp">
+            <summary>
+            Removes the timestamp from each value of an observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Materialize">
+            <summary>
+            Materializes the implicit notifications of an observable sequence as explicit notification values.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Dematerialize">
+            <summary>
+            Dematerializes the explicit notification values of an observable sequence as implicit notifications.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Delay(System.Int32)">
+            <summary>
+            Time shifts the observable sequence by dueTime.
+            The relative time intervals between the values are preserved.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Delay(System.Int32,Rx.Scheduler)">
+            <summary>
+            Time shifts the observable sequence by dueTime.
+            The relative time intervals between the values are preserved.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Throttle(System.Int32)">
+            <summary>
+            Ignores values from an observable sequence which are followed by another value before dueTime.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Throttle(System.Int32,Rx.Scheduler)">
+            <summary>
+            Ignores values from an observable sequence which are followed by another value before dueTime.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Timeout(System.Int32)">
+            <summary>
+            Returns observable sequence that ends with a TimeoutException if dueTime elapses.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Timeout(System.Int32,Rx.Scheduler)">
+            <summary>
+            Returns observable sequence that ends with a TimeoutException if dueTime elapses.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Timeout(System.Int32,Rx.Observable)">
+            <summary>
+            Returns the source observable sequence until completed or if dueTime elapses replaces the observable sequence with other.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Timeout(System.Int32,Rx.Observable,Rx.Scheduler)">
+            <summary>
+            Returns the source observable sequence until completed or if dueTime elapses replaces the observable sequence with other.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Sample(System.Int32)">
+            <summary>
+            Samples the observable sequence at each interval.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Sample(System.Int32,Rx.Scheduler)">
+            <summary>
+            Samples the observable sequence at each interval.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Repeat">
+            <summary>
+            Repeats the observable sequence indefinitely.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Repeat(System.Int32)">
+            <summary>
+            Repeats the observable sequence repeatCount times.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Repeat(System.Int32,Rx.Scheduler)">
+            <summary>
+            Repeats the observable sequence repeatCount times.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Retry">
+            <summary>
+            Repeats the source observable sequence until it successfully terminates.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Retry(System.Int32)">
+            <summary>
+            Repeats the source observable sequence the retryCount times or until it successfully terminates.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Retry(System.Int32,Rx.Scheduler)">
+            <summary>
+            Repeats the source observable sequence the retryCount times or until it successfully terminates.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.BufferWithTime(System.Int32)">
+            <summary>
+            Projects each value of an observable sequence into a buffer.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.BufferWithTime(System.Int32,System.Int32)">
+            <summary>
+            Projects each value of an observable sequence into a buffer.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.BufferWithTime(System.Int32,System.Int32,Rx.Scheduler)">
+            <summary>
+            Projects each value of an observable sequence into a buffer.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.BufferWithTimeOrCount(System.Int32,System.Int32)">
+            <summary>
+            Projects each value of an observable sequence into a buffer.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.BufferWithTimeOrCount(System.Int32,System.Int32,Rx.Scheduler)">
+            <summary>
+            Projects each value of an observable sequence into a buffer.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.BufferWithCount(System.Int32)">
+            <summary>
+            Projects each value of an observable sequence into a buffer.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.BufferWithCount(System.Int32,System.Int32)">
+            <summary>
+            Projects each value of an observable sequence into a buffer.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.AsObservable">
+            <summary>
+            Hides the identity of an observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.StartWith(System.Object)">
+            <summary>
+            Prepends a value to an observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.StartWith(System.Object,Rx.Scheduler)">
+            <summary>
+            Prepends a value to an observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.StartWith(System.Object[])">
+            <summary>
+            Prepends a sequence values to an observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.StartWith(System.Object[],Rx.Scheduler)">
+            <summary>
+            Prepends a sequence values to an observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.DistinctUntilChanged">
+            <summary>
+            Returns an observable sequence that contains only distinct contiguous values.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.DistinctUntilChanged(System.FuncObjectObject)">
+            <summary>
+            Returns an observable sequence that contains only distinct contiguous values according to the keySelector.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.DistinctUntilChanged(System.FuncObjectObject,System.FuncObjectObjectBoolean)">
+            <summary>
+            Returns an observable sequence that contains only distinct contiguous values according to the keySelector and comparer.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Merge(Rx.Observable[])">
+            <summary>
+            Merges all the observable sequences into a single observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Merge(Rx.Observable[],Rx.Scheduler)">
+            <summary>
+            Merges all the observable sequences into a single observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Concat(Rx.Observable[])">
+            <summary>
+            Concatenates all the observable sequences.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Concat(Rx.Observable[],Rx.Scheduler)">
+            <summary>
+            Concatenates all the observable sequences.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.FromArray(System.Object[])">
+            <summary>
+            Returns an observable sequence that contains all values from the array in order.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.FromArray(System.Object[],Rx.Scheduler)">
+            <summary>
+            Returns an observable sequence that contains all values from the array in order.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Return(System.Object)">
+            <summary>
+            Returns an observable sequence that contains a single value.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Return(System.Object,Rx.Scheduler)">
+            <summary>
+            Returns an observable sequence that contains a single value.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Throw(System.Object)">
+            <summary>
+            Returns an observable sequence that terminates with an exception.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Throw(System.Object,Rx.Scheduler)">
+            <summary>
+            Returns an observable sequence that terminates with an exception.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Never">
+            <summary>
+            Returns a non-terminating observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Empty">
+            <summary>
+            Returns an empty observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Empty(Rx.Scheduler)">
+            <summary>
+            Returns an empty observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.FromIEEvent(System.DHTML.DOMElement,System.String)">
+            <summary>
+            Returns an observable sequence that contains the values of the underlying Internet Explorer event.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.FromHtmlEvent(System.DHTML.DOMElement,System.String)">
+            <summary>
+            Returns an observable sequence that contains the values of the underlying Html event.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.FromDOMEvent(System.DHTML.DOMElement,System.String)">
+            <summary>
+            Returns an observable sequence that contains the values of the underlying DOM event.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.FromIEEvent(System.DHTML.DOMDocument,System.String)">
+            <summary>
+            Returns an observable sequence that contains the values of the underlying Internet Explorer event.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.FromHtmlEvent(System.DHTML.DOMDocument,System.String)">
+            <summary>
+            Returns an observable sequence that contains the values of the underlying Html event.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.FromDOMEvent(System.DHTML.DOMDocument,System.String)">
+            <summary>
+            Returns an observable sequence that contains the values of the underlying DOM event.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.FromIEEvent(System.DHTML.WindowInstance,System.String)">
+            <summary>
+            Returns an observable sequence that contains the values of the underlying Internet Explorer event.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.FromHtmlEvent(System.DHTML.WindowInstance,System.String)">
+            <summary>
+            Returns an observable sequence that contains the values of the underlying Html event.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.FromDOMEvent(System.DHTML.WindowInstance,System.String)">
+            <summary>
+            Returns an observable sequence that contains the values of the underlying DOM event.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Defer(System.FuncObservable)">
+            <summary>
+            Returns an observable sequence that invokes the observableFactory function whenever a new observer subscribes.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Catch(Rx.Observable[])">
+            <summary>
+            Continues an observable sequence that is terminated by an exception with the next observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Catch(Rx.Observable[],Rx.Scheduler)">
+            <summary>
+            Continues an observable sequence that is terminated by an exception with the next observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Using(System.FuncIDisposable,System.FuncIDisposableObservable)">
+            <summary>
+            Retrieves resource from resourceSelector for use in resourceUsage and disposes 
+            the resource once the resulting observable sequence terminates.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Range(System.Int32,System.Int32)">
+            <summary>
+            Generates an observable sequence of integral numbers within a specified range.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Range(System.Int32,System.Int32,Rx.Scheduler)">
+            <summary>
+            Generates an observable sequence of integral numbers within a specified range.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Repeat(System.Object)">
+            <summary>
+            Generates an observable sequence that contains one repeated value.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Repeat(System.Object,System.Int32)">
+            <summary>
+            Generates an observable sequence that contains one repeated value.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Repeat(System.Object,System.Int32,Rx.Scheduler)">
+            <summary>
+            Generates an observable sequence that contains one repeated value.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Generate(System.FuncObject,System.FuncObjectBoolean,System.FuncObjectObject,System.FuncObjectObject)">
+            <summary>
+            Generates an observable sequence by iterating a state from an initial state until
+            the condition fails.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Generate(System.FuncObject,System.FuncObjectBoolean,System.FuncObjectObject,System.FuncObjectObject,Rx.Scheduler)">
+            <summary>
+            Generates an observable sequence by iterating a state from an initial state until
+            the condition fails.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.GenerateWithTime(System.FuncObject,System.FuncObjectBoolean,System.FuncObjectObject,System.FuncObjectObject,System.FuncObjectInt32)">
+            <summary>
+            Generates an observable sequence by iterating a state from an initial state until
+            the condition fails.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.GenerateWithTime(System.FuncObject,System.FuncObjectBoolean,System.FuncObjectObject,System.FuncObjectObject,System.FuncObjectInt32,Rx.Scheduler)">
+            <summary>
+            Generates an observable sequence by iterating a state from an initial state until
+            the condition fails.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.OnErrorResumeNext(Rx.Observable[])">
+            <summary>
+            Continues an observable sequence that is terminated normally or by an exception with the next observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.OnErrorResumeNext(Rx.Observable[],Rx.Scheduler)">
+            <summary>
+            Continues an observable sequence that is terminated normally or by an exception with the next observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Amb(Rx.Observable)">
+            <summary>
+            Returns the observable sequence that reacts first.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Amb(Rx.Observable,Rx.Observable)">
+            <summary>
+            Returns the observable sequence that reacts first.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Amb(Rx.Observable,Rx.Observable,Rx.Observable)">
+            <summary>
+            Returns the observable sequence that reacts first.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Amb(Rx.Observable,Rx.Observable,Rx.Observable,Rx.Observable)">
+            <summary>
+            Returns the observable sequence that reacts first.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Interval(System.Int32)">
+            <summary>
+            Returns an observable sequence that produces a value after each period.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Interval(System.Int32,Rx.Scheduler)">
+            <summary>
+            Returns an observable sequence that produces a value after each period.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Timer(System.Int32)">
+            <summary>
+            Returns an observable sequence that produces a value at dueTime.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Timer(System.Int32,System.Int32)">
+            <summary>
+            Returns an observable sequence that produces a value after dueTime has elapsed and then after each period.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Timer(System.Int32,System.Int32,Rx.Scheduler)">
+            <summary>
+            Returns an observable sequence that produces a value after dueTime has elapsed and then after each period.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.ToAsync(System.Action)">
+            <summary>
+            Converts the action into an asynchronous function.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.ToAsync(System.FuncObject)">
+            <summary>
+            Converts the function into an asynchronous function.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.ToAsync(System.ActionObject)">
+            <summary>
+            Converts the action into an asynchronous function.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.ToAsync(System.FuncObjectObject)">
+            <summary>
+            Converts the function into an asynchronous function.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.ToAsync(System.FuncObjectArrayObject)">
+            <summary>
+            Converts the function into an asynchronous function.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.Action)">
+            <summary>
+            Invokes the action asynchronously.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.FuncObject)">
+            <summary>
+            Invokes the function asynchronously.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.ActionObject)">
+            <summary>
+            Invokes the function asynchronously.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.FuncObjectObject)">
+            <summary>
+            Invokes the function asynchronously.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.FuncObjectArrayObject)">
+            <summary>
+            Invokes the function asynchronously.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.Action,System.Object)">
+            <summary>
+            Invokes the action asynchronously.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.FuncObject,System.Object)">
+            <summary>
+            Invokes the function asynchronously.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.FuncObjectObject,System.Object)">
+            <summary>
+            Invokes the function asynchronously.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.FuncObjectArrayObject,System.Object)">
+            <summary>
+            Invokes the function asynchronously.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.Action,System.Object,System.Object[])">
+            <summary>
+            Invokes the action asynchronously.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.FuncObject,System.Object,System.Object[])">
+            <summary>
+            Invokes the function asynchronously.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.ActionObject,System.Object,System.Object[])">
+            <summary>
+            Invokes the function asynchronously.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.FuncObjectObject,System.Object,System.Object[])">
+            <summary>
+            Invokes the function asynchronously.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.FuncObjectArrayObject,System.Object,System.Object[])">
+            <summary>
+            Invokes the function asynchronously.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.ToAsync(System.Action,Rx.Scheduler)">
+            <summary>
+            Converts the action into an asynchronous function, using scheduler to schedule the work.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.ToAsync(System.FuncObject,Rx.Scheduler)">
+            <summary>
+            Converts the function into an asynchronous function, using scheduler to schedule the work.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.ToAsync(System.ActionObject,Rx.Scheduler)">
+            <summary>
+            Converts the action into an asynchronous function, using scheduler to schedule the work.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.ToAsync(System.FuncObjectObject,Rx.Scheduler)">
+            <summary>
+            Converts the function into an asynchronous function, using scheduler to schedule the work.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.ToAsync(System.FuncObjectArrayObject,Rx.Scheduler)">
+            <summary>
+            Converts the function into an asynchronous function, using scheduler to schedule the work.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.Action,Rx.Scheduler)">
+            <summary>
+            Invokes the action asynchronously, using scheduler to schedule the work.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.FuncObject,Rx.Scheduler)">
+            <summary>
+            Invokes the function asynchronously, using scheduler to schedule the work.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.ActionObject,Rx.Scheduler)">
+            <summary>
+            Invokes the function asynchronously, using scheduler to schedule the work.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.FuncObjectObject,Rx.Scheduler)">
+            <summary>
+            Invokes the function asynchronously, using scheduler to schedule the work.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.FuncObjectArrayObject,Rx.Scheduler)">
+            <summary>
+            Invokes the function asynchronously, using scheduler to schedule the work.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.Action,System.Object,Rx.Scheduler)">
+            <summary>
+            Invokes the action asynchronously, using scheduler to schedule the work.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.FuncObject,System.Object,Rx.Scheduler)">
+            <summary>
+            Invokes the function asynchronously, using scheduler to schedule the work.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.FuncObjectObject,System.Object,Rx.Scheduler)">
+            <summary>
+            Invokes the function asynchronously, using scheduler to schedule the work.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.FuncObjectArrayObject,System.Object,Rx.Scheduler)">
+            <summary>
+            Invokes the function asynchronously, using scheduler to schedule the work.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.Action,System.Object,System.Object[],Rx.Scheduler)">
+            <summary>
+            Invokes the action asynchronously, using scheduler to schedule the work.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.FuncObject,System.Object,System.Object[],Rx.Scheduler)">
+            <summary>
+            Invokes the function asynchronously, using scheduler to schedule the work.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.ActionObject,System.Object,System.Object[],Rx.Scheduler)">
+            <summary>
+            Invokes the function asynchronously, using scheduler to schedule the work.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.FuncObjectObject,System.Object,System.Object[],Rx.Scheduler)">
+            <summary>
+            Invokes the function asynchronously, using scheduler to schedule the work.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Start(System.FuncObjectArrayObject,System.Object,System.Object[],Rx.Scheduler)">
+            <summary>
+            Invokes the function asynchronously, using scheduler to schedule the work.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Publish">
+            <summary>
+            Returns a connectable observable sequence that shares a single subscription to the underlying source.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Publish(System.FuncObservableObservable)">
+            <summary>
+            Returns an observable sequence that is the result of invoking the selector on a connectable observable sequence that shares a single subscription to the underlying source.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Prune">
+            <summary>
+            Returns a connectable observable sequence that shares a single subscription to the underlying source containing only the last notification.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Prune(System.FuncObservableObservable)">
+            <summary>
+            Returns a connectable observable sequence that shares a single subscription to the underlying source containing only the last notification.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Prune(System.FuncObservableObservable,Rx.Scheduler)">
+            <summary>
+            Returns a connectable observable sequence that shares a single subscription to the underlying source containing only the last notification.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Replay">
+            <summary>
+            Returns a connectable observable sequence that shares a single subscription to the underlying source replaying all notifications.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Replay(System.FuncObservableObservable)">
+            <summary>
+            Returns a connectable observable sequence that shares a single subscription to the underlying source replaying all notifications.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Replay(System.FuncObservableObservable,System.Int32)">
+            <summary>
+            Returns a connectable observable sequence that shares a single subscription to the underlying source replaying bufferSize notifications.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Replay(System.FuncObservableObservable,System.Int32,System.Int32)">
+            <summary>
+            Returns a connectable observable sequence that shares a single subscription to the underlying source replaying bufferSize notifications within window.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Replay(System.FuncObservableObservable,System.Int32,System.Int32,Rx.Scheduler)">
+            <summary>
+            Returns a connectable observable sequence that shares a single subscription to the underlying source replaying bufferSize notifications within window.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.XmlHttpRequest(Rx.XmlHttpRequestDetails)">
+            <summary>
+            Starts an asynchronous XmlHttpRequest. 
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.XmlHttpRequest(System.String)">
+            <summary>
+            Starts an asynchronous XmlHttpRequest. 
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Aggregate(System.Object,System.FuncObjectObjectObject)">
+            <summary>
+            Applies an accumulator function over an observable sequence. The specified seed value is used as the initial accumulator value.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Aggregate1(System.FuncObjectObjectObject)">
+            <summary>
+            Applies an accumulator function over an observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.IsEmpty">
+            <summary>
+            Determines whether an observable sequence is empty.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Any">
+            <summary>
+            Determines whether an observable sequence contains any elements.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Any(System.FuncObjectBoolean)">
+            <summary>
+            Determines whether any element of an observable sequence satisfies a condition.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.All(System.FuncObjectBoolean)">
+            <summary>
+            Determines whether all elements of an observable sequence satisfy a condition.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Contains(System.Object)">
+            <summary>
+            Determines whether an observable sequence contains a specified element by using the default comparer.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Contains(System.Object,System.FuncObjectObjectBoolean)">
+            <summary>
+            Determines whether an observable sequence contains a specified element by using the specified comparer.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Count">
+            <summary>
+            Returns an number representing the total number of elements in an observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Sum">
+            <summary>
+            Computes the sum of a sequence of numeric values.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Average">
+            <summary>
+            Computes the average of a sequence of numeric values.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Final">
+            <summary>
+            Returns an observable that contains only the final OnNext value.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Min">
+            <summary>
+            Returns the minimum value in an observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Max">
+            <summary>
+            Returns the maximum value in an observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.MinBy(System.FuncObjectObject)">
+            <summary>
+            Returns the elements in an observable sequence with the minimum key value.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.MinBy(System.FuncObjectObject,System.FuncObjectObjectInt32)">
+            <summary>
+            Returns the elements in an observable sequence with the minimum key value by using the specified comparer.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.MaxBy(System.FuncObjectObject)">
+            <summary>
+            Returns the elements in an observable sequence with the maximum key value.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.MaxBy(System.FuncObjectObject,System.FuncObjectObjectInt32)">
+            <summary>
+            Returns the elements in an observable sequence with the maximum key value by using the specified comparer.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.ForkJoin(Rx.Observable,Rx.Observable)">
+            <summary>
+            Runs all observable sequences in parallel and combines their last values.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.ForkJoin(Rx.Observable,Rx.Observable,Rx.Observable)">
+            <summary>
+            Runs all observable sequences in parallel and combines their last values.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.ForkJoin(Rx.Observable,Rx.Observable,Rx.Observable,Rx.Observable)">
+            <summary>
+            Runs all observable sequences in parallel and combines their last values.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.ForkJoin(Rx.Observable,Rx.Observable,Rx.Observable,Rx.Observable,Rx.Observable)">
+            <summary>
+            Runs all observable sequences in parallel and combines their last values.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.And(Rx.Observable)">
+            <summary>
+            Matches when both observable sequences have an available value.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Then(System.Function)">
+            <summary>
+            Matches when the observable sequence has an available value and projects the value.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Join(Rx.Plan)">
+            <summary>
+            Joins together the results from several plans.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Join(Rx.Plan,Rx.Plan)">
+            <summary>
+            Joins together the results from several plans.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Join(Rx.Plan,Rx.Plan,Rx.Plan)">
+            <summary>
+            Joins together the results from several plans.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Join(Rx.Plan,Rx.Plan,Rx.Plan,Rx.Plan)">
+            <summary>
+            Joins together the results from several plans.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Join(Rx.Plan,Rx.Plan,Rx.Plan,Rx.Plan,Rx.Plan)">
+            <summary>
+            Joins together the results from several plans.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Join(Rx.Plan,Rx.Plan,Rx.Plan,Rx.Plan,Rx.Plan,Rx.Plan)">
+            <summary>
+            Joins together the results from several plans.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Join(Rx.Plan,Rx.Plan,Rx.Plan,Rx.Plan,Rx.Plan,Rx.Plan,Rx.Plan)">
+            <summary>
+            Joins together the results from several plans.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Join(Rx.Plan,Rx.Plan,Rx.Plan,Rx.Plan,Rx.Plan,Rx.Plan,Rx.Plan,Rx.Plan)">
+            <summary>
+            Joins together the results from several plans.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.SkipLast(System.Int32)">
+            <summary>
+            Bypasses a specified number of values at the end of an observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.TakeLast(System.Int32)">
+            <summary>
+            Returns a specified number of contiguous values from the end of an observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.While(System.FuncBoolean,Rx.Observable)">
+            <summary>
+            Repeats source as long as condition holds.
+            </summary>        
+        </member>
+        <member name="M:Rx.Observable.If(System.FuncBoolean,Rx.Observable,Rx.Observable)">
+            <summary>
+            If condition is true, then thenSource else elseSource.
+            </summary>        
+        </member>
+        <member name="M:Rx.Observable.DoWhile(Rx.Observable,System.FuncBoolean)">
+            <summary>
+            Repeats source as long as condition holds.
+            </summary>   
+        </member>
+        <member name="M:Rx.Observable.Case(System.FuncObservable,System.Dictionary)">
+            <summary>
+            Uses selector to determine which source in sources to use, empty if no match is found.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Case(System.FuncObservable,System.Dictionary,Rx.Observable)">
+            <summary>
+            Uses selector to determine which source in sources to use, uses defaultSource if no match is found.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Case(System.FuncObservable,System.Dictionary,Rx.Observable,Rx.Scheduler)">
+            <summary>
+            Uses selector to determine which source in sources to use, uses defaultSource if no match is found.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.For(System.Array,System.FuncObjectObservable)">
+            <summary>
+            Concatenates the observable sequences obtained by running the resultSelector for each element in source.
+            </summary>
+        </member>
+        <member name="M:Rx.Observable.Let(System.Object,System.FuncObjectObservable)">
+            <summary>
+            Returns an observable sequence that invokes selector with value whenever a new observer subscribes.
+            </summary>
+        </member>
+        <member name="T:Rx.ISubject">
+            <summary>
+            Represents an object that is both an observable sequence as well as an observer.
+            </summary>
+        </member>
+        <member name="T:Rx.IObserver">
+            <summary>
+            Supports push-style iteration over an observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.IObserver.OnNext(System.Object)">
+            <summary>
+            Notifies the observer of a new value in the sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.IObserver.OnError(System.Object)">
+            <summary>
+            Notifies the observer that an exception has occurred.
+            </summary>
+        </member>
+        <member name="M:Rx.IObserver.OnCompleted">
+            <summary>
+            Notifies the observer of the end of the sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.AsyncSubject.#ctor(Rx.Scheduler)">
+            <summary>
+            Creates a subject that can only receive one value and that value is cached for all future observations.
+            </summary>
+        </member>
+        <member name="M:Rx.AsyncSubject.#ctor">
+            <summary>
+            Creates a subject that can only receive one value and that value is cached for all future observations.
+            </summary>
+        </member>
+        <member name="M:Rx.AsyncSubject.OnNext(System.Object)">
+            <summary>
+            Notifies all subscribed observers with the value.
+            </summary>
+        </member>
+        <member name="M:Rx.AsyncSubject.OnError(System.Object)">
+            <summary>
+            Notifies all subscribed observers with the exception. 
+            </summary>
+        </member>
+        <member name="M:Rx.AsyncSubject.OnCompleted">
+            <summary>
+            Notifies all subscribed observers of the end of the sequence.
+            </summary>
+        </member>
+        <member name="T:Rx.BehaviorSubject">
+            <summary>
+            Represents an object that is both an observable sequence as well as an observer.
+            </summary>
+        </member>
+        <member name="T:Rx.ReplaySubject">
+            <summary>
+            Represents an object that is both an observable sequence as well as an observer.
+            </summary>
+        </member>
+        <member name="M:Rx.ReplaySubject.#ctor(System.Int32,System.Int32,Rx.Scheduler)">
+            <summary>
+            Creates a replayable subject.
+            </summary>
+        </member>
+        <member name="M:Rx.ReplaySubject.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Creates a replayable subject.
+            </summary>
+        </member>
+        <member name="M:Rx.ReplaySubject.OnNext(System.Object)">
+            <summary>
+            Notifies the observer of a new value in the sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.ReplaySubject.OnError(System.Object)">
+            <summary>
+            Notifies the observer that an exception has occurred.
+            </summary>
+        </member>
+        <member name="M:Rx.ReplaySubject.OnCompleted">
+            <summary>
+            Notifies the observer of the end of the sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.BehaviorSubject.#ctor(System.Object,Rx.Scheduler)">
+            <summary>
+            Creates a behavior subject.
+            </summary>
+        </member>
+        <member name="M:Rx.BehaviorSubject.#ctor(System.Object)">
+            <summary>
+            Creates a behavior subject.
+            </summary>
+        </member>
+        <member name="T:Rx.ConnectableObservable">
+            <summary>
+            Represents an observable that can be connected and disconnected from its source.
+            </summary>
+        </member>
+        <member name="M:Rx.ConnectableObservable.#ctor(Rx.Observable,Rx.ISubject)">
+            <summary>
+            Creates an observable that can be connected and disconnected from its source.
+            </summary>
+        </member>
+        <member name="M:Rx.ConnectableObservable.#ctor(Rx.Observable)">
+            <summary>
+            Creates an observable that can be connected and disconnected from its source.
+            </summary>
+        </member>
+        <member name="M:Rx.ConnectableObservable.Connect">
+            <summary>
+            Connects the observable to its source.
+            </summary>
+        </member>
+        <member name="M:Rx.ConnectableObservable.RefCount">
+            <summary>
+            Returns an observable sequence that stays connected to the source as long as there is at least one subscription to the observable sequence.
+            </summary>
+        </member>
+        <member name="T:Rx.Plan">
+            <summary>
+            Represents an execution plan for join patterns.
+            </summary>    
+        </member>
+        <member name="T:Rx.List">
+            <summary>
+            Represents mutable List semantics in JavaScript
+            </summary>
+        </member>
+        <member name="M:Rx.List.#ctor">
+            <summary>
+            Creates a new List.
+            </summary>
+        </member>
+        <member name="M:Rx.List.#ctor(System.FuncObjectObjectBoolean)">
+            <summary>
+            Creates a new List that uses comparer for looking up items.
+            </summary>
+        </member>
+        <member name="M:Rx.List.Add(System.Object)">
+            <summary>
+            Adds item to the list.
+            </summary>
+        </member>
+        <member name="M:Rx.List.RemoveAt(System.Int32)">
+            <summary>
+            Removes item at index.
+            </summary>
+        </member>
+        <member name="M:Rx.List.IndexOf(System.Object)">
+            <summary>
+            Searches item in the list and returns it index if found, returns -1 otherwise.
+            </summary>
+        </member>
+        <member name="M:Rx.List.Remove(System.Object)">
+            <summary>
+            Tries to remove item from list, returns boolean indicating success.
+            </summary>
+        </member>
+        <member name="M:Rx.List.Clear">
+            <summary>
+            Clears the list.
+            </summary>
+        </member>
+        <member name="M:Rx.List.GetCount">
+            <summary>
+            Returns the amount of items in the list.
+            </summary>
+        </member>
+        <member name="M:Rx.List.GetItem(System.Int32)">
+            <summary>
+            returns item at position index.
+            </summary>
+        </member>
+        <member name="M:Rx.List.SetItem(System.Int32,System.Object)">
+            <summary>
+            Replaces value at postition index with item.
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Rx.List.ToArray" -->
+        <member name="T:Rx.Pattern">
+            <summary>
+            Represents a join pattern.
+            </summary>
+        </member>
+        <member name="M:Rx.Pattern.And(Rx.Observable)">
+            <summary>
+            Matches when all observable sequences have an available value.
+            </summary>
+        </member>
+        <member name="M:Rx.Pattern.Then(System.Function)">
+            <summary>
+            Matches when all observable sequences have an available value and projects the values.
+            </summary>
+        </member>
+        <member name="T:Rx.RefCountDisposable">
+            <summary>
+            Represents a disposable that only disposes its underlying disposable when all dependent disposables have been disposed.
+            </summary>
+        </member>
+        <member name="M:Rx.RefCountDisposable.#ctor">
+            <summary>
+            Creates a disposable that only disposes its underlying disposable when all dependent disposables have been disposed.
+            </summary>
+        </member>
+        <member name="M:Rx.RefCountDisposable.Dispose">
+            <summary>
+            Disposes the underlying disposable only when all dependent disposables have been disposed.
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Rx.RefCountDisposable.GetDisposable" -->
+        <member name="T:Rx.Subject">
+            <summary>
+            Represents an object that is both an observable sequence as well as an observer.
+            </summary>
+        </member>
+        <member name="M:Rx.Subject.#ctor(Rx.Scheduler)">
+            <summary>
+            Creates a subject.
+            </summary>
+        </member>
+        <member name="M:Rx.Subject.#ctor">
+            <summary>
+            Creates a subject.
+            </summary>
+        </member>
+        <member name="M:Rx.Subject.OnNext(System.Object)">
+            <summary>
+            Notifies all subscribed observers with the value.
+            </summary>
+        </member>
+        <member name="M:Rx.Subject.OnError(System.Object)">
+            <summary>
+            Notifies all subscribed observers with the exception.
+            </summary>
+        </member>
+        <member name="M:Rx.Subject.OnCompleted">
+            <summary>
+            Notifies all subscribed observers of the end of the sequence.
+            </summary>
+        </member>
+        <member name="T:Rx.Notification">
+            <summary>
+            Represents a notification to an observer.
+            </summary>
+        </member>
+        <member name="M:Rx.Notification.#ctor(System.String,System.Object)">
+            <summary>
+            Constructs a notification.
+            </summary>
+        </member>
+        <member name="M:Rx.Notification.#ctor(System.String)">
+            <summary>
+            Constructs a notification.
+            </summary>
+        </member>
+        <member name="M:Rx.Notification.Accept(Rx.Observer)">
+            <summary>
+            Invokes the observer's method corresponding to the notification.
+            </summary>
+        </member>
+        <member name="P:Rx.Notification.Kind">
+            <summary>
+            Gets the kind of notification that is represented.
+            </summary>
+        </member>
+        <member name="P:Rx.Notification.Value">
+            <summary>
+            Returns the current value.
+            </summary>
+        </member>
+        <member name="T:Rx.GroupedObservable">
+            <summary>
+            Represents an observable sequence of values that have a common key.
+            </summary>
+        </member>
+        <member name="P:Rx.GroupedObservable.Key">
+            <summary>
+            Gets the common key.
+            </summary>
+        </member>
+        <member name="T:Rx.Scheduler">
+            <summary>
+            Represents an object that schedules units of work.
+            </summary>
+        </member>
+        <member name="M:Rx.Scheduler.#ctor(System.Action,System.ActionInt32)">
+            <summary>
+            Creates an observer from the specified schedule and scheduleWithTime actions.
+            </summary>
+        </member>
+        <member name="M:Rx.Scheduler.Schedule(System.Action)">
+            <summary>
+            Schedules action to be executed.
+            </summary>
+        </member>
+        <member name="M:Rx.Scheduler.ScheduleWithTime(System.Action,System.Int32)">
+            <summary>
+            Schedules action to be executed after dueTime.
+            </summary>
+        </member>
+        <member name="M:Rx.Scheduler.ScheduleRecursive(System.ActionAction)">
+            <summary>
+            Schedules action to be executed recursively.
+            </summary>
+        </member>
+        <member name="M:Rx.Scheduler.ScheduleRecursiveWithTime(System.ActionActionInt32,System.Int32)">
+            <summary>
+            Schedules action to be executed recursively after each dueTime.
+            </summary>
+        </member>
+        <member name="M:Rx.Scheduler.Now">
+            <summary>
+            Gets the scheduler's notion of current time.
+            </summary>
+        </member>
+        <member name="P:Rx.Scheduler.CurrentThread">
+            <summary>
+            Gets the scheduler that schedules work as soon as possible on the current thread.
+            </summary>
+        </member>
+        <member name="P:Rx.Scheduler.Immediate">
+            <summary>
+            Gets the scheduler that schedules work immediately on the current thread.
+            </summary>
+        </member>
+        <member name="P:Rx.Scheduler.Timeout">
+            <summary>
+            Gets the scheduler that schedules work using window.setTimeout.
+            </summary>
+        </member>
+        <member name="T:Rx.MutableDisposable">
+            <summary>
+            Represents a disposable whose underlying disposable can be swapped for another disposable.
+            </summary>
+        </member>
+        <member name="M:Rx.MutableDisposable.#ctor">
+            <summary>
+            Constructs a new MutableDisposable with no current underlying disposable.
+            </summary>
+        </member>
+        <member name="M:Rx.MutableDisposable.Dispose">
+            <summary>
+            Disposes the underlying disposable as well as all future replacements.
+            </summary>
+        </member>
+        <member name="M:Rx.MutableDisposable.Get">
+            <summary>
+            Gets a value indicating whether the MutableDisposable has an underlying disposable.
+            </summary>
+        </member>
+        <member name="M:Rx.MutableDisposable.Replace(System.IDisposable)">
+            <summary>
+            Swaps and disposes the current disposable with the new disposable. 
+            </summary>
+        </member>
+        <member name="T:Rx.CompositeDisposable">
+            <summary>
+            Represents a group of Disposables that are disposed together.
+            </summary>
+        </member>
+        <member name="M:Rx.CompositeDisposable.#ctor">
+            <summary>
+            Constructs a CompositeDisposable from a group of disposables.
+            </summary>
+        </member>
+        <member name="M:Rx.CompositeDisposable.#ctor(System.IDisposable)">
+            <summary>
+            Constructs a CompositeDisposable from a group of disposables.
+            </summary>
+        </member>
+        <member name="M:Rx.CompositeDisposable.#ctor(System.IDisposable,System.IDisposable)">
+            <summary>
+            Constructs a CompositeDisposable from a group of disposables.
+            </summary>
+        </member>
+        <member name="M:Rx.CompositeDisposable.#ctor(System.IDisposable,System.IDisposable,System.IDisposable)">
+            <summary>
+            Constructs a CompositeDisposable from a group of disposables.
+            </summary>
+        </member>
+        <member name="M:Rx.CompositeDisposable.#ctor(System.IDisposable,System.IDisposable,System.IDisposable,System.IDisposable)">
+            <summary>
+            Constructs a CompositeDisposable from a group of disposables.
+            </summary>
+        </member>
+        <member name="M:Rx.CompositeDisposable.Dispose">
+            <summary>
+            Disposes all disposables in the group and removes them from the group.
+            </summary>
+        </member>
+        <member name="M:Rx.CompositeDisposable.Add(System.IDisposable)">
+            <summary>
+            Adds a disposable to the CompositeDisposable or disposes the disposable if the CompositeDisposable is disposed.
+            </summary>
+        </member>
+        <member name="M:Rx.CompositeDisposable.Remove(System.IDisposable)">
+            <summary>
+            Removes and disposes the first occurrence of a disposable from the CompositeDisposable.
+            </summary>
+        </member>
+        <member name="M:Rx.CompositeDisposable.GetCount">
+            <summary>
+            Gets the number of disposables contained in the CompositeDisposable.
+            </summary>
+        </member>
+        <member name="M:Rx.CompositeDisposable.Clear">
+            <summary>
+            Removes and disposes all disposables from the CompositeDisposable, but does not dispose the CompositeDisposable.
+            </summary>
+        </member>
+        <member name="T:Rx.Disposable">
+            <summary>
+            Provides a set of static methods for creating Disposables.
+            </summary>
+        </member>
+        <member name="M:Rx.Disposable.Create(System.Action)">
+            <summary>
+            Creates the disposable that invokes dispose when disposed.
+            </summary>
+        </member>
+        <member name="P:Rx.Disposable.Empty">
+            <summary>
+            Represents the disposable that does nothing when disposed.
+            </summary>
+        </member>
+        <member name="T:Rx.Observer">
+            <summary>
+            Supports push-style iteration over an observable sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observer.#ctor(System.ActionObject)">
+            <summary>
+            Creates an observer from the specified OnNext action.
+            </summary>
+        </member>
+        <member name="M:Rx.Observer.#ctor(System.ActionObject,System.ActionObject)">
+            <summary>
+            Creates an observer from the specified OnNext and OnError actions.
+            </summary>
+        </member>
+        <member name="M:Rx.Observer.#ctor(System.ActionObject,System.ActionObject,System.Action)">
+            <summary>
+            Creates an observer from the specified OnNext, OnError, and OnCompleted actions.
+            </summary>
+        </member>
+        <member name="M:Rx.Observer.OnNext(System.Object)">
+            <summary>
+            Notifies the observer of a new value in the sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observer.OnError(System.Object)">
+            <summary>
+            Notifies the observer that an exception has occurred.
+            </summary>
+        </member>
+        <member name="M:Rx.Observer.OnCompleted">
+            <summary>
+            Notifies the observer of the end of the sequence.
+            </summary>
+        </member>
+        <member name="M:Rx.Observer.AsObserver">
+            <summary>
+            Hides the identity of an observer.
+            </summary>
+        </member>
+        <member name="M:Rx.Observer.Create(System.ActionObject)">
+            <summary>
+            Creates an observer from the specified OnNext action.
+            </summary>
+        </member>
+        <member name="M:Rx.Observer.Create(System.ActionObject,System.ActionObject)">
+            <summary>
+            Creates an observer from the specified OnNext and OnError actions.
+            </summary>
+        </member>
+        <member name="M:Rx.Observer.Create(System.ActionObject,System.ActionObject,System.Action)">
+            <summary>
+            Creates an observer from the specified OnNext, OnError, and OnCompleted actions.
+            </summary>
+        </member>
+        <member name="T:Rx.XmlHttpRequestDetails">
+            <summary>
+            Represents required and optional arguments passed into Observable.XmlHttpRequest.
+            </summary>
+        </member>
+        <member name="M:Rx.XmlHttpRequestDetails.#ctor">
+            <summary>
+            Creates a new XmlHttpRequestDetails object.
+            </summary>
+        </member>
+        <member name="P:Rx.XmlHttpRequestDetails.Url">
+             <summary>
+            Required. String that specifies either the absolute or a relative URL of the XML data or server-side XML Web services.
+             </summary>
+        </member>
+        <member name="P:Rx.XmlHttpRequestDetails.Method">
+            <summary>
+            Required. String that specifies the HTTP method used to open the connection: such as GET, POST, or HEAD. This parameter is not case-sensitive.
+            </summary>
+        </member>
+        <member name="P:Rx.XmlHttpRequestDetails.User">
+            <summary>
+            Optional. String that specifies the name of the user for authentication. If this parameter is null ("") or missing and the site requires authentication, the component displays a logon window
+            </summary>
+        </member>
+        <member name="P:Rx.XmlHttpRequestDetails.Password">
+            <summary>
+            Optional. String that specifies the password for authentication. This parameter is ignored if the user parameter is null ("") or missing.
+            </summary>
+        </member>
+        <member name="P:Rx.XmlHttpRequestDetails.Headers">
+            <summary>
+            Adds custom HTTP headers to the request.
+            </summary>
+        </member>
+    </members>
+</doc>

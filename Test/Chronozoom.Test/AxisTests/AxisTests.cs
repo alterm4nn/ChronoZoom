@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
+using System.Globalization;
 
 namespace Chronozoom.Test.AxisTests
 {
@@ -123,14 +124,15 @@ namespace Chronozoom.Test.AxisTests
         /// <param name="endDay">Day of second date.</param>
         private void CheckConvertion(int startYear, int startMonth, int startDay, int endYear, int endMonth, int endDay)
         {
-            var n = (Driver as IJavaScriptExecutor).ExecuteScript
+            var n = ExecuteScriptGetNumber
                         ("return getYearsBetweenDates(" + startYear + "," + startMonth + "," + startDay + "," + endYear + "," + endMonth + "," + endDay + ");");
-            var date = (Driver as IJavaScriptExecutor).ExecuteScript
-                        ("return getDateFrom(" + endYear + "," + endMonth + "," + endDay + "," + Convert.ToDouble(n) + ");");
 
-            Assert.AreEqual(Convert.ToDouble((date as Dictionary<string, object>)["year"]), startYear);
-            Assert.AreEqual(Convert.ToDouble((date as Dictionary<string, object>)["month"]), startMonth);
-            Assert.AreEqual(Convert.ToDouble((date as Dictionary<string, object>)["day"]), startDay);
+            var date = ExecuteScriptGetJson
+                        ("return getDateFrom(" + endYear + "," + endMonth + "," + endDay + "," + n.ToString(CultureInfo.CreateSpecificCulture("en-US")) + ");");
+
+            Assert.AreEqual(Convert.ToDouble(date["year"]), startYear);
+            Assert.AreEqual(Convert.ToDouble(date["month"]), startMonth);
+            Assert.AreEqual(Convert.ToDouble(date["day"]), startDay);
         }
 
         /// <summary>
@@ -163,11 +165,11 @@ namespace Chronozoom.Test.AxisTests
         {
             GoToUrl();
 
-            var active = (Driver as IJavaScriptExecutor).ExecuteScript("return $(\"#axis\").axis(\"Active\");");
-            Assert.AreEqual(active, null);
+            var active = ExecuteScriptGetNumber("return $(\"#axis\").axis(\"MarkerPosition\");");
+            Assert.AreEqual(active, -1);
 
-            (Driver as IJavaScriptExecutor).ExecuteScript("$(\"#axis\").axis(\"setActive\", -10500000);");
-            active = (Driver as IJavaScriptExecutor).ExecuteScript("return $(\"#axis\").axis(\"Active\");");
+            ExecuteScript("$(\"#axis\").axis(\"setTimeMarker\", -10500000);");
+            active = ExecuteScriptGetNumber("return $(\"#axis\").axis(\"MarkerPosition\");");
             Assert.AreEqual(Convert.ToDouble(active), -10500000.0);
         }
     }

@@ -13,15 +13,17 @@ namespace ThumbGen
     {
         public Size PreviewSize;
         public string AzureBlobUrl;
-        public string AzureConnectionString;
+        public string AzureAccountName;
+        public string AzureKeytoBlob;
         public string SqlConnectionString;
 
-        public ControllerSettings(Size pSize, string sqlConnection, string azureBlobAdress, string azureConnectionString)
+        public ControllerSettings(Size pSize, string sqlConnection, string azureBlobAdress, string azureUsename, string azureKey)
         {
             PreviewSize = pSize;
             SqlConnectionString = sqlConnection;
             AzureBlobUrl = azureBlobAdress;
-            AzureConnectionString = azureConnectionString;
+            AzureAccountName = azureUsename;
+            AzureKeytoBlob = azureKey;
         }
     }
 }

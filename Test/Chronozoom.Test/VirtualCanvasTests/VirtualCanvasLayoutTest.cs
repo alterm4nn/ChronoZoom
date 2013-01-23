@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
+using System.Threading;
 
 namespace Chronozoom.Test.VirtualCanvasTests
 {
@@ -17,22 +18,23 @@ namespace Chronozoom.Test.VirtualCanvasTests
             GoToUrl();
 
             IJavaScriptExecutor js = Driver as IJavaScriptExecutor;
-            string script = "var timeline = {};" + "timeline.TimeUnit='Ga';" + "timeline.Year=5;" +
-                "GenerateProperty(timeline, 'TimeUnit', 'Year', 'Date', 'x');" + "return timeline;";
+            string script = "var timeline = {};" + "timeline.FromTimeUnit='Ga';" + "timeline.FromYear=5;" +
+                "GenerateProperty(timeline, 'FromTimeUnit', 'FromYear', 'FromMonth', 'FromDay', 'left');" + "return timeline;";
 
             var res = js.ExecuteScript(script);
-            Assert.IsTrue(Convert.ToDouble((res as Dictionary<string, object>)["x"]) == -5000000000.0);
+            Assert.IsTrue(Convert.ToDouble((res as Dictionary<string, object>)["left"]) == -5000000000.0);
         }
 
         [TestMethod]
         public void TestWCFResponceParsing()
         {
             GoToUrl();
+            Thread.Sleep(3000);
             IJavaScriptExecutor js = Driver as IJavaScriptExecutor;
-            string loadResponceDump = "return LoadResponceDump()";
+            string isContentLoaded = "return contentLoadedFromService;";
 
-            var res = js.ExecuteScript(loadResponceDump);
-            Assert.IsTrue((res as Dictionary<string, object>)["d"] != null);
+            bool res = (bool)js.ExecuteScript(isContentLoaded);
+            Assert.IsTrue(res);
         }
     }
 

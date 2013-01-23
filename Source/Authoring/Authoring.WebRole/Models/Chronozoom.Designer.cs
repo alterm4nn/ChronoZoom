@@ -8,12 +8,13 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.ComponentModel;
+using System.Data.EntityClient;
 using System.Data.Objects;
 using System.Data.Objects.DataClasses;
-using System.Data.EntityClient;
-using System.ComponentModel;
-using System.Xml.Serialization;
+using System.Linq;
 using System.Runtime.Serialization;
+using System.Xml.Serialization;
 
 [assembly: EdmSchemaAttribute()]
 #region EDM Relationship Metadata
@@ -585,6 +586,7 @@ namespace Authoring.WebRole.Models
         private ObjectSet<CZVersion> _CZVersions;
 
         #endregion
+
         #region AddTo Methods
     
         /// <summary>
@@ -804,6 +806,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Function Imports
     
         /// <summary>
@@ -864,11 +867,11 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
     }
-    
 
     #endregion
-    
+
     #region Entities
     
     /// <summary>
@@ -895,6 +898,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -1093,6 +1097,7 @@ namespace Authoring.WebRole.Models
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -1195,6 +1200,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -1225,6 +1231,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -1471,6 +1478,7 @@ namespace Authoring.WebRole.Models
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -1627,6 +1635,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -1655,6 +1664,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -1949,6 +1959,7 @@ namespace Authoring.WebRole.Models
         partial void OnIsVisibleChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -2073,6 +2084,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -2099,6 +2111,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -2297,6 +2310,7 @@ namespace Authoring.WebRole.Models
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -2399,6 +2413,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -2443,6 +2458,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -2977,6 +2993,7 @@ namespace Authoring.WebRole.Models
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -3291,6 +3308,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -3319,6 +3337,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -3541,6 +3560,7 @@ namespace Authoring.WebRole.Models
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -3697,6 +3717,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -3721,6 +3742,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -3799,6 +3821,7 @@ namespace Authoring.WebRole.Models
         partial void OnCZSystemVersionIDChanged();
 
         #endregion
+
     
     }
     
@@ -3830,6 +3853,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -3980,6 +4004,7 @@ namespace Authoring.WebRole.Models
         partial void OnCZVersionIDChanged();
 
         #endregion
+
     
     }
     
@@ -4013,6 +4038,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -4403,6 +4429,7 @@ namespace Authoring.WebRole.Models
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -4685,6 +4712,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -4713,6 +4741,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -4959,6 +4988,7 @@ namespace Authoring.WebRole.Models
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -5115,6 +5145,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -5143,6 +5174,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -5365,6 +5397,7 @@ namespace Authoring.WebRole.Models
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -5521,6 +5554,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -5549,6 +5583,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -5795,6 +5830,7 @@ namespace Authoring.WebRole.Models
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -5951,6 +5987,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -5977,6 +6014,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -6199,6 +6237,7 @@ namespace Authoring.WebRole.Models
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -6345,6 +6384,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -6373,6 +6413,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -6595,6 +6636,7 @@ namespace Authoring.WebRole.Models
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -6697,6 +6739,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -6723,6 +6766,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -6921,6 +6965,7 @@ namespace Authoring.WebRole.Models
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -7023,6 +7068,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -7049,6 +7095,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -7271,6 +7318,7 @@ namespace Authoring.WebRole.Models
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -7351,6 +7399,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -7391,6 +7440,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -7781,6 +7831,7 @@ namespace Authoring.WebRole.Models
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -7943,6 +7994,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -7971,6 +8023,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -8193,6 +8246,7 @@ namespace Authoring.WebRole.Models
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -8349,6 +8403,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -8375,6 +8430,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -8597,6 +8653,7 @@ namespace Authoring.WebRole.Models
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -8743,6 +8800,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -8769,6 +8827,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -8967,6 +9026,7 @@ namespace Authoring.WebRole.Models
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -9091,6 +9151,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -9117,6 +9178,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -9435,6 +9497,7 @@ namespace Authoring.WebRole.Models
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -9657,6 +9720,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -9697,6 +9761,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -10255,6 +10320,7 @@ namespace Authoring.WebRole.Models
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -10569,6 +10635,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -10597,6 +10664,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -10819,6 +10887,7 @@ namespace Authoring.WebRole.Models
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -10975,6 +11044,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -11001,6 +11071,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -11199,6 +11270,7 @@ namespace Authoring.WebRole.Models
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -11389,6 +11461,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -11417,6 +11490,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -11735,6 +11809,7 @@ namespace Authoring.WebRole.Models
         partial void OnIsVisibleChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -11837,6 +11912,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -11867,6 +11943,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -12137,6 +12214,7 @@ namespace Authoring.WebRole.Models
         partial void OnIsVisibleChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -12293,6 +12371,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -12329,6 +12408,7 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -12647,6 +12727,7 @@ namespace Authoring.WebRole.Models
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -13865,8 +13946,10 @@ namespace Authoring.WebRole.Models
         }
 
         #endregion
+
     }
 
     #endregion
+
     
 }

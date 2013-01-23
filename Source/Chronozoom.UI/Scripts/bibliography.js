@@ -3,17 +3,63 @@
     $("#biblCloseButton").mouseup(function () {
         pendingBibliographyForExhibitID = null;
         $("#bibliographyBack").hide('clip', {}, 'slow');
+        window.location.hash = window.location.hash.replace(new RegExp("&b=[a-z0-9_]+$", "gi"), "");
     });
 }
 
 var pendingBibliographyForExhibitID = null;
 
-function showBibliography(descr) {
-    $("#bibliographyBack").show('clip', {}, 'slow');
+function showBibliography(descr, element, id) {
+    // Bibliography link that raised showBibliohraphy.
+    var sender;
+    // Trying to find sender of bibliography link. Stop process of showing bibliography, if didn't find.
+    try {
+        sender = getChild(element, id);
+    }
+    catch (ex) {
+        return;
+    }
+
+    var vp = vc.virtualCanvas("getViewport");
+    var nav = vcelementToNavString(element, vp);
+
+    if (window.location.hash.match("b=([a-z0-9_]+)") == null) {
+        var bibl = "&b=" + id;
+        if (window.location.hash.indexOf('@') == -1)
+            bibl = "@" + bibl;
+        nav = nav + bibl;
+    }
+    
+    window.location.hash = nav;
+
+    // Remove 'onmouseclick' handler from current bibliography link to prevent multiple opening animation of bibliography window.
+    sender.onmouseclick = null;
+    var a = $("#bibliographyBack").css("display");
+    if ($("#bibliographyBack").css("display") == "none") {
+        $("#bibliographyBack").show('clip', {}, 'slow', function () {
+            // After bibliography window was fully opened, reset 'onmouseclick' handler for sender of bibliography link.
+            sender.onmouseclick = function (e) {
+                this.vc.element.css('cursor', 'default');
+                showBibliography({ infodot: descr.infodot, contentItems: descr.contentItems }, element, id);
+
+                return true;
+            }
+        });
+    } else {
+        // After bibliography window was fully opened, reset 'onmouseclick' handler for sender of bibliography link.
+        sender.onmouseclick = function (e) {
+            
+            this.vc.element.css('cursor', 'default');
+            showBibliography({ infodot: descr.infodot, contentItems: descr.contentItems }, element, id);
+
+            return true;
+        }
+    }
+
 
     // clearing all fields
     $("#bibliography .sources").empty();
-
+    $("#bibliography .title").html("<span></span> &gt; Bibliography");
     // Filling with new information
     if (descr) {
         if (descr.infodot) {

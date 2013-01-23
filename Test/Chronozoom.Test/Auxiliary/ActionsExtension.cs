@@ -13,6 +13,10 @@ namespace Chronozoom.Test.Auxiliary
     /// </summary>
     public class ActionsExtension
     {
+        // Constants.
+        private const int ElementPositionBoundX = 10;
+        private const int ElementPositionBoundY = 10;
+
         // This log contains all offsets of mouse. It used to set default position of mouse.
         private Stack<Point> log = new Stack<Point>();
 
@@ -134,9 +138,9 @@ namespace Chronozoom.Test.Auxiliary
         public ActionsExtension MoveToElement(IWebElement toElement, int offsetX, int offsetY)
         {
             builder = builder.MoveToElement(toElement, offsetX, offsetY);
-            // NOTE: If the value of offset is too little, then Selenium ignores it.
-            // TODO: Provide more accurate condition.
-            if (toElement.Location.X > 10 && toElement.Location.Y > 10)
+            // NOTE: If the value of offset is too little by X or Y, then Selenium ignores it.
+            // TODO: Provide more accurate condition. It's very unexpected. What's the real reason of such behavior?
+            if (toElement.Location.X > ElementPositionBoundX || toElement.Location.Y > ElementPositionBoundY)
             {
                 log.Push(new Point(-toElement.Location.X, -toElement.Location.Y));
             }

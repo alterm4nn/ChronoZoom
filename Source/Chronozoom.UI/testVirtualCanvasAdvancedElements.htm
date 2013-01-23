@@ -6,6 +6,7 @@
     <script type="text/javascript" src="Scripts/jquery-ui-1.8.16.custom.min.js"></script>
     <script type="text/javascript" src="Scripts/rx.js"></script>
     <script type="text/javascript" src="Scripts/rx.jQuery.js"></script>
+    <script type="text/javascript" src="Scripts/seadragon-min.js"></script>
     <script type="text/javascript" src="Scripts/common.js"></script>
     <script type="text/javascript" src="Scripts/cz.settings.js"></script>
     <script type="text/javascript" src="Scripts/vccontent.js"></script>
@@ -15,6 +16,7 @@
     <script type="text/javascript" src="Scripts/gestures.js"></script>
     <script type="text/javascript" src="Scripts/viewportAnimation.js"></script>
     <script type="text/javascript" src="Scripts/viewportController.js"></script>
+    <script type="text/javascript" src="Scripts/urlnav.js"></script>
     <script type="text/javascript">
         var maxPermitedVerticalRange = { top: -10000000, bottom: 10000000 };
 
@@ -92,33 +94,36 @@
 
                 addInfodot(t1, "layerInfodots", "frontierInfodot",
                 -18.7 * k, 2.0 * k, 0.6 * k,
-                [
-                {   title: 'Frontier Infodot',
+                [{   title: 'Frontier Infodot',
                     description: 'Test infodot for bug verification.',
                     mediaUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CMB_Timeline300_no_WMAP.jpg/1280px-CMB_Timeline300_no_WMAP.jpg',
                     mediaType: 'image'
-                }]);
+                }],
+                {
+                    title: 'frontierInfodot'
+                });
 
                 var infodot02 = addInfodot(t1, "layerInfodots", "infodot02",
                 -16 * k, 2.0 * k, 0.6 * k,
-                [
-                { title: 'Space like infinity',
+                [{ title: 'Space like infinity',
                     description: 'The Universe was once in an extremely hot and dense state which expanded rapidly.',
                     mediaUrl: "rihard_shtraus_zaratustra.mp3",
                     mediaType:'audio'
-                }
+                }],
+                {
+                    title: 'infodot02'
+                });
 
-                ]);
-                 var infodot01 = addInfodot(t1, "layerInfodots", "infodot01",
+                var infodot01 = addInfodot(t1, "layerInfodots", "infodot01",
                 -14 * k, 2.0 * k, 0.6 * k,
-                [
-                { title: 'Space like infinity',
+                [{ title: 'Space like infinity',
                     description: 'The Universe was once in an extremely hot and dense state which expanded rapidly.',
                     mediaUrl: 'http://www.hpcaconf.org/hpca11/papers/30_ananian-unboundedtransactionalmemory.pdf',
                     mediaType: 'pdf'
-                }
-
-                ]);
+                }],
+                {
+                    title: 'infodot01'
+                });
 
             var infodot0 = addInfodot(t1, "layerInfodots", "infodot0",
                 -12 * k, 2.0 * k, 0.6 * k,
@@ -126,9 +131,10 @@
                     description: 'The Universe was once in an extremely hot and dense state which expanded rapidly.',
                     mediaUrl: 'http://player.vimeo.com/video/31911961?title=0&amp;byline=0&amp;portrait=0',
                     mediaType: 'video'
-                }
-
-                ]);
+                }],
+                {
+                    title: 'infodot0'
+                });
 
             var infodot1 = addInfodot(t1, "layerInfodots", "infodot1",
                 -10 * k, 2.0 * k, 0.6 * k,
@@ -166,7 +172,10 @@
                     description: 'The Universe was once in an extremely hot and dense state which expanded rapidly.',
                     mediaUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CMB_Timeline300_no_WMAP.jpg/1280px-CMB_Timeline300_no_WMAP.jpg',
                     mediaType: 'image'
-                }]);
+                }],
+                {
+                    title: 'infodot1'
+                });
 
             t2 = addTimeline(t1, "layerTimelines", "t2",
                  {
@@ -175,13 +184,18 @@
                      header: "Life",
                      fillStyle: "rgba(30, 100, 30, 0.5)"
                  });
+
             var infodot2 = addInfodot(t2, "layerInfodots", "infodot2",
                 -4 * k, 0.8 * k, 0.2 * k,
                 [{ id: "i2_c1", title: 'Penguins (family Spheniscidae)',
                     description: 'A group of aquatic, flightless birds living almost exclusively in the southern hemisphere.',
                     mediaUrl: 'http://www.photographyis.co.uk/blog/wp-content/uploads/2011/02/penguin.jpg',
                     mediaType: 'image'
-                }]);
+                }],
+                {
+                    title: 'infodot2'
+                });
+
             var infodot3 = addInfodot(t2, "layerInfodots", "infodot3",
                 -4 * k, 1.5 * k, 0.2 * k,
                 [{ id: "i3_c1", title: 'Otocolobus manul',
@@ -203,14 +217,21 @@
                     description: "Pallas's cat is about the size of a domestic cat, with a 46 to 65 cm body.",
                     mediaUrl: 'http://www.zoopicture.ru/wp-content/uploads/2009/04/manul1.jpg',
                     mediaType: 'image'
-                }]);
+                }],
+                {
+                    title: 'infodot3'
+                });
+
             var infodot4 = addInfodot(t2, "layerInfodots", "infodot4",
                 -3.0 * k, 0.8 * k, 0.2 * k,
                 [{ id: "i4_c1", title: 'Tiger (Panthera tigris)',
                     description: "The tiger is the largest cat species, reaching a total body length of up to 3.3 metres and weighing up to 306 kg.",
                     mediaUrl: 'http://www.baby-einstein.net/wp-content/uploads/2010/11/Tiger-Cubs.jpg',
                     mediaType: 'image'
-                }]);
+                }],
+                {
+                    title: 'infodot4'
+                });
 
             root.endEdit(true);
 

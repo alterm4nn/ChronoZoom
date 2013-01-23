@@ -51,7 +51,7 @@ namespace ThumbGen
         public void SetControllerSettings(ControllerSettings cs)
         {
             SetPreviewSize(cs.PreviewSize);
-            ConfigureAzure(cs.AzureBlobUrl, cs.AzureConnectionString);
+            ConfigureAzure(cs.AzureBlobUrl, cs.AzureAccountName, cs.AzureKeytoBlob);
             ConfigureSQL(cs.SqlConnectionString);
         }
 

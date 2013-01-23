@@ -23,14 +23,14 @@ namespace Chronozoom.Test.GeneralTests
         // Set RandomRegimeOn to true or false. If it's true, then the test checks NumberOfSearchQueries random existent titles.
         // If it's false, then the test checks the range of titles, starting from StartIndex. The length of range is NumberOfSearchQueries.
         private const bool RandomRegimeOn = false;
-        private const int NumberOfSearchQueries = 5;
-        private const int StartIndex = 0;
+        private const int NumberOfSearchQueries = 42;
+        private const int StartIndex = 725;
 
         private const string ResponseDumpPath = "../../../../Source/Chronozoom.UI/ResponseDump.txt";
         private const string SearchResultXPath = ".//*[@class = 'searchResult'][1]";
         private const int WaitResultsMs = 3000;
         private const int WaitSearchMenuExpandingMs = 1000;
-        private const int WaitTimeOutMs = 1000;
+        private const int WaitTimeOutMs = 3000;
         private const string alertString = "ALERT_";
 
         private VirtualCanvasComponent vcPageObj;
@@ -57,7 +57,8 @@ namespace Chronozoom.Test.GeneralTests
         public void TestSearch_SearchQueries_ScreenshotsCreated()
         {
             // Get titles.
-            string[] titles = GetTitlesFromResponseDump();
+            string[] titles = GetExistentTitlesFromResponseDump();
+            Console.WriteLine(titles.Length); // The number of titles.
 
             // Get random titles or range of titles from collection.
             List<string> searchQueries = (RandomRegimeOn) ? GetRandomTitles(titles) : GetRangeOfTitles(titles);
@@ -81,7 +82,7 @@ namespace Chronozoom.Test.GeneralTests
             {
                 alertIsActive = false;
 
-                vcPageObj.EnterSearchQuery(query);
+                vcPageObj.EnterSearchQuery(query.Replace(@"\/", "/").Replace("\\\"", "\"")); // Replace escape sequences in titles.
                 Thread.Sleep(WaitResultsMs);
 
                 // Move mouse arrow to result and click on it.
@@ -101,6 +102,10 @@ namespace Chronozoom.Test.GeneralTests
                 catch (TimeoutException)
                 {
                     Console.WriteLine("NOT FOUND: " + query);
+                }
+                catch (StaleElementReferenceException e)
+                {
+                    Console.WriteLine(e.Message + ": " + query);
                 }
 
                 // Handling of alert messages.
@@ -132,7 +137,8 @@ namespace Chronozoom.Test.GeneralTests
             }
         }
 
-        private string[] GetTitlesFromResponseDump()
+        // Gets all titles from response dump, including titles of sources, etc.
+        private string[] GetAllTitlesFromResponseDump()
         {
             string response = String.Empty;
 
@@ -153,10 +159,49 @@ namespace Chronozoom.Test.GeneralTests
             return (from titleString in titleStrings
                     let keyValue = titleString.Split(':')
                     let titleWithQuotes = (keyValue.Length == 3) ? (keyValue[1] + ':' + keyValue[2]) : keyValue[1] // Does title contain ':'?
-                    let titleWithoutQuotes = titleWithQuotes.Split('"')[1]
+                    let titleWithoutQuotes = titleWithQuotes.Substring(1, titleWithQuotes.Length - 2) // Remove quotes.
                     select titleWithoutQuotes).ToArray<string>();
         }
 
+        // Gets all titles of timelines, exhibits and content items (excluding sources' titles).
+        // TODO: exclude more titles, if necessary.
+        private string[] GetExistentTitlesFromResponseDump()
+        {
+            string response = String.Empty;
+
+            using (StreamReader reader = new StreamReader(ResponseDumpPath))
+            {
+                response = reader.ReadLine();
+            }
+
+            // Split response on more simple strings and remove nonexistent title strings.
+            // It's noticable, that nonexistent title strings go after "Source" strings.
+            var subStrings = response.Split(',');
+            int numberOfSubStrings = subStrings.Length;
+
+            for (int i = 0; i < numberOfSubStrings; ++i)
+            {
+                if (subStrings[i].StartsWith("\"Source\""))
+                {
+                    subStrings[i + 1] = String.Empty;
+                }
+            }
+
+            // Get strings, that starts from "Title".
+            var titleStrings = from subString in subStrings
+                               where subString.StartsWith("\"Title\"")
+                               select subString;
+
+            // Get titles without quotes.
+            return (from titleString in titleStrings
+                    let keyValue = titleString.Split(':')
+                    let titleWithQuotes = (keyValue.Length == 3) ? (keyValue[1] + ':' + keyValue[2]) : keyValue[1] // Does title contain ':'?
+                    let titleWithoutQuotes = titleWithQuotes.Substring(1, titleWithQuotes.Length - 2) // Remove quotes.
+                    //let titleWithoutQuotes = titleWithQuotes.Split('"')[1]
+                    select titleWithoutQuotes).ToArray<string>();
+        }
+
+        // Gets random titles from titles collection.
         private List<string> GetRandomTitles(string[] titles)
         {
             // Choose random titles from title collection.
@@ -172,6 +217,7 @@ namespace Chronozoom.Test.GeneralTests
             return searchQueries;
         }
 
+        // Gets range of titles from titles collection.
         private List<string> GetRangeOfTitles(string[] titles)
         {
             // Get the range of titles.
@@ -184,6 +230,11 @@ namespace Chronozoom.Test.GeneralTests
             }
 
             return searchQueries;
+        }
+
+        private bool IsElementOnCanvas(string id)
+        {
+            return vcPageObj.FindElement(id) != null;
         }
     }
 

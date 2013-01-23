@@ -41,6 +41,8 @@ namespace Chronozoom.Test.VirtualCanvasTests
             }
         }
 
+        // This test was duplicated and expanded by tests in InfodotContentTests.cs.
+        [Ignore]
         [TestMethod]
         public void TestAdvancedElements_InfodotThumbnail()
         {

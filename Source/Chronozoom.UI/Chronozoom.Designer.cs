@@ -8,15 +8,15 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.ComponentModel;
+using System.Data.EntityClient;
 using System.Data.Objects;
 using System.Data.Objects.DataClasses;
-using System.Data.EntityClient;
-using System.ComponentModel;
-using System.Xml.Serialization;
+using System.Linq;
 using System.Runtime.Serialization;
+using System.Xml.Serialization;
 
 [assembly: EdmSchemaAttribute()]
-
 namespace UI
 {
     #region Contexts
@@ -594,6 +594,7 @@ namespace UI
         private ObjectSet<Auth_TourView> _Auth_TourView;
 
         #endregion
+
         #region AddTo Methods
     
         /// <summary>
@@ -861,6 +862,7 @@ namespace UI
         }
 
         #endregion
+
         #region Function Imports
     
         /// <summary>
@@ -883,11 +885,11 @@ namespace UI
         }
 
         #endregion
+
     }
-    
 
     #endregion
-    
+
     #region Entities
     
     /// <summary>
@@ -922,6 +924,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -1231,6 +1234,7 @@ namespace UI
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
     }
     
@@ -1276,6 +1280,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -1840,6 +1845,7 @@ namespace UI
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
     }
     
@@ -1885,6 +1891,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -2329,6 +2336,7 @@ namespace UI
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
     }
     
@@ -2366,6 +2374,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -2654,6 +2663,7 @@ namespace UI
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
     }
     
@@ -2689,6 +2699,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -2974,6 +2985,7 @@ namespace UI
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
     }
     
@@ -3007,6 +3019,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -3409,6 +3422,7 @@ namespace UI
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
     }
     
@@ -3440,6 +3454,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -3671,6 +3686,7 @@ namespace UI
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
     }
     
@@ -3708,6 +3724,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -4116,6 +4133,7 @@ namespace UI
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
     }
     
@@ -4149,6 +4167,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -4719,6 +4738,7 @@ namespace UI
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
     }
     
@@ -4750,6 +4770,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -4981,6 +5002,7 @@ namespace UI
         partial void OnCurrVersionChanged();
 
         #endregion
+
     
     }
     
@@ -5010,6 +5032,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -5334,6 +5357,7 @@ namespace UI
         partial void OnIsVisibleChanged();
 
         #endregion
+
     
     }
     
@@ -5379,6 +5403,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -5721,6 +5746,7 @@ namespace UI
         partial void OnIncludeInVersionChanged();
 
         #endregion
+
     
     }
     
@@ -5770,6 +5796,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -6376,6 +6403,7 @@ namespace UI
         partial void OnIncludeInVersionChanged();
 
         #endregion
+
     
     }
     
@@ -6421,6 +6449,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -6883,6 +6912,7 @@ namespace UI
         partial void OnIncludeInVersionChanged();
 
         #endregion
+
     
     }
     
@@ -6922,6 +6952,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -7240,6 +7271,7 @@ namespace UI
         partial void OnIncludeInVersionChanged();
 
         #endregion
+
     
     }
     
@@ -7275,6 +7307,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -7593,6 +7626,7 @@ namespace UI
         partial void OnIncludeInVersionChanged();
 
         #endregion
+
     
     }
     
@@ -7630,6 +7664,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -8092,6 +8127,7 @@ namespace UI
         partial void OnIncludeInVersionChanged();
 
         #endregion
+
     
     }
     
@@ -8125,6 +8161,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -8395,6 +8432,7 @@ namespace UI
         partial void OnIncludeInVersionChanged();
 
         #endregion
+
     
     }
     
@@ -8434,6 +8472,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -8872,6 +8911,7 @@ namespace UI
         partial void OnIncludeInVersionChanged();
 
         #endregion
+
     
     }
     
@@ -8909,6 +8949,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -9539,6 +9580,7 @@ namespace UI
         partial void OnIncludeInVersionChanged();
 
         #endregion
+
     
     }
     
@@ -9572,6 +9614,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -9842,6 +9885,7 @@ namespace UI
         partial void OnIncludeInVersionChanged();
 
         #endregion
+
     
     }
     
@@ -9875,6 +9919,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -10241,6 +10286,7 @@ namespace UI
         partial void OnIncludeInVersionChanged();
 
         #endregion
+
     
     }
     
@@ -10286,6 +10332,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -10628,6 +10675,7 @@ namespace UI
         partial void OnIncludeInVersionChanged();
 
         #endregion
+
     
     }
     
@@ -10677,6 +10725,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -11283,6 +11332,7 @@ namespace UI
         partial void OnIncludeInVersionChanged();
 
         #endregion
+
     
     }
     
@@ -11328,6 +11378,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -11790,6 +11841,7 @@ namespace UI
         partial void OnIncludeInVersionChanged();
 
         #endregion
+
     
     }
     
@@ -11829,6 +11881,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -12147,6 +12200,7 @@ namespace UI
         partial void OnIncludeInVersionChanged();
 
         #endregion
+
     
     }
     
@@ -12182,6 +12236,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -12500,6 +12555,7 @@ namespace UI
         partial void OnIncludeInVersionChanged();
 
         #endregion
+
     
     }
     
@@ -12537,6 +12593,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -12999,6 +13056,7 @@ namespace UI
         partial void OnIncludeInVersionChanged();
 
         #endregion
+
     
     }
     
@@ -13032,6 +13090,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -13302,6 +13361,7 @@ namespace UI
         partial void OnIncludeInVersionChanged();
 
         #endregion
+
     
     }
     
@@ -13341,6 +13401,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -13779,6 +13840,7 @@ namespace UI
         partial void OnIncludeInVersionChanged();
 
         #endregion
+
     
     }
     
@@ -13816,6 +13878,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -14446,6 +14509,7 @@ namespace UI
         partial void OnIncludeInVersionChanged();
 
         #endregion
+
     
     }
     
@@ -14479,6 +14543,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -14749,6 +14814,7 @@ namespace UI
         partial void OnIncludeInVersionChanged();
 
         #endregion
+
     
     }
     
@@ -14782,6 +14848,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -15148,10 +15215,12 @@ namespace UI
         partial void OnIncludeInVersionChanged();
 
         #endregion
+
     
     }
 
     #endregion
+
     #region ComplexTypes
     
     /// <summary>
@@ -15184,6 +15253,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -15739,6 +15809,7 @@ namespace UI
         partial void OnCurrVersionChanged();
 
         #endregion
+
     }
     
     /// <summary>
@@ -15771,6 +15842,7 @@ namespace UI
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -16326,8 +16398,10 @@ namespace UI
         partial void OnCurrVersionChanged();
 
         #endregion
+
     }
 
     #endregion
+
     
 }

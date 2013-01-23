@@ -150,7 +150,7 @@ namespace Chronozoom.Test.GeneralTests
             string bookmarkUrl = tours.d[0].bookmarks[0].URL;
 
             // Relative URLs only
-            Regex bookmarkTemplate = new Regex(@"^(/t\d+)+(/e\d+)?(/c\d+)?$");
+            Regex bookmarkTemplate = new Regex(@"^(/t\d+)+(/e\d+)?(/c\d+)?@?");
 
             Assert.IsTrue(bookmarkTemplate.IsMatch(bookmarkUrl), "Bad bookmark format: {0}", bookmarkUrl);
         }

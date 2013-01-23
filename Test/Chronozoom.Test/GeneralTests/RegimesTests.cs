@@ -11,15 +11,20 @@ using System.Drawing.Imaging;
 using System.Drawing;
 using System.Threading;
 using Chronozoom.Test.JsTypes;
+using System.Diagnostics;
 
 namespace Chronozoom.Test.GeneralTests
 {
     [TestClass]
-    [TestPage(CzCommon.CzBetaStartPage)]
+    [TestPage("cz.htm")]
     public abstract class RegimesTests : CzTestBase
     {
         private VirtualCanvasComponent vcPageObj;
         private ActionsExtension action;
+
+
+        private const int AnimationImplicity = 100; // Permissible implicity for visible after EllipticalZoom animation for test success.
+        private const int AnimationDuration = 10000; // EllipticalZoom animation duration.
 
         [TestInitialize]
         public void TestInitialize()
@@ -36,6 +41,48 @@ namespace Chronozoom.Test.GeneralTests
             {
                 action.SetDefault();
             }
+        }
+
+        [TestMethod]
+        public void TestRegimes_RefreshPage_NavigatorBarSavedItState()
+        {
+            // generate random visible
+            Random rnd = new Random();
+            double centerX = -65000000 * rnd.NextDouble();
+            double centerY = 300000 * rnd.NextDouble();
+            double scale = 500 * rnd.NextDouble();
+
+            // performing EllipticalZoom animation to generated visible and wait until animation is over.
+            IJavaScriptExecutor js = Driver as IJavaScriptExecutor;
+            js.ExecuteScript("setVisible(new VisibleRegion2d(" + centerX + ", " + centerY + ", " + scale + "));");
+
+            Thread.Sleep(AnimationDuration);
+
+            // save current width and left CSS properties
+            var regimeNavigator = Driver.FindElement(By.Id("regime_navigator"));
+            var savedState = new Dictionary<string, object>();
+            savedState.Add("left", regimeNavigator.GetCssValue("left"));
+            savedState.Add("width", regimeNavigator.GetCssValue("width"));
+
+            // save current url
+            var URL = Driver.Url;
+
+            // reload page
+            GoToUrl(this.StartPage);
+            var vcPageObj = new VirtualCanvasComponent(Driver);
+            vcPageObj.WaitContentLoading();
+            GoToUrl(URL);
+            vcPageObj.WaitContentLoading();
+
+            // get width and left CSS properties after page reloading
+            regimeNavigator = Driver.FindElement(By.Id("regime_navigator"));
+            var newState = new Dictionary<string, object>();
+            newState.Add("left", regimeNavigator.GetCssValue("left"));
+            newState.Add("width", regimeNavigator.GetCssValue("width"));
+
+            // check that old and new width and left CSS properties are the same.
+            Assert.AreEqual(savedState["left"], newState["left"], "ERROR: CSS 'left' changed.");
+            Assert.AreEqual(savedState["width"], newState["width"], "ERROR: CSS 'width' changed.");
         }
 
         [TestMethod]
@@ -57,8 +104,8 @@ namespace Chronozoom.Test.GeneralTests
             JsCoordinates timelineCenter = new JsCoordinates(timeline.left + width / 2, timeline.y + timeline.height / 2);
 
             Assert.IsTrue(IsTimlineInFullSize(visibleAfter, timeline));
-            Assert.AreEqual(visibleAfter.CenterX, timelineCenter.X, 1);
-            Assert.AreEqual(visibleAfter.CenterY, timelineCenter.Y, 1);
+            Assert.AreEqual(visibleAfter.CenterX, timelineCenter.X, AnimationImplicity);
+            Assert.AreEqual(visibleAfter.CenterY, timelineCenter.Y, AnimationImplicity);
             Assert.AreNotEqual(visibleBefore, visibleAfter);
         }
 
@@ -81,8 +128,8 @@ namespace Chronozoom.Test.GeneralTests
             JsCoordinates timelineCenter = new JsCoordinates(timeline.left + width / 2, timeline.y + timeline.height / 2);
 
             Assert.IsTrue(IsTimlineInFullSize(visibleAfter, timeline));
-            Assert.AreEqual(visibleAfter.CenterX, timelineCenter.X, 1);
-            Assert.AreEqual(visibleAfter.CenterY, timelineCenter.Y, 1);
+            Assert.AreEqual(visibleAfter.CenterX, timelineCenter.X, AnimationImplicity);
+            Assert.AreEqual(visibleAfter.CenterY, timelineCenter.Y, AnimationImplicity);
             Assert.AreNotEqual(visibleBefore, visibleAfter);
         }
 
@@ -105,8 +152,8 @@ namespace Chronozoom.Test.GeneralTests
             JsCoordinates timelineCenter = new JsCoordinates(timeline.left + width / 2, timeline.y + timeline.height / 2);
 
             Assert.IsTrue(IsTimlineInFullSize(visibleAfter, timeline));
-            Assert.AreEqual(visibleAfter.CenterX, timelineCenter.X, 1);
-            Assert.AreEqual(visibleAfter.CenterY, timelineCenter.Y, 1);
+            Assert.AreEqual(visibleAfter.CenterX, timelineCenter.X, AnimationImplicity);
+            Assert.AreEqual(visibleAfter.CenterY, timelineCenter.Y, AnimationImplicity);
             Assert.AreNotEqual(visibleBefore, visibleAfter);
         }
 
@@ -129,8 +176,8 @@ namespace Chronozoom.Test.GeneralTests
             JsCoordinates timelineCenter = new JsCoordinates(timeline.left + width / 2, timeline.y + timeline.height / 2);
 
             Assert.IsTrue(IsTimlineInFullSize(visibleAfter, timeline));
-            Assert.AreEqual(visibleAfter.CenterX, timelineCenter.X, 1);
-            Assert.AreEqual(visibleAfter.CenterY, timelineCenter.Y, 1);
+            Assert.AreEqual(visibleAfter.CenterX, timelineCenter.X, AnimationImplicity);
+            Assert.AreEqual(visibleAfter.CenterY, timelineCenter.Y, AnimationImplicity);
             Assert.AreNotEqual(visibleBefore, visibleAfter);
         }
 
@@ -162,11 +209,297 @@ namespace Chronozoom.Test.GeneralTests
             JsCoordinates timelineCenter = new JsCoordinates(timeline.left + width / 2, timeline.y + timeline.height / 2);
 
             Assert.IsTrue(IsTimlineInFullSize(visibleAfter, timeline));
-            Assert.AreEqual(visibleAfter.CenterX, timelineCenter.X, 1);
-            Assert.AreEqual(visibleAfter.CenterY, timelineCenter.Y, 1);
+            Assert.AreEqual(visibleAfter.CenterX, timelineCenter.X, AnimationImplicity);
+            Assert.AreEqual(visibleAfter.CenterY, timelineCenter.Y, AnimationImplicity);
             Assert.AreNotEqual(visibleBefore, visibleAfter);
         }
 
+        //
+        [TestMethod]
+        public void TestRegimes_ClickHumanityBarWithOverlay_HumanityTimelineIsVisible()
+        {
+            Point barPosition = vcPageObj.HumanityBar.Location;
+            JsVisible visibleBefore = vcPageObj.GetViewport();
+
+            action = new ActionsExtension(Driver);
+
+            // Click on the regime bar.
+            action.MoveByOffset(barPosition.X + 5, barPosition.Y + 2).Click().Perform();
+
+            vcPageObj.WaitAnimation();
+
+            JsVisible visibleAfter = vcPageObj.GetViewport();
+            JsTimeline timeline = GetHumanityTimeline();
+            double width = timeline.right - timeline.left;
+            JsCoordinates timelineCenter = new JsCoordinates(timeline.left + width / 2, timeline.y + timeline.height / 2);
+
+            Assert.IsTrue(IsTimlineInFullSize(visibleAfter, timeline));
+            Assert.AreEqual(visibleAfter.CenterX, timelineCenter.X, AnimationImplicity);
+            Assert.AreEqual(visibleAfter.CenterY, timelineCenter.Y, AnimationImplicity);
+            Assert.AreNotEqual(visibleBefore, visibleAfter);
+        }
+
+        [TestMethod]
+        public void TestRegimes_ClickPrehistoryBarWithOverlay_PrehistoryTimelineIsVisible()
+        {
+            Point barPosition = vcPageObj.PrehistoryBar.Location;
+            JsVisible visibleBefore = vcPageObj.GetViewport();
+
+            action = new ActionsExtension(Driver);
+
+            // Click on the regime bar.
+            action.MoveByOffset(barPosition.X + 5, barPosition.Y + 2).Click().Perform();
+
+            vcPageObj.WaitAnimation();
+
+            JsVisible visibleAfter = vcPageObj.GetViewport();
+            JsTimeline timeline = GetPrehistoryTimeline();
+            double width = timeline.right - timeline.left;
+            JsCoordinates timelineCenter = new JsCoordinates(timeline.left + width / 2, timeline.y + timeline.height / 2);
+
+            Assert.IsTrue(IsTimlineInFullSize(visibleAfter, timeline));
+            Assert.AreEqual(visibleAfter.CenterX, timelineCenter.X, AnimationImplicity);
+            Assert.AreEqual(visibleAfter.CenterY, timelineCenter.Y, AnimationImplicity);
+            Assert.AreNotEqual(visibleBefore, visibleAfter);
+        }
+
+        [TestMethod]
+        public void TestRegimes_ClickLifeBarWithOverlay_LifeTimelineIsVisible()
+        {
+            Point barPosition = vcPageObj.LifeBar.Location;
+            JsVisible visibleBefore = vcPageObj.GetViewport();
+
+            action = new ActionsExtension(Driver);
+
+            // Click on the regime bar.
+            action.MoveByOffset(barPosition.X + 5, barPosition.Y + 2).Click().Perform();
+
+            vcPageObj.WaitAnimation();
+
+            JsVisible visibleAfter = vcPageObj.GetViewport();
+            JsTimeline timeline = GetLifeTimeline();
+            double width = timeline.right - timeline.left;
+            JsCoordinates timelineCenter = new JsCoordinates(timeline.left + width / 2, timeline.y + timeline.height / 2);
+
+            Assert.IsTrue(IsTimlineInFullSize(visibleAfter, timeline));
+            Assert.AreEqual(visibleAfter.CenterX, timelineCenter.X, AnimationImplicity);
+            Assert.AreEqual(visibleAfter.CenterY, timelineCenter.Y, AnimationImplicity);
+            Assert.AreNotEqual(visibleBefore, visibleAfter);
+        }
+
+        [TestMethod]
+        public void TestRegimes_ClickEarthBarWithOverlay_EarthTimelineIsVisible()
+        {
+            Point barPosition = vcPageObj.EarthBar.Location;
+            JsVisible visibleBefore = vcPageObj.GetViewport();
+
+            action = new ActionsExtension(Driver);
+
+            // Click on the regime bar.
+            action.MoveByOffset(barPosition.X + 5, barPosition.Y + 2).Click().Perform();
+
+            vcPageObj.WaitAnimation();
+
+            JsVisible visibleAfter = vcPageObj.GetViewport();
+            JsTimeline timeline = GetEarthTimeline();
+            double width = timeline.right - timeline.left;
+            JsCoordinates timelineCenter = new JsCoordinates(timeline.left + width / 2, timeline.y + timeline.height / 2);
+
+            Assert.IsTrue(IsTimlineInFullSize(visibleAfter, timeline));
+            Assert.AreEqual(visibleAfter.CenterX, timelineCenter.X, AnimationImplicity);
+            Assert.AreEqual(visibleAfter.CenterY, timelineCenter.Y, AnimationImplicity);
+            Assert.AreNotEqual(visibleBefore, visibleAfter);
+        }
+
+        [TestMethod]
+        public void TestRegimes_ClickCosmosBarWithOverlay_CosmosTimelineIsVisible()
+        {
+            Point cosmosBarPosition = vcPageObj.CosmosBar.Location;
+            Point earthBarPosition = vcPageObj.EarthBar.Location;
+
+            action = new ActionsExtension(Driver);
+
+            // Click on the earth regime bar.
+            action.MoveByOffset(earthBarPosition.X + 5, earthBarPosition.Y + 2).Click().Perform();
+
+            vcPageObj.WaitAnimation();
+
+            action.SetDefault();
+
+            JsVisible visibleBefore = vcPageObj.GetViewport();
+
+            // Click on the cosmos regime bar.
+            action.MoveByOffset(cosmosBarPosition.X + 100, cosmosBarPosition.Y + 2).Click().Perform();
+
+            vcPageObj.WaitAnimation();
+
+            JsVisible visibleAfter = vcPageObj.GetViewport();
+            JsTimeline timeline = GetCosmosTimeline();
+            double width = timeline.right - timeline.left;
+            JsCoordinates timelineCenter = new JsCoordinates(timeline.left + width / 2, timeline.y + timeline.height / 2);
+
+            Assert.IsTrue(IsTimlineInFullSize(visibleAfter, timeline));
+            Assert.AreEqual(visibleAfter.CenterX, timelineCenter.X, AnimationImplicity);
+            Assert.AreEqual(visibleAfter.CenterY, timelineCenter.Y, AnimationImplicity);
+            Assert.AreNotEqual(visibleBefore, visibleAfter);
+        }
+
+        //
+        [TestMethod]
+        public void TestRegimes_ClickHumanityBarNoOverlay_HumanityTimelineIsVisible()
+        {
+            var vc = new VirtualCanvasComponent(Driver);
+            vc.SetVisible(new JsVisible(-21.173972602739752, 226047946.84065938, 0.02607632093933464));
+            vc.UpdateViewport();
+            Thread.Sleep(100);
+
+            Point barPosition = vcPageObj.HumanityBar.Location;
+            JsVisible visibleBefore = vcPageObj.GetViewport();
+
+            action = new ActionsExtension(Driver);
+
+            // Click on the regime bar.
+            action.MoveByOffset(barPosition.X + 5, barPosition.Y + 2).Click().Perform();
+
+            vcPageObj.WaitAnimation();
+
+            JsVisible visibleAfter = vcPageObj.GetViewport();
+            JsTimeline timeline = GetHumanityTimeline();
+            double width = timeline.right - timeline.left;
+            JsCoordinates timelineCenter = new JsCoordinates(timeline.left + width / 2, timeline.y + timeline.height / 2);
+
+            Assert.IsTrue(IsTimlineInFullSize(visibleAfter, timeline));
+            Assert.AreEqual(visibleAfter.CenterX, timelineCenter.X, AnimationImplicity);
+            Assert.AreEqual(visibleAfter.CenterY, timelineCenter.Y, AnimationImplicity);
+            Assert.AreNotEqual(visibleBefore, visibleAfter);
+        }
+
+        [TestMethod]
+        public void TestRegimes_ClickPrehistoryBarNoOverlay_PrehistoryTimelineIsVisible()
+        {
+            var vc = new VirtualCanvasComponent(Driver);
+            vc.SetVisible(new JsVisible(-21.173972602739752, 226047946.84065938, 0.02607632093933464));
+            vc.UpdateViewport();
+            Thread.Sleep(100);
+
+            Point barPosition = vcPageObj.PrehistoryBar.Location;
+            JsVisible visibleBefore = vcPageObj.GetViewport();
+
+            action = new ActionsExtension(Driver);
+
+            // Click on the regime bar.
+            action.MoveByOffset(barPosition.X + 5, barPosition.Y + 2).Click().Perform();
+
+            vcPageObj.WaitAnimation();
+
+            JsVisible visibleAfter = vcPageObj.GetViewport();
+            JsTimeline timeline = GetPrehistoryTimeline();
+            double width = timeline.right - timeline.left;
+            JsCoordinates timelineCenter = new JsCoordinates(timeline.left + width / 2, timeline.y + timeline.height / 2);
+
+            Assert.IsTrue(IsTimlineInFullSize(visibleAfter, timeline));
+            Assert.AreEqual(visibleAfter.CenterX, timelineCenter.X, AnimationImplicity);
+            Assert.AreEqual(visibleAfter.CenterY, timelineCenter.Y, AnimationImplicity);
+            Assert.AreNotEqual(visibleBefore, visibleAfter);
+        }
+
+        [TestMethod]
+        public void TestRegimes_ClickLifeBarNoOverlay_LifeTimelineIsVisible()
+        {
+            var vc = new VirtualCanvasComponent(Driver);
+            vc.SetVisible(new JsVisible(-21.173972602739752, 226047946.84065938, 0.02607632093933464));
+            vc.UpdateViewport();
+            Thread.Sleep(100);
+
+            Point barPosition = vcPageObj.LifeBar.Location;
+            JsVisible visibleBefore = vcPageObj.GetViewport();
+
+            action = new ActionsExtension(Driver);
+
+            // Click on the regime bar.
+            action.MoveByOffset(barPosition.X + 5, barPosition.Y + 2).Click().Perform();
+
+            vcPageObj.WaitAnimation();
+
+            JsVisible visibleAfter = vcPageObj.GetViewport();
+            JsTimeline timeline = GetLifeTimeline();
+            double width = timeline.right - timeline.left;
+            JsCoordinates timelineCenter = new JsCoordinates(timeline.left + width / 2, timeline.y + timeline.height / 2);
+
+            Assert.IsTrue(IsTimlineInFullSize(visibleAfter, timeline));
+            Assert.AreEqual(visibleAfter.CenterX, timelineCenter.X, AnimationImplicity);
+            Assert.AreEqual(visibleAfter.CenterY, timelineCenter.Y, AnimationImplicity);
+            Assert.AreNotEqual(visibleBefore, visibleAfter);
+        }
+
+        [TestMethod]
+        public void TestRegimes_ClickEarthBarNoOverlay_EarthTimelineIsVisible()
+        {
+            var vc = new VirtualCanvasComponent(Driver);
+            vc.SetVisible(new JsVisible(-21.173972602739752, 226047946.84065938, 0.02607632093933464));
+            vc.UpdateViewport();
+            Thread.Sleep(100);
+
+            Point barPosition = vcPageObj.EarthBar.Location;
+            JsVisible visibleBefore = vcPageObj.GetViewport();
+
+            action = new ActionsExtension(Driver);
+
+            // Click on the regime bar.
+            action.MoveByOffset(barPosition.X + 5, barPosition.Y + 2).Click().Perform();
+
+            vcPageObj.WaitAnimation();
+
+            JsVisible visibleAfter = vcPageObj.GetViewport();
+            JsTimeline timeline = GetEarthTimeline();
+            double width = timeline.right - timeline.left;
+            JsCoordinates timelineCenter = new JsCoordinates(timeline.left + width / 2, timeline.y + timeline.height / 2);
+
+            Assert.IsTrue(IsTimlineInFullSize(visibleAfter, timeline));
+            Assert.AreEqual(visibleAfter.CenterX, timelineCenter.X, AnimationImplicity);
+            Assert.AreEqual(visibleAfter.CenterY, timelineCenter.Y, AnimationImplicity);
+            Assert.AreNotEqual(visibleBefore, visibleAfter);
+        }
+
+        [TestMethod]
+        public void TestRegimes_ClickCosmosBarNoOverlay_CosmosTimelineIsVisible()
+        {
+            var vc = new VirtualCanvasComponent(Driver);
+            vc.SetVisible(new JsVisible(-21.173972602739752, 226047946.84065938, 0.02607632093933464));
+            vc.UpdateViewport();
+            Thread.Sleep(100);
+
+            Point cosmosBarPosition = vcPageObj.CosmosBar.Location;
+            Point earthBarPosition = vcPageObj.EarthBar.Location;
+
+            action = new ActionsExtension(Driver);
+
+            // Click on the earth regime bar.
+            action.MoveByOffset(earthBarPosition.X + 5, earthBarPosition.Y + 2).Click().Perform();
+
+            vcPageObj.WaitAnimation();
+
+            action.SetDefault();
+
+            JsVisible visibleBefore = vcPageObj.GetViewport();
+
+            // Click on the cosmos regime bar.
+            action.MoveByOffset(cosmosBarPosition.X + 5, cosmosBarPosition.Y + 2).Click().Perform();
+
+            vcPageObj.WaitAnimation();
+
+            JsVisible visibleAfter = vcPageObj.GetViewport();
+            JsTimeline timeline = GetCosmosTimeline();
+            double width = timeline.right - timeline.left;
+            JsCoordinates timelineCenter = new JsCoordinates(timeline.left + width / 2, timeline.y + timeline.height / 2);
+
+            Assert.IsTrue(IsTimlineInFullSize(visibleAfter, timeline));
+            Assert.AreEqual(visibleAfter.CenterX, timelineCenter.X, AnimationImplicity);
+            Assert.AreEqual(visibleAfter.CenterY, timelineCenter.Y, AnimationImplicity);
+            Assert.AreNotEqual(visibleBefore, visibleAfter);
+        }
+
+        //
         public bool IsTimlineInFullSize(JsVisible visible, JsTimeline timeline)
         {
             Size vcSize = vcPageObj.VirtualCanvas.Size;
@@ -223,7 +556,7 @@ namespace Chronozoom.Test.GeneralTests
         public JsTimeline GetLifeTimeline()
         {
             JsTimeline tl = new JsTimeline();
-            string script = "return FindChildTimeline(FindChildTimeline(content.d[0], earthTimelineID), lifeTimelineID)";
+            string script = "return FindChildTimeline(content.d[0], lifeTimelineID, true)";
 
             tl.left = ExecuteScriptGetNumber(script + ".left;");
             tl.right = ExecuteScriptGetNumber(script + ".right;");
@@ -238,8 +571,7 @@ namespace Chronozoom.Test.GeneralTests
         public JsTimeline GetPrehistoryTimeline()
         {
             JsTimeline tl = new JsTimeline();
-            string script = "return FindChildTimeline(FindChildTimeline(FindChildTimeline(content.d[0], earthTimelineID), " +
-                            "lifeTimelineID), prehistoryTimelineID)";
+            string script = "return FindChildTimeline(content.d[0], prehistoryTimelineID, true)";
 
             tl.left = ExecuteScriptGetNumber(script + ".left;");
             tl.right = ExecuteScriptGetNumber(script + ".right;");
@@ -254,8 +586,7 @@ namespace Chronozoom.Test.GeneralTests
         public JsTimeline GetHumanityTimeline()
         {
             JsTimeline tl = new JsTimeline();
-            string script = "return FindChildTimeline(FindChildTimeline(FindChildTimeline(FindChildTimeline(content.d[0], earthTimelineID), " +
-                            "lifeTimelineID), prehistoryTimelineID), humanityTimelineID)";
+            string script = "return FindChildTimeline(content.d[0], humanityTimelineID,true)";
 
             tl.left = ExecuteScriptGetNumber(script + ".left;");
             tl.right = ExecuteScriptGetNumber(script + ".right;");

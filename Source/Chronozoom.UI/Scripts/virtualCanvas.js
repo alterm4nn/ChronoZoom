@@ -9,6 +9,13 @@ Next <div> is rendered on the top of previous one.
 */
 (function ($, undefined) {
 
+    //    $("iframe").live("mouseup",function () {
+    //        //        var origin = getXBrowserMouseOrigin(this.element, e);
+    //        //        if (this.lastClickPosition && this.lastClickPosition.x == origin.x && this.lastClickPosition.y == origin.y)
+    //        //            this._mouseClick(e);
+    //        alert("mouseup");
+    //    });
+
 
     $.widget("ui.virtualCanvas",
     {
@@ -29,6 +36,11 @@ Next <div> is rendered on the top of previous one.
             var self = this;
             self.element.addClass("virtualCanvas");
             var size = self._getClientSize();
+
+            this.lastEvent = null; // last mouse event
+
+            this.canvasWidth = null; // width of canvas
+            this.canvasHeight = null; // height of canvas
 
             self.cursorPositionChangedEvent = new jQuery.Event("cursorPositionChanged");
             self.breadCrumbsChengedEvent = jQuery.Event("breadCrumbsChanged");
@@ -60,9 +72,20 @@ Next <div> is rendered on the top of previous one.
             this.updateViewport();
 
             // start up the mouse handling
-            self.element.bind('mousemove.' + this.widgetName, function (e) { self._mouseMove(e) });
-            self.element.bind('mousedown.' + this.widgetName, function (e) { self._mouseDown(e) });
-            self.element.bind('mouseup.' + this.widgetName, function (e) { self._mouseUp(e) });
+            self.element.bind('mousemove.' + this.widgetName, function (e) { self.mouseMove(e) });
+            self.element.bind('mousedown.' + this.widgetName, function (e) {
+                switch (e.which) {
+                    case 1: self._mouseDown(e);         //means that only left click will be interpreted
+                        break;
+                }
+
+            });
+            self.element.bind('mouseup.' + this.widgetName, function (e) {
+                switch (e.which) {
+                    case 1: self._mouseUp(e);
+                }
+            });
+            self.element.bind('mouseleave.' + this.widgetName, function (e) { self._mouseLeave(e) });
         },
 
         /* Destroys a widget 
@@ -79,6 +102,13 @@ Next <div> is rendered on the top of previous one.
                 x: origin.x,
                 y: origin.y
             };
+
+            //Bug (176751): Infodots/video. Mouseup event handling.
+            //Chrome/Firefox solution
+            $("iframe").css("pointer-events", "none");
+
+            //IE solution
+            $('#iframe_layer').css("display", "block").css("z-index", "99999");
         },
 
         /* Handles mouse up event within the widget
@@ -87,6 +117,31 @@ Next <div> is rendered on the top of previous one.
             var origin = getXBrowserMouseOrigin(this.element, e);
             if (this.lastClickPosition && this.lastClickPosition.x == origin.x && this.lastClickPosition.y == origin.y)
                 this._mouseClick(e);
+
+            //Bug (176751): Infodots/video. Mouseup event handling.
+            //Chrome/Firefox solution
+            $("iframe").css("pointer-events", "auto");
+
+            //IE solution
+            $('#iframe_layer').css("display", "none");
+        },
+
+        /* 
+        Handles mouseleave event within the widget
+        */
+        _mouseLeave: function (e) {
+            // check if any content item or infodot or timeline are highlighted
+            if (this.currentlyHoveredContentItem != null && this.currentlyHoveredContentItem.onmouseleave != null)
+                this.currentlyHoveredContentItem.onmouseleave(e);
+            if (this.currentlyHoveredInfodot != null && this.currentlyHoveredInfodot.onmouseleave != null)
+                this.currentlyHoveredInfodot.onmouseleave(e);
+            if (this.currentlyHoveredTimeline != null && this.currentlyHoveredTimeline.onmouseunhover != null)
+                this.currentlyHoveredTimeline.onmouseunhover(null, e);
+
+            // hide tooltip now
+            stopAnimationTooltip();
+            // remove last mouse position from canvas to prevent unexpected highlight of canvas elements
+            this.lastEvent = null;
         },
 
         /* Mouse click happens when mouse up happens at the same point as previous mouse down.
@@ -122,8 +177,7 @@ Next <div> is rendered on the top of previous one.
         */
         getHoveredInfodot: function () {
             return this.currentlyHoveredInfodot;
-        }
-        ,
+        },
         /*
         Returns the time value that corresponds to the current cursor position
         */
@@ -159,15 +213,57 @@ Next <div> is rendered on the top of previous one.
             this.cursorPositionChangedEvent.Time = self.cursorPosition;
             this.element.trigger(this.cursorPositionChangedEvent);
         },
+
+        /*
+        Updates tooltip position
+        */
+        updateTooltipPosition: function (posv) {
+            var scrPoint = this.viewport.pointVirtualToScreen(posv.x, posv.y); // (x,y) mouse coordinates on canvas
+
+            var heigthOffset = 17;
+
+            var length, height;
+
+            var obj = null;
+
+            if (tooltipMode == 'infodot') obj = this.currentlyHoveredInfodot;
+            else
+                if (tooltipMode == 'timeline') obj = this.currentlyHoveredTimeline;
+
+            if (obj == null) return;
+
+            length = parseInt(scrPoint.x) + obj.panelWidth; // position of right edge of tooltip's panel
+            height = parseInt(scrPoint.y) + obj.panelHeight + heigthOffset; // position of bottom edge of tooltip's panel
+
+            // tooltip goes beyond right edge of canvas
+            if (length > this.canvasWidth)
+                scrPoint.x = this.canvasWidth - obj.panelWidth;
+            // tooltip goes beyond bottom edge of canvas
+            if (height > this.canvasHeight)
+                scrPoint.y = this.canvasHeight - obj.panelHeight - heigthOffset + 1;
+
+            // Update tooltip position.
+            $('.bubbleInfo').css({
+                position: "absolute",
+                top: scrPoint.y,
+                left: scrPoint.x
+            });
+        },
+
         /* Handles mouse move event within the widget
         */
-        _mouseMove: function (e) {
+        mouseMove: function (e) {
             var viewport = this.getViewport();
             var origin = getXBrowserMouseOrigin(this.element, e);
             var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
 
             // triggers an event that handles current mouse position
             if (!this.currentlyHoveredInfodot) {
+                this.cursorPosition = posv.x;
+                this.RaiseCursorChanged();
+            }
+
+            if (!this.currentlyHoveredTimeline) {
                 this.cursorPosition = posv.x;
                 this.RaiseCursorChanged();
             }
@@ -235,8 +331,34 @@ Next <div> is rendered on the top of previous one.
                     break;
                 }
             }
-        },
 
+            // update tooltip for currently tooltiped infodot|t if tooltip is enabled for this infodot|timeline
+            if ((this.currentlyHoveredInfodot != null && this.currentlyHoveredInfodot.tooltipEnabled == true)
+			|| (this.currentlyHoveredTimeline != null && this.currentlyHoveredTimeline.tooltipEnabled == true && tooltipMode != "infodot")) {
+
+                var obj = null;
+
+                if (tooltipMode == 'infodot') obj = this.currentlyHoveredInfodot;
+                else if (tooltipMode == 'timeline') obj = this.currentlyHoveredTimeline;
+
+                if (obj != null) {
+                    // show tooltip if it is not shown yet
+                    if (obj.tooltipIsShown == false) {
+                        obj.tooltipIsShown = true;
+                        animationTooltipRunning = $('.bubbleInfo').fadeIn();
+                    }
+                }
+                // update position of tooltip
+                this.updateTooltipPosition(posv);
+            }
+
+            // last mouse move event
+            this.lastEvent = e;
+        },
+        // Returns last mouse move event
+        getLastEvent: function () {
+            return this.lastEvent;
+        },
         // Returns root of the element tree.
         getLayerContent: function () {
             return this._layersContent;
@@ -299,7 +421,7 @@ Next <div> is rendered on the top of previous one.
 
             // rendering canvas (we should update the image because of new visible region)
             var viewbox_v = this._visibleToViewBox(newVisible); // visible region in appropriate format
-            var viewport = this.getViewport();            
+            var viewport = this.getViewport();
             this._renderCanvas(this._layersContent, viewbox_v, viewport);
         },
 
@@ -322,6 +444,11 @@ Next <div> is rendered on the top of previous one.
                     canvas.height = size.height;
                 }
             }
+
+            // update canvas width and height
+            this.canvasWidth = $("#vc").width();
+            this.canvasHeight = $("#vc").height();
+
             this.setVisible(this.options.visible);
         },
 
@@ -410,13 +537,13 @@ Next <div> is rendered on the top of previous one.
 // todo: temporarily fixes bug in jQuery (http://stackoverflow.com/questions/7825448/webkit-issues-with-event-layerx-and-event-layery)
 // it is fixed in jQuery 1.7
 (function ($) {
-    // remove layerX and layerY
-    var all = $.event.props,
+	// remove layerX and layerY
+	var all = $.event.props,
         len = all.length,
         res = [];
-    while (len--) {
-        var el = all[len];
-        if (el != 'layerX' && el != 'layerY') res.push(el);
-    }
-    $.event.props = res;
+	while (len--) {
+		var el = all[len];
+		if (el != 'layerX' && el != 'layerY') res.push(el);
+	}
+	$.event.props = res;
 } (jQuery));

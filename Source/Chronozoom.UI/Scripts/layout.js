@@ -382,7 +382,8 @@ function Convert(parent, timeline) {
         header: timeline.Title,
         fillStyle: "rgba(0,0,0,0.25)",
         titleRect: timeline.titleRect,
-        strokeStyle: tlColor
+        strokeStyle: tlColor,
+        regime: timeline.Regime
     });
 
     //Creating Infodots
@@ -513,7 +514,7 @@ function Load(vcph, timelines) {
     }
 }
 
-function FindChildTimeline(timeline, id) {
+var FindChildTimeline = function (timeline, id, recursive) {
     var result = undefined;
 
     if (timeline) {
@@ -521,8 +522,18 @@ function FindChildTimeline(timeline, id) {
         for (var i = 0; i < n; i++) {
             var childTimeline = timeline.ChildTimelines[i];
             if (childTimeline.ID == id) {
+                // timeline was found
                 result = childTimeline;
                 break;
+            }
+            else {
+                // if recursive mode is on, then search timeline through children of current child timeline
+                if (recursive == true) {
+                    result = FindChildTimeline(childTimeline, id, recursive);
+                    if (result != undefined)
+                        // timeline was found
+                        break;
+                }
             }
         }
     }

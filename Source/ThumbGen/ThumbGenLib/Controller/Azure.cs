@@ -13,14 +13,16 @@ namespace ThumbGen
         /// Configures Azure account and container
         /// </summary>
         /// <param name="bloburl">string with url to the blob</param>
-        /// <param name="connectionString">Azure blob connection string</param>
-        public void ConfigureAzure(string bloburl, string connectionString)
+        /// <param name="accountName">string containing name </param>
+        /// <param name="accesskey"></param>
+        public void ConfigureAzure(string bloburl, string accountName, string accesskey)
         {
             // Azure preparations
             DestinationBlobUrl = bloburl;
 
             // Set storage account
-            cloudStorageAccount = CloudStorageAccount.Parse(connectionString);
+            cloudStorageAccount = CloudStorageAccount.Parse("DefaultEndpointsProtocol=http;AccountName="
+                + accountName + ";AccountKey=" + accesskey);
 
             // Initialize client
             blobClient = new Microsoft.WindowsAzure.StorageClient.CloudBlobClient(cloudStorageAccount.BlobEndpoint,

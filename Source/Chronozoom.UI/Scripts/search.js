@@ -34,6 +34,8 @@ function searchHighlight(isOn) {
     }
 }
 
+
+
 function initializeSearch() {
     $("#searchTextBox")
             .focus(function () {
@@ -61,8 +63,12 @@ function initializeSearch() {
                 }
 
                 delayedSearchRequest = setTimeout(function () {
-                    search(escapeSearchString($("#searchTextBox")[0].value));
+                    if ($('#searchTextBox').val() != "") {
+                        $("#loadingImage").fadeIn('slow');
+                    }
+                    search(escapeSearchString($("#searchTextBox")[0].value.substr(0, 700))); // limit the search to the first 700 characters
                 }, 300);
+                
             });
 
     $("#search").hide();
@@ -133,12 +139,12 @@ function onSearchResults(searchString, results) {
         var height;
         var output = $("#search .searchResults").empty();
         if (results == null) {
-            height = "80";
+
         }
         else if (results.length == 0) {
             $("<div class='searchNoResult'>No results</div>")
                             .appendTo(output)
-            height = "100";
+
         } else {
             var addResults = function (objectType, sectionTitle) {
                 var first = true;
@@ -166,11 +172,9 @@ function onSearchResults(searchString, results) {
             addResults(1, "Timelines");
             addResults(0, "Exhibits");
             addResults(2, "Artifacts");
-            height = "200";
+
         }
-        if ($("#search").height() != height) {
-            $("#search").height(height + "px");
-        }
+
     }
 
     if (isSearching) {
@@ -181,6 +185,8 @@ function onSearchResults(searchString, results) {
         pendingSearch = null;
         search(q);
     }
+
+    $("#loadingImage").fadeOut('slow');
 }
 
 var pendingSearch = null;

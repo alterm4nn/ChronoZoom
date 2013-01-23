@@ -1,15 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <AzureCredentials>ChronoZoom</AzureCredentials>
-    <AzureHostedServiceName>czproduction</AzureHostedServiceName>
-    <AzureHostedServiceLabel>ChronozoomProduction</AzureHostedServiceLabel>
+    <AzureCredentials>[Your azure account]</AzureCredentials>
+    <AzureHostedServiceName>[Your azure storage service name]</AzureHostedServiceName>
+    <AzureHostedServiceLabel>[Your azure storage service label]</AzureHostedServiceLabel>
     <AzureSlot>Production</AzureSlot>
     <AzureEnableIntelliTrace>False</AzureEnableIntelliTrace>
     <AzureEnableProfiling>False</AzureEnableProfiling>
     <AzureEnableWebDeploy>False</AzureEnableWebDeploy>
-    <AzureStorageAccountName>czdiagnostics</AzureStorageAccountName>
-    <AzureStorageAccountLabel>czdiagnostics</AzureStorageAccountLabel>
+    <AzureStorageAccountName>[Your azure storage account name]</AzureStorageAccountName>
+    <AzureStorageAccountLabel>[Your azure storage account name]</AzureStorageAccountLabel>
     <AzureDeploymentLabel>Chronozoom.Prod.Azure</AzureDeploymentLabel>
     <AzureSolutionConfiguration>Production</AzureSolutionConfiguration>
     <AzureServiceConfiguration>Production</AzureServiceConfiguration>

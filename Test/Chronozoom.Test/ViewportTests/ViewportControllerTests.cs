@@ -16,13 +16,28 @@ namespace Chronozoom.Test.ViewportTests
     [TestPage("testViewportController.htm")]
     public abstract class ViewportControllerTests : CzTestBase
     {
+        private VirtualCanvasComponent vcPageObj;
+        private ActionsExtension action;
+
+        const double Ga = 1e9; //  1.0 Gigaannum
+                               // 13.7 Gigaannum - Age of universe
+
         [TestInitialize]
         public void TestInitialize()
         {
             GoToUrl();
-            //var vcPageObj = new VirtualCanvasComponent(Driver);
-            //vcPageObj.WaitContentLoading();
+            vcPageObj = new VirtualCanvasComponent(Driver);
         }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            if (action != null)
+            {
+                action.SetDefault();
+            }
+        }
+
         /// <summary>
         /// Interrupts one elliptical zoom with another one
         /// </summary>
@@ -117,10 +132,6 @@ namespace Chronozoom.Test.ViewportTests
             Assert.AreEqual(oldScale, newScale);
         }
 
-
-        double Ga = 1e9; //  1.0 Gigaannum
-                         // 13.7 Gigaannum - Age of universe
-
         [TestMethod]
         public void TestViewportController_PanForcesViewportToExceedLeftBorder_ViewportDoesNotExceedLeftBorder()
         {
@@ -128,14 +139,11 @@ namespace Chronozoom.Test.ViewportTests
              * Set up the viewport such that a pan of width
              * forces the viewport to exceed the left border.
              */
-            GoToUrl();
-
             IWebElement vcElem = Driver.FindElement(By.Id("vc"));
             double widthInSc = vcElem.Size.Width - 2;   // border of 1 px on each side
             double widthInVc = 1.37 * Ga;
             double scale = widthInVc / widthInSc;       // 1/10 the age of the universe
-
-            double minLeftCenterX = ExecuteScriptGetNumber(@"return window.maxPermitedTimeRange.left;"); 
+            double minLeftCenterX = -13.7 * Ga;
 
             var vc = new VirtualCanvasComponent(Driver);
             vc.SetVisible(new JsVisible(-13 * Ga, 0, scale));
@@ -144,17 +152,17 @@ namespace Chronozoom.Test.ViewportTests
             /* Act
              * Pan by width to the right.
              */
-            Vector pan = new Vector(widthInSc, 0);
-            ActionsExtension act = new ActionsExtension(Driver);
-            act.MoveToElement(vcElem, 0, 0);
-            act.ClickAndHold();
-            act.MoveByOffset(Convert.ToInt32(pan.X), Convert.ToInt32(pan.Y));
-            act.Release();
-            act.Perform();
+            Vector pan = new Vector(widthInSc - 1, 0);
+            action = new ActionsExtension(Driver);
+            action.MoveToElement(vcElem, 1, 1);
+            action.ClickAndHold();
+            action.MoveByOffset(Convert.ToInt32(pan.X), Convert.ToInt32(pan.Y));
+            action.Release();
+            action.Perform();
             vc.WaitAnimation();
 
-            /* Without the horizontal contraints the viewport centerX will exceed minLeftCenterX
-             * after a pan of width as (-13Ga + -1.37Ga < 13.7Ga).
+            /* Without the horizontal contraints the viewport centerX will exceed
+             * minLeftCenterX after a pan of width as (-13Ga + -1.37Ga < -13.7Ga).
              * With the contraints in place viewport centerX is limited to minLeftCenterX.
              */
 
@@ -164,8 +172,7 @@ namespace Chronozoom.Test.ViewportTests
              */
             var vp = vc.GetViewport();
             double vpCenterX = vp.CenterX;
-
-            Assert.AreEqual(minLeftCenterX, vpCenterX, 5);
+            Assert.IsTrue(vpCenterX >= minLeftCenterX);
         }
 
         [TestMethod]
@@ -175,29 +182,26 @@ namespace Chronozoom.Test.ViewportTests
              * Set up the viewport such that a pan of width 
              * forces the viewport to exceed the right border.
              */
-            GoToUrl();
-
             IWebElement vcElem = Driver.FindElement(By.Id("vc"));
             double widthInSc = vcElem.Size.Width - 2;   // border of 1 px on each side
             double widthInVc = 1.37 * Ga;
             double scale = widthInVc / widthInSc;       // 1/10 the age of the universe
-
-            double maxRightCenterX = ExecuteScriptGetNumber(@"return window.maxPermitedTimeRange.right;"); 
+            double maxRightCenterX = 0;
 
             var vc = new VirtualCanvasComponent(Driver);
-            vc.SetVisible(new JsVisible(-1 * Ga, 0 , scale));
+            vc.SetVisible(new JsVisible(-1 * Ga, 0, scale));
             vc.UpdateViewport();
 
             /* Act
              * Pan by width to the left.
              */
-            Vector pan = new Vector(-widthInSc, 0);
-            ActionsExtension act = new ActionsExtension(Driver);
-            act.MoveToElement(vcElem, (int) widthInSc, 0);
-            act.ClickAndHold();
-            act.MoveByOffset(Convert.ToInt32(pan.X), Convert.ToInt32(pan.Y));
-            act.Release();
-            act.Perform();
+            Vector pan = new Vector(1 - widthInSc, 0);
+            action = new ActionsExtension(Driver);
+            action.MoveToElement(vcElem, (int)widthInSc, 1);
+            action.ClickAndHold();
+            action.MoveByOffset(Convert.ToInt32(pan.X), Convert.ToInt32(pan.Y));
+            action.Release();
+            action.Perform();
             vc.WaitAnimation();
 
             /* Assert
@@ -206,17 +210,12 @@ namespace Chronozoom.Test.ViewportTests
              */
             var vp = vc.GetViewport();
             double vpCenterX = vp.CenterX;
-
-            Assert.AreEqual(maxRightCenterX, vpCenterX, 5);
+            Assert.IsTrue(vpCenterX <= maxRightCenterX);
         }
 
-        [Ignore]
         [TestMethod]
         public void TestViewportController_ZoomForcesViewportToExceedMinPermittedZoomIn_ViewportDoesNotExceedMinPermittedZoomIn()
         {
-            GoToUrl();
-
-            double zoomFactor = ExecuteScriptGetNumber(@"return window.zoomLevelFactor;");
             dynamic timelines = ExecuteScript("return window.deeperZoomConstraints;");
 
             for (int i = 0; i < timelines.Count; i++)
@@ -233,23 +232,19 @@ namespace Chronozoom.Test.ViewportTests
                 double left = timeline["left"];
                 double right = timeline["right"];
                 double minScale = timeline["scale"];
-                double aboveMinScale = minScale * zoomFactor;
-
-                // for all scale in [minScale, aboveMinScale) => scale / zoomFactor < minScale
-                Random rnd = new Random();
-                double scale = minScale + rnd.NextDouble() * (aboveMinScale - minScale);
+                double aboveMinScale = minScale * 1.1;
 
                 var vc = new VirtualCanvasComponent(Driver);
-                vc.SetVisible(new JsVisible((left + right) / 2, 0, scale));
+                vc.SetVisible(new JsVisible((left + right) / 2, 0, aboveMinScale));
                 vc.UpdateViewport();
 
                 /* Act
                  * ZoomIn.
                  */
-                ActionsExtension act = new ActionsExtension(Driver);
-                act.MoveToElement(vcElem, 10, 10);
-                act.DoubleClick();
-                act.Perform();
+                action = new ActionsExtension(Driver);
+                action.MoveToElement(vcElem, 1, 1);
+                action.DoubleClick();
+                action.Perform();
                 vc.WaitAnimation();
 
                 /* Assert
@@ -261,7 +256,6 @@ namespace Chronozoom.Test.ViewportTests
             }
         }
 
-        [Ignore]
         [TestMethod]
         public void TestViewportController_ZoomForcesViewportToExceedMaxPermittedZoomOut_ViewportDoesNotExceedMaxPermittedZoomOut()
         {
@@ -269,34 +263,23 @@ namespace Chronozoom.Test.ViewportTests
              * Set up the viewport such that a zoom gesture 
              * forces the viewport to exceed maximum zoomout level.
              */
-            GoToUrl();
-
             IWebElement vcElem = Driver.FindElement(By.Id("vc"));
-            double width = vcElem.Size.Width - 2; // border of 1 px on each side
 
-            double additionalPermitedPixels = ExecuteScriptGetNumber(@"return window.timelinesAbsenceInterval;");
-            double zoomFactor = ExecuteScriptGetNumber(@"return window.zoomLevelFactor;");
-
-            double maxScaleWithoutPadding = 13.7 * Ga / width;
-            double maxScale = (13.7 * Ga + 2 * additionalPermitedPixels * maxScaleWithoutPadding) / width;
-            double belowMaxScale = maxScale / zoomFactor;
-
-            // for all scale in (belowMaxScale, maxScale] => scale * zoomFactor > maxScale 
-            Random rnd = new Random();
-            double scale = belowMaxScale + rnd.NextDouble() * (maxScale - belowMaxScale);
+            double maxScale = ExecuteScriptGetNumber("return window.maxPermitedScale");
+            double belowMaxScale = maxScale / 1.1;
 
             var vc = new VirtualCanvasComponent(Driver);
-            vc.SetVisible(new JsVisible(-13.7 * Ga / 2, 0, scale));
+            vc.SetVisible(new JsVisible(-13.7 * Ga / 2, 0, belowMaxScale));
             vc.UpdateViewport();
 
             /* Act
              * ZoomOut.
              */
             ExecuteScript(@"setZoomOut()");
-            ActionsExtension act = new ActionsExtension(Driver);
-            act.MoveToElement(vcElem, 10, 10);
-            act.DoubleClick();
-            act.Perform();
+            action = new ActionsExtension(Driver);
+            action.MoveToElement(vcElem, 1, 1);
+            action.DoubleClick();
+            action.Perform();
             vc.WaitAnimation();
 
             /* Assert

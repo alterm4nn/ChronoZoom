@@ -1,11 +1,14 @@
 ﻿czDataSource = 'db'; // possible values: db, relay, dump
 // configures whether we should use Chronozoom.svc (directly accesses the database) ['db'], or ChronozoomRelay.svc (using HTTP GET) ['relay'], or saved as local file ResponseDump.txt ['dump'].
 
+czVersion = "main"; //can be main or mobile.is needed for threshold rendering
+
 ellipticalZoomZoomoutFactor = 0.5; //configures how high the elliptic zoom zooms out while changing visible region
-ellipticalZoomDuration = 6000; //(ms) approx transition time from cosmos to humanity timline
+ellipticalZoomDuration = 9000; //(ms) approx transition time from cosmos to humanity timline
 panSpeedFactor = 3.0;   //the factor of how fast the image pursuing the mouse while panning
 zoomSpeedFactor = 2.0;  //the factor of how fast the image pursuing the mouse while zooming
 zoomLevelFactor = 1.4;  //the step of the zooming
+allowedVisibileImprecision = 0.00001; // allowed imprecision in compare of two visibles
 
 contentScaleMargin = 20; //setts up margin in pixels for zooming to content option
 
@@ -19,6 +22,7 @@ fallbackImageUri = 'Images/Temp-Thumbnail2.png'; // the image that is shown when
 // Styles of timelines
 timelineHeaderMargin = 1.0 / 18.0;  // size of left margins, relative to height of the timeline.
 timelineHeaderSize = 1.0 / 9.0;    // header's font size, relative to height of the timeline
+timelineTooltipMaxHeaderSize = 5; // timeline tooltip appears, when its title screen size less than this constant
 timelineHeaderFontName = 'Arial';    // header's font size, relative to height of the timeline
 timelineHeaderFontColor = 'rgb(232,232,232)';
 timelineHoveredHeaderFontColor = 'white';
@@ -28,9 +32,12 @@ timelineHoveredLineWidth = 1; // in px
 timelineMinAspect = 0.2; //minimal timeline.height / timeline.width
 timelineContentMargin = 0.01; //determines margin for child elements of timeline. Margin = timelineWidth * timelineContentMargin
 timelineBorderColor = 'rgb(232,232,232)';
-timelineHoveredBoxBorderColor = 'rgb(232,232,232)'; 
+timelineHoveredBoxBorderColor = 'rgb(232,232,232)';
+timelineBreadCrumbBorderOffset = 50; // maximum allowed offset of timeline from canvas edge to show breadcrumb
+timelineCenterOffsetAcceptableImplicity = 0.00001; // acceptable implicity in position of center of canvas inside timeline
 
 infodotShowContentZoomLevel = 9; // zoom level (log_2 of size in pixel) when all content is shown
+infodotShowContentThumbZoomLevel = 2; // zoom level (log_2 of size in pixel) when thumbnails for all content items are shown
 infoDotHoveredBorderWidth = 40.0 / 450; // in virtual coordinates 
 infoDotBorderWidth = 27.0 / 450; // in virtual coordinates
 infodotTitleWidth = 200.0 / 489;
@@ -118,6 +125,16 @@ humanityTimelineID = "4afb5bb6-1544-4416-a949-8c8f473e544d";
 //tours
 toursAudioFormats =
 [
-    { ext:  'mp3'   }, //the order of the elements affects the priority of the format to use. the first format has the higher priority
-    { ext:  'wav'   }    
+    { ext: 'mp3' }, //the order of the elements affects the priority of the format to use. the first format has the higher priority
+    {ext: 'wav' }
 ];
+
+// seadragon
+seadragonServiceURL = "http://api.zoom.it/v1/content/?url=";
+seadragonImagePath = "../Images/";
+seadragonMaxConnectionAttempts = 3;
+seadragonRetryInterval = 2000; // ms
+
+// breadcrumb
+navigateNextMaxCount = 2; // if navNext (left or right) button was pressed rapidly this amount of times, then perfrom long navigation
+longNavigationLength = 10; // length of navigation in long navigation regime

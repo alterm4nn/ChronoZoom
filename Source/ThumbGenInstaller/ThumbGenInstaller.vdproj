@@ -7,52 +7,22 @@
 "LanguageId" = "3:1033"
 "CodePage" = "3:1252"
 "UILanguageId" = "3:1033"
-"SccProjectName" = "8:SAK"
-"SccLocalPath" = "8:SAK"
-"SccAuxPath" = "8:SAK"
-"SccProvider" = "8:SAK"
+"SccProjectName" = "8:"
+"SccLocalPath" = "8:"
+"SccAuxPath" = "8:"
+"SccProvider" = "8:"
     "Hierarchy"
     {
         "Entry"
         {
-        "MsmKey" = "8:_41EDD3476E1FAA3C606976AFE182DF3A"
-        "OwnerKey" = "8:_435EB85A52A653DCE35DD4760AA387EF"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_41EDD3476E1FAA3C606976AFE182DF3A"
-        "OwnerKey" = "8:_C5495073A9E9411C97BD373FDFEAFDBA"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_435EB85A52A653DCE35DD4760AA387EF"
-        "OwnerKey" = "8:_C5495073A9E9411C97BD373FDFEAFDBA"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_C5495073A9E9411C97BD373FDFEAFDBA"
+        "MsmKey" = "8:_89D79426B8784B1BBC8C9EB3E434F730"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_41EDD3476E1FAA3C606976AFE182DF3A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_C5495073A9E9411C97BD373FDFEAFDBA"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_435EB85A52A653DCE35DD4760AA387EF"
+        "OwnerKey" = "8:_89D79426B8784B1BBC8C9EB3E434F730"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -160,68 +130,6 @@
         }
         "File"
         {
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_41EDD3476E1FAA3C606976AFE182DF3A"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Microsoft.WindowsAzure.StorageClient, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_41EDD3476E1FAA3C606976AFE182DF3A"
-                    {
-                    "Name" = "8:Microsoft.WindowsAzure.StorageClient.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:Microsoft.WindowsAzure.StorageClient.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_7770EDF608444DC398B6E4F16E931FE4"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_435EB85A52A653DCE35DD4760AA387EF"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:TGLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86"
-                "ScatterAssemblies"
-                {
-                    "_435EB85A52A653DCE35DD4760AA387EF"
-                    {
-                    "Name" = "8:TGLib.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:TGLib.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_7770EDF608444DC398B6E4F16E931FE4"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
         }
         "FileType"
         {
@@ -279,7 +187,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Thumbnail Generator"
         "ProductCode" = "8:{7BA061B8-96FA-4FB0-A2F7-47958512DF61}"
-        "PackageCode" = "8:{2B95368C-1F08-4B1B-910D-3BD2E7714F08}"
+        "PackageCode" = "8:{3ADEF251-0817-4556-B4D8-3D742D282CF6}"
         "UpgradeCode" = "8:{532FEC5D-46CE-4C4C-A1AB-95420BDE579D}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -798,9 +706,9 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_C5495073A9E9411C97BD373FDFEAFDBA"
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_89D79426B8784B1BBC8C9EB3E434F730"
             {
-            "SourcePath" = "8:..\\ThumbGen\\ThumbGenApp\\obj\\DevPreview\\ThumbGen.exe"
+            "SourcePath" = "8:..\\ThumbGen\\ThumbGenApp\\obj\\Debug\\ThumbGen.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_7770EDF608444DC398B6E4F16E931FE4"

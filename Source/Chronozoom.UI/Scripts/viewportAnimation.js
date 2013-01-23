@@ -8,12 +8,12 @@ function PanZoomAnimation(startViewport) {
     this.isForciblyStoped = false;
     this.ID = globalAnimationID++;
     var startVisible = startViewport.visible;
-    
+
     this.velocity = 0.001; //affects animation speed, is to be overrided by the viewportController according to settings.js file
 
     this.isActive = true;  //are more animation frames needed
     this.type = "PanZoom";
-    
+
     this.startViewport = new Viewport2d( //deep copy of the startViewport
                     startViewport.aspectRatio,
                     startViewport.width,
@@ -23,7 +23,7 @@ function PanZoomAnimation(startViewport) {
     this.estimatedEndViewport; //an estimated state of the viewport at the end of the animation
 
     //estinmated start and end visible centers in the screen coordinate system of a start viewport 
-    this.endCenterInSC; 
+    this.endCenterInSC;
     this.startCenterInSC = this.startViewport.pointVirtualToScreen(startVisible.centerX, startVisible.centerY);
 
     //previous animation frame is prepared according to current viewport state
@@ -80,7 +80,7 @@ function PanZoomAnimation(startViewport) {
         else {
             this.direction.X /= this.pathLeng; //normalizing rhe direction vector
             this.direction.Y /= this.pathLeng;
-        }               
+        }
     }
 
 
@@ -141,8 +141,9 @@ function PanZoomAnimation(startViewport) {
     }
 }
 
+
 /* Implements an "optimal" animated zoom/pan path between two view rectangles.
- Based on the paper "Smooth and efficient zooming and panning" by Jarke j. van Wijk and Wim A.A. Nuij
+Based on the paper "Smooth and efficient zooming and panning" by Jarke j. van Wijk and Wim A.A. Nuij
 @param startVisible   (visible2d) a viewport visible region from which the elliptical zoom starts
 @param endVisible     (visible2d) a viewport visible region that will be reached at the end of elliptical zoom animation
 */
@@ -151,8 +152,10 @@ function EllipticalZoom(startVisible, endVisible) {
     this.ID = globalAnimationID++;
     this.type = "EllipticalZoom";
     this.isActive = true;
-    this.targetVisible = new VisibleRegion2d(endVisible.centerX, endVisible.centerY,endVisible.scale);
+    this.targetVisible = new VisibleRegion2d(endVisible.centerX, endVisible.centerY, endVisible.scale);
     this.startTime = (new Date()).getTime();
+
+    this.imprecision = 0.0001; // Average imprecision in pathlength when centers of startVisible and endVisible visible regions are the same.
 
     function cosh(x) {
         return (Math.exp(x) + Math.exp(-x)) / 2;
@@ -164,10 +167,10 @@ function EllipticalZoom(startVisible, endVisible) {
 
     function tanh(x) {
         return sinh(x) / cosh(x);
-    }    
+    }
 
     //is used in the visible center point coordinates calculation according the article
-    //@param s    (number)  chenges between [0;this.S]    
+    //@param s    (number)  chenges between [0;this.S]
     this.u = function (s) {
         var val = this.startScale / Math.pow(this.ro, 2) * cosh(this.r0) * tanh(this.ro * s + this.r0) - this.startScale / Math.pow(this.ro, 2) * sinh(this.r0) + this.u0;
         return val;
@@ -189,19 +192,26 @@ function EllipticalZoom(startVisible, endVisible) {
     //@param t    (number)      changes between [0;1]. 0 coresponds to the beginig of the animatoin. 1 coresponds to the end of the animation
     this.y = function (t) {
         return startPoint.Y + (endPoint.Y - startPoint.Y) / this.pathLen * this.u(t * this.S);
-    }
+    }    
 
     // Returns the visible region for the animation frame according to the current viewport state
     //param currentViewport (viewport2d) the parameter is ignored in this type of animation. the calculation is performed using only current time
     this.produceNextVisible = function (currentViewport) {
         var curTime = (new Date()).getTime();
         var t;
+
         if (this.duration > 0)
             t = Math.min(1.0, (curTime - this.startTime) / this.duration); //projecting current time to the [0;1] interval of the animation parameter
         else
             t = 1.0;
-        if (t == 1.0) //the end of the animation. marking the animation as finished
+
+        // Change t value for accelereation and decceleration effect.
+        t = animationEase(t);
+
+        if (t == 1.0) { //the end of the animation. marking the animation as finished
             this.isActive = false;
+        }
+
         return new VisibleRegion2d(
             this.x(t),
             this.y(t),
@@ -221,7 +231,7 @@ function EllipticalZoom(startVisible, endVisible) {
     };
     var endScale = endVisible.scale;
 
-    var xDiff =startPoint.X - endPoint.X;
+    var xDiff = startPoint.X - endPoint.X;
     var yDiff = startPoint.Y - endPoint.Y;
     this.pathLen = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
 
@@ -234,12 +244,14 @@ function EllipticalZoom(startVisible, endVisible) {
     this.startScale = startScale;
     this.endPoint = endPoint;
     this.endScale = endScale;
-    if (u0 != u1) {
-    var uDiff= u0 - u1;
-    var b0 = (endScale * endScale - startScale * startScale + Math.pow(ro, 4) * uDiff * uDiff) /
-        (2 * startScale * ro * ro * (-uDiff));
-    var b1 = (endScale * endScale - startScale * startScale - Math.pow(ro, 4) * uDiff * uDiff) /
-        (2 * endScale * ro * ro * (-uDiff));
+
+    //Centers of startVisible and endVisible visible regions are not equal.
+    if (Math.abs(u0 - u1) > this.imprecision) {
+        var uDiff = u0 - u1;
+        var b0 = (endScale * endScale - startScale * startScale + Math.pow(ro, 4) * uDiff * uDiff) /
+            (2 * startScale * ro * ro * (-uDiff));
+        var b1 = (endScale * endScale - startScale * startScale - Math.pow(ro, 4) * uDiff * uDiff) /
+            (2 * endScale * ro * ro * (-uDiff));
 
         //calculating parameters for further animation frames calculation
 
@@ -255,14 +267,36 @@ function EllipticalZoom(startVisible, endVisible) {
         this.duration = ellipticalZoomDuration / 300 * this.S; //300 is a number to make animation eye candy. Please adjust ellipticalZoomDuration in settings.js instead of 300 constant here.
     }
     else {//special case of i0 == u1, overridding methods
-        var logScaleChange = Math.log(Math.abs(endScale - startScale))+10;
+        var logScaleChange = Math.log(Math.abs(endScale - startScale)) + 10;
         if (logScaleChange < 0)
             this.isActive = false;
-        this.duration = ellipticalZoomDuration * 0.005 * logScaleChange;
+
+        //This coefficient helps to avoid constant duration value in cases when centers of endVisible and startVisible are the same
+        var scaleDiff = 0.5;
+
+        //Avoid divide by zero situations.
+        if (endScale !== 0 || startScale !== 0) {
+            //This value is almost the same in all cases, when we click to infodot and then click to main content item and vice versa.
+            scaleDiff = Math.min(endScale, startScale) / Math.max(endScale, startScale);
+        }
+
+        //no animation is required, if start and end scales are the same.
+        if (scaleDiff === 1) { 
+            this.isActive = false;
+        }
+
+        this.duration = ellipticalZoomDuration * scaleDiff * 0.2;
+
         this.x = function (s) { return this.startPoint.X; }
         this.y = function (s) { return this.startPoint.Y; }
-        this.scale = function (s) {            
-            return this.startScale + (this.endScale-this.startScale)*s;
+        this.scale = function (s) {
+            return this.startScale + (this.endScale - this.startScale) * s;
         }
     }
+}
+
+//function to make animation EaseInOut. [0,1] -> [0,1]
+//@param t    (number)      changes between [0;1]. 0 coresponds to the beginig of the animatoin. 1 coresponds to the end of the animation
+function animationEase(t) {
+    return -2 * t * t * t + 3 * t * t;
 }

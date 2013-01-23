@@ -56,10 +56,6 @@ namespace Chronozoom.Test.AxisTests
             var lB = Convert.ToDouble((rangeBefore as Dictionary<string, object>)["left"]);
             var rB = Convert.ToDouble((rangeBefore as Dictionary<string, object>)["right"]);
 
-            //Trace.WriteLine("before: " + rangeBefore.ToString());
-            //screenshot befor actions
-            //WebDriverScreenshotMaker.SaveScreenshot(Driver, "TestSetGet", "BeforActions", ImageFormat.Png, true);
-
             double lA = lB - change1;
             double rA = rB - change2;
             (Driver as IJavaScriptExecutor).ExecuteScript("$(\"#axis\").axis(\"setRange\"," + lA + "," + rA + ");");
@@ -67,11 +63,8 @@ namespace Chronozoom.Test.AxisTests
             ExecuteScript("return $(\"#axis\").axis(\"getRange\");");
             var lAA = Convert.ToDouble((rangeAfter as Dictionary<string, object>)["left"]);
             var rAA = Convert.ToDouble((rangeAfter as Dictionary<string, object>)["right"]);
-            //Trace.WriteLine("after: " + rangeAfter.ToString());
-            // screenshot after actions
-            //WebDriverScreenshotMaker.SaveScreenshot(Driver, "TestSetGet", "AfterActions", ImageFormat.Png, true);
 
-            Assert.IsTrue(lB == lA - change1 && rB == rA - change2);
+            Assert.IsTrue(lB == lA + change1 && rB == rA + change2);
         }
 
         [TestMethod]
@@ -82,7 +75,7 @@ namespace Chronozoom.Test.AxisTests
             SetGet(123435.0, 23.0);
         }
 
-//Must be no more than four decimal places.
+        //Must be no more than four decimal places.
         public void Rounding(double lx, double rx)
         {
             (Driver as IJavaScriptExecutor).ExecuteScript("$(\"#axis\").axis(\"setRange\"," + lx + "," + rx + ");");
@@ -90,16 +83,19 @@ namespace Chronozoom.Test.AxisTests
             ExecuteScript("return $(\"#axis\").axis(\"getRange\");");
             var lr = Convert.ToDouble((range as Dictionary<string, object>)["left"]);
             var rr = Convert.ToDouble((range as Dictionary<string, object>)["right"]);
-            // WebDriverScreenshotMaker.SaveScreenshot(Driver, "RoundingTest", "Left=" + after.L1 + "Right=" + after.R1, ImageFormat.Png, true);
+
             Assert.IsTrue(Math.Round(lx, 4) == lr & Math.Round(rx, 4) == rr);
+            
         }
 
+        // Test is obsolete. It is duplicated by other tests and manual test cases.
+        [Ignore]
         [TestMethod]
         public void TestRounding()
         {
             GoToUrl();
 
-            Rounding(-145827349327.2347352836, -3.234);
+            Rounding(-145827349327.2347352836, -3.234222);
             Rounding(-5.2347352836, -0.0876087654757);
             Rounding(-234.15643764103412, -4.0);
         }

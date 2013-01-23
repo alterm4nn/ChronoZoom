@@ -80,15 +80,15 @@ namespace UI
         {
             if (this.Env == DataEnvironment.Production)
             {
-                return DB.Prod_ExhibitContentItemInfo.AsEnumerable<IExhibitContentItemInfo>();
+                return DB.Prod_ExhibitContentItemInfo.AsEnumerable<IExhibitContentItemInfo>().OrderBy(item => item.Order).OrderBy(item => item.Title);
             }
             else if (this.Env == DataEnvironment.Staging)
             {
-                return DB.Staging_ExhibitContentItemInfo.AsEnumerable<IExhibitContentItemInfo>();
+                return DB.Staging_ExhibitContentItemInfo.AsEnumerable<IExhibitContentItemInfo>().OrderBy(item => item.Order).OrderBy(item => item.Title);
             }
             else
             {
-                return DB.Auth_ExhibitContentItemInfoView.AsEnumerable<IExhibitContentItemInfo>();
+                return DB.Auth_ExhibitContentItemInfoView.AsEnumerable<IExhibitContentItemInfo>().OrderBy(item => item.Order).OrderBy(item => item.Title);
             }
         }
 

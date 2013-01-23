@@ -1,0 +1,6 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+// This code is licensed by Microsoft Corporation under the terms
+// of the MICROSOFT REACTIVE EXTENSIONS FOR JAVASCRIPT AND .NET LIBRARIES License.
+// See http://go.microsoft.com/fwlink/?LinkId=186234.
+
+(function(){var a;if(typeof ProvideCustomRxRootObject =="undefined")a=this.Rx; else a=ProvideCustomRxRootObject();var b=a.Observable;var c=Ext;var d=function(e,f,g,h){return b.Create(function(i){var j=c.EventManager;var k=function(l){i.OnNext(l);};j.on(e,f,k,g,h);return function(){j.un(e,f,k,g);};});};c.Element.prototype.toObservable=function(e,f,g){return d(this,e,f,g);};c.util.Observable.prototype.toObservable=function(e,f,g){var h=this;return b.Create(function(i){var j=function(k){i.OnNext(k);};h.on(e,j,f,g);return function(){h.un(e,j,f);};});};c.Ajax.observableRequest=function(e){var f={};for(var g in e) f[g]=e[g];var h=new a.AsyncSubject();f.success=function(i,j){h.OnNext({response:i,options:j});h.OnCompleted();};f.failure=function(i,j){h.OnError({response:i,options:j});};c.Ajax.request(f);return h;};})();

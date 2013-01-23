@@ -1,0 +1,50 @@
+﻿<!--
+Rapidly zooming in/out of an Infodot with video should not throw exceptions (object, player, g -> undefined).
+Click the +/- button rapidly and verify that no exceptions are thrown.
+
+Note: Set iframe src = "" before removing it, inorder to stop it from further loading and causing exceptions.
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Video Load and Unload</title>
+    
+    <script type="text/javascript">
+        var cnt = 0;
+        var b, d, p, v;
+
+        function loaded() {
+            b = document.getElementById('b');
+            d = document.getElementById('d');
+            p = document.getElementById('p');
+            b.innerText = "+";
+        }
+
+        function btn_click() {
+            if (cnt++ % 2 === 0) { // add iframe
+                b.innerText = "-";
+                v = document.createElement('iframe');
+                v.setAttribute("id", 'elem_video');
+                v.setAttribute("width", '635px');
+                v.setAttribute("height", '475px');
+                v.setAttribute("visible", 'true');
+                v.setAttribute("controls", 'true');
+                v.setAttribute("src", "http://player.vimeo.com/video/37942669?wmode=opaque");
+                d.appendChild(v);
+                p.innerText = d.outerHTML;
+            } else { // remove iframe
+                b.innerText = "+";
+                v.src = ""; // stop iframe from loading (if not yet loaded)
+                d.removeChild(v);
+                p.innerText = d.outerHTML;
+            }
+        }
+    </script>
+</head>
+<body onload="loaded()">
+    <div id="d" style="width: 640px; height: 480px; border: 5px solid red; background-color: #cdc8c8"></div>
+    <button id="b" onclick="btn_click()" style="margin: 10px; width: 150px; height: 50px"></button>
+    <p id="p"></p>
+</body>
+</html>

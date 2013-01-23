@@ -32,6 +32,8 @@ namespace Chronozoom.Test.AxisTests
             }
         }
 
+        // Test is obsolete. It is dulpicated by manual test cases.
+        [Ignore]
         [TestMethod]
         public void TestMinZoom()
         {
@@ -130,6 +132,8 @@ namespace Chronozoom.Test.AxisTests
             Assert.IsTrue(aL < bL && aR < bR);
         }
 
+        // Test is obsolete. It is dulpicated by tests in CanvasAxisInteractionTests.cs and manual test cases.
+        [Ignore]
         [TestMethod]
         public void TestDifActives()
         {

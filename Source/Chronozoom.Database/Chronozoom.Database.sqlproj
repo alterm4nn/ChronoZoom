@@ -8,6 +8,7 @@
     <PostConversionAddToScc>
     </PostConversionAddToScc>
     <GenerateDac>False</GenerateDac>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">DevPreview</Configuration>

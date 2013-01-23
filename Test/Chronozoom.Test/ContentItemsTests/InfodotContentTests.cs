@@ -117,6 +117,8 @@ namespace Chronozoom.Test.ContentItemsTests
             Assert.IsTrue(ContentItems.GetInfodotCI(infodotID, mainItem) && ContentItems.GetInfodotCI(infodotID, minorItem));
         }
 
+        // This test is obsolete in current design: 14th june 2012
+        [Ignore]
         [TestMethod]
         public void TestInfodotContent_ZoomOutFromInfodot_InfodotContentUnloaded()
         {
@@ -164,6 +166,8 @@ namespace Chronozoom.Test.ContentItemsTests
             Assert.IsTrue(ContentItems.GetInfodotThumbnail().Equals("not visible"));
         }
 
+        // This test is obsolete in current design: 14th june 2012
+        [Ignore]
         [TestMethod]
         public void TestInfodotContent_ZoomOutFromInfodot_InfodotThumbnailIsVisible()
         {
@@ -175,7 +179,7 @@ namespace Chronozoom.Test.ContentItemsTests
             // Fail if infodot wasn't added.
             if (!ContentItems.GetInfodot(infodotID))
                 Assert.Fail();
-
+            
             // Check that thumbnail is not visible.
             Assert.IsTrue(ContentItems.GetInfodotThumbnail().Equals("visible"));
         }
@@ -265,9 +269,11 @@ namespace Chronozoom.Test.ContentItemsTests
         #endregion
 
         #region Bibliography link tests
+        // Obsolete. Specifications changed.
+        [Ignore]
         [TestMethod]
         public void TestInfodotContent_EmptyBibliographyReferences_NoBibliographyLink()
-        {
+        {           
             string infodotID = "demoInfodot";
 
             GoToUrl();
