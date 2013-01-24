@@ -540,11 +540,6 @@
     <Content Include="Views\Shared\Search.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Web.Sandbox.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Views\User\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
