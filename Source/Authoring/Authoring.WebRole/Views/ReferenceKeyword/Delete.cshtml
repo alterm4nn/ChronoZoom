@@ -1,0 +1,28 @@
+﻿@model Authoring.WebRole.Models.ReferenceKeyword
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>ReferenceKeyword - Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<fieldset>
+    <legend>ReferenceKeyword</legend>
+
+    <div class="display-label">Reference</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Reference.Authors)
+    </div>
+
+    <div class="display-label">Keyword</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Keyword.Keyword1)
+    </div>
+</fieldset>
+@using (Html.BeginForm()) {
+    <p>
+        <input type="submit" value="Delete" /> |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+}

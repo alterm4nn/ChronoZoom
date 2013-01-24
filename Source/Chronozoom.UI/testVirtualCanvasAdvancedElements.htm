@@ -1,0 +1,278 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <link href="Styles/cz.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="Scripts/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-ui-1.8.16.custom.min.js"></script>
+    <script type="text/javascript" src="Scripts/rx.js"></script>
+    <script type="text/javascript" src="Scripts/rx.jQuery.js"></script>
+    <script type="text/javascript" src="Scripts/seadragon-min.js"></script>
+    <script type="text/javascript" src="Scripts/common.js"></script>
+    <script type="text/javascript" src="Scripts/cz.settings.js"></script>
+    <script type="text/javascript" src="Scripts/vccontent.js"></script>
+    <script type="text/javascript" src="Scripts/viewport.js"></script>
+    <script type="text/javascript" src="Scripts/virtualCanvas.js"></script>
+    <script type="text/javascript" src="Scripts/mouseWheelPlugin.js"></script>
+    <script type="text/javascript" src="Scripts/gestures.js"></script>
+    <script type="text/javascript" src="Scripts/viewportAnimation.js"></script>
+    <script type="text/javascript" src="Scripts/viewportController.js"></script>
+    <script type="text/javascript" src="Scripts/urlnav.js"></script>
+    <script type="text/javascript">
+        var maxPermitedVerticalRange = { top: -10000000, bottom: 10000000 };
+
+        var t1, t2;
+        var infodot1;
+        var k = 100;
+
+        function checkInfodot1Thumbnail() {
+            if (infodot1.children.length != 1) // DLOD element
+                throw "No dynamic LOD element";
+
+            if (infodot1.children[0].children.length != 1 // thumbnail image
+                || !("img" in infodot1.children[0].children[0]))
+                throw "Infodot must contain sigle image";
+
+            return 1;
+        }
+
+        function checkInfodot1HasContent() {
+            if (infodot1.children.length != 1) // DLOD element
+                throw "No dynamic LOD element";
+
+            if (infodot1.children[0].children.length <= 1 // content items
+                )
+                throw "Infodot must contain items";
+
+            return 1;
+        }
+
+        function checkTimelines() {
+            checkTimeline(t1, "Cosmos", -18.7 * k, 18.7 * k, 0, 5 * k, "rgba(100, 30, 30, 0.5)");
+            checkTimeline(t2, "Life", -5.7 * k, 5.7 * k, 0.1 * k, 2 * k, "rgba(30, 100, 30, 0.5)");
+            checkTimeline(getChild(t1, "t2"), "Life", -5.7 * k, 5.7 * k, 0.1 * k, 2 * k, "rgba(30, 100, 30, 0.5)");
+            return 1;
+        }
+
+        function checkTimeline(timeline, text, timeLeft, timeSpan, top, height, fillStyle)
+        {
+            if("layerTimelines" != timeline["layerid"]
+                || timeLeft != timeline["x"]
+                || top!= timeline["y"]
+                || timeSpan!= timeline["width"]
+                || height!= timeline["height"])
+                throw "Timeline basic properties are incorrect";
+
+            var settings = timeline.settings;
+            if(timelineStrokeStyle != settings["strokeStyle"]
+                || timelineLineWidth != settings["lineWidth"]
+                || fillStyle != settings["fillStyle"]);
+
+            var textElement = timeline.children[0];
+            checkText(textElement, text);
+        }
+
+        function checkText(element, text)
+        {
+            if(text != element["text"]) throw "Text is incorrect";
+        }
+
+        $(document).ready(function () {
+            var vc = $("#vc");
+            vc.virtualCanvas();
+
+            k = 200;
+
+            var root = vc.virtualCanvas("getLayerContent");
+            root.beginEdit();
+            t1 = addTimeline(root, "layerTimelines", "t1",
+                {
+                    timeStart: -18.7 * k, timeEnd: 0,
+                    top: 0, height: 5 * k,
+                    header: "Cosmos",
+                    fillStyle: "rgba(100, 30, 30, 0.5)"
+                });
+
+                addInfodot(t1, "layerInfodots", "frontierInfodot",
+                -18.7 * k, 2.0 * k, 0.6 * k,
+                [{   title: 'Frontier Infodot',
+                    description: 'Test infodot for bug verification.',
+                    mediaUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CMB_Timeline300_no_WMAP.jpg/1280px-CMB_Timeline300_no_WMAP.jpg',
+                    mediaType: 'image'
+                }],
+                {
+                    title: 'frontierInfodot'
+                });
+
+                var infodot02 = addInfodot(t1, "layerInfodots", "infodot02",
+                -16 * k, 2.0 * k, 0.6 * k,
+                [{ title: 'Space like infinity',
+                    description: 'The Universe was once in an extremely hot and dense state which expanded rapidly.',
+                    mediaUrl: "rihard_shtraus_zaratustra.mp3",
+                    mediaType:'audio'
+                }],
+                {
+                    title: 'infodot02'
+                });
+
+                var infodot01 = addInfodot(t1, "layerInfodots", "infodot01",
+                -14 * k, 2.0 * k, 0.6 * k,
+                [{ title: 'Space like infinity',
+                    description: 'The Universe was once in an extremely hot and dense state which expanded rapidly.',
+                    mediaUrl: 'http://www.hpcaconf.org/hpca11/papers/30_ananian-unboundedtransactionalmemory.pdf',
+                    mediaType: 'pdf'
+                }],
+                {
+                    title: 'infodot01'
+                });
+
+            var infodot0 = addInfodot(t1, "layerInfodots", "infodot0",
+                -12 * k, 2.0 * k, 0.6 * k,
+                [{ title: 'Space like infinity',
+                    description: 'The Universe was once in an extremely hot and dense state which expanded rapidly.',
+                    mediaUrl: 'http://player.vimeo.com/video/31911961?title=0&amp;byline=0&amp;portrait=0',
+                    mediaType: 'video'
+                }],
+                {
+                    title: 'infodot0'
+                });
+
+            var infodot1 = addInfodot(t1, "layerInfodots", "infodot1",
+                -10 * k, 2.0 * k, 0.6 * k,
+                [{ id: "i1_c1", title: 'Big Bang',
+                    description: 'The Universe was once in an extremely hot and dense state which expanded rapidly.',
+                    mediaUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CMB_Timeline300_no_WMAP.jpg/1280px-CMB_Timeline300_no_WMAP.jpg',
+                    mediaType: 'image'
+                },
+                { id: "i1_c2", title: 'Big Bang2',
+                    description: 'The Universe was once in an extremely hot and dense state which expanded rapidly.',
+                    mediaUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CMB_Timeline300_no_WMAP.jpg/1280px-CMB_Timeline300_no_WMAP.jpg',
+                    mediaType: 'image'
+                },
+                { id: "i1_c3", title: 'Big Bang2',
+                    description: 'The Universe was once in an extremely hot and dense state which expanded rapidly.',
+                    mediaUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CMB_Timeline300_no_WMAP.jpg/1280px-CMB_Timeline300_no_WMAP.jpg',
+                    mediaType: 'image'
+                },
+                { id: "i1_c4", title: 'Big Bang2',
+                    description: 'The Universe was once in an extremely hot and dense state which expanded rapidly.',
+                    mediaUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CMB_Timeline300_no_WMAP.jpg/1280px-CMB_Timeline300_no_WMAP.jpg',
+                    mediaType: 'image'
+                },
+                { id: "i1_c5", title: 'Big Bang2',
+                    description: 'The Universe was once in an extremely hot and dense state which expanded rapidly.',
+                    mediaUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CMB_Timeline300_no_WMAP.jpg/1280px-CMB_Timeline300_no_WMAP.jpg',
+                    mediaType: 'image'
+                },                
+                { id: "i1_c6", title: 'Big Bang2',
+                    description: 'The Universe was once in an extremely hot and dense state which expanded rapidly.',
+                    mediaUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CMB_Timeline300_no_WMAP.jpg/1280px-CMB_Timeline300_no_WMAP.jpg',
+                    mediaType: 'image'
+                },
+                { id: "i1_c7", title: 'Big Bang2',
+                    description: 'The Universe was once in an extremely hot and dense state which expanded rapidly.',
+                    mediaUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CMB_Timeline300_no_WMAP.jpg/1280px-CMB_Timeline300_no_WMAP.jpg',
+                    mediaType: 'image'
+                }],
+                {
+                    title: 'infodot1'
+                });
+
+            t2 = addTimeline(t1, "layerTimelines", "t2",
+                 {
+                     timeStart: -5.7 * k, timeEnd: 0,
+                     top: 0.1 * k, height: 2 * k,
+                     header: "Life",
+                     fillStyle: "rgba(30, 100, 30, 0.5)"
+                 });
+
+            var infodot2 = addInfodot(t2, "layerInfodots", "infodot2",
+                -4 * k, 0.8 * k, 0.2 * k,
+                [{ id: "i2_c1", title: 'Penguins (family Spheniscidae)',
+                    description: 'A group of aquatic, flightless birds living almost exclusively in the southern hemisphere.',
+                    mediaUrl: 'http://www.photographyis.co.uk/blog/wp-content/uploads/2011/02/penguin.jpg',
+                    mediaType: 'image'
+                }],
+                {
+                    title: 'infodot2'
+                });
+
+            var infodot3 = addInfodot(t2, "layerInfodots", "infodot3",
+                -4 * k, 1.5 * k, 0.2 * k,
+                [{ id: "i3_c1", title: 'Otocolobus manul',
+                    description: "Pallas's cat is about the size of a domestic cat, with a 46 to 65 cm body.",
+                    mediaUrl: 'http://savemanul.org/images/full/pc_rus.jpg',
+                    mediaType: 'image'
+                },
+                { id: "i3_c2", title: 'Otocolobus manul',
+                    description: "Pallas's cat is about the size of a domestic cat, with a 46 to 65 cm body.",
+                    mediaUrl: 'http://manul.me/picture/index-manul-me.jpg',
+                    mediaType: 'image'
+                },
+                { id: "i3_c3", title: 'Otocolobus manul',
+                    description: "Pallas's cat is about the size of a domestic cat, with a 46 to 65 cm body.",
+                    mediaUrl: 'http://www.zoopicture.ru/wp-content/uploads/2009/04/manul15.jpg',
+                    mediaType: 'image'
+                },
+                { id: "i3_c4", title: 'Otocolobus manul',
+                    description: "Pallas's cat is about the size of a domestic cat, with a 46 to 65 cm body.",
+                    mediaUrl: 'http://www.zoopicture.ru/wp-content/uploads/2009/04/manul1.jpg',
+                    mediaType: 'image'
+                }],
+                {
+                    title: 'infodot3'
+                });
+
+            var infodot4 = addInfodot(t2, "layerInfodots", "infodot4",
+                -3.0 * k, 0.8 * k, 0.2 * k,
+                [{ id: "i4_c1", title: 'Tiger (Panthera tigris)',
+                    description: "The tiger is the largest cat species, reaching a total body length of up to 3.3 metres and weighing up to 306 kg.",
+                    mediaUrl: 'http://www.baby-einstein.net/wp-content/uploads/2010/11/Tiger-Cubs.jpg',
+                    mediaType: 'image'
+                }],
+                {
+                    title: 'infodot4'
+                });
+
+            root.endEdit(true);
+
+            controller = new ViewportController(
+                            function (visible) {
+                                vc.virtualCanvas("setVisible", visible, controller.activeAnimation);
+                            },
+                            function () {
+                                return vc.virtualCanvas("getViewport");
+                            },
+                            getGesturesStream(vc));
+
+            vc.bind("elementclick", function (e) {
+                controller.moveToVisible(e.newvisible);
+            });
+
+            vc.virtualCanvas("setVisible", new VisibleRegion2d(-7.0 * k, 2.5 * k, 14.0 * k / 1024.0));
+
+
+            UpdateLayout();
+        });
+
+        function UpdateLayout() {
+            document.getElementById("vc").style.height = (window.innerHeight - 20) + "px";
+            $("#vc").virtualCanvas("updateViewport");
+        }
+
+        $(window).bind('resize', function () {
+            UpdateLayout();
+        });
+
+    </script>
+    <title>Virtual Canvas Primitives</title>
+</head>
+<body style="background-color: Black">
+    <div id="vc" style="width: 100%; height: auto; overflow: hidden; background-image: url('Images/background.jpg');
+        background-size: cover">
+        <div id="layerTimelines">
+        </div>
+        <div id="layerInfodots">
+        </div>
+    </div>
+</body>
+</html>

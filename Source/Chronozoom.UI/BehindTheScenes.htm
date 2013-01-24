@@ -1,0 +1,236 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>ChronoZoom - Behind the scenes</title>
+    <style type="text/css">
+        body
+        {
+            font-family: Arial;
+            font-size: 12px;
+            line-space: 16px;
+            line-height: 16px;
+        }
+        .style1
+        {
+            width: 960px;
+            background-color: #d0d0d0;
+            
+        }
+    </style>
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29180487-2']);
+        _gaq.push(['_setDomainName', 'chronozoomproject.org']);
+        _gaq.push(['_setAllowLinker', true]);
+        _gaq.push(['_trackPageview']);
+        (function () {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+<body>
+
+    <table class="style1">
+        <tr>
+            <td colspan="2">
+                <img src="Images/header.png" alt="ChronoZoom behind the scenes"/>
+                </td>
+        </tr>
+        <tr>
+            <td style="width:600px; vertical-align: top">
+               <div style="margin-left:45px; margin-top:27px">
+                    <img src="Images/about-chronozoom.png" alt="About ChronoZoom"/>
+                    <p>
+                    ChronoZoom is an open source community project dedicated to visualizing the history of everything to bridge the gap between the humanities and sciences using the story of Big History to easily understand all this information. This project has been funded and supported by Microsoft Research Connections in collaboration with University California at Berkeley and Moscow State University.
+                    </p>
+                    <p>
+                    You can browse through history on ChronoZoom to find data in the form of articles, images, video, sound, and other multimedia.   ChronoZoom links a wealth of information from five major regimes that unifies all historical knowledge collectively known as Big History.
+                    </p>
+                    <p>
+                    By drawing upon the latest discoveries from many different disciplines, you can visualize the temporal relationships between events, trends, and themes.  Some of the disciplines that contribute information to ChronoZoom include biology, astronomy, geology, climatology, prehistory, archeology, anthropology, economics, cosmology, natural history, and population and environmental studies.
+                    </p>
+                     <img src="Images/inspiration.png" alt="Inspiration"/>
+                     <p>
+                     In the spring of 2009, Roland Saekow decided to take the Big History course from Walter Alvarez at the University of California Berkeley.   Walter had created a series of timeline handouts created with a number of different methodologies.   Fascinated, Roland was inspired to dedicate his student project to the study of timelines and thus sparked the inception for the concept of ChronoZoom as a way to examine the concept of Big History.
+                     </p>
+                     <p>
+                     Roland and Walter began to discuss ideas for an interactive timeline application and often exchanged drawings on the blackboard after class or quick sketches during office hours.   Walter soon began using Adobe Illustrator to create mockups with limited zoom capability, but quickly discovered that the current graphics applications did not have a fraction of the ability to zoom on the needed timescale.
+                     </p>
+                     <p>
+                    Walter and Roland turned to an office on the Berkeley campus called the Office of Intellectual Property and Industry Research Alliances (IPIRA) and put together a description of the project and rehearsed a demonstration of the prototype that we had built. 
+                    </p>
+                    <p>
+                    The response from IPIRA group was phenomenal.  “We are used to getting technical people such as chemists and biologists who come in and present their latest synthesized compound or chemical. Usually we just try to nod and pretend to share their excitement, but this is really cool!” 
+                    </p>
+                    <p>
+                    IPIRA helped Walter and Roland arrange a conference call with Microsoft Research.  They produced a seven minute video that explained both the Big History timescale problem as well as an initial prototype and ChronoZoom was born. 
+                    </p>
+                    <p>
+                    A small but highly dedicated team at Microsoft Live Labs produced the first version of ChronoZoom.  It was capable of zooming from a single day all the way back to the Big Bang. This impressive accomplishment was achieved in time for Walter's Faculty Research Lecture, where ChronoZoom made its worldwide debut. Walter had been selected as one of two faculty members to give the annual talk to the UC Berkeley community in 2010. 
+                    </p>
+                    <p>
+                    UC Berkeley wanted to create an intuitive easy to use dynamic cloud service that could have multiple data sets available.  In the alpha attempt, we focused on an extensive back end that could handle hundreds of thousands of terabytes and multiple data types, but in the end was far too complicated in the front end.  
+                    </p>
+                    <p>
+                    The team changed focus to an intuitive user experience on a very easy to use tool and then expanded to include the community of humanities and scientists interested in using ChronoZoom for research and teaching. 
+                    </p>
+                    <img src="Images/the-journey-to-the-chronozoom-beta.png" alt="The journey to the ChronoZoom beta"/>
+                    <p>
+                    The Microsoft Research Connections (MRC) team had been instrumental in establishing the collaboration between the Microsoft Live Labs and Berkeley teams.  With an investment in a dedicated engineering effort as well as funding for student contributions, the next phase of ChronoZoom was secured.
+                    </p>
+                    <p>
+                    It was agreed that Berkeley would continue to be the primary visionary of the project, but would take on an additional role of Content Management.  The power of ChronoZoom would only be evident if the content and the stories they told were compelling and so an army of students were employed to research, collect, analyze, and finally create the content elements inside ChronoZoom beta.
+                    </p>
+                    <p>
+                    The Live Labs team at Microsoft had been disbanded and so the project was in need of new technical leadership.  The Microsoft Research Connections organization had been growing their own top-notch engineering team, and as the stars aligned, this team brought to bear over 50 years of collective software development experience to the effort.
+                    </p>
+                    <p>
+                    As the project goals and strategy unfolded, we knew that we needed to react to changes in the technical strategy in the market if we wanted it to have a viable future.   The solution was to rebuild ChronoZoom from the ground up to leverage the power of Windows Azure for the flexibility and scalability on the backend with HTML 5 as the latest and greatest cross-platform and rich UI client technology to support the demands of a complex infinite zoom canvas and interface.  We learned that ChronoZoom needed to focus on scalability and user interface.  
+                    </p>
+                    <p>
+                    This decision had its share of drawbacks, and ultimately resulted in the need to re-evaluate the resource needs and skillsets required.  We had a number of challenging obstacles to overcome.  To fully realize the dream of ChronoZoom, developers had to create algorithms that could dynamic timeline behaviors as well as deal with difficult scenarios such as leap years, no year 0, and Before Common Era timeline.  
+                    </p>
+                    <p>
+                    We decided to reach out to reach out to the Development Team from Moscow State University.  These students proved to be the missing piece of the puzzle as the team started hitting on all cylinders during the latter half of 2011.  They learned HTML 5 and how to integrate Jscript to produce quality animations and functionality.  Just as in life, things happen for a reason and the team was fortunate to have the opportunity to bring on a new set of highly skilled student developers from Lomonosov Moscow State University.  The complexity both from a technical and usability standpoint is immense in this project, and what might seem like a relatively short development cycle was pre-empted by a lot of hard work, re-work, and sometimes starting over.  The philosophy we have used is to iterate regularly, obtain feedback at every chance, and to consider design and usability as a first priority.  As a result, ChronoZoom Beta is ready for mass consumption and feedback, structured to scale up to petabytes of content, and architected for the future of personal computing.
+                    </p>
+                    <img src="Images/help-chronozoom-grow.png" alt="Help ChronoZoom grow"/>
+                    <p>
+                    We envision a world where scientists, researchers, students, and teachers collaborate through ChronoZoom to share information via data, tours, and insight.  
+                    </p>
+                    <p>
+                    Imagine a world where the leading academics publish their findings to the world in a manner that can easily be accessed and compared to other data.
+                    </p>
+                    <p>
+                    Imagine a tool that allows teachers to generate tours specific to their classroom needs.
+                    </p>
+                    <p>
+                    This can happen with your support.   We need your feedback and support to continue to mold this project to suit your needs.
+                    </p>
+                    <p>
+                    We will be focusing on community development of features, capabilities and content.  We ask people to try ChronoZoom and the give us feedback in the survey and vote for features this will help us priorities the next feature set.  We are looking to work with two communities.  One a community of content providers, humanities and science researchers, think tanks, ischools and organizations that have digital libraries, digital content, and cultural content that can be viewed in a time-based tool that can help the history of everything come to life when you bring humanities and science stories together.  
+                    </p>
+                    <p>
+                    Examples:  History of particle physics, history of chemical reactions, climate change, history of the Nile which could include cultural and scientific data, the history of Polynesian culture, etc. 
+                    </p>
+                    <p>
+                    We are also looking for computer science departments and ischools that are interested in big data, data visualization, database design, and informatics who are interested in helping us build out the next set of features for ChronoZoom to support the needs of researchers and professors.  
+                    </p>
+                    <p>
+                    Some big questions we are trying to answer with ChronoZoom: 
+                    </p>
+                    <p><li>How do you organize huge amounts (terabytes and more..) of data that are several different types of content—audio,  video, txt, pdfs, images—logically and so they’re easily consumable? </li></p>
+                    <p><li>How do you not sacrifice precision but show billions of years ago to a day on one scale? </li></p>
+                    <p><li>How do you prioritize content when you have multiple items for the same time period? For example someone may create Egyptian history timeline, Chinese cultural history timeline, Islamic history timeline, Japanese American history timeline and particle physics timeline and they all share a significant event on the date 1890- how do you show this on the timeline canvas? </li></p>
+                    <p><li>How do you efficiently draw elements on the canvas using html DOM graphical elements and not sacrifice CPU usage?
+                    <br>And how do you ensure the same experience on multiple devices, operating systems, and browsers—the exact same experience on a Mac, PC, iPad, iPhone, Windows Phone, and Android devices?</li></p>
+                    <p><li>How do you make a 3rd party authoring tool that serves as a peer review- editorial board approval process with annotations etc. to populate the timeline- as a new type of peer review journal?</li></p>
+                    <p><li>Do you require an author to build a timeline and create a story line or do you automate the pull of data from all creative commons freely available datasets and libraries on the internet, how do you do this logically.</li></p>
+                    <p><li>How do you compare multiple timelines and data sets? </li></p>
+                    <p><li>How do you keep ambiguity there are many parts of history that are debated and not one answer is true, how do you help students to see the information but then interpret on their own and make their own decision on what happened and make sure folks understand this in not one factual story but the understanding of many researchers and experts and an ability to present various interpretations of an event in the timeline.</li></p>
+                    <p></p>
+                    <img src="Images/whats-next.png" alt="What's next"/>
+                    <p>
+                    Some of the possible future features include:
+                    </p>
+                    <p><li>Ability to create my personal canvas/timeline/tours</li></p>
+                    <p><li>Ability to generate internal user bookmarks</li></p>
+                    <p><li>Generate a chart dynamically and place it where I want on the timeline</li></p>
+                    <ul>
+                    <p><li>Display curve and segmented line graphs, plot of events coded for magnitude</li></p>
+                    <p><li>Phylogenetic trees</li></p>
+                    <p><li>Svg drawing</li></p>
+                    </ul>
+                    <p><li>Filter Exhibits based on subject</li></p>
+                    <p><li>Choose data from data library</li></p>
+                    <p><li>Customize time direction up and down, down to up, left to right, right to left</li></p>
+                    <p><li>Comparison of timeline, Comparison of data, Comparison of data and timelines</li></p>
+                    <p><li>Ability to share my timeline or tour with others via social networking </li></p>
+                    <p><li>Ability to show uncertainty of dates (+/-)</li></p>
+                    <p><li>Ability to show a time range and not only just a specific date in time</li></p>
+                    <p><li>Ability to show multiple interpretations </li></p>
+                    <p><li>Ability to show geo-spacial data </li></p>
+                    <img src="Images/frequently-asked-questions.png" alt="Frequently asked questions" id="faq"/>
+                    <table>
+                    <tr>
+                        <td><img src="Images/Q.png" alt="Q"/></td>
+                        <td><p>Why does the animation appear slow or jittery on my computer?</p></td>
+                    </tr>
+                    <tr>
+                        <td><img src="Images/A.png" alt="A"/></td>
+                        <td><p>ChronoZoom is designed to support computers that meet the hardware requirements for browsers that support HTM 5.  On some computers, the graphics can be slower or less smooth than intended due to limited memory, processor power, or graphics capability.</p></td>
+                    </tr>
+                    <tr>
+                        <td><img src="Images/Q.png" alt="Q"/></td>
+                        <td><p>Why don’t the graphics perform well in Firefox 10.x?</p></td>
+                    </tr>
+                    <tr>
+                        <td><img src="Images/A.png" alt="A"/></td>
+                        <td><p>Firefox 10.x automatically activates hardware graphic acceleration even if the computer doesn’t have a graphics adapter that can support this functionality.  We recommend disabling the Firefox hardware graphics acceleration.  
+                        More information can be found on this <a href="http://www.trixya.net/index.php/internet/enable-or-disable-hardware-acceleration-for-graphics-in-firefox" target="_blank">webpage</a>.</p></td>
+                    </tr>
+                    </table>
+                    <p><a href="http://chronozoom.codeplex.com/documentation" target="_blank">For more information please visit out codeplex website</a></p>
+                    <img src="Images/Credits.png" alt="Credits" style="margin-left:215px" id="credits"/>
+                    <table>
+                    <tr>
+                        <td style="vertical-align:top; width:305px">
+                            <p></p><img src="Images/program-managers.png" alt="Program managers"/>
+                            <br />Michael Zyskowski<br />Bob Walter<p></p>
+                            <img src="Images/developers-and-testers.png" alt="Developers and testers"/>
+                            <br />Danny Dalal<br />Kal Viswanathan<br />Roman Snytsar<br />
+                            Sergey Berezin<br />Alexander Zenchenko<br />Anna Isaeva<br />Dmitry Grechka<br />Dmitry Voytsekhovskiy<br />
+                            Eugene Nourminsky<br />Ivan Samylovskiy<br />Michael Kalygin<br />Nataliya Stepanova<br />Nikita Skoblov
+                            <br />Alva Bandy<br />Palani Vairavan<br />Wahib Faizi<br />Yuriy Zhayvoronok
+                            </td>
+                       <td style="vertical-align:top">
+                            <p></p><img src="Images/product-management-and-community-outreach.png" alt="Product management and community outreach"/>
+                            <br />Rane Johnson<p></p>
+                            <img src="Images/chronozoom-content.png" alt="ChronoZoom content"/>
+                            <br />Walter Alvarez<br />Roland Saekow<br />Chris Engberg<br />Michelle Lo<br>Ken Zhou<br>Matt Hoffman<br>
+                            Robbie Bruens<br />Madison Allen<br />Sergey Piterman<br />Cecily Gardner<br />Kenneth Leung<br />David Shimabukuro<p></p>
+                            <img src="Images/UX-and-collateral.png" alt="UX and collected materials"/>
+                            <br />Jessica Herron<br />Chris Engberg<br />Jason Andrew<br />Paul Secord</td>
+                    </tr>
+                    </table>
+                    <p></p><br /><img src="Images/Chronozoom-project-advisors.png" alt="ChronoZoom project advisors" style="margin-left:175px"/>
+                    <p>Eric J. Chaisson, Harvard University; Barry Rodrigue, University South Maine; Lowell Gustafson, Villanova University; Craig Benjamin, 
+                    Grand Valley State University; Fred Spier, Amsterdam University; David Christian, Marquarie University; Ian Sands, Michael Dix, 
+                    Greg Amrofel and Andy Cook of the Gates’ Big History Project; Cynthia Brown, Dominican University; Mojgan Behmand, Dominican University of California; 
+                    Jo Guldi, Harvard University; Jerry Bentley, University of Hawaii; Manning, Patrick, University of Pittsburgh; William Turkel, University of Western Ontario; 
+                    Bill Crow, Microsoft; Curtis Wong, Microsoft Research; Steven Drucker, Microsoft Research; Jian Zhao, 
+                    Intern Microsoft Research; Phillippe Claeys, Université libre de Bruxelles</p>
+                    <p></p><img src="Images/corporate-and-institutional-support.png" alt="Corporate and institutional support" style="margin-left:175px"/>
+                    <p>Microsoft Research Connections, FUSE labs: Microsoft Corporation; Outercurve Foundation; University of California, Berkeley; Moscow State University; University of Washington; Big History Project; Dominican University; Lake Washington High School;Microsoft Live Labs (Bill Crow, Goldie Chaudhuri, Karan Pal Singh, Melinda Minch, Asta Roseway)</p>
+              </div>
+            </td>
+            <td>
+                <div style="margin-left:50px; ">
+                    <br /><a href="http://go.microsoft.com/?linkid=9797058" target="_blank">Take our survey</a><img src="Images/we-need-your-feedback.png" alt="We need your feedback" />
+                    <br /><a href="http://chronozoom.codeplex.com/documentation">Frequently Asked Questions</a>
+                    <br /><a href="#credits">Who built ChronoZoom?</a>
+                    <br /><a href="http://chronozoom.codeplex.com" target="_blank">Visit the ChronoZoom codeplex site</a>
+                    <br />Managed by <a href="http://www.outercurve.org/Galleries/ResearchAccelerators/ChronoZoom" target="_blank">Outercurve Foundation</a>
+                    <br />Sponsored by <a href="http://research.microsoft.com/en-us/projects/chronozoom/default.aspx" target="_blank">Microsoft Research</a>
+                </div>
+                <div style="margin-top:27px">
+                    <img src="Images/right-column.png" alt="ChronoZoom team" usemap="#right-column" border="0"/>
+                    <map name="right-column">
+                    <area shape="poly" coords="256, 415, 355, 404, 359, 425, 258, 434" 
+                            alt="Roland's webpage" href="http://www.linkedin.com/pub/roland-saekow/41/593/782" 
+                            target="_blank"/>
+                    <area shape="poly" coords="80, 719, 190, 742, 190, 756, 80, 736" 
+                            alt="Walter's presentation" href="http://www.youtube.com/watch?v=CDWKAAxL10Q" 
+                            target="_blank"/>
+                    <area shape="poly" coords="61, 749, 152, 769, 152, 782, 61, 766" 
+                            alt="Walter's website" 
+                            href="http://eps.berkeley.edu/development/view_person.php?uid=90" 
+                            target="_blank"/>
+                    </map>
+                </div></td>
+        </tr>
+    </table>
+
+</body>
+</html>

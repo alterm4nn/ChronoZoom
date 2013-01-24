@@ -1,0 +1,85 @@
+﻿@model IEnumerable<Authoring.WebRole.Models.AuthoringTable>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @if (ViewBag.write)
+    {
+        @Html.ActionLink("Create New", "Create")
+    }
+</p>
+<table>
+    <tr>
+        <th>
+            AuthoringTable
+        </th>
+        @*<th>
+            Created By
+        </th>
+        <th>
+            modified By
+        </th>
+        <th>
+            CreatedOn
+        </th>
+        <th>
+            ModifiedOn
+        </th>
+        <th>
+            IsDeleted
+        </th>*@
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.AuthoringTable1)
+        </td>
+        @*<td>
+            @Html.DisplayFor(modelItem => item.User.UserName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.User1.UserName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.CreatedOn)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ModifiedOn)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IsDeleted)
+        </td>*@
+        <td>
+        @if(ViewBag.delete) 
+        {
+ 
+            @Html.ActionLink("Edit", "Edit", new { id=item.ID })  
+            @String.Format("{0}", "|");
+            @Html.ActionLink("Details", "Details", new { id=item.ID }) 
+            @String.Format("{0}", "|");
+            @Html.ActionLink("Delete", "Delete", new { id = item.ID })
+            
+        }
+        else if (ViewBag.write)
+        {
+            @Html.ActionLink("Edit", "Edit", new { id = item.ID }) 
+            @String.Format("{0}", "|");
+            @Html.ActionLink("Details", "Details", new { id = item.ID })
+        }
+        else if (ViewBag.read)
+        { 
+
+            @Html.ActionLink("Details", "Details", new { id = item.ID })
+
+        }            
+        </td>
+    </tr>
+}
+
+</table>

@@ -1,0 +1,25 @@
+﻿@model Authoring.WebRole.Models.ContentKeyword
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>ContentKeyword - Details</h2>
+
+<fieldset>
+    <legend>ContentKeyword</legend>
+
+    <div class="display-label">ContentItem</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.ContentItem.Title)
+    </div>
+
+    <div class="display-label">Keyword</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Keyword.Keyword1)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.ContentKeywordID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <script type="text/javascript" src="Scripts/jquery-1.6.2.min.js"></script>
+    <title>Testing async image loading</title>
+    <script type="text/javascript">
+        var audio;
+
+        function startload() {
+            if (audio) {
+                audio.pause();
+                audio = undefined;
+            }
+            else {
+                audio = document.createElement('audio');
+                audio.controls = false;
+                audio.src = 'testAudio.mp3';
+                audio.autoplay = true;
+                audio.loop = false;
+            }
+        }
+    </script>
+</head>
+<body>    
+    <button onclick='startload();'>
+        Start play</button>
+    <p id="output">
+    </p>
+    <div id='div'></div>
+</body>
+</html>

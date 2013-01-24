@@ -1,0 +1,45 @@
+﻿@model Authoring.WebRole.Models.Threshold
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Threshold - Details</h2>
+
+<fieldset>
+    <legend>Threshold</legend>
+
+    <div class="display-label">Threshold1</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Threshold1)
+    </div>
+
+    <div class="display-label">ThresholdDate</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.ThresholdDate)
+    </div>
+
+    <div class="display-label">ThresholdYear</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.ThresholdYear)
+    </div>
+
+    <div class="display-label">ThresholdTimeUnit</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.ThresholdTimeUnit)
+    </div>
+
+    <div class="display-label">Bookmark</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.BookMark.Name)
+    </div>
+
+    <div class="display-label">ShortDescription</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.ShortDescription)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

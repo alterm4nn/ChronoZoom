@@ -1,0 +1,61 @@
+﻿@model IEnumerable<Authoring.WebRole.Models.LicenseType>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>LicenseType</h2>
+
+<p>
+    @if (ViewBag.write)
+    {
+        @Html.ActionLink("Create New", "Create")
+    }
+</p>
+<table>
+    <tr>
+        <th>
+            LicenseType1
+        </th>
+        <th>
+            LicenseURL
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.LicenseType1)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.LicenseURL)
+        </td>
+        <td>
+        @if(ViewBag.delete) 
+        {
+ 
+            @Html.ActionLink("Edit", "Edit", new { id=item.ID })  
+            @String.Format("{0}", "|");
+            @Html.ActionLink("Details", "Details", new { id=item.ID }) 
+            @String.Format("{0}", "|");
+            @Html.ActionLink("Delete", "Delete", new { id = item.ID })
+            
+        }
+        else if (ViewBag.write)
+        {
+            @Html.ActionLink("Edit", "Edit", new { id = item.ID }) 
+            @String.Format("{0}", "|");
+            @Html.ActionLink("Details", "Details", new { id = item.ID })
+        }
+        else if (ViewBag.read)
+        { 
+
+            @Html.ActionLink("Details", "Details", new { id = item.ID })
+
+        }            
+        </td>
+    </tr>
+}
+
+</table>

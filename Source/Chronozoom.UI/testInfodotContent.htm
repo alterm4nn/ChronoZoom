@@ -1,0 +1,456 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <link href="Styles/cz.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="Scripts/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-ui-1.8.16.custom.min.js"></script>
+    <script type="text/javascript" src="Scripts/rx.js"></script>
+    <script type="text/javascript" src="Scripts/rx.jQuery.js"></script>
+    <script type="text/javascript" src="Scripts/seadragon-min.js"></script>
+    <script type="text/javascript" src="Scripts/common.js"></script>
+    <script type="text/javascript" src="Scripts/cz.settings.js"></script>
+    <script type="text/javascript" src="Scripts/vccontent.js"></script>
+    <script type="text/javascript" src="Scripts/viewport.js"></script>
+    <script type="text/javascript" src="Scripts/virtualCanvas.js"></script>
+    <script type="text/javascript" src="Scripts/mouseWheelPlugin.js"></script>
+    <script type="text/javascript" src="Scripts/gestures.js"></script>
+    <script type="text/javascript" src="Scripts/viewportAnimation.js"></script>
+    <script type="text/javascript" src="Scripts/viewportController.js"></script>
+    <script type="text/javascript" src="Scripts/urlnav.js"></script>
+    <script type="text/javascript">
+        var maxPermitedVerticalRange = { top: -10000000, bottom: 10000000 };
+
+        var t1, ci, demoItem;
+        var k = 100;
+        
+        var mainItem = { id: "mainItem", title: 'Main Content Item',
+                    description: 'Main content item.',
+                    mediaUrl: 'http://www.youtube.com/embed/7hqX8ljEP34',
+                    mediaType: 'video'
+                };
+
+       var minorItem = { id: "minorItem", title: 'Minor Content Item',
+                    description: 'Minor content item.',
+                    mediaUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CMB_Timeline300_no_WMAP.jpg/1280px-CMB_Timeline300_no_WMAP.jpg',
+                    mediaType: 'image'
+                };
+
+        addContentItem = function (index) {
+            var temp = {
+                id: 'contentItem' + index.toString(), title: 'Content Item ' + index.toString(),
+                description: 'Minor content item number ' + index.toString(),
+                mediaUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CMB_Timeline300_no_WMAP.jpg/1280px-CMB_Timeline300_no_WMAP.jpg',
+                mediaType: 'image'
+            };
+            return temp;
+        }
+
+        $(document).ready(function () {
+            var vc = $("#vc");
+            vc.virtualCanvas();
+
+            var root = vc.virtualCanvas("getLayerContent");
+            root.beginEdit();
+            t1 = addTimeline(root, "layerTimelines", "t1",
+                {
+                    timeStart: -15.7 * k, timeEnd: -4.0,
+                    top: 0, height: 5 * k,
+                    header: "Cosmos",
+                    fillStyle: "rgba(100, 30, 30, 0.5)"
+                });
+
+            add_Infodot = function () {
+                demoItem = addInfodot(t1, "layerInfodots", "demoInfodot",
+                -10 * k, 2.0 * k, 0.9 * k,
+                [
+                mainItem, minorItem], { title: "Demo Infodot", date: 1500 });
+            }
+
+            addInfodot(t1, "layerInfodots", "pdfInfodot",
+                -14 * k, 2.0 * k, 0.9 * k,
+                [
+                { id: "id_pdf", title: 'PDF',
+                    description: 'The Universe is commonly defined as the totality of everything that exists, including all matter and energy, the planets, stars, galaxies, and the contents of intergalactic space. Definitions and usage vary and similar terms include the cosmos, the world and nature. Scientific observation of earlier stages in the development of the Universe, which can be seen at great distances, suggests that the Universe has been governed by the same physical laws and constants throughout most of its extent and history. There are various multiverse theories, in which physicists have suggested that our universe is one among many universes that likewise exist. (From Wikipedia, the free Encyclopedia)',
+                    mediaUrl: "http://www.iiasa.ac.at/Research/GGI/docs/DICE_Skunk_Report.pdf",
+                    mediaType: 'pdf'
+                }], { title: "PDF DOC", date: 1500 });
+
+            addInfodot(t1, "layerInfodots", "audioInfodot",
+                -12 * k, 2.0 * k, 0.9 * k,
+                [
+                { id: "id_sound", title: 'Audio',
+                    description: 'Audio.',
+                    mediaUrl: "rihard_shtraus_zaratustra.mp3",
+                    mediaType: 'audio'
+                }], { title: "audioInfodot" });
+
+            addInfodot(t1, "layerInfodots", "vimeoInfodot",
+                -8 * k, 2.0 * k, 0.9 * k,
+                [{ id: "id_vimeo", title: 'Vimeo Video',
+                    description: 'Vidmeo Video.',
+                    mediaUrl: 'http://player.vimeo.com/video/31911961?title=0&amp;byline=0&amp;portrait=0',
+                    mediaType: 'video'
+                }], { title: "vimeoInfodot" });
+
+            addInfodot(t1, "layerInfodots", "multitextInfodot",
+                -6 * k, 2.0 * k, 0.9 * k,
+                [{ id: "id_text",
+                    title: 'Space like infinity',
+                    description: 'The Universe was once in an extremely hot and dense state which expanded rapidly.',
+                    mediaUrl:
+                    'The Universe is commonly defined as the totality of everything that exists, including all matter and energy, the planets, stars, galaxies, and the contents of intergalactic space. Definitions and usage vary and similar terms include the cosmos, the world and nature. Scientific observation of earlier stages in the development of the Universe, which can be seen at great distances, suggests that the Universe has been governed by the same physical laws and constants throughout most of its extent and history. There are various multiverse theories, in which physicists have suggested that our universe is one among many universes that likewise exist. (From Wikipedia, the free Encyclopedia)',
+                    mediaType: 'multiline'
+                }], { title: "multitextInfodot" });
+
+            addInfodot(t1, "layerInfodots", "ci1",
+                -3.0 * k, 2.0 * k, 0.2 * k,
+                [
+                { id: "id_youtube", title: '1 Minor Content Item',
+                    description: '1 Minor Content Item',
+                    mediaUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CMB_Timeline300_no_WMAP.jpg/1280px-CMB_Timeline300_no_WMAP.jpg',
+                    mediaType: 'image'
+                },
+                addContentItem(1)
+                ], { title: "ci1" });
+
+            addInfodot(t1, "layerInfodots", "ci2",
+                -2.5 * k, 2.0 * k, 0.2 * k,
+                [
+                { id: "id_youtube", title: '2 Minor Content Items',
+                    description: '2 Minor Content Items',
+                    mediaUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CMB_Timeline300_no_WMAP.jpg/1280px-CMB_Timeline300_no_WMAP.jpg',
+                    mediaType: 'image'
+                },
+                addContentItem(1), addContentItem(2)
+                ], { title: "ci2" });
+
+            addInfodot(t1, "layerInfodots", "ci3",
+                -2.0 * k, 2.0 * k, 0.2 * k,
+                [
+                { id: "id_youtube", title: '3 Minor Content Items',
+                    description: '3 Minor Content Items',
+                    mediaUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CMB_Timeline300_no_WMAP.jpg/1280px-CMB_Timeline300_no_WMAP.jpg',
+                    mediaType: 'image'
+                },
+                addContentItem(1), addContentItem(2), addContentItem(3)
+                ], { title: "ci3" });
+
+            addInfodot(t1, "layerInfodots", "ci4",
+                -1.5 * k, 2.0 * k, 0.2 * k,
+                [
+                { id: "id_youtube", title: '4 Minor Content Items',
+                    description: '4 Minor Content Items',
+                    mediaUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CMB_Timeline300_no_WMAP.jpg/1280px-CMB_Timeline300_no_WMAP.jpg',
+                    mediaType: 'image'
+                },
+                addContentItem(1), addContentItem(2), addContentItem(3), addContentItem(4)
+                ], { title: "ci4" });
+
+            addInfodot(t1, "layerInfodots", "ci5",
+                -3.0 * k, 2.5 * k, 0.2 * k,
+                [
+                { id: "id_youtube", title: '5 Minor Content Items',
+                    description: '5 Minor Content Items',
+                    mediaUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CMB_Timeline300_no_WMAP.jpg/1280px-CMB_Timeline300_no_WMAP.jpg',
+                    mediaType: 'image'
+                },
+                addContentItem(1), addContentItem(2), addContentItem(3), addContentItem(4),
+                addContentItem(5)
+                ], { title: "ci5" });
+
+            addInfodot(t1, "layerInfodots", "ci6",
+                -2.5 * k, 2.5 * k, 0.2 * k,
+                [
+                { id: "id_youtube", title: '6 Minor Content Items',
+                    description: '6 Minor Content Items',
+                    mediaUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CMB_Timeline300_no_WMAP.jpg/1280px-CMB_Timeline300_no_WMAP.jpg',
+                    mediaType: 'image'
+                },
+                addContentItem(1), addContentItem(2), addContentItem(3), addContentItem(4),
+                addContentItem(5), addContentItem(6)
+                ], { title: "ci6" });
+
+            addInfodot(t1, "layerInfodots", "ci7",
+                -2.0 * k, 2.5 * k, 0.2 * k,
+                [
+                { id: "id_youtube", title: '7 Minor Content Items',
+                    description: '7 Minor Content Items',
+                    mediaUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CMB_Timeline300_no_WMAP.jpg/1280px-CMB_Timeline300_no_WMAP.jpg',
+                    mediaType: 'image'
+                },
+                addContentItem(1), addContentItem(2), addContentItem(3), addContentItem(4),
+                addContentItem(5), addContentItem(6), addContentItem(7)
+                ], { title: "ci7" });
+
+            addInfodot(t1, "layerInfodots", "ci8",
+                -1.5 * k, 2.5 * k, 0.2 * k,
+                [
+                { id: "id_youtube", title: '8 Minor Content Items',
+                    description: '8 Minor Content Items',
+                    mediaUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CMB_Timeline300_no_WMAP.jpg/1280px-CMB_Timeline300_no_WMAP.jpg',
+                    mediaType: 'image'
+                },
+                addContentItem(1), addContentItem(2), addContentItem(3), addContentItem(4),
+                addContentItem(5), addContentItem(6), addContentItem(7), addContentItem(8)
+                ], { title: "ci8" });
+
+            addInfodot(t1, "layerInfodots", "ci9",
+                -3.0 * k, 3.0 * k, 0.2 * k,
+                [
+                { id: "id_youtube", title: '9 Minor Content Items',
+                    description: '9 Minor Content Items',
+                    mediaUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CMB_Timeline300_no_WMAP.jpg/1280px-CMB_Timeline300_no_WMAP.jpg',
+                    mediaType: 'image'
+                },
+                addContentItem(1), addContentItem(2), addContentItem(3), addContentItem(4),
+                addContentItem(5), addContentItem(6), addContentItem(7), addContentItem(8),
+                addContentItem(9)
+                ], { title: "ci9" });
+
+            addInfodot(t1, "layerInfodots", "ci10",
+                -2.5 * k, 3.0 * k, 0.2 * k,
+                [
+                { id: "id_youtube", title: '10 Minor Content Items',
+                    description: '10 Minor Content Items',
+                    mediaUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CMB_Timeline300_no_WMAP.jpg/1280px-CMB_Timeline300_no_WMAP.jpg',
+                    mediaType: 'image'
+                },
+                addContentItem(1), addContentItem(2), addContentItem(3), addContentItem(4),
+                addContentItem(5), addContentItem(6), addContentItem(7), addContentItem(8),
+                addContentItem(9), addContentItem(10)
+                ], { title: "ci10" });
+
+            addInfodot(t1, "layerInfodots", "ci11",
+                -2.0 * k, 3.0 * k, 0.2 * k,
+                [
+                { id: "id_youtube", title: '11 Minor Content Items',
+                    description: '11 Minor Content Items',
+                    mediaUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CMB_Timeline300_no_WMAP.jpg/1280px-CMB_Timeline300_no_WMAP.jpg',
+                    mediaType: 'image'
+                },
+                addContentItem(1), addContentItem(2), addContentItem(3), addContentItem(4),
+                addContentItem(5), addContentItem(6), addContentItem(7), addContentItem(8),
+                addContentItem(9), addContentItem(10), addContentItem(11)
+                ], { title: "ci11" });
+
+            addInfodot(t1, "layerInfodots", "ci12",
+                -1.5 * k, 3.0 * k, 0.2 * k,
+                [
+                { id: "id_youtube", title: '12 Minor Content Items',
+                    description: '12 Minor Content Items',
+                    mediaUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CMB_Timeline300_no_WMAP.jpg/1280px-CMB_Timeline300_no_WMAP.jpg',
+                    mediaType: 'image'
+                },
+                addContentItem(1), addContentItem(2), addContentItem(3), addContentItem(4),
+                addContentItem(5), addContentItem(6), addContentItem(7), addContentItem(8),
+                addContentItem(9), addContentItem(10), addContentItem(11), addContentItem(12)
+                ], { title: "ci12" });
+
+            getInfodotContent = function (infodotID, contentItemID) {
+                try { var dlod = getChild(demoItem, infodotID); }
+                catch (ex) { return null; }
+
+                var item;
+                var vp = vc.virtualCanvas("getViewport");
+                var sz = vp.vectorVirtualToScreen(demoItem.width, demoItem.height);
+                var a = dlod.changeZoomLevel(demoItem.zoomLevel, getZoomLevel(sz));
+                try { item = getChild(a.content, contentItemID); }
+                catch (ex) { return null; }
+                return item;
+            }
+
+            getDemoInfodotBibliography = function () {
+                var item = getInfodotContent("demoInfodot_dlod", "demoInfodot__bibliography");
+                if (item == null)
+                    return false;
+                if (item.text == "Bibliography")
+                    return true;
+                else
+                    return false;
+            }
+
+            getDemoInfodotThumbnail = function () {
+                try { var dlod = getChild(demoItem, "demoInfodot_dlod"); }
+                catch (ex) {
+                    return "failed";
+                }
+
+                var item;
+                var vp = vc.virtualCanvas("getViewport");
+                var sz = vp.vectorVirtualToScreen(demoItem.width, demoItem.height);
+
+                var a = dlod.changeZoomLevel(demoItem.zoomLevel, getZoomLevel(sz));
+                try { a.content.img.src }
+                catch (ex) {
+                    return "not visible";
+                }
+
+                return "visible";
+            }
+
+            getDemoInfodotCIThumbnail = function () {
+                try { var dlod = getChild(demoItem, "demoInfodot_dlod"); }
+                catch (ex) {
+                    return "failed";
+                }
+
+                var item;
+                var vp = vc.virtualCanvas("getViewport");
+                var sz = vp.vectorVirtualToScreen(demoItem.width, demoItem.height);
+                var a = dlod.changeZoomLevel(demoItem.zoomLevel, getZoomLevel(sz));
+                try { item = getChild(a.content, "minorItem"); }
+                catch (ex) {
+                    return "failed";
+                }
+                sz = vp.vectorVirtualToScreen(item.width, item.height);
+                a = item.changeZoomLevel(demoItem.zoomLevel, getZoomLevel(sz));
+                if (a == null)
+                    return "failed";
+
+                try { a.content.img.src; }
+                catch (ex) {
+                    return "not visible";
+                }
+
+                return "visible";
+            }
+
+            getCI = function (id) {
+                try { var dlod = getChild(demoItem, "demoInfodot_dlod"); }
+                catch (ex) {
+                    return "failed";
+                }
+
+                var item;
+                var vp = vc.virtualCanvas("getViewport");
+                var sz = vp.vectorVirtualToScreen(demoItem.width, demoItem.height);
+                var a = dlod.changeZoomLevel(demoItem.zoomLevel, getZoomLevel(sz));
+                try { item = getChild(a.content, "minorItem"); }
+                catch (ex) {
+                    return "failed";
+                }
+                sz = vp.vectorVirtualToScreen(item.width, item.height);
+                a = item.changeZoomLevel(demoItem.zoomLevel, getZoomLevel(sz));
+
+                try { item = getChild(a.content, id); }
+                catch (ex) { return null; }
+                return item;
+            }
+
+            getCITitle = function () {
+                var item = getCI("minorItem__title__");
+
+                if (item == null)
+                    return null;
+                return item.text;
+            }
+
+            getCIDescription = function () {
+                var item = getCI("minorItem__description__");
+
+                if (item == null)
+                    return false;
+                return true;
+            }
+
+            getCIMedia = function () {
+                var item = getCI("minorItem__media__");
+
+                if (item == null)
+                    return false;
+                return true;
+            }
+
+            getInfodotCI = function (infodotID, contentItemID) {
+                var item = getInfodotContent(infodotID + "_dlod", contentItemID);
+
+                if (item == null)
+                    return false;
+                return true;
+            }
+
+            getTitle = function (infodotID) {
+                var item = getInfodotContent(infodotID + "_dlod", "demoInfodot__title");
+
+                if (item == null)
+                    return null;
+                return item.text;
+            }
+
+            getInfodot = function (id) {
+                try { getChild(t1, id); }
+                catch (ex) {
+                    return false;
+                }
+                return true;
+            }
+
+            removeInfodot = function (id) {
+                removeChild(t1, id);
+            }
+
+            viewDemoInfodot = function () {
+                vc.virtualCanvas("setVisible", new VisibleRegion2d(-10.0 * k, 2.0 * k, 1.4 * k / 1024.0));
+            }
+
+            viewDemoInfodotMinorCI = function () {
+                vc.virtualCanvas("setVisible", new VisibleRegion2d(-10.5 * k, 2.0 * k, 0.3 * k / 1024.0));
+            }
+
+            viewDemoInfodotThumbnail = function () {
+                vc.virtualCanvas("setVisible", new VisibleRegion2d(-10.0 * k, 2.0 * k, 10 * k / 1024.0));
+            }
+
+            root.endEdit(true);
+
+            controller = new ViewportController(
+                            function (visible) {
+                                vc.virtualCanvas("setVisible", visible, controller.activeAnimation);
+                            },
+                            function () {
+                                return vc.virtualCanvas("getViewport");
+                            },
+                            getGesturesStream(vc));
+
+            vc.virtualCanvas("setVisible", new VisibleRegion2d(-7.0 * k, 2.5 * k, 14 * k / 1024.0));
+
+            vc.bind("elementclick", function (e) {
+                controller.moveToVisible(e.newvisible);
+            });
+
+            UpdateLayout();
+        });
+
+        function UpdateLayout() {
+            document.getElementById("vc").style.height = (window.innerHeight - 60) + "px";
+            $("#vc").virtualCanvas("updateViewport");
+        }
+
+
+        function viewPopupWindow() {
+            
+            addPopupWindow("Bibliography.htm", "popupwnd1", 400,400,'yes','yes');
+        }
+
+        $(window).bind('resize', function () {
+            UpdateLayout();
+        });
+
+    </script>
+    <title>Virtual Canvas Primitives</title>
+</head>
+<body style="background-color: Black">
+    <button onclick="add_Infodot()">Add demo infodot</button>
+    <button id="removeInfodot" onclick="removeInfodot('demoInfodot')">Remove demo infodot</button>
+    <button id="viewInfodot" onclick="viewDemoInfodot()">View demo infodot</button>
+    <button id="popupWIndow" onclick="viewPopupWindow()">View popup window</button>
+    <div id="vc" style="width: 100%; height: auto; overflow: hidden; background-image: url('Images/background.jpg');
+        background-size: cover">
+        <div id="layerTimelines">
+        </div>
+        <div id="layerInfodots">
+        </div>
+    </div>
+</body>
+</html>
+-->

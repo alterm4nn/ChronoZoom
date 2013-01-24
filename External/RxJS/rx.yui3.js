@@ -1,0 +1,6 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+// This code is licensed by Microsoft Corporation under the terms
+// of the MICROSOFT REACTIVE EXTENSIONS FOR JAVASCRIPT AND .NET LIBRARIES License.
+// See http://go.microsoft.com/fwlink/?LinkId=186234.
+
+(function(){var a=Rx.Observable.YUI3Use=function(d){return Rx.Observable.CreateWithDisposable(function(e){var f=function(h){e.OnNext(h);};var g=YUI().use(d,f);return Rx.Disposable.Empty;});};var b=Rx.Observable.FromYUI3Event=function(d,e){return a("node-base").SelectMany(function(f){return Rx.Observable.Create(function(g){var h=function(i){g.OnNext(i);};f.on(e,h,d);return function(){f.detach(e,h,d);};});});};var c=Rx.Observable.FromYUI3IO=function(d,e){return a("io-base").SelectMany(function(f){var g={};for(var h in e) g[h]=e[h];var i=new Rx.AsyncSubject();g.on={success:function(j,k,l){i.OnNext({transactionid:j,response:k,arguments:l});i.OnCompleted();},failure:function(j,k,l){i.OnError({transactionid:j,response:k,arguments:l});}};f.io(d,g);return i;});};})();

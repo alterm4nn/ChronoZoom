@@ -1,0 +1,798 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="Pragma" content="no-cache" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+   <script type="text/javascript">
+       // Invoke timings.show() to get timings
+       var timings = new Object();
+       timings.parseStarted = new Date();
+       timings.show = function () {
+           var msg =
+                "External scripts loading: " + (timings.scriptsLoaded - timings.parseStarted) +
+                " ms\nDocument ready handler: " + (timings.readyStarted - timings.scriptsLoaded) +
+                " ms\n\nRequesting server for timelines data: " + (timings.wcfRequestCompleted - timings.wcfRequestStarted) +
+                " ms\nLayout algorithm: " + (timings.layoutCompleted - timings.wcfRequestCompleted) +
+                " ms\nPopulating virtual canvas: " + (timings.canvasInited - timings.layoutCompleted) + " ms";
+           alert(msg);
+       }
+    </script>
+    <link rel="stylesheet" type="text/css" href="Styles/cz.css" />
+    <link rel="stylesheet" type="text/css" href="Styles/axis.css" />
+    <script type="text/javascript" src="Scripts/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-ui-1.8.16.custom.min.js"></script>
+    <script type="text/javascript" src="Scripts/rx.js"></script>
+    <script type="text/javascript" src="Scripts/rx.jQuery.js"></script>
+    <script type="text/javascript" src="Scripts/cz.settings.js"></script>
+    <script type="text/javascript" src="Scripts/common.js"></script>
+    <script type="text/javascript" src="Scripts/viewport.js"></script>
+    <script type="text/javascript" src="Scripts/viewportAnimation.js"></script>
+    <script type="text/javascript" src="Scripts/mouseWheelPlugin.js"></script>
+    <script type="text/javascript" src="Scripts/gestures.js"></script>
+    <script type="text/javascript" src="Scripts/virtualCanvas.js"></script>
+    <script type="text/javascript" src="Scripts/vccontent.js"></script>
+    <script type="text/javascript" src="Scripts/viewportController.js"></script>
+    <script type="text/javascript" src="Scripts/axis.js"></script>
+    <script type="text/javascript" src="Scripts/urlnav.js"></script>
+    <script type="text/javascript" src="Scripts/layout.js"></script>
+    <script type="text/javascript" src="Scripts/tours.js"></script>
+    <script type="text/javascript" src="Scripts/search.js"></script>
+    <script type="text/javascript" src="Scripts/bibliography.js"></script>
+    
+    <script type="text/javascript">
+        var timelineData = {
+            "d": [
+                {
+                    "__type": "Timeline:#Chronozoom.Entities",
+                    "ChildTimelines": [
+                        {
+                            "__type": "Timeline:#Chronozoom.Entities",
+                            "ChildTimelines": [],
+                            "Exhibits": [],
+                            "FromDay": 0,
+                            "FromMonth": 0,
+                            "FromTimeUnit": "Ga",
+                            "FromYear": 12,
+                            "Height": 50,
+                            "ID": "039dbe65-4743-45fa-81de-7d12360df111",
+                            "Regime": "Roman History",
+                            "Sequence": null,
+                            "Threshold": "1. Origins of Roman History",
+                            "Title": "Roman History",
+                            "ToDay": 0,
+                            "ToMonth": 0,
+                            "ToTimeUnit": "Ga",
+                            "ToYear": 10,
+                            "UniqueID": 1
+                        },
+                        {
+                            "__type": "Timeline:#Chronozoom.Entities",
+                            "ChildTimelines": [],
+                            "Exhibits": [],
+                            "FromDay": 0,
+                            "FromMonth": 0,
+                            "FromTimeUnit": "Ga",
+                            "FromYear": 4,
+                            "Height": 50,
+                            "ID": "66b5e656-cfb0-4f98-8d13-e9335c8310b0",
+                            "Regime": "Byzantine Empire",
+                            "Sequence": null,
+                            "Threshold": "Origins of Byzantine Empire",
+                            "Title": "Byzantine Empire",
+                            "ToDay": 0,
+                            "ToMonth": 0,
+                            "ToTimeUnit": "Ga",
+                            "ToYear": 2,
+                            "UniqueID": 2
+                        }
+                    ],
+                    "Exhibits": [],
+                    "FromDay": 0,
+                    "FromMonth": 0,
+                    "FromTimeUnit": "Ga",
+                    "FromYear": 13.7000,
+                    "Height": 90.0000,
+                    "ID": "468a8005-36e3-4676-9f52-312d8b6eb7b7",
+                    "Regime": "Cosmos",
+                    "Sequence": null,
+                    "Threshold": "1. Origins of the Universe",
+                    "Title": "Cosmos",
+                    "ToDay": 0,
+                    "ToMonth": 0,
+                    "ToTimeUnit": "Ga",
+                    "ToYear": 0.0000,
+                    "UniqueID": 55
+                }
+            ]
+        };
+
+        var tourData = {
+            "d": [
+                {
+                    "__type": "Tour:#Chronozoom.Entities",
+                    "AudioBlobUrl": "testAudio.mp3",
+                    "Category": "Regimes",
+                    "ID": "73a4968d-3676-4181-bb6b-00e1328d4021",
+                    "Name": "Empire Tour",
+                    "Sequence": 4,
+                    "UniqueID": 13,
+                    "bookmarks": [
+                        {
+                            "__type": "BookMark:#Chronozoom.Entities",
+                            "Description": "Roman Empire Description",
+                            "ID": "1440c8f2-85d2-46b3-b4b5-0a417f45e8b0",
+                            "LapseTime": 72,
+                            "Name": "Roman Empire",
+                            "URL": "\/t55\/t1"
+                        },
+                        {
+                            "__type": "BookMark:#Chronozoom.Entities",
+                            "Description": "Byzantine Empire Description",
+                            "ID": "8ade4490-1e62-4a43-9081-969d757dfb66",
+                            "LapseTime": 150,
+                            "Name": "Byzantine Empire",
+                            "URL": "\/t55\/t2"
+                        }
+                    ]
+                }
+            ]
+        };
+        
+    </script>
+
+    <script type="text/javascript">
+        timings.scriptsLoaded = new Date();
+
+        var ax, vc;
+        var visReg;
+        var cosmosVisible, earthVisible, lifeVisible, prehistoryVisible, humanityVisible;
+        var content;
+        var breadCrumbs; //titles and visibles of the recent breadcrumbs
+
+        var regimeNavigator;
+
+        var k = 1000000000;
+        var setNavigationStringTo; // { element or bookmark, id } identifies that we zoom into this element and when (if) finish the zoom, we should put the element's path into navigation string
+
+
+        var regimesRatio;
+
+        function updateAxis(vc, ax) {
+            var vp = vc.virtualCanvas("getViewport");
+            var lt = vp.pointScreenToVirtual(0, 0);
+            var rb = vp.pointScreenToVirtual(vp.width, vp.height);
+            ax.axis("setRange", lt.x, rb.x);
+        }
+
+        var controller; //a controller to perform smooth navigation
+        var isAxisFreezed = true; //indicates whether the axis moves together with canvas during navigation or not
+        var startHash;
+
+        $(document).ready(function () {
+            if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
+                if (/Chrome[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
+                    var oprversion = new Number(RegExp.$1) // capture x.x portion and store as a number
+                    if (oprversion < 14.0) {
+                        window.location = "testFallBackPage.htm";
+                        return;
+                    }
+                }
+            }
+            else if (navigator.userAgent.toLowerCase().indexOf('version') > -1) {
+                if (/Version[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
+                    var oprversion = new Number(RegExp.$1) // capture x.x portion and store as a number
+                    if (oprversion < 5.0) {
+                        window.location = "testFallBackPage.htm";
+                        return;
+                    }
+                }
+            }
+            else {
+                var br = $.browser;
+                var isIe9 = br.msie && parseInt(br.version, 10) >= 9;
+                if (!isIe9) {
+                    var isFF9 = br.mozilla && parseInt(br.version, 10) >= 7;
+                    if (!isFF9) {
+                        var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+                        if (!is_chrome) {
+                            window.location = "testFallBackPage.htm";
+                        }
+                        return;
+                    }
+                }
+            }
+
+            maxPermitedVerticalRange = { top: 0, bottom: 10000000 }; //temporary value until there is no data
+            timings.readyStarted = new Date();
+
+            ax = $("#axis");
+            ax.axis();
+
+            vc = $("#vc");
+            vc.virtualCanvas();
+
+            regimeNavigator = $('#regime_navigator');
+            regimesRatio = 300 / Math.abs(maxPermitedTimeRange.left - maxPermitedTimeRange.right);
+
+            if (window.location.hash)
+                startHash = window.location.hash; // to be processes after the data is loaded
+            loadData(); //retrieving the data
+
+            initializeSearch();
+            initializeBibliography();
+            initializeToursUI();
+
+            var canvasGestures = getGesturesStream(vc); //gesture sequence of the virtual canvas
+            var axisGestures = applyAxisBehavior(getGesturesStream(ax)); //gesture sequence of axis (tranformed according to axis behavior logic)
+            var jointGesturesStream = canvasGestures.Merge(axisGestures);
+
+            var navigatorFunc = function (coordinate) {
+                if (Math.abs(coordinate) < 0.00000000001)
+                    return 0;
+                //Get log10 from coordinate
+                var log = Math.log(coordinate) / 2.302585092994046;
+                //Get pow from log10
+                var pow = Math.pow(log, 3) * Math.exp(-log * 0.001);
+                //Get final width of the column
+                return (log + pow) * 13700000000 / 1041.2113538234402;
+            }
+
+            controller = new ViewportController(
+                            function (visible) {
+                                var vp = vc.virtualCanvas("getViewport");
+                                var markerPos = ax.axis("MarkerPosition");
+                                var oldMarkerPosInScreen = vp.pointVirtualToScreen(markerPos, 0).x;
+
+                                vc.virtualCanvas("setVisible", visible, controller.activeAnimation);
+                                updateAxis(vc, ax);
+                                vp = vc.virtualCanvas("getViewport");
+                                if (pauseTourAtAnyAnimation) { //watch for the user animation during playing of some tour bookmark
+                                    tourPause();
+                                    pauseTourAtAnyAnimation = false;
+                                }
+
+                                var hoveredInfodot = vc.virtualCanvas("getHoveredInfodot");
+                                var actAni = controller.activeAnimation != undefined;
+
+                                if (actAni && !hoveredInfodot.id) {
+                                    var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
+                                    ax.axis("setTimeMarker", newMarkerPos);
+                                }
+
+                                var left = vp.pointScreenToVirtual(0, 0).x;
+                                if (left < maxPermitedTimeRange.left) left = maxPermitedTimeRange.left;
+                                var right = vp.pointScreenToVirtual(vp.width, vp.height).x;
+                                if (right > maxPermitedTimeRange.right) right = maxPermitedTimeRange.right;
+                                var newRight = navigatorFunc(Math.abs(right));
+                                var newLeft = navigatorFunc(Math.abs(left));
+                                var newWidth = Math.max(2.0 / regimesRatio, Math.abs(newRight - newLeft));
+                                regimeNavigator.css('left', 301 - regimesRatio * newLeft);
+                                regimeNavigator.css('width', regimesRatio * newWidth);
+                            },
+                            function () {
+                                return vc.virtualCanvas("getViewport");
+                            },
+                            jointGesturesStream);
+
+            var hashChangeFromOutside = true; // True if url is changed externally
+
+            // URL Nav: update URL when animation is complete
+            controller.onAnimationComplete.push(function (id) {
+                hashChangeFromOutside = false;
+                if (setNavigationStringTo && setNavigationStringTo.bookmark) { // go to search result
+                    navigationAnchor = navStringTovcElement(setNavigationStringTo.bookmark, vc.virtualCanvas("getLayerContent"));
+                    window.location.hash = setNavigationStringTo.bookmark;
+                }
+                else {
+                    if (setNavigationStringTo && setNavigationStringTo.id == id)
+                        navigationAnchor = setNavigationStringTo.element;
+
+                    var vp = vc.virtualCanvas("getViewport");
+                    window.location.hash = vcelementToNavString(navigationAnchor, vp);
+                }
+                setNavigationStringTo = null;
+            });
+
+            // URL Nav: handle URL changes from outside
+            window.addEventListener("hashchange", function () {
+                if (window.location.hash && hashChangeFromOutside) {
+                    var hash = window.location.hash;
+                    var visReg = navStringToVisible(window.location.hash.substring(1), vc);
+                    if (visReg) {
+                        isAxisFreezed = true;
+                        controller.moveToVisible(visReg, true);
+                        // to make sure that the hash is correct (it can be incorrectly changed in onCurrentlyObservedInfodotChanged)
+                        if (window.location.hash != hash) {
+                            hashChangeFromOutside = false;
+                            window.location.hash = hash;
+                        }
+                    }
+                } else
+                    hashChangeFromOutside = true;
+            });
+
+
+            // Axis: enable showing thresholds
+            controller.onAnimationComplete.push(function () {
+                ax.axis("enableThresholds", true);
+                //if (window.console && console.log("thresholds enabled"));
+            });
+            //Axis: disable showing thresholds
+            controller.onAnimationStarted.push(function () {
+                ax.axis("enableThresholds", false);
+                //if (window.console && console.log("thresholds disabled"));
+            });
+
+            //Tour: notifyng tour that the bookmark is reached
+            controller.onAnimationComplete.push(
+                                function (id) {
+                                    if (tourBookmarkTransitionCompleted != undefined)
+                                        tourBookmarkTransitionCompleted(id);
+                                    if (tour != undefined && tour.state != "finished") //enabling wathcing for user activity while playing the bookmark
+                                        pauseTourAtAnyAnimation = true;
+                                });
+            //Tour: notifyng tour that the transition was interrupted
+            controller.onAnimationUpdated.push(
+                                function (oldId, newId) {
+                                    if (tour != undefined) {
+                                        if (tourBookmarkTransitionInterrupted != undefined) { //in transition
+                                            var prevState = tour.state;
+                                            tourBookmarkTransitionInterrupted(oldId);
+                                            var alteredState = tour.state;
+
+                                            if (prevState == "play" && alteredState == "pause") //interruption caused toue pausing. stop any animations, updating UI as well                                            
+                                                tourPause();
+                                        }
+                                    }
+                                }
+            );
+
+            updateLayout();
+
+            vc.bind("elementclick", function (e) {
+                navigateToElement(e);
+            });
+
+            vc.bind('cursorPositionChanged', function (cursorPositionChangedEvent) {
+                updateMarker();
+            });
+
+            ax.bind('thresholdBookmarkChanged', function (thresholdBookmark) {
+                var bookmark = navStringToVisible(thresholdBookmark.Bookmark, vc);
+                if (bookmark != undefined) {
+                    controller.moveToVisible(bookmark, false);
+                }
+            });
+
+            // Reacting on the event when one of the infodot exploration causes inner zoom constraint
+            vc.bind("innerZoomConstraintChenged", function (constraint) {
+                controller.effectiveExplorationZoomConstraint = constraint.zoomValue; // applying the constraint
+                ax.axis("allowMarkerMovesOnHover", !constraint.zoomValue);
+            });
+
+            vc.bind("breadCrumbsChanged", function (breadCrumbsEvent) { //reacting on the event when the first timeline that contains whole visible region is changed                                
+                updateBreadCrumbsLabels(breadCrumbsEvent.breadCrumbs);
+            });
+
+            timings.readyFinished = new Date();
+            var vp = vc.virtualCanvas("getViewport");
+            vc.virtualCanvas("setVisible", getVisibleForElement({ x: -13700000000, y: 0, width: 13700000000, height: 5535444444.444445 }, 1.0, vp));
+            updateAxis(vc, ax);
+        });
+
+        function updateMarker() {
+            ax.axis("setTimeMarker", vc.virtualCanvas("getCursorPosition"));
+        }
+
+        //loading the data from the service
+        function loadData() {
+            timings.wcfRequestStarted = new Date();
+            var url;
+            switch (czDataSource) {
+                case 'db': url = "Chronozoom.svc/get";
+                    break;
+                case 'relay': url = "ChronozoomRelay";
+                    break;
+                case 'dump': url = "ResponseDump.txt";
+                    break;
+            }
+
+            $.ajax({ //main content fetching
+                cache: false,
+                type: "GET",
+                async: true,
+                dataType: "json",
+                url: url,
+                success: function (result) {
+                    content = timelineData;
+                    ProcessContent(timelineData);
+                },
+                error: function (xhr) {
+                    timings.RequestCompleted = new Date();
+                    alert("Error connecting to service: " + xhr.responseText);
+                }
+            });
+
+            var toursUrl;
+            switch (czDataSource) {
+                case 'db': toursUrl = "Chronozoom.svc/getTours";
+                    break;
+                case 'relay': toursUrl = "ChronozoomRelay";
+                    break;
+                case 'dump': toursUrl = "toursDump.txt";
+                    break;
+            }
+
+            $.ajax({ //tours fetching
+                cache: false,
+                type: "GET",
+                async: true,
+                dataType: "json",
+                url: toursUrl,
+                success: function (result) {
+                    parseTours(tourData);
+                    initializeToursContent();
+                },
+                error: function (xhr) {
+                    $("tours_index").attr("onmouseup", function () {
+                        alert("The tours failed to download. Please refresh the page later and try to activate tours again.");
+                    });
+                    initializeToursContent();
+                }
+            });
+        }
+
+        function ProcessContent(content) {
+            timings.wcfRequestCompleted = new Date();
+            Load(vc, content.d);
+            timings.layoutCompleted = new Date();
+            if (startHash) { // restoring the window's hash as it was on the page loading
+                visReg = navStringToVisible(startHash.substring(1), vc);
+            }
+
+            InitializeRegimes();
+            if (!visReg && cosmosVisible) {
+                window.location.hash = cosmosVisible;
+                visReg = navStringToVisible(cosmosVisible, vc);
+            }
+            if (visReg) {
+                vc.virtualCanvas("setVisible", visReg);
+                updateAxis(vc, ax);
+
+                if (startHash && window.location.hash !== startHash) {
+                    hashChangeFromOutside = false;
+                    window.location.hash = startHash; // synchronizing
+                }
+            }
+            timings.canvasInited = new Date();
+        }
+
+        function InitializeRegimes() {
+            if (content) {
+                if (content.d.length > 0) {
+                    var f = function (timeline) {
+                        if (!timeline) return null;
+                        var v = vc.virtualCanvas("findElement", 't' + timeline.UniqueID);
+                        if (v) v = vcelementToNavString(v);
+                        return v;
+                    }
+
+                    var cosmosTimeline = content.d[0];
+                    cosmosVisible = f(cosmosTimeline);
+                    navigationAnchor = vc.virtualCanvas("findElement", 't' + cosmosTimeline.UniqueID);
+
+                    var earthTimeline = FindChildTimeline(cosmosTimeline, earthTimelineID);
+                    earthVisible = f(earthTimeline);
+                    var lifeTimeline = FindChildTimeline(earthTimeline, lifeTimelineID);
+                    lifeVisible = f(lifeTimeline);
+                    var prehistoryTimeline = FindChildTimeline(lifeTimeline, prehistoryTimelineID);
+                    prehistoryVisible = f(prehistoryTimeline);
+                    var humanityTimeline = FindChildTimeline(prehistoryTimeline, humanityTimelineID, true);
+                    humanityVisible = f(humanityTimeline);
+
+                    maxPermitedVerticalRange = {    //setting top and bottom observation constraints according to cosmos timeline
+                        top: cosmosTimeline.y,
+                        bottom: cosmosTimeline.y + cosmosTimeline.height
+                    };
+
+                    maxPermitedScale = navStringToVisible(cosmosVisible, vc).scale * 1.1;
+                }
+            }
+        }
+
+        $(window).bind('resize', function () {
+            updateLayout();
+        });
+
+        function updateLayout() {
+            document.getElementById("vc").style.height = (window.innerHeight - 148) + "px";
+
+            breadCrumbsAllowedLength = $("#vc").width() / 2 - 50;
+
+            // todo: use axis' height instead of constants
+            document.getElementById("bibliographyBack").style.height = window.innerHeight + "px";
+            document.getElementById("bibliographyOut").style.top = (150) + "px";
+            var height = window.innerHeight - 187;
+            document.getElementById("bibliographyOut").style.height = height + "px";
+            document.getElementById("bibliographyOut").style.top = (150) + "px";
+            document.getElementById("bibliography").style.height = (height - 50) + "px";
+            document.getElementById("bibliography").style.top = (25) + "px";
+
+            InitializeRegimes();
+            vc.virtualCanvas("updateViewport");
+            ax.axis("updateWidth");
+            updateAxis(vc, ax);
+            updateBreadCrumbsLabels();
+            checkBreadCrumbsLength();
+        }
+
+        /*
+        Is called by direct user actions like links, bread crumbs clicking, etc.
+        */
+        function setVisibleByUserDirectly(visible) {
+            pauseTourAtAnyAnimation = false;
+            if (tour != undefined && tour.state == "play")
+                tourPause();
+            return setVisible(visible);
+        }
+
+        function setVisible(visible) {
+            if (visible) {
+                ax.axis("enableThresholds", false);
+                return controller.moveToVisible(visible);
+            }
+        }
+
+        function updateBreadCrumbsLabels(newBreadCrumbs) {
+            if (newBreadCrumbs)
+                breadCrumbs = newBreadCrumbs;
+            var breadCrumbsDiv = document.getElementById("bread_crumbs");
+            var crumbsText;
+            var isFirst = true;
+
+            //clearing old bread crumbs links
+            if (breadCrumbsDiv.hasChildNodes())
+                while (breadCrumbsDiv.childNodes.length >= 1)
+                    breadCrumbsDiv.removeChild(breadCrumbsDiv.firstChild);
+
+            //generatiung new bread crumbs links
+            if (breadCrumbs)
+                for (var i = 0; i < breadCrumbs.length; i++) {
+                    if (isFirst) {
+                        isFirst = false;
+                    }
+                    else { //putting ">" symbol if needed
+                        var arrow = document.createTextNode("  >  ");
+                        breadCrumbsDiv.appendChild(arrow);
+                    }
+
+                    var crumb = document.createElement('span');
+                    crumb.setAttribute("onmouseup", "setVisibleByUserDirectly(navigateToBookmark(vcelementToNavString(breadCrumbs[" + i + "].vcElement)));");
+                    crumb.setAttribute("style:pointer", "cursor");
+                    crumb.setAttribute("id", "bread_crumb_" + i);
+                    var text = document.createTextNode(breadCrumbs[i].vcElement.title);
+                    crumb.appendChild(text);
+                    breadCrumbsDiv.appendChild(crumb);
+                }
+            checkBreadCrumbsLength();
+        }
+
+        function checkBreadCrumbsLength() {
+            var breadCrumbsDiv = document.getElementById("bread_crumbs");
+            if (!breadCrumbsDiv.firstChild) return;
+
+            var a = $("#bread_crumbs").width();
+
+            while ($("#bread_crumbs").width() > breadCrumbsAllowedLength) {
+                if (breadCrumbsDiv.firstChild.innerHTML === "..." ||
+                breadCrumbsDiv.firstChild.data === "...") {
+                    for (var i = 0; i < 2; i++)
+                        breadCrumbsDiv.removeChild(breadCrumbsDiv.firstChild);
+                }
+                var ellipsis = document.createTextNode("...");
+                breadCrumbsDiv.replaceChild(ellipsis, breadCrumbsDiv.firstChild);
+            }
+        }
+
+        var isFirstClick = true;
+        function play() {
+            if (isFirstClick) {
+                activateTour(tours[0], true);
+                isFirstClick = false;
+                document.getElementById("play").innerHTML = 'Pause';
+                return;
+            }
+            if (document.getElementById("play").innerHTML == 'Pause') {
+                // pausing
+                document.getElementById("play").innerHTML = 'Play';
+                tourPlayPause();
+            } else {
+                // playing
+                document.getElementById("play").innerHTML = 'Pause';
+                tourPlayPause();
+            }
+        }
+
+        function next() {
+            tourNext();
+        };
+
+        function prev() {
+            tourPrev();
+        };
+
+    </script>
+    <title>ChronoZoom</title>
+</head>
+    <body style="background-color: Black">
+    <div id="controls">
+        <button id="prev" onclick="prev();">Previous</button>&nbsp;
+        <button id="play" onclick="play();">Play</button>&nbsp;
+        <button id="next" onclick="next();">Next</button>
+    </div>
+    <div id="header" style="height: 67px">
+        <div style="position: relative">
+            <div style="left: 15px; height: 29px; position: absolute;">
+                <img style="margin: 0 0 0 5px;  float: left" title="ChronoZoom" src="Images/03cztitle_beta_grey_bold_italic.png" />
+                <img style="margin: 5px 0 0 14px; float: right" id="search_button" title="Search ChronoZoom" alt="Search ChronoZoom" src="Images/search_off.jpg"
+                    onmouseup="onSearchClicked();" onmouseover="searchHighlight(true);"
+                    onmouseout="searchHighlight(false);" />
+                <img style="margin: 5px 0 0 14px" title="Take a guided tour" id="tours_index" alt="Take a guided tour" src="Images/tour_off.jpg"
+                     onmouseover="tourButtonHighlight(true);" onmouseout="tourButtonHighlight(false);"
+                    onmouseup="onTourClicked();" />
+            </div>
+            <div style="right: 0px; position: absolute; top: 0px; width: 302px; height: 62px;">
+                <div id="human_rect" style="position: absolute; top: 1px; width: 17px; left: 284px;
+                    height: 10px; background-color: rgba(212, 92, 70, 1.0);">
+                </div>
+                <div id="prehuman_rect" style="position: absolute; top: 13px; width: 100px; left: 201px;
+                    height: 10px; background-color: rgba(237, 145, 50, 1.0);">
+                </div>
+                <div id="life_rect" style="position: absolute; top: 25px; width: 255px; left: 46px;
+                    height: 10px; background-color: rgba(73, 150, 73, 1.0);">
+                </div>
+                <div id="earth_rect" style="position: absolute; top: 37px; width: 260px; left: 41px;
+                    height: 10px; background-color: rgba(81, 127, 149, 1.0);">
+                </div>
+                <div id="cosmos_rect" style="position: absolute; top: 49px; width: 300px; left: 1px;
+                    height: 10px; background-color: rgba(152, 108, 157, 1.0);">
+                </div>
+                <div id="regime_navigator" style="position: absolute; top: 0px; left: 1px; width: 300px;
+                    height: 62px; background-color: White; opacity: 0.3">
+                </div>
+            </div>
+            <!--<img alt="regimes_navigator" style="right: 0px; position: absolute; top: 0px" src="Images/regimes.png" />-->
+            <div class="regimes_titles" style="top: 0px; position: absolute; right: 309px; font-size: 11.5;">
+                <div style="position: relative; height: 12px;">
+                    <div class="regimes_title" onmouseup="navigateToBookmark(humanityVisible);">
+                        Humanity</div>
+                </div>
+                <div style="position: relative; height: 12px;">
+                    <div class="regimes_title" onmouseup="navigateToBookmark(prehistoryVisible);">
+                        Human&nbsp;Prehistory</div>
+                </div>
+                <div style="position: relative; height: 12px;">
+                    <div class="regimes_title" onmouseup="navigateToBookmark(lifeVisible);">
+                        Life</div>
+                </div>
+                <div style="position: relative; height: 12px;">
+                    <div class="regimes_title" onmouseup="navigateToBookmark(earthVisible);">
+                        Earth</div>
+                </div>
+                <div style="position: relative; height: 12px;">
+                    <div class="regimes_title" onmouseup="navigateToBookmark(cosmosVisible);">
+                        Cosmos</div>
+                </div>
+            </div>
+            <div style="top: 50px; position: absolute">
+                <div style="position: relative">
+                    <div id="bread_crumbs" class="bread_crumbs" style="bottom: 0px; top: 0px; white-space: nowrap;"
+                        onresize="checkBreadCrumbsLength();">
+                    </div>
+                </div>
+            </div>
+            <div id="tour_control" class="tour_control" style="visibility: hidden; display: none; top: 14px; position: relative;
+                margin: auto">
+                <img id="tour_prev" src="Images/tour_prev_off.jpg" alt="previous" onmouseout="toggleOffImage('tour_prev');"
+                    onmouseover="toggleOnImage('tour_prev');" onclick="tourPrev();" /><img style="margin: 0 0 0 16px"
+                        id="tour_playpause" src="Images/tour_pause_off.jpg" alt="play/pause" onmouseout="toggleOffImage('tour_playpause');"
+                        onmouseover="toggleOnImage('tour_playpause');" onclick="tourPlayPause();" /><img
+                            style="margin: 0 0 0 16px" id="tour_next" src="Images/tour_next_off.jpg" alt="next"
+                            onmouseout="toggleOffImage('tour_next');" onmouseover="toggleOnImage('tour_next');"
+                            onclick="tourNext();" /><img style="margin: 0 0 0 10px" id="tour_exit" src="Images/tour_exit_off.jpg"
+                                alt="exit" onmouseout="toggleOffImage('tour_exit');" onmouseover="toggleOnImage('tour_exit');"
+                                onclick="tourAbort();" />
+            </div>
+        </div>
+    </div>
+    <div id="axis" style="width: 100%; height: 47px; overflow: hidden" onselectstart="return false;">
+    </div>
+    <div id="vc" style="width: 100%; height: auto; overflow: hidden; background-image: url('Images/background.jpg');
+        background-repeat: no-repeat; background-attachment: fixed; background-position: center center;
+        background-size: cover">
+        <div id="layerTimelines" onselectstart="return false;">
+        </div>
+        <div id="layerInfodots" onselectstart="return false;">
+        </div>
+    </div>
+    <div id="search" class="czWindow" style="z-index: 2010; height: 80px">
+        <div class="header" onselectstart="return false;">
+            Search</div>
+        <div>
+            <input id="searchTextBox" class="czTextBox emptyTextBox" style="margin: 10px 10px 10px 10px;
+                width: 190px" value="type here..." />
+        </div>
+        <div class="searchResults">
+        </div>
+    </div>
+    <div id="tours" class="czWindow" onselectstart="return false;">
+        <div class="header">
+            Tours</div>
+        <div id="tours-narration" class="narration" onclick="onNarrationClick();">
+            Narration: <span id="tours-narration-on" class="narration-selected">ON</span> |
+            <span id="tours-narration-off">OFF</span>
+        </div>
+        <div id="tours-content" class="content">
+        </div>
+    </div>
+    <div id="bookmarks" class="bookmarksWindow" onselectstart="return false;">
+        <img id="bookmarksCollapse" src="Images/collapse-left.png" class="headerButton" onclick="onBookmarksCollapse();" />
+        <div class="header">
+        </div>
+        <div class="slideHeader">
+        </div>
+        <div class="slideText">
+        </div>
+        <div class="slideFooter">
+        </div>
+    </div>
+    <div id="bibliographyBack" class="biblBack">
+        <div id="bibliographyOut" class="biblOuterWindow">
+            <div id="bibliography" class="biblWindow">
+                <img class="closeButton" id="biblCloseButton" src="Images/close_off.png" onmouseover="toggleOnImage('biblCloseButton', 'png');"
+                    onmouseout="toggleOffImage('biblCloseButton', 'png');" alt="Close" onselectstart="return false;" />
+                <div class="title" onselectstart="return false;">
+                    <span>Infodot name</span> &gt; Bibliography
+                </div>
+                <div class="sources">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="position: relative; text-align: right;" >
+          <span id="Span11" class="footerText" onclick="javascript: window.open('http://go.microsoft.com/?linkid=9797058');">
+        Take Our Survey
+        </span>
+         <span id="Span10" class="pipeText" >
+        |
+        </span>
+         <span id="Span2" class="footerText" onclick="javascript: window.open('http://chronozoom.codeplex.com/workitem/list/basic');">
+        Report a Problem
+        </span>
+        <span id="Span3" class="pipeText" >
+        |
+        </span>
+      <span id="Span9" class="footerText">
+        Behind the Scenes
+        </span>
+        <span id="Span1" class="pipeText" >
+        |
+        </span>
+         <span id="Span4" class="footerText" onclick="javascript: window.open('TermsOfUse.htm');">
+        Terms of Use
+        </span>
+        <span id="Span5" class="pipeText" >
+        |
+        </span>
+         <span id="Span6" class="footerText" onclick="javascript: window.open('Privacy.htm');">
+        Privacy
+        </span>
+        <span id="Span7" class="pipeText" >
+        |
+        </span>
+         <span id="Span8" class="footerText" onclick="javascript: window.open('Trademark_Copyright.htm');">
+        Trademark
+        </span>
+   </div>
+</body>
+</html>

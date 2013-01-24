@@ -1,0 +1,39 @@
+﻿@model Authoring.WebRole.Models.BookMark
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Bookmark - Details</h2>
+
+<fieldset>
+    <legend>BookMark</legend>
+
+    <div class="display-label">Name</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Name)
+    </div>
+
+    <div class="display-label">URL</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.URL)
+    </div>
+
+    <div class="display-label">LapseTime</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.LapseTime)
+    </div>
+
+    <div class="display-label">Description</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Description)
+    </div>
+    <div class="display-label">IsVisible</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.IsVisible)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

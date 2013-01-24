@@ -1,0 +1,53 @@
+﻿@model Authoring.WebRole.Models.LicenseType
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>LicenseType - Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<fieldset>
+    <legend>LicenseType</legend>
+
+    <div class="display-label">LicenseType1</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.LicenseType1)
+    </div>
+
+    <div class="display-label">LicenseURL</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.LicenseURL)
+    </div>
+
+    @*<div class="display-label">CreatedBy</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.User.UserName)
+    </div>
+
+    <div class="display-label">ModifiedBy</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.User1.UserName)
+    </div>
+
+    <div class="display-label">CreatedOn</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.CreatedOn)
+    </div>
+
+    <div class="display-label">ModifiedOn</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.ModifiedOn)
+    </div>
+
+    <div class="display-label">IsDeleted</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.IsDeleted)
+    </div>*@
+</fieldset>
+@using (Html.BeginForm()) {
+    <p>
+        <input type="submit" value="Delete" /> |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+}

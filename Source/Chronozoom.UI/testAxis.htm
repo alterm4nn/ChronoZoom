@@ -1,0 +1,283 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<meta http-equiv="Pragma" content="no-cache" />
+<head>
+    <link rel="stylesheet" type="text/css" href="Styles/cz.css" />
+    <link rel="stylesheet" type="text/css" href="Styles/axis.css" />
+    <script type="text/javascript" src="Scripts/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-ui-1.8.16.custom.min.js"></script>
+    <script type="text/javascript" src="Scripts/rx.js"></script>
+    <script type="text/javascript" src="Scripts/rx.jQuery.js"></script>
+    <script type="text/javascript" src="Scripts/cz.settings.js"></script>
+    <script type="text/javascript" src="Scripts/common.js"></script>
+    <script type="text/javascript" src="Scripts/viewport.js"></script>
+    <script type="text/javascript" src="Scripts/viewportAnimation.js"></script>
+    <script type="text/javascript" src="Scripts/mouseWheelPlugin.js"></script>
+    <script type="text/javascript" src="Scripts/gestures.js"></script>
+    <script type="text/javascript" src="Scripts/virtualCanvas.js"></script>
+    <script type="text/javascript" src="Scripts/vccontent.js"></script>
+    <script type="text/javascript" src="Scripts/viewportController.js"></script>
+    <script type="text/javascript" src="Scripts/axis.js"></script>
+    <script type="text/javascript" src="Scripts/urlnav.js"></script>
+    <script type="text/javascript" src="Scripts/layout.js"></script>
+    <script type="text/javascript">
+        var ax, vc;
+        var visReg;
+        var cosmosVisible, earthVisible, lifeVisible, prehistoryVisible, humanityVisible;
+        var content;
+
+        var k = 1000000000;
+
+        function updateAxis(vc, ax) {
+            var vp = vc.virtualCanvas("getViewport");
+            var lt = vp.pointScreenToVirtual(0, 0);
+            var rb = vp.pointScreenToVirtual(vp.width, vp.height);
+            ax.axis("setRange", lt.x, rb.x);
+        }
+
+        var controller; //a controller to perform smooth navigation
+        var presentYear = 2011; // Current year. Should be specified in axis options too.
+        var isAxisFreezed = true; //indicates whether the axis moves together with canvas during navigation or not
+
+        $(document).ready(function () {
+            ax = $("#axis");
+            ax.axis();
+
+            vc = $("#vc");
+            vc.virtualCanvas();
+
+            if (window.location.hash)
+                visReg = paramStringToVisible(window.location.hash.substring(1), presentYear);
+
+            loadData(); //retrieving the data
+
+
+            var canvasGestures = getGesturesStream(vc); //gesture sequence of the virtual canvas
+            var axisGestures = applyAxisBehavior(getGesturesStream(ax)); //gesture sequence of axis (tranformed according to axis behavior logic)
+            var jointGesturesStream = canvasGestures.Merge(axisGestures);
+
+            controller = new ViewportController(
+                            function (visible) {
+                                var wasAxisFreezed = isAxisFreezed;
+                                vc.virtualCanvas("setVisible", visible, controller.activeAnimation);
+                                if (isAxisFreezed)
+                                    updateAxis(vc, ax);
+                            },
+                            function () {
+                                return vc.virtualCanvas("getViewport");
+                            },
+                            jointGesturesStream);
+
+            var hashChangeFromOutside = true; // True if url is changed externally
+
+            // URL Nav: update URL when animation is complete
+            controller.onAnimationStopped = function (c) {
+                hashChangeFromOutside = false;
+                window.location.hash = visibleToParamString(c.getViewport().visible, presentYear);
+            };
+
+            // URL Nav: handle URL changes from outside
+            window.addEventListener("hashchange", function () {
+                if (window.location.hash && hashChangeFromOutside) {
+                    var visReg = paramStringToVisible(window.location.hash.substring(1), presentYear);
+                    if (visReg != undefined) {
+                        isAxisFreezed = true;
+                        controller.moveToVisible(visReg, true);
+                    }
+                } else
+                    hashChangeFromOutside = true;
+            });
+
+            updateLayout();
+
+            vc.bind("elementclick", function (e) {
+                controller.moveToVisible(e.newvisible);
+            });
+
+            vc.bind('activeTimeChanged', function (activeTimeEvent) {
+                if (isAxisFreezed)
+                    ax.axis("setActive", activeTimeEvent.Time);
+            });
+
+            vc.bind("currentlyObservedInfodotChanged", function (infodotObservedEvent) { //reacting on the event when one of the infodot takes most of the screen space
+                var infodotObserved = infodotObservedEvent.currentlyObservedInfodot;
+                if (infodotObserved) { // an infodot took most of the viewport space       
+                    isAxisFreezed = false; //freeze the axis
+                    ax.axis("setActive", infodotObserved.x);
+                    var curScale = infodotObserved.radVirtual / infodotObserved.radPixels; //calculating the constraint of the scale for the infodot that is currently explored
+                    var constrainedScale = curScale * infoDotZoomConstraint;
+                    controller.effectiveExplorationZoomConstraint = constrainedScale; // applying the constraint
+                }
+                else { //the observed infodot is small enough                    
+                    isAxisFreezed = true; //unfreeze the axis
+                    controller.effectiveExplorationZoomConstraint = undefined; //disable the infodot zooming constraint
+                }
+            });
+
+        });
+
+        //-------------------------------------------
+        function ZoomMouseInCenterCanvas(intDelta) {
+            var vp = $("#vc").virtualCanvas("getViewport");
+            var event = new jQuery.Event("xbrowserwheel");
+            event.delta = intDelta;
+            event.offsetX = vp.width * 0.5;
+            event.offsetY = vp.height * 0.5;
+            event.origin = new getXBrowserMouseOrigin(vc, event);
+            vc.trigger(event);
+        }
+        //--------------------------------------------
+
+        function Helper() {
+            numberx = -400.0;
+            shiftx = 300.0
+            var llx = numberx - shiftx;
+            var rrx = numberx + shiftx;
+            $("#axis").axis("setRange", llx, rrx);
+            $("#axis").axis("setActive", numberx);
+        }
+
+        function ZoomInMarker(intDelta) {
+            var vp = $("#vc").virtualCanvas("getViewport");
+            numberx = -400.0;
+            shiftx = 300.0
+            var llx = numberx - shiftx;
+            var rrx = numberx + shiftx;
+            $("#axis").axis("setRange", llx, rrx);
+            $("#axis").axis("setActive", numberx);
+            var active = $("#axis").axis("Active");
+            var event = new jQuery.Event("xbrowserwheel");
+            event.delta = intDelta;
+            event.offsetX = active;
+            event.offsetY = vp.height * 0.5;
+            event.origin = new getXBrowserMouseOrigin(vc, event);
+            vc.trigger(event);
+        }
+
+        //--------------------------------------------------------------
+
+        //loading the data from the service
+        function loadData() {
+            $.ajax({
+                cache: false,
+                type: "GET",
+                async: true,
+                dataType: "json",
+                url: "Chronozoom.svc/get",
+                //url: "ResponseDump.txt",
+                success: function (result) {
+                    content = result;
+                    ProcessContent(result);
+                },
+                error: function (xhr) {
+                    alert("Error connecting to service: " + xhr.responseText);
+                }
+            });
+        }
+
+        function ProcessContent(content) {
+            Load(vc, content.d);
+            if (!visReg) {
+                if (content.d.length >= 1) {
+                    visReg = GetVisibleFromTimeline(content.d[0], vc);
+                }
+                else
+                    visReg = new VisibleRegion2d(-7 * k, 2.5 * k, 14 * k / 2000.0);
+                window.location.hash = visibleToParamString(visReg);
+            }
+
+            InitializeRegimes();
+            if (visReg)
+                vc.virtualCanvas("setVisible", visReg);
+            updateAxis(vc, ax);
+        }
+
+        function InitializeRegimes() {
+            if (content) {
+                if (content.d.length > 0) {
+                    var cosmosTimeline = content.d[0];
+                    cosmosVisible = GetVisibleFromTimeline(cosmosTimeline, vc);
+                    var earthTimeline = FindChildTimeline(cosmosTimeline, earthTimelineID);
+                    earthVisible = GetVisibleFromTimeline(earthTimeline, vc);
+                    var lifeTimeline = FindChildTimeline(earthTimeline, lifeTimelineID);
+                    lifeVisible = GetVisibleFromTimeline(lifeTimeline, vc);
+                    var prehistoryTimeline = FindChildTimeline(lifeTimeline, prehistoryTimelineID);
+                    prehistoryVisible = GetVisibleFromTimeline(prehistoryTimeline, vc);
+                    var humanityTimeline = FindChildTimeline(prehistoryTimeline, humanityTimelineID);
+                    humanityVisible = GetVisibleFromTimeline(humanityTimeline, vc);
+                }
+            }
+        }
+
+        $(window).bind('resize', function () {
+            updateLayout();
+        });
+
+        function updateLayout() {
+            document.getElementById("vc").style.height = (window.innerHeight - 150) + "px";
+            InitializeRegimes();
+            vc.virtualCanvas("updateViewport");
+            ax.axis("updateWidth");
+            updateAxis(vc, ax);
+        }
+
+        function setVisible(visible) {
+            if (visible) {
+                controller.moveToVisible(visible);
+            }
+        }
+
+    </script>
+    <title>Axis Zoom</title>
+</head>
+<body style="background-color: Black">
+    <div id="header" style="height: 53px; position: relative">
+        <img alt="page title" src="Images/chronozoom_title.png" style="position: relative" />
+        <img alt="page title" style="right: 0px; position: absolute; top: 0px" src="Images/regimes.png" />
+        <div class="regimes_titles" style="top: 0px" onmouseup="setVisible(humanityVisible);">
+            Humanity</div>
+        <div class="regimes_titles" style="top: 9px" onmouseup="setVisible(prehistoryVisible);">
+            Human Pre-History</div>
+        <div class="regimes_titles" style="top: 18px" onmouseup="setVisible(lifeVisible);">
+            Life</div>
+        <div class="regimes_titles" style="top: 27px" onmouseup="setVisible(earthVisible);">
+            Earth</div>
+        <div class="regimes_titles" style="top: 36px" onmouseup="setVisible(cosmosVisible);">
+            Cosmos</div>
+    </div>
+    <div id="axis" style="width: 100%; height: 83px; margin-bottom: -55px; margin-top: 4px; overflow: hidden">
+    </div>
+    <div id="vc" style="width: 100%; height: auto; overflow: hidden; background-image: url('Images/background.jpg');
+        background-size: cover">
+        <div id="layerTimelines">
+        </div>
+        <div id="layerInfodots">
+        </div>
+    </div>
+    <div>
+
+    </div>
+    <div style="float: left; margin-top: 5px; margin-bottom: 10px">
+        <button id="buttonZoomIn" onclick="ZoomMouseInCenterCanvas(1.0)">
+            ZoomIn</button>
+    </div>
+        <div style="float: left; margin-top: 5px; margin-bottom: 10px">
+        <button id="buttonZoomOut" onclick="ZoomMouseInCenterCanvas(-1.0)">
+            ZoomOut</button>
+    </div>
+    <div style="float: left; margin-top: 5px; margin-bottom: 10px">
+        <button id="buttonZoomMarkerOut" onclick="ZoomInMarker(-1.0)">
+            ZoomInMarkerOut</button>
+    </div>
+        <div style="float: left; margin-top: 5px; margin-bottom: 10px">
+        <button id="buttonZoomMarkerIn" onclick="ZoomInMarker(1.0)">
+            ZoomInMarkerIn</button>
+    </div>
+        <div style="float: left; margin-top: 5px; margin-bottom: 10px">
+        <button id="buttonHelper" onclick="Helper()">
+            Helper</button>
+    </div>
+</body>
+</html>
+
+

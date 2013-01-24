@@ -1,0 +1,38 @@
+<html>
+	<head>
+		<script src="http://yui.yahooapis.com/3.0.0/build/yui/yui-min.js"></script>
+		<script src="..\rx.js"></script>
+		<script src="..\rx.yui3.js"></script>
+		<script>
+
+YUI().use('node-base', function(Y) {
+     Y.on("domready", function() {
+			var liveEvent = new Rx.MutableDisposable();
+			Rx.Observable.FromYUI3Event("#bind","click")
+				.Subscribe(function () {
+					Y.one("#theone").setContent("can click...");
+
+					liveEvent.Replace(Rx.Observable.FromYUI3Event("#theone","click")
+						.Subscribe(function() {
+							alert('hello');  }));
+					});
+
+			Rx.Observable.FromYUI3Event("#unbind", "click")
+				.Subscribe(function () {
+						Y.one("#theone").setContent("Does nothing...");
+						liveEvent.Dispose();
+						liveEvent = new Rx.MutableDisposable();
+					});
+			});
+		});
+	</script>
+
+</head>
+<body>
+	<button id="theone">Does nothing...</button>
+	<button id="bind">Bind Click</button>
+	<button id="unbind">Unbind Click</button>
+</body>
+</html>
+
+

@@ -1,0 +1,106 @@
+﻿@model IEnumerable<Authoring.WebRole.Models.Threshold>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Threshold</h2>
+
+<p>
+    @if (ViewBag.write)
+    {
+        @Html.ActionLink("Create New", "Create")
+    }
+</p>
+<table>
+    <tr>
+        <th></th>
+        <th>
+            Threshold1
+        </th>
+        <th>
+            ThresholdDate
+        </th>
+        <th>
+            ThresholdYear
+        </th>
+        <th>
+            ThresholdTimeUnit
+        </th>
+        <th>
+            BookmarkID
+        </th>
+        <th>
+            ShortDescription
+        </th>
+       <th>
+            CreatedBy
+        </th>
+        <th>
+            CreatedOn
+        </th>
+        <th>
+            ModifiedBy
+        </th>
+         <th>
+            ModifiedOn
+        </th>
+
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+        @if(ViewBag.delete) 
+        {
+            @Html.ActionLink("Edit", "Edit", new { id=item.ID })  
+            @String.Format("{0}", "|");
+            @Html.ActionLink("Details", "Details", new { id=item.ID }) 
+            @String.Format("{0}", "|");
+            @Html.ActionLink("Delete", "Delete", new { id = item.ID })
+        }
+        else if (ViewBag.write)
+        {
+            @Html.ActionLink("Edit", "Edit", new { id = item.ID }) 
+            @String.Format("{0}", "|");
+            @Html.ActionLink("Details", "Details", new { id = item.ID })
+        }
+        else if (ViewBag.read)
+        { 
+            @Html.ActionLink("Details", "Details", new { id = item.ID })
+        }            
+        </td>
+         <td>
+            @Html.DisplayFor(modelItem => item.Threshold1)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ThresholdDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ThresholdYear)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.TimeUnit.TimeUnit1)
+        </td>
+          <td>
+            @Html.DisplayFor(modelItem => item.BookMark.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ShortDescription)
+        </td>
+         <td>
+            @Html.DisplayFor(modelItem => item.User.UserName)
+        </td>
+         <td>
+            @Html.DisplayFor(modelItem => item.CreatedOn)
+        </td>
+         <td>
+            @Html.DisplayFor(modelItem => item.User1.UserName)
+        </td>
+         <td>
+            @Html.DisplayFor(modelItem => item.ModifiedOn)
+        </td>
+  </tr>
+}
+
+</table>

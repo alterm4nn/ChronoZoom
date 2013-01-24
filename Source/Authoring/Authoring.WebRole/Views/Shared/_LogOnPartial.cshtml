@@ -1,0 +1,20 @@
+﻿@if (Session["userrole"] != null && !string.IsNullOrEmpty(Session["userrole"].ToString()))
+{
+    if (Request.IsAuthenticated)
+    {
+        <text>Welcome <strong>@User.Identity.Name</strong>!
+        [ @Html.ActionLink("Log Off", "LogOff", "Account") ]</text>
+    }
+    else
+    {
+        @:[ @Html.ActionLink("Log On", "LogOn", "Account") ]
+    }
+}
+else
+{
+    @:[ @Html.ActionLink("Log On", "LogOn", "Account") ]
+    if (Request.RawUrl != "/" && !Request.RawUrl.Contains("/Home") && !Request.RawUrl.Contains("/Account"))
+    {
+        Response.Redirect("/Home/Index");
+    }
+}

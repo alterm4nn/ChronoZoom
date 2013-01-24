@@ -1,0 +1,88 @@
+﻿@model Authoring.WebRole.Models.ContentItem
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>ContentItem - Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<fieldset>
+    <legend>ContentItem</legend>
+
+    <div class="display-label">Title</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Title)
+    </div>
+
+    <div class="display-label">Caption</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Caption)
+    </div>
+
+    <div class="display-label">ID Number</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Topic)
+    </div>
+
+    <div class="display-label">MediaType</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.MediaType.MediaType1)
+    </div>
+
+    <div class="display-label">Threshold</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Threshold.Threshold1)
+    </div>
+
+    <div class="display-label">Regime</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Regime.Regime1)
+    </div>
+
+    <div class="display-label">Azure Storage Explorer uri</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.MediaBlobURL)
+    </div>
+
+    <div class="display-label">TimeUnit</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.TimeUnit.TimeUnit1)
+    </div>
+
+    <div class="display-label">ContentDate</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.ContentDate)
+    </div>
+
+    <div class="display-label">ContentYear</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.ContentYear)
+    </div>
+
+    <div class="display-label">MediaSource</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.MediaSource)
+    </div>
+
+    <div class="display-label">Attribution</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Attribution)
+    </div>
+
+    <div class="display-label">LicenseType</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.LicenseType.LicenseType1)
+    </div>
+
+    <div class="display-label">IsVisible</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.IsVisible)
+    </div>
+</fieldset>
+@using (Html.BeginForm()) {
+    <p>
+        <input type="submit" value="Delete" /> |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+}

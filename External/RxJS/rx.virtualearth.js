@@ -1,0 +1,6 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+// This code is licensed by Microsoft Corporation under the terms
+// of the MICROSOFT REACTIVE EXTENSIONS FOR JAVASCRIPT AND .NET LIBRARIES License.
+// See http://go.microsoft.com/fwlink/?LinkId=186234.
+
+(function(){var a=VEMap;var b;var c=this;if(typeof ProvideCustomRxRootObject =="undefined")b=c.Rx; else b=ProvideCustomRxRootObject();var d=b.Observable;var e=d.Create;var f=b.AsyncSubject;a.prototype.ToObservable=function(g){var h=this;return e(function(i){var j=function(k){i.OnNext(k);};h.AttachEvent(g,j);return function(){h.DetachEvent(g,j);};});};a.prototype.FindAsObservable=function(g,h,i,j,k,l,m,n,o,p){var q=new f();this.Find(g,h,i,j,k,l,m,n,o,p,function(r,s,t,u,v){if(v)q.OnError(v); else{q.OnNext({ShapeLayer:r,FindResults:s,Places:t,HasMoreResults:u});q.OnCompleted();}});return q;};a.prototype.FindLocationsAsObservable=function(g){var h=new f();this.FindLocations(g,function(i){h.OnNext(i);h.OnCompleted();});return h;};a.prototype.GetDirectionsAsObservable=function(g,h){var i=new VERouteOptions();for(var j in h) i[j]=h[j];var k=new f();i.RouteCallback=function(l){k.OnNext(l);k.OnCompleted();};this.GetDirections(g,i);return k;};a.prototype.ImportShapeLayerDataAsObservable=function(g,h){var i=new f();this.ImportShapeLayerData(g,function(j){i.OnNext(j);i.OnCompleted();},h);return i;};})();

@@ -1,0 +1,236 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Test Gestures Page</title>
+    <link href="Styles/cz.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="Scripts/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-ui-1.8.16.custom.min.js"></script>
+    <script type="text/javascript" src="Scripts/rx.js"></script>
+    <script type="text/javascript" src="Scripts/rx.jQuery.js"></script>
+    <script type="text/javascript" src="Scripts/common.js"></script>
+    <script type="text/javascript" src="Scripts/cz.settings.js"></script>
+    <script type="text/javascript" src="Scripts/vccontent.js"></script>
+    <script type="text/javascript" src="Scripts/viewport.js"></script>
+    <script type="text/javascript" src="Scripts/virtualCanvas.js"></script>
+    <script type="text/javascript" src="Scripts/mouseWheelPlugin.js"></script>
+    <script type="text/javascript" src="Scripts/gestures.js"></script>
+    <script type="text/javascript" src="Scripts/viewportAnimation.js"></script>
+    <script type="text/javascript" src="Scripts/viewportController.js"></script>
+    <script type="text/javascript">  
+        var timeline;
+        var infodot;
+        var vcitems;
+
+        var minorContentItem =
+        {
+            id: "i1_c2", title: 'Big Bang2',
+            description: 'The Universe was once in an extremely hot and dense state which expanded rapidly.',
+            mediaUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CMB_Timeline300_no_WMAP.jpg/1280px-CMB_Timeline300_no_WMAP.jpg',
+            mediaType: 'image'
+        };
+
+        var majorContentItem =
+        {
+            id: "i1_c1", title: 'Big Bang',
+            description: 'The Universe was once in an extremely hot and dense state which expanded rapidly.',
+            mediaUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CMB_Timeline300_no_WMAP.jpg/1280px-CMB_Timeline300_no_WMAP.jpg',
+            mediaType: 'image'
+        };
+
+        var minorBorder;
+        var majorBorder;
+
+        var k = 100;
+
+        var zoomHandled = false;
+        var panHandled = false;
+        var pinHandled = false;
+        var offset = { "xOffset": 0, "yOffset": 0 };
+        var scale = { "xOrigin": 0, "yOrigin": 0, "scaleFactor": 0 };
+        var maxPermitedVerticalRange = { top: -10000000, bottom: 10000000 };
+
+        var vc;
+
+        // Enables click handling for timeline.
+        function timelineClickOn() {
+            timeline.onmouseclick = function (e) { return zoomToElementHandler(this, e, 1.0); };
+        }
+
+        $(document).ready(function () {
+
+            vc = $("#vc");
+            vc.virtualCanvas();
+            var gesturesStream = getGesturesStream(vc);
+
+            // Gesture stream for zoom by double click.
+
+            vc.mousewheel(function (objEvent, intDelta) {
+                var event = jQuery.Event("xbrowserwheel");
+                event.delta = intDelta;
+                event.origin = getXBrowserMouseOrigin(vc, objEvent)
+                vc.trigger(event);
+            });
+
+            var mouseWheel = vc.toObservable("xbrowserwheel");
+
+            var mouseWheels = mouseWheel.Zip(mouseWheel, function (arg) {
+                return new ZoomGesture(arg.origin.x, arg.origin.y, arg.delta > 0 ? 1 / zoomLevelFactor : 1 * zoomLevelFactor);
+            });
+
+            var mousedblclick = vc.toObservable("dblclick");
+
+            var mousedblclicks = mousedblclick.Zip(mousedblclick, function (event) {
+                var origin = getXBrowserMouseOrigin(vc, event);
+                return new ZoomGesture(origin.x, origin.y, 0.666); // Zoom Scale Factor
+            });
+
+            var panController = createPanSubject(vc);
+            var pinController = createPinSubject(vc);
+            var zoomController = mouseWheels.Merge(mousedblclicks);
+
+            var newGesturesStream = pinController.Merge(panController.Merge(zoomController));
+
+            newGesturesStream.Subscribe(function (gesture) {
+                switch (gesture.Type) {
+                    case "Zoom":
+                        zoomHandled = true;
+                        scale.xOrigin = gesture.xOrigin;
+                        scale.yOrigin = gesture.yOrigin;
+                        scale.scaleFactor = gesture.scaleFactor;
+                        break;
+                    case "Pan":
+                        panHandled = true;
+                        offset.xOffset += gesture.xOffset;
+                        offset.yOffset += gesture.yOffset;
+                        break;
+                    case "Pin": pinHandled = true;
+                }
+            });
+
+            k = 200;
+
+            var root = vc.virtualCanvas("getLayerContent");
+            root.beginEdit();
+            timeline = addTimeline(root, "layerTimelines", "timeline",
+                {
+                    timeStart: -18.7 * k, timeEnd: 0,
+                    top: 0, height: 5 * k,
+                    header: "Cosmos",
+                    fillStyle: "rgba(100, 30, 30, 0.5)"
+                }
+            );
+
+            timeline.onmouseclick = undefined;
+
+            infodot = addInfodot(timeline, "layerInfodots", "infodot",
+                -16 * k, 2.0 * k, 0.6 * k,
+                [majorContentItem, minorContentItem]
+            );
+
+            root.endEdit(true);
+
+            // Get content items. By default, DLOD element generates new collection with content items
+            // when it's necessary. For testing purposes, redefining of changeZoomLevel is needed.
+            // The only difference is that now it always returns the same collection of content items
+            // (always stores it in memory). It gives an opportunity to check its settings in tests.
+            // Seems, that there is no other way to get this collection.
+            var dlod = getChild(infodot, "infodot_dlod");
+            var contentItems = [majorContentItem, minorContentItem];
+            var innerRad = 0.6 * k - infoDotHoveredBorderWidth * 0.6 * k;
+            var time = -16 * k;
+            var vyc = 2.0 * k;
+            var layerid = "layerInfodots";
+            var id = "infodot";
+            var element = timeline;
+
+            vcitems = buildVcContentItems([majorContentItem, minorContentItem], -16 * k, 2.0 * k, 0.6 * k, timeline.vc, "layerInfodots");
+            majorBorder = getChild(vcitems[0], vcitems[0].id.toString() + "__rect__");
+            minorBorder = getChild(vcitems[1], vcitems[1].id.toString() + "__rect__");
+
+            // It's the copy-paste of the same method from addInfodot() method in vccontent.js,
+            // that written by Dmitry Voytsekhovskiy.
+            dlod.changeZoomLevel = function (curZl, newZl) {
+                if (newZl >= infodotShowContentZoomLevel) { // building content for an infodot
+                    if (curZl >= infodotShowContentZoomLevel) return null;
+
+                    var contentItem = null;
+                    // Main content item
+                    if (contentItems.length > 0) {
+                        contentItem = new ContainerElement(element.vc, layerid, id + "__contentItems", dlod.x, dlod.y, 2 * innerRad, 2 * innerRad);
+                        var items = vcitems; // This is the only row, that changed.
+                        if (items) {
+                            for (var i = 0; i < items.length; i++) {
+                                addChild(contentItem, items[i]);
+                            }
+                        }
+                    }
+                    if (contentItem) {
+                        return { zoomLevel: newZl,
+                            content: contentItem
+                        };
+                    }
+                    else return null;
+                } else { // building thumbnails
+                    if (contentItems.length == 0) return null;
+                    var zl = newZl;
+                    if (zl <= contentItemThumbnailMinLevel) {
+                        if (curZl <= contentItemThumbnailMinLevel && curZl > 0) return null;
+                    }
+                    if (zl >= contentItemThumbnailMaxLevel) {
+                        if (curZl >= contentItemThumbnailMaxLevel && curZl < infodotShowContentZoomLevel) return null; // we are already showing the largest thumbnail available
+                        zl = contentItemThumbnailMaxLevel;
+                    }
+                    if (zl < contentItemThumbnailMinLevel) {
+                        return { zoomLevel: zl,
+                            content: new ContainerElement(element.vc, layerid, id + "__empty", time, vyc, 0, 0)
+                        };
+                    }
+                    var contentItem = contentItems[0];
+                    var sz = 1 << zl;
+                    var thumbnailUri = contentItemThumbnailBaseUri + 'x' + sz + '/' + contentItem.id + '.png';
+                    var l = innerRad * 260 / 225;
+                    return { zoomLevel: zl,
+                        content: new CanvasImage(element.vc, layerid, id + "@" + zl, thumbnailUri, time - l / 2.0, vyc - l / 2.0, l, l)
+                    };
+                }
+            };
+
+            controller = new ViewportController(
+                            function (visible) {
+                                vc.virtualCanvas("setVisible", visible, controller.activeAnimation);
+                            },
+                            function () {
+                                return vc.virtualCanvas("getViewport");
+                            },
+                            newGesturesStream);
+
+            vc.bind("elementclick", function (e) {
+                controller.moveToVisible(e.newvisible);
+            });
+
+            vc.virtualCanvas("setVisible", new VisibleRegion2d(-12.0 * k, 2.5 * k, 14.0 * k / 1024.0));
+
+            UpdateLayout();
+        });
+
+        function UpdateLayout() {
+            document.getElementById("vc").style.height = (window.innerHeight - 20) + "px";
+            $("#vc").virtualCanvas("updateViewport");
+        }
+
+        $(window).bind('resize', function () {
+            UpdateLayout();
+        });
+
+    </script>
+</head>
+<body style="background-color: Black">
+    <div id="vc" style="width: 100%; height: auto; overflow: hidden; background-image: url('Images/background.jpg');
+        background-size: cover">
+        <div id="layerTimelines">
+        </div>
+        <div id="layerInfodots">
+        </div>
+    </div>
+</body>
+</html>

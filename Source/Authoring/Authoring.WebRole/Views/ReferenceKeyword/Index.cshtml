@@ -1,0 +1,57 @@
+﻿@model IEnumerable<Authoring.WebRole.Models.ReferenceKeyword>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>ReferenceKeyword - Index</h2>
+
+<p>
+    @if (ViewBag.write)
+    {
+        @Html.ActionLink("Create New", "Create")
+    }
+</p>
+<table>
+    <tr>
+        <th>
+            Reference
+        </th>
+        <th>
+            Keyword
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Reference.Authors)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Keyword.Keyword1)
+        </td>
+        <td>
+        @if(ViewBag.delete) 
+        {
+            @Html.ActionLink("Edit", "Edit", new { id = item.ReferenceKeywordID })  
+            @String.Format("{0}", "|");
+            @Html.ActionLink("Details", "Details", new { id = item.ReferenceKeywordID }) 
+            @String.Format("{0}", "|");
+            @Html.ActionLink("Delete", "Delete", new { id = item.ReferenceKeywordID })
+        }
+        else if (ViewBag.write)
+        {
+            @Html.ActionLink("Edit", "Edit", new { id = item.ReferenceKeywordID }) 
+            @String.Format("{0}", "|");
+            @Html.ActionLink("Details", "Details", new { id = item.ReferenceKeywordID })
+        }
+        else if (ViewBag.read)
+        { 
+            @Html.ActionLink("Details", "Details", new { id = item.ReferenceKeywordID })
+        }            
+        </td>
+    </tr>
+}
+
+</table>

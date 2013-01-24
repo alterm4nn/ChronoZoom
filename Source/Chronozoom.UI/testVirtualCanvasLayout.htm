@@ -1,0 +1,237 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <link href="Styles/cz.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="Scripts/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-ui-1.8.16.custom.min.js"></script>
+    <script type="text/javascript" src="Scripts/rx.js"></script>
+    <script type="text/javascript" src="Scripts/rx.jQuery.js"></script>
+    <script type="text/javascript" src="Scripts/common.js"></script>
+    <script type="text/javascript" src="Scripts/cz.settings.js"></script>
+    <script type="text/javascript" src="Scripts/vccontent.js"></script>
+    <script type="text/javascript" src="Scripts/viewport.js"></script>
+    <script type="text/javascript" src="Scripts/virtualCanvas.js"></script>
+    <script type="text/javascript" src="Scripts/mouseWheelPlugin.js"></script>
+    <script type="text/javascript" src="Scripts/gestures.js"></script>
+    <script type="text/javascript" src="Scripts/viewportAnimation.js"></script>
+    <script type="text/javascript" src="Scripts/viewportController.js"></script>
+    <script type="text/javascript" src="Scripts/layout.js"></script>
+    <script type="text/javascript">
+        var maxPermitedVerticalRange = { top: -10000000, bottom: 10000000 };
+
+        var responseDump;
+        var contentLoadedFromService = false;
+
+        var count = 2;
+        var i1 = new Infodot(-450, []);
+        var i2 = new Infodot(-450, []);
+        var infodots = new Array();
+        var tl;
+
+        i1.ID = "i1";
+        i2.ID = "i2";
+
+        infodots.push(i1);
+        infodots.push(i2);
+
+        function loadContent() {
+            var vc = $("#vc");
+            vc.virtualCanvas();
+
+            var tmpar = new Array();
+            tmpar.push({ Sequence: 0, title: "First" });
+            tmpar.push({ Sequence: 4, title: "Fourth" });
+            tmpar.push({ title: "undef" });
+            tmpar.push({ Sequence: 3, title: "Middle" });
+            tmpar.push({ Sequence: 40, title: "Last" });
+
+            tmpar.sort(function (l, r) {
+                if (!l.Sequence)
+                    return -1;
+                else if (!r.Sequence)
+                    return 1;
+                else
+                    return l.Sequence - r.Sequence;
+            });
+
+            //Loading sample timeline hierarchy
+            var content;
+            var tls = new Array();
+            var ids = new Array();
+
+            var globalLeft = -550;
+            var globalRight = -50;
+            var globalDiff = globalRight - globalLeft;
+
+            ids.push(new Infodot(-300, [{ ID: "1", Title: "Sequence: 10"}]));
+            ids[0].Sequence = 10;
+
+            ids.push(new Infodot(-200, [{ ID: "2", Title: "Sequence: 11"}]));
+            ids[1].Sequence = 11;
+
+            ids.push(new Infodot(-400, [{ ID: "3", Title: "Sequence: 12"}]));
+            ids[2].Sequence = 12;
+
+
+            for (i = 0; i < 30; i++) {
+                ids.push(new Infodot(Math.floor(Math.random() * (globalDiff * 0.8) + globalLeft + globalDiff * 0.1), []));
+            }
+
+            var halfDiff = globalDiff * 0.8 * 0.5;
+            var left1 = Math.floor(Math.random() * (halfDiff) + globalLeft + globalDiff * 0.1);
+            var right1 = Math.floor(Math.random() * (halfDiff) + halfDiff + globalLeft + globalDiff * 0.1);
+            var globalDiff1 = right1 - left1;
+
+            var halfDiff1 = globalDiff1 * 0.8 * 0.5;
+            var left11 = Math.floor(Math.random() * halfDiff1 + halfDiff1 * 0.1 + left1);
+            var right11 = Math.floor(Math.random() * halfDiff1 + halfDiff1 * 1.1 + left1);
+            var tls2 = [
+                new Timeline("Inner", left11, right11, [],
+                [
+                    new Infodot(Math.floor(Math.random() * (right11 - left11) * 0.8 + left11 + (right11 - left11) * 0.1), []),
+                    new Infodot(Math.floor(Math.random() * (right11 - left11) * 0.8 + left11 + (right11 - left11) * 0.1), []),
+                    new Infodot(Math.floor(Math.random() * (right11 - left11) * 0.8 + left11 + (right11 - left11) * 0.1), []),
+                    new Infodot(Math.floor(Math.random() * (right11 - left11) * 0.8 + left11 + (right11 - left11) * 0.1), []),
+                    new Infodot(Math.floor(Math.random() * (right11 - left11) * 0.8 + left11 + (right11 - left11) * 0.1), [])
+                ])
+            ];
+
+            tls.push(new Timeline("Life1", left1, right1,
+                            tls2,
+                            [
+                                new Infodot(Math.floor(Math.random() * (right1 - left1) * 0.8 + left1 + (right1 - left1) * 0.1), []),
+                                new Infodot(Math.floor(Math.random() * (right1 - left1) * 0.8 + left1 + (right1 - left1) * 0.1), []),
+                                new Infodot(Math.floor(Math.random() * (right1 - left1) * 0.8 + left1 + (right1 - left1) * 0.1), []),
+                                new Infodot(Math.floor(Math.random() * (right1 - left1) * 0.8 + left1 + (right1 - left1) * 0.1), []),
+                                new Infodot(Math.floor(Math.random() * (right1 - left1) * 0.8 + left1 + (right1 - left1) * 0.1), [])
+                            ]));
+
+            //tls[0].Height = 0.8;
+
+            var left = Math.floor(Math.random() * (halfDiff) + globalLeft + globalDiff * 0.1);
+            var right = Math.floor(Math.random() * (halfDiff) + halfDiff + globalLeft + globalDiff * 0.1);
+            tls.push(new Timeline("Life2", left, right,
+                new Array(),
+                [
+                    new Infodot(Math.floor(Math.random() * (right - left) * 0.8 + left + (right - left) * 0.1), []),
+                    new Infodot(Math.floor(Math.random() * (right - left) * 0.8 + left + (right - left) * 0.1), []),
+                    new Infodot(Math.floor(Math.random() * (right - left) * 0.8 + left + (right - left) * 0.1), []),
+                    new Infodot(Math.floor(Math.random() * (right - left) * 0.8 + left + (right - left) * 0.1), []),
+                    new Infodot(Math.floor(Math.random() * (right - left) * 0.8 + left + (right - left) * 0.1), [])
+                ]));
+
+            // Add timeline for test arranging of infodots.
+            tl = new Timeline("Arrange Infodots", globalLeft + 10, globalRight - 10, [], infodots);
+            tl.ID = "tl";
+            tls.push(tl);
+
+            var name = "VeryLongTitleNameStringWithAdditionalLettersWithCountIsVeryBig";
+            //name = "MagicTheGathering";
+            content = new Timeline(name, globalLeft, globalRight, tls, ids);
+            //content.AspectRatio = 6;
+
+            var p = eval(getPresent());
+
+            //Converting to Virtual Canvas
+            var mctx = document.createElement("canvas").getContext("2d");
+            LayoutTimeline(content, 0, mctx);
+            Arrange(content);
+            LoadTimeline(vc, content);
+        }
+
+        $(document).ready(function () {
+            var vc = $("#vc");
+            vc.virtualCanvas();
+            
+            loadContent();
+
+            //Create navigation
+            controller = new ViewportController(
+                function (visible) {
+                    vc.virtualCanvas("setVisible", visible, controller.activeAnimation);
+                },
+                function () {
+                    return vc.virtualCanvas("getViewport");
+                },
+                getGesturesStream(vc));
+
+            vc.bind("elementclick", function (e) {
+                controller.moveToVisible(e.newvisible)
+            });
+
+            //Updating Layout
+            UpdateLayout();
+
+            LoadResponseDump();
+
+        });
+
+        function LoadResponseDump() {
+            var errorConnecting = false;
+
+            $.ajax({
+                cache: false,
+                type: "GET",
+                async: true,
+                dataType: "json",
+                url: "ResponseDump.txt",
+                success: function (result) {
+                    responseDump = result;
+                    if (responseDump.d != null)
+                        contentLoadedFromService = true;
+                },
+                error: function (xhr) {
+                    errorConnecting = true;
+                }
+            });
+
+            if (!errorConnecting)
+                return responseDump;
+            else
+                return errorConnecting;
+        }
+
+        function UpdateLayout() {
+            document.getElementById("vc").style.height = (window.innerHeight - 60) + "px";
+            $("#vc").virtualCanvas("updateViewport");
+        }
+
+        $(window).bind('resize', function () {
+            UpdateLayout();
+        });
+
+        // Add new infodot in "Arrange Infodots" timeline with given X coordinate.
+        // Also shows, how layout algorithm works.
+        function addNewInfodot() {
+            count++;
+            var vc = $("#vc");
+            var root = vc.virtualCanvas("getLayerContent");
+
+            clear(root);
+
+            var x = $("#infodotX").val();
+            var ii = new Infodot(eval(x), []);
+            ii.ID = "i" + count;
+            infodots.push(ii);
+
+            loadContent();
+
+            UpdateLayout();
+        }
+    </script>
+    <title>Virtual Canvas Layout</title>
+</head>
+<body>
+    <button onclick="addNewInfodot()">
+        Add infodot</button>
+    X coordinate:
+    <input id="infodotX" value="-450" />
+    <div id="vc" style="width: 100%; height: auto; overflow: hidden; background-image: url('Images/background.jpg');
+        background-size: cover">
+        <div id="layerTimelines">
+        </div>
+        <div id="layerInfodots">
+        </div>
+    </div>
+</body>
+</html>

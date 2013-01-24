@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <script type="text/javascript" src="Scripts/jquery-1.6.2.min.js"></script>
+    <title>Testing async image loading</title>
+    <script type="text/javascript">
+        var start;
+        var x0 = 0, x1 = 0;
+        var render = false;
+        var prev;
+
+        function startload() {
+            x0 = x1 = 0;
+            var img = new Image();
+            img.addEventListener("load",
+                 function (e) {
+                     var end = new Date();
+                     var delta = end.getTime() - start.getTime();
+                     $('#output').append('image loaded: ' + delta + 'ms <br>');
+                     $('#divimg').append(img);
+                     end = new Date();
+                     delta = end.getTime() - start.getTime();
+                     $('#output').append('image loaded (after): ' + delta + 'ms <br>');
+                     render = false;
+                     //alert('done');
+                 }, false);
+
+            $('#output').append('starting image loading...<br>');
+            render = true;
+            window.setTimeout(progress, 10);
+            start = new Date();
+            prev = start.getTime();
+            img.style.width = '1000px';
+            img.style.height = '500px';
+            img.src = 'http://savemanul.org/images/full/pc_rus.jpg';
+        }
+
+        function progress() {
+            var _canvas = document.getElementById('cv');
+            var ctx = _canvas.getContext("2d");
+            ctx.fillStyle = 'blue';
+
+            var now = new Date().getTime();
+            x1 += now - prev;
+            prev = now;
+            ctx.fillRect(0, 0, x1, 50);
+            if (!render) return;
+            window.setTimeout(progress, 10);
+        }
+    </script>
+</head>
+<body>
+    <canvas id='cv'></canvas>
+    <button onclick='startload();'>
+        Start load</button>
+    <p id="output">
+    </p>
+    <br />
+    <br />
+    <br />
+    <div id='divimg' />
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+    <head>
+		<script src="../rx.js" type="text/javascript"></script>
+		<script src="../rx.html.js" type="text/javascript"></script>
+		<script type="text/javascript">
+
+		Rx.Observable.FromHtmlEvent(window, "load").Subscribe(function() 
+		{
+			var liveEvent = new Rx.MutableDisposable();
+
+			Rx.Observable.FromHtmlEvent(document.getElementById("bind"), "click")
+				.Subscribe(function () {
+					document.getElementById("theone").innerHTML = "can click...";
+
+					liveEvent.Replace(Rx.Observable.FromHtmlEvent(document.getElementById("theone"), "click")
+						.Subscribe(function() {
+							alert('hello');  }));
+					});
+
+			Rx.Observable.FromHtmlEvent(document.getElementById("unbind"), "click")
+				.Subscribe(function () {
+						document.getElementById("theone").innerHTML = "Does nothing...";						
+						liveEvent.Dispose();
+						liveEvent = new Rx.MutableDisposable();
+					});
+		});
+	</script>
+
+</head>
+<body>
+	<button id="theone">Does nothing...</button>
+	<button id="bind">Bind Click</button>
+	<button id="unbind">Unbind Click</button>
+</body>
+</html>
+
+

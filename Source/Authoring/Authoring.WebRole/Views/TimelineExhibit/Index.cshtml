@@ -1,0 +1,57 @@
+﻿@model IEnumerable<Authoring.WebRole.Models.TimelineExhibit>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>TimelineExhibit - Index</h2>
+
+<p>
+    @if (ViewBag.write)
+    {
+        @Html.ActionLink("Create New", "Create")
+    }
+</p>
+<table>
+    <tr>
+        <th></th>
+        <th>
+            Timeline
+        </th>
+        <th>
+            Exhibit
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+         <td>
+        @if(ViewBag.delete) 
+        {
+            @Html.ActionLink("Edit", "Edit", new { id = item.TimelineExhibitID })  
+            @String.Format("{0}", "|");
+            @Html.ActionLink("Details", "Details", new { id = item.TimelineExhibitID }) 
+            @String.Format("{0}", "|");
+            @Html.ActionLink("Delete", "Delete", new { id = item.TimelineExhibitID })
+        }
+        else if (ViewBag.write)
+        {
+            @Html.ActionLink("Edit", "Edit", new { id = item.TimelineExhibitID }) 
+            @String.Format("{0}", "|");
+            @Html.ActionLink("Details", "Details", new { id = item.TimelineExhibitID })
+        }
+        else if (ViewBag.read)
+        { 
+            @Html.ActionLink("Details", "Details", new { id = item.TimelineExhibitID })
+        }            
+        </td>
+       <td>
+            @Html.DisplayFor(modelItem => item.Timeline.Title)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Exhibit.Title)
+        </td>
+    </tr>
+}
+
+</table>

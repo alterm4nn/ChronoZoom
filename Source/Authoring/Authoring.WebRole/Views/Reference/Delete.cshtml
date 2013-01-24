@@ -1,0 +1,63 @@
+﻿@model Authoring.WebRole.Models.Reference
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Reference - Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<fieldset>
+    <legend>Reference</legend>
+
+    <div class="display-label">Authors</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Authors)
+    </div>
+
+    <div class="display-label">BookChapters</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.BookChapters)
+    </div>
+
+    <div class="display-label">Title</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Title)
+    </div>
+
+    <div class="display-label">CitationType</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.CitationType.CitationType1)
+    </div>
+
+    <div class="display-label">PageNumbers</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.PageNumbers)
+    </div>
+
+    <div class="display-label">Publication</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Publication)
+    </div>
+
+    <div class="display-label">PublicationDates</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.PublicationDates)
+    </div>
+
+    <div class="display-label">Source</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Source)
+    </div>
+
+    <div class="display-label">IsVisible</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.IsVisible)
+    </div>
+</fieldset>
+@using (Html.BeginForm()) {
+    <p>
+        <input type="submit" value="Delete" /> |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+}

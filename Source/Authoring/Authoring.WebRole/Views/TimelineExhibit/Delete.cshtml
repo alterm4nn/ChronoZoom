@@ -1,0 +1,28 @@
+﻿@model Authoring.WebRole.Models.TimelineExhibit
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>TimelineExhibit - Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<fieldset>
+    <legend>TimelineExhibit</legend>
+
+    <div class="display-label">Timeline</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Timeline.Title)
+    </div>
+
+    <div class="display-label">Exhibit</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Exhibit.Title)
+    </div>
+</fieldset>
+@using (Html.BeginForm()) {
+    <p>
+        <input type="submit" value="Delete" /> |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+}

@@ -1,0 +1,75 @@
+﻿@model IEnumerable<Authoring.WebRole.Models.ExhibitReferenceEntity>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>ExhibitReference - Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table>
+    <tr>
+        <th></th>
+        <th>
+            Exhibit
+        </th>
+        <th>
+            Reference
+        </th>
+        <th>
+            Order
+        </th>
+        <th>
+            CreatedOn
+        </th>
+        <th>
+            CreatedBy
+        </th>
+        <th>
+            ModifiedOn
+        </th>
+        <th>
+            ModifiedBy
+        </th>
+        <th>
+            IsDeleted
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+         <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.ExhibitReferenceID }) |
+            @Html.ActionLink("Details", "Details", new { id=item.ExhibitReferenceID }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.ExhibitReferenceID })
+        </td>
+       <td>
+            @Html.DisplayFor(modelItem => item.Exhibit.Title)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Reference.Authors)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Order)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.CreatedOn)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.User.UserName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ModifiedOn)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.User1.UserName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IsDeleted)
+        </td>
+    </tr>
+}
+
+</table>

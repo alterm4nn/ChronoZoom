@@ -1,0 +1,144 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>FallBack Page</title>
+	<script type="text/javascript" src="Scripts/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="Scripts/flash_detect.js"></script>
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29180487-2']);
+        _gaq.push(['_setDomainName', 'chronozoomproject.org']);
+        _gaq.push(['_setAllowLinker', true]);
+        _gaq.push(['_trackPageview']);
+        (function () {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+
+
+        function setCookie(c_name, value, exdays) {
+            var exdate = new Date();
+            exdate.setDate(exdate.getDate() + exdays);
+            var c_value = escape(value) + ((exdays == null) ? "" : "; expires=" + exdate.toUTCString());
+            document.cookie = c_name + "=" + c_value;
+        }
+
+        function agreement() {
+            setCookie("new_bad_browser_agreement", "1", 365);
+            window.location = "cz.htm";
+        }
+
+
+        function hideWelcomeScreen() {
+        	$("#welcomeScreenBack").css("display", "none");
+        	document.getElementById("fallbackScreenMedia").src = "";
+			agreement();
+        }
+
+
+
+        $(document).ready(function () {
+        	if (!FlashDetect.installed) {
+        		//alert("problem?");
+        		$("#welcomeVideo").css("display", "none");
+        		$("#imageDefault").css("display", "block");
+        	}
+        	
+        });
+
+      /*  function updateLayout() {
+        	var height = $(window).height();
+        	var offset = Math.max(0, height - 187);
+
+        	var outerWindow = document.getElementById("fallbackScreenOuterWindow");
+        	var fallbackScreen = document.getElementById("fallbackScreen");
+
+        	document.getElementById("fallbackScreenBack").style.height = height + "px";
+        	// todo: use (welcomeScreen' content + axis height + footer height) instead of consants
+        	if (height <= 669) {
+        		outerWindow.style.top = (150) + "px";
+        		outerWindow.style.height = offset + "px";
+        		fallbackScreen.style.height = (offset - 50) + "px";
+        	}
+        	else { // keeping height of welcome screen constant, positioning in center of canvas
+        		var diff = Math.floor((height - 669) / 2);
+        		outerWindow.style.top = (150 + diff) + "px";
+        		outerWindow.style.height = (482) + "px";
+        		outerWindow.style.top = (150 + diff) + "px";
+        		fallbackScreen.style.height = (432) + "px";
+        	}
+        	fallbackScreen.style.top = (25) + "px";
+
+        }*/
+	</script>
+    <link rel="stylesheet" type="text/css" href="Styles/cz.css" />
+</head>
+<body style="background:none transparent; clear:both; margin: 0px auto; padding: 0px">
+	
+	<img src='Images/backgroundWithBlur.jpg' class='fallbackBackground' />
+
+	<!--
+	<div id="fallbackScreenBack" class="fallbackScreenBack">
+        <div id="fallbackScreenOuterWindow" class="fallbackScreenOuterWindow">
+            <div id="fallbackScreen" class="fallbackScreen">
+                <div class="titleArea">
+                <div class="title">
+                    <span>We suggest upgrading your browser...</span>
+                </div>
+                </div>
+                <div class="content">
+                    <div class="description">
+                        ChronoZoom is an interactive timeline for all of history.
+                        <p>ChronoZoom uses HTML5, a new web standard.</p>
+                        We recommend you use on of the following browsers: <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home">Internet Explorer 9</a> or later, <a href="http://www.mozilla.org/en-US/firefox/channel/">Firefox 7</a> or later, <a href="http://www.apple.com/safari/">Safari 5</a> or later, <a href="https://www.google.com/intl/en/chrome/browser/">Chrome 14</a> or later
+                        
+                        <div style="position: absolute; bottom: 0px; left:0px">
+                            <button class="button" onclick="hideWelcomeScreen()">Continue Anyway!</button>
+                        </div>
+                    </div>
+                    <div class="media" id="fallbackScreenMedia">
+                        <iframe class="player" id="welcomeVideo" src="http://www.youtube.com/embed/3jvJD8Qv5ec" frameborder="0"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+	-->
+	
+	
+		<div class="fallbackOuterContent">
+				<div class="fallbackContent">
+					<div class="titleArea">
+					<div class="title">
+						<span>We suggest upgrading your browser...</span>
+					</div>
+					</div>
+					<div class="content">
+						<div class="description">
+							ChronoZoom is an interactive timeline for all of history.
+							<p>ChronoZoom uses HTML5, a new web standard.</p>
+							We recommend you use on of the following browsers: <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home">Internet Explorer 9</a> or later, <a href="http://www.mozilla.org/en-US/firefox/channel/">Firefox 7</a> or later, <a href="http://www.apple.com/safari/">Safari 5</a> or later, <a href="https://www.google.com/intl/en/chrome/browser/">Chrome 14</a> or later
+                        
+							<div style="position: absolute; bottom: 0px; left:0px;">
+								<button class="button" onclick="hideWelcomeScreen()">Continue Anyway!</button>
+							</div>
+						</div>
+						<div class="media" style="background-color:transparent;" id="fallbackScreenMedia">
+							<!--<iframe class="player" allowTransparency="true" id="welcomeVideo" src="http://www.youtube.com/embed/3jvJD8Qv5ec?wmode=opaque" frameBorder="0" />-->
+							<object class="player" id="welcomeVideo" width="560px" height="315px">
+								<param name="movie" value="http://www.youtube.com/v/3jvJD8Qv5ec?wmode=opaque"></param>
+								<param name="allowFullScreen" value="true"></param>
+								<param name="allowTransparency" value"true" />
+								<param name="frameborder" value="0" />
+								
+								<embed src="http://www.youtube.com/v/3jvJD8Qv5ec?wmode=opaque" allowTransparency="true" type="application/x-shockwave-flash" frameborder="0" allowfullscreen="true" width="560px"  height="315px"></embed>
+							</object>
+
+							<img class="player" style="display:none" id="imageDefault" src="Images/fallbackWalterImageDefault.jpg" />
+						</div>
+				</div>
+		</div>
+	
+</body>
+</html>

@@ -1,0 +1,26 @@
+﻿CREATE TABLE [dbo].[Exhibit] (
+    [ID]          UNIQUEIDENTIFIER   NOT NULL,
+    [Title]       NVARCHAR (100)     NOT NULL,
+    [ThresholdID] UNIQUEIDENTIFIER   NOT NULL,
+    [RegimeID]    UNIQUEIDENTIFIER   NOT NULL,
+    [ContentDate] DATETIMEOFFSET (7) NULL,
+    [ContentYear] DECIMAL (8, 4)     NULL,
+    [CreatedOn]   SMALLDATETIME      CONSTRAINT [DF_Exhibit_CreatedOn] DEFAULT (CONVERT([smalldatetime],getdate(),(0))) NULL,
+    [CreatedBy]   UNIQUEIDENTIFIER   NULL,
+    [ModifiedOn]  SMALLDATETIME      CONSTRAINT [DF_Exhibit_ModifiedOn] DEFAULT (CONVERT([smalldatetime],getdate(),(0))) NULL,
+    [ModifiedBy]  UNIQUEIDENTIFIER   NULL,
+    [IsVisible]   BIT                NULL,
+    [IsDeleted]   BIT                NULL,
+    [TimeUnitID]  UNIQUEIDENTIFIER   NULL,
+    [UniqueID]    INT                IDENTITY (1, 1) NOT NULL,
+    [Sequence]    INT                NULL,
+    [CurrVersion] INT                NULL,
+    CONSTRAINT [PK_Exhibit] PRIMARY KEY CLUSTERED ([ID] ASC),
+    FOREIGN KEY ([CurrVersion]) REFERENCES [dbo].[CZVersion] ([VersionNumber]) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT [FK_Exhibit_Regime] FOREIGN KEY ([RegimeID]) REFERENCES [dbo].[Regime] ([ID]) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT [FK_Exhibit_Threshold] FOREIGN KEY ([ThresholdID]) REFERENCES [dbo].[Threshold] ([ID]) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT [FK_Exhibit_TimeUnit] FOREIGN KEY ([TimeUnitID]) REFERENCES [dbo].[TimeUnit] ([ID]) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT [FK_Exhibit_User] FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[User] ([ID]) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT [FK_Exhibit_User1] FOREIGN KEY ([ModifiedBy]) REFERENCES [dbo].[User] ([ID]) ON DELETE NO ACTION ON UPDATE NO ACTION
+);
+

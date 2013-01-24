@@ -1,0 +1,75 @@
+﻿@model Authoring.WebRole.Models.Threshold
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Threshold - Edit</h2>
+
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+    <fieldset>
+        <legend>Threshold</legend>
+
+        @Html.HiddenFor(model => model.ID)
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Threshold1)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Threshold1)
+            @Html.ValidationMessageFor(model => model.Threshold1)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.ThresholdDate)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.ThresholdDate)
+            @Html.ValidationMessageFor(model => model.ThresholdDate)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.ThresholdYear)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.ThresholdYear)
+            @Html.ValidationMessageFor(model => model.ThresholdYear)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.ThresholdTimeUnit)
+        </div>
+        <div class="editor-field">
+             @Html.DropDownList("ThresholdTimeUnit", String.Empty)
+            @Html.ValidationMessageFor(model => model.ThresholdTimeUnit)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.BookmarkID, "Bookmark")
+        </div>
+        <div class="editor-field">
+             @Html.DropDownList("BookmarkID", String.Empty)
+            @Html.ValidationMessageFor(model => model.BookmarkID)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.ShortDescription)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.ShortDescription)
+            @Html.ValidationMessageFor(model => model.ShortDescription)
+        </div>
+
+        <p>
+            <input type="submit" value="Save" />
+        </p>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>

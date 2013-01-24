@@ -1,0 +1,7 @@
+﻿.backgroundCanvas { position: absolute; background-color: transparent; z-index:1002 }
+.ticksCanvas { position: absolute; background-color: transparent; z-index:1001 }
+.thresholdCanvas { position: absolute; background-color: transparent; z-index:1002 }
+.mouseMarkCanvas { position: absolute; background-color: transparent; z-index:1004 }
+.thresholdDiv { position: absolute; width: 175px; z-index:1004; font-family: Arial; font-size: 12px }
+.smallThresholdDiv { position: absolute; height: 33px; z-index:1004; font-family: Arial; font-size: 12px; white-space: nowrap }
+.thresholdLine { position: absolute; z-index:1001; }
