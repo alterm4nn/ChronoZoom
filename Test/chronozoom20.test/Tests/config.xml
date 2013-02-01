@@ -1,0 +1,31 @@
+﻿<Application>
+  <Settings>
+    <Global>
+      <IsUsingGrid>false</IsUsingGrid>
+      <BaseUrl>http://www.chronozoomproject.org</BaseUrl>
+      <ImplicitWait>60</ImplicitWait>
+      <ExplicitWait>60</ExplicitWait>
+      <BrowserName>chrome</BrowserName>
+      <ConnectionWait>60</ConnectionWait>
+    </Global>
+    <IncludeTestCategories>
+      <Category></Category>
+    </IncludeTestCategories>
+    <ExcludeTestCategories>
+    </ExcludeTestCategories>
+    <GridExecuting>
+      <x86HubUrl>http://192.168.50.175:4445/wd/hub</x86HubUrl>
+      <x64HubUrl>http://192.168.50.175:4444/wd/hub</x64HubUrl>
+      <HubUrl>http://192.168.50.175:4444/wd/hub</HubUrl>
+      <BrowserVersion>24</BrowserVersion>
+      <PlatformName>VISTA</PlatformName>
+      <GridCapabilities>
+        <Capability Platform="Win8x64" Browser="chrome" Version="22" />
+      </GridCapabilities>
+    </GridExecuting>
+    <Highliting>
+      <HasHighliting>true</HasHighliting>
+      <HighlightWait>200</HighlightWait>
+    </Highliting>
+  </Settings>
+</Application>
