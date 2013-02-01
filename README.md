@@ -15,6 +15,8 @@ Community
 
 For Developers
 ----------
+If you are new to Github, [Learning To Use Github](LearningToUseGithub.md) will help get you started.
+
 You can follow ChronoZoom's bugs and activity [here](https://github.com/alterm4nn/ChronoZoom/issues).
 
 Work items and goals are managed on Trello [here](https://trello.com/chronozoom).
