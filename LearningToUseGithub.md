@@ -17,42 +17,28 @@
 [Topic Branches](http://git-scm.com/book/en/Git-Branching-Branching-Workflows) – an important concept for working well together on Github
 
 ## Your first checkin ##
+
 1.	Install the Visual Studio tools.
-
 2.	Create an account on Github.
-
-- [Signing up for a new Github Account](https://help.github.com/articles/signing-up-for-a-new-github-account)
-- [Setting your email in Git](https://help.github.com/articles/setting-your-email-in-git)
-- [Setting your username in Git](https://help.github.com/articles/setting-your-username-in-git)
-
+    - [Signing up for a new Github Account](https://help.github.com/articles/signing-up-for-a-new-github-account)
+    - [Setting your email in Git](https://help.github.com/articles/setting-your-email-in-git)
+    - [Setting your username in Git](https://help.github.com/articles/setting-your-username-in-git)
 3.	Fork the ‘blessed’ repository owned by Eugene, https://github.com/alterm4nn/ChronoZoom, into your own Github repository.
-
-![Picture of fork button](ChronoZoom/tree/master/Images/Fork.jpg)
-
-- [How to Fork a Repo](https://help.github.com/articles/fork-a-repo)
-
+    ![Picture of fork button](Images/Fork.jpg)
+    - [How to Fork a Repo](https://help.github.com/articles/fork-a-repo)
 4.	Clone your ChronoZoom repository on Github to your local computer
-
-- e.g. ‘git clone https://github.com/YourNameHere/ChronoZoom.git’
-- [How to set up Git](http://learn.github.com/p/setup.html)
-- [Normal Workflow](http://learn.github.com/p/normal.html)
-
+    - e.g. ‘git clone https://github.com/YourNameHere/ChronoZoom.git’
+    - [How to set up Git](http://learn.github.com/p/setup.html)
+    - [Normal Workflow](http://learn.github.com/p/normal.html)
 5.	Create and switch to a ‘topic branch’ for what you are working on, e.g. ‘git checkout –b newFooBar’
-
-- [Branching and Merging](http://learn.github.com/p/branching.html)
-- [Git Branching Workflows](http://git-scm.com/book/en/Git-Branching-Branching-Workflows)
-
+    - [Branching and Merging](http://learn.github.com/p/branching.html)
+    - [Git Branching Workflows](http://git-scm.com/book/en/Git-Branching-Branching-Workflows)
 6.	Make your changes, commit into the local branch on your computer.
-
-- [Recording Changes](http://git-scm.com/book/en/Git-Basics-Recording-Changes-to-the-Repository)
-
+    - [Recording Changes](http://git-scm.com/book/en/Git-Basics-Recording-Changes-to-the-Repository)
 7.	Push the changes to Github so everyone can see them, e.g. ‘git push origin newFooBar’
-
-- [Distributed Git](http://learn.github.com/p/remotes.html)
-
+    - [Distributed Git](http://learn.github.com/p/remotes.html)
 8.	When you’re ready to integrate your changes with the rest of the team, submit a ‘Pull Request’ back to Eugene
-
-- [Using Pull Requests](https://help.github.com/articles/using-pull-requests)
+    - [Using Pull Requests](https://help.github.com/articles/using-pull-requests)
 
 ## Tips ##
 - Do not install ‘Github for Windows’.  This is an ‘easy to use’ tool that doesn’t integrate well with Visual Studio and can interfere with your Git installation.
