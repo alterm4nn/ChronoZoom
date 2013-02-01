@@ -10,7 +10,7 @@ Community
 
 * [Mailing List for Developers](https://groups.google.com/d/forum/chronozoom-dev)
 * [Skype Group Chat for Developers](skype:?chat&blob=F2NxTFrqpjbZLnJ6iNEChQ0Ic339uMi5yfm_4cMI8Fw09dUX_QjGFUA835lXNO0)
-* [Documentation](tree/master/Doc)
+* [Documentation](ChronoZoom/tree/master/Doc)
 * [File a Bug](https://github.com/alterm4nn/ChronoZoom/issues)
 
 For Developers
