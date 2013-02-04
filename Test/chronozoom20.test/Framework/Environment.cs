@@ -45,7 +45,7 @@ namespace Framework
                 case BrowserNames.Firefox:
                     if (!_isUsingGrid)
                     {
-                        _driver = new FirefoxDriver(new FirefoxProfile { EnableNativeEvents = true });
+                        _driver = new FirefoxDriver(new FirefoxProfile{EnableNativeEvents = true});
                         _driver.Manage().Window.Maximize();
                     }
                     break;
@@ -76,6 +76,7 @@ namespace Framework
                 _driver = new ScreenShotRemoteWebDriver(new Uri(Configuration.HubUrl), _capability);
                 //_driver = new RemoteWebDriver(new Uri("http://192.168.50.39:3001/wd/hub"), DesiredCapabilities.IPad()); //Not implemented yet; only for ipad testing
                 _driver.Manage().Window.Maximize();
+
             }
             SetImplicitWait(Configuration.ImplicitWait);
         }

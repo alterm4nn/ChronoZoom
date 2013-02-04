@@ -81,7 +81,6 @@ $process.Close()
 Write-Host "Done"
 }
 
-
 $MSTest10Pathx64 = "${Env:ProgramFiles}" + "\Microsoft Visual Studio 10.0\Common7\IDE\MSTest.exe"
 $MSTest10Pathx86 = "${Env:ProgramFiles(x86)}" + "\Microsoft Visual Studio 10.0\Common7\IDE\MSTest.exe"
 $MSTest11Pathx64 = "${Env:ProgramFiles}" + "\Microsoft Visual Studio 11.0\Common7\IDE\MSTest.exe"
@@ -96,19 +95,19 @@ if (Test-Path($MSTest10Pathx86))
 {
 	$MSTestPath = $MSTest10Pathx86
 }
-#if (Test-Path($MSTest11Pathx64))
-#{
-#	$MSTestPath = $MSTest11Pathx64
-#}
-#if (Test-Path($MSTest11Pathx86))
-#{
-#	$MSTestPath = $MSTest11Pathx86
-#}
+if (Test-Path($MSTest11Pathx64))
+{
+	$MSTestPath = $MSTest11Pathx64
+}
+if (Test-Path($MSTest11Pathx86))
+{
+	$MSTestPath = $MSTest11Pathx86
+}
 
 $SrcFolderpath = Get-ScriptDirectory | Split-Path -Parent
 
-$AbsoleteTestDllPath = "Tests\bin\Release\Tests.dll"
-$Configuration = "Release"
+$AbsoleteTestDllPath = "Tests\bin\Debug\Tests.dll"
+$Configuration = "Debug"
 if($BuildKey -match "NB")
 {
 	$AbsoleteTestDllPath = "Tests\bin\NB\Tests.dll"
@@ -120,16 +119,16 @@ if($BuildKey -match "BVT")
 	$Configuration = "BVT"
 	if($BuildKey.Length -gt 3)
 	{
-		$AbsoleteTestDllPath = "Tests\bin\Release\Tests.dll"
+		$AbsoleteTestDllPath = "Tests\bin\Debug\Tests.dll"
 	}
 }
 
 $TestsLibraryPath = Join-Path $SrcFolderpath $AbsoleteTestDllPath
 $ConfigPath = Get-ConfigPath
-$MSTestSettingsPath = Join-Path $SrcFolderpath "Local.testsettings"
+$MSTestSettingsPath = Join-Path $SrcFolderpath "local.testsettings"
 $TestResultsPath = Join-Path $SrcFolderpath "TestResults"
 $TrxToHtmlResultPath = Join-Path $SrcFolderpath "Utils\Trx2HtmlReport.exe"
-$solutionPath = join-path $SrcFolderpath "TryFSharp.WebTesting.sln"
+$solutionPath = join-path $SrcFolderpath "ChronoZoom.Testing.sln"
 
 $tempFolderName = Get-Date -Format "dd.MM.yy_HH.mm.ss"
 $tempFolderPath = Join-Path $TestResultsPath $tempFolderName
@@ -222,7 +221,6 @@ function GetActuallyHub()
 	return $ActuallyHub
 }
 
-
 function GetActuallyPlatform()
 {
 	param ($PlatformName)
@@ -245,7 +243,7 @@ function GetActuallyPlatform()
 	return $ActuallyPlatform
 }
 
-#Category args ==========================================================================
+#region Category args
 [Array]$IncludedCategories = $xml.Application.Settings.IncludeTestCategories.Category
 [Array]$ExcludedCategories = $xml.Application.Settings.ExcludeTestCategories.Category
 
@@ -281,7 +279,8 @@ else
 {
 	$categoryArgs = '/category:"' + $categoryArgs + '"'
 }
-#Category args ==========================================================================
+#endregion 
+
 Write-Host "Category args: " $categoryArgs
 
 if(($isUsingGrid -eq "true"))
@@ -324,7 +323,7 @@ if(($isUsingGrid -eq "true"))
 					$MSTestArgumentList = " /testcontainer:" + '"' + $TestsLibraryPath + '"' + " /resultsfile:" + '"'+$resultFilePath+'"' + " /testsettings:" + '"' + $MSTestSettingsPath + '"' + ' ' + $categoryArgs
 					$currentTime = Get-Date -Format "HH.mm.ss"
 					Write-Host "Environment: " $resultFilename.Replace('.trx','') "`t Time start: " $currentTime
-					Write-Host "[Debug] msbuild args: " $MSTestArgumentList
+					Write-Host "[Debug] mstest args: " $MSTestArgumentList
 					StartNewProcess -processPath $MSTestPath -processArguments $MSTestArgumentList
 					
 					$buildMachineResultFilePath = Join-Path $TestResultsPath "result.trx"
@@ -353,34 +352,22 @@ if(($isUsingGrid -eq "false"))
 }
 
 $reportFilePath = join-path $tempFolderPath "TestReport.html"
-$TrxParserArgumentList = "/resultsfolder:" + '"' + $tempFolderPath + '"' + " /reportfilepath:" + '"' + $reportFilePath + '"'
+$TrxParserArgumentList = "/resultsfolder:" + '"' + $tempFolderPath + '"' + " /reportfilepath:" + '"' + $reportFilePath + '" /reporttype:Full'
+
+
+#region Screenshot collecting
+
+$screenshotsFolderPath = join-path $tempFolderPath "Screenshots"
+New-Item -Path $screenshotsFolderPath -ItemType Directory
+
+$SsPathArray = @()
+Get-ChildItem -Path $tempFolderPath -Filter *.png -Recurse  | foreach-object { $SsPathArray += $_.FullName }
+
+foreach ($element in $SsPathArray) {
+	Copy-Item $element $screenshotsFolderPath
+}
+
+#endregion
 
 StartNewProcess -processPath $TrxToHtmlResultPath -processArguments $TrxParserArgumentList
-
-if(Test-Path($reportFilePath))
-{
-	$webResultReportFileName = "WebTesting_" + $BuildKey + "_" + $tempFolderName + ".html"
-	Rename-Item $reportFilePath $webResultReportFileName
-	$newResultFilePath = Join-Path $tempFolderPath $webResultReportFileName
-	Move-Item $newResultFilePath $TestResultsPath
-	$newResultFilePath = Join-Path $TestResultsPath $webResultReportFileName
-	#Remove-Item $tempFolderPath -Recurse -Force
-    Write-Host "Path to tests report:  " $newResultFilePath
-      
-    $trunkFolderPath = $SrcFolderpath | Split-Path -Parent
-    $webTestingFolderPath = $trunkFolderPath | Split-Path -Parent
-    $SourcesFolderPath = $webTestingFolderPath | Split-Path -Parent
-    $TryFSharpWebTestingManual = $SourcesFolderPath | Split-Path -Parent
-    $lastFolderName = Split-Path $TryFSharpWebTestingManual -Leaf
-    if($lastFolderName -eq "TryFSharp.WebTesting.Manual")
-    {
-        $Binaries = Join-Path $TryFSharpWebTestingManual "Binaries"
-        $TestResults = Join-Path $Binaries "TestResults"
-        
-        New-Item -Path $TestResults -ItemType "directory" | Out-Null
-        Copy-Item $newResultFilePath $TestResults
-    }
-    
-    #Start-Process $newResultFilePath -Wait
-}
-#Start-Sleep -Seconds 30
+Write-Host $reportFilePath

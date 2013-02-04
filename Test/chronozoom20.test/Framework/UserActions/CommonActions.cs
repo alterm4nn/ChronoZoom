@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Drawing.Imaging;
 using System.Net;
-using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 using Framework.Extensions;
