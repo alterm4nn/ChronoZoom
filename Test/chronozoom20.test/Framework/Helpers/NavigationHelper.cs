@@ -20,6 +20,7 @@ namespace Framework.Helpers
         public void NavigateToCosmos()
         {
             Click(By.Id("bc_link_t55"));
+            WaitAnimation();
         }
 
         public void OpenLifePage()

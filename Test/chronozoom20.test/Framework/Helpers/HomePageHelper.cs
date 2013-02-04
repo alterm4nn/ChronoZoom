@@ -29,12 +29,13 @@ namespace Framework.Helpers
         public void OpenLifeTimeLine()
         {
             _manager.GetNavigationHelper().OpenLifePage();
+            WaitAnimation();
             Logger.Log("Life page opened");
         }
 
         public string GetLastBreadcrumbs()
         {
-            Sleep(5);
+            WaitAnimation();
             var result = GetText(By.XPath("//*[@id='breadCrumbsTable']/*/tr/td[last()]/div"));
             Logger.Log(result);
             return result;

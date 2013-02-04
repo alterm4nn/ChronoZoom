@@ -307,5 +307,18 @@ namespace Framework.UserActions
             return _driver.CurrentWindowHandle;
         }
 
+        protected void WaitAnimation()
+        {
+            WaitCondition(AreEqualViewports, 60);
+        }
+
+        private bool AreEqualViewports()
+        {
+            string v1 = GetJavaScriptExecutionResult("$('#vc').virtualCanvas('getViewport')");
+            Sleep(1);
+            string v2 = GetJavaScriptExecutionResult("$('#vc').virtualCanvas('getViewport')");
+            return v1 == v2;
+        }
+
     }
 }
