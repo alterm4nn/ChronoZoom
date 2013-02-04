@@ -6,7 +6,7 @@ namespace Framework.Helpers
 {
     public class HomePageHelper : DependentActions
     {
-        private readonly ApplicationManager _manager;
+        private ApplicationManager _manager;
 
         public HomePageHelper()
         {
@@ -22,6 +22,7 @@ namespace Framework.Helpers
         public string GetEukaryoticCellsDescription()
         {
             _manager.GetNavigationHelper().OpenExhibitEukaryoticCells();
+            Logger.Log("ExhibitEukaryotic Cell is opened");
             WaitForElementIsDisplayed(By.XPath("//*[@id='vc']/*[@class='contentItemDescription']/div"));
             return GetText(By.XPath("//*[@id='vc']/*[@class='contentItemDescription']/div"));
         }

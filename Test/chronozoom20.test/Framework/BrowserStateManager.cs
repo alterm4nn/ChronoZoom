@@ -20,7 +20,7 @@ namespace Framework
 
         private void RestartBrowserIfDead()
         {
-            Environment environment = ApplicationManager.GetInstance().GetEnvironment();
+            var environment = ApplicationManager.GetInstance().GetEnvironment();
             try
             {
                 GetCurrentUrl();
@@ -33,9 +33,9 @@ namespace Framework
 
         private bool IsInternetConnected()
         {
-            TimeSpan timeToReconnect = TimeSpan.FromSeconds(Configuration.ConnectionWait);
+            var timeToReconnect = TimeSpan.FromSeconds(Configuration.ConnectionWait);
 
-            bool isInternetConnected = Convert.ToBoolean(GetJavaScriptExecutionResult("window.navigator.onLine;"));
+            var isInternetConnected = Convert.ToBoolean(GetJavaScriptExecutionResult("window.navigator.onLine;"));
             if (!isInternetConnected)
             {
                 Logger.Log(string.Format("No internet connection, wait {0} minute(s).", timeToReconnect), LogType.Debug);
