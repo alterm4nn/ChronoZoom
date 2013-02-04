@@ -35,9 +35,10 @@ namespace Framework.Helpers
 
         public string GetLastBreadcrumbs()
         {
+            Logger.Log("<-");
             WaitAnimation();
             var result = GetText(By.XPath("//*[@id='breadCrumbsTable']/*/tr/td[last()]/div"));
-            Logger.Log(result);
+            Logger.Log("-> result: " + result);
             return result;
         }
     }
