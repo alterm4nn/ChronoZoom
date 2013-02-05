@@ -1,6 +1,4 @@
-﻿USE [Chronozoom]
-GO
-/****** Object:  Table [dbo].[CZVersion]    Script Date: 03/01/2012 18:31:18 ******/
+﻿/****** Object:  Table [dbo].[CZVersion]    Script Date: 03/01/2012 18:31:18 ******/
 INSERT [dbo].[CZVersion] ([VersionNumber], [CreatedDate], [PublishDate], [UserID], [IsDeleted], [CZVersionID]) VALUES (29, CAST(0x0000A0050152B20B AS DateTime), NULL, NULL, 0, N'9320ed0c-c181-4d95-8b5f-041d1fc0d1d9')
 INSERT [dbo].[CZVersion] ([VersionNumber], [CreatedDate], [PublishDate], [UserID], [IsDeleted], [CZVersionID]) VALUES (6, CAST(0x00009FF900137345 AS DateTime), NULL, NULL, 0, N'069bbe45-642b-4975-bb31-0562839910b1')
 INSERT [dbo].[CZVersion] ([VersionNumber], [CreatedDate], [PublishDate], [UserID], [IsDeleted], [CZVersionID]) VALUES (9, CAST(0x00009FFF01524386 AS DateTime), NULL, NULL, 0, N'f25b5674-9f96-4066-8a48-12d297e2b5d3')
