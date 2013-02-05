@@ -1,5 +1,6 @@
 ﻿using System;
 using Framework.Constants;
+using Framework.Extensions;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
@@ -74,7 +75,6 @@ namespace Framework
             {
                 _capability.IsJavaScriptEnabled = true;
                 _driver = new ScreenShotRemoteWebDriver(new Uri(Configuration.HubUrl), _capability);
-                //_driver = new RemoteWebDriver(new Uri("http://192.168.50.39:3001/wd/hub"), DesiredCapabilities.IPad()); //Not implemented yet; only for ipad testing
                 _driver.Manage().Window.Maximize();
 
             }

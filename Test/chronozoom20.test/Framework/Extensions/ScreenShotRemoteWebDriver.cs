@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Remote;
 
-namespace Framework
+namespace Framework.Extensions
 {
     internal class ScreenShotRemoteWebDriver : RemoteWebDriver, ITakesScreenshot
     {

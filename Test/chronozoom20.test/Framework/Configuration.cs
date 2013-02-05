@@ -49,11 +49,6 @@ namespace Framework
             get { return GetConfigProperty(ConfigProperties.PlatformName); }
         }
 
-        public static string UserGuid
-        {
-            get { return GetConfigProperty(ConfigProperties.UserGuid); }
-        }
-
         public static int HighlightWait
         {
             get { return GetIntConfigProperty(ConfigProperties.HighlightWait); }
@@ -62,11 +57,6 @@ namespace Framework
         public static bool HasHighliting
         {
             get { return GetBoolConfigProperty(ConfigProperties.HasHighliting); }
-        }
-
-        public static bool IsUsingUsingGrid
-        {
-            get { return GetBoolConfigProperty(ConfigProperties.IsUsingUsingGrid); }
         }
 
         public static int ConnectionWait
