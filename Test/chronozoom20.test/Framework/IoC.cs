@@ -5,6 +5,9 @@ using Microsoft.Practices.Unity;
 
 namespace Framework
 {
+    /// <summary>
+    /// Unity container using for registration
+    /// </summary>
     public static class IoC
     {
         private static IDependencyResolver _resolver;
@@ -31,6 +34,10 @@ namespace Framework
         T Resolve<T>();
     }
 
+    /// <summary>
+    /// Class for cross-browser compatibility realization.
+    /// The class allows to implement different depending on a browser
+    /// </summary>
     public class UnityDependencyResolver : IDependencyResolver
     {
         private readonly IUnityContainer _container;
