@@ -48,7 +48,7 @@ namespace Tests
         {
             HomePageHelper.OpenLifeTimeLine();
             string actual = HomePageHelper.GetLastBreadcrumbs();
-            Assert.AreEqual(actual, "Life!");
+            Assert.AreEqual(actual, "Life");
         }
     }
 }

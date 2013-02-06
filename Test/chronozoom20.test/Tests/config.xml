@@ -1,7 +1,7 @@
 <Application>
   <Settings>
     <Global>
-      <IsUsingGrid>true</IsUsingGrid>
+      <IsUsingGrid>false</IsUsingGrid>
       <BaseUrl>http://www.chronozoomproject.org</BaseUrl>
       <ImplicitWait>60</ImplicitWait>
       <ExplicitWait>60</ExplicitWait>
