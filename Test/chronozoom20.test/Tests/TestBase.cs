@@ -11,9 +11,12 @@ namespace Tests
         public static NavigationHelper NavigationHelper { get; set; }
         public static CommonHelper CommonHelper { get; set; }
         public static BrowserStateManager BrowserStateManager { get; set; }
+        public static TourHelper TourHelper { get; set; }
+        protected static BookmarkHelper BookmarkHelper { get; set; }
+
         public static ScreenshotManager ScreenshotManager
         {
-            get { return ApplicationManager.GetScreenshotManager(); } 
+            get { return ApplicationManager.GetScreenshotManager(); }
         }
 
         public static HomePageHelper HomePageHelper { get; set; }
@@ -28,7 +31,11 @@ namespace Tests
             CommonHelper = ApplicationManager.GetCommonHelper();
             BrowserStateManager = ApplicationManager.GetBrowserStateManager();
             HomePageHelper = ApplicationManager.GetHomePageHelper();
+            TourHelper = ApplicationManager.GetTourHelper();
+            BookmarkHelper = ApplicationManager.GetBookmarkHelper();
         }
+
+
 
         [AssemblyCleanup]
         public static void AssemblyCleanup()
