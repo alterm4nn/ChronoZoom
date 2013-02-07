@@ -1,46 +1,56 @@
 # ChronoZoom Dictionary #
 
-## Content Item ##
+----------
+
+## Entities ##
+
+### Content Item ###
 
 A pointer to a piece of content in ChronoZoom.  It consists of a Url, Title, Caption, and Attribution.  It is contained by an Exhibit.  It is only viewable as part of an Exhibit.
 
-## Exhibit ##
+### Exhibit ###
 
-Contains a set of Content Items and References.  It has a Title, Date, and Tags.  It is contained by Timeline or a Collection.  Is externally searchable & linkable.
+Contains a set of Content Items.  It has a Title, Date, and Tags.  It is contained by Timeline or a Collection.  It is externally searchable & linkable.
 
-## Timeline ##
+### Timeline ###
 
-A visual representation of a time period that contains a set of Exhibits, child Timelines, and Time Series Data.  It has a Title, Date Range, and Tags.  It is contained by a Timeline or a Collection.  Is externally searchable & linkable.
+A visual representation of a time period that contains a set of Exhibits, child Timelines, and Time Series Data.  It has a Title, Date Range, and Tags.  It is contained by a Timeline or a Collection.  It is externally searchable & linkable.
 
-## Tag ##
+### Tour ###
 
-A grouping for related content.  Content can be made visible/invisible by selecting one or more Tags for display.
+A narrated tour with an audio track and media events that perform navigations to Timelines or Exhibits.  It has a Title and Tags.  It is contained by a Collection.  It is externally searchable & linkable.
 
-## Tour ##
+### Collection ###
 
-A narrated tour with an audio track and media events that perform navigations of to Timelines or Exhibits.  Is contained by a Collection.
+A set of Timelines, Exhibits, and Tours.  It has a Title and Tags.  It is externally searchable & linkable.
 
-## Collection ##
-
-A set of Timelines, Exhibits, and Tours.  Is externally searchable & linkable.
-
-## SuperCollection ##
+### SuperCollection ###
 
 A set of Collections owned by a person.  Is externally searchable & linkable.
 
+### Tag ###
+
+A grouping for related content.  Content can be made visible/invisible by selecting one or more Tags for display.
+
 ----------
 
-## The Commons ##
+## Collections ##
 
-A Collection containing the world of community shared content.
+### The Commons ###
 
-## Personal Collection ##
+A Collection containing the world of community shared content which is World:Write.
+
+### Default Collection ###
+
+A SuperCollection stored in ChronoZoom.Org which is the default content for new users.  When a user logs into the site, a copy of the Default collection becomes the starting point of their Personal Collection.
+
+### Personal Collection ###
 
 A SuperCollection stored in ChronoZoom.Org which is Owner:Write and World:Read.
 
-## Private Collection ##
+### Private Collection ###
 
-A SuperCollection stored in a personally owned and managed directory/files.  Could be stored on a simple website or a file sharing site like SkyDrive.
+A SuperCollection stored in a personally owned and managed file.  Could be stored on SkyDrive or a simple website.
 
 ----------
 
