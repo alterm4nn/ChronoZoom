@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Chronozoom.Entities.Exhibit">
+    <Position X="3.25" Y="2.5" Width="1.5" />
+    <Members>
+      <Property Name="Day" Hidden="true" />
+      <Method Name="Exhibit" Hidden="true" />
+      <Property Name="Month" Hidden="true" />
+      <Property Name="Regime" Hidden="true" />
+      <Property Name="Sequence" Hidden="true" />
+      <Property Name="Threshold" Hidden="true" />
+      <Property Name="TimeUnit" Hidden="true" />
+      <Property Name="UniqueID" Hidden="true" />
+    </Members>
+    <AssociationLine Name="ContentItems" Type="Chronozoom.Entities.ContentItem" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="4.375" Y="3.988" />
+        <Point X="4.375" Y="5.032" />
+        <Point X="5" Y="5.032" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="References" Type="Chronozoom.Entities.Reference" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="3.688" Y="3.988" />
+        <Point X="3.688" Y="6.802" />
+        <Point X="5" Y="6.802" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAJAAAgEAAAAQAAAAAAAAQAAAEAAAgAAEAAMA=</HashCode>
+      <FileName>Exhibit.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="ContentItems" />
+      <Field Name="References" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Chronozoom.Entities.Timeline">
+    <Position X="1" Y="0.5" Width="1.5" />
+    <Members>
+      <Property Name="FromDay" Hidden="true" />
+      <Property Name="FromMonth" Hidden="true" />
+      <Property Name="FromTimeUnit" Hidden="true" />
+      <Property Name="Height" Hidden="true" />
+      <Property Name="Regime" Hidden="true" />
+      <Property Name="Sequence" Hidden="true" />
+      <Property Name="Threshold" Hidden="true" />
+      <Method Name="Timeline" Hidden="true" />
+      <Property Name="ToDay" Hidden="true" />
+      <Property Name="ToMonth" Hidden="true" />
+      <Property Name="ToTimeUnit" Hidden="true" />
+      <Property Name="UniqueID" Hidden="true" />
+    </Members>
+    <AssociationLine Name="ChildTimelines" Type="Chronozoom.Entities.Timeline" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="1.532" Y="2.18" />
+        <Point X="1.532" Y="2.663" />
+        <Point X="2.312" Y="2.663" />
+        <Point X="2.312" Y="2.18" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="Exhibits" Type="Chronozoom.Entities.Exhibit" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="2.5" Y="1.625" />
+        <Point X="2.875" Y="1.625" />
+        <Point X="2.875" Y="3.31" />
+        <Point X="3.25" Y="3.31" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAgAABgBAgGAIAAQAAAAEAAABAAAAAAQgAEEAAIE=</HashCode>
+      <FileName>Timeline.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="ChildTimelines" />
+      <Field Name="Exhibits" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Chronozoom.Entities.ContentItem">
+    <Position X="5" Y="4" Width="1.5" />
+    <Members>
+      <Method Name="ContentItem" Hidden="true" />
+      <Property Name="HasBibliography" Hidden="true" />
+      <Property Name="MediaSource" Hidden="true" />
+      <Property Name="MediaType" Hidden="true" />
+      <Property Name="Order" Hidden="true" />
+      <Property Name="Regime" Hidden="true" />
+      <Property Name="Threshold" Hidden="true" />
+      <Property Name="TimeUnit" Hidden="true" />
+      <Property Name="UniqueID" Hidden="true" />
+      <Property Name="Year" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAEAQAAARAAAgEgAAAQAAAAAAAAAAAABCAAgAAAAAMA=</HashCode>
+      <FileName>ContentItem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chronozoom.Entities.Reference">
+    <Position X="5" Y="6.25" Width="1.5" />
+    <Members>
+      <Property Name="Authors" Hidden="true" />
+      <Property Name="BookChapters" Hidden="true" />
+      <Property Name="CitationType" Hidden="true" />
+      <Property Name="PageNumbers" Hidden="true" />
+      <Property Name="Publication" Hidden="true" />
+      <Property Name="PublicationDates" Hidden="true" />
+      <Method Name="Reference" Hidden="true" />
+      <Property Name="Source" Hidden="true" />
+      <Property Name="Title" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAgAAgEAAAAEAAAAAAABAAAAAAAQAAECAAAA=</HashCode>
+      <FileName>Reference.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chronozoom.Entities.Tour">
+    <Position X="5.25" Y="0.5" Width="1.5" />
+    <Members>
+      <Field Name="bookmarks" Hidden="true" />
+      <Property Name="Category" Hidden="true" />
+      <Property Name="Sequence" Hidden="true" />
+      <Method Name="Tour" Hidden="true" />
+      <Property Name="UniqueID" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAgAAAQAQAAAQAAAAAAAAAAAAAAAEACAA=</HashCode>
+      <FileName>Tour.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
