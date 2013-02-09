@@ -1,18 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.ServiceModel;
-using System.ServiceModel.Activation;
-using System.ServiceModel.Web;
-using System.Text;
-using Chronozoom.Entities;
-using System.Web;
-using System.Net;
 
 namespace UI
 {
-    public partial class Prod_BibliographyView : IBibliographyView { }
+
+  public partial class Prod_BibliographyView : IBibliographyView { }
     public partial class Prod_ContentItemView : IContentItemView { }
     public partial class Prod_ExhibitContentItemInfo : IExhibitContentItemInfo { }
     public partial class Prod_ExhibitInfo : IExhibitInfo { }
@@ -62,7 +56,16 @@ namespace UI
         
         private DataEnvironmentAccess()
         {
-            this.DB = new ChronoZoomEntities();
+            var connectionString =
+              "metadata=res://*/ChronoZoom.csdl|res://*/ChronoZoom.ssdl|res://*/ChronoZoom.msl;provider=System.Data.SqlClient"
+              + @";provider connection string=""data source=" + ConfigurationManager.AppSettings["Server"]
+              + ";initial catalog=" + ConfigurationManager.AppSettings["Database"]
+              + ";user id=" + ConfigurationManager.AppSettings["UserId"]
+              + ";password=" + ConfigurationManager.AppSettings["Password"]
+              + @";multipleactiveresultsets=True;App=EntityFramework""";
+
+            this.DB = new ChronoZoomEntities(connectionString);
+
             DataEnvironment env;
 
             if (Enum.TryParse<DataEnvironment>(System.Configuration.ConfigurationManager.AppSettings["Environment"], out env))
