@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using System.Xml;
 using Framework.Constants;
 
@@ -39,7 +40,7 @@ namespace Framework
         #region HelperMethods
         private static XmlDocument GetConfig()
         {
-            const string configFilePath = ConfigProperties.ConfigFileName;
+            string configFilePath = File.Exists(ConfigFileLocations.ConfigPathVsRun) ? ConfigFileLocations.ConfigPathVsRun : ConfigFileLocations.ConfigPathConsoleRun;
             var xml = new XmlDocument();
             xml.Load(configFilePath);
             return _config ?? (_config = xml);
