@@ -2,7 +2,7 @@
 {
     public class WebDriverDirectories
     {
-        private const string WebDriversDirectoryCommandLineRun = @"..\..\..\..\ThirdParty";
-        private const string WebDriversDirectoryVsRun = @"..\..\..\ThirdParty"; 
+        internal const string WebDriversDirectoryCommandLineRun = @"..\..\..\..\ThirdParty";
+        internal const string WebDriversDirectoryVsRun = @"..\..\..\ThirdParty"; 
     }
 }

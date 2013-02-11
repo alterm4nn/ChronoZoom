@@ -9,61 +9,32 @@ namespace Framework
         private static XmlDocument _config;
         private static string _keyValue;
 
-        public static string BrowserName
-        {
-            get { return GetConfigProperty(ConfigProperties.BrowserName); }
-        }
+        public static string BrowserName { get; set; }
+        public static string BaseUrl { get; set; }
+        public static string HubUrl { get; set; }
+        public static int ImplicitWait { get; set; }
+        public static int ExplicitWait { get; set; }
+        public static bool IsUsingGrid { get; set; }
+        public static string BrowserVersion { get; set; }
+        public static string Platform { get; set; }
+        public static int HighlightWait { get; set; }
+        public static bool HasHighliting { get; set; }
+        public static int ConnectionWait { get; set; }
 
-        public static string BaseUrl
+        static Configuration()
         {
-            get { return GetConfigProperty(ConfigProperties.BaseUrl); }
+            BrowserName = GetConfigProperty(ConfigProperties.BrowserName);
+            BaseUrl = GetConfigProperty(ConfigProperties.BaseUrl);
+            HubUrl = GetConfigProperty(ConfigProperties.HubUrl);
+            ImplicitWait = GetIntConfigProperty(ConfigProperties.ImplicitWait);
+            ExplicitWait = GetIntConfigProperty(ConfigProperties.ExplicitWait);
+            IsUsingGrid = GetBoolConfigProperty(ConfigProperties.IsUsingGrid);
+            BrowserVersion = GetConfigProperty(ConfigProperties.BrowserVersion);
+            Platform = GetConfigProperty(ConfigProperties.PlatformName);
+            HighlightWait = GetIntConfigProperty(ConfigProperties.HighlightWait);
+            HasHighliting = GetBoolConfigProperty(ConfigProperties.HasHighliting);
+            ConnectionWait = GetIntConfigProperty(ConfigProperties.ConnectionWait);
         }
-
-        public static string HubUrl
-        {
-            get { return GetConfigProperty(ConfigProperties.HubUrl); }
-        }
-
-        public static int ImplicitWait
-        {
-            get { return GetIntConfigProperty(ConfigProperties.ImplicitWait); }
-        }
-
-        public static int ExplicitWait
-        {
-            get { return GetIntConfigProperty(ConfigProperties.ExplicitWait); }
-        }
-
-        public static bool IsUsingGrid
-        {
-            get { return GetBoolConfigProperty(ConfigProperties.IsUsingGrid); }
-        }
-
-        public static string BrowserVersion
-        {
-            get { return GetConfigProperty(ConfigProperties.BrowserVersion); }
-        }
-
-        public static string Platform
-        {
-            get { return GetConfigProperty(ConfigProperties.PlatformName); }
-        }
-
-        public static int HighlightWait
-        {
-            get { return GetIntConfigProperty(ConfigProperties.HighlightWait); }
-        }
-
-        public static bool HasHighliting
-        {
-            get { return GetBoolConfigProperty(ConfigProperties.HasHighliting); }
-        }
-
-        public static int ConnectionWait
-        {
-            get { return GetIntConfigProperty(ConfigProperties.ConnectionWait); }
-        }
-
 
         #region HelperMethods
         private static XmlDocument GetConfig()

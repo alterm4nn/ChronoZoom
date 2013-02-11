@@ -80,6 +80,7 @@
     <Compile Include="Constants\BrowserNames.cs" />
     <Compile Include="Constants\ConfigProperties.cs" />
     <Compile Include="Constants\CookieConstants.cs" />
+    <Compile Include="Constants\WebDriverDirectories.cs" />
     <Compile Include="Environment.cs" />
     <Compile Include="Extensions\ScreenShotRemoteWebDriver.cs" />
     <Compile Include="Extensions\WebElementExtension.cs" />
