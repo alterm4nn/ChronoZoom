@@ -2,7 +2,7 @@
 {
     public class ConfigProperties
     {
-        public const string ConfigFileName = "config.xml";
+        public const string ConfigFileName = @"C:\Users\vladimir.avdeev\Documents\GitHub\ChronoZoom\Test\chronozoom20.test\Tests\config.xml";
         public const string ImplicitWait = "//Application/Settings/Global/ImplicitWait";
         public const string ExplicitWait = "//Application/Settings/Global/ExplicitWait";
         public const string BrowserName = "//Application/Settings/Global/BrowserName";

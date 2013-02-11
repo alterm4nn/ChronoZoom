@@ -1,9 +1,4 @@
-﻿param
-(
-$BuildKey = ""
-)
-
-function Get-ScriptDirectory
+﻿function Get-ScriptDirectory
 {
 	$Invocation = (Get-Variable MyInvocation -Scope 1).Value
 	Split-Path $Invocation.MyCommand.Path
@@ -12,17 +7,12 @@ function Get-ScriptDirectory
 function Get-ConfigPath
 {
 	$ConfigPath = Join-Path $SrcFolderpath "Tests\config.xml"
-	$CustomConfigPath = Join-Path $SrcFolderpath "Tests\customconfig.xml"
-    $ValidConfigPath = ""
-	if(Test-Path($CustomConfigPath))
-	{
-		$ValidConfigPath = $CustomConfigPath
-	}
-	elseif(Test-Path($ConfigPath))
+	$ValidConfigPath = ""
+	if(Test-Path($ConfigPath))
 	{
 		$ValidConfigPath = $ConfigPath
 	}
-	if(!(Test-Path($CustomConfigPath)) -and !(Test-Path($ConfigPath)))
+	if(!(Test-Path($ConfigPath)))
 	{
 		Write-Host "Config file not found." -ForegroundColor Red
 		exit
@@ -107,25 +97,10 @@ if (Test-Path($MSTest11Pathx86))
 $SrcFolderpath = Get-ScriptDirectory | Split-Path -Parent
 
 $AbsoleteTestDllPath = "Tests\bin\Debug\Tests.dll"
-$Configuration = "Debug"
-if($BuildKey -match "NB")
-{
-	$AbsoleteTestDllPath = "Tests\bin\NB\Tests.dll"
-	$Configuration = "NB"
-}
-if($BuildKey -match "BVT")
-{
-	$AbsoleteTestDllPath = "Tests\bin\BVT\Tests.dll"
-	$Configuration = "BVT"
-	if($BuildKey.Length -gt 3)
-	{
-		$AbsoleteTestDllPath = "Tests\bin\Debug\Tests.dll"
-	}
-}
 
 $TestsLibraryPath = Join-Path $SrcFolderpath $AbsoleteTestDllPath
 $ConfigPath = Get-ConfigPath
-$MSTestSettingsPath = Join-Path $SrcFolderpath "local.testsettings"
+#$MSTestSettingsPath = Join-Path $SrcFolderpath "local.testsettings"
 $TestResultsPath = Join-Path $SrcFolderpath "TestResults"
 $TrxToHtmlResultPath = Join-Path $SrcFolderpath "Utils\Trx2HtmlReport.exe"
 $solutionPath = join-path $SrcFolderpath "ChronoZoom.Testing.sln"
@@ -134,6 +109,7 @@ $tempFolderName = Get-Date -Format "dd.MM.yy_HH.mm.ss"
 $tempFolderPath = Join-Path $TestResultsPath $tempFolderName
 New-Item -Path $tempFolderPath -ItemType "directory" | Out-Null
 
+#region Check MSTest exist
 if (!(Test-Path($MSTest10Pathx64))-and!(Test-Path($MSTest10Pathx86))-and!(Test-Path($MSTest11Pathx86))-and!(Test-Path($MSTest11Pathx64)))
 {
 	Write-Host "MSTest not found" -ForegroundColor Red
@@ -143,7 +119,9 @@ else
 {
     Write-host "MSTest found" -ForegroundColor Green
 }
+#endregion
 
+#region Check MSBuild exist
 $MSBuildPath = ""
 $MSBuildpathx64 = join-path $Env:windir "\Microsoft.NET\Framework64\v4.0.30319\msbuild.exe"
 $MSBuildpathx86 = join-path $Env:windir "\Microsoft.NET\Framework\v4.0.30319\msbuild.exe"
@@ -156,15 +134,15 @@ elseif (test-path($MSBuildpathx64))
 {
     $MSBuildPath = $MSBuildpathx64
 }
-
 if($MSBuildPath -eq "")
 {
     Write-host "Can not find .NET Framework v4.0. please install and try again."
     exit
 }
+#endregion
 
-$MSBuildArgumentList = '"' + $solutionPath + '"' + " /p:Configuration=" + $Configuration
-Write-Host "[Debug] msbuild arg list: " $MSBuildArgumentList
+$MSBuildArgumentList = '"' + $solutionPath + '"' + " /p:Configuration=Debug"
+#Write-Host "[Debug] msbuild arg list: " $MSBuildArgumentList
 
 if((Test-Path($MSBuildPath)) -and ($MSBuildPath -ne "") -and (!(Test-path($TestsLibraryPath))))
 {
@@ -174,7 +152,7 @@ if((Test-Path($MSBuildPath)) -and ($MSBuildPath -ne "") -and (!(Test-path($Tests
 
 if (!(Test-Path($TestsLibraryPath)))
 {
-	Write-Host "Test.dll not found, please build manually test project in " $Configuration " configuration." -ForegroundColor Red
+	Write-Host "Test.dll not found, please build manually test project in Debug configuration." -ForegroundColor Red
 	exit
 }
 
@@ -279,9 +257,11 @@ else
 {
 	$categoryArgs = '/category:"' + $categoryArgs + '"'
 }
-#endregion 
 
 Write-Host "Category args: " $categoryArgs
+#endregion 
+
+#region using grid = true
 
 if(($isUsingGrid -eq "true"))
 {
@@ -291,7 +271,7 @@ if(($isUsingGrid -eq "true"))
 			{
 				if ($tempCapability -ne "")
 				{
-					$resultFilename = "local.trx"
+					$resultFileName = "local.trx"
 					
 						$resultFileName = $tempCapability.Platform + "-" + $tempCapability.BrowserName + "-" + $tempCapability.BrowserVersion + ".trx"
 						$resultFilePath = Join-Path $tempFolderPath $resultFileName
@@ -338,18 +318,21 @@ if(($isUsingGrid -eq "true"))
 		}
 }
 
+#endregion
+
+#region using grid = false
 if(($isUsingGrid -eq "false"))
 {
 	$resultFilename = "local.trx"
 	$resultFilePath = join-path $tempFolderPath $resultFilename
-	$RedirectStandardError = $resultFilePath + ".errors.log"
-	$RedirectStandardOutput = $resultFilePath + ".output.log"
 					 
-	$MSTestArgumentList = " /testcontainer:" + '"' + $TestsLibraryPath + '"' + " /resultsfile:" + '"'+$resultFilePath+'"' + " /testsettings:" + '"' + $MSTestSettingsPath + '"' + ' ' + $categoryArgs
+	$MSTestArgumentList = " /testcontainer:" + '"' + $TestsLibraryPath + '"' + " /resultsfile:" + '"'+$resultFilePath+'"' + ' ' + $categoryArgs
 	$currentTime = Get-Date -Format "HH.mm.ss"
 	Write-Host "Environment: " $resultFilename.Replace('.trx','') "`t Time start: " $currentTime
+	
 	StartNewProcess -processPath $MSTestPath -processArguments $MSTestArgumentList 
 }
+#endregion
 
 $reportFilePath = join-path $tempFolderPath "TestReport.html"
 $TrxParserArgumentList = "/resultsfolder:" + '"' + $tempFolderPath + '"' + " /reportfilepath:" + '"' + $reportFilePath + '" /reporttype:Full'

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Framework.Constants;
 using Framework.Extensions;
 using OpenQA.Selenium;
@@ -16,9 +17,13 @@ namespace Framework
         private readonly DesiredCapabilities _capability;
         readonly string _browserName = Configuration.BrowserName;
         readonly bool _isUsingGrid = Configuration.IsUsingGrid;
+        private const string WebDriversDirectoryCommandLineRun = @"..\..\..\..\ThirdParty";
+        private const string WebDriversDirectoryVsRun = @"..\..\..\ThirdParty";
+        private static string _webDriversDirectory;
 
         internal Environment()
         {
+            _webDriversDirectory = Directory.Exists(WebDriversDirectoryCommandLineRun) ? WebDriversDirectoryCommandLineRun : WebDriversDirectoryVsRun;
             string browserVersion = Configuration.BrowserVersion;
             string platform = Configuration.Platform;
             _capability = new DesiredCapabilities(_browserName, browserVersion, new Platform(NormalizePlatformName(platform)));
@@ -36,7 +41,7 @@ namespace Framework
 
                     if (!_isUsingGrid)
                     {
-                        _driver = new ChromeDriver(chromeOptions);
+                        _driver = new ChromeDriver(_webDriversDirectory, chromeOptions);
                     }
                     else
                     {
@@ -53,11 +58,11 @@ namespace Framework
                 case BrowserNames.InternetExplorer:
                     if (!_isUsingGrid)
                     {
-                        var ie = new InternetExplorerOptions
+                        var internetExplorerOptions = new InternetExplorerOptions
                         {
                             EnableNativeEvents = true
                         };
-                        _driver = new InternetExplorerDriver(ie);
+                        _driver = new InternetExplorerDriver(_webDriversDirectory,internetExplorerOptions);
                         _driver.Manage().Window.Maximize();
                     }
                     break;

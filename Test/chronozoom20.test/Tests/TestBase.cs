@@ -24,8 +24,7 @@ namespace Tests
         [AssemblyInitialize]
         public static void AssemblyInit(TestContext testContext)
         {
-            Logger.Log("", LogType.Delimiter);
-
+            //Logger.Log(":D");
             ApplicationManager = ApplicationManager.GetInstance();
             NavigationHelper = ApplicationManager.GetNavigationHelper();
             CommonHelper = ApplicationManager.GetCommonHelper();
@@ -34,8 +33,6 @@ namespace Tests
             TourHelper = ApplicationManager.GetTourHelper();
             BookmarkHelper = ApplicationManager.GetBookmarkHelper();
         }
-
-
 
         [AssemblyCleanup]
         public static void AssemblyCleanup()
