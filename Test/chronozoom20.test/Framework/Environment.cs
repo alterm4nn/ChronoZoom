@@ -17,13 +17,11 @@ namespace Framework
         private readonly DesiredCapabilities _capability;
         readonly string _browserName = Configuration.BrowserName;
         readonly bool _isUsingGrid = Configuration.IsUsingGrid;
-        private const string WebDriversDirectoryCommandLineRun = @"..\..\..\..\ThirdParty";
-        private const string WebDriversDirectoryVsRun = @"..\..\..\ThirdParty";
         private static string _webDriversDirectory;
 
         internal Environment()
         {
-            _webDriversDirectory = Directory.Exists(WebDriversDirectoryCommandLineRun) ? WebDriversDirectoryCommandLineRun : WebDriversDirectoryVsRun;
+            _webDriversDirectory = Directory.Exists(WebDriverDirectories.WebDriversDirectoryCommandLineRun) ? WebDriverDirectories.WebDriversDirectoryCommandLineRun : WebDriverDirectories.WebDriversDirectoryVsRun;
             string browserVersion = Configuration.BrowserVersion;
             string platform = Configuration.Platform;
             _capability = new DesiredCapabilities(_browserName, browserVersion, new Platform(NormalizePlatformName(platform)));
