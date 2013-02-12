@@ -6,25 +6,34 @@ namespace Framework.Helpers
 {
     public class TourHelper : DependentActions
     {
+        private const string MayanHistoryTourName = "Mayan History";
 
         public void OpenToursListWindow()
         {
+            Logger.Log("<-");
             Click(By.Id("tours_index"));
+            Logger.Log("->");
         }
 
         public void SelectMayanHistoryTour()
         {
-            SelectTour("Mayan History");
+            Logger.Log("<-");
+            SelectTour(MayanHistoryTourName);
+            Logger.Log("->");
         }
 
         public void PauseTour()
         {
+            Logger.Log("<-");
             Click(By.Id("tour_playpause"));
+            Logger.Log("->");
         }
 
         public void ResumeTour()
         {
+            Logger.Log("<-");
             PauseTour();
+            Logger.Log("->");
         }
 
         private void SelectTour(string tour)
