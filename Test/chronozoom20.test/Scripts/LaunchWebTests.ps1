@@ -297,13 +297,9 @@ if(($isUsingGrid -eq "true"))
 						
 						$resultFilePath = join-path $tempFolderPath $resultFilename
 					
-					$RedirectStandardError = $resultFilePath + ".errors.log"
-					$RedirectStandardOutput = $resultFilePath + ".output.log"
-
-					$MSTestArgumentList = " /testcontainer:" + '"' + $TestsLibraryPath + '"' + " /resultsfile:" + '"'+$resultFilePath+'"' + " /testsettings:" + '"' + $MSTestSettingsPath + '"' + ' ' + $categoryArgs
+					$MSTestArgumentList = " /testcontainer:" + '"' + $TestsLibraryPath + '"' + " /resultsfile:" + '"'+$resultFilePath+'"' + ' ' + $categoryArgs
 					$currentTime = Get-Date -Format "HH.mm.ss"
 					Write-Host "Environment: " $resultFilename.Replace('.trx','') "`t Time start: " $currentTime
-					Write-Host "[Debug] mstest args: " $MSTestArgumentList
 					StartNewProcess -processPath $MSTestPath -processArguments $MSTestArgumentList
 					
 					$buildMachineResultFilePath = Join-Path $TestResultsPath "result.trx"
