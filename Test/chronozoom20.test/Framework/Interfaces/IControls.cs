@@ -2,6 +2,6 @@
 {
     public interface IControls
     {
-        void SomeMethod();
+        void ClickCloseButton();
     }
 }

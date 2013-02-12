@@ -5,9 +5,9 @@ namespace Framework.BrowserImpl
 {
     public class DefaultControls : CommonActions
     {
-        public virtual void SomeMethod()
+        public virtual void ClickCloseButton()
         {
-            //Some function
+            MoveToElementAndClick(By.Id("welcomeScreenCloseButton"));
         }
     }
 }

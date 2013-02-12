@@ -16,13 +16,14 @@ namespace Framework.Helpers
             OpenLifePage();
             NavigateToProterozoic();
             ExecuteJavaScript("goToSearchResult('e121')");
+            WaitAnimation();
             Logger.Log("->");
         }
 
         public void NavigateToCosmos()
         {
             Logger.Log("<-");
-            Click(By.Id("bc_link_t55"));
+            Click(By.Id("cosmos_rect"));
             WaitAnimation();
             Logger.Log("->");
         }

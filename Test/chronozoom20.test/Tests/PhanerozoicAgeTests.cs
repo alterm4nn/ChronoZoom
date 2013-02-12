@@ -6,7 +6,7 @@ namespace Tests
     public class PhanerozoicAgeTests : TestBase
     {
         public TestContext TestContext { get; set; }
-        
+
         #region Initialize and Cleanup
 
         [ClassInitialize]
@@ -48,7 +48,7 @@ namespace Tests
         {
             HomePageHelper.OpenLifeTimeLine();
             string actual = HomePageHelper.GetLastBreadcrumbs();
-            Assert.AreEqual(actual, "Life");
+            Assert.AreEqual("Life", actual);
         }
     }
 }

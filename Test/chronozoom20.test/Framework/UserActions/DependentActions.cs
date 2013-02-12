@@ -11,9 +11,9 @@ namespace Framework.UserActions
             _controls = IoC.Resolve<IControls>(Configuration.BrowserName);
         }
 
-        protected void SomeMethod()
+        protected void ClickCloseButton()
         {
-            _controls.SomeMethod();
+            _controls.ClickCloseButton();
         }
     }
 }

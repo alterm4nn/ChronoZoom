@@ -16,7 +16,7 @@ namespace Framework.Helpers
         public void CloseWelcomePopup()
         {
             Logger.Log("<-");
-            MoveToElementAndClick(By.Id("welcomeScreenCloseButton"));
+            ClickCloseButton();
             WaitCondition(()=>Convert.ToBoolean(GetJavaScriptExecutionResult("visReg != undefined")),60);
             Logger.Log("->");
         }

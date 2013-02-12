@@ -19,6 +19,7 @@ namespace Framework.Helpers
         {
             Logger.Log("<-");
             SelectTour(MayanHistoryTourName);
+            WaitForElementIsDisplayed(By.Id("bc_link_t554"));
             Logger.Log("->");
         }
 
@@ -40,7 +41,6 @@ namespace Framework.Helpers
         {
             string xpath = String.Format("//*[@id='tours-content']/div[2]/*[text()='{0}']", tour);
             Click(By.XPath(xpath));
-            WaitForElementIsDisplayed(By.Id("bc_link_t554"));
         }
     }
 }
