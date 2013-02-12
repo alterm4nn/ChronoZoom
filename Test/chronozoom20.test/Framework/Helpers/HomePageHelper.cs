@@ -15,31 +15,37 @@ namespace Framework.Helpers
         }
         public void CloseWelcomePopup()
         {
+            Logger.Log("<-");
             MoveToElementAndClick(By.Id("welcomeScreenCloseButton"));
             WaitCondition(()=>Convert.ToBoolean(GetJavaScriptExecutionResult("visReg != undefined")),60);
+            Logger.Log("->");
         }
 
         public string GetEukaryoticCellsDescription()
         {
+            Logger.Log("<-");
             _manager.GetNavigationHelper().OpenExhibitEukaryoticCells();
             Logger.Log("ExhibitEukaryotic Cell is opened");
             WaitForElementIsDisplayed(By.XPath("//*[@id='vc']/*[@class='contentItemDescription']/div"));
-            return GetText(By.XPath("//*[@id='vc']/*[@class='contentItemDescription']/div"));
+            string description = GetText(By.XPath("//*[@id='vc']/*[@class='contentItemDescription']/div"));
+            Logger.Log("-> description: " + description);
+            return description;
         }
 
         public void OpenLifeTimeLine()
         {
+            Logger.Log("<-");
             _manager.GetNavigationHelper().OpenLifePage();
             WaitAnimation();
-            Logger.Log("Life page opened");
+            Logger.Log("->");
         }
 
         public string GetLastBreadcrumbs()
         {
             Logger.Log("<-");
             WaitAnimation();
-            var result = GetText(By.XPath("//*[@id='breadCrumbsTable']/*/tr/td[last()]/div"));
-            Logger.Log("-> result: " + result);
+            string result = GetText(By.XPath("//*[@id='breadCrumbsTable']/*/tr/td[last()]/div"));
+            Logger.Log("-> Last Breadcrumbs: " + result);
             return result;
         }
     }
