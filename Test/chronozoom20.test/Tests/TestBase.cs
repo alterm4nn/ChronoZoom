@@ -9,7 +9,6 @@ namespace Tests
     {
         public static ApplicationManager ApplicationManager { get; set; }
         public static NavigationHelper NavigationHelper { get; set; }
-        public static CommonHelper CommonHelper { get; set; }
         public static BrowserStateManager BrowserStateManager { get; set; }
         public static TourHelper TourHelper { get; set; }
         protected static BookmarkHelper BookmarkHelper { get; set; }
@@ -24,10 +23,8 @@ namespace Tests
         [AssemblyInitialize]
         public static void AssemblyInit(TestContext testContext)
         {
-            //Logger.Log(":D");
             ApplicationManager = ApplicationManager.GetInstance();
             NavigationHelper = ApplicationManager.GetNavigationHelper();
-            CommonHelper = ApplicationManager.GetCommonHelper();
             BrowserStateManager = ApplicationManager.GetBrowserStateManager();
             HomePageHelper = ApplicationManager.GetHomePageHelper();
             TourHelper = ApplicationManager.GetTourHelper();

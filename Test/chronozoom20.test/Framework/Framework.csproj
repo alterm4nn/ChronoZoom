@@ -86,7 +86,6 @@
     <Compile Include="Extensions\ScreenShotRemoteWebDriver.cs" />
     <Compile Include="Extensions\WebElementExtension.cs" />
     <Compile Include="Helpers\BookmarkHelper.cs" />
-    <Compile Include="Helpers\CommonHelper.cs" />
     <Compile Include="Helpers\HomePageHelper.cs" />
     <Compile Include="Helpers\NavigationHelper.cs" />
     <Compile Include="Helpers\TourHelper.cs" />

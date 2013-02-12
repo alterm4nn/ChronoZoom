@@ -6,7 +6,6 @@ namespace Framework
     {
         private static ApplicationManager _singleton;
         private Environment _environment;
-        private CommonHelper _commonHelper;
         private NavigationHelper _navigationHelper;
         private BrowserStateManager _browserStateManager;
         private ScreenshotManager _screenshotManager;
@@ -32,12 +31,7 @@ namespace Framework
         {
             return _environment ?? (_environment = new Environment());
         }
-
-        public CommonHelper GetCommonHelper()
-        {
-            return _commonHelper ?? (_commonHelper = new CommonHelper());
-        }
-
+        
         public NavigationHelper GetNavigationHelper()
         {
             return _navigationHelper ?? (_navigationHelper = new NavigationHelper());
