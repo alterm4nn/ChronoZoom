@@ -6,7 +6,7 @@ namespace Framework.Helpers
 {
     public class HomePageHelper : DependentActions
     {
-        private ApplicationManager _manager;
+        private readonly ApplicationManager _manager;
 
         public HomePageHelper()
         {
