@@ -9,13 +9,17 @@ namespace Framework.Helpers
 
         public void HideBookmark()
         {
+            Logger.Log("<-");
             Click(By.Id("bookmarksCollapse"));
+            Logger.Log("->");
         }
 
         public bool IsBookmarkExpanded()
         {
-            return Convert.ToBoolean(GetJavaScriptExecutionResult("isBookmarksWindowExpanded"));
+            Logger.Log("<-");
+            bool result = Convert.ToBoolean(GetJavaScriptExecutionResult("isBookmarksWindowExpanded"));
+            Logger.Log("-> IsBookmarkExpanded: " + result);
+            return result;
         }
-
     }
 }

@@ -12,25 +12,33 @@ namespace Framework.Helpers
 
         public void OpenExhibitEukaryoticCells()
         {
+            Logger.Log("<-");
             OpenLifePage();
             NavigateToProterozoic();
             ExecuteJavaScript("goToSearchResult('e121')");
+            Logger.Log("->");
         }
 
         public void NavigateToCosmos()
         {
+            Logger.Log("<-");
             Click(By.Id("bc_link_t55"));
             WaitAnimation();
+            Logger.Log("->");
         }
 
         public void OpenLifePage()
         {
+            Logger.Log("<-");
             Click(By.Id("life_rect"));
+            Logger.Log("->");
         }
 
         private void NavigateToProterozoic()
         {
-           ExecuteJavaScript("goToSearchResult('t308')");
+            Logger.Log("<-");
+            ExecuteJavaScript("goToSearchResult('t308')");
+            Logger.Log("->");
         }
 
 
