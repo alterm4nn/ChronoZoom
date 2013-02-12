@@ -26,7 +26,6 @@ namespace Framework.Helpers
             Logger.Log("<-");
             _manager.GetNavigationHelper().OpenExhibitEukaryoticCells();
             Logger.Log("ExhibitEukaryotic Cell is opened");
-            WaitForElementIsDisplayed(By.XPath("//*[@id='vc']/*[@class='contentItemDescription']/div"));
             string description = GetText(By.XPath("//*[@id='vc']/*[@class='contentItemDescription']/div"));
             Logger.Log("-> description: " + description);
             return description;
