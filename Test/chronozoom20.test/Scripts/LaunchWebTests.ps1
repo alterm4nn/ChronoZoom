@@ -330,9 +330,10 @@ if(($isUsingGrid -eq "false"))
 }
 #endregion
 
-$reportFilePath = join-path $tempFolderPath "TestReport.html"
-$TrxParserArgumentList = "/resultsfolder:" + '"' + $tempFolderPath + '"' + " /reportfilepath:" + '"' + $reportFilePath + '" /reporttype:Full'
-
+$reportFilePathFull = join-path $tempFolderPath "TestReport.html"
+$reportFilePathShort = join-path $tempFolderPath "TestReportForManagers.html"
+$TrxParserArgumentListFull = "/resultsfolder:" + '"' + $tempFolderPath + '"' + " /reportfilepath:" + '"' + $reportFilePathFull + '" /reporttype:Full'
+$TrxParserArgumentListShort = "/resultsfolder:" + '"' + $tempFolderPath + '"' + " /reportfilepath:" + '"' + $reportFilePathShort + '" /reporttype:Shorten'
 
 #region Screenshot collecting
 
@@ -348,6 +349,11 @@ foreach ($element in $SsPathArray) {
 
 #endregion
 
-StartNewProcess -processPath $TrxToHtmlResultPath -processArguments $TrxParserArgumentList
-Copy-Item $reportFilePath $TestResultsPath
-Write-Host $reportFilePath
+StartNewProcess -processPath $TrxToHtmlResultPath -processArguments $TrxParserArgumentListFull
+StartNewProcess -processPath $TrxToHtmlResultPath -processArguments $TrxParserArgumentListShort
+
+Copy-Item $reportFilePathFull $TestResultsPath
+Copy-Item $reportFilePathShort $TestResultsPath
+
+Write-Host $reportFilePathFull
+Write-Host $reportFilePathShort
