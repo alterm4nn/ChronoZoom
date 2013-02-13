@@ -20,8 +20,20 @@
       <PlatformName>Vista</PlatformName>
       <GridCapabilities>
         <Capability Platform="Win8x64" Browser="chrome" Version="24" />
+        <Capability Platform="Win8x64" Browser="firefox" Version="18" />
+        <Capability Platform="Win8x64" Browser="Internet explorer" Version="10" />
+        <Capability Platform="Win8x86" Browser="chrome" Version="24" />
+        <Capability Platform="Win8x86" Browser="firefox" Version="18" />
+        <Capability Platform="Win8x86" Browser="Internet explorer" Version="10" />
         <Capability Platform="Win7x64" Browser="chrome" Version="24" />
         <Capability Platform="Win7x64" Browser="firefox" Version="18" />
+        <Capability Platform="Win7x64" Browser="Internet explorer" Version="9" />
+        <Capability Platform="Win7x86" Browser="chrome" Version="24" />
+        <Capability Platform="Win7x86" Browser="firefox" Version="18" />
+        <Capability Platform="Win7x86" Browser="Internet explorer" Version="9" />
+        <Capability Platform="Macx86" Browser="chrome" Version="24" />
+        <Capability Platform="Macx86" Browser="firefox" Version="18" />
+        <Capability Platform="Macx86" Browser="safari" Version="6" />
       </GridCapabilities>
     </GridExecuting>
     <Highliting>
