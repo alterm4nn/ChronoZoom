@@ -349,4 +349,5 @@ foreach ($element in $SsPathArray) {
 #endregion
 
 StartNewProcess -processPath $TrxToHtmlResultPath -processArguments $TrxParserArgumentList
+Copy-Item $reportFilePath $TestResultsPath
 Write-Host $reportFilePath
