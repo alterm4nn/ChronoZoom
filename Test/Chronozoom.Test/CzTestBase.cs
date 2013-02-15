@@ -208,14 +208,12 @@ namespace Chronozoom.Test
                     driver = new FirefoxDriver();
                     break;
                 case BrowserType.InternetExplorer:
-                    driver = new InternetExplorerDriver();
+                    driver = new InternetExplorerDriver(CzCommon.IeDriverDirectory);
                     break;
                 case BrowserType.Chrome:
                     // Full size for Chrome browser window.
-                    DesiredCapabilities capabilities = new DesiredCapabilities();
-                    List<string> switches = new List<string> { "--start-maximized" };
-                    capabilities.SetCapability("chrome.switches", switches);
-                    driver = new ChromeDriver(CzCommon.ChromeDriverDirectory, capabilities);
+                    driver = new ChromeDriver(CzCommon.ChromeDriverDirectory);
+                    driver.Manage().Window.Maximize();
                     break;
                 case BrowserType.Safari:
                     throw new Exception("There is no support for Safari Webdriver yet.");
