@@ -83,7 +83,7 @@
     <Compile Include="Constants\CookieConstants.cs" />
     <Compile Include="Constants\WebDriverDirectories.cs" />
     <Compile Include="Environment.cs" />
-    <Compile Include="Extensions\ScreenShotRemoteWebDriver.cs" />
+    <Compile Include="Extensions\ExtendedRemoteWebDriver.cs" />
     <Compile Include="Extensions\WebElementExtension.cs" />
     <Compile Include="Helpers\BookmarkHelper.cs" />
     <Compile Include="Helpers\HomePageHelper.cs" />

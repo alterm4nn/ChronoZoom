@@ -6,9 +6,17 @@ namespace Framework.Extensions
 {
     public static class WebElementExtension
     {
-        private static ApplicationManager App
+        private static IJavaScriptExecutor _javaScriptExecutor;
+
+        private static ApplicationManager ApplicationManager
         {
             get { return ApplicationManager.GetInstance(); }
+        }
+
+        public static IJavaScriptExecutor JavaScriptExecutor
+        {
+            get { _javaScriptExecutor = ApplicationManager.GetEnvironment().GetJavaScriptExecutor(); return _javaScriptExecutor; }
+            set { _javaScriptExecutor = value; }
         }
 
         public static string GetBackgroundColor(this IWebElement element)
@@ -29,7 +37,7 @@ namespace Framework.Extensions
         {
             if (!IsHighlitingOn())
                 return;
-            var element = App.GetEnvironment().GetDriver().FindElement(By.TagName("body"));
+            var element = ApplicationManager.GetEnvironment().GetDriver().FindElement(By.TagName("body"));
             var color = element.GetPreviousAndChangeBackgroundColor("yellow");
             action.Invoke();
             element.ChangeBackgroundColor(color);
@@ -46,8 +54,7 @@ namespace Framework.Extensions
         {
             if (!IsHighlitingOn())
                 return;
-            IJavaScriptExecutor executor = App.GetEnvironment().GetJavaScriptExecutor();
-            executor.ExecuteScript("arguments[0].style.backgroundColor = '" + color + "'", element);
+            JavaScriptExecutor.ExecuteScript("arguments[0].style.backgroundColor = '" + color + "'", element);
         }
 
         private static bool IsHighlitingOn()

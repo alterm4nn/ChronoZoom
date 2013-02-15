@@ -12,41 +12,55 @@ namespace Framework.UserActions
 {
     public class CommonActions
     {
-        private readonly IWebDriver _driver;
         private readonly WebDriverWait _wait;
-        private readonly IJavaScriptExecutor _executor;
-        private readonly Actions _builder;
         private readonly Environment _environment;
 
+        private IWebDriver _webDriver;
+        public IWebDriver WebDriver
+        {
+            get
+            {
+                _webDriver = ApplicationManager.GetInstance().GetEnvironment().GetDriver();
+                return _webDriver;
+            }
+            set { _webDriver = value; }
+        }
+        private IJavaScriptExecutor _executor;
+        public IJavaScriptExecutor Executor
+        {
+            get { _executor = ApplicationManager.GetInstance().GetEnvironment().GetJavaScriptExecutor(); return _executor; }
+            set { _executor = value; }
+        }
+
+        private Actions _builder;
         protected Actions Builder
         {
-            get { return _builder; }
+            get { _builder = new Actions(WebDriver);
+                return _builder;
+            }
         }
 
         protected CommonActions()
         {
-            _driver = ApplicationManager.GetInstance().GetEnvironment().GetDriver();
             _environment = ApplicationManager.GetInstance().GetEnvironment();
-            _builder = new Actions(_driver);
             _wait = Wait(Configuration.ExplicitWait);
-            _executor = ApplicationManager.GetInstance().GetEnvironment().GetJavaScriptExecutor();
         }
 
         protected WebDriverWait Wait(int seconds)
         {
-            return new WebDriverWait(_driver, TimeSpan.FromSeconds(seconds));
+            return new WebDriverWait(WebDriver, TimeSpan.FromSeconds(seconds));
         }
 
         protected string GetCurrentUrl()
         {
-            return _driver.Url;
+            return WebDriver.Url;
         }
 
         protected IWebElement FindElement(By by)
         {
             try
             {
-                IWebElement element = _driver.FindElement(by);
+                IWebElement element = WebDriver.FindElement(by);
                 element.Highlight();
                 return element;
             }
@@ -58,7 +72,7 @@ namespace Framework.UserActions
 
         protected ReadOnlyCollection<IWebElement> FindElements(By by)
         {
-            return _driver.FindElements(by);
+            return WebDriver.FindElements(by);
         }
 
         protected void Click(By by)
@@ -68,7 +82,7 @@ namespace Framework.UserActions
 
         protected void OpenUrl(string url)
         {
-            _driver.Navigate().GoToUrl(url);
+            WebDriver.Navigate().GoToUrl(url);
         }
 
         protected string GetText(By by)
@@ -78,7 +92,7 @@ namespace Framework.UserActions
 
         protected string GetPageTitle()
         {
-            return _driver.Title;
+            return WebDriver.Title;
         }
 
         protected int GetItemsCount(By by)
@@ -139,11 +153,11 @@ namespace Framework.UserActions
         {
             if (obj == null)
             {
-                _executor.ExecuteScript(script);
+                Executor.ExecuteScript(script);
             }
             else
             {
-                _executor.ExecuteScript(script, obj);
+                Executor.ExecuteScript(script, obj);
             }
         }
 
@@ -156,7 +170,7 @@ namespace Framework.UserActions
 
         protected string GetJavaScriptExecutionResult(string script)
         {
-            return _executor.ExecuteScript("return " + script).ToString();
+            return Executor.ExecuteScript("return " + script).ToString();
         }
 
         protected bool IsElementExists(By by)
@@ -174,7 +188,7 @@ namespace Framework.UserActions
 
         protected void Refresh()
         {
-            _driver.Navigate().Refresh();
+            WebDriver.Navigate().Refresh();
         }
 
         private static void InvokeChain(Func<Actions> chain)
@@ -185,27 +199,27 @@ namespace Framework.UserActions
         protected void ClickElementAndType(By by, string text)
         {
             IWebElement element = FindElement(by);
-            InvokeChain(() => _builder.MoveToElement(element).Click().SendKeys(text));
+            InvokeChain(() => Builder.MoveToElement(element).Click().SendKeys(text));
         }
 
         protected void SwitchToFrame(By by)
         {
             IWebElement frame = FindElement(by);
-            _driver.SwitchTo().Frame(frame);
+            WebDriver.SwitchTo().Frame(frame);
         }
 
         protected void SwitchToDefaultContent()
         {
-            _driver.SwitchTo().DefaultContent();
+            WebDriver.SwitchTo().DefaultContent();
         }
 
         protected void SwitchToWindow(string name)
         {
-            foreach (string item in _driver.WindowHandles)
+            foreach (string item in WebDriver.WindowHandles)
             {
-                if (_driver.SwitchTo().Window(item).Title.Contains(name))
+                if (WebDriver.SwitchTo().Window(item).Title.Contains(name))
                 {
-                    _driver.SwitchTo().Window(item);
+                    WebDriver.SwitchTo().Window(item);
                     break;
                 }
             }
@@ -213,7 +227,7 @@ namespace Framework.UserActions
 
         protected string GetCurrentWindowTitle()
         {
-            return _driver.Title;
+            return WebDriver.Title;
         }
 
         protected void PressCtrlAndSpace()
@@ -229,7 +243,7 @@ namespace Framework.UserActions
         protected void MoveToElementAndClick(By by)
         {
             IWebElement element = FindElement(by);
-            InvokeChain(() => _builder.MoveToElement(element).Click(element));
+            InvokeChain(() => Builder.MoveToElement(element).Click(element));
         }
 
         protected string GetAttributeValue(By by, string attributeName)
@@ -277,7 +291,7 @@ namespace Framework.UserActions
 
         protected void CloseCurrentWindow()
         {
-            _driver.Close();
+            WebDriver.Close();
         }
 
         protected void Sleep(int sec)
@@ -290,7 +304,7 @@ namespace Framework.UserActions
             ReadOnlyCollection<string> handles;
             try
             {
-                handles = _driver.WindowHandles;
+                handles = WebDriver.WindowHandles;
             }
             catch (Exception)
             {
@@ -301,7 +315,7 @@ namespace Framework.UserActions
 
         protected string GetCurrentHandle()
         {
-            return _driver.CurrentWindowHandle;
+            return WebDriver.CurrentWindowHandle;
         }
 
         protected void WaitAnimation()
@@ -316,6 +330,5 @@ namespace Framework.UserActions
             string v2 = GetJavaScriptExecutionResult("$('#vc').virtualCanvas('getViewport')");
             return v1 == v2;
         }
-
     }
 }

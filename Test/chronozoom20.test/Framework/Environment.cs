@@ -77,9 +77,8 @@ namespace Framework
             if (_isUsingGrid)
             {
                 _capability.IsJavaScriptEnabled = true;
-                _driver = new ScreenShotRemoteWebDriver(new Uri(Configuration.HubUrl), _capability);
+                _driver = new ExtendedRemoteWebDriver(new Uri(Configuration.HubUrl), _capability);
                 _driver.Manage().Window.Maximize();
-
             }
             SetImplicitWait(Configuration.ImplicitWait);
         }

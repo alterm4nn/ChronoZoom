@@ -25,7 +25,7 @@ namespace Framework.Helpers
             Logger.Log("<-");
             Click(By.Id("cosmos_rect"));
             WaitAnimation();
-            Logger.Log("->");
+            //Logger.Log("->");
         }
 
         public void OpenLifePage()

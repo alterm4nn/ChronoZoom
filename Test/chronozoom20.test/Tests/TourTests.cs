@@ -1,6 +1,4 @@
-﻿using Framework;
-using Framework.Helpers;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Tests
 {
@@ -14,14 +12,15 @@ namespace Tests
         [ClassInitialize]
         public static void ClassInitialize(TestContext testContext)
         {
-            NavigationHelper.OpenHomePage();
-            HomePageHelper.CloseWelcomePopup();
+           
         }
 
         [TestInitialize]
         public void TestInitialize()
         {
             BrowserStateManager.RefreshState();
+            NavigationHelper.OpenHomePage();
+            HomePageHelper.CloseWelcomePopup();
         }
 
         [ClassCleanup]
@@ -32,8 +31,8 @@ namespace Tests
         [TestCleanup]
         public void TestCleanup()
         {
-            NavigationHelper.NavigateToCosmos();
             CreateScreenshotsIfTestFail(TestContext);
+            NavigationHelper.NavigateToCosmos();
         }
 
         #endregion 

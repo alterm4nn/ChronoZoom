@@ -12,14 +12,15 @@ namespace Tests
         [ClassInitialize]
         public static void ClassInitialize(TestContext testContext)
         {
-            NavigationHelper.OpenHomePage();
-            HomePageHelper.CloseWelcomePopup();
+            
         }
 
         [TestInitialize]
         public void TestInitialize()
         {
             BrowserStateManager.RefreshState();
+            NavigationHelper.OpenHomePage();
+            HomePageHelper.CloseWelcomePopup();
         }
 
         [ClassCleanup]
@@ -30,8 +31,8 @@ namespace Tests
         [TestCleanup]
         public void TestCleanup()
         {
-            NavigationHelper.NavigateToCosmos();
             CreateScreenshotsIfTestFail(TestContext);
+            NavigationHelper.NavigateToCosmos();
         }
 
         #endregion
@@ -39,6 +40,7 @@ namespace Tests
         [TestMethod]
         public void Test_Eukaryotic_Cells_Description()
         {
+
             string description = HomePageHelper.GetEukaryoticCellsDescription();
             StringAssert.Contains(description, "Eukaryote cells");
         }

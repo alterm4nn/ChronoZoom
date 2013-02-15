@@ -4,9 +4,9 @@ using OpenQA.Selenium.Remote;
 
 namespace Framework.Extensions
 {
-    internal class ScreenShotRemoteWebDriver : RemoteWebDriver, ITakesScreenshot
+    internal class ExtendedRemoteWebDriver : RemoteWebDriver, ITakesScreenshot
     {
-        public ScreenShotRemoteWebDriver(Uri remoteAddress, ICapabilities desiredCapabilities)
+        public ExtendedRemoteWebDriver(Uri remoteAddress, ICapabilities desiredCapabilities)
             : base(remoteAddress, desiredCapabilities)
         {
         }
