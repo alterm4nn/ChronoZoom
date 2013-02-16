@@ -40,8 +40,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.5.0.0\lib\net40\EntityFramework.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -301,12 +305,6 @@
     <Compile Include="Account\Register.aspx.designer.cs">
       <DependentUpon>Register.aspx</DependentUpon>
     </Compile>
-    <Compile Include="ChonozoomEDMtoEntityFactory.cs" />
-    <Compile Include="ChronoZoom.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>ChronoZoom.edmx</DependentUpon>
-    </Compile>
     <Compile Include="Chronozoom.svc.cs">
       <DependentUpon>Chronozoom.svc</DependentUpon>
     </Compile>
@@ -317,9 +315,6 @@
       <DependentUpon>cz.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Data\DataExtensions.cs" />
-    <Compile Include="Data\DataInterfaces.cs" />
-    <Compile Include="EDMInfoLoader.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -331,6 +326,7 @@
     <Compile Include="Site.Master.designer.cs">
       <DependentUpon>Site.Master</DependentUpon>
     </Compile>
+    <Compile Include="Storage.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -371,10 +367,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <EntityDeploy Include="ChronoZoom.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>ChronoZoom.Designer.cs</LastGenOutput>
-    </EntityDeploy>
+    <Content Include="..\Settings.StyleCop">
+      <Link>Settings.StyleCop</Link>
+    </Content>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

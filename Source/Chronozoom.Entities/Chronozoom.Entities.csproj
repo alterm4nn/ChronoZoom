@@ -52,6 +52,9 @@
     <Compile Include="Tour.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\Settings.StyleCop">
+      <Link>Settings.StyleCop</Link>
+    </None>
     <None Include="Entities.cd" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
