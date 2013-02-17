@@ -5,15 +5,25 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System;
+using System.Data.Entity;
+using System.Diagnostics;
+using System.Web.Routing;
+using OuterCurve;
 
 namespace UI
 {
-    using System.Data.Entity;
-
     public class Global : System.Web.HttpApplication
     {
+        public static TraceSource Trace = new TraceSource("Global", SourceLevels.All);
+
+        public static TraceListener SignalRTraceListener = new SignalRTraceListener();
+
         public void Application_Start(object sender, EventArgs e)
         {
+            Trace.Listeners.Add(SignalRTraceListener);
+            RouteTable.Routes.MapHubs();
+
+            Trace.TraceInformation("Application Starting");
             Database.SetInitializer(new Storage.StorageChangeInitializer());
         }
 
@@ -23,18 +33,6 @@ namespace UI
 
         public void Application_Error(object sender, EventArgs e)
         {
-        }
-
-        public void Session_Start(object sender, EventArgs e)
-        {
-        }
-
-        public void Session_End(object sender, EventArgs e)
-        {
-            // Code that runs when a session ends. 
-            // Note: The Session_End event is raised only when the sessionstate mode
-            // is set to InProc in the Web.config file. If session mode is set to StateServer 
-            // or SQLServer, the event is not raised.
         }
     }
 }
