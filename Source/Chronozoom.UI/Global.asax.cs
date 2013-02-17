@@ -1,47 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Security;
-using System.Web.SessionState;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright company="Outercurve Foundation">
+//   Copyright (c) 2013, The Outercurve Foundation
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
+using System;
+using System.Data.Entity;
+using System.Diagnostics;
+using System.Web.Routing;
+using OuterCurve;
 
 namespace UI
 {
     public class Global : System.Web.HttpApplication
     {
+        public static TraceSource Trace = new TraceSource("Global", SourceLevels.All);
 
-        void Application_Start(object sender, EventArgs e)
+        public static TraceListener SignalRTraceListener = new SignalRTraceListener();
+
+        public void Application_Start(object sender, EventArgs e)
         {
-            // Code that runs on application startup
+            Trace.Listeners.Add(SignalRTraceListener);
+            RouteTable.Routes.MapHubs();
 
+            Trace.TraceInformation("Application Starting");
+            Database.SetInitializer(new Storage.StorageChangeInitializer());
         }
 
-        void Application_End(object sender, EventArgs e)
+        public void Application_End(object sender, EventArgs e)
         {
-            //  Code that runs on application shutdown
-
         }
 
-        void Application_Error(object sender, EventArgs e)
+        public void Application_Error(object sender, EventArgs e)
         {
-            // Code that runs when an unhandled error occurs
-
         }
-
-        void Session_Start(object sender, EventArgs e)
-        {
-            // Code that runs when a new session is started
-
-        }
-
-        void Session_End(object sender, EventArgs e)
-        {
-            // Code that runs when a session ends. 
-            // Note: The Session_End event is raised only when the sessionstate mode
-            // is set to InProc in the Web.config file. If session mode is set to StateServer 
-            // or SQLServer, the event is not raised.
-
-        }
-
     }
 }

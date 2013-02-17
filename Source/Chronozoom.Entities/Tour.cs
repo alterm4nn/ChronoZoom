@@ -1,7 +1,11 @@
-﻿using System;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright company="Outercurve Foundation">
+//   Copyright (c) 2013, The Outercurve Foundation
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Runtime.Serialization;
 
 namespace Chronozoom.Entities
@@ -28,18 +32,6 @@ namespace Chronozoom.Entities
         public int? Sequence { get; set; }
 
         [DataMember]
-        public List<BookMark> bookmarks;
-
-        public Tour(Guid id, string name, int uniqueID, string audioBlobUrl, string category, int? sequence)
-        {
-            ID = id;
-            Name = name;
-            UniqueID = uniqueID;
-            AudioBlobUrl = audioBlobUrl;
-            Category = category;
-            Sequence = sequence;
-
-            bookmarks = new List<BookMark>();
-        }
+        public virtual List<BookMark> bookmarks { get; set; }
     }
 }
