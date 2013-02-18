@@ -1,4 +1,8 @@
 ﻿
+
+
+
+
 CREATE PROCEDURE [dbo].[GenerateExhibitContentItemInfoVersion]
 @VersionNumber int
 AS 
@@ -7,7 +11,7 @@ INSERT INTO dbo.Staging_ExhibitContentItemInfo
 SELECT *
 FROM (
 SELECT DISTINCT ContentItem.ID,
-		Exhibit.ID as ExhibitID,
+		ExhibitContentItem.ExhibitID as ExhibitID,
 		ContentItem.Title,
 		ContentItem.Caption,
 		Threshold.Threshold,
@@ -25,11 +29,30 @@ SELECT DISTINCT ContentItem.ID,
 		ContentItem.CurrVersion,
 		CASE 
 			WHEN 
-			--(Timeline.IsDeleted = 1) OR
-			--	(Timeline.IsVisible = 0) OR
-			--	(TimelineExhibit.IsDeleted = 1) OR
-				(Exhibit.IsDeleted = 1) OR
-				(Exhibit.IsVisible = 0) OR
+				( SELECT	CASE 
+								WHEN	(MIN(CAST(COALESCE(Timeline.IsDeleted, 0) as int)) = 0) AND
+										(MAX(CAST(COALESCE(Timeline.IsVisible, 1) as int)) = 1) AND
+										(MIN(CAST(COALESCE(TimelineExhibit.IsDeleted, 0) as int)) = 0) AND
+										(MIN(CAST(COALESCE(Exhibit.IsDeleted, 0) as int)) = 0) AND
+										(MAX(CAST(COALESCE(Exhibit.IsVisible, 1) as int)) = 1) THEN 1
+								ELSE 0 END 
+					FROM  Version_TimelineExhibit as TimelineExhibit
+					INNER JOIN Version_Exhibit as Exhibit ON Exhibit.ID = ExhibitContentItem.ExhibitID
+							AND	Exhibit.CurrVersion = (	SELECT MAX(CurrVersion) 
+													FROM Version_Exhibit 
+													WHERE Version_Exhibit.CurrVersion <= @VersionNumber
+													AND Version_Exhibit.ID = ExhibitContentItem.ExhibitID)
+					INNER JOIN Version_Timeline as Timeline on Timeline.ID = TimelineExhibit.TimelineID
+							AND	Timeline.CurrVersion = (	SELECT MAX(CurrVersion) 
+													FROM Version_Timeline 
+													WHERE Version_Timeline.CurrVersion <= @VersionNumber
+													AND Version_Timeline.ID = TimelineExhibit.TimelineID)
+					WHERE TimelineExhibit.ExhibitID = ExhibitContentItem.ExhibitID
+					AND	TimelineExhibit.CurrVersion = (	SELECT MAX(CurrVersion) 
+											FROM Version_TimelineExhibit 
+											WHERE Version_TimelineExhibit.CurrVersion <= @VersionNumber
+											AND Version_TimelineExhibit.ExhibitID = TimelineExhibit.ExhibitID
+											AND Version_TimelineExhibit.TimelineID = TimelineExhibit.TimelineID)) = 0 OR
 				(ExhibitContentItem.IsDeleted = 1) OR
 				(ContentItem.IsDeleted = 1) OR
 				(ContentItem.IsVisible = 0) OR
@@ -52,21 +75,6 @@ INNER JOIN Version_MediaType as MediaType ON MediaType.ID = ContentItem.MediaTyp
 											FROM MediaType 
 											WHERE MediaType.CurrVersion <= @VersionNumber
 											AND MediaType.ID = ContentItem.MediaTypeID)
---INNER JOIN Version_TimelineExhibit as TimelineExhibit ON TimelineExhibit.ExhibitID = ExhibitContentItem.ExhibitID
---			AND	TimelineExhibit.CurrVersion = (	SELECT MAX(CurrVersion) 
---											FROM Version_TimelineExhibit 
---											WHERE Version_TimelineExhibit.CurrVersion <= @VersionNumber
---											AND Version_TimelineExhibit.ExhibitID = ExhibitContentItem.ExhibitID)
-INNER JOIN Version_Exhibit as Exhibit ON Exhibit.ID = ExhibitContentItem.ExhibitID
-			AND	Exhibit.CurrVersion = (	SELECT MAX(CurrVersion) 
-											FROM Version_Exhibit 
-											WHERE Version_Exhibit.CurrVersion <= @VersionNumber
-											AND Version_Exhibit.ID = ExhibitContentItem.ExhibitID)
---INNER JOIN Version_Timeline as Timeline on Timeline.ID = TimelineExhibit.TimelineID
---			AND	Timeline.CurrVersion = (	SELECT MAX(CurrVersion) 
---											FROM Version_Timeline 
---											WHERE Version_Timeline.CurrVersion <= @VersionNumber
---											AND Version_Timeline.ID = TimelineExhibit.TimelineID)
 INNER JOIN Version_Regime as Regime ON Regime.ID = ContentItem.RegimeID
 			AND	Regime.CurrVersion = (	SELECT MAX(CurrVersion) 
 											FROM Version_Regime 
