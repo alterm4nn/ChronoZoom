@@ -8,6 +8,7 @@ using System;
 using System.Data.Entity;
 using System.Diagnostics;
 using System.Web.Routing;
+using Chronozoom.Entities;
 using OuterCurve;
 
 namespace UI
@@ -21,10 +22,11 @@ namespace UI
         public void Application_Start(object sender, EventArgs e)
         {
             Trace.Listeners.Add(SignalRTraceListener);
+            Storage.Trace.Listeners.Add(SignalRTraceListener);
+
             RouteTable.Routes.MapHubs();
 
             Trace.TraceInformation("Application Starting");
-            Database.SetInitializer(new Storage.StorageChangeInitializer());
         }
 
         public void Application_End(object sender, EventArgs e)
