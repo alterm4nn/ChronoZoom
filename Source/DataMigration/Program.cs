@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -28,7 +30,7 @@ namespace DataMigration
         private static void InitializeDbContext()
         {
             dbInst = new Storage();
-            dbInst.Database.Connection.ConnectionString = "Data Source=tcp:u0l7hb80xg.database.windows.net,1433;Initial Catalog=cztest2;User Id=cz-wds-svenkatdb@u0l7hb80xg;Password=Yucky!@#;";
+            //dbInst.Database.Connection.ConnectionString = "Data Source=tcp:u0l7hb80xg.database.windows.net,1433;Initial Catalog=cztest2;User Id=cz-wds-svenkatdb@u0l7hb80xg;Password=Yucky!@#;";
         }
 
         static void Main(string[] args)
@@ -274,10 +276,14 @@ namespace DataMigration
         {
             WebClient myWebClient = new WebClient();
             Stream data = myWebClient.OpenRead("http://www.chronozoomproject.org/Chronozoom.svc/get");
-            StreamReader reader = new StreamReader(data);
-            string s = reader.ReadToEnd();
-            JObject jobj = JObject.Parse(s);
-            ParseJsonData(jobj);
+            var timelines = new DataContractJsonSerializer(typeof(BaseJsonResult<IEnumerable<Timeline>>)).ReadObject(data);
+        }
+
+        [DataContract]
+        public class BaseJsonResult<T>
+        {
+            [DataMember]
+            public T d;
         }
     }
 }
