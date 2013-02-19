@@ -5,6 +5,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
 namespace Chronozoom.Entities
@@ -38,7 +39,9 @@ namespace Chronozoom.Entities
         
         [DataMember]
         public string MediaType { get; set; }
-        
+
+        // TODO: Fix up this string Uri
+        [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "To be fixed when entities are revisited")]
         [DataMember]
         public string Uri { get; set; }
         

@@ -5,7 +5,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System;
-using System.Data.Entity;
 using System.Diagnostics;
 using System.Web.Routing;
 using Chronozoom.Entities;
@@ -15,12 +14,13 @@ namespace UI
 {
     public class Global : System.Web.HttpApplication
     {
-        public static TraceSource Trace = new TraceSource("Global", SourceLevels.All);
+        internal static readonly TraceListener SignalRTraceListener = new SignalRTraceListener();
 
-        public static TraceListener SignalRTraceListener = new SignalRTraceListener();
+        internal static TraceSource Trace { get; set; }
 
         public void Application_Start(object sender, EventArgs e)
         {
+            Trace = new TraceSource("Global", SourceLevels.All);
             Trace.Listeners.Add(SignalRTraceListener);
             Storage.Trace.Listeners.Add(SignalRTraceListener);
 
