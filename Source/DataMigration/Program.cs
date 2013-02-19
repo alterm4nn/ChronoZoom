@@ -141,7 +141,7 @@ namespace DataMigration
             {
                 // not using time unit here as it is built into date if the date is in CE
                 //If the date is not in CE, then this object is not of type JObject - it is of type JValue in the JSON and is handled in the catch block
-                c.Date = getDateTimeFromDateTimeOffset((JObject)jobj["Date"]); 
+                //c.Date = getDateTimeFromDateTimeOffset((JObject)jobj["Date"]); 
                 c.Year = convertToDecimalYear(getDateTimeFromDateTimeOffset((JObject)jobj["Date"]));
             }
             catch (InvalidCastException e)
@@ -276,7 +276,19 @@ namespace DataMigration
         {
             WebClient myWebClient = new WebClient();
             Stream data = myWebClient.OpenRead("http://www.chronozoomproject.org/Chronozoom.svc/get");
-            var timelines = new DataContractJsonSerializer(typeof(BaseJsonResult<IEnumerable<Timeline>>)).ReadObject(data);
+            var bjr = new DataContractJsonSerializer(typeof(BaseJsonResult<IEnumerable<Timeline>>)).ReadObject(data) as BaseJsonResult<IEnumerable<Timeline>>;
+
+            foreach (var timeline in bjr.d)
+            {
+                timeline.ChildTimelines.Clear();
+
+                // First attempt at removing primary key duplications, not working because we have some form of dupe in the child timelines tree
+                if (dbInst.Timelines.Find(timeline.ID) == null)
+                {
+                    dbInst.Timelines.Add(timeline);
+                }
+            }
+            dbInst.SaveChanges();
         }
 
         [DataContract]

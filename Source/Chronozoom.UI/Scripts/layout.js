@@ -391,6 +391,7 @@ function Convert(parent, timeline) {
         var date; // building a date to be shown in a title of the content item to the left of the title text.
 
         var contentItems = new Array();
+        if (!childInfodot.ContentItems) childInfodot.ContentItems = [];
         childInfodot.ContentItems.forEach(function (contentItemProt) {
             var mediaType = contentItemProt.MediaType;
             if (mediaType == "Picture")
