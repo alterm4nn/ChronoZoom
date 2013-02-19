@@ -30,7 +30,6 @@ namespace DataMigration
         private static void InitializeDbContext()
         {
             dbInst = new Storage();
-            //dbInst.Database.Connection.ConnectionString = "Data Source=tcp:u0l7hb80xg.database.windows.net,1433;Initial Catalog=cztest2;User Id=cz-wds-svenkatdb@u0l7hb80xg;Password=Yucky!@#;";
         }
 
         static void Main(string[] args)
@@ -125,7 +124,6 @@ namespace DataMigration
             DateTimeOffset dtOffset = new DateTimeOffset(DateTime.Parse(datetime), new TimeSpan(0, 0, offsetmins, 0));
             return dtOffset.DateTime;
         }
-
 
         private static ContentItem ParseContentItem(JObject jobj)
         {
@@ -264,31 +262,37 @@ namespace DataMigration
             return retObject;
         }
 
-        private static void ParseJsonData(JObject jobj)
-        {
-            JArray parseArray = (JArray)jobj["d"];
-            Object alldataObj = ParseJArray(parseArray);
-            dbInst.SaveChanges();
-            Console.WriteLine("Parsed Successfully \n");
-        }
-
         public static void Migrate()
         {
             WebClient myWebClient = new WebClient();
-            Stream data = myWebClient.OpenRead("http://www.chronozoomproject.org/Chronozoom.svc/get");
-            var bjr = new DataContractJsonSerializer(typeof(BaseJsonResult<IEnumerable<Timeline>>)).ReadObject(data) as BaseJsonResult<IEnumerable<Timeline>>;
 
-            foreach (var timeline in bjr.d)
+            Stream dataTimelines = myWebClient.OpenRead("http://www.chronozoomproject.org/Chronozoom.svc/get");
+            var bjrTimelines = new DataContractJsonSerializer(typeof(BaseJsonResult<IEnumerable<Timeline>>)).ReadObject(dataTimelines) as BaseJsonResult<IEnumerable<Timeline>>;
+
+            //foreach (var timeline in bjrTimelines.d.First())
+            var timeline = bjrTimelines.d.Skip(1).First();
             {
-                timeline.ChildTimelines.Clear();
-
-                // First attempt at removing primary key duplications, not working because we have some form of dupe in the child timelines tree
-                if (dbInst.Timelines.Find(timeline.ID) == null)
-                {
-                    dbInst.Timelines.Add(timeline);
-                }
+                dbInst.Timelines.Add(timeline);
             }
+
+            Stream dataTours = myWebClient.OpenRead("http://www.chronozoomproject.org/Chronozoom.svc/getTours");
+            var bjrTours = new DataContractJsonSerializer(typeof(BaseJsonResult<IEnumerable<Tour>>)).ReadObject(dataTours) as BaseJsonResult<IEnumerable<Tour>>;
+
+            foreach (var tour in bjrTours.d)
+            {
+                dbInst.Tours.Add(tour);
+            }
+
+            Stream dataThresholds = myWebClient.OpenRead("http://www.chronozoomproject.org/Chronozoom.svc/getThresholds");
+            var bjrThresholds = new DataContractJsonSerializer(typeof(BaseJsonResult<IEnumerable<Threshold>>)).ReadObject(dataThresholds) as BaseJsonResult<IEnumerable<Threshold>>;
+
+            foreach (var threshold in bjrThresholds.d)
+            {
+                dbInst.Thresholds.Add(threshold);
+            }
+
             dbInst.SaveChanges();
+            Console.WriteLine("Parsed Successfully \n");
         }
 
         [DataContract]
