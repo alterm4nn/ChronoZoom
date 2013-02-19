@@ -171,10 +171,19 @@ namespace DataMigration
             e.Year = convertToDecimalYear((int?)jobj["Day"], (int?)jobj["Month"], (Decimal?)jobj["Year"], (string)jobj["TimeUnit"]);
             e.UniqueID = (int)jobj["UniqueID"];
             e.Sequence = (int?)jobj["Sequence"];
+
             JArray contentItems = (JArray)jobj["ContentItems"];
-            e.ContentItems = (List<ContentItem>)ParseJArray(contentItems);
+            foreach (var contentItem in (List<ContentItem>)ParseJArray(contentItems))
+            {
+                e.ContentItems.Add(contentItem);
+            }
+
             JArray references = (JArray)jobj["References"];
-            e.References = (List<Reference>)ParseJArray(references);
+            foreach (var reference in (List<Reference>)ParseJArray(references))
+            {
+                e.References.Add(reference);
+            }
+
             // Insert into db here
             dbInst.Exhibits.Add(e);
             return e;
@@ -198,10 +207,19 @@ namespace DataMigration
             t.UniqueID = (int)jobj["UniqueID"];
             t.Sequence = (int?)jobj["Sequence"];
             t.Height = (Decimal?)jobj["Height"];
+
             JArray childTimesLines = (JArray)jobj["ChildTimelines"];
-            t.ChildTimelines = (List<Timeline>)ParseJArray(childTimesLines);
+            foreach (var childTimeline in (List<Timeline>) ParseJArray(childTimesLines))
+            {
+                t.ChildTimelines.Add(childTimeline);
+            }
+
             JArray exhibitsArray = (JArray)jobj["Exhibits"];
-            t.Exhibits = (List<Exhibit>)ParseJArray(exhibitsArray);
+            foreach (var exhibit in (List<Exhibit>) ParseJArray(exhibitsArray))
+            {
+                t.Exhibits.Add(exhibit);
+            }
+
             // Insert into db here
             dbInst.Timelines.Add(t);
             return t;
@@ -258,10 +276,8 @@ namespace DataMigration
             Stream data = myWebClient.OpenRead("http://www.chronozoomproject.org/Chronozoom.svc/get");
             StreamReader reader = new StreamReader(data);
             string s = reader.ReadToEnd();
-
             JObject jobj = JObject.Parse(s);
             ParseJsonData(jobj);
-
         }
     }
 }
