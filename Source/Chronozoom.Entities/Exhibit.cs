@@ -5,7 +5,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
 
 namespace Chronozoom.Entities
@@ -44,9 +44,9 @@ namespace Chronozoom.Entities
         public int? Sequence { get; set; }
 
         [DataMember]
-        public virtual List<ContentItem> ContentItems { get; set; }
+        public virtual Collection<ContentItem> ContentItems { get; private set; }
 
         [DataMember]
-        public virtual List<Reference> References { get; set; }
+        public virtual Collection<Reference> References { get; private set; }
     }
 }
