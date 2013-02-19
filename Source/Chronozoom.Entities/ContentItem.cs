@@ -5,6 +5,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
@@ -13,6 +14,7 @@ namespace Chronozoom.Entities
     [DataContract]
     public class ContentItem
     {
+        [Key]
         [DataMember]
         public Guid ID { get; set; }
         
