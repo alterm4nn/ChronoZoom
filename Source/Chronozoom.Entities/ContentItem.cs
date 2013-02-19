@@ -32,7 +32,7 @@ namespace Chronozoom.Entities
         public string TimeUnit { get; set; }
         
         [DataMember]
-        public DateTime? Date { get; set; }
+        public DateTimeOffset? Date { get; set; }
         
         [DataMember]
         public decimal? Year { get; set; }
