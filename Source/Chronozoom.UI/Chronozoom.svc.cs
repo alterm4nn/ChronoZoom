@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.Caching;
 using System.ServiceModel;
@@ -18,50 +20,54 @@ using Chronozoom.Entities;
 
 namespace UI
 {
+    [SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly", Justification = "No unmanaged handles")]
     [ServiceContract(Namespace = "")]
     [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
     public class ChronozoomSVC : IDisposable
     {
-        private readonly TraceSource _trace = new TraceSource("Service", SourceLevels.All) { Listeners = { Global.SignalRTraceListener }};
-        private readonly Storage _storage = new Storage();
         private static readonly MemoryCache Cache = new MemoryCache("Storage");
+
+        private static readonly TraceSource Trace = new TraceSource("Service", SourceLevels.All) { Listeners = { Global.SignalRTraceListener } };
+        private readonly Storage _storage = new Storage();
 
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public List<Timeline> Get()
+        public IEnumerable<Timeline> Get()
         {
-            _trace.TraceInformation("Get Timelines");
+            Trace.TraceInformation("Get Timelines");
 
             lock (Cache)
             {
                 if (!Cache.Contains("Timelines"))
                 {
-                    _trace.TraceInformation("Get Timelines Cache Miss");
+                    Trace.TraceInformation("Get Timelines Cache Miss");
                     var timelines = _storage.Timelines.ToList();
                     foreach (var t in timelines)
                     {
                         _storage.Entry(t).Collection(x => x.Exhibits).Load();
                         _storage.Entry(t).Collection(x => x.ChildTimelines).Load();
                     }
-                    Cache.Add("Timelines", timelines, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"])));
+
+                    Cache.Add("Timelines", timelines, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
                 }
 
                 return (List<Timeline>)Cache["Timelines"];
             }
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public List<Threshold> GetThresholds()
+        public IEnumerable<Threshold> GetThresholds()
         {
-            _trace.TraceInformation("Get Thresholds");
+            Trace.TraceInformation("Get Thresholds");
 
             lock (Cache)
             {
                 if (!Cache.Contains("Thresholds"))
                 {
-                    _trace.TraceInformation("Get Thresholds Cache Miss");
-                    Cache.Add("Thresholds", _storage.Thresholds.ToList(), DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"])));
+                    Trace.TraceInformation("Get Thresholds Cache Miss");
+                    Cache.Add("Thresholds", _storage.Thresholds.ToList(), DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
                 }
 
                 return (List<Threshold>)Cache["Thresholds"];
@@ -70,56 +76,66 @@ namespace UI
 
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public List<SearchResult> Search(string s)
+        public IEnumerable<SearchResult> Search(string searchTerm)
         {
-            s = s.ToLower();
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return null;
+            }
 
-            var timelines = _storage.Timelines.Where(_ => _.Title.Contains(s)).ToList();
-            var searchResults = timelines.Select(timeline => new SearchResult(timeline.ID, timeline.Title, ObjectTypeEnum.Timeline, timeline.UniqueID)).ToList();
+            searchTerm = searchTerm.ToUpperInvariant();
 
-            var exhibits = _storage.Exhibits.Where(_ => _.Title.Contains(s)).ToList();
-            searchResults.AddRange(exhibits.Select(exhibit => new SearchResult(exhibit.ID, exhibit.Title, ObjectTypeEnum.Exhibit, exhibit.UniqueID)));
+            var timelines = _storage.Timelines.Where(_ => _.Title.ToUpperInvariant().Contains(searchTerm)).ToList();
+            var searchResults = timelines.Select(timeline => new SearchResult { ID = timeline.ID, Title = timeline.Title, ObjectType = ObjectTypeEnum.Timeline, UniqueID = timeline.UniqueID }).ToList();
 
-            var contentItems = _storage.ContentItems.Where(_ => _.Title.Contains(s) || _.Caption.Contains(s)).ToList();
-            searchResults.AddRange(contentItems.Select(contentItem => new SearchResult(contentItem.ID, contentItem.Title, ObjectTypeEnum.ContentItem, contentItem.UniqueID)));
+            var exhibits = _storage.Exhibits.Where(_ => _.Title.ToUpperInvariant().Contains(searchTerm)).ToList();
+            searchResults.AddRange(exhibits.Select(exhibit => new SearchResult { ID = exhibit.ID, Title = exhibit.Title, ObjectType = ObjectTypeEnum.Exhibit, UniqueID = exhibit.UniqueID }));
+
+            var contentItems = _storage.ContentItems.Where(_ => _.Title.ToUpperInvariant().Contains(searchTerm) || _.Caption.ToUpperInvariant().Contains(searchTerm)).ToList();
+            searchResults.AddRange(contentItems.Select(contentItem => new SearchResult { ID = contentItem.ID, Title = contentItem.Title, ObjectType = ObjectTypeEnum.ContentItem, UniqueID = contentItem.UniqueID }));
 
             return searchResults;
         }
 
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public List<Reference> GetBibliography(string exhibitId)
+        public IEnumerable<Reference> GetBibliography(string exhibitId)
         {
             Guid guid;
             return !Guid.TryParse(exhibitId, out guid) ? null : _storage.Exhibits.First(_ => _.ID == guid).References.ToList();
         }
 
-        [OperationContract]
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")][
+        OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public List<Tour> GetTours()
+        public IEnumerable<Tour> GetTours()
         {
-            _trace.TraceInformation("Get Tours");
+            Trace.TraceInformation("Get Tours");
 
             lock (Cache)
             {
                 if (!Cache.Contains("Tours"))
                 {
-                    _trace.TraceInformation("Get Tours Cache Miss");
+                    Trace.TraceInformation("Get Tours Cache Miss");
                     var tours = _storage.Tours.ToList();
                     foreach (var t in tours)
                     {
                         _storage.Entry(t).Collection(x => x.bookmarks).Load();
                     }
-                    Cache.Add("Tours", tours, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"])));
+
+                    Cache.Add("Tours", tours, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
                 }
 
                 return (List<Tour>)Cache["Tours"];
             }
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly", Justification = "No unmanaged handles")]
         public void Dispose()
         {
             _storage.Dispose();
+
+            GC.SuppressFinalize(this);
         }
     }
 }

@@ -5,7 +5,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
 namespace Chronozoom.Entities
@@ -22,6 +23,8 @@ namespace Chronozoom.Entities
         [DataMember]
         public int UniqueID { get; set; }
 
+        // TODO: Fix up this string Uri
+        [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "To be fixed when entities are revisited")]
         [DataMember]
         public string AudioBlobUrl { get; set; }
 
@@ -32,6 +35,6 @@ namespace Chronozoom.Entities
         public int? Sequence { get; set; }
 
         [DataMember]
-        public virtual List<BookMark> bookmarks { get; set; }
+        public virtual Collection<BookMark> bookmarks { get; private set; }
     }
 }

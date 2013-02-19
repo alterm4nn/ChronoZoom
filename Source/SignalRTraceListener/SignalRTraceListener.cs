@@ -5,6 +5,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System.Diagnostics;
+using System.Globalization;
+
 using Microsoft.AspNet.SignalR;
 
 namespace OuterCurve
@@ -45,7 +47,7 @@ namespace OuterCurve
             // ReSharper restore HeuristicUnreachableCode
             else
             {
-                _traceLog.Clients.All.traceEvent(source, eventType.ToString(), id, string.Format(format, args));
+                _traceLog.Clients.All.traceEvent(source, eventType.ToString(), id, string.Format(CultureInfo.InvariantCulture, format, args));
             }
         }
 

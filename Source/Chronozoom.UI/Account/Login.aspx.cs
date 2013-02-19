@@ -1,9 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright company="Outercurve Foundation">
+//   Copyright (c) 2013, The Outercurve Foundation
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
+using System;
 using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
 
 namespace UI.Account
 {
