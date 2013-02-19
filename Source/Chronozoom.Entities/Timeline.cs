@@ -1,7 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright company="Outercurve Foundation">
+//   Copyright (c) 2013, The Outercurve Foundation
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
+using System;
+using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
 
 namespace Chronozoom.Entities
@@ -11,60 +15,53 @@ namespace Chronozoom.Entities
     {
         [DataMember]
         public Guid ID { get; set; }
+
         [DataMember]
         public string Title { get; set; }
+
         [DataMember]
         public string Threshold { get; set; }
+
         [DataMember]
         public string Regime { get; set; }
+
         [DataMember]
         public string FromTimeUnit { get; set; }
+
         [DataMember]
         public int? FromDay { get; set; }
+
         [DataMember]
         public int? FromMonth { get; set; }
+
         [DataMember]
-        public Decimal? FromYear { get; set; }
+        public decimal? FromYear { get; set; }
+
         [DataMember]
         public string ToTimeUnit { get; set; }
+
         [DataMember]
         public int? ToDay { get; set; }
+
         [DataMember]
         public int? ToMonth { get; set; }
+
         [DataMember]
-        public Decimal? ToYear { get; set; }
+        public decimal? ToYear { get; set; }
+        
         [DataMember]
         public int UniqueID { get; set; }
+        
         [DataMember]
         public int? Sequence { get; set; }
+        
         [DataMember]
         public decimal? Height { get; set; }
 
         [DataMember]
-        public List<Timeline> ChildTimelines;
+        public virtual Collection<Timeline> ChildTimelines { get; private set; }
+
         [DataMember]
-        public List<Exhibit> Exhibits;
-
-        public Timeline(Guid id, string title, string threshold, string regime, string fromTimeUnit, int? fromDay, int? fromMonth, Decimal? fromYear, string toTimeUnit, int? toDay, int? toMonth, Decimal? toYear, int uniqueID, int? sequence, decimal? height)
-        {
-            ID = id;
-            Title = title;
-            Threshold = threshold;
-            Regime = regime;
-            FromTimeUnit = fromTimeUnit;
-            FromDay = fromDay;
-            FromMonth = fromMonth;
-            FromYear = fromYear;
-            ToTimeUnit = toTimeUnit;
-            ToDay = toDay;
-            ToMonth = toMonth;
-            ToYear = toYear;
-            UniqueID = uniqueID;
-            Sequence = sequence;
-            Height = height;
-
-            ChildTimelines = new List<Timeline>();
-            Exhibits = new List<Exhibit>();
-        }
+        public virtual Collection<Exhibit> Exhibits { get; private set; }
     }
 }

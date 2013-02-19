@@ -1,7 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright company="Outercurve Foundation">
+//   Copyright (c) 2013, The Outercurve Foundation
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
+using System;
 using System.Runtime.Serialization;
 
 namespace Chronozoom.Entities
@@ -35,18 +38,5 @@ namespace Chronozoom.Entities
 
         [DataMember]
         public string Source { get; set; }
-
-        public Reference(Guid id, string title, string authors, string bookChapters, string citationType, string pageNumbers, string publication, string publicationDates, string source)
-        {
-            ID = id;
-            Title = title;
-            Authors = authors;
-            BookChapters = bookChapters;
-            CitationType = citationType;
-            PageNumbers = pageNumbers;
-            Publication = publication;
-            PublicationDates = publicationDates;
-            Source = source;
-        }
     }
 }

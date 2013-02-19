@@ -8,6 +8,10 @@
     [IsDeleted]   BIT              NULL,
     [CurrVersion] INT              NULL,
     CONSTRAINT [PK_Role] PRIMARY KEY CLUSTERED ([ID] ASC),
-    FOREIGN KEY ([CurrVersion]) REFERENCES [dbo].[CZVersion] ([VersionNumber]) ON DELETE NO ACTION ON UPDATE NO ACTION
+    FOREIGN KEY ([CurrVersion]) REFERENCES [dbo].[CZVersion] ([VersionNumber]),
+    CONSTRAINT [FK_Role_User] FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[User] ([ID]),
+    CONSTRAINT [FK_Role_User1] FOREIGN KEY ([ModifiedBy]) REFERENCES [dbo].[User] ([ID])
 );
+
+
 

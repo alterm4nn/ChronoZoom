@@ -1,232 +1,141 @@
-﻿using System;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright company="Outercurve Foundation">
+//   Copyright (c) 2013, The Outercurve Foundation
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
-using System.Runtime.Serialization;
+using System.Runtime.Caching;
 using System.ServiceModel;
 using System.ServiceModel.Activation;
 using System.ServiceModel.Web;
-using System.Text;
+
 using Chronozoom.Entities;
-using System.Web;
-using System.Net;
 
 namespace UI
 {
+    [SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly", Justification = "No unmanaged handles")]
     [ServiceContract(Namespace = "")]
     [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
-    public class ChronozoomSVC
+    public class ChronozoomSVC : IDisposable
     {
+        private static readonly MemoryCache Cache = new MemoryCache("Storage");
+
+        private static readonly TraceSource Trace = new TraceSource("Service", SourceLevels.All) { Listeners = { Global.SignalRTraceListener } };
+        private readonly Storage _storage = new Storage();
+
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public List<Chronozoom.Entities.Timeline> Get()
+        public IEnumerable<Timeline> Get()
         {
-            List<Chronozoom.Entities.Timeline> rootLines =
-                EDMTimelineBuilder.BuildTimeLine(DataEnvironmentAccess.AnInstance);
+            Trace.TraceInformation("Get Timelines");
 
-            return rootLines;
+            lock (Cache)
+            {
+                if (!Cache.Contains("Timelines"))
+                {
+                    Trace.TraceInformation("Get Timelines Cache Miss");
+                    var timelines = _storage.Timelines.ToList();
+                    foreach (var t in timelines)
+                    {
+                        _storage.Entry(t).Collection(x => x.Exhibits).Load();
+                        _storage.Entry(t).Collection(x => x.ChildTimelines).Load();
+                    }
+
+                    Cache.Add("Timelines", timelines, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
+                }
+
+                return (List<Timeline>)Cache["Timelines"];
+            }
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        public IEnumerable<Threshold> GetThresholds()
+        {
+            Trace.TraceInformation("Get Thresholds");
+
+            lock (Cache)
+            {
+                if (!Cache.Contains("Thresholds"))
+                {
+                    Trace.TraceInformation("Get Thresholds Cache Miss");
+                    Cache.Add("Thresholds", _storage.Thresholds.ToList(), DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
+                }
+
+                return (List<Threshold>)Cache["Thresholds"];
+            }
         }
 
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public List<Chronozoom.Entities.Threshold> GetThresholds()
+        public IEnumerable<SearchResult> Search(string searchTerm)
         {
-            var Thresholds = DataEnvironmentAccess.AnInstance.GetIThresholdView();
-            var tholds = new List<Chronozoom.Entities.Threshold>();
-            foreach (var threshold in Thresholds)
+            if (string.IsNullOrWhiteSpace(searchTerm))
             {
-                try
-                {
-                    Chronozoom.Entities.Threshold th = new Chronozoom.Entities.Threshold(threshold.Threshold,
-                        threshold.Timeunit,
-                        threshold.ThresholdDate.HasValue == true ? threshold.ThresholdDate.Value.Day : 0,
-                        threshold.ThresholdDate.HasValue == true ? threshold.ThresholdDate.Value.Month : 0,
-                        threshold.ThresholdYear,
-                        threshold.ShortDescription,
-                        (!string.IsNullOrEmpty(threshold.URL) && threshold.URL.IndexOf('#') >0)  ? threshold.URL.Substring(threshold.URL.IndexOf('#')+1): string.Empty
-                        );
-                    tholds.Add(th);
-                }
-                catch
-                {
-                    //error
-                }
-            }
-            return tholds;
-        }
-
-
-        [OperationContract]
-        [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public List<Chronozoom.Entities.SearchResult> Search(string s)
-        {
-            s = s.ToLower();
-
-            var searchResults = new List<Chronozoom.Entities.SearchResult>();
-            var timelines = DataEnvironmentAccess.AnInstance.GetITimelineInfo(s);
-
-            foreach (var timeline in timelines)
-            {
-                Chronozoom.Entities.SearchResult sr = new Chronozoom.Entities.SearchResult(timeline.ID,
-                    timeline.Title,
-                    ObjectTypeEnum.Timeline,
-                    timeline.UniqueID
-                    );
-                searchResults.Add(sr);
+                return null;
             }
 
-            var exhibits = DataEnvironmentAccess.AnInstance.GetIExhibitView(s);
-            foreach (var exhibit in exhibits)
-            {
-                Chronozoom.Entities.SearchResult sr = new Chronozoom.Entities.SearchResult(exhibit.ID,
-                    exhibit.Title,
-                    ObjectTypeEnum.Exhibit,
-                    exhibit.UniqueID
-                    );
-                searchResults.Add(sr);
-            }
+            searchTerm = searchTerm.ToUpperInvariant();
 
+            var timelines = _storage.Timelines.Where(_ => _.Title.ToUpperInvariant().Contains(searchTerm)).ToList();
+            var searchResults = timelines.Select(timeline => new SearchResult { ID = timeline.ID, Title = timeline.Title, ObjectType = ObjectTypeEnum.Timeline, UniqueID = timeline.UniqueID }).ToList();
 
-            var contentItems = DataEnvironmentAccess.AnInstance.GetIExhibitContentItemInfo(s);
-            foreach (var contentItem in contentItems)
-            {
-                Chronozoom.Entities.SearchResult sr = new Chronozoom.Entities.SearchResult(contentItem.ID,
-                    contentItem.Title,
-                    ObjectTypeEnum.ContentItem,
-                    contentItem.UniqueID
-                    );
-                searchResults.Add(sr);
-            }
+            var exhibits = _storage.Exhibits.Where(_ => _.Title.ToUpperInvariant().Contains(searchTerm)).ToList();
+            searchResults.AddRange(exhibits.Select(exhibit => new SearchResult { ID = exhibit.ID, Title = exhibit.Title, ObjectType = ObjectTypeEnum.Exhibit, UniqueID = exhibit.UniqueID }));
+
+            var contentItems = _storage.ContentItems.Where(_ => _.Title.ToUpperInvariant().Contains(searchTerm) || _.Caption.ToUpperInvariant().Contains(searchTerm)).ToList();
+            searchResults.AddRange(contentItems.Select(contentItem => new SearchResult { ID = contentItem.ID, Title = contentItem.Title, ObjectType = ObjectTypeEnum.ContentItem, UniqueID = contentItem.UniqueID }));
 
             return searchResults;
         }
 
-
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public List<Chronozoom.Entities.Reference> GetBibliography(string exhibitID)
+        public IEnumerable<Reference> GetBibliography(string exhibitId)
         {
-            try
-            {
-                Guid guid;
-                if (!Guid.TryParse(exhibitID, out guid))
-                {
-                    return null;
-                }
-
-                var references = new List<Chronozoom.Entities.Reference>();
-                var exhibitReferences = DataEnvironmentAccess.AnInstance.GetIBibliographyView(guid);
-                foreach (var reference in exhibitReferences)
-                {
-                    Chronozoom.Entities.Reference sr = new Chronozoom.Entities.Reference(reference.ID,
-                        reference.Title,
-                        reference.Authors,
-                        reference.BookChapters,
-                        reference.CitationType,
-                        reference.PageNumbers,
-                        reference.Publication,
-                        reference.PublicationDates,
-                        reference.Source
-                        );
-                    references.Add(sr);
-                }
-
-                return references;
-            }
-            catch 
-            {
-                //error
-                return null;
-            }
+            Guid guid;
+            return !Guid.TryParse(exhibitId, out guid) ? null : _storage.Exhibits.First(_ => _.ID == guid).References.ToList();
         }
 
-
-        [OperationContract]
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")][
+        OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public string GetBibliographyRelay(string exhibitID)
+        public IEnumerable<Tour> GetTours()
         {
-            try
+            Trace.TraceInformation("Get Tours");
+
+            lock (Cache)
             {
-                var req = WebRequest.Create("http://[Your domain]/Chronozoom.svc/GetBibliography?exhibitID=" + exhibitID);
-                var resp = req.GetResponse();
-                using (var rs = resp.GetResponseStream())
-                using (var reader = new System.IO.StreamReader(rs))
+                if (!Cache.Contains("Tours"))
                 {
-                    var result = reader.ReadToEnd();
-                    if (result.StartsWith("{\"d\":"))
+                    Trace.TraceInformation("Get Tours Cache Miss");
+                    var tours = _storage.Tours.ToList();
+                    foreach (var t in tours)
                     {
-                        result = result.Substring(5, result.Length - 5 - 1);
+                        _storage.Entry(t).Collection(x => x.bookmarks).Load();
                     }
-                    return result;
+
+                    Cache.Add("Tours", tours, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
                 }
-            }
-            catch (Exception ex)
-            {
-                return "{Error: " + ex.Message + "}";
+
+                return (List<Tour>)Cache["Tours"];
             }
         }
 
-        [OperationContract]
-        [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public string SearchRelay(string s)
+        [SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly", Justification = "No unmanaged handles")]
+        public void Dispose()
         {
-            try
-            {
-                var req = WebRequest.Create("http://[Your domain]/Chronozoom.svc/search?s=" + s);
-                var resp = req.GetResponse();
-                using (var rs = resp.GetResponseStream())
-                using(var reader = new System.IO.StreamReader(rs))
-                {
-                    var result = reader.ReadToEnd();
-                    if (result.StartsWith("{\"d\":"))
-                    {
-                        result = result.Substring(5, result.Length - 5 - 1);
-                    }
-                    return result;
-                }
-            }
-            catch (Exception ex)
-            {
-                return "{Error: " + ex.Message + "}";
-            }
-        }
+            _storage.Dispose();
 
-
-        [OperationContract]
-        [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public List<Chronozoom.Entities.Tour> GetTours()
-        {
-            var tours = new List<Chronozoom.Entities.Tour>();
-            var trs = DataEnvironmentAccess.AnInstance.GetITourView();
-            foreach (var tour in trs)
-            {
-                Chronozoom.Entities.Tour t = new Chronozoom.Entities.Tour(tour.ID,
-                    tour.Name,
-                    tour.UniqueID,
-                    tour.AudioBlobUrl,
-                    tour.Category,
-                    tour.Sequence
-                    );
-                LoadBookmark(t);
-                tours.Add(t);
-            }
-            return tours;
-        }
-
-        private void LoadBookmark(Chronozoom.Entities.Tour tour)
-        {
-            var bookmarks = DataEnvironmentAccess.AnInstance.GetITourBookmarkView(tour.ID);
-            var bmarks = new List<Chronozoom.Entities.BookMark>();
-            foreach (var bookmark in bookmarks)
-            {
-                Chronozoom.Entities.BookMark b = new Chronozoom.Entities.BookMark(bookmark.ID,
-                    bookmark.Name,
-                    (!string.IsNullOrEmpty(bookmark.URL) && bookmark.URL.IndexOf('#') >0)  ? bookmark.URL.Substring(bookmark.URL.IndexOf('#')+1): string.Empty,
-                    bookmark.LapseTime,
-                    bookmark.Description
-                    );
-                bmarks.Add(b);
-            }
-            tour.bookmarks = bmarks;
+            GC.SuppressFinalize(this);
         }
     }
 }

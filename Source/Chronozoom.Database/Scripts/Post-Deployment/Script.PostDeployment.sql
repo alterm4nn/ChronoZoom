@@ -1,4 +1,93 @@
-﻿/****** Object:  Table [dbo].[CZVersion]    Script Date: 03/01/2012 18:31:18 ******/
+﻿/* Clean all existing records to allow a fresh deployment of data */
+
+ALTER TABLE [dbo].[AuthoringTableRolePermission] NOCHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[AuthoringTableRolePermission] DISABLE TRIGGER ALL
+DELETE FROM [dbo].[AuthoringTableRolePermission]
+ALTER TABLE [dbo].[AuthoringTableRolePermission] CHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[AuthoringTableRolePermission] ENABLE TRIGGER ALL
+
+ALTER TABLE [dbo].[CZVersion] NOCHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[CZVersion] DISABLE TRIGGER ALL
+DELETE FROM [dbo].[CZVersion]
+ALTER TABLE [dbo].[CZVersion] CHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[CZVersion] ENABLE TRIGGER ALL
+
+ALTER TABLE [dbo].[CZSystemVersion] NOCHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[CZSystemVersion] DISABLE TRIGGER ALL
+DELETE FROM [dbo].[CZSystemVersion]
+ALTER TABLE [dbo].[CZSystemVersion] CHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[CZSystemVersion] ENABLE TRIGGER ALL
+
+ALTER TABLE [dbo].[User] NOCHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[User] DISABLE TRIGGER ALL
+DELETE FROM [dbo].[User]
+ALTER TABLE [dbo].[User] CHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[User] ENABLE TRIGGER ALL
+
+ALTER TABLE [dbo].[Role] NOCHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[Role] DISABLE TRIGGER ALL
+DELETE FROM [dbo].[Role]
+ALTER TABLE [dbo].[Role] CHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[Role] ENABLE TRIGGER ALL
+
+ALTER TABLE [dbo].[TimeUnit] NOCHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[TimeUnit] DISABLE TRIGGER ALL
+DELETE FROM [dbo].[TimeUnit]
+ALTER TABLE [dbo].[TimeUnit] CHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[TimeUnit] ENABLE TRIGGER ALL
+
+ALTER TABLE [dbo].[Regime] NOCHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[Regime] DISABLE TRIGGER ALL
+DELETE FROM [dbo].[Regime]
+ALTER TABLE [dbo].[Regime] CHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[Regime] ENABLE TRIGGER ALL
+
+ALTER TABLE [dbo].[Threshold] NOCHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[Threshold] DISABLE TRIGGER ALL
+DELETE FROM [dbo].[Threshold]
+ALTER TABLE [dbo].[Threshold] CHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[Threshold] ENABLE TRIGGER ALL
+
+ALTER TABLE [dbo].[Timeline] NOCHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[Timeline] DISABLE TRIGGER ALL
+DELETE FROM [dbo].[Timeline]
+ALTER TABLE [dbo].[Timeline] CHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[Timeline] ENABLE TRIGGER ALL
+
+ALTER TABLE [dbo].[MediaType] NOCHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[MediaType] DISABLE TRIGGER ALL
+DELETE FROM [dbo].[MediaType]
+ALTER TABLE [dbo].[MediaType] CHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[MediaType] ENABLE TRIGGER ALL
+
+ALTER TABLE [dbo].[LicenseType] NOCHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[LicenseType] DISABLE TRIGGER ALL
+DELETE FROM [dbo].[LicenseType]
+ALTER TABLE [dbo].[LicenseType] CHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[LicenseType] ENABLE TRIGGER ALL
+
+ALTER TABLE [dbo].[CitationType] NOCHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[CitationType] DISABLE TRIGGER ALL
+DELETE FROM [dbo].[CitationType]
+ALTER TABLE [dbo].[CitationType] CHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[CitationType] ENABLE TRIGGER ALL
+
+ALTER TABLE [dbo].[Permission] NOCHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[Permission] DISABLE TRIGGER ALL
+DELETE FROM [dbo].[Permission]
+ALTER TABLE [dbo].[Permission] CHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[Permission] ENABLE TRIGGER ALL
+
+ALTER TABLE [dbo].[AuthoringTable] NOCHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[AuthoringTable] DISABLE TRIGGER ALL
+DELETE FROM [dbo].[AuthoringTable]
+ALTER TABLE [dbo].[AuthoringTable] CHECK CONSTRAINT ALL
+ALTER TABLE [dbo].[AuthoringTable] ENABLE TRIGGER ALL
+
+GO
+
+/****** Object:  Table [dbo].[CZVersion]    Script Date: 03/01/2012 18:31:18 ******/
+
 INSERT [dbo].[CZVersion] ([VersionNumber], [CreatedDate], [PublishDate], [UserID], [IsDeleted], [CZVersionID]) VALUES (29, CAST(0x0000A0050152B20B AS DateTime), NULL, NULL, 0, N'9320ed0c-c181-4d95-8b5f-041d1fc0d1d9')
 INSERT [dbo].[CZVersion] ([VersionNumber], [CreatedDate], [PublishDate], [UserID], [IsDeleted], [CZVersionID]) VALUES (6, CAST(0x00009FF900137345 AS DateTime), NULL, NULL, 0, N'069bbe45-642b-4975-bb31-0562839910b1')
 INSERT [dbo].[CZVersion] ([VersionNumber], [CreatedDate], [PublishDate], [UserID], [IsDeleted], [CZVersionID]) VALUES (9, CAST(0x00009FFF01524386 AS DateTime), NULL, NULL, 0, N'f25b5674-9f96-4066-8a48-12d297e2b5d3')
