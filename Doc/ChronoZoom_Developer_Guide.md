@@ -22,6 +22,7 @@ If you are new to GitHub, we recommend reading [Learning to use GitHub for Chron
 <a href="#ssh">Generate an SSH Key for GitHub Authentication</a><br />
 <a href="#clone">Clone the ChronoZoom GitHub Repository</a><br />
 <a href="#deploy">Deploy ChronoZoom to Azure</a><br />
+<a href="#guidelines">Contributing Guidelines</a><br />
 <a href="#future">The Future of ChronoZoom</a><br />
 <a href="#disclaimer">Disclaimer</a><br />
 
@@ -71,29 +72,19 @@ Once this is done you can add the SSH key to GitHub. For more detailed informati
 In order to get the source for ChronoZoom, you will need to clone the GitHub repository. Before doing so, be sure that you have installed [Git for Windows](http://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git).
 
 1. Go to: [https://github.com/alterm4nn/ChronoZoom](https://github.com/alterm4nn/ChronoZoom). This is the master branch for the project.
-2. Clone this branch on your local computer.
+1. Clone this branch on your local computer.
 - Open the Git shell and run the following commands:
         - `git clone git@github.com:alterm4nn/ChronoZoom.git`
         - `cd ChronoZoom`
-3. You now have your own copy of ChronoZoom. 
+    
+    You now have your own fork of the ChronoZoom project.
+
+1. Create a working branch by using the following command:   
+    `git checkout -b branch_name`
+    
+    Make all of your changes in this branch, and consider the master branch to be an "untouched" master that can be updated to get the latest changes with `git pull`.
 
 For more information, see [Git Basics - Getting a Git Repository](http://git-scm.com/book/en/Git-Basics-Getting-a-Git-Repository).
-
-## Contributing Guidelines ##
-
-### Setup ###
-1. Fork the project and clone the fork to your local computer. For more information, see [Fork a Repo](https://help.github.com/articles/fork-a-repo).
-
-2. Create a feature branch to work in.    
-    `git checkout -b feature_name`
-
-### Coding ###
-- Use the project's coding style, not your own. Use the existing code as an example of what to do.
-- Use [Stylecop](http://stylecop.codeplex.com/) to ensure that your code is conformant.
-- Include tests that fail without your code.
-
-<!-- Should we talk about using code analysis and Stylecop tools? -->
-<!-- !!! best practices around GitHub usage. -->
 
 <a id="deploy"></a>
 
@@ -166,6 +157,14 @@ Browse to http://***[myUsername]***.azurewebsites.net/ and behold your own copy 
 
 <a id="future"></a>
 
+<a id="guidelines"></a>
+## Contributing Guidelines ##
+
+- Prior to making a pull request, be sure to apply the latest changes from master to your working branch.
+- Add meaningful comments when you make your commits.
+- Use the project's coding style, not your own. Follow the existing code as an example of what to do.
+- Use [Stylecop](http://stylecop.codeplex.com/) to ensure that your code is conformant with project style.
+
 ## The Future of ChronoZoom
 We envision a world where scientists, researchers, students, and teachers collaborate through ChronoZoom to share information via data, tours, and insight.
 
@@ -190,6 +189,3 @@ This document does not provide you with any legal rights to any intellectual pro
 Distributed under Creative Commons Attribution 3.0 Unported License.
 
 Microsoft, Visual Studio, and Windows are trademarks of the Microsoft group of companies.  All other trademarks are property of their respective owners.
-
-
-----------
