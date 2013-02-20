@@ -1,0 +1,306 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>ChronoZoom_Developer_Guide.md</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+/*---------------------------------------------------------
+ * Copyright (C) Microsoft Corporation. All rights reserved.
+ *--------------------------------------------------------*/
+
+body
+{
+    font-family: "Segoe UI";
+    font-size: 14px;
+    color: #404040;
+    line-height: 24px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: normal;
+}
+
+
+h1
+{
+	font-size:250%; font-weight: 200;
+	color:rgb(32,66,86);margin-bottom:10px;
+	padding-top:3px;
+}
+
+h2 
+{
+	font-size:200%;
+	font-weight: 200;
+	color:#204256;
+	margin:10px 0 10px 0;
+}
+
+h3
+{
+	font-size:130%;
+	font-weight: 100;
+	color:#204256;
+	margin:10px 0 10px 0;
+}
+
+hr 
+{
+	color:#DDE4EC;
+	background-color:#DDE4EC;
+	height:1px; border:none;
+	margin:20px 0 20px 0;width:100%;
+}
+
+pre { padding:15px 20px; background:#f3f6f6; margin:5px 0 5px 0; font:normal 12px Consolas; color:#204256; white-space:pre-wrap;} 
+
+code{ font:normal 12px Consolas; } 
+
+
+
+</style>
+</head>
+<body>
+<p><img src="images/CZ_beta_logo.png" alt="" />
+<center><h1>Developer's Guide</h1></center></p>
+
+<h2>Introduction</h2>
+
+<p>ChronoZoom is an open source community project dedicated to visualizing Big History that has been funded and supported by Microsoft Research Connections in collaboration with University California at Berkeley and Moscow State University.</p>
+
+<p>You can browse through history on ChronoZoom to find data in the form of articles, images, video, sound, and other multimedia. ChronoZoom links a wealth of information from five major regimes that unifies all historical knowledge collectively known as Big History.</p>
+
+<p>This guide covers everything you need know to install the ChronoZoom development environment tools, use GitHub to get ChronoZoom source code, and deploy ChronoZoom to an Azure hosted website.</p>
+
+<p>If you are new to GitHub, we recommend reading <a href="/../LearningTouseGithub.md/">Learning to use GitHub for ChronoZoom development</a> for more information on setting up your source code repository.</p>
+
+<!-- Note: Some of the APIs for ChronoZoom are not yet available for the public. -->
+
+<hr />
+
+<h2>Contents</h2>
+
+<p><a href="#install">Install the ChronoZoom Development Environment Tools</a><br />
+<a href="#ssh">Generate an SSH Key for GitHub Authentication</a><br />
+<a href="#clone">Clone the ChronoZoom GitHub Repository</a><br />
+<a href="#deploy">Deploy ChronoZoom to Azure</a><br />
+<a href="#guidelines">Contributing Guidelines</a><br />
+<a href="#future">The Future of ChronoZoom</a><br />
+<a href="#disclaimer">Disclaimer</a><br /></p>
+
+<hr />
+
+<p><a id="install"></a></p>
+
+<h2>Install the ChronoZoom Development Environment Tools</h2>
+
+<h3>Minimum Requirements</h3>
+
+<ul>
+<li><a href="http://www.microsoft.com/visualstudio/eng/products/visual-studio-overview">Visual Studio 2012 Ultimate</a> or <a href="http://www.microsoft.com/visualstudio/eng/products/visual-studio-express-for-web">Visual Studio Express for Web</a></li>
+<li><a href="http://www.microsoft.com/en-us/download/details.aspx?id=36539">Visual Studio 2012.2 CTP 3</a></li>
+<li><a href="http://visualstudiogallery.msdn.microsoft.com/abafc7d6-dcaa-40f4-8a5e-d6724bdb980c">Visual Studio Tools for Git</a></li>
+<li><a href="http://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git">Git for Windows</a>
+<ul>
+<li>Be sure to select 'Run Git from the Windows Command Prompt' during installation.</li>
+</ul></li>
+<li><a href="http://stylecop.codeplex.com/">Stylecop</a></li>
+</ul>
+
+<h3>Recommended</h3>
+
+<ul>
+<li><a href="http://www.scootersoftware.com/moreinfo.php">Beyond Compare</a>
+<ul>
+<li><a href="http://www.scootersoftware.com/support.php?zz=kb_vcs">Using Beyond Compare with Git</a></li>
+</ul></li>
+<li><a href="http://markdownpad.com/">Markdown Pad for Windows</a></li>
+<li><a href="http://visualstudiogallery.msdn.microsoft.com/07d54d12-7133-4e15-becb-6f451ea3bea6">Web Essentials 2012</a></li>
+<li><a href="http://www.jetbrains.com/resharper">Jetbrains Resharper</a>
+<ul>
+<li><a href="http://www.jetbrains.com/eforms/openSourceRequest.action?licenseRequest=RSOSL">Free license for open source development</a></li>
+</ul></li>
+</ul>
+
+<h3>Optional</h3>
+
+<ul>
+<li><a href="http://www.microsoft.com/web/downloads/platform.aspx">Web Platform Installer</a></li>
+<li><a href="http://www.microsoft.com/en-us/download/details.aspx?id=35579">SQL Server Express 2012 SP1 with Tools</a>
+<ul>
+<li>Use Mixed Mode Authentication, Azure doesn't support Integrated Mode security</li>
+</ul></li>
+<li>Internet Information Server</li>
+<li><a href="http://www.windowsazure.com/en-us/develop/downloads/">Azure SDK for .NET</a></li>
+</ul>
+
+<p><a id="ssh"></a></p>
+
+<h2>Generate an SSH Key for GitHub Authentication</h2>
+
+<p>You can use SSH keys to establish a secure connection between your computer and GitHub. This is an alternative to cloning an HTTPS repository URL. The following example shows using the ssh-keygen utility to generate a new key, and then using the <strong>clip</strong> command to copy the key to the clipboard.</p>
+
+<p><code>ssh-keygen -t rsa -C "youremail@server.com" -f %userprofile%\.ssh\id_rsa</code>
+<code>clip &lt; %userprofile%\.ssh\id_rsa.pub</code></p>
+
+<p>Once this is done you can add the SSH key to GitHub. For more detailed information, see <a href="https://help.github.com/articles/generating-ssh-keys">Generating SSH Keys</a>.</p>
+
+<p><a id="clone"></a></p>
+
+<h2>Clone the ChronoZoom GitHub Repository</h2>
+
+<p>In order to get the source for ChronoZoom, you will need to clone the GitHub repository. Before doing so, be sure that you have installed <a href="http://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git">Git for Windows</a>.</p>
+
+<ol>
+<li>Go to: <a href="https://github.com/alterm4nn/ChronoZoom">https://github.com/alterm4nn/ChronoZoom</a>. This is the master branch for the project.</li>
+<li><p>Clone this branch on your local computer.</p>
+
+<ul>
+<li>Open the Git shell and run the following commands:
+<ul>
+<li><code>git clone git@github.com:alterm4nn/ChronoZoom.git</code></li>
+<li><code>cd ChronoZoom</code></li>
+</ul></li>
+</ul>
+
+<p>You now have your own fork of the ChronoZoom project.</p></li>
+<li><p>Create a working branch by using the following command:<br />
+<code>git checkout -b branch_name</code></p>
+
+<p>Make all of your changes in this branch, and consider the master branch to be an "untouched" master that can be updated to get the latest changes with <code>git pull</code>.</p></li>
+</ol>
+
+<p>For more information, see <a href="http://git-scm.com/book/en/Git-Basics-Getting-a-Git-Repository">Git Basics - Getting a Git Repository</a>.</p>
+
+<p><a id="deploy"></a></p>
+
+<h2>Deploy ChronoZoom to Azure</h2>
+
+<p>To test your changes, you will need to deploy ChronoZoom to Azure.</p>
+
+<h3>Add a New Website</h3>
+
+<p>Login to <a href="https://manage.windowsazure.com">Azure Management Portal</a>.</p>
+
+<p>At the bottom of the page, click the <strong>+ NEW</strong> bar and select the following options:</p>
+
+<p><strong>Compute</strong> -> <strong>Web Site</strong> -> <strong>Custom Create</strong> -> <strong>Create Web Site</strong></p>
+
+<p>In the <strong>Create Web Site</strong> dialog, fill in the fields as follows:</p>
+
+<ul>
+<li><strong>Url</strong>: Enter a name for your website (in this example the website name is <strong><em>mycz</em></strong>).</li>
+<li><strong>Region</strong>: Leave the default value.</li>
+<li><strong>Database</strong>: Select the <strong>Create New Sql Database</strong> option.</li>
+<li><strong>DB Connection String Name</strong>: Enter "Storage" (omit quotation marks).</li>
+<li><strong>Publish from Source Control</strong>: Checked</li>
+<li>Click the arrow icon to go to page 2.</li>
+</ul>
+
+<h3>Specify Database Settings</h3>
+
+<p>Fill in the fields as follows:</p>
+
+<ul>
+<li><strong>Server</strong>: Select <strong>New SQL Database server</strong>. It's okay to select a pre-existing database if you have already created one.</li>
+<li><strong>Login name</strong>: Enter the user name for the database. In this example the user name is <strong><em>myDatabaseUsername</em></strong>.</li>
+<li><strong>Password</strong>: Enter the password for the database. In this example the password is <strong><em>myDatabasePassword</em></strong>.</li>
+<li>Click the arrow icon to go to page 3.</li>
+</ul>
+
+<h3>Specify Source Control Settings</h3>
+
+<ul>
+<li><strong>Source Control Type</strong>: Select <strong>Git</strong>.</li>
+<li><strong>Repository Location <em>*: Select *</em>Local Repository</strong>.
+<ul>
+<li>It is possible to set up continuous replication from GitHub here, however this example uses a local repository for simplicity.</li>
+</ul></li>
+<li>Click the arrow icon to go to page 4.</li>
+</ul>
+
+<h3>New user name and password (for Git)</h3>
+
+<ul>
+<li><strong>Username</strong>: Enter a user name for Git. In this example it is <strong><em>myGitUsername</em></strong>.</li>
+<li><strong>Password</strong>: Enter a password for Git. In this example it is <strong><em>myGitPassword</em></strong>.</li>
+</ul>
+
+<h3>Go to Dashboard for Web Site</h3>
+
+<ul>
+<li>Copy the Git Clone Url. It will be listed under <strong>quick glance</strong> in the right column, and will be something like: <em>https://<strong></em>myGitUsername<em></strong>@<strong></em>mycz<em></strong>.scm.azurewebsites.net/<strong></em>mycz<em></strong>.git</em></li>
+</ul>
+
+<h3>Get a local copy of the ChronoZoom source code</h3>
+
+<p>Open the Git command prompt and clone the main ChronoZoom repository as follows:</p>
+
+<ul>
+<li>git clone git@github.com:alterm4nn/ChronoZoom.git</li>
+<li>cd ChronoZoom</li>
+</ul>
+
+<h3>Add a connection to the Azure Web Site</h3>
+
+<ul>
+<li>git remote add azure https://<strong><em>myUsername</em></strong>@<strong><em>mycz</em></strong>.scm.azurewebsites.net/<strong><em>mycz</em></strong>.git</li>
+</ul>
+
+<p>Now you can make changes to the source code.</p>
+
+<h3>Publish your changes to the Azure Web Site</h3>
+
+<p>Open the Git command prompt and use the following command. You will be prompted for your Azure deployment credentials.</p>
+
+<ul>
+<li>git push --set-upstream azure master</li>
+</ul>
+
+<h3>Preview Your Site!</h3>
+
+<p>Browse to http://<strong><em>[myUsername]</em></strong>.azurewebsites.net/ and behold your own copy of ChronoZoom! Your site URL is listed in the <strong>quick glance</strong> column of the Azure dashboard.</p>
+
+<p><a id="future"></a></p>
+
+<p><a id="guidelines"></a></p>
+
+<h2>Contributing Guidelines</h2>
+
+<ul>
+<li>Prior to making a pull request, be sure to apply the latest changes from master to your working branch.</li>
+<li>Add meaningful comments when you make your commits.</li>
+<li>Use the project's coding style, not your own. Follow the existing code as an example of what to do.</li>
+<li>Use <a href="http://stylecop.codeplex.com/">Stylecop</a> to ensure that your code is conformant with project style.</li>
+</ul>
+
+<h2>The Future of ChronoZoom</h2>
+
+<p>We envision a world where scientists, researchers, students, and teachers collaborate through ChronoZoom to share information via data, tours, and insight.</p>
+
+<p>Imagine a world where the leading academics publish their findings to the world in a manner that can easily be accessed and compared to other data.</p>
+
+<p>Imagine a tool that allows teachers to generate tours specific to their classroom needs.</p>
+
+<p>This can happen with your support.   As ChronoZoom through the beta release, we need your feedback and support to continue to mold this project to suit your needs.</p>
+
+<p>Help ChronoZoom evolve by taking this survey so we can provide the best possible future features: <a href="http://www.zoomerang.com/Survey/WEB22EFZBLQL4B/">http://www.zoomerang.com/Survey/WEB22EFZBLQL4B/</a></p>
+
+<hr />
+
+<p><a id="future"></a></p>
+
+<h2>Disclaimer</h2>
+
+<p>This document is provided "as-is". Information and views expressed in this document, including URL and other Internet Web site references, may change without notice. You bear the risk of using it.</p>
+
+<p>This document does not provide you with any legal rights to any intellectual property in any Microsoft product. You may copy and use this document for your internal, reference purposes.</p>
+
+<p>&copy; 2013 The Outercurve Foundation.</p>
+
+<p>Distributed under Creative Commons Attribution 3.0 Unported License.</p>
+
+<p>Microsoft, Visual Studio, and Windows are trademarks of the Microsoft group of companies.  All other trademarks are property of their respective owners.</p>
+
+</body>
+</html>
+<!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
