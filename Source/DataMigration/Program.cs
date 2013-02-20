@@ -269,8 +269,7 @@ namespace DataMigration
             Stream dataTimelines = myWebClient.OpenRead("http://www.chronozoomproject.org/Chronozoom.svc/get");
             var bjrTimelines = new DataContractJsonSerializer(typeof(BaseJsonResult<IEnumerable<Timeline>>)).ReadObject(dataTimelines) as BaseJsonResult<IEnumerable<Timeline>>;
 
-            //foreach (var timeline in bjrTimelines.d.First())
-            var timeline = bjrTimelines.d.Skip(1).First();
+            foreach (var timeline in bjrTimelines.d)
             {
                 dbInst.Timelines.Add(timeline);
             }
