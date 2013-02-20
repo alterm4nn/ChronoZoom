@@ -53,10 +53,16 @@ namespace UI
 
         private void LoadChildren(Timeline t)
         {
-            _storage.Entry(t).Collection(x => x.Exhibits).Load();
-            _storage.Entry(t).Collection(x => x.ChildTimelines).Load();
+            _storage.Entry(t).Collection(_ => _.Exhibits).Load();
 
-            foreach (Timeline c in t.ChildTimelines)
+            foreach (var e in t.Exhibits)
+            {
+                _storage.Entry(e).Collection(_ => _.ContentItems).Load();
+            }
+
+            _storage.Entry(t).Collection(_ => _.ChildTimelines).Load();
+
+            foreach (var c in t.ChildTimelines)
             {
                 LoadChildren(c);
             }
