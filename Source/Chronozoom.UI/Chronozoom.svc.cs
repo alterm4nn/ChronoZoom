@@ -58,6 +58,7 @@ namespace UI
             foreach (var e in t.Exhibits)
             {
                 _storage.Entry(e).Collection(_ => _.ContentItems).Load();
+                _storage.Entry(e).Collection(_ => _.References).Load();
             }
 
             _storage.Entry(t).Collection(_ => _.ChildTimelines).Load();
@@ -93,6 +94,7 @@ namespace UI
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
             {
+                Trace.TraceEvent(TraceEventType.Warning, 0, "Search called with null search term");
                 return null;
             }
 
@@ -107,6 +109,7 @@ namespace UI
             var contentItems = _storage.ContentItems.Where(_ => _.Title.ToUpper().Contains(searchTerm) || _.Caption.ToUpper().Contains(searchTerm)).ToList();
             searchResults.AddRange(contentItems.Select(contentItem => new SearchResult { ID = contentItem.ID, Title = contentItem.Title, ObjectType = ObjectTypeEnum.ContentItem, UniqueID = contentItem.UniqueID }));
 
+            Trace.TraceInformation("Search called for search term {0}", searchTerm);
             return searchResults;
         }
 
@@ -115,7 +118,22 @@ namespace UI
         public IEnumerable<Reference> GetBibliography(string exhibitID)
         {
             Guid guid;
-            return !Guid.TryParse(exhibitID, out guid) ? null : _storage.Exhibits.First(_ => _.ID == guid).References.ToList();
+            if (!Guid.TryParse(exhibitID, out guid))
+            {
+                Trace.TraceEvent(TraceEventType.Warning, 0, "GetBibliography called with invalid Id {0}", exhibitID);
+                return null;
+            }
+
+            var exhibit = _storage.Exhibits.Find(guid);
+            if (exhibit == null)
+            {
+                Trace.TraceEvent(TraceEventType.Warning, 0, "GetBibliography called, no matching exhibit found with Id {0}", exhibitID);
+                return null;
+            }
+
+            Trace.TraceInformation("GetBibliography called for Exhibit Id {0}", exhibitID);
+            _storage.Entry(exhibit).Collection(_ => _.References).Load();
+            return exhibit.References.ToList();
         }
 
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")][
