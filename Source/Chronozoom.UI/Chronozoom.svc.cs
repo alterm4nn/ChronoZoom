@@ -98,13 +98,13 @@ namespace UI
 
             searchTerm = searchTerm.ToUpperInvariant();
 
-            var timelines = _storage.Timelines.Where(_ => _.Title.ToUpperInvariant().Contains(searchTerm)).ToList();
+            var timelines = _storage.Timelines.Where(_ => _.Title.ToUpper().Contains(searchTerm)).ToList();
             var searchResults = timelines.Select(timeline => new SearchResult { ID = timeline.ID, Title = timeline.Title, ObjectType = ObjectTypeEnum.Timeline, UniqueID = timeline.UniqueID }).ToList();
 
-            var exhibits = _storage.Exhibits.Where(_ => _.Title.ToUpperInvariant().Contains(searchTerm)).ToList();
+            var exhibits = _storage.Exhibits.Where(_ => _.Title.ToUpper().Contains(searchTerm)).ToList();
             searchResults.AddRange(exhibits.Select(exhibit => new SearchResult { ID = exhibit.ID, Title = exhibit.Title, ObjectType = ObjectTypeEnum.Exhibit, UniqueID = exhibit.UniqueID }));
 
-            var contentItems = _storage.ContentItems.Where(_ => _.Title.ToUpperInvariant().Contains(searchTerm) || _.Caption.ToUpperInvariant().Contains(searchTerm)).ToList();
+            var contentItems = _storage.ContentItems.Where(_ => _.Title.ToUpper().Contains(searchTerm) || _.Caption.ToUpper().Contains(searchTerm)).ToList();
             searchResults.AddRange(contentItems.Select(contentItem => new SearchResult { ID = contentItem.ID, Title = contentItem.Title, ObjectType = ObjectTypeEnum.ContentItem, UniqueID = contentItem.UniqueID }));
 
             return searchResults;
@@ -112,10 +112,10 @@ namespace UI
 
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public IEnumerable<Reference> GetBibliography(string exhibitId)
+        public IEnumerable<Reference> GetBibliography(string exhibitID)
         {
             Guid guid;
-            return !Guid.TryParse(exhibitId, out guid) ? null : _storage.Exhibits.First(_ => _.ID == guid).References.ToList();
+            return !Guid.TryParse(exhibitID, out guid) ? null : _storage.Exhibits.First(_ => _.ID == guid).References.ToList();
         }
 
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")][
