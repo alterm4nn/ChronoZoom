@@ -41,17 +41,24 @@ namespace UI
                 if (!Cache.Contains("Timelines"))
                 {
                     Trace.TraceInformation("Get Timelines Cache Miss");
-                    var timelines = _storage.Timelines.ToList();
-                    foreach (var t in timelines)
-                    {
-                        _storage.Entry(t).Collection(x => x.Exhibits).Load();
-                        _storage.Entry(t).Collection(x => x.ChildTimelines).Load();
-                    }
+                    var t = _storage.Timelines.Find(new Guid("468A8005-36E3-4676-9F52-312D8B6EB7B7")); // Hardcoded 'root' timeline :-(
+                    LoadChildren(t);
 
-                    Cache.Add("Timelines", timelines, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
+                    Cache.Add("Timelines", new [] { t }, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
                 }
 
-                return (List<Timeline>)Cache["Timelines"];
+                return (IEnumerable<Timeline>)Cache["Timelines"];
+            }
+        }
+
+        private void LoadChildren(Timeline t)
+        {
+            _storage.Entry(t).Collection(x => x.Exhibits).Load();
+            _storage.Entry(t).Collection(x => x.ChildTimelines).Load();
+
+            foreach (Timeline c in t.ChildTimelines)
+            {
+                LoadChildren(c);
             }
         }
 
