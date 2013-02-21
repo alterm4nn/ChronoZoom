@@ -5,7 +5,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
 
 namespace Chronozoom.Entities
@@ -59,9 +59,9 @@ namespace Chronozoom.Entities
         public decimal? Height { get; set; }
 
         [DataMember]
-        public virtual List<Timeline> ChildTimelines { get; set; }
+        public virtual Collection<Timeline> ChildTimelines { get; private set; }
 
         [DataMember]
-        public virtual List<Exhibit> Exhibits { get; set; }
+        public virtual Collection<Exhibit> Exhibits { get; private set; }
     }
 }

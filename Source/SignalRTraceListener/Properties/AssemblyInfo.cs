@@ -4,6 +4,8 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -14,6 +16,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("Copyright © 2013, The OuterCurve Foundation")]
 
 [assembly: ComVisible(false)]
+[assembly: CLSCompliant(false)]
 
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
+
+[assembly: SuppressMessage("Microsoft.Design", "CA2210:AssembliesShouldHaveValidStrongNames", Justification = "Open source project")]
