@@ -36,25 +36,16 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
-  </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
       <ItemGroup>
         <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
       </ItemGroup>
     </When>
-    <Otherwise>
-      <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
-      </ItemGroup>
-    </Otherwise>
+    <Otherwise />
   </Choose>
   <ItemGroup>
     <Compile Include="Controllers\JasmineController.cs" />
-    <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -65,24 +56,16 @@
   <ItemGroup>
     <Content Include="Content\jasmine\jasmine.css" />
     <Content Include="Content\jasmine\jasmine_favicon.png" />
-    <Content Include="Scripts\jasmine-samples\csvUtils.js" />
-    <Content Include="Scripts\jasmine-samples\helloWorld.js" />
-    <Content Include="Scripts\jasmine-samples\jquery-1.4.1-vsdoc.js" />
-    <Content Include="Scripts\jasmine-samples\jquery-1.4.1.js" />
-    <Content Include="Scripts\jasmine-samples\jquery-1.4.1.min.js" />
-    <Content Include="Scripts\jasmine-samples\jquery-1.6.2.min.js" />
-    <Content Include="Scripts\jasmine-samples\jquery-1.7.2.min.js" />
-    <Content Include="Scripts\jasmine-samples\jquery-1.8.0.min.js" />
-    <Content Include="Scripts\jasmine-samples\jquery-1.9.1.min.js" />
-    <Content Include="Scripts\jasmine-samples\jquery-ui-1.8.16.custom.min.js" />
-    <Content Include="Scripts\jasmine-samples\jquery.cookie.js" />
-    <Content Include="Scripts\jasmine-samples\Player.js" />
-    <Content Include="Scripts\jasmine-samples\PlayerSpec.js" />
-    <Content Include="Scripts\jasmine-samples\Song.js" />
-    <Content Include="Scripts\jasmine-samples\SpecHelper.js" />
-    <Content Include="Scripts\jasmine-samples\CsvParseSpec.js" />
+    <Content Include="Scripts\csvUtils.js" />
+    <Content Include="Scripts\jquery-1.8.0.min.js" />
+    <Content Include="Scripts\jquery.cookie.js" />
+    <Content Include="Scripts\Specs\CsvParseSpec.js" />
     <Content Include="Scripts\jasmine\jasmine-html.js" />
     <Content Include="Scripts\jasmine\jasmine.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
