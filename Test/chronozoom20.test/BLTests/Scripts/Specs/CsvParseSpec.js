@@ -1,5 +1,5 @@
 ﻿/// <reference path="../jquery-1.8.0.min.js" />
-/// <reference path="..//csvUtils.js" />
+/// <reference path="../csvUtils.js" />
 
 
 describe("Parsed file", function () {
