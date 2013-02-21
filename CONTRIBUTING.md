@@ -6,3 +6,8 @@
 - Use [Stylecop](http://stylecop.codeplex.com/) to ensure that your code is conformant with project style.
 
 Add links for all of our other docs.
+
+Need to reference the requirement to sign an OuterCurve Contributors Agreement to assign copyright of contributions over to the foundation.
+
+Will need them to run unit tests before submitting.
+

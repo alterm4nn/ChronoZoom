@@ -77,20 +77,23 @@ In order to get the source for ChronoZoom, you will need to install [Git for Win
 
 1. If you have not already done so, sign up for [GitHub](http://github.com).
 1. Go to: [https://github.com/alterm4nn/ChronoZoom](https://github.com/alterm4nn/ChronoZoom). This is the master branch for the project.
-1. Clone this branch to your GitHub repository.
-- Open the Git shell and run the following commands:
-        - `git clone https://github.com/alterm4nn/ChronoZoom.git`
-        - `cd ChronoZoom`
-    
+1. Fork the repo by clicking **Fork**. For more information see [Fork a Repo](https://help.github.com/articles/fork-a-repo).
+
+1. Clone the fork to your local computer by running the following command:
+    `git clone https://github.com/alterm4nn/ChronoZoom.git`
+
     You now have your own fork of the ChronoZoom project.
+
+1. Add a remote for the master repository by running the following commands:
+    `cd ChronoZoom`
+    `git remote add upstream https://github.com/alterm4nn/ChronoZoom.git`
+    `git pull blessed master`
 
 1. In your GitHub repository, create a [topic branch](http://learn.github.com/p/branching.html). Topic branches are typically lightweight branches that you create locally and that have a name that is meaningful for you. They are where you might do work for a bug fix or feature (they're also called feature branches). The following command shows using  the git **checkout** command to create a topic branch:
 
     `git checkout -b branch_name`
     
     Make all of your changes in the topic branch, and consider the master branch to be an "untouched" master that can be updated to get the latest changes with `git pull`.
-
-For more information, see [Git Basics - Getting a Git Repository](http://git-scm.com/book/en/Git-Basics-Getting-a-Git-Repository).
 
 <a id="deploy"></a>
 
@@ -139,13 +142,6 @@ Fill in the fields as follows:
 
 - Copy the Git Clone Url. It will be listed under **quick glance** in the right column, and will be something like: *https://***myGitUsername***@***mycz***.scm.azurewebsites.net/***mycz***.git*
 
-### Get a local copy of the ChronoZoom source code ###
-
-Open the Git command prompt and clone the main ChronoZoom repository as follows:
-
-- git clone git@github.com:alterm4nn/ChronoZoom.git
-- cd ChronoZoom
-
 ### Add a connection to the Azure Web Site ###
 
 - git remote add azure https://***myUsername***@***mycz***.scm.azurewebsites.net/***mycz***.git
@@ -153,7 +149,7 @@ Open the Git command prompt and clone the main ChronoZoom repository as follows:
 Now you can make changes to the source code.
 
 ### Publish your changes to the Azure Web Site ###
-Open the Git command prompt and use the following command. You will be prompted for your Azure deployment credentials.
+Open the Git command prompt and use the following command. You will be prompted for your Azure password.
 
 - git push --set-upstream azure master
  
@@ -169,9 +165,7 @@ Imagine a world where the leading academics publish their findings to the world 
 
 Imagine a tool that allows teachers to generate tours specific to their classroom needs.
 
-This can happen with your support.   As ChronoZoom through the beta release, we need your feedback and support to continue to mold this project to suit your needs.
-
-Help ChronoZoom evolve by taking this survey so we can provide the best possible future features: [http://www.zoomerang.com/Survey/WEB22EFZBLQL4B/](http://www.zoomerang.com/Survey/WEB22EFZBLQL4B/)
+This can happen with your support. As ChronoZoom through the beta release, we need your feedback and support to continue to mold this project to suit your needs.
 
 ---------
 <a id="disclaimer"></a>
