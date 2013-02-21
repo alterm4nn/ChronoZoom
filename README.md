@@ -23,6 +23,15 @@ Work items and goals are managed on Trello [here](https://trello.com/chronozoom)
 
 Project workflow and developer guidelines are available [here](developers.md).
 
+Installation
+----------
+
+* Make a fork of https://github.com/alterm4nn/ChronoZoom
+* git clone git://github.com/<your-username>/ChronoZoom.git (Case Sensitive)
+* Launch source\chronozoom.sln
+* Enable EnableNuGetPackageRestore (Right click on VS Solution - Enable NuGet Package Restore)
+* Build/Deploy locally from Visual Studio
+
 Acknowledgements
 ----------
 ChronoZoom is built and maintained by a growing community, with the support of:
