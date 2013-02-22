@@ -1,4 +1,5 @@
 # Contributing Guidelines #
+Prior to contributing to ChronoZoom, you are required to sign an [OuterCurve Contributors Agreement](http://www.outercurve.org/Portals/0/docs/Outercurve%20Foundation%20Contribution%20Agreement%20%28editable%29.pdf) to assign the copyright of your contributions to the foundation.
 
 ## GitHub Etiquette ##
 - Prior to making a pull request, be sure to apply the latest changes from master to your topic branch.
@@ -47,8 +48,6 @@ Please try to be as detailed as possible in your report.
 
 
 Add links for all of our other docs.
-
-In order to contribute to ChronoZoom, you are required to sign an [OuterCurve Contributors Agreement](http://www.outercurve.org/Portals/0/docs/Outercurve%20Foundation%20Contribution%20Agreement%20%28editable%29.pdf) to assign the copyright of your contributions to the foundation.
 
 
 
