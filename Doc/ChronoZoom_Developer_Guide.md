@@ -87,6 +87,8 @@ In order to get the source for ChronoZoom, you will need to install [Git for Win
 1. Add a remote for the master repository by running the following commands:
     `cd ChronoZoom`
     `git remote add upstream https://github.com/alterm4nn/ChronoZoom.git`
+
+1. Get the very latest master code by running the following command:
     `git pull blessed master`
 
 1. In your GitHub repository, create a [topic branch](http://learn.github.com/p/branching.html). Topic branches are typically lightweight branches that you create locally and that have a name that is meaningful for you. They are where you might do work for a bug fix or feature (they're also called feature branches). The following command shows using  the git **checkout** command to create a topic branch:
@@ -94,6 +96,12 @@ In order to get the source for ChronoZoom, you will need to install [Git for Win
     `git checkout -b branch_name`
     
     Make all of your changes in the topic branch, and consider the master branch to be an "untouched" master that can be updated to get the latest changes with `git pull`.
+
+<!--
++* Launch source\chronozoom.sln
++* Enable EnableNuGetPackageRestore (Right click on VS Solution - Enable NuGet Package Restore)
++* Build/Deploy locally from Visual Studio
+-->
 
 <a id="deploy"></a>
 
