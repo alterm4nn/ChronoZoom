@@ -5,6 +5,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
 namespace Chronozoom.Entities
@@ -12,6 +13,7 @@ namespace Chronozoom.Entities
     [DataContract]
     public class Reference
     {
+        [Key]
         [DataMember]
         public Guid ID { get; set; }
 
