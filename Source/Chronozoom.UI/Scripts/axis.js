@@ -1151,6 +1151,8 @@
                 ctx.font = (axisTextSize - 1) + " " + axisTextFont;
                 if (this.options.mode == "cosmos") {
                     var n = Math.max(Math.floor(Math.log(this.delta * Math.pow(10, this.beta) / this.level) * this.log10), -4) - 1;
+                    if (n > 20) n = 20;
+                    if (n < -20) n = -20;
                     if (n < 0) text = (new Number(-this.markerPosition / this.level)).toFixed(-n);
                     else text = (new Number(-this.markerPosition / this.level)).toFixed(n);
                 }
