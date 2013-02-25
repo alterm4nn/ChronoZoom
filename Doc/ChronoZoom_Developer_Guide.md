@@ -24,8 +24,6 @@ If you are new to GitHub, we recommend reading [Learning to use GitHub for Chron
 
 [Deploy ChronoZoom to Azure](#deploy)
 
-[Disclaimer](#disclaimer)
-
 ----------
 
 
@@ -160,17 +158,3 @@ Open the Git command prompt and use the following command. You will be prompted 
 ### Preview Your Site! ###
 
 Browse to http://**mycz**.azurewebsites.net/ and behold your own copy of ChronoZoom! Your site URL is listed in the **quick glance** column of the Azure dashboard.
-
----------
-<a id="disclaimer"></a>
-
-## Disclaimer ##
-This document is provided "as-is". Information and views expressed in this document, including URL and other Internet Web site references, may change without notice. You bear the risk of using it.
-
-This document does not provide you with any legal rights to any intellectual property in any Microsoft product. You may copy and use this document for your internal, reference purposes.
-
-&copy; 2013 The Outercurve Foundation.
-
-Distributed under Creative Commons Attribution 3.0 Unported License.
-
-Microsoft, Visual Studio, and Windows are trademarks of the Microsoft group of companies.  All other trademarks are property of their respective owners.
