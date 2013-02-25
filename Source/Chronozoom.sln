@@ -23,6 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{83B2C8
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OuterCurve.SignalRTraceListener", "SignalRTraceListener\OuterCurve.SignalRTraceListener.csproj", "{E9C7A64B-D03B-47D7-89DD-48D046DE564C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataMigration", "DataMigration\DataMigration.csproj", "{1E192464-3936-4C74-835C-069D2D49BD5A}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Chronozoom.vsmdi
@@ -76,6 +78,16 @@ Global
 		{E9C7A64B-D03B-47D7-89DD-48D046DE564C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{E9C7A64B-D03B-47D7-89DD-48D046DE564C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{E9C7A64B-D03B-47D7-89DD-48D046DE564C}.Release|x86.ActiveCfg = Release|Any CPU
+		{1E192464-3936-4C74-835C-069D2D49BD5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E192464-3936-4C74-835C-069D2D49BD5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E192464-3936-4C74-835C-069D2D49BD5A}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{1E192464-3936-4C74-835C-069D2D49BD5A}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{1E192464-3936-4C74-835C-069D2D49BD5A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1E192464-3936-4C74-835C-069D2D49BD5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E192464-3936-4C74-835C-069D2D49BD5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E192464-3936-4C74-835C-069D2D49BD5A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{1E192464-3936-4C74-835C-069D2D49BD5A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{1E192464-3936-4C74-835C-069D2D49BD5A}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

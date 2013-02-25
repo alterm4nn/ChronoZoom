@@ -41,17 +41,31 @@ namespace UI
                 if (!Cache.Contains("Timelines"))
                 {
                     Trace.TraceInformation("Get Timelines Cache Miss");
-                    var timelines = _storage.Timelines.ToList();
-                    foreach (var t in timelines)
-                    {
-                        _storage.Entry(t).Collection(x => x.Exhibits).Load();
-                        _storage.Entry(t).Collection(x => x.ChildTimelines).Load();
-                    }
+                    var t = _storage.Timelines.Find(new Guid("468A8005-36E3-4676-9F52-312D8B6EB7B7")); // Hardcoded 'root' timeline :-(
+                    LoadChildren(t);
 
-                    Cache.Add("Timelines", timelines, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
+                    Cache.Add("Timelines", new [] { t }, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
                 }
 
-                return (List<Timeline>)Cache["Timelines"];
+                return (IEnumerable<Timeline>)Cache["Timelines"];
+            }
+        }
+
+        private void LoadChildren(Timeline t)
+        {
+            _storage.Entry(t).Collection(_ => _.Exhibits).Load();
+
+            foreach (var e in t.Exhibits)
+            {
+                _storage.Entry(e).Collection(_ => _.ContentItems).Load();
+                _storage.Entry(e).Collection(_ => _.References).Load();
+            }
+
+            _storage.Entry(t).Collection(_ => _.ChildTimelines).Load();
+
+            foreach (var c in t.ChildTimelines)
+            {
+                LoadChildren(c);
             }
         }
 
@@ -80,29 +94,46 @@ namespace UI
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
             {
+                Trace.TraceEvent(TraceEventType.Warning, 0, "Search called with null search term");
                 return null;
             }
 
             searchTerm = searchTerm.ToUpperInvariant();
 
-            var timelines = _storage.Timelines.Where(_ => _.Title.ToUpperInvariant().Contains(searchTerm)).ToList();
+            var timelines = _storage.Timelines.Where(_ => _.Title.ToUpper().Contains(searchTerm)).ToList();
             var searchResults = timelines.Select(timeline => new SearchResult { ID = timeline.ID, Title = timeline.Title, ObjectType = ObjectTypeEnum.Timeline, UniqueID = timeline.UniqueID }).ToList();
 
-            var exhibits = _storage.Exhibits.Where(_ => _.Title.ToUpperInvariant().Contains(searchTerm)).ToList();
+            var exhibits = _storage.Exhibits.Where(_ => _.Title.ToUpper().Contains(searchTerm)).ToList();
             searchResults.AddRange(exhibits.Select(exhibit => new SearchResult { ID = exhibit.ID, Title = exhibit.Title, ObjectType = ObjectTypeEnum.Exhibit, UniqueID = exhibit.UniqueID }));
 
-            var contentItems = _storage.ContentItems.Where(_ => _.Title.ToUpperInvariant().Contains(searchTerm) || _.Caption.ToUpperInvariant().Contains(searchTerm)).ToList();
+            var contentItems = _storage.ContentItems.Where(_ => _.Title.ToUpper().Contains(searchTerm) || _.Caption.ToUpper().Contains(searchTerm)).ToList();
             searchResults.AddRange(contentItems.Select(contentItem => new SearchResult { ID = contentItem.ID, Title = contentItem.Title, ObjectType = ObjectTypeEnum.ContentItem, UniqueID = contentItem.UniqueID }));
 
+            Trace.TraceInformation("Search called for search term {0}", searchTerm);
             return searchResults;
         }
 
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public IEnumerable<Reference> GetBibliography(string exhibitId)
+        public IEnumerable<Reference> GetBibliography(string exhibitID)
         {
             Guid guid;
-            return !Guid.TryParse(exhibitId, out guid) ? null : _storage.Exhibits.First(_ => _.ID == guid).References.ToList();
+            if (!Guid.TryParse(exhibitID, out guid))
+            {
+                Trace.TraceEvent(TraceEventType.Warning, 0, "GetBibliography called with invalid Id {0}", exhibitID);
+                return null;
+            }
+
+            var exhibit = _storage.Exhibits.Find(guid);
+            if (exhibit == null)
+            {
+                Trace.TraceEvent(TraceEventType.Warning, 0, "GetBibliography called, no matching exhibit found with Id {0}", exhibitID);
+                return null;
+            }
+
+            Trace.TraceInformation("GetBibliography called for Exhibit Id {0}", exhibitID);
+            _storage.Entry(exhibit).Collection(_ => _.References).Load();
+            return exhibit.References.ToList();
         }
 
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")][
