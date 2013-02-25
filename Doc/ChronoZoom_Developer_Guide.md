@@ -144,11 +144,11 @@ Fill in the fields as follows:
 	
 ### Go to Dashboard for Web Site ###
 
-- Copy the Git Clone Url. It will be listed under **quick glance** in the right column, and will be something like: *https://***myGitUsername***@***mycz***.scm.azurewebsites.net/***mycz***.git*
+- Copy the Git Clone Url. It will be listed under **quick glance** in the right column, and will be something like: https://**myGitUsername**@mycz.scm.azurewebsites.net/**mycz**.git
 
 ### Add a connection to the Azure Web Site ###
 
-- git remote add azure https://***myUsername***@***mycz***.scm.azurewebsites.net/***mycz***.git
+- git remote add azure https://**myGitUsername**@**mycz**.scm.azurewebsites.net/**mycz**.git
 
 Now you can make changes to the source code.
 
@@ -159,7 +159,7 @@ Open the Git command prompt and use the following command. You will be prompted 
  
 ### Preview Your Site! ###
 
-Browse to http://***[mycz]***.azurewebsites.net/ and behold your own copy of ChronoZoom! Your site URL is listed in the **quick glance** column of the Azure dashboard.
+Browse to http://**mycz**.azurewebsites.net/ and behold your own copy of ChronoZoom! Your site URL is listed in the **quick glance** column of the Azure dashboard.
 
 ---------
 <a id="disclaimer"></a>
