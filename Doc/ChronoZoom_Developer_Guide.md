@@ -24,8 +24,6 @@ If you are new to GitHub, we recommend reading [Learning to use GitHub for Chron
 
 [Deploy ChronoZoom to Azure](#deploy)
 
-[The Future of ChronoZoom](#future)
-
 [Disclaimer](#disclaimer)
 
 ----------
@@ -80,18 +78,13 @@ In order to get the source for ChronoZoom, you will need to install [Git for Win
 1. Fork the repo by clicking **Fork**. For more information see [Fork a Repo](https://help.github.com/articles/fork-a-repo).
 
 1. Clone the fork to your local computer by running the following command:
-    `git clone https://github.com/alterm4nn/ChronoZoom.git`
+    `git clone https://github.com/[your-GitHub-ID]/ChronoZoom.git`
 
     You now have your own fork of the ChronoZoom project.
 
 1. Add a remote for the master repository by running the following commands:
     `cd ChronoZoom`
     `git remote add upstream https://github.com/alterm4nn/ChronoZoom.git`
-<<<<<<< HEAD
-
-1. Get the very latest master code by running the following command:
-=======
->>>>>>> 254768da05f0a4fa974c37aafb292150a3c1123f
     `git pull blessed master`
 
 1. In your GitHub repository, create a [topic branch](http://learn.github.com/p/branching.html). Topic branches are typically lightweight branches that you create locally and that have a name that is meaningful for you. They are where you might do work for a bug fix or feature (they're also called feature branches). The following command shows using  the git **checkout** command to create a topic branch:
@@ -100,15 +93,12 @@ In order to get the source for ChronoZoom, you will need to install [Git for Win
     
     Make all of your changes in the topic branch, and consider the master branch to be an "untouched" master that can be updated to get the latest changes with `git pull`.
 
-<<<<<<< HEAD
 <!--
 +* Launch source\chronozoom.sln
 +* Enable EnableNuGetPackageRestore (Right click on VS Solution - Enable NuGet Package Restore)
 +* Build/Deploy locally from Visual Studio
 -->
 
-=======
->>>>>>> 254768da05f0a4fa974c37aafb292150a3c1123f
 <a id="deploy"></a>
 
 ## Deploy ChronoZoom to Azure ##
@@ -169,17 +159,7 @@ Open the Git command prompt and use the following command. You will be prompted 
  
 ### Preview Your Site! ###
 
-Browse to http://***[myUsername]***.azurewebsites.net/ and behold your own copy of ChronoZoom! Your site URL is listed in the **quick glance** column of the Azure dashboard.
-
-<a id="future"></a>
-## The Future of ChronoZoom
-We envision a world where scientists, researchers, students, and teachers collaborate through ChronoZoom to share information via data, tours, and insight.
-
-Imagine a world where the leading academics publish their findings to the world in a manner that can easily be accessed and compared to other data.
-
-Imagine a tool that allows teachers to generate tours specific to their classroom needs.
-
-This can happen with your support. As ChronoZoom through the beta release, we need your feedback and support to continue to mold this project to suit your needs.
+Browse to http://***[mycz]***.azurewebsites.net/ and behold your own copy of ChronoZoom! Your site URL is listed in the **quick glance** column of the Azure dashboard.
 
 ---------
 <a id="disclaimer"></a>
