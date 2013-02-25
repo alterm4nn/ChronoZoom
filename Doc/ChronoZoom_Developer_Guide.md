@@ -24,8 +24,6 @@ If you are new to GitHub, we recommend reading [Learning to use GitHub for Chron
 
 [Deploy ChronoZoom to Azure](#deploy)
 
-[The Future of ChronoZoom](#future)
-
 [Disclaimer](#disclaimer)
 
 ----------
@@ -80,7 +78,7 @@ In order to get the source for ChronoZoom, you will need to install [Git for Win
 1. Fork the repo by clicking **Fork**. For more information see [Fork a Repo](https://help.github.com/articles/fork-a-repo).
 
 1. Clone the fork to your local computer by running the following command:
-    `git clone https://github.com/alterm4nn/ChronoZoom.git`
+    `git clone https://github.com/[your-GitHub-ID]/ChronoZoom.git`
 
     You now have your own fork of the ChronoZoom project.
 
@@ -161,17 +159,7 @@ Open the Git command prompt and use the following command. You will be prompted 
  
 ### Preview Your Site! ###
 
-Browse to http://***[myUsername]***.azurewebsites.net/ and behold your own copy of ChronoZoom! Your site URL is listed in the **quick glance** column of the Azure dashboard.
-
-<a id="future"></a>
-## The Future of ChronoZoom
-We envision a world where scientists, researchers, students, and teachers collaborate through ChronoZoom to share information via data, tours, and insight.
-
-Imagine a world where the leading academics publish their findings to the world in a manner that can easily be accessed and compared to other data.
-
-Imagine a tool that allows teachers to generate tours specific to their classroom needs.
-
-This can happen with your support. As ChronoZoom through the beta release, we need your feedback and support to continue to mold this project to suit your needs.
+Browse to http://***[mycz]***.azurewebsites.net/ and behold your own copy of ChronoZoom! Your site URL is listed in the **quick glance** column of the Azure dashboard.
 
 ---------
 <a id="disclaimer"></a>
