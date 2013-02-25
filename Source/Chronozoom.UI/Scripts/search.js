@@ -219,7 +219,7 @@ function search(searchString) {
         type: "GET",
         async: true,
         dataType: "json",
-        data: { s: searchString },
+        data: { searchTerm: searchString },
         url: url,
         success: function (result) {
             if (czDataSource == 'db')
