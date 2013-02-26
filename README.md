@@ -32,6 +32,8 @@ Installation
 * Enable EnableNuGetPackageRestore (Right click on VS Solution - Enable NuGet Package Restore)
 * Use [F5] to compile and run ChronoZoom locally
 
+For detailed instructions, see the [ChronoZoom Developer's Guide](doc/ChronoZoom_Developer_Guide.md).
+
 Acknowledgements
 ----------
 ChronoZoom is built and maintained by a growing community, with the support of:
