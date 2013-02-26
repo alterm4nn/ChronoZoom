@@ -21,7 +21,7 @@ You can follow ChronoZoom's bugs and activity [here](https://github.com/alterm4n
 
 Work items and goals are managed on Trello [here](https://trello.com/chronozoom).
 
-Project workflow and developer guidelines are available [here](developers.md).
+Project workflow and developer guidelines are available [here](Doc/ChronoZoom_Developer_Guide.md).
 
 Installation
 ----------
@@ -31,6 +31,8 @@ Installation
 * Launch source\chronozoom.sln
 * Enable EnableNuGetPackageRestore (Right click on VS Solution - Enable NuGet Package Restore)
 * Use [F5] to compile and run ChronoZoom locally
+
+For detailed instructions, see the [ChronoZoom Developer's Guide](Doc/ChronoZoom_Developer_Guide.md).
 
 Acknowledgements
 ----------
