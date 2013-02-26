@@ -401,6 +401,7 @@
 
         // Retrieves the URL to download the data from
         function loadDataUrl() {
+            // The following regexp extracts the pattern dataurl=url from the page hash to enable loading timelines from arbitrary sources.
             var match = /dataurl=([^\/]*)/g.exec(window.location.hash);
             if (match) {
                 return unescape(match[1]);
