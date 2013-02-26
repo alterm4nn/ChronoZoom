@@ -30,7 +30,7 @@ Installation
 * git clone git://github.com/<your-username>/ChronoZoom.git (Case Sensitive)
 * Launch source\chronozoom.sln
 * Enable EnableNuGetPackageRestore (Right click on VS Solution - Enable NuGet Package Restore)
-* Build/Deploy locally from Visual Studio
+* Use [F5] to compile and run ChronoZoom locally
 
 Acknowledgements
 ----------
