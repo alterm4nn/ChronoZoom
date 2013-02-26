@@ -118,6 +118,14 @@ describe("Parsed file", function () {
             expect(function () { reader.openFile(file, callbacks); }).toThrow(new Error("Input element is undefined."));
         });
     });
+
+
+    describe("when file is start with spaces", function () {
+        var file = "   {\"thickness\":5, \"stroke\": \"#ff6aff\"}\r\nx,y\r\n231,-21.6678\t\r\n232, 29.4294 \r\n233, -1.9404     \t\t\t\t\t                 ";
+        it("should throw error 'Invalid content of the file (blank area).'", function () {
+            expect(function () { reader.parseFile(file); }).toThrow(new Error("Invalid content of the file (blank area). [3]"));
+        });
+    });
     
 
 });
