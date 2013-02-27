@@ -6,7 +6,10 @@
 
 using System;
 using System.Data.Entity;
+using System.Data.Entity.Migrations;
+using System.Data.Entity.Migrations.Design;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Chronozoom.Entities
 {
@@ -40,18 +43,61 @@ namespace Chronozoom.Entities
 
         public DbSet<Tour> Tours { get; set; }
 
+        /// <summary>
+        /// If the schema changes, upgrades the storage.
+        /// </summary>
+        public static void Upgrade()
+        {
+            var dbMigrator = new DbMigrator(new StorageMigrationsConfiguration());
+            dbMigrator.Update();
+        }
+
+        /// <summary>
+        /// Retrieves the root timeline.
+        /// </summary>
+        public Timeline RootTimeline()
+        {
+            return (from timeline in Timelines
+                    where timeline.ParentTimeline == null
+                    select timeline).FirstOrDefault();
+        }
+
+        private static void SeedInitialData(Storage context)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException("context");
+            }
+
+            Trace.TraceInformation("Seeding database with data");
+
+            if (context.RootTimeline() == null)
+            {
+                Trace.TraceInformation("Root timeline does not exist, creating one");
+                context.Timelines.Add(new Timeline { ID = new Guid("00000000-0000-0000-0000-000000000000"), UniqueID = 655, Title = "Hello world", FromYear = 711, ToYear = 1492, Height = 20, FromTimeUnit = "CE", ToTimeUnit = "CE" });
+            }
+        }
+
         private class StorageChangeInitializer : CreateDatabaseIfNotExists<Storage>
         {
             protected override void Seed(Storage context)
             {
-                if (context == null)
-                {
-                    throw new ArgumentNullException("context");
-                }
+                SeedInitialData(context);
+            }
+        }
 
-                Trace.TraceInformation("Seeding database with data");
-                context.Timelines.Add(new Timeline { ID = Guid.NewGuid(), UniqueID = 655, Title = "Hello world", FromYear = 711, ToYear = 1492, Height = 20, FromTimeUnit = "CE", ToTimeUnit = "CE" });
-            } 
+        /// <summary>
+        /// Describes storage migration options. Used when a schema upgrade is required.
+        /// </summary>
+        private class StorageMigrationsConfiguration : DbMigrationsConfiguration<Storage>
+        {
+            public StorageMigrationsConfiguration()
+            {
+                AutomaticMigrationsEnabled = true;
+
+                // The schema is still changing rapidly; however, at some point this settings needs to be removed.
+                AutomaticMigrationDataLossAllowed = true;
+            }
         }
     }
 }
