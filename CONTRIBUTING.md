@@ -16,8 +16,7 @@ See the [ChronoZoom Developer's Guide](Doc/ChronoZoom_Developer_Guide.md) for de
    ```bash
    git push origin <topic-branch-name>
    ```
-1. [Open a Pull Request](https://help.github.com/articles/using-pull-requests) with a
-    clear title and description.
+1. [Open a Pull Request](https://help.github.com/articles/using-pull-requests) with a clear title and description.
 
 ## Git Hygiene ##
 While working, commit your changes in logical chunks. Use Git's [interactive rebase](https://help.github.com/articles/interactive-rebase) feature to tidy up your commits before making them public. Note that this should not be done after pushing changes to any remote repository. Additionally, be sure to observe these [git commit message guidelines](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html). 
