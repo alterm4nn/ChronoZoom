@@ -41,7 +41,7 @@ namespace UI
                 if (!Cache.Contains("Timelines"))
                 {
                     Trace.TraceInformation("Get Timelines Cache Miss");
-                    var t = _storage.Timelines.Find(new Guid("468A8005-36E3-4676-9F52-312D8B6EB7B7")); // Hardcoded 'root' timeline :-(
+					var t = _storage.Timelines.Find(new Guid("00000000-0000-0000-0000-000000000000"));
                     LoadChildren(t);
 
                     Cache.Add("Timelines", new [] { t }, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
