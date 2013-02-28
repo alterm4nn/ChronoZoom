@@ -48,7 +48,7 @@ namespace UI
                             select timeline).FirstOrDefault();
 
                     if (t == null)
-                        Trace.TraceInformation("Can't find a default timeline");
+                        Trace.TraceInformation("Can't find a default timeline from " + _storage.Timelines.Count().ToString() + " timelines");
 
                     LoadChildren(t);
 
