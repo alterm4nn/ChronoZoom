@@ -81,7 +81,7 @@ In order to get the source for ChronoZoom, you will need to install [Git for Win
     You now have your own fork of the ChronoZoom project.
 
 1. Add a remote for the master repository by running the following commands:
-    ```bash
+    ```
     # Navigate to the newly cloned directory.
     cd ChronoZoom
     # Assign the original repo to a remote called "blessed".
