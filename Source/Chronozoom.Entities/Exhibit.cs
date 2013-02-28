@@ -50,5 +50,11 @@ namespace Chronozoom.Entities
 
         [DataMember]
         public virtual Collection<Reference> References { get; private set; }
+
+        public Exhibit()
+        {
+            ContentItems = new Collection<ContentItem>();
+            References = new Collection<Reference>();
+        }
     }
 }

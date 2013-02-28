@@ -68,5 +68,11 @@ namespace Chronozoom.Entities
 
         [DataMember]
         public virtual Collection<Exhibit> Exhibits { get; private set; }
+
+        public Timeline()
+        {
+            ChildTimelines = new Collection<Timeline>();
+            Exhibits = new Collection<Exhibit>();
+        }
     }
 }

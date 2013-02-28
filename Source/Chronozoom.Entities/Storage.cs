@@ -6,6 +6,8 @@
 
 using System;
 using System.Data.Entity;
+using System.Data.Entity.Migrations;
+using System.Data.Entity.Migrations.Design;
 using System.Diagnostics;
 
 namespace Chronozoom.Entities
@@ -40,6 +42,15 @@ namespace Chronozoom.Entities
 
         public DbSet<Tour> Tours { get; set; }
 
+        /// <summary>
+        /// If the schema changes, upgrades the database.
+        /// </summary>
+        public static void Upgrade()
+        {
+            var dbMigrator = new DbMigrator(new StorageMigrationsConfiguration());
+            dbMigrator.Update();
+        }
+
         private class StorageChangeInitializer : CreateDatabaseIfNotExists<Storage>
         {
             protected override void Seed(Storage context)
@@ -52,6 +63,17 @@ namespace Chronozoom.Entities
                 Trace.TraceInformation("Seeding database with data");
                 context.Timelines.Add(new Timeline { ID = new Guid("00000000-0000-0000-0000-000000000000"), UniqueID = 655, Title = "Hello world", FromYear = 711, ToYear = 1492, Height = 20, FromTimeUnit = "CE", ToTimeUnit = "CE" });
             } 
+        }
+
+        private class StorageMigrationsConfiguration : DbMigrationsConfiguration<Storage>
+        {
+            public StorageMigrationsConfiguration()
+            {
+                AutomaticMigrationsEnabled = true;
+
+                // The schema is still changing rapidly; however, at some point this settings needs to be removed.
+                AutomaticMigrationDataLossAllowed = true;
+            }
         }
     }
 }
