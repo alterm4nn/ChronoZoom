@@ -27,8 +27,8 @@ Click **CONFIGURE** to access the Web site configuration options tab. Here you c
 
 Click **SCALE** to bring up the SCALE tab. Here you can modify scale options to give a Web site additional load capacity and/or fault tolerance.
 
-![Scale](images/ops_guide-5.png)
+![Scale](images/ops_guide-6.png)
 
 Click **LINKED RESOURCES** to see all of the resources that your Web site is dependent upon. At the start, you should see only your SQL database. Note that you can scale the capacity of your SQL database on the **SCALE** tab for your Web site.
 
-![Linked Resources](images/ops_guide-6.png)
+![Linked Resources](images/ops_guide-7.png)
