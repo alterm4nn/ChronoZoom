@@ -43,7 +43,7 @@ namespace Chronozoom.Entities
         public DbSet<Tour> Tours { get; set; }
 
         /// <summary>
-        /// If the schema changes, upgrades the database.
+        /// If the schema changes, upgrades the storage.
         /// </summary>
         public static void Upgrade()
         {
@@ -65,6 +65,9 @@ namespace Chronozoom.Entities
             } 
         }
 
+        /// <summary>
+        /// Describes storage migration options. Used when a schema upgrade is required.
+        /// </summary>
         private class StorageMigrationsConfiguration : DbMigrationsConfiguration<Storage>
         {
             public StorageMigrationsConfiguration()
