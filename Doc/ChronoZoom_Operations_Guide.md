@@ -29,6 +29,6 @@ Click **SCALE** to bring up the SCALE tab. Here you can modify scale options to 
 
 ![Scale](images/ops_guide-5.png)
 
-Click **LINKED RESOURCES** to see all of the resources that your Web site is dependent upon. At the start, you should see only your SQL database. Note that you can scale the capacity of your SQL database on the **SCALE** page for your Web site.
+Click **LINKED RESOURCES** to see all of the resources that your Web site is dependent upon. At the start, you should see only your SQL database. Note that you can scale the capacity of your SQL database on the **SCALE** tab for your Web site.
 
 ![Linked Resources](images/ops_guide-6.png)
