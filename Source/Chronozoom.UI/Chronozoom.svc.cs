@@ -47,6 +47,9 @@ namespace UI
                             where timeline.ParentTimeline == null
                             select timeline).FirstOrDefault();
 
+                    if (t == null)
+                        Trace.TraceInformation("Can't find a default timeline from " + _storage.Timelines.Count().ToString() + " timelines");
+
                     LoadChildren(t);
 
                     Cache.Add("Timelines", new [] { t }, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));

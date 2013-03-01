@@ -51,17 +51,22 @@ namespace Chronozoom.Entities
             dbMigrator.Update();
         }
 
+        private static void SeedInitialData(Storage context)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException("context");
+            }
+
+            Trace.TraceInformation("Seeding database with data");
+            context.Timelines.Add(new Timeline { ID = new Guid("00000000-0000-0000-0000-000000000000"), UniqueID = 655, Title = "Hello world", FromYear = 711, ToYear = 1492, Height = 20, FromTimeUnit = "CE", ToTimeUnit = "CE" });
+        }
+
         private class StorageChangeInitializer : CreateDatabaseIfNotExists<Storage>
         {
             protected override void Seed(Storage context)
             {
-                if (context == null)
-                {
-                    throw new ArgumentNullException("context");
-                }
-
-                Trace.TraceInformation("Seeding database with data");
-                context.Timelines.Add(new Timeline { ID = new Guid("00000000-0000-0000-0000-000000000000"), UniqueID = 655, Title = "Hello world", FromYear = 711, ToYear = 1492, Height = 20, FromTimeUnit = "CE", ToTimeUnit = "CE" });
+                SeedInitialData(context);
             } 
         }
 
@@ -74,9 +79,14 @@ namespace Chronozoom.Entities
             {
                 AutomaticMigrationsEnabled = true;
 
-                // The schema is still changing rapidly; however, at some point this setting needs to be removed.
+                // The schema is still changing rapidly; however, at some point this settings needs to be removed.
                 AutomaticMigrationDataLossAllowed = true;
             }
+
+            protected override void Seed(Storage context)
+            {
+                SeedInitialData(context);
+            } 
         }
     }
 }
