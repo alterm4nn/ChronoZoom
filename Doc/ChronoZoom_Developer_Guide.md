@@ -81,10 +81,15 @@ In order to get the source for ChronoZoom, you will need to install [Git for Win
     You now have your own fork of the ChronoZoom project.
 
 1. Add a remote for the master repository by running the following commands:
-    `cd ChronoZoom`
-    `git remote add upstream https://github.com/alterm4nn/ChronoZoom.git`
-    `git pull blessed master`
-
+    ```
+    # Navigate to the newly cloned directory.
+    cd ChronoZoom
+    # Assign the original repo to a remote called "blessed".
+    git remote add blessed https://github.com/alterm4nn/ChronoZoom.git
+    # Get the latest changes from blessed:
+    git checkout master
+    git pull blessed master
+    ```
 1. In your GitHub repository, create a [topic branch](http://learn.github.com/p/branching.html). Topic branches are typically lightweight branches that you create locally and that have a name that is meaningful for you. They are where you might do work for a bug fix or feature (they're also called feature branches). The following command shows using  the git **checkout** command to create a topic branch:
 
     `git checkout -b branch_name`
@@ -157,4 +162,4 @@ Open the Git command prompt and use the following command. You will be prompted 
  
 ### Preview Your Site! ###
 
-Browse to http://**mycz**.azurewebsites.net/ and behold your own copy of ChronoZoom! Your site URL is listed in the **quick glance** column of the Azure dashboard.
+Browse to http://**mycz**.azurewebsites.net/ and behold your own copy of ChronoZoom! Your site URL is listed in the **quick glance** column of the Azure dashboard. For operational management details, see [Chronozoom Operations Guide](Doc/ChronoZoom_Operations_Guide.md).
