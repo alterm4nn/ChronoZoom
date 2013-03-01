@@ -9,6 +9,7 @@ using System.Data.Entity;
 using System.Data.Entity.Migrations;
 using System.Data.Entity.Migrations.Design;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Chronozoom.Entities
 {
@@ -51,6 +52,16 @@ namespace Chronozoom.Entities
             dbMigrator.Update();
         }
 
+        /// <summary>
+        /// Retrieves the root timeline.
+        /// </summary>
+        public Timeline RootTimeline()
+        {
+            return (from timeline in Timelines
+                    where timeline.ParentTimeline == null
+                    select timeline).FirstOrDefault();
+        }
+
         private static void SeedInitialData(Storage context)
         {
             if (context == null)
@@ -59,7 +70,12 @@ namespace Chronozoom.Entities
             }
 
             Trace.TraceInformation("Seeding database with data");
-            context.Timelines.Add(new Timeline { ID = new Guid("00000000-0000-0000-0000-000000000000"), UniqueID = 655, Title = "Hello world", FromYear = 711, ToYear = 1492, Height = 20, FromTimeUnit = "CE", ToTimeUnit = "CE" });
+
+            if (context.RootTimeline() == null)
+            {
+                Trace.TraceInformation("Root timeline does not exist, creating one");
+                context.Timelines.Add(new Timeline { ID = new Guid("00000000-0000-0000-0000-000000000000"), UniqueID = 655, Title = "Hello world", FromYear = 711, ToYear = 1492, Height = 20, FromTimeUnit = "CE", ToTimeUnit = "CE" });
+            }
         }
 
         private class StorageChangeInitializer : CreateDatabaseIfNotExists<Storage>

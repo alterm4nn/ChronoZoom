@@ -42,14 +42,7 @@ namespace UI
                 {
                     Trace.TraceInformation("Get Timelines Cache Miss");
 
-                    // Retrieve the master timeline (the one that has not parent).
-                    var t = (from timeline in _storage.Timelines
-                            where timeline.ParentTimeline == null
-                            select timeline).FirstOrDefault();
-
-                    if (t == null)
-                        Trace.TraceInformation("Can't find a default timeline from " + _storage.Timelines.Count().ToString() + " timelines");
-
+                    var t = _storage.RootTimeline();
                     LoadChildren(t);
 
                     Cache.Add("Timelines", new [] { t }, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
