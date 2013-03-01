@@ -60,7 +60,6 @@ namespace Chronozoom.Entities
         [DataMember]
         public decimal? Height { get; set; }
 
-        [DataMember]
         public virtual Timeline ParentTimeline { get; private set; }
 
         [DataMember]
