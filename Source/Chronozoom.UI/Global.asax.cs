@@ -26,6 +26,9 @@ namespace UI
 
             RouteTable.Routes.MapHubs();
 
+            // If required, upgrades the database.
+            Storage.Upgrade();
+
             Trace.TraceInformation("Application Starting");
         }
 
