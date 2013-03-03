@@ -60,10 +60,18 @@ namespace Chronozoom.Entities
         [DataMember]
         public decimal? Height { get; set; }
 
+        public virtual Timeline ParentTimeline { get; private set; }
+
         [DataMember]
         public virtual Collection<Timeline> ChildTimelines { get; private set; }
 
         [DataMember]
         public virtual Collection<Exhibit> Exhibits { get; private set; }
+
+        public Timeline()
+        {
+            ChildTimelines = new Collection<Timeline>();
+            Exhibits = new Collection<Exhibit>();
+        }
     }
 }
