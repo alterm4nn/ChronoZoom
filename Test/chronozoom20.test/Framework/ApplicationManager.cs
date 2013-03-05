@@ -12,6 +12,7 @@ namespace Framework
         private HomePageHelper _homePageHelper;
         private TourHelper _tourHelper;
         private BookmarkHelper _bookmarkHelper;
+        private TimelineHelper _timelineHelper;
 
         public static ApplicationManager GetInstance()
         {
@@ -60,6 +61,11 @@ namespace Framework
         public BookmarkHelper GetBookmarkHelper()
         {
             return _bookmarkHelper ?? (_bookmarkHelper = new BookmarkHelper());
+        }
+
+        public TimelineHelper GetTimelineHelper()
+        {
+            return _timelineHelper ?? (_timelineHelper = new TimelineHelper());
         }
 
     }

@@ -84,6 +84,7 @@
     <Compile Include="Helpers\BookmarkHelper.cs" />
     <Compile Include="Helpers\HomePageHelper.cs" />
     <Compile Include="Helpers\NavigationHelper.cs" />
+    <Compile Include="Helpers\TimelineHelper.cs" />
     <Compile Include="Helpers\TourHelper.cs" />
     <Compile Include="Interfaces\IControls.cs" />
     <Compile Include="IoC.cs" />

@@ -33,6 +33,13 @@ namespace Framework.Helpers
             Logger.Log("<-");
             Click(By.Id("life_rect"));
             Logger.Log("->");
+        } 
+        
+        public void OpenHumanityPage()
+        {
+            Logger.Log("<-");
+            Click(By.Id("human_rect"));
+            Logger.Log("->");
         }
 
         private void NavigateToProterozoic()

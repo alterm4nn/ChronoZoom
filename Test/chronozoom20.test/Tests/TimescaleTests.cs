@@ -3,7 +3,7 @@
 namespace Tests
 {
     [TestClass]
-    public class PhanerozoicAgeTests : TestBase
+    public class TimescaleTests : TestBase
     {
         public TestContext TestContext { get; set; }
 
@@ -12,7 +12,7 @@ namespace Tests
         [ClassInitialize]
         public static void ClassInitialize(TestContext testContext)
         {
-            
+
         }
 
         [TestInitialize]
@@ -20,7 +20,7 @@ namespace Tests
         {
             BrowserStateManager.RefreshState();
             NavigationHelper.OpenHomePage();
-            HomePageHelper.CloseWelcomePopup();
+            //HomePageHelper.CloseWelcomePopup();
         }
 
         [ClassCleanup]
@@ -35,22 +35,22 @@ namespace Tests
             NavigationHelper.NavigateToCosmos();
         }
 
-        #endregion
+        #endregion 
 
         [TestMethod]
-        public void Test_Eukaryotic_Cells_Description()
-        {
-
-            string description = HomePageHelper.GetEukaryoticCellsDescription();
-            StringAssert.Contains(description, "Eukaryote cells");
-        }
-
-        [TestMethod]
-        public void Test_Navigate_To_Life()
+        public void Life_TimeLine_Contains_Data()
         {
             HomePageHelper.OpenLifeTimeline();
-            string actual = HomePageHelper.GetLastBreadcrumbs();
-            Assert.AreEqual("Life", actual);
-        }
+            CollectionAssert.Contains(TimelineHelper.GetLabels(), "-4000Ma", "-4000Ma is presented");
+            CollectionAssert.Contains(TimelineHelper.GetLabels(), "-500Ma", "-500Ma is presented");
+        } 
+        
+        [TestMethod]
+        public void Humanity_TimeLine_Contains_Data()
+        {
+            HomePageHelper.OpenHumanityTimeline();
+            CollectionAssert.Contains(TimelineHelper.GetLabels(), "3000BCE", "3000BCE is presented");
+            CollectionAssert.Contains(TimelineHelper.GetLabels(), "2000CE", "2000CE is presented");
+        }  
     }
 }

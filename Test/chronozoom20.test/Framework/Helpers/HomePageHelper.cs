@@ -30,10 +30,18 @@ namespace Framework.Helpers
             return description;
         }
 
-        public void OpenLifeTimeLine()
+        public void OpenLifeTimeline()
         {
             Logger.Log("<-");
             _manager.GetNavigationHelper().OpenLifePage();
+            WaitAnimation();
+            Logger.Log("->");
+        } 
+        
+        public void OpenHumanityTimeline()
+        {
+            Logger.Log("<-");
+            _manager.GetNavigationHelper().OpenHumanityPage();
             WaitAnimation();
             Logger.Log("->");
         }
