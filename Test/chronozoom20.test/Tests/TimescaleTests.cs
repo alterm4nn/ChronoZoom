@@ -52,5 +52,13 @@ namespace Tests
             CollectionAssert.Contains(TimelineHelper.GetLabels(), "3000BCE", "3000BCE is presented");
             CollectionAssert.Contains(TimelineHelper.GetLabels(), "2000CE", "2000CE is presented");
         }  
+        
+        [TestMethod]
+        public void Transition_BCE_to_CE_should_contain_1BCE_and_1CE_ticks()
+        {
+            HomePageHelper.OpenBceCeArea();
+            CollectionAssert.Contains(TimelineHelper.GetLabels(), "1BCE", "1BCE is presented");
+            CollectionAssert.Contains(TimelineHelper.GetLabels(), "1CE", "1CE is presented");
+        }  
     }
 }

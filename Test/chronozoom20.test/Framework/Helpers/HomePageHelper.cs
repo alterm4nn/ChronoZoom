@@ -46,6 +46,14 @@ namespace Framework.Helpers
             Logger.Log("->");
         }
 
+        public void OpenBceCeArea()
+        {
+            Logger.Log("<-");
+            ExecuteJavaScript("controller.moveToVisible(new VisibleRegion2d(-2012.9408427494022, 222893683.28023896,0.001905849287056807),false)");
+            WaitAnimation();
+            Logger.Log("->");
+        }
+
         public string GetLastBreadcrumbs()
         {
             Logger.Log("<-");
