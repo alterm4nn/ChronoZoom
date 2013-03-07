@@ -39,5 +39,5 @@ ON [dbo].[Timeline]
 FOR INSERT, UPDATE
 AS 
 BEGIN
-	UPDATE [dbo].[Timeline] SET i.ForkNode = ForkNode(i.StartContentYear, i.EndContentYear) FROM INSERTED i
+	UPDATE [dbo].[Timeline] SET i.ForkNode = ForkNode(i.FromContentYear, i.ToContentYear) FROM INSERTED i
 END
