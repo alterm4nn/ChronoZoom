@@ -7,6 +7,7 @@
     [FromContentYear]  DECIMAL (8, 4)     NULL,
     [ToContentDate]    DATETIMEOFFSET (7) NULL,
     [ToContentYear]    DECIMAL (8, 4)     NULL,
+    [ForkNode]         INT                NULL,
     [ParentTimelineID] UNIQUEIDENTIFIER   NULL,
     [CreatedOn]        SMALLDATETIME      CONSTRAINT [DF_Timeline_CreatedOn] DEFAULT (CONVERT([smalldatetime],getdate(),(0))) NULL,
     [CreatedBy]        UNIQUEIDENTIFIER   NULL,
@@ -32,3 +33,11 @@
     CONSTRAINT [FK_Timeline_User] FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[User] ([ID]) ON DELETE NO ACTION ON UPDATE NO ACTION,
     CONSTRAINT [FK_Timeline_User1] FOREIGN KEY ([ModifiedBy]) REFERENCES [dbo].[User] ([ID]) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
+
+CREATE TRUGGER ComputeForkNode
+ON [dbo].[Timeline] 
+FOR INSERT, UPDATE
+AS 
+BEGIN
+	UPDATE [dbo].[Timeline] SET i.ForkNode = ForkNode(i.StartContentYearr, i.EndContentYear) FROM INSERTED i
+END
