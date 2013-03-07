@@ -2,7 +2,7 @@
   <Settings>
     <Global>
       <IsUsingGrid>true</IsUsingGrid>
-      <BaseUrl>http://www.chronozoomproject.org</BaseUrl>
+      <BaseUrl>http://depot.cs.msu.su:9090/TimescaleDemo/test/html/testTimescale.htm</BaseUrl>
       <ImplicitWait>60</ImplicitWait>
       <ExplicitWait>60</ExplicitWait>
       <BrowserName>chrome</BrowserName>
