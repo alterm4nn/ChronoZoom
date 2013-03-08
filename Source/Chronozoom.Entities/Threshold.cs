@@ -8,6 +8,7 @@ using System.Runtime.Serialization;
 
 namespace Chronozoom.Entities
 {
+    [KnownType(typeof(ExhibitRaw))]
     [DataContract]
     public class Threshold
     {

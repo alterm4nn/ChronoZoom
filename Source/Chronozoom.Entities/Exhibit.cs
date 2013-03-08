@@ -7,10 +7,13 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 
 namespace Chronozoom.Entities
 {
+    [KnownType(typeof(ContentItemRaw))]
+    [KnownType(typeof(ReferenceRaw))]
     [DataContract]
     public class Exhibit
     {
@@ -46,9 +49,16 @@ namespace Chronozoom.Entities
         public int? Sequence { get; set; }
 
         [DataMember]
-        public virtual Collection<ContentItem> ContentItems { get; private set; }
+        public virtual Collection<ContentItem> ContentItems { get; set; }
 
         [DataMember]
-        public virtual Collection<Reference> References { get; private set; }
+        public virtual Collection<Reference> References { get; set; }
+    }
+
+    [DataContract]
+    [NotMapped]
+    public class ExhibitRaw : Exhibit
+    {
+        public Guid Timeline_ID { get; set; }
     }
 }
