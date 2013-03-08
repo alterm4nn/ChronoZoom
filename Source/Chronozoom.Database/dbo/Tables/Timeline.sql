@@ -34,10 +34,13 @@
     CONSTRAINT [FK_Timeline_User1] FOREIGN KEY ([ModifiedBy]) REFERENCES [dbo].[User] ([ID]) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
+CREATE NONCLUSTERED INDEX [dbo].[FromContentYearIndex] ON [dbo].[Timeline](ForkNode, FromContentYear);
+CREATE NONCLUSTERED INDEX [dbo].[ToContentYearIndex] ON [dbo].[Timeline](ForkNode, ToContentYear);
+
 CREATE TRUGGER ComputeForkNode
 ON [dbo].[Timeline] 
 FOR INSERT, UPDATE
 AS 
 BEGIN
-	UPDATE [dbo].[Timeline] SET i.ForkNode = ForkNode(i.FromContentYear, i.ToContentYear) FROM INSERTED i
+	UPDATE [dbo].[Timeline] SET i.ForkNode = GetForkNode(i.FromContentYear, i.ToContentYear) FROM INSERTED i
 END
