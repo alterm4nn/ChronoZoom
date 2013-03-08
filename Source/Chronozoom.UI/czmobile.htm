@@ -1,35 +1,34 @@
-﻿
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Pragma" content="no-cache" />
     <meta name="Description" content="ChronoZoom is an open-source community project dedicated to visualizing the history of everything." />
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, maximum-scale=1.0" />
-   <script type="text/javascript">
-       // Invoke timings.show() to get timings
-       var timings = new Object();
-       timings.parseStarted = new Date();
-       timings.show = function () {
-           var msg =
+    <script type="text/javascript">
+        // Invoke timings.show() to get timings
+        var timings = new Object();
+        timings.parseStarted = new Date();
+        timings.show = function () {
+            var msg =
                 "External scripts loading: " + (timings.scriptsLoaded - timings.parseStarted) +
                 " ms\nDocument ready handler: " + (timings.readyStarted - timings.scriptsLoaded) +
                 " ms\n\nRequesting server for timelines data: " + (timings.wcfRequestCompleted - timings.wcfRequestStarted) +
                 " ms\nLayout algorithm: " + (timings.layoutCompleted - timings.wcfRequestCompleted) +
                 " ms\nPopulating virtual canvas: " + (timings.canvasInited - timings.layoutCompleted) + " ms";
-           alert(msg);
-       }
+            alert(msg);
+        }
 
-       var _gaq = _gaq || [];
-       _gaq.push(['_setAccount', 'UA-29180487-2']);
-       _gaq.push(['_setDomainName', 'chronozoomproject.org']);
-       _gaq.push(['_setAllowLinker', true]);
-       _gaq.push(['_trackPageview']);
-       (function () {
-           var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-           ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-           var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-       })();
-</script>
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29180487-2']);
+        _gaq.push(['_setDomainName', 'chronozoomproject.org']);
+        _gaq.push(['_setAllowLinker', true]);
+        _gaq.push(['_trackPageview']);
+        (function () {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
 
     <link rel="stylesheet" type="text/css" href="Styles/cz.css" />
     <link rel="stylesheet" type="text/css" href="Styles/axis.css" />
@@ -64,7 +63,7 @@
 
         var regimes = new Array();
         var regimeNavigator;
-        
+
         var k = 1000000000;
         var setNavigationStringTo; // { element or bookmark, id } identifies that we zoom into this element and when (if) finish the zoom, we should put the element's path into navigation string
 
@@ -223,8 +222,6 @@
                 }
             });
 
-
-
             updateLayout();
 
             vc.bind("elementclick", function (e) {
@@ -251,18 +248,30 @@
             updateAxis(vc, ax);
         });
 
-          //loading the data from the service
+        // Retrieves the URL to download the data from
+        function loadDataUrl() {
+                        // The following regexp extracts the pattern dataurl=url from the page hash to enable loading timelines from arbitrary sources.
+            var match = /dataurl=([^\/]*)/g.exec(window.location.hash);
+            if (match) {
+                return unescape(match[1]);
+            } else {
+                switch (czDataSource) {
+                    case 'db':
+                        return "Chronozoom.svc/get";
+                    case 'relay':
+                        return "ChronozoomRelay";
+                    case 'dump':
+                        return "ResponseDump.txt";
+                    default:
+                        return null;
+                }
+            }
+        }
+
+        //loading the data from the service
         function loadData() {
             timings.wcfRequestStarted = new Date();
-            var url;
-            switch (czDataSource) {
-                case 'db': url = "Chronozoom.svc/get";
-                    break;
-                case 'relay': url = "ChronozoomRelay";
-                    break;
-                case 'dump': url = "ResponseDump.txt";
-                    break;
-            }
+            var url = loadDataUrl();
 
             $.ajax({ //main content fetching
                 cache: false,
@@ -348,7 +357,7 @@
         function updateLayout() {
             //document.getElementById("vc").style.height = (window.innerHeight - 150) + "px";
             //vertical regime
-               
+
             var height = window.innerHeight;
             var offset = height - 187;
             // todo: use axis' height instead of constants
@@ -362,7 +371,7 @@
             vc.virtualCanvas("updateViewport");
             ax.axis("updateWidth");
             updateAxis(vc, ax);
-    
+
         }
 
 
@@ -426,7 +435,7 @@
 
         });
 
-           
+
         /*
         Is called by direct user actions like links, bread crumbs clicking, etc.
         */
@@ -450,14 +459,14 @@
                 setNavigationStringTo = { element: e.element, id: animId };
             }
         }
-     
 
-	</script>
+
+    </script>
     <title>ChronoZoom</title>
 </head>
 <body style="background-color: Black" >
-	
-      <div id="axis" style="width: 100%; height: 47px; overflow: hidden" onselectstart="return false;">
+    
+    <div id="axis" style="width: 100%; height: 47px; overflow: hidden" onselectstart="return false;">
     </div>
     <div id="vc" style="width: 100%; height: auto; overflow: hidden; background-image: url('Images/background.jpg');
         background-repeat: no-repeat; background-attachment: fixed; background-position: center center;
@@ -485,45 +494,36 @@
         </div>
     </div>
     
-    
+    <div id = "DownDiv" style="position: relative; text-align: right;" >
+        <div id="cosmos_rect"; class="regime_rect" style="margin: 0 0 0 0; font-family: Arial;
+            height: 20px; text-align: center; width: 30px; background-color: rgba(152, 108, 157, 1.0); cursor: pointer;float: left" onclick="navigateToBookmark(cosmosVisible);">
+            C
+        </div>
 
-     <div id = "DownDiv" style="position: relative; text-align: right;" >
-                <div id="cosmos_rect"; class="regime_rect" style="margin: 0 0 0 0; font-family: Arial;
-                    height: 20px; text-align: center; width: 30px; background-color: rgba(152, 108, 157, 1.0); cursor: pointer;float: left" onclick="navigateToBookmark(cosmosVisible);">
-                    C
-                </div>
+        <div id="earth_rect"; class="regime_rect" style="margin: 0 0 0 10px;font-family: Arial;
+            height: 20px; text-align: center; width: 30px; background-color: rgba(81, 127, 149, 1.0); cursor: pointer;float: left" onclick="navigateToBookmark(earthVisible);">
+            E
+        </div>
 
-                 <div id="earth_rect"; class="regime_rect" style="margin: 0 0 0 10px;font-family: Arial;
-                    height: 20px; text-align: center; width: 30px; background-color: rgba(81, 127, 149, 1.0); cursor: pointer;float: left" onclick="navigateToBookmark(earthVisible);">
-                    E
-                </div>
+        <div id="life_rect"; class="regime_rect" style="margin: 0 0 0 10px;font-family: Arial;
+            height: 20px; text-align: center; width: 30px; background-color: rgba(73, 150, 73, 1.0); cursor: pointer;float: left" onclick="navigateToBookmark(lifeVisible);">
+            L
+        </div>
 
-                 <div id="life_rect"; class="regime_rect" style="margin: 0 0 0 10px;font-family: Arial;
-                    height: 20px; text-align: center; width: 30px; background-color: rgba(73, 150, 73, 1.0); cursor: pointer;float: left" onclick="navigateToBookmark(lifeVisible);">
-                    L
-                </div>
+        <div id="prehuman_rect"; class="regime_rect" style="margin: 0 0 0 10px;font-family: Arial;
+            height: 20px; text-align: center; width: 30px; background-color: rgba(237, 145, 50, 1.0); cursor: pointer;float: left" onclick="navigateToBookmark(prehistoryVisible);">
+            P
+        </div>
 
-                 <div id="prehuman_rect"; class="regime_rect" style="margin: 0 0 0 10px;font-family: Arial;
-                    height: 20px; text-align: center; width: 30px; background-color: rgba(237, 145, 50, 1.0); cursor: pointer;float: left" onclick="navigateToBookmark(prehistoryVisible);">
-                    P
-                </div>
+        <div id="human_rect"; class="regime_rect" style="margin: 0 0 0 10px;font-family: Arial;
+            height: 20px; text-align: center; width: 30px; background-color: rgba(212, 92, 70, 1.0); cursor: pointer;float: left" onclick="navigateToBookmark(humanityVisible);">
+            H
+        </div>
 
-                 <div id="human_rect"; class="regime_rect" style="margin: 0 0 0 10px;font-family: Arial;
-                    height: 20px; text-align: center; width: 30px; background-color: rgba(212, 92, 70, 1.0); cursor: pointer;float: left" onclick="navigateToBookmark(humanityVisible);">
-                    H
-                </div>
-
-            
-
-     <span id="Span" class="footerText" style="float: left;" onclick="javascript: window.open('cz.htm');">
-      Go to full version
-     </span> 
-
-       <img  id = "Czpicture" style="float: left" title="ChronoZoom"  src="Images/chronzoom-200px-white-mob.png" />
-  
-     </div>
-
-     
- 
+        <span id="Span" class="footerText" style="float: left;" onclick="javascript: window.open('cz.htm');">
+            Go to full version
+        </span> 
+        <img  id = "Czpicture" style="float: left" title="ChronoZoom"  src="Images/chronzoom-200px-white-mob.png" />
+    </div>
 </body>
 </html>

@@ -50,7 +50,7 @@ namespace Chronozoom.Entities
                 }
 
                 Trace.TraceInformation("Seeding database with data");
-                context.Timelines.Add(new Timeline { ID = Guid.NewGuid(), UniqueID = 655, Title = "Hello world", FromYear = 711, ToYear = 1492, Height = 20, FromTimeUnit = "CE", ToTimeUnit = "CE" });
+                context.Timelines.Add(new Timeline { ID = Guid.Empty, UniqueID = 655, Title = "Hello world", FromYear = 711, ToYear = 1492, Height = 20, FromTimeUnit = "CE", ToTimeUnit = "CE" });
             } 
         }
     }
