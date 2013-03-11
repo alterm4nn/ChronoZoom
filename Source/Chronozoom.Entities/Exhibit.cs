@@ -7,6 +7,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 
 namespace Chronozoom.Entities
@@ -27,17 +28,20 @@ namespace Chronozoom.Entities
         [DataMember]
         public string Regime { get; set; }
 
+        [NotMapped]
         [DataMember]
         public string TimeUnit { get; set; }
 
+        [NotMapped]
         [DataMember]
         public int? Day { get; set; }
 
+        [NotMapped]
         [DataMember]
         public int? Month { get; set; }
 
         [DataMember]
-        public decimal? Year { get; set; }
+        public decimal Year { get; set; }
 
         [DataMember]
         public int UniqueID { get; set; }
