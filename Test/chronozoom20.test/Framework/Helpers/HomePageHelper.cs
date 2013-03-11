@@ -34,6 +34,7 @@ namespace Framework.Helpers
         {
             Logger.Log("<-");
             _manager.GetNavigationHelper().OpenLifePage();
+            WaitForElementIsDisplayed(By.Id("bc_link_t66"));
             WaitAnimation();
             Logger.Log("->");
         } 
@@ -42,6 +43,7 @@ namespace Framework.Helpers
         {
             Logger.Log("<-");
             _manager.GetNavigationHelper().OpenHumanityPage();
+            WaitForElementIsDisplayed(By.Id("bc_link_t161"));
             WaitAnimation();
             Logger.Log("->");
         }
@@ -50,6 +52,7 @@ namespace Framework.Helpers
         {
             Logger.Log("<-");
             ExecuteJavaScript("controller.moveToVisible(new VisibleRegion2d(-2012.9408427494022, 222893683.28023896,0.001905849287056807),false)");
+            WaitForElementIsDisplayed(By.Id("bc_link_t550"));
             WaitAnimation();
             Logger.Log("->");
         }

@@ -25,12 +25,13 @@ namespace Framework.Helpers
             Logger.Log("<-");
             Click(By.Id("cosmos_rect"));
             WaitAnimation();
-            //Logger.Log("->");
+            Logger.Log("->");
         }
 
         public void OpenLifePage()
         {
             Logger.Log("<-");
+            WaitForElementEnabled(By.Id("life_rect"));
             Click(By.Id("life_rect"));
             Logger.Log("->");
         } 
@@ -38,6 +39,7 @@ namespace Framework.Helpers
         public void OpenHumanityPage()
         {
             Logger.Log("<-");
+            WaitForElementEnabled(By.Id("human_rect"));
             Click(By.Id("human_rect"));
             Logger.Log("->");
         }
