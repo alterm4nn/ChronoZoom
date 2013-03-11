@@ -8,8 +8,8 @@ namespace Tests
     {
         const string Label3000Bce = "3000 BCE";
         const string Label2000Ce = "2000 CE";
-        const string LabelMinus4000Ma = "4000 Ma";
-        const string LabelMinus500Ma = "500 Ma";
+        const string LabelMinus4000Ma = "-4000 Ma";
+        const string LabelMinus500Ma = "-500 Ma";
         const string Label1Bce = "1 BCE";
         const string Label1Ce = "1 CE";
 
