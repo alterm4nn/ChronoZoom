@@ -1,10 +1,18 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Collections.Generic;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Tests
 {
     [TestClass]
     public class TimescaleTests : TestBase
     {
+        const string Label3000Bce = "3000 BCE";
+        const string Label2000Ce = "2000 CE";
+        const string LabelMinus4000Ma = "-4000 Ma";
+        const string LabelMinus500Ma = "-500 Ma";
+        const string Label1Bce = "1 BCE";
+        const string Label1Ce = "1 CE";
+
         public TestContext TestContext { get; set; }
 
         #region Initialize and Cleanup
@@ -41,24 +49,27 @@ namespace Tests
         public void Life_TimeLine_Contains_Data()
         {
             HomePageHelper.OpenLifeTimeline();
-            CollectionAssert.Contains(TimelineHelper.GetLabels(), "-4000Ma", "-4000Ma is presented");
-            CollectionAssert.Contains(TimelineHelper.GetLabels(), "-500Ma", "-500Ma is presented");
+            List<string> labels = TimelineHelper.GetLabels();
+            CollectionAssert.Contains(labels, LabelMinus4000Ma, LabelMinus4000Ma + " is presented");
+            CollectionAssert.Contains(labels, LabelMinus500Ma, LabelMinus500Ma + "is presented");
         } 
         
         [TestMethod]
         public void Humanity_TimeLine_Contains_Data()
         {
             HomePageHelper.OpenHumanityTimeline();
-            CollectionAssert.Contains(TimelineHelper.GetLabels(), "3000BCE", "3000BCE is presented");
-            CollectionAssert.Contains(TimelineHelper.GetLabels(), "2000CE", "2000CE is presented");
+            List<string> labels = TimelineHelper.GetLabels();
+            CollectionAssert.Contains(labels, Label3000Bce, Label3000Bce + " is presented");
+            CollectionAssert.Contains(labels, Label2000Ce, Label2000Ce + " is presented");
         }  
         
         [TestMethod]
         public void Transition_BCE_to_CE_should_contain_1BCE_and_1CE_ticks()
         {
             HomePageHelper.OpenBceCeArea();
-            CollectionAssert.Contains(TimelineHelper.GetLabels(), "1BCE", "1BCE is presented");
-            CollectionAssert.Contains(TimelineHelper.GetLabels(), "1CE", "1CE is presented");
+            List<string> labels = TimelineHelper.GetLabels();
+            CollectionAssert.Contains(labels, Label1Bce, Label1Bce + " is presented");
+            CollectionAssert.Contains(labels, Label1Ce, Label1Ce + " is presented");
         }  
     }
 }

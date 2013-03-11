@@ -13,6 +13,10 @@ namespace Framework.Helpers
             Logger.Log("<--");
             ReadOnlyCollection<IWebElement> webElements = FindElements(By.XPath("//*[@class='cz-timescale-label' and contains(@style,'display: block;')]"));
             List<string> labels = webElements.Select(label => label.Text).ToList();
+            foreach (string label in labels)
+            {
+                Logger.Log("--> label: " + label + "\r\n");
+            }
             return labels;
         }
     }
