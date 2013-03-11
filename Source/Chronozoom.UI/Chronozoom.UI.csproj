@@ -87,6 +87,7 @@
   <ItemGroup>
     <Content Include="BehindTheScenes.htm" />
     <Content Include="cz.aspx" />
+    <Content Include="cz2.html" />
     <Content Include="czmobile.htm" />
     <Content Include="favicon.ico" />
     <Content Include="Images\A.png" />
