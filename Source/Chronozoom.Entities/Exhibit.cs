@@ -1,7 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright company="Outercurve Foundation">
+//   Copyright (c) 2013, The Outercurve Foundation
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
+using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
 namespace Chronozoom.Entities
@@ -9,9 +14,10 @@ namespace Chronozoom.Entities
     [DataContract]
     public class Exhibit
     {
+        [Key]
         [DataMember]
         public Guid ID { get; set; }
-        
+
         [DataMember]
         public string Title { get; set; }
 
@@ -31,37 +37,18 @@ namespace Chronozoom.Entities
         public int? Month { get; set; }
 
         [DataMember]
-        public Decimal? Year { get; set; }
-
+        public decimal? Year { get; set; }
 
         [DataMember]
         public int UniqueID { get; set; }
-        
+
         [DataMember]
         public int? Sequence { get; set; }
 
         [DataMember]
-        public List<ContentItem> ContentItems;
+        public virtual Collection<ContentItem> ContentItems { get; private set; }
 
         [DataMember]
-        public List<Reference> References;
-
-
-        public Exhibit(Guid id, string title, string threshold, string regime, string timeUnit, int? day, int? month, Decimal? year, int uniqueID, int? sequence)
-        {
-            ID = id;
-            Title = title;
-            Threshold = threshold;
-            Regime = regime;
-            TimeUnit = timeUnit;
-            Day = day;
-            Month = month;
-            Year = year;
-            UniqueID = uniqueID;
-            Sequence = Sequence;
-
-            ContentItems = new List<ContentItem>();
-            References = new List<Reference>();
-        }
+        public virtual Collection<Reference> References { get; private set; }
     }
 }

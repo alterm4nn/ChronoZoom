@@ -53,7 +53,7 @@ contentItemDescriptionNumberOfLines = 10;
 contentItemShowContentZoomLevel = 9; // zoom level (log_2 of size in pixel) when all content is shown
 contentItemThumbnailMinLevel = 3; // miminimal available thumbnail in the database
 contentItemThumbnailMaxLevel = 7; // maximal available thumbnail in the database
-contentItemThumbnailBaseUri = 'https://[Your blob name].blob.core.windows.net/images/';
+contentItemThumbnailBaseUri = 'http://czbeta.blob.core.windows.net/images/';
 contentItemTopTitleHeight = 47.0 / 540;
 contentItemContentWidth = 480.0 / 520;
 contentItemVerticalMargin = 13.0 / 540;
@@ -116,7 +116,7 @@ gapLabelTick = 3; // gap between tick and label
 activeMarkSize = 10; // length of side of active triangle
 
 // IDs of regime timelines
-cosmosTimelineID = "468a8005-36e3-4676-9f52-312d8b6eb7b7"; //"4fd1cb5e-39bf-4117-9737-d4f0f575e867";
+cosmosTimelineID = "00000000-0000-0000-0000-000000000000"; //"4fd1cb5e-39bf-4117-9737-d4f0f575e867";
 earthTimelineID = "48fbb8a8-7c5d-49c3-83e1-98939ae2ae67";
 lifeTimelineID = "d4809be4-3cf9-4ddd-9703-3ca24e4d3a26"; //"18d7204b-11a7-46fb-918c-edf603af778f";
 prehistoryTimelineID = "a6b821df-2a4d-4f0e-baf5-28e47ecb720b"; //"990e6392-11a2-4379-873a-71e787eeab6e";

@@ -9,9 +9,12 @@
     [IsDeleted]         BIT              NULL,
     [CurrVersion]       INT              NULL,
     CONSTRAINT [PK_TimelineExhibit] PRIMARY KEY CLUSTERED ([TimelineExhibitID] ASC),
-    FOREIGN KEY ([CurrVersion]) REFERENCES [dbo].[CZVersion] ([VersionNumber]) ON DELETE NO ACTION ON UPDATE NO ACTION,
-    CONSTRAINT [FK_TimelineExhibit_Exhibit] FOREIGN KEY ([ExhibitID]) REFERENCES [dbo].[Exhibit] ([ID]) ON DELETE NO ACTION ON UPDATE NO ACTION,
-    CONSTRAINT [FK_TimelineExhibit_User] FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[User] ([ID]) ON DELETE NO ACTION ON UPDATE NO ACTION,
-    CONSTRAINT [FK_TimelineExhibit_User1] FOREIGN KEY ([ModifiedBy]) REFERENCES [dbo].[User] ([ID]) ON DELETE NO ACTION ON UPDATE NO ACTION
+    FOREIGN KEY ([CurrVersion]) REFERENCES [dbo].[CZVersion] ([VersionNumber]),
+    CONSTRAINT [FK_TimelineExhibit_Exhibit] FOREIGN KEY ([ExhibitID]) REFERENCES [dbo].[Exhibit] ([ID]),
+    CONSTRAINT [FK_TimelineExhibit_Timeline] FOREIGN KEY ([TimelineID]) REFERENCES [dbo].[Timeline] ([ID]),
+    CONSTRAINT [FK_TimelineExhibit_User] FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[User] ([ID]),
+    CONSTRAINT [FK_TimelineExhibit_User1] FOREIGN KEY ([ModifiedBy]) REFERENCES [dbo].[User] ([ID])
 );
+
+
 
