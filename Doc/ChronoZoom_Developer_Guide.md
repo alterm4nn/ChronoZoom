@@ -18,16 +18,13 @@ If you are new to GitHub, we recommend reading [Learning to use GitHub for Chron
 
 ## Contents ##
 
-[Install the ChronoZoom Development Environment Tools](#install)
+[Install the ChronoZoom Development Environment Tools](#install-the-chronozoom-development-environment-tools)
 
-[Clone the ChronoZoom GitHub Repository](#clone)
+[Clone the ChronoZoom GitHub Repository](#clone-the-chronozoom-github-repository)
 
-[Deploy ChronoZoom to Azure](#deploy)
+[Deploy ChronoZoom to Azure](#deploy-chronozoom-to-azure)
 
 ----------
-
-
-<a id="install"></a>
 
 ##  Install the ChronoZoom Development Environment Tools ##
 
@@ -66,7 +63,6 @@ You can use SSH keys to establish a secure connection between your computer and 
 
 Once this is done you can add the SSH key to GitHub. For more detailed information, see [Generating SSH Keys](https://help.github.com/articles/generating-ssh-keys).
 -->
-<a id="clone"></a>
 
 ## Clone the ChronoZoom GitHub Repository ##
 In order to get the source for ChronoZoom, you will need to install [Git for Windows](http://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git) and clone the GitHub repository. This section shows you how.
@@ -101,8 +97,6 @@ In order to get the source for ChronoZoom, you will need to install [Git for Win
 +* Enable EnableNuGetPackageRestore (Right click on VS Solution - Enable NuGet Package Restore)
 +* Build/Deploy locally from Visual Studio
 -->
-
-<a id="deploy"></a>
 
 ## Deploy ChronoZoom to Azure ##
 To test your changes, you will need to deploy ChronoZoom to Azure.
