@@ -145,14 +145,15 @@ describe("CZ.CosmosTickSource part", function () { //this is the class for creat
     //});
     
     describe("getRegime() method should set", function () {
-        it("regime to 'ka' if l <= -10000000000", function () {
-            var l = -10000000000;
+        it("regime to 'Ga' if l <= -10000000000", function () {
+            var l = -100000000000;
             var r = 0;
             cosmosTickSrc.getRegime(l, r);
             expect("Ga").toEqual(cosmosTickSrc.regime);
+            expect("Ga").toEqual(cosmosTickSrc.beta);
         });
         
-        it("regime to 'ka' if l <= -10000000", function () {
+        it("regime to 'Ma' if l <= -10000000", function () {
             var l = -10000000;
             var r = 0;
             cosmosTickSrc.getRegime(l, r);
