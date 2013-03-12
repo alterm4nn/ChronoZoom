@@ -1,4 +1,5 @@
-﻿using Framework.UserActions;
+﻿using System;
+using Framework.UserActions;
 using OpenQA.Selenium;
 
 namespace Framework.Helpers
@@ -8,6 +9,7 @@ namespace Framework.Helpers
         public void OpenHomePage()
         {
             OpenUrl(Configuration.BaseUrl);
+            WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("visReg != undefined")), 60);
         }
 
         public void OpenExhibitEukaryoticCells()
