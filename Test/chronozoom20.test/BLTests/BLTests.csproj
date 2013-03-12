@@ -56,12 +56,20 @@
   <ItemGroup>
     <Content Include="Content\jasmine\jasmine.css" />
     <Content Include="Content\jasmine\jasmine_favicon.png" />
+    <Content Include="Scripts\common.js" />
     <Content Include="Scripts\csvUtils.js" />
+    <Content Include="Scripts\cz.html.js" />
     <Content Include="Scripts\jquery-1.8.0.min.js" />
     <Content Include="Scripts\jquery.cookie.js" />
     <Content Include="Scripts\Specs\CsvParseSpec.js" />
     <Content Include="Scripts\jasmine\jasmine-html.js" />
     <Content Include="Scripts\jasmine\jasmine.js" />
+    <Content Include="Scripts\cz.html" />
+    <Content Include="Scripts\Specs\cz.html.js.Spec.js" />
+    <Content Include="Scripts\Specs\CommonSpec.js" />
+    <Content Include="Scripts\cz.settings.js" />
+    <Content Include="Scripts\Specs\TimeScaleSpec.js" />
+    <Content Include="Scripts\timescale.js" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
