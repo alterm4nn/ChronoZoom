@@ -6,7 +6,10 @@
 
 using System;
 using System.Data.Entity;
+using System.Data.Entity.Migrations;
+using System.Data.Entity.Migrations.Design;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Chronozoom.Entities
 {
@@ -22,7 +25,7 @@ namespace Chronozoom.Entities
 
         public Storage()
         {
-            Database.SetInitializer(new StorageChangeInitializer());
+            Database.SetInitializer(new MigrateDatabaseToLatestVersion<Storage, StorageMigrationsConfiguration>());
             Configuration.ProxyCreationEnabled = false;
         }
 
@@ -40,18 +43,9 @@ namespace Chronozoom.Entities
 
         public DbSet<Tour> Tours { get; set; }
 
-        private class StorageChangeInitializer : CreateDatabaseIfNotExists<Storage>
-        {
-            protected override void Seed(Storage context)
-            {
-                if (context == null)
-                {
-                    throw new ArgumentNullException("context");
-                }
+        public DbSet<Entities.Collection> Collections { get; set; }
 
-                Trace.TraceInformation("Seeding database with data");
-                context.Timelines.Add(new Timeline { ID = Guid.Empty, UniqueID = 655, Title = "Hello world", FromYear = 711, ToYear = 1492, Height = 20, FromTimeUnit = "CE", ToTimeUnit = "CE" });
-            } 
-        }
+        public DbSet<SuperCollection> SuperCollections { get; set; }
+
     }
 }
