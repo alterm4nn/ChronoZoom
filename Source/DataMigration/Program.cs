@@ -21,6 +21,7 @@ namespace DataMigration
         public static string TIMELINE_ENTITY = "Timeline:#Chronozoom.Entities";
         public static string EXHIBIT_ENTITY = "Exhibit:#Chronozoom.Entities";
         public static string CONTENTITEM_ENTITY = "ContentItem:#Chronozoom.Entities";
+        public static readonly Guid _oldRootID = new Guid("468a8005-36e3-4676-9f52-312d8b6eb7b7");
         
         // Unused
         public static Decimal BigBangTime = -13700000000;
@@ -269,8 +270,23 @@ namespace DataMigration
             Stream dataTimelines = myWebClient.OpenRead("http://www.chronozoomproject.org/Chronozoom.svc/get");
             var bjrTimelines = new DataContractJsonSerializer(typeof(BaseJsonResult<IEnumerable<Timeline>>)).ReadObject(dataTimelines) as BaseJsonResult<IEnumerable<Timeline>>;
 
+            Collection rootCollection = new Collection();
+            rootCollection.Id = Guid.Empty;
+            rootCollection.Title = "Beta Content";
+
+            dbInst.Collections.Add(rootCollection);
+
             foreach (var timeline in bjrTimelines.d)
             {
+                // Add to root collection
+                timeline.Collection = rootCollection;
+
+                // Replace old root with new root
+                if (timeline.ID == _oldRootID)
+                {
+                    timeline.ID = Guid.Empty;
+                }
+
                 dbInst.Timelines.Add(timeline);
             }
 
