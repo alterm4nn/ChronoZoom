@@ -153,6 +153,11 @@ width: 190px;
 cursor: pointer;
 }
 
+
+/********************************************
+*               bibliography                *
+********************************************/
+
 .biblBack
 {
 width: 100%;
@@ -181,16 +186,16 @@ font-family: Arial;
 font-size: 18.5px;
 color: White;
 background-color: #434343;
-width: 738px;
-height: 500px;
-margin-left: auto;
-margin-right: auto;
+
 vertical-align: middle;
-position: relative;
+position: absolute;
 border-radius: 8px;
 cursor: default;
 overflow: hidden;
+bottom: 25px;
 top: 25px;
+left: 25px;
+right: 25px;
 }
 
 .biblWindow .closeButton
@@ -672,7 +677,9 @@ border-top: 1px solid #BFBFBF;
 }
 
 
-
+/****************************************
+*               tooltip                 *    
+****************************************/
 
 .bubbleInfo 
 {
@@ -743,9 +750,10 @@ border-top: 1px solid #BFBFBF;
 		}		
 		
 		
-/********************************
-*          Breadcrumbs          *
-*********************************/
+/********************************************
+*               breadcrumbs                 *
+********************************************/
+
 .breadCrumbNavButton 
 {
 	display: none;
@@ -880,6 +888,8 @@ border-top: 1px solid #BFBFBF;
 	position: relative;
 	border-radius: 8px;
 	cursor: default;
+    min-height: 443px;
+    height: 443px;
 }
 
 .welcomeScreen
@@ -893,9 +903,15 @@ border-top: 1px solid #BFBFBF;
 	margin-right: auto;
 	vertical-align: middle;
 	position: relative;
+    top: 16px;
+    right: 0px;
+    bottom: 16px;
+    left: 0px;
+    height: auto;
 	border-radius: 8px;
 	cursor: default;
 	overflow: hidden;
+    min-height: 411px;
 }
 
 .welcomeScreen .titleArea

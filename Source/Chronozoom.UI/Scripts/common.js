@@ -219,7 +219,7 @@ function GenerateProperty(dateContainer, timeUnit, year, month, day, propName) {
 }
 
 function closeWelcomeScreen() {
-    if ($('input[name=welcomeScreenCheckbox]').is(':checked'))
+    //if ($('input[name=welcomeScreenCheckbox]').is(':checked'))
         setCookie("welcomeScreenDisallowed", "1", 365);
 
     hideWelcomeScreen();
@@ -433,7 +433,6 @@ function updateLayout() {
     var bodyTopMargin = parseFloat($("body").css("marginTop").replace('px', ''));
     var bodyBottomMargin = parseFloat($("body").css("marginBottom").replace('px', ''));
     var bodyMargin = bodyTopMargin + bodyBottomMargin; // calculated top and bottom margin of body tag
-
     var occupiedHeight = topHeight + bottomHeight + bodyMargin; // occupied height of the page
 
     document.getElementById("vc").style.height = (window.innerHeight - occupiedHeight) + "px";
@@ -447,30 +446,14 @@ function updateLayout() {
 
     var biblOutTopMargin = 25; // top margin of bibliography outer window
     var biblOutBottomMargin = 15; // bottom margin of bibliography outer window
-    var biblWindowMargin = 50; // top and bottom margin of bibliography window
 
     document.getElementById("bibliographyOut").style.top = (topHeight + bodyTopMargin + 25) + "px";
     document.getElementById("bibliographyOut").style.height = (window.innerHeight - occupiedHeight -
         biblOutTopMargin - biblOutBottomMargin) + "px";
-    document.getElementById("bibliography").style.height = (window.innerHeight - occupiedHeight -
-        biblOutTopMargin - biblOutBottomMargin - biblWindowMargin) + "px";
 
-    //document.getElementById("welcomeScreenBack").style.height = window.innerHeight + "px";
-    //// todo: use (welcomeScreen' content + axis height + footer height) instead of consants
-    //if (height <= 669) {
-    //    document.getElementById("welcomeScreenOut").style.top = (150) + "px";
-    //    document.getElementById("welcomeScreenOut").style.height = offset + "px";
-    //    document.getElementById("welcomeScreenOut").style.top = (150) + "px";
-    //    document.getElementById("welcomeScreen").style.height = (offset - 50) + "px";
-    //}
-    //else { // keeping height of welcome screen constant, positioning in center of canvas
-    //    var diff = Math.floor((height - 669) / 2);
-    //    document.getElementById("welcomeScreenOut").style.top = (150 + diff) + "px";
-    //    document.getElementById("welcomeScreenOut").style.height = (482) + "px";
-    //    document.getElementById("welcomeScreenOut").style.top = (150 + diff) + "px";
-    //    document.getElementById("welcomeScreen").style.height = (432) + "px";
-    //}
-    //document.getElementById("welcomeScreen").style.top = (25) + "px";
+    var welcomeScreenHeight = $("#welcomeScreenOut").outerHeight();
+    var diff = Math.floor((window.innerHeight - welcomeScreenHeight) / 2);
+    document.getElementById("welcomeScreenOut").style.top = diff + "px";
 
     InitializeRegimes();
     vc.virtualCanvas("updateViewport");

@@ -64,20 +64,20 @@
         $(document).ready(function () {
             $('.bubbleInfo').hide();
             ("#axis").showThresholds = true;
-            //var wlcmScrnCookie = getCookie("welcomeScreenDisallowed");
-            //if (wlcmScrnCookie != null) {
+            var wlcmScrnCookie = getCookie("welcomeScreenDisallowed");
+            if (wlcmScrnCookie != null) {
                 hideWelcomeScreen();
-            //}
-            //else {
-            //    // click on gray area hides welcome screen
-            //    $("#welcomeScreenOut").click(function (e) {
-            //        e.stopPropagation();
-            //    });
+            }
+            else {
+                // click on gray area hides welcome screen
+                $("#welcomeScreenOut").click(function (e) {
+                    e.stopPropagation();
+                });
 
-            //    $("#welcomeScreenBack").click(function () {
-            //        hideWelcomeScreen();
-            //    });
-            //}
+                $("#welcomeScreenBack").click(function () {
+                    closeWelcomeScreen();
+                });
+            }
 
             if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
                 if (/Chrome[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
@@ -464,7 +464,7 @@
     </div>
     <div id="bibliographyBack" class="biblBack" style="display: none">
         <div id="bibliographyOut" class="biblOuterWindow">
-            <div id="bibliography" class="biblWindow">
+             <div id="bibliography" class="biblWindow">
                 <img class="closeButton" id="biblCloseButton" src="Images/close_off.png" onmouseover="toggleOnImage('biblCloseButton', 'png');"
                     onmouseout="toggleOffImage('biblCloseButton', 'png');" alt="Close" onselectstart="return false;" />
                 <div class="title" onselectstart="return false;">
@@ -472,7 +472,7 @@
                 </div>
                 <div class="sources">
                 </div>
-            </div>
+               </div>
         </div>
     </div>
     
@@ -563,68 +563,5 @@
             </div>
         </div>
     </div>
-
-    <!--<div id="welcomeScreenIntroduction">
-        <div id="welcomeScreenBack" class="fullScreenBlurred">
-    
-            <div id="welcomeScreenOut" class="welcomeScreenOuterWindow" style="top: 150px">
-                    <div class="innerIntroductionContent">
-
-                        <div style="position:absolute; top:30px; left:20px; width:94%; height:50px;" class="topIntro">
-                            <table cellpadding="0" cellspacing="0" style="width:100%;">
-                                <tr>
-                                <td>
-                                    <label>&nbsp;&nbsp;Introduction to ChronoZoom</label>
-                                </td>
-
-                                <td style="padding-right:10px; padding-top:3px" >
-                                    <img src="../Images/welcomeCloseButton.png"  onclick="hideWelcomeScreen()" />
-                                </td>
-                                </tr>
-                            </table>
-                        </div>
-
-                    
-
-                        <div style="position:relative; top:120px; left:20px; display:table; height:385px; width:94%">
-                        
-                            <table cellpadding="0" cellspacing="" style="height:385px;">
-                                <tr>
-                                    <td style="width:640px; padding-left:70px">
-                                        <iframe style="text-align:center" id="welcomeVideo" class="youtube-player" type="text/html" width="640" height="385" src="http://www.youtube.com/embed/HjQxjVaMp-g" frameborder="0">
-                                        </iframe>
-                                    </td>
-
-                                    <td style="padding-left: 15px" >
-                                        <img src="../Images/welcomeButtonNext.png" />
-                                    </td>
-                                </tr>
-                            </table>
-
-                        </div>
-
-                        <div style="position:absolute; bottom:30px; left:20px; height:20px; display:table;">
-                    
-                            <div style="display:table-cell; float: left">
-                                  <input type="checkbox" id="welcomeScreenCheckbox" name="welcomeScreenCheckbox" onclick="checkboxWelcomeChanged()" /> 
-
-                                <label for="welcomeScreenCheckbox" unselectable="on">Don't show again</label> 
-                            </div>
-
-                            <div id="navigationControls" style="display:table-cell; float: left">
-                                <ul>
-                                    <li class="active" />
-                                    <li />
-                                    <li />
-                                    <li />
-                                </ul>                            
-                            </div>
-
-                        </div>
-                    </div>
-            </div>
-        </div>
-    </div>-->
-
 </body>
 </html>
