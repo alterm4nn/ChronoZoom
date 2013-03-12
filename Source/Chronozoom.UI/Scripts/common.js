@@ -428,39 +428,49 @@ function InitializeRegimes() {
 }
 
 function updateLayout() {
-    document.getElementById("vc").style.height = (window.innerHeight - 148) + "px";
+    var topHeight = $("#header").outerHeight(true) + $("#axis").outerHeight(true); // height of header and axis
+    var bottomHeight = $("#footer").outerHeight(true); // height of footer
+    var bodyTopMargin = parseFloat($("body").css("marginTop").replace('px', ''));
+    var bodyBottomMargin = parseFloat($("body").css("marginBottom").replace('px', ''));
+    var bodyMargin = bodyTopMargin + bodyBottomMargin; // calculated top and bottom margin of body tag
+
+    var occupiedHeight = topHeight + bottomHeight + bodyMargin; // occupied height of the page
+
+    document.getElementById("vc").style.height = (window.innerHeight - occupiedHeight) + "px";
 
     $(".breadCrumbPanel").css("width", Math.round(($("#vc").width() / 2 - 50)));
     $("#bc_navRight").css("left", ($(".breadCrumbPanel").width() + $(".breadCrumbPanel").position().left + 2) + "px");
     visibleAreaWidth = $(".breadCrumbPanel").width();
     updateHiddenBreadCrumbs();
 
-    var height = window.innerHeight;
-    var offset = height - 187;
-    // todo: use axis' height instead of constants
-    document.getElementById("bibliographyBack").style.height = window.innerHeight + "px";
-    document.getElementById("bibliographyOut").style.top = (150) + "px";
-    document.getElementById("bibliographyOut").style.height = offset + "px";
-    document.getElementById("bibliographyOut").style.top = (150) + "px";
-    document.getElementById("bibliography").style.height = (offset - 50) + "px";
-    document.getElementById("bibliography").style.top = (25) + "px";
+    var offset = window.innerHeight - occupiedHeight;
 
-    document.getElementById("welcomeScreenBack").style.height = window.innerHeight + "px";
-    // todo: use (welcomeScreen' content + axis height + footer height) instead of consants
-    if (height <= 669) {
-        document.getElementById("welcomeScreenOut").style.top = (150) + "px";
-        document.getElementById("welcomeScreenOut").style.height = offset + "px";
-        document.getElementById("welcomeScreenOut").style.top = (150) + "px";
-        document.getElementById("welcomeScreen").style.height = (offset - 50) + "px";
-    }
-    else { // keeping height of welcome screen constant, positioning in center of canvas
-        var diff = Math.floor((height - 669) / 2);
-        document.getElementById("welcomeScreenOut").style.top = (150 + diff) + "px";
-        document.getElementById("welcomeScreenOut").style.height = (482) + "px";
-        document.getElementById("welcomeScreenOut").style.top = (150 + diff) + "px";
-        document.getElementById("welcomeScreen").style.height = (432) + "px";
-    }
-    document.getElementById("welcomeScreen").style.top = (25) + "px";
+    var biblOutTopMargin = 25; // top margin of bibliography outer window
+    var biblOutBottomMargin = 15; // bottom margin of bibliography outer window
+    var biblWindowMargin = 50; // top and bottom margin of bibliography window
+
+    document.getElementById("bibliographyOut").style.top = (topHeight + bodyTopMargin + 25) + "px";
+    document.getElementById("bibliographyOut").style.height = (window.innerHeight - occupiedHeight -
+        biblOutTopMargin - biblOutBottomMargin) + "px";
+    document.getElementById("bibliography").style.height = (window.innerHeight - occupiedHeight -
+        biblOutTopMargin - biblOutBottomMargin - biblWindowMargin) + "px";
+
+    //document.getElementById("welcomeScreenBack").style.height = window.innerHeight + "px";
+    //// todo: use (welcomeScreen' content + axis height + footer height) instead of consants
+    //if (height <= 669) {
+    //    document.getElementById("welcomeScreenOut").style.top = (150) + "px";
+    //    document.getElementById("welcomeScreenOut").style.height = offset + "px";
+    //    document.getElementById("welcomeScreenOut").style.top = (150) + "px";
+    //    document.getElementById("welcomeScreen").style.height = (offset - 50) + "px";
+    //}
+    //else { // keeping height of welcome screen constant, positioning in center of canvas
+    //    var diff = Math.floor((height - 669) / 2);
+    //    document.getElementById("welcomeScreenOut").style.top = (150 + diff) + "px";
+    //    document.getElementById("welcomeScreenOut").style.height = (482) + "px";
+    //    document.getElementById("welcomeScreenOut").style.top = (150 + diff) + "px";
+    //    document.getElementById("welcomeScreen").style.height = (432) + "px";
+    //}
+    //document.getElementById("welcomeScreen").style.top = (25) + "px";
 
     InitializeRegimes();
     vc.virtualCanvas("updateViewport");

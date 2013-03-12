@@ -64,20 +64,20 @@
         $(document).ready(function () {
             $('.bubbleInfo').hide();
             ("#axis").showThresholds = true;
-            var wlcmScrnCookie = getCookie("welcomeScreenDisallowed");
-            if (wlcmScrnCookie != null) {
+            //var wlcmScrnCookie = getCookie("welcomeScreenDisallowed");
+            //if (wlcmScrnCookie != null) {
                 hideWelcomeScreen();
-            }
-            else {
-                // click on gray area hides welcome screen
-                $("#welcomeScreenOut").click(function (e) {
-                    e.stopPropagation();
-                });
+            //}
+            //else {
+            //    // click on gray area hides welcome screen
+            //    $("#welcomeScreenOut").click(function (e) {
+            //        e.stopPropagation();
+            //    });
 
-                $("#welcomeScreenBack").click(function () {
-                    hideWelcomeScreen();
-                });
-            }
+            //    $("#welcomeScreenBack").click(function () {
+            //        hideWelcomeScreen();
+            //    });
+            //}
 
             if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
                 if (/Chrome[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
@@ -476,52 +476,59 @@
         </div>
     </div>
     
-    <div style="position: relative; text-align: right;" >
-            <span id="Span12" class="footerLeftText" >
-        Created by: 
-        </span>
-        <span id="Span13" class="footerLeftTextMRC" onclick="javascript: window.open('http://research.microsoft.com/en-us/projects/chronozoom/default.aspx');" >
-            <img id="Img1" src="Images/mrclogo-17x53.png" alt="Microsoft Research" />
-        </span>
-        <span id="Span14" class="footerLeftTextUC" onclick="javascript: window.open('http://eps.berkeley.edu/');" >
-            <img id="Img2" src="Images/berkeley-logo-17-86.png" alt="University of California Berkeley Department of Earth and Planetary Science" />
-        </span>
-        <span id="Span15" class="footerLeftTextMSU" onclick="javascript: window.open('http://www.cs.msu.su/');" >
-            <img id="Img3" src="Images/MSU_logo-white17x74.png" alt="Moscow State University" />
-        </span>
-          <span id="Span11" class="footerSurveyText" onclick="javascript: window.open('http://go.microsoft.com/?linkid=9797058');">
-        Take Our Survey
-        </span>
-         <span id="Span10" class="pipeText" >
-        |
-        </span>
-         <span id="Span2" class="footerText" onclick="javascript: window.open('http://chronozoom.codeplex.com/workitem/list/basic');">
-        Report a Problem
-        </span>
-        <span id="Span3" class="pipeText" >
-        |
-        </span>
-      <span id="Span9" class="footerText" onclick="javascript: window.open('BehindTheScenes.htm');">
-        Behind the Scenes
-        </span>
-        <span id="Span1" class="pipeText" >
-        |
-        </span>
-         <span id="Span4" class="footerText" onclick="javascript: window.open('TermsOfUse.htm');">
-        Terms of Use
-        </span>
-        <span id="Span5" class="pipeText" >
-        |
-        </span>
-         <span id="Span6" class="footerText" onclick="javascript: window.open('Privacy.htm');">
-        Privacy
-        </span>
-        <span id="Span7" class="pipeText" >
-        |
-        </span>
-         <span id="Span8" class="footerText" onclick="javascript: window.open('Trademark_Copyright.htm');">
-        Trademark
-        </span>
+    <div id="footer">
+        <div id="footer-left">
+            <span class="footer-text" >
+                Created by: 
+            </span>
+            <a href="http://research.microsoft.com/en-us/projects/chronozoom/default.aspx">
+                <img src="Images/mrclogo-17x53.png" title="Microsoft Research" />
+            </a>
+            <a href="http://eps.berkeley.edu">
+                <img src="Images/berkeley-logo-17-86.png" title="University of California Berkeley Department of Earth and Planetary Science" />
+            </a>
+            <a href="http://www.cs.msu.su" >
+                <img src="Images/MSU_logo-white17x74.png" title="Moscow State University" />
+            </a>
+        </div>
+
+        <div id="footer-right">            
+            <a href="http://go.microsoft.com/?linkid=9797058" class="footer-survey">
+                Take Our Survey
+            </a>
+            <span class="footer-separator">
+                |
+            </span>
+            <a href="http://chronozoom.codeplex.com/workitem/list/basic" class="footer-link">
+                Report a Problem
+            </a>
+            <span class="footer-separator">
+                |
+            </span>
+            <a href="BehindTheScenes.htm" class="footer-link">
+                Behind the Scenes
+            </a>
+            <span class="footer-separator">
+                |
+            </span>
+            <a href="TermsOfUse.htm" class="footer-link">
+                Terms of Use
+            </a>      
+            <span class="footer-separator">
+                |
+            </span>
+            <a href="Privacy.htm" class="footer-link">
+                Privacy
+            </a>  
+            <span class="footer-separator">
+                |
+            </span>
+            <a href="Trademark_Copyright.htm" class="footer-link">
+                Trademark
+            </a>        
+        </div>
+
+        <div class="clearer"></div>       
     </div>
 
     <div id="welcomeScreenBack" class="welcomeScreenBack">
