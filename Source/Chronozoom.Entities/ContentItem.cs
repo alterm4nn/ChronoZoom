@@ -6,6 +6,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
@@ -58,5 +59,12 @@ namespace Chronozoom.Entities
 
         [DataMember]
         public bool HasBibliography { get; set; }
+    }
+
+    [DataContract]
+    [NotMapped]
+    public class ContentItemRaw : ContentItem
+    {
+        public Guid Exhibit_ID { get; set; }
     }
 }

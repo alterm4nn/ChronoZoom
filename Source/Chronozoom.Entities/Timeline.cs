@@ -7,10 +7,13 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 
 namespace Chronozoom.Entities
 {
+    [KnownType(typeof(TimelineRaw))]
+    [KnownType(typeof(ExhibitRaw))]
     [DataContract]
     public class Timeline
     {
@@ -61,12 +64,19 @@ namespace Chronozoom.Entities
         public decimal? Height { get; set; }
 
         [DataMember]
-        public virtual Collection<Timeline> ChildTimelines { get; private set; }
+        public virtual Collection<Timeline> ChildTimelines { get; set; }
 
         [DataMember]
-        public virtual Collection<Exhibit> Exhibits { get; private set; }
+        public virtual Collection<Exhibit> Exhibits { get; set; }
 
         [DataMember]
         public virtual Entities.Collection Collection { get; set; }
+    }
+
+    [DataContract]
+    [NotMapped]
+    public class TimelineRaw : Timeline
+    {
+        public Guid? Timeline_ID { get; set; }
     }
 }

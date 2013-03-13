@@ -41,31 +41,12 @@ namespace UI
                 if (!Cache.Contains("Timelines"))
                 {
                     Trace.TraceInformation("Get Timelines Cache Miss");
-                    var t = _storage.Timelines.Find(Guid.Empty);
-                    LoadChildren(t);
 
-                    Cache.Add("Timelines", new [] { t }, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
+                    Timeline t = _storage.TimelinesQuery().Find(timeline => timeline.ID == Guid.Empty);
+                    Cache.Add("Timelines", new[] { t }, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
                 }
 
                 return (IEnumerable<Timeline>)Cache["Timelines"];
-            }
-        }
-
-        private void LoadChildren(Timeline t)
-        {
-            _storage.Entry(t).Collection(_ => _.Exhibits).Load();
-
-            foreach (var e in t.Exhibits)
-            {
-                _storage.Entry(e).Collection(_ => _.ContentItems).Load();
-                _storage.Entry(e).Collection(_ => _.References).Load();
-            }
-
-            _storage.Entry(t).Collection(_ => _.ChildTimelines).Load();
-
-            foreach (var c in t.ChildTimelines)
-            {
-                LoadChildren(c);
             }
         }
 
@@ -136,8 +117,9 @@ namespace UI
             return exhibit.References.ToList();
         }
 
-        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")][
-        OperationContract]
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
+        [
+            OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
         public IEnumerable<Tour> GetTours()
         {

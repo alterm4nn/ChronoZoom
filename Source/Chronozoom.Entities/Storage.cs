@@ -5,11 +5,19 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Common;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Migrations;
 using System.Data.Entity.Migrations.Design;
+using System.Data.SqlClient;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
 
 namespace Chronozoom.Entities
 {
@@ -47,5 +55,82 @@ namespace Chronozoom.Entities
 
         public DbSet<SuperCollection> SuperCollections { get; set; }
 
+        public List<Timeline> TimelinesQuery()
+        {
+            Dictionary<Guid, Timeline> timelinesMap = new Dictionary<Guid, Timeline>();
+            List<Timeline> timelines = FillTimelines(timelinesMap);
+
+            FillTimelineRelations(timelinesMap);
+
+            return timelines;
+        }
+
+        private void FillTimelineRelations(Dictionary<Guid, Timeline> timelinesMap)
+        {
+            // Populate Exhibits
+            string exhibitsQuery = "SELECT * FROM Exhibits";
+            var exhibitsRaw = Database.SqlQuery<ExhibitRaw>(exhibitsQuery);
+            Dictionary<Guid, Exhibit> exhibits = new Dictionary<Guid, Exhibit>();
+            foreach (ExhibitRaw exhibitRaw in exhibitsRaw)
+            {
+                if (exhibitRaw.ContentItems == null)
+                    exhibitRaw.ContentItems = new System.Collections.ObjectModel.Collection<ContentItem>();
+
+                if (exhibitRaw.References == null)
+                    exhibitRaw.References = new System.Collections.ObjectModel.Collection<Reference>();
+
+                timelinesMap[exhibitRaw.Timeline_ID].Exhibits.Add(exhibitRaw);
+                exhibits[exhibitRaw.ID] = exhibitRaw;
+            }
+
+            // Populate Content Items
+            string contentItemsQuery = "SELECT * FROM ContentItems";
+            var contentItemsRaw = Database.SqlQuery<ContentItemRaw>(contentItemsQuery);
+            foreach (ContentItemRaw contentItemRaw in contentItemsRaw)
+                exhibits[contentItemRaw.Exhibit_ID].ContentItems.Add(contentItemRaw);
+
+            // Populate References
+            string referencesQuery = "SELECT * FROM [References]";
+            var referencesRaw = Database.SqlQuery<ReferenceRaw>(referencesQuery);
+            foreach (ReferenceRaw referenceRaw in referencesRaw)
+                exhibits[referenceRaw.Exhibit_ID].References.Add(referenceRaw);
+        }
+
+        private List<Timeline> FillTimelines(Dictionary<Guid, Timeline> timelinesMap)
+        {
+            List<Timeline> timelines = new List<Timeline>();
+            Dictionary<Guid, Guid?> timelinesParents = new Dictionary<Guid, Guid?>();
+
+            // Populate References
+            string timelinesQuery = "SELECT * FROM Timelines";
+            var timelinesRaw = Database.SqlQuery<TimelineRaw>(timelinesQuery);
+            foreach (TimelineRaw timelineRaw in timelinesRaw)
+            {
+                if (timelineRaw.ChildTimelines == null)
+                    timelineRaw.ChildTimelines = new System.Collections.ObjectModel.Collection<Timeline>();
+
+                if (timelineRaw.Exhibits == null)
+                    timelineRaw.Exhibits = new System.Collections.ObjectModel.Collection<Exhibit>();
+
+                timelinesParents[timelineRaw.ID] = timelineRaw.Timeline_ID;
+                timelinesMap[timelineRaw.ID] = timelineRaw;
+            }
+
+            // Build the timelines tree by assigning each timeline to its parent
+            foreach (Timeline timeline in timelinesMap.Values)
+            {
+                Guid? parentId = timelinesParents[timeline.ID];
+                if (parentId != null)
+                {
+                    timelinesMap[(Guid)parentId].ChildTimelines.Add(timeline);
+                }
+                else
+                {
+                    timelines.Add(timeline);
+                }
+            }
+
+            return timelines;
+        }
     }
 }

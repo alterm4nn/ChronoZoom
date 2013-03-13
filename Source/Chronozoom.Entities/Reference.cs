@@ -6,6 +6,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 
 namespace Chronozoom.Entities
@@ -40,5 +41,12 @@ namespace Chronozoom.Entities
 
         [DataMember]
         public string Source { get; set; }
+    }
+
+    [DataContract]
+    [NotMapped]
+    public class ReferenceRaw : Reference
+    {
+        public Guid Exhibit_ID { get; set; }
     }
 }
