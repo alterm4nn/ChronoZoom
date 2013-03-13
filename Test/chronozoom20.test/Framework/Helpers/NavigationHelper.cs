@@ -46,12 +46,20 @@ namespace Framework.Helpers
             Logger.Log("->");
         }
 
+        public void NavigateToRomanHistoryTimeline()
+        {
+            Logger.Log("<-");
+            ExecuteJavaScript("goToSearchResult('t44')");
+            Logger.Log("->");
+        }
+
         private void NavigateToProterozoic()
         {
             Logger.Log("<-");
             ExecuteJavaScript("goToSearchResult('t308')");
             Logger.Log("->");
         }
+
 
 
     }

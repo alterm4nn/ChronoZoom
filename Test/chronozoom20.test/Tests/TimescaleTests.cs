@@ -70,6 +70,16 @@ namespace Tests
             List<string> labels = TimelineHelper.GetLabels();
             CollectionAssert.Contains(labels, Label1Bce, Label1Bce + " is presented");
             CollectionAssert.Contains(labels, Label1Ce, Label1Ce + " is presented");
+        }    
+        
+        [TestMethod]
+        public void Roman_History_TimeLine_Borders()
+        {
+            HomePageHelper.OpenRomanHistoryTimeline();
+            const double expected = 943;
+            double leftBorder = TimelineHelper.GetLeftBorderDate();
+            double rightBorder = TimelineHelper.GetRightBorderDate();
+            Assert.AreEqual(expected, rightBorder - leftBorder);
         }  
     }
 }

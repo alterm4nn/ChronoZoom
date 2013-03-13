@@ -57,6 +57,15 @@ namespace Framework.Helpers
             Logger.Log("->");
         }
 
+        public void OpenRomanHistoryTimeline()
+        {
+            Logger.Log("<-");
+            _manager.GetNavigationHelper().NavigateToRomanHistoryTimeline();
+            WaitForElementIsDisplayed(By.Id("bc_link_t44"));
+            WaitAnimation();
+            Logger.Log("->");
+        }
+
         public string GetLastBreadcrumbs()
         {
             Logger.Log("<-");
