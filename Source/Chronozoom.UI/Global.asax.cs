@@ -4,11 +4,14 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System;
-using System.Diagnostics;
-using System.Web.Routing;
+using Chronozoom.Api;
+using Chronozoom.Api.Models;
 using Chronozoom.Entities;
 using OuterCurve;
+using System;
+using System.Diagnostics;
+using System.Web.Http;
+using System.Web.Routing;
 
 namespace UI
 {
@@ -25,6 +28,9 @@ namespace UI
             Storage.Trace.Listeners.Add(SignalRTraceListener);
 
             RouteTable.Routes.MapHubs();
+            WebApiConfig.Register(GlobalConfiguration.Configuration);
+
+            Globals.initData();
 
             Trace.TraceInformation("Application Starting");
         }
