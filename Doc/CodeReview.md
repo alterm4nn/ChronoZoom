@@ -21,12 +21,12 @@ CodeCollaborator Client](http://support.smartbear.com/resources/cc/GettingStarte
 
 1. Click **Start**, **All Programs**, **Code Collaborator Client**, **Code Collaborator Client GUI**.
 
-    The CodeCollaborator Client GUI offers several options:
+The CodeCollaborator Client GUI offers several options:
         
-    - **Add Changes:** 
-    - **Add Unpushed Commits:**
-    - **Add Commits:** 
-    - **Add Git Diffs:** 
+- **Add Changes:** Allows you to upload the modifications that are currently in the index. These are the modifications that would be committed if you typed `git commit` from a command line.
+- **Add Unpushed Commits:** Selects all commits in your local branch that have not been pushed to its tracking branch. NOTE: This assumes that you have set up branch tracking in Git. If you see an error when running Add Unpushed Commits... (like, "Error initializing local changelists") make sure that your current branch has a tracking branch set. You can set this up, initially by running `git config branch.autosetupmerge always`. You can set this up on an existing branch by running `git branch --set-upstream name-of-branch name-of-upstream`.
+- **Add Commits:** Allows you to upload commits, whether they've been pushed or not. You can add a specific commit by adding the commit ID and clicking **Add**.
+- **Add Git Diffs:** Upload arbitrary Git diffs to the Collaborator Server for review.
 
 - Commit to your local repository using a topic branch. The following example shows using **git checkout** with the **-b** option to create a new topic branch named "myFeature":
  - `git checkout -b myFeature`
