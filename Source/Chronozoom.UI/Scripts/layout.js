@@ -1,4 +1,6 @@
-﻿function Timeline(title, left, right, childTimelines, exhibits) {
+﻿var isLayoutAnimation = true; // temp variable for debugging
+
+function Timeline(title, left, right, childTimelines, exhibits) {
     this.Title = title;
     this.left = left;
     this.right = right;
@@ -37,18 +39,19 @@ function Prepare(timeline) {
 
 function GenerateAspect(timeline) {
     if (timeline.ID == cosmosTimelineID) {
-        timeline.AspectRatio = 10; //64.0 / 33.0;
-    } 
-    
-//    else if (timeline.ID == earthTimelineID) {
-//        timeline.AspectRatio = 1.0;
-//    } else if (timeline.ID == lifeTimelineID) {
-//        timeline.AspectRatio = 47.0 / 22.0;
-//    } else if (timeline.ID == prehistoryTimelineID) {
-//        timeline.AspectRatio = 37.0 / 11.0;
-//    } else if (timeline.ID == humanityTimelineID) {
-//        timeline.AspectRatio = 55.0 / 4.0;
-//    }
+        timeline.AspectRatio = 10;
+    }
+    /*
+    else if (timeline.ID == earthTimelineID) {
+        timeline.AspectRatio = 1.0;
+    } else if (timeline.ID == lifeTimelineID) {
+        timeline.AspectRatio = 47.0 / 22.0;
+    } else if (timeline.ID == prehistoryTimelineID) {
+        timeline.AspectRatio = 37.0 / 11.0;
+    } else if (timeline.ID == humanityTimelineID) {
+        timeline.AspectRatio = 55.0 / 4.0;
+    }
+    */
 }
 
 function LayoutTimeline(timeline, parentWidth, measureContext) {
@@ -137,8 +140,6 @@ function LayoutTimeline(timeline, parentWidth, measureContext) {
         }
 
         timeline.titleRect = titleObject;
-
-
     }
     else {
         var min = res.min;
@@ -153,8 +154,6 @@ function LayoutTimeline(timeline, parentWidth, measureContext) {
         var titleObject = GenerateTitleObject(fullHeight, timeline, measureContext);
         timeline.titleRect = titleObject;
         timeline.height = fullHeight;
-
-
     }
 
     timeline.heightEps = parentWidth * timelineContentMargin;
@@ -383,7 +382,8 @@ function Convert(parent, timeline) {
         fillStyle: "rgba(0,0,0,0.25)",
         titleRect: timeline.titleRect,
         strokeStyle: tlColor,
-        regime: timeline.Regime
+        regime: timeline.Regime,
+        opacity: 0
     });
 
     //Creating Infodots
@@ -391,7 +391,6 @@ function Convert(parent, timeline) {
         var date; // building a date to be shown in a title of the content item to the left of the title text.
 
         var contentItems = new Array();
-        if (!childInfodot.ContentItems) childInfodot.ContentItems = [];
         childInfodot.ContentItems.forEach(function (contentItemProt) {
             var mediaType = contentItemProt.MediaType;
             if (mediaType == "Picture")
@@ -418,7 +417,12 @@ function Convert(parent, timeline) {
         date = buildDate(childInfodot);
         var infodot1 = addInfodot(t1, "layerInfodots", 'e' + childInfodot.UniqueID,
                 (childInfodot.left + childInfodot.right) / 2.0, childInfodot.y, 0.8 * childInfodot.size / 2.0, contentItems,
-                { title: childInfodot.Title, date: date, guid: childInfodot.ID });
+                {
+                    title: childInfodot.Title,
+                    date: date,
+                    guid: childInfodot.ID,
+                    opacity: 0
+                });
     });
 
     //Filling child timelines
@@ -441,77 +445,23 @@ function buildDate(obj) {
     return date;
 }
 
-function GetParentLayer(timeline, parentID) {
-    if (timeline.ID == parentID)
-        return 0;
-
-    if (!timeline.ParentTimeline)
-        return -1;
-
-    var index = 0;
-    var parent = timeline;
-    while (parent.ParentTimeline && parent.ID != parentID) {
-        parent = parent.ParentTimeline;
-        index++;
-    }
-
-    if (parent.ID != parentID)
-        return -1;
-    else
-        return index;
-}
-
-function SelectColor(index, baseColor, nestedColor1, nestedColor2) {
-    if (index == -1)
-        return "rgba(255, 255, 255, 0.5)";
-    else if (index == 0)
-        return baseColor;
-    else if (index % 2 != 0)
-        return nestedColor1;
-    else
-        return nestedColor2;
-}
-
 function GetTimelineColor(timeline) {
     if (timeline.Regime == "Cosmos") {
-        return SelectColor(GetParentLayer(timeline, cosmosTimelineID), "rgba(152, 108, 157, 1.0)", "rgba(94, 78, 129, 1.0)", "rgba(149, 136, 193, 1.0)");
+        return "rgba(152, 108, 157, 1.0)";
     }
     else if (timeline.Regime == "Earth") {
-        return SelectColor(GetParentLayer(timeline, earthTimelineID), "rgba(81, 127, 149, 1.0)", "rgba(11, 110, 131, 1.0)", "rgba(117, 163, 174, 1.0)");
+        return "rgba(81, 127, 149, 1.0)";
     }
     else if (timeline.Regime == "Life") {
-        return SelectColor(GetParentLayer(timeline, lifeTimelineID), "rgba(73, 150, 73, 1.0)", "rgba(13, 106, 49, 1.0)", "rgba(139, 167, 97, 1.0)");
+        return "rgba(73, 150, 73, 1.0)";
     }
     else if (timeline.Regime == "Pre-history") {
-        return SelectColor(GetParentLayer(timeline, prehistoryTimelineID), "rgba(237, 145, 50, 1.0)", "rgba(193, 90, 47, 1.0)", "rgba(223, 161, 68, 1.0)");
+        return "rgba(237, 145, 50, 1.0)";
     }
     else if (timeline.Regime == "Humanity") {
-        return SelectColor(GetParentLayer(timeline, humanityTimelineID), "rgba(212, 92, 70, 1.0)", "rgba(140, 72, 69, 1.0)", "rgba(207, 124, 111, 1.0)");
-    }
-    else return "rgba(255, 255, 255, 0.5)";
-}
-
-function Load(vcph, timelines) {
-    if (timelines.length > 0) {
-        for (i = timelines.length - 1; i >= 0; i--) {
-            Prepare(timelines[i]);
-        }
-
-        timelines.sort(function (l, r) {
-            return l.left - r.left;
-        });
-
-        for (i = 0; i < timelines.length - 1; i++) {
-            timelines[i].ChildTimelines.push(timelines[i + 1]);
-        }
-
-        var measureContext = document.createElement("canvas").getContext('2d');
-        //Measure child content for each timiline in tree
-        LayoutTimeline(timelines[0], 0, measureContext);
-        //Calculating final placement of the data
-        Arrange(timelines[0]);
-        //Load timline to Virtual Canvas
-        LoadTimeline(vcph, timelines[0]);
+        return "rgba(212, 92, 70, 1.0)";
+    } else {
+        return "rgba(255, 255, 255, 0.5)";
     }
 }
 
@@ -553,13 +503,464 @@ function GetVisibleFromTimeline(timeline, vcph) {
     }
 }
 
-function LoadTimeline(vcph, rootTimeline) {
-    var root = vcph.virtualCanvas("getLayerContent");
+function LoadTimeline(root, rootTimeline) {
     root.beginEdit();
     Convert(root, rootTimeline);
     root.endEdit(true);
 }
 
-function SetOutput(vcph, timeline) {
-    vcph.virtualCanvas("setVisible", GetVisibleFromTimeline(timeline, vcph));
+function Load(root, timeline) {
+    if (timeline) {
+        //Transform timeline start and end dates
+        Prepare(timeline);
+        //Measure child content for each timiline in tree
+        var measureContext = document.createElement("canvas").getContext('2d');
+        LayoutTimeline(timeline, 0, measureContext);
+        //Calculating final placement of the data
+        Arrange(timeline);
+        //Load timline to Virtual Canvas
+        LoadTimeline(root, timeline);
+    }
+}
+
+/*
+---------------------------------------------------------------------------
+                        DYNAMIC LAYOUT 
+---------------------------------------------------------------------------
+*/
+
+// takes a metadata timeline (FromTimeUnit, FromYear, FromMonth, FromDay, ToTimeUnit, ToYear, ToMonth, ToDay)
+// and returns a corresponding scenegraph (x, y, width, height)
+// todo: remove dependency on virtual canvas (vc)
+function generateLayout(tmd, tsg) {
+    try {
+        if (!tmd.AspectRatio) tmd.height = tsg.height;
+        var root = new CanvasRootElement(tsg.vc, undefined, "__root__", -Infinity, -Infinity, Infinity, Infinity);
+        Load(root, tmd);
+        return root.children[0];
+    } catch (msg) {
+        console.log("exception in [nikita's layout]: " + msg);
+    }
+}
+
+// converts a scenegraph element in absolute coords to relative coords
+function convertRelativeToAbsoluteCoords(el, delta) {
+    if (!delta) return;
+    if (typeof el.y !== 'undefined') {
+        el.y += delta;
+        el.newY += delta;
+    }
+    if (typeof el.baseline !== 'undefined') {
+        el.baseline += delta;
+        el.newBaseline += delta;
+    }
+    el.children.forEach(function (child) {
+        convertRelativeToAbsoluteCoords(child, delta);
+    });
+}
+
+// shifts a scenegraph element in absolute coords by delta
+function shiftAbsoluteCoords(el, delta) {
+    if (!delta) return;
+    if (typeof el.newY !== 'undefined') el.newY += delta;
+    if (el.newBaseline) el.newBaseline += delta;
+    el.children.forEach(function (child) {
+        shiftAbsoluteCoords(child, delta);
+    });
+}
+
+// calculates the net force excerted on each child timeline and infodot
+// after expansion of child timelines to fit the newly added content
+function calculateForceOnChildren(tsg) {
+    var eps = tsg.height / 10;
+
+    var v = [];
+    for (var i = 0, el; i < tsg.children.length; i++) {
+        el = tsg.children[i];
+        if (el.type && (el.type === "timeline" || el.type === "infodot")) {
+            el.force = 0;
+            v.push(el);
+        }
+    }
+
+    v.sort(function (el, ael) { return el.newY - ael.newY }); // inc order of y
+
+    for (var i = 0, el; i < v.length; i++) {
+        el = v[i];
+        if (el.type && el.type === "timeline") {
+            if (el.delta) {
+                var l = el.x;
+                var r = el.x + el.width;
+                var b = el.y + el.newHeight + eps;
+                for (var j = i + 1; j < v.length; j++) {
+                    var ael = v[j];
+                    if (ael.x > l && ael.x < r || ael.x + ael.width > l && ael.x + ael.width < r || ael.x + ael.width > l && ael.x + ael.width === 0 && r === 0) {
+                        // ael intersects (l, r)
+                        if (ael.y < b) {
+                            // ael overlaps with el
+                            ael.force += el.delta;
+
+                            l = Math.min(l, ael.x);
+                            r = Math.max(r, ael.x + ael.width)
+                            b = ael.y + ael.newHeight + el.delta + eps;
+                        } else {
+                            // ael does not overlap with el
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+function animateElement(elem) {
+    var duration = canvasElementAnimationTime;
+    var args = [];
+
+    if (elem.fadeIn == false && typeof elem.animation === 'undefined') {
+        elem.height = elem.newHeight;
+        elem.y = elem.newY;
+
+        if (elem.baseline)
+            elem.baseline = elem.newBaseline;
+    }    
+
+    if (elem.newHeight != elem.height || elem.newY != elem.y) {
+        args.push({
+            property: "y",
+            startValue: elem.y,
+            targetValue: elem.newY
+        });
+        args.push({
+            property: "height",
+            startValue: elem.height,
+            targetValue: elem.newHeight
+        });
+    }
+
+    if (elem.baseline)
+        args.push({
+            property: "baseline",
+            startValue: elem.baseline,
+            targetValue: elem.newBaseline
+        });
+
+    if (elem.opacity != 1 && elem.fadeIn == false) {
+        args.push({
+            property: "opacity",
+            startValue: elem.opacity,
+            targetValue: 1
+        });
+        duration = canvasElementFadeInTime;
+    }
+
+    if (isLayoutAnimation == false || args.length == 0)
+        duration = 0;    
+    
+    initializeAnimation(elem, duration, args);
+
+    // first animate resize/transition of buffered content. skip new content
+    if (elem.fadeIn == true) {
+        for (var i = 0; i < elem.children.length; i++)
+            if (elem.children[i].fadeIn == true) 
+                animateElement(elem.children[i]);
+    }
+    else // animate new content (fadeIn = false)
+        for (var i = 0; i < elem.children.length; i++)
+            animateElement(elem.children[i]);    
+}
+
+function initializeAnimation(elem, duration, args) {
+    var startTime = (new Date()).getTime();
+    elem.animation = {
+        isAnimating: true, // indicates if there is ongoing animation
+        duration: duration, // duration of the animation
+        startTime: startTime, // start time of the animation
+        args: args // arguments of canvas element that should be animated
+    };
+
+    // calculates new animation frame of element
+    elem.requestNewFrame = function () {
+        var curTime = (new Date()).getTime();
+        var t;
+
+        if (elem.animation.duration > 0)
+            t = Math.min(1.0, (curTime - elem.animation.startTime) / elem.animation.duration); //projecting current time to the [0;1] interval of the animation parameter
+        else
+            t = 1.0;
+
+        t = animationEase(t);
+
+        for (var i = 0; i < args.length; i++) {
+            if (typeof elem[args[i].property] !== 'undefined')
+                elem[elem.animation.args[i].property] = elem.animation.args[i].startValue +
+                    t * (elem.animation.args[i].targetValue - elem.animation.args[i].startValue);
+        }
+
+        if (t == 1.0) {
+            elem.animation.isAnimating = false;
+            if (elem.fadeIn == false)
+                elem.fadeIn = true;
+
+            // animate newly added content of this element
+            for (var i = 0; i < elem.children.length; i++)
+                if (typeof elem.children[i].animation === 'undefined')
+                    animateElement(elem.children[i]);
+
+            return;
+        }
+
+        // require new frame with respect to target fps rate if animation is not over 
+        setTimeout(function () {
+            elem.vc.requestInvalidate();
+        }, 1000.0 / targetFps);
+    }
+}
+
+// utiltity function for debugging
+function numberWithCommas(n) {
+    var parts = n.toString().split(".");
+    return parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (parts[1] ? "." + parts[1] : "");
+}
+
+// src = metadata tree (responsedump.txt + isBuffered)
+// dest = scenegraph tree (tree of CanvasTimelines) 
+// returns void. 
+// mutates scenegraph tree (dest) by appending missing data from metadata tree (src).
+
+// dest timelines can be in 1 of 3 states
+// 1. No Metadata.  (isBuffered == false)
+// 2. All Metadata. (isBuffered == false)
+// 3. All Content.  (isBuffered == true)
+function merge(src, dest) {
+    if ("t" + src.UniqueID === dest.id) {
+        var srcChildTimelines = src.ChildTimelines;
+        var destChildTimelines = [];
+        for (var i = 0; i < dest.children.length; i++)
+            if (dest.children[i].type && dest.children[i].type === "timeline")
+                destChildTimelines.push(dest.children[i]);
+
+
+        if (srcChildTimelines.length === destChildTimelines.length) { // dest contains all src children
+            // cal bbox (top, bottom) for child timelines and infodots
+            var origTop = Number.MAX_VALUE;
+            var origBottom = Number.MIN_VALUE;
+            for (var i = 0; i < dest.children.length; i++) {
+                if (dest.children[i].type && (dest.children[i].type === "timeline" || dest.children[i].type === "infodot")) {
+                    if (dest.children[i].newY < origTop)
+                        origTop = dest.children[i].newY;
+                    if (dest.children[i].newY + dest.children[i].newHeight > origBottom)
+                        origBottom = dest.children[i].newY + dest.children[i].newHeight;
+                }
+            }
+
+            // merge child timelines
+            dest.delta = 0;
+            for (var i = 0; i < srcChildTimelines.length; i++)
+                merge(srcChildTimelines[i], destChildTimelines[i]);
+
+            // check if child timelines have expanded
+            var haveChildTimelineExpanded = false;
+            for (var i = 0; i < destChildTimelines.length; i++)
+                if (destChildTimelines[i].delta)
+                    haveChildTimelineExpanded = true;
+
+            if (haveChildTimelineExpanded) {
+                // expand child timelines with delta
+                for (var i = 0; i < destChildTimelines.length; i++)
+                    if (destChildTimelines[i].delta)
+                        destChildTimelines[i].newHeight += destChildTimelines[i].delta;
+
+                // shift all timelines and infodots above and below a expanding timeline
+                calculateForceOnChildren(dest);
+                for (var i = 0; i < dest.children.length; i++)
+                    if (dest.children[i].force)
+                        shiftAbsoluteCoords(dest.children[i], dest.children[i].force);
+
+                // cal bbox (top, bottom) for child timelines and infodots after expansion
+                var top = Number.MAX_VALUE;
+                var bottom = Number.MIN_VALUE;
+                var bottomElementName = "";
+                for (var i = 0; i < dest.children.length; i++) {
+                    if (dest.children[i].type && (dest.children[i].type === "timeline" || dest.children[i].type === "infodot")) {
+                        if (dest.children[i].newY < top)
+                            top = dest.children[i].newY;
+                        if (dest.children[i].newY + dest.children[i].newHeight > bottom) {
+                            bottom = dest.children[i].newY + dest.children[i].newHeight;
+                            bottomElementName = dest.children[i].title;
+                        }
+                    }
+                }
+
+                // update title pos after expansion
+                dest.delta = Math.max(0, (bottom - top) - (origBottom - origTop));
+                dest.titleObject.newY += dest.delta;
+                dest.titleObject.newBaseline += dest.delta;
+
+                // assert: child content cannot exceed parent
+                if (bottom > dest.titleObject.newY) {
+                    var msg = bottomElementName + " EXCEEDS " + dest.title + ".\n" + "bottom: " + numberWithCommas(bottom) + "\n" + "   top: " + numberWithCommas(dest.titleObject.newY) + "\n";
+                    console.log(msg);
+                }
+
+                // assert: child content doesnot overlap
+                for (var i = 1; i < dest.children.length; i++) {
+                    var el = dest.children[i];
+                    for (var j = 1; j < dest.children.length; j++) {
+                        var ael = dest.children[j];
+                        if (el.id !== ael.id) {
+                            if (!(ael.x <= el.x && ael.x + ael.width <= el.x ||
+                                ael.x >= el.x + el.width && ael.x + ael.width >= el.x + el.width ||
+                                ael.newY <= el.newY && ael.newY + ael.newHeight <= el.newY ||
+                                ael.newY >= el.newY + el.newHeight && ael.newY + ael.newHeight >= el.newY + el.newHeight)) {
+
+                                var msg = el.title + " OVERLAPS " + ael.title + ".\n";
+                                console.log(msg);
+                            }
+                        }
+                    }
+                }
+
+                animateElement(dest);
+            }
+        } else if (srcChildTimelines.length > 0 && destChildTimelines.length === 0) { // dest does not contain any src children
+            var t = generateLayout(src, dest);
+            var margin = Math.min(t.width, t.newHeight) * timelineHeaderMargin;
+            dest.delta = Math.max(0, t.newHeight - dest.newHeight); // timelines can only grow, never shrink
+
+            // replace dest.children (timelines, infodots, titleObject) with matching t.children
+            dest.children.splice(0);
+            for (var i = 0; i < t.children.length; i++)
+                dest.children.push(t.children[i]);
+
+            // dest now contains all src children
+            for (var i = 0; i < dest.children.length; i++)
+                convertRelativeToAbsoluteCoords(dest.children[i], dest.newY);
+            
+            animateElement(dest);
+        } else {
+            dest.delta = 0;
+        }
+    } else {
+        throw "error: Cannot merge timelines. Src and dest node ids differ.";
+    }
+}
+
+function Merge(src, dest) {
+    if (src && dest) {
+        if (dest.id === "__root__") {
+            src.AspectRatio = 10;
+            var t = generateLayout(src, dest);
+            convertRelativeToAbsoluteCoords(t, 0);
+            dest.children.push(t);
+            animateElement(dest);
+            vc.virtualCanvas("requestInvalidate");
+        } else {
+            merge(src, dest);
+            dest.newHeight += dest.delta;
+            animateElement(dest);
+            vc.virtualCanvas("requestInvalidate");
+        }
+    }
+}
+
+
+
+
+//loading the data from the service
+function loadData() {
+    timings.wcfRequestStarted = new Date();
+
+    var regimesUrl = serverUrlBase
+                + "left=" + -400
+                + "&right=" + 0
+                + "&min_width=" + 13700000000
+                + "&lca_id=" + 161;
+    console.log(regimesUrl);
+
+    $.ajax({ // get basic skeleton (regime timelines)
+        cache: false,
+        type: "GET",
+        async: true,
+        dataType: "json",
+        url: regimesUrl,
+        success: function (result) {
+            ProcessContent(result);
+            vc.virtualCanvas("updateViewport");
+        },
+        error: function (xhr) {
+            timings.RequestCompleted = new Date();
+            alert("Error connecting to service:\n" + regimesUrl);
+        }
+    });
+
+    /*
+    var toursUrl;
+    switch (czDataSource) {
+        case 'db': toursUrl = "Chronozoom.svc/getTours";
+            break;
+        case 'relay': toursUrl = "ChronozoomRelay";
+            break;
+        case 'dump': toursUrl = "Content/ResponseDumps/toursDump.txt";
+            break;
+    }
+
+    $.ajax({ //tours fetching
+        cache: false,
+        type: "GET",
+        async: true,
+        dataType: "json",
+        url: toursUrl,
+        success: function (result) {
+            parseTours(result);
+            initializeToursContent();
+
+            // check at shared tour
+            if (tourNotParsed == true) {
+                loadTourFromURL();
+                tourNotParsed = false;
+            }
+        },
+        error: function (xhr) {
+            $("tours_index").attr("onmouseup", function () {
+                alert("The tours failed to download. Please refresh the page later and try to activate tours again.");
+            });
+            initializeToursContent();
+        }
+    });
+    */
+}
+
+function ProcessContent(content) {
+    timings.wcfRequestCompleted = new Date();
+
+    var root = vc.virtualCanvas("getLayerContent");
+    root.beginEdit();
+    Merge(content, root);
+    root.endEdit(true);
+
+    timings.layoutCompleted = new Date();
+    if (startHash) { // restoring the window's hash as it was on the page loading
+        visReg = navStringToVisible(startHash.substring(1), vc);
+    }
+
+    InitializeRegimes(content);
+    if (!visReg && cosmosVisible) {
+        window.location.hash = cosmosVisible;
+        visReg = navStringToVisible(cosmosVisible, vc);
+    }
+    if (visReg) {
+        controller.moveToVisible(visReg, true);
+        updateAxis(vc, ax);
+        var vp = vc.virtualCanvas("getViewport");
+        updateNavigator(vp);
+
+        if (startHash && window.location.hash !== startHash) {
+            hashChangeFromOutside = false;
+            window.location.hash = startHash; // synchronizing
+        }
+    }
+    timings.canvasInited = new Date();
 }

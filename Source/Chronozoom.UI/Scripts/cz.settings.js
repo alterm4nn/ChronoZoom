@@ -9,6 +9,8 @@ panSpeedFactor = 3.0;   //the factor of how fast the image pursuing the mouse wh
 zoomSpeedFactor = 2.0;  //the factor of how fast the image pursuing the mouse while zooming
 zoomLevelFactor = 1.4;  //the step of the zooming
 allowedVisibileImprecision = 0.00001; // allowed imprecision in compare of two visibles
+canvasElementAnimationTime = 1300; //duration of animation of resize or transition of canvas element
+canvasElementFadeInTime = 400; // duration of fade in animation of newly added canvas element
 
 contentScaleMargin = 20; //setts up margin in pixels for zooming to content option
 
@@ -138,3 +140,8 @@ seadragonRetryInterval = 2000; // ms
 // breadcrumb
 navigateNextMaxCount = 2; // if navNext (left or right) button was pressed rapidly this amount of times, then perfrom long navigation
 longNavigationLength = 10; // length of navigation in long navigation regime
+
+// progresive loading
+serverUrlBase = "http://localhost:4949/api/Timeline?";
+//serverUrlBase = "http://depot.cs.msu.su:9090/cz_with_dynamic_layout/api/Timeline?";
+minTimelineWidth = 100; // px

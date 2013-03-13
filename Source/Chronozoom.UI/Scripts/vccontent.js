@@ -49,9 +49,13 @@ function CanvasElement(vc, layerid, id, vx, vy, vw, vh) {
 	this.layerid = layerid;
 	this.x = vx;
 	this.y = vy;
+	this.newY = vy;
 	this.width = vw;
 	this.height = vh;
+	this.newHeight = vh;
+
 	this.children = [];
+	this.fadeIn = false; // indicates whether element has had fade in animation or not
 
 	/* Checks whether this object is visible in the given visible box (in virtual space)
 	@param visibleBox_v   ({Left,Top,Right,Bottom}) Visible region in virtual space
@@ -245,6 +249,10 @@ function turnIsRenderedOff(element) {
 @param opacity          (float in [0,1]) 0 means transparent, 1 means opaque.
 */
 var render = function (element, contexts, visibleBox_v, viewport2d, opacity) {
+    // first calculate new values of animating properties 
+    if (element.animation && element.animation.isAnimating)
+        element.requestNewFrame();
+
 	if (!element.isVisible(visibleBox_v)) {
 		if (element.isRendered) turnIsRenderedOff(element);
 		return;
@@ -290,7 +298,7 @@ var addChild = function (parent, element, suppresCheck) {
 	if (!isWithin && Log)
 		Log.push("Child element does not belong to the parent element " + parent.id + " " + element.ID);
 
-	if (!suppresCheck && !isWithin) throw "Child element does not belong to the parent element";
+	//if (!suppresCheck && !isWithin) throw "Child element does not belong to the parent element";
 	parent.children.push(element);
 	element.parent = parent;
 	return element;
@@ -362,6 +370,7 @@ this.getChild = function (element, id) {
 function CanvasRootElement(vc, layerid, id, vx, vy, vw, vh) {
 	this.base = CanvasElement;
 	this.base(vc, layerid, id, vx, vy, vw, vh);
+	this.opacity = 0;
 
 	/* Overrides base function. Root element is visible when it has at least one child. */
 	this.isVisible = function (visibleBox_v) {
@@ -690,6 +699,18 @@ function CanvasRectangle(vc, layerid, id, vx, vy, vw, vh, settings) {
             }
         }
     };
+
+    this.intersects = function (rect) {
+        return !(this.x + this.width < rect.x || this.x > rect.x + rect.width || this.y + this.height < rect.y || this.y > rect.y + rect.height);
+    };
+
+    this.contains = function (rect) {
+        return (rect.x > this.x && rect.x + rect.width < this.x + this.width && rect.y > this.y && rect.y + rect.height < this.y + this.height);
+    };
+
+    this.isVisibleOnScreen = function (scale) {
+        return Math.min(this.width, this.height) / scale >= 20;
+    }
 }
 CanvasRectangle.prototype = new CanvasElement;
 
@@ -705,6 +726,8 @@ CanvasRectangle.prototype = new CanvasElement;
 function CanvasTimeline(vc, layerid, id, vx, vy, vw, vh, settings, timelineinfo) {
 	this.base = CanvasRectangle;
 	this.base(vc, layerid, id, vx, vy, vw, vh);
+
+	this.isBuffered = false;
 	this.settings = settings;
 	this.parent = undefined;
 	this.currentlyObservedTimelineEvent = vc.currentlyObservedTimelineEvent;
@@ -725,6 +748,7 @@ function CanvasTimeline(vc, layerid, id, vx, vy, vw, vh, settings, timelineinfo)
 	this.regime = timelineinfo.regime;
 	this.settings.gradientOpacity = 0;
 	this.settings.gradientFillStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : timelineBorderColor;
+	this.opacity = timelineinfo.opacity;
 
 	this.reactsOnMouse = true;
 
@@ -937,7 +961,7 @@ function CanvasCircle(vc, layerid, id, vxc, vyc, vradius, settings) {
 	/* Checks whether the given point (virtual) is inside the object
 	(should take into account the shape) */
 	this.isInside = function (point_v) {
-		var len2 = sqr(point_v.x - vxc) + sqr(point_v.y - vyc);
+	    var len2 = sqr(point_v.x - vxc) + sqr(point_v.y - this.y - this.height / 2);
 		return len2 <= vradius * vradius;
 	};
 }
@@ -997,6 +1021,7 @@ function CanvasText(vc, layerid, id, vx, vy, baseline, vh, text, settings, wv) {
 	this.base(vc, layerid, id, vx, vy, wv ? wv : 0, vh);  // proper text width will be computed on first render
 	this.text = text;
 	this.baseline = baseline;
+	this.newBaseline = baseline;
 	this.settings = settings;
 
 	if (typeof this.settings.textBaseline != 'undefined' &&
@@ -1700,8 +1725,12 @@ var addTimeline = function (element, layerid, id, timelineinfo) {
 	var width = timelineinfo.timeEnd - timelineinfo.timeStart;
 	var timeline = addChild(element, new CanvasTimeline(element.vc, layerid, id,
                             timelineinfo.timeStart, timelineinfo.top,
-                            width, timelineinfo.height,
-                            { strokeStyle: timelineinfo.strokeStyle ? timelineinfo.strokeStyle : timelineStrokeStyle, lineWidth: timelineLineWidth, fillStyle: timelineinfo.fillStyle }, timelineinfo), true);
+                            width, timelineinfo.height, {
+                                strokeStyle: timelineinfo.strokeStyle ? timelineinfo.strokeStyle : timelineStrokeStyle,
+                                lineWidth: timelineLineWidth,
+                                fillStyle: timelineinfo.fillStyle,
+                                opacity: typeof timelineinfo.opacity !== 'undefined' ? timelineinfo.opacity : 1
+                            }, timelineinfo), true);
 	return timeline;
 }
 
@@ -1766,7 +1795,13 @@ function ContentItem(vc, layerid, id, vx, vy, vw, vh, contentItem) {
 		return zoomToElementHandler(this, e, 1.0)
 	};
 
+	var self = this;
 	this.changeZoomLevel = function (curZl, newZl) {
+	    var vy = self.newY;
+	    var mediaTop = vy + verticalMargin;
+	    var sourceTop = mediaTop + mediaHeight + sourceVertMargin;
+	    var titleTop = sourceTop + verticalMargin + sourceHeight;
+
 		if (newZl >= contentItemShowContentZoomLevel) { // building content for an infodot
 			if (curZl >= contentItemShowContentZoomLevel) return null;
 
@@ -1893,11 +1928,15 @@ function CanvasInfodot(vc, layerid, id, time, vyc, radv, contentItems, infodotDe
         { strokeStyle: infoDotBorderColor, lineWidth: infoDotBorderWidth * radv, fillStyle: infoDotFillColor, isLineWidthVirtual: true });
 	this.contentItems = contentItems;
 	this.hasContentItems = false;
+	this.title = infodotDescription.title;
+	this.opacity = typeof infodotDescription.opacity !== 'undefined' ? infodotDescription.opacity : 1;
+
 
 	contentItems.sort(function (a, b) {
 		return a.order - b.order;
 	});
 
+	var vyc = this.newY + radv;
 	var innerRad = radv - infoDotHoveredBorderWidth * radv;
 	this.outerRad = radv;
 
@@ -1968,14 +2007,13 @@ function CanvasInfodot(vc, layerid, id, time, vyc, radv, contentItems, infodotDe
 
 	// Building dynamic LOD content
 	var infodot = this;
-	var root = new CanvasDynamicLOD(vc, layerid, id + "_dlod", time - innerRad, vyc - innerRad, 2 * innerRad, 2 * innerRad);
+	var root = new CanvasDynamicLOD(vc, layerid, id + "_dlod", time - innerRad, infodot.newY + radv - innerRad, 2 * innerRad, 2 * innerRad);
 	root.removeWhenInvisible = true;
 	addChild(this, root);
 
 	root.firstLoad = true;
 	root.changeZoomLevel = function (curZl, newZl) {
-
-
+	    var vyc = infodot.newY + radv;
 
 		// Showing only thumbnails for every content item of the infodot
 	    if (newZl >= infodotShowContentThumbZoomLevel && newZl < infodotShowContentZoomLevel) {
@@ -1992,7 +2030,7 @@ function CanvasInfodot(vc, layerid, id, time, vyc, radv, contentItems, infodotDe
 			var contentItem = null;
 
 			if (infodot.contentItems.length > 0) {
-				contentItem = new ContainerElement(vc, layerid, id + "__contentItems", root.x, root.y, 2 * innerRad, 2 * innerRad);
+			    contentItem = new ContainerElement(vc, layerid, id + "__contentItems", root.x, root.newY, 2 * innerRad, 2 * innerRad);
 				var items = buildVcContentItems(infodot.contentItems, time, vyc, innerRad, vc, layerid);
 				if (items)
 					for (var i = 0; i < items.length; i++)
@@ -2136,10 +2174,6 @@ function CanvasInfodot(vc, layerid, id, time, vyc, radv, contentItems, infodotDe
 	var _hc = (262.0 + 0) * k;
 	var strokeWidth = 3 * k * radv;
 	var strokeLength = 24.0 * k * radv;
-	var xlt0 = -_wc / 2 * radv + time;
-	var ylt0 = -_hc / 2 * radv + vyc;
-	var xlt1 = _wc / 2 * radv + time;
-	var ylt1 = _hc / 2 * radv + vyc;
 
 	/* Renders an infodot.
 	@param ctx              (context2d) Canvas context2d to render on.
@@ -2153,6 +2187,12 @@ function CanvasInfodot(vc, layerid, id, time, vyc, radv, contentItems, infodotDe
 
 		var sw = viewport2d.widthVirtualToScreen(strokeWidth);
 		if (sw < 0.5) return;
+
+		var vyc = infodot.y + radv;
+		var xlt0 = -_wc / 2 * radv + time;
+		var ylt0 = -_hc / 2 * radv + vyc;
+		var xlt1 = _wc / 2 * radv + time;
+		var ylt1 = _hc / 2 * radv + vyc;
 
 		var rad = this.width / 2.0;
 		var xc = this.x + rad;

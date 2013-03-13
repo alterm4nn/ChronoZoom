@@ -566,3 +566,21 @@ function getCookie(c_name) {
     }
     return null;
 }
+
+function viewportToViewBox(vp) {
+    var w = vp.widthScreenToVirtual(vp.width);
+    var h = vp.heightScreenToVirtual(vp.height);
+    var x = vp.visible.centerX - w / 2;
+    var y = vp.visible.centerY - h / 2;
+    return {
+        left: x,
+        right: x + w,
+        top: y,
+        bottom: y + h,
+        width: w,
+        height: h,
+        centerX: vp.visible.centerX,
+        centerY: vp.visible.centerY,
+        scale: vp.visible.scale
+    };
+}
