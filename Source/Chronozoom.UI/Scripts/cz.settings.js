@@ -142,6 +142,7 @@ navigateNextMaxCount = 2; // if navNext (left or right) button was pressed rapid
 longNavigationLength = 10; // length of navigation in long navigation regime
 
 // progresive loading
-serverUrlBase = "http://localhost:4949/api/Timeline?";
+serverUrlBase = document.URL.match(/((?:http:\/\/)?(?:[0-9a-zA-Z.:]+))(.*)/)[1] + "/api/Timeline?";
+//serverUrlBase = "http://localhost:4949/api/Timeline?";
 //serverUrlBase = "http://depot.cs.msu.su:9090/cz_with_dynamic_layout/api/Timeline?";
 minTimelineWidth = 100; // px

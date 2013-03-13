@@ -74,7 +74,7 @@
             $("#timelineChangeName").hide('slide', {}, 'slow');
         },
 
-        InitializeTimelineChangeName: function () {
+        initializeTimelineChangeName: function () {
             $("#ChangeNameTextBox")
                     .focus(function () {
                         if ($(this).hasClass('emptyTextBox')) {
@@ -132,7 +132,7 @@
             exhibit.ContentItems.push(contentItem);
         },
 
-        AtOnClicked: function () {
+        atOnClicked: function () {
             this.isActive = !this.isActive;
 
             if (this.isActive)
@@ -523,10 +523,6 @@
 
             return date;
         }
-    });
-
-    Object.defineProperties(Authoring, {
-        // Properties here...
     });
 
     return CZ;

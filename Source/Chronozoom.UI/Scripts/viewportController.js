@@ -70,6 +70,10 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
     @param gesture      (PanGesture) The gesture to apply
     */
     function PanViewport(viewport, panGesture) {
+        if (CZ.Authoring.isActive) {
+            return;
+        }
+        
         var virtualOffset = viewport.vectorScreenToVirtual(panGesture.xOffset, panGesture.yOffset);
         var oldVisible = viewport.visible;
         viewport.visible.centerX = oldVisible.centerX - virtualOffset.x;

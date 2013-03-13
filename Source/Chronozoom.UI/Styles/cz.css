@@ -1394,6 +1394,35 @@ img.fallbackBackground {
     cursor:         default;
 }
 
+/************************************
+*              Authoring            *
+************************************/
+
+.authModeSwitch {
+    background: grey;
+    color: white;
+    border: 2px solid #BFBFBF;
+    margin-left: 25px;
+    margin-top: 5px;
+    width: 55px;
+    height: 25px;
+}
+
+
+.authSwitch {
+    background: grey;
+    color: white;
+    border: 2px solid #BFBFBF;
+    margin-left: 50px;
+    margin-top: 5px;
+    width: 55px;
+    height: 25px;
+}
+
+
+.buttonActive {
+    border:2px solid green;
+}
 
 /************************************
 *               Auxilary            *

@@ -55,6 +55,7 @@
     <script type="text/javascript" src="Scripts/search.js"></script>
     <script type="text/javascript" src="Scripts/bibliography.js"></script>
     <script type="text/javascript" src="Scripts/breadCrumbs.js"></script>
+    <script type="text/javascript" src="Scripts/authoring.js"></script>
     <!--[if IE]>
     <script type="text/javascript" src="Scripts/regimesIE.js"></script>
     <![endif]-->
@@ -78,6 +79,26 @@
                     closeWelcomeScreen();
                 });
             }
+
+            $(".authModeSwitch").mouseup(function () {
+                if ($(this).hasClass("buttonActive")) {
+                    $(this).removeClass("buttonActive");
+                    return;
+                }
+
+                $(".authModeSwitch").removeClass("buttonActive");
+                $(this).addClass("buttonActive");
+
+            });
+
+            $(".authSwitch").mouseup(function () {
+                if ($(this).hasClass("buttonActive")) {
+                    $(this).removeClass("buttonActive");
+                    return;
+                }
+
+                $(this).addClass("buttonActive");
+            });
 
             if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
                 if (/Chrome[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
@@ -156,6 +177,7 @@
             initializeSearch();
             initializeBibliography();
             initializeToursUI();
+            CZ.Authoring.initializeTimelineChangeName();
 
             var canvasGestures = getGesturesStream(vc); //gesture sequence of the virtual canvas
             var axisGestures = applyAxisBehavior(getGesturesStream(ax)); //gesture sequence of axis (tranformed according to axis behavior logic)
@@ -319,6 +341,220 @@
                 $("#bibliography .title").html("<span>Loading...</span>");
                 $("#bibliographyBack").css("display", "block");
             }
+
+            // TODO: Move this code to virtualCanvas.js.
+            // drag desktop image to canvas
+            var holder = document.getElementById("vc");
+
+            holder.ondragover = function (e) {
+                var vp = vc.virtualCanvas("getViewport");
+                var origin = getXBrowserMouseOrigin(vc, e);
+                var posv = vp.pointScreenToVirtual(origin.x, origin.y);
+
+                // remove circle that marks the place where new infodot will be created
+                if (CZ.Authoring.hoveredTimeline != null) {
+                    // sometimes exception is being thrown
+                    // TODO: remove try-catch and repair exception
+                    try {
+                        removeChild(CZ.Authoring.hoveredTimeline, "newInfodotCircle");
+                    }
+                    catch (ex) {
+                        console.log(ex);
+                    }
+                }
+
+                // trigger mouseMove event to create a hovered timeline
+                vc.virtualCanvas("mouseMove", e);
+
+                CZ.Authoring.hoveredTimeline = vc.virtualCanvas("getHoveredTimeline"); // parent timeline
+                CZ.Authoring.hoveredInfodot = vc.virtualCanvas("getHoveredInfodot"); // parent infodot
+
+                if (CZ.Authoring.hoveredTimeline == null)
+                    return;
+
+                if (CZ.Authoring.hoveredInfodot && CZ.Authoring.hoveredInfodot.id) {
+                    if (CZ.Authoring.hoveredInfodot.contentItems.length == infodotMaxContentItems) {
+                        CZ.Authoring.hoveredInfodot.settings.strokeStyle = "red";
+                        return false;
+                    }
+                    CZ.Authoring.hoveredInfodot.settings.strokeStyle = "green";
+                }
+                else {
+                    var radius;
+                    if (CZ.Authoring.hoveredTimeline.width > CZ.Authoring.hoveredTimeline.height) radius = CZ.Authoring.hoveredTimeline.width / 10.0
+                    else radius = CZ.Authoring.hoveredTimeline.height / 10.0;
+
+                    while (radius > (CZ.Authoring.hoveredTimeline.height / 10)) radius /= 1.5;
+                    while (radius > (CZ.Authoring.hoveredTimeline.width / 10)) radius /= 1.5;
+                    for (var i = 0; i < CZ.Authoring.hoveredTimeline.children.length; i++) {
+                        if (CZ.Authoring.hoveredTimeline.children[i].type == "infodot") {
+                            radius = CZ.Authoring.hoveredTimeline.children[i].outerRad;
+                            break;
+                        }
+                    }
+
+                    for (var i = 0; i < CZ.Authoring.hoveredTimeline.children.length; i++) {
+                        if (CZ.Authoring.hoveredTimeline.children[i].type == "infodot") {
+                            radius = CZ.Authoring.hoveredTimeline.children[i].outerRad;
+                            break;
+                        }
+                    }
+
+                    // circle that marks the place where infodot will be created if mouse button will be released
+                    try {
+                        // sometimes exception is being thrown
+                        // TODO: remove try-catch and repair exception
+                        addCircle(CZ.Authoring.hoveredTimeline, "layerInfodots", "newInfodotCircle", posv.x, posv.y, radius,
+                        { strokeStyle: 'green', lineWidth: 1, fillStyle: 'rgba(0,140,140,0.5)' }, true);
+                    }
+                    catch (ex) {
+                        console.log(ex);
+                    }
+                }
+
+                return false;
+            };
+            holder.ondragleave = function (e) {
+                var vp = vc.virtualCanvas("getViewport");
+                var origin = getXBrowserMouseOrigin(vc, e);
+                var posv = vp.pointScreenToVirtual(origin.x, origin.y);
+
+                // remove circle that marks the place where new infodot will be created
+                if (CZ.Authoring.hoveredTimeline != null) {
+                    // sometimes exception is being thrown
+                    // TODO: remove try-catch and repair exception
+                    try {
+                        removeChild(CZ.Authoring.hoveredTimeline, "newInfodotCircle");
+                    }
+                    catch (ex) {
+                        console.log(ex);
+                    }
+                }
+
+                vc.virtualCanvas("mouseMove", e);
+
+                return false;
+            };
+            holder.ondragend = function () {
+                return false;
+            };
+            holder.ondrop = function (e) {
+                e.preventDefault();
+
+                // convert event's screen coordinates into virtual space coordinates
+                var vp = vc.virtualCanvas("getViewport");
+                var origin = getXBrowserMouseOrigin(vc, e);
+                var posv = vp.pointScreenToVirtual(origin.x, origin.y);
+
+                // remove circle that marks the place where new infodot will be created
+                if (CZ.Authoring.hoveredTimeline != null) {
+                    // sometimes exception is being thrown
+                    // TODO: remove try-catch and repair exception
+                    try {
+                        removeChild(CZ.Authoring.hoveredTimeline, "newInfodotCircle");
+                    }
+                    catch (ex) {
+                        console.log(ex);
+                    }
+                }
+
+                vc.virtualCanvas("mouseMove", e);
+
+                var file = e.dataTransfer.files[0];
+                if (!file || !file.type.match("image/"))
+                    return false;
+
+                var reader = new FileReader();
+
+                // callback
+                reader.onload = function (event) {
+                    desktopImageURL = event.target.result;
+
+                    if (!CZ.Authoring.hoveredTimeline || !CZ.Authoring.hoveredTimeline.id)
+                        return false;
+
+                    var radius;
+                    if (CZ.Authoring.hoveredTimeline.width > CZ.Authoring.hoveredTimeline.height) radius = CZ.Authoring.hoveredTimeline.width / 10.0
+                    else radius = CZ.Authoring.hoveredTimeline.height / 10.0;
+                   
+                    while (radius > (CZ.Authoring.hoveredTimeline.height / 10)) radius /= 1.5;
+                    while (radius > (CZ.Authoring.hoveredTimeline.width / 10)) radius /= 1.5;
+                    for (var i = 0; i < CZ.Authoring.hoveredTimeline.children.length; i++) {
+                        if (CZ.Authoring.hoveredTimeline.children[i].type == "infodot") {
+                            radius = CZ.Authoring.hoveredTimeline.children[i].outerRad;
+                            break;
+                        }
+                    }
+                    // sometimes exception is being thrown
+                    // TODO: remove try-catch and repair exception
+                    // UPDATE: throwing of the exception was fixed, but try-catch is still there to prevent unexpected errors
+                    try {
+                        if (CZ.Authoring.hoveredInfodot && CZ.Authoring.hoveredInfodot.id) { // adding CI into infodot
+                            if (CZ.Authoring.hoveredInfodot.contentItems.length == infodotMaxContentItems)
+                                return;
+
+                            CZ.Authoring.hoveredInfodot.contentItems.push({
+                                id: 'contentItem' + CZ.Authoring.contentItemCount++, title: 'Sample title',
+                                description: 'description',
+                                mediaUrl: desktopImageURL,
+                                mediaType: 'image'
+                            });
+
+                            var vyc = CZ.Authoring.hoveredInfodot.vyc;
+                            var time = CZ.Authoring.hoveredInfodot.x + CZ.Authoring.hoveredInfodot.width / 2;
+                            var id = CZ.Authoring.hoveredInfodot.id;
+                            var cis = CZ.Authoring.hoveredInfodot.contentItems;
+                            var descr = CZ.Authoring.hoveredInfodot.infodotDescription;
+
+                            try {
+                                // remove and then adding infodot to position content items properly
+                                removeChild(CZ.Authoring.hoveredTimeline, CZ.Authoring.hoveredInfodot.id);
+                                addInfodot(CZ.Authoring.hoveredTimeline, "layerInfodots", id, time, vyc, radius, cis, descr);
+                            }
+                            catch (ex) {
+                                console.log(ex);
+                            }
+
+                        } else { // adding new infodot
+                            var date = CZ.Authoring.getInfodotDate(posv.x);
+
+                            addInfodot(CZ.Authoring.hoveredTimeline, "layerInfodots", "infodot" + CZ.Authoring.infodotCount++,
+                                posv.x, posv.y, radius,
+                                [{
+                                    id: 'contentItem' + CZ.Authoring.contentItemCount++, title: 'Sample content item',
+                                    description: 'Content item created by dragging desktop image.',
+                                    mediaUrl: desktopImageURL,
+                                    mediaType: 'image'
+                                }], {
+                                    title: "Sample infodot",
+                                    date: date
+                                });
+                        }
+                    }
+                    catch (ex) {
+                        console.log(ex);
+                    }
+
+                    CZ.Authoring.createInfodot({
+                        regime: CZ.Authoring.hoveredTimeline.regime,
+                        threshold: CZ.Authoring.hoveredTimeline.threshold,
+                        year: -posv.x,
+                        contentItem: {
+                            uri: desktopImageURL,
+                            caption: 'Infodot created by dragging desktop image.',
+                            title: 'Image'
+                        }
+                    });
+                };
+
+                reader.onerror = function (event) {
+                    console.log("Reading of the desktop file failed.");
+                }
+
+                reader.readAsDataURL(file);
+
+                return false;
+            };
         });
     </script>
     <title>ChronoZoom</title>
@@ -328,6 +564,20 @@
     <div id="header" style="height: 67px">
         <div style="position: relative">
             
+            <button class="authSwitch" style="width: auto; left: 350px; position: absolute;" id="AT_button"
+                onmouseup="CZ.Authoring.atOnClicked();">Authoring</button>
+            <div id="authoringToolsPanel" style="position: absolute; left: 500px; top: 0px; display: none; max-width: 800px;">
+                <button class="authModeSwitch" style="width: auto;"
+                    onmouseup="CZ.Authoring.editModeChanged('addTimeline');">Create timeline</button>
+                <button class="authModeSwitch" style="width: auto;"
+                    onmouseup="CZ.Authoring.editModeChanged('editTimelineDate');">Edit timeline</button>
+                <button class="authModeSwitch" style="width: auto;"
+                    onmouseup="CZ.Authoring.editModeChanged('moveContent');">Move timeline</button>
+                <button class="authModeSwitch" style="width: auto;"
+                    onmouseup="CZ.Authoring.editModeChanged('moveInfodot');">Move Exhibit</button>
+                <button class="authModeSwitch" style="width: auto;"
+                    onmouseup="CZ.Authoring.editModeChanged('moveInfodotHorizontally');">Edit Exhibit</button>
+            </div>
             <div style="left: 15px; height: 29px; position: absolute;">
                 <img style="margin: 9px 0 0 5px;  float: left" title="ChronoZoom" src="Images/chronzoom-200px-white.png" />
                 <img style="margin: 5px 0 0 14px; float: right" id="search_button" title="Search ChronoZoom" alt="Search ChronoZoom" src="Images/search_off.jpg"
@@ -424,6 +674,21 @@
         <div id="layerInfodots" onselectstart="return false;">
         </div>
         <div id="iframe_layer" onselectstart="return false;">
+        </div>
+    </div>
+
+    <div id="timelineChangeName" class="czWindow" style="z-index: 2010;max-height:250px; display: none;">
+        <div class="header" onselectstart="return false;" style="display: inline-block;">
+            Input new name
+        </div>
+        <img id="editorCloseButton" style="display: inline-block; position: relative; top: 10px;" src="Images/close_off.png" alt="Close"
+            onmouseover="toggleOnImage('editorCloseButton', 'png');"
+            onmouseout="toggleOffImage('editorCloseButton', 'png');"
+            onclick="CZ.Authoring.hideTitleEditor()" 
+            onselectstart="return false;" />
+        <div>
+            <input id="ChangeNameTextBox" class="czTextBox emptyTextBox" style="margin: 10px 10px 10px 10px;
+                width: 190px" value="type here..." />
         </div>
     </div>
     
