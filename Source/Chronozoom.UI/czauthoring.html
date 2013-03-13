@@ -1,0 +1,989 @@
+﻿
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta name="Description" content="ChronoZoom is an open-source community project dedicated to visualizing the history of everything." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+   <script type="text/javascript">
+       // Invoke timings.show() to get timings
+       var timings = new Object();
+       timings.parseStarted = new Date();
+       timings.show = function () {
+           var msg =
+                   "External scripts loading: " + (timings.scriptsLoaded - timings.parseStarted) +
+                   " ms\nDocument ready handler: " + (timings.readyStarted - timings.scriptsLoaded) +
+                   " ms\n\nRequesting server for timelines data: " + (timings.wcfRequestCompleted - timings.wcfRequestStarted) +
+                   " ms\nLayout algorithm: " + (timings.layoutCompleted - timings.wcfRequestCompleted) +
+                   " ms\nPopulating virtual canvas: " + (timings.canvasInited - timings.layoutCompleted) + " ms";
+           alert(msg);
+       }
+
+       var _gaq = _gaq || [];
+       _gaq.push(['_setAccount', 'UA-29180487-2']);
+       _gaq.push(['_setDomainName', 'chronozoomproject.org']);
+       _gaq.push(['_setAllowLinker', true]);
+       _gaq.push(['_trackPageview']);
+       (function () {
+           var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+           ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+           var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+       })();
+</script>
+
+    <link rel="stylesheet" type="text/css" href="Styles/cz.css" />
+    <link rel="stylesheet" type="text/css" href="Styles/axis.css" />
+
+    <script type="text/javascript" src="Scripts/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-ui-1.8.16.custom.min.js"></script>
+	<!--<script type="text/javascript" src="Scripts/jquery.cookie.js"></script>-->
+    <script type="text/javascript" src="Scripts/rx.js"></script>
+    <script type="text/javascript" src="Scripts/rx.jQuery.js"></script>
+    <script type="text/javascript" src="Scripts/seadragon-min.js"></script>
+    <script type="text/javascript" src="Scripts/cz.settings.js"></script>
+    <script type="text/javascript" src="Scripts/common.js"></script>
+    <script type="text/javascript" src="Scripts/viewport.js"></script>
+    <script type="text/javascript" src="Scripts/viewportAnimation.js"></script>
+    <script type="text/javascript" src="Scripts/mouseWheelPlugin.js"></script>
+    <script type="text/javascript" src="Scripts/gestures.js"></script>
+    <script type="text/javascript" src="Scripts/virtualCanvas_1.js"></script>
+    <script type="text/javascript" src="Scripts/vccontent_1.js"></script>
+    <script type="text/javascript" src="Scripts/viewportController_1.js"></script>
+    <script type="text/javascript" src="Scripts/axis.js"></script>
+    <script type="text/javascript" src="Scripts/urlnav.js"></script>
+    <script type="text/javascript" src="Scripts/layout.js"></script>
+    <script type="text/javascript" src="Scripts/search.js"></script>
+    <!--<script type="text/javascript" src="Scripts/bibliography.js"></script>-->
+    <script type="text/javascript" src="Scripts/breadCrumbs.js"></script>
+    <script type="text/javascript" src="Scripts/authoring.js"></script>
+    
+     <!--[if IE]>
+    <script type="text/javascript" src="Scripts/regimesIE.js"></script>
+    <![endif]-->
+    <script type="text/javascript">
+
+        timings.scriptsLoaded = new Date();
+        var searchString;
+        var ax, vc;
+        var visReg;
+        var cosmosVisible, earthVisible, lifeVisible, prehistoryVisible, humanityVisible;
+        var content;
+        var breadCrumbs; //titles and visibles of the recent breadcrumbs
+
+        var firstTimeWelcomeChecked = true; // if welcome screen checkbox checked or not
+
+        var regimes = new Array();
+        var regimeNavigator;
+
+        var k = 1000000000;
+        var setNavigationStringTo; // { element or bookmark, id } identifies that we zoom into this element and when (if) finish the zoom, we should put the element's path into navigation string
+
+        var regimesRatio;
+
+        var hashHandle = true; // Handle hash change event
+        var dataFile = undefined;
+
+        function updateAxis(vc, ax) {
+            var vp = vc.virtualCanvas("getViewport");
+            var lt = vp.pointScreenToVirtual(0, 0);
+            var rb = vp.pointScreenToVirtual(vp.width, vp.height);
+            ax.axis("setRange", lt.x, rb.x);
+        }
+
+        function updateNavigator(vp) {
+            var navigatorFunc = function (coordinate) {
+                if (Math.abs(coordinate) < 0.00000000001)
+                    return 0;
+                //Get log10 from coordinate
+                var log = Math.log(coordinate) / 2.302585092994046;
+                //Get pow from log10
+                var pow = Math.pow(log, 3) * Math.exp(-log * 0.001);
+                //Get final width of the column
+                return (log + pow) * 13700000000 / 1041.2113538234402;
+            }
+
+            var left = vp.pointScreenToVirtual(0, 0).x;
+            if (left < maxPermitedTimeRange.left) left = maxPermitedTimeRange.left;
+            var right = vp.pointScreenToVirtual(vp.width, vp.height).x;
+            if (right > maxPermitedTimeRange.right) right = maxPermitedTimeRange.right;
+            var newRight = navigatorFunc(Math.abs(right));
+            var newLeft = navigatorFunc(Math.abs(left));
+            var newWidth = Math.max(2.0 / regimesRatio, Math.abs(newRight - newLeft));
+
+            var min = 0;
+            var max = document.getElementById("cosmos_rect").clientWidth;
+
+            var l = 301 - regimesRatio * newLeft;
+            var w = regimesRatio * newWidth;
+
+            if (l < 0 || l + w > max + 5)
+                return;
+
+            regimeNavigator.css('left', l);
+            regimeNavigator.css('width', w);
+        }
+
+        var controller; //a controller to perform smooth navigation
+        var isAxisFreezed = true; //indicates whether the axis moves together with canvas during navigation or not
+        var startHash;
+
+        $(document).ready(function () {
+            // prevent browser from opening dragged file
+            window.addEventListener("dragover", function (e) {
+                e = e || event;
+                e.preventDefault();
+            }, false);
+            window.addEventListener("drop", function (e) {
+                e = e || event;
+                e.preventDefault();
+            }, false);
+
+            $(".authModeSwitch").mouseup(function () {
+                if ($(this).hasClass("buttonActive")) {
+                    $(this).removeClass("buttonActive");
+                    return;
+                }
+
+                $(".authModeSwitch").removeClass("buttonActive");
+                $(this).addClass("buttonActive");
+
+            });
+
+            $(".authSwitch").mouseup(function () {
+                if ($(this).hasClass("buttonActive")) {
+                    $(this).removeClass("buttonActive");
+                    return;
+                }
+
+                $(this).addClass("buttonActive");
+            });
+
+            $('.bubbleInfo').hide();
+            ("#axis").showThresholds = true;
+
+            if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
+                if (/Chrome[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
+                    var oprversion = new Number(RegExp.$1) // capture x.x portion and store as a number
+                    if (oprversion < 14.0) {
+                        var fallback_agreement = getCookie("new_bad_browser_agreement");
+                        if ((fallback_agreement == null) || (fallback_agreement == "")) {
+                            window.location = "testFallBackPage.htm";
+                            return;
+                        }
+                    }
+                }
+            }
+            else if (navigator.userAgent.toLowerCase().indexOf('version') > -1) {
+                if (/Version[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
+                    var oprversion = new Number(RegExp.$1) // capture x.x portion and store as a number
+                    if (oprversion < 5.0) {
+                        var fallback_agreement = getCookie("new_bad_browser_agreement");
+                        if ((fallback_agreement == null) || (fallback_agreement == "")) {
+                            window.location = "testFallBackPage.htm";
+                            return;
+                        }
+                    }
+                }
+            }
+            else {
+                var br = $.browser;
+                var isIe9 = br.msie && parseInt(br.version, 10) >= 9;
+                if (!isIe9) {
+                    var isFF9 = br.mozilla && parseInt(br.version, 10) >= 7;
+                    if (!isFF9) {
+                        var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+                        if (!is_chrome) {
+                            var fallback_agreement = getCookie("new_bad_browser_agreement");
+                            if ((fallback_agreement == null) || (fallback_agreement == "")) {
+                                window.location = "testFallBackPage.htm";
+                                return;
+                            }
+                        }
+                        return;
+                    }
+                }
+            }
+
+            if (navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
+                // Suppress the default iOS elastic pan/zoom actions.
+                document.addEventListener('touchmove', function (e) { e.preventDefault(); });
+            }
+
+            if (navigator.userAgent.indexOf('Mac') != -1) {
+                // Disable Mac OS Scrolling Bounce Effect
+                var body = document.getElementsByTagName('body')[0];
+                body.style.overflow = "hidden";
+            }
+
+            // init seadragon. set path to image resources for nav buttons 
+            Seadragon.Config.imagePath = seadragonImagePath;
+
+            maxPermitedVerticalRange = { top: 0, bottom: 10000000 }; //temporary value until there is no data
+            timings.readyStarted = new Date();
+
+            ax = $("#axis");
+            ax.axis();
+
+            vc = $("#vc");
+            vc.virtualCanvas();
+
+            regimeNavigator = $('#regime_navigator');
+            regimeNavigator.click(passThrough);
+            regimesRatio = 300 / Math.abs(maxPermitedTimeRange.left - maxPermitedTimeRange.right);
+
+            if (window.location.hash)
+                startHash = window.location.hash; // to be processes after the data is loaded
+             loadData(); //retrieving the data
+
+            CZ.Authoring.InitializeTimelineChangeName();
+
+            var canvasGestures = getGesturesStream(vc); //gesture sequence of the virtual canvas
+            var axisGestures = applyAxisBehavior(getGesturesStream(ax)); //gesture sequence of axis (tranformed according to axis behavior logic)
+            var jointGesturesStream = canvasGestures.Merge(axisGestures);
+
+            controller = new ViewportController(
+                            function (visible) {
+                                var vp = vc.virtualCanvas("getViewport");
+                                var markerPos = ax.axis("MarkerPosition");
+                                var oldMarkerPosInScreen = vp.pointVirtualToScreen(markerPos, 0).x;
+
+                                vc.virtualCanvas("setVisible", visible, controller.activeAnimation);
+                                updateAxis(vc, ax);
+                                vp = vc.virtualCanvas("getViewport");
+
+                                var hoveredInfodot = vc.virtualCanvas("getHoveredInfodot");
+                                var actAni = controller.activeAnimation != undefined;
+
+                                if (actAni && !hoveredInfodot.id) {
+                                    var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
+                                    ax.axis("setTimeMarker", newMarkerPos);
+                                }
+
+                                updateNavigator(vp);
+                            },
+                            function () {
+                                return vc.virtualCanvas("getViewport");
+                            },
+                            jointGesturesStream);
+
+            var hashChangeFromOutside = true; // True if url is changed externally
+
+            // URL Nav: update URL when animation is complete
+            controller.onAnimationComplete.push(function (id) {
+                hashChangeFromOutside = false;
+                if (setNavigationStringTo && setNavigationStringTo.bookmark) { // go to search result
+                    navigationAnchor = navStringTovcElement(setNavigationStringTo.bookmark, vc.virtualCanvas("getLayerContent"));
+                    window.location.hash = setNavigationStringTo.bookmark;
+                }
+                else {
+                    if (setNavigationStringTo && setNavigationStringTo.id == id)
+                        navigationAnchor = setNavigationStringTo.element;
+
+                    var vp = vc.virtualCanvas("getViewport");
+                    window.location.hash = vcelementToNavString(navigationAnchor, vp);
+                }
+                setNavigationStringTo = null;
+            });
+
+            // URL Nav: handle URL changes from outside
+            window.addEventListener("hashchange", function () {
+                if (window.location.hash && hashChangeFromOutside && hashHandle) {
+                    var hash = window.location.hash;
+                    var visReg = navStringToVisible(window.location.hash.substring(1), vc);
+                    if (visReg) {
+                        isAxisFreezed = true;
+                        controller.moveToVisible(visReg, true);
+                        // to make sure that the hash is correct (it can be incorrectly changed in onCurrentlyObservedInfodotChanged)
+                        if (window.location.hash != hash) {
+                            hashChangeFromOutside = false;
+                            window.location.hash = hash;
+                        }
+                    }
+                    hashHandle = true;
+                } else
+                    hashChangeFromOutside = true;
+            });
+
+
+            // Axis: enable showing thresholds
+            controller.onAnimationComplete.push(function () {
+                ax.axis("enableThresholds", true);
+                //if (window.console && console.log("thresholds enabled"));
+            });
+            //Axis: disable showing thresholds
+            controller.onAnimationStarted.push(function () {
+                ax.axis("enableThresholds", true);
+                //if (window.console && console.log("thresholds disabled"));
+            });
+            // Axis: enable showing thresholds
+            controller.onAnimationUpdated.push(function (oldId, newId) {
+                if (oldId != undefined && newId == undefined) { // animation interrupted
+                    setTimeout(function () {
+                        ax.axis("enableThresholds", true);
+                        //if (window.console && console.log("thresholds enabled"));
+                    }, 500);
+                }
+            });
+
+            updateLayout();
+
+            vc.bind("elementclick", function (e) {
+                navigateToElement(e);
+            });
+
+            vc.bind('cursorPositionChanged', function (cursorPositionChangedEvent) {
+                updateMarker();
+                // if (LeftMode) {var new_coord = vc.virtualCanvas("getCursorPosition"); }
+            });
+
+            ax.bind('thresholdBookmarkChanged', function (thresholdBookmark) {
+                var bookmark = navStringToVisible(thresholdBookmark.Bookmark, vc);
+                if (bookmark != undefined) {
+                    controller.moveToVisible(bookmark, false);
+                }
+            });
+
+            // Reacting on the event when one of the infodot exploration causes inner zoom constraint
+            vc.bind("innerZoomConstraintChenged", function (constraint) {
+                controller.effectiveExplorationZoomConstraint = constraint.zoomValue; // applying the constraint
+                ax.axis("allowMarkerMovesOnHover", !constraint.zoomValue);
+            });
+
+            vc.bind("breadCrumbsChanged", function (breadCrumbsEvent) { //reacting on the event when the first timeline that contains whole visible region is changed
+                updateBreadCrumbsLabels(breadCrumbsEvent.breadCrumbs);
+            });
+
+            timings.readyFinished = new Date();
+            var vp = vc.virtualCanvas("getViewport");
+            vc.virtualCanvas("setVisible", getVisibleForElement({ x: -13700000000, y: 0, width: 13700000000, height: 5535444444.444445 }, 1.0, vp));
+            updateAxis(vc, ax);
+
+            //var bid = window.location.hash.match("b=([a-z0-9_]+)");
+            //if (bid) {
+            //    //bid[0] - source string
+            //    //bid[1] - found match
+            //    $("#bibliography .sources").empty();
+            //    $("#bibliography .title").html("<span>Loading...</span>");
+            //    $("#bibliographyBack").css("display", "block");
+            //}
+
+
+            // drag desktop image to canvas
+            var holder = document.getElementById("vc");
+
+            holder.ondragover = function (e) {
+                var vp = vc.virtualCanvas("getViewport");
+                var origin = getXBrowserMouseOrigin(vc, e);
+                var posv = vp.pointScreenToVirtual(origin.x, origin.y);
+
+                // remove circle that marks the place where new infodot will be created
+                if (CZ.Authoring.hoveredTimeline != null) {
+                    // sometimes exception is being thrown
+                    // TODO: remove try-catch and repair exception
+                    try {
+                        removeChild(CZ.Authoring.hoveredTimeline, "newInfodotCircle");
+                    }
+                    catch (ex) {
+                        console.log(ex);
+                    }
+                }
+
+                // trigger mouseMove event to create a hovered timeline
+                vc.virtualCanvas("mouseMove", e);
+
+                CZ.Authoring.hoveredTimeline = vc.virtualCanvas("getHoveredTimeline"); // parent timeline
+                CZ.Authoring.hoveredInfodot = vc.virtualCanvas("getHoveredInfodot"); // parent infodot
+
+                if (CZ.Authoring.hoveredTimeline == null)
+                    return;
+
+                if (CZ.Authoring.hoveredInfodot && CZ.Authoring.hoveredInfodot.id) {
+                    if (CZ.Authoring.hoveredInfodot.contentItems.length == infodotMaxContentItems) {
+                        CZ.Authoring.hoveredInfodot.settings.strokeStyle = "red";
+                        return false;
+                    }
+                    CZ.Authoring.hoveredInfodot.settings.strokeStyle = "green";
+                }
+                else {
+                    var radius;
+                    if (CZ.Authoring.hoveredTimeline.width > CZ.Authoring.hoveredTimeline.height) radius = CZ.Authoring.hoveredTimeline.width / 10.0
+                    else radius = CZ.Authoring.hoveredTimeline.height / 10.0;
+
+                    while (radius > (CZ.Authoring.hoveredTimeline.height / 10)) radius /= 1.5;
+                    while (radius > (CZ.Authoring.hoveredTimeline.width / 10)) radius /= 1.5;
+                    for (var i = 0; i < CZ.Authoring.hoveredTimeline.children.length; i++) {
+                        if (CZ.Authoring.hoveredTimeline.children[i].type == "infodot") {
+                            radius = CZ.Authoring.hoveredTimeline.children[i].outerRad;
+                            break;
+                        }
+                    }
+
+                    for (var i = 0; i < CZ.Authoring.hoveredTimeline.children.length; i++) {
+                        if (CZ.Authoring.hoveredTimeline.children[i].type == "infodot") {
+                            radius = CZ.Authoring.hoveredTimeline.children[i].outerRad;
+                            break;
+                        }
+                    }
+
+                    // circle that marks the place where infodot will be created if mouse button will be released
+                    try {
+                        // sometimes exception is being thrown
+                        // TODO: remove try-catch and repair exception
+                        addCircle(CZ.Authoring.hoveredTimeline, "layerInfodots", "newInfodotCircle", posv.x, posv.y, radius,
+                        { strokeStyle: 'green', lineWidth: 1, fillStyle: 'rgba(0,140,140,0.5)' }, true);
+                    }
+                    catch (ex) {
+                        console.log(ex);
+                    }
+                }
+
+                return false;
+            };
+            holder.ondragleave = function (e) {
+                var vp = vc.virtualCanvas("getViewport");
+                var origin = getXBrowserMouseOrigin(vc, e);
+                var posv = vp.pointScreenToVirtual(origin.x, origin.y);
+
+                // remove circle that marks the place where new infodot will be created
+                if (CZ.Authoring.hoveredTimeline != null) {
+                    // sometimes exception is being thrown
+                    // TODO: remove try-catch and repair exception
+                    try {
+                        removeChild(CZ.Authoring.hoveredTimeline, "newInfodotCircle");
+                    }
+                    catch (ex) {
+                        console.log(ex);
+                    }
+                }
+
+                vc.virtualCanvas("mouseMove", e);
+
+                return false;
+            };
+            holder.ondragend = function () {
+                return false;
+            };
+            holder.ondrop = function (e) {
+                e.preventDefault();
+
+                // convert event's screen coordinates into virtual space coordinates
+                var vp = vc.virtualCanvas("getViewport");
+                var origin = getXBrowserMouseOrigin(vc, e);
+                var posv = vp.pointScreenToVirtual(origin.x, origin.y);
+
+                // remove circle that marks the place where new infodot will be created
+                if (CZ.Authoring.hoveredTimeline != null) {
+                    // sometimes exception is being thrown
+                    // TODO: remove try-catch and repair exception
+                    try {
+                        removeChild(CZ.Authoring.hoveredTimeline, "newInfodotCircle");
+                    }
+                    catch (ex) {
+                        console.log(ex);
+                    }
+                }
+
+                vc.virtualCanvas("mouseMove", e);
+
+                var file = e.dataTransfer.files[0];
+                if (!file || !file.type.match("image/"))
+                    return false;
+
+                var reader = new FileReader();
+
+                // callback
+                reader.onload = function (event) {
+                    desktopImageURL = event.target.result;
+
+                    if (!CZ.Authoring.hoveredTimeline || !CZ.Authoring.hoveredTimeline.id)
+                        return false;
+
+                    var radius;
+                    if (CZ.Authoring.hoveredTimeline.width > CZ.Authoring.hoveredTimeline.height) radius = CZ.Authoring.hoveredTimeline.width / 10.0
+                    else radius = CZ.Authoring.hoveredTimeline.height / 10.0;
+                   
+                    while (radius > (CZ.Authoring.hoveredTimeline.height / 10)) radius /= 1.5;
+                    while (radius > (CZ.Authoring.hoveredTimeline.width / 10)) radius /= 1.5;
+                    for (var i = 0; i < CZ.Authoring.hoveredTimeline.children.length; i++) {
+                        if (CZ.Authoring.hoveredTimeline.children[i].type == "infodot") {
+                            radius = CZ.Authoring.hoveredTimeline.children[i].outerRad;
+                            break;
+                        }
+                    }
+                    // sometimes exception is being thrown
+                    // TODO: remove try-catch and repair exception
+                    // UPDATE: throwing of the exception was fixed, but try-catch is still there to prevent unexpected errors
+                    try {
+                        if (CZ.Authoring.hoveredInfodot && CZ.Authoring.hoveredInfodot.id) { // adding CI into infodot
+                            if (CZ.Authoring.hoveredInfodot.contentItems.length == infodotMaxContentItems)
+                                return;
+
+                            CZ.Authoring.hoveredInfodot.contentItems.push({
+                                id: 'contentItem' + CZ.Authoring.contentItemCount++, title: 'Sample title',
+                                description: 'description',
+                                mediaUrl: desktopImageURL,
+                                mediaType: 'image'
+                            });
+
+                            var vyc = CZ.Authoring.hoveredInfodot.vyc;
+                            var time = CZ.Authoring.hoveredInfodot.x + CZ.Authoring.hoveredInfodot.width / 2;
+                            var id = CZ.Authoring.hoveredInfodot.id;
+                            var cis = CZ.Authoring.hoveredInfodot.contentItems;
+                            var descr = CZ.Authoring.hoveredInfodot.infodotDescription;
+
+                            try {
+                                // remove and then adding infodot to position content items properly
+                                removeChild(CZ.Authoring.hoveredTimeline, CZ.Authoring.hoveredInfodot.id);
+                                addInfodot(CZ.Authoring.hoveredTimeline, "layerInfodots", id, time, vyc, radius, cis, descr);
+                            }
+                            catch (ex) {
+                                console.log(ex);
+                            }
+
+                        } else { // adding new infodot
+                            var date = CZ.Authoring.getInfodotDate(posv.x);
+
+                            addInfodot(CZ.Authoring.hoveredTimeline, "layerInfodots", "infodot" + CZ.Authoring.infodotCount++,
+                                posv.x, posv.y, radius,
+                                [{
+                                    id: 'contentItem' + CZ.Authoring.contentItemCount++, title: 'Sample content item',
+                                    description: 'Content item created by dragging desktop image.',
+                                    mediaUrl: desktopImageURL,
+                                    mediaType: 'image'
+                                }], {
+                                    title: "Sample infodot",
+                                    date: date
+                                });
+                        }
+                    }
+                    catch (ex) {
+                        console.log(ex);
+                    }
+
+                    CZ.Authoring.createInfodot({
+                        regime: CZ.Authoring.hoveredTimeline.regime,
+                        threshold: CZ.Authoring.hoveredTimeline.threshold,
+                        year: -posv.x,
+                        contentItem: {
+                            uri: desktopImageURL,
+                            caption: 'Infodot created by dragging desktop image.',
+                            title: 'Image'
+                        }
+                    });
+                };
+
+                reader.onerror = function (event) {
+                    console.log("Reading of the desktop file failed.");
+                }
+
+                reader.readAsDataURL(file);
+
+                return false;
+            };
+        });
+
+        function updateMarker() {
+            ax.axis("setTimeMarker", vc.virtualCanvas("getCursorPosition"));
+        }
+
+        //loading the data from the service
+        function loadData() {
+            timings.wcfRequestStarted = new Date();
+            var url;
+            switch (czDataSource) {
+                case 'db': url = "Chronozoom.svc/get";
+                    break;
+                case 'relay': url = "ChronozoomRelay";
+                    break;
+                case 'dump': url = "ResponseDump.txt";
+                    break;
+            }
+
+            $.ajax({ //main content fetching
+                cache: false,
+                type: "GET",
+                async: true,
+                dataType: "json",
+                url: url,
+                success: function (result) {
+                    content = JSON.parse(JSON.stringify(result));
+                    ProcessContent(result);
+                },
+                error: function (xhr) {
+                    timings.RequestCompleted = new Date();
+                    alert("Error connecting to service: " + xhr.responseText);
+                }
+            });
+        }
+
+        function ProcessContent(content) {
+            timings.wcfRequestCompleted = new Date();
+            Load(vc, content.d);
+            timings.layoutCompleted = new Date();
+            if (startHash) { // restoring the window's hash as it was on the page loading
+                visReg = navStringToVisible(startHash.substring(1), vc);
+            }
+
+            InitializeRegimes();
+            if (!visReg && cosmosVisible) {
+                window.location.hash = cosmosVisible;
+                visReg = navStringToVisible(cosmosVisible, vc);
+            }
+            if (visReg) {
+                vc.virtualCanvas("setVisible", visReg);
+                updateAxis(vc, ax);
+                var vp = vc.virtualCanvas("getViewport");
+                updateNavigator(vp);
+
+                if (startHash && window.location.hash !== startHash) {
+                    hashChangeFromOutside = false;
+                    window.location.hash = startHash; // synchronizing
+                }
+            }
+            timings.canvasInited = new Date();
+        }
+
+        function InitializeRegimes() {
+            if (content) {
+                if (content.d.length > 0) {
+                    var f = function (timeline) {
+                        if (!timeline) return null;
+                        var v = vc.virtualCanvas("findElement", 't' + timeline.UniqueID);
+                        regimes.push(v);
+                        if (v) v = vcelementToNavString(v);
+                        return v;
+                    }
+
+                    var cosmosTimeline = content.d[0];
+                    cosmosVisible = f(cosmosTimeline);
+                    navigationAnchor = vc.virtualCanvas("findElement", 't' + cosmosTimeline.UniqueID);
+
+                    var earthTimeline = FindChildTimeline(cosmosTimeline, earthTimelineID);
+                    earthVisible = f(earthTimeline);
+                    var lifeTimeline = FindChildTimeline(earthTimeline, lifeTimelineID);
+                    lifeVisible = f(lifeTimeline);
+                    var prehistoryTimeline = FindChildTimeline(lifeTimeline, prehistoryTimelineID);
+                    prehistoryVisible = f(prehistoryTimeline);
+                    var humanityTimeline = FindChildTimeline(prehistoryTimeline, humanityTimelineID, true);
+                    humanityVisible = f(humanityTimeline);
+
+                    maxPermitedVerticalRange = {    //setting top and bottom observation constraints according to cosmos timeline
+                        top: cosmosTimeline.y,
+                        bottom: cosmosTimeline.y + cosmosTimeline.height
+                    };
+
+                    maxPermitedScale = navStringToVisible(cosmosVisible, vc).scale * 1.1;
+                }
+            }
+        }
+
+        $(window).bind('resize', function () {
+            updateLayout();
+        });
+
+        function updateLayout() {
+            document.getElementById("vc").style.height = (window.innerHeight - 210) + "px";
+
+            $(".breadCrumbPanel").css("width", Math.round(($("#vc").width() / 2 - 50)));
+            $("#bc_navRight").css("left", ($(".breadCrumbPanel").width() + $(".breadCrumbPanel").position().left + 2) + "px");
+            visibleAreaWidth = $(".breadCrumbPanel").width();
+            updateHiddenBreadCrumbs();
+
+            var height = window.innerHeight;
+            var offset = height - 187;
+            // todo: use axis' height instead of constants
+            document.getElementById("bibliographyBack").style.height = window.innerHeight + "px";
+            document.getElementById("bibliographyOut").style.top = (150) + "px";
+            document.getElementById("bibliographyOut").style.height = offset + "px";
+            document.getElementById("bibliographyOut").style.top = (150) + "px";
+            document.getElementById("bibliography").style.height = (offset - 50) + "px";
+            document.getElementById("bibliography").style.top = (25) + "px";
+
+            InitializeRegimes();
+            vc.virtualCanvas("updateViewport");
+            ax.axis("updateWidth");
+            updateAxis(vc, ax);
+            updateBreadCrumbsLabels();
+        }
+
+        /*
+    	Is called by direct user actions like links, bread crumbs clicking, etc.
+    	*/
+        function setVisibleByUserDirectly(visible) {
+            return setVisible(visible);
+        }
+
+        function setVisible(visible) {
+            if (visible) {
+                //ax.axis("enableThresholds", false);
+                return controller.moveToVisible(visible);
+            }
+        }
+
+        function passThrough(e) {
+            var mouseX = e.pageX;
+            var mouseY = e.pageY;
+
+            var cosmos_rect = $("#cosmos_rect");
+            var offset_space = cosmos_rect.offset();
+            var width_space = cosmos_rect.width();
+            var height_space = cosmos_rect.height();
+            if (mouseX > offset_space.left && mouseX < offset_space.left + width_space
+             && mouseY > offset_space.top && mouseY < offset_space.top + height_space)
+                navigateToBookmark(cosmosVisible);
+
+            var earth_rect = $("#earth_rect");
+            var offset_earth = earth_rect.offset();
+            var width_earth = earth_rect.width();
+            var height_earth = earth_rect.height();
+            if (mouseX > offset_earth.left && mouseX < offset_earth.left + width_earth
+             && mouseY > offset_earth.top && mouseY < offset_earth.top + height_earth)
+                navigateToBookmark(earthVisible);
+
+            var life_rect = $("#life_rect");
+            var offset_life = life_rect.offset();
+            var width_life = life_rect.width();
+            var height_life = life_rect.height();
+            if (mouseX > offset_life.left && mouseX < offset_life.left + width_life
+             && mouseY > offset_life.top && mouseY < offset_life.top + height_life)
+                navigateToBookmark(lifeVisible);
+
+            var prehuman_rect = $("#prehuman_rect");
+            var offset_prehuman = prehuman_rect.offset();
+            var width_prehuman = prehuman_rect.width();
+            var height_prehuman = prehuman_rect.height();
+            if (mouseX > offset_prehuman.left && mouseX < offset_prehuman.left + width_prehuman
+             && mouseY > offset_prehuman.top && mouseY < offset_prehuman.top + height_prehuman)
+                navigateToBookmark(prehistoryVisible);
+
+            var human_rect = $("#human_rect");
+            var offset_human = human_rect.offset();
+            var width_human = human_rect.width();
+            var height_human = human_rect.height();
+            if (mouseX > offset_human.left && mouseX < offset_human.left + width_human
+             && mouseY > offset_human.top && mouseY < offset_human.top + height_human)
+                navigateToBookmark(humanityVisible);
+        }
+
+        function importData() {
+            if (content != null)
+                return;
+
+            if (localStorage && typeof localStorage["canvasData"] != "undefined") {
+                content = JSON.parse(localStorage["canvasData"]);
+                ProcessContent(JSON.parse(localStorage["canvasData"]));
+            }
+            else
+                loadData();
+        }
+
+        function exportData() {
+            if (content == null)
+                return;
+
+            var toSave = JSON.stringify(content);//
+
+            if (localStorage)
+                localStorage["canvasData"] = toSave;
+            //var dataToSave = JSON.stringify(content);
+            //var uriContent = "data:text/html," + dataToSave;
+
+            //window.open(uriContent, "responseDump.txt");
+        }
+
+        function handleFileSelect(evt) {
+            dataFile = evt.target.files[0]; // FileList object
+
+            var reader = new FileReader();
+
+            reader.onloadstart = (function () {
+                console.log("loading started");
+            });
+
+            reader.onload = (function () {
+                console.log("loading ended");
+
+                content = JSON.parse(reader.result);
+                ProcessContent(JSON.parse(reader.result));
+            });
+
+            console.log("starting read from file");
+            var result = reader.readAsText(dataFile);
+        }
+
+	</script>
+    <title>ChronoZoom</title>
+</head>
+<body style="background-color: Black; min-width: 950px;" >
+	
+    <div id="header" style="height: 125px">
+        <div style="position: relative; top: 20px;">
+
+            <button class="authSwitch" style="width: auto;" id="AT_button"
+                onmouseup="CZ.Authoring.AtOnClicked();">Authoring</button>
+            <div id="authoringToolsPanel" style="position: absolute; left: 150px; top: 0px; display: none; max-width: 800px;">                
+                <button class="authModeSwitch" style="width: auto;"
+                    onmouseup="CZ.Authoring.editModeChanged('addTimeline');">Create timeline</button>
+                <button class="authModeSwitch" style="width: auto;"
+                    onmouseup="CZ.Authoring.editModeChanged('editTimelineDate');">Edit timeline</button>
+                <button class="authModeSwitch" style="width: auto;"
+                    onmouseup="CZ.Authoring.editModeChanged('moveContent');">Move timeline</button>
+                <button class="authModeSwitch" style="width: auto;"
+                    onmouseup="CZ.Authoring.editModeChanged('moveInfodot');">Move Exhibit</button>
+                <button class="authModeSwitch" style="width: auto;"
+                    onmouseup="CZ.Authoring.editModeChanged('moveInfodotHorizontally');">Edit Exhibit</button>
+            </div>
+            <div class="regimes_rects" style="right: 0px; position: absolute; top: 0px; width: 302px; height: 62px;">
+                <div id="human_rect" class="regime_rect" style="position: absolute; top: 1px; width: 17px; left: 284px;
+                    height: 10px; background-color: rgba(212, 92, 70, 1.0); cursor: pointer;" onclick="navigateToBookmark(humanityVisible);">
+                </div>
+                <div id="prehuman_rect" class="regime_rect" style="position: absolute; top: 13px; width: 100px; left: 201px;
+                    height: 10px; background-color: rgba(237, 145, 50, 1.0); cursor: pointer;" onclick="navigateToBookmark(prehistoryVisible);">
+                </div>
+                <div id="life_rect" class="regime_rect" style="position: absolute; top: 25px; width: 255px; left: 46px;
+                    height: 10px; background-color: rgba(73, 150, 73, 1.0); cursor: pointer;" onclick="navigateToBookmark(lifeVisible);">
+                </div>
+                <div id="earth_rect" class="regime_rect" style="position: absolute; top: 37px; width: 260px; left: 41px;
+                    height: 10px; background-color: rgba(81, 127, 149, 1.0); cursor: pointer;" onclick="navigateToBookmark(earthVisible);">
+                </div>
+                <div id="cosmos_rect" class="regime_rect" style="position: absolute; top: 49px; width: 300px; left: 1px;
+                    height: 10px; background-color: rgba(152, 108, 157, 1.0); cursor: pointer;" onclick="navigateToBookmark(cosmosVisible);">
+                </div>
+                <div id="regime_navigator" style="position: absolute; top: 0px; left: 1px; width: 300px;
+                    height: 62px; background-color: White; opacity: 0.3; pointer-events: none;">
+                </div>
+            </div>
+            <!--<img alt="regimes_navigator" style="right: 0px; position: absolute; top: 0px" src="Images/regimes.png" />-->
+            <div class="regimes_titles" style="top: 0px; position: absolute; right: 309px; font-size: 11.5;">
+                <div style="position: relative; height: 12px;">
+                    <div class="regimes_title" onclick="navigateToBookmark(humanityVisible);">
+                        Humanity</div>
+                </div>
+                <div style="position: relative; height: 12px;">
+                    <div class="regimes_title" onclick="navigateToBookmark(prehistoryVisible);">
+                        Human&nbsp;Prehistory</div>
+                </div>
+                <div style="position: relative; height: 12px;">
+                    <div class="regimes_title" onclick="navigateToBookmark(lifeVisible);">
+                        Life</div>
+                </div>
+                <div style="position: relative; height: 12px;">
+                    <div class="regimes_title" onclick="navigateToBookmark(earthVisible);">
+                        Earth</div>
+                </div>
+                <div style="position: relative; height: 12px;">
+                    <div class="regimes_title" onclick="navigateToBookmark(cosmosVisible);">
+                        Cosmos</div>
+                </div>
+            </div>
+
+            
+            <div id="bc_navLeft"  onclick="breadCrumbNavLeft()" class="breadCrumbNavButton">&#171;</div> 
+            <div id="breadCrumbsPanel" class="breadCrumbPanel unselectable">
+                <table id="breadCrumbsTable" class="breadCrumbTable">
+                    <tr>
+                    </tr>
+                </table>
+            </div>
+            <div id="bc_navRight" onclick="breadCrumbNavRight()" class="breadCrumbNavButton">&#187;</div>
+        </div>
+    </div>
+     <div id="axis" style="width: 100%; height: 47px; overflow: hidden" onselectstart="return false;">
+    </div>
+    <div id="vc" style="width: 100%; height: auto; overflow: hidden; background-image: url('Images/background.jpg');
+        background-repeat: no-repeat; background-attachment: fixed; background-position: center center;
+        background-size: cover">
+        <div id="layerTimelines" onselectstart="return false;">
+        </div>
+               <!--for popup's-->
+		  <p class="bubbleInfo" style="display:inline-block; z-index:3000;" id="defaultBox">
+			<span></span>
+		  </p>
+        <!--//////////-->
+        <div id="layerInfodots" onselectstart="return false;">
+        </div>
+        <div id="iframe_layer" onselectstart="return false;">
+        </div>
+    </div>
+
+    <div id="timelineChangeName" class="czWindow" style="z-index: 2010;max-height:250px; display: none;">
+        <div class="header" onselectstart="return false;" style="display: inline-block;">
+            Input new name
+        </div>
+        <img id="editorCloseButton" style="display: inline-block; position: relative; top: 10px;" src="Images/close_off.png" alt="Close"
+            onmouseover="toggleOnImage('editorCloseButton', 'png');"
+            onmouseout="toggleOffImage('editorCloseButton', 'png');"
+            onclick="CZ.Authoring.hideTitleEditor()" 
+            onselectstart="return false;" />
+        <div>
+            <input id="ChangeNameTextBox" class="czTextBox emptyTextBox" style="margin: 10px 10px 10px 10px;
+                width: 190px" value="type here..." />
+        </div>
+    </div>
+
+    <div id="bibliographyBack" class="biblBack" style="display: none">
+        <div id="bibliographyOut" class="biblOuterWindow">
+            <div id="bibliography" class="biblWindow">
+                <img class="closeButton" id="biblCloseButton" src="Images/close_off.png" onmouseover="toggleOnImage('biblCloseButton', 'png');"
+                    onmouseout="toggleOffImage('biblCloseButton', 'png');" alt="Close" onselectstart="return false;" />
+                <div class="title" onselectstart="return false;">
+                    <span>Infodot name</span> &gt; Bibliography
+                </div>
+                <div class="sources">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="position: relative; text-align: right;" >
+            <span id="Span12" class="footerLeftText" >
+        Created by: 
+        </span>
+        <span id="Span13" class="footerLeftTextMRC" onclick="javascript: window.open('http://research.microsoft.com/en-us/projects/chronozoom/default.aspx');" >
+            <img id="Img1" src="Images/mrclogo-17x53.png" alt="Microsoft Research" />
+        </span>
+        <span id="Span14" class="footerLeftTextUC" onclick="javascript: window.open('http://eps.berkeley.edu/');" >
+            <img id="Img2" src="Images/berkeley-logo-17-86.png" alt="University of California Berkeley Department of Earth and Planetary Science" />
+        </span>
+        <span id="Span15" class="footerLeftTextMSU" onclick="javascript: window.open('http://www.cs.msu.su/');" >
+            <img id="Img3" src="Images/MSU_logo-white17x74.png" alt="Moscow State University" />
+        </span>
+          <span id="Span11" class="footerSurveyText" onclick="javascript: window.open('http://go.microsoft.com/?linkid=9797058');">
+        Take Our Survey
+        </span>
+         <span id="Span10" class="pipeText" >
+        |
+        </span>
+         <span id="Span2" class="footerText" onclick="javascript: window.open('http://chronozoom.codeplex.com/workitem/list/basic');">
+        Report a Problem
+        </span>
+        <span id="Span3" class="pipeText" >
+        |
+        </span>
+      <span id="Span9" class="footerText" onclick="javascript: window.open('BehindTheScenes.htm');">
+        Behind the Scenes
+        </span>
+        <span id="Span1" class="pipeText" >
+        |
+        </span>
+         <span id="Span4" class="footerText" onclick="javascript: window.open('TermsOfUse.htm');">
+        Terms of Use
+        </span>
+        <span id="Span5" class="pipeText" >
+        |
+        </span>
+         <span id="Span6" class="footerText" onclick="javascript: window.open('Privacy.htm');">
+        Privacy
+        </span>
+        <span id="Span7" class="pipeText" >
+        |
+        </span>
+         <span id="Span8" class="footerText" onclick="javascript: window.open('Trademark_Copyright.htm');">
+        Trademark
+        </span>
+    </div>
+
+    <!-- <input type="file" id="filePicker" class="filePicker"/>-->
+    <!--<button onclick="importData()" class="fileButton">Import</button>-->
+</body>
+</html>
