@@ -81,5 +81,17 @@ namespace Tests
             double rightBorder = TimelineHelper.GetRightBorderDate();
             Assert.AreEqual(expected, rightBorder - leftBorder);
         }  
+        
+        [TestMethod]
+        public void Roman_History_TimeLine_Borders_Ages()
+        {
+            HomePageHelper.OpenRomanHistoryTimeline();
+            const string leftBorderAge = "BCE";
+            const string righBorderAge = "AD";
+            string leftBorder = TimelineHelper.GetLeftBorderDateAge();
+            string rightBorder = TimelineHelper.GetRightBorderDateAge();
+            Assert.AreEqual(leftBorderAge, leftBorder);
+            Assert.AreEqual(righBorderAge, rightBorder);
+        }  
     }
 }

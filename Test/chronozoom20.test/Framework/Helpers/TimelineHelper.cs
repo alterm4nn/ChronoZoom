@@ -37,20 +37,35 @@ namespace Framework.Helpers
             return value;
         }
 
+        public string GetLeftBorderDateAge()
+        {
+            Logger.Log("<--");
+            string text = GetText(By.Id("timescale_left_border"));
+            Logger.Log("-- text: " + text);
+            return text.Split(' ')[1];
+        } 
+        
+        public string GetRightBorderDateAge()
+        {
+            Logger.Log("<--");
+            string text = GetText(By.Id("timescale_right_border"));
+            Logger.Log("-- text: " + text);
+            return text.Split(' ')[1];
+        }
+
         private double GetBorderDate(By by)
         {
             Logger.Log("<--");
             string timeText = GetText(by);
             Logger.Log("-- timeText: " + timeText);
-            double value = ConvertDateToDouble(timeText);
+            double value = ConvertDateToDouble(timeText.Split(' ')[0]);
             Logger.Log("--> text: " + value);
             return value;
         }
 
         private double ConvertDateToDouble(string date)
         {
-            string timeValue = date.Split(' ')[0];
-            double value = Convert.ToDouble(timeValue);
+            double value = Convert.ToDouble(date);
             return value;
         }
     }
