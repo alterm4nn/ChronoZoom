@@ -3,6 +3,18 @@
 /// <reference path="../Js/common.js" />
 /// <reference path="../Js/cz.settings.js" />
 
+describe("Timescale constructor", function () {
+    it("should throw exception if container undifined", function () {
+        var container;
+        expect(function () { new CZ.Timescale(container) }).toThrow(new Error("Container parameter is undefined!"));
+    });
+
+    it("should throw exception if container is no 'div'", function () {
+        var container = document.createElement('table');
+        expect(function () { new CZ.Timescale(container) }).toThrow(new Error("Container parameter is invalid! It should be DIV, or ID of DIV, or jQuery instance of DIV."));
+    });
+});
+
 describe("CZ.TickSource part", function () { //this is the class for creating ticks
     var tickSrc;
     beforeEach(function () {
@@ -114,18 +126,6 @@ describe("CZ.TickSource part", function () { //this is the class for creating ti
                 expect(ticksLabels).toContain('29 February');
             });
         });
-    });
-});
-
-describe("Timescale constructor", function () {
-    it("should throw exception if container undifined", function () {
-        var container;
-        expect(function () { new CZ.Timescale(container) }).toThrow(new Error("Container parameter is undefined!"));
-    });
-
-    it("should throw exception if container is no 'div'", function () {
-        var container = document.createElement('table');
-        expect(function () { new CZ.Timescale(container) }).toThrow(new Error("Container parameter is invalid! It should be DIV, or ID of DIV, or jQuery instance of DIV."));
     });
 });
 
@@ -258,21 +258,18 @@ describe("CZ.CalendarTickSource part", function () { //this is the class for cre
             expect({ year: currentDate.getFullYear(), month: currentDate.getMonth(), day: currentDate.getDate() }).toEqual(calendarTickSrc.endDate);
         });
     });
+    
+    describe("createTicks() method should return", function () {
+        it("more than one tiks", function () {
+            calendarTickSrc.range = { min: -2013.735907209565, max: -2012.656057065432 };
+            calendarTickSrc.beta = 0;
+            calendarTickSrc.delta = 1;
+            var ticks = calendarTickSrc.createTicks(this.range);
+            expect(ticks.length).toBeGreaterThan(1);
+        });
+    });
+
 });
-
-//describe("CZ.DateTickSource part", function () {
-//    var dateTickSrc;
-//    beforeEach(function () {
-//        dateTickSrc = new CZ.DateTickSource();
-//    });
-
-//    describe("getLabel() method should return", function () {
-//        it("555", function () {
-//            var result = dateTickSrc.getLabel();
-//            expect("anything").toEqual(result);
-//        });
-//    });
-//});
 
 describe("CZ.ClockTickSource part", function () {
     var clockTickSrc;
@@ -282,8 +279,8 @@ describe("CZ.ClockTickSource part", function () {
 
     describe("getRegime() method should set regime to", function () {
         it("'QuarterDays_Hours' if beta >= -2.2", function () {
-            var r = 1;
             var l = 0.9;
+            var r = 1;
             clockTickSrc.getRegime(l,r);
             expect("QuarterDays_Hours").toEqual(clockTickSrc.regime);
         });
@@ -314,6 +311,20 @@ describe("CZ.ClockTickSource part", function () {
             var r = 1;
             clockTickSrc.getRegime(l, r);
             expect("10mins_mins").toEqual(clockTickSrc.regime);
+        });
+        
+        it("'QuarterDays_Hours' if l > r ", function () {
+            var l = 2;
+            var r = 1;
+            clockTickSrc.getRegime(l, r);
+            expect("QuarterDays_Hours").toEqual(clockTickSrc.regime);
+        });
+        
+        it("'QuarterDays_Hours' if l = r ", function () {
+            var l = 1;
+            var r = 1;
+            clockTickSrc.getRegime(l, r);
+            expect("QuarterDays_Hours").toEqual(clockTickSrc.regime);
         });
         
     });

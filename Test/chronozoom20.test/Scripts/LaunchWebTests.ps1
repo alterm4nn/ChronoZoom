@@ -357,3 +357,27 @@ Copy-Item $reportFilePathShort $TestResultsPath
 
 Write-Host $reportFilePathFull
 Write-Host $reportFilePathShort
+
+#region Create archize with screenshots
+
+$7zipPath = ""
+$7zipPathx86 = "C:\Program Files\7-Zip\7z.exe"
+$7zipPathx64 = "C:\Program Files (x86)\7-Zip\7z.exe"
+if(Test-Path $7zipPathx86)
+{
+	$7zipPath = $7zipPathx86
+}
+if(Test-Path $7zipPathx64)
+{
+	$7zipPath = $7zipPathx64
+}
+if((Test-Path $7zipPathx86) -or (Test-Path $7zipPathx64))
+{
+	$archivePath = Join-Path $tempFolderPath "ArchiveTestReport.zip"
+	$7zipArgs = "a", "-tzip", $archivePath, $screenshotsFolderPath, $reportFilePathFull
+	Start-Process -FilePath $7zipPath -ArgumentList $7zipArgs -Wait
+	Write-Host "Archive has been created!"
+	Copy-Item $archivePath $TestResultsPath
+}
+
+#endregion
