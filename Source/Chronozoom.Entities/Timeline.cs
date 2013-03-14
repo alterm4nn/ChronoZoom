@@ -72,5 +72,8 @@ namespace Chronozoom.Entities
 
         [DataMember]
         public virtual Collection<Exhibit> Exhibits { get; private set; }
+
+        [DataMember]
+        public virtual Entities.Collection Collection { get; set; }
     }
 }
