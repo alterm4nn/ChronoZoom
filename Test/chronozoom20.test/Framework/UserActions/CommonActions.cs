@@ -326,7 +326,7 @@ namespace Framework.UserActions
         private bool AreEqualViewports()
         {
             string v1 = GetJavaScriptExecutionResult("$('#vc').virtualCanvas('getViewport')");
-            Sleep(1);
+            Sleep(2);
             string v2 = GetJavaScriptExecutionResult("$('#vc').virtualCanvas('getViewport')");
             return v1 == v2;
         }
