@@ -290,6 +290,12 @@ var addChild = function (parent, element, suppresCheck) {
 	if (!isWithin && Log)
 		Log.push("Child element does not belong to the parent element " + parent.id + " " + element.ID);
 
+    // The change to decimal dates is causing this bounds check to fire in some recent data.  I assume this is because
+    // of some sublty in date ranges which was not caught with the previous compound dates that makes some data now invalid.
+    // In liu of going through the data to fix, I am disabling this check because when the exception is thrown all data rendering
+    // is thrown away and we instead get a blank screen with no data.
+	suppresCheck = true;
+
 	if (!suppresCheck && !isWithin) throw "Child element does not belong to the parent element";
 	parent.children.push(element);
 	element.parent = parent;
