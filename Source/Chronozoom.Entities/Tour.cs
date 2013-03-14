@@ -14,14 +14,14 @@ namespace Chronozoom.Entities
     [DataContract]
     public class Tour
     {
-        [DataMember]
-        public Guid ID { get; set; }
+        [DataMember(Name="ID")]
+        public Guid Id { get; set; }
 
         [DataMember]
         public string Name { get; set; }
 
-        [DataMember]
-        public int UniqueID { get; set; }
+        [DataMember(Name="UniqueID")]
+        public int UniqueId { get; set; }
 
         // TODO: Fix up this string Uri
         [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "To be fixed when entities are revisited")]
@@ -35,6 +35,7 @@ namespace Chronozoom.Entities
         public int? Sequence { get; set; }
 
         [DataMember]
-        public virtual Collection<BookMark> bookmarks { get; private set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification="Automatically implemented properties must define both get and set accessors.")]
+        public virtual Collection<Bookmark> Bookmarks { get; private set; }
     }
 }

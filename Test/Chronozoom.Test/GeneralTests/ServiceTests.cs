@@ -81,7 +81,7 @@ namespace Chronozoom.Test.GeneralTests
 
             foreach (Chronozoom.Entities.Timeline timeline in timelines.d)
             {
-                Assert.AreNotEqual<int>(0, timeline.UniqueID, "Timeline ID should not be 0");
+                Assert.AreNotEqual<int>(0, timeline.UniqueId, "Timeline ID should not be 0");
             }
         }
 
@@ -100,7 +100,7 @@ namespace Chronozoom.Test.GeneralTests
             {
                 foreach (Chronozoom.Entities.Exhibit exhibit in timeline.Exhibits)
                 {
-                    if (exhibit.UniqueID == 118)
+                    if (exhibit.UniqueId == 118)
                     {
                         Assert.AreNotEqual<int>(0, exhibit.References.Count, "Expecting references");
                     }
@@ -147,7 +147,7 @@ namespace Chronozoom.Test.GeneralTests
             DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(ToursQueryResult));
             ToursQueryResult tours = (ToursQueryResult)serializer.ReadObject(response.GetResponseStream());
 
-            string bookmarkUrl = tours.d[0].bookmarks[0].URL;
+            string bookmarkUrl = tours.d[0].Bookmarks[0].Url.ToString();
 
             // Relative URLs only
             Regex bookmarkTemplate = new Regex(@"^(/t\d+)+(/e\d+)?(/c\d+)?@?");

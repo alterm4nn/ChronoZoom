@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Common;
 using System.Data.Entity;
@@ -55,14 +56,14 @@ namespace Chronozoom.Entities
 
         public DbSet<SuperCollection> SuperCollections { get; set; }
 
-        public List<Timeline> TimelinesQuery()
+        public Collection<Timeline> TimelinesQuery()
         {
             Dictionary<Guid, Timeline> timelinesMap = new Dictionary<Guid, Timeline>();
             List<Timeline> timelines = FillTimelines(timelinesMap);
 
             FillTimelineRelations(timelinesMap);
 
-            return timelines;
+            return new Collection<Timeline>(timelines);
         }
 
         private void FillTimelineRelations(Dictionary<Guid, Timeline> timelinesMap)
@@ -80,7 +81,7 @@ namespace Chronozoom.Entities
                     exhibitRaw.References = new System.Collections.ObjectModel.Collection<Reference>();
 
                 timelinesMap[exhibitRaw.Timeline_ID].Exhibits.Add(exhibitRaw);
-                exhibits[exhibitRaw.ID] = exhibitRaw;
+                exhibits[exhibitRaw.Id] = exhibitRaw;
             }
 
             // Populate Content Items
@@ -112,14 +113,14 @@ namespace Chronozoom.Entities
                 if (timelineRaw.Exhibits == null)
                     timelineRaw.Exhibits = new System.Collections.ObjectModel.Collection<Exhibit>();
 
-                timelinesParents[timelineRaw.ID] = timelineRaw.Timeline_ID;
-                timelinesMap[timelineRaw.ID] = timelineRaw;
+                timelinesParents[timelineRaw.Id] = timelineRaw.Timeline_ID;
+                timelinesMap[timelineRaw.Id] = timelineRaw;
             }
 
             // Build the timelines tree by assigning each timeline to its parent
             foreach (Timeline timeline in timelinesMap.Values)
             {
-                Guid? parentId = timelinesParents[timeline.ID];
+                Guid? parentId = timelinesParents[timeline.Id];
                 if (parentId != null)
                 {
                     timelinesMap[(Guid)parentId].ChildTimelines.Add(timeline);
