@@ -9,7 +9,7 @@
       <Property Name="Sequence" Hidden="true" />
       <Property Name="Threshold" Hidden="true" />
       <Property Name="TimeUnit" Hidden="true" />
-      <Property Name="UniqueID" Hidden="true" />
+      <Property Name="UniqueId" Hidden="true" />
     </Members>
     <AssociationLine Name="ContentItems" Type="Chronozoom.Entities.ContentItem" FixedFromPoint="true" FixedToPoint="true">
       <Path>
@@ -19,7 +19,7 @@
       </Path>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAJAAAgEAAAAQAAAAAAAAQAAAEAAAgAAEAAMA=</HashCode>
+      <HashCode>AAACAAAAJAAAAEAAAAAAAAAAAAAQAAAEAAAgAAEAQMA=</HashCode>
       <FileName>Exhibit.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
@@ -39,7 +39,7 @@
       <Property Name="ToDay" Hidden="true" />
       <Property Name="ToMonth" Hidden="true" />
       <Property Name="ToTimeUnit" Hidden="true" />
-      <Property Name="UniqueID" Hidden="true" />
+      <Property Name="UniqueId" Hidden="true" />
     </Members>
     <AssociationLine Name="ChildTimelines" Type="Chronozoom.Entities.Timeline" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
       <Path>
@@ -58,7 +58,7 @@
       </Path>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AAAAAgAABgBAwGAIAAQAAAAEAAABAAAAAAQgAEEAAIE=</HashCode>
+      <HashCode>AAACAgAABgBAQGAIAAAAAAAEAAABAAAAAAQgAEEAQIE=</HashCode>
       <FileName>Timeline.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
@@ -76,11 +76,11 @@
       <Property Name="Regime" Hidden="true" />
       <Property Name="Threshold" Hidden="true" />
       <Property Name="TimeUnit" Hidden="true" />
-      <Property Name="UniqueID" Hidden="true" />
+      <Property Name="UniqueId" Hidden="true" />
       <Property Name="Year" Hidden="true" />
     </Members>
     <TypeIdentifier>
-      <HashCode>AAEAQAAARAAAgEgAAAQAAAAAAAAAAAAACAAgAAAAAMA=</HashCode>
+      <HashCode>AAECQAAARAAAAEgAAAQAAAAAAAAAAAAACAAgAAAAQMA=</HashCode>
       <FileName>ContentItem.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -97,20 +97,20 @@
       <Property Name="Title" Hidden="true" />
     </Members>
     <TypeIdentifier>
-      <HashCode>AAAAgAAAAgAAgEAAAAEAAAAAAABAAAAAAAQAAECAAAA=</HashCode>
+      <HashCode>AAACgAAAAgAAAEAAAAEAAAAAAABAAAAAAAQAAECAAAA=</HashCode>
       <FileName>Reference.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Chronozoom.Entities.Tour">
     <Position X="7.5" Y="2.5" Width="1.5" />
     <Members>
-      <Property Name="bookmarks" Hidden="true" />
+      <Property Name="Bookmarks" Hidden="true" />
       <Property Name="Category" Hidden="true" />
       <Property Name="Sequence" Hidden="true" />
-      <Property Name="UniqueID" Hidden="true" />
+      <Property Name="UniqueId" Hidden="true" />
     </Members>
     <TypeIdentifier>
-      <HashCode>BAAAAAAAAAAAgAAAQAQAAAQAAAAAAAAAAAAAAAEACAA=</HashCode>
+      <HashCode>BAACAAAAAABAAAAAAAAAAAQAAAAAAAAAAAAAAAEASAA=</HashCode>
       <FileName>Tour.cs</FileName>
     </TypeIdentifier>
   </Class>
