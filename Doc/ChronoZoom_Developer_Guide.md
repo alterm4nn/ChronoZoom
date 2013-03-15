@@ -43,7 +43,7 @@ If you are new to GitHub, we recommend reading [Learning to use GitHub for Chron
 - [Beyond Compare](http://www.scootersoftware.com/moreinfo.php)
  - [Using Beyond Compare with Git](http://www.scootersoftware.com/support.php?zz=kb_vcs)
 - [Markdown Pad for Windows](http://markdownpad.com/)
-- [Web Essentials 2012](http://visualstudiogallery.msdn.microsoft.com/07d54d12-7133-4e15-becb-6f451ea3bea6)
+- [Web Essentials 2012](http://visualstudiogallery.msdn.microsoft.com/07d54d12-7133-4e15-becb-6f451ea3bea6) --> this now requires ASP.NET and Web Tools 2012.2
 - [Jetbrains Resharper](http://www.jetbrains.com/resharper)
  - [Free license for open source development](http://www.jetbrains.com/eforms/openSourceRequest.action?licenseRequest=RSOSL)
 
