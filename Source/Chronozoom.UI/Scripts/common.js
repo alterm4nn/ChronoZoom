@@ -61,6 +61,14 @@ function preventbubble(e) {
         e.cancelBubble = true;
 }
 
+function getCoordinateFromDecimalYear(decimalYear) {
+    if (decimalYear === 9999) {
+        return 0;
+    }
+
+    return getCoordinateFromDMY(decimalYear, 0, 0);
+}
+
 function getCoordinateFromDate(dateTime) {
     var localPresent = getPresent();
     return getYearsBetweenDates(dateTime.getFullYear(), dateTime.getMonth(), dateTime.getDay(), localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);

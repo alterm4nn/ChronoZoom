@@ -97,6 +97,12 @@ namespace DataMigration
         // returns the decimal year equivalent of the incoming data
         private static decimal ConvertToDecimalYear(int? day, int? month, decimal year, string timeUnit)
         {
+            // Substitute 0.0 for year 9999.  Today the algorithm assumes year 0.0 means 'today' but in decimal years, 0.0 is a valid value.
+            if (year == 0)
+            {
+                return 9999;
+            }
+
             decimal decimalyear = year;
 
             // if the timeUnit is null - we still calculate decimalyear in the first if of the function and return that value

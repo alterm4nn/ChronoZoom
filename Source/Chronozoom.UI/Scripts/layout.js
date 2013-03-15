@@ -8,13 +8,11 @@ function titleObject(name) {
 }
 
 function Prepare(timeline) {
-    // For simplicity of maintenance change, duplicating property contents.  Should clean this up moving forward.
-    timeline.left = timeline.FromYear;
-    timeline.right = timeline.ToYear;
+    timeline.left = getCoordinateFromDecimalYear(timeline.FromYear);
+    timeline.right = getCoordinateFromDecimalYear(timeline.ToYear);
 
     timeline.Exhibits.forEach(function (exhibit) {
-        // For simplicity of maintenance change, duplicating property contents.  Should clean this up moving forward.
-        exhibit.x = exhibit.Year;
+        exhibit.x = getCoordinateFromDecimalYear(exhibit.Year);
     });
     
     timeline.ChildTimelines.forEach(function (childTimeline) {
@@ -426,10 +424,22 @@ function buildDate(obj) {
     var date;
     if (obj.Year) {
         date = obj.Year;
-        
-        // TODO: date is the string format of the Year value.  As such it should use more human accessible units
-        // such as ka or ma or ga for very large year values.  This optimization has been lost with the change to
-        // decimal dates
+
+        if (date < 0) {
+            if (date < -999999999) {
+                date /= -1000000000;
+                date += ' GA';
+            } else if (date < -999999) {
+                date /= -1000000;
+                date += ' MA';
+            } else if (date < -999) {
+                date /= -1000;
+                date += ' KA';
+            } else {
+                date /= -1;
+                date += ' BCE';
+            }
+        }
     }
     else {
         date = obj.Date;

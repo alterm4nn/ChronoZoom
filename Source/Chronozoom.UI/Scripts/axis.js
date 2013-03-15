@@ -130,8 +130,7 @@
             this.numberOfThresholds = content.d.length;
             this.thresholds = [];
             for (var i = 0; i < this.numberOfThresholds; i++) {
-                // For simplicity of maintenance change, duplicating property contents.  Should clean this up moving forward.
-                content.d[i].time = content.d[i].ThresholdYear;
+                content.d[i].time = getCoordinateFromDecimalYear(content.d[i].ThresholdYear);
                 this.thresholds[i] = {
                     'title': content.d[i].Title, 'description': (content.d[i].Description == null ? '' : content.d[i].Description),
                     'time': content.d[i].time, 'bookmark': content.d[i].BookmarkRelativePath,
