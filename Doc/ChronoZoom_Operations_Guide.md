@@ -9,6 +9,12 @@ You can use the [Azure Management Portal](https://manage.windowsazure.com/) to c
 
 **To Take Site Down for Maintenance:** Use the **STOP** button on the bottom bar of the [Azure Management Portal](https://manage.windowsazure.com/) **DASHBOARD** management page. Users will see a generic "This site is currently not available" page. To start the site again, click the **START** button on the bottom bar.
 
+**To Add Endpoint Monitoring:** See [How to Monitor Cloud Services](http://www.windowsazure.com/en-us/manage/services/cloud-services/how-to-monitor-a-cloud-service/#endpointstatus).
+
+**To Add a Staged Deployment:** TBD.
+
+
+
 See the [Windows Azure Documentation](http://www.windowsazure.com/en-us/documentation/) for more detailed information.
 
 ## Azure Managment Portal ##
