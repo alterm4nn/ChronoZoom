@@ -49,7 +49,7 @@ If you are new to GitHub, we recommend reading [Learning to use GitHub for Chron
 
 ### Optional ###
 - [Web Platform Installer](http://www.microsoft.com/web/downloads/platform.aspx)
-- [SQL Server Express 2012 SP1 with Tools](http://www.microsoft.com/en-us/download/details.aspx?id=35579)
+- [SQL Server Express 2012 SP1 with Tools](http://www.microsoft.com/en-us/download/details.aspx?id=35579) >>>>>> [charuch] Mentioning the packing name would be useful here "Express with Tools (SQLEXPRWT)". 
  - Use Mixed Mode Authentication, Azure doesn't support Integrated Mode security
 - Internet Information Server
 - [Azure SDK for .NET](http://www.windowsazure.com/en-us/develop/downloads/)
