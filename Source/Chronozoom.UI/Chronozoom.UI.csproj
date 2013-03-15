@@ -186,6 +186,9 @@
     <Content Include="Scripts\jquery.signalR-1.0.0-rc2.min.js" />
     <Content Include="Scripts\regimesIE.js" />
     <Content Include="Scripts\seadragon-min.js" />
+    <Content Include="Scripts\settings.js" />
+    <Content Include="Scripts\timescale.js" />
+    <Content Include="Styles\timescale.css" />
     <Content Include="TraceLog.html" />
     <Content Include="Trademark_Copyright.htm" />
     <Content Include="TermsOfUse.htm" />

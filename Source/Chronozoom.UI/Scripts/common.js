@@ -150,6 +150,7 @@ function getDateFrom(year, month, day, n) {
     endDay += Math.round(nDays);
     // get count of days in current month
     var tempDays = daysInMonth[endMonth];
+    if (isLeapYear(endYear)) tempDays++;
     // if result day is bigger than count of days then one more month has passed too            
     while (endDay > tempDays) {
         endDay -= tempDays;
@@ -159,6 +160,7 @@ function getDateFrom(year, month, day, n) {
             endYear++;
         }
         tempDays = daysInMonth[endMonth];
+        if (isLeapYear(endYear)) tempDays++;
     }
     if (endYear < 0 && year > 0)
         endYear -= 1;
@@ -277,10 +279,6 @@ function setVisible(visible) {
         //ax.axis("enableThresholds", false);
         return controller.moveToVisible(visible);
     }
-}
-
-function updateMarker() {
-    ax.axis("setTimeMarker", vc.virtualCanvas("getCursorPosition"));
 }
 
 // Retrieves the URL to download the data from
@@ -457,7 +455,7 @@ function updateLayout() {
 
     InitializeRegimes();
     vc.virtualCanvas("updateViewport");
-    ax.axis("updateWidth");
+    //ax.axis("updateWidth");
     updateAxis(vc, ax);
     updateBreadCrumbsLabels();
 }
@@ -511,7 +509,8 @@ function updateAxis(vc, ax) {
     var vp = vc.virtualCanvas("getViewport");
     var lt = vp.pointScreenToVirtual(0, 0);
     var rb = vp.pointScreenToVirtual(vp.width, vp.height);
-    ax.axis("setRange", lt.x, rb.x);
+    var newrange = { min: lt.x, max: rb.x };
+    axis.update(newrange);
 }
 
 function updateNavigator(vp) {
@@ -583,4 +582,9 @@ function viewportToViewBox(vp) {
         centerY: vp.visible.centerY,
         scale: vp.visible.scale
     };
+}
+
+function updateMarker() {
+    axis.setTimeMarker(vc.virtualCanvas("getCursorPosition"));
+    axis.setTimeBorders();
 }

@@ -32,6 +32,7 @@
 
     <link rel="stylesheet" type="text/css" href="Styles/cz.css" />
     <link rel="stylesheet" type="text/css" href="Styles/axis.css" />
+    <link rel="stylesheet" type="text/css" href="Styles/timescale.css" />
 
     <script type="text/javascript" src="Scripts/jquery-1.7.2.min.js"></script>
     <script type="text/javascript" src="Scripts/jquery-ui-1.8.16.custom.min.js"></script>
@@ -56,6 +57,10 @@
     <script type="text/javascript" src="Scripts/bibliography.js"></script>
     <script type="text/javascript" src="Scripts/breadCrumbs.js"></script>
     <script type="text/javascript" src="Scripts/authoring.js"></script>
+
+    <script type="text/javascript" src="Scripts/settings.js"></script>
+    <script type="text/javascript" src="Scripts/timescale.js"></script>
+
     <!--[if IE]>
     <script type="text/javascript" src="Scripts/regimesIE.js"></script>
     <![endif]-->
@@ -64,7 +69,7 @@
 
         $(document).ready(function () {
             $('.bubbleInfo').hide();
-            ("#axis").showThresholds = true;
+            //("#axis").showThresholds = true;
             var wlcmScrnCookie = getCookie("welcomeScreenDisallowed");
             if (wlcmScrnCookie != null) {
                 hideWelcomeScreen();
@@ -161,7 +166,7 @@
             timings.readyStarted = new Date();
 
             ax = $("#axis");
-            ax.axis();
+            axis = new CZ.Timescale("axis");
 
             vc = $("#vc");
             vc.virtualCanvas();
@@ -186,7 +191,7 @@
             controller = new ViewportController(
                             function (visible) {
                                 var vp = vc.virtualCanvas("getViewport");
-                                var markerPos = ax.axis("MarkerPosition");
+                                var markerPos = axis.MarkerPosition();
                                 var oldMarkerPosInScreen = vp.pointVirtualToScreen(markerPos, 0).x;
 
                                 vc.virtualCanvas("setVisible", visible, controller.activeAnimation);
@@ -202,10 +207,10 @@
 
                                 if (actAni && !hoveredInfodot.id) {
                                     var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
-                                    ax.axis("setTimeMarker", newMarkerPos);
+                                    updateMarker();
+                                    // ax.axis("setTimeMarker", newMarkerPos);
                                 }
-
-                                updateNavigator(vp);
+                                updateNavigator(vp);                                
                             },
                             function () {
                                 return vc.virtualCanvas("getViewport");
@@ -253,19 +258,19 @@
 
             // Axis: enable showing thresholds
             controller.onAnimationComplete.push(function () {
-                ax.axis("enableThresholds", true);
+                //ax.axis("enableThresholds", true);
                 //if (window.console && console.log("thresholds enabled"));
             });
             //Axis: disable showing thresholds
             controller.onAnimationStarted.push(function () {
-                ax.axis("enableThresholds", true);
+                //ax.axis("enableThresholds", true);
                 //if (window.console && console.log("thresholds disabled"));
             });
             // Axis: enable showing thresholds
             controller.onAnimationUpdated.push(function (oldId, newId) {
                 if (oldId != undefined && newId == undefined) { // animation interrupted
                     setTimeout(function () {
-                        ax.axis("enableThresholds", true);
+                        //ax.axis("enableThresholds", true);
                         //if (window.console && console.log("thresholds enabled"));
                     }, 500);
                 }
@@ -317,7 +322,7 @@
             // Reacting on the event when one of the infodot exploration causes inner zoom constraint
             vc.bind("innerZoomConstraintChenged", function (constraint) {
                 controller.effectiveExplorationZoomConstraint = constraint.zoomValue; // applying the constraint
-                ax.axis("allowMarkerMovesOnHover", !constraint.zoomValue);
+                //ax.axis("allowMarkerMovesOnHover", !constraint.zoomValue);
             });
 
             vc.bind("breadCrumbsChanged", function (breadCrumbsEvent) { //reacting on the event when the first timeline that contains whole visible region is changed
@@ -659,7 +664,8 @@
             </div>
         </div>
     </div>
-     <div id="axis" style="width: 100%; height: 47px; overflow: hidden" onselectstart="return false;">
+
+    <div id="axis">
     </div>
     <div id="vc" style="width: 100%; height: auto; overflow: hidden; background-image: url('Images/background.jpg');
         background-repeat: no-repeat; background-attachment: fixed; background-position: center center;
