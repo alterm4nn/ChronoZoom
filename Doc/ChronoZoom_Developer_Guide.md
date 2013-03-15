@@ -30,7 +30,7 @@ If you are new to GitHub, we recommend reading [Learning to use GitHub for Chron
 
 ### Minimum Requirements ###
 - [Visual Studio 2012 Ultimate](http://www.microsoft.com/visualstudio/eng/products/visual-studio-overview) or [Visual Studio Express for Web](http://www.microsoft.com/visualstudio/eng/products/visual-studio-express-for-web)
-- [Visual Studio 2012.2 CTP 3](http://www.microsoft.com/en-us/download/details.aspx?id=36539)
+- [Visual Studio 2012.2 CTP 3](http://www.microsoft.com/en-us/download/details.aspx?id=36833)
 - [Visual Studio Tools for Git](http://visualstudiogallery.msdn.microsoft.com/abafc7d6-dcaa-40f4-8a5e-d6724bdb980c)
 - [Git for Windows](http://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git)
  - Be sure to select 'Run Git from the Windows Command Prompt' during installation.
@@ -40,17 +40,17 @@ If you are new to GitHub, we recommend reading [Learning to use GitHub for Chron
 - [Beyond Compare](http://www.scootersoftware.com/moreinfo.php)
  - [Using Beyond Compare with Git](http://www.scootersoftware.com/support.php?zz=kb_vcs)
 - [Markdown Pad for Windows](http://markdownpad.com/)
-- [Web Essentials 2012](http://visualstudiogallery.msdn.microsoft.com/07d54d12-7133-4e15-becb-6f451ea3bea6)
+- [Web Essentials 2012](http://visualstudiogallery.msdn.microsoft.com/07d54d12-7133-4e15-becb-6f451ea3bea6) Note: This now requires ASP.NET and Web Tools 2012.2.
 - [Jetbrains Resharper](http://www.jetbrains.com/resharper)
  - [Free license for open source development](http://www.jetbrains.com/eforms/openSourceRequest.action?licenseRequest=RSOSL)
 
 ### Optional ###
 - [Web Platform Installer](http://www.microsoft.com/web/downloads/platform.aspx)
-- [SQL Server Express 2012 SP1 with Tools](http://www.microsoft.com/en-us/download/details.aspx?id=35579)
+- [SQL Server Express 2012 SP1 with Tools (SQLEXPRWT)](http://www.microsoft.com/en-us/download/details.aspx?id=35579) 
  - Use Mixed Mode Authentication, Azure doesn't support Integrated Mode security
 - Internet Information Server
 - [Azure SDK for .NET](http://www.windowsazure.com/en-us/develop/downloads/)
-
+- [TypeScript Visual Studio plugin](http://www.typescriptlang.org/#Download)
 
 <!--
 <a id="ssh"></a>
@@ -107,7 +107,7 @@ Login to [Azure Management Portal](https://manage.windowsazure.com).
 
 At the bottom of the page, click the **+ NEW** bar and select the following options:
 
-**Compute** -> **Web Site** -> **Custom Create** -> **Create Web Site**
+**Compute** -> **Web Site** -> **Custom Create**
 
 In the **Create Web Site** dialog, fill in the fields as follows:
 
@@ -129,9 +129,9 @@ Fill in the fields as follows:
 	
 ### Specify Source Control Settings ###
 
-- **Source Control Type**: Select **Git**.
+- **Source Control Type**: Select **GitHub**.
 - **Repository Location **: Select **Local Repository**.
-	- It is possible to set up continuous replication from GitHub here, however this example uses a local repository for simplicity.
+	- It is possible to set up continuous replication from GitHub here, however this example uses a local repository for simplicity. For more details about continuous replication, read [this](http://www.windowsazure.com/en-us/develop/nodejs/common-tasks/publishing-with-git/).
 - Click the arrow icon to go to page 4.
 	
 ### New user name and password (for Git) ###

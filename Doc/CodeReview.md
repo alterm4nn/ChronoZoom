@@ -28,9 +28,13 @@ The CodeCollaborator Client GUI offers several options:
 - **Add Commits:** Allows you to upload commits, whether they've been pushed or not. You can add a specific commit by adding the commit ID and clicking **Add**.
 - **Add Git Diffs:** Upload arbitrary Git diffs to the Collaborator Server for review.
 
+
+### Example Workflow ###
+
 - Commit to your local repository using a topic branch. The following example shows using **git checkout** with the **-b** option to create a new topic branch named "myFeature":
  - `git checkout -b myFeature`
- - Make changes, validate locally, fix Stylecop & code analysis issues, run tests:
+ - Make changes, validate locally, fix Stylecop & code analysis issues, run tests.
+ - Commit your changes:
  - `git commit -a -m "Description of my feature changes"`
  - Find your commit id using `git log -1`
  
