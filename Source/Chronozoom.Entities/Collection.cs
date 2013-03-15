@@ -12,6 +12,7 @@ using System.Runtime.Serialization;
 namespace Chronozoom.Entities
 {
     [DataContract]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix")]
     public class Collection
     {
         [Key]

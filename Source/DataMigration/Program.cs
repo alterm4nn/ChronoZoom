@@ -43,9 +43,9 @@ namespace DataMigration
                 foreach (var timeline in bjrTimelines.d)
                 {
                     timeline.Collection = betaCollection;
-                    if (timeline.ID == OldRootId)
+                    if (timeline.Id == OldRootId)
                     {
-                        timeline.ID = Guid.Empty;
+                        timeline.Id = Guid.Empty;
                     }
 
                     MigrateInPlace(timeline);
