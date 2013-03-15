@@ -53,6 +53,14 @@ namespace Framework.Helpers
             return text.Split(' ')[1];
         }
 
+        public string GetMouseMarkerText()
+        {
+            Logger.Log("<--");
+            string textMouseMarker = GetText(By.Id("timescale_marker"));
+            Logger.Log("--> text: " + textMouseMarker);
+            return textMouseMarker;
+        }
+
         private double GetBorderDate(By by)
         {
             Logger.Log("<--");

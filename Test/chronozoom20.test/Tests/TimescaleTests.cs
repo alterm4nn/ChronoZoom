@@ -93,5 +93,19 @@ namespace Tests
             Assert.AreEqual(leftBorderAge, leftBorder);
             Assert.AreEqual(righBorderAge, rightBorder);
         }  
+        
+        [TestMethod]
+        public void Mouse_Marker()
+        {
+            HomePageHelper.OpenHumanityTimeline();
+            string mouseMarkerText = TimelineHelper.GetMouseMarkerText();
+            HomePageHelper.MoveMouseToCenter();
+            string mouseMarkerCenterText = TimelineHelper.GetMouseMarkerText();
+            Assert.AreNotEqual(mouseMarkerText, mouseMarkerCenterText);
+            Assert.AreEqual("494 BCE",mouseMarkerCenterText);
+            HomePageHelper.MoveMouseToLeft();
+            mouseMarkerText = TimelineHelper.GetMouseMarkerText();
+            Assert.AreNotEqual(mouseMarkerText, mouseMarkerCenterText);
+        }  
     }
 }

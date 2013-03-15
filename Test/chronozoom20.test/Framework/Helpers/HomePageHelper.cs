@@ -74,5 +74,25 @@ namespace Framework.Helpers
             Logger.Log("-> Last Breadcrumbs: " + result);
             return result;
         }
+
+        public void MoveMouseToCenter()
+        {
+            IWebElement timescale = FindElement(By.Id("axis"));
+            MoveToElementAndClick(By.Id("axis"));
+            var size = timescale.Size;
+            //MoveToElementCoordinates(By.Id("axis"), size.Width/4, 0);
+            //MoveToElementCoordinates(By.Id("axis"), 100, 0);
+            //MoveToElementCoordinates(By.Id("axis"), 500, 0);
+            //MoveToElementCoordinates(By.Id("axis"), 80, 0);
+            //MoveToElementCoordinates(By.Id("axis"), 800, 0);
+        }
+
+        public void MoveMouseToLeft()
+        {
+            IWebElement timescale = FindElement(By.Id("axis"));
+            double size = timescale.Size.Width;
+            MoveToElementCoordinates(By.Id("axis"), (int)Math.Round(size/4), 0);
+            
+        }
     }
 }

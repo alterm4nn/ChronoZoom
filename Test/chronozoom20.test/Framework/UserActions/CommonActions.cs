@@ -230,22 +230,19 @@ namespace Framework.UserActions
             return WebDriver.Title;
         }
 
-        protected void PressCtrlAndSpace()
-        {
-            SendKeys.SendWait("^( )");
-        }
-
-        protected void PressArrowDown()
-        {
-            SendKeys.SendWait("{DOWN}");
-        }
 
         protected void MoveToElementAndClick(By by)
         {
             IWebElement element = FindElement(by);
             InvokeChain(() => Builder.MoveToElement(element).Click(element));
         }
-
+        
+        protected void MoveToElementCoordinates(By by, int x, int y)
+        {
+            IWebElement element = FindElement(by);
+            InvokeChain(() => Builder.MoveToElement(element,x,y));
+        }
+        
         protected string GetAttributeValue(By by, string attributeName)
         {
             return FindElement(by).GetAttribute(attributeName);
