@@ -42,7 +42,7 @@ namespace UI
                 {
                     Trace.TraceInformation("Get Timelines Cache Miss");
 
-                    Timeline t = _storage.TimelinesQuery().Find(timeline => timeline.ID == Guid.Empty);
+                    Timeline t = _storage.TimelinesQuery().Single(timeline => timeline.Id == Guid.Empty);
                     Cache.Add("Timelines", new[] { t }, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
                 }
 
@@ -82,13 +82,13 @@ namespace UI
             searchTerm = searchTerm.ToUpperInvariant();
 
             var timelines = _storage.Timelines.Where(_ => _.Title.ToUpper().Contains(searchTerm)).ToList();
-            var searchResults = timelines.Select(timeline => new SearchResult { ID = timeline.ID, Title = timeline.Title, ObjectType = ObjectTypeEnum.Timeline, UniqueID = timeline.UniqueID }).ToList();
+            var searchResults = timelines.Select(timeline => new SearchResult { Id = timeline.Id, Title = timeline.Title, ObjectType = ObjectType.Timeline, UniqueId = timeline.UniqueId }).ToList();
 
             var exhibits = _storage.Exhibits.Where(_ => _.Title.ToUpper().Contains(searchTerm)).ToList();
-            searchResults.AddRange(exhibits.Select(exhibit => new SearchResult { ID = exhibit.ID, Title = exhibit.Title, ObjectType = ObjectTypeEnum.Exhibit, UniqueID = exhibit.UniqueID }));
+            searchResults.AddRange(exhibits.Select(exhibit => new SearchResult { Id = exhibit.Id, Title = exhibit.Title, ObjectType = ObjectType.Exhibit, UniqueId = exhibit.UniqueId }));
 
             var contentItems = _storage.ContentItems.Where(_ => _.Title.ToUpper().Contains(searchTerm) || _.Caption.ToUpper().Contains(searchTerm)).ToList();
-            searchResults.AddRange(contentItems.Select(contentItem => new SearchResult { ID = contentItem.ID, Title = contentItem.Title, ObjectType = ObjectTypeEnum.ContentItem, UniqueID = contentItem.UniqueID }));
+            searchResults.AddRange(contentItems.Select(contentItem => new SearchResult { Id = contentItem.Id, Title = contentItem.Title, ObjectType = ObjectType.ContentItem, UniqueId = contentItem.UniqueId }));
 
             Trace.TraceInformation("Search called for search term {0}", searchTerm);
             return searchResults;
@@ -133,7 +133,7 @@ namespace UI
                     var tours = _storage.Tours.ToList();
                     foreach (var t in tours)
                     {
-                        _storage.Entry(t).Collection(x => x.bookmarks).Load();
+                        _storage.Entry(t).Collection(x => x.Bookmarks).Load();
                     }
 
                     Cache.Add("Tours", tours, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
