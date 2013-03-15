@@ -136,9 +136,10 @@ Fill in the fields as follows:
 	
 ### Specify Source Control Settings ###
 
-- **Source Control Type**: Select **Git**.
+- **Source Control Type**: Select **Git**. >>>>> [charuch] The options I see are "Git Hub" and "Local Git". It is not clear which one to select  here.
 - **Repository Location **: Select **Local Repository**.
 	- It is possible to set up continuous replication from GitHub here, however this example uses a local repository for simplicity.
+        >>>>> [charuch] Is is recommened to setup continuous replication from GitHub? If yes, then instructions on how to do that should be included here.
 - Click the arrow icon to go to page 4.
 	
 ### New user name and password (for Git) ###
@@ -146,7 +147,7 @@ Fill in the fields as follows:
 - **Username**: Enter a user name for Git. In this example it is ***myGitUsername***.
 - **Password**: Enter a password for Git. In this example it is ***myGitPassword***.
 	
-### Go to Dashboard for Web Site ###
+### Go to Dashboard for Web Site ### >>>>>> [charuch] The Git Url is under Deployments. I don't see it under Dashboard.
 
 - Copy the Git Clone Url. It will be listed under **quick glance** in the right column, and will be something like: https://myGitUsername@mycz.scm.azurewebsites.net/mycz.git
 
@@ -164,3 +165,5 @@ Open the Git command prompt and use the following command. You will be prompted 
 ### Preview Your Site! ###
 
 Browse to http://**mycz**.azurewebsites.net/ and behold your own copy of ChronoZoom! Your site URL is listed in the **quick glance** column of the Azure dashboard. For operational management details, see [Chronozoom Operations Guide](Doc/ChronoZoom_Operations_Guide.md).
+
+>>>>> [charuch] Navigating to the local repository (http://charuchlocalcz.azurewebsites.net in my case) give a simple "Hello World". I assume that is expected.
