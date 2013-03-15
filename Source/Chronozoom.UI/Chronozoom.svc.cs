@@ -41,31 +41,12 @@ namespace UI
                 if (!Cache.Contains("Timelines"))
                 {
                     Trace.TraceInformation("Get Timelines Cache Miss");
-                    var t = _storage.Timelines.Find(Guid.Empty);
-                    LoadChildren(t);
 
-                    Cache.Add("Timelines", new [] { t }, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
+                    Timeline t = _storage.TimelinesQuery().Single(timeline => timeline.Id == Guid.Empty);
+                    Cache.Add("Timelines", new[] { t }, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
                 }
 
                 return (IEnumerable<Timeline>)Cache["Timelines"];
-            }
-        }
-
-        private void LoadChildren(Timeline t)
-        {
-            _storage.Entry(t).Collection(_ => _.Exhibits).Load();
-
-            foreach (var e in t.Exhibits)
-            {
-                _storage.Entry(e).Collection(_ => _.ContentItems).Load();
-                _storage.Entry(e).Collection(_ => _.References).Load();
-            }
-
-            _storage.Entry(t).Collection(_ => _.ChildTimelines).Load();
-
-            foreach (var c in t.ChildTimelines)
-            {
-                LoadChildren(c);
             }
         }
 
@@ -101,13 +82,13 @@ namespace UI
             searchTerm = searchTerm.ToUpperInvariant();
 
             var timelines = _storage.Timelines.Where(_ => _.Title.ToUpper().Contains(searchTerm)).ToList();
-            var searchResults = timelines.Select(timeline => new SearchResult { ID = timeline.ID, Title = timeline.Title, ObjectType = ObjectTypeEnum.Timeline, UniqueID = timeline.UniqueID }).ToList();
+            var searchResults = timelines.Select(timeline => new SearchResult { Id = timeline.Id, Title = timeline.Title, ObjectType = ObjectType.Timeline, UniqueId = timeline.UniqueId }).ToList();
 
             var exhibits = _storage.Exhibits.Where(_ => _.Title.ToUpper().Contains(searchTerm)).ToList();
-            searchResults.AddRange(exhibits.Select(exhibit => new SearchResult { ID = exhibit.ID, Title = exhibit.Title, ObjectType = ObjectTypeEnum.Exhibit, UniqueID = exhibit.UniqueID }));
+            searchResults.AddRange(exhibits.Select(exhibit => new SearchResult { Id = exhibit.Id, Title = exhibit.Title, ObjectType = ObjectType.Exhibit, UniqueId = exhibit.UniqueId }));
 
             var contentItems = _storage.ContentItems.Where(_ => _.Title.ToUpper().Contains(searchTerm) || _.Caption.ToUpper().Contains(searchTerm)).ToList();
-            searchResults.AddRange(contentItems.Select(contentItem => new SearchResult { ID = contentItem.ID, Title = contentItem.Title, ObjectType = ObjectTypeEnum.ContentItem, UniqueID = contentItem.UniqueID }));
+            searchResults.AddRange(contentItems.Select(contentItem => new SearchResult { Id = contentItem.Id, Title = contentItem.Title, ObjectType = ObjectType.ContentItem, UniqueId = contentItem.UniqueId }));
 
             Trace.TraceInformation("Search called for search term {0}", searchTerm);
             return searchResults;
@@ -136,8 +117,9 @@ namespace UI
             return exhibit.References.ToList();
         }
 
-        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")][
-        OperationContract]
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
+        [
+            OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
         public IEnumerable<Tour> GetTours()
         {
@@ -151,7 +133,7 @@ namespace UI
                     var tours = _storage.Tours.ToList();
                     foreach (var t in tours)
                     {
-                        _storage.Entry(t).Collection(x => x.bookmarks).Load();
+                        _storage.Entry(t).Collection(x => x.Bookmarks).Load();
                     }
 
                     Cache.Add("Tours", tours, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
