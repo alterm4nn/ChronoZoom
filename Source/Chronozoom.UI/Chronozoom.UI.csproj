@@ -175,6 +175,7 @@
     <Content Include="ScriptsMobile\cz.settings.mobile.js" />
     <Content Include="ScriptsMobile\vccontent.mobile.js" />
     <Content Include="ScriptsMobile\virtualCanvas.mobile.js" />
+    <Content Include="Scripts\authoring.js" />
     <Content Include="Scripts\breadCrumbs.js" />
     <Content Include="Scripts\flash_detect.js" />
     <None Include="Scripts\jquery-1.6.4-vsdoc.js" />
