@@ -27,10 +27,10 @@ namespace Chronozoom.Entities
             Trace.TraceInformation("Entering storage seed stage");
 
             // If initial data is missing, seed initial data.
-            if (context.Timelines.Where(timeline => timeline.ID == Guid.Empty).FirstOrDefault() == null)
+            if (context.Timelines.Where(timeline => timeline.Id == Guid.Empty).FirstOrDefault() == null)
             {
                 Trace.TraceInformation("Seeding database with data");
-                context.Timelines.Add(new Timeline { ID = Guid.Empty, UniqueID = 655, Title = "Hello world", FromYear = 711, ToYear = 1492, Height = 20, FromTimeUnit = "CE", ToTimeUnit = "CE" });
+                context.Timelines.Add(new Timeline { Id = Guid.Empty, UniqueId = 655, Title = "Hello world", FromYear = 711, ToYear = 1492, Height = 20, FromTimeUnit = "CE", ToTimeUnit = "CE" });
             }
         }
 

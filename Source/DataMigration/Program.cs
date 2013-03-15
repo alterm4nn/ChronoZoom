@@ -22,7 +22,7 @@ namespace DataMigration
         public static string EXHIBIT_ENTITY = "Exhibit:#Chronozoom.Entities";
         public static string CONTENTITEM_ENTITY = "ContentItem:#Chronozoom.Entities";
         public static readonly Guid _oldRootID = new Guid("468a8005-36e3-4676-9f52-312d8b6eb7b7");
-        
+
         // Unused
         public static Decimal BigBangTime = -13700000000;
 
@@ -46,9 +46,9 @@ namespace DataMigration
             Decimal? decimalyear = null;
             if (year.HasValue)
             {
-                decimalyear = (Decimal)year; 
+                decimalyear = (Decimal)year;
             }
-            else 
+            else
             {
                 return null; //if the value of the year var is null, return null
             }
@@ -110,7 +110,7 @@ namespace DataMigration
         {
             Decimal year = dateTime.Year;
             Decimal secondsInThisYear = DateTime.IsLeapYear(dateTime.Year) ? 366 * 24 * 60 * 60 : 365 * 24 * 60 * 60;
-            Decimal secondsElapsedSinceYearStart = 
+            Decimal secondsElapsedSinceYearStart =
                 (dateTime.DayOfYear - 1) * 24 * 60 * 60 + dateTime.Hour * 60 * 60 + dateTime.Minute * 60 + dateTime.Second;
 
             Decimal fractionalYear = secondsElapsedSinceYearStart / secondsInThisYear;
@@ -129,8 +129,8 @@ namespace DataMigration
         private static ContentItem ParseContentItem(JObject jobj)
         {
             ContentItem c = new ContentItem();
-            
-            c.ID = Guid.NewGuid();
+
+            c.Id = Guid.NewGuid();
             c.Title = (string)jobj["Title"];
             c.Caption = (string)jobj["Caption"];
             c.Threshold = (string)jobj["Threshold"];
@@ -146,12 +146,12 @@ namespace DataMigration
             catch (InvalidCastException e)
             {   //Calculating the decimal year given year and TimeUnit
                 c.Year = convertToDecimalYear(null, null, (Decimal?)jobj["Year"], (string)jobj["TimeUnit"]);
-            }   
+            }
             c.MediaType = (string)jobj["MediaType"];
             c.Uri = (string)jobj["Uri"];
             c.MediaSource = (string)jobj["MediaSource"];
             c.Attribution = (string)jobj["Attribution"];
-            c.UniqueID = (int)jobj["UniqueID"];
+            c.UniqueId = (int)jobj["UniqueID"];
             c.Order = (short?)jobj["Order"];
             c.HasBibliography = (bool)jobj["HasBibliography"];
             // Insert into db here
@@ -162,7 +162,7 @@ namespace DataMigration
         private static Exhibit ParseExhibit(JObject jobj)
         {
             Exhibit e = new Exhibit();
-            e.ID = Guid.NewGuid();
+            e.Id = Guid.NewGuid();
             e.Title = (string)jobj["Title"];
             e.Threshold = (string)jobj["Threshold"];
             e.Regime = (string)jobj["Regime"];
@@ -170,7 +170,7 @@ namespace DataMigration
             e.Day = (int?)jobj["Day"];
             e.Month = (int?)jobj["Month"];
             e.Year = convertToDecimalYear((int?)jobj["Day"], (int?)jobj["Month"], (Decimal?)jobj["Year"], (string)jobj["TimeUnit"]);
-            e.UniqueID = (int)jobj["UniqueID"];
+            e.UniqueId = (int)jobj["UniqueID"];
             e.Sequence = (int?)jobj["Sequence"];
 
             JArray contentItems = (JArray)jobj["ContentItems"];
@@ -193,7 +193,7 @@ namespace DataMigration
         private static Timeline ParseTimeline(JObject jobj)
         {
             Timeline t = new Timeline();
-            t.ID = Guid.NewGuid();
+            t.Id = Guid.NewGuid();
             t.Title = (string)jobj["Title"];
             t.Threshold = (string)jobj["Threshold"];
             t.Regime = (string)jobj["Regime"];
@@ -205,18 +205,18 @@ namespace DataMigration
             t.ToDay = (int?)jobj["ToDay"];
             t.ToMonth = (int?)jobj["ToMonth"];
             t.ToYear = convertToDecimalYear((int?)jobj["ToDay"], (int?)jobj["ToMonth"], (Decimal?)jobj["ToYear"], (string)jobj["ToTimeUnit"]);
-            t.UniqueID = (int)jobj["UniqueID"];
+            t.UniqueId = (int)jobj["UniqueID"];
             t.Sequence = (int?)jobj["Sequence"];
             t.Height = (Decimal?)jobj["Height"];
 
             JArray childTimesLines = (JArray)jobj["ChildTimelines"];
-            foreach (var childTimeline in (List<Timeline>) ParseJArray(childTimesLines))
+            foreach (var childTimeline in (List<Timeline>)ParseJArray(childTimesLines))
             {
                 t.ChildTimelines.Add(childTimeline);
             }
 
             JArray exhibitsArray = (JArray)jobj["Exhibits"];
-            foreach (var exhibit in (List<Exhibit>) ParseJArray(exhibitsArray))
+            foreach (var exhibit in (List<Exhibit>)ParseJArray(exhibitsArray))
             {
                 t.Exhibits.Add(exhibit);
             }
@@ -282,9 +282,9 @@ namespace DataMigration
                 timeline.Collection = rootCollection;
 
                 // Replace old root with new root
-                if (timeline.ID == _oldRootID)
+                if (timeline.Id == _oldRootID)
                 {
-                    timeline.ID = Guid.Empty;
+                    timeline.Id = Guid.Empty;
                 }
 
                 dbInst.Timelines.Add(timeline);

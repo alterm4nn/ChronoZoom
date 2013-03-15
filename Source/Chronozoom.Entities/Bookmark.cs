@@ -5,24 +5,24 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
 namespace Chronozoom.Entities
 {
-    [DataContract]
-    public class BookMark
+    [DataContract(Name="BookMark")]
+    public class Bookmark
     {
-        [DataMember]
-        public Guid ID { get; set; }
+        [DataMember(Name="ID")]
+        public Guid Id { get; set; }
 
         [DataMember]
         public string Name { get; set; }
 
-        // TODO: Fix up this string Uri
-        [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "To be fixed when entities are revisited")]
-        [DataMember]
-        public string URL { get; set; }
+        [DataMember(Name="URL")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification="Uri not supported in entity framework.")]
+        public string Url { get; set; }
 
         [DataMember]
         public int? LapseTime { get; set; }
