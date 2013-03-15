@@ -16,7 +16,7 @@ If you are new to GitHub, we recommend reading [Learning to use GitHub for Chron
 
 ----------
 
-## Contents ##
+## Contents ## >>>>> [charuch] These 3 links do not work
 
 [Install the ChronoZoom Development Environment Tools](#install)
 
@@ -33,7 +33,7 @@ If you are new to GitHub, we recommend reading [Learning to use GitHub for Chron
 
 ### Minimum Requirements ###
 - [Visual Studio 2012 Ultimate](http://www.microsoft.com/visualstudio/eng/products/visual-studio-overview) or [Visual Studio Express for Web](http://www.microsoft.com/visualstudio/eng/products/visual-studio-express-for-web)
-- [Visual Studio 2012.2 CTP 3](http://www.microsoft.com/en-us/download/details.aspx?id=36539)
+- [Visual Studio 2012.2 CTP 3](http://www.microsoft.com/en-us/download/details.aspx?id=36539) >>>>>> [charuch] This link does not work. Use http://www.microsoft.com/en-us/download/details.aspx?id=36833 and install ◦VS2012.2 CTP.exe
 - [Visual Studio Tools for Git](http://visualstudiogallery.msdn.microsoft.com/abafc7d6-dcaa-40f4-8a5e-d6724bdb980c)
 - [Git for Windows](http://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git)
  - Be sure to select 'Run Git from the Windows Command Prompt' during installation.
