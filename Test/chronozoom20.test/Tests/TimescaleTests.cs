@@ -102,7 +102,6 @@ namespace Tests
             HomePageHelper.MoveMouseToCenter();
             string mouseMarkerCenterText = TimelineHelper.GetMouseMarkerText();
             Assert.AreNotEqual(mouseMarkerText, mouseMarkerCenterText);
-            Assert.AreEqual("494 BCE",mouseMarkerCenterText);
             HomePageHelper.MoveMouseToLeft();
             mouseMarkerText = TimelineHelper.GetMouseMarkerText();
             Assert.AreNotEqual(mouseMarkerText, mouseMarkerCenterText);
