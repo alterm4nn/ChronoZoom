@@ -114,7 +114,7 @@ Login to [Azure Management Portal](https://manage.windowsazure.com).
 
 At the bottom of the page, click the **+ NEW** bar and select the following options:
 
-**Compute** -> **Web Site** -> **Custom Create** -> **Create Web Site**
+**Compute** -> **Web Site** -> **Custom Create** -> **Create Web Site** >>>>[charuch] **Create Web Site** is the name of the dialog not one of the options that needs to be selected
 
 In the **Create Web Site** dialog, fill in the fields as follows:
 
