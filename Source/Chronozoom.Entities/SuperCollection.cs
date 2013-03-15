@@ -23,7 +23,11 @@ namespace Chronozoom.Entities
         public string Title { get; set; }
 
         [DataMember]
+        public string UserId { get; set; }
+
+        [DataMember]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification="Need to be able to assemble this objects collection.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification="Automatically implemented properties must define both get and set accessors.")]
-        public virtual Collection<Entities.Collection> Collections { get; private set; }
+        public virtual Collection<Entities.Collection> Collections { get; set; }
     }
 }
