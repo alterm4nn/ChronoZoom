@@ -1,6 +1,6 @@
-var ChronoZoom;
-(function (ChronoZoom) {
-    (function (Viewport) {
+﻿module ChronoZoom {
+    export module Viewport {
+
         // Creates an instance of VisibleRegion.
         // @param centerX, centerY  (number)     center point of visible rectangle (in virtual coordinates)
         // @param scale             (number)     how many time units in a single screen pixel (time unit/pixel)
@@ -9,6 +9,7 @@ var ChronoZoom;
             this.centerY = centerY;
             this.scale = scale;
         }
+
         // Creates an instance of Viewport2d.
         // @param aspectRatio      (number)    how many h-units are in a single time unit
         // @param width, height    (number)    sizes of the visible region (in screen coordinates)
@@ -23,34 +24,35 @@ var ChronoZoom;
             this.visible = visible;
             this.width = width;
             this.height = height;
-            // Converts pixels in h-units
+
+            // Converts pixels in h-units 
             // @param wp    (number)    Amount of pixels
-            // @returns amount of h-units
+            // @returns amount of h-units 
             this.widthScreenToVirtual = function (wp) {
                 return this.visible.scale * wp;
             };
-            // Converts pixels in t-units
+            // Converts pixels in t-units 
             // @param hp    (number)    Amount of pixels
             // @returns amount of t-units
             this.heightScreenToVirtual = function (hp) {
                 return this.aspectRatio * this.visible.scale * hp;
             };
-            // Converts h-units into pixels
+            // Converts h-units into pixels 
             // @param wv    (number)    Amount of h-units
-            // @returns amount of pixels
+            // @returns amount of pixels 
             this.widthVirtualToScreen = function (wv) {
                 return wv / this.visible.scale;
             };
-            // Converts t-units into pixels
+            // Converts t-units into pixels 
             // @param hv    (number)    Amount of t-units
-            // @returns amount of pixels
+            // @returns amount of pixels 
             this.heightVirtualToScreen = function (hv) {
                 return hv / (this.aspectRatio * this.visible.scale);
             };
             // Converts a vector of a virtual space into screen space.
             // @param vx    (number)    Amount of t-units
             // @param vy    (number)    Amount of h-units
-            // @returns     ({x:number, y:number})  vector (in screen pixels)
+            // @returns     ({x:number, y:number})  vector (in screen pixels) 
             this.vectorVirtualToScreen = function (vx, vy) {
                 return {
                     x: vx / this.visible.scale,
@@ -60,7 +62,7 @@ var ChronoZoom;
             // Converts a point of a virtual space into screen space.
             // @param px    (number)    Coordinate in t-units
             // @param py    (number)    Coordinate in h-units
-            // @returns     ({x:number, y:number})  vector (in screen pixels)
+            // @returns     ({x:number, y:number})  vector (in screen pixels) 
             this.pointVirtualToScreen = function (px, py) {
                 return {
                     x: (px - this.visible.centerX) / this.visible.scale + this.width / 2.0,
@@ -70,7 +72,7 @@ var ChronoZoom;
             // Converts a point of a virtual space into screen space.
             // @param vx    (number)    Coordinate in t-units
             // @param vy    (number)    Coordinate in h-units
-            // @returns     ({x:number, y:number})  vector (t-units,h-units)
+            // @returns     ({x:number, y:number})  vector (t-units,h-units) 
             this.pointScreenToVirtual = function (px, py) {
                 return {
                     x: (px - this.width / 2.0) * this.visible.scale + this.visible.centerX,
@@ -88,6 +90,5 @@ var ChronoZoom;
                 };
             };
         }
-    })(ChronoZoom.Viewport || (ChronoZoom.Viewport = {}));
-    var Viewport = ChronoZoom.Viewport;
-})(ChronoZoom || (ChronoZoom = {}));
+    }
+}

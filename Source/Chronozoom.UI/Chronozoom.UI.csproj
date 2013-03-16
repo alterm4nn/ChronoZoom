@@ -172,6 +172,12 @@
     <Content Include="Scripts\jquery.cookie.js" />
     <Content Include="Scripts\jquery.signalR-1.0.0-rc2.js" />
     <Content Include="Scripts\jquery.signalR-1.0.0-rc2.min.js" />
+    <Content Include="Scripts\layout.js">
+      <DependentUpon>layout.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\layout.min.js">
+      <DependentUpon>layout.ts</DependentUpon>
+    </Content>
     <Content Include="Scripts\regimesIE.js" />
     <Content Include="Scripts\seadragon-min.js" />
     <Content Include="TraceLog.html" />
@@ -247,7 +253,7 @@
     <Content Include="Images\4.png" />
     <Content Include="Images\flower16x16.png" />
     <Content Include="rihard_shtraus_zaratustra.mp3" />
-    <Content Include="Scripts\layout.js" />
+    <Content Include="Scripts\layout.ts" />
     <Content Include="testDynamicLod.htm" />
     <Content Include="testGestures.htm" />
     <Content Include="testVirtualCanvasLayout.htm" />
@@ -269,7 +275,7 @@
     <Content Include="css\ui-lightness\jquery-ui-1.8.16.custom.css" />
     <Content Include="Global.asax" />
     <Content Include="Images\flower.png" />
-    <Content Include="Scripts\axis.js" />
+    <Content Include="Scripts\axis.ts" />
     <Content Include="Scripts\common.js" />
     <Content Include="Scripts\cz.settings.js" />
     <Content Include="Scripts\gestures.js" />
