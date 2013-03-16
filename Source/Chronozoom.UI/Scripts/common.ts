@@ -29,7 +29,7 @@ module ChronoZoom {
         var Log = new Array();
 
         export var controller; //a controller to perform smooth navigation
-        var isAxisFreezed = true; //indicates whether the axis moves together with canvas during navigation or not
+        export var isAxisFreezed = true; //indicates whether the axis moves together with canvas during navigation or not
         export var startHash;
 
         var searchString;
@@ -42,8 +42,8 @@ module ChronoZoom {
         var firstTimeWelcomeChecked = true; // if welcome screen checkbox checked or not
 
         var regimes = new Array();
-        var regimesRatio;
-        var regimeNavigator;
+        export var regimesRatio;
+        export var regimeNavigator;
 
         var k = 1000000000;
         export var setNavigationStringTo; // { element or bookmark, id } identifies that we zoom into this element and when (if) finish the zoom, we should put the element's path into navigation string
@@ -291,7 +291,7 @@ module ChronoZoom {
             }
         }
 
-        function updateMarker() {
+        export function updateMarker() {
             ax.axis("setTimeMarker", vc.virtualCanvas("getCursorPosition"));
         }
 
@@ -439,7 +439,7 @@ module ChronoZoom {
             }
         }
 
-        function updateLayout() {
+        export function updateLayout() {
             document.getElementById("vc").style.height = (window.innerHeight - 148) + "px";
 
             $(".breadCrumbPanel").css("width", Math.round(($("#vc").width() / 2 - 50)));
@@ -481,7 +481,7 @@ module ChronoZoom {
             ChronoZoom.BreadCrumbs.updateBreadCrumbsLabels();
         }
 
-        function passThrough(e) {
+        export function passThrough(e) {
             var mouseX = e.pageX;
             var mouseY = e.pageY;
 
@@ -526,14 +526,14 @@ module ChronoZoom {
                 ChronoZoom.Search.navigateToBookmark(humanityVisible);
         }
 
-        function updateAxis(vc, ax) {
+        export function updateAxis(vc, ax) {
             var vp = vc.virtualCanvas("getViewport");
             var lt = vp.pointScreenToVirtual(0, 0);
             var rb = vp.pointScreenToVirtual(vp.width, vp.height);
             ax.axis("setRange", lt.x, rb.x);
         }
 
-        function updateNavigator(vp) {
+        export function updateNavigator(vp) {
             var navigatorFunc = function (coordinate) {
                 if (Math.abs(coordinate) < 0.00000000001)
                     return 0;

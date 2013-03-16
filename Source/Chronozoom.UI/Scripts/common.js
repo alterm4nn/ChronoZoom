@@ -482,7 +482,7 @@ var ChronoZoom;
                 ChronoZoom.Search.navigateToBookmark(humanityVisible);
             }
         }
-        function updateAxis(vc, ax) {
+        export function updateAxis(vc, ax) {
             var vp = vc.virtualCanvas("getViewport");
             var lt = vp.pointScreenToVirtual(0, 0);
             var rb = vp.pointScreenToVirtual(vp.width, vp.height);

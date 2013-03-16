@@ -87,6 +87,10 @@
   <ItemGroup>
     <Content Include="BehindTheScenes.htm" />
     <Content Include="cz.aspx" />
+    <TypeScriptCompile Include="cz.ts" />
+    <Content Include="cz.js">
+      <DependentUpon>cz.ts</DependentUpon>
+    </Content>
     <Content Include="czmobile.htm" />
     <Content Include="favicon.ico" />
     <Content Include="Images\A.png" />

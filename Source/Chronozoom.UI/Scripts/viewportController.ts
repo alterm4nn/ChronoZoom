@@ -12,7 +12,7 @@ module ChronoZoom {
         //@param setVisible (void setVisible(visible))      a callback which is called when controller wants to set intermediate visible regions while animation.
         //@param getViewport (Viewport2D getViewport())     a callback which is called when controller wants to get recent state of corresponding viewport.
         //@param gestureSource (merged RX gesture stream)   an RX stream of gestures described in gestures.js
-        function ViewportController(setVisible, getViewport, gesturesSource) {
+        export function ViewportController(setVisible, getViewport, gesturesSource) {
             this.activeAnimation; //currently running animation. undefined if no animation active            
 
             //recent FPS value

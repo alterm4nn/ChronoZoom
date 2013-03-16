@@ -217,7 +217,7 @@ module ChronoZoom {
         }
 
         //Creates gestures stream for specified jQuery element
-        function getGesturesStream(source) {
+        export function getGesturesStream(source) {
             var panController;
             var zoomController;
             var pinController;
@@ -251,7 +251,7 @@ module ChronoZoom {
         }
 
         //modify the gesture stream to apply the logic of gesture handling by the axis
-        function applyAxisBehavior(gestureSequence) {
+        export function applyAxisBehavior(gestureSequence) {
             return gestureSequence
             .Where(function (el) { return el.Type != "Zoom" }) //skipping zooms
             .Select(function (el) { //setting any vertical movement to zero

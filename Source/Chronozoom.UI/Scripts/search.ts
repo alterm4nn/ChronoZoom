@@ -85,7 +85,7 @@ module ChronoZoom {
         }
 
 
-        function navigateToElement(e) {
+        export function navigateToElement(e) {
             var animId = ChronoZoom.Common.setVisibleByUserDirectly(e.newvisible);
             if (animId) {
                 ChronoZoom.Common.setNavigationStringTo = { element: e.element, id: animId };

@@ -66,7 +66,7 @@ module ChronoZoom {
         which has child contentItem with id 10
         #/t55/e118
         */
-        function navStringTovcElement(nav, root) {
+        export function navStringTovcElement(nav, root) {
             if (!nav) return null;
             try {
                 var k = nav.indexOf('@');
