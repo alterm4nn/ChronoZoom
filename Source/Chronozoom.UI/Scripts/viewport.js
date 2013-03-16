@@ -9,6 +9,7 @@ var ChronoZoom;
             this.centerY = centerY;
             this.scale = scale;
         }
+        Viewport.VisibleRegion2d = VisibleRegion2d;
         // Creates an instance of Viewport2d.
         // @param aspectRatio      (number)    how many h-units are in a single time unit
         // @param width, height    (number)    sizes of the visible region (in screen coordinates)

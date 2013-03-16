@@ -1,30 +1,28 @@
-﻿declare var $: any;
-declare var moveToRightEdge: any;
-declare var navigateNextMaxCount: any;
-declare var longNavigationLength: any;
-declare var showHiddenBreadCrumb: any;
-declare var goToSearchResult: any;
+﻿/// <reference path='cz.settings.ts'/>
+/// <reference path='search.ts'/>
+
+declare var $: any;
 
 module ChronoZoom {
     export module BreadCrumbs {
 
         var hiddenFromLeft = []; // hidden breadcrumbs from the left side
         var hiddenFromRight = []; // hidden breadcrumbs from the right side
-        var visibleAreaWidth = 0;
+        export var visibleAreaWidth = 0;
 
 
         var breadCrumbs;
 
         // Updates current breadcrumbs path, raised when breadcrumbs path has changed.
         // @param  newBreadCrumbs       (array) new breadcrumbs path.
-        function updateBreadCrumbsLabels(newBreadCrumbs) {
+        export function updateBreadCrumbsLabels(newBreadCrumbs?) {
             if (newBreadCrumbs) {
                 if (breadCrumbs == null) {
                     breadCrumbs = newBreadCrumbs;
                     for (var i = 0; i < breadCrumbs.length; i++)
                         addBreadCrumb(breadCrumbs[i].vcElement);
 
-                    moveToRightEdge(null);
+                    moveToRightEdge();
 
                     return
                 }
@@ -45,13 +43,13 @@ module ChronoZoom {
                     }
                 }
 
-                moveToRightEdge(null);
+                moveToRightEdge();
 
                 // length of new breadcrumbs path is higher than length of current path
                 for (i = breadCrumbs.length; i < newBreadCrumbs.length; i++)
                     addBreadCrumb(newBreadCrumbs[i].vcElement);
 
-                moveToRightEdge(null);
+                moveToRightEdge();
 
                 breadCrumbs = newBreadCrumbs;
             }
@@ -59,7 +57,7 @@ module ChronoZoom {
 
         // Update hidden breadcrumb links arrays. Breadcrumb is hidden, if more than 1/3 of its width
         // is not visible and this breadcrumb is not animating.
-        function updateHiddenBreadCrumbs() {
+        export function updateHiddenBreadCrumbs() {
             hiddenFromLeft = [];
             hiddenFromRight = [];
 
@@ -110,7 +108,7 @@ module ChronoZoom {
         // Moves hidden from left (right) breadcrumb to left (right) side of breadcrumb panel.
         // @param direction     (string) direction of navigation.
         // @param index         (number) index of breadcrumb to show, shows first hidden element if param is null.
-        function showHiddenBreadCrumb(direction, index) {
+        function showHiddenBreadCrumb(direction, index?) {
             // finds index of breadcrumb that should be shown if index is undefined
             if (index == null) {
                 updateHiddenBreadCrumbs();
@@ -163,7 +161,7 @@ module ChronoZoom {
 
         // Moves breadcrumbs path to the right edge of visible area of breadcrumbs if it is allowed.
         // @param   callback            (function) callback function at the end of animation.
-        function moveToRightEdge(callback) {
+        function moveToRightEdge(callback?) {
             var tableOffset = $(".breadCrumbTable").position().left; // breadcrumbs table offset from breadcrumbs visible area (<= 0 in px)
             var tableWidth = $(".breadCrumbTable").width(); // width of breadcrumbs table (>= 0 in px)
 
@@ -279,16 +277,16 @@ module ChronoZoom {
             });
 
             // perform long navigation if enough breadcrumbs are moving at one time
-            if (movingLeftBreadCrumbs == navigateNextMaxCount) {
-                var index = number - longNavigationLength;
+            if (movingLeftBreadCrumbs == ChronoZoom.Settings.navigateNextMaxCount) {
+                var index = number - ChronoZoom.Settings.longNavigationLength;
                 if (index < 0)
                     index = 0;
 
                 showHiddenBreadCrumb("left", index);
             }
                 // if not enough breadcrumbs are moving then show left breadcrumb
-            else if (movingLeftBreadCrumbs < navigateNextMaxCount)
-                showHiddenBreadCrumb("left", null);
+            else if (movingLeftBreadCrumbs < ChronoZoom.Settings.navigateNextMaxCount)
+                showHiddenBreadCrumb("left");
         }
 
         // Handles click over navigate to right button.
@@ -304,23 +302,23 @@ module ChronoZoom {
             });
 
             // perform long navigation if enough breadcrumbs are moving at one time
-            if (movingRightBreadCrumbs == navigateNextMaxCount) {
-                var index = number + longNavigationLength;
+            if (movingRightBreadCrumbs == ChronoZoom.Settings.navigateNextMaxCount) {
+                var index = number + ChronoZoom.Settings.longNavigationLength;
                 if (index >= $(".breadCrumbTable tr td").length)
                     index = $(".breadCrumbTable tr td").length - 1;
 
                 showHiddenBreadCrumb("right", index);
             }
                 // if not enough breadcrumbs are moving then show right breadcrumb
-            else if (movingRightBreadCrumbs < navigateNextMaxCount)
-                showHiddenBreadCrumb("right", null);
+            else if (movingRightBreadCrumbs < ChronoZoom.Settings.navigateNextMaxCount)
+                showHiddenBreadCrumb("right");
         }
 
         // Handles click over breadcrumb link.
         // @param   timelineID          (string) id of timeline to navigate.
         // @param   breadCrumbLinkID    (string) id of table element which breadcrumb link was cliked.
         function clickOverBreadCrumb(timelineID, breadCrumbLinkID) {
-            goToSearchResult(timelineID); // start EllipticalZoom to element
+            ChronoZoom.Search.goToSearchResult(timelineID); // start EllipticalZoom to element
 
             var selector = "#bc_" + breadCrumbLinkID;
 

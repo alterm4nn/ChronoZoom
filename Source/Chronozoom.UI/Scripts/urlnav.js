@@ -1,8 +1,9 @@
+/// <reference path='vccontent.ts'/>
 var ChronoZoom;
 (function (ChronoZoom) {
     (function (UrlNav) {
         // Helper routines to perform URL to/from visible conversion
-        var navigationAnchor = null;// a canvas element which is used as an anchor for relative positioning in a bookmark
+        UrlNav.navigationAnchor = null;// a canvas element which is used as an anchor for relative positioning in a bookmark
         
         /* Builds a navigation string for the given typed virtual canvas element.
         @param vcelem   (CanvasElement) An element of a virtual canvas.
@@ -46,6 +47,7 @@ var ChronoZoom;
             }
             return nav;
         }
+        UrlNav.vcelementToNavString = vcelementToNavString;
         /* Finds a virtual canvas element by given navigation string without scale.
         @param nav      (String) A navigation string.
         @param root     (CanvasElement) Root element for the canvas tree.
@@ -78,7 +80,7 @@ var ChronoZoom;
                     is not rendered. */
                     if(typeof root.type !== 'undefined' && root.type === 'infodot'/*&& !root.hasContentItems*/ ) {
                         // If we are looking for a content item ('c...'), it is possible that they are not loaded actually in a virtual canvas.
-                        return getContentItem(root, id);
+                        return ChronoZoom.VCContent.getContentItem(root, id);
                     }
                     if(!root.children || root.children.length == 0) {
                         return null;
@@ -185,10 +187,7 @@ var ChronoZoom;
             };
             return vis2;
         }
-        // Obsolete
-        function visibleToParamString(s, presentYear) {
-            return "x=" + vxToDateString(s.centerX, presentYear) + "&y=" + s.centerY + "&s=" + s.scale;
-        }
+        UrlNav.navStringToVisible = navStringToVisible;
         /* Returns structure built from URL string
         Remarks:
         Example of the navigation string is 'http://localhost:4949/cz.htm?a=b&c=d#/t55/t174/t66@x=0.06665506329113924&y=-0.03591540681832514' which means
@@ -296,6 +295,7 @@ var ChronoZoom;
                 window.location.hash = hash;
             }
         }
+        UrlNav.setURL = setURL;
     })(ChronoZoom.UrlNav || (ChronoZoom.UrlNav = {}));
     var UrlNav = ChronoZoom.UrlNav;
 })(ChronoZoom || (ChronoZoom = {}));

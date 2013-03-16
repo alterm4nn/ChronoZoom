@@ -1,12 +1,11 @@
-﻿declare var getContentItem: any;
-declare var vxToDateString: any;
+﻿/// <reference path='vccontent.ts'/>
 
 module ChronoZoom {
     export module UrlNav {
 
         // Helper routines to perform URL to/from visible conversion
 
-        var navigationAnchor = null; // a canvas element which is used as an anchor for relative positioning in a bookmark
+        export var navigationAnchor = null; // a canvas element which is used as an anchor for relative positioning in a bookmark
 
         /* Builds a navigation string for the given typed virtual canvas element.
         @param vcelem   (CanvasElement) An element of a virtual canvas.
@@ -21,7 +20,7 @@ module ChronoZoom {
         with position (0.33,0.255) of the visible region center so left-upper corner is (0,0), right-bottom is (1,1)
         with width 1.5x size of the element width so height 1.0 shows entire element vertically.
         */
-        function vcelementToNavString(vcElem, vp) {
+        export function vcelementToNavString(vcElem, vp?) {
             var nav = '';
             var el = vcElem;
             while (vcElem) {
@@ -82,7 +81,7 @@ module ChronoZoom {
                        is not rendered. */
                     if (typeof root.type !== 'undefined' && root.type === 'infodot' /*&& !root.hasContentItems*/) {
                         // If we are looking for a content item ('c...'), it is possible that they are not loaded actually in a virtual canvas.
-                        return getContentItem(root, id);
+                        return ChronoZoom.VCContent.getContentItem(root, id);
                     }
                     if (!root.children || root.children.length == 0) return null;
 
@@ -128,7 +127,7 @@ module ChronoZoom {
         which has child contentItem with id 10
         #/t55/e118
         */
-        function navStringToVisible(nav, vc) {
+        export function navStringToVisible(nav, vc) {
             var k = nav.indexOf('@');
             var w = 1.05; // includes margins by default
             var h = 1.05;
@@ -176,14 +175,6 @@ module ChronoZoom {
             };
             return vis2;
         }
-
-        // Obsolete
-        function visibleToParamString(s, presentYear) {
-            return "x=" + vxToDateString(s.centerX, presentYear) +
-                           "&y=" + s.centerY +
-                           "&s=" + s.scale;
-        }
-
 
         /* Returns structure built from URL string
         Remarks:
@@ -279,7 +270,7 @@ module ChronoZoom {
             IF reload = true, full URL modifications, this may reload page if needed.
             IF reload = false, hash modification only, no page reload
         */
-        function setURL(url, reload) {
+        export function setURL(url, reload?) {
             if (reload == null) {
                 reload = false;
             } else {

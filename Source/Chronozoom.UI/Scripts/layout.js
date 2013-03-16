@@ -1,6 +1,14 @@
+/// <reference path='cz.settings.ts'/>
+/// <reference path='vccontent.ts'/>
+/// <reference path='common.ts'/>
+/// <reference path='viewport.ts'/>
 var ChronoZoom;
 (function (ChronoZoom) {
     (function (Layout) {
+        var Settings = ChronoZoom.Settings;
+        var VCContent = ChronoZoom.VCContent;
+        var Common = ChronoZoom.Common;
+        var Viewport = ChronoZoom.Viewport;
         function Infodot(x, contentItems) {
             this.x = x;
             this.ContentItems = contentItems;
@@ -9,10 +17,10 @@ var ChronoZoom;
             this.name = name;
         }
         function Prepare(timeline) {
-            timeline.left = getCoordinateFromDecimalYear(timeline.FromYear);
-            timeline.right = getCoordinateFromDecimalYear(timeline.ToYear);
+            timeline.left = Common.getCoordinateFromDecimalYear(timeline.FromYear);
+            timeline.right = Common.getCoordinateFromDecimalYear(timeline.ToYear);
             timeline.Exhibits.forEach(function (exhibit) {
-                exhibit.x = getCoordinateFromDecimalYear(exhibit.Year);
+                exhibit.x = Common.getCoordinateFromDecimalYear(exhibit.Year);
             });
             timeline.ChildTimelines.forEach(function (childTimeline) {
                 childTimeline.ParentTimeline = timeline;
@@ -26,26 +34,41 @@ var ChronoZoom;
             }
         }
         function GenerateAspect(timeline) {
-            if(timeline.ID == cosmosTimelineID) {
-                timeline.AspectRatio = 10;
+            if(timeline.ID == Settings.cosmosTimelineID) {
+                timeline.AspectRatio = 10//64.0 / 33.0;
+                ;
             }
-        }
+            //    else if (timeline.ID == earthTimelineID) {
+            //        timeline.AspectRatio = 1.0;
+            //    } else if (timeline.ID == lifeTimelineID) {
+            //        timeline.AspectRatio = 47.0 / 22.0;
+            //    } else if (timeline.ID == prehistoryTimelineID) {
+            //        timeline.AspectRatio = 37.0 / 11.0;
+            //    } else if (timeline.ID == humanityTimelineID) {
+            //        timeline.AspectRatio = 55.0 / 4.0;
+            //    }
+                    }
         function LayoutTimeline(timeline, parentWidth, measureContext) {
-            var headerPercent = timelineHeaderSize + 2 * timelineHeaderMargin;
+            var headerPercent = Settings.timelineHeaderSize + 2 * Settings.timelineHeaderMargin;
             var timelineWidth = timeline.right - timeline.left;
             timeline.width = timelineWidth;
+            //If child timeline has fixed aspect ratio, calculate its height according to it
             if(timeline.AspectRatio && !timeline.height) {
                 timeline.height = timelineWidth / timeline.AspectRatio;
             }
             timeline.ChildTimelines.forEach(function (tl) {
+                //If child timeline has fixed aspect ratio, calculate its height according to it
                 if(tl.AspectRatio) {
                     tl.height = (tl.right - tl.left) / tl.AspectRatio;
                 } else if(timeline.height && tl.Height) {
+                    //If Child timeline has height in percentage of parent, calculate it before layout pass
                     tl.height = timeline.height * tl.Height;
                 }
+                //Calculate layout for each child timeline
                 LayoutTimeline(tl, timelineWidth, measureContext);
             });
             if(!timeline.height) {
+                //Searching for timeline with the biggest ratio between its height percentage and real height
                 var scaleCoef = undefined;
                 timeline.ChildTimelines.forEach(function (tl) {
                     if(tl.Height && !tl.AspectRatio) {
@@ -55,6 +78,7 @@ var ChronoZoom;
                         }
                     }
                 });
+                //Scaling timelines to make their percentages corresponding to each other
                 if(scaleCoef) {
                     timeline.ChildTimelines.forEach(function (tl) {
                         if(tl.Height && !tl.AspectRatio) {
@@ -65,11 +89,15 @@ var ChronoZoom;
                             }
                         }
                     });
+                    //Set final timelineHeight
                     timeline.height = scaleCoef;
                 }
             }
+            //Now positioning child content and title
             var exhibitSize = CalcInfodotSize(timeline);
+            //Layout only timelines to check that they fit into parent timeline
             var tlRes = LayoutChildTimelinesOnly(timeline);
+            //First layout iteration of full content (taking Sequence in account)
             var res = LayoutContent(timeline, exhibitSize);
             if(timeline.height) {
                 var titleObject = GenerateTitleObject(timeline.height, timeline, measureContext);
@@ -79,27 +107,39 @@ var ChronoZoom;
                         res = LayoutContent(timeline, exhibitSize);
                     }
                 }
-                if((res.max - res.min) > (timeline.height - titleObject.bboxHeight) && Log) {
-                    Log.push("Warning: Child timelines and exhibits doesn't fit into parent. Timeline name: " + timeline.Title);
+                if((res.max - res.min) > (timeline.height - titleObject.bboxHeight)) {
+                    console.log("Warning: Child timelines and exhibits doesn't fit into parent. Timeline name: " + timeline.Title);
                     var contentHeight = res.max - res.min;
                     var fullHeight = contentHeight / (1 - headerPercent);
                     var titleObject = GenerateTitleObject(fullHeight, timeline, measureContext);
                     timeline.height = fullHeight;
                 } else {
-                }
+                    //var scale = (timeline.height - titleObject.bboxHeight) / (res.max - res.min);
+                    //if (scale > 1) {
+                    //    timeline.ChildTimelines.forEach(function (tl) {
+                    //        tl.realY *= scale;
+                    //        if (!tl.AspectRatio)
+                    //            Scale(tl, scale, measureContext);
+                    //    });
+                    //    timeline.Exhibits.forEach(function (eb) {
+                    //        eb.realY *= scale;
+                    //    });
+                    //}
+                                    }
                 timeline.titleRect = titleObject;
             } else {
                 var min = res.min;
                 var max = res.max;
-                var minAspect = 1.0 / timelineMinAspect;
+                var minAspect = 1.0 / Settings.timelineMinAspect;
                 var minHeight = timelineWidth / minAspect;
+                //Measure title
                 var contentHeight = Math.max((1 - headerPercent) * minHeight, max - min);
                 var fullHeight = contentHeight / (1 - headerPercent);
                 var titleObject = GenerateTitleObject(fullHeight, timeline, measureContext);
                 timeline.titleRect = titleObject;
                 timeline.height = fullHeight;
             }
-            timeline.heightEps = parentWidth * timelineContentMargin;
+            timeline.heightEps = parentWidth * Settings.timelineContentMargin;
             timeline.realHeight = timeline.height + 2 * timeline.heightEps;
             timeline.realY = 0;
             timeline.Exhibits.forEach(function (infodot) {
@@ -122,6 +162,7 @@ var ChronoZoom;
                 });
                 var y = 0;
                 if(usedY.length > 0) {
+                    //Find free segments
                     var segmentPoints = new Array();
                     usedY.forEach(function (segment) {
                         segmentPoints.push({
@@ -151,6 +192,7 @@ var ChronoZoom;
                             });
                         }
                     }
+                    //Find suitable free segment
                     var foundPlace = false;
                     for(var i = 0; i < freeSegments.length; i++) {
                         if((freeSegments[i].top - freeSegments[i].bottom) > el.realHeight) {
@@ -169,6 +211,7 @@ var ChronoZoom;
             });
         }
         function LayoutContent(timeline, exhibitSize) {
+            //Prepare arrays for ordered and unordered content
             var sequencedContent = new Array();
             var unsequencedContent = new Array();
             timeline.ChildTimelines.forEach(function (tl) {
@@ -201,6 +244,7 @@ var ChronoZoom;
             sequencedContent.sort(function (l, r) {
                 return l.Sequence - r.Sequence;
             });
+            //Prepare measure arrays
             var arrangedElements = new Array();
             PositionContent(sequencedContent, arrangedElements, function (el, ael) {
                 return el.left < ael.right;
@@ -283,11 +327,11 @@ var ChronoZoom;
         }
         function GenerateTitleObject(tlHeight, timeline, measureContext) {
             var tlW = timeline.right - timeline.left;
-            measureContext.font = "100pt " + timelineHeaderFontName;
+            measureContext.font = "100pt " + Settings.timelineHeaderFontName;
             var size = measureContext.measureText(timeline.Title);
-            var height = timelineHeaderSize * tlHeight;
+            var height = Settings.timelineHeaderSize * tlHeight;
             var width = height * size.width / 100.0;
-            var margin = Math.min(tlHeight, tlW) * timelineHeaderMargin;
+            var margin = Math.min(tlHeight, tlW) * Settings.timelineHeaderMargin;
             if(width + 2 * margin > tlW) {
                 width = tlW - 2 * margin;
                 height = width * 100.0 / size.width;
@@ -302,8 +346,9 @@ var ChronoZoom;
             };
         }
         function Convert(parent, timeline) {
+            //Creating timeline
             var tlColor = GetTimelineColor(timeline);
-            var t1 = addTimeline(parent, "layerTimelines", 't' + timeline.UniqueID, {
+            var t1 = VCContent.addTimeline(parent, "layerTimelines", 't' + timeline.UniqueID, {
                 timeStart: timeline.left,
                 timeEnd: timeline.right,
                 top: timeline.y,
@@ -314,8 +359,10 @@ var ChronoZoom;
                 strokeStyle: tlColor,
                 regime: timeline.Regime
             });
+            //Creating Infodots
             timeline.Exhibits.forEach(function (childInfodot) {
-                var date;
+                var date;// building a date to be shown in a title of the content item to the left of the title text.
+                
                 var contentItems = new Array();
                 if(!childInfodot.ContentItems) {
                     childInfodot.ContentItems = [];
@@ -342,12 +389,13 @@ var ChronoZoom;
                     });
                 });
                 date = buildDate(childInfodot);
-                var infodot1 = addInfodot(t1, "layerInfodots", 'e' + childInfodot.UniqueID, (childInfodot.left + childInfodot.right) / 2.0, childInfodot.y, 0.8 * childInfodot.size / 2.0, contentItems, {
+                var infodot1 = VCContent.addInfodot(t1, "layerInfodots", 'e' + childInfodot.UniqueID, (childInfodot.left + childInfodot.right) / 2.0, childInfodot.y, 0.8 * childInfodot.size / 2.0, contentItems, {
                     title: childInfodot.Title,
                     date: date,
                     guid: childInfodot.ID
                 });
             });
+            //Filling child timelines
             timeline.ChildTimelines.forEach(function (childTimeLine) {
                 Convert(t1, childTimeLine);
             });
@@ -408,15 +456,15 @@ var ChronoZoom;
         }
         function GetTimelineColor(timeline) {
             if(timeline.Regime == "Cosmos") {
-                return SelectColor(GetParentLayer(timeline, cosmosTimelineID), "rgba(152, 108, 157, 1.0)", "rgba(94, 78, 129, 1.0)", "rgba(149, 136, 193, 1.0)");
+                return SelectColor(GetParentLayer(timeline, Settings.cosmosTimelineID), "rgba(152, 108, 157, 1.0)", "rgba(94, 78, 129, 1.0)", "rgba(149, 136, 193, 1.0)");
             } else if(timeline.Regime == "Earth") {
-                return SelectColor(GetParentLayer(timeline, earthTimelineID), "rgba(81, 127, 149, 1.0)", "rgba(11, 110, 131, 1.0)", "rgba(117, 163, 174, 1.0)");
+                return SelectColor(GetParentLayer(timeline, Settings.earthTimelineID), "rgba(81, 127, 149, 1.0)", "rgba(11, 110, 131, 1.0)", "rgba(117, 163, 174, 1.0)");
             } else if(timeline.Regime == "Life") {
-                return SelectColor(GetParentLayer(timeline, lifeTimelineID), "rgba(73, 150, 73, 1.0)", "rgba(13, 106, 49, 1.0)", "rgba(139, 167, 97, 1.0)");
+                return SelectColor(GetParentLayer(timeline, Settings.lifeTimelineID), "rgba(73, 150, 73, 1.0)", "rgba(13, 106, 49, 1.0)", "rgba(139, 167, 97, 1.0)");
             } else if(timeline.Regime == "Pre-history") {
-                return SelectColor(GetParentLayer(timeline, prehistoryTimelineID), "rgba(237, 145, 50, 1.0)", "rgba(193, 90, 47, 1.0)", "rgba(223, 161, 68, 1.0)");
+                return SelectColor(GetParentLayer(timeline, Settings.prehistoryTimelineID), "rgba(237, 145, 50, 1.0)", "rgba(193, 90, 47, 1.0)", "rgba(223, 161, 68, 1.0)");
             } else if(timeline.Regime == "Humanity") {
-                return SelectColor(GetParentLayer(timeline, humanityTimelineID), "rgba(212, 92, 70, 1.0)", "rgba(140, 72, 69, 1.0)", "rgba(207, 124, 111, 1.0)");
+                return SelectColor(GetParentLayer(timeline, Settings.humanityTimelineID), "rgba(212, 92, 70, 1.0)", "rgba(140, 72, 69, 1.0)", "rgba(207, 124, 111, 1.0)");
             } else {
                 return "rgba(255, 255, 255, 0.5)";
             }
@@ -433,24 +481,31 @@ var ChronoZoom;
                     timelines[i].ChildTimelines.push(timelines[i + 1]);
                 }
                 var measureContext = ((document.createElement("canvas"))).getContext('2d');
+                //Measure child content for each timiline in tree
                 LayoutTimeline(timelines[0], 0, measureContext);
+                //Calculating final placement of the data
                 Arrange(timelines[0]);
+                //Load timline to Virtual Canvas
                 LoadTimeline(vcph, timelines[0]);
             }
         }
-        var FindChildTimeline = function (timeline, id, recursive) {
+        Layout.Load = Load;
+        function FindChildTimeline(timeline, id, recursive) {
             var result = undefined;
             if(timeline) {
                 var n = timeline.ChildTimelines.length;
                 for(var i = 0; i < n; i++) {
                     var childTimeline = timeline.ChildTimelines[i];
                     if(childTimeline.ID == id) {
+                        // timeline was found
                         result = childTimeline;
                         break;
                     } else {
+                        // if recursive mode is on, then search timeline through children of current child timeline
                         if(recursive == true) {
                             result = FindChildTimeline(childTimeline, id, recursive);
                             if(result != undefined) {
+                                // timeline was found
                                 break;
                             }
                         }
@@ -458,14 +513,15 @@ var ChronoZoom;
                 }
             }
             return result;
-        };
+        }
+        Layout.FindChildTimeline = FindChildTimeline;
         function GetVisibleFromTimeline(timeline, vcph) {
             if(timeline) {
                 var vp = vcph.virtualCanvas("getViewport");
                 var width = timeline.right - timeline.left;
                 var scaleX = vp.visible.scale * width / vp.width;
                 var scaleY = vp.visible.scale * timeline.height / vp.height;
-                return new VisibleRegion2d(timeline.left + (timeline.right - timeline.left) / 2.0, timeline.y + timeline.height / 2.0, Math.max(scaleX, scaleY));
+                return new Viewport.VisibleRegion2d(timeline.left + (timeline.right - timeline.left) / 2.0, timeline.y + timeline.height / 2.0, Math.max(scaleX, scaleY));
             }
         }
         function LoadTimeline(vcph, rootTimeline) {

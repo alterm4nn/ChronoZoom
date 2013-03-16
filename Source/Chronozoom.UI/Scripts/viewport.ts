@@ -4,7 +4,7 @@
         // Creates an instance of VisibleRegion.
         // @param centerX, centerY  (number)     center point of visible rectangle (in virtual coordinates)
         // @param scale             (number)     how many time units in a single screen pixel (time unit/pixel)
-        function VisibleRegion2d(centerX, centerY, scale) {
+        export function VisibleRegion2d(centerX, centerY, scale) {
             this.centerX = centerX;
             this.centerY = centerY;
             this.scale = scale;

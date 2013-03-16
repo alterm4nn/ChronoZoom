@@ -57,17 +57,17 @@ var ChronoZoom;
             vc.mousewheel(function (objEvent, intDelta) {
                 var event = $.Event("xbrowserwheel");
                 event.delta = intDelta;
-                event.origin = getXBrowserMouseOrigin(vc, objEvent);
+                event.origin = ChronoZoom.Common.getXBrowserMouseOrigin(vc, objEvent);
                 vc.trigger(event);
             });
             var mouseWheel = vc.toObservable("xbrowserwheel");
             var mouseWheels = mouseWheel.Zip(mouseWheel, function (arg) {
-                return new ZoomGesture(arg.origin.x, arg.origin.y, arg.delta > 0 ? 1 / zoomLevelFactor : 1 * zoomLevelFactor, "Mouse");
+                return new ZoomGesture(arg.origin.x, arg.origin.y, arg.delta > 0 ? 1 / ChronoZoom.Settings.zoomLevelFactor : 1 * ChronoZoom.Settings.zoomLevelFactor, "Mouse");
             });
             var mousedblclick = vc.toObservable("dblclick");
             var mousedblclicks = mousedblclick.Zip(mousedblclick, function (event) {
-                var origin = getXBrowserMouseOrigin(vc, event);
-                return new ZoomGesture(origin.x, origin.y, 1.0 / zoomLevelFactor, "Mouse");
+                var origin = ChronoZoom.Common.getXBrowserMouseOrigin(vc, event);
+                return new ZoomGesture(origin.x, origin.y, 1.0 / ChronoZoom.Settings.zoomLevelFactor, "Mouse");
             });
             //return mouseWheels.Merge(mousedblclicks); //disabling mouse double clicks, as it causes strange behavior in conjection with elliptical zooming on the clicked item.
             return mouseWheels;

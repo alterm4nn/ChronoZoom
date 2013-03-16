@@ -1,36 +1,23 @@
-﻿declare var $: any;
-declare var navStringToVisible: any;
-declare var toursAudioFormats: any;
-declare var getURL: any;
-declare var setURL: any;
-declare var hashHandle: any;
-declare var controller: any;
-declare var compareVisibles: any;
-declare var isTourPlayRequested: any;
-declare var toggleOffImage: any;
-declare var isSearchWindowVisible: any;
-declare var onSearchClicked: any;
-declare var toggleOnImage: any;
-declare var vc: any;
-declare var setVisible: any;
-declare var setNavigationStringTo: any;
+﻿/// <reference path='urlnav.ts'/>
+/// <reference path='common.ts'/>
+
+declare var $: any;
 
 module ChronoZoom {
     export module Tours {
 
-        var isTourWindowVisible = false;
+        export var isTourWindowVisible = false;
         var isBookmarksWindowVisible = false;
         var isBookmarksWindowExpanded = true;
         var isBookmarksTextShown = true;
         var isNarrationOn = true;
 
-
-        var tours; // list of loaded tours
-        var tour; //an active tour. Undefined if no tour is active
+        export var tours; // list of loaded tours
+        export var tour; //an active tour. Undefined if no tour is active
         var tourBookmarkTransitionCompleted; // a callbacks that is to be set by tour and to be called by animation framework
         var tourBookmarkTransitionInterrupted;
 
-        var pauseTourAtAnyAnimation = false;
+        export var pauseTourAtAnyAnimation = false;
 
         var bookmarkAnimation; // current animation of bookmark' description text sliding
 
@@ -55,7 +42,7 @@ module ChronoZoom {
         @returns VisibleRegion2d for the bookmark
         */
         function getBookmarkVisible(bookmark) {
-            return navStringToVisible(bookmark.url, this.vc);
+            return ChronoZoom.UrlNav.navStringToVisible(bookmark.url, this.vc);
         }
 
 
@@ -85,13 +72,13 @@ module ChronoZoom {
 
             var isAudioLoaded = false; //is set automaticly after the audio track is loaded
             var isAudioEnabled = false; //to be changed by toggleAudio function
-            var isTourPlayRequested = false; //indicated whether the play should start after the data is loaded
+            this.isTourPlayRequested = false; //indicated whether the play should start after the data is loaded
             if (!bookmarks || bookmarks.length == 0) throw "Tour has no bookmarks";
 
             this.state = 'pause'; // possible states: play, pause, finished
             this.currentPlace = { type: 'goto', bookmark: 0 };
 
-            var self = this;
+            self = this;
 
             //ordering the bookmarks by the lapsetime
             bookmarks.sort(function (b1, b2) {
@@ -100,7 +87,7 @@ module ChronoZoom {
 
             var audio; // audio element of this tour
 
-            isTourPlayRequested = false;
+            this.isTourPlayRequested = false;
 
             for (var i = 1; i < bookmarks.length; i++) {  //calculating bookmarks durations        
                 bookmarks[i - 1].duration = bookmarks[i].lapseTime - bookmarks[i - 1].lapseTime;
@@ -178,11 +165,9 @@ module ChronoZoom {
 
                 // add audio sources of different audio file extensions for audio element
                 var blobPrefix = audioBlobUrl.substring(0, audioBlobUrl.length - 3);
-                for (var i = 0; i < toursAudioFormats.length; i++) {
+                for (var i = 0; i < ChronoZoom.Settings.toursAudioFormats.length; i++) {
                     var audioSource = document.createElement("Source");
-                    audioSource.setAttribute("src", blobPrefix + toursAudioFormats[i].ext);
-                    if (toursAudioFormats[i].type)
-                        audioSource.setAttribute("type", toursAudioFormats[i].type);
+                    audioSource.setAttribute("src", blobPrefix + ChronoZoom.Settings.toursAudioFormats[i].ext);
                     audio.appendChild(audioSource);
                 }
 
@@ -295,8 +280,8 @@ module ChronoZoom {
                 //curURL.hash.params["bookmark"] = self.currentPlace.bookmark+1;
 
                 //This flag is used to overcome hashchange event handler
-                hashHandle = false;
-                setURL(curURL);
+                ChronoZoom.Common.hashHandle = false;
+                ChronoZoom.UrlNav.setURL(curURL);
 
                 if (isToursDebugEnabled && window.console && console.log("reached the bookmark index " + self.currentPlace.bookmark));
 
@@ -344,7 +329,7 @@ module ChronoZoom {
 
                 var visible = vc.virtualCanvas("getViewport").visible;
 
-                if (this.currentPlace != null && this.currentPlace.bookmark != null && compareVisibles(visible, getBookmarkVisible(this.bookmarks[this.currentPlace.bookmark])))
+                if (this.currentPlace != null && this.currentPlace.bookmark != null && ChronoZoom.Common.compareVisibles(visible, getBookmarkVisible(this.bookmarks[this.currentPlace.bookmark])))
                 // current visible is equal to visible of bookmark
                     this.currentPlace = { type: 'bookmark', bookmark: this.currentPlace.bookmark };
                 else
@@ -385,7 +370,7 @@ module ChronoZoom {
 
                     //This flag is used to overcome hashchange event handler
                     hashHandle = false;
-                    setURL(curURL);
+                    ChronoZoom.UrlNav.setURL(curURL);
                 }
             };
 
@@ -393,8 +378,8 @@ module ChronoZoom {
                 if (this.state !== 'play') return;
 
                 if (isToursDebugEnabled && window.console && console.log("tour playback paused"));
-                if (isAudioEnabled && isTourPlayRequested)
-                    isTourPlayRequested = false;
+                if (isAudioEnabled && self.isTourPlayRequested)
+                    self.isTourPlayRequested = false;
 
                 // clear active bookmark timer
                 if (timerOnBookmarkIsOver) {
@@ -524,7 +509,7 @@ module ChronoZoom {
         function removeActiveTour() {
             // stop active tour
             tourPause();
-            isTourPlayRequested = false;
+            self.isTourPlayRequested = false;
 
             // hide tour' UI
             var tourControlDiv = document.getElementById("tour_control");
@@ -563,14 +548,14 @@ module ChronoZoom {
         /*
         switch the tour in the paused state
         */
-        function tourPause() {
+        export function tourPause() {
             if (tour != undefined) {
                 $("#tour_playpause").attr("src", "Images/tour_play_off.jpg");
 
                 // pause tour
                 tour.pause();
                 // stop active animation
-                controller.stopAnimation();
+                ChronoZoom.Common.controller.stopAnimation();
                 // remove animation callbacks
                 tourBookmarkTransitionInterrupted = undefined;
                 tourBookmarkTransitionCompleted = undefined;
@@ -619,7 +604,7 @@ module ChronoZoom {
             var curURL = getURL();
             delete curURL.hash.params["tour"];
             delete curURL.hash.params["bookmark"];
-            setURL(curURL);
+            ChronoZoom.UrlNav.setURL(curURL);
         }
 
 
@@ -634,7 +619,7 @@ module ChronoZoom {
 
 
 
-        function initializeToursContent() {
+        export function initializeToursContent() {
             var toursUI = $('#tours-content');
             tours.sort(function (u, v) { return u.sequenceNum - v.sequenceNum });
             var category = null;
@@ -677,7 +662,7 @@ module ChronoZoom {
                         
                                 // hide tour UI
                                 $("#tours").hide('slide', {}, 'slow');
-                                toggleOffImage('tours_index');
+                                ChronoZoom.Common.toggleOffImage('e_index');
                                 isTourWindowVisible = false;
 
                                 // activate selected tour  
@@ -781,15 +766,15 @@ module ChronoZoom {
         /*
         Tours button handler.
         */
-        function onTourClicked() {
-            if (isSearchWindowVisible)
-                onSearchClicked();
+        export function onTourClicked() {
+            if (ChronoZoom.Search.isSearchWindowVisible)
+                ChronoZoom.Search.onSearchClicked();
 
             if (isTourWindowVisible) {
-                toggleOffImage('tours_index');
+                ChronoZoom.Common.toggleOffImage('tours_index');
                 $("#tours").hide('slide', {}, 'slow');
             } else {
-                toggleOnImage('tours_index');
+                ChronoZoom.Common.toggleOnImage('tours_index');
                 $("#tours").show('slide', {}, 'slow');
             }
             isTourWindowVisible = !isTourWindowVisible;
@@ -799,11 +784,11 @@ module ChronoZoom {
         /* Highlights the tour button in the top menu */
         function tourButtonHighlight(isOn) {
             if (isOn) {
-                toggleOnImage('tours_index');
+                ChronoZoom.Common.toggleOnImage('tours_index');
             }
             else {
                 if (!isTourWindowVisible)
-                    toggleOffImage('tours_index');
+                    ChronoZoom.Common.toggleOffImage('tours_index');
             }
         }
 
@@ -870,7 +855,7 @@ module ChronoZoom {
         Called after successful response from tours request.
         @param content      (array) an array of tours that were returned by request 
         */
-        function parseTours(content) {
+        export function parseTours(content) {
             tours = new Array();
 
             // build array of tours that could be played
@@ -916,7 +901,7 @@ module ChronoZoom {
                     continue;
 
                 // tour is correct and can be played
-                tours.push(new Tour(tourString.Name, tourBookmarks, bookmarkTransition, vc, tourString.Category, tourString.AudioBlobUrl, tourString.Sequence));
+                tours.push(new Tour(tourString.Name, tourBookmarks, bookmarkTransition, $('#vc'), tourString.Category, tourString.AudioBlobUrl, tourString.Sequence));
             }
         }
 
@@ -931,15 +916,15 @@ module ChronoZoom {
             pauseTourAtAnyAnimation = false;
 
             // id of this bookmark' transition animation
-            var animId = setVisible(visible);
+            var animId = ChronoZoom.Common.setVisible(visible);
 
             if (animId && bookmark) {
-                setNavigationStringTo = { bookmark: bookmark, id: animId };
+                ChronoZoom.Common.setNavigationStringTo = { bookmark: bookmark, id: animId };
             }
             return animId;
         }
 
-        function loadTourFromURL() {
+        export function loadTourFromURL() {
             var curURL = getURL();
             if ((typeof curURL.hash.params !== 'undefined') && (curURL.hash.params["tour"] > tours.length))
                 return;

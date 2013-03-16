@@ -1,8 +1,8 @@
-﻿declare var $: any;
-declare var getChild: any;
-declare var vc: any;
-declare var vcelementToNavString: any;
-declare var czDataSource: any;
+﻿/// <reference path='urlnav.ts'/>
+/// <reference path='vccontent.ts'/>
+/// <reference path='cz.settings.ts'/>
+
+declare var $: any;
 
 module ChronoZoom {
     export module Bibliography {
@@ -23,14 +23,14 @@ module ChronoZoom {
             var sender;
             // Trying to find sender of bibliography link. Stop process of showing bibliography, if didn't find.
             try {
-                sender = getChild(element, id);
+                sender = ChronoZoom.VCContent.getChild(element, id);
             }
             catch (ex) {
                 return;
             }
 
-            var vp = vc.virtualCanvas("getViewport");
-            var nav = vcelementToNavString(element, vp);
+            var vp = $("#vc").virtualCanvas("getViewport");
+            var nav = ChronoZoom.UrlNav.vcelementToNavString(element, vp);
 
             if (window.location.hash.match("b=([a-z0-9_]+)") == null) {
                 var bibl = "&b=" + id;
@@ -158,7 +158,7 @@ module ChronoZoom {
             };
 
             var url;
-            switch (czDataSource) {
+            switch (ChronoZoom.Settings.czDataSource) {
                 case 'db': url = "Chronozoom.svc/GetBibliography";
                     break;
                 default: url = "Chronozoom.svc/GetBibliographyRelay";
@@ -172,7 +172,7 @@ module ChronoZoom {
                 data: { exhibitID: exhibitID },
                 url: url,
                 success: function (result) {
-                    if (czDataSource == 'db')
+                    if (ChronoZoom.Settings.czDataSource == 'db')
                         onBiblReceived(result.d);
                     else
                         onBiblReceived(eval(result.d));

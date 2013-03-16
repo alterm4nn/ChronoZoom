@@ -1,44 +1,31 @@
-﻿declare var $: any;
-declare var allowedVisibileImprecision: any;
-declare var pauseTourAtAnyAnimation: any;
-declare var daysInMonth: any;
-declare var czDataSource: any;
-declare var initializeToursContent: any;
-declare var loadTourFromURL: any;
+﻿/// <reference path='cz.settings.ts'/>
+/// <reference path='tours.ts'/>
+/// <reference path='breadcrumbs.ts'/>
+/// <reference path='search.ts'/>
+/// <reference path='urlnav.ts'/>
+/// <reference path='layout.ts'/>
+
+declare var $: any;
 declare var unescape: any;
-declare var parseTours: any;
 declare var timings: any;
-declare var navStringToVisible: any;
-declare var navigationAnchor: any;
 declare var escape: any;
-declare var tour: any;
-declare var tourPause: any;
-declare var Load: any;
-declare var vcelementToNavString: any;
-declare var FindChildTimeline: any;
-declare var lifeTimelineID: any;
-declare var earthTimelineID: any;
-declare var prehistoryTimelineID: any;
-declare var humanityTimelineID: any;
-declare var maxPermitedVerticalRange: any;
-declare var maxPermitedScale: any;
-declare var maxPermitedTimeRange: any;
-declare var tours: any;
-declare var visibleAreaWidth: any;
-declare var updateHiddenBreadCrumbs: any;
-declare var updateBreadCrumbsLabels: any;
-declare var navigateToBookmark: any;
 declare var hashChangeFromOutside: any;
 
 module ChronoZoom {
     export module Common {
+
+        var Settings = ChronoZoom.Settings;
+        var Tours = ChronoZoom.Tours;
+
+        export var maxPermitedScale;
+        export var maxPermitedVerticalRange;
 
         /*
         Array for logging of inners messages and exceptions
         */
         var Log = new Array();
 
-        var controller; //a controller to perform smooth navigation
+        export var controller; //a controller to perform smooth navigation
         var isAxisFreezed = true; //indicates whether the axis moves together with canvas during navigation or not
         var startHash;
 
@@ -56,8 +43,8 @@ module ChronoZoom {
         var regimeNavigator;
 
         var k = 1000000000;
-        var setNavigationStringTo; // { element or bookmark, id } identifies that we zoom into this element and when (if) finish the zoom, we should put the element's path into navigation string
-        var hashHandle = true; // Handle hash change event
+        export var setNavigationStringTo; // { element or bookmark, id } identifies that we zoom into this element and when (if) finish the zoom, we should put the element's path into navigation string
+        export var hashHandle = true; // Handle hash change event
         var tourNotParsed = undefined; // indicates that URL was checked at tour sharing after page load
 
 
@@ -65,7 +52,7 @@ module ChronoZoom {
         @param jqelement  (JQuery to Dom element) jQuery element to get local offset for.
         @param event   (Mouse event args) mouse event args describing mouse cursor.
         */
-        function getXBrowserMouseOrigin(jqelement, event) {
+        export function getXBrowserMouseOrigin(jqelement, event) {
             var offsetX;
             ///if (!event.offsetX)
             offsetX = event.pageX - jqelement[0].offsetLeft;
@@ -89,14 +76,14 @@ module ChronoZoom {
         // Prevents the event from bubbling. 
         // In non IE browsers, use e.stopPropagation() instead. 
         // To cancel event bubbling across browsers, you should check for support for e.stopPropagation(), and proceed accordingly:
-        function preventbubble(e) {
+        export function preventbubble(e) {
             if (e && e.stopPropagation) //if stopPropagation method supported
                 e.stopPropagation();
             else
                 e.cancelBubble = true;
         }
 
-        function getCoordinateFromDecimalYear(decimalYear) {
+        export function getCoordinateFromDecimalYear(decimalYear) {
             if (decimalYear === 9999) {
                 return 0;
             }
@@ -109,18 +96,18 @@ module ChronoZoom {
             return getYearsBetweenDates(dateTime.getFullYear(), dateTime.getMonth(), dateTime.getDay(), localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
         }
 
-        function getCoordinateFromDMY(year, month, day) {
+        export function getCoordinateFromDMY(year, month, day) {
             var localPresent = getPresent();
             return getYearsBetweenDates(year, month, day, localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
         }
 
-        function getDMYFromCoordinate(coord) {
+        export function getDMYFromCoordinate(coord) {
             var localPresent = getPresent();
             return getDateFrom(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay, coord);
         }
 
         var present = undefined;
-        function getPresent() {
+        export function getPresent() {
             if (!present) {
                 present = new Date();
 
@@ -157,7 +144,7 @@ module ChronoZoom {
                 if (month == 12) {
                     month = 0;
                 }
-                days += daysInMonth[month];
+                days += Settings.daysInMonth[month];
                 month++;
             }
             days += d2;
@@ -182,7 +169,7 @@ module ChronoZoom {
             // calculate how many full months have passed
             while (nDays < 0) {
                 var tempMonth = endMonth > 0 ? endMonth - 1 : 11;
-                nDays += daysInMonth[tempMonth];
+                nDays += Settings.daysInMonth[tempMonth];
                 endMonth--;
                 if (endMonth < 0) {
                     endYear--;
@@ -192,7 +179,7 @@ module ChronoZoom {
 
             endDay += Math.round(nDays);
             // get count of days in current month
-            var tempDays = daysInMonth[endMonth];
+            var tempDays = Settings.daysInMonth[endMonth];
             // if result day is bigger than count of days then one more month has passed too            
             while (endDay > tempDays) {
                 endDay -= tempDays;
@@ -201,7 +188,7 @@ module ChronoZoom {
                     endMonth = 0;
                     endYear++;
                 }
-                tempDays = daysInMonth[endMonth];
+                tempDays = Settings.daysInMonth[endMonth];
             }
             if (endYear < 0 && year > 0)
                 endYear -= 1;
@@ -214,7 +201,7 @@ module ChronoZoom {
             else return false;
         }
 
-        function toggleOffImage(elemId, ext) {
+        export function toggleOffImage(elemId, ext?) {
             if (!ext) ext = 'jpg';
             var imageSrc = $("#" + elemId).attr("src");
             var len = imageSrc.length;
@@ -225,7 +212,7 @@ module ChronoZoom {
             }
         }
 
-        function toggleOnImage(elemId, ext) {
+        export function toggleOnImage(elemId, ext?) {
             if (!ext) ext = 'jpg';
             var imageSrc = $("#" + elemId).attr("src");
             var len = imageSrc.length;
@@ -276,25 +263,25 @@ module ChronoZoom {
         }
 
         // Compares 2 visibles. Returns true if they are equal with an allowable imprecision
-        function compareVisibles(vis1, vis2) {
+        export function compareVisibles(vis1, vis2) {
             return vis2 != null ?
-                    (Math.abs(vis1.centerX - vis2.centerX) < allowedVisibileImprecision &&
-                    Math.abs(vis1.centerY - vis2.centerY) < allowedVisibileImprecision &&
-                    Math.abs(vis1.scale - vis2.scale) < allowedVisibileImprecision)
+                    (Math.abs(vis1.centerX - vis2.centerX) < Settings.allowedVisibileImprecision &&
+                    Math.abs(vis1.centerY - vis2.centerY) < Settings.allowedVisibileImprecision &&
+                    Math.abs(vis1.scale - vis2.scale) < Settings.allowedVisibileImprecision)
                     : false;
         }
 
         /*
         Is called by direct user actions like links, bread crumbs clicking, etc.
         */
-        function setVisibleByUserDirectly(visible) {
-            pauseTourAtAnyAnimation = false;
-            if (tour != undefined && tour.state == "play")
-                tourPause();
+        export function setVisibleByUserDirectly(visible) {
+            Tours.pauseTourAtAnyAnimation = false;
+            if (Tours.tour != undefined && Tours.tour.state == "play")
+                Tours.tourPause();
             return setVisible(visible);
         }
 
-        function setVisible(visible) {
+        export function setVisible(visible) {
             if (visible) {
                 //ax.axis("enableThresholds", false);
                 return controller.moveToVisible(visible);
@@ -312,7 +299,7 @@ module ChronoZoom {
             if (match) {
                 return unescape(match[1]);
             } else {
-                switch (czDataSource) {
+                switch (Settings.czDataSource) {
                     case 'db':
                         return "Chronozoom.svc/get";
                     case 'relay':
@@ -340,8 +327,8 @@ module ChronoZoom {
                     content = result;
                     ProcessContent(result);
 
-                    if (typeof tours !== 'undefined') { // tours are loaded, check at shared tour
-                        loadTourFromURL();
+                    if (Tours.tours) { // tours are loaded, check at shared tour
+                        Tours.loadTourFromURL();
                         tourNotParsed = false;
                     }
                     else // tours are not loaded yet, checking at shared tour will be after successful load of tours 
@@ -354,7 +341,7 @@ module ChronoZoom {
             });
 
             var toursUrl;
-            switch (czDataSource) {
+            switch (Settings.czDataSource) {
                 case 'db': toursUrl = "Chronozoom.svc/getTours";
                     break;
                 case 'relay': toursUrl = "ChronozoomRelay";
@@ -370,12 +357,12 @@ module ChronoZoom {
                 dataType: "json",
                 url: toursUrl,
                 success: function (result) {
-                    parseTours(result);
-                    initializeToursContent();
+                    Tours.parseTours(result);
+                    Tours.initializeToursContent();
 
                     // check at shared tour
                     if (tourNotParsed == true) {
-                        loadTourFromURL();
+                        Tours.loadTourFromURL();
                         tourNotParsed = false;
                     }
                 },
@@ -383,23 +370,23 @@ module ChronoZoom {
                     $("tours_index").attr("onmouseup", function () {
                         alert("The tours failed to download. Please refresh the page later and try to activate tours again.");
                     });
-                    initializeToursContent();
+                    Tours.initializeToursContent();
                 }
             });
         }
 
         function ProcessContent(content) {
             timings.wcfRequestCompleted = new Date();
-            Load(vc, content.d);
+            ChronoZoom.Layout.Load(vc, content.d);
             timings.layoutCompleted = new Date();
             if (startHash) { // restoring the window's hash as it was on the page loading
-                visReg = navStringToVisible(startHash.substring(1), vc);
+                visReg = ChronoZoom.UrlNav.navStringToVisible(startHash.substring(1), vc);
             }
 
             InitializeRegimes();
             if (!visReg && cosmosVisible) {
                 window.location.hash = cosmosVisible;
-                visReg = navStringToVisible(cosmosVisible, vc);
+                visReg = ChronoZoom.UrlNav.navStringToVisible(cosmosVisible, vc);
             }
             if (visReg) {
                 vc.virtualCanvas("setVisible", visReg);
@@ -422,21 +409,21 @@ module ChronoZoom {
                         if (!timeline) return null;
                         var v = vc.virtualCanvas("findElement", 't' + timeline.UniqueID);
                         regimes.push(v);
-                        if (v) v = vcelementToNavString(v);
+                        if (v) v = ChronoZoom.UrlNav.vcelementToNavString(v);
                         return v;
                     }
 
                     var cosmosTimeline = content.d[0];
                     cosmosVisible = f(cosmosTimeline);
-                    navigationAnchor = vc.virtualCanvas("findElement", 't' + cosmosTimeline.UniqueID);
+                    ChronoZoom.UrlNav.navigationAnchor = vc.virtualCanvas("findElement", 't' + cosmosTimeline.UniqueID);
 
-                    var earthTimeline = FindChildTimeline(cosmosTimeline, earthTimelineID);
+                    var earthTimeline = ChronoZoom.Layout.FindChildTimeline(cosmosTimeline, Settings.earthTimelineID);
                     earthVisible = f(earthTimeline);
-                    var lifeTimeline = FindChildTimeline(earthTimeline, lifeTimelineID);
+                    var lifeTimeline = ChronoZoom.Layout.FindChildTimeline(earthTimeline, Settings.lifeTimelineID);
                     lifeVisible = f(lifeTimeline);
-                    var prehistoryTimeline = FindChildTimeline(lifeTimeline, prehistoryTimelineID);
+                    var prehistoryTimeline = ChronoZoom.Layout.FindChildTimeline(lifeTimeline, Settings.prehistoryTimelineID);
                     prehistoryVisible = f(prehistoryTimeline);
-                    var humanityTimeline = FindChildTimeline(prehistoryTimeline, humanityTimelineID, true);
+                    var humanityTimeline = ChronoZoom.Layout.FindChildTimeline(prehistoryTimeline, Settings.humanityTimelineID, true);
                     humanityVisible = f(humanityTimeline);
 
                     maxPermitedVerticalRange = {    //setting top and bottom observation constraints according to cosmos timeline
@@ -444,7 +431,7 @@ module ChronoZoom {
                         bottom: cosmosTimeline.y + cosmosTimeline.height
                     };
 
-                    maxPermitedScale = navStringToVisible(cosmosVisible, vc).scale * 1.1;
+                    maxPermitedScale = ChronoZoom.UrlNav.navStringToVisible(cosmosVisible, vc).scale * 1.1;
                 }
             }
         }
@@ -454,8 +441,8 @@ module ChronoZoom {
 
             $(".breadCrumbPanel").css("width", Math.round(($("#vc").width() / 2 - 50)));
             $("#bc_navRight").css("left", ($(".breadCrumbPanel").width() + $(".breadCrumbPanel").position().left + 2) + "px");
-            visibleAreaWidth = $(".breadCrumbPanel").width();
-            updateHiddenBreadCrumbs();
+            ChronoZoom.BreadCrumbs.visibleAreaWidth = $(".breadCrumbPanel").width();
+            ChronoZoom.BreadCrumbs.updateHiddenBreadCrumbs();
 
             var height = window.innerHeight;
             var offset = height - 187;
@@ -488,7 +475,7 @@ module ChronoZoom {
             vc.virtualCanvas("updateViewport");
             ax.axis("updateWidth");
             updateAxis(vc, ax);
-            updateBreadCrumbsLabels();
+            ChronoZoom.BreadCrumbs.updateBreadCrumbsLabels();
         }
 
         function passThrough(e) {
@@ -501,7 +488,7 @@ module ChronoZoom {
             var height_space = cosmos_rect.height();
             if (mouseX > offset_space.left && mouseX < offset_space.left + width_space
              && mouseY > offset_space.top && mouseY < offset_space.top + height_space)
-                navigateToBookmark(cosmosVisible);
+                ChronoZoom.Search.navigateToBookmark(cosmosVisible);
 
             var earth_rect = $("#earth_rect");
             var offset_earth = earth_rect.offset();
@@ -509,7 +496,7 @@ module ChronoZoom {
             var height_earth = earth_rect.height();
             if (mouseX > offset_earth.left && mouseX < offset_earth.left + width_earth
              && mouseY > offset_earth.top && mouseY < offset_earth.top + height_earth)
-                navigateToBookmark(earthVisible);
+                ChronoZoom.Search.navigateToBookmark(earthVisible);
 
             var life_rect = $("#life_rect");
             var offset_life = life_rect.offset();
@@ -517,7 +504,7 @@ module ChronoZoom {
             var height_life = life_rect.height();
             if (mouseX > offset_life.left && mouseX < offset_life.left + width_life
              && mouseY > offset_life.top && mouseY < offset_life.top + height_life)
-                navigateToBookmark(lifeVisible);
+                ChronoZoom.Search.navigateToBookmark(lifeVisible);
 
             var prehuman_rect = $("#prehuman_rect");
             var offset_prehuman = prehuman_rect.offset();
@@ -525,7 +512,7 @@ module ChronoZoom {
             var height_prehuman = prehuman_rect.height();
             if (mouseX > offset_prehuman.left && mouseX < offset_prehuman.left + width_prehuman
              && mouseY > offset_prehuman.top && mouseY < offset_prehuman.top + height_prehuman)
-                navigateToBookmark(prehistoryVisible);
+                ChronoZoom.Search.navigateToBookmark(prehistoryVisible);
 
             var human_rect = $("#human_rect");
             var offset_human = human_rect.offset();
@@ -533,7 +520,7 @@ module ChronoZoom {
             var height_human = human_rect.height();
             if (mouseX > offset_human.left && mouseX < offset_human.left + width_human
              && mouseY > offset_human.top && mouseY < offset_human.top + height_human)
-                navigateToBookmark(humanityVisible);
+                ChronoZoom.Search.navigateToBookmark(humanityVisible);
         }
 
         function updateAxis(vc, ax) {
@@ -556,9 +543,9 @@ module ChronoZoom {
             }
 
             var left = vp.pointScreenToVirtual(0, 0).x;
-            if (left < maxPermitedTimeRange.left) left = maxPermitedTimeRange.left;
+            if (left < Settings.maxPermitedTimeRange.left) left = Settings.maxPermitedTimeRange.left;
             var right = vp.pointScreenToVirtual(vp.width, vp.height).x;
-            if (right > maxPermitedTimeRange.right) right = maxPermitedTimeRange.right;
+            if (right > Settings.maxPermitedTimeRange.right) right = Settings.maxPermitedTimeRange.right;
             var newRight = navigatorFunc(Math.abs(right));
             var newLeft = navigatorFunc(Math.abs(left));
             var newWidth = Math.max(2.0 / regimesRatio, Math.abs(newRight - newLeft));

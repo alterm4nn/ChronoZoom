@@ -67,7 +67,7 @@ module ChronoZoom {
     export module VCContent {
 
         var elementclick = $.Event("elementclick");
-        var getVisibleForElement = function (element, scale, viewport) {
+        export function getVisibleForElement(element, scale, viewport) {
 	        var margin = 2 * (contentScaleMargin ? contentScaleMargin : 0);
 
 	        var width = viewport.width - margin;
@@ -195,15 +195,15 @@ module ChronoZoom {
         @param onload (optional callback function) called when image is loaded
         @param parent (CanvasElement) Parent element, whose children is to be new element.
         */
-        var addImage = function (element, layerid, id, vx, vy, vw, vh, imgSrc, onload) {
+        var addImage = function (element, layerid, id, vx, vy, vw, vh, imgSrc, onload?) {
 	        if (vw <= 0 || vh <= 0) throw "Image size must be positive";
 	        return addChild(element, new CanvasImage(element.vc, layerid, id, imgSrc, vx, vy, vw, vh, onload), false);
         };
-        var addLodImage = function (element, layerid, id, vx, vy, vw, vh, imgSources, onload) {
+        var addLodImage = function (element, layerid, id, vx, vy, vw, vh, imgSources, onload?) {
 	        if (vw <= 0 || vh <= 0) throw "Image size must be positive";
 	        return addChild(element, new CanvasLODImage(element.vc, layerid, id, imgSources, vx, vy, vw, vh, onload), false);
         };
-        var addSeadragonImage = function (element, layerid, id, vx, vy, vw, vh, z, imgSrc, onload) {
+        var addSeadragonImage = function (element, layerid, id, vx, vy, vw, vh, z, imgSrc, onload?) {
 	        if (vw <= 0 || vh <= 0) throw "Image size must be positive";
 	        return addChild(element, new SeadragonImage(element.vc, /*parent*/element, layerid, id, imgSrc, vx, vy, vw, vh, z, onload), false);
         };
@@ -267,7 +267,7 @@ module ChronoZoom {
         @remarks
         Text width is adjusted using measureText() on first render call. 
         */
-        function addText(element, layerid, id, vx, vy, baseline, vh, text, settings, vw) {
+        function addText(element, layerid, id, vx, vy, baseline, vh, text, settings, vw?) {
 	        return addChild(element, new CanvasText(element.vc, layerid, id, vx, vy, baseline, vh, text, settings, vw), false);
         };
 
@@ -405,7 +405,7 @@ module ChronoZoom {
         @returns    The children object (derived from CanvasContentItem) 
         @exception  if there is no child with the id
         */
-        function getChild(element, id) {
+        export function getChild(element, id) {
 	        var n = element.children.length;
 	        for (var i = 0; i < n; i++) {
 		        if (element.children[i].id == id) return element.children[i];
@@ -787,7 +787,7 @@ module ChronoZoom {
 	        var baseline = timelineinfo.top + marginTop + headerSize / 2.0;
 
 	        this.titleObject = addText(this, layerid, id + "__header__", timelineinfo.timeStart + marginLeft, timelineinfo.top + marginTop, baseline, headerSize,
-                timelineinfo.header, { fontName: timelineHeaderFontName, fillStyle: timelineHeaderFontColor, textBaseline: 'middle' }, null);
+                timelineinfo.header, { fontName: timelineHeaderFontName, fillStyle: timelineHeaderFontColor, textBaseline: 'middle' });
 
 	        this.title = this.titleObject.text;
 	        this.regime = timelineinfo.regime;
@@ -1296,7 +1296,7 @@ module ChronoZoom {
         @remarks 
         optional property onLoad() is called if defined when the image is loaded and the element is completely initialized.
         */
-        function CanvasImage(vc, layerid, id, imageSource, vx, vy, vw, vh, onload) {
+        function CanvasImage(vc, layerid, id, imageSource, vx, vy, vw, vh, onload?) {
 	        this.base = CanvasElement;
 	        this.base(vc, layerid, id, vx, vy, vw, vh);
 	        this.onload = onload;
@@ -1744,7 +1744,7 @@ module ChronoZoom {
 
 		        self.onRemove(); // removes the dom element
 		        removeChild(parent, self.id); // removes the cur seadragon object from the scene graph
-		        addImage(parent, layerid, id, vx, vy, vw, vh, imageSource, null);
+		        addImage(parent, layerid, id, vx, vy, vw, vh, imageSource);
 	        }
 
 	        // run
@@ -1764,7 +1764,7 @@ module ChronoZoom {
         header (string), fillStyle (color) })
         @returns         root of the timeline tree
         */
-        var addTimeline = function (element, layerid, id, timelineinfo) {
+        export function addTimeline(element, layerid, id, timelineinfo) {
 	        var width = timelineinfo.timeEnd - timelineinfo.timeStart;
 	        var timeline = addChild(element, new CanvasTimeline(element.vc, layerid, id,
                                     timelineinfo.timeStart, timelineinfo.top,
@@ -1844,7 +1844,7 @@ module ChronoZoom {
 			        var mediaID = id + "__media__";
 			        var imageElem = null;
 			        if (contentItem.mediaType === 'image') {
-			            imageElem = addSeadragonImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, mediaContentElementZIndex, contentItem.mediaUrl, null);
+			            imageElem = addSeadragonImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, mediaContentElementZIndex, contentItem.mediaUrl);
 			        }
 			        else if (contentItem.mediaType === 'video') {
 				        addVideo(container, layerid, mediaID, contentItem.mediaUrl, vx + leftOffset, mediaTop, contentWidth, mediaHeight, mediaContentElementZIndex);
@@ -1937,7 +1937,7 @@ module ChronoZoom {
 			        var sz = 1 << zl;
 			        var thumbnailUri = contentItemThumbnailBaseUri + 'x' + sz + '/' + contentItem.guid + '.png';
 			        return { zoomLevel: newZl,
-				        content: new CanvasImage(vc, layerid, id + "@" + 1, thumbnailUri, vx, vy, vw, vh, null)
+				        content: new CanvasImage(vc, layerid, id + "@" + 1, thumbnailUri, vx, vy, vw, vh)
 			        };
 		        }
 	        };
@@ -2190,7 +2190,7 @@ module ChronoZoom {
 			        var l = innerRad * 260 / 225;
 			        return {
 				        zoomLevel: zl,
-				        content: new CanvasImage(vc, layerid, id + "@" + zl, thumbnailUri, time - l / 2.0, vyc - l / 2.0, l, l, null)
+				        content: new CanvasImage(vc, layerid, id + "@" + zl, thumbnailUri, time - l / 2.0, vyc - l / 2.0, l, l)
 			        };
 		        }
 
@@ -2260,7 +2260,7 @@ module ChronoZoom {
         @param cid  {string}            id of the content item
         Returns {x,y,width,height,parent} of a content item even if it is not presented yet in the infodot children collection.
         */
-        var getContentItem = function (infodot, cid) {
+        export function getContentItem(infodot, cid) {
 	        if (infodot.type !== 'infodot' || infodot.contentItems.length === 0) return null;
 	        var radv = infodot.width / 2;
 	        var innerRad = radv - infoDotHoveredBorderWidth * radv;
@@ -2281,7 +2281,7 @@ module ChronoZoom {
         @param contentItems (array of { id, date (string), title (string), description (string), mediaUrl (string), mediaType (string) }) content items of the infodot, first is central.
         @returns         root of the content item tree
         */
-        var addInfodot = function addInfodot(element, layerid, id, time, vyc, radv, contentItems, infodotDescription) {
+        export function addInfodot(element, layerid, id, time, vyc, radv, contentItems, infodotDescription) {
 	        var infodot = new CanvasInfodot(element.vc, layerid, id, time, vyc, radv, contentItems, infodotDescription);
 	        return addChild(element, infodot, true);
         }

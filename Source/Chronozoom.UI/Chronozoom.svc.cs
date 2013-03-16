@@ -96,23 +96,23 @@ namespace UI
 
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public IEnumerable<Reference> GetBibliography(string exhibitID)
+        public IEnumerable<Reference> GetBibliography(string exhibitId)
         {
             Guid guid;
-            if (!Guid.TryParse(exhibitID, out guid))
+            if (!Guid.TryParse(exhibitId, out guid))
             {
-                Trace.TraceEvent(TraceEventType.Warning, 0, "GetBibliography called with invalid Id {0}", exhibitID);
+                Trace.TraceEvent(TraceEventType.Warning, 0, "GetBibliography called with invalid Id {0}", exhibitId);
                 return null;
             }
 
             var exhibit = _storage.Exhibits.Find(guid);
             if (exhibit == null)
             {
-                Trace.TraceEvent(TraceEventType.Warning, 0, "GetBibliography called, no matching exhibit found with Id {0}", exhibitID);
+                Trace.TraceEvent(TraceEventType.Warning, 0, "GetBibliography called, no matching exhibit found with Id {0}", exhibitId);
                 return null;
             }
 
-            Trace.TraceInformation("GetBibliography called for Exhibit Id {0}", exhibitID);
+            Trace.TraceInformation("GetBibliography called for Exhibit Id {0}", exhibitId);
             _storage.Entry(exhibit).Collection(_ => _.References).Load();
             return exhibit.References.ToList();
         }

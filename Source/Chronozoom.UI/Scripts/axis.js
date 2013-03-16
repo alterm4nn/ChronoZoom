@@ -1,35 +1,60 @@
 var ChronoZoom;
 (function (ChronoZoom) {
     (function (Axis) {
+        var Settings = ChronoZoom.Settings;
         $.widget("ui.axis", {
             width: null,
-            height: null,
-            beta: 0,
+            height: // axis width
+            null,
+            beta: // axis background and ticks height
+            // constants to calculate span between ticks: delta can be 1, 2, 5; beta is value of power
+            // span = this.delta * Math.pow(10, this.beta);
+            0,
             delta: 1,
             regime: "",
-            level: 1,
-            ticks: null,
-            minorTicks: null,
-            labels: null,
-            mousePosition: null,
-            log10: 1 / Math.log(10),
+            level: // "Ga", "Ma", "ka" for 'cosmos' mode, "BCE/CE" for 'calendar' mode, "Date" for 'date' mode
+            1,
+            ticks: // divider for each regime
+            null,
+            minorTicks: // array of ticks values
+            null,
+            labels: // array of minor ticks values
+            null,
+            mousePosition: // array of labels shown above ticks
+            null,
+            log10: // current position of mouse (in px)
+            1 / Math.log(10),
             firstYear: null,
-            startDate: null,
-            endDate: null,
-            markerPosition: -1,
-            doesMarkerMovesOnHover: true,
-            numberOfThresholds: null,
+            startDate: // coordinate of first year for current range in calendar or date mode
+            null,
+            endDate: // start date of range in 'date' mode
+            null,
+            markerPosition: // end date of range in 'date' mode
+            -1,
+            doesMarkerMovesOnHover: // current time (position of mouse)
+            true,
+            numberOfThresholds: //reaction of mouse move over the axis
+            null,
             thresholds: null,
             thresholdVisibility: "no",
-            currentThreshold: -1,
-            showThresholds: null,
-            animation: false,
-            hideAllTimeout: undefined,
-            highlighted_num: 0,
+            currentThreshold: // checks if threshold is visible: 'no', 'all', 'one'
+            -1,
+            showThresholds: // index of current visible threshold or -1 if there is no visible threshold
+            null,
+            animation: // value indicating should thresholds be rendered or not
+            false,
+            hideAllTimeout: // true when thresholds start showing or closing, false when animation is completed
+            undefined,
+            highlighted_num: // Timeout to hide bunch of visible thresholds
+            0,
             _create: function () {
+                // background canvas
                 this.backgroundCanvas = $("<canvas></canvas>").appendTo(this.element).addClass("backgroundCanvas");
+                // ticks canvas
                 this.ticksCanvas = $("<canvas></canvas>").appendTo(this.element).addClass("ticksCanvas");
+                // current mouse position canvas
                 this.mouseMarkCanvas = $("<canvas></canvas>").appendTo(this.element).addClass("mouseMarkCanvas");
+                // canvas for dynamically thresholds
                 this.thresholdCanvas = $("<canvas></canvas>").appendTo(this.element).addClass("thresholdCanvas");
                 var canvas = this.backgroundCanvas[0];
                 canvas.width = this.element[0].clientWidth;
@@ -45,9 +70,9 @@ var ChronoZoom;
                 canvas.height = this.element[0].clientHeight;
                 this.width = canvas.width;
                 this.height = canvas.height;
-                if(czVersion == "mobile") {
+                if(Settings.czVersion == "mobile") {
                     this.showThresholds = false;
-                } else if(czVersion == "main") {
+                } else if(Settings.czVersion == "main") {
                     this.showThresholds = true;
                 }
                 this._loadThresholds();
@@ -58,7 +83,8 @@ var ChronoZoom;
                 self.element.mouseup(function (e) {
                     switch(e.which) {
                         case 1:
-                            self._mouseUp(e);
+                            self._mouseUp(e)//means that only left click will be interpreted
+                            ;
                             break;
                     }
                 });
@@ -69,9 +95,12 @@ var ChronoZoom;
                     self._mouseLeave();
                 });
                 this._drawBackground();
-                this.setRange(maxPermitedTimeRange.left, maxPermitedTimeRange.right);
+                this.setRange(Settings.maxPermitedTimeRange.left, Settings.maxPermitedTimeRange.right);
             },
-            allowMarkerMovesOnHover: function (e) {
+            allowMarkerMovesOnHover: /*
+            sets whether the mouse move over the axis will move the marker
+            */
+            function (e) {
                 this.doesMarkerMovesOnHover = e;
             },
             _init: function () {
@@ -84,10 +113,11 @@ var ChronoZoom;
                 this.element.removeClass("axis");
                 return this;
             },
-            _loadThresholds: function () {
+            _loadThresholds: // loads thresholds from service or dump file
+            function () {
                 var url;
                 var axis = this;
-                switch(czDataSource) {
+                switch(Settings.czDataSource) {
                     case 'db':
                         url = "Chronozoom.svc/getthresholds";
                         break;
@@ -112,18 +142,19 @@ var ChronoZoom;
                     }
                 });
             },
-            _getThresholdsContent: function (content) {
+            _getThresholdsContent: // parses thresholds content
+            function (content) {
                 this.numberOfThresholds = content.d.length;
                 this.thresholds = [];
                 for(var i = 0; i < this.numberOfThresholds; i++) {
-                    content.d[i].time = getCoordinateFromDecimalYear(content.d[i].ThresholdYear);
+                    content.d[i].time = ChronoZoom.Common.getCoordinateFromDecimalYear(content.d[i].ThresholdYear);
                     this.thresholds[i] = {
                         'title': content.d[i].Title,
                         'description': (content.d[i].Description == null ? '' : content.d[i].Description),
                         'time': content.d[i].time,
                         'bookmark': content.d[i].BookmarkRelativePath,
-                        'color': thresholdColors[i % thresholdColors.length],
-                        'textColor': thresholdTextColors[i % thresholdTextColors.length],
+                        'color': Settings.thresholdColors[i % Settings.thresholdColors.length],
+                        'textColor': Settings.thresholdTextColors[i % Settings.thresholdTextColors.length],
                         'isVisible': false,
                         'showing': 'left',
                         'coordinate': 0
@@ -133,7 +164,8 @@ var ChronoZoom;
             _mouseUp: function (e) {
                 if(this.showThresholds) {
                     if(this.doesMarkerMovesOnHover) {
-                        var point = getXBrowserMouseOrigin(this.element, e);
+                        // show active marker when mouse is over axis
+                        var point = ChronoZoom.Common.getXBrowserMouseOrigin(this.element, e);
                         var k = (this.options.range.right - this.options.range.left) / this.width;
                         var time = this.options.range.right - k * (this.width - point.x);
                         this.setTimeMarker(time);
@@ -141,24 +173,28 @@ var ChronoZoom;
                     var x = 0;
                     var number = 0;
                     var leftEps = 2;
-                    var rightEps = 10;
+                    var rightEps = 10;//are not the same with leftEps, because this.thresholds[i].coordinate defines left corner of the threshold
+                    
                     var verticalEps = 0;
                     var downEps = 10;
-                    var shift = axisHeight - gapLabelTick;
+                    var shift = Settings.axisHeight - Settings.gapLabelTick;
                     var self = this;
                     var top = this.element[0].offsetTop + shift;
                     var To_Avoid_Overlap = false;
                     if(this.thresholds) {
+                        // no thresholds are currently visible -> show all
                         var canvas = this.thresholdCanvas[0];
                         var ctx = canvas.getContext("2d");
-                        ctx.font = (axisTextSize - 1) + " " + axisTextFont;
+                        ctx.font = (Settings.axisTextSize - 1) + " " + Settings.axisTextFont;
                         var visible = false;
                         if(this.thresholds != null) {
                             for(var i = 0; i < this.thresholds.length; i++) {
+                                // for each thresholds that can be visible
                                 if(this.thresholds[i].isVisible) {
                                     x = this.thresholds[i].coordinate;
-                                    var point = getXBrowserMouseOrigin(this.element, e);
-                                    if((point.x >= x - leftEps) && (point.x <= x + rightEps) && (point.y >= axisHeight - strokeWidth - downEps) && (point.y <= axisHeight - strokeWidth + verticalEps) && (To_Avoid_Overlap != true)) {
+                                    var point = ChronoZoom.Common.getXBrowserMouseOrigin(this.element, e);
+                                    if((point.x >= x - leftEps) && (point.x <= x + rightEps) && (point.y >= Settings.axisHeight - Settings.strokeWidth - downEps) && (point.y <= Settings.axisHeight - Settings.strokeWidth + verticalEps) && (To_Avoid_Overlap != true)) {
+                                        // creating temporary div for threshold
                                         var temp = 0;
                                         if(this.thresholdVisibility == "no") {
                                             temp = 1;
@@ -169,6 +205,7 @@ var ChronoZoom;
                                         if((this.thresholdVisibility == "one") && (temp == 0)) {
                                             self._onThresholdsClear(false);
                                             this.thresholdVisibility = "no";
+                                            //if this elem doesn't exist
                                             if(!$("div").is('#threshold' + i)) {
                                                 self._onExpandThreshold(i);
                                             }
@@ -186,35 +223,39 @@ var ChronoZoom;
             },
             _mouseMove: function (e) {
                 if(this.doesMarkerMovesOnHover) {
-                    var point = getXBrowserMouseOrigin(this.element, e);
+                    // show active marker when mouse is over axis
+                    var point = ChronoZoom.Common.getXBrowserMouseOrigin(this.element, e);
                     var k = (this.options.range.right - this.options.range.left) / this.width;
                     var time = this.options.range.right - k * (this.width - point.x);
                     this.setTimeMarker(time);
                 }
                 var To_Avoid_Overlap = false;
                 var leftEps = 2;
-                var rightEps = 10;
+                var rightEps = 10;//are not the same with leftEps, because this.thresholds[i].coordinate defines left corner of the threshold
+                
                 var verticalEps = 10;
                 var self = this;
                 if(this.thresholds != null) {
                     for(var i = 0; i < this.thresholds.length; i++) {
-                        x = this.thresholds[i].coordinate;
-                        if((point.x >= x - leftEps) && (point.x <= x + rightEps) && (point.y >= axisHeight - strokeWidth - verticalEps) && (point.y <= axisHeight - strokeWidth + verticalEps) && (To_Avoid_Overlap != true)) {
+                        var x = this.thresholds[i].coordinate;
+                        if((point.x >= x - leftEps) && (point.x <= x + rightEps) && (point.y >= Settings.axisHeight - Settings.strokeWidth - verticalEps) && (point.y <= Settings.axisHeight - Settings.strokeWidth + verticalEps) && (To_Avoid_Overlap != true)) {
                             this.highlighted_num = i;
                             To_Avoid_Overlap = true;
+                            //to delete marker when hover on collapsed threshold
                             var canvas = this.mouseMarkCanvas[0];
                             var ctx = canvas.getContext("2d");
                             ctx.clearRect(0, 0, canvas.width, canvas.height);
                             self._drawHighlightedCollapsedThreshold(i);
                         } else {
-                            if((point.x >= x - 10 * leftEps) && (point.x <= x + 2 * rightEps) && (point.y >= axisHeight - strokeWidth - 2 * verticalEps) && (point.y <= axisHeight - strokeWidth + 2 * verticalEps)) {
+                            if((point.x >= x - 10 * leftEps) && (point.x <= x + 2 * rightEps) && (point.y >= Settings.axisHeight - Settings.strokeWidth - 2 * verticalEps) && (point.y <= Settings.axisHeight - Settings.strokeWidth + 2 * verticalEps)) {
                                 self._drawCollapsedThreshold(i);
                             }
                         }
                     }
                 }
             },
-            _mouseLeave: function () {
+            _mouseLeave: // function to perform after mouse leaves axis
+            function () {
                 var self = this;
                 if(this.thresholds != null) {
                     for(var i = 0; i < this.thresholds.length; i++) {
@@ -222,27 +263,30 @@ var ChronoZoom;
                     }
                 }
             },
-            _showThreshold: function (i) {
+            _showThreshold: // method to show a threshold after showing line
+            function (i) {
                 var self = this;
                 $('#threshold' + i).show('slide', {
                     direction: this.thresholds[i].showing
                 }, 'slow');
                 this.animation = false;
             },
-            _hideThresholdCompleted: function () {
+            _hideThresholdCompleted: // is called after threshold is hidden to hide a line
+            function (i) {
                 var self = this;
-                $('#line' + i).slideUp(thresholdsAnimationTime, function () {
-                    self._hideLineCompleted();
+                $('#line' + i).slideUp(Settings.thresholdsAnimationTime, function () {
+                    self._hideLineCompleted(i);
                 });
                 $('#threshold' + i).remove();
             },
-            _hideLineCompleted: function () {
+            _hideLineCompleted: // is called after line is hidden to clear everything
+            function (i) {
                 $('#line' + i).remove();
                 this._onThresholdsClearCompleted();
             },
             _hideThresholdsCompleted: function (i, toExpand) {
                 var self = this;
-                $('#line' + i).slideUp(thresholdsAnimationTime, function () {
+                $('#line' + i).slideUp(Settings.thresholdsAnimationTime, function () {
                     var num = parseFloat(this.id.substring(4));
                     self._hideLinesCompleted(num, toExpand);
                 });
@@ -250,7 +294,7 @@ var ChronoZoom;
             },
             _hideThresholdsCompletedSpecific: function (i, toExpand) {
                 var self = this;
-                $('#line' + i).slideUp(thresholdsAnimationTime, function () {
+                $('#line' + i).slideUp(Settings.thresholdsAnimationTime, function () {
                     var num = parseFloat(this.id.substring(4));
                     self._hideLinesCompletedSpecific(num, toExpand);
                 });
@@ -265,47 +309,56 @@ var ChronoZoom;
             _hideLinesCompletedSpecific: function (i, toExpand) {
                 $('#line' + i).remove();
             },
-            enableThresholds: function (enable) {
+            enableThresholds: // enables or disables showing thresholds
+            function (enable) {
                 if(!enable && this.showThresholds) {
                     this._onThresholdsClear(false);
                 }
                 this.showThresholds = enable;
             },
-            _onExpandThreshold: function (i) {
+            _onExpandThreshold: // function called when user clicks on one of thresholds to expand it
+            function (i) {
+                // remove shown threshold
                 var self = this;
-                var shift = this.element[0].offsetTop + axisHeight - gapLabelTick;
+                var shift = this.element[0].offsetTop + Settings.axisHeight - Settings.gapLabelTick;
                 var x = this.thresholds[i].coordinate;
                 this.currentThreshold = i;
+                // line to connect threshold with axis
                 $('<div id="line' + i + '">').appendTo(this.element).addClass("thresholdLine").css({
-                    'width': thresholdWidth,
+                    'width': Settings.thresholdWidth,
                     'left': this.element[0].offsetLeft + x,
                     'top': shift,
                     'background-color': this.thresholds[i].color,
-                    'height': thresholdHeight
+                    'height': Settings.thresholdHeight
                 });
+                // creating temporary div for particular threshold
                 $('<div id="threshold' + i + '" style="color:' + this.thresholds[i].textColor + '">' + '<div style="left: 5px; top: 5px; position: absolute">Threshold ' + (i + 1) + ':' + '</div>' + '<div id="title" style="left: 15px; top: 17px; position: absolute; color: White;">' + this.thresholds[i].title + '</div>' + '<div id="desc" style="left: 10px; right: 10px; position: absolute">' + this.thresholds[i].description + '</div>' + '<div id="bookmark" style="right: 13px; bottom: 25px; position: absolute; color: White; cursor: pointer;">Jump To Threshold -> </div>' + '<div id="bookmark2" style="right: 13px; bottom: 8px; position: absolute; color: White; cursor: pointer;">Close Threshold </div>' + '</div>').appendTo(this.element).addClass("thresholdDiv").css({
                     'background-color': this.thresholds[i].color,
-                    'top': shift + thresholdHeight,
+                    'top': shift + Settings.thresholdHeight,
                     'left': this.element[0].offsetLeft + x
                 });
                 $('#threshold' + i + ' #desc').css('top', $('#threshold' + i + ' #title').height() + 22);
                 $('#threshold' + i).css('height', $('#threshold' + i + ' #desc').height() + 96);
+                // thresholds should open from right to left if they are near right side of page
                 if($('#threshold' + i).position().left + $('#threshold' + i).width() >= this.width - 450) {
                     this.thresholds[i].showing = 'right';
-                    $('#threshold' + i).css('left', this.element[0].offsetLeft + x - $('#threshold' + i).width() + thresholdWidth);
+                    $('#threshold' + i).css('left', this.element[0].offsetLeft + x - $('#threshold' + i).width() + Settings.thresholdWidth);
                 } else {
                     this.thresholds[i].showing = 'left';
                 }
+                // event for clicking a 'Jump to threshold' bookmark
                 $('#threshold' + i + ' #bookmark')[0].addEventListener('mouseup', function () {
                     if(self.currentThreshold != -1) {
                         self._onThresholdMouseClick();
                     }
                 }, false);
+                // event for clicking a 'close' bookmark
                 $('#threshold' + i + ' #bookmark2')[0].addEventListener('mouseup', function () {
                     if(self.currentThreshold != -1) {
                         self._onThresholdsClear(false);
                     }
                 }, false);
+                // stop mouse at time of threshold if mouse is over expanded threshold or line to it
                 $('#threshold' + i)[0].addEventListener('mousemove', function () {
                     var e = window.event;
                     if(e) {
@@ -320,18 +373,23 @@ var ChronoZoom;
                     direction: this.thresholds[i].showing
                 }, 'slow');
                 self.thresholdVisibility = "one";
-            },
-            _onThresholdsClear: function (toExpand) {
+                // only one threshold is visible now
+                            },
+            _onThresholdsClear: // method that is called for visible threshold to remove it, threshold visibility changaes on 'no' after the animation
+            function (toExpand) {
+                // remove all visible thresholds and lines
                 var self = this;
                 if(this.thresholdVisibility == "one") {
                     for(var i = 0; i < this.thresholds.length; i++) {
                         if(this.thresholds[i].isVisible) {
                             if(this.animation) {
+                                // if animation is already in progress, remove everything
                                 $('#threshold' + i).remove();
                                 $('#line' + i).remove();
                                 this._onThresholdsClearCompleted();
                             } else {
-                                $('#threshold' + i).slideUp(thresholdsAnimationTime, function () {
+                                // hide small thresholds and lines
+                                $('#threshold' + i).slideUp(Settings.thresholdsAnimationTime, function () {
                                     var num = parseFloat(this.id.substring(9));
                                     self._hideThresholdsCompletedSpecific(num, toExpand);
                                 });
@@ -341,33 +399,43 @@ var ChronoZoom;
                 }
             },
             _onThresholdsClearCompleted: function () {
+                // no threshold will be visible after removing current
                 this.currentThreshold = -1;
                 this.thresholdVisibility = "no";
+                // clear thresholds canvas
                 var canvas = this.thresholdCanvas[0];
                 var ctx = canvas.getContext("2d");
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
             },
-            _onThresholdMouseClick: function () {
+            _onThresholdMouseClick: // method that is called for visible threshold to jump to its bookmark
+            function () {
+                // prevent event bubbling
                 var e = window.event;
-                var event = new jQuery.Event("thresholdBookmarkChanged");
+                //if (e) preventbubble(e);
+                // trigger an event to provide jumping to current threshold
+                var event = new $.Event("thresholdBookmarkChanged");
                 event.Bookmark = this.thresholds[this.currentThreshold].bookmark;
                 this.element.trigger(event);
+                // calling method to remove current threshold
                 this._onThresholdsClear(false);
             },
-            _drawBackground: function () {
+            _drawBackground: // draws background lines
+            function () {
                 var canvas = this.backgroundCanvas[0];
                 var ctx = canvas.getContext("2d");
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.strokeStyle = axisStrokeColor;
-                ctx.lineWidth = strokeWidth;
-                var shift = axisHeight - strokeWidth;
+                ctx.strokeStyle = Settings.axisStrokeColor;
+                ctx.lineWidth = Settings.strokeWidth;
+                var shift = Settings.axisHeight - Settings.strokeWidth;
                 ctx.beginPath();
                 ctx.moveTo(0, shift);
                 ctx.lineTo(this.width, shift);
                 ctx.closePath();
                 ctx.stroke();
             },
-            _drawCollapsedThresholds: function () {
+            _drawCollapsedThresholds: // render thresholds in collapsed view in calculated places
+            // thresholds are rounded rectangles
+            function () {
                 var self = this;
                 if((this.thresholds != null) && (this.showThresholds != false)) {
                     for(var i = 0; i < this.thresholds.length; i++) {
@@ -375,22 +443,24 @@ var ChronoZoom;
                     }
                 }
             },
-            _drawCollapsedThreshold: function (i) {
+            _drawCollapsedThreshold: // render threshold in collapsed view in calculated place
+            // thresholds are rounded rectangles
+            function (i) {
                 var canvas = this.ticksCanvas[0];
                 var ctx = canvas.getContext("2d");
                 if((this.thresholds != null) && (this.showThresholds != false)) {
                     if(this.thresholds[i].isVisible) {
-                        x = this.thresholds[i].coordinate;
+                        var x = this.thresholds[i].coordinate;
                         ctx.fillStyle = this.thresholds[i].color;
                         ctx.strokeStyle = "black";
                         ctx.beginPath();
-                        ctx.moveTo(x, axisHeight - strokeWidth);
-                        ctx.lineTo(x + thresholdWidth, axisHeight - strokeWidth);
-                        ctx.lineTo(x + thresholdWidth, axisHeight - strokeWidth - (thresholdHeight - rectangleRadius));
-                        ctx.quadraticCurveTo(x + thresholdWidth, axisHeight - strokeWidth - thresholdHeight, x + thresholdWidth - rectangleRadius, axisHeight - strokeWidth - thresholdHeight);
-                        ctx.lineTo(x + rectangleRadius, axisHeight - strokeWidth - thresholdHeight);
-                        ctx.quadraticCurveTo(x, axisHeight - strokeWidth - thresholdHeight, x, axisHeight - strokeWidth - (thresholdHeight - rectangleRadius));
-                        ctx.lineTo(x, axisHeight - strokeWidth);
+                        ctx.moveTo(x, Settings.axisHeight - Settings.strokeWidth);
+                        ctx.lineTo(x + Settings.thresholdWidth, Settings.axisHeight - Settings.strokeWidth);
+                        ctx.lineTo(x + Settings.thresholdWidth, Settings.axisHeight - Settings.strokeWidth - (Settings.thresholdHeight - Settings.rectangleRadius));
+                        ctx.quadraticCurveTo(x + Settings.thresholdWidth, Settings.axisHeight - Settings.strokeWidth - Settings.thresholdHeight, x + Settings.thresholdWidth - Settings.rectangleRadius, Settings.axisHeight - Settings.strokeWidth - Settings.thresholdHeight);
+                        ctx.lineTo(x + Settings.rectangleRadius, Settings.axisHeight - Settings.strokeWidth - Settings.thresholdHeight);
+                        ctx.quadraticCurveTo(x, Settings.axisHeight - Settings.strokeWidth - Settings.thresholdHeight, x, Settings.axisHeight - Settings.strokeWidth - (Settings.thresholdHeight - Settings.rectangleRadius));
+                        ctx.lineTo(x, Settings.axisHeight - Settings.strokeWidth);
                         ctx.closePath();
                         ctx.lineWidth = 1;
                         ctx.fill();
@@ -399,30 +469,34 @@ var ChronoZoom;
                     }
                 }
             },
-            _drawHighlightedCollapsedThreshold: function (i) {
+            _drawHighlightedCollapsedThreshold: // render highlighted threshold in collapsed view in calculated place
+            // thresholds are rounded rectangles
+            function (i) {
                 var canvas = this.ticksCanvas[0];
                 var ctx = canvas.getContext("2d");
                 if((this.thresholds != null) && (this.showThresholds != false)) {
                     if(this.thresholds[i].isVisible) {
-                        x = this.thresholds[i].coordinate;
+                        var x = this.thresholds[i].coordinate;
                         ctx.fillStyle = this.thresholds[i].color;
                         ctx.strokeStyle = "white";
                         ctx.lineWidth = 1;
                         ctx.beginPath();
-                        ctx.moveTo(x, axisHeight - strokeWidth);
-                        ctx.lineTo(x + thresholdWidth, axisHeight - strokeWidth);
-                        ctx.lineTo(x + thresholdWidth, axisHeight - strokeWidth - (thresholdHeight - rectangleRadius));
-                        ctx.quadraticCurveTo(x + thresholdWidth, axisHeight - strokeWidth - thresholdHeight, x + thresholdWidth - rectangleRadius, axisHeight - strokeWidth - thresholdHeight);
-                        ctx.lineTo(x + rectangleRadius, axisHeight - strokeWidth - thresholdHeight);
-                        ctx.quadraticCurveTo(x, axisHeight - strokeWidth - thresholdHeight, x, axisHeight - strokeWidth - (thresholdHeight - rectangleRadius));
-                        ctx.lineTo(x, axisHeight - strokeWidth);
+                        ctx.moveTo(x, Settings.axisHeight - Settings.strokeWidth);
+                        ctx.lineTo(x + Settings.thresholdWidth, Settings.axisHeight - Settings.strokeWidth);
+                        ctx.lineTo(x + Settings.thresholdWidth, Settings.axisHeight - Settings.strokeWidth - (Settings.thresholdHeight - Settings.rectangleRadius));
+                        ctx.quadraticCurveTo(x + Settings.thresholdWidth, Settings.axisHeight - Settings.strokeWidth - Settings.thresholdHeight, x + Settings.thresholdWidth - Settings.rectangleRadius, Settings.axisHeight - Settings.strokeWidth - Settings.thresholdHeight);
+                        ctx.lineTo(x + Settings.rectangleRadius, Settings.axisHeight - Settings.strokeWidth - Settings.thresholdHeight);
+                        ctx.quadraticCurveTo(x, Settings.axisHeight - Settings.strokeWidth - Settings.thresholdHeight, x, Settings.axisHeight - Settings.strokeWidth - (Settings.thresholdHeight - Settings.rectangleRadius));
+                        ctx.lineTo(x, Settings.axisHeight - Settings.strokeWidth);
                         ctx.closePath();
                         ctx.fill();
                         ctx.stroke();
                     }
                 }
             },
-            _drawNotCollapsedThresholds: function () {
+            _drawNotCollapsedThresholds: // render threshold in not collapsed view in calculated places
+            // thresholds are rounded rectangles,constants like 5 and 7 are defined "on eye"
+            function () {
                 var canvas = this.ticksCanvas[0];
                 var ctx = canvas.getContext("2d");
                 ctx.lineWidth = 2;
@@ -434,7 +508,7 @@ var ChronoZoom;
                                 $('#line' + i).css('left', this.element[0].offsetLeft + x);
                                 if(this.thresholds[i].showing == 'right') {
                                     if(($('#threshold' + i).position().left >= 0) && ($('#threshold' + i).position().left + $('#threshold' + i).width() <= this.width + 5)) {
-                                        $('#threshold' + i).css('left', this.element[0].offsetLeft + x - $('#threshold' + i).width() + thresholdWidth);
+                                        $('#threshold' + i).css('left', this.element[0].offsetLeft + x - $('#threshold' + i).width() + Settings.thresholdWidth);
                                     } else {
                                         var self = this;
                                         $('#threshold' + i).remove();
@@ -463,13 +537,16 @@ var ChronoZoom;
                     }
                 }
             },
-            _drawTicks: function () {
+            _drawTicks: // creates and renders ticks
+            function () {
                 var canvas = this.ticksCanvas[0];
                 var ctx = canvas.getContext("2d");
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.strokeStyle = axisStrokeColor;
-                ctx.font = axisTextSize + " " + axisTextFont;
+                // settings
+                ctx.strokeStyle = Settings.axisStrokeColor;
+                ctx.font = Settings.axisTextSize + " " + Settings.axisTextFont;
                 ctx.lineWidth = 1;
+                // write text under scale
                 var text = "";
                 if(this.regime == "Ga") {
                     text = "Billions of Years Ago";
@@ -480,38 +557,42 @@ var ChronoZoom;
                 } else {
                     text = this.regime;
                 }
-                ctx.strokeText(text, horizontalTextMargin, verticalTextMargin);
+                ctx.strokeText(text, Settings.horizontalTextMargin, Settings.verticalTextMargin);
                 if(this.options.mode == "cosmos" && this.options.range.right >= 0) {
-                    ctx.strokeText("Today", this.width - horizontalTextMargin - ctx.measureText("Today").width, verticalTextMargin);
+                    ctx.strokeText("Today", this.width - Settings.horizontalTextMargin - ctx.measureText("Today").width, Settings.verticalTextMargin);
                 } else {
-                    ctx.strokeText(text, this.width - horizontalTextMargin - ctx.measureText(text).width, verticalTextMargin);
+                    ctx.strokeText(text, this.width - Settings.horizontalTextMargin - ctx.measureText(text).width, Settings.verticalTextMargin);
                 }
                 var currentMeasuredText = 0;
                 var measuredText1 = 0;
                 var measuredText2 = 0;
                 var x = 0;
+                // write current year and month
                 if(this.options.mode == "date") {
-                    text = (this.beta <= -2 ? months[this.startDate.month] + ", " : "") + (this.startDate.year > 0 ? (this.startDate.year) + " CE" : -this.startDate.year + (this.startDate.year == 0 ? 1 : 0) + " BCE");
+                    text = (this.beta <= -2 ? Settings.months[this.startDate.month] + ", " : "") + (this.startDate.year > 0 ? (this.startDate.year) + " CE" : -this.startDate.year + (this.startDate.year == 0 ? 1 : 0) + " BCE");
                     measuredText1 = ctx.measureText(text).width + 5;
-                    ctx.strokeText(text, 5, verticalTextMargin * 2);
-                    text = (this.beta <= -2 ? months[this.endDate.month] + ", " : "") + (this.endDate.year > 0 ? (this.endDate.year) + " CE" : -this.endDate.year + (this.endDate.year == 0 ? 1 : 0) + " BCE");
+                    ctx.strokeText(text, 5, Settings.verticalTextMargin * 2);
+                    text = (this.beta <= -2 ? Settings.months[this.endDate.month] + ", " : "") + (this.endDate.year > 0 ? (this.endDate.year) + " CE" : -this.endDate.year + (this.endDate.year == 0 ? 1 : 0) + " BCE");
                     measuredText2 = ctx.measureText(text).width + 5;
-                    ctx.strokeText(text, this.width - measuredText2, verticalTextMargin * 2);
+                    ctx.strokeText(text, this.width - measuredText2, Settings.verticalTextMargin * 2);
                 }
                 var k = this.width / (this.options.range.right - this.options.range.left);
                 var present = -k * this.options.range.left;
+                // render ticks & labels, ticks are in virtual coordinates
                 for(var i = 0; i < this.ticks.length; i++) {
+                    // render tick
                     x = k * (this.ticks[i] - this.options.range.left);
                     if(this.options.mode == "calendar") {
                         x += k * this.firstYear;
                     }
                     if(x <= present) {
                         ctx.beginPath();
-                        ctx.lineWidth = strokeWidth;
-                        ctx.moveTo(x, axisHeight - strokeWidth);
-                        ctx.lineTo(x, axisHeight - strokeWidth - tickLength);
+                        ctx.lineWidth = Settings.strokeWidth;
+                        ctx.moveTo(x, Settings.axisHeight - Settings.strokeWidth);
+                        ctx.lineTo(x, Settings.axisHeight - Settings.strokeWidth - Settings.tickLength);
                         ctx.closePath();
                         ctx.stroke();
+                        // render label if it doesn't overlay background text
                         currentMeasuredText = ctx.measureText(this.labels[i]).width;
                         var toRender = true;
                         if(measuredText1 != 0 || measuredText2 != 0) {
@@ -528,10 +609,11 @@ var ChronoZoom;
                         }
                         if(toRender) {
                             ctx.lineWidth = 1;
-                            ctx.strokeText(this.labels[i], x - currentMeasuredText / 2, verticalTextMargin * 2);
+                            ctx.strokeText(this.labels[i], x - currentMeasuredText / 2, Settings.verticalTextMargin * 2);
                         }
                     }
                 }
+                // render minor ticks if they are defined
                 if(this.minorTicks != null) {
                     for(var i = 0; i < this.minorTicks.length; i++) {
                         x = k * (this.minorTicks[i] - this.options.range.left);
@@ -539,29 +621,35 @@ var ChronoZoom;
                             x += k * this.firstYear;
                         }
                         ctx.beginPath();
-                        ctx.lineWidth = strokeWidth;
-                        ctx.moveTo(x, axisHeight - strokeWidth);
-                        ctx.lineTo(x, axisHeight - strokeWidth - smallTickLength);
+                        ctx.lineWidth = Settings.strokeWidth;
+                        ctx.moveTo(x, Settings.axisHeight - Settings.strokeWidth);
+                        ctx.lineTo(x, Settings.axisHeight - Settings.strokeWidth - Settings.smallTickLength);
                         ctx.closePath();
                         ctx.stroke();
                     }
                 }
             },
-            _createTicks: function () {
+            _createTicks: // function to create ticks for current range
+            function () {
                 var n = this._getTicks();
                 var ticks = n.ticks;
                 var labels = n.labels;
+                // check for possible labels overlay
                 var result = this._checkLabelsArrangement(ticks, labels);
                 var newTicks, newLabels, newResult;
                 var iterations = 0;
                 if(result == -1) {
-                    while(iterations++ < maxTickArrangeIterations) {
+                    // if labels overlay each other -> need to be decreased
+                    while(iterations++ < Settings.maxTickArrangeIterations) {
                         this._decreaseTickCount();
+                        // get new ticks after decreasing
                         n = this._getTicks();
                         newTicks = n.ticks;
                         newLabels = n.labels;
+                        // check new labels for possible overlay
                         newResult = this._checkLabelsArrangement(newTicks, newLabels);
                         if(newResult == 1) {
+                            // if new labels need to be increased, then return one step back and break
                             this._increaseTickCount();
                             break;
                         }
@@ -569,17 +657,22 @@ var ChronoZoom;
                         labels = newLabels;
                         if(newResult == 0) {
                             break;
-                        }
+                        }// break if everything is fine
+                        
                     }
                 }
                 if(result == 1) {
-                    while(iterations++ < maxTickArrangeIterations) {
+                    // if labels do not overlay each other and there is enough space to increase them -> need to be increased
+                    while(iterations++ < Settings.maxTickArrangeIterations) {
                         this._increaseTickCount();
+                        // get new ticks after increasing
                         n = this._getTicks();
                         newTicks = n.ticks;
                         newLabels = n.labels;
+                        // check new labels for possible overlay
                         newResult = this._checkLabelsArrangement(newTicks, newLabels);
                         if(newResult == -1) {
+                            // if new labels need to be decreased, then return one step back and break
                             this._decreaseTickCount();
                             break;
                         }
@@ -587,7 +680,8 @@ var ChronoZoom;
                         labels = newLabels;
                         if(newResult == 0) {
                             break;
-                        }
+                        }// break if everything is fine
+                        
                     }
                 }
                 return {
@@ -595,19 +689,23 @@ var ChronoZoom;
                     labels: labels
                 };
             },
-            _getTicks: function () {
+            _getTicks: // gets ticks for current delta & beta constants
+            function () {
                 var ticks = new Array();
                 var labels = new Array();
+                // in cosmos or calendar mode zoom is possible up to 4 decimal digits or up to 1 year span near present date (or zero)
                 if(this.options.mode == "cosmos" || this.options.mode == "calendar") {
-                    var start = Math.max(this.options.range.left, maxPermitedTimeRange.left);
-                    var finish = Math.min(this.options.range.right, maxPermitedTimeRange.right);
+                    var start = Math.max(this.options.range.left, Settings.maxPermitedTimeRange.left);
+                    var finish = Math.min(this.options.range.right, Settings.maxPermitedTimeRange.right);
                     if(this.options.mode == "calendar") {
+                        // shift range limits as in calendar mode we count from present year
                         start -= this.firstYear;
                         finish -= this.firstYear;
                     }
                     var d = finish - start;
                     var beta = this.beta;
                     if(this.options.mode == "cosmos") {
+                        // prevent zooming deeper than 4 decimal digits
                         if(this.regime == "Ga" && beta < 5) {
                             beta = 5;
                         } else if(this.regime == "Ma" && beta < 2) {
@@ -616,14 +714,19 @@ var ChronoZoom;
                             beta = -1;
                         }
                     } else if(this.options.mode == "calendar") {
+                        // prevent zooming deeper than 1 year span
                         if(beta < 0) {
                             beta = 0;
                         }
                     }
+                    // span between two neighboring ticks
                     var temp = this.delta * Math.pow(10, beta);
+                    // calculate count of ticks to create
                     var min = Math.floor(start / temp);
                     var max = Math.floor(finish / temp);
                     var count = max - min + 1;
+                    // calculate rounded ticks values
+                    // they are in virtual coordinates (years from present date)
                     var x0 = min * temp;
                     if(temp == 2) {
                         count++;
@@ -635,6 +738,7 @@ var ChronoZoom;
                                 v += 1;
                             }
                             if(Math.abs(v) < 1e-10 && temp > 1) {
+                                // Move tick from 1BCE to 1CE
                                 v++;
                             }
                         }
@@ -642,11 +746,16 @@ var ChronoZoom;
                             ticks.push(v);
                         }
                     }
+                    // get labels for created ticks
                     labels = this._getLabels(ticks);
-                } else if(this.options.mode == "date") {
+                } else // in 'date' mode it is possible to zoom up to days; 'date' mode is possible only in CE date region
+                if(this.options.mode == "date") {
+                    // get extreme points of range
                     var right = Math.min(this.options.range.right, 0);
                     var left = Math.min(this.options.range.left, 0);
+                    // span between two rendering neighboring days
                     var tempDays = 0;
+                    // count number of months to render
                     var countMonths = 0;
                     var tempMonth = this.startDate.month;
                     var tempYear = this.startDate.year;
@@ -658,6 +767,7 @@ var ChronoZoom;
                             tempYear++;
                         }
                     }
+                    // count number of days to render
                     var countDays = 0;
                     if(this.beta <= -2 && this.beta >= -4) {
                         tempDays = 5;
@@ -665,7 +775,10 @@ var ChronoZoom;
                     if(this.beta <= -5) {
                         tempDays = 1;
                     }
-                    year = this.startDate.year;
+                    // calculate ticks values
+                    // they are in virtual coordinates (years from present date)
+                    var year = this.startDate.year;
+                    // create month ticks
                     var month = this.startDate.month - 1;
                     for(var j = 0; j <= countMonths + 2; j++) {
                         month++;
@@ -673,21 +786,22 @@ var ChronoZoom;
                             month = 0;
                             year++;
                         }
-                        tick = getCoordinateFromDMY(year, month, 1);
+                        var tick = ChronoZoom.Common.getCoordinateFromDMY(year, month, 1);
                         if(tick >= left && tick <= right) {
                             if(tempDays != 1) {
-                                labels.push(months[month]);
+                                labels.push(Settings.months[month]);
                                 ticks.push(tick);
                             }
                         }
+                        // create days ticks for this month
                         if(tempDays != 0) {
-                            countDays = Math.floor((daysInMonth[month]) / tempDays);
-                            if(tempDays == 5 && daysInMonth[month] >= 30 && this.beta == -2) {
+                            countDays = Math.floor((Settings.daysInMonth[month]) / tempDays);
+                            if(tempDays == 5 && Settings.daysInMonth[month] >= 30 && this.beta == -2) {
                                 countDays--;
                             }
                             for(var k = 1; k <= countDays; k++) {
-                                day = k * tempDays;
-                                tick = getCoordinateFromDMY(year, month, day);
+                                var day = k * tempDays;
+                                tick = ChronoZoom.Common.getCoordinateFromDMY(year, month, day);
                                 if(tick >= left && tick <= right) {
                                     labels.push(day);
                                     ticks.push(tick);
@@ -701,12 +815,16 @@ var ChronoZoom;
                     labels: labels
                 };
             },
-            _getLabels: function (ticks) {
+            _getLabels: // function to create labels by given array of ticks in virtual coordinates
+            function (ticks) {
                 var labels = new Array();
                 var text;
+                // maximum number of decimal digits
                 var n = Math.max(Math.floor(Math.log(this.delta * Math.pow(10, this.beta) / this.level) * this.log10), -4);
+                // for each created tick
                 for(var i = 0; i < ticks.length; i++) {
                     if(this.options.mode == "cosmos") {
+                        // divide tick coordinate by level of cosmos zoom
                         text = -ticks[i] / this.level;
                         if(n < 0) {
                             text = (new Number(text)).toFixed(-n);
@@ -715,6 +833,7 @@ var ChronoZoom;
                             text += this.regime;
                         }
                     } else {
+                        // in calendar mode to solve year-zero problem consider zero year to be 1BCE
                         if(ticks[i] <= 0) {
                             text = -ticks[i] + 1;
                         } else {
@@ -732,34 +851,40 @@ var ChronoZoom;
                 }
                 return labels;
             },
-            _checkLabelsArrangement: function (ticks, labels) {
+            _checkLabelsArrangement: // function to check whether created labels overlay each other
+            function (ticks, labels) {
                 var canvas = this.ticksCanvas[0];
                 var ctx = canvas.getContext("2d");
-                ctx.font = axisTextSize + " " + axisTextFont;
+                ctx.font = Settings.axisTextSize + " " + Settings.axisTextFont;
                 var i;
                 var measure1, measure2;
+                // for each label: if distance between labels is smaller than threshold for any of the labels - decrease
                 for(i = 0; i < ticks.length - 1; i++) {
                     measure1 = ctx.measureText(labels[i]).width;
                     measure2 = ctx.measureText(labels[i + 1]).width;
-                    if((this._getCoordinateFromTick(ticks[i]) + measure1 / 2 + spaceBetweenLabels) > this._getCoordinateFromTick(ticks[i + 1]) - measure2 / 2) {
+                    if((this._getCoordinateFromTick(ticks[i]) + measure1 / 2 + Settings.spaceBetweenLabels) > this._getCoordinateFromTick(ticks[i + 1]) - measure2 / 2) {
                         return -1;
                     }
                 }
+                // by default if labels doesn't overlay - increase
                 var res = 1;
+                // for each label: if distance between labels is in defined range then break, everything is fine
                 for(i = 0; i < ticks.length - 1; i++) {
                     measure1 = ctx.measureText(labels[i]).width;
                     measure2 = ctx.measureText(labels[i + 1]).width;
-                    if((this._getCoordinateFromTick(ticks[i]) + measure1 / 2 + spaceBetweenLabels) > this._getCoordinateFromTick(ticks[i + 1]) - measure2 / 2) {
+                    if((this._getCoordinateFromTick(ticks[i]) + measure1 / 2 + Settings.spaceBetweenLabels) > this._getCoordinateFromTick(ticks[i + 1]) - measure2 / 2) {
                         res = 0;
                         break;
                     }
                 }
                 return res;
             },
-            _getCoordinateFromTick: function (x) {
+            _getCoordinateFromTick: // returns screen coordinate (in pixels) of point given in virtual coordinates (years from present)
+            function (x) {
                 return ((x - this.options.range.left) * this.width / (this.options.range.right - this.options.range.left));
             },
-            _decreaseTickCount: function () {
+            _decreaseTickCount: // change constants to decrease count of ticks and changes mode if necessary
+            function () {
                 if(this.delta == 1) {
                     this.delta = 2;
                 } else if(this.delta == 2) {
@@ -770,7 +895,8 @@ var ChronoZoom;
                 }
                 this._setMode();
             },
-            _increaseTickCount: function () {
+            _increaseTickCount: // change constants to increase count of ticks and changes mode if necessary
+            function () {
                 if(this.delta == 1) {
                     this.delta = 5;
                     this.beta--;
@@ -781,7 +907,8 @@ var ChronoZoom;
                 }
                 this._setMode();
             },
-            _round: function (x, n) {
+            _round: // additional function for rounding decimal value x to n digits
+            function (x, n) {
                 var pow = 1;
                 var i;
                 if(n <= 0) {
@@ -800,35 +927,43 @@ var ChronoZoom;
                     return val;
                 }
             },
-            _setMode: function () {
+            _setMode: // get regime and level of axis depending on range.left
+            function () {
                 if(this.options.range.left <= -10000000000) {
+                    // billions of years ago
                     this.regime = "Ga";
                     this.options.mode = "cosmos";
                     this.level = 1000000000;
                 } else if(this.options.range.left <= -10000000) {
+                    // millions of years ago
                     this.regime = "Ma";
                     this.options.mode = "cosmos";
                     this.level = 1000000;
                 } else if(this.options.range.left <= -10000) {
+                    // thousands of years ago
                     this.regime = "ka";
                     this.options.mode = "cosmos";
                     this.level = 1000;
                 } else {
+                    // BCE or CE years
                     if(this.beta < 0) {
+                        // zoom is deep enough to render month and days of years if possible
                         this.regime = "Date";
                         this.options.mode = "date";
                         this.level = 1;
                     } else {
+                        // no months, only years
                         this.regime = "BCE/CE";
                         this.options.mode = "calendar";
                         this.level = 1;
                     }
                 }
             },
-            _createMinorTicks: function (ticks) {
+            _createMinorTicks: // function to create minor ticks
+            function (ticks) {
                 var minors = new Array();
-                var start = Math.max(this.options.range.left, maxPermitedTimeRange.left);
-                var end = Math.min(this.options.range.right, maxPermitedTimeRange.right);
+                var start = Math.max(this.options.range.left, Settings.maxPermitedTimeRange.left);
+                var end = Math.min(this.options.range.right, Settings.maxPermitedTimeRange.right);
                 if(this.options.mode == "calendar") {
                     start -= this.firstYear;
                     end -= this.firstYear;
@@ -839,7 +974,7 @@ var ChronoZoom;
                 var l = ticks.length > 1 ? ticks[1] - ticks[0] : 0;
                 var step = l / (n + 1);
                 if(this.options.mode == "cosmos" || this.options.mode == "calendar") {
-                    if(k * step < spaceBetweenSmallTicks) {
+                    if(k * step < Settings.spaceBetweenSmallTicks) {
                         return null;
                     }
                     var tick = ticks[0] - step;
@@ -849,6 +984,7 @@ var ChronoZoom;
                     }
                     for(var i = 0; i < ticks.length - 1; i++) {
                         var t = ticks[i];
+                        // Count minor ticks from 1BCE, not from 1CE if step between large ticks greater than 1
                         if(step > 1e-10 + 1 / (n + 1) && Math.abs(t - 1.0) < 1e-10) {
                             t = 0;
                         }
@@ -863,6 +999,7 @@ var ChronoZoom;
                         tick += step;
                     }
                 } else {
+                    // in 'date' mode number of minor ticks depends on number of days in current month
                     if(this.beta >= -1) {
                         step = 5;
                     } else if(this.beta <= -2 && this.beta >= -4) {
@@ -871,76 +1008,88 @@ var ChronoZoom;
                         return null;
                     }
                     var tick = ticks[0];
-                    var date = getDMYFromCoordinate(tick);
+                    var date = ChronoZoom.Common.getDMYFromCoordinate(tick);
                     date.day -= step;
-                    tick = getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = ChronoZoom.Common.getCoordinateFromDMY(date.year, date.month, date.day);
                     while(tick > start) {
                         minors.push(tick);
                         date.day -= step;
-                        tick = getCoordinateFromDMY(date.year, date.month, date.day);
+                        tick = ChronoZoom.Common.getCoordinateFromDMY(date.year, date.month, date.day);
                     }
                     for(var i = 0; i < ticks.length - 1; i++) {
                         var tick = ticks[i];
-                        var date = getDMYFromCoordinate(tick);
-                        var n = Math.floor(daysInMonth[date.month] / step);
+                        var date = ChronoZoom.Common.getDMYFromCoordinate(tick);
+                        var n = Math.floor(Settings.daysInMonth[date.month] / step);
                         for(var j = 1; j <= n; j++) {
                             date.day += step;
                             if(date.day == step + 1 && step != 1) {
                                 date.day--;
                             }
-                            tick = getCoordinateFromDMY(date.year, date.month, date.day);
-                            if(minors.length == 0 || k * (ticks[i + 1] - tick) > spaceBetweenSmallTicks) {
+                            tick = ChronoZoom.Common.getCoordinateFromDMY(date.year, date.month, date.day);
+                            if(minors.length == 0 || k * (ticks[i + 1] - tick) > Settings.spaceBetweenSmallTicks) {
                                 minors.push(tick);
                             }
                         }
                     }
                     var tick = ticks[ticks.length - 1];
-                    var date = getDMYFromCoordinate(tick);
+                    var date = ChronoZoom.Common.getDMYFromCoordinate(tick);
                     date.day += step;
-                    tick = getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = ChronoZoom.Common.getCoordinateFromDMY(date.year, date.month, date.day);
                     while(tick < end) {
                         minors.push(tick);
                         date.day += step;
-                        tick = getCoordinateFromDMY(date.year, date.month, date.day);
+                        tick = ChronoZoom.Common.getCoordinateFromDMY(date.year, date.month, date.day);
                     }
                 }
                 return minors;
             },
-            setRange: function (l, r) {
+            setRange: // sets new axis range
+            // l is left value, r is right, should be l < r <= 0
+            // default range is [-14Ga, 0]
+            function (l, r) {
                 if(l < r) {
                     this.options.range.left = l;
                     this.options.range.right = r;
                 } else {
-                    this.options.range.left = maxPermitedTimeRange.left;
-                    this.options.range.right = maxPermitedTimeRange.right;
+                    // default range
+                    this.options.range.left = Settings.maxPermitedTimeRange.left;
+                    this.options.range.right = Settings.maxPermitedTimeRange.right;
                 }
-                var localPresent = getPresent();
+                // set present date
+                var localPresent = ChronoZoom.Common.getPresent();
                 this.options.present = {
                     year: localPresent.getUTCFullYear(),
                     month: localPresent.getUTCMonth(),
                     day: localPresent.getUTCDate()
                 };
-                this.firstYear = getCoordinateFromDMY(0, 0, 1);
+                // remember value in virtual coordinates when 1CE starts
+                this.firstYear = ChronoZoom.Common.getCoordinateFromDMY(0, 0, 1);
+                // in calendar or date mode remember start and end dates
                 if(this.mode != 'cosmos') {
                     this.startDate = this.options.present;
                     this.endDate = this.options.present;
                     if(this.options.range.left < 0) {
-                        this.startDate = getDMYFromCoordinate(this.options.range.left);
+                        this.startDate = ChronoZoom.Common.getDMYFromCoordinate(this.options.range.left);
                     }
                     if(this.options.range.right < 0) {
-                        this.endDate = getDMYFromCoordinate(this.options.range.right);
+                        this.endDate = ChronoZoom.Common.getDMYFromCoordinate(this.options.range.right);
                     }
                 }
+                // set default constant for arranging ticks
                 this.delta = 1;
                 this.beta = Math.floor(Math.log(this.options.range.right - this.options.range.left) * this.log10);
+                // find mode of axis by range and present date
                 this._setMode();
                 if(this.thresholds != null) {
                     this._setThresholdsVisibility();
                 }
+                // get ticks & labels
                 var n = this._createTicks();
                 this.ticks = n.ticks;
                 this.labels = n.labels;
+                // get minor ticks
                 this.minorTicks = this._createMinorTicks(this.ticks);
+                // render ticks for new range
                 this._drawTicks();
                 this._drawCollapsedThresholds();
                 this._drawNotCollapsedThresholds();
@@ -949,12 +1098,13 @@ var ChronoZoom;
             _setThresholdsVisibility: function () {
                 var k = this.width / (this.options.range.right - this.options.range.left);
                 var x = 0;
+                // make an array of thresholds to render at current range
                 for(var i = 0; i < this.numberOfThresholds; i++) {
                     if(this.thresholds[i].time >= this.options.range.left && this.thresholds[i].time <= this.options.range.right) {
                         this.thresholds[i].isVisible = true;
                         x = Math.floor(k * (this.thresholds[i].time - this.options.range.left));
                         if(i == this.numberOfThresholds - 1 && x > 0) {
-                            this.thresholds[i].coordinate = x - thresholdWidth;
+                            this.thresholds[i].coordinate = x - Settings.thresholdWidth;
                         } else {
                             this.thresholds[i].coordinate = x;
                         }
@@ -962,14 +1112,15 @@ var ChronoZoom;
                         this.thresholds[i].isVisible = false;
                     }
                 }
+                // fix coordinates to show thresholds (to avoid overlay)
                 var n = this.thresholds.length - 1;
-                while(n > 0 && this.thresholds[n].coordinate - thresholdWidth <= this.thresholds[n - 1].coordinate && this.thresholds[n].isVisible) {
-                    this.thresholds[n - 1].coordinate = this.thresholds[n].coordinate - thresholdWidth - 1;
+                while(n > 0 && this.thresholds[n].coordinate - Settings.thresholdWidth <= this.thresholds[n - 1].coordinate && this.thresholds[n].isVisible) {
+                    this.thresholds[n - 1].coordinate = this.thresholds[n].coordinate - Settings.thresholdWidth - 1;
                     n--;
                 }
                 for(var i = 0; i < n; i++) {
-                    if(this.thresholds[i].coordinate + thresholdWidth >= this.thresholds[i + 1].coordinate && this.thresholds[i].isVisible) {
-                        this.thresholds[i + 1].coordinate = this.thresholds[i].coordinate + thresholdWidth + 1;
+                    if(this.thresholds[i].coordinate + Settings.thresholdWidth >= this.thresholds[i + 1].coordinate && this.thresholds[i].isVisible) {
+                        this.thresholds[i + 1].coordinate = this.thresholds[i].coordinate + Settings.thresholdWidth + 1;
                     }
                 }
                 if(this.thresholdVisibility == 'one') {
@@ -977,27 +1128,32 @@ var ChronoZoom;
                     $('#line' + i).css('left', this.element[0].offsetLeft + this.thresholds[this.currentThreshold].coordinate);
                 }
             },
-            _renderMarker: function () {
+            _renderMarker: /*
+            Renders a marker with value
+            */
+            function () {
                 x = this.markerPosition;
                 var canvas = this.mouseMarkCanvas[0];
                 var ctx = canvas.getContext("2d");
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                if((x >= maxPermitedTimeRange.left && x <= maxPermitedTimeRange.right)) {
+                if((x >= Settings.maxPermitedTimeRange.left && x <= Settings.maxPermitedTimeRange.right)) {
                     var k = this.width / (this.options.range.right - this.options.range.left);
-                    x = k * (x - this.options.range.left);
+                    var x = k * (x - this.options.range.left);
                     this.mousePosition = x;
-                    ctx.strokeStyle = axisStrokeColor;
-                    ctx.fillStyle = axisStrokeColor;
+                    // render marker
+                    ctx.strokeStyle = Settings.axisStrokeColor;
+                    ctx.fillStyle = Settings.axisStrokeColor;
                     ctx.beginPath();
-                    var shift = axisHeight - strokeWidth;
+                    var shift = Settings.axisHeight - Settings.strokeWidth;
                     ctx.moveTo(x, shift);
-                    ctx.lineTo(x + activeMarkSize / 2, shift - activeMarkSize);
-                    ctx.lineTo(x - activeMarkSize / 2, shift - activeMarkSize);
+                    ctx.lineTo(x + Settings.activeMarkSize / 2, shift - Settings.activeMarkSize);
+                    ctx.lineTo(x - Settings.activeMarkSize / 2, shift - Settings.activeMarkSize);
                     ctx.lineTo(x, shift);
                     ctx.closePath();
                     ctx.fill();
+                    // render value
                     var text;
-                    ctx.font = (axisTextSize - 1) + " " + axisTextFont;
+                    ctx.font = (Settings.axisTextSize - 1) + " " + Settings.axisTextFont;
                     if(this.options.mode == "cosmos") {
                         var n = Math.max(Math.floor(Math.log(this.delta * Math.pow(10, this.beta) / this.level) * this.log10), -4) - 1;
                         if(n > 20) {
@@ -1021,54 +1177,65 @@ var ChronoZoom;
                             text = 1;
                         }
                     } else {
-                        var date = getDMYFromCoordinate(this.markerPosition);
+                        var date = ChronoZoom.Common.getDMYFromCoordinate(this.markerPosition);
                         text = (this.beta > -3 ? date.month + 1 + "." : "") + date.day;
                     }
                     var width = ctx.measureText(text).width;
+                    // render background rect
                     ctx.fillStyle = "Black";
                     ctx.globalAlpha = 0.75;
                     ctx.beginPath();
-                    ctx.moveTo(x - width + rectangleRadius, verticalTextMargin);
-                    ctx.lineTo(x - width + width * 2 - rectangleRadius, verticalTextMargin);
-                    ctx.quadraticCurveTo(x - width + width * 2, verticalTextMargin, x - width + width * 2, verticalTextMargin + rectangleRadius);
-                    ctx.lineTo(x - width + width * 2, verticalTextMargin * 2 + gapLabelTick - rectangleRadius);
-                    ctx.quadraticCurveTo(x - width + width * 2, verticalTextMargin * 2 + gapLabelTick, x - width + width * 2 - rectangleRadius, verticalTextMargin * 2 + gapLabelTick);
-                    ctx.lineTo(x - width + rectangleRadius, verticalTextMargin * 2 + gapLabelTick);
-                    ctx.quadraticCurveTo(x - width, verticalTextMargin * 2 + gapLabelTick, x - width, verticalTextMargin * 2 + gapLabelTick - rectangleRadius);
-                    ctx.lineTo(x - width, verticalTextMargin + rectangleRadius);
-                    ctx.quadraticCurveTo(x - width, verticalTextMargin, x - width + rectangleRadius, verticalTextMargin);
+                    ctx.moveTo(x - width + Settings.rectangleRadius, Settings.verticalTextMargin);
+                    ctx.lineTo(x - width + width * 2 - Settings.rectangleRadius, Settings.verticalTextMargin);
+                    ctx.quadraticCurveTo(x - width + width * 2, Settings.verticalTextMargin, x - width + width * 2, Settings.verticalTextMargin + Settings.rectangleRadius);
+                    ctx.lineTo(x - width + width * 2, Settings.verticalTextMargin * 2 + Settings.gapLabelTick - Settings.rectangleRadius);
+                    ctx.quadraticCurveTo(x - width + width * 2, Settings.verticalTextMargin * 2 + Settings.gapLabelTick, x - width + width * 2 - Settings.rectangleRadius, Settings.verticalTextMargin * 2 + Settings.gapLabelTick);
+                    ctx.lineTo(x - width + Settings.rectangleRadius, Settings.verticalTextMargin * 2 + Settings.gapLabelTick);
+                    ctx.quadraticCurveTo(x - width, Settings.verticalTextMargin * 2 + Settings.gapLabelTick, x - width, Settings.verticalTextMargin * 2 + Settings.gapLabelTick - Settings.rectangleRadius);
+                    ctx.lineTo(x - width, Settings.verticalTextMargin + Settings.rectangleRadius);
+                    ctx.quadraticCurveTo(x - width, Settings.verticalTextMargin, x - width + Settings.rectangleRadius, Settings.verticalTextMargin);
                     ctx.closePath();
                     ctx.fill();
                     ctx.globalAlpha = 1;
-                    ctx.strokeText(text, x - width / 2, verticalTextMargin * 2);
+                    ctx.strokeText(text, x - width / 2, Settings.verticalTextMargin * 2);
                 }
             },
-            setTimeMarker: function (x) {
+            setTimeMarker: // renders tick in specific position of a screen given in virtual coordinates
+            // is used to draw current mouse position tick
+            function (x) {
                 this.markerPosition = x;
                 this._renderMarker();
             },
-            getRange: function () {
+            getRange: // returns current axis range
+            function () {
                 return {
                     left: this.options.range.left,
                     right: this.options.range.right
                 };
             },
-            Ticks: function () {
+            Ticks: // returns current ticks
+            function () {
                 return this.ticks;
             },
-            Labels: function () {
+            Labels: // returns current labels
+            function () {
                 return this.labels;
             },
-            Regime: function () {
+            Regime: // returns regime for current range
+            function () {
                 return this.regime;
             },
-            Mode: function () {
+            Mode: // returns regime for current range
+            function () {
                 return this.options.mode;
             },
-            MarkerPosition: function () {
+            MarkerPosition: // returns current time (position of mouse)
+            function () {
                 return this.markerPosition;
             },
-            updateWidth: function () {
+            updateWidth: // function that should be called when width of axis changes
+            // causes axis redrawing
+            function () {
                 var width = this.element[0].clientWidth;
                 var canvas = this.backgroundCanvas[0];
                 canvas.width = width;
@@ -1079,6 +1246,7 @@ var ChronoZoom;
                 canvas = this.thresholdCanvas[0];
                 canvas.width = width;
                 this.width = width;
+                // get ticks & labels
                 var n = this._createTicks();
                 this.ticks = n.ticks;
                 this.labels = n.labels;
@@ -1087,15 +1255,23 @@ var ChronoZoom;
                 this._drawCollapsedThresholds();
                 this._drawNotCollapsedThresholds();
             },
-            options: {
+            options: // axis options:
+            // range ([left, right] - years from present),
+            // present date - is set each time range changes
+            // mode ('cosmos' for billions, millions, thousands of years ago;
+            //       'calendar' for ranges that contain BCE or CE dates;
+            //       'date' for ranges that include shown months or days
+            {
                 range: {
                     left: -1,
                     right: 0
                 },
                 present: null,
-                mode: null
+                mode: // {year: 1, month: 0, day: 1}
+                null
             }
         });
-    })(ChronoZoom.Axis || (ChronoZoom.Axis = {}));
+        // "cosmos", "calendar", "date"
+            })(ChronoZoom.Axis || (ChronoZoom.Axis = {}));
     var Axis = ChronoZoom.Axis;
 })(ChronoZoom || (ChronoZoom = {}));

@@ -1,22 +1,15 @@
-﻿declare var GenerateProperty: any;
-declare var cosmosTimelineID: any;
-declare var earthTimelineID: any;
-declare var lifeTimelineID: any;
-declare var prehistoryTimelineID: any;
-declare var humanityTimelineID: any;
-declare var timelineHeaderSize: any;
-declare var timelineHeaderMargin: any;
-declare var Log: any;
-declare var timelineMinAspect: any;
-declare var timelineContentMargin: any;
-declare var timelineHeaderFontName: any;
-declare var addTimeline: any;
-declare var addInfodot: any;
-declare var VisibleRegion2d: any;
-declare var getCoordinateFromDecimalYear: any;
+﻿/// <reference path='cz.settings.ts'/>
+/// <reference path='vccontent.ts'/>
+/// <reference path='common.ts'/>
+/// <reference path='viewport.ts'/>
 
 module ChronoZoom {
 	export module Layout {
+
+	    var Settings = ChronoZoom.Settings;
+	    var VCContent = ChronoZoom.VCContent;
+	    var Common = ChronoZoom.Common;
+	    var Viewport = ChronoZoom.Viewport;
 
         function Infodot(x, contentItems) {
 	        this.x = x;
@@ -28,11 +21,11 @@ module ChronoZoom {
         }
 
         function Prepare(timeline) {
-	        timeline.left = getCoordinateFromDecimalYear(timeline.FromYear);
-	        timeline.right = getCoordinateFromDecimalYear(timeline.ToYear);
+	        timeline.left = Common.getCoordinateFromDecimalYear(timeline.FromYear);
+	        timeline.right = Common.getCoordinateFromDecimalYear(timeline.ToYear);
 
 	        timeline.Exhibits.forEach(function (exhibit) {
-		        exhibit.x = getCoordinateFromDecimalYear(exhibit.Year);
+	            exhibit.x = Common.getCoordinateFromDecimalYear(exhibit.Year);
 	        });
 	
 	        timeline.ChildTimelines.forEach(function (childTimeline) {
@@ -48,7 +41,7 @@ module ChronoZoom {
         }
 
         function GenerateAspect(timeline) {
-	        if (timeline.ID == cosmosTimelineID) {
+	        if (timeline.ID == Settings.cosmosTimelineID) {
 		        timeline.AspectRatio = 10; //64.0 / 33.0;
 	        } 
 	
@@ -64,7 +57,7 @@ module ChronoZoom {
         }
 
         function LayoutTimeline(timeline, parentWidth, measureContext) {
-	        var headerPercent = timelineHeaderSize + 2 * timelineHeaderMargin;
+            var headerPercent = Settings.timelineHeaderSize + 2 * Settings.timelineHeaderMargin;
 	        var timelineWidth = timeline.right - timeline.left;
 	        timeline.width = timelineWidth;
 
@@ -127,8 +120,8 @@ module ChronoZoom {
 			        }
 		        }
 
-		        if ((res.max - res.min) > (timeline.height - titleObject.bboxHeight) && Log) {
-			        Log.push("Warning: Child timelines and exhibits doesn't fit into parent. Timeline name: " + timeline.Title);
+		        if ((res.max - res.min) > (timeline.height - titleObject.bboxHeight)) {
+			        console.log("Warning: Child timelines and exhibits doesn't fit into parent. Timeline name: " + timeline.Title);
 			        var contentHeight = res.max - res.min;
 			        var fullHeight = contentHeight / (1 - headerPercent);
 			        var titleObject = GenerateTitleObject(fullHeight, timeline, measureContext);
@@ -156,7 +149,7 @@ module ChronoZoom {
 		        var min = res.min;
 		        var max = res.max;
 
-		        var minAspect = 1.0 / timelineMinAspect;
+		        var minAspect = 1.0 / Settings.timelineMinAspect;
 		        var minHeight = timelineWidth / minAspect;
 
 		        //Measure title
@@ -169,7 +162,7 @@ module ChronoZoom {
 
 	        }
 
-	        timeline.heightEps = parentWidth * timelineContentMargin;
+	        timeline.heightEps = parentWidth * Settings.timelineContentMargin;
 	        timeline.realHeight = timeline.height + 2 * timeline.heightEps;
 	        timeline.realY = 0;
 
@@ -359,12 +352,12 @@ module ChronoZoom {
         function GenerateTitleObject(tlHeight, timeline, measureContext) {
 	        var tlW = timeline.right - timeline.left;
 
-	        measureContext.font = "100pt " + timelineHeaderFontName;
+	        measureContext.font = "100pt " + Settings.timelineHeaderFontName;
 	        var size = measureContext.measureText(timeline.Title);
-	        var height = timelineHeaderSize * tlHeight;
+	        var height = Settings.timelineHeaderSize * tlHeight;
 	        var width = height * size.width / 100.0;
 
-	        var margin = Math.min(tlHeight, tlW) * timelineHeaderMargin;
+	        var margin = Math.min(tlHeight, tlW) * Settings.timelineHeaderMargin;
 
 	        if (width + 2 * margin > tlW) {
 		        width = tlW - 2 * margin;
@@ -385,7 +378,7 @@ module ChronoZoom {
         function Convert(parent, timeline) {
 	        //Creating timeline
 	        var tlColor = GetTimelineColor(timeline);
-	        var t1 = addTimeline(parent, "layerTimelines", 't' + timeline.UniqueID,
+	        var t1 = VCContent.addTimeline(parent, "layerTimelines", 't' + timeline.UniqueID,
 	        {
 		        timeStart: timeline.left,
 		        timeEnd: timeline.right,
@@ -428,7 +421,7 @@ module ChronoZoom {
 		        });
 
 		        date = buildDate(childInfodot);
-		        var infodot1 = addInfodot(t1, "layerInfodots", 'e' + childInfodot.UniqueID,
+		        var infodot1 = VCContent.addInfodot(t1, "layerInfodots", 'e' + childInfodot.UniqueID,
 				        (childInfodot.left + childInfodot.right) / 2.0, childInfodot.y, 0.8 * childInfodot.size / 2.0, contentItems,
 				        { title: childInfodot.Title, date: date, guid: childInfodot.ID });
 	        });
@@ -500,24 +493,24 @@ module ChronoZoom {
 
         function GetTimelineColor(timeline) {
 	        if (timeline.Regime == "Cosmos") {
-		        return SelectColor(GetParentLayer(timeline, cosmosTimelineID), "rgba(152, 108, 157, 1.0)", "rgba(94, 78, 129, 1.0)", "rgba(149, 136, 193, 1.0)");
+		        return SelectColor(GetParentLayer(timeline, Settings.cosmosTimelineID), "rgba(152, 108, 157, 1.0)", "rgba(94, 78, 129, 1.0)", "rgba(149, 136, 193, 1.0)");
 	        }
 	        else if (timeline.Regime == "Earth") {
-		        return SelectColor(GetParentLayer(timeline, earthTimelineID), "rgba(81, 127, 149, 1.0)", "rgba(11, 110, 131, 1.0)", "rgba(117, 163, 174, 1.0)");
+		        return SelectColor(GetParentLayer(timeline, Settings.earthTimelineID), "rgba(81, 127, 149, 1.0)", "rgba(11, 110, 131, 1.0)", "rgba(117, 163, 174, 1.0)");
 	        }
 	        else if (timeline.Regime == "Life") {
-		        return SelectColor(GetParentLayer(timeline, lifeTimelineID), "rgba(73, 150, 73, 1.0)", "rgba(13, 106, 49, 1.0)", "rgba(139, 167, 97, 1.0)");
+	            return SelectColor(GetParentLayer(timeline, Settings.lifeTimelineID), "rgba(73, 150, 73, 1.0)", "rgba(13, 106, 49, 1.0)", "rgba(139, 167, 97, 1.0)");
 	        }
 	        else if (timeline.Regime == "Pre-history") {
-		        return SelectColor(GetParentLayer(timeline, prehistoryTimelineID), "rgba(237, 145, 50, 1.0)", "rgba(193, 90, 47, 1.0)", "rgba(223, 161, 68, 1.0)");
+	            return SelectColor(GetParentLayer(timeline, Settings.prehistoryTimelineID), "rgba(237, 145, 50, 1.0)", "rgba(193, 90, 47, 1.0)", "rgba(223, 161, 68, 1.0)");
 	        }
 	        else if (timeline.Regime == "Humanity") {
-		        return SelectColor(GetParentLayer(timeline, humanityTimelineID), "rgba(212, 92, 70, 1.0)", "rgba(140, 72, 69, 1.0)", "rgba(207, 124, 111, 1.0)");
+	            return SelectColor(GetParentLayer(timeline, Settings.humanityTimelineID), "rgba(212, 92, 70, 1.0)", "rgba(140, 72, 69, 1.0)", "rgba(207, 124, 111, 1.0)");
 	        }
 	        else return "rgba(255, 255, 255, 0.5)";
         }
 
-        function Load(vcph, timelines) {
+        export function Load(vcph, timelines) {
 	        if (timelines.length > 0) {
 		        for (var i = timelines.length - 1; i >= 0; i--) {
 			        Prepare(timelines[i]);
@@ -541,7 +534,7 @@ module ChronoZoom {
 	        }
         }
 
-        var FindChildTimeline = function (timeline, id, recursive) {
+        export function FindChildTimeline(timeline, id, recursive?) {
 	        var result = undefined;
 
 	        if (timeline) {
@@ -575,7 +568,7 @@ module ChronoZoom {
 		        var width = timeline.right - timeline.left;
 		        var scaleX = vp.visible.scale * width / vp.width;
 		        var scaleY = vp.visible.scale * timeline.height / vp.height;
-		        return new VisibleRegion2d(timeline.left + (timeline.right - timeline.left) / 2.0, timeline.y + timeline.height / 2.0, Math.max(scaleX, scaleY));
+		        return new Viewport.VisibleRegion2d(timeline.left + (timeline.right - timeline.left) / 2.0, timeline.y + timeline.height / 2.0, Math.max(scaleX, scaleY));
 	        }
         }
 

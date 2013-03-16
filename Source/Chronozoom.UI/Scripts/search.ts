@@ -1,15 +1,9 @@
-﻿declare var $: any;
-declare var isTourWindowVisible: any;
-declare var onTourClicked: any;
-declare var toggleOffImage: any;
-declare var toggleOnImage: any;
-declare var setVisibleByUserDirectly: any;
-declare var vc: any;
-declare var getContentItem: any;
-declare var getVisibleForElement: any;
-declare var setNavigationStringTo: any;
-declare var czDataSource: any;
-declare var navStringToVisible: any;
+﻿/// <reference path='urlnav.ts'/>
+/// <reference path='cz.settings.ts'/>
+/// <reference path='common.ts'/>
+/// <reference path='vccontent.ts'/>
+
+declare var $: any;
 
 /* This file contains code to perform search over the Chronozoom database and show the results in UI.
 The page design must correspond to the schema and naming conventions presented here.
@@ -18,20 +12,20 @@ The page design must correspond to the schema and naming conventions presented h
 module ChronoZoom {
     export module Search {
 
-        var isSearchWindowVisible = false;
+        export var isSearchWindowVisible = false;
         var delayedSearchRequest = null;
 
 
         // The method is called when the search button is clicked
-        function onSearchClicked() {
-            if (isTourWindowVisible && onTourClicked)
-                onTourClicked();
+        export function onSearchClicked() {
+            if (ChronoZoom.Tours.isTourWindowVisible && ChronoZoom.Tours.onTourClicked)
+                ChronoZoom.Tours.onTourClicked();
 
             if (isSearchWindowVisible) {
-                toggleOffImage('search_button');
+                ChronoZoom.Common.toggleOffImage('search_button');
                 $("#search").hide('slide', {}, 'slow');
             } else {
-                toggleOnImage('search_button');
+                ChronoZoom.Common.toggleOnImage('search_button');
                 $("#search").show('slide', {}, 'slow',
                     function () {
                         $("#searchTextBox").focus();
@@ -42,11 +36,11 @@ module ChronoZoom {
 
         function searchHighlight(isOn) {
             if (isOn) {
-                toggleOnImage('search_button');
+                ChronoZoom.Common.toggleOnImage('search_button');
             }
             else {
                 if (!isSearchWindowVisible)
-                    toggleOffImage('search_button');
+                    ChronoZoom.Common.toggleOffImage('search_button');
             }
         }
 
@@ -92,30 +86,30 @@ module ChronoZoom {
 
 
         function navigateToElement(e) {
-            var animId = setVisibleByUserDirectly(e.newvisible);
+            var animId = ChronoZoom.Common.setVisibleByUserDirectly(e.newvisible);
             if (animId) {
-                setNavigationStringTo = { element: e.element, id: animId };
+                ChronoZoom.Common.setNavigationStringTo = { element: e.element, id: animId };
             }
         }
 
-        function navigateToBookmark(bookmark) {
+        export function navigateToBookmark(bookmark) {
             if (bookmark) {
-                var visible = navStringToVisible(bookmark, vc);
+                var visible = ChronoZoom.UrlNav.navStringToVisible(bookmark, $('#vc'));
                 if (visible) {
-                    var animId = setVisibleByUserDirectly(visible);
+                    var animId = ChronoZoom.Common.setVisibleByUserDirectly(visible);
                     if (animId) {
-                        setNavigationStringTo = { bookmark: bookmark, id: animId };
+                        ChronoZoom.Common.setNavigationStringTo = { bookmark: bookmark, id: animId };
                     }
                 }
             }
         }
 
-        function goToSearchResult(id) {
-            var elem = findVCElement(vc.virtualCanvas("getLayerContent"), id);
+        export function goToSearchResult(id) {
+            var elem = findVCElement($('#vc').virtualCanvas("getLayerContent"), id);
             if (!elem) {
                 alert('Element not found in the content.');
             } else {
-                var visible = getVisibleForElement(elem, 1.0, vc.virtualCanvas("getViewport"));
+                var visible = ChronoZoom.VCContent.getVisibleForElement(elem, 1.0, $('#vc').virtualCanvas("getViewport"));
                 navigateToElement({ element: elem, newvisible: visible });
             }
         }
@@ -150,7 +144,7 @@ module ChronoZoom {
             return rfind(root, id);
         }
 
-        function onSearchResults(searchString, results) {
+        function onSearchResults(searchString, results?) {
             if (escapeSearchString($("#searchTextBox")[0].value).indexOf(searchString) === 0 || searchString === '') {
                 var height;
                 var output = $("#search .searchResults").empty();
@@ -218,13 +212,13 @@ module ChronoZoom {
 
             if (!searchString || searchString === '') {
                 setTimeout(function () {
-                    onSearchResults(searchString, null);
+                    onSearchResults(searchString);
                 }, 1);
                 return;
             }
 
             var url;
-            switch (czDataSource) {
+            switch (ChronoZoom.Settings.czDataSource) {
                 case 'db': url = "Chronozoom.svc/Search";
                     break;
                 default: url = "Chronozoom.svc/SearchRelay";
@@ -238,7 +232,7 @@ module ChronoZoom {
                 data: { searchTerm: searchString },
                 url: url,
                 success: function (result) {
-                    if (czDataSource == 'db')
+                    if (ChronoZoom.Settings.czDataSource == 'db')
                         onSearchResults(searchString, result.d);
                     else
                         onSearchResults(searchString, eval(result.d));

@@ -1,7 +1,8 @@
-﻿declare var $: any;
+﻿/// <reference path='common.ts'/>
+
+declare var $: any;
 declare var Viewport2d: any;
 declare var VisibleRegion2d: any;
-declare var maxPermitedScale: any;
 declare var maxPermitedTimeRange: any;
 declare var maxPermitedVerticalRange: any;
 declare var targetFps: any;
@@ -13,6 +14,8 @@ declare var zoomSpeedFactor: any;
 
 module ChronoZoom {
     export module ViewportController {
+
+        var Common = ChronoZoom.Common;
 
         //constructs the new instance of the viewportController that handles an animations of the viewport
         //@param setVisible (void setVisible(visible))      a callback which is called when controller wants to set intermediate visible regions while animation.
@@ -188,9 +191,9 @@ module ChronoZoom {
             this.coerceVisibleOuterZoom = function (vp, gesture) {
                 if (gesture.Type === "Zoom") {
                     var visible = vp.visible;
-                    if (typeof maxPermitedScale != 'undefined' && maxPermitedScale) {
-                        if (visible.scale > maxPermitedScale) {
-                            gesture.scaleFactor = maxPermitedScale / visible.scale;
+                    if (Common.maxPermitedScale) {
+                        if (visible.scale > Common.maxPermitedScale) {
+                            gesture.scaleFactor = Common.maxPermitedScale / visible.scale;
                             ZoomViewport(vp, gesture);
                         }
                     }
