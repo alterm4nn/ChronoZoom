@@ -19,7 +19,7 @@ CodeCollaborator Client](http://support.smartbear.com/resources/cc/GettingStarte
 
 ### Use the CodeCollaborator Client ###
 
-1. Click **Start**, **All Programs**, **Code Collaborator Client**, **Code Collaborator Client GUI**.
+- Click **Start**, **All Programs**, **Code Collaborator Client**, **Code Collaborator Client GUI**.
 
 The CodeCollaborator Client GUI offers several options:
         
