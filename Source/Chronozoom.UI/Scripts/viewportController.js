@@ -31,7 +31,7 @@ var ChronoZoom;
             // an animation frame enqueueing function. It is used to schedula a new animation frame
             if(!(window).requestAnimFrame) {
                 (window).requestAnimFrame = function (callback) {
-                    window.setTimeout(callback, 1000 / targetFps)// scheduling frame rendering timer
+                    window.setTimeout(callback, 1000 / ChronoZoom.Settings.targetFps)// scheduling frame rendering timer
                     ;
                 };
             }
@@ -97,12 +97,12 @@ var ChronoZoom;
                         if(previouslyEstimatedViewport) {
                             initialViewport = previouslyEstimatedViewport;
                         } else {
-                            initialViewport = new Viewport2d(latestViewport.aspectRatio, latestViewport.width, latestViewport.height, new VisibleRegion2d(latestVisible.centerX, latestVisible.centerY, latestVisible.scale));
+                            initialViewport = new ChronoZoom.Viewport.Viewport2d(latestViewport.aspectRatio, latestViewport.width, latestViewport.height, new ChronoZoom.Viewport.VisibleRegion2d(latestVisible.centerX, latestVisible.centerY, latestVisible.scale));
                         }
                     } else {
                         // gesture.Source == "Mouse"
-                        initialViewport = new Viewport2d(//zoom is always performed over recent viewport state, not the estimated target viewport. Cloning latest viewport (deep copy)
-                        latestViewport.aspectRatio, latestViewport.width, latestViewport.height, new VisibleRegion2d(latestVisible.centerX, latestVisible.centerY, latestVisible.scale));
+                        initialViewport = new ChronoZoom.Viewport.Viewport2d(//zoom is always performed over recent viewport state, not the estimated target viewport. Cloning latest viewport (deep copy)
+                        latestViewport.aspectRatio, latestViewport.width, latestViewport.height, new ChronoZoom.Viewport.VisibleRegion2d(latestVisible.centerX, latestVisible.centerY, latestVisible.scale));
                     }
                     //calculating changed viewport according to the gesture
                     ZoomViewport(initialViewport, gesture);
@@ -112,7 +112,7 @@ var ChronoZoom;
                         initialViewport = previouslyEstimatedViewport;
                     } else {
                         //there is no previously estimated viewport and there is no currently active Pan/Zoom animation. Cloning latest viewport (deep copy)
-                        initialViewport = new Viewport2d(latestViewport.aspectRatio, latestViewport.width, latestViewport.height, new VisibleRegion2d(latestVisible.centerX, latestVisible.centerY, latestVisible.scale));
+                        initialViewport = new ChronoZoom.Viewport.Viewport2d(latestViewport.aspectRatio, latestViewport.width, latestViewport.height, new ChronoZoom.Viewport.VisibleRegion2d(latestVisible.centerX, latestVisible.centerY, latestVisible.scale));
                     }
                     //calculating changed viewport according to the gesture
                     PanViewport(initialViewport, gesture);
@@ -161,13 +161,13 @@ var ChronoZoom;
             */
             this.coerceVisibleHorizontalBound = function (vp) {
                 var visible = vp.visible;
-                if(maxPermitedTimeRange) {
-                    if(visible.centerX > maxPermitedTimeRange.right) {
+                if(ChronoZoom.Settings.maxPermitedTimeRange) {
+                    if(visible.centerX > ChronoZoom.Settings.maxPermitedTimeRange.right) {
                         //canvas right border in virtual coordinates is greater than permited border
-                        visible.centerX = maxPermitedTimeRange.right;
-                    } else if(visible.centerX < maxPermitedTimeRange.left) {
+                        visible.centerX = ChronoZoom.Settings.maxPermitedTimeRange.right;
+                    } else if(visible.centerX < ChronoZoom.Settings.maxPermitedTimeRange.left) {
                         //canvas left border in virtual coordinates is less than permited border
-                        visible.centerX = maxPermitedTimeRange.left;
+                        visible.centerX = ChronoZoom.Settings.maxPermitedTimeRange.left;
                     }
                 }
             };
@@ -178,13 +178,13 @@ var ChronoZoom;
             */
             this.coerceVisibleVerticalBound = function (vp) {
                 var visible = vp.visible;
-                if(maxPermitedVerticalRange) {
-                    if(visible.centerY > maxPermitedVerticalRange.bottom) {
+                if(ChronoZoom.Common.maxPermitedVerticalRange) {
+                    if(visible.centerY > ChronoZoom.Common.maxPermitedVerticalRange.bottom) {
                         //canvas top border in virtual coordinates is greater than permited border
-                        visible.centerY = maxPermitedVerticalRange.bottom;
-                    } else if(visible.centerY < maxPermitedVerticalRange.top) {
+                        visible.centerY = ChronoZoom.Common.maxPermitedVerticalRange.bottom;
+                    } else if(visible.centerY < ChronoZoom.Common.maxPermitedVerticalRange.top) {
                         //canvas bottom border in virtual coordinates is less than permited border
-                        visible.centerY = maxPermitedVerticalRange.top;
+                        visible.centerY = ChronoZoom.Common.maxPermitedVerticalRange.top;
                     }
                 }
             };
@@ -204,9 +204,9 @@ var ChronoZoom;
                     //explicitly set content observation constraint overrides the constraints of timelines
                     constr = this.effectiveExplorationZoomConstraint;
                 } else {
-                    for(var i = 0; i < deeperZoomConstraints.length; i++) {
+                    for(var i = 0; i < ChronoZoom.Settings.deeperZoomConstraints.length; i++) {
                         //determinig the region to apply deeper zoom constraint of timelines
-                        var possibleConstr = deeperZoomConstraints[i];
+                        var possibleConstr = ChronoZoom.Settings.deeperZoomConstraints[i];
                         if(possibleConstr.left <= x && possibleConstr.right > x) {
                             constr = possibleConstr.scale;
                             break;
@@ -223,7 +223,7 @@ var ChronoZoom;
             self.updateRecentViewport = function () {
                 var vp = getViewport();
                 var vis = vp.visible;
-                self.recentViewport = new Viewport2d(vp.aspectRatio, vp.width, vp.height, new VisibleRegion2d(vis.centerX, vis.centerY, vis.scale));
+                self.recentViewport = new ChronoZoom.Viewport.Viewport2d(vp.aspectRatio, vp.width, vp.height, new ChronoZoom.Viewport.VisibleRegion2d(vis.centerX, vis.centerY, vis.scale));
             };
             gesturesSource.Subscribe(function (gesture) {
                 if(typeof gesture != "undefined") {
@@ -240,16 +240,16 @@ var ChronoZoom;
                         var newlyEstimatedViewport = calculateTargetViewport(latestViewport, gesture, self.estimatedViewport);
                         if(!self.estimatedViewport) {
                             //if there is no ongoing PanZoom animation create it
-                            self.activeAnimation = new PanZoomAnimation(latestViewport);
+                            self.activeAnimation = new ChronoZoom.ViewportAnimation.PanZoomAnimation(latestViewport);
                             //storing size to handle window resize
                             self.saveScreenParameters(latestViewport);
                         }
                         if(gesture.Type == "Pan") {
                             //setting animation velocity according to gesture type
-                            self.activeAnimation.velocity = panSpeedFactor * 0.001;
+                            self.activeAnimation.velocity = ChronoZoom.Settings.panSpeedFactor * 0.001;
                         } else {
                             // is baseline coefficient for animation speed to make not very slow and not very fast. it can be altered with a panSpeedFactor value in settings.js
-                            self.activeAnimation.velocity = zoomSpeedFactor * 0.0025;
+                            self.activeAnimation.velocity = ChronoZoom.Settings.zoomSpeedFactor * 0.0025;
                         }// is baseline coefficient for animation speed to make not very slow and not very fast. it can be altered with a zoomSpeedFactor value in settings.js
                         
                         //set or update the target state of the viewport
@@ -307,7 +307,7 @@ var ChronoZoom;
                         //stop the animation cycle
                         var stopAnimationID = self.activeAnimation.ID;
                         self.updateRecentViewport();
-                        setVisible(new VisibleRegion2d(self.recentViewport.visible.centerX, self.recentViewport.visible.centerY, self.recentViewport.visible.scale))//other components may suppose that it would be more frames by looking at activeAnimation property, so draw the last frame
+                        setVisible(new ChronoZoom.Viewport.VisibleRegion2d(self.recentViewport.visible.centerX, self.recentViewport.visible.centerY, self.recentViewport.visible.scale))//other components may suppose that it would be more frames by looking at activeAnimation property, so draw the last frame
                         ;
                         if(!self.activeAnimation.isForciblyStoped) {
                             //notifyng that the animation is complete only if it was not interrupted
@@ -364,7 +364,7 @@ var ChronoZoom;
                 self.updateRecentViewport();
                 var vp = self.recentViewport;
                 this.estimatedViewport = undefined;
-                this.activeAnimation = new EllipticalZoom(vp.visible, visible);
+                this.activeAnimation = new ChronoZoom.ViewportAnimation.EllipticalZoom(vp.visible, visible);
                 //storing size to handle window resize
                 self.viewportWidth = vp.width;
                 self.viewportHeight = vp.height;
@@ -380,6 +380,7 @@ var ChronoZoom;
             };
             //end of public fields
                     }
+        ViewportController.ViewportController = ViewportController;
     })(ChronoZoom.ViewportController || (ChronoZoom.ViewportController = {}));
     var ViewportController = ChronoZoom.ViewportController;
 })(ChronoZoom || (ChronoZoom = {}));

@@ -35,7 +35,11 @@ module ChronoZoom {
         var searchString;
         var ax, vc;
         var visReg;
-        var cosmosVisible, earthVisible, lifeVisible, prehistoryVisible, humanityVisible;
+        export var cosmosVisible;
+        export var earthVisible;
+        export var lifeVisible;
+        export var prehistoryVisible;
+        export var humanityVisible;
         var content;
         var breadCrumbs; //titles and visibles of the recent breadcrumbs
 
@@ -230,7 +234,7 @@ module ChronoZoom {
             $("#footerBack").show('clip', {}, 'slow');
         }
 
-        function closeWelcomeScreen() {
+        export function closeWelcomeScreen() {
             if ($('input[name=welcomeScreenCheckbox]').is(':checked'))
                 setCookie("welcomeScreenDisallowed", "1", 365);
 

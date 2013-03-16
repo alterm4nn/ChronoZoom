@@ -34,7 +34,7 @@ module ChronoZoom {
             isSearchWindowVisible = !isSearchWindowVisible;
         }
 
-        function searchHighlight(isOn) {
+        export function searchHighlight(isOn) {
             if (isOn) {
                 ChronoZoom.Common.toggleOnImage('search_button');
             }

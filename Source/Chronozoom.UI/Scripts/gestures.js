@@ -205,6 +205,7 @@ var ChronoZoom;
             }
             return pinController.Merge(panController.Merge(zoomController));
         }
+        Gestures.getGesturesStream = getGesturesStream;
         //modify the gesture stream to apply the logic of gesture handling by the axis
         function applyAxisBehavior(gestureSequence) {
             return gestureSequence.Where(function (el) {
@@ -218,6 +219,7 @@ var ChronoZoom;
                 return el;
             });
         }
+        Gestures.applyAxisBehavior = applyAxisBehavior;
     })(ChronoZoom.Gestures || (ChronoZoom.Gestures = {}));
     var Gestures = ChronoZoom.Gestures;
 })(ChronoZoom || (ChronoZoom = {}));

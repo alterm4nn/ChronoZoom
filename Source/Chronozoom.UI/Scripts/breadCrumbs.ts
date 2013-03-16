@@ -264,7 +264,7 @@ module ChronoZoom {
         }
 
         // Handles click over navigate to left button.
-        function breadCrumbNavLeft() {
+        export function breadCrumbNavLeft() {
             var movingLeftBreadCrumbs = 0; // counter of currently moving to left breadcrumbs
             var number = 0; // index of first moving to left breadcrumb
 
@@ -290,7 +290,7 @@ module ChronoZoom {
         }
 
         // Handles click over navigate to right button.
-        function breadCrumbNavRight() {
+        export function breadCrumbNavRight() {
             var movingRightBreadCrumbs = 0; // counter of currently moving to right breadcrumbs
             var number = 0; // index of first moving to right breadcrumb
 

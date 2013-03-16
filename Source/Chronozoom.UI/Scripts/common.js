@@ -11,21 +11,25 @@ var ChronoZoom;
         var Log = new Array();
         Common.controller;//a controller to perform smooth navigation
         
-        var isAxisFreezed = true;//indicates whether the axis moves together with canvas during navigation or not
+        Common.isAxisFreezed = true;//indicates whether the axis moves together with canvas during navigation or not
         
-        var startHash;
+        Common.startHash;
         var searchString;
         var ax, vc;
         var visReg;
-        var cosmosVisible, earthVisible, lifeVisible, prehistoryVisible, humanityVisible;
+        Common.cosmosVisible;
+        Common.earthVisible;
+        Common.lifeVisible;
+        Common.prehistoryVisible;
+        Common.humanityVisible;
         var content;
         var breadCrumbs;//titles and visibles of the recent breadcrumbs
         
         var firstTimeWelcomeChecked = true;// if welcome screen checkbox checked or not
         
         var regimes = new Array();
-        var regimesRatio;
-        var regimeNavigator;
+        Common.regimesRatio;
+        Common.regimeNavigator;
         var k = 1000000000;
         Common.setNavigationStringTo;// { element or bookmark, id } identifies that we zoom into this element and when (if) finish the zoom, we should put the element's path into navigation string
         
@@ -57,6 +61,7 @@ var ChronoZoom;
         function sqr(d) {
             return d * d;
         }
+        Common.sqr = sqr;
         // Prevents the event from bubbling.
         // In non IE browsers, use e.stopPropagation() instead.
         // To cancel event bubbling across browsers, you should check for support for e.stopPropagation(), and proceed accordingly:
@@ -216,27 +221,30 @@ var ChronoZoom;
             }
             hideWelcomeScreen();
         }
+        Common.closeWelcomeScreen = closeWelcomeScreen;
         function hideWelcomeScreen() {
             ((document.createElement("welcomeVideo"))).src = "";
             $("#welcomeScreenBack").css("display", "none");
         }
+        Common.hideWelcomeScreen = hideWelcomeScreen;
         /*Animation tooltip parameter*/
-        var animationTooltipRunning = null;
-        var tooltipMode = "default";//['infodot'], ['timeline'] indicates whether tooltip is refers to timeline or to infodot
+        Common.animationTooltipRunning = null;
+        Common.tooltipMode = "default";//['infodot'], ['timeline'] indicates whether tooltip is refers to timeline or to infodot
         
         function stopAnimationTooltip() {
-            if(animationTooltipRunning != null) {
+            if(Common.animationTooltipRunning != null) {
                 $('.bubbleInfo').stop();
                 $(".bubbleInfo").css("opacity", "0.9");
                 $(".bubbleInfo").css("filter", "alpha(opacity=90)");
                 $(".bubbleInfo").css("-moz-opacity", "0.9");
-                animationTooltipRunning = null;
+                Common.animationTooltipRunning = null;
                 //tooltipMode = "default"; //default
                 //tooltipIsShown = false;
                 $(".bubbleInfo").attr("id", "defaultBox");
                 $(".bubbleInfo").hide();
             }
         }
+        Common.stopAnimationTooltip = stopAnimationTooltip;
         // Compares 2 visibles. Returns true if they are equal with an allowable imprecision
         function compareVisibles(vis1, vis2) {
             return vis2 != null ? (Math.abs(vis1.centerX - vis2.centerX) < Settings.allowedVisibileImprecision && Math.abs(vis1.centerY - vis2.centerY) < Settings.allowedVisibileImprecision && Math.abs(vis1.scale - vis2.scale) < Settings.allowedVisibileImprecision) : false;
@@ -263,6 +271,7 @@ var ChronoZoom;
         function updateMarker() {
             ax.axis("setTimeMarker", vc.virtualCanvas("getCursorPosition"));
         }
+        Common.updateMarker = updateMarker;
         // Retrieves the URL to download the data from
         function loadDataUrl() {
             // The following regexp extracts the pattern dataurl=url from the page hash to enable loading timelines from arbitrary sources.
@@ -346,27 +355,28 @@ var ChronoZoom;
                 }
             });
         }
+        Common.loadData = loadData;
         function ProcessContent(content) {
             timings.wcfRequestCompleted = new Date();
             ChronoZoom.Layout.Load(vc, content.d);
             timings.layoutCompleted = new Date();
-            if(startHash) {
+            if(Common.startHash) {
                 // restoring the window's hash as it was on the page loading
-                visReg = ChronoZoom.UrlNav.navStringToVisible(startHash.substring(1), vc);
+                visReg = ChronoZoom.UrlNav.navStringToVisible(Common.startHash.substring(1), vc);
             }
             InitializeRegimes();
-            if(!visReg && cosmosVisible) {
-                window.location.hash = cosmosVisible;
-                visReg = ChronoZoom.UrlNav.navStringToVisible(cosmosVisible, vc);
+            if(!visReg && Common.cosmosVisible) {
+                window.location.hash = Common.cosmosVisible;
+                visReg = ChronoZoom.UrlNav.navStringToVisible(Common.cosmosVisible, vc);
             }
             if(visReg) {
                 vc.virtualCanvas("setVisible", visReg);
                 updateAxis(vc, ax);
                 var vp = vc.virtualCanvas("getViewport");
                 updateNavigator(vp);
-                if(startHash && window.location.hash !== startHash) {
+                if(Common.startHash && window.location.hash !== Common.startHash) {
                     hashChangeFromOutside = false;
-                    window.location.hash = startHash// synchronizing
+                    window.location.hash = Common.startHash// synchronizing
                     ;
                 }
             }
@@ -387,22 +397,22 @@ var ChronoZoom;
                         return v;
                     };
                     var cosmosTimeline = content.d[0];
-                    cosmosVisible = f(cosmosTimeline);
+                    Common.cosmosVisible = f(cosmosTimeline);
                     ChronoZoom.UrlNav.navigationAnchor = vc.virtualCanvas("findElement", 't' + cosmosTimeline.UniqueID);
                     var earthTimeline = ChronoZoom.Layout.FindChildTimeline(cosmosTimeline, Settings.earthTimelineID);
-                    earthVisible = f(earthTimeline);
+                    Common.earthVisible = f(earthTimeline);
                     var lifeTimeline = ChronoZoom.Layout.FindChildTimeline(earthTimeline, Settings.lifeTimelineID);
-                    lifeVisible = f(lifeTimeline);
+                    Common.lifeVisible = f(lifeTimeline);
                     var prehistoryTimeline = ChronoZoom.Layout.FindChildTimeline(lifeTimeline, Settings.prehistoryTimelineID);
-                    prehistoryVisible = f(prehistoryTimeline);
+                    Common.prehistoryVisible = f(prehistoryTimeline);
                     var humanityTimeline = ChronoZoom.Layout.FindChildTimeline(prehistoryTimeline, Settings.humanityTimelineID, true);
-                    humanityVisible = f(humanityTimeline);
+                    Common.humanityVisible = f(humanityTimeline);
                     Common.maxPermitedVerticalRange = {
                         top: //setting top and bottom observation constraints according to cosmos timeline
                         cosmosTimeline.y,
                         bottom: cosmosTimeline.y + cosmosTimeline.height
                     };
-                    Common.maxPermitedScale = ChronoZoom.UrlNav.navStringToVisible(cosmosVisible, vc).scale * 1.1;
+                    Common.maxPermitedScale = ChronoZoom.UrlNav.navStringToVisible(Common.cosmosVisible, vc).scale * 1.1;
                 }
             }
         }
@@ -443,6 +453,7 @@ var ChronoZoom;
             updateAxis(vc, ax);
             ChronoZoom.BreadCrumbs.updateBreadCrumbsLabels();
         }
+        Common.updateLayout = updateLayout;
         function passThrough(e) {
             var mouseX = e.pageX;
             var mouseY = e.pageY;
@@ -451,43 +462,45 @@ var ChronoZoom;
             var width_space = cosmos_rect.width();
             var height_space = cosmos_rect.height();
             if(mouseX > offset_space.left && mouseX < offset_space.left + width_space && mouseY > offset_space.top && mouseY < offset_space.top + height_space) {
-                ChronoZoom.Search.navigateToBookmark(cosmosVisible);
+                ChronoZoom.Search.navigateToBookmark(Common.cosmosVisible);
             }
             var earth_rect = $("#earth_rect");
             var offset_earth = earth_rect.offset();
             var width_earth = earth_rect.width();
             var height_earth = earth_rect.height();
             if(mouseX > offset_earth.left && mouseX < offset_earth.left + width_earth && mouseY > offset_earth.top && mouseY < offset_earth.top + height_earth) {
-                ChronoZoom.Search.navigateToBookmark(earthVisible);
+                ChronoZoom.Search.navigateToBookmark(Common.earthVisible);
             }
             var life_rect = $("#life_rect");
             var offset_life = life_rect.offset();
             var width_life = life_rect.width();
             var height_life = life_rect.height();
             if(mouseX > offset_life.left && mouseX < offset_life.left + width_life && mouseY > offset_life.top && mouseY < offset_life.top + height_life) {
-                ChronoZoom.Search.navigateToBookmark(lifeVisible);
+                ChronoZoom.Search.navigateToBookmark(Common.lifeVisible);
             }
             var prehuman_rect = $("#prehuman_rect");
             var offset_prehuman = prehuman_rect.offset();
             var width_prehuman = prehuman_rect.width();
             var height_prehuman = prehuman_rect.height();
             if(mouseX > offset_prehuman.left && mouseX < offset_prehuman.left + width_prehuman && mouseY > offset_prehuman.top && mouseY < offset_prehuman.top + height_prehuman) {
-                ChronoZoom.Search.navigateToBookmark(prehistoryVisible);
+                ChronoZoom.Search.navigateToBookmark(Common.prehistoryVisible);
             }
             var human_rect = $("#human_rect");
             var offset_human = human_rect.offset();
             var width_human = human_rect.width();
             var height_human = human_rect.height();
             if(mouseX > offset_human.left && mouseX < offset_human.left + width_human && mouseY > offset_human.top && mouseY < offset_human.top + height_human) {
-                ChronoZoom.Search.navigateToBookmark(humanityVisible);
+                ChronoZoom.Search.navigateToBookmark(Common.humanityVisible);
             }
         }
-        export function updateAxis(vc, ax) {
+        Common.passThrough = passThrough;
+        function updateAxis(vc, ax) {
             var vp = vc.virtualCanvas("getViewport");
             var lt = vp.pointScreenToVirtual(0, 0);
             var rb = vp.pointScreenToVirtual(vp.width, vp.height);
             ax.axis("setRange", lt.x, rb.x);
         }
+        Common.updateAxis = updateAxis;
         function updateNavigator(vp) {
             var navigatorFunc = function (coordinate) {
                 if(Math.abs(coordinate) < 0.00000000001) {
@@ -510,17 +523,18 @@ var ChronoZoom;
             }
             var newRight = navigatorFunc(Math.abs(right));
             var newLeft = navigatorFunc(Math.abs(left));
-            var newWidth = Math.max(2.0 / regimesRatio, Math.abs(newRight - newLeft));
+            var newWidth = Math.max(2.0 / Common.regimesRatio, Math.abs(newRight - newLeft));
             var min = 0;
             var max = document.getElementById("cosmos_rect").clientWidth;
-            var l = 301 - regimesRatio * newLeft;
-            var w = regimesRatio * newWidth;
+            var l = 301 - Common.regimesRatio * newLeft;
+            var w = Common.regimesRatio * newWidth;
             if(l < 0 || l + w > max + 5) {
                 return;
             }
-            regimeNavigator.css('left', l);
-            regimeNavigator.css('width', w);
+            Common.regimeNavigator.css('left', l);
+            Common.regimeNavigator.css('width', w);
         }
+        Common.updateNavigator = updateNavigator;
         function setCookie(c_name, value, exdays) {
             var exdate = new Date();
             exdate.setDate(exdate.getDate() + exdays);
@@ -539,6 +553,7 @@ var ChronoZoom;
             }
             return null;
         }
+        Common.getCookie = getCookie;
     })(ChronoZoom.Common || (ChronoZoom.Common = {}));
     var Common = ChronoZoom.Common;
 })(ChronoZoom || (ChronoZoom = {}));

@@ -525,7 +525,7 @@ module ChronoZoom {
         /*
         Handling of prev button click in UI
         */
-        function tourPrev() {
+        export function tourPrev() {
             if (Tours.tour != undefined) {
                 Tours.tour.prev();
             }
@@ -534,7 +534,7 @@ module ChronoZoom {
         /*
         Handling of next button click in UI
         */
-        function tourNext() {
+        export function tourNext() {
             if (Tours.tour != undefined) {
                 tours.tour.next();
             }
@@ -568,7 +568,7 @@ module ChronoZoom {
         /*
         Handling of play/pause button click in UI
         */
-        function tourPlayPause() {
+        export function tourPlayPause() {
             if (Tours.tour != undefined) {
                 if (Tours.tour.state == "pause") {
                     tourResume();
@@ -590,7 +590,7 @@ module ChronoZoom {
         /*
         Handling of close button click in UI.
         */
-        function tourAbort() {
+        export function tourAbort() {
             // close tour and hide all tour' UI elements
             removeActiveTour();
             $("#bookmarks").hide();
@@ -770,7 +770,7 @@ module ChronoZoom {
         }
 
         /* Highlights the tour button in the top menu */
-        function tourButtonHighlight(isOn) {
+        export function tourButtonHighlight(isOn) {
             if (isOn) {
                 ChronoZoom.Common.toggleOnImage('tours_index');
             }
@@ -816,7 +816,7 @@ module ChronoZoom {
         /*
         Collapses/expands bookmark description window.
         */
-        function onBookmarksCollapse() {
+        export function onBookmarksCollapse() {
             if (!isBookmarksWindowExpanded) {
                 expandBookmarks();
             } else {
@@ -827,7 +827,7 @@ module ChronoZoom {
         /*
         Handles click in tour narration window.
         */
-        function onNarrationClick() {
+        export function onNarrationClick() {
             if (isNarrationOn) {
                 $("#tours-narration-on").removeClass("narration-selected", "slow");
                 $("#tours-narration-off").addClass("narration-selected", "slow");

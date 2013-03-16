@@ -268,6 +268,7 @@ var ChronoZoom;
                 showHiddenBreadCrumb("left");
             }
         }
+        BreadCrumbs.breadCrumbNavLeft = breadCrumbNavLeft;
         // Handles click over navigate to right button.
         function breadCrumbNavRight() {
             var movingRightBreadCrumbs = 0;// counter of currently moving to right breadcrumbs
@@ -292,6 +293,7 @@ var ChronoZoom;
                 showHiddenBreadCrumb("right");
             }
         }
+        BreadCrumbs.breadCrumbNavRight = breadCrumbNavRight;
         // Handles click over breadcrumb link.
         // @param   timelineID          (string) id of timeline to navigate.
         // @param   breadCrumbLinkID    (string) id of table element which breadcrumb link was cliked.

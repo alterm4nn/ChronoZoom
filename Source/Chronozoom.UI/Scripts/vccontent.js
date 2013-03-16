@@ -242,7 +242,7 @@ var ChronoZoom;
                 return;
             }
             var sz = viewport2d.vectorVirtualToScreen(element.width, element.height);
-            if(sz.y <= renderThreshold || (element.width != 0 && sz.x <= renderThreshold)) {
+            if(sz.y <= ChronoZoom.Settings.renderThreshold || (element.width != 0 && sz.x <= ChronoZoom.Settings.renderThreshold)) {
                 // (width != 0): to render text first time, since it measures its width on first render only
                 if(element.isRendered) {
                     turnIsRenderedOff(element);
@@ -275,8 +275,8 @@ var ChronoZoom;
         */
         var addChild = function (parent, element, suppresCheck) {
             var isWithin = parent.width == Infinity || (element.x >= parent.x && element.x + element.width <= parent.x + parent.width) && (element.y >= parent.y && element.y + element.height <= parent.y + parent.height);
-            if(!isWithin && Log) {
-                Log.push("Child element does not belong to the parent element " + parent.id + " " + element.ID);
+            if(!isWithin) {
+                console.log("Child element does not belong to the parent element " + parent.id + " " + element.ID);
             }
             if(!suppresCheck && !isWithin) {
                 throw "Child element does not belong to the parent element";
@@ -706,7 +706,7 @@ var ChronoZoom;
             var baseline = timelineinfo.top + marginTop + headerSize / 2.0;
             this.titleObject = addText(this, layerid, id + "__header__", timelineinfo.timeStart + marginLeft, timelineinfo.top + marginTop, baseline, headerSize, timelineinfo.header, {
                 fontName: ChronoZoom.Settings.timelineHeaderFontName,
-                fillStyle: timelineHeaderFontColor,
+                fillStyle: ChronoZoom.Settings.timelineHeaderFontColor,
                 textBaseline: 'middle'
             });
             this.title = this.titleObject.text;
@@ -729,7 +729,7 @@ var ChronoZoom;
                     try  {
                         this.vc.currentlyHoveredInfodot.id;
                     } catch (ex) {
-                        stopAnimationTooltip();
+                        ChronoZoom.Common.stopAnimationTooltip();
                         this.vc.currentlyHoveredTimeline.tooltipIsShown = false;
                     }
                 }
@@ -737,7 +737,7 @@ var ChronoZoom;
                 this.vc.currentlyHoveredTimeline = this;
                 this.settings.strokeStyle = ChronoZoom.Settings.timelineHoveredBoxBorderColor;
                 this.settings.lineWidth = ChronoZoom.Settings.timelineHoveredLineWidth;
-                this.titleObject.settings.fillStyle = timelineHoveredHeaderFontColor;
+                this.titleObject.settings.fillStyle = ChronoZoom.Settings.timelineHoveredHeaderFontColor;
                 this.settings.hoverAnimationDelta = 3 / 60.0;
                 this.vc.requestInvalidate();
                 //if title is not in visible region, try to eval its screenFontSize using
@@ -747,15 +747,15 @@ var ChronoZoom;
                     this.titleObject.screenFontSize = ChronoZoom.Settings.timelineHeaderSize * vp.heightVirtualToScreen(this.height);
                 }
                 //if timeline title is small, show tooltip
-                if(this.titleObject.screenFontSize <= timelineTooltipMaxHeaderSize) {
+                if(this.titleObject.screenFontSize <= ChronoZoom.Settings.timelineTooltipMaxHeaderSize) {
                     this.tooltipEnabled = true;
                 } else {
                     this.tooltipEnabled = false;
                 }
-                if(tooltipMode != "infodot") {
-                    tooltipMode = "timeline";
+                if(ChronoZoom.Common.tooltipMode != "infodot") {
+                    ChronoZoom.Common.tooltipMode = "timeline";
                     if(this.tooltipEnabled == false) {
-                        stopAnimationTooltip();
+                        ChronoZoom.Common.stopAnimationTooltip();
                         this.tooltipIsShown = false;
                         return;
                     }
@@ -784,23 +784,23 @@ var ChronoZoom;
                         this.panelHeight = $('.bubbleInfo').outerHeight()// complete height of tooltip panel
                         ;
                         this.tooltipIsShown = true;
-                        animationTooltipRunning = $('.bubbleInfo').fadeIn();
+                        ChronoZoom.Common.animationTooltipRunning = $('.bubbleInfo').fadeIn();
                     }
                 }
             };
             this.onmouseunhover = function (pv, e) {
                 if(this.vc.currentlyHoveredTimeline != null && this.vc.currentlyHoveredTimeline.id == id) {
                     this.vc.currentlyHoveredTimeline = null;
-                    if((this.tooltipIsShown == true) && (tooltipMode == "timeline")) {
-                        tooltipMode = "default";
-                        stopAnimationTooltip();
+                    if((this.tooltipIsShown == true) && (ChronoZoom.Common.tooltipMode == "timeline")) {
+                        ChronoZoom.Common.tooltipMode = "default";
+                        ChronoZoom.Common.stopAnimationTooltip();
                         $(".bubbleInfo").attr("id", "defaultBox");
                         this.tooltipIsShown = false;
                     }
                 }
                 this.settings.strokeStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : ChronoZoom.Settings.timelineBorderColor;
                 this.settings.lineWidth = ChronoZoom.Settings.timelineLineWidth;
-                this.titleObject.settings.fillStyle = timelineHeaderFontColor;
+                this.titleObject.settings.fillStyle = ChronoZoom.Settings.timelineHeaderFontColor;
                 this.settings.hoverAnimationDelta = -3 / 60.0;
                 this.vc.requestInvalidate();
             };
@@ -908,7 +908,7 @@ var ChronoZoom;
             /* Checks whether the given point (virtual) is inside the object
             (should take into account the shape) */
             this.isInside = function (point_v) {
-                var len2 = sqr(point_v.x - vxc) + sqr(point_v.y - vyc);
+                var len2 = ChronoZoom.Common.sqr(point_v.x - vxc) + ChronoZoom.Common.sqr(point_v.y - vyc);
                 return len2 <= vradius * vradius;
             };
         }
@@ -1430,11 +1430,11 @@ var ChronoZoom;
             //So, we create "wrapping" div elemWrap, with position:absolute
             //Inside elemWrap, create child div with position:relative
             var elem = $("<div id='citext_" + id + "' class='contentItemDescription'></div").appendTo(vc);
-            elem[0].addEventListener("mousemove", preventbubble, false);
-            //elem[0].addEventListener("mouseup", preventbubble, false);
-            elem[0].addEventListener("mousedown", preventbubble, false);
-            elem[0].addEventListener("DOMMouseScroll", preventbubble, false);
-            elem[0].addEventListener("mousewheel", preventbubble, false);
+            elem[0].addEventListener("mousemove", ChronoZoom.Common.preventbubble, false);
+            //elem[0].addEventListener("mouseup", ChronoZoom.Common.preventbubble, false);
+            elem[0].addEventListener("mousedown", ChronoZoom.Common.preventbubble, false);
+            elem[0].addEventListener("DOMMouseScroll", ChronoZoom.Common.preventbubble, false);
+            elem[0].addEventListener("mousewheel", ChronoZoom.Common.preventbubble, false);
             var textElem = $("<div style='position:relative' class='text'></div>").html(text).appendTo(elem);
             //Initialize content
             this.initializeContent(elem[0]);
@@ -1446,11 +1446,11 @@ var ChronoZoom;
             };
             this.onRemove = function () {
                 CanvasScrollTextItem.prototype.onRemove.call(this);
-                elem[0].removeEventListener("mousemove", preventbubble, false);
-                elem[0].removeEventListener("mouseup", preventbubble, false);
-                elem[0].removeEventListener("mousedown", preventbubble, false);
-                elem[0].removeEventListener("DOMMouseScroll", preventbubble, false);
-                elem[0].removeEventListener("mousewheel", preventbubble, false);
+                elem[0].removeEventListener("mousemove", ChronoZoom.Common.preventbubble, false);
+                elem[0].removeEventListener("mouseup", ChronoZoom.Common.preventbubble, false);
+                elem[0].removeEventListener("mousedown", ChronoZoom.Common.preventbubble, false);
+                elem[0].removeEventListener("DOMMouseScroll", ChronoZoom.Common.preventbubble, false);
+                elem[0].removeEventListener("mousewheel", ChronoZoom.Common.preventbubble, false);
                 elem = undefined;
             };
         }
@@ -1547,10 +1547,10 @@ var ChronoZoom;
             ;
             this.initializeContent(container);
             this.viewer = new Seadragon.Viewer(container);
-            this.viewer.elmt.addEventListener("mousemove", preventbubble, false);
-            this.viewer.elmt.addEventListener("mousedown", preventbubble, false);
-            this.viewer.elmt.addEventListener("DOMMouseScroll", preventbubble, false);
-            this.viewer.elmt.addEventListener("mousewheel", preventbubble, false);
+            this.viewer.elmt.addEventListener("mousemove", ChronoZoom.Common.preventbubble, false);
+            this.viewer.elmt.addEventListener("mousedown", ChronoZoom.Common.preventbubble, false);
+            this.viewer.elmt.addEventListener("DOMMouseScroll", ChronoZoom.Common.preventbubble, false);
+            this.viewer.elmt.addEventListener("mousewheel", ChronoZoom.Common.preventbubble, false);
             this.viewer.addEventListener("open", function (e) {
                 if(self.onload) {
                     self.onload();
@@ -1858,7 +1858,7 @@ var ChronoZoom;
                 // it can be null because of mouse events sequence: mouseenter for infodot -> mousehover for timeline -> mouseunhover for timeline
                 if(this.vc.currentlyHoveredTimeline != null) {
                     // stop active tooltip fadein animation and hide tooltip
-                    stopAnimationTooltip();
+                    ChronoZoom.Common.stopAnimationTooltip();
                     this.vc.currentlyHoveredTimeline.tooltipIsShown = false;
                 }
                 $(".bubbleInfo span").text(infodotDescription.title);
@@ -1866,13 +1866,13 @@ var ChronoZoom;
                 ;
                 this.panelHeight = $('.bubbleInfo').outerHeight()// complete height of tooltip panel
                 ;
-                tooltipMode = "infodot"//set tooltip mode to infodot
+                ChronoZoom.Common.tooltipMode = "infodot"//set tooltip mode to infodot
                 ;
                 // start tooltip fadein animation for this infodot
                 if((this.tooltipEnabled == true) && (this.tooltipIsShown == false)) {
                     this.tooltipIsShown = true;
                     $(".bubbleInfo").attr("id", "defaultBox");
-                    animationTooltipRunning = $('.bubbleInfo').fadeIn();
+                    ChronoZoom.Common.animationTooltipRunning = $('.bubbleInfo').fadeIn();
                 }
                 this.vc.cursorPosition = time;
                 this.vc.currentlyHoveredInfodot = this;
@@ -1886,10 +1886,10 @@ var ChronoZoom;
                 this.vc.requestInvalidate();
                 // stop active fadein animation and hide tooltip
                 if(this.tooltipIsShown == true) {
-                    stopAnimationTooltip();
+                    ChronoZoom.Common.stopAnimationTooltip();
                 }
                 this.tooltipIsShown = false;
-                tooltipMode = "default";
+                ChronoZoom.Common.tooltipMode = "default";
                 this.vc.currentlyHoveredInfodot = undefined;
                 this.vc._setConstraintsByInfodotHover(undefined);
                 this.vc.RaiseCursorChanged();
@@ -1907,12 +1907,12 @@ var ChronoZoom;
             root.firstLoad = true;
             root.changeZoomLevel = function (curZl, newZl) {
                 // Showing only thumbnails for every content item of the infodot
-                if(newZl >= ChronoZoom.Settings.infodotShowContentThumbZoomLevel && newZl < infodotShowContentZoomLevel) {
-                    var URL = getURL();
+                if(newZl >= ChronoZoom.Settings.infodotShowContentThumbZoomLevel && newZl < ChronoZoom.Settings.infodotShowContentZoomLevel) {
+                    var URL = ChronoZoom.UrlNav.getURL();
                     if(typeof URL.hash.params != 'undefined' && typeof URL.hash.params['b'] != 'undefined') {
                         bibliographyFlag = false;
                     }
-                    if(curZl >= ChronoZoom.Settings.infodotShowContentThumbZoomLevel && curZl < infodotShowContentZoomLevel) {
+                    if(curZl >= ChronoZoom.Settings.infodotShowContentThumbZoomLevel && curZl < ChronoZoom.Settings.infodotShowContentZoomLevel) {
                         return null;
                     }
                     // Tooltip is enabled now.
@@ -1937,15 +1937,15 @@ var ChronoZoom;
                         return null;
                     }
                 } else // Showing all content items, bibliography link and title of the infodot
-                if(newZl >= infodotShowContentZoomLevel) {
-                    if(curZl >= infodotShowContentZoomLevel) {
+                if(newZl >= ChronoZoom.Settings.infodotShowContentZoomLevel) {
+                    if(curZl >= ChronoZoom.Settings.infodotShowContentZoomLevel) {
                         return null;
                     }
                     // Tooltip is disabled now.
                     infodot.tooltipEnabled = false;
                     // stop active fadein animation and hide tooltip
                     if(infodot.tooltipIsShown == true) {
-                        stopAnimationTooltip();
+                        ChronoZoom.Common.stopAnimationTooltip();
                         infodot.tooltipIsShown = false;
                     }
                     var contentItem = null;
@@ -1989,7 +1989,7 @@ var ChronoZoom;
                     bibl.reactsOnMouse = true;
                     bibl.onmouseclick = function (e) {
                         this.vc.element.css('cursor', 'default');
-                        showBibliography({
+                        ChronoZoom.Bibliography.showBibliography({
                             infodot: infodotDescription,
                             contentItems: infodot.contentItems
                         }, contentItem, id + "__bibliography");
@@ -2010,7 +2010,7 @@ var ChronoZoom;
                     if(bid && bibliographyFlag) {
                         //bid[0] - source string
                         //bid[1] - found match
-                        showBibliography({
+                        ChronoZoom.Bibliography.showBibliography({
                             infodot: infodotDescription,
                             contentItems: infodot.contentItems
                         }, contentItem, bid[1]);
@@ -2037,7 +2037,7 @@ var ChronoZoom;
                         }
                     }
                     if(zl >= ChronoZoom.Settings.contentItemThumbnailMaxLevel) {
-                        if(curZl >= ChronoZoom.Settings.contentItemThumbnailMaxLevel && curZl < infodotShowContentZoomLevel) {
+                        if(curZl >= ChronoZoom.Settings.contentItemThumbnailMaxLevel && curZl < ChronoZoom.Settings.infodotShowContentZoomLevel) {
                             return null;
                         }// we are already showing the largest thumbnail available
                         

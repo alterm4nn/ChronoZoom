@@ -91,6 +91,9 @@
     <Content Include="cz.js">
       <DependentUpon>cz.ts</DependentUpon>
     </Content>
+    <Content Include="cz.min.js">
+      <DependentUpon>cz.ts</DependentUpon>
+    </Content>
     <Content Include="czmobile.htm" />
     <Content Include="favicon.ico" />
     <Content Include="Images\A.png" />

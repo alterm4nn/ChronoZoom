@@ -34,6 +34,7 @@ var ChronoZoom;
                 }
             }
         }
+        Search.searchHighlight = searchHighlight;
         function initializeSearch() {
             $("#searchTextBox").focus(function () {
                 if($(this).hasClass('emptyTextBox')) {
@@ -66,6 +67,7 @@ var ChronoZoom;
             });
             $("#search").hide();
         }
+        Search.initializeSearch = initializeSearch;
         function navigateToElement(e) {
             var animId = ChronoZoom.Common.setVisibleByUserDirectly(e.newvisible);
             if(animId) {
@@ -75,6 +77,7 @@ var ChronoZoom;
                 };
             }
         }
+        Search.navigateToElement = navigateToElement;
         function navigateToBookmark(bookmark) {
             if(bookmark) {
                 var visible = ChronoZoom.UrlNav.navStringToVisible(bookmark, $('#vc'));
@@ -129,7 +132,7 @@ var ChronoZoom;
                     }
                 }
                 if(lookingForCI && el.type === 'infodot') {
-                    var ci = getContentItem(el, id);
+                    var ci = ChronoZoom.VCContent.getContentItem(el, id);
                     if(ci != null) {
                         return ci;
                     }

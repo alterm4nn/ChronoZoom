@@ -10,6 +10,7 @@
                 window.location.hash = window.location.hash.replace(new RegExp("&b=[a-z0-9_]+$", "gi"), "");
             });
         }
+        Bibliography.initializeBibliography = initializeBibliography;
         var pendingBibliographyForExhibitID = null;
         function showBibliography(descr, element, id) {
             // Bibliography link that raised showBibliohraphy.
@@ -70,6 +71,7 @@
                 }
             }
         }
+        Bibliography.showBibliography = showBibliography;
         function getBibliography(exhibitID, contentItems) {
             pendingBibliographyForExhibitID = exhibitID;
             var onBiblReceived = function (response) {
