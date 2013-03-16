@@ -89,6 +89,7 @@ var ChronoZoom;
                 };
             };
         }
+        Viewport.Viewport2d = Viewport2d;
     })(ChronoZoom.Viewport || (ChronoZoom.Viewport = {}));
     var Viewport = ChronoZoom.Viewport;
 })(ChronoZoom || (ChronoZoom = {}));

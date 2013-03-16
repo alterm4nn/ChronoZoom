@@ -211,7 +211,7 @@ module ChronoZoom {
         Note to check object fields for 'null' & 'undefined'. If URL string has no parameters, there is not array. 
         */
 
-        function getURL() {
+        export function getURL() {
             var url : {
                 protocol: string;
                 host: string;

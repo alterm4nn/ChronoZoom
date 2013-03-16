@@ -273,7 +273,7 @@ module ChronoZoom {
                 if (!self.currentPlace || self.currentPlace.animationID == undefined || self.currentPlace.animationID != animationID) // callback is obsolete
                     return;
 
-                var curURL = getURL();
+                var curURL = ChronoZoom.UrlNav.getURL();
                 if (typeof curURL.hash.params == 'undefined')
                     curURL.hash.params = new Array();
                 curURL.hash.params["tour"] = tour.sequenceNum;
@@ -360,7 +360,7 @@ module ChronoZoom {
                     RaiseTourStarted();
                 }
 
-                var curURL = getURL();
+                var curURL = ChronoZoom.UrlNav.getURL();
                 if (typeof curURL.hash.params == 'undefined') {
                     curURL.hash.params = new Array();
                 }
@@ -369,7 +369,7 @@ module ChronoZoom {
                     curURL.hash.params["tour"] = tour.sequenceNum;
 
                     //This flag is used to overcome hashchange event handler
-                    hashHandle = false;
+                    ChronoZoom.Common.hashHandle = false;
                     ChronoZoom.UrlNav.setURL(curURL);
                 }
             };
@@ -601,7 +601,7 @@ module ChronoZoom {
             $("#bookmarks").hide();
             isBookmarksWindowVisible = false;
 
-            var curURL = getURL();
+            var curURL = ChronoZoom.UrlNav.getURL();
             delete curURL.hash.params["tour"];
             delete curURL.hash.params["bookmark"];
             ChronoZoom.UrlNav.setURL(curURL);
@@ -925,7 +925,7 @@ module ChronoZoom {
         }
 
         export function loadTourFromURL() {
-            var curURL = getURL();
+            var curURL = ChronoZoom.UrlNav.getURL();
             if ((typeof curURL.hash.params !== 'undefined') && (curURL.hash.params["tour"] > tours.length))
                 return;
 

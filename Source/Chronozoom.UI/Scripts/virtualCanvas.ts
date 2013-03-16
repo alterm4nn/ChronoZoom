@@ -1,13 +1,9 @@
-﻿declare var $: any;
-declare var CanvasRootElement: any;
-declare var VisibleRegion2d: any;
-declare var getXBrowserMouseOrigin: any;
-declare var stopAnimationTooltip: any;
-declare var infoDotZoomConstraint: any;
-declare var tooltipMode: any;
-declare var animationTooltipRunning: any;
-declare var Viewport2d: any;
-declare var targetFps: any;
+﻿/// <reference path='cz.settings.ts'/>
+/// <reference path='common.ts'/>
+/// <reference path='viewport.ts'/>
+/// <reference path='vccontent.ts'/>
+
+declare var $: any;
 
 module ChronoZoom {
     export module VirtualCanvas {
@@ -79,10 +75,10 @@ module ChronoZoom {
                     });
 
                     // creating layers' content root element
-                    this._layersContent = new CanvasRootElement(self, undefined, "__root__", -Infinity, -Infinity, Infinity, Infinity);
+                    this._layersContent = new ChronoZoom.VCContent.CanvasRootElement(self, undefined, "__root__", -Infinity, -Infinity, Infinity, Infinity);
 
                     // default visible region 
-                    this.options.visible = new VisibleRegion2d(0, 0, 1); // ...in virtual coordinates: centerX, centerY, scale.
+                    this.options.visible = new ChronoZoom.Viewport.VisibleRegion2d(0, 0, 1); // ...in virtual coordinates: centerX, centerY, scale.
                     this.updateViewport();
 
                     // start up the mouse handling
@@ -111,7 +107,7 @@ module ChronoZoom {
                 /* Handles mouse down event within the widget
                 */
                 _mouseDown: function (e) {
-                    var origin = getXBrowserMouseOrigin(this.element, e);
+                    var origin = ChronoZoom.Common.getXBrowserMouseOrigin(this.element, e);
                     this.lastClickPosition = { // saving a position where the mouse was clicked last time
                         x: origin.x,
                         y: origin.y
@@ -128,7 +124,7 @@ module ChronoZoom {
                 /* Handles mouse up event within the widget
                 */
                 _mouseUp: function (e) {
-                    var origin = getXBrowserMouseOrigin(this.element, e);
+                    var origin = ChronoZoom.Common.getXBrowserMouseOrigin(this.element, e);
                     if (this.lastClickPosition && this.lastClickPosition.x == origin.x && this.lastClickPosition.y == origin.y)
                         this._mouseClick(e);
 
@@ -153,7 +149,7 @@ module ChronoZoom {
                         this.currentlyHoveredTimeline.onmouseunhover(null, e);
 
                     // hide tooltip now
-                    stopAnimationTooltip();
+                    ChronoZoom.Common.stopAnimationTooltip();
                     // remove last mouse position from canvas to prevent unexpected highlight of canvas elements
                     this.lastEvent = null;
                 },
@@ -163,7 +159,7 @@ module ChronoZoom {
                 */
                 _mouseClick: function (e) {
                     var viewport = this.getViewport();
-                    var origin = getXBrowserMouseOrigin(this.element, e);
+                    var origin = ChronoZoom.Common.getXBrowserMouseOrigin(this.element, e);
                     var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
 
                     // the function handle mouse click an a content item
@@ -206,7 +202,7 @@ module ChronoZoom {
                     var val;
                     if (e) {
                         var recentVp = this.getViewport();
-                        val = e.outerRad * infoDotZoomConstraint / recentVp.width;
+                        val = e.outerRad * ChronoZoom.Settings.infoDotZoomConstraint / recentVp.width;
                     }
                     else
                         val = undefined;
@@ -240,9 +236,9 @@ module ChronoZoom {
 
                     var obj = null;
 
-                    if (tooltipMode == 'infodot') obj = this.currentlyHoveredInfodot;
+                    if (ChronoZoom.Common.tooltipMode == 'infodot') obj = this.currentlyHoveredInfodot;
                     else
-                        if (tooltipMode == 'timeline') obj = this.currentlyHoveredTimeline;
+                        if (ChronoZoom.Common.tooltipMode == 'timeline') obj = this.currentlyHoveredTimeline;
 
                     if (obj == null) return;
 
@@ -268,7 +264,7 @@ module ChronoZoom {
                 */
                 mouseMove: function (e) {
                     var viewport = this.getViewport();
-                    var origin = getXBrowserMouseOrigin(this.element, e);
+                    var origin = ChronoZoom.Common.getXBrowserMouseOrigin(this.element, e);
                     var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
 
                     // triggers an event that handles current mouse position
@@ -348,18 +344,18 @@ module ChronoZoom {
 
                     // update tooltip for currently tooltiped infodot|t if tooltip is enabled for this infodot|timeline
                     if ((this.currentlyHoveredInfodot != null && this.currentlyHoveredInfodot.tooltipEnabled == true)
-			        || (this.currentlyHoveredTimeline != null && this.currentlyHoveredTimeline.tooltipEnabled == true && tooltipMode != "infodot")) {
+                    || (this.currentlyHoveredTimeline != null && this.currentlyHoveredTimeline.tooltipEnabled == true && ChronoZoom.Common.tooltipMode != "infodot")) {
 
                         var obj = null;
 
-                        if (tooltipMode == 'infodot') obj = this.currentlyHoveredInfodot;
-                        else if (tooltipMode == 'timeline') obj = this.currentlyHoveredTimeline;
+                        if (ChronoZoom.Common.tooltipMode == 'infodot') obj = this.currentlyHoveredInfodot;
+                        else if (ChronoZoom.Common.tooltipMode == 'timeline') obj = this.currentlyHoveredTimeline;
 
                         if (obj != null) {
                             // show tooltip if it is not shown yet
                             if (obj.tooltipIsShown == false) {
                                 obj.tooltipIsShown = true;
-                                animationTooltipRunning = $('.bubbleInfo').fadeIn();
+                                ChronoZoom.Common.animationTooltipRunning = $('.bubbleInfo').fadeIn();
                             }
                         }
                         // update position of tooltip
@@ -482,7 +478,7 @@ module ChronoZoom {
                     if (!this.viewport) {
                         var size = this._getClientSize();
                         var o = this.options;
-                        this.viewport = new Viewport2d(o.aspectRatio, size.width, size.height, o.visible);
+                        this.viewport = new ChronoZoom.Viewport.Viewport2d(o.aspectRatio, size.width, size.height, o.visible);
                     }
                     return this.viewport;
                 },
@@ -537,7 +533,7 @@ module ChronoZoom {
                     setTimeout(function () {
                         self.isInAnimation = false;
                         self.invalidate();
-                    }, 1000.0 / targetFps); // 1/targetFps sec (targetFps is defined in a settings.js)
+                    }, 1000.0 / ChronoZoom.Settings.targetFps); // 1/targetFps sec (targetFps is defined in a settings.js)
                 },
 
                 options: {

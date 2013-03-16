@@ -1,7 +1,5 @@
-﻿declare var Viewport2d: any;
-declare var VisibleRegion2d: any;
-declare var ellipticalZoomZoomoutFactor: any;
-declare var ellipticalZoomDuration: any;
+﻿/// <reference path='cz.settings.ts'/>
+/// <reference path='viewport.ts'/>
 
 module ChronoZoom {
     export module ViewportAnimation {
@@ -12,7 +10,7 @@ module ChronoZoom {
         to make animation work one must call setTargetViewport method before requesting any animation frames
         @param startViewport (Viewport2D) The state of the viewport at the begining of the animation
         */
-        function PanZoomAnimation(startViewport) {
+        export function PanZoomAnimation(startViewport) {
             this.isForciblyStoped = false;
             this.ID = globalAnimationID++;
             var startVisible = startViewport.visible;
@@ -22,11 +20,11 @@ module ChronoZoom {
             this.isActive = true;  //are more animation frames needed
             this.type = "PanZoom";
 
-            this.startViewport = new Viewport2d( //deep copy of the startViewport
+            this.startViewport = new ChronoZoom.Viewport.Viewport2d( //deep copy of the startViewport
                             startViewport.aspectRatio,
                             startViewport.width,
                             startViewport.height,
-                            new VisibleRegion2d(startVisible.centerX, startVisible.centerY, startVisible.scale)
+                            new ChronoZoom.Viewport.VisibleRegion2d(startVisible.centerX, startVisible.centerY, startVisible.scale)
                         );
             this.estimatedEndViewport; //an estimated state of the viewport at the end of the animation
 
@@ -51,11 +49,11 @@ module ChronoZoom {
 
                 var prevVis = this.previousFrameViewport.visible;
 
-                this.startViewport = new Viewport2d(
+                this.startViewport = new ChronoZoom.Viewport.Viewport2d(
                             this.previousFrameViewport.aspectRatio,
                             this.previousFrameViewport.width,
                             this.previousFrameViewport.height,
-                            new VisibleRegion2d(prevVis.centerX, prevVis.centerY, prevVis.scale)
+                            new ChronoZoom.Viewport.VisibleRegion2d(prevVis.centerX, prevVis.centerY, prevVis.scale)
                         ); //previous frame becomes the first one
 
                 //updating all coordinates according to the screen coodinate system of new start Viewport
@@ -112,7 +110,7 @@ module ChronoZoom {
 
                 //updating previous frame info. This will be returned as the requested animation frame
                 var prevFrameVisible = this.previousFrameViewport.visible;
-                var updatedVisible = new VisibleRegion2d(
+                var updatedVisible = new ChronoZoom.Viewport.VisibleRegion2d(
                 prevFrameVisible.centerX,
                 prevFrameVisible.centerY,
                 prevFrameVisible.scale
@@ -155,12 +153,12 @@ module ChronoZoom {
         @param startVisible   (visible2d) a viewport visible region from which the elliptical zoom starts
         @param endVisible     (visible2d) a viewport visible region that will be reached at the end of elliptical zoom animation
         */
-        function EllipticalZoom(startVisible, endVisible) {
+        export function EllipticalZoom(startVisible, endVisible) {
             this.isForciblyStoped = false;
             this.ID = globalAnimationID++;
             this.type = "EllipticalZoom";
             this.isActive = true;
-            this.targetVisible = new VisibleRegion2d(endVisible.centerX, endVisible.centerY, endVisible.scale);
+            this.targetVisible = new ChronoZoom.Viewport.VisibleRegion2d(endVisible.centerX, endVisible.centerY, endVisible.scale);
             this.startTime = (new Date()).getTime();
 
             this.imprecision = 0.0001; // Average imprecision in pathlength when centers of startVisible and endVisible visible regions are the same.
@@ -220,7 +218,7 @@ module ChronoZoom {
                     this.isActive = false;
                 }
 
-                return new VisibleRegion2d(
+                return new ChronoZoom.Viewport.VisibleRegion2d(
                     this.x(t),
                     this.y(t),
                     this.scale(t));
@@ -243,7 +241,7 @@ module ChronoZoom {
             var yDiff = startPoint.Y - endPoint.Y;
             this.pathLen = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
 
-            var ro = 0.1 * ellipticalZoomZoomoutFactor; //is set from settings.js
+            var ro = 0.1 * ChronoZoom.Settings.ellipticalZoomZoomoutFactor; //is set from settings.js
             this.ro = ro;
             var u0 = 0;
             this.u0 = u0;
@@ -272,7 +270,7 @@ module ChronoZoom {
                     this.r1 = -Math.log(2 * b1);
 
                 this.S = (this.r1 - this.r0) / ro;
-                this.duration = ellipticalZoomDuration / 300 * this.S; //300 is a number to make animation eye candy. Please adjust ellipticalZoomDuration in settings.js instead of 300 constant here.
+                this.duration = ChronoZoom.Settings.ellipticalZoomDuration / 300 * this.S; //300 is a number to make animation eye candy. Please adjust ellipticalZoomDuration in settings.js instead of 300 constant here.
             }
             else {//special case of i0 == u1, overridding methods
                 var logScaleChange = Math.log(Math.abs(endScale - startScale)) + 10;
@@ -293,7 +291,7 @@ module ChronoZoom {
                     this.isActive = false;
                 }
 
-                this.duration = ellipticalZoomDuration * scaleDiff * 0.2;
+                this.duration = ChronoZoom.Settings.ellipticalZoomDuration * scaleDiff * 0.2;
 
                 this.x = function (s) { return this.startPoint.X; }
                 this.y = function (s) { return this.startPoint.Y; }

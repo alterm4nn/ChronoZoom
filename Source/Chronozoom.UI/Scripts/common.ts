@@ -6,9 +6,12 @@
 /// <reference path='layout.ts'/>
 
 declare var $: any;
-declare var unescape: any;
-declare var timings: any;
+
+// Obsolete functions not included in the typescript base library bindings
 declare var escape: any;
+declare var unescape: any;
+
+declare var timings: any;
 declare var hashChangeFromOutside: any;
 
 module ChronoZoom {
@@ -71,7 +74,7 @@ module ChronoZoom {
             };
         }
 
-        function sqr(d) { return d * d; }
+        export function sqr(d) { return d * d; }
 
         // Prevents the event from bubbling. 
         // In non IE browsers, use e.stopPropagation() instead. 
@@ -241,10 +244,10 @@ module ChronoZoom {
 
 
         /*Animation tooltip parameter*/
-        var animationTooltipRunning = null;
-        var tooltipMode = "default"; //['infodot'], ['timeline'] indicates whether tooltip is refers to timeline or to infodot
+        export var animationTooltipRunning = null;
+        export var tooltipMode = "default"; //['infodot'], ['timeline'] indicates whether tooltip is refers to timeline or to infodot
 
-        function stopAnimationTooltip() {
+        export function stopAnimationTooltip() {
             if (animationTooltipRunning != null) {
                 $('.bubbleInfo').stop();
                 $(".bubbleInfo").css("opacity", "0.9");

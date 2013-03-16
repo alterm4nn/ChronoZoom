@@ -18,7 +18,7 @@ module ChronoZoom {
 
         var pendingBibliographyForExhibitID = null;
 
-        function showBibliography(descr, element, id) {
+        export function showBibliography(descr, element, id) {
             // Bibliography link that raised showBibliohraphy.
             var sender;
             // Trying to find sender of bibliography link. Stop process of showing bibliography, if didn't find.

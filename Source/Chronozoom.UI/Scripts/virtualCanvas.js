@@ -60,9 +60,9 @@ var ChronoZoom;
                     ;
                 });
                 // creating layers' content root element
-                this._layersContent = new CanvasRootElement(self, undefined, "__root__", -Infinity, -Infinity, Infinity, Infinity);
+                this._layersContent = new ChronoZoom.VCContent.CanvasRootElement(self, undefined, "__root__", -Infinity, -Infinity, Infinity, Infinity);
                 // default visible region
-                this.options.visible = new VisibleRegion2d(0, 0, 1)// ...in virtual coordinates: centerX, centerY, scale.
+                this.options.visible = new ChronoZoom.Viewport.VisibleRegion2d(0, 0, 1)// ...in virtual coordinates: centerX, centerY, scale.
                 ;
                 this.updateViewport();
                 // start up the mouse handling

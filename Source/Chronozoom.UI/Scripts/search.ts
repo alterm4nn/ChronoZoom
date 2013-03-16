@@ -132,7 +132,7 @@ module ChronoZoom {
                     if (res) return res;
                 }
                 if (lookingForCI && el.type === 'infodot') {
-                    var ci = getContentItem(el, id);
+                    var ci = ChronoZoom.VCContent.getContentItem(el, id);
                     if (ci != null) {
                         return ci;
                     }

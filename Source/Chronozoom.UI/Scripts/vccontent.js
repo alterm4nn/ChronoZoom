@@ -3,7 +3,7 @@ var ChronoZoom;
     (function (VCContent) {
         var elementclick = $.Event("elementclick");
         function getVisibleForElement(element, scale, viewport) {
-            var margin = 2 * (contentScaleMargin ? contentScaleMargin : 0);
+            var margin = 2 * (ChronoZoom.Settings.contentScaleMargin ? ChronoZoom.Settings.contentScaleMargin : 0);
             var width = viewport.width - margin;
             if(width < 0) {
                 width = viewport.width;
@@ -409,6 +409,7 @@ var ChronoZoom;
                 }
             };
         }
+        VCContent.CanvasRootElement = CanvasRootElement;
         CanvasRootElement.prototype = CanvasElement;
         /*****************************************************************************************/
         /* Dynamic Level of Details element                                                      */
@@ -698,20 +699,20 @@ var ChronoZoom;
             this.settings.outline = true;
             this.type = 'timeline';
             var width = timelineinfo.timeEnd - timelineinfo.timeStart;
-            var headerSize = timelineinfo.titleRect ? timelineinfo.titleRect.height : timelineHeaderSize * timelineinfo.height;
-            var marginLeft = timelineinfo.titleRect ? timelineinfo.titleRect.marginLeft : timelineHeaderMargin * timelineinfo.height;// size of left and top margins (e.g. if timeline is for 100 years, relative margin timelineHeaderMargin=0.05, then absolute margin is 5 years).
+            var headerSize = timelineinfo.titleRect ? timelineinfo.titleRect.height : ChronoZoom.Settings.timelineHeaderSize * timelineinfo.height;
+            var marginLeft = timelineinfo.titleRect ? timelineinfo.titleRect.marginLeft : ChronoZoom.Settings.timelineHeaderMargin * timelineinfo.height;// size of left and top margins (e.g. if timeline is for 100 years, relative margin timelineHeaderMargin=0.05, then absolute margin is 5 years).
             
-            var marginTop = timelineinfo.titleRect ? timelineinfo.titleRect.marginTop : (1 - timelineHeaderMargin) * timelineinfo.height - headerSize;
+            var marginTop = timelineinfo.titleRect ? timelineinfo.titleRect.marginTop : (1 - ChronoZoom.Settings.timelineHeaderMargin) * timelineinfo.height - headerSize;
             var baseline = timelineinfo.top + marginTop + headerSize / 2.0;
             this.titleObject = addText(this, layerid, id + "__header__", timelineinfo.timeStart + marginLeft, timelineinfo.top + marginTop, baseline, headerSize, timelineinfo.header, {
-                fontName: timelineHeaderFontName,
+                fontName: ChronoZoom.Settings.timelineHeaderFontName,
                 fillStyle: timelineHeaderFontColor,
                 textBaseline: 'middle'
             });
             this.title = this.titleObject.text;
             this.regime = timelineinfo.regime;
             this.settings.gradientOpacity = 0;
-            this.settings.gradientFillStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : timelineBorderColor;
+            this.settings.gradientFillStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : ChronoZoom.Settings.timelineBorderColor;
             this.reactsOnMouse = true;
             this.tooltipEnabled = true//enable tooltips to timelines
             ;
@@ -734,8 +735,8 @@ var ChronoZoom;
                 }
                 //make currentTimeline to this
                 this.vc.currentlyHoveredTimeline = this;
-                this.settings.strokeStyle = timelineHoveredBoxBorderColor;
-                this.settings.lineWidth = timelineHoveredLineWidth;
+                this.settings.strokeStyle = ChronoZoom.Settings.timelineHoveredBoxBorderColor;
+                this.settings.lineWidth = ChronoZoom.Settings.timelineHoveredLineWidth;
                 this.titleObject.settings.fillStyle = timelineHoveredHeaderFontColor;
                 this.settings.hoverAnimationDelta = 3 / 60.0;
                 this.vc.requestInvalidate();
@@ -743,7 +744,7 @@ var ChronoZoom;
                 //formula based on height of its parent timeline
                 if(this.titleObject.initialized == false) {
                     var vp = this.vc.getViewport();
-                    this.titleObject.screenFontSize = timelineHeaderSize * vp.heightVirtualToScreen(this.height);
+                    this.titleObject.screenFontSize = ChronoZoom.Settings.timelineHeaderSize * vp.heightVirtualToScreen(this.height);
                 }
                 //if timeline title is small, show tooltip
                 if(this.titleObject.screenFontSize <= timelineTooltipMaxHeaderSize) {
@@ -797,8 +798,8 @@ var ChronoZoom;
                         this.tooltipIsShown = false;
                     }
                 }
-                this.settings.strokeStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : timelineBorderColor;
-                this.settings.lineWidth = timelineLineWidth;
+                this.settings.strokeStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : ChronoZoom.Settings.timelineBorderColor;
+                this.settings.lineWidth = ChronoZoom.Settings.timelineLineWidth;
                 this.titleObject.settings.fillStyle = timelineHeaderFontColor;
                 this.settings.hoverAnimationDelta = -3 / 60.0;
                 this.vc.requestInvalidate();
@@ -833,9 +834,9 @@ var ChronoZoom;
                     y: p.y + size_p.y
                 };
                 // is center of canvas inside timeline
-                var isCenterInside = viewport2d.visible.centerX - timelineCenterOffsetAcceptableImplicity <= this.x + this.width && viewport2d.visible.centerX + timelineCenterOffsetAcceptableImplicity >= this.x && viewport2d.visible.centerY - timelineCenterOffsetAcceptableImplicity <= this.y + this.height && viewport2d.visible.centerY + timelineCenterOffsetAcceptableImplicity >= this.y;
+                var isCenterInside = viewport2d.visible.centerX - ChronoZoom.Settings.timelineCenterOffsetAcceptableImplicity <= this.x + this.width && viewport2d.visible.centerX + ChronoZoom.Settings.timelineCenterOffsetAcceptableImplicity >= this.x && viewport2d.visible.centerY - ChronoZoom.Settings.timelineCenterOffsetAcceptableImplicity <= this.y + this.height && viewport2d.visible.centerY + ChronoZoom.Settings.timelineCenterOffsetAcceptableImplicity >= this.y;
                 // is timeline inside "breadcrumb offset box"
-                var isVisibleInTheRectangle = ((p.x < timelineBreadCrumbBorderOffset && p2.x > viewport2d.width - timelineBreadCrumbBorderOffset) || (p.y < timelineBreadCrumbBorderOffset && p2.y > viewport2d.height - timelineBreadCrumbBorderOffset));
+                var isVisibleInTheRectangle = ((p.x < ChronoZoom.Settings.timelineBreadCrumbBorderOffset && p2.x > viewport2d.width - ChronoZoom.Settings.timelineBreadCrumbBorderOffset) || (p.y < ChronoZoom.Settings.timelineBreadCrumbBorderOffset && p2.y > viewport2d.height - ChronoZoom.Settings.timelineBreadCrumbBorderOffset));
                 if(isVisibleInTheRectangle && isCenterInside) {
                     var length = vc.breadCrumbs.length;
                     if(length > 1) {
@@ -1233,7 +1234,7 @@ var ChronoZoom;
             var onCanvasImageLoadError = function (e) {
                 if(!img['isFallback']) {
                     img['isFallback'] = true;
-                    img.src = fallbackImageUri;
+                    img.src = ChronoZoom.Settings.fallbackImageUri;
                 } else {
                     throw "Cannot load an image!";
                 }
@@ -1439,7 +1440,7 @@ var ChronoZoom;
             this.initializeContent(elem[0]);
             this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
                 //Scale new font size
-                var fontSize = size_p.y / contentItemDescriptionNumberOfLines;
+                var fontSize = size_p.y / ChronoZoom.Settings.contentItemDescriptionNumberOfLines;
                 elem.css('font-size', fontSize + "px");
                 CanvasScrollTextItem.prototype.render.call(this, ctx, visibleBox, viewport2d, size_p, opacity);
             };
@@ -1575,9 +1576,9 @@ var ChronoZoom;
                     self.showFallbackImage();
                 } else {
                     // conversion to dzi (deepzoom image format) is in progress
-                    if(self.nAttempts < seadragonMaxConnectionAttempts) {
+                    if(self.nAttempts < ChronoZoom.Settings.seadragonMaxConnectionAttempts) {
                         self.viewer.showMessage("Loading " + Math.round(100 * content.progress) + "% done.");
-                        self.timeoutHandles.push(setTimeout(self.requestDZI, seadragonRetryInterval))// retry
+                        self.timeoutHandles.push(setTimeout(self.requestDZI, ChronoZoom.Settings.seadragonRetryInterval))// retry
                         ;
                     } else {
                         self.showFallbackImage();
@@ -1586,8 +1587,8 @@ var ChronoZoom;
             };
             this.onError = function () {
                 // ajax query failed
-                if(self.nAttempts < seadragonMaxConnectionAttempts) {
-                    self.timeoutHandles.push(setTimeout(self.requestDZI, seadragonRetryInterval))// retry
+                if(self.nAttempts < ChronoZoom.Settings.seadragonMaxConnectionAttempts) {
+                    self.timeoutHandles.push(setTimeout(self.requestDZI, ChronoZoom.Settings.seadragonRetryInterval))// retry
                     ;
                 } else {
                     self.showFallbackImage();
@@ -1596,7 +1597,7 @@ var ChronoZoom;
             this.requestDZI = function () {
                 self.nAttempts++;
                 $.ajax({
-                    url: seadragonServiceURL + encodeURIComponent(imageSource),
+                    url: ChronoZoom.Settings.seadragonServiceURL + encodeURIComponent(imageSource),
                     dataType: "jsonp",
                     success: self.onSuccess,
                     error: self.onError
@@ -1648,8 +1649,8 @@ var ChronoZoom;
         function addTimeline(element, layerid, id, timelineinfo) {
             var width = timelineinfo.timeEnd - timelineinfo.timeStart;
             var timeline = addChild(element, new CanvasTimeline(element.vc, layerid, id, timelineinfo.timeStart, timelineinfo.top, width, timelineinfo.height, {
-                strokeStyle: timelineinfo.strokeStyle ? timelineinfo.strokeStyle : timelineStrokeStyle,
-                lineWidth: timelineLineWidth,
+                strokeStyle: timelineinfo.strokeStyle ? timelineinfo.strokeStyle : ChronoZoom.Settings.timelineStrokeStyle,
+                lineWidth: ChronoZoom.Settings.timelineLineWidth,
                 fillStyle: timelineinfo.fillStyle
             }, timelineinfo), true);
             return timeline;
@@ -1677,34 +1678,34 @@ var ChronoZoom;
             this.base(vc, layerid, id, vx, vy, vw, vh);
             this.type = 'contentItem';
             // Building content of the item
-            var titleHeight = vh * contentItemTopTitleHeight * 0.8;
-            var mediaHeight = vh * contentItemMediaHeight;
-            var descrHeight = contentItemFontHeight * vh;
-            var contentWidth = vw * contentItemContentWidth;
+            var titleHeight = vh * ChronoZoom.Settings.contentItemTopTitleHeight * 0.8;
+            var mediaHeight = vh * ChronoZoom.Settings.contentItemMediaHeight;
+            var descrHeight = ChronoZoom.Settings.contentItemFontHeight * vh;
+            var contentWidth = vw * ChronoZoom.Settings.contentItemContentWidth;
             var leftOffset = (vw - contentWidth) / 2.0;
-            var verticalMargin = vh * contentItemVerticalMargin;
+            var verticalMargin = vh * ChronoZoom.Settings.contentItemVerticalMargin;
             var mediaTop = vy + verticalMargin;//vy + titleHeight + 2 * verticalMargin;
             
             var sourceVertMargin = verticalMargin * 0.4;
             var sourceTop = mediaTop + mediaHeight + sourceVertMargin;
             var sourceRight = vx + vw - leftOffset;
-            var sourceHeight = vh * contentItemSourceHeight * 0.8;
+            var sourceHeight = vh * ChronoZoom.Settings.contentItemSourceHeight * 0.8;
             var titleTop = sourceTop + verticalMargin + sourceHeight;
             // Bounding rectangle
             var rect = addRectangle(this, layerid, id + "__rect__", vx, vy, vw, vh, {
-                strokeStyle: contentItemBoundingBoxBorderColor,
-                lineWidth: contentItemBoundingBoxBorderWidth * vw,
-                fillStyle: contentItemBoundingBoxFillColor,
+                strokeStyle: ChronoZoom.Settings.contentItemBoundingBoxBorderColor,
+                lineWidth: ChronoZoom.Settings.contentItemBoundingBoxBorderWidth * vw,
+                fillStyle: ChronoZoom.Settings.contentItemBoundingBoxFillColor,
                 isLineWidthVirtual: true
             });
             this.reactsOnMouse = true;
             this.onmouseenter = function (e) {
-                rect.settings.strokeStyle = contentItemBoundingHoveredBoxBorderColor;
+                rect.settings.strokeStyle = ChronoZoom.Settings.contentItemBoundingHoveredBoxBorderColor;
                 this.vc.currentlyHoveredContentItem = this;
                 this.vc.requestInvalidate();
             };
             this.onmouseleave = function (e) {
-                rect.settings.strokeStyle = contentItemBoundingBoxBorderColor;
+                rect.settings.strokeStyle = ChronoZoom.Settings.contentItemBoundingBoxBorderColor;
                 this.vc.currentlyHoveredContentItem = null;
                 this.isMouseIn = false;
                 this.vc.requestInvalidate();
@@ -1713,9 +1714,9 @@ var ChronoZoom;
                 return zoomToElementHandler(this, e, 1.0);
             };
             this.changeZoomLevel = function (curZl, newZl) {
-                if(newZl >= contentItemShowContentZoomLevel) {
+                if(newZl >= ChronoZoom.Settings.contentItemShowContentZoomLevel) {
                     // building content for an infodot
-                    if(curZl >= contentItemShowContentZoomLevel) {
+                    if(curZl >= ChronoZoom.Settings.contentItemShowContentZoomLevel) {
                         return null;
                     }
                     var container = new ContainerElement(vc, layerid, id + "__content", vx, vy, vw, vh);
@@ -1723,21 +1724,21 @@ var ChronoZoom;
                     var mediaID = id + "__media__";
                     var imageElem = null;
                     if(contentItem.mediaType === 'image') {
-                        imageElem = addSeadragonImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, mediaContentElementZIndex, contentItem.mediaUrl);
+                        imageElem = addSeadragonImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, ChronoZoom.Settings.mediaContentElementZIndex, contentItem.mediaUrl);
                     } else if(contentItem.mediaType === 'video') {
-                        addVideo(container, layerid, mediaID, contentItem.mediaUrl, vx + leftOffset, mediaTop, contentWidth, mediaHeight, mediaContentElementZIndex);
+                        addVideo(container, layerid, mediaID, contentItem.mediaUrl, vx + leftOffset, mediaTop, contentWidth, mediaHeight, ChronoZoom.Settings.mediaContentElementZIndex);
                     } else if(contentItem.mediaType === 'audio') {
-                        mediaTop += contentItemAudioTopMargin * vh;
-                        mediaHeight = vh * contentItemAudioHeight;
-                        addAudio(container, layerid, mediaID, contentItem.mediaUrl, vx + leftOffset, mediaTop, contentWidth, mediaHeight, mediaContentElementZIndex);
+                        mediaTop += ChronoZoom.Settings.contentItemAudioTopMargin * vh;
+                        mediaHeight = vh * ChronoZoom.Settings.contentItemAudioHeight;
+                        addAudio(container, layerid, mediaID, contentItem.mediaUrl, vx + leftOffset, mediaTop, contentWidth, mediaHeight, ChronoZoom.Settings.mediaContentElementZIndex);
                     } else if(contentItem.mediaType === 'pdf') {
-                        addPdf(container, layerid, mediaID, contentItem.mediaUrl, vx + leftOffset, mediaTop, contentWidth, mediaHeight, mediaContentElementZIndex);
+                        addPdf(container, layerid, mediaID, contentItem.mediaUrl, vx + leftOffset, mediaTop, contentWidth, mediaHeight, ChronoZoom.Settings.mediaContentElementZIndex);
                     }
                     // Title
                     var titleText = contentItem.title;
                     addText(container, layerid, id + "__title__", vx + leftOffset, titleTop, titleTop + titleHeight / 2.0, 0.9 * titleHeight, titleText, {
-                        fontName: contentItemHeaderFontName,
-                        fillStyle: contentItemHeaderFontColor,
+                        fontName: ChronoZoom.Settings.contentItemHeaderFontName,
+                        fillStyle: ChronoZoom.Settings.contentItemHeaderFontColor,
                         textBaseline: 'middle',
                         textAlign: 'center',
                         wrapText: true,
@@ -1748,8 +1749,8 @@ var ChronoZoom;
                     if(sourceText) {
                         var addSourceText = function (sx, sw, sy) {
                             var sourceItem = addText(container, layerid, id + "__source__", sx, sy, sy + sourceHeight / 2.0, 0.9 * sourceHeight, sourceText, {
-                                fontName: contentItemHeaderFontName,
-                                fillStyle: contentItemSourceFontColor,
+                                fontName: ChronoZoom.Settings.contentItemHeaderFontName,
+                                fillStyle: ChronoZoom.Settings.contentItemSourceFontColor,
                                 textBaseline: 'middle',
                                 textAlign: 'right',
                                 adjustWidth: true
@@ -1763,12 +1764,12 @@ var ChronoZoom;
                                     return true;
                                 };
                                 sourceItem.onmouseenter = function (pv, e) {
-                                    this.settings.fillStyle = contentItemSourceHoveredFontColor;
+                                    this.settings.fillStyle = ChronoZoom.Settings.contentItemSourceHoveredFontColor;
                                     this.vc.requestInvalidate();
                                     this.vc.element.css('cursor', 'pointer');
                                 };
                                 sourceItem.onmouseleave = function (pv, e) {
-                                    this.settings.fillStyle = contentItemSourceFontColor;
+                                    this.settings.fillStyle = ChronoZoom.Settings.contentItemSourceFontColor;
                                     this.vc.requestInvalidate();
                                     this.vc.element.css('cursor', 'default');
                                 };
@@ -1791,26 +1792,26 @@ var ChronoZoom;
                     addScrollText(container, layerid, id + "__description__", vx + leftOffset, descrTop, contentWidth, descrHeight, contentItem.description, 30, {
                     });
                     return {
-                        zoomLevel: contentItemShowContentZoomLevel,
+                        zoomLevel: ChronoZoom.Settings.contentItemShowContentZoomLevel,
                         content: container
                     };
                 } else {
                     // building thumbnails
                     var zl = newZl;
-                    if(zl >= contentItemThumbnailMaxLevel) {
-                        if(curZl >= contentItemThumbnailMaxLevel && curZl < contentItemShowContentZoomLevel) {
+                    if(zl >= ChronoZoom.Settings.contentItemThumbnailMaxLevel) {
+                        if(curZl >= ChronoZoom.Settings.contentItemThumbnailMaxLevel && curZl < ChronoZoom.Settings.contentItemShowContentZoomLevel) {
                             return null;
                         }// we already show this level
                         
-                        zl = contentItemThumbnailMaxLevel;
-                    } else if(zl <= contentItemThumbnailMinLevel) {
-                        if(curZl <= contentItemThumbnailMinLevel && curZl > 0) {
+                        zl = ChronoZoom.Settings.contentItemThumbnailMaxLevel;
+                    } else if(zl <= ChronoZoom.Settings.contentItemThumbnailMinLevel) {
+                        if(curZl <= ChronoZoom.Settings.contentItemThumbnailMinLevel && curZl > 0) {
                             return null;
                         }
-                        zl = contentItemThumbnailMinLevel;
+                        zl = ChronoZoom.Settings.contentItemThumbnailMinLevel;
                     }
                     var sz = 1 << zl;
-                    var thumbnailUri = contentItemThumbnailBaseUri + 'x' + sz + '/' + contentItem.guid + '.png';
+                    var thumbnailUri = ChronoZoom.Settings.contentItemThumbnailBaseUri + 'x' + sz + '/' + contentItem.guid + '.png';
                     return {
                         zoomLevel: newZl,
                         content: new CanvasImage(vc, layerid, id + "@" + 1, thumbnailUri, vx, vy, vw, vh)
@@ -1831,9 +1832,9 @@ var ChronoZoom;
         function CanvasInfodot(vc, layerid, id, time, vyc, radv, contentItems, infodotDescription) {
             this.base = CanvasCircle;
             this.base(vc, layerid, id, time, vyc, radv, {
-                strokeStyle: infoDotBorderColor,
-                lineWidth: infoDotBorderWidth * radv,
-                fillStyle: infoDotFillColor,
+                strokeStyle: ChronoZoom.Settings.infoDotBorderColor,
+                lineWidth: ChronoZoom.Settings.infoDotBorderWidth * radv,
+                fillStyle: ChronoZoom.Settings.infoDotFillColor,
                 isLineWidthVirtual: true
             });
             this.contentItems = contentItems;
@@ -1841,7 +1842,7 @@ var ChronoZoom;
             contentItems.sort(function (a, b) {
                 return a.order - b.order;
             });
-            var innerRad = radv - infoDotHoveredBorderWidth * radv;
+            var innerRad = radv - ChronoZoom.Settings.infoDotHoveredBorderWidth * radv;
             this.outerRad = radv;
             this.type = 'infodot';
             this.reactsOnMouse = true;
@@ -1850,8 +1851,8 @@ var ChronoZoom;
             this.tooltipIsShown = false// indicates whether tooltip is shown or not
             ;
             this.onmouseenter = function (e) {
-                this.settings.strokeStyle = infoDotHoveredBorderColor;
-                this.settings.lineWidth = infoDotHoveredBorderWidth * radv;
+                this.settings.strokeStyle = ChronoZoom.Settings.infoDotHoveredBorderColor;
+                this.settings.lineWidth = ChronoZoom.Settings.infoDotHoveredBorderWidth * radv;
                 this.vc.requestInvalidate();
                 // clear tooltipIsShown flag for currently hovered timeline
                 // it can be null because of mouse events sequence: mouseenter for infodot -> mousehover for timeline -> mouseunhover for timeline
@@ -1880,8 +1881,8 @@ var ChronoZoom;
             };
             this.onmouseleave = function (e) {
                 this.isMouseIn = false;
-                this.settings.strokeStyle = infoDotBorderColor;
-                this.settings.lineWidth = infoDotBorderWidth * radv;
+                this.settings.strokeStyle = ChronoZoom.Settings.infoDotBorderColor;
+                this.settings.lineWidth = ChronoZoom.Settings.infoDotBorderWidth * radv;
                 this.vc.requestInvalidate();
                 // stop active fadein animation and hide tooltip
                 if(this.tooltipIsShown == true) {
@@ -1906,12 +1907,12 @@ var ChronoZoom;
             root.firstLoad = true;
             root.changeZoomLevel = function (curZl, newZl) {
                 // Showing only thumbnails for every content item of the infodot
-                if(newZl >= infodotShowContentThumbZoomLevel && newZl < infodotShowContentZoomLevel) {
+                if(newZl >= ChronoZoom.Settings.infodotShowContentThumbZoomLevel && newZl < infodotShowContentZoomLevel) {
                     var URL = getURL();
                     if(typeof URL.hash.params != 'undefined' && typeof URL.hash.params['b'] != 'undefined') {
                         bibliographyFlag = false;
                     }
-                    if(curZl >= infodotShowContentThumbZoomLevel && curZl < infodotShowContentZoomLevel) {
+                    if(curZl >= ChronoZoom.Settings.infodotShowContentThumbZoomLevel && curZl < infodotShowContentZoomLevel) {
                         return null;
                     }
                     // Tooltip is enabled now.
@@ -1960,8 +1961,8 @@ var ChronoZoom;
                     if(contentItem == null) {
                         return null;
                     }
-                    var titleWidth = infodotTitleWidth * radv * 2;
-                    var titleHeight = infodotTitleHeight * radv * 2;
+                    var titleWidth = ChronoZoom.Settings.infodotTitleWidth * radv * 2;
+                    var titleHeight = ChronoZoom.Settings.infodotTitleHeight * radv * 2;
                     var centralSquareSize = (270 / 2 + 5) / 450 * 2 * radv;
                     var titleTop = vyc - centralSquareSize - titleHeight;
                     var title = '';
@@ -1969,19 +1970,19 @@ var ChronoZoom;
                         title = infodotDescription.title + '\n(' + infodotDescription.date + ')';
                     }
                     addText(contentItem, layerid, id + "__title", time - titleWidth / 2, titleTop, titleTop, titleHeight, title, {
-                        fontName: contentItemHeaderFontName,
-                        fillStyle: contentItemHeaderFontColor,
+                        fontName: ChronoZoom.Settings.contentItemHeaderFontName,
+                        fillStyle: ChronoZoom.Settings.contentItemHeaderFontColor,
                         textBaseline: 'middle',
                         textAlign: 'center',
                         wrapText: true,
                         numberOfLines: 2
                     }, titleWidth);
                     var biblBottom = vyc + centralSquareSize + 63.0 / 450 * 2 * radv;
-                    var biblHeight = infodotBibliographyHeight * radv * 2;
+                    var biblHeight = ChronoZoom.Settings.infodotBibliographyHeight * radv * 2;
                     var biblWidth = titleWidth / 3;
                     var bibl = addText(contentItem, layerid, id + "__bibliography", time - biblWidth / 2, biblBottom - biblHeight, biblBottom - biblHeight / 2, biblHeight, "Bibliography", {
-                        fontName: contentItemHeaderFontName,
-                        fillStyle: timelineBorderColor,
+                        fontName: ChronoZoom.Settings.contentItemHeaderFontName,
+                        fillStyle: ChronoZoom.Settings.timelineBorderColor,
                         textBaseline: 'middle',
                         textAlign: 'center'
                     }, biblWidth);
@@ -1995,12 +1996,12 @@ var ChronoZoom;
                         return true;
                     };
                     bibl.onmouseenter = function (pv, e) {
-                        this.settings.fillStyle = infoDotHoveredBorderColor;
+                        this.settings.fillStyle = ChronoZoom.Settings.infoDotHoveredBorderColor;
                         this.vc.requestInvalidate();
                         this.vc.element.css('cursor', 'pointer');
                     };
                     bibl.onmouseleave = function (pv, e) {
-                        this.settings.fillStyle = infoDotBorderColor;
+                        this.settings.fillStyle = ChronoZoom.Settings.infoDotBorderColor;
                         this.vc.requestInvalidate();
                         this.vc.element.css('cursor', 'default');
                     };
@@ -2030,19 +2031,19 @@ var ChronoZoom;
                         return null;
                     }
                     var zl = newZl;
-                    if(zl <= contentItemThumbnailMinLevel) {
-                        if(curZl <= contentItemThumbnailMinLevel && curZl > 0) {
+                    if(zl <= ChronoZoom.Settings.contentItemThumbnailMinLevel) {
+                        if(curZl <= ChronoZoom.Settings.contentItemThumbnailMinLevel && curZl > 0) {
                             return null;
                         }
                     }
-                    if(zl >= contentItemThumbnailMaxLevel) {
-                        if(curZl >= contentItemThumbnailMaxLevel && curZl < infodotShowContentZoomLevel) {
+                    if(zl >= ChronoZoom.Settings.contentItemThumbnailMaxLevel) {
+                        if(curZl >= ChronoZoom.Settings.contentItemThumbnailMaxLevel && curZl < infodotShowContentZoomLevel) {
                             return null;
                         }// we are already showing the largest thumbnail available
                         
-                        zl = contentItemThumbnailMaxLevel;
+                        zl = ChronoZoom.Settings.contentItemThumbnailMaxLevel;
                     }
-                    if(zl < contentItemThumbnailMinLevel) {
+                    if(zl < ChronoZoom.Settings.contentItemThumbnailMinLevel) {
                         return {
                             zoomLevel: zl,
                             content: new ContainerElement(vc, layerid, id + "__empty", time, vyc, 0, 0)
@@ -2050,7 +2051,7 @@ var ChronoZoom;
                     }
                     var contentItem = infodot.contentItems[0];
                     var sz = 1 << zl;
-                    var thumbnailUri = contentItemThumbnailBaseUri + 'x' + sz + '/' + contentItem.guid + '.png';
+                    var thumbnailUri = ChronoZoom.Settings.contentItemThumbnailBaseUri + 'x' + sz + '/' + contentItem.guid + '.png';
                     var l = innerRad * 260 / 225;
                     return {
                         zoomLevel: zl,
@@ -2091,7 +2092,7 @@ var ChronoZoom;
                 var pl0 = viewport2d.pointVirtualToScreen(xlt0, ylt0);
                 var pl1 = viewport2d.pointVirtualToScreen(xlt1, ylt1);
                 ctx.lineWidth = sw;
-                ctx.strokeStyle = contentItemBoundingBoxFillColor;
+                ctx.strokeStyle = ChronoZoom.Settings.contentItemBoundingBoxFillColor;
                 // Rendering additional graphics for the infodot
                 ctx.beginPath();
                 ctx.moveTo(pl0.x, pl0.y);
@@ -2122,7 +2123,7 @@ var ChronoZoom;
                 return null;
             }
             var radv = infodot.width / 2;
-            var innerRad = radv - infoDotHoveredBorderWidth * radv;
+            var innerRad = radv - ChronoZoom.Settings.infoDotHoveredBorderWidth * radv;
             var citems = buildVcContentItems(infodot.contentItems, infodot.x + infodot.width / 2, infodot.y + infodot.height / 2, innerRad, infodot.vc, infodot.layerid);
             if(!citems) {
                 return null;

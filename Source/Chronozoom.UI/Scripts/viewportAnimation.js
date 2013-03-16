@@ -1,3 +1,5 @@
+/// <reference path='cz.settings.ts'/>
+/// <reference path='viewport.ts'/>
 var ChronoZoom;
 (function (ChronoZoom) {
     (function (ViewportAnimation) {
@@ -15,8 +17,8 @@ var ChronoZoom;
             this.isActive = true//are more animation frames needed
             ;
             this.type = "PanZoom";
-            this.startViewport = new Viewport2d(//deep copy of the startViewport
-            startViewport.aspectRatio, startViewport.width, startViewport.height, new VisibleRegion2d(startVisible.centerX, startVisible.centerY, startVisible.scale));
+            this.startViewport = new ChronoZoom.Viewport.Viewport2d(//deep copy of the startViewport
+            startViewport.aspectRatio, startViewport.width, startViewport.height, new ChronoZoom.Viewport.VisibleRegion2d(startVisible.centerX, startVisible.centerY, startVisible.scale));
             this.estimatedEndViewport//an estimated state of the viewport at the end of the animation
             ;
             //estinmated start and end visible centers in the screen coordinate system of a start viewport
@@ -35,7 +37,7 @@ var ChronoZoom;
             this.setTargetViewport = function (estimatedEndViewport) {
                 this.estimatedEndViewport = estimatedEndViewport;
                 var prevVis = this.previousFrameViewport.visible;
-                this.startViewport = new Viewport2d(this.previousFrameViewport.aspectRatio, this.previousFrameViewport.width, this.previousFrameViewport.height, new VisibleRegion2d(prevVis.centerX, prevVis.centerY, prevVis.scale))//previous frame becomes the first one
+                this.startViewport = new ChronoZoom.Viewport.Viewport2d(this.previousFrameViewport.aspectRatio, this.previousFrameViewport.width, this.previousFrameViewport.height, new ChronoZoom.Viewport.VisibleRegion2d(prevVis.centerX, prevVis.centerY, prevVis.scale))//previous frame becomes the first one
                 ;
                 //updating all coordinates according to the screen coodinate system of new start Viewport
                 this.startCenterInSC = this.startViewport.pointVirtualToScreen(prevVis.centerX, prevVis.centerY);
@@ -82,7 +84,7 @@ var ChronoZoom;
                 
                 //updating previous frame info. This will be returned as the requested animation frame
                 var prevFrameVisible = this.previousFrameViewport.visible;
-                var updatedVisible = new VisibleRegion2d(prevFrameVisible.centerX, prevFrameVisible.centerY, prevFrameVisible.scale);
+                var updatedVisible = new ChronoZoom.Viewport.VisibleRegion2d(prevFrameVisible.centerX, prevFrameVisible.centerY, prevFrameVisible.scale);
                 this.previousFrameCenterInSC.x += curDist * k * this.direction.X;
                 this.previousFrameCenterInSC.y += curDist * k * this.direction.Y;
                 updatedVisible.scale += (this.estimatedEndViewport.visible.scale - updatedVisible.scale) * k;
@@ -108,6 +110,7 @@ var ChronoZoom;
                 return updatedVisible;
             };
         }
+        ViewportAnimation.PanZoomAnimation = PanZoomAnimation;
         /* Implements an "optimal" animated zoom/pan path between two view rectangles.
         Based on the paper "Smooth and efficient zooming and panning" by Jarke j. van Wijk and Wim A.A. Nuij
         @param startVisible   (visible2d) a viewport visible region from which the elliptical zoom starts
@@ -118,7 +121,7 @@ var ChronoZoom;
             this.ID = globalAnimationID++;
             this.type = "EllipticalZoom";
             this.isActive = true;
-            this.targetVisible = new VisibleRegion2d(endVisible.centerX, endVisible.centerY, endVisible.scale);
+            this.targetVisible = new ChronoZoom.Viewport.VisibleRegion2d(endVisible.centerX, endVisible.centerY, endVisible.scale);
             this.startTime = (new Date()).getTime();
             this.imprecision = 0.0001// Average imprecision in pathlength when centers of startVisible and endVisible visible regions are the same.
             ;
@@ -169,7 +172,7 @@ var ChronoZoom;
                     //the end of the animation. marking the animation as finished
                     this.isActive = false;
                 }
-                return new VisibleRegion2d(this.x(t), this.y(t), this.scale(t));
+                return new ChronoZoom.Viewport.VisibleRegion2d(this.x(t), this.y(t), this.scale(t));
             };
             var startPoint = {
                 X: startVisible.centerX,
@@ -184,7 +187,7 @@ var ChronoZoom;
             var xDiff = startPoint.X - endPoint.X;
             var yDiff = startPoint.Y - endPoint.Y;
             this.pathLen = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
-            var ro = 0.1 * ellipticalZoomZoomoutFactor;//is set from settings.js
+            var ro = 0.1 * ChronoZoom.Settings.ellipticalZoomZoomoutFactor;//is set from settings.js
             
             this.ro = ro;
             var u0 = 0;
@@ -212,7 +215,7 @@ var ChronoZoom;
                     this.r1 = -Math.log(2 * b1);
                 }
                 this.S = (this.r1 - this.r0) / ro;
-                this.duration = ellipticalZoomDuration / 300 * this.S//300 is a number to make animation eye candy. Please adjust ellipticalZoomDuration in settings.js instead of 300 constant here.
+                this.duration = ChronoZoom.Settings.ellipticalZoomDuration / 300 * this.S//300 is a number to make animation eye candy. Please adjust ellipticalZoomDuration in settings.js instead of 300 constant here.
                 ;
             } else {
                 //special case of i0 == u1, overridding methods
@@ -231,7 +234,7 @@ var ChronoZoom;
                 if(scaleDiff === 1) {
                     this.isActive = false;
                 }
-                this.duration = ellipticalZoomDuration * scaleDiff * 0.2;
+                this.duration = ChronoZoom.Settings.ellipticalZoomDuration * scaleDiff * 0.2;
                 this.x = function (s) {
                     return this.startPoint.X;
                 };
@@ -243,6 +246,7 @@ var ChronoZoom;
                 };
             }
         }
+        ViewportAnimation.EllipticalZoom = EllipticalZoom;
         //function to make animation EaseInOut. [0,1] -> [0,1]
         //@param t    (number)      changes between [0;1]. 0 coresponds to the beginig of the animatoin. 1 coresponds to the end of the animation
         function animationEase(t) {

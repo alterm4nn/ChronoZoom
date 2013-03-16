@@ -76,7 +76,7 @@ var ChronoZoom;
                 type: 'goto',
                 bookmark: 0
             };
-            var self = this;
+            this.self = this;
             //ordering the bookmarks by the lapsetime
             bookmarks.sort(function (b1, b2) {
                 return b1.lapseTime - b2.lapseTime;
@@ -167,9 +167,6 @@ var ChronoZoom;
                 for(var i = 0; i < ChronoZoom.Settings.toursAudioFormats.length; i++) {
                     var audioSource = document.createElement("Source");
                     audioSource.setAttribute("src", blobPrefix + ChronoZoom.Settings.toursAudioFormats[i].ext);
-                    if(ChronoZoom.Settings.toursAudioFormats[i].type) {
-                        audioSource.setAttribute("type", ChronoZoom.Settings.toursAudioFormats[i].type);
-                    }
                     audio.appendChild(audioSource);
                 }
                 audio.load();

@@ -353,7 +353,7 @@ module ChronoZoom {
                 // stop mouse at time of threshold if mouse is over expanded threshold or line to it
                 $('#threshold' + i)[0].addEventListener('mousemove', function () {
                     var e = window.event;
-                    if (e) preventbubble(e);
+                    if (e) ChronoZoom.Common.preventbubble(e);
                     self.setTimeMarker(self.thresholds[self.currentThreshold].time);
                     if (self.currentThreshold != -1) self.setTimeMarker(self.thresholds[self.currentThreshold].time);
                 }, false);

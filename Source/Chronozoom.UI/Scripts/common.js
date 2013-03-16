@@ -29,7 +29,7 @@ var ChronoZoom;
         var k = 1000000000;
         Common.setNavigationStringTo;// { element or bookmark, id } identifies that we zoom into this element and when (if) finish the zoom, we should put the element's path into navigation string
         
-        var hashHandle = true;// Handle hash change event
+        Common.hashHandle = true;// Handle hash change event
         
         var tourNotParsed = undefined;// indicates that URL was checked at tour sharing after page load
         

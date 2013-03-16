@@ -19,7 +19,7 @@
         // Viewport is a physical window where we render virtual canvas,
         // (width,height) is a size of a viewport window in pixels.
         // Visible describes the same window in the virtual space.
-        function Viewport2d(aspectRatio, width, height, visible) {
+        export function Viewport2d(aspectRatio, width, height, visible) {
             this.aspectRatio = aspectRatio;
             this.visible = visible;
             this.width = width;
