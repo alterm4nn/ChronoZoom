@@ -46,7 +46,7 @@ module ChronoZoom {
 
 
 
-        function initializeSearch() {
+        export function initializeSearch() {
             $("#searchTextBox")
                     .focus(function () {
                         if ($(this).hasClass('emptyTextBox')) {

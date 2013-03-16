@@ -30,7 +30,7 @@ module ChronoZoom {
 
         export var controller; //a controller to perform smooth navigation
         var isAxisFreezed = true; //indicates whether the axis moves together with canvas during navigation or not
-        var startHash;
+        export var startHash;
 
         var searchString;
         var ax, vc;
@@ -237,7 +237,7 @@ module ChronoZoom {
             hideWelcomeScreen();
         }
 
-        function hideWelcomeScreen() {
+        export function hideWelcomeScreen() {
             (<HTMLIFrameElement>(document.createElement("welcomeVideo"))).src = "";
             $("#welcomeScreenBack").css("display", "none");
         }
@@ -316,7 +316,7 @@ module ChronoZoom {
         }
 
         //loading the data from the service
-        function loadData() {
+        export function loadData() {
             timings.wcfRequestStarted = new Date();
             var url = loadDataUrl();
 
@@ -573,7 +573,7 @@ module ChronoZoom {
             document.cookie = c_name + "=" + c_value;
         }
 
-        function getCookie(c_name) {
+        export function getCookie(c_name) {
             var i, x, y, ARRcookies = document.cookie.split(";");
             for (i = 0; i < ARRcookies.length; i++) {
                 x = ARRcookies[i].substr(0, ARRcookies[i].indexOf("="));

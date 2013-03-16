@@ -7,7 +7,7 @@ declare var $: any;
 module ChronoZoom {
     export module Bibliography {
 
-        function initializeBibliography() {
+        export function initializeBibliography() {
             $("#bibliographyBack").hide();
             $("#biblCloseButton").mouseup(function () {
                 pendingBibliographyForExhibitID = null;

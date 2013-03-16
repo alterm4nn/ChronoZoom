@@ -7,19 +7,19 @@ module ChronoZoom {
     export module Tours {
 
         export var isTourWindowVisible = false;
-        var isBookmarksWindowVisible = false;
-        var isBookmarksWindowExpanded = true;
-        var isBookmarksTextShown = true;
-        var isNarrationOn = true;
+        private isBookmarksWindowVisible = false;
+        private isBookmarksWindowExpanded = true;
+        private isBookmarksTextShown = true;
+        private isNarrationOn = true;
 
         export var tours; // list of loaded tours
         export var tour; //an active tour. Undefined if no tour is active
-        var tourBookmarkTransitionCompleted; // a callbacks that is to be set by tour and to be called by animation framework
-        var tourBookmarkTransitionInterrupted;
+        export var tourBookmarkTransitionCompleted; // a callbacks that is to be set by tour and to be called by animation framework
+        export var tourBookmarkTransitionInterrupted;
 
         export var pauseTourAtAnyAnimation = false;
 
-        var bookmarkAnimation; // current animation of bookmark' description text sliding
+        private bookmarkAnimation; // current animation of bookmark' description text sliding
 
         var isToursDebugEnabled = false; // enables rebug output
 
@@ -28,368 +28,363 @@ module ChronoZoom {
         @param caption (string) text describing the bookmark
         @param lapseTime (number) a position in the audiotreck of the bookmark in seconds
         */
-        function TourBookmark(url, caption, lapseTime, text) {
-            this.url = url;
-            this.caption = caption;
-            this.lapseTime = lapseTime;
-            this.duration = undefined;
-            this.text = text;
-            this.number = 0;
-            this.elapsed = 0; // number of seconds that were already played (if interrupted).
+        class TourBookmark {
+
+            public duration = undefined;
+            public number = 0;
+            public elapsed = 0; // number of seconds that were already played (if interrupted).
+
+            constructor(public url, public caption, public lapseTime, public text) { }
         }
 
         /*
         @returns VisibleRegion2d for the bookmark
         */
-        function getBookmarkVisible(bookmark) {
+        export function getBookmarkVisible(bookmark) {
             return ChronoZoom.UrlNav.navStringToVisible(bookmark.url, this.vc);
         }
 
+        export interface Place {
+            type: string;
+            bookmark: number;
+            startTime: number;
+            animationId: number;
+        }
 
-        /* Tour represents a sequence of bookmarks.
-        @param title        (string)    Title of the tour.
-        @param bookmarks    (non empty array of TourBookmark) A sequence of bookmarks
-        @param zoomTo       (func (VisibleRegion2d, onSuccess, onFailure, bookmark) : number) Allows the tour to zoom into required places, returns a unique animation id, which is then passed to callbacks.
-        @param vc           (jquery)    VirtualCanvas
-        @param category (String) category of the tour
-        @param sequenceNum (number) an ordering number
-        @callback tour_BookmarkStarted      Array of (func(tour, bookmark)) The function is called when new bookmark starts playing
-        @callback tour_BookmarkFinished     Array of (func(tour, bookmark)) The function is called when new bookmark is finished
-        @callback tour_TourFinished     Array of (func(tour)) The function is called when the tour is finished
-        @callback tour_TourStarted      Array of (func(tour)) The function is called when the tour is finished
-        */
-        function Tour(title, bookmarks, zoomTo, vc, category, audioBlobUrl, sequenceNum) {
-            this.title = title;
-            this.bookmarks = bookmarks;
-            this.category = category;
-            this.vc = vc;
-            this.sequenceNum = sequenceNum;
+        export class Tour {
+            public tour_BookmarkStarted = [];
+            public tour_BookmarkFinished = [];
+            public tour_TourStarted = [];
+            public tour_TourFinished = [];
 
-            this.tour_BookmarkStarted = [];
-            this.tour_BookmarkFinished = [];
-            this.tour_TourStarted = [];
-            this.tour_TourFinished = [];
+            public state = 'pause'; // possible states: play, pause, finished
+            public currentPlace : Place = { type: 'goto', bookmark: 0, startTime: null, animationId: null };
+            public isTourPlayRequested = false; //indicated whether the play should start after the data is loaded
 
-            var isAudioLoaded = false; //is set automaticly after the audio track is loaded
-            var isAudioEnabled = false; //to be changed by toggleAudio function
-            this.isTourPlayRequested = false; //indicated whether the play should start after the data is loaded
-            if (!bookmarks || bookmarks.length == 0) throw "Tour has no bookmarks";
+            private isAudioLoaded = false; //is set automaticly after the audio track is loaded
+            private isAudioEnabled = false; //to be changed by toggleAudio function
+            private audio; // audio element of this tour
 
-            this.state = 'pause'; // possible states: play, pause, finished
-            this.currentPlace = { type: 'goto', bookmark: 0 };
-
-            self = this;
-
-            //ordering the bookmarks by the lapsetime
-            bookmarks.sort(function (b1, b2) {
-                return b1.lapseTime - b2.lapseTime;
-            });
-
-            var audio; // audio element of this tour
-
-            this.isTourPlayRequested = false;
-
-            for (var i = 1; i < bookmarks.length; i++) {  //calculating bookmarks durations        
-                bookmarks[i - 1].duration = bookmarks[i].lapseTime - bookmarks[i - 1].lapseTime;
-                bookmarks[i - 1].number = i;
-            }
-            bookmarks[bookmarks.length - 1].duration = 10; //this will be overrided when the audio will be downloaded
-            bookmarks[bookmarks.length - 1].number = bookmarks.length;
-
-            var timerOnBookmarkIsOver;  // timer id which is set for bookmark complete event (stored to be able to cancel it if paused)
-
-            /*
-            Raises that bookmark playback is over. Called only if state is "play" and currentPlace is bookmark
-            @param goBack (boolen) specifies the direction to move (prev - true, next - false)
-            */
-            var onBookmarkIsOver = function (goBack) {    
-
-                self.bookmarks[self.currentPlace.bookmark].elapsed = 0; // reset bookmark's playback progress
-
-                // Going to the next bookmark if we are not at the end
-                if ((self.currentPlace.bookmark == self.bookmarks.length - 1) && !goBack) {
-                    // reset tour state
-                    self.state = 'pause';
-                    self.currentPlace = { type: 'goto', bookmark: 0 };
-                    RaiseTourFinished();
-                }
-                else {
-                    goToTheNextBookmark(goBack);
-                }
-            };
+            private timerOnBookmarkIsOver;  // timer id which is set for bookmark complete event (stored to be able to cancel it if paused)
 
             /*
             Enables or disables an audio playback of the tour.
             @param isOn (Boolean) whether the audio is enabled
             */
-            this.toggleAudio = function (isOn) {
+            public toggleAudio(isOn) {
                 if (isOn)
-                    isAudioEnabled = true;
+                    this.isAudioEnabled = true;
                 else
-                    isAudioEnabled = false;
+                    this.isAudioEnabled = false;
             }
 
-            this.ReinitializeAudio = function () {
+            private ReinitializeAudio () {
                 // stop audio playback and clear audio element
-                if (audio) {
-                    audio.pause();
+                if (this.audio) {
+                    this.audio.pause();
                 }
-                audio = undefined;
 
-                isAudioLoaded = false;
+                this.audio = undefined;
+
+                this.isAudioLoaded = false;
                 // reinitialize audio element
-                audio = document.createElement('audio');
+                this.audio = document.createElement('audio');
 
-                audio.addEventListener("loadedmetadata", function () {
-                    if (audio.duration != Infinity)
-                        bookmarks[bookmarks.length - 1].duration = audio.duration - bookmarks[bookmarks.length - 1].lapseTime; //overriding the last bookmark duration
-                    if (isToursDebugEnabled && window.console && console.log("Tour " + self.title + " metadata loaded (readystate 1)"));
+                this.audio.addEventListener("loadedmetadata", function () {
+                    if (this.audio.duration != Infinity)
+                        this.bookmarks[this.bookmarks.length - 1].duration = this.audio.duration - this.bookmarks[this.bookmarks.length - 1].lapseTime; //overriding the last bookmark duration
+                    if (isToursDebugEnabled && window.console && console.log("Tour " + this.title + " metadata loaded (readystate 1)"));
                 });
-                audio.addEventListener("canplaythrough", function () {
+                this.audio.addEventListener("canplaythrough", function () {
                     // audio track is fully loaded
-                    self.isAudioLoaded = true;
+                    this.isAudioLoaded = true;
 
-                    if (isToursDebugEnabled && window.console && console.log("Tour " + self.title + " readystate 4"));
+                    if (isToursDebugEnabled && window.console && console.log("Tour " + this.title + " readystate 4"));
                 });
-                audio.addEventListener("progress", function () {
-                    if (audio.buffered.length > 0)
-                        if (isToursDebugEnabled && window.console && console.log("Tour " + self.title + " downloaded " + (audio.buffered.end(audio.buffered.length - 1) / audio.duration)));
+                this.audio.addEventListener("progress", function () {
+                    if (this.audio.buffered.length > 0)
+                        if (isToursDebugEnabled && window.console && console.log("Tour " + this.title + " downloaded " + (this.audio.buffered.end(this.audio.buffered.length - 1) / this.audio.duration)));
                 });
 
-                audio.controls = false;
-                audio.autoplay = false;
-                audio.loop = false;
-                audio.volume = 1;
+                this.audio.controls = false;
+                this.audio.autoplay = false;
+                this.audio.loop = false;
+                this.audio.volume = 1;
 
-                audio.preload = "none";
+                this.audio.preload = "none";
 
                 // add audio sources of different audio file extensions for audio element
-                var blobPrefix = audioBlobUrl.substring(0, audioBlobUrl.length - 3);
+                var blobPrefix = this.audioBlobUrl.substring(0, this.audioBlobUrl.length - 3);
                 for (var i = 0; i < ChronoZoom.Settings.toursAudioFormats.length; i++) {
                     var audioSource = document.createElement("Source");
                     audioSource.setAttribute("src", blobPrefix + ChronoZoom.Settings.toursAudioFormats[i].ext);
-                    audio.appendChild(audioSource);
+                    this.audio.appendChild(audioSource);
                 }
 
-                audio.load();
-                if (isToursDebugEnabled && window.console && console.log("Loading of tour " + self.title + " is queued"));
+                this.audio.load();
+                if (isToursDebugEnabled && window.console && console.log("Loading of tour " + this.title + " is queued"));
             }
 
+            /* Tour represents a sequence of bookmarks.
+            @param title        (string)    Title of the tour.
+            @param bookmarks    (non empty array of TourBookmark) A sequence of bookmarks
+            @param zoomTo       (func (VisibleRegion2d, onSuccess, onFailure, bookmark) : number) Allows the tour to zoom into required places, returns a unique animation id, which is then passed to callbacks.
+            @param vc           (jquery)    VirtualCanvas
+            @param category (String) category of the tour
+            @param sequenceNum (number) an ordering number
+            @callback tour_BookmarkStarted      Array of (func(tour, bookmark)) The function is called when new bookmark starts playing
+            @callback tour_BookmarkFinished     Array of (func(tour, bookmark)) The function is called when new bookmark is finished
+            @callback tour_TourFinished     Array of (func(tour)) The function is called when the tour is finished
+            @callback tour_TourStarted      Array of (func(tour)) The function is called when the tour is finished
+            */
+            constructor(public title, public bookmarks, public zoomTo, public vc, public category, public audioBlobUrl, public sequenceNum) {
+
+                if (!bookmarks || bookmarks.length == 0) throw "Tour has no bookmarks";
+
+                //ordering the bookmarks by the lapsetime
+                bookmarks.sort(function (b1, b2) {
+                    return b1.lapseTime - b2.lapseTime;
+                });
+
+                for (var i = 1; i < bookmarks.length; i++) {  //calculating bookmarks durations        
+                    bookmarks[i - 1].duration = bookmarks[i].lapseTime - bookmarks[i - 1].lapseTime;
+                    bookmarks[i - 1].number = i;
+                }
+                bookmarks[bookmarks.length - 1].duration = 10; //this will be overrided when the audio will be downloaded
+                bookmarks[bookmarks.length - 1].number = bookmarks.length;
+            }
 
             /*
-            Moves the tour to the next or to the prev bookmark activating elliptical zoom
+            Raises that bookmark playback is over. Called only if state is "play" and currentPlace is bookmark
             @param goBack (boolen) specifies the direction to move (prev - true, next - false)
             */
-            var goToTheNextBookmark = function (goBack) {
-                var newBookmark = self.currentPlace.bookmark;
-                var oldBookmark = newBookmark;
-        
-                // calculate index of new bookmark in array of bookmarks
-                if (goBack) {
-                    newBookmark = Math.max(0, newBookmark - 1);
+            private onBookmarkIsOver(goBack) {
+
+                this.bookmarks[this.currentPlace.bookmark].elapsed = 0; // reset bookmark's playback progress
+
+                // Going to the next bookmark if we are not at the end
+                if ((this.currentPlace.bookmark == this.bookmarks.length - 1) && !goBack) {
+                    // reset tour state
+                    this.state = 'pause';
+                    this.currentPlace = <Place>{ type: 'goto', bookmark: 0 };
+                    this.RaiseTourFinished();
                 }
                 else {
-                    newBookmark = Math.min(self.bookmarks.length - 1, newBookmark + 1);
+                    this.goToTheNextBookmark(goBack);
                 }
+            };
 
-                // raise bookmark finished callback functions
-                RaiseBookmarkFinished(oldBookmark);
+        /*
+        Moves the tour to the next or to the prev bookmark activating elliptical zoom
+        @param goBack (boolen) specifies the direction to move (prev - true, next - false)
+        */
+        private goToTheNextBookmark(goBack) {
+            var newBookmark = this.currentPlace.bookmark;
+            var oldBookmark = newBookmark;
 
-                // change current position in tour and start EllipticalZoom animation
-                self.currentPlace = { type: 'goto', bookmark: newBookmark };
-
-                var bookmark = self.bookmarks[self.currentPlace.bookmark]; // next bookmark
-
-                // activate bookmark & audio naration if required
-                if (newBookmark != 0){
-                    RaiseBookmarkStarted(bookmark);
-
-                    // start audio narration
-                    if (isAudioEnabled && self.state === 'play' && self.isAudioLoaded == true)
-                        startBookmarkAudio(bookmark);
-            
-                }
-
-                // initialize bookmark's timer
-                if (self.state != 'pause' && self.isAudioLoaded == true)
-                    setTimer(bookmark);
-
-                if (isToursDebugEnabled && window.console && console.log("Transitioning to the bm index " + newBookmark));
-
-                // start new EllipticalZoom animation if needed
-                self.currentPlace.animationID = zoomTo(getBookmarkVisible(bookmark), onGoToSuccess, onGoToFailure, bookmark.url);
+            // calculate index of new bookmark in array of bookmarks
+            if (goBack) {
+                newBookmark = Math.max(0, newBookmark - 1);
+            }
+            else {
+                newBookmark = Math.min(this.bookmarks.length - 1, newBookmark + 1);
             }
 
-            /*
-            Resumes/starts audio narration for bookmark.
-            @param bookmark         (bookmark) bookmark which audio narration part should be played.
-            */
-            function startBookmarkAudio(bookmark) {
-                if (isToursDebugEnabled && window.console && console.log("playing source: " + audio.currentSrc));
+            // raise bookmark finished callback functions
+            this.RaiseBookmarkFinished(oldBookmark);
 
-                audio.pause();
+            // change current position in tour and start EllipticalZoom animation
+            this.currentPlace = <Place>{ type: 'goto', bookmark: newBookmark };
 
-                // set audio track's time to time when this bookmark was paused (beginning of bookmark if it wasn't paused)
-                try {
-                    audio.currentTime = bookmark.lapseTime + bookmark.elapsed;
-                    if (isToursDebugEnabled && window.console && console.log("audio currentTime is set to " + (bookmark.lapseTime + bookmark.elapsed)));
-                }
-                catch (ex) {
-                    if (window.console && console.error("currentTime assignment: " + ex));
-                }
+            var bookmark = this.bookmarks[this.currentPlace.bookmark]; // next bookmark
 
-                if (isToursDebugEnabled && window.console && console.log("audio element is forced to play"));
+            // activate bookmark & audio naration if required
+            if (newBookmark != 0) {
+                this.RaiseBookmarkStarted(bookmark);
 
-                audio.play();
+                // start audio narration
+                if (this.isAudioEnabled && this.state === 'play' && this.isAudioLoaded == true)
+                    this.startBookmarkAudio(bookmark);
+
             }
 
-            /*
-            Sets up the transition to the next bookmark timer. Resets the currently active one.
-            */
-            function setTimer(bookmark) {
-                // clear active timer
-                if (timerOnBookmarkIsOver) {
-                    clearTimeout(timerOnBookmarkIsOver);
-                }
+            // initialize bookmark's timer
+            if (this.state != 'pause' && this.isAudioLoaded == true)
+                this.setTimer(bookmark);
 
-                // calculate time to the end of active bookmark
-                var duration = bookmark.duration;
-                if (bookmark.elapsed != 0) {
-                    duration = Math.max(duration - bookmark.elapsed, 0);
-                }
+            if (isToursDebugEnabled && window.console && console.log("Transitioning to the bm index " + newBookmark));
 
-                // save start time
-                self.currentPlace.startTime = new Date().getTime();
+            // start new EllipticalZoom animation if needed
+            this.currentPlace.animationId = this.zoomTo(getBookmarkVisible(bookmark), this.onGoToSuccess, this.onGoToFailure, bookmark.url);
+        }
 
-                if (isToursDebugEnabled && window.console && console.log("transition to next bookmark will be in " + duration + " seconds"));
+        /*
+        Resumes/starts audio narration for bookmark.
+        @param bookmark         (bookmark) bookmark which audio narration part should be played.
+        */
+        private startBookmarkAudio(bookmark) {
+            if (isToursDebugEnabled && window.console && console.log("playing source: " + this.audio.currentSrc));
 
-                // activate new timer
-                timerOnBookmarkIsOver = setTimeout(onBookmarkIsOver, duration * 1000 /* ms */);
+            this.audio.pause();
+
+            // set audio track's time to time when this bookmark was paused (beginning of bookmark if it wasn't paused)
+            try {
+                this.audio.currentTime = bookmark.lapseTime + bookmark.elapsed;
+                if (isToursDebugEnabled && window.console && console.log("audio currentTime is set to " + (bookmark.lapseTime + bookmark.elapsed)));
+            }
+            catch (ex) {
+                if (window.console && console.error("currentTime assignment: " + ex));
             }
 
-            // Zoom animation callbacks:
-            var onGoToSuccess = function (animationID) { // we've finished zooming into the bookmark
-                // the function is called only when state is play and currentPlace is goto, otherwise we are paused        
-                if (!self.currentPlace || self.currentPlace.animationID == undefined || self.currentPlace.animationID != animationID) // callback is obsolete
-                    return;
+            if (isToursDebugEnabled && window.console && console.log("audio element is forced to play"));
 
-                var curURL = ChronoZoom.UrlNav.getURL();
-                if (typeof curURL.hash.params == 'undefined')
-                    curURL.hash.params = new Array();
+            this.audio.play();
+        }
+
+        /*
+        Sets up the transition to the next bookmark timer. Resets the currently active one.
+        */
+        private setTimer(bookmark) {
+            // clear active timer
+            if (this.timerOnBookmarkIsOver) {
+                clearTimeout(this.timerOnBookmarkIsOver);
+            }
+
+            // calculate time to the end of active bookmark
+            var duration = bookmark.duration;
+            if (bookmark.elapsed != 0) {
+                duration = Math.max(duration - bookmark.elapsed, 0);
+            }
+
+            // save start time
+            this.currentPlace.startTime = new Date().getTime();
+
+            if (isToursDebugEnabled && window.console && console.log("transition to next bookmark will be in " + duration + " seconds"));
+
+            // activate new timer
+            this.timerOnBookmarkIsOver = setTimeout(this.onBookmarkIsOver, duration * 1000 /* ms */);
+        }
+
+        // Zoom animation callbacks:
+        private onGoToSuccess(animationId) { // we've finished zooming into the bookmark
+            // the function is called only when state is play and currentPlace is goto, otherwise we are paused        
+            if (!this.currentPlace || this.currentPlace.animationId == undefined || this.currentPlace.animationId != animationId) // callback is obsolete
+                return;
+
+            var curURL = ChronoZoom.UrlNav.getURL();
+            if (typeof curURL.hash.params == 'undefined')
+                curURL.hash.params = new Array();
+            curURL.hash.params["tour"] = Tours.tour.sequenceNum;
+            //curURL.hash.params["bookmark"] = self.currentPlace.bookmark+1;
+
+            //This flag is used to overcome hashchange event handler
+            ChronoZoom.Common.hashHandle = false;
+            ChronoZoom.UrlNav.setURL(curURL);
+
+            if (isToursDebugEnabled && window.console && console.log("reached the bookmark index " + this.currentPlace.bookmark));
+
+            this.currentPlace = <Place>{ type: 'bookmark', bookmark: this.currentPlace.bookmark };
+
+            //start the audio after the transition to the first bookmark if not paused
+            if (this.currentPlace.bookmark == 0) {
+                // raise bookmark started callback functions
+                var bookmark = this.bookmarks[this.currentPlace.bookmark];
+                this.RaiseBookmarkStarted(bookmark);
+
+                if (this.state != 'pause') {
+                    if (this.isAudioLoaded != true) // stop tour if audio is not ready yet
+                        tourPause();
+                    else { // audio is ready
+                        this.setTimer(bookmark);
+                        if (this.isAudioEnabled)
+                            this.startBookmarkAudio(bookmark);
+                    }
+                }
+            }
+
+        };
+
+        private onGoToFailure(animationId) { // we've been interrupted during zoom to the bookmark
+            // the function is called only when state is play and currentPlace is goto, otherwise we are paused
+            if (!this.currentPlace || this.currentPlace.animationId == undefined || this.currentPlace.animationId != animationId) // callback is obsolete
+                return;
+
+            // pause tour
+            this.pause();
+
+            if (isToursDebugEnabled && window.console && console.log("tour interrupted by user during transition"));
+        };
+
+        private play() {
+            if (this.state !== 'pause') return;
+
+            // first we go to the bookmark and then continue play it
+            if (isToursDebugEnabled && window.console && console.log("tour playback activated"));
+            this.state = 'play';
+
+            var visible = this.vc.virtualCanvas("getViewport").visible;
+
+            if (this.currentPlace != null && this.currentPlace.bookmark != null && ChronoZoom.Common.compareVisibles(visible, getBookmarkVisible(this.bookmarks[this.currentPlace.bookmark])))
+                // current visible is equal to visible of bookmark
+                this.currentPlace = <Place>{ type: 'bookmark', bookmark: this.currentPlace.bookmark };
+            else
+                // current visible is not equal to visible of bookmark, animation is required
+                this.currentPlace = <Place>{ type: 'goto', bookmark: this.currentPlace.bookmark };
+
+            var bookmark = this.bookmarks[this.currentPlace.bookmark];
+
+            // indicates if animation to first bookmark is required
+            var isInTransitionToFirstBookmark = (this.currentPlace.bookmark == 0 && this.currentPlace.type == 'goto');
+
+            // transition to bookmark is over OR not in process of transition to first bookmark => start bookmark
+            if (this.currentPlace.type == 'bookmark' || this.currentPlace.bookmark != 0) {
+                this.RaiseBookmarkStarted(bookmark);
+
+                // start bookmark' timer & audio narration if audio is ready
+                if (this.isAudioLoaded == true) {
+                    this.setTimer(bookmark);
+                    if (this.isAudioEnabled)
+                        this.startBookmarkAudio(bookmark);
+                }
+            }
+
+            this.currentPlace.animationId = this.zoomTo(getBookmarkVisible(bookmark), this.onGoToSuccess, this.onGoToFailure, bookmark.url);
+
+            // raise tourStarted callback functions
+            if (this.currentPlace.bookmark === 0 && isInTransitionToFirstBookmark) {
+                this.RaiseTourStarted();
+            }
+
+            var curURL = ChronoZoom.UrlNav.getURL();
+            if (typeof curURL.hash.params == 'undefined') {
+                curURL.hash.params = new Array();
+            }
+
+            if (typeof curURL.hash.params["tour"] == 'undefined') {
                 curURL.hash.params["tour"] = tour.sequenceNum;
-                //curURL.hash.params["bookmark"] = self.currentPlace.bookmark+1;
 
                 //This flag is used to overcome hashchange event handler
                 ChronoZoom.Common.hashHandle = false;
                 ChronoZoom.UrlNav.setURL(curURL);
+            }
+        };
 
-                if (isToursDebugEnabled && window.console && console.log("reached the bookmark index " + self.currentPlace.bookmark));
-
-                self.currentPlace = { type: 'bookmark', bookmark: self.currentPlace.bookmark };
-
-                //start the audio after the transition to the first bookmark if not paused
-                if (self.currentPlace.bookmark == 0) {
-                    // raise bookmark started callback functions
-                    var bookmark = self.bookmarks[self.currentPlace.bookmark];
-                    RaiseBookmarkStarted(bookmark);
-
-                    if (self.state != 'pause') {
-                        if (self.isAudioLoaded != true) // stop tour if audio is not ready yet
-                            tourPause();
-                        else { // audio is ready
-                            setTimer(bookmark);
-                            if (isAudioEnabled)
-                                startBookmarkAudio(bookmark);
-                        }
-                    }
-                }
-
-            };
-
-            var onGoToFailure = function (animationID) { // we've been interrupted during zoom to the bookmark
-                // the function is called only when state is play and currentPlace is goto, otherwise we are paused
-                if (!self.currentPlace || self.currentPlace.animationID == undefined || self.currentPlace.animationID != animationID) // callback is obsolete
-                    return;
-
-                // pause tour
-                self.pause();
-
-                if (isToursDebugEnabled && window.console && console.log("tour interrupted by user during transition"));
-            };
-
-
-            //-------------------------------------------------------------------------------------------
-            // Public interface
-            this.play = function () {
-                if (this.state !== 'pause') return;
-
-                // first we go to the bookmark and then continue play it
-                if (isToursDebugEnabled && window.console && console.log("tour playback activated"));
-                this.state = 'play';
-
-                var visible = vc.virtualCanvas("getViewport").visible;
-
-                if (this.currentPlace != null && this.currentPlace.bookmark != null && ChronoZoom.Common.compareVisibles(visible, getBookmarkVisible(this.bookmarks[this.currentPlace.bookmark])))
-                // current visible is equal to visible of bookmark
-                    this.currentPlace = { type: 'bookmark', bookmark: this.currentPlace.bookmark };
-                else
-                // current visible is not equal to visible of bookmark, animation is required
-                    this.currentPlace = { type: 'goto', bookmark: this.currentPlace.bookmark };
-
-                var bookmark = this.bookmarks[this.currentPlace.bookmark];
-
-                // indicates if animation to first bookmark is required
-                var isInTransitionToFirstBookmark = (this.currentPlace.bookmark == 0 && this.currentPlace.type == 'goto');
-
-                // transition to bookmark is over OR not in process of transition to first bookmark => start bookmark
-                if (this.currentPlace.type == 'bookmark' || this.currentPlace.bookmark != 0) { 
-                    RaiseBookmarkStarted(bookmark);
-            
-                    // start bookmark' timer & audio narration if audio is ready
-                    if (this.isAudioLoaded == true) {
-                        setTimer(bookmark);
-                        if (isAudioEnabled)
-                            startBookmarkAudio(bookmark);
-                    }
-                }
-
-                this.currentPlace.animationID = zoomTo(getBookmarkVisible(bookmark), onGoToSuccess, onGoToFailure, bookmark.url);
-
-                // raise tourStarted callback functions
-                if (this.currentPlace.bookmark === 0 && isInTransitionToFirstBookmark) {
-                    RaiseTourStarted();
-                }
-
-                var curURL = ChronoZoom.UrlNav.getURL();
-                if (typeof curURL.hash.params == 'undefined') {
-                    curURL.hash.params = new Array();
-                }
-
-                if (typeof curURL.hash.params["tour"] == 'undefined') {
-                    curURL.hash.params["tour"] = tour.sequenceNum;
-
-                    //This flag is used to overcome hashchange event handler
-                    ChronoZoom.Common.hashHandle = false;
-                    ChronoZoom.UrlNav.setURL(curURL);
-                }
-            };
-
-            this.pause = function () {
+            private pause() {
                 if (this.state !== 'play') return;
 
                 if (isToursDebugEnabled && window.console && console.log("tour playback paused"));
-                if (isAudioEnabled && self.isTourPlayRequested)
-                    self.isTourPlayRequested = false;
+                if (this.isAudioEnabled && this.isTourPlayRequested)
+                    this.isTourPlayRequested = false;
 
                 // clear active bookmark timer
-                if (timerOnBookmarkIsOver) {
-                    clearTimeout(timerOnBookmarkIsOver);
-                    timerOnBookmarkIsOver = undefined;
+                if (this.timerOnBookmarkIsOver) {
+                    clearTimeout(this.timerOnBookmarkIsOver);
+                    this.timerOnBookmarkIsOver = undefined;
                 }
 
                 this.state = 'pause';
-                if (isAudioEnabled) {
-                    audio.pause();
+                if (this.isAudioEnabled) {
+                    this.audio.pause();
                     if (isToursDebugEnabled && window.console && console.log("audio element is forced to pause"));
                 }
 
@@ -399,71 +394,71 @@ module ChronoZoom {
                     bookmark.elapsed += (new Date().getTime() - this.currentPlace.startTime) / 1000; // sec
             };
 
-            this.next = function () { // goes to the next bookmark
+            private next() { // goes to the next bookmark
                 // ignore if last bookmark
-                if (self.currentPlace.bookmark != bookmarks.length - 1) {
+                if (this.currentPlace.bookmark != this.bookmarks.length - 1) {
                     if (this.state === 'play') {
                         // clear active bookmark timer
-                        if (timerOnBookmarkIsOver) clearTimeout(timerOnBookmarkIsOver);
-                        timerOnBookmarkIsOver = undefined;
+                        if (this.timerOnBookmarkIsOver) clearTimeout(this.timerOnBookmarkIsOver);
+                        this.timerOnBookmarkIsOver = undefined;
                     }
 
-                    onBookmarkIsOver(false); // goes to the next bookmark            
+                    this.onBookmarkIsOver(false); // goes to the next bookmark            
                 }
             };
 
-            this.prev = function () { // goes to the previous bookmark
+            private prev() { // goes to the previous bookmark
                 // ignore if first bookmark
-                if (self.currentPlace.bookmark == 0)
-                {
-                    //self.currentPlace = { type: 'goto', bookmark: 0, animationID: self.currentPlace.animationID };
+                if (this.currentPlace.bookmark == 0) {
+                    //self.currentPlace = { type: 'goto', bookmark: 0, animationId: self.currentPlace.animationId };
                     return;
                 }
                 if (this.state === 'play') {
                     // clear active bookmark timer
-                    if (timerOnBookmarkIsOver) clearTimeout(timerOnBookmarkIsOver);
-                    timerOnBookmarkIsOver = undefined;
+                    if (this.timerOnBookmarkIsOver) clearTimeout(this.timerOnBookmarkIsOver);
+                    this.timerOnBookmarkIsOver = undefined;
                 }
-        
-                onBookmarkIsOver(true); // goes to the prev bookmark
+
+                this.onBookmarkIsOver(true); // goes to the prev bookmark
             };
 
             // public properties
-            this.getBookmark = function () {
+            private getBookmark() {
                 return this.bookmarks[this.currentPlace.bookmark];
             };
 
             // calls every bookmarkStarted callback function
-            function RaiseBookmarkStarted(bookmark) {
-                if (self.tour_BookmarkStarted.length > 0) {
-                    for (var i = 0; i < self.tour_BookmarkStarted.length; i++)
-                        self.tour_BookmarkStarted[i](self, bookmark);
+            private RaiseBookmarkStarted(bookmark) {
+                if (this.tour_BookmarkStarted.length > 0) {
+                    for (var i = 0; i < this.tour_BookmarkStarted.length; i++)
+                        this.tour_BookmarkStarted[i](self, bookmark);
                 }
             }
 
             // calls every bookmarkFinished callback function
-            function RaiseBookmarkFinished(bookmark) {
-                if (self.tour_BookmarkFinished.length > 0) {
-                    for (var i = 0; i < self.tour_BookmarkFinished.length; i++)
-                        self.tour_BookmarkFinished[i](self, bookmark);
+            private RaiseBookmarkFinished(bookmark) {
+                if (this.tour_BookmarkFinished.length > 0) {
+                    for (var i = 0; i < this.tour_BookmarkFinished.length; i++)
+                        this.tour_BookmarkFinished[i](self, bookmark);
                 }
             }
 
-            // calls every tourStarted callback function
-            function RaiseTourStarted() {
-                if (self.tour_TourStarted.length > 0) {
-                    for (var i = 0; i < self.tour_TourStarted.length; i++)
-                        self.tour_TourStarted[i](self);
+                // calls every tourStarted callback function
+            private RaiseTourStarted() {
+                if (this.tour_TourStarted.length > 0) {
+                    for (var i = 0; i < this.tour_TourStarted.length; i++)
+                        this.tour_TourStarted[i](self);
                 }
             }
 
-            // calls every tourFinished callback function
-            function RaiseTourFinished() {
-                if (self.tour_TourFinished.length > 0) {
-                    for (var i = 0; i < self.tour_TourFinished.length; i++)
-                        self.tour_TourFinished[i](self);
+                // calls every tourFinished callback function
+            private RaiseTourFinished() {
+                if (this.tour_TourFinished.length > 0) {
+                    for (var i = 0; i < this.tour_TourFinished.length; i++)
+                        this.tour_TourFinished[i](self);
                 }
             }
+
         }
 
         /*
@@ -471,7 +466,7 @@ module ChronoZoom {
         @param    tour (Tour). A tour to play.
         @param    isAudioEnabled (Boolean) Whether to play audio during the tour or not
         */
-        function activateTour(newTour, isAudioEnabled) {
+        export function activateTour(newTour, isAudioEnabled) {
             if (newTour != undefined) {
                 var tourControlDiv = document.getElementById("tour_control");
                 tourControlDiv.style.display = "block";
@@ -479,9 +474,9 @@ module ChronoZoom {
         
                 // add new tourFinished callback function
                 tour.tour_TourFinished.push(function (tour) {
-                    hideBookmark(tour);
-                    tourPause();
-                    hideBookmarks();
+                    this.hideBookmark(tour);
+                    this.tourPause();
+                    this.hideBookmarks();
                 });
 
                 tour.toggleAudio(isAudioEnabled);
@@ -499,7 +494,7 @@ module ChronoZoom {
                     tour.isAudioLoaded = true;
                 }
                 // start a tour
-                tourResume();
+                this.tourResume();
             }
         }
 
@@ -508,31 +503,31 @@ module ChronoZoom {
         */
         function removeActiveTour() {
             // stop active tour
-            tourPause();
-            self.isTourPlayRequested = false;
+            Tours.tour.tourPause();
+            this.isTourPlayRequested = false;
 
             // hide tour' UI
             var tourControlDiv = document.getElementById("tour_control");
             tourControlDiv.style.display = "none";
-            if (tour) {
-                hideBookmarks();
+            if (Tours.tour) {
+                Tours.tour.hideBookmarks();
                 $("#bookmarks .header").html("");
 
                 // remove audio track
-                if (tour.audio)
-                    tour.audio = undefined;
+                if (Tours.tour.audio)
+                    Tours.tour.audio = undefined;
             }
 
             // reset active tour
-            tour = undefined;
+            Tours.tour = undefined;
         }
 
         /*
         Handling of prev button click in UI
         */
         function tourPrev() {
-            if (tour != undefined) {
-                tour.prev();
+            if (Tours.tour != undefined) {
+                Tours.tour.prev();
             }
         }
 
@@ -540,8 +535,8 @@ module ChronoZoom {
         Handling of next button click in UI
         */
         function tourNext() {
-            if (tour != undefined) {
-                tour.next();
+            if (Tours.tour != undefined) {
+                tours.tour.next();
             }
         }
 
@@ -549,16 +544,16 @@ module ChronoZoom {
         switch the tour in the paused state
         */
         export function tourPause() {
-            if (tour != undefined) {
+            if (Tours.tour != undefined) {
                 $("#tour_playpause").attr("src", "Images/tour_play_off.jpg");
 
                 // pause tour
-                tour.pause();
+                Tours.tour.pause();
                 // stop active animation
                 ChronoZoom.Common.controller.stopAnimation();
                 // remove animation callbacks
-                tourBookmarkTransitionInterrupted = undefined;
-                tourBookmarkTransitionCompleted = undefined;
+                Tours.tour.tourBookmarkTransitionInterrupted = undefined;
+                Tours.tour.tourBookmarkTransitionCompleted = undefined;
             }
         }
 
@@ -567,18 +562,18 @@ module ChronoZoom {
         */
         function tourResume() {
             $("#tour_playpause").attr("src", "Images/tour_pause_off.jpg");
-            tour.play();
+            Tours.tour.play();
         }
 
         /*
         Handling of play/pause button click in UI
         */
         function tourPlayPause() {
-            if (tour != undefined) {
-                if (tour.state == "pause") {
+            if (Tours.tour != undefined) {
+                if (Tours.tour.state == "pause") {
                     tourResume();
                 }
-                else if (tour.state == "play") {
+                else if (Tours.tour.state == "play") {
                     tourPause();
                 }
 
@@ -607,21 +602,16 @@ module ChronoZoom {
             ChronoZoom.UrlNav.setURL(curURL);
         }
 
-
-
-
-        function initializeToursUI() {
+        export function initializeToursUI() {
             $("#tours").hide();
 
             // Bookmarks window
             hideBookmarks();
         }
 
-
-
         export function initializeToursContent() {
             var toursUI = $('#tours-content');
-            tours.sort(function (u, v) { return u.sequenceNum - v.sequenceNum });
+            Tours.tours.sort(function (u, v) { return u.sequenceNum - v.sequenceNum });
             var category = null;
             var categoryContent;
 
@@ -638,7 +628,6 @@ module ChronoZoom {
                 tour.tour_BookmarkFinished.push(function (t, bookmark) {
                     hideBookmark(t);
                 });
-
         
                 // add new category to tours menu
                 if (tour.category !== category) {
@@ -780,7 +769,6 @@ module ChronoZoom {
             isTourWindowVisible = !isTourWindowVisible;
         }
 
-
         /* Highlights the tour button in the top menu */
         function tourButtonHighlight(isOn) {
             if (isOn) {
@@ -850,13 +838,12 @@ module ChronoZoom {
             isNarrationOn = !isNarrationOn;
         }
 
-
         /*
         Called after successful response from tours request.
         @param content      (array) an array of tours that were returned by request 
         */
         export function parseTours(content) {
-            tours = new Array();
+            Tours.tours = new Array();
 
             // build array of tours that could be played
             for (var i = 0; i < content.d.length; i++) {
@@ -905,7 +892,6 @@ module ChronoZoom {
             }
         }
 
-
         /*
         Bookmark' transition handler function to be passed to tours.
         */
@@ -930,7 +916,7 @@ module ChronoZoom {
                 return;
 
             if (typeof curURL.hash.params !== 'undefined' && typeof curURL.hash.params["tour"] !== 'undefined') {
-                if (tours == null)
+                if (tours.tours == null)
                     initializeToursContent();
 
                 if (isTourWindowVisible) {
