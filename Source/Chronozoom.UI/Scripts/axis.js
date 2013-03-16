@@ -198,7 +198,7 @@ var ChronoZoom;
                 var self = this;
                 if(this.thresholds != null) {
                     for(var i = 0; i < this.thresholds.length; i++) {
-                        var x = this.thresholds[i].coordinate;
+                        x = this.thresholds[i].coordinate;
                         if((point.x >= x - leftEps) && (point.x <= x + rightEps) && (point.y >= axisHeight - strokeWidth - verticalEps) && (point.y <= axisHeight - strokeWidth + verticalEps) && (To_Avoid_Overlap != true)) {
                             this.highlighted_num = i;
                             To_Avoid_Overlap = true;
@@ -229,14 +229,14 @@ var ChronoZoom;
                 }, 'slow');
                 this.animation = false;
             },
-            _hideThresholdCompleted: function (i) {
+            _hideThresholdCompleted: function () {
                 var self = this;
                 $('#line' + i).slideUp(thresholdsAnimationTime, function () {
-                    self._hideLineCompleted(i);
+                    self._hideLineCompleted();
                 });
                 $('#threshold' + i).remove();
             },
-            _hideLineCompleted: function (i) {
+            _hideLineCompleted: function () {
                 $('#line' + i).remove();
                 this._onThresholdsClearCompleted();
             },
@@ -349,7 +349,7 @@ var ChronoZoom;
             },
             _onThresholdMouseClick: function () {
                 var e = window.event;
-                var event = new $.Event("thresholdBookmarkChanged");
+                var event = new jQuery.Event("thresholdBookmarkChanged");
                 event.Bookmark = this.thresholds[this.currentThreshold].bookmark;
                 this.element.trigger(event);
                 this._onThresholdsClear(false);
@@ -380,7 +380,7 @@ var ChronoZoom;
                 var ctx = canvas.getContext("2d");
                 if((this.thresholds != null) && (this.showThresholds != false)) {
                     if(this.thresholds[i].isVisible) {
-                        var x = this.thresholds[i].coordinate;
+                        x = this.thresholds[i].coordinate;
                         ctx.fillStyle = this.thresholds[i].color;
                         ctx.strokeStyle = "black";
                         ctx.beginPath();
@@ -404,7 +404,7 @@ var ChronoZoom;
                 var ctx = canvas.getContext("2d");
                 if((this.thresholds != null) && (this.showThresholds != false)) {
                     if(this.thresholds[i].isVisible) {
-                        var x = this.thresholds[i].coordinate;
+                        x = this.thresholds[i].coordinate;
                         ctx.fillStyle = this.thresholds[i].color;
                         ctx.strokeStyle = "white";
                         ctx.lineWidth = 1;
@@ -665,7 +665,7 @@ var ChronoZoom;
                     if(this.beta <= -5) {
                         tempDays = 1;
                     }
-                    var year = this.startDate.year;
+                    year = this.startDate.year;
                     var month = this.startDate.month - 1;
                     for(var j = 0; j <= countMonths + 2; j++) {
                         month++;
@@ -673,7 +673,7 @@ var ChronoZoom;
                             month = 0;
                             year++;
                         }
-                        var tick = getCoordinateFromDMY(year, month, 1);
+                        tick = getCoordinateFromDMY(year, month, 1);
                         if(tick >= left && tick <= right) {
                             if(tempDays != 1) {
                                 labels.push(months[month]);
@@ -686,7 +686,7 @@ var ChronoZoom;
                                 countDays--;
                             }
                             for(var k = 1; k <= countDays; k++) {
-                                var day = k * tempDays;
+                                day = k * tempDays;
                                 tick = getCoordinateFromDMY(year, month, day);
                                 if(tick >= left && tick <= right) {
                                     labels.push(day);
@@ -984,7 +984,7 @@ var ChronoZoom;
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 if((x >= maxPermitedTimeRange.left && x <= maxPermitedTimeRange.right)) {
                     var k = this.width / (this.options.range.right - this.options.range.left);
-                    var x = k * (x - this.options.range.left);
+                    x = k * (x - this.options.range.left);
                     this.mousePosition = x;
                     ctx.strokeStyle = axisStrokeColor;
                     ctx.fillStyle = axisStrokeColor;
