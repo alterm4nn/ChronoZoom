@@ -61,6 +61,14 @@ function preventbubble(e) {
         e.cancelBubble = true;
 }
 
+function getCoordinateFromDecimalYear(decimalYear) {
+    if (decimalYear === 9999) {
+        return 0;
+    }
+
+    return getCoordinateFromDMY(decimalYear, 0, 0);
+}
+
 function getCoordinateFromDate(dateTime) {
     var localPresent = getPresent();
     return getYearsBetweenDates(dateTime.getFullYear(), dateTime.getMonth(), dateTime.getDay(), localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
@@ -195,27 +203,6 @@ function toggleOnImage(elemId, ext) {
 
 function showFooter() {
     $("#footerBack").show('clip', {}, 'slow');
-}
-
-function GenerateProperty(dateContainer, timeUnit, year, month, day, propName) {
-    var present = getPresent().getUTCFullYear();
-    if (dateContainer[timeUnit].toLowerCase() == "ga") {
-        dateContainer[propName] = -dateContainer[year] * 1000000000;
-    } else if (dateContainer[timeUnit].toLowerCase() == "ma") {
-        dateContainer[propName] = -dateContainer[year] * 1000000;
-    } else if (dateContainer[timeUnit].toLowerCase() == "ka") {
-        dateContainer[propName] = -dateContainer[year] * 1000;
-    } else if (dateContainer[timeUnit].toLowerCase() == "bce") {
-        dateContainer[propName] = getCoordinateFromDMY(
-            -dateContainer[year],
-            dateContainer[month] == null ? 0 : Math.min(11, Math.max(0, dateContainer[month] - 1)),
-            dateContainer[day] == null ? 1 : dateContainer[day]);
-    } else if (dateContainer[timeUnit].toLowerCase() == "ce") {
-        dateContainer[propName] = getCoordinateFromDMY(
-            dateContainer[year],
-            dateContainer[month] == null ? 0 : Math.min(11, Math.max(0, dateContainer[month] - 1)),
-            dateContainer[day] == null ? 1 : dateContainer[day]);
-    }
 }
 
 function closeWelcomeScreen() {
