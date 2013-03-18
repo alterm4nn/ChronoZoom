@@ -1312,10 +1312,12 @@ img.fallbackBackground {
 #footer {
     height:         22px;    
     margin-top:     4px;
+    text-align:     center;
 }
 
 #footer-left {
     float:      left;
+    display:    inline-block;
     height:     100%;
 }
 
@@ -1330,6 +1332,7 @@ img.fallbackBackground {
 
 #footer-right {
     float:      right;
+    display:    inline-block;
     height:     100%;
 }
 
@@ -1399,6 +1402,42 @@ img.fallbackBackground {
 /************************************
 *              Authoring            *
 ************************************/
+
+#footer-authoring {
+    display:            inline-block;
+    background-color:   #212121;
+}
+
+.footer-authoring-text {
+    margin-right:       5px;
+    vertical-align:     middle;
+    
+    color:              #BFBFBF;
+    font:               11.5px Arial;
+    white-space:        nowrap;
+}
+
+.footer-authoring-link {
+    margin-right:           3px;
+    margin-left:            3px;
+    padding:                4px 2px 3px 3px;
+    vertical-align:         middle;   
+    
+    color:                  #BFBFBF;
+    font:                   11.5px Arial;
+    white-space:            nowrap;
+
+    -webkit-border-radius:  1px;
+	-moz-border-radius:     1px;
+	border-radius:          1px;
+}
+
+    .footer-authoring-link:hover {
+        color:              black;
+        background-color:   #BFBFBF;
+        text-decoration:    none;
+        cursor: default;
+    }
 
 .authModeSwitch {
     background: grey;

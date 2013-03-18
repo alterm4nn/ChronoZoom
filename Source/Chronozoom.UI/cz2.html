@@ -30,12 +30,16 @@
         })();
     </script>
 
+    <!--TODO: Download custom version of jQuery UI-->
+
     <link rel="stylesheet" type="text/css" href="Styles/cz.css" />
     <link rel="stylesheet" type="text/css" href="Styles/axis.css" />
     <link rel="stylesheet" type="text/css" href="Styles/timescale.css" />
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
 
     <script type="text/javascript" src="Scripts/jquery-1.7.2.min.js"></script>
-    <script type="text/javascript" src="Scripts/jquery-ui-1.8.16.custom.min.js"></script>
+    <!--<script type="text/javascript" src="Scripts/jquery-ui-1.8.16.custom.min.js"></script>-->
+    <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
     <script type="text/javascript" src="Scripts/jquery.cookie.js"></script>
     <script type="text/javascript" src="Scripts/rx.js"></script>
     <script type="text/javascript" src="Scripts/rx.jQuery.js"></script>
@@ -561,6 +565,14 @@
                 return false;
             };
         });
+
+        function createTimeline() {
+            $("#addTimelineDialog").dialog({ modal: true, height: 500, width: 500 });
+            $("#timelineStartInput").spinner();
+            $("#timelineEndInput").spinner();
+            $("#timelineVerticalInput").spinner();
+            $("#saveTimelineButton").button();
+        }
     </script>
     <title>ChronoZoom</title>
 </head>
@@ -568,7 +580,6 @@
     
     <div id="header" style="height: 67px">
         <div style="position: relative">
-            
             <button class="authSwitch" style="width: auto; left: 350px; position: absolute;" id="AT_button"
                 onmouseup="CZ.Authoring.atOnClicked();">Authoring</button>
             <div id="authoringToolsPanel" style="position: absolute; left: 500px; top: 0px; display: none; max-width: 800px;">
@@ -761,6 +772,58 @@
             <a href="http://www.cs.msu.su" >
                 <img src="Images/MSU_logo-white17x74.png" title="Moscow State University" />
             </a>
+        </div>
+
+        <div id="footer-authoring">
+
+            <a onclick="createTimeline()" class="footer-authoring-link">
+                create timeline
+            </a>
+            <a onclick="editTimeline()" class="footer-authoring-link">
+                edit timeline
+            </a>
+            <a onclick="createExhibit()" class="footer-authoring-link">
+                create exhibit
+            </a>
+            <a onclick="editExhibit()" class="footer-authoring-link">
+                edit exhibit
+            </a>
+
+            <!--Create Timeline popup dialog-->
+            <div id="addTimelineDialog" title="create timeline" style="background-color: rgb(60, 95, 150); display: none; color: white;">
+                <p>
+                    <label style="display: block">title</label>
+                    <input id="timelineTitleInput" style="display: block" type="text" />
+                </p>
+
+                <p style="display: inline-block">
+                    <label style="display: block">start</label>
+                    <input id="timelineStartInput" style="display: block" />
+                    <select>
+                        <option value="CE">CE</option>
+                        <option value="BCE">BCE</option>
+                    </select>
+                </p>
+
+                <p style="display: inline-block">
+                    <label style="display: block">end</label>
+                    <input id="timelineEndInput" style="display: block" />
+                    <select>
+                        <option value="CE">CE</option>
+                        <option value="BCE">BCE</option>
+                    </select>
+                </p>
+
+                <p style="display: inline-block">
+                    <label style="display: block">vertical units</label>
+                    <input id="timelineVerticalInput" style="display: block" />
+                </p>
+
+                <p>
+                    <button id="saveTimelineButton" style="display: block">save and close</button>
+                </p>
+            </div>
+
         </div>
 
         <div id="footer-right">            
