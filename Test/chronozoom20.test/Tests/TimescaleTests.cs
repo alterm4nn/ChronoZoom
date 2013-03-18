@@ -75,6 +75,7 @@ namespace Tests
         [TestMethod]
         public void Roman_History_TimeLine_Borders()
         {
+            HomePageHelper.OpenHumanityTimeline();
             HomePageHelper.OpenRomanHistoryTimeline();
             const double expected = 943;
             double leftBorder = TimelineHelper.GetLeftBorderDate();
