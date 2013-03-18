@@ -1,12 +1,4 @@
-﻿function Timeline(title, left, right, childTimelines, exhibits) {
-    this.Title = title;
-    this.left = left;
-    this.right = right;
-    this.ChildTimelines = childTimelines;
-    this.Exhibits = exhibits;
-}
-
-function Infodot(x, contentItems) {
+﻿function Infodot(x, contentItems) {
     this.x = x;
     this.ContentItems = contentItems;
 }
@@ -16,13 +8,13 @@ function titleObject(name) {
 }
 
 function Prepare(timeline) {
-    GenerateProperty(timeline, "FromTimeUnit", "FromYear", "FromMonth", "FromDay", "left");
-    GenerateProperty(timeline, "ToTimeUnit", "ToYear", "ToMonth", "ToDay", "right");
+    timeline.left = getCoordinateFromDecimalYear(timeline.FromYear);
+    timeline.right = getCoordinateFromDecimalYear(timeline.ToYear);
 
     timeline.Exhibits.forEach(function (exhibit) {
-        GenerateProperty(exhibit, "TimeUnit", "Year", "Month", "Day", "x");
+        exhibit.x = getCoordinateFromDecimalYear(exhibit.Year);
     });
-
+    
     timeline.ChildTimelines.forEach(function (childTimeline) {
         childTimeline.ParentTimeline = timeline;
         Prepare(childTimeline);
@@ -432,8 +424,22 @@ function buildDate(obj) {
     var date;
     if (obj.Year) {
         date = obj.Year;
-        if (obj.TimeUnit !== 'CE')
-            date += ' ' + obj.TimeUnit;
+
+        if (date < 0) {
+            if (date < -999999999) {
+                date /= -1000000000;
+                date += ' GA';
+            } else if (date < -999999) {
+                date /= -1000000;
+                date += ' MA';
+            } else if (date < -999) {
+                date /= -1000;
+                date += ' KA';
+            } else {
+                date /= -1;
+                date += ' BCE';
+            }
+        }
     }
     else {
         date = obj.Date;

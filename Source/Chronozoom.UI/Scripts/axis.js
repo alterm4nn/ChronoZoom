@@ -129,9 +129,8 @@
         _getThresholdsContent: function (content) {
             this.numberOfThresholds = content.d.length;
             this.thresholds = [];
-            var isValid = true;
             for (var i = 0; i < this.numberOfThresholds; i++) {
-                GenerateProperty(content.d[i], "ThresholdTimeUnit", "ThresholdYear", "ThresholdMonth", "ThresholdDay", "time");
+                content.d[i].time = getCoordinateFromDecimalYear(content.d[i].ThresholdYear);
                 this.thresholds[i] = {
                     'title': content.d[i].Title, 'description': (content.d[i].Description == null ? '' : content.d[i].Description),
                     'time': content.d[i].time, 'bookmark': content.d[i].BookmarkRelativePath,

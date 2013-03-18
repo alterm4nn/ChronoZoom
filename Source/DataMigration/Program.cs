@@ -1,65 +1,121 @@
-﻿using System;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright company="Outercurve Foundation">
+//   Copyright (c) 2013, The Outercurve Foundation
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Data;
+using System.IO;
+using System.Net;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
-using System.IO;
-using System.Xml;
-using System.Net;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+
 using Chronozoom.Entities;
-using UI;
 
 namespace DataMigration
 {
-    class Program
+    public class Program
     {
-        public static string TIMELINE_ENTITY = "Timeline:#Chronozoom.Entities";
-        public static string EXHIBIT_ENTITY = "Exhibit:#Chronozoom.Entities";
-        public static string CONTENTITEM_ENTITY = "ContentItem:#Chronozoom.Entities";
-        public static readonly Guid _oldRootID = new Guid("468a8005-36e3-4676-9f52-312d8b6eb7b7");
+        private static readonly Storage Storage = new Storage();
+        private static readonly Guid OldRootId = new Guid("468a8005-36e3-4676-9f52-312d8b6eb7b7");
 
-        // Unused
-        public static Decimal BigBangTime = -13700000000;
-
-        private static Storage dbInst;
-
-        private static void InitializeDbContext()
+        public static void Main()
         {
-            dbInst = new Storage();
-        }
-
-        static void Main(string[] args)
-        {
-            //Console.Write("Enter the URL from which you want to migrate JSON data ");
-            InitializeDbContext();
             Migrate();
         }
 
-        //returns the decimal year equivalent of the incoming data
-        private static Decimal? convertToDecimalYear(int? day, int? month, Decimal? year, string timeUnit)
+        public static void Migrate()
         {
-            Decimal? decimalyear = null;
-            if (year.HasValue)
+            var myWebClient = new WebClient();
+
+            var betaCollection = new Collection { Id = Guid.Empty, Title = "Beta Content" };
+            Storage.Collections.Add(betaCollection);
+
+            // First remove the 'Hello World' timeline that is inserted into a new database
+            Storage.Timelines.Remove(Storage.Timelines.Find(Guid.Empty));
+
+            using (Stream dataTimelines = myWebClient.OpenRead("http://www.chronozoomproject.org/Chronozoom.svc/get"))
             {
-                decimalyear = (Decimal)year;
-            }
-            else
-            {
-                return null; //if the value of the year var is null, return null
+                var bjrTimelines = (BaseJsonResult<IEnumerable<Timeline>>)new DataContractJsonSerializer(typeof(BaseJsonResult<IEnumerable<Timeline>>)).ReadObject(dataTimelines);
+
+                foreach (var timeline in bjrTimelines.d)
+                {
+                    timeline.Collection = betaCollection;
+                    if (timeline.Id == OldRootId)
+                    {
+                        timeline.Id = Guid.Empty;
+                    }
+
+                    MigrateInPlace(timeline);
+                    Storage.Timelines.Add(timeline);
+                }
             }
 
-            if (timeUnit != null) //if the timeUnit is null - we still calculate decimalyear in the first if of the function and return that value
+            using (Stream dataTours = myWebClient.OpenRead("http://www.chronozoomproject.org/Chronozoom.svc/getTours"))
             {
-                if (string.Compare(timeUnit, "ce", true) == 0) //if the timeunit is CE
+                var bjrTours = (BaseJsonResult<IEnumerable<Tour>>)new DataContractJsonSerializer(typeof(BaseJsonResult<IEnumerable<Tour>>)).ReadObject(dataTours);
+
+                foreach (var tour in bjrTours.d)
+                {
+                    Storage.Tours.Add(tour);
+                }
+            }
+
+            using (Stream dataThresholds = myWebClient.OpenRead("http://www.chronozoomproject.org/Chronozoom.svc/getThresholds"))
+            {
+                var bjrThresholds = (BaseJsonResult<IEnumerable<Threshold>>)new DataContractJsonSerializer(typeof(BaseJsonResult<IEnumerable<Threshold>>)).ReadObject(dataThresholds);
+
+                foreach (var threshold in bjrThresholds.d)
+                {
+                    threshold.ThresholdYear = ConvertToDecimalYear(threshold.ThresholdDay, threshold.ThresholdMonth, threshold.ThresholdYear, threshold.ThresholdTimeUnit);
+                    Storage.Thresholds.Add(threshold);
+                }
+            }
+
+            Storage.SaveChanges();
+            Console.WriteLine("Parsed Successfully \n");
+        }
+
+        private static void MigrateInPlace(Timeline timeline)
+        {
+            timeline.FromYear = ConvertToDecimalYear(timeline.FromDay, timeline.FromMonth, timeline.FromYear, timeline.FromTimeUnit);
+            timeline.ToYear = ConvertToDecimalYear(timeline.ToDay, timeline.ToMonth, timeline.ToYear, timeline.ToTimeUnit);
+
+            foreach (var exhibit in timeline.Exhibits)
+            {
+                exhibit.Year = ConvertToDecimalYear(exhibit.Day, exhibit.Month, exhibit.Year, exhibit.TimeUnit);
+            }
+
+            foreach (var child in timeline.ChildTimelines)
+            {
+                MigrateInPlace(child);
+            }
+        }
+
+        // returns the decimal year equivalent of the incoming data
+        private static decimal ConvertToDecimalYear(int? day, int? month, decimal year, string timeUnit)
+        {
+            // Substitute 0.0 for year 9999.  Today the algorithm assumes year 0.0 means 'today' but in decimal years, 0.0 is a valid value.
+            if (year == 0)
+            {
+                return 9999;
+            }
+
+            decimal decimalyear = year;
+
+            // if the timeUnit is null - we still calculate decimalyear in the first if of the function and return that value
+            if (timeUnit != null)
+            {
+                // if the timeunit is CE
+                if (string.Compare(timeUnit, "ce", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     int tempmonth = 1;
                     int tempday = 1;
-                    if (month.HasValue && month > 0) //if the month and day values are null, calculating decimalyear with the first day of the year
+
+                    // if the month and day values are null, calculating decimalyear with the first day of the year
+                    if (month.HasValue && month > 0)
                     {
                         tempmonth = (int)month;
                         if (day.HasValue && day > 0)
@@ -67,254 +123,64 @@ namespace DataMigration
                             tempday = (int)day;
                         }
                     }
-                    DateTime dt = new DateTime((int)decimalyear, tempmonth, tempday);
-                    decimalyear = convertToDecimalYear(dt);
+
+                    var dt = new DateTime((int)decimalyear, tempmonth, tempday);
+                    decimalyear = ConvertToDecimalYear(dt);
                 }
-                else if (string.Compare(timeUnit, "bce", true) == 0)
+                else if (string.Compare(timeUnit, "bce", StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    decimalyear *= -1; //anything that is not CE is in the negative scale. 0 CE = O Decimal Year
+                    // anything that is not CE is in the negative scale. 0 CE = O Decimal Year
+                    decimalyear *= -1;
                 }
-                else if (string.Compare(timeUnit, "ka", true) == 0)
+                else if (string.Compare(timeUnit, "ka", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     decimalyear *= -1000;
                 }
-                else if (string.Compare(timeUnit, "ma", true) == 0)
+                else if (string.Compare(timeUnit, "ma", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     decimalyear *= -1000000;
                 }
-                else if (string.Compare(timeUnit, "ga", true) == 0)
+                else if (string.Compare(timeUnit, "ga", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     decimalyear *= -1000000000;
                 }
-                else if (string.Compare(timeUnit, "ta", true) == 0)
+                else if (string.Compare(timeUnit, "ta", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     decimalyear *= -1000000000000;
                 }
-                else if (string.Compare(timeUnit, "pa", true) == 0)
+                else if (string.Compare(timeUnit, "pa", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     decimalyear *= -1000000000000000;
                 }
-                else if (string.Compare(timeUnit, "ea", true) == 0)
+                else if (string.Compare(timeUnit, "ea", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     decimalyear *= -1000000000000000000;
                 }
                 else
                 {
-                    Console.WriteLine(timeUnit); //was never hit with the current data
+                    throw new DataException(string.Format("Unable to parse timeUnit: {0}", timeUnit));
                 }
             }
+
             return decimalyear;
         }
 
-        private static Decimal convertToDecimalYear(DateTime dateTime)
+        private static decimal ConvertToDecimalYear(DateTime dateTime)
         {
-            Decimal year = dateTime.Year;
-            Decimal secondsInThisYear = DateTime.IsLeapYear(dateTime.Year) ? 366 * 24 * 60 * 60 : 365 * 24 * 60 * 60;
-            Decimal secondsElapsedSinceYearStart =
-                (dateTime.DayOfYear - 1) * 24 * 60 * 60 + dateTime.Hour * 60 * 60 + dateTime.Minute * 60 + dateTime.Second;
+            decimal year = dateTime.Year;
+            decimal secondsInThisYear = DateTime.IsLeapYear(dateTime.Year) ? 366 * 24 * 60 * 60 : 365 * 24 * 60 * 60;
+            decimal secondsElapsedSinceYearStart = (dateTime.DayOfYear - 1) * 24 * 60 * 60 + dateTime.Hour * 60 * 60 + dateTime.Minute * 60 + dateTime.Second;
 
-            Decimal fractionalYear = secondsElapsedSinceYearStart / secondsInThisYear;
+            decimal fractionalYear = secondsElapsedSinceYearStart / secondsInThisYear;
 
             return year + fractionalYear;
-        }
-
-        private static DateTime getDateTimeFromDateTimeOffset(JObject dateTimeOffset)
-        {
-            string datetime = (string)dateTimeOffset["DateTime"];
-            int offsetmins = (int)dateTimeOffset["OffsetMinutes"];
-            DateTimeOffset dtOffset = new DateTimeOffset(DateTime.Parse(datetime), new TimeSpan(0, 0, offsetmins, 0));
-            return dtOffset.DateTime;
-        }
-
-        private static ContentItem ParseContentItem(JObject jobj)
-        {
-            ContentItem c = new ContentItem();
-
-            c.Id = Guid.NewGuid();
-            c.Title = (string)jobj["Title"];
-            c.Caption = (string)jobj["Caption"];
-            c.Threshold = (string)jobj["Threshold"];
-            c.Regime = (string)jobj["Regime"];
-            c.TimeUnit = (string)jobj["TimeUnit"];
-            try
-            {
-                // not using time unit here as it is built into date if the date is in CE
-                //If the date is not in CE, then this object is not of type JObject - it is of type JValue in the JSON and is handled in the catch block
-                //c.Date = getDateTimeFromDateTimeOffset((JObject)jobj["Date"]); 
-                c.Year = convertToDecimalYear(getDateTimeFromDateTimeOffset((JObject)jobj["Date"]));
-            }
-            catch (InvalidCastException e)
-            {   //Calculating the decimal year given year and TimeUnit
-                c.Year = convertToDecimalYear(null, null, (Decimal?)jobj["Year"], (string)jobj["TimeUnit"]);
-            }
-            c.MediaType = (string)jobj["MediaType"];
-            c.Uri = (string)jobj["Uri"];
-            c.MediaSource = (string)jobj["MediaSource"];
-            c.Attribution = (string)jobj["Attribution"];
-            c.UniqueId = (int)jobj["UniqueID"];
-            c.Order = (short?)jobj["Order"];
-            c.HasBibliography = (bool)jobj["HasBibliography"];
-            // Insert into db here
-            dbInst.ContentItems.Add(c);
-            return c;
-        }
-
-        private static Exhibit ParseExhibit(JObject jobj)
-        {
-            Exhibit e = new Exhibit();
-            e.Id = Guid.NewGuid();
-            e.Title = (string)jobj["Title"];
-            e.Threshold = (string)jobj["Threshold"];
-            e.Regime = (string)jobj["Regime"];
-            e.TimeUnit = (string)jobj["TimeUnit"];
-            e.Day = (int?)jobj["Day"];
-            e.Month = (int?)jobj["Month"];
-            e.Year = convertToDecimalYear((int?)jobj["Day"], (int?)jobj["Month"], (Decimal?)jobj["Year"], (string)jobj["TimeUnit"]);
-            e.UniqueId = (int)jobj["UniqueID"];
-            e.Sequence = (int?)jobj["Sequence"];
-
-            JArray contentItems = (JArray)jobj["ContentItems"];
-            foreach (var contentItem in (List<ContentItem>)ParseJArray(contentItems))
-            {
-                e.ContentItems.Add(contentItem);
-            }
-
-            JArray references = (JArray)jobj["References"];
-            foreach (var reference in (List<Reference>)ParseJArray(references))
-            {
-                e.References.Add(reference);
-            }
-
-            // Insert into db here
-            dbInst.Exhibits.Add(e);
-            return e;
-        }
-
-        private static Timeline ParseTimeline(JObject jobj)
-        {
-            Timeline t = new Timeline();
-            t.Id = Guid.NewGuid();
-            t.Title = (string)jobj["Title"];
-            t.Threshold = (string)jobj["Threshold"];
-            t.Regime = (string)jobj["Regime"];
-            t.FromTimeUnit = (string)jobj["FromTimeUnit"];
-            t.FromDay = (int?)jobj["FromDay"];
-            t.FromMonth = (int?)jobj["FromMonth"];
-            t.FromYear = convertToDecimalYear((int?)jobj["FromDay"], (int?)jobj["FromMonth"], (Decimal?)jobj["FromYear"], (string)jobj["FromTimeUnit"]);
-            t.ToTimeUnit = (string)jobj["ToTimeUnit"];
-            t.ToDay = (int?)jobj["ToDay"];
-            t.ToMonth = (int?)jobj["ToMonth"];
-            t.ToYear = convertToDecimalYear((int?)jobj["ToDay"], (int?)jobj["ToMonth"], (Decimal?)jobj["ToYear"], (string)jobj["ToTimeUnit"]);
-            t.UniqueId = (int)jobj["UniqueID"];
-            t.Sequence = (int?)jobj["Sequence"];
-            t.Height = (Decimal?)jobj["Height"];
-
-            JArray childTimesLines = (JArray)jobj["ChildTimelines"];
-            foreach (var childTimeline in (List<Timeline>)ParseJArray(childTimesLines))
-            {
-                t.ChildTimelines.Add(childTimeline);
-            }
-
-            JArray exhibitsArray = (JArray)jobj["Exhibits"];
-            foreach (var exhibit in (List<Exhibit>)ParseJArray(exhibitsArray))
-            {
-                t.Exhibits.Add(exhibit);
-            }
-
-            // Insert into db here
-            dbInst.Timelines.Add(t);
-            return t;
-        }
-
-        private static Object ParseJArray(JArray parseArray)
-        {
-            Object retObject = null;
-            if (parseArray != null && parseArray.Count > 0)
-            {
-                string type = (string)parseArray[0]["__type"];
-                if (type.Equals(TIMELINE_ENTITY))
-                {
-                    List<Timeline> l = new List<Timeline>();
-                    foreach (JObject obj in parseArray)
-                    {
-                        l.Add(ParseTimeline(obj));
-                    }
-                    retObject = l;
-                }
-                else if (type.Equals(EXHIBIT_ENTITY))
-                {
-                    List<Exhibit> l = new List<Exhibit>();
-                    foreach (JObject obj in parseArray)
-                    {
-                        l.Add(ParseExhibit(obj));
-                    }
-                    retObject = l;
-                }
-                else if (type.Equals(CONTENTITEM_ENTITY))
-                {
-                    List<ContentItem> l = new List<ContentItem>();
-                    foreach (JObject obj in parseArray)
-                    {
-                        l.Add(ParseContentItem(obj));
-                    }
-                    retObject = l;
-                }
-            }
-            return retObject;
-        }
-
-        public static void Migrate()
-        {
-            WebClient myWebClient = new WebClient();
-
-            Stream dataTimelines = myWebClient.OpenRead("http://www.chronozoomproject.org/Chronozoom.svc/get");
-            var bjrTimelines = new DataContractJsonSerializer(typeof(BaseJsonResult<IEnumerable<Timeline>>)).ReadObject(dataTimelines) as BaseJsonResult<IEnumerable<Timeline>>;
-
-            Collection rootCollection = new Collection();
-            rootCollection.Id = Guid.Empty;
-            rootCollection.Title = "Beta Content";
-
-            dbInst.Collections.Add(rootCollection);
-
-            foreach (var timeline in bjrTimelines.d)
-            {
-                // Add to root collection
-                timeline.Collection = rootCollection;
-
-                // Replace old root with new root
-                if (timeline.Id == _oldRootID)
-                {
-                    timeline.Id = Guid.Empty;
-                }
-
-                dbInst.Timelines.Add(timeline);
-            }
-
-            Stream dataTours = myWebClient.OpenRead("http://www.chronozoomproject.org/Chronozoom.svc/getTours");
-            var bjrTours = new DataContractJsonSerializer(typeof(BaseJsonResult<IEnumerable<Tour>>)).ReadObject(dataTours) as BaseJsonResult<IEnumerable<Tour>>;
-
-            foreach (var tour in bjrTours.d)
-            {
-                dbInst.Tours.Add(tour);
-            }
-
-            Stream dataThresholds = myWebClient.OpenRead("http://www.chronozoomproject.org/Chronozoom.svc/getThresholds");
-            var bjrThresholds = new DataContractJsonSerializer(typeof(BaseJsonResult<IEnumerable<Threshold>>)).ReadObject(dataThresholds) as BaseJsonResult<IEnumerable<Threshold>>;
-
-            foreach (var threshold in bjrThresholds.d)
-            {
-                dbInst.Thresholds.Add(threshold);
-            }
-
-            dbInst.SaveChanges();
-            Console.WriteLine("Parsed Successfully \n");
         }
 
         [DataContract]
         public class BaseJsonResult<T>
         {
             [DataMember]
-            public T d;
+            public T d { get; set; }
         }
     }
 }

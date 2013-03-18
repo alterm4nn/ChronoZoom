@@ -30,30 +30,36 @@ namespace Chronozoom.Entities
         [DataMember]
         public string Regime { get; set; }
 
+        [NotMapped]
         [DataMember]
         public string FromTimeUnit { get; set; }
 
+        [NotMapped]
         [DataMember]
         public int? FromDay { get; set; }
 
+        [NotMapped]
         [DataMember]
         public int? FromMonth { get; set; }
 
         [DataMember]
-        public decimal? FromYear { get; set; }
+        public decimal FromYear { get; set; }
 
+        [NotMapped]
         [DataMember]
         public string ToTimeUnit { get; set; }
 
+        [NotMapped]
         [DataMember]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ToDay", Justification="This property will be removed soon")]
         public int? ToDay { get; set; }
 
+        [NotMapped]
         [DataMember]
         public int? ToMonth { get; set; }
 
         [DataMember]
-        public decimal? ToYear { get; set; }
+        public decimal ToYear { get; set; }
         
         [DataMember(Name="UniqueID")]
         public int UniqueId { get; set; }
