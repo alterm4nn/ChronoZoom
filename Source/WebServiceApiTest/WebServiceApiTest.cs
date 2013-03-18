@@ -148,8 +148,6 @@ namespace WebServiceApiTest
             WebResponse response = request.GetResponse();
             Stream responseStream = response.GetResponseStream();
 
-            string sResp = new StreamReader(responseStream).ReadToEnd();
-
             DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(ToursQueryResult));
             ToursQueryResult tours = (ToursQueryResult)serializer.ReadObject(responseStream);
 
