@@ -2,7 +2,7 @@
 /// <reference path='vccontent.ts'/>
 /// <reference path='cz.settings.ts'/>
 
-declare var $: any;
+/// <reference path='typings/jquery/jquery.d.ts'/>
 
 module ChronoZoom {
     export module Bibliography {
@@ -29,7 +29,7 @@ module ChronoZoom {
                 return;
             }
 
-            var vp = $("#vc").virtualCanvas("getViewport");
+            var vp = (<any>$("#vc")).virtualCanvas("getViewport");
             var nav = ChronoZoom.UrlNav.vcelementToNavString(element, vp);
 
             if (window.location.hash.match("b=([a-z0-9_]+)") == null) {

@@ -1,7 +1,7 @@
 ﻿//IE9 trick
 //This script passes mouse events over the div#regime_navigator to div.regime_rect's
 
-declare var $: any;
+/// <reference path='typings/jquery/jquery.d.ts'/>
 
 module ChronoZoom {
     export module RegimesIE {

@@ -4,86 +4,91 @@
 /// <reference path='scripts/viewportcontroller.ts'/>
 /// <reference path='scripts/gestures.ts'/>
 /// <reference path='scripts/tours.ts'/>
+/// <reference path='scripts/virtualCanvas.ts'/>
 
-declare var $;
+/// <reference path='scripts/typings/jquery/jquery.d.ts'/>
 
 module ChronoZoom {
     module HomePageViewModel {
 
         $(document).ready(function () {
+
+            ChronoZoom.VirtualCanvas.initialize();
+
             $('.bubbleInfo').hide();
-            $("#axis").showThresholds = true;
+
+            (<any>$("#axis")).showThresholds = true;
 
             $('#search_button')
-                .onmouseup(ChronoZoom.Search.onSearchClicked)
-                .onmouseover(() => { ChronoZoom.Search.searchHighlight(true); })
-                .onmouseout(() => { ChronoZoom.Search.searchHighlight(false); });
+                .mouseup(ChronoZoom.Search.onSearchClicked)
+                .mouseover(() => { ChronoZoom.Search.searchHighlight(true); })
+                .mouseout(() => { ChronoZoom.Search.searchHighlight(false); });
 
             $('#tours_index')
-                .onmouseup(ChronoZoom.Tours.onTourClicked)
-                .onmouseover(() => { ChronoZoom.Tours.tourButtonHighlight(true); })
-                .onmouseout(() => { ChronoZoom.Tours.tourButtonHighlight(true); });
+                .mouseup(ChronoZoom.Tours.onTourClicked)
+                .mouseover(() => { ChronoZoom.Tours.tourButtonHighlight(true); })
+                .mouseout(() => { ChronoZoom.Tours.tourButtonHighlight(true); });
 
             $('human_rect')
-                .onclick(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.humanityVisible); });
+                .click(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.humanityVisible); });
             $('prehuman_rect')
-                .onclick(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.prehistoryVisible); });
+                .click(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.prehistoryVisible); });
             $('life_rect')
-                .onclick(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.lifeVisible); });
+                .click(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.lifeVisible); });
             $('earth_rect')
-                .onclick(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.earthVisible); });
+                .click(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.earthVisible); });
             $('cosmos_rect')
-                .onclick(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.cosmosVisible); });
+                .click(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.cosmosVisible); });
 
             $('humanBookmark')
-                .onclick(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.humanityVisible); });
+                .click(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.humanityVisible); });
             $('prehistoryBookmark')
-                .onclick(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.prehistoryVisible); });
+                .click(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.prehistoryVisible); });
             $('lifeBookmark')
-                .onclick(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.lifeVisible); });
+                .click(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.lifeVisible); });
             $('earthBookmark')
-                .onclick(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.earthVisible); });
+                .click(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.earthVisible); });
             $('cosmosBookmark')
-                .onclick(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.cosmosVisible); });
+                .click(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.cosmosVisible); });
 
             $('#bc_navLeft')
-                .onclick(ChronoZoom.BreadCrumbs.breadCrumbNavLeft);
+                .click(ChronoZoom.BreadCrumbs.breadCrumbNavLeft);
             $('#bc_navRight')
-                .onclick(ChronoZoom.BreadCrumbs.breadCrumbNavRight);
+                .click(ChronoZoom.BreadCrumbs.breadCrumbNavRight);
 
             $('#tour_prev')
-                .onmouseout(() => { ChronoZoom.Common.toggleOffImage('tour_prev'); })
-                .onmouseover(() => { ChronoZoom.Common.toggleOnImage('tour_prev'); })
-                .onclick(ChronoZoom.Tours.tourPrev);
+                .mouseout(() => { ChronoZoom.Common.toggleOffImage('tour_prev'); })
+                .mouseover(() => { ChronoZoom.Common.toggleOnImage('tour_prev'); })
+                .click(ChronoZoom.Tours.tourPrev);
             $('#tour_playpause')
-                .onmouseout(() => { ChronoZoom.Common.toggleOffImage('tour_playpause'); })
-                .onmouseover(() => { ChronoZoom.Common.toggleOnImage('tour_playpause'); })
-                .onclick(ChronoZoom.Tours.tourPlayPause);
+                .mouseout(() => { ChronoZoom.Common.toggleOffImage('tour_playpause'); })
+                .mouseover(() => { ChronoZoom.Common.toggleOnImage('tour_playpause'); })
+                .click(ChronoZoom.Tours.tourPlayPause);
             $('#tour_next')
-                .onmouseout(() => { ChronoZoom.Common.toggleOffImage('tour_next'); })
-                .onmouseover(() => { ChronoZoom.Common.toggleOnImage('tour_next'); })
-                .onclick(ChronoZoom.Tours.tourNext);
+                .mouseout(() => { ChronoZoom.Common.toggleOffImage('tour_next'); })
+                .mouseover(() => { ChronoZoom.Common.toggleOnImage('tour_next'); })
+                .click(ChronoZoom.Tours.tourNext);
             $('#tour_exit')
-                .onmouseout(() => { ChronoZoom.Common.toggleOffImage('tour_exit'); })
-                .onmouseover(() => { ChronoZoom.Common.toggleOnImage('tour_exit'); })
-                .onclick(ChronoZoom.Tours.tourAbort);
+                .mouseout(() => { ChronoZoom.Common.toggleOffImage('tour_exit'); })
+                .mouseover(() => { ChronoZoom.Common.toggleOnImage('tour_exit'); })
+                .click(ChronoZoom.Tours.tourAbort);
 
             $('#tours-narration')
-                .onclick(ChronoZoom.Tours.onNarrationClick);
+                .click(ChronoZoom.Tours.onNarrationClick);
 
             $('#bookmarksCollapse')
-                .onclick(ChronoZoom.Tours.onBookmarksCollapse);
+                .click(ChronoZoom.Tours.onBookmarksCollapse);
 
             $('#biblCloseButton')
-                .onmouseout(() => { ChronoZoom.Common.toggleOffImage('biblCloseButton', 'png'); })
-                .onmouseover(() => { ChronoZoom.Common.toggleOnImage('biblCloseButton', 'png'); })
+                .mouseout(() => { ChronoZoom.Common.toggleOffImage('biblCloseButton', 'png'); })
+                .mouseover(() => { ChronoZoom.Common.toggleOnImage('biblCloseButton', 'png'); })
 
             $('#welcomeScreenCloseButton')
-                .onmouseover(() => { ChronoZoom.Common.toggleOnImage('welcomeScreenCloseButton', 'png'); })
-                .onmouseout(() => { ChronoZoom.Common.toggleOffImage('welcomeScreenCloseButton', 'png'); })
-                .onclick(ChronoZoom.Common.hideWelcomeScreen);
+                .mouseover(() => { ChronoZoom.Common.toggleOnImage('welcomeScreenCloseButton', 'png'); })
+                .mouseout(() => { ChronoZoom.Common.toggleOffImage('welcomeScreenCloseButton', 'png'); })
+                .click(ChronoZoom.Common.hideWelcomeScreen);
             $('#closeWelcomeScreenButton')
-                .onclick(ChronoZoom.Common.closeWelcomeScreen);
+                .click(ChronoZoom.Common.closeWelcomeScreen);
 
             var wlcmScrnCookie = ChronoZoom.Common.getCookie("welcomeScreenDisallowed");
             if (wlcmScrnCookie != null) {
@@ -125,7 +130,7 @@ module ChronoZoom {
                 }
             }
             else {
-                var br = $.browser;
+                var br = (<any>$).browser;
                 var isIe9 = br.msie && parseInt(br.version, 10) >= 9;
                 if (!isIe9) {
                     var isFF9 = br.mozilla && parseInt(br.version, 10) >= 7;
@@ -158,12 +163,11 @@ module ChronoZoom {
             Seadragon.Config.imagePath = ChronoZoom.Settings.seadragonImagePath;
 
             ChronoZoom.Common.maxPermitedVerticalRange = { top: 0, bottom: 10000000 }; //temporary value until there is no data
-            timings.readyStarted = new Date();
 
-            var ax = $("#axis");
+            var ax = (<any>$("#axis"));
             ax.axis();
 
-            var vc = $("#vc");
+            var vc = (<any>$("#vc"));
             vc.virtualCanvas();
 
             ChronoZoom.Common.regimeNavigator = $('#regime_navigator');
@@ -182,7 +186,7 @@ module ChronoZoom {
             var axisGestures = ChronoZoom.Gestures.applyAxisBehavior(ChronoZoom.Gestures.getGesturesStream(ax)); //gesture sequence of axis (tranformed according to axis behavior logic)
             var jointGesturesStream = canvasGestures.Merge(axisGestures);
 
-            var controller = new ChronoZoom.ViewportController.ViewportController(
+            var controller = new ChronoZoom.ViewportController.ViewportController2(
                             function (visible) {
                                 var vp = vc.virtualCanvas("getViewport");
                                 var markerPos = ax.axis("MarkerPosition");
@@ -327,7 +331,6 @@ module ChronoZoom {
                 ChronoZoom.Common.updateLayout();
             });
 
-            timings.readyFinished = new Date();
             var vp = vc.virtualCanvas("getViewport");
             vc.virtualCanvas("setVisible", ChronoZoom.VCContent.getVisibleForElement({ x: -13700000000, y: 0, width: 13700000000, height: 5535444444.444445 }, 1.0, vp));
             ChronoZoom.Common.updateAxis(vc, ax);

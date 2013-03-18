@@ -1,4 +1,8 @@
-﻿var ChronoZoom;
+﻿/// <reference path='urlnav.ts'/>
+/// <reference path='vccontent.ts'/>
+/// <reference path='cz.settings.ts'/>
+/// <reference path='typings/jquery/jquery.d.ts'/>
+var ChronoZoom;
 (function (ChronoZoom) {
     (function (Bibliography) {
         function initializeBibliography() {
@@ -21,7 +25,7 @@
             } catch (ex) {
                 return;
             }
-            var vp = $("#vc").virtualCanvas("getViewport");
+            var vp = ($("#vc")).virtualCanvas("getViewport");
             var nav = ChronoZoom.UrlNav.vcelementToNavString(element, vp);
             if(window.location.hash.match("b=([a-z0-9_]+)") == null) {
                 var bibl = "&b=" + id;

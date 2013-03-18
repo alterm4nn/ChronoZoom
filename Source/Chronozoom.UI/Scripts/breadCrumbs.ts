@@ -1,8 +1,6 @@
 ﻿/// <reference path='cz.settings.ts'/>
 /// <reference path='search.ts'/>
 
-declare var $: any;
-
 module ChronoZoom {
     export module BreadCrumbs {
 

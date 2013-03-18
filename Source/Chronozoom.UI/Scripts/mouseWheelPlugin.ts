@@ -1,4 +1,4 @@
-﻿declare var $: any;
+﻿/// <reference path='typings/jquery/jquery.d.ts'/>
 
 module ChronoZoom {
     export module MouseWheelPlugin {

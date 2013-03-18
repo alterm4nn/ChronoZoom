@@ -1,9 +1,9 @@
-﻿/// <reference path='cz.settings.ts'/>
+﻿/// <reference path=typings/jqueryui/jqueryui.d.ts'/>
+
+/// <reference path='cz.settings.ts'/>
 /// <reference path='common.ts'/>
 /// <reference path='viewport.ts'/>
 /// <reference path='vccontent.ts'/>
-
-declare var $: any;
 
 module ChronoZoom {
     export module VirtualCanvas {
@@ -25,6 +25,7 @@ module ChronoZoom {
             //        alert("mouseup");
             //    });
 
+        export function initialize() {
 
             $.widget("ui.virtualCanvas",
             {
@@ -38,30 +39,28 @@ module ChronoZoom {
                 */
                 _layers: [],
 
-                _self: null,
-
                 /* Constructs a widget 
                 */
                 _create: function () {
-                    this._self = this;
-                    this._self.element.addClass("virtualCanvas");
-                    var size = this._self._getClientSize();
+                    var self = this;
+                    self.element.addClass("virtualCanvas");
+                    var size = self._getClientSize();
 
                     this.lastEvent = null; // last mouse event
 
                     this.canvasWidth = null; // width of canvas
                     this.canvasHeight = null; // height of canvas
 
-                    this._self.cursorPositionChangedEvent = new $.Event("cursorPositionChanged");
-                    this._self.breadCrumbsChengedEvent = $.Event("breadCrumbsChanged");
-                    this._self.innerZoomConstraintChengedEvent = $.Event("innerZoomConstraintChenged");
-                    this._self.currentlyHoveredInfodot = undefined;
-                    this._self.breadCrumbs = [];
-                    this._self.recentBreadCrumb = { vcElement: { title: "initObject"} };
+                    self.cursorPositionChangedEvent = new (<any>$).Event("cursorPositionChanged");
+                    self.breadCrumbsChengedEvent = $.Event("breadCrumbsChanged");
+                    self.innerZoomConstraintChengedEvent = $.Event("innerZoomConstraintChenged");
+                    self.currentlyHoveredInfodot = undefined;
+                    self.breadCrumbs = [];
+                    self.recentBreadCrumb = { vcElement: { title: "initObject" } };
 
-                    this._self.cursorPosition = 0.0;
+                    self.cursorPosition = 0.0;
 
-                    var layerDivs = this._self.element.children("div");
+                    var layerDivs = self.element.children("div");
                     layerDivs.each(function (index) { // for each internal (div)
                         // make a layer from (div)
                         $(this).addClass("virtualCanvasLayerDiv").zIndex(index * 3);
@@ -71,7 +70,7 @@ module ChronoZoom {
                                             .appendTo($(this))
                                             .addClass("virtualCanvasLayerCanvas")
                                             .zIndex(index * 3 + 1);
-                        this._self._layers.push($(this)); // save jquery for this layer for further use
+                        self._layers.push($(this)); // save jquery for this layer for further use
                     });
 
                     // creating layers' content root element
@@ -82,20 +81,20 @@ module ChronoZoom {
                     this.updateViewport();
 
                     // start up the mouse handling
-                    this._self.element.bind('mousemove.' + this.widgetName, function (e) { this._self.mouseMove(e) });
-                    this._self.element.bind('mousedown.' + this.widgetName, function (e) {
+                    self.element.bind('mousemove.' + this.widgetName, function (e) { self.mouseMove(e) });
+                    self.element.bind('mousedown.' + this.widgetName, function (e) {
                         switch (e.which) {
-                            case 1: this._self._mouseDown(e);         //means that only left click will be interpreted
+                            case 1: self._mouseDown(e);         //means that only left click will be interpreted
                                 break;
                         }
 
                     });
-                    this._self.element.bind('mouseup.' + this.widgetName, function (e) {
+                    self.element.bind('mouseup.' + this.widgetName, function (e) {
                         switch (e.which) {
-                            case 1: this._self._mouseUp(e);
+                            case 1: self._mouseUp(e);
                         }
                     });
-                    this._self.element.bind('mouseleave.' + this.widgetName, function (e) { this._self._mouseLeave(e) });
+                    self.element.bind('mouseleave.' + this.widgetName, function (e) { self._mouseLeave(e) });
                 },
 
                 /* Destroys a widget 
@@ -220,7 +219,7 @@ module ChronoZoom {
                 Fires the event of cursor position changed
                 */
                 RaiseCursorChanged: function () {
-                    this.cursorPositionChangedEvent.Time = this._self.cursorPosition;
+                    // this.cursorPositionChangedEvent.Time = self.cursorPosition; // BUGBUG: self is not set correctly
                     this.element.trigger(this.cursorPositionChangedEvent);
                 },
 
@@ -332,7 +331,7 @@ module ChronoZoom {
                             this.hovered = null;
                         }
                     }
-                    for (var n = mouseInStack.length; --n >= 0; ) {
+                    for (var n = mouseInStack.length; --n >= 0;) {
                         if (mouseInStack[n].onmousehover) {
                             mouseInStack[n].onmousehover(posv, e);
                             if (this.hovered && this.hovered != mouseInStack[n] && this.hovered.onmouseunhover)
@@ -465,7 +464,8 @@ module ChronoZoom {
                 /* Produces {width, height} object from actual width and height of widget's <div> (in pixels).
                 */
                 _getClientSize: function () {
-                    return { width: this.element[0].clientWidth,
+                    return {
+                        width: this.element[0].clientWidth,
                         height: this.element[0].clientHeight
                     };
                 },
@@ -538,8 +538,9 @@ module ChronoZoom {
 
                 options: {
                     aspectRatio: 1, /* (number)    how many h-units are in a single time unit */
-                    visible: { centerX: 0, centerY: 0, scale: 1} /* (VisibleRegion2d) describes the visible region */
+                    visible: { centerX: 0, centerY: 0, scale: 1 } /* (VisibleRegion2d) describes the visible region */
                 }
             });
+        }
     }
 }

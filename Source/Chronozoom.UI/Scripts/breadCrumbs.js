@@ -1,3 +1,5 @@
+/// <reference path='cz.settings.ts'/>
+/// <reference path='search.ts'/>
 var ChronoZoom;
 (function (ChronoZoom) {
     (function (BreadCrumbs) {

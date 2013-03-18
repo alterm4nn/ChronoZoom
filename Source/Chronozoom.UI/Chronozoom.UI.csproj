@@ -76,13 +76,16 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web" />
     <Reference Include="System.Configuration" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="BehindTheScenes.htm" />
@@ -253,6 +256,9 @@
     <Content Include="Scripts\tours.min.js">
       <DependentUpon>tours.ts</DependentUpon>
     </Content>
+    <Content Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
+    <Content Include="Scripts\typings\jquery\jquery.d.ts" />
+    <Content Include="Scripts\typings\rx.js\rx.js.d.ts" />
     <Content Include="Scripts\urlnav.js">
       <DependentUpon>urlnav.ts</DependentUpon>
     </Content>

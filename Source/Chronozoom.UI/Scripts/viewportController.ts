@@ -1,18 +1,14 @@
 ﻿/// <reference path='common.ts'/>
 /// <reference path='viewportAnimation.ts'/>
 
-declare var $: any;
-
 module ChronoZoom {
     export module ViewportController {
-
-        var Common = ChronoZoom.Common;
 
         //constructs the new instance of the viewportController that handles an animations of the viewport
         //@param setVisible (void setVisible(visible))      a callback which is called when controller wants to set intermediate visible regions while animation.
         //@param getViewport (Viewport2D getViewport())     a callback which is called when controller wants to get recent state of corresponding viewport.
         //@param gestureSource (merged RX gesture stream)   an RX stream of gestures described in gestures.js
-        export function ViewportController(setVisible, getViewport, gesturesSource) {
+        export function ViewportController2(setVisible, getViewport, gesturesSource) {
             this.activeAnimation; //currently running animation. undefined if no animation active            
 
             //recent FPS value
@@ -182,9 +178,9 @@ module ChronoZoom {
             this.coerceVisibleOuterZoom = function (vp, gesture) {
                 if (gesture.Type === "Zoom") {
                     var visible = vp.visible;
-                    if (Common.maxPermitedScale) {
-                        if (visible.scale > Common.maxPermitedScale) {
-                            gesture.scaleFactor = Common.maxPermitedScale / visible.scale;
+                    if (ChronoZoom.Common.maxPermitedScale) {
+                        if (visible.scale > ChronoZoom.Common.maxPermitedScale) {
+                            gesture.scaleFactor = ChronoZoom.Common.maxPermitedScale / visible.scale;
                             ZoomViewport(vp, gesture);
                         }
                     }
@@ -372,7 +368,7 @@ module ChronoZoom {
                 this.frames++;
                 this.oneSecondFrames++;
 
-                var vc = $("#vc");
+                var vc = (<any>$)("#vc");
                 var e = vc.virtualCanvas("getLastEvent");
                 if (e != null) {
                     vc.virtualCanvas("mouseMove", e);

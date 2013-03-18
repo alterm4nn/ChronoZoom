@@ -3,8 +3,6 @@
 /// <reference path='common.ts'/>
 /// <reference path='vccontent.ts'/>
 
-declare var $: any;
-
 /* This file contains code to perform search over the Chronozoom database and show the results in UI.
 The page design must correspond to the schema and naming conventions presented here.
 */
@@ -76,7 +74,7 @@ module ChronoZoom {
                             if ($('#searchTextBox').val() != "") {
                                 $("#loadingImage").fadeIn('slow');
                             }
-                            search(escapeSearchString($("#searchTextBox")[0].value.substr(0, 700))); // limit the search to the first 700 characters
+                            search(escapeSearchString((<HTMLInputElement>$("#searchTextBox")[0]).value.substr(0, 700))); // limit the search to the first 700 characters
                         }, 300);
                 
                     });
@@ -105,11 +103,11 @@ module ChronoZoom {
         }
 
         export function goToSearchResult(id) {
-            var elem = findVCElement($('#vc').virtualCanvas("getLayerContent"), id);
+            var elem = findVCElement((<any>$)('#vc').virtualCanvas("getLayerContent"), id);
             if (!elem) {
                 alert('Element not found in the content.');
             } else {
-                var visible = ChronoZoom.VCContent.getVisibleForElement(elem, 1.0, $('#vc').virtualCanvas("getViewport"));
+                var visible = ChronoZoom.VCContent.getVisibleForElement(elem, 1.0, (<any>$)('#vc').virtualCanvas("getViewport"));
                 navigateToElement({ element: elem, newvisible: visible });
             }
         }
@@ -145,7 +143,7 @@ module ChronoZoom {
         }
 
         function onSearchResults(searchString, results?) {
-            if (escapeSearchString($("#searchTextBox")[0].value).indexOf(searchString) === 0 || searchString === '') {
+            if (escapeSearchString((<HTMLInputElement>$("#searchTextBox")[0]).value).indexOf(searchString) === 0 || searchString === '') {
                 var height;
                 var output = $("#search .searchResults").empty();
                 if (results == null) {

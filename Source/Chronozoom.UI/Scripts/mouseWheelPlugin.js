@@ -1,3 +1,4 @@
+/// <reference path='typings/jquery/jquery.d.ts'/>
 var ChronoZoom;
 (function (ChronoZoom) {
     (function (MouseWheelPlugin) {

@@ -5,35 +5,27 @@
 /// <reference path='urlnav.ts'/>
 /// <reference path='layout.ts'/>
 
-declare var $: any;
-
 // Obsolete functions not included in the typescript base library bindings
 declare var escape: any;
 declare var unescape: any;
 
-declare var timings: any;
 declare var hashChangeFromOutside: any;
 
 module ChronoZoom {
     export module Common {
 
         var Settings = ChronoZoom.Settings;
-        var Tours = ChronoZoom.Tours;
 
         export var maxPermitedScale;
         export var maxPermitedVerticalRange;
-
-        /*
-        Array for logging of inners messages and exceptions
-        */
-        var Log = new Array();
 
         export var controller; //a controller to perform smooth navigation
         export var isAxisFreezed = true; //indicates whether the axis moves together with canvas during navigation or not
         export var startHash;
 
         var searchString;
-        var ax, vc;
+        var ax = (<any>$)('#ax');
+        var vc = (<any>$)('#vc');
         var visReg;
         export var cosmosVisible;
         export var earthVisible;
@@ -282,9 +274,9 @@ module ChronoZoom {
         Is called by direct user actions like links, bread crumbs clicking, etc.
         */
         export function setVisibleByUserDirectly(visible) {
-            Tours.pauseTourAtAnyAnimation = false;
-            if (Tours.tour != undefined && Tours.tour.state == "play")
-                Tours.tourPause();
+            ChronoZoom.Tours.pauseTourAtAnyAnimation = false;
+            if (ChronoZoom.Tours.tour != undefined && ChronoZoom.Tours.tour.state == "play")
+                ChronoZoom.Tours.tourPause();
             return setVisible(visible);
         }
 
@@ -321,7 +313,6 @@ module ChronoZoom {
 
         //loading the data from the service
         export function loadData() {
-            timings.wcfRequestStarted = new Date();
             var url = loadDataUrl();
 
             $.ajax({ //main content fetching
@@ -334,15 +325,14 @@ module ChronoZoom {
                     content = result;
                     ProcessContent(result);
 
-                    if (Tours.tours) { // tours are loaded, check at shared tour
-                        Tours.loadTourFromURL();
+                    if (ChronoZoom.Tours.tours) { // tours are loaded, check at shared tour
+                        ChronoZoom.Tours.loadTourFromURL();
                         tourNotParsed = false;
                     }
                     else // tours are not loaded yet, checking at shared tour will be after successful load of tours 
                         tourNotParsed = true;
                 },
                 error: function (xhr) {
-                    timings.RequestCompleted = new Date();
                     alert("Error connecting to service: " + xhr.responseText);
                 }
             });
@@ -364,12 +354,12 @@ module ChronoZoom {
                 dataType: "json",
                 url: toursUrl,
                 success: function (result) {
-                    Tours.parseTours(result);
-                    Tours.initializeToursContent();
+                    ChronoZoom.Tours.parseTours(result);
+                    ChronoZoom.Tours.initializeToursContent();
 
                     // check at shared tour
                     if (tourNotParsed == true) {
-                        Tours.loadTourFromURL();
+                        ChronoZoom.Tours.loadTourFromURL();
                         tourNotParsed = false;
                     }
                 },
@@ -377,15 +367,12 @@ module ChronoZoom {
                     $("tours_index").attr("onmouseup", function () {
                         alert("The tours failed to download. Please refresh the page later and try to activate tours again.");
                     });
-                    Tours.initializeToursContent();
                 }
             });
         }
 
         function ProcessContent(content) {
-            timings.wcfRequestCompleted = new Date();
             ChronoZoom.Layout.Load(vc, content.d);
-            timings.layoutCompleted = new Date();
             if (startHash) { // restoring the window's hash as it was on the page loading
                 visReg = ChronoZoom.UrlNav.navStringToVisible(startHash.substring(1), vc);
             }
@@ -406,7 +393,6 @@ module ChronoZoom {
                     window.location.hash = startHash; // synchronizing
                 }
             }
-            timings.canvasInited = new Date();
         }
 
         function InitializeRegimes() {

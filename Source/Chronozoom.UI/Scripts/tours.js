@@ -1,3 +1,6 @@
+/// <reference path='/scripts/typings/jqueryui/jqueryui.d.ts'/>
+/// <reference path='urlnav.ts'/>
+/// <reference path='common.ts'/>
 var ChronoZoom;
 (function (ChronoZoom) {
     (function (Tours) {
@@ -632,7 +635,7 @@ var ChronoZoom;
                     var img = $('<img src="Images/collapse-down.png" class="collapseButton" />').appendTo(cat);
                     if(i == 0) {
                         cat.removeClass('category').addClass('categorySelected');
-                        img[0].src = "Images/collapse-up.png";
+                        (img[0]).src = "Images/collapse-up.png";
                     }
                     categoryContent = $('<div class="itemContainer"></div>').appendTo(toursUI);
                     category = tour.category;
@@ -657,7 +660,7 @@ var ChronoZoom;
                 });
             }
             // create jquery widget for category' content sliding
-            $("#tours-content").accordion({
+            ($)("#tours-content").accordion({
                 fillSpace: false,
                 collapsible: true,
                 autoHeight: false
@@ -667,7 +670,7 @@ var ChronoZoom;
                 if(ui.newHeader) {
                     ui.newHeader.removeClass('category');
                     ui.newHeader.addClass('categorySelected');
-                    var img = $(".collapseButton", ui.newHeader)[0];
+                    var img = ($(".collapseButton", ui.newHeader)[0]);
                     if(img) {
                         img.src = "Images/collapse-up.png";
                     }
@@ -675,7 +678,7 @@ var ChronoZoom;
                 if(ui.oldHeader) {
                     ui.oldHeader.removeClass('categorySelected');
                     ui.oldHeader.addClass('category');
-                    var img = $(".collapseButton", ui.oldHeader)[0];
+                    var img = ($(".collapseButton", ui.oldHeader)[0]);
                     if(img) {
                         img.src = "Images/collapse-down.png";
                     }

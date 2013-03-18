@@ -928,7 +928,7 @@ var ChronoZoom;
         This behaviour minimizes text shaking in chrome.
         */
         function drawText(text, ctx, x, y, fontSize, fontName) {
-            var br = $.browser;
+            var br = ($).browser;
             var isIe9 = br.msie && parseInt(br.version, 10) >= 9;
             if(isIe9) {
                 ctx.font = fontSize + "pt " + fontName;

@@ -1,14 +1,12 @@
 ﻿/// <reference path='cz.settings.ts'/>
 /// <reference path='common.ts'/>
 
-declare var $: any;
-
 module ChronoZoom {
 	export module Axis {
 
 	    var Settings = ChronoZoom.Settings;
 
-        $.widget("ui.axis",
+        (<any>$).widget("ui.axis",
         {
             width: null, // axis width
             height: null, // axis background and ticks height
@@ -407,7 +405,7 @@ module ChronoZoom {
                 //if (e) preventbubble(e);
 
                 // trigger an event to provide jumping to current threshold
-                var event = new $.Event("thresholdBookmarkChanged");
+                var event = new (<any>$).Event("thresholdBookmarkChanged");
                 event.Bookmark = this.thresholds[this.currentThreshold].bookmark;
                 this.element.trigger(event);
 

@@ -1,8 +1,10 @@
+/// <reference path='cz.settings.ts'/>
+/// <reference path='common.ts'/>
 var ChronoZoom;
 (function (ChronoZoom) {
     (function (Axis) {
         var Settings = ChronoZoom.Settings;
-        $.widget("ui.axis", {
+        ($).widget("ui.axis", {
             width: null,
             height: // axis width
             null,
@@ -413,7 +415,7 @@ var ChronoZoom;
                 var e = window.event;
                 //if (e) preventbubble(e);
                 // trigger an event to provide jumping to current threshold
-                var event = new $.Event("thresholdBookmarkChanged");
+                var event = new ($).Event("thresholdBookmarkChanged");
                 event.Bookmark = this.thresholds[this.currentThreshold].bookmark;
                 this.element.trigger(event);
                 // calling method to remove current threshold

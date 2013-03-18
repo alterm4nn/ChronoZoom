@@ -1,3 +1,5 @@
+/// <reference path='cz.settings.ts'/>
+/// <reference path='common.ts'/>
 var ChronoZoom;
 (function (ChronoZoom) {
     (function (Gestures) {
@@ -32,7 +34,7 @@ var ChronoZoom;
         ******************************************/
         //Subject that converts input mouse events into Pan gestures
         function createPanSubject(vc) {
-            var _doc = $(document);
+            var _doc = ($(document));
             var mouseDown = vc.toObservable("mousedown");
             var mouseMove = vc.toObservable("mousemove");
             var mouseUp = _doc.toObservable("mouseup");
@@ -55,7 +57,7 @@ var ChronoZoom;
         //Subject that converts input mouse events into Zoom gestures
         function createZoomSubject(vc) {
             vc.mousewheel(function (objEvent, intDelta) {
-                var event = $.Event("xbrowserwheel");
+                var event = ($).Event("xbrowserwheel");
                 event.delta = intDelta;
                 event.origin = ChronoZoom.Common.getXBrowserMouseOrigin(vc, objEvent);
                 vc.trigger(event);
@@ -79,7 +81,7 @@ var ChronoZoom;
         **********************************************************/
         //Subject that converts input touch events into Pan gestures
         function createTouchPanSubject(vc) {
-            var _doc = $(document);
+            var _doc = ($)(document);
             var touchStart = vc.toObservable("touchstart");
             var touchMove = vc.toObservable("touchmove");
             var touchEnd = _doc.toObservable("touchend");
@@ -107,7 +109,7 @@ var ChronoZoom;
         }
         //Subject that converts input touch events into Zoom gestures
         function createTouchZoomSubject(vc) {
-            var _doc = $(document);
+            var _doc = ($)(document);
             var gestureStart = vc.toObservable("gesturestart");
             var gestureChange = vc.toObservable("gesturechange");
             var gestureEnd = _doc.toObservable("gestureend");
