@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+using System.Collections.Generic;
 using System.Net;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Text.RegularExpressions;
 
-
-
-namespace Chronozoom.Test.GeneralTests
+namespace WebServiceApiTest
 {
     [DataContract]
     public class TimelineQueryResult
@@ -41,12 +39,12 @@ namespace Chronozoom.Test.GeneralTests
     }
 
     [TestClass]
-    public class ServiceTests
+    public class WebServiceApiTest
     {
         static string endpointVerb = "http://{0}/chronozoom.svc/{1}";
-        static string endpointSearch = "http://{0}/chronozoom.svc/search?s={1}";
+        static string endpointSearch = "http://{0}/chronozoom.svc/search?searchTerm={1}";
 
-        static string serviceUrl = "chronozoomui.cloudapp.net";
+        static string serviceUrl = "test.chronozoomproject.org";
 
         static string verbDefault = "get";
         static string verbThresholds = "getThresholds";
@@ -59,9 +57,10 @@ namespace Chronozoom.Test.GeneralTests
             HttpWebRequest request = CreateRequest(endPoint);
 
             WebResponse response = request.GetResponse();
+            Stream responseStream = response.GetResponseStream();
 
             DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineQueryResult));
-            TimelineQueryResult timelines = (TimelineQueryResult)serializer.ReadObject(response.GetResponseStream());
+            TimelineQueryResult timelines = (TimelineQueryResult)serializer.ReadObject(responseStream);
 
             Assert.AreNotEqual<int>(0, timelines.d.Count, "No timelines returned");
 
@@ -75,9 +74,10 @@ namespace Chronozoom.Test.GeneralTests
             HttpWebRequest request = CreateRequest(endPoint);
 
             WebResponse response = request.GetResponse();
+            Stream responseStream = response.GetResponseStream();
 
             DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineQueryResult));
-            TimelineQueryResult timelines = (TimelineQueryResult)serializer.ReadObject(response.GetResponseStream());
+            TimelineQueryResult timelines = (TimelineQueryResult)serializer.ReadObject(responseStream);
 
             foreach (Chronozoom.Entities.Timeline timeline in timelines.d)
             {
@@ -92,9 +92,10 @@ namespace Chronozoom.Test.GeneralTests
             HttpWebRequest request = CreateRequest(endPoint);
 
             WebResponse response = request.GetResponse();
-
+            Stream responseStream = response.GetResponseStream();
+            
             DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineQueryResult));
-            TimelineQueryResult timelines = (TimelineQueryResult)serializer.ReadObject(response.GetResponseStream());
+            TimelineQueryResult timelines = (TimelineQueryResult)serializer.ReadObject(responseStream);
 
             foreach (Chronozoom.Entities.Timeline timeline in timelines.d)
             {
@@ -115,9 +116,10 @@ namespace Chronozoom.Test.GeneralTests
             HttpWebRequest request = CreateRequest(endPoint);
 
             WebResponse response = request.GetResponse();
+            Stream responseStream = response.GetResponseStream();
 
             DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(ThesholdsQueryResult));
-            ThesholdsQueryResult thresholds = (ThesholdsQueryResult)serializer.ReadObject(response.GetResponseStream());
+            ThesholdsQueryResult thresholds = (ThesholdsQueryResult)serializer.ReadObject(responseStream);
 
             Assert.AreEqual<int>(8, thresholds.d.Count, "Expected 8 thresholds");
         }
@@ -129,9 +131,10 @@ namespace Chronozoom.Test.GeneralTests
             HttpWebRequest request = CreateRequest(endPoint);
 
             WebResponse response = request.GetResponse();
+            Stream responseStream = response.GetResponseStream();
 
             DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(ToursQueryResult));
-            ToursQueryResult tours = (ToursQueryResult)serializer.ReadObject(response.GetResponseStream());
+            ToursQueryResult tours = (ToursQueryResult)serializer.ReadObject(responseStream);
 
             Assert.AreNotEqual<int>(0, tours.d.Count, "No tours returned");
         }
@@ -143,11 +146,14 @@ namespace Chronozoom.Test.GeneralTests
             HttpWebRequest request = CreateRequest(endPoint);
 
             WebResponse response = request.GetResponse();
+            Stream responseStream = response.GetResponseStream();
+
+            string sResp = new StreamReader(responseStream).ReadToEnd();
 
             DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(ToursQueryResult));
-            ToursQueryResult tours = (ToursQueryResult)serializer.ReadObject(response.GetResponseStream());
+            ToursQueryResult tours = (ToursQueryResult)serializer.ReadObject(responseStream);
 
-            string bookmarkUrl = tours.d[0].Bookmarks[0].Url.ToString();
+            string bookmarkUrl = tours.d[0].Bookmarks[0].Url;
 
             // Relative URLs only
             Regex bookmarkTemplate = new Regex(@"^(/t\d+)+(/e\d+)?(/c\d+)?@?");
@@ -162,9 +168,10 @@ namespace Chronozoom.Test.GeneralTests
             HttpWebRequest request = CreateRequest(endPoint);
 
             WebResponse response = request.GetResponse();
+            Stream responseStream = response.GetResponseStream();
 
             DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(SearchQueryResult));
-            SearchQueryResult results = (SearchQueryResult)serializer.ReadObject(response.GetResponseStream());
+            SearchQueryResult results = (SearchQueryResult)serializer.ReadObject(responseStream);
 
             Assert.AreNotEqual<int>(0, results.d.Count, "No results returned");
         }
@@ -176,9 +183,10 @@ namespace Chronozoom.Test.GeneralTests
             HttpWebRequest request = CreateRequest(endPoint);
 
             WebResponse response = request.GetResponse();
+            Stream responseStream = response.GetResponseStream();
 
             DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(SearchQueryResult));
-            SearchQueryResult results = (SearchQueryResult)serializer.ReadObject(response.GetResponseStream());
+            SearchQueryResult results = (SearchQueryResult)serializer.ReadObject(responseStream);
 
             Assert.AreEqual<int>(0, results.d.Count, "Unexpected results returned");
         }
