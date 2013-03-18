@@ -1,9 +1,6 @@
 ﻿body
 {
 -ms-touch-action: none;
-margin: 8px 8px 4px 8px;
-    overflow-x: hidden;
-    overflow-y: auto;
 }
 
 .czz-main
@@ -29,22 +26,24 @@ user-select: none;
 user-select: text;
 }
 
-a
+A
 {
+color: #DBDBDB;
+font-family: Arial;
 text-decoration: none;
 }
 
-a:hover
+A:hover
 {
-text-decoration: none;
-}
-
-a:visited {
-text-decoration: none;
+color: White;
+font-family: Arial;
+text-decoration: underline;
 }
 
 .virtualCanvas
 {
+border-width: 1px;
+border-style: solid;
 background-color: Black;
 position: relative;
 -webkit-tap-highlight-color: rgba(0,0,0,0);
@@ -155,11 +154,6 @@ width: 190px;
 cursor: pointer;
 }
 
-
-/********************************************
-*               bibliography                *
-********************************************/
-
 .biblBack
 {
 width: 100%;
@@ -188,16 +182,15 @@ font-family: Arial;
 font-size: 18.5px;
 color: White;
 background-color: #434343;
-
+width: 738px;
+height: 500px;
+margin-left: auto;
+margin-right: auto;
 vertical-align: middle;
-position: absolute;
+position: relative;
 border-radius: 8px;
 cursor: default;
 overflow: hidden;
-bottom: 25px;
-top: 25px;
-left: 25px;
-right: 25px;
 }
 
 .biblWindow .closeButton
@@ -679,9 +672,123 @@ border-top: 1px solid #BFBFBF;
 }
 
 
-/****************************************
-*               tooltip                 *    
-****************************************/
+.footerLeftText
+{
+position: absolute;
+color: #BFBFBF;
+font-family: Arial;
+font-size: 11.5px;
+text-align: left;
+margin-left: 0px;
+margin-right: 5px;
+left: 0px;
+bottom: 0px;
+top: 5px;
+white-space: nowrap;
+}
+
+.footerLeftTextMRC
+{
+position: absolute;
+color: #BFBFBF;
+font-family: Arial;
+font-size: 11.5px;
+text-align: left;
+margin-left: 0px;
+margin-right: 5px;
+left: 75px;
+bottom: 0px;
+top: 5px;
+cursor: pointer;
+white-space: nowrap;
+}
+.footerLeftTextUC
+{
+position: absolute;
+color: #BFBFBF;
+font-family: Arial;
+font-size: 11.5px;
+text-align: left;
+margin-left: 0px;
+margin-right: 5px;
+left: 145px;
+bottom: 0px;
+top: 5px;
+cursor: pointer;
+white-space: nowrap;
+}
+.footerLeftTextMSU
+{
+position: absolute;
+color: #BFBFBF;
+font-family: Arial;
+font-size: 11.5px;
+text-align: left;
+margin-left: 0px;
+margin-right: 5px;
+left: 245px;
+bottom: 0px;
+top: 5px;
+cursor: pointer;
+white-space: nowrap;
+}
+
+.footerText, .footerSurveyText
+{
+    padding-top: 4px;
+    padding-bottom: 3px;
+    padding-left: 3px;
+    padding-right: 2px;    
+    
+    position: relative;
+    font-family: Arial;
+    font-size: 11.5px;
+    cursor: pointer;
+    text-align: right;
+    margin-left: 2px;
+    margin-right: 3px;
+    right: 0px;
+    bottom: 0px;
+    top: 5px;
+    white-space: nowrap;
+    
+    -webkit-border-radius: 1px;
+    -moz-border-radius: 1px;
+    border-radius: 1px;
+}
+
+.footerText
+{
+    color: #BFBFBF;
+}
+
+.footerSurveyText, .footerText:hover
+{
+    background-color: #BFBFBF;
+    color: Black;
+}
+
+.footerSurveyText:hover
+{
+    background-color: #FFFFFF;
+}
+
+.pipeText
+{
+    position: relative;
+    color: #BFBFBF;
+    font-family: Arial;
+    font-size: 11.5px;
+    cursor: default;
+    text-align: right;
+    margin-left: 5px;
+    margin-right: 5px;
+    right: 0px;
+    bottom: 0px; 
+    top: 5px;
+    white-space: nowrap;
+}
+
 
 .bubbleInfo 
 {
@@ -689,20 +796,20 @@ border-top: 1px solid #BFBFBF;
 	float:left;
 	white-space:nowrap;
 	
-	filter:alpha(opacity=90); 
-	-moz-opacity: 0.9; 
-	opacity: 0.9; 
-	
+    filter:alpha(opacity=90); 
+    -moz-opacity: 0.9; 
+    opacity: 0.9; 
+    
 	clear:both;
 	padding:10px;
-	
-	background-position: center;
-	
-	-webkit-border-radius: 8px;
-	-moz-border-radius: 8px;
-	border-radius: 8px;
-	
-	display: block;
+    
+    background-position: center;
+    
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+    
+    display: block;
 }
 
 #defaultBox
@@ -752,31 +859,30 @@ border-top: 1px solid #BFBFBF;
 		}		
 		
 		
-/********************************************
-*               breadcrumbs                 *
-********************************************/
-
+/********************************
+*          Breadcrumbs          *
+*********************************/
 .breadCrumbNavButton 
 {
-	display: none;
-	position: absolute;
-	left: 26px;
-	top: 37px;
-	font-size: 23px;
+    display: none;
+    position: absolute;
+    left: 26px;
+    top: 37px;
+    font-size: 23px;
 	margin: 0px;
 	padding: 0px;
-	color: #bfbfbf; 
-	cursor: pointer;
+    color: #bfbfbf; 
+    cursor: pointer;
 }
 
 .breadCrumbNavButton:hover
 {
-	color: white;
+    color: white;
 }
 
 .breadCrumbPanel
 {
-	background: black;
+    background: black;
 	overflow: hidden;
 	position: absolute;
 	margin: 0px;
@@ -798,7 +904,7 @@ border-top: 1px solid #BFBFBF;
 		
 .breadCrumbTable .breadCrumbTableCell 
 {
-	vertical-align: top;
+    vertical-align: top;
 	padding: 0px;
 	margin: 0px;
 	position: relative;
@@ -808,26 +914,26 @@ border-top: 1px solid #BFBFBF;
 
 .breadCrumbSeparator 
 {
-	margin-left: 3px;
-	margin-right: 3px;
-	color: #bfbfbf; 
-	position: relative;
-	left: 0px;
-	top: 0px;
-	vertical-align: super;	
+    margin-left: 3px;
+    margin-right: 3px;
+    color: #bfbfbf; 
+    position: relative;
+    left: 0px;
+    top: 0px;
+    vertical-align: super;	
 	font-size: 12.5px;
 	font-family: verdana;
-	cursor: default;
+    cursor: default;
 }
   
 .breadCrumbLink 
 {
-	display: inline-block;
-	margin: 0px;
-	padding: 0px;
-	position: relative;
-	left: 0px;
-	top: 0px;
+    display: inline-block;
+    margin: 0px;
+    padding: 0px;
+    position: relative;
+    left: 0px;
+    top: 0px;
 	vertical-align: super;	
 	font-size: 12.5px;
 	/*font-family: arial;*/
@@ -863,7 +969,7 @@ border-top: 1px solid #BFBFBF;
 
 .breadCrumbHover
 {
-	color: white;
+    color: white;
 }
 
 
@@ -872,152 +978,144 @@ border-top: 1px solid #BFBFBF;
 ************************************/
 .welcomeScreenBack
 {   
-	width: 100%;
-	height: 100%;
-	z-index: 5000;
-	background-color: rgba(255,255,255,0.2);
-	position: absolute;
-	left: 0;
-	top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5000;
+    background-color: rgba(255,255,255,0.2);
+    position: absolute;
+    left: 0;
+    top: 0;
 }
 
 .welcomeScreenOuterWindow
 {
-	background-color: rgba(0,0,0,0.6);
-	width: 900px;
-	margin-left: auto;
-	margin-right: auto;
-	position: relative;
-	border-radius: 8px;
-	cursor: default;
-    min-height: 443px;
-    height: 443px;
+    background-color: rgba(0,0,0,0.6);
+    width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    border-radius: 8px;
+    cursor: default;
 }
 
 .welcomeScreen
 {
-	font-family: Arial;
-	font-size: 18.5px;
-	color: White;
-	background-color: #3C5F96;
-	width: 864px;    
-	margin-left: auto;
-	margin-right: auto;
-	vertical-align: middle;
-	position: relative;
-    top: 16px;
-    right: 0px;
-    bottom: 16px;
-    left: 0px;
-    height: auto;
-	border-radius: 8px;
-	cursor: default;
-	overflow: hidden;
-    min-height: 411px;
+    font-family: Arial;
+    font-size: 18.5px;
+    color: White;
+    background-color: #3C5F96;
+    width: 864px;    
+    margin-left: auto;
+    margin-right: auto;
+    vertical-align: middle;
+    position: relative;
+    border-radius: 8px;
+    cursor: default;
+    overflow: hidden;
 }
 
 .welcomeScreen .titleArea
 {
-	margin-right: 22px;
-	margin-left: 32px;
-	border-bottom: 1px solid #DBDBDB;
+    margin-right: 22px;
+    margin-left: 32px;
+    border-bottom: 1px solid #DBDBDB;
 }
 
 .welcomeScreen .titleArea .closeButton
 {
-	background-image: "Images/close.png";
-	position: absolute;
-	top: 12px;
-	right: 22px;
-	width: 30px;
-	height: 30px;
-	z-index: 5005;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	-o-user-select: none;
-	user-select: none;
+    background-image: "Images/close.png";
+    position: absolute;
+    top: 12px;
+    right: 22px;
+    width: 30px;
+    height: 30px;
+    z-index: 5005;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
 }
 
 .welcomeScreen .titleArea .title
 {
-	font-family: Arial;
-	font-size: 18px;
-	font-weight: bold;
-	color: White;
-	padding-top: 22px;
-	padding-bottom: 7px;
-	margin-right: 60px;   
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	cursor: default;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	-o-user-select: none;
-	user-select: none;
+    font-family: Arial;
+    font-size: 18px;
+    font-weight: bold;
+    color: White;
+    padding-top: 22px;
+    padding-bottom: 7px;
+    margin-right: 60px;   
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: default;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
 }
 
 .welcomeScreen .content
 {
-	width: 810px;
-	display: block;
-	position: absolute;
-	height: auto;
-	bottom: 0;
-	top: 0;
-	left: 0;
-	right: 0;
-	margin-left: 32px;
-	margin-right: 32px;
-	margin-top: 75px;
-	margin-bottom: 13px;
-	height: auto;
-	overflow: hidden;
-	font-family: Arial;
-	font-size: 16px;
+    width: 810px;
+    display: block;
+    position: absolute;
+    height: auto;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin-left: 32px;
+    margin-right: 32px;
+    margin-top: 75px;
+    margin-bottom: 13px;
+    height: auto;
+    overflow: hidden;
+    font-family: Arial;
+    font-size: 16px;
 }
 
 .welcomeScreen .content .description
 {
-	display: inline-block;
-	position: absolute;
-	height: 315px;
-	width: 220px;
-	margin-right: 20px;
+    display: inline-block;
+    position: absolute;
+    height: 315px;
+    width: 220px;
+    margin-right: 20px;
 }
 
 .welcomeScreen .content .description .button
 {
-	margin-bottom: 10px;
-	border: 1px solid #EF4136; 
-	background: #EA7134; 
-	width: 220px; 
-	height: 36px;
-	font-family: Arial;
-	font-size: 18px;
-	font-weight: bold;
-	color: White;
+    margin-bottom: 10px;
+    border: 1px solid #EF4136; 
+    background: #EA7134; 
+    width: 220px; 
+    height: 36px;
+    font-family: Arial;
+    font-size: 18px;
+    font-weight: bold;
+    color: White;
 }
 
 .welcomeScreen .content .media
 {    
-	display: inline-block;
-	position: absolute;
-	width: 560px;
-	height: 315px;
-	right: 0px;
+    display: inline-block;
+    position: absolute;
+    width: 560px;
+    height: 315px;
+    right: 0px;
 }
 
 .welcomeScreen .content .media .player
 {
-	position: absolute; 
-	right: 0px; 
-	width: 100%; 
-	height: 100%;
+    position: absolute; 
+    right: 0px; 
+    width: 100%; 
+    height: 100%;
 }
 
 /**********************************
@@ -1026,89 +1124,89 @@ border-top: 1px solid #BFBFBF;
 /*
 .fallbackScreenBack
 {   
-	width: 100%;
-	height: 100%;
-	z-index: 5000;
-	position: absolute;
-	left: 0;
-	top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5000;
+    position: absolute;
+    left: 0;
+    top: 0;
 }
 
 .fallbackScreenOuterWindow
 {
 	background-image: url('../Images/fallbackOuterBackground.jpg');
 	background-position: top center;
-	width: 900px;
-	margin-left: auto;
-	margin-right: auto;
-	position: relative;
-	cursor: default;
+    width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    cursor: default;
 }
 
 .fallbackScreen
 {
-	font-family: Arial;
-	font-size: 18.5px;
-	color: White;
-	background-color: #3C5F96;
-	width: 864px;    
-	margin-left: auto;
-	margin-right: auto;
-	vertical-align: middle;
-	position: relative;
-	cursor: default;
-	overflow: hidden;
+    font-family: Arial;
+    font-size: 18.5px;
+    color: White;
+    background-color: #3C5F96;
+    width: 864px;    
+    margin-left: auto;
+    margin-right: auto;
+    vertical-align: middle;
+    position: relative;
+    cursor: default;
+    overflow: hidden;
 }
 
 .fallbackScreen .titleArea
 {
-	margin-right: 22px;
-	margin-left: 32px;
-	border-bottom: 1px solid #DBDBDB;
+    margin-right: 22px;
+    margin-left: 32px;
+    border-bottom: 1px solid #DBDBDB;
 }
 
 .fallbackScreen .titleArea .title
 {
-	font-family: Arial;
-	font-size: 18px;
-	font-weight: bold;
-	color: White;
-	padding-top: 22px;
-	padding-bottom: 7px;
-	margin-right: 60px;   
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	cursor: default;
+    font-family: Arial;
+    font-size: 18px;
+    font-weight: bold;
+    color: White;
+    padding-top: 22px;
+    padding-bottom: 7px;
+    margin-right: 60px;   
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: default;
 }
 
 .fallbackScreen .content
 {
-	width: 810px;
-	display: block;
-	position: absolute;
-	height: auto;
-	bottom: 0;
-	top: 0;
-	left: 0;
-	right: 0;
-	margin-left: 32px;
-	margin-right: 32px;
-	margin-top: 75px;
-	margin-bottom: 13px;
-	height: auto;
-	overflow: hidden;
-	font-family: Arial;
-	font-size: 16px;
+    width: 810px;
+    display: block;
+    position: absolute;
+    height: auto;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin-left: 32px;
+    margin-right: 32px;
+    margin-top: 75px;
+    margin-bottom: 13px;
+    height: auto;
+    overflow: hidden;
+    font-family: Arial;
+    font-size: 16px;
 }
 
 .fallbackScreen .content .description
 {
-	display: inline-block;
-	position: absolute;
-	height: 315px;
-	width: 220px;
-	margin-right: 20px;
+    display: inline-block;
+    position: absolute;
+    height: 315px;
+    width: 220px;
+    margin-right: 20px;
 }
 
 .fallbackScreen .content .description a
@@ -1121,32 +1219,32 @@ border-top: 1px solid #BFBFBF;
 
 .fallbackScreen .content .description .button
 {
-	margin-bottom: 10px;
-	border: 1px solid #EF4136; 
-	background: #EA7134; 
-	width: 220px; 
-	height: 36px;
-	font-family: Arial;
-	font-size: 18px;
-	font-weight: bold;
-	color: White;
+    margin-bottom: 10px;
+    border: 1px solid #EF4136; 
+    background: #EA7134; 
+    width: 220px; 
+    height: 36px;
+    font-family: Arial;
+    font-size: 18px;
+    font-weight: bold;
+    color: White;
 }
 
 .fallbackScreen .content .media
 {    
-	display: inline-block;
-	position: absolute;
-	width: 560px;
-	height: 315px;
-	right: 0px;
+    display: inline-block;
+    position: absolute;
+    width: 560px;
+    height: 315px;
+    right: 0px;
 }
 
 .fallbackScreen .content .media .player
 {
-	position: absolute; 
-	right: 0px; 
-	width: 100%; 
-	height: 100%;
+    position: absolute; 
+    right: 0px; 
+    width: 100%; 
+    height: 100%;
 }*/
 
 img.fallbackBackground {
@@ -1203,64 +1301,64 @@ img.fallbackBackground {
 	background-color: #3C5F96;
 
 	font-family: Arial;
-	font-size: 18.5px;
-	color: White;
-	
-	vertical-align: middle;
-	cursor: default;
-	overflow: hidden;
+    font-size: 18.5px;
+    color: White;
+    
+    vertical-align: middle;
+    cursor: default;
+    overflow: hidden;
 }
 
 
 .fallbackContent .titleArea
 {
-	margin-right: 22px;
-	margin-left: 32px;
-	border-bottom: 1px solid #DBDBDB;
+    margin-right: 22px;
+    margin-left: 32px;
+    border-bottom: 1px solid #DBDBDB;
 }
 
 .fallbackContent .titleArea .title
 {
-	font-family: Arial;
-	font-size: 18px;
-	font-weight: bold;
-	color: White;
-	padding-top: 22px;
-	padding-bottom: 7px;
-	margin-right: 60px;   
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	cursor: default;
+    font-family: Arial;
+    font-size: 18px;
+    font-weight: bold;
+    color: White;
+    padding-top: 22px;
+    padding-bottom: 7px;
+    margin-right: 60px;   
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: default;
 }
 
 .fallbackContent .content
 {
-	width: 810px;
-	display: block;
-	position: absolute;
-	height: auto;
-	bottom: 0;
-	top: 0;
-	left: 0;
-	right: 0;
-	margin-left: 32px;
-	margin-right: 32px;
-	margin-top: 75px;
-	margin-bottom: 13px;
-	height: auto;
-	overflow: hidden;
-	font-family: Arial;
-	font-size: 16px;
+    width: 810px;
+    display: block;
+    position: absolute;
+    height: auto;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin-left: 32px;
+    margin-right: 32px;
+    margin-top: 75px;
+    margin-bottom: 13px;
+    height: auto;
+    overflow: hidden;
+    font-family: Arial;
+    font-size: 16px;
 }
 
 .fallbackContent .content .description
 {
-	display: inline-block;
-	position: absolute;
-	height: 315px;
-	width: 220px;
-	margin-right: 20px;
+    display: inline-block;
+    position: absolute;
+    height: 315px;
+    width: 220px;
+    margin-right: 20px;
 }
 
 .fallbackContent .content .description a
@@ -1273,14 +1371,14 @@ img.fallbackBackground {
 
 .fallbackContent .content .description .button
 {
-	border: 1px solid #EF4136; 
-	background: #EA7134; 
-	width: 220px; 
-	height: 36px;
-	font-family: Arial;
-	font-size: 18px;
-	font-weight: bold;
-	color: White;
+    border: 1px solid #EF4136; 
+    background: #EA7134; 
+    width: 220px; 
+    height: 36px;
+    font-family: Arial;
+    font-size: 18px;
+    font-weight: bold;
+    color: White;
 
 	text-align: center;
 	vertical-align:middle;
@@ -1289,186 +1387,17 @@ img.fallbackBackground {
 
 .fallbackContent .content .media
 {    
-	display: inline-block;
-	position: absolute;
-	width: 560px;
-	height: 315px;
-	right: 0px;
+    display: inline-block;
+    position: absolute;
+    width: 560px;
+    height: 315px;
+    right: 0px;
 }
 
 .fallbackContent .content .media .player
 {
-	position: absolute; 
-	right: 0px; 
-	width: 100%; 
-	height: 100%;
-}
-
-
-/*********************************************************
-*                       footer                           *
-**********************************************************/
-
-#footer {
-    height:         22px;    
-    margin-top:     4px;
-    text-align:     center;
-}
-
-#footer-left {
-    float:      left;
-    display:    inline-block;
-    height:     100%;
-}
-
-    #footer-left a {
-        margin-left:    7px;
-    }
-
-    #footer-left img {
-         border:            none; 
-         vertical-align:    middle;
-    }
-
-#footer-right {
-    float:      right;
-    display:    inline-block;
-    height:     100%;
-}
-
-.footer-text {
-    margin-right:       5px;
-    vertical-align:     middle;
-    
-    color:              #BFBFBF;
-    font:               11.5px Arial;
-    white-space:        nowrap;
-}
-
-.footer-link {
-    margin-right:           3px;
-    margin-left:            3px;
-    padding:                4px 2px 3px 3px;
-    vertical-align:         middle;   
-    
-    color:                  #BFBFBF;
-    font:                   11.5px Arial;
-    white-space:            nowrap;
-
-    -webkit-border-radius:  1px;
-	-moz-border-radius:     1px;
-	border-radius:          1px;
-}
-
-    .footer-link:hover {
-        color:              black;
-        background-color:   #BFBFBF;
-        text-decoration:    none;
-    }
-
-.footer-survey {
-    margin-right:           3px;
-    margin-left:            3px;
-    padding:                4px 2px 3px 3px;
-    vertical-align:         middle;
-    
-    background-color:       #BFBFBF;
-	color:                  black;
-    font:                   11.5px Arial;
-    white-space:            nowrap;
-
-    -webkit-border-radius:  1px;
-	-moz-border-radius:     1px;
-	border-radius:          1px;
-}
-
-    .footer-survey:hover {
-        background-color:   #FFF;
-    }
-
-
-.footer-separator {    
-	margin-right:   5px;    
-	margin-left:    5px;
-    padding:        4px 2px 3px 3px;    
-    
-    color:          #BFBFBF;
-    font:           11.5px Arial;
-	white-space:    nowrap;
-
-    cursor:         default;
-}
-
-/************************************
-*              Authoring            *
-************************************/
-
-#footer-authoring {
-    display:            inline-block;
-    background-color:   #212121;
-}
-
-.footer-authoring-text {
-    margin-right:       5px;
-    vertical-align:     middle;
-    
-    color:              #BFBFBF;
-    font:               11.5px Arial;
-    white-space:        nowrap;
-}
-
-.footer-authoring-link {
-    margin-right:           3px;
-    margin-left:            3px;
-    padding:                4px 2px 3px 3px;
-    vertical-align:         middle;   
-    
-    color:                  #BFBFBF;
-    font:                   11.5px Arial;
-    white-space:            nowrap;
-
-    -webkit-border-radius:  1px;
-	-moz-border-radius:     1px;
-	border-radius:          1px;
-}
-
-    .footer-authoring-link:hover {
-        color:              black;
-        background-color:   #BFBFBF;
-        text-decoration:    none;
-        cursor: default;
-    }
-
-.authModeSwitch {
-    background: grey;
-    color: white;
-    border: 2px solid #BFBFBF;
-    margin-left: 25px;
-    margin-top: 5px;
-    width: 55px;
-    height: 25px;
-}
-
-
-.authSwitch {
-    background: grey;
-    color: white;
-    border: 2px solid #BFBFBF;
-    margin-left: 50px;
-    margin-top: 5px;
-    width: 55px;
-    height: 25px;
-}
-
-
-.buttonActive {
-    border:2px solid green;
-}
-
-/************************************
-*               Auxilary            *
-************************************/
-
-.clearer {
-    clear:  both;
+    position: absolute; 
+    right: 0px; 
+    width: 100%; 
+    height: 100%;
 }

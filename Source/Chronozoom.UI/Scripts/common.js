@@ -150,7 +150,6 @@ function getDateFrom(year, month, day, n) {
     endDay += Math.round(nDays);
     // get count of days in current month
     var tempDays = daysInMonth[endMonth];
-    if (isLeapYear(endYear)) tempDays++;
     // if result day is bigger than count of days then one more month has passed too            
     while (endDay > tempDays) {
         endDay -= tempDays;
@@ -160,7 +159,6 @@ function getDateFrom(year, month, day, n) {
             endYear++;
         }
         tempDays = daysInMonth[endMonth];
-        if (isLeapYear(endYear)) tempDays++;
     }
     if (endYear < 0 && year > 0)
         endYear -= 1;
@@ -221,7 +219,7 @@ function GenerateProperty(dateContainer, timeUnit, year, month, day, propName) {
 }
 
 function closeWelcomeScreen() {
-    //if ($('input[name=welcomeScreenCheckbox]').is(':checked'))
+    if ($('input[name=welcomeScreenCheckbox]').is(':checked'))
         setCookie("welcomeScreenDisallowed", "1", 365);
 
     hideWelcomeScreen();
@@ -279,6 +277,10 @@ function setVisible(visible) {
         //ax.axis("enableThresholds", false);
         return controller.moveToVisible(visible);
     }
+}
+
+function updateMarker() {
+    ax.axis("setTimeMarker", vc.virtualCanvas("getCursorPosition"));
 }
 
 // Retrieves the URL to download the data from
@@ -426,36 +428,43 @@ function InitializeRegimes() {
 }
 
 function updateLayout() {
-    var topHeight = $("#header").outerHeight(true) + $("#axis").outerHeight(true); // height of header and axis
-    var bottomHeight = $("#footer").outerHeight(true); // height of footer
-    var bodyTopMargin = parseFloat($("body").css("marginTop").replace('px', ''));
-    var bodyBottomMargin = parseFloat($("body").css("marginBottom").replace('px', ''));
-    var bodyMargin = bodyTopMargin + bodyBottomMargin; // calculated top and bottom margin of body tag
-    var occupiedHeight = topHeight + bottomHeight + bodyMargin; // occupied height of the page
-
-    document.getElementById("vc").style.height = (window.innerHeight - occupiedHeight) + "px";
+    document.getElementById("vc").style.height = (window.innerHeight - 148) + "px";
 
     $(".breadCrumbPanel").css("width", Math.round(($("#vc").width() / 2 - 50)));
     $("#bc_navRight").css("left", ($(".breadCrumbPanel").width() + $(".breadCrumbPanel").position().left + 2) + "px");
     visibleAreaWidth = $(".breadCrumbPanel").width();
     updateHiddenBreadCrumbs();
 
-    var offset = window.innerHeight - occupiedHeight;
+    var height = window.innerHeight;
+    var offset = height - 187;
+    // todo: use axis' height instead of constants
+    document.getElementById("bibliographyBack").style.height = window.innerHeight + "px";
+    document.getElementById("bibliographyOut").style.top = (150) + "px";
+    document.getElementById("bibliographyOut").style.height = offset + "px";
+    document.getElementById("bibliographyOut").style.top = (150) + "px";
+    document.getElementById("bibliography").style.height = (offset - 50) + "px";
+    document.getElementById("bibliography").style.top = (25) + "px";
 
-    var biblOutTopMargin = 25; // top margin of bibliography outer window
-    var biblOutBottomMargin = 15; // bottom margin of bibliography outer window
-
-    document.getElementById("bibliographyOut").style.top = (topHeight + bodyTopMargin + 25) + "px";
-    document.getElementById("bibliographyOut").style.height = (window.innerHeight - occupiedHeight -
-        biblOutTopMargin - biblOutBottomMargin) + "px";
-
-    var welcomeScreenHeight = $("#welcomeScreenOut").outerHeight();
-    var diff = Math.floor((window.innerHeight - welcomeScreenHeight) / 2);
-    document.getElementById("welcomeScreenOut").style.top = diff + "px";
+    document.getElementById("welcomeScreenBack").style.height = window.innerHeight + "px";
+    // todo: use (welcomeScreen' content + axis height + footer height) instead of consants
+    if (height <= 669) {
+        document.getElementById("welcomeScreenOut").style.top = (150) + "px";
+        document.getElementById("welcomeScreenOut").style.height = offset + "px";
+        document.getElementById("welcomeScreenOut").style.top = (150) + "px";
+        document.getElementById("welcomeScreen").style.height = (offset - 50) + "px";
+    }
+    else { // keeping height of welcome screen constant, positioning in center of canvas
+        var diff = Math.floor((height - 669) / 2);
+        document.getElementById("welcomeScreenOut").style.top = (150 + diff) + "px";
+        document.getElementById("welcomeScreenOut").style.height = (482) + "px";
+        document.getElementById("welcomeScreenOut").style.top = (150 + diff) + "px";
+        document.getElementById("welcomeScreen").style.height = (432) + "px";
+    }
+    document.getElementById("welcomeScreen").style.top = (25) + "px";
 
     InitializeRegimes();
     vc.virtualCanvas("updateViewport");
-    //ax.axis("updateWidth");
+    ax.axis("updateWidth");
     updateAxis(vc, ax);
     updateBreadCrumbsLabels();
 }
@@ -509,8 +518,7 @@ function updateAxis(vc, ax) {
     var vp = vc.virtualCanvas("getViewport");
     var lt = vp.pointScreenToVirtual(0, 0);
     var rb = vp.pointScreenToVirtual(vp.width, vp.height);
-    var newrange = { min: lt.x, max: rb.x };
-    axis.update(newrange);
+    ax.axis("setRange", lt.x, rb.x);
 }
 
 function updateNavigator(vp) {
@@ -564,27 +572,4 @@ function getCookie(c_name) {
         }
     }
     return null;
-}
-
-function viewportToViewBox(vp) {
-    var w = vp.widthScreenToVirtual(vp.width);
-    var h = vp.heightScreenToVirtual(vp.height);
-    var x = vp.visible.centerX - w / 2;
-    var y = vp.visible.centerY - h / 2;
-    return {
-        left: x,
-        right: x + w,
-        top: y,
-        bottom: y + h,
-        width: w,
-        height: h,
-        centerX: vp.visible.centerX,
-        centerY: vp.visible.centerY,
-        scale: vp.visible.scale
-    };
-}
-
-function updateMarker() {
-    axis.setTimeMarker(vc.virtualCanvas("getCursorPosition"));
-    axis.setTimeBorders();
 }

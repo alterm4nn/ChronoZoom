@@ -70,10 +70,6 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
     @param gesture      (PanGesture) The gesture to apply
     */
     function PanViewport(viewport, panGesture) {
-        if (CZ.Authoring.isActive) {
-            return;
-        }
-        
         var virtualOffset = viewport.vectorScreenToVirtual(panGesture.xOffset, panGesture.yOffset);
         var oldVisible = viewport.visible;
         viewport.visible.centerX = oldVisible.centerX - virtualOffset.x;
@@ -145,7 +141,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
             PanViewport(initialViewport, gesture);
         }
 
-        //self.coerceVisible(initialViewport, gesture); //applying navigaion constraints
+        self.coerceVisible(initialViewport, gesture); //applying navigaion constraints
         return initialViewport;
     }
 
@@ -257,29 +253,6 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
             ));
     }
 
-    var requestTimer;
-    this.getMissingData = function (vbox, lca_id, onSuccess, onError) {
-        window.clearTimeout(requestTimer);
-        requestTimer = window.setTimeout(function () {
-            var url = serverUrlBase
-                + "left=" + vbox.left
-                + "&right=" + vbox.right
-                + "&min_width=" + minTimelineWidth * vbox.scale
-                + "&lca_id=" + lca_id;
-            console.log(url);
-
-            $.ajax({
-                cache: false,
-                type: "GET",
-                async: true,
-                dataType: "json",
-                url: url,
-                success: onSuccess,
-                error: onError
-            });
-        }, 1000);
-    }
-
     gesturesSource.Subscribe(function (gesture) {
         if (typeof gesture != "undefined") {
             var isAnimationActive = self.activeAnimation;
@@ -295,26 +268,6 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
 
             if (gesture.Type == "Pan" || gesture.Type == "Zoom") {
                 var newlyEstimatedViewport = calculateTargetViewport(latestViewport, gesture, self.estimatedViewport);
-
-                var vbox = viewportToViewBox(newlyEstimatedViewport);
-                var wnd = new CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
-
-                //if (!vc.virtualCanvas("InBuffer", wnd, newlyEstimatedViewport.visible.scale)) {
-                var root = vc.virtualCanvas("getLayerContent");
-                if (root.children.length > 0) {
-                    var lca = vc.virtualCanvas("findLca", root.children[0], wnd);
-                    self.getMissingData(vbox, lca.id.substring(1),
-                        function (result) {
-                            var root = vc.virtualCanvas("getLayerContent");
-                            root.beginEdit();
-                            Merge(result, root.children[0]);
-                            root.endEdit(false);
-                        },
-                        function (xhr) {
-                            alert("Error connecting to service: " + xhr.responseText);
-                        }
-                    );
-                }
 
                 if (!self.estimatedViewport) { //if there is no ongoing PanZoom animation create it
                     self.activeAnimation = new PanZoomAnimation(latestViewport);
@@ -432,28 +385,6 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
     //param visible (Visible2D) a visible region to zoom into
     //param noAnimation (bool) - method performs instant transition without any animation if true
     this.moveToVisible = function (visible, noAnimation) {
-        var currentViewport = getViewport();
-        var targetViewport = new Viewport2d(currentViewport.aspectRatio, currentViewport.width, currentViewport.height, visible);
-
-        var vbox = viewportToViewBox(targetViewport);
-        var wnd = new CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
-        //if (!vc.virtualCanvas("InBuffer", wnd, targetViewport.visible.scale)) {
-        var root = vc.virtualCanvas("getLayerContent");
-        if (root.children.length > 0) {
-            var lca = vc.virtualCanvas("findLca", root.children[0], wnd);
-            self.getMissingData(vbox, lca.id.substring(1),
-                function (result) {
-                    var root = vc.virtualCanvas("getLayerContent");
-                    root.beginEdit();
-                    Merge(result, root.children[0]);
-                    root.endEdit(false);
-                },
-                function (xhr) {
-                    alert("Error connecting to service: " + xhr.responseText);
-                }
-            );
-        }
-
         if (noAnimation) {
             self.stopAnimation();
             self.setVisible(visible);
