@@ -276,7 +276,7 @@ var ChronoZoom;
         var addChild = function (parent, element, suppresCheck) {
             var isWithin = parent.width == Infinity || (element.x >= parent.x && element.x + element.width <= parent.x + parent.width) && (element.y >= parent.y && element.y + element.height <= parent.y + parent.height);
             if(!isWithin) {
-                console.log("Child element does not belong to the parent element " + parent.id + " " + element.ID);
+                console.log("Child element does not belong to the parent element " + parent.id + " " + element.id);
             }
             if(!suppresCheck && !isWithin) {
                 throw "Child element does not belong to the parent element";
@@ -1442,10 +1442,10 @@ var ChronoZoom;
                 //Scale new font size
                 var fontSize = size_p.y / ChronoZoom.Settings.contentItemDescriptionNumberOfLines;
                 elem.css('font-size', fontSize + "px");
-                CanvasScrollTextItem.prototype.render.call(this, ctx, visibleBox, viewport2d, size_p, opacity);
+                this.prototype.render.call(this, ctx, visibleBox, viewport2d, size_p, opacity);
             };
             this.onRemove = function () {
-                CanvasScrollTextItem.prototype.onRemove.call(this);
+                this.prototype.onRemove.call(this);
                 elem[0].removeEventListener("mousemove", ChronoZoom.Common.preventbubble, false);
                 elem[0].removeEventListener("mouseup", ChronoZoom.Common.preventbubble, false);
                 elem[0].removeEventListener("mousedown", ChronoZoom.Common.preventbubble, false);
@@ -1607,7 +1607,7 @@ var ChronoZoom;
                 if(self.viewer.isFullPage()) {
                     return;
                 }
-                SeadragonImage.prototype.render.call(this, ctx, visibleBox, viewport2d, size_p, opacity);
+                this.prototype.render.call(this, ctx, visibleBox, viewport2d, size_p, opacity);
                 if(self.viewer.viewport) {
                     self.viewer.viewport.resize({
                         x: size_p.x,
@@ -1619,7 +1619,7 @@ var ChronoZoom;
             this.onRemove = function () {
                 self.viewer.close()// closes any open content
                 ;
-                SeadragonImage.prototype.onRemove.call(this);
+                this.prototype.onRemove.call(this);
             };
             this.showFallbackImage = function () {
                 for(var i = 0; i < self.timeoutHandles.length; i++) {

@@ -39,7 +39,6 @@ module ChronoZoom {
 	        return true;
         };
 
-
         /*  Represents a base element that can be added to the VirtualCanvas.
         @remarks CanvasElement has extension in virtual space, that enables to check visibility of an object and render it.
         @param vc   (jquery to virtual canvas) note that vc.element[0] is the virtual canvas object
@@ -92,7 +91,6 @@ module ChronoZoom {
 	        this.render = function (ctx, visibleBox_v, viewport2d, size_p, opacity) {
 	        };
         }
-
 
         /* Adds a rectangle as a child of the given virtual canvas element.
         @param element   (CanvasElement) Parent element, whose children is to be new element.
@@ -149,7 +147,6 @@ module ChronoZoom {
 	        if (vw <= 0 || vh <= 0) throw "Image size must be positive";
 	        return addChild(element, new SeadragonImage(element.vc, /*parent*/element, layerid, id, imgSrc, vx, vy, vw, vh, z, onload), false);
         };
-
 
         /* Adds a video as a child of the given virtual canvas element.
         @param element   (CanvasElement) Parent element, whose children is to be new element.
@@ -233,8 +230,6 @@ module ChronoZoom {
 	        return addChild(element, new CanvasMultiLineTextItem(element.vc, layerid, id, vx, vy, baseline, vh, text, lineWidth), false);
         };
 
-
-
         function turnIsRenderedOff(element) {
 	        element.isRendered = false;
 	        if (element.onIsRenderedChanged)
@@ -245,7 +240,6 @@ module ChronoZoom {
 			        turnIsRenderedOff(element.children[n]);
 	        }
         }
-
 
         /* Renders a CanvasElement recursively 
         @param element          (CanvasElement) element to render
@@ -298,7 +292,7 @@ module ChronoZoom {
                            (element.y >= parent.y && element.y + element.height <= parent.y + parent.height);
 
 	        if (!isWithin)
-		        console.log("Child element does not belong to the parent element " + parent.id + " " + element.ID);
+		        console.log("Child element does not belong to the parent element " + parent.id + " " + element.id);
 
 	        if (!suppresCheck && !isWithin) throw "Child element does not belong to the parent element";
 	        parent.children.push(element);
@@ -355,11 +349,8 @@ module ChronoZoom {
 	        throw "There is no child with id [" + id + "]";
         };
 
-
-
         /*****************************************************************************************/
         /* Root element                                                                          */
-
         /*  A root of an element tree of a VirtualCanvas.
         @param vc   (VirtualCanvas) A virtual canvas that own this element tree.
         @param layerid   (any type) id of the layer for this object
@@ -432,10 +423,8 @@ module ChronoZoom {
 	        this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
         }
 
-
         /*****************************************************************************************/
         /* Dynamic Level of Details element                                                      */
-
         /* Gets the zoom level for the given size of an element (in pixels).
         @param size_p           ({x,y}) size of bounding box of this element in pixels
         @returns (number)   zoom level which minimum natural number or zero zl so that max(size_p.x,size_p.y) <= 2^zl
@@ -584,7 +573,6 @@ module ChronoZoom {
 	        this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
 
         }
-
 
         /*****************************************************************************************/
         /* Primitive elements                                                                    */
@@ -961,7 +949,6 @@ module ChronoZoom {
 	        this.prototype = new CanvasElement(vc, layerid, id, vxc - vradius / 2, vyc - vradius / 2, vradius, vradius);
         }
 
-
         /*A popup window element
         */
         function addPopupWindow(url, id, width, height, scrollbars, resizable) {
@@ -1174,7 +1161,6 @@ module ChronoZoom {
 
 	        this.prototype = new CanvasElement(vc, layerid, id, vx, vy, wv ? wv : 0, vh);
         }
-
 
         /*  A multiline text element on a virtual canvas.
         @param layerid   (any type) id of the layer for this element
@@ -1453,7 +1439,6 @@ module ChronoZoom {
 	        this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
         }
 
-
         /*Represents Text block with scroll*/
         /*  Represents an image on a virtual canvas.
         @param videoSrc     video source
@@ -1494,11 +1479,11 @@ module ChronoZoom {
 	            var fontSize = size_p.y / ChronoZoom.Settings.contentItemDescriptionNumberOfLines;
 		        elem.css('font-size', fontSize + "px");
 
-		        CanvasScrollTextItem.prototype.render.call(this, ctx, visibleBox, viewport2d, size_p, opacity);
+		        this.prototype.render.call(this, ctx, visibleBox, viewport2d, size_p, opacity);
 	        }
 
 	        this.onRemove = function () {
-		        CanvasScrollTextItem.prototype.onRemove.call(this);
+		        this.prototype.onRemove.call(this);
 		        elem[0].removeEventListener("mousemove", ChronoZoom.Common.preventbubble, false);
 		        elem[0].removeEventListener("mouseup", ChronoZoom.Common.preventbubble, false);
 		        elem[0].removeEventListener("mousedown", ChronoZoom.Common.preventbubble, false);
@@ -1536,7 +1521,6 @@ module ChronoZoom {
 
 	        this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
-
 
         /*Represents video element
         @param videoSrc     video source
@@ -1675,7 +1659,7 @@ module ChronoZoom {
 		        if (self.viewer.isFullPage())
 			        return;
 
-		        SeadragonImage.prototype.render.call(this, ctx, visibleBox, viewport2d, size_p, opacity);
+		        this.prototype.render.call(this, ctx, visibleBox, viewport2d, size_p, opacity);
 		        if (self.viewer.viewport) {
 			        self.viewer.viewport.resize({ x: size_p.x, y: size_p.y });
 			        self.viewer.viewport.update();
@@ -1684,7 +1668,7 @@ module ChronoZoom {
 
 	        this.onRemove = function () {
 		        self.viewer.close(); // closes any open content
-		        SeadragonImage.prototype.onRemove.call(this);
+		        this.prototype.onRemove.call(this);
 	        }
 
 	        this.showFallbackImage = function () {
@@ -1701,7 +1685,6 @@ module ChronoZoom {
 
 	        this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
-
 
         /*******************************************************************************************************/
         /* Timelines                                                                                           */
