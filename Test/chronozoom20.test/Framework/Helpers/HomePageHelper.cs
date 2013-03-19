@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using Framework.UserActions;
 using OpenQA.Selenium;
 
@@ -51,7 +52,11 @@ namespace Framework.Helpers
         public void OpenBceCeArea()
         {
             Logger.Log("<-");
-            ExecuteJavaScript("controller.moveToVisible(new VisibleRegion2d(-2012.9408427494022, 222893683.28023896,0.001905849287056807),false)");
+            string targetDate = (GetCurrentTimeInYearFormat() - 1).ToString(CultureInfo.InvariantCulture);
+            Logger.Log("-- targetDate: " + targetDate);
+            string script = String.Format("controller.moveToVisible(new VisibleRegion2d(-{0},222893683.28948474,0.0009286813988062588),false)", targetDate);
+            Logger.Log("-- script: " + script);
+            ExecuteJavaScript(script);
             WaitForElementIsDisplayed(By.Id("bc_link_t550"));
             WaitAnimation();
             Logger.Log("->");
@@ -79,12 +84,6 @@ namespace Framework.Helpers
         {
             IWebElement timescale = FindElement(By.Id("axis"));
             MoveToElementAndClick(By.Id("axis"));
-            var size = timescale.Size;
-            //MoveToElementCoordinates(By.Id("axis"), size.Width/4, 0);
-            //MoveToElementCoordinates(By.Id("axis"), 100, 0);
-            //MoveToElementCoordinates(By.Id("axis"), 500, 0);
-            //MoveToElementCoordinates(By.Id("axis"), 80, 0);
-            //MoveToElementCoordinates(By.Id("axis"), 800, 0);
         }
 
         public void MoveMouseToLeft()
@@ -93,6 +92,16 @@ namespace Framework.Helpers
             double size = timescale.Size.Width;
             MoveToElementCoordinates(By.Id("axis"), (int)Math.Round(size/4), 0);
             
+        }
+
+        private double GetCurrentTimeInYearFormat()
+        {
+            DateTime now = DateTime.Now;
+            var yearFirstDay = new DateTime(now.Year, 1, 1);
+            double secondsInThisYear = (yearFirstDay.AddYears(1).AddSeconds(-1) - yearFirstDay).TotalSeconds;
+            double secondsFromFirstDay = (now - yearFirstDay).TotalSeconds;
+            double currentTimeInYearFormat = now.Year + (secondsFromFirstDay / secondsInThisYear);
+            return currentTimeInYearFormat;
         }
     }
 }

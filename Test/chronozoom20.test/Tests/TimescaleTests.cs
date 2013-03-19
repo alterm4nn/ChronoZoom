@@ -28,7 +28,7 @@ namespace Tests
         {
             BrowserStateManager.RefreshState();
             NavigationHelper.OpenHomePage();
-            //HomePageHelper.CloseWelcomePopup();
+            HomePageHelper.CloseWelcomePopup();
         }
 
         [ClassCleanup]
@@ -70,7 +70,7 @@ namespace Tests
             List<string> labels = TimelineHelper.GetLabels();
             CollectionAssert.Contains(labels, Label1Bce, Label1Bce + " is presented");
             CollectionAssert.Contains(labels, Label1Ce, Label1Ce + " is presented");
-        }    
+        }  
         
         [TestMethod]
         public void Roman_History_TimeLine_Borders()

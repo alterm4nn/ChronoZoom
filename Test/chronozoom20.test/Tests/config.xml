@@ -4,7 +4,7 @@
       <IsUsingGrid>false</IsUsingGrid>
       <!--<BaseUrl>http://depot.cs.msu.su:9090/czcurrent/cz2.html#/t55</BaseUrl>-->
       <BaseUrl>http://depot.cs.msu.su:9090/axis_marker/test/html/testTimescale.htm</BaseUrl>
-      <ImplicitWait>60</ImplicitWait>
+     <ImplicitWait>60</ImplicitWait>
       <ExplicitWait>60</ExplicitWait>
       <BrowserName>chrome</BrowserName>
       <ConnectionWait>60</ConnectionWait>
