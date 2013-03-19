@@ -428,8 +428,9 @@ module ChronoZoom {
 			        }
 		        }
 	        };
+
+	        this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
         }
-        CanvasRootElement.prototype = CanvasElement;
 
 
         /*****************************************************************************************/
@@ -580,8 +581,9 @@ module ChronoZoom {
 			        this.zoomLevel = 0;
 		        }
 	        }
+	        this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
+
         }
-        CanvasDynamicLOD.prototype = CanvasElement;
 
 
         /*****************************************************************************************/
@@ -598,8 +600,10 @@ module ChronoZoom {
 
 	        this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
 	        };
+
+	        this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
+
         }
-        ContainerElement.prototype = CanvasElement;
 
         /*  A rectangle element that can be added to a VirtualCanvas.
         @param layerid   (any type) id of the layer for this element
@@ -700,8 +704,9 @@ module ChronoZoom {
                     }
                 }
             };
+
+            this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
         }
-        CanvasRectangle.prototype = CanvasElement;
 
         /*  A Timeline element that can be added to a VirtualCanvas (Rect + caption + bread crumbs tracing).
         @param layerid   (any type) id of the layer for this element
@@ -887,8 +892,10 @@ module ChronoZoom {
                     });
 		        }
 	        }
+
+	        this.prototype = new CanvasRectangle(vc, layerid, id, vx, vy, vw, vh, settings);
+
         }
-        CanvasTimeline.prototype = CanvasRectangle;
 
         /*  A circle element that can be added to a VirtualCanvas.
         @param layerid   (any type) id of the layer for this element
@@ -950,8 +957,9 @@ module ChronoZoom {
 		        var len2 = ChronoZoom.Common.sqr(point_v.x - vxc) + ChronoZoom.Common.sqr(point_v.y - vyc);
 		        return len2 <= vradius * vradius;
 	        };
+
+	        this.prototype = new CanvasElement(vc, layerid, id, vxc - vradius / 2, vyc - vradius / 2, vradius, vradius);
         }
-        CanvasCircle.prototype = CanvasElement;
 
 
         /*A popup window element
@@ -1163,8 +1171,9 @@ module ChronoZoom {
 		        } // else we yet do not know the width, so consider the text as visible if
 		        return Math.max(this.y, visibleBox_v.Top) <= Math.min(objBottom, visibleBox_v.Bottom);
 	        };
+
+	        this.prototype = new CanvasElement(vc, layerid, id, vx, vy, wv ? wv : 0, vh);
         }
-        CanvasText.prototype = CanvasElement;
 
 
         /*  A multiline text element on a virtual canvas.
@@ -1223,9 +1232,9 @@ module ChronoZoom {
 		        textOutput(ctx, this.text, p.x, p.y, height, lineWidth * height);
 		        // ctx.fillText(this.text, p.x, p.y);
 	        };
-        }
-        CanvasMultiLineTextItem.prototype = CanvasElement;
 
+	        this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vh * 10, vh);
+        }
 
         /*  Represents an image on a virtual canvas.
         @param layerid   (any type) id of the layer for this element
@@ -1306,9 +1315,9 @@ module ChronoZoom {
 		        this.img.isRemoved = true;
 		        delete this.img;
 	        };
-        }
-        CanvasImage.prototype = CanvasElement;
 
+	        this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
+        }
 
         /*  Represents an image on a virtual canvas with support of dynamic level of detail.
         @param layerid   (any type) id of the layer for this element
@@ -1339,13 +1348,9 @@ module ChronoZoom {
 		        }
 		        return null;
 	        }
+
+	        this.prototype = new CanvasDynamicLOD(vc, layerid, id, vx, vy, vw, vh);
         }
-        CanvasLODImage.prototype = CanvasDynamicLOD;
-
-
-
-
-
 
         /* A canvas element which can host any of HTML elements.
         @param vc        (jquery to virtual canvas) note that vc.element[0] is the virtual canvas object
@@ -1444,8 +1449,9 @@ module ChronoZoom {
 			        alert(ex.Description);
 		        }
 	        };
+
+	        this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
         }
-        CanvasDomItem.prototype = CanvasElement;
 
 
         /*Represents Text block with scroll*/
@@ -1500,11 +1506,9 @@ module ChronoZoom {
 		        elem[0].removeEventListener("mousewheel", ChronoZoom.Common.preventbubble, false);
 		        elem = undefined;
 	        }
+
+	        this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
-        CanvasScrollTextItem.prototype = CanvasDomItem;
-
-
-
 
         /*Represents PDF element
         @param pdfSrc     pdf source
@@ -1529,8 +1533,9 @@ module ChronoZoom {
 	        elem.setAttribute("controls", 'true');
 
 	        this.initializeContent(elem);
+
+	        this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
-        CanvasPdfItem.prototype = CanvasDomItem;
 
 
         /*Represents video element
@@ -1556,8 +1561,9 @@ module ChronoZoom {
 	        elem.setAttribute("controls", 'true');
 
 	        this.initializeContent(elem);
+
+	        this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
-        CanvasVideoItem.prototype = CanvasDomItem;
 
         /*Represents Audio element*/
         /*  Represents an image on a virtual canvas.
@@ -1579,8 +1585,9 @@ module ChronoZoom {
 	        elem.setAttribute("visible", 'true');
 	        elem.setAttribute("controls", 'true');
 	        this.initializeContent(elem);
+
+	        this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
-        CanvasAudioItem.prototype = CanvasDomItem;
 
         /*Represents a Seadragon based image
         @param imageSource  image source
@@ -1691,8 +1698,9 @@ module ChronoZoom {
 
 	        // run
 	        self.requestDZI();
+
+	        this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
-        SeadragonImage.prototype = CanvasDomItem;
 
 
         /*******************************************************************************************************/
@@ -1883,9 +1891,9 @@ module ChronoZoom {
 			        };
 		        }
 	        };
-        }
-        ContentItem.prototype = CanvasDynamicLOD;
 
+	        this.prototype = new CanvasDynamicLOD(vc, layerid, id, vx, vy, vw, vh);
+        }
 
         /*  An Infodot element that can be added to a VirtualCanvas.
         @param layerid   (any type) id of the layer for this element
@@ -1896,7 +1904,6 @@ module ChronoZoom {
         @param vh   (number) height of a bounding box in virtual space
         @param infodotDescription  ({title}) 
         */
-
         function CanvasInfodot(vc, layerid, id, time, vyc, radv, contentItems, infodotDescription) {
 	        this.base = CanvasCircle;
 	        this.base(vc, layerid, id, time, vyc, radv,
@@ -1984,8 +1991,6 @@ module ChronoZoom {
 
 	        root.firstLoad = true;
 	        root.changeZoomLevel = function (curZl, newZl) {
-
-
 
 		        // Showing only thumbnails for every content item of the infodot
 	            if (newZl >= ChronoZoom.Settings.infodotShowContentThumbZoomLevel && newZl < ChronoZoom.Settings.infodotShowContentZoomLevel) {
@@ -2138,7 +2143,6 @@ module ChronoZoom {
 
 	        };
 
-
 	        // Applying Jessica's proportions
 	        var _rad = 450.0 / 2.0;
 	        var k = 1.0 / _rad;
@@ -2194,8 +2198,10 @@ module ChronoZoom {
 		        ctx.lineTo(pl1.x + sl, pl0.y - sl);
 		        ctx.stroke();
 	        }
+
+	        this.prototype = new CanvasCircle(vc, layerid, id, time, vyc, radv,
+                { strokeStyle: ChronoZoom.Settings.infoDotBorderColor, lineWidth: ChronoZoom.Settings.infoDotBorderWidth * radv, fillStyle: ChronoZoom.Settings.infoDotFillColor, isLineWidthVirtual: true });
         }
-        CanvasInfodot.prototype = CanvasCircle;
 
         /* 
         @param infodot {CanvasElement}  Parent of the content item
