@@ -494,7 +494,7 @@ module ChronoZoom {
                     tour.isAudioLoaded = true;
                 }
                 // start a tour
-                this.tourResume();
+                tourResume();
             }
         }
 

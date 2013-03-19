@@ -505,7 +505,7 @@ var ChronoZoom;
                     Tours.tour.isAudioLoaded = true;
                 }
                 // start a tour
-                this.tourResume();
+                tourResume();
             }
         }
         Tours.activateTour = activateTour;
