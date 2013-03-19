@@ -11,9 +11,9 @@ var ChronoZoom;
     var HomePageViewModel;
     (function (HomePageViewModel) {
         $(document).ready(function () {
-            ChronoZoom.VirtualCanvas.initialize();
             $('.bubbleInfo').hide();
-            ($("#axis")).showThresholds = true;
+            ChronoZoom.Common.initialize();
+            ChronoZoom.Common.ax.showThresholds = true;
             $('#search_button').mouseup(ChronoZoom.Search.onSearchClicked).mouseover(function () {
                 ChronoZoom.Search.searchHighlight(true);
             }).mouseout(function () {
@@ -161,10 +161,6 @@ var ChronoZoom;
                 bottom: 10000000
             }//temporary value until there is no data
             ;
-            var ax = ($("#axis"));
-            ax.axis();
-            var vc = ($("#vc"));
-            vc.virtualCanvas();
             ChronoZoom.Common.regimeNavigator = $('#regime_navigator');
             ChronoZoom.Common.regimeNavigator.click(ChronoZoom.Common.passThrough);
             ChronoZoom.Common.regimesRatio = 300 / Math.abs(ChronoZoom.Settings.maxPermitedTimeRange.left - ChronoZoom.Settings.maxPermitedTimeRange.right);
@@ -177,32 +173,32 @@ var ChronoZoom;
             ChronoZoom.Search.initializeSearch();
             ChronoZoom.Bibliography.initializeBibliography();
             ChronoZoom.Tours.initializeToursUI();
-            var canvasGestures = ChronoZoom.Gestures.getGesturesStream(vc);//gesture sequence of the virtual canvas
+            var canvasGestures = ChronoZoom.Gestures.getGesturesStream(ChronoZoom.Common.vc);//gesture sequence of the virtual canvas
             
-            var axisGestures = ChronoZoom.Gestures.applyAxisBehavior(ChronoZoom.Gestures.getGesturesStream(ax));//gesture sequence of axis (tranformed according to axis behavior logic)
+            var axisGestures = ChronoZoom.Gestures.applyAxisBehavior(ChronoZoom.Gestures.getGesturesStream(ChronoZoom.Common.ax));//gesture sequence of axis (tranformed according to axis behavior logic)
             
             var jointGesturesStream = canvasGestures.Merge(axisGestures);
             var controller = new ChronoZoom.ViewportController.ViewportController2(function (visible) {
-                var vp = vc.virtualCanvas("getViewport");
-                var markerPos = ax.axis("MarkerPosition");
+                var vp = ChronoZoom.Common.vc.virtualCanvas("getViewport");
+                var markerPos = ChronoZoom.Common.ax.axis("MarkerPosition");
                 var oldMarkerPosInScreen = vp.pointVirtualToScreen(markerPos, 0).x;
-                vc.virtualCanvas("setVisible", visible, controller.activeAnimation);
-                ChronoZoom.Common.updateAxis(vc, ax);
-                vp = vc.virtualCanvas("getViewport");
+                ChronoZoom.Common.vc.virtualCanvas("setVisible", visible, controller.activeAnimation);
+                ChronoZoom.Common.updateAxis(ChronoZoom.Common.vc, ChronoZoom.Common.ax);
+                vp = ChronoZoom.Common.vc.virtualCanvas("getViewport");
                 if(ChronoZoom.Tours.pauseTourAtAnyAnimation) {
                     //watch for the user animation during playing of some tour bookmark
                     ChronoZoom.Tours.tourPause();
                     ChronoZoom.Tours.pauseTourAtAnyAnimation = false;
                 }
-                var hoveredInfodot = vc.virtualCanvas("getHoveredInfodot");
+                var hoveredInfodot = ChronoZoom.Common.vc.virtualCanvas("getHoveredInfodot");
                 var actAni = controller.activeAnimation != undefined;
                 if(actAni && !hoveredInfodot.id) {
                     var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
-                    ax.axis("setTimeMarker", newMarkerPos);
+                    ChronoZoom.Common.ax.axis("setTimeMarker", newMarkerPos);
                 }
                 ChronoZoom.Common.updateNavigator(vp);
             }, function () {
-                return vc.virtualCanvas("getViewport");
+                return ChronoZoom.Common.vc.virtualCanvas("getViewport");
             }, jointGesturesStream);
             var hashChangeFromOutside = true;// True if url is changed externally
             
@@ -211,13 +207,13 @@ var ChronoZoom;
                 hashChangeFromOutside = false;
                 if(ChronoZoom.Common.setNavigationStringTo && ChronoZoom.Common.setNavigationStringTo.bookmark) {
                     // go to search result
-                    ChronoZoom.UrlNav.navigationAnchor = ChronoZoom.UrlNav.navStringTovcElement(ChronoZoom.Common.setNavigationStringTo.bookmark, vc.virtualCanvas("getLayerContent"));
+                    ChronoZoom.UrlNav.navigationAnchor = ChronoZoom.UrlNav.navStringTovcElement(ChronoZoom.Common.setNavigationStringTo.bookmark, ChronoZoom.Common.vc.virtualCanvas("getLayerContent"));
                     window.location.hash = ChronoZoom.Common.setNavigationStringTo.bookmark;
                 } else {
                     if(ChronoZoom.Common.setNavigationStringTo && ChronoZoom.Common.setNavigationStringTo.id == id) {
                         ChronoZoom.UrlNav.navigationAnchor = ChronoZoom.Common.setNavigationStringTo.element;
                     }
-                    var vp = vc.virtualCanvas("getViewport");
+                    var vp = ChronoZoom.Common.vc.virtualCanvas("getViewport");
                     window.location.hash = ChronoZoom.UrlNav.vcelementToNavString(ChronoZoom.UrlNav.navigationAnchor, vp);
                 }
                 ChronoZoom.Common.setNavigationStringTo = null;
@@ -226,7 +222,7 @@ var ChronoZoom;
             window.addEventListener("hashchange", function () {
                 if(window.location.hash && hashChangeFromOutside && ChronoZoom.Common.hashHandle) {
                     var hash = window.location.hash;
-                    var visReg = ChronoZoom.UrlNav.navStringToVisible(window.location.hash.substring(1), vc);
+                    var visReg = ChronoZoom.UrlNav.navStringToVisible(window.location.hash.substring(1), ChronoZoom.Common.vc);
                     if(visReg) {
                         ChronoZoom.Common.isAxisFreezed = true;
                         controller.moveToVisible(visReg, true);
@@ -243,12 +239,12 @@ var ChronoZoom;
             });
             // Axis: enable showing thresholds
             controller.onAnimationComplete.push(function () {
-                ax.axis("enableThresholds", true);
+                ChronoZoom.Common.ax.axis("enableThresholds", true);
                 //if (window.console && console.log("thresholds enabled"));
                             });
             //Axis: disable showing thresholds
             controller.onAnimationStarted.push(function () {
-                ax.axis("enableThresholds", true);
+                ChronoZoom.Common.ax.axis("enableThresholds", true);
                 //if (window.console && console.log("thresholds disabled"));
                             });
             // Axis: enable showing thresholds
@@ -256,7 +252,7 @@ var ChronoZoom;
                 if(oldId != undefined && newId == undefined) {
                     // animation interrupted
                     setTimeout(function () {
-                        ax.axis("enableThresholds", true);
+                        ChronoZoom.Common.ax.axis("enableThresholds", true);
                         //if (window.console && console.log("thresholds enabled"));
                                             }, 500);
                 }
@@ -288,39 +284,39 @@ var ChronoZoom;
                 }
             });
             ChronoZoom.Common.updateLayout();
-            vc.bind("elementclick", function (e) {
+            ChronoZoom.Common.vc.bind("elementclick", function (e) {
                 ChronoZoom.Search.navigateToElement(e);
             });
-            vc.bind('cursorPositionChanged', function (cursorPositionChangedEvent) {
+            ChronoZoom.Common.vc.bind('cursorPositionChanged', function (cursorPositionChangedEvent) {
                 ChronoZoom.Common.updateMarker();
             });
-            ax.bind('thresholdBookmarkChanged', function (thresholdBookmark) {
-                var bookmark = ChronoZoom.UrlNav.navStringToVisible(thresholdBookmark.Bookmark, vc);
+            ChronoZoom.Common.ax.bind('thresholdBookmarkChanged', function (thresholdBookmark) {
+                var bookmark = ChronoZoom.UrlNav.navStringToVisible(thresholdBookmark.Bookmark, ChronoZoom.Common.vc);
                 if(bookmark != undefined) {
                     controller.moveToVisible(bookmark, false);
                 }
             });
             // Reacting on the event when one of the infodot exploration causes inner zoom constraint
-            vc.bind("innerZoomConstraintChenged", function (constraint) {
+            ChronoZoom.Common.vc.bind("innerZoomConstraintChenged", function (constraint) {
                 controller.effectiveExplorationZoomConstraint = constraint.zoomValue// applying the constraint
                 ;
-                ax.axis("allowMarkerMovesOnHover", !constraint.zoomValue);
+                ChronoZoom.Common.ax.axis("allowMarkerMovesOnHover", !constraint.zoomValue);
             });
-            vc.bind("breadCrumbsChanged", function (breadCrumbsEvent) {
+            ChronoZoom.Common.vc.bind("breadCrumbsChanged", function (breadCrumbsEvent) {
                 //reacting on the event when the first timeline that contains whole visible region is changed
                 ChronoZoom.BreadCrumbs.updateBreadCrumbsLabels(breadCrumbsEvent.breadCrumbs);
             });
             $(window).bind('resize', function () {
                 ChronoZoom.Common.updateLayout();
             });
-            var vp = vc.virtualCanvas("getViewport");
-            vc.virtualCanvas("setVisible", ChronoZoom.VCContent.getVisibleForElement({
+            var vp = ChronoZoom.Common.vc.virtualCanvas("getViewport");
+            ChronoZoom.Common.vc.virtualCanvas("setVisible", ChronoZoom.VCContent.getVisibleForElement({
                 x: -13700000000,
                 y: 0,
                 width: 13700000000,
                 height: 5535444444.444445
             }, 1.0, vp));
-            ChronoZoom.Common.updateAxis(vc, ax);
+            ChronoZoom.Common.updateAxis(ChronoZoom.Common.vc, ChronoZoom.Common.ax);
             var bid = window.location.hash.match("b=([a-z0-9_]+)");
             if(bid) {
                 //bid[0] - source string

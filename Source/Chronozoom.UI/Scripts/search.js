@@ -84,7 +84,7 @@ var ChronoZoom;
         Search.navigateToElement = navigateToElement;
         function navigateToBookmark(bookmark) {
             if(bookmark) {
-                var visible = ChronoZoom.UrlNav.navStringToVisible(bookmark, $('#vc'));
+                var visible = ChronoZoom.UrlNav.navStringToVisible(bookmark, ChronoZoom.Common.vc);
                 if(visible) {
                     var animId = ChronoZoom.Common.setVisibleByUserDirectly(visible);
                     if(animId) {
@@ -98,11 +98,11 @@ var ChronoZoom;
         }
         Search.navigateToBookmark = navigateToBookmark;
         function goToSearchResult(id) {
-            var elem = findVCElement(($)('#vc').virtualCanvas("getLayerContent"), id);
+            var elem = findVCElement(ChronoZoom.Common.vc.virtualCanvas("getLayerContent"), id);
             if(!elem) {
                 alert('Element not found in the content.');
             } else {
-                var visible = ChronoZoom.VCContent.getVisibleForElement(elem, 1.0, ($)('#vc').virtualCanvas("getViewport"));
+                var visible = ChronoZoom.VCContent.getVisibleForElement(elem, 1.0, ChronoZoom.Common.vc.virtualCanvas("getViewport"));
                 navigateToElement({
                     element: elem,
                     newvisible: visible

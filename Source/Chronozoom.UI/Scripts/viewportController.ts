@@ -368,10 +368,9 @@ module ChronoZoom {
                 this.frames++;
                 this.oneSecondFrames++;
 
-                var vc = (<any>$)("#vc");
-                var e = vc.virtualCanvas("getLastEvent");
+                var e = ChronoZoom.Common.vc.virtualCanvas("getLastEvent");
                 if (e != null) {
-                    vc.virtualCanvas("mouseMove", e);
+                    ChronoZoom.Common.vc.virtualCanvas("mouseMove", e);
                 }
             }
 

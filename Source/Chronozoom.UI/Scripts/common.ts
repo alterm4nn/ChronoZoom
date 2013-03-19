@@ -24,8 +24,8 @@ module ChronoZoom {
         export var startHash;
 
         var searchString;
-        var ax = (<any>$)('#ax');
-        var vc = (<any>$)('#vc');
+        export var ax;
+        export var vc;
         var visReg;
         export var cosmosVisible;
         export var earthVisible;
@@ -46,6 +46,18 @@ module ChronoZoom {
         export var hashHandle = true; // Handle hash change event
         var tourNotParsed = undefined; // indicates that URL was checked at tour sharing after page load
 
+        /* Initialize the JQuery UI Widgets
+        */
+        export function initialize() {
+
+            ChronoZoom.Axis.initialize();
+            ax = (<any>$)('#ax');
+            ax.axis();
+
+            ChronoZoom.VirtualCanvas.initialize();
+            vc = (<any>$)('#vc');
+            vc.virtualCanvas();
+        }
 
         /* Calculates local offset of mouse cursor in specified jQuery element.
         @param jqelement  (JQuery to Dom element) jQuery element to get local offset for.
@@ -432,7 +444,7 @@ module ChronoZoom {
         export function updateLayout() {
             document.getElementById("vc").style.height = (window.innerHeight - 148) + "px";
 
-            $(".breadCrumbPanel").css("width", Math.round(($("#vc").width() / 2 - 50)));
+            $(".breadCrumbPanel").css("width", Math.round((vc.width() / 2 - 50)));
             $("#bc_navRight").css("left", ($(".breadCrumbPanel").width() + $(".breadCrumbPanel").position().left + 2) + "px");
             ChronoZoom.BreadCrumbs.visibleAreaWidth = $(".breadCrumbPanel").width();
             ChronoZoom.BreadCrumbs.updateHiddenBreadCrumbs();

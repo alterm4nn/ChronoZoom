@@ -1,4 +1,4 @@
-/// <reference path='/scripts/typings/jqueryui/jqueryui.d.ts'/>
+/// <reference path='typings/jqueryui/jqueryui.d.ts'/>
 /// <reference path='urlnav.ts'/>
 /// <reference path='common.ts'/>
 var ChronoZoom;
@@ -884,7 +884,7 @@ var ChronoZoom;
                     continue;
                 }
                 // tour is correct and can be played
-                Tours.tours.push(new Tour(tourString.Name, tourBookmarks, bookmarkTransition, $('#vc'), tourString.Category, tourString.AudioBlobUrl, tourString.Sequence));
+                Tours.tours.push(new Tour(tourString.Name, tourBookmarks, bookmarkTransition, ChronoZoom.Common.vc, tourString.Category, tourString.AudioBlobUrl, tourString.Sequence));
             }
         }
         Tours.parseTours = parseTours;

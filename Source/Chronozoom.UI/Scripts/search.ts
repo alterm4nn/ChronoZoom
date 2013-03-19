@@ -92,7 +92,7 @@ module ChronoZoom {
 
         export function navigateToBookmark(bookmark) {
             if (bookmark) {
-                var visible = ChronoZoom.UrlNav.navStringToVisible(bookmark, $('#vc'));
+                var visible = ChronoZoom.UrlNav.navStringToVisible(bookmark, ChronoZoom.Common.vc);
                 if (visible) {
                     var animId = ChronoZoom.Common.setVisibleByUserDirectly(visible);
                     if (animId) {
@@ -103,11 +103,11 @@ module ChronoZoom {
         }
 
         export function goToSearchResult(id) {
-            var elem = findVCElement((<any>$)('#vc').virtualCanvas("getLayerContent"), id);
+            var elem = findVCElement(ChronoZoom.Common.vc.virtualCanvas("getLayerContent"), id);
             if (!elem) {
                 alert('Element not found in the content.');
             } else {
-                var visible = ChronoZoom.VCContent.getVisibleForElement(elem, 1.0, (<any>$)('#vc').virtualCanvas("getViewport"));
+                var visible = ChronoZoom.VCContent.getVisibleForElement(elem, 1.0, ChronoZoom.Common.vc.virtualCanvas("getViewport"));
                 navigateToElement({ element: elem, newvisible: visible });
             }
         }

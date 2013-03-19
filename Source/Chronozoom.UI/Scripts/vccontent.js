@@ -1,7 +1,7 @@
 var ChronoZoom;
 (function (ChronoZoom) {
     (function (VCContent) {
-        var elementclick = $.Event("elementclick");
+        var elementclick = ($).Event("elementclick");
         function getVisibleForElement(element, scale, viewport) {
             var margin = 2 * (ChronoZoom.Settings.contentScaleMargin ? ChronoZoom.Settings.contentScaleMargin : 0);
             var width = viewport.width - margin;

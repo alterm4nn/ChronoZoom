@@ -25,7 +25,7 @@ var ChronoZoom;
             } catch (ex) {
                 return;
             }
-            var vp = ($("#vc")).virtualCanvas("getViewport");
+            var vp = ChronoZoom.Common.vc.virtualCanvas("getViewport");
             var nav = ChronoZoom.UrlNav.vcelementToNavString(element, vp);
             if(window.location.hash.match("b=([a-z0-9_]+)") == null) {
                 var bibl = "&b=" + id;

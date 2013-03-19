@@ -22,7 +22,7 @@ var ChronoZoom;
         //        alert("mouseup");
         //    });
         function initialize() {
-            $.widget("ui.virtualCanvas", {
+            ($).widget("ui.virtualCanvas", {
                 _layersContent: /* Root element of the widget content.
                 Element of type CanvasItemsRoot.
                 */
@@ -463,8 +463,8 @@ var ChronoZoom;
                         }
                     }
                     // update canvas width and height
-                    this.canvasWidth = $("#vc").width();
-                    this.canvasHeight = $("#vc").height();
+                    this.canvasWidth = ChronoZoom.Common.vc.width();
+                    this.canvasHeight = ChronoZoom.Common.vc.height();
                     this.setVisible(this.options.visible);
                 },
                 _getClientSize: /* Produces {width, height} object from actual width and height of widget's <div> (in pixels).

@@ -2,20 +2,16 @@ var ChronoZoom;
 (function (ChronoZoom) {
     (function (Common) {
         var Settings = ChronoZoom.Settings;
-        var Tours = ChronoZoom.Tours;
         Common.maxPermitedScale;
         Common.maxPermitedVerticalRange;
-        /*
-        Array for logging of inners messages and exceptions
-        */
-        var Log = new Array();
         Common.controller;//a controller to perform smooth navigation
         
         Common.isAxisFreezed = true;//indicates whether the axis moves together with canvas during navigation or not
         
         Common.startHash;
         var searchString;
-        var ax, vc;
+        Common.ax;
+        Common.vc;
         var visReg;
         Common.cosmosVisible;
         Common.earthVisible;
@@ -37,6 +33,17 @@ var ChronoZoom;
         
         var tourNotParsed = undefined;// indicates that URL was checked at tour sharing after page load
         
+        /* Initialize the JQuery UI Widgets
+        */
+        function initialize() {
+            ChronoZoom.Axis.initialize();
+            Common.ax = ($)('#ax');
+            Common.ax.axis();
+            ChronoZoom.VirtualCanvas.initialize();
+            Common.vc = ($)('#vc');
+            Common.vc.virtualCanvas();
+        }
+        Common.initialize = initialize;
         /* Calculates local offset of mouse cursor in specified jQuery element.
         @param jqelement  (JQuery to Dom element) jQuery element to get local offset for.
         @param event   (Mouse event args) mouse event args describing mouse cursor.
@@ -254,9 +261,9 @@ var ChronoZoom;
         Is called by direct user actions like links, bread crumbs clicking, etc.
         */
         function setVisibleByUserDirectly(visible) {
-            Tours.pauseTourAtAnyAnimation = false;
-            if(Tours.tour != undefined && Tours.tour.state == "play") {
-                Tours.tourPause();
+            ChronoZoom.Tours.pauseTourAtAnyAnimation = false;
+            if(ChronoZoom.Tours.tour != undefined && ChronoZoom.Tours.tour.state == "play") {
+                ChronoZoom.Tours.tourPause();
             }
             return setVisible(visible);
         }
@@ -269,7 +276,7 @@ var ChronoZoom;
         }
         Common.setVisible = setVisible;
         function updateMarker() {
-            ax.axis("setTimeMarker", vc.virtualCanvas("getCursorPosition"));
+            Common.ax.axis("setTimeMarker", Common.vc.virtualCanvas("getCursorPosition"));
         }
         Common.updateMarker = updateMarker;
         // Retrieves the URL to download the data from
@@ -293,7 +300,6 @@ var ChronoZoom;
         }
         //loading the data from the service
         function loadData() {
-            timings.wcfRequestStarted = new Date();
             var url = loadDataUrl();
             $.ajax({
                 cache: //main content fetching
@@ -305,9 +311,9 @@ var ChronoZoom;
                 success: function (result) {
                     content = result;
                     ProcessContent(result);
-                    if(Tours.tours) {
+                    if(ChronoZoom.Tours.tours) {
                         // tours are loaded, check at shared tour
-                        Tours.loadTourFromURL();
+                        ChronoZoom.Tours.loadTourFromURL();
                         tourNotParsed = false;
                     } else {
                         // tours are not loaded yet, checking at shared tour will be after successful load of tours
@@ -315,7 +321,6 @@ var ChronoZoom;
                     }
                 },
                 error: function (xhr) {
-                    timings.RequestCompleted = new Date();
                     alert("Error connecting to service: " + xhr.responseText);
                 }
             });
@@ -339,11 +344,11 @@ var ChronoZoom;
                 dataType: "json",
                 url: toursUrl,
                 success: function (result) {
-                    Tours.parseTours(result);
-                    Tours.initializeToursContent();
+                    ChronoZoom.Tours.parseTours(result);
+                    ChronoZoom.Tours.initializeToursContent();
                     // check at shared tour
                     if(tourNotParsed == true) {
-                        Tours.loadTourFromURL();
+                        ChronoZoom.Tours.loadTourFromURL();
                         tourNotParsed = false;
                     }
                 },
@@ -351,28 +356,25 @@ var ChronoZoom;
                     $("tours_index").attr("onmouseup", function () {
                         alert("The tours failed to download. Please refresh the page later and try to activate tours again.");
                     });
-                    Tours.initializeToursContent();
                 }
             });
         }
         Common.loadData = loadData;
         function ProcessContent(content) {
-            timings.wcfRequestCompleted = new Date();
-            ChronoZoom.Layout.Load(vc, content.d);
-            timings.layoutCompleted = new Date();
+            ChronoZoom.Layout.Load(Common.vc, content.d);
             if(Common.startHash) {
                 // restoring the window's hash as it was on the page loading
-                visReg = ChronoZoom.UrlNav.navStringToVisible(Common.startHash.substring(1), vc);
+                visReg = ChronoZoom.UrlNav.navStringToVisible(Common.startHash.substring(1), Common.vc);
             }
             InitializeRegimes();
             if(!visReg && Common.cosmosVisible) {
                 window.location.hash = Common.cosmosVisible;
-                visReg = ChronoZoom.UrlNav.navStringToVisible(Common.cosmosVisible, vc);
+                visReg = ChronoZoom.UrlNav.navStringToVisible(Common.cosmosVisible, Common.vc);
             }
             if(visReg) {
-                vc.virtualCanvas("setVisible", visReg);
-                updateAxis(vc, ax);
-                var vp = vc.virtualCanvas("getViewport");
+                Common.vc.virtualCanvas("setVisible", visReg);
+                updateAxis(Common.vc, Common.ax);
+                var vp = Common.vc.virtualCanvas("getViewport");
                 updateNavigator(vp);
                 if(Common.startHash && window.location.hash !== Common.startHash) {
                     hashChangeFromOutside = false;
@@ -380,7 +382,6 @@ var ChronoZoom;
                     ;
                 }
             }
-            timings.canvasInited = new Date();
         }
         function InitializeRegimes() {
             if(content) {
@@ -389,7 +390,7 @@ var ChronoZoom;
                         if(!timeline) {
                             return null;
                         }
-                        var v = vc.virtualCanvas("findElement", 't' + timeline.UniqueID);
+                        var v = Common.vc.virtualCanvas("findElement", 't' + timeline.UniqueID);
                         regimes.push(v);
                         if(v) {
                             v = ChronoZoom.UrlNav.vcelementToNavString(v);
@@ -398,7 +399,7 @@ var ChronoZoom;
                     };
                     var cosmosTimeline = content.d[0];
                     Common.cosmosVisible = f(cosmosTimeline);
-                    ChronoZoom.UrlNav.navigationAnchor = vc.virtualCanvas("findElement", 't' + cosmosTimeline.UniqueID);
+                    ChronoZoom.UrlNav.navigationAnchor = Common.vc.virtualCanvas("findElement", 't' + cosmosTimeline.UniqueID);
                     var earthTimeline = ChronoZoom.Layout.FindChildTimeline(cosmosTimeline, Settings.earthTimelineID);
                     Common.earthVisible = f(earthTimeline);
                     var lifeTimeline = ChronoZoom.Layout.FindChildTimeline(earthTimeline, Settings.lifeTimelineID);
@@ -412,13 +413,13 @@ var ChronoZoom;
                         cosmosTimeline.y,
                         bottom: cosmosTimeline.y + cosmosTimeline.height
                     };
-                    Common.maxPermitedScale = ChronoZoom.UrlNav.navStringToVisible(Common.cosmosVisible, vc).scale * 1.1;
+                    Common.maxPermitedScale = ChronoZoom.UrlNav.navStringToVisible(Common.cosmosVisible, Common.vc).scale * 1.1;
                 }
             }
         }
         function updateLayout() {
             document.getElementById("vc").style.height = (window.innerHeight - 148) + "px";
-            $(".breadCrumbPanel").css("width", Math.round(($("#vc").width() / 2 - 50)));
+            $(".breadCrumbPanel").css("width", Math.round((Common.vc.width() / 2 - 50)));
             $("#bc_navRight").css("left", ($(".breadCrumbPanel").width() + $(".breadCrumbPanel").position().left + 2) + "px");
             ChronoZoom.BreadCrumbs.visibleAreaWidth = $(".breadCrumbPanel").width();
             ChronoZoom.BreadCrumbs.updateHiddenBreadCrumbs();
@@ -448,9 +449,9 @@ var ChronoZoom;
             }
             document.getElementById("welcomeScreen").style.top = (25) + "px";
             InitializeRegimes();
-            vc.virtualCanvas("updateViewport");
-            ax.axis("updateWidth");
-            updateAxis(vc, ax);
+            Common.vc.virtualCanvas("updateViewport");
+            Common.ax.axis("updateWidth");
+            updateAxis(Common.vc, Common.ax);
             ChronoZoom.BreadCrumbs.updateBreadCrumbsLabels();
         }
         Common.updateLayout = updateLayout;

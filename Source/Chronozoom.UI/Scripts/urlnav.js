@@ -231,13 +231,15 @@ var ChronoZoom;
             var expr = new RegExp("^(https|http):\/\/([a-z_0-9\-.]{4,})(?:\:([0-9]{1,5}))?(?:\/*)([a-z\-_0-9\/.]*)[?]?([a-z\-_0-9=&]*)$", "i");
             var result = path.match(expr);
             if(result != null) {
-                url.protocol = result[1];
-                url.host = result[2];
-                url.port = result[3];
-                url.path = result[4];
+                url = {
+                    protocol: result[1],
+                    host: result[2],
+                    port: result[3],
+                    path: result[4]
+                };
                 //If GET parameters exists
                 if(result[5] != "") {
-                    url.params = new Array();
+                    url.params = [];
                     var getParams = result[5].split("&");
                     for(var i = 0; i < getParams.length; i++) {
                         var pair = getParams[i].split("=");
@@ -249,9 +251,12 @@ var ChronoZoom;
             }
             if(typeof hash != 'undefined') {
                 var h = hash.split("@");
-                url.hash.path = h[0];
+                url.hash = {
+                    path: h[0]
+                };
                 //If hash parameters exists
                 if(h.length > 1 && h[1] != "") {
+                    url.hash.params = [];
                     var hashParams = new String(h[1]).split("&");
                     for(var i = 0; i < hashParams.length; i++) {
                         var pair = hashParams[i].split("=");

@@ -27,7 +27,7 @@ module ChronoZoom {
 
         export function initialize() {
 
-            $.widget("ui.virtualCanvas",
+            (<any>$).widget("ui.virtualCanvas",
             {
                 /* Root element of the widget content.
                 Element of type CanvasItemsRoot. 
@@ -455,8 +455,8 @@ module ChronoZoom {
                     }
 
                     // update canvas width and height
-                    this.canvasWidth = $("#vc").width();
-                    this.canvasHeight = $("#vc").height();
+                    this.canvasWidth = ChronoZoom.Common.vc.width();
+                    this.canvasHeight = ChronoZoom.Common.vc.height();
 
                     this.setVisible(this.options.visible);
                 },

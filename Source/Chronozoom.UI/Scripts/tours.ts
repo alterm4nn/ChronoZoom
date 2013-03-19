@@ -888,7 +888,7 @@ module ChronoZoom {
                     continue;
 
                 // tour is correct and can be played
-                tours.push(new Tour(tourString.Name, tourBookmarks, bookmarkTransition, $('#vc'), tourString.Category, tourString.AudioBlobUrl, tourString.Sequence));
+                tours.push(new Tour(tourString.Name, tourBookmarks, bookmarkTransition, ChronoZoom.Common.vc, tourString.Category, tourString.AudioBlobUrl, tourString.Sequence));
             }
         }
 
