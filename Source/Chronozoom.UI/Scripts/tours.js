@@ -514,7 +514,9 @@ var ChronoZoom;
         */
         function removeActiveTour() {
             // stop active tour
-            Tours.tour.tourPause();
+            if(Tours.tour) {
+                Tours.tour.tourPause();
+            }
             this.isTourPlayRequested = false;
             // hide tour' UI
             var tourControlDiv = document.getElementById("tour_control");

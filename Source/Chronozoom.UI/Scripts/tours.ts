@@ -274,7 +274,7 @@ module ChronoZoom {
             var curURL = ChronoZoom.UrlNav.getURL();
             if (typeof curURL.hash.params == 'undefined')
                 curURL.hash.params = new Array();
-            curURL.hash.params["tour"] = Tours.tour.sequenceNum;
+            curURL.hash.params["tour"] = tour.sequenceNum;
             //curURL.hash.params["bookmark"] = self.currentPlace.bookmark+1;
 
             //This flag is used to overcome hashchange event handler
@@ -503,31 +503,34 @@ module ChronoZoom {
         */
         function removeActiveTour() {
             // stop active tour
-            Tours.tour.tourPause();
+            if (tour) {
+                tour.tourPause();
+            }
+
             this.isTourPlayRequested = false;
 
             // hide tour' UI
             var tourControlDiv = document.getElementById("tour_control");
             tourControlDiv.style.display = "none";
-            if (Tours.tour) {
-                Tours.tour.hideBookmarks();
+            if (tour) {
+                tour.hideBookmarks();
                 $("#bookmarks .header").html("");
 
                 // remove audio track
-                if (Tours.tour.audio)
-                    Tours.tour.audio = undefined;
+                if (tour.audio)
+                    tour.audio = undefined;
             }
 
             // reset active tour
-            Tours.tour = undefined;
+            tour = undefined;
         }
 
         /*
         Handling of prev button click in UI
         */
         export function tourPrev() {
-            if (Tours.tour != undefined) {
-                Tours.tour.prev();
+            if (tour != undefined) {
+                tour.prev();
             }
         }
 
@@ -535,7 +538,7 @@ module ChronoZoom {
         Handling of next button click in UI
         */
         export function tourNext() {
-            if (Tours.tour != undefined) {
+            if (tour != undefined) {
                 tours.tour.next();
             }
         }
@@ -544,16 +547,16 @@ module ChronoZoom {
         switch the tour in the paused state
         */
         export function tourPause() {
-            if (Tours.tour != undefined) {
+            if (tour != undefined) {
                 $("#tour_playpause").attr("src", "Images/tour_play_off.jpg");
 
                 // pause tour
-                Tours.tour.pause();
+                tour.pause();
                 // stop active animation
                 ChronoZoom.Common.controller.stopAnimation();
                 // remove animation callbacks
-                Tours.tour.tourBookmarkTransitionInterrupted = undefined;
-                Tours.tour.tourBookmarkTransitionCompleted = undefined;
+                tour.tourBookmarkTransitionInterrupted = undefined;
+                tour.tourBookmarkTransitionCompleted = undefined;
             }
         }
 
@@ -562,18 +565,18 @@ module ChronoZoom {
         */
         function tourResume() {
             $("#tour_playpause").attr("src", "Images/tour_pause_off.jpg");
-            Tours.tour.play();
+            tour.play();
         }
 
         /*
         Handling of play/pause button click in UI
         */
         export function tourPlayPause() {
-            if (Tours.tour != undefined) {
-                if (Tours.tour.state == "pause") {
+            if (tour != undefined) {
+                if (tour.state == "pause") {
                     tourResume();
                 }
-                else if (Tours.tour.state == "play") {
+                else if (tour.state == "play") {
                     tourPause();
                 }
 
@@ -611,7 +614,7 @@ module ChronoZoom {
 
         export function initializeToursContent() {
             var toursUI = $('#tours-content');
-            Tours.tours.sort(function (u, v) { return u.sequenceNum - v.sequenceNum });
+            tours.sort(function (u, v) { return u.sequenceNum - v.sequenceNum });
             var category = null;
             var categoryContent;
 
@@ -843,7 +846,7 @@ module ChronoZoom {
         @param content      (array) an array of tours that were returned by request 
         */
         export function parseTours(content) {
-            Tours.tours = new Array();
+            tours = new Array();
 
             // build array of tours that could be played
             for (var i = 0; i < content.d.length; i++) {
@@ -951,7 +954,6 @@ module ChronoZoom {
 
                 //showBookmark(tour, 0);
                 //$("#tour_playpause").attr("src", "Images/tour_play_off.jpg");
-
             }
         }
     }
