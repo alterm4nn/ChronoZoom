@@ -654,7 +654,7 @@ module ChronoZoom {
                         
                                 // hide tour UI
                                 $("#tours").hide('slide', {}, 'slow');
-                                ChronoZoom.Common.toggleOffImage('e_index');
+                                ChronoZoom.Common.toggleOffImage('tours_index');
                                 isTourWindowVisible = false;
 
                                 // activate selected tour  

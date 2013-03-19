@@ -650,7 +650,7 @@ var ChronoZoom;
                     // hide tour UI
                     $("#tours").hide('slide', {
                     }, 'slow');
-                    ChronoZoom.Common.toggleOffImage('e_index');
+                    ChronoZoom.Common.toggleOffImage('tours_index');
                     Tours.isTourWindowVisible = false;
                     // activate selected tour
                     var mytour = Tours.tours[this.getAttribute("tour")];
