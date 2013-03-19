@@ -53,9 +53,9 @@ namespace Framework.Helpers
         {
             Logger.Log("<-");
             string targetDate = (GetCurrentTimeInYearFormat() - 1).ToString(CultureInfo.InvariantCulture);
-            Logger.Log("-- targetDate: " + targetDate);
+            Logger.Log("- targetDate: " + targetDate);
             string script = String.Format("controller.moveToVisible(new VisibleRegion2d(-{0},222893683.28948474,0.0009286813988062588),false)", targetDate);
-            Logger.Log("-- script: " + script);
+            Logger.Log("- script: " + script);
             ExecuteJavaScript(script);
             WaitForElementIsDisplayed(By.Id("bc_link_t550"));
             WaitAnimation();
@@ -82,15 +82,19 @@ namespace Framework.Helpers
 
         public void MoveMouseToCenter()
         {
+            Logger.Log("<-");
             IWebElement timescale = FindElement(By.Id("axis"));
             MoveToElementAndClick(By.Id("axis"));
+            Logger.Log("->");
         }
 
         public void MoveMouseToLeft()
         {
+            Logger.Log("<-");
             IWebElement timescale = FindElement(By.Id("axis"));
             double size = timescale.Size.Width;
             MoveToElementCoordinates(By.Id("axis"), (int)Math.Round(size/4), 0);
+            Logger.Log("->");
             
         }
 
