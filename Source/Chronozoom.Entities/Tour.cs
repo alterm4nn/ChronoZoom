@@ -34,7 +34,7 @@ namespace Chronozoom.Entities
         [DataMember]
         public int? Sequence { get; set; }
 
-        [DataMember]
+        [DataMember(Name="bookmarks")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification="Automatically implemented properties must define both get and set accessors.")]
         public virtual Collection<Bookmark> Bookmarks { get; private set; }
     }
