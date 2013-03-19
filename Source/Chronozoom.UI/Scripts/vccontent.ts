@@ -2163,7 +2163,7 @@ module ChronoZoom {
 	        @remarks The method is implemented for each particular VirtualCanvas element.
 	        */
 	        this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
-		        CanvasInfodot.prototype.render.call(this, ctx, visibleBox, viewport2d, size_p, opacity); // rendering the circle
+		        this.prototype.render.call(this, ctx, visibleBox, viewport2d, size_p, opacity); // rendering the circle
 
 		        var sw = viewport2d.widthVirtualToScreen(strokeWidth);
 		        if (sw < 0.5) return;
