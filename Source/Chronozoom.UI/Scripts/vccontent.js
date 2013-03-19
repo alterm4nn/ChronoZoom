@@ -283,7 +283,7 @@ var render = function (element, contexts, visibleBox_v, viewport2d, opacity) {
 The method must be called within the BeginEdit/EndEdit of the root item.
 */
 var addChild = function (parent, element, suppresCheck) {
-	var isWithin = parent.width == Infinity ||
+    var isWithin = parent.width == Infinity ||
                    (element.x >= parent.x && element.x + element.width <= parent.x + parent.width) &&
                    (element.y >= parent.y && element.y + element.height <= parent.y + parent.height);
 
