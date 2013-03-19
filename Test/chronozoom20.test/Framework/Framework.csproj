@@ -82,6 +82,7 @@
     <Compile Include="Extensions\ExtendedRemoteWebDriver.cs" />
     <Compile Include="Extensions\WebElementExtension.cs" />
     <Compile Include="Helpers\BookmarkHelper.cs" />
+    <Compile Include="Helpers\DateTimeHelper.cs" />
     <Compile Include="Helpers\HomePageHelper.cs" />
     <Compile Include="Helpers\NavigationHelper.cs" />
     <Compile Include="Helpers\TimelineHelper.cs" />

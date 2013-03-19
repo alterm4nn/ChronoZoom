@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using Framework.UserActions;
 using OpenQA.Selenium;
 
@@ -52,13 +51,7 @@ namespace Framework.Helpers
         public void OpenBceCeArea()
         {
             Logger.Log("<-");
-            string targetDate = (GetCurrentTimeInYearFormat() - 1).ToString(CultureInfo.InvariantCulture);
-            Logger.Log("- targetDate: " + targetDate);
-            string script = String.Format("controller.moveToVisible(new VisibleRegion2d(-{0},222893683.28948474,0.0009286813988062588),false)", targetDate);
-            Logger.Log("- script: " + script);
-            ExecuteJavaScript(script);
-            WaitForElementIsDisplayed(By.Id("bc_link_t550"));
-            WaitAnimation();
+            NavigateBceToCeEra();
             Logger.Log("->");
         }
 
@@ -96,16 +89,6 @@ namespace Framework.Helpers
             MoveToElementCoordinates(By.Id("axis"), (int)Math.Round(size/4), 0);
             Logger.Log("->");
             
-        }
-
-        private double GetCurrentTimeInYearFormat()
-        {
-            DateTime now = DateTime.Now;
-            var yearFirstDay = new DateTime(now.Year, 1, 1);
-            double secondsInThisYear = (yearFirstDay.AddYears(1).AddSeconds(-1) - yearFirstDay).TotalSeconds;
-            double secondsFromFirstDay = (now - yearFirstDay).TotalSeconds;
-            double currentTimeInYearFormat = now.Year + (secondsFromFirstDay / secondsInThisYear);
-            return currentTimeInYearFormat;
         }
     }
 }

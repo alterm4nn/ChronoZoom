@@ -15,5 +15,10 @@ namespace Framework.UserActions
         {
             _controls.ClickCloseButton();
         }
+
+        protected void NavigateBceToCeEra()
+        {
+            _controls.NavigateBceToCeEra();
+        }
     }
 }

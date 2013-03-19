@@ -3,5 +3,6 @@
     public interface IControls
     {
         void ClickCloseButton();
+        void NavigateBceToCeEra();
     }
 }
