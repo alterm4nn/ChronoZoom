@@ -180,13 +180,13 @@ module ChronoZoom {
             var axisGestures = ChronoZoom.Gestures.applyAxisBehavior(ChronoZoom.Gestures.getGesturesStream(ChronoZoom.Common.ax)); //gesture sequence of axis (tranformed according to axis behavior logic)
             var jointGesturesStream = canvasGestures.Merge(axisGestures);
 
-            var controller = new ChronoZoom.ViewportController.ViewportController2(
+            ChronoZoom.Common.controller = new ChronoZoom.ViewportController.ViewportController2(
                             function (visible) {
                                 var vp = ChronoZoom.Common.vc.virtualCanvas("getViewport");
                                 var markerPos = ChronoZoom.Common.ax.axis("MarkerPosition");
                                 var oldMarkerPosInScreen = vp.pointVirtualToScreen(markerPos, 0).x;
 
-                                ChronoZoom.Common.vc.virtualCanvas("setVisible", visible, controller.activeAnimation);
+                                ChronoZoom.Common.vc.virtualCanvas("setVisible", visible, ChronoZoom.Common.controller.activeAnimation);
                                 ChronoZoom.Common.updateAxis(ChronoZoom.Common.vc, ChronoZoom.Common.ax);
                                 vp = ChronoZoom.Common.vc.virtualCanvas("getViewport");
                                 if (ChronoZoom.Tours.pauseTourAtAnyAnimation) { //watch for the user animation during playing of some tour bookmark
@@ -195,7 +195,7 @@ module ChronoZoom {
                                 }
 
                                 var hoveredInfodot = ChronoZoom.Common.vc.virtualCanvas("getHoveredInfodot");
-                                var actAni = controller.activeAnimation != undefined;
+                                var actAni = ChronoZoom.Common.controller.activeAnimation != undefined;
 
                                 if (actAni && !hoveredInfodot.id) {
                                     var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
@@ -212,7 +212,7 @@ module ChronoZoom {
             var hashChangeFromOutside = true; // True if url is changed externally
 
             // URL Nav: update URL when animation is complete
-            controller.onAnimationComplete.push(function (id) {
+            ChronoZoom.Common.controller.onAnimationComplete.push(function (id) {
                 hashChangeFromOutside = false;
                 if (ChronoZoom.Common.setNavigationStringTo && ChronoZoom.Common.setNavigationStringTo.bookmark) { // go to search result
                     ChronoZoom.UrlNav.navigationAnchor = ChronoZoom.UrlNav.navStringTovcElement(ChronoZoom.Common.setNavigationStringTo.bookmark, ChronoZoom.Common.vc.virtualCanvas("getLayerContent"));
@@ -235,7 +235,7 @@ module ChronoZoom {
                     var visReg = ChronoZoom.UrlNav.navStringToVisible(window.location.hash.substring(1), ChronoZoom.Common.vc);
                     if (visReg) {
                         ChronoZoom.Common.isAxisFreezed = true;
-                        controller.moveToVisible(visReg, true);
+                        ChronoZoom.Common.controller.moveToVisible(visReg, true);
                         // to make sure that the hash is correct (it can be incorrectly changed in onCurrentlyObservedInfodotChanged)
                         if (window.location.hash != hash) {
                             hashChangeFromOutside = false;
@@ -249,17 +249,17 @@ module ChronoZoom {
 
 
             // Axis: enable showing thresholds
-            controller.onAnimationComplete.push(function () {
+            ChronoZoom.Common.controller.onAnimationComplete.push(function () {
                 ChronoZoom.Common.ax.axis("enableThresholds", true);
                 //if (window.console && console.log("thresholds enabled"));
             });
             //Axis: disable showing thresholds
-            controller.onAnimationStarted.push(function () {
+            ChronoZoom.Common.controller.onAnimationStarted.push(function () {
                 ChronoZoom.Common.ax.axis("enableThresholds", true);
                 //if (window.console && console.log("thresholds disabled"));
             });
             // Axis: enable showing thresholds
-            controller.onAnimationUpdated.push(function (oldId, newId) {
+            ChronoZoom.Common.controller.onAnimationUpdated.push(function (oldId, newId) {
                 if (oldId != undefined && newId == undefined) { // animation interrupted
                     setTimeout(function () {
                         ChronoZoom.Common.ax.axis("enableThresholds", true);
@@ -269,7 +269,7 @@ module ChronoZoom {
             });
 
             //Tour: notifyng tour that the bookmark is reached
-            controller.onAnimationComplete.push(
+            ChronoZoom.Common.controller.onAnimationComplete.push(
                                 function (id) {
                                     if (ChronoZoom.Tours.tourBookmarkTransitionCompleted != undefined)
                                         ChronoZoom.Tours.tourBookmarkTransitionCompleted(id);
@@ -277,7 +277,7 @@ module ChronoZoom {
                                         ChronoZoom.Tours.pauseTourAtAnyAnimation = true;
                                 });
             //Tour: notifyng tour that the transition was interrupted
-            controller.onAnimationUpdated.push(
+            ChronoZoom.Common.controller.onAnimationUpdated.push(
                                 function (oldId, newId) {
                                     if (ChronoZoom.Tours.tour != undefined) {
                                         if (ChronoZoom.Tours.tourBookmarkTransitionInterrupted != undefined) { //in transition
@@ -307,13 +307,13 @@ module ChronoZoom {
             ChronoZoom.Common.ax.bind('thresholdBookmarkChanged', function (thresholdBookmark) {
                 var bookmark = ChronoZoom.UrlNav.navStringToVisible(thresholdBookmark.Bookmark, ChronoZoom.Common.vc);
                 if (bookmark != undefined) {
-                    controller.moveToVisible(bookmark, false);
+                    ChronoZoom.Common.controller.moveToVisible(bookmark, false);
                 }
             });
 
             // Reacting on the event when one of the infodot exploration causes inner zoom constraint
             ChronoZoom.Common.vc.bind("innerZoomConstraintChenged", function (constraint) {
-                controller.effectiveExplorationZoomConstraint = constraint.zoomValue; // applying the constraint
+                ChronoZoom.Common.controller.effectiveExplorationZoomConstraint = constraint.zoomValue; // applying the constraint
                 ChronoZoom.Common.ax.axis("allowMarkerMovesOnHover", !constraint.zoomValue);
             });
 
