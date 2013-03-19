@@ -252,7 +252,7 @@ function turnIsRenderedOff(element) {
 var render = function (element, contexts, visibleBox_v, viewport2d, opacity) {
     // first calculate new values of animating properties 
     if (element.animation && element.animation.isAnimating)
-        element.requestNewFrame();
+        element.calculateNewFrame();
 
 	if (!element.isVisible(visibleBox_v)) {
 		if (element.isRendered) turnIsRenderedOff(element);
@@ -1244,6 +1244,7 @@ function CanvasText(vc, layerid, id, vx, vy, baseline, vh, text, settings, wv) {
 	this.baseline = baseline;
 	this.newBaseline = baseline;
 	this.settings = settings;
+	this.opacity = 0;
 
 	if (typeof this.settings.textBaseline != 'undefined' &&
         this.settings.textBaseline === 'middle') {
@@ -2445,9 +2446,6 @@ function CanvasInfodot(vc, layerid, id, time, vyc, radv, contentItems, infodotDe
 		}
 		// Showing all content items, bibliography link and title of the infodot
 		else if (newZl >= infodotShowContentZoomLevel) {
-
-
-
 			if (curZl >= infodotShowContentZoomLevel)
 				return null;
 
@@ -2482,7 +2480,7 @@ function CanvasInfodot(vc, layerid, id, time, vyc, radv, contentItems, infodotDe
 				title = infodotDescription.title + '\n(' + infodotDescription.date + ')';
 			}
 
-			var infodotTitle = addText(contentItem, layerid, id + "__title", infodot.time - titleWidth / 2, titleTop, titleTop, titleHeight,
+			var infodotTitle = addText(contentItem, layerid, id + "__title", time - titleWidth / 2, titleTop, titleTop, titleHeight,
                 title,
                 {
                     fontName: contentItemHeaderFontName, fillStyle: contentItemHeaderFontColor, textBaseline: 'middle', textAlign: 'center',

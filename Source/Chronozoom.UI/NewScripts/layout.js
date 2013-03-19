@@ -1,4 +1,5 @@
 ﻿var isLayoutAnimation = true; // temp variable for debugging
+var animatingElements = {}; // hashmap of animating elements of virtual canvas
 
 function Timeline(title, left, right, childTimelines, exhibits) {
     this.Title = title;
@@ -563,7 +564,7 @@ function convertRelativeToAbsoluteCoords(el, delta) {
 function shiftAbsoluteCoords(el, delta) {
     if (!delta) return;
     if (typeof el.newY !== 'undefined') el.newY += delta;
-    if (el.newBaseline) el.newBaseline += delta;
+    if (typeof el.newBaseline !== 'undefined') el.newBaseline += delta;
     el.children.forEach(function (child) {
         shiftAbsoluteCoords(child, delta);
     });
@@ -674,6 +675,9 @@ function animateElement(elem) {
 
 function initializeAnimation(elem, duration, args) {
     var startTime = (new Date()).getTime();
+
+    animatingElements[elem.id] = elem; // update/push element in hashmap
+
     elem.animation = {
         isAnimating: true, // indicates if there is ongoing animation
         duration: duration, // duration of the animation
@@ -682,7 +686,7 @@ function initializeAnimation(elem, duration, args) {
     };
 
     // calculates new animation frame of element
-    elem.requestNewFrame = function () {
+    elem.calculateNewFrame = function () {
         var curTime = (new Date()).getTime();
         var t;
 
@@ -701,6 +705,9 @@ function initializeAnimation(elem, duration, args) {
 
         if (t == 1.0) {
             elem.animation.isAnimating = false;
+            elem.animation.args = [];
+            delete animatingElements[elem.id]; // remove element from hashmap
+
             if (elem.fadeIn == false)
                 elem.fadeIn = true;
 

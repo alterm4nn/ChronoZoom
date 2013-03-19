@@ -560,7 +560,8 @@ Next <div> is rendered on the top of previous one.
         otherwise, it sets the timeout to invalidate the image.
         */
         requestInvalidate: function () {
-            if (this.isInAnimation) return;
+            if (this.isInAnimation)
+                return;
 
             this.isInAnimation = true;
             var self = this;
