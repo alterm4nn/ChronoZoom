@@ -48,7 +48,7 @@ module ChronoZoom {
                 $("#bibliographyBack").show('clip', {}, 'slow', function () {
                     // After bibliography window was fully opened, reset 'onmouseclick' handler for sender of bibliography link.
                     sender.onmouseclick = function (e) {
-                        this.vc.element.css('cursor', 'default');
+                        ChronoZoom.Common.vc.element.css('cursor', 'default');
                         showBibliography({ infodot: descr.infodot, contentItems: descr.contentItems }, element, id);
 
                         return true;
@@ -58,7 +58,7 @@ module ChronoZoom {
                 // After bibliography window was fully opened, reset 'onmouseclick' handler for sender of bibliography link.
                 sender.onmouseclick = function (e) {
             
-                    this.vc.element.css('cursor', 'default');
+                    ChronoZoom.Common.vc.element.css('cursor', 'default');
                     showBibliography({ infodot: descr.infodot, contentItems: descr.contentItems }, element, id);
 
                     return true;

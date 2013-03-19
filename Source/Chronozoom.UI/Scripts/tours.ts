@@ -41,7 +41,7 @@ module ChronoZoom {
         @returns VisibleRegion2d for the bookmark
         */
         export function getBookmarkVisible(bookmark) {
-            return ChronoZoom.UrlNav.navStringToVisible(bookmark.url, this.vc);
+            return ChronoZoom.UrlNav.navStringToVisible(bookmark.url, ChronoZoom.Common.vc);
         }
 
         export interface Place {
