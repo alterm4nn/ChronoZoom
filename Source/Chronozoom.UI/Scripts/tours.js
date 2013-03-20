@@ -518,7 +518,7 @@ var ChronoZoom;
             var tourControlDiv = document.getElementById("tour_control");
             tourControlDiv.style.display = "none";
             if(Tours.tour) {
-                Tours.tour.hideBookmarks();
+                hideBookmarks();
                 $("#bookmarks .header").html("");
                 // remove audio track
                 if(Tours.tour.audio) {
