@@ -1,5 +1,6 @@
 ﻿var isLayoutAnimation = true; // temp variable for debugging
-var animatingElements = {}; // hashmap of animating elements of virtual canvas
+var dynamicLayoutActive = false; // indicates wheter dynamic layout animation is active or no
+var dynamicLayoutTimeout; // reference to active timeout
 
 function Timeline(title, left, right, childTimelines, exhibits) {
     this.Title = title;
@@ -628,25 +629,18 @@ function animateElement(elem) {
             elem.baseline = elem.newBaseline;
     }    
 
-    if (elem.newHeight != elem.height || elem.newY != elem.y) {
+    if (elem.newY != elem.y && !elem.id.match("__header__")) 
         args.push({
             property: "y",
             startValue: elem.y,
             targetValue: elem.newY
         });
+    if (elem.newHeight != elem.height && !elem.id.match("__header__"))
         args.push({
             property: "height",
             startValue: elem.height,
             targetValue: elem.newHeight
-        });
-    }
-
-    if (elem.baseline)
-        args.push({
-            property: "baseline",
-            startValue: elem.baseline,
-            targetValue: elem.newBaseline
-        });
+        });    
 
     if (elem.opacity != 1 && elem.fadeIn == false) {
         args.push({
@@ -676,14 +670,24 @@ function animateElement(elem) {
 function initializeAnimation(elem, duration, args) {
     var startTime = (new Date()).getTime();
 
-    animatingElements[elem.id] = elem; // update/push element in hashmap
-
     elem.animation = {
         isAnimating: true, // indicates if there is ongoing animation
         duration: duration, // duration of the animation
         startTime: startTime, // start time of the animation
         args: args // arguments of canvas element that should be animated
     };
+
+    if (duration != 0) {
+        dynamicLayoutActive = true;
+
+        if (dynamicLayoutTimeout)
+            clearTimeout(dynamicLayoutTimeout);
+
+        // set new timeout (while animation is on dynamicLayoutActive is true otherwise its false)
+        dynamicLayoutTimeout = window.setTimeout(function () {
+            dynamicLayoutActive = false;
+        }, duration + 500);
+    }
 
     // calculates new animation frame of element
     elem.calculateNewFrame = function () {
@@ -706,7 +710,6 @@ function initializeAnimation(elem, duration, args) {
         if (t == 1.0) {
             elem.animation.isAnimating = false;
             elem.animation.args = [];
-            delete animatingElements[elem.id]; // remove element from hashmap
 
             if (elem.fadeIn == false)
                 elem.fadeIn = true;
@@ -803,8 +806,13 @@ function merge(src, dest) {
 
                 // update title pos after expansion
                 dest.delta = Math.max(0, (bottom - top) - (origBottom - origTop));
+                // hide animating text
+                // TODO: find the better way to fix text shacking bug if possible
                 dest.titleObject.newY += dest.delta;
                 dest.titleObject.newBaseline += dest.delta;
+                dest.titleObject.opacity = 0;
+                dest.titleObject.fadeIn = false;
+                delete dest.titleObject.animation;
 
                 // assert: child content cannot exceed parent
                 if (bottom > dest.titleObject.newY) {
@@ -829,8 +837,6 @@ function merge(src, dest) {
                         }
                     }
                 }
-
-                animateElement(dest);
             }
         } else if (srcChildTimelines.length > 0 && destChildTimelines.length === 0) { // dest does not contain any src children
             var t = generateLayout(src, dest);
@@ -845,8 +851,6 @@ function merge(src, dest) {
             // dest now contains all src children
             for (var i = 0; i < dest.children.length; i++)
                 convertRelativeToAbsoluteCoords(dest.children[i], dest.newY);
-            
-            animateElement(dest);
         } else {
             dest.delta = 0;
         }
