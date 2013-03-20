@@ -22,14 +22,18 @@ function Prepare(timeline) {
     GenerateProperty(timeline, "FromTimeUnit", "FromYear", "FromMonth", "FromDay", "left");
     GenerateProperty(timeline, "ToTimeUnit", "ToYear", "ToMonth", "ToDay", "right");
 
-    timeline.Exhibits.forEach(function (exhibit) {
-        GenerateProperty(exhibit, "TimeUnit", "Year", "Month", "Day", "x");
-    });
+    if (timeline.Exhibits instanceof Array) {
+        timeline.Exhibits.forEach(function (exhibit) {
+            GenerateProperty(exhibit, "TimeUnit", "Year", "Month", "Day", "x");
+        });
+    }
 
-    timeline.ChildTimelines.forEach(function (childTimeline) {
-        childTimeline.ParentTimeline = timeline;
-        Prepare(childTimeline);
-    });
+    if (timeline.ChildTimelines instanceof Array) {
+        timeline.ChildTimelines.forEach(function (childTimeline) {
+            childTimeline.ParentTimeline = timeline;
+            Prepare(childTimeline);
+        });
+    }
 
     GenerateAspect(timeline);
     if (timeline.Height)
@@ -65,39 +69,45 @@ function LayoutTimeline(timeline, parentWidth, measureContext) {
         timeline.height = timelineWidth / timeline.AspectRatio;
     }
 
-    timeline.ChildTimelines.forEach(function (tl) {
-        //If child timeline has fixed aspect ratio, calculate its height according to it
-        if (tl.AspectRatio) {
-            tl.height = (tl.right - tl.left) / tl.AspectRatio;
-        } else if (timeline.height && tl.Height) {
-            //If Child timeline has height in percentage of parent, calculate it before layout pass
-            tl.height = timeline.height * tl.Height;
-        }
-        //Calculate layout for each child timeline
-        LayoutTimeline(tl, timelineWidth, measureContext);
-    });
+    if (timeline.ChildTimelines instanceof Array) {
+        timeline.ChildTimelines.forEach(function (tl) {
+            //If child timeline has fixed aspect ratio, calculate its height according to it
+            if (tl.AspectRatio) {
+                tl.height = (tl.right - tl.left) / tl.AspectRatio;
+            } else if (timeline.height && tl.Height) {
+                //If Child timeline has height in percentage of parent, calculate it before layout pass
+                tl.height = timeline.height * tl.Height;
+            }
+            //Calculate layout for each child timeline
+            LayoutTimeline(tl, timelineWidth, measureContext);
+        });
+    }
 
     if (!timeline.height) {
         //Searching for timeline with the biggest ratio between its height percentage and real height
         var scaleCoef = undefined;
-        timeline.ChildTimelines.forEach(function (tl) {
-            if (tl.Height && !tl.AspectRatio) {
-                var localScale = tl.height / tl.Height;
-                if (!scaleCoef || scaleCoef < localScale)
-                    scaleCoef = localScale;
-            }
-        });
-        //Scaling timelines to make their percentages corresponding to each other
-        if (scaleCoef) {
+        if (timeline.ChildTimelines instanceof Array) {
             timeline.ChildTimelines.forEach(function (tl) {
                 if (tl.Height && !tl.AspectRatio) {
-                    var scaleParam = scaleCoef * tl.Height / tl.height;
-                    if (scaleParam > 1) {
-                        tl.realY *= scaleParam;
-                        Scale(tl, scaleParam, measureContext);
-                    }
+                    var localScale = tl.height / tl.Height;
+                    if (!scaleCoef || scaleCoef < localScale)
+                        scaleCoef = localScale;
                 }
             });
+        }
+        //Scaling timelines to make their percentages corresponding to each other
+        if (scaleCoef) {
+            if (timeline.ChildTimelines instanceof Array) {
+                timeline.ChildTimelines.forEach(function (tl) {
+                    if (tl.Height && !tl.AspectRatio) {
+                        var scaleParam = scaleCoef * tl.Height / tl.height;
+                        if (scaleParam > 1) {
+                            tl.realY *= scaleParam;
+                            Scale(tl, scaleParam, measureContext);
+                        }
+                    }
+                });
+            }
             //Set final timelineHeight
             timeline.height = scaleCoef;
         }
@@ -112,10 +122,12 @@ function LayoutTimeline(timeline, parentWidth, measureContext) {
     if (timeline.height) {
         var titleObject = GenerateTitleObject(timeline.height, timeline, measureContext);
 
-        if (timeline.Exhibits.length > 0 && (tlRes.max - tlRes.min) < timeline.height) {
-            while ((res.max - res.min) > (timeline.height - titleObject.bboxHeight) && exhibitSize > timelineWidth / 20.0) {
-                exhibitSize /= 1.5;
-                res = LayoutContent(timeline, exhibitSize);
+        if (timeline.Exhibits instanceof Array) {
+            if (timeline.Exhibits.length > 0 && (tlRes.max - tlRes.min) < timeline.height) {
+                while ((res.max - res.min) > (timeline.height - titleObject.bboxHeight) && exhibitSize > timelineWidth / 20.0) {
+                    exhibitSize /= 1.5;
+                    res = LayoutContent(timeline, exhibitSize);
+                }
             }
         }
 
@@ -161,13 +173,17 @@ function LayoutTimeline(timeline, parentWidth, measureContext) {
     timeline.realHeight = timeline.height + 2 * timeline.heightEps;
     timeline.realY = 0;
 
-    timeline.Exhibits.forEach(function (infodot) {
-        infodot.realY -= res.min;
-    });
+    if (timeline.Exhibits instanceof Array) {
+        timeline.Exhibits.forEach(function (infodot) {
+            infodot.realY -= res.min;
+        });
+    }
 
-    timeline.ChildTimelines.forEach(function (tl) {
-        tl.realY -= res.min;
-    });
+    if (timeline.ChildTimelines instanceof Array) {
+        timeline.ChildTimelines.forEach(function (tl) {
+            tl.realY -= res.min;
+        });
+    }
 }
 
 function PositionContent(contentArray, arrangedArray, intersectionFunc) {
@@ -229,34 +245,40 @@ function LayoutContent(timeline, exhibitSize) {
     var sequencedContent = new Array();
     var unsequencedContent = new Array();
 
-    timeline.ChildTimelines.forEach(function (tl) {
-        if (tl.Sequence)
-            sequencedContent.push(tl);
-        else
-            unsequencedContent.push(tl);
-    });
-
-    timeline.Exhibits.forEach(function (eb) {
-        eb.size = exhibitSize;
-        eb.left = eb.x - eb.size / 2.0;
-        eb.right = eb.x + eb.size / 2.0;
-        eb.realHeight = exhibitSize;
-
-        if (eb.left < timeline.left) {
-            eb.left = timeline.left;
-            eb.right = eb.left + eb.size;
-            eb.isDeposed = true;
-        } else if (eb.right > timeline.right) {
-            eb.right = timeline.right;
-            eb.left = timeline.right - eb.size;
-            eb.isDeposed = true;
+    function PositionContent(contentArray, arrangedArray, intersectionFunc) {
+        if (timeline.ChildTimelines instanceof Array) {
+            timeline.ChildTimelines.forEach(function (tl) {
+                if (tl.Sequence)
+                    sequencedContent.push(tl);
+                else
+                    unsequencedContent.push(tl);
+            });
         }
+    }
 
-        if (eb.Sequence)
-            sequencedContent.push(eb);
-        else
-            unsequencedContent.push(eb);
-    });
+    if (timeline.Exhibits instanceof Array) {
+        timeline.Exhibits.forEach(function (eb) {
+            eb.size = exhibitSize;
+            eb.left = eb.x - eb.size / 2.0;
+            eb.right = eb.x + eb.size / 2.0;
+            eb.realHeight = exhibitSize;
+
+            if (eb.left < timeline.left) {
+                eb.left = timeline.left;
+                eb.right = eb.left + eb.size;
+                eb.isDeposed = true;
+            } else if (eb.right > timeline.right) {
+                eb.right = timeline.right;
+                eb.left = timeline.right - eb.size;
+                eb.isDeposed = true;
+            }
+
+            if (eb.Sequence)
+                sequencedContent.push(eb);
+            else
+                unsequencedContent.push(eb);
+        });
+    }
 
     sequencedContent.sort(function (l, r) {
         return l.Sequence - r.Sequence;
@@ -316,28 +338,36 @@ function Scale(timeline, scale, mctx) {
     timeline.realHeight = timeline.height + 2 * timeline.heightEps;
     timeline.titleRect = GenerateTitleObject(timeline.height, timeline, mctx);
 
-    timeline.ChildTimelines.forEach(function (tl) {
-        tl.realY *= scale;
-        if (!tl.AspectRatio)
-            Scale(tl, scale, mctx);
-    });
+    if (timeline.ChildTimelines instanceof Array) {
+        timeline.ChildTimelines.forEach(function (tl) {
+            tl.realY *= scale;
+            if (!tl.AspectRatio)
+                Scale(tl, scale, mctx);
+        });
+    }
 
-    timeline.Exhibits.forEach(function (eb) {
-        eb.realY *= scale;
-    });
+    if (timeline.Exhibits instanceof Array) {
+        timeline.Exhibits.forEach(function (eb) {
+            eb.realY *= scale;
+        });
+    }
 }
 
 function Arrange(timeline) {
     timeline.y = timeline.realY + timeline.heightEps;
 
-    timeline.Exhibits.forEach(function (infodot) {
-        infodot.y = infodot.realY + infodot.size / 2.0 + timeline.y;
-    });
+    if (timeline.Exhibits instanceof Array) {
+        timeline.Exhibits.forEach(function (infodot) {
+            infodot.y = infodot.realY + infodot.size / 2.0 + timeline.y;
+        });
+    }
 
-    timeline.ChildTimelines.forEach(function (tl) {
-        tl.realY += timeline.y;
-        Arrange(tl);
-    });
+    if (timeline.ChildTimelines instanceof Array) {
+        timeline.ChildTimelines.forEach(function (tl) {
+            tl.realY += timeline.y;
+            Arrange(tl);
+        });
+    }
 }
 
 function CalcInfodotSize(timeline) {
@@ -388,48 +418,54 @@ function Convert(parent, timeline) {
     });
 
     //Creating Infodots
-    timeline.Exhibits.forEach(function (childInfodot) {
-        var date; // building a date to be shown in a title of the content item to the left of the title text.
+    if (timeline.Exhibits instanceof Array) {
+        timeline.Exhibits.forEach(function (childInfodot) {
+            var date; // building a date to be shown in a title of the content item to the left of the title text.
 
-        var contentItems = new Array();
-        childInfodot.ContentItems.forEach(function (contentItemProt) {
-            var mediaType = contentItemProt.MediaType;
-            if (mediaType == "Picture")
-                mediaType = 'image';
-            else if (mediaType == "Video")
-                mediaType = 'video';
+            var contentItems = new Array();
+            if (childInfodot.ContentItems instanceof Array) {
+                childInfodot.ContentItems.forEach(function (contentItemProt) {
+                    var mediaType = contentItemProt.MediaType;
+                    if (mediaType == "Picture")
+                        mediaType = 'image';
+                    else if (mediaType == "Video")
+                        mediaType = 'video';
 
-            date = buildDate(contentItemProt);
+                    date = buildDate(contentItemProt);
 
-            contentItems.push({
-                id: 'c' + contentItemProt.UniqueID,
-                title: contentItemProt.Title,
-                mediaUrl: contentItemProt.Uri,
-                mediaType: mediaType,
-                description: contentItemProt.Caption,
-                date: date,
-                guid: contentItemProt.ID,
-                attribution: contentItemProt.Attribution,
-                mediaSource: contentItemProt.MediaSource,
-                order: contentItemProt.Order ? contentItemProt.Order : 0
-            });
-        });
-
-        date = buildDate(childInfodot);
-        var infodot1 = addInfodot(t1, "layerInfodots", 'e' + childInfodot.UniqueID,
-                (childInfodot.left + childInfodot.right) / 2.0, childInfodot.y, 0.8 * childInfodot.size / 2.0, contentItems,
-                {
-                    title: childInfodot.Title,
-                    date: date,
-                    guid: childInfodot.ID,
-                    opacity: 0
+                    contentItems.push({
+                        id: 'c' + contentItemProt.UniqueID,
+                        title: contentItemProt.Title,
+                        mediaUrl: contentItemProt.Uri,
+                        mediaType: mediaType,
+                        description: contentItemProt.Caption,
+                        date: date,
+                        guid: contentItemProt.ID,
+                        attribution: contentItemProt.Attribution,
+                        mediaSource: contentItemProt.MediaSource,
+                        order: contentItemProt.Order ? contentItemProt.Order : 0
+                    });
                 });
-    });
+            }
+
+            date = buildDate(childInfodot);
+            var infodot1 = addInfodot(t1, "layerInfodots", 'e' + childInfodot.UniqueID,
+                    (childInfodot.left + childInfodot.right) / 2.0, childInfodot.y, 0.8 * childInfodot.size / 2.0, contentItems,
+                    {
+                        title: childInfodot.Title,
+                        date: date,
+                        guid: childInfodot.ID,
+                        opacity: 0
+                    });
+        });
+    }
 
     //Filling child timelines
-    timeline.ChildTimelines.forEach(function (childTimeLine) {
-        Convert(t1, childTimeLine);
-    });
+    if (timeline.ChildTimelines instanceof Array) {
+        timeline.ChildTimelines.forEach(function (childTimeLine) {
+            Convert(t1, childTimeLine);
+        });
+    }
 
 }
 
@@ -469,7 +505,7 @@ function GetTimelineColor(timeline) {
 var FindChildTimeline = function (timeline, id, recursive) {
     var result = undefined;
 
-    if (timeline) {
+    if (timeline && timeline.ChildTimelines instanceof Array) {
         var n = timeline.ChildTimelines.length;
         for (var i = 0; i < n; i++) {
             var childTimeline = timeline.ChildTimelines[i];
