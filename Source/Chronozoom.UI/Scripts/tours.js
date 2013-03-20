@@ -110,7 +110,7 @@ var ChronoZoom;
                         this.isAudioEnabled = false;
                     }
                 };
-function ReinitializeAudio() {
+                this.ReinitializeAudio = function ReinitializeAudio() {
                     // stop audio playback and clear audio element
                     if(this.audio) {
                         this.audio.pause();
@@ -158,7 +158,7 @@ function ReinitializeAudio() {
                     if(isToursDebugEnabled && window.console && console.log("Loading of tour " + this.title + " is queued")) {
                         ;
                     }
-                }
+                };
                 /*
                 Raises that bookmark playback is over. Called only if state is "play" and currentPlace is bookmark
                 @param goBack (boolen) specifies the direction to move (prev - true, next - false)
@@ -324,7 +324,7 @@ function onGoToFailure(animationId) {
                     }
                 }
                 ;
-function play() {
+                this.play = function play() {
                     if(this.state !== 'pause') {
                         return;
                     }
@@ -376,9 +376,8 @@ function play() {
                         ChronoZoom.Common.hashHandle = false;
                         ChronoZoom.UrlNav.setURL(curURL);
                     }
-                }
-                ;
-function pause() {
+                };
+                this.pause = function pause() {
                     if(this.state !== 'play') {
                         return;
                     }
@@ -406,9 +405,8 @@ function pause() {
                         bookmark.elapsed += (new Date().getTime() - this.currentPlace.startTime) / 1000;
                     }// sec
                     
-                }
-                ;
-function next() {
+                };
+                this.next = function next() {
                     // goes to the next bookmark
                     // ignore if last bookmark
                     if(this.currentPlace.bookmark != this.bookmarks.length - 1) {
@@ -422,9 +420,8 @@ function next() {
                         this.onBookmarkIsOver(false)// goes to the next bookmark
                         ;
                     }
-                }
-                ;
-function prev() {
+                };
+                this.prev = function prev() {
                     // goes to the previous bookmark
                     // ignore if first bookmark
                     if(this.currentPlace.bookmark == 0) {
@@ -440,13 +437,7 @@ function prev() {
                     }
                     this.onBookmarkIsOver(true)// goes to the prev bookmark
                     ;
-                }
-                ;
-                // public properties
-                function getBookmark() {
-                    return this.bookmarks[this.currentPlace.bookmark];
-                }
-                ;
+                };
                 // calls every bookmarkStarted callback function
                 function RaiseBookmarkStarted(bookmark) {
                     if(this.tour_BookmarkStarted.length > 0) {
@@ -495,9 +486,9 @@ function prev() {
                 Tours.tour = newTour;
                 // add new tourFinished callback function
                 Tours.tour.tour_TourFinished.push(function (tour) {
-                    this.hideBookmark(tour);
-                    this.tourPause();
-                    this.hideBookmarks();
+                    hideBookmark(tour);
+                    tourPause();
+                    hideBookmarks();
                 });
                 Tours.tour.toggleAudio(isAudioEnabled);
                 // reset pause time for every bookmark
@@ -553,7 +544,7 @@ function prev() {
         */
         function tourNext() {
             if(Tours.tour != undefined) {
-                Tours.tours.tour.next();
+                Tours.tour.next();
             }
         }
         Tours.tourNext = tourNext;

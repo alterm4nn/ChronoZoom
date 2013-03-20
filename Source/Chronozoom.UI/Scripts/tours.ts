@@ -68,6 +68,11 @@ module ChronoZoom {
             private timerOnBookmarkIsOver;  // timer id which is set for bookmark complete event (stored to be able to cancel it if paused)
 
             public toggleAudio;
+            private ReinitializeAudio;
+            private play;
+            private pause;
+            private next;
+            private prev;
 
             /* Tour represents a sequence of bookmarks.
             @param title        (string)    Title of the tour.
@@ -108,7 +113,7 @@ module ChronoZoom {
                         this.isAudioEnabled = false;
                 }
 
-                function ReinitializeAudio() {
+                this.ReinitializeAudio = function ReinitializeAudio() {
                     // stop audio playback and clear audio element
                     if (this.audio) {
                         this.audio.pause();
@@ -316,7 +321,7 @@ module ChronoZoom {
                     if (isToursDebugEnabled && window.console && console.log("tour interrupted by user during transition"));
                 };
 
-                function play() {
+                this.play = function play() {
                     if (this.state !== 'pause') return;
 
                     // first we go to the bookmark and then continue play it
@@ -370,7 +375,7 @@ module ChronoZoom {
                     }
                 };
 
-                function pause() {
+                this.pause = function pause() {
                     if (this.state !== 'play') return;
 
                     if (isToursDebugEnabled && window.console && console.log("tour playback paused"));
@@ -395,7 +400,7 @@ module ChronoZoom {
                         bookmark.elapsed += (new Date().getTime() - this.currentPlace.startTime) / 1000; // sec
                 };
 
-                function next() { // goes to the next bookmark
+                this.next = function next() { // goes to the next bookmark
                     // ignore if last bookmark
                     if (this.currentPlace.bookmark != this.bookmarks.length - 1) {
                         if (this.state === 'play') {
@@ -408,7 +413,7 @@ module ChronoZoom {
                     }
                 };
 
-                function prev() { // goes to the previous bookmark
+                this.prev = function prev() { // goes to the previous bookmark
                     // ignore if first bookmark
                     if (this.currentPlace.bookmark == 0) {
                         //self.currentPlace = { type: 'goto', bookmark: 0, animationId: self.currentPlace.animationId };
@@ -421,11 +426,6 @@ module ChronoZoom {
                     }
 
                     this.onBookmarkIsOver(true); // goes to the prev bookmark
-                };
-
-                // public properties
-                function getBookmark() {
-                    return this.bookmarks[this.currentPlace.bookmark];
                 };
 
                 // calls every bookmarkStarted callback function
@@ -459,7 +459,6 @@ module ChronoZoom {
                             this.tour_TourFinished[i](self);
                     }
                 }
-
             }
         }
 
@@ -476,9 +475,9 @@ module ChronoZoom {
 
                 // add new tourFinished callback function
                 tour.tour_TourFinished.push(function (tour) {
-                    this.hideBookmark(tour);
-                    this.tourPause();
-                    this.hideBookmarks();
+                    hideBookmark(tour);
+                    tourPause();
+                    hideBookmarks();
                 });
 
                 tour.toggleAudio(isAudioEnabled);
@@ -541,7 +540,7 @@ module ChronoZoom {
         */
         export function tourNext() {
             if (tour != undefined) {
-                tours.tour.next();
+                tour.next();
             }
         }
 
