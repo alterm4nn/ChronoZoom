@@ -20,4 +20,23 @@ namespace Chronozoom.Api.Models
         // extra properties for backward compatibility
         public int UniqueID;
     }
+
+    public static class ExhibitExtensions
+    {
+        public static Exhibit Clone(this Exhibit exhibit)
+        {
+            return new Exhibit()
+            {
+                id = exhibit.id,
+                parent = exhibit.parent,
+                time = exhibit.time,
+                title = exhibit.title,
+                description = exhibit.description,
+                contentItems = new List<ContentItem>(),
+
+                // extra properties for backward compatibility
+                UniqueID = exhibit.UniqueID
+            };
+        }
+    }
 }

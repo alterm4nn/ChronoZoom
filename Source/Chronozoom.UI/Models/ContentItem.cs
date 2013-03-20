@@ -19,4 +19,24 @@ namespace Chronozoom.Api.Models
         public int UniqueID;
         public short? Order;
     }
+
+    public static class ContentItemExtensions
+    {
+        public static ContentItem Clone(this ContentItem contentItem)
+        {
+            return new ContentItem()
+            {
+                id = contentItem.id,
+                parent = contentItem.parent,
+                title = contentItem.title,
+                description = contentItem.description,
+                uri = contentItem.uri,
+                mediaType = contentItem.mediaType,
+
+                // extra properties for backward compatibility
+                UniqueID = contentItem.UniqueID,
+                Order = contentItem.Order
+            };
+        }
+    }
 }
