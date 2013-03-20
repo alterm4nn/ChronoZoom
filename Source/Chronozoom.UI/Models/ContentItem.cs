@@ -22,9 +22,9 @@ namespace Chronozoom.Api.Models
 
     public static class ContentItemExtensions
     {
-        public static ContentItem Clone(this ContentItem contentItem)
+        public static ContentItem CloneData(this ContentItem contentItem)
         {
-            return new ContentItem()
+            var clone = new ContentItem()
             {
                 id = contentItem.id,
                 parent = contentItem.parent,
@@ -37,6 +37,8 @@ namespace Chronozoom.Api.Models
                 UniqueID = contentItem.UniqueID,
                 Order = contentItem.Order
             };
+
+            return clone;
         }
     }
 }

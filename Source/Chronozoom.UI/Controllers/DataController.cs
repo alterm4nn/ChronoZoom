@@ -25,16 +25,16 @@ namespace Chronozoom.Api.Controllers
         private void FindElements(Timeline timeline, List<string> ids, ref PostDataResponse response)
         {
             if (ids.Contains(timeline.id))
-                response.timelines.Add(timeline.Clone());
+                response.timelines.Add(timeline.CloneData());
 
             foreach (var exhibit in timeline.exhibits)
             {
                 if (ids.Contains(exhibit.id))
-                    response.exhibits.Add(exhibit.Clone());
+                    response.exhibits.Add(exhibit.CloneData());
 
                 foreach (var contentItem in exhibit.contentItems)
                     if (ids.Contains(contentItem.id))
-                        response.contentItems.Add(contentItem.Clone());
+                        response.contentItems.Add(contentItem.CloneData());
             }
 
             foreach (var childTimeline in timeline.timelines)

@@ -1,4 +1,5 @@
 ﻿using Chronozoom.Api.Models;
+using System.Collections.Generic;
 using System.Web.Http;
 
 namespace Chronozoom.Api.Controllers
@@ -47,11 +48,13 @@ namespace Chronozoom.Api.Controllers
 
             if (!(t1.start < start && t1.end < start || t1.start > end && t1.end > end) && (t1.end - t1.start >= minspan))
             {
-                var t2 = t1.Clone();
+                var t2 = t1.CloneStructure();
+                t2.exhibits = new List<Exhibit>();
+                t2.timelines = new List<Timeline>();
 
                 foreach (var e1 in t1.exhibits)
                 {
-                    var e2 = e1.Clone();
+                    var e2 = e1.CloneStructure();
                     t2.exhibits.Add(e2);
                 }
 
@@ -64,9 +67,7 @@ namespace Chronozoom.Api.Controllers
             }
             else
             {
-                var t2 = t1.Clone();
-                t2.timelines = null;
-                t2.exhibits = null;
+                var t2 = t1.CloneStructure();
                 return t2;
             }
         }

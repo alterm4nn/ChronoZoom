@@ -23,9 +23,27 @@ namespace Chronozoom.Api.Models
 
     public static class ExhibitExtensions
     {
-        public static Exhibit Clone(this Exhibit exhibit)
+        public static Exhibit CloneStructure(this Exhibit exhibit)
         {
-            return new Exhibit()
+            var clone = new Exhibit()
+            {
+                id = exhibit.id,
+                parent = exhibit.parent,
+                time = exhibit.time,
+                title = exhibit.title,
+                description = exhibit.description,
+                contentItems = null,
+
+                // extra properties for backward compatibility
+                UniqueID = exhibit.UniqueID
+            };
+
+            return clone;
+        }
+
+        public static Exhibit CloneData(this Exhibit exhibit)
+        {
+            var clone = new Exhibit()
             {
                 id = exhibit.id,
                 parent = exhibit.parent,
@@ -37,6 +55,11 @@ namespace Chronozoom.Api.Models
                 // extra properties for backward compatibility
                 UniqueID = exhibit.UniqueID
             };
+
+            foreach (var contentItem in exhibit.contentItems)
+                clone.contentItems.Add(contentItem.CloneData());
+
+            return clone;
         }
     }
 }
