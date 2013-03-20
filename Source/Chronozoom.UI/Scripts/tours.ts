@@ -525,7 +525,7 @@ module ChronoZoom {
         function removeActiveTour() {
             // stop active tour
             if (tour) {
-                tour.tourPause();
+                tourPause();
                 tour.isTourPlayRequested = false;
             }
 
