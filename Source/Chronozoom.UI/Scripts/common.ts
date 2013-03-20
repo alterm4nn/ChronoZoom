@@ -53,7 +53,7 @@ module ChronoZoom {
         export function initialize() {
 
             ChronoZoom.Axis.initialize();
-            ax = (<any>$)('#ax');
+            ax = (<any>$)('#axis');
             ax.axis();
 
             ChronoZoom.VirtualCanvas.initialize();

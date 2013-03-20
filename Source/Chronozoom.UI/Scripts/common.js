@@ -37,7 +37,7 @@ var ChronoZoom;
         */
         function initialize() {
             ChronoZoom.Axis.initialize();
-            Common.ax = ($)('#ax');
+            Common.ax = ($)('#axis');
             Common.ax.axis();
             ChronoZoom.VirtualCanvas.initialize();
             Common.vc = ($)('#vc');
