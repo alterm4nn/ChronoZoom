@@ -1,491 +1,491 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>
-    </ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{1A1F34C7-6E40-41C1-9ADB-D374DBAF7C50}</ProjectGuid>
-    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>UI</RootNamespace>
-    <AssemblyName>UI</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort />
-    <IISExpressAnonymousAuthentication />
-    <IISExpressWindowsAuthentication />
-    <IISExpressUseClassicPipelineMode />
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="EntityFramework, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.SignalR.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.1.0.0-rc2\lib\net40\Microsoft.AspNet.SignalR.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.SignalR.Owin">
-      <HintPath>..\packages\Microsoft.AspNet.SignalR.Owin.1.0.0-rc2\lib\net45\Microsoft.AspNet.SignalR.Owin.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.1.0.0-rc2\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Host.SystemWeb">
-      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.1.0.0-rc2\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Owin">
-      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data.Entity" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.4.0.20710.0\lib\net40\System.Net.Http.Formatting.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net.Http.WebRequest" />
-    <Reference Include="System.Runtime.Caching" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.ServiceModel.Web" />
-    <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.4.0.20710.0\lib\net40\System.Web.Http.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.Http.WebHost, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.4.0.20710.0\lib\net40\System.Web.Http.WebHost.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="BehindTheScenes.htm" />
-    <Content Include="cz.aspx" />
-    <Content Include="cz2.html" />
-    <Content Include="czmobile.htm" />
-    <Content Include="favicon.ico" />
-    <Content Include="Images\A.png" />
-    <Content Include="Images\about-chronozoom.png" />
-    <Content Include="Images\activeListWelcomeScreen.png" />
-    <Content Include="Images\background.jpg" />
-    <Content Include="Images\backgroundWithBlur.jpg" />
-    <Content Include="Images\berkeley-logo-17-86.png" />
-    <Content Include="Images\bg.png" />
-    <Content Include="Images\chronozoom-content.png" />
-    <Content Include="Images\Chronozoom-project-advisors.png" />
-    <Content Include="Images\chronzoom-200px-white-mob.png" />
-    <Content Include="Images\chronzoom-200px-white.png" />
-    <Content Include="Images\corporate-and-institutional-support.png" />
-    <Content Include="Images\cosmosRegimeBox.jpg" />
-    <Content Include="Images\Credits.png" />
-    <Content Include="Images\defaultGradientBox.jpg" />
-    <Content Include="Images\developers-and-testers.png" />
-    <Content Include="Images\earthRegimeBox.jpg" />
-    <Content Include="Images\fallbackOuterBackground.jpg" />
-    <Content Include="Images\fallbackWalterImageDefault.jpg" />
-    <Content Include="Images\frequently-asked-questions.png" />
-    <Content Include="Images\fullpage_grouphover.png" />
-    <Content Include="Images\fullpage_hover.png" />
-    <Content Include="Images\fullpage_pressed.png" />
-    <Content Include="Images\fullpage_rest.png" />
-    <Content Include="Images\header.png" />
-    <Content Include="Images\help-chronozoom-grow.png" />
-    <Content Include="Images\home_grouphover.png" />
-    <Content Include="Images\home_hover.png" />
-    <Content Include="Images\home_pressed.png" />
-    <Content Include="Images\home_rest.png" />
-    <Content Include="Images\humanityRegimeBox.jpg" />
-    <Content Include="Images\inspiration.png" />
-    <Content Include="Images\lifeRegimeBox.jpg" />
-    <Content Include="Images\loading.gif" />
-    <Content Include="Images\mrclogo-17x53.png" />
-    <Content Include="Images\MSU_logo-white17x74.png" />
-    <Content Include="Images\new-logo-white-for-canvas.png" />
-    <Content Include="Images\normalListWelcomeScreen.png" />
-    <Content Include="Images\OuterCurve_Logo_17x68.png" />
-    <Content Include="Images\prehistoryRegimeBox.jpg" />
-    <Content Include="Images\product-management-and-community-outreach.png" />
-    <Content Include="Images\program-managers.png" />
-    <Content Include="Images\Q.png" />
-    <Content Include="Images\right-column.png" />
-    <Content Include="Images\the-journey-to-the-chronozoom-beta.png" />
-    <Content Include="Images\Unsupported-Browser.jpg" />
-    <Content Include="Images\UX-and-collateral.png" />
-    <Content Include="Images\view_left_off.jpg" />
-    <Content Include="Images\view_left_on.jpg" />
-    <Content Include="Images\view_next_off.jpg" />
-    <Content Include="Images\view_next_on.jpg" />
-    <Content Include="Images\view_right_off.jpg" />
-    <Content Include="Images\view_right_on.jpg" />
-    <Content Include="Images\we-need-your-feedback.png" />
-    <Content Include="Images\welcomeButtonNext.png" />
-    <Content Include="Images\welcomeCloseButton.png" />
-    <Content Include="Images\welcomeScreenCheckbox.png" />
-    <Content Include="Images\whats-next.png" />
-    <Content Include="Images\wlcmScreen_close_off.png" />
-    <Content Include="Images\wlcmScreen_close_on.png" />
-    <Content Include="Images\zoomin_grouphover.png" />
-    <Content Include="Images\zoomin_hover.png" />
-    <Content Include="Images\zoomin_pressed.png" />
-    <Content Include="Images\zoomin_rest.png" />
-    <Content Include="Images\zoomout_grouphover.png" />
-    <Content Include="Images\zoomout_hover.png" />
-    <Content Include="Images\zoomout_pressed.png" />
-    <Content Include="Images\zoomout_rest.png" />
-    <Content Include="Privacy.htm" />
-    <Content Include="robots.txt" />
-    <Content Include="ScriptsMobile\axis.mobile.js" />
-    <Content Include="ScriptsMobile\cz.settings.mobile.js" />
-    <Content Include="ScriptsMobile\vccontent.mobile.js" />
-    <Content Include="ScriptsMobile\virtualCanvas.mobile.js" />
-    <Content Include="NewScripts\authoring.js" />
-    <Content Include="NewScripts\breadCrumbs.js" />
-    <Content Include="NewScripts\flash_detect.js" />
-    <None Include="NewScripts\jquery-1.6.4-vsdoc.js" />
-    <Content Include="NewScripts\jquery-1.6.4.js" />
-    <Content Include="NewScripts\jquery-1.6.4.min.js" />
-    <Content Include="NewScripts\jquery-1.7.2.min.js" />
-    <Content Include="NewScripts\jquery.cookie.js" />
-    <Content Include="NewScripts\jquery.signalR-1.0.0-rc2.js" />
-    <Content Include="NewScripts\jquery.signalR-1.0.0-rc2.min.js" />
-    <Content Include="NewScripts\regimesIE.js" />
-    <Content Include="NewScripts\seadragon-min.js" />
-    <Content Include="NewScripts\settings.js" />
-    <Content Include="NewScripts\timescale.js" />
-    <Content Include="NewStyles\timescale.css" />
-    <Content Include="Scripts\axis.js" />
-    <Content Include="Scripts\bibliography.js" />
-    <Content Include="Scripts\breadCrumbs.js" />
-    <Content Include="Scripts\common.js" />
-    <Content Include="Scripts\cz.settings.js" />
-    <Content Include="Scripts\flash_detect.js" />
-    <Content Include="Scripts\gestures.js" />
-    <None Include="Scripts\jquery-1.4.1-vsdoc.js" />
-    <Content Include="Scripts\jquery-1.4.1.js" />
-    <Content Include="Scripts\jquery-1.4.1.min.js" />
-    <Content Include="Scripts\jquery-1.6.2.min.js" />
-    <None Include="Scripts\jquery-1.6.4-vsdoc.js" />
-    <Content Include="Scripts\jquery-1.6.4.js" />
-    <Content Include="Scripts\jquery-1.6.4.min.js" />
-    <Content Include="Scripts\jquery-1.7.2.min.js" />
-    <Content Include="Scripts\jquery-ui-1.8.16.custom.min.js" />
-    <Content Include="Scripts\jquery.cookie.js" />
-    <Content Include="Scripts\jquery.signalR-1.0.0-rc2.js" />
-    <Content Include="Scripts\jquery.signalR-1.0.0-rc2.min.js" />
-    <Content Include="Scripts\layout.js" />
-    <Content Include="Scripts\mouseWheelPlugin.js" />
-    <Content Include="Scripts\regimesIE.js" />
-    <Content Include="Scripts\rx.jQuery.js" />
-    <Content Include="Scripts\rx.js" />
-    <Content Include="Scripts\seadragon-min.js" />
-    <Content Include="Scripts\search.js" />
-    <Content Include="Scripts\tours.js" />
-    <Content Include="Scripts\urlnav.js" />
-    <Content Include="Scripts\vccontent.js" />
-    <Content Include="Scripts\viewport.js" />
-    <Content Include="Scripts\viewportAnimation.js" />
-    <Content Include="Scripts\viewportController.js" />
-    <Content Include="Scripts\virtualCanvas.js" />
-    <Content Include="Styles\axis.css" />
-    <Content Include="Styles\cz.css" />
-    <Content Include="Styles\Site.css" />
-    <Content Include="TraceLog.html" />
-    <Content Include="Trademark_Copyright.htm" />
-    <Content Include="TermsOfUse.htm" />
-    <Content Include="cztransfer.htm" />
-    <Content Include="Images\03cztitle_beta_grey_bold_italic.png" />
-    <Content Include="Images\1280px-CMB_Timeline300_no_WMAP.jpg" />
-    <Content Include="Images\bkmrk_off.jpg" />
-    <Content Include="Images\bkmrk_on.jpg" />
-    <Content Include="Images\Blueprint_Paper.jpg" />
-    <Content Include="Images\close_off.png" />
-    <Content Include="Images\close_on.png" />
-    <Content Include="Images\collapse-down.png" />
-    <Content Include="Images\collapse-left.png" />
-    <Content Include="Images\collapse-up.png" />
-    <Content Include="Images\collapse.png" />
-    <Content Include="Images\expand-right.png" />
-    <Content Include="Images\expand.png" />
-    <Content Include="Images\fullscreen_off.jpg" />
-    <Content Include="Images\LOGO_beta_below.png" />
-    <Content Include="Images\search_off.jpg" />
-    <Content Include="Images\search_on.jpg" />
-    <Content Include="Images\Temp-Thumbnail2.png" />
-    <Content Include="Images\tour_exit_off.jpg" />
-    <Content Include="Images\tour_exit_on.jpg" />
-    <Content Include="Images\tour_next_off.jpg" />
-    <Content Include="Images\tour_next_on.jpg" />
-    <Content Include="Images\tour_off.jpg" />
-    <Content Include="Images\tour_on.jpg" />
-    <Content Include="Images\tour_pause_off.jpg" />
-    <Content Include="Images\tour_pause_on.jpg" />
-    <Content Include="Images\tour_play_off.jpg" />
-    <Content Include="Images\tour_play_on.jpg" />
-    <Content Include="Images\tour_prev_off.jpg" />
-    <Content Include="Images\tour_prev_on.jpg" />
-    <Content Include="ResponseDumpThresholds.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="NewScripts\bibliography.js" />
-    <Content Include="NewScripts\search.js" />
-    <Content Include="ServiceResponse_2012_01_16.txt" />
-    <Content Include="testAudio.htm" />
-    <Content Include="testAudio2.mp3" />
-    <Content Include="Account\ChangePassword.aspx" />
-    <Content Include="Account\ChangePasswordSuccess.aspx" />
-    <Content Include="Account\Login.aspx" />
-    <Content Include="Account\Register.aspx" />
-    <Content Include="Bibliography.htm" />
-    <Content Include="testFallBackPage.htm" />
-    <Content Include="testTour.htm" />
-    <Content Include="testAudio.mp3" />
-    <Content Include="testAudioPlayback.htm" />
-    <Content Include="ResponseDump.txt" />
-    <Content Include="NewScripts\tours.js" />
-    <Content Include="testAsyncImageLoad.htm" />
-    <Content Include="testInfodotContent.htm" />
-    <Content Include="testVirtualCanvasAudioVideoElements.htm" />
-    <Content Include="axis.htm" />
-    <Content Include="Chronozoom.svc" />
-    <Content Include="NewScripts\urlnav.js" />
-    <Content Include="testUrlNav.htm" />
-    <Content Include="Images\chronozoom_title.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\regimes.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="testVCTree.htm">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="cz.htm" />
-    <Content Include="Images\4.png" />
-    <Content Include="Images\flower16x16.png" />
-    <Content Include="rihard_shtraus_zaratustra.mp3" />
-    <Content Include="NewScripts\layout.js" />
-    <Content Include="testDynamicLod.htm" />
-    <Content Include="testGestures.htm" />
-    <Content Include="testVirtualCanvasLayout.htm" />
-    <Content Include="testVirtualCanvasOpacity.htm" />
-    <Content Include="css\ui-lightness\images\ui-bg_diagonals-thick_18_b81900_40x40.png" />
-    <Content Include="css\ui-lightness\images\ui-bg_diagonals-thick_20_666666_40x40.png" />
-    <Content Include="css\ui-lightness\images\ui-bg_flat_10_000000_40x100.png" />
-    <Content Include="css\ui-lightness\images\ui-bg_glass_100_f6f6f6_1x400.png" />
-    <Content Include="css\ui-lightness\images\ui-bg_glass_100_fdf5ce_1x400.png" />
-    <Content Include="css\ui-lightness\images\ui-bg_glass_65_ffffff_1x400.png" />
-    <Content Include="css\ui-lightness\images\ui-bg_gloss-wave_35_f6a828_500x100.png" />
-    <Content Include="css\ui-lightness\images\ui-bg_highlight-soft_100_eeeeee_1x100.png" />
-    <Content Include="css\ui-lightness\images\ui-bg_highlight-soft_75_ffe45c_1x100.png" />
-    <Content Include="css\ui-lightness\images\ui-icons_222222_256x240.png" />
-    <Content Include="css\ui-lightness\images\ui-icons_228ef1_256x240.png" />
-    <Content Include="css\ui-lightness\images\ui-icons_ef8c08_256x240.png" />
-    <Content Include="css\ui-lightness\images\ui-icons_ffd27a_256x240.png" />
-    <Content Include="css\ui-lightness\images\ui-icons_ffffff_256x240.png" />
-    <Content Include="css\ui-lightness\jquery-ui-1.8.16.custom.css" />
-    <Content Include="Global.asax" />
-    <Content Include="Images\flower.png" />
-    <Content Include="NewScripts\axis.js" />
-    <Content Include="NewScripts\common.js" />
-    <Content Include="NewScripts\cz.settings.js" />
-    <Content Include="NewScripts\gestures.js" />
-    <Content Include="NewScripts\jquery-1.6.2.min.js" />
-    <Content Include="NewScripts\jquery-ui-1.8.16.custom.min.js" />
-    <Content Include="NewScripts\mouseWheelPlugin.js" />
-    <Content Include="NewScripts\rx.jQuery.js" />
-    <Content Include="NewScripts\rx.js" />
-    <Content Include="NewScripts\vccontent.js" />
-    <Content Include="NewScripts\viewport.js" />
-    <Content Include="NewScripts\viewportAnimation.js" />
-    <Content Include="NewScripts\viewportController.js" />
-    <Content Include="NewScripts\virtualCanvas.js" />
-    <Content Include="NewStyles\axis.css" />
-    <Content Include="NewStyles\cz.css" />
-    <Content Include="NewStyles\Site.css" />
-    <Content Include="NewScripts\jquery-1.4.1-vsdoc.js" />
-    <Content Include="NewScripts\jquery-1.4.1.js" />
-    <Content Include="NewScripts\jquery-1.4.1.min.js" />
-    <Content Include="testFunctions.htm" />
-    <Content Include="testViewportController.htm" />
-    <Content Include="testVirtualCanvas.htm" />
-    <Content Include="testVirtualCanvasAdvancedElements.htm" />
-    <Content Include="testVirtualCanvasPrimitives.htm">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="toursDump.txt" />
-    <Content Include="Web.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Account\ChangePassword.aspx.cs">
-      <DependentUpon>ChangePassword.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Account\ChangePassword.aspx.designer.cs">
-      <DependentUpon>ChangePassword.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Account\ChangePasswordSuccess.aspx.cs">
-      <DependentUpon>ChangePasswordSuccess.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Account\ChangePasswordSuccess.aspx.designer.cs">
-      <DependentUpon>ChangePasswordSuccess.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Account\Login.aspx.cs">
-      <DependentUpon>Login.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Account\Login.aspx.designer.cs">
-      <DependentUpon>Login.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Account\Register.aspx.cs">
-      <DependentUpon>Register.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Account\Register.aspx.designer.cs">
-      <DependentUpon>Register.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Chronozoom.svc.cs">
-      <DependentUpon>Chronozoom.svc</DependentUpon>
-    </Compile>
-    <Compile Include="Controllers\TimelineController.cs" />
-    <Compile Include="cz.aspx.cs">
-      <DependentUpon>cz.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Global.asax.cs">
-      <DependentUpon>Global.asax</DependentUpon>
-    </Compile>
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Models\ContentItem.cs" />
-    <Compile Include="Models\Exhibit.cs" />
-    <Compile Include="Models\Globals.cs" />
-    <Compile Include="Models\Reference.cs" />
-    <Compile Include="Models\Timeline.cs" />
-    <Compile Include="Models\Utility.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Site.Master.cs">
-      <DependentUpon>Site.Master</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Site.Master.designer.cs">
-      <DependentUpon>Site.Master</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Site.Master" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Account\Web.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Chronozoom.Entities\Chronozoom.Entities.csproj">
-      <Project>{B995D3CF-E31F-4986-A7F7-77988EA275D3}</Project>
-      <Name>Chronozoom.Entities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SignalRTraceListener\OuterCurve.SignalRTraceListener.csproj">
-      <Project>{e9c7a64b-d03b-47d7-89dd-48d046de564c}</Project>
-      <Name>OuterCurve.SignalRTraceListener</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Web.Sandbox.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Web.Staging.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Web.DevPreview.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Web.Production.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\Settings.StyleCop">
-      <Link>Settings.StyleCop</Link>
-    </Content>
-  </ItemGroup>
-  <PropertyGroup>
-    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
-    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
-  </PropertyGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
-  <ProjectExtensions>
-    <VisualStudio>
-      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
-        <WebProjectProperties>
-          <UseIIS>False</UseIIS>
-          <AutoAssignPort>False</AutoAssignPort>
-          <DevelopmentServerPort>4949</DevelopmentServerPort>
-          <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:4949/</IISUrl>
-          <NTLMAuthentication>False</NTLMAuthentication>
-          <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
-          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
-        </WebProjectProperties>
-      </FlavorProperties>
-    </VisualStudio>
-  </ProjectExtensions>
-  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1A1F34C7-6E40-41C1-9ADB-D374DBAF7C50}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>UI</RootNamespace>
+    <AssemblyName>UI</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.1.0.0-rc2\lib\net40\Microsoft.AspNet.SignalR.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Owin">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Owin.1.0.0-rc2\lib\net45\Microsoft.AspNet.SignalR.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.1.0.0-rc2\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Host.SystemWeb">
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.1.0.0-rc2\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin">
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.4.0.20710.0\lib\net40\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.4.0.20710.0\lib\net40\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.WebHost, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.4.0.20710.0\lib\net40\System.Web.Http.WebHost.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="BehindTheScenes.htm" />
+    <Content Include="cz.aspx" />
+    <Content Include="cz2.html" />
+    <Content Include="czmobile.htm" />
+    <Content Include="favicon.ico" />
+    <Content Include="Images\A.png" />
+    <Content Include="Images\about-chronozoom.png" />
+    <Content Include="Images\activeListWelcomeScreen.png" />
+    <Content Include="Images\background.jpg" />
+    <Content Include="Images\backgroundWithBlur.jpg" />
+    <Content Include="Images\berkeley-logo-17-86.png" />
+    <Content Include="Images\bg.png" />
+    <Content Include="Images\chronozoom-content.png" />
+    <Content Include="Images\Chronozoom-project-advisors.png" />
+    <Content Include="Images\chronzoom-200px-white-mob.png" />
+    <Content Include="Images\chronzoom-200px-white.png" />
+    <Content Include="Images\corporate-and-institutional-support.png" />
+    <Content Include="Images\cosmosRegimeBox.jpg" />
+    <Content Include="Images\Credits.png" />
+    <Content Include="Images\defaultGradientBox.jpg" />
+    <Content Include="Images\developers-and-testers.png" />
+    <Content Include="Images\earthRegimeBox.jpg" />
+    <Content Include="Images\fallbackOuterBackground.jpg" />
+    <Content Include="Images\fallbackWalterImageDefault.jpg" />
+    <Content Include="Images\frequently-asked-questions.png" />
+    <Content Include="Images\fullpage_grouphover.png" />
+    <Content Include="Images\fullpage_hover.png" />
+    <Content Include="Images\fullpage_pressed.png" />
+    <Content Include="Images\fullpage_rest.png" />
+    <Content Include="Images\header.png" />
+    <Content Include="Images\help-chronozoom-grow.png" />
+    <Content Include="Images\home_grouphover.png" />
+    <Content Include="Images\home_hover.png" />
+    <Content Include="Images\home_pressed.png" />
+    <Content Include="Images\home_rest.png" />
+    <Content Include="Images\humanityRegimeBox.jpg" />
+    <Content Include="Images\inspiration.png" />
+    <Content Include="Images\lifeRegimeBox.jpg" />
+    <Content Include="Images\loading.gif" />
+    <Content Include="Images\mrclogo-17x53.png" />
+    <Content Include="Images\MSU_logo-white17x74.png" />
+    <Content Include="Images\new-logo-white-for-canvas.png" />
+    <Content Include="Images\normalListWelcomeScreen.png" />
+    <Content Include="Images\OuterCurve_Logo_17x68.png" />
+    <Content Include="Images\prehistoryRegimeBox.jpg" />
+    <Content Include="Images\product-management-and-community-outreach.png" />
+    <Content Include="Images\program-managers.png" />
+    <Content Include="Images\Q.png" />
+    <Content Include="Images\right-column.png" />
+    <Content Include="Images\the-journey-to-the-chronozoom-beta.png" />
+    <Content Include="Images\Unsupported-Browser.jpg" />
+    <Content Include="Images\UX-and-collateral.png" />
+    <Content Include="Images\view_left_off.jpg" />
+    <Content Include="Images\view_left_on.jpg" />
+    <Content Include="Images\view_next_off.jpg" />
+    <Content Include="Images\view_next_on.jpg" />
+    <Content Include="Images\view_right_off.jpg" />
+    <Content Include="Images\view_right_on.jpg" />
+    <Content Include="Images\we-need-your-feedback.png" />
+    <Content Include="Images\welcomeButtonNext.png" />
+    <Content Include="Images\welcomeCloseButton.png" />
+    <Content Include="Images\welcomeScreenCheckbox.png" />
+    <Content Include="Images\whats-next.png" />
+    <Content Include="Images\wlcmScreen_close_off.png" />
+    <Content Include="Images\wlcmScreen_close_on.png" />
+    <Content Include="Images\zoomin_grouphover.png" />
+    <Content Include="Images\zoomin_hover.png" />
+    <Content Include="Images\zoomin_pressed.png" />
+    <Content Include="Images\zoomin_rest.png" />
+    <Content Include="Images\zoomout_grouphover.png" />
+    <Content Include="Images\zoomout_hover.png" />
+    <Content Include="Images\zoomout_pressed.png" />
+    <Content Include="Images\zoomout_rest.png" />
+    <Content Include="Privacy.htm" />
+    <Content Include="robots.txt" />
+    <Content Include="ScriptsMobile\axis.mobile.js" />
+    <Content Include="ScriptsMobile\cz.settings.mobile.js" />
+    <Content Include="ScriptsMobile\vccontent.mobile.js" />
+    <Content Include="ScriptsMobile\virtualCanvas.mobile.js" />
+    <Content Include="NewScripts\authoring.js" />
+    <Content Include="NewScripts\breadCrumbs.js" />
+    <Content Include="NewScripts\flash_detect.js" />
+    <None Include="NewScripts\jquery-1.6.4-vsdoc.js" />
+    <Content Include="NewScripts\jquery-1.6.4.js" />
+    <Content Include="NewScripts\jquery-1.6.4.min.js" />
+    <Content Include="NewScripts\jquery-1.7.2.min.js" />
+    <Content Include="NewScripts\jquery.cookie.js" />
+    <Content Include="NewScripts\jquery.signalR-1.0.0-rc2.js" />
+    <Content Include="NewScripts\jquery.signalR-1.0.0-rc2.min.js" />
+    <Content Include="NewScripts\regimesIE.js" />
+    <Content Include="NewScripts\seadragon-min.js" />
+    <Content Include="NewScripts\settings.js" />
+    <Content Include="NewScripts\timescale.js" />
+    <Content Include="NewStyles\timescale.css" />
+    <Content Include="Scripts\axis.js" />
+    <Content Include="Scripts\bibliography.js" />
+    <Content Include="Scripts\breadCrumbs.js" />
+    <Content Include="Scripts\common.js" />
+    <Content Include="Scripts\cz.settings.js" />
+    <Content Include="Scripts\flash_detect.js" />
+    <Content Include="Scripts\gestures.js" />
+    <None Include="Scripts\jquery-1.4.1-vsdoc.js" />
+    <Content Include="Scripts\jquery-1.4.1.js" />
+    <Content Include="Scripts\jquery-1.4.1.min.js" />
+    <Content Include="Scripts\jquery-1.6.2.min.js" />
+    <None Include="Scripts\jquery-1.6.4-vsdoc.js" />
+    <Content Include="Scripts\jquery-1.6.4.js" />
+    <Content Include="Scripts\jquery-1.6.4.min.js" />
+    <Content Include="Scripts\jquery-1.7.2.min.js" />
+    <Content Include="Scripts\jquery-ui-1.8.16.custom.min.js" />
+    <Content Include="Scripts\jquery.cookie.js" />
+    <Content Include="Scripts\jquery.signalR-1.0.0-rc2.js" />
+    <Content Include="Scripts\jquery.signalR-1.0.0-rc2.min.js" />
+    <Content Include="Scripts\layout.js" />
+    <Content Include="Scripts\mouseWheelPlugin.js" />
+    <Content Include="Scripts\regimesIE.js" />
+    <Content Include="Scripts\rx.jQuery.js" />
+    <Content Include="Scripts\rx.js" />
+    <Content Include="Scripts\seadragon-min.js" />
+    <Content Include="Scripts\search.js" />
+    <Content Include="Scripts\tours.js" />
+    <Content Include="Scripts\urlnav.js" />
+    <Content Include="Scripts\vccontent.js" />
+    <Content Include="Scripts\viewport.js" />
+    <Content Include="Scripts\viewportAnimation.js" />
+    <Content Include="Scripts\viewportController.js" />
+    <Content Include="Scripts\virtualCanvas.js" />
+    <Content Include="Styles\axis.css" />
+    <Content Include="Styles\cz.css" />
+    <Content Include="Styles\Site.css" />
+    <Content Include="TraceLog.html" />
+    <Content Include="Trademark_Copyright.htm" />
+    <Content Include="TermsOfUse.htm" />
+    <Content Include="cztransfer.htm" />
+    <Content Include="Images\03cztitle_beta_grey_bold_italic.png" />
+    <Content Include="Images\1280px-CMB_Timeline300_no_WMAP.jpg" />
+    <Content Include="Images\bkmrk_off.jpg" />
+    <Content Include="Images\bkmrk_on.jpg" />
+    <Content Include="Images\Blueprint_Paper.jpg" />
+    <Content Include="Images\close_off.png" />
+    <Content Include="Images\close_on.png" />
+    <Content Include="Images\collapse-down.png" />
+    <Content Include="Images\collapse-left.png" />
+    <Content Include="Images\collapse-up.png" />
+    <Content Include="Images\collapse.png" />
+    <Content Include="Images\expand-right.png" />
+    <Content Include="Images\expand.png" />
+    <Content Include="Images\fullscreen_off.jpg" />
+    <Content Include="Images\LOGO_beta_below.png" />
+    <Content Include="Images\search_off.jpg" />
+    <Content Include="Images\search_on.jpg" />
+    <Content Include="Images\Temp-Thumbnail2.png" />
+    <Content Include="Images\tour_exit_off.jpg" />
+    <Content Include="Images\tour_exit_on.jpg" />
+    <Content Include="Images\tour_next_off.jpg" />
+    <Content Include="Images\tour_next_on.jpg" />
+    <Content Include="Images\tour_off.jpg" />
+    <Content Include="Images\tour_on.jpg" />
+    <Content Include="Images\tour_pause_off.jpg" />
+    <Content Include="Images\tour_pause_on.jpg" />
+    <Content Include="Images\tour_play_off.jpg" />
+    <Content Include="Images\tour_play_on.jpg" />
+    <Content Include="Images\tour_prev_off.jpg" />
+    <Content Include="Images\tour_prev_on.jpg" />
+    <Content Include="ResponseDumpThresholds.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="NewScripts\bibliography.js" />
+    <Content Include="NewScripts\search.js" />
+    <Content Include="ServiceResponse_2012_01_16.txt" />
+    <Content Include="testAudio.htm" />
+    <Content Include="testAudio2.mp3" />
+    <Content Include="Account\ChangePassword.aspx" />
+    <Content Include="Account\ChangePasswordSuccess.aspx" />
+    <Content Include="Account\Login.aspx" />
+    <Content Include="Account\Register.aspx" />
+    <Content Include="Bibliography.htm" />
+    <Content Include="testFallBackPage.htm" />
+    <Content Include="testTour.htm" />
+    <Content Include="testAudio.mp3" />
+    <Content Include="testAudioPlayback.htm" />
+    <Content Include="ResponseDump.txt" />
+    <Content Include="NewScripts\tours.js" />
+    <Content Include="testAsyncImageLoad.htm" />
+    <Content Include="testInfodotContent.htm" />
+    <Content Include="testVirtualCanvasAudioVideoElements.htm" />
+    <Content Include="axis.htm" />
+    <Content Include="Chronozoom.svc" />
+    <Content Include="NewScripts\urlnav.js" />
+    <Content Include="testUrlNav.htm" />
+    <Content Include="Images\chronozoom_title.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\regimes.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="testVCTree.htm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="cz.htm" />
+    <Content Include="Images\4.png" />
+    <Content Include="Images\flower16x16.png" />
+    <Content Include="rihard_shtraus_zaratustra.mp3" />
+    <Content Include="NewScripts\layout.js" />
+    <Content Include="testDynamicLod.htm" />
+    <Content Include="testGestures.htm" />
+    <Content Include="testVirtualCanvasLayout.htm" />
+    <Content Include="testVirtualCanvasOpacity.htm" />
+    <Content Include="css\ui-lightness\images\ui-bg_diagonals-thick_18_b81900_40x40.png" />
+    <Content Include="css\ui-lightness\images\ui-bg_diagonals-thick_20_666666_40x40.png" />
+    <Content Include="css\ui-lightness\images\ui-bg_flat_10_000000_40x100.png" />
+    <Content Include="css\ui-lightness\images\ui-bg_glass_100_f6f6f6_1x400.png" />
+    <Content Include="css\ui-lightness\images\ui-bg_glass_100_fdf5ce_1x400.png" />
+    <Content Include="css\ui-lightness\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="css\ui-lightness\images\ui-bg_gloss-wave_35_f6a828_500x100.png" />
+    <Content Include="css\ui-lightness\images\ui-bg_highlight-soft_100_eeeeee_1x100.png" />
+    <Content Include="css\ui-lightness\images\ui-bg_highlight-soft_75_ffe45c_1x100.png" />
+    <Content Include="css\ui-lightness\images\ui-icons_222222_256x240.png" />
+    <Content Include="css\ui-lightness\images\ui-icons_228ef1_256x240.png" />
+    <Content Include="css\ui-lightness\images\ui-icons_ef8c08_256x240.png" />
+    <Content Include="css\ui-lightness\images\ui-icons_ffd27a_256x240.png" />
+    <Content Include="css\ui-lightness\images\ui-icons_ffffff_256x240.png" />
+    <Content Include="css\ui-lightness\jquery-ui-1.8.16.custom.css" />
+    <Content Include="Global.asax" />
+    <Content Include="Images\flower.png" />
+    <Content Include="NewScripts\axis.js" />
+    <Content Include="NewScripts\common.js" />
+    <Content Include="NewScripts\cz.settings.js" />
+    <Content Include="NewScripts\gestures.js" />
+    <Content Include="NewScripts\jquery-1.6.2.min.js" />
+    <Content Include="NewScripts\jquery-ui-1.8.16.custom.min.js" />
+    <Content Include="NewScripts\mouseWheelPlugin.js" />
+    <Content Include="NewScripts\rx.jQuery.js" />
+    <Content Include="NewScripts\rx.js" />
+    <Content Include="NewScripts\vccontent.js" />
+    <Content Include="NewScripts\viewport.js" />
+    <Content Include="NewScripts\viewportAnimation.js" />
+    <Content Include="NewScripts\viewportController.js" />
+    <Content Include="NewScripts\virtualCanvas.js" />
+    <Content Include="NewStyles\axis.css" />
+    <Content Include="NewStyles\cz.css" />
+    <Content Include="NewStyles\Site.css" />
+    <Content Include="NewScripts\jquery-1.4.1-vsdoc.js" />
+    <Content Include="NewScripts\jquery-1.4.1.js" />
+    <Content Include="NewScripts\jquery-1.4.1.min.js" />
+    <Content Include="testFunctions.htm" />
+    <Content Include="testViewportController.htm" />
+    <Content Include="testVirtualCanvas.htm" />
+    <Content Include="testVirtualCanvasAdvancedElements.htm" />
+    <Content Include="testVirtualCanvasPrimitives.htm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="toursDump.txt" />
+    <Content Include="Web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Account\ChangePassword.aspx.cs">
+      <DependentUpon>ChangePassword.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Account\ChangePassword.aspx.designer.cs">
+      <DependentUpon>ChangePassword.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Account\ChangePasswordSuccess.aspx.cs">
+      <DependentUpon>ChangePasswordSuccess.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Account\ChangePasswordSuccess.aspx.designer.cs">
+      <DependentUpon>ChangePasswordSuccess.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Account\Login.aspx.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Account\Login.aspx.designer.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Account\Register.aspx.cs">
+      <DependentUpon>Register.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Account\Register.aspx.designer.cs">
+      <DependentUpon>Register.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Chronozoom.svc.cs">
+      <DependentUpon>Chronozoom.svc</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\TimelineController.cs" />
+    <Compile Include="cz.aspx.cs">
+      <DependentUpon>cz.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Models\ContentItem.cs" />
+    <Compile Include="Models\Exhibit.cs" />
+    <Compile Include="Models\Globals.cs" />
+    <Compile Include="Models\Reference.cs" />
+    <Compile Include="Models\Timeline.cs" />
+    <Compile Include="Models\Utility.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Site.Master.cs">
+      <DependentUpon>Site.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Site.Master.designer.cs">
+      <DependentUpon>Site.Master</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Site.Master" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Account\Web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Chronozoom.Entities\Chronozoom.Entities.csproj">
+      <Project>{B995D3CF-E31F-4986-A7F7-77988EA275D3}</Project>
+      <Name>Chronozoom.Entities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SignalRTraceListener\OuterCurve.SignalRTraceListener.csproj">
+      <Project>{e9c7a64b-d03b-47d7-89dd-48d046de564c}</Project>
+      <Name>OuterCurve.SignalRTraceListener</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Web.Sandbox.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Web.Staging.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Web.DevPreview.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Web.Production.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\Settings.StyleCop">
+      <Link>Settings.StyleCop</Link>
+    </Content>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>False</AutoAssignPort>
+          <DevelopmentServerPort>4949</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:4949/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
 </Project>
