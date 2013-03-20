@@ -526,9 +526,8 @@ module ChronoZoom {
             // stop active tour
             if (tour) {
                 tour.tourPause();
+                tour.isTourPlayRequested = false;
             }
-
-            tour.isTourPlayRequested = false;
 
             // hide tour' UI
             var tourControlDiv = document.getElementById("tour_control");
