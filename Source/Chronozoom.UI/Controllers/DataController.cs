@@ -1,12 +1,14 @@
-﻿using System.Web.Http;
+﻿using Chronozoom.Api.Wrappers;
+using System.Web.Http;
 
-namespace UI.Controllers
+namespace Chronozoom.Api.Controllers
 {
     public class DataController : ApiController
     {
-        public string Post([FromBody]string value)
+        // todo: implement filtering using searchString and entityType
+        public PostDataResponse Post(PostDataRequest value)
         {
-            return "Hello from DataController.Post()";
-        }
+            return null;   
+        }        
     }
 }
