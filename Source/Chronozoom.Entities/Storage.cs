@@ -56,10 +56,10 @@ namespace Chronozoom.Entities
 
         public DbSet<SuperCollection> SuperCollections { get; set; }
 
-        public Collection<Timeline> TimelinesQuery()
+        public Collection<Timeline> TimelinesQuery(decimal startTime, decimal endTime, decimal span)
         {
             Dictionary<Guid, Timeline> timelinesMap = new Dictionary<Guid, Timeline>();
-            List<Timeline> timelines = FillTimelines(timelinesMap);
+            List<Timeline> timelines = FillTimelines(timelinesMap, startTime, endTime, span);
 
             FillTimelineRelations(timelinesMap);
 
@@ -80,30 +80,43 @@ namespace Chronozoom.Entities
                 if (exhibitRaw.References == null)
                     exhibitRaw.References = new System.Collections.ObjectModel.Collection<Reference>();
 
-                timelinesMap[exhibitRaw.Timeline_ID].Exhibits.Add(exhibitRaw);
-                exhibits[exhibitRaw.Id] = exhibitRaw;
-            }
+                if (timelinesMap.Keys.Contains(exhibitRaw.Timeline_ID))
+                {
+                    timelinesMap[exhibitRaw.Timeline_ID].Exhibits.Add(exhibitRaw);
+                    exhibits[exhibitRaw.Id] = exhibitRaw;
+                }
+        }
 
             // Populate Content Items
             string contentItemsQuery = "SELECT * FROM ContentItems";
             var contentItemsRaw = Database.SqlQuery<ContentItemRaw>(contentItemsQuery);
             foreach (ContentItemRaw contentItemRaw in contentItemsRaw)
-                exhibits[contentItemRaw.Exhibit_ID].ContentItems.Add(contentItemRaw);
+            {
+                if (exhibits.Keys.Contains(contentItemRaw.Exhibit_ID))
+                {
+                    exhibits[contentItemRaw.Exhibit_ID].ContentItems.Add(contentItemRaw);
+                }
+            }
 
             // Populate References
             string referencesQuery = "SELECT * FROM [References]";
             var referencesRaw = Database.SqlQuery<ReferenceRaw>(referencesQuery);
             foreach (ReferenceRaw referenceRaw in referencesRaw)
-                exhibits[referenceRaw.Exhibit_ID].References.Add(referenceRaw);
+            {
+                if (exhibits.Keys.Contains(referenceRaw.Exhibit_ID))
+                {
+                    exhibits[referenceRaw.Exhibit_ID].References.Add(referenceRaw);
+                }
+            }
         }
 
-        private List<Timeline> FillTimelines(Dictionary<Guid, Timeline> timelinesMap)
+        private List<Timeline> FillTimelines(Dictionary<Guid, Timeline> timelinesMap, decimal startTime, decimal endTime, decimal span)
         {
             List<Timeline> timelines = new List<Timeline>();
             Dictionary<Guid, Guid?> timelinesParents = new Dictionary<Guid, Guid?>();
 
             // Populate References
-            string timelinesQuery = "SELECT * FROM Timelines";
+            string timelinesQuery = string.Format(CultureInfo.InvariantCulture, "SELECT * FROM Timelines WHERE FromYear >= {0} AND ToYear <= {1} AND ToYear-FromYear >= {2}", startTime, endTime, span);
             var timelinesRaw = Database.SqlQuery<TimelineRaw>(timelinesQuery);
             foreach (TimelineRaw timelineRaw in timelinesRaw)
             {
@@ -121,7 +134,7 @@ namespace Chronozoom.Entities
             foreach (Timeline timeline in timelinesMap.Values)
             {
                 Guid? parentId = timelinesParents[timeline.Id];
-                if (parentId != null)
+                if (parentId != null && timelinesMap.Keys.Contains((Guid)parentId))
                 {
                     timelinesMap[(Guid)parentId].ChildTimelines.Add(timeline);
                 }
