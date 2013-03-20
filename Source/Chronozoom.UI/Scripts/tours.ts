@@ -69,8 +69,6 @@ module ChronoZoom {
 
             public toggleAudio;
 
-            private ReinitializeAudio;
-
             /* Tour represents a sequence of bookmarks.
             @param title        (string)    Title of the tour.
             @param bookmarks    (non empty array of TourBookmark) A sequence of bookmarks
@@ -103,7 +101,7 @@ module ChronoZoom {
                 Enables or disables an audio playback of the tour.
                 @param isOn (Boolean) whether the audio is enabled
                 */
-                function toggleAudio(isOn) {
+                this.toggleAudio = function toggleAudio(isOn) {
                     if (isOn)
                         this.isAudioEnabled = true;
                     else

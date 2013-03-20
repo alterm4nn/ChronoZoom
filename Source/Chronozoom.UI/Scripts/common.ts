@@ -4,6 +4,8 @@
 /// <reference path='search.ts'/>
 /// <reference path='urlnav.ts'/>
 /// <reference path='layout.ts'/>
+/// <reference path='axis.ts'/>
+/// <reference path='virtualcanvas.ts'/>
 
 // Obsolete functions not included in the typescript base library bindings
 declare var escape: any;

@@ -103,13 +103,13 @@ var ChronoZoom;
                 Enables or disables an audio playback of the tour.
                 @param isOn (Boolean) whether the audio is enabled
                 */
-                function toggleAudio(isOn) {
+                this.toggleAudio = function toggleAudio(isOn) {
                     if(isOn) {
                         this.isAudioEnabled = true;
                     } else {
                         this.isAudioEnabled = false;
                     }
-                }
+                };
 function ReinitializeAudio() {
                     // stop audio playback and clear audio element
                     if(this.audio) {
