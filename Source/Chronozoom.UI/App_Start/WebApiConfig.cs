@@ -7,9 +7,8 @@ namespace Chronozoom.Api
         public static void Register(HttpConfiguration config)
         {
             config.Routes.MapHttpRoute(
-                name: "DefaultApi",
-                routeTemplate: "api/{controller}/{id}",
-                defaults: new { id = RouteParameter.Optional }
+                name: "RestApi",
+                routeTemplate: "api/{controller}"
             );
         }
     }

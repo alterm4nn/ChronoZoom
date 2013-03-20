@@ -10,6 +10,13 @@ namespace Chronozoom.Api.Models
 {
     public class Exhibit
     {
-        
+        public string id;
+        public double time;
+        public string title;
+        public string description;
+        public List<ContentItem> contentItems = new List<ContentItem>();
+
+        // extra
+        public int UniqueID;
     }
 }

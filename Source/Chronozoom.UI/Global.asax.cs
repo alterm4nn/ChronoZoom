@@ -7,9 +7,12 @@
 using Chronozoom.Api;
 using Chronozoom.Api.Models;
 using Chronozoom.Entities;
+using Newtonsoft.Json;
 using OuterCurve;
 using System;
 using System.Diagnostics;
+using System.IO;
+using System.Web.Hosting;
 using System.Web.Http;
 using System.Web.Routing;
 
@@ -30,7 +33,11 @@ namespace UI
             RouteTable.Routes.MapHubs();
             WebApiConfig.Register(GlobalConfiguration.Configuration);
 
-            Globals.initData();
+            using (StreamReader file = File.OpenText(HostingEnvironment.ApplicationPhysicalPath + @"ResponseDumpRest.txt"))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                Globals.Root = (Chronozoom.Api.Models.Timeline)serializer.Deserialize(file, typeof(Chronozoom.Api.Models.Timeline));
+            }
 
             Trace.TraceInformation("Application Starting");
         }
