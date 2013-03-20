@@ -24,34 +24,34 @@ var ChronoZoom;
             }).mouseout(function () {
                 ChronoZoom.Tours.tourButtonHighlight(true);
             });
-            $('human_rect').click(function () {
+            $('#human_rect').click(function () {
                 ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.humanityVisible);
             });
-            $('prehuman_rect').click(function () {
+            $('#prehuman_rect').click(function () {
                 ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.prehistoryVisible);
             });
-            $('life_rect').click(function () {
+            $('#life_rect').click(function () {
                 ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.lifeVisible);
             });
-            $('earth_rect').click(function () {
+            $('#earth_rect').click(function () {
                 ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.earthVisible);
             });
-            $('cosmos_rect').click(function () {
+            $('#cosmos_rect').click(function () {
                 ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.cosmosVisible);
             });
-            $('humanBookmark').click(function () {
+            $('#humanBookmark').click(function () {
                 ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.humanityVisible);
             });
-            $('prehistoryBookmark').click(function () {
+            $('#prehistoryBookmark').click(function () {
                 ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.prehistoryVisible);
             });
-            $('lifeBookmark').click(function () {
+            $('#lifeBookmark').click(function () {
                 ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.lifeVisible);
             });
-            $('earthBookmark').click(function () {
+            $('#earthBookmark').click(function () {
                 ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.earthVisible);
             });
-            $('cosmosBookmark').click(function () {
+            $('#cosmosBookmark').click(function () {
                 ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.cosmosVisible);
             });
             $('#bc_navLeft').click(ChronoZoom.BreadCrumbs.breadCrumbNavLeft);
@@ -89,6 +89,7 @@ var ChronoZoom;
                 ChronoZoom.Common.toggleOffImage('welcomeScreenCloseButton', 'png');
             }).click(ChronoZoom.Common.hideWelcomeScreen);
             $('#closeWelcomeScreenButton').click(ChronoZoom.Common.closeWelcomeScreen);
+            $('#regime_navigator').click(ChronoZoom.Common.passThrough);
             var wlcmScrnCookie = ChronoZoom.Common.getCookie("welcomeScreenDisallowed");
             if(wlcmScrnCookie != null) {
                 ChronoZoom.Common.hideWelcomeScreen();
@@ -162,7 +163,6 @@ var ChronoZoom;
             }//temporary value until there is no data
             ;
             ChronoZoom.Common.regimeNavigator = $('#regime_navigator');
-            ChronoZoom.Common.regimeNavigator.click(ChronoZoom.Common.passThrough);
             ChronoZoom.Common.regimesRatio = 300 / Math.abs(ChronoZoom.Settings.maxPermitedTimeRange.left - ChronoZoom.Settings.maxPermitedTimeRange.right);
             if(window.location.hash) {
                 ChronoZoom.Common.startHash = window.location.hash;

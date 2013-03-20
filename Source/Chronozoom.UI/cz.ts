@@ -29,26 +29,26 @@ module ChronoZoom {
                 .mouseover(() => { ChronoZoom.Tours.tourButtonHighlight(true); })
                 .mouseout(() => { ChronoZoom.Tours.tourButtonHighlight(true); });
 
-            $('human_rect')
+            $('#human_rect')
                 .click(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.humanityVisible); });
-            $('prehuman_rect')
+            $('#prehuman_rect')
                 .click(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.prehistoryVisible); });
-            $('life_rect')
+            $('#life_rect')
                 .click(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.lifeVisible); });
-            $('earth_rect')
+            $('#earth_rect')
                 .click(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.earthVisible); });
-            $('cosmos_rect')
+            $('#cosmos_rect')
                 .click(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.cosmosVisible); });
 
-            $('humanBookmark')
+            $('#humanBookmark')
                 .click(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.humanityVisible); });
-            $('prehistoryBookmark')
+            $('#prehistoryBookmark')
                 .click(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.prehistoryVisible); });
-            $('lifeBookmark')
+            $('#lifeBookmark')
                 .click(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.lifeVisible); });
-            $('earthBookmark')
+            $('#earthBookmark')
                 .click(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.earthVisible); });
-            $('cosmosBookmark')
+            $('#cosmosBookmark')
                 .click(() => { ChronoZoom.Search.navigateToBookmark(ChronoZoom.Common.cosmosVisible); });
 
             $('#bc_navLeft')
@@ -89,6 +89,9 @@ module ChronoZoom {
                 .click(ChronoZoom.Common.hideWelcomeScreen);
             $('#closeWelcomeScreenButton')
                 .click(ChronoZoom.Common.closeWelcomeScreen);
+
+            $('#regime_navigator')
+                .click(ChronoZoom.Common.passThrough);
 
             var wlcmScrnCookie = ChronoZoom.Common.getCookie("welcomeScreenDisallowed");
             if (wlcmScrnCookie != null) {
@@ -165,7 +168,7 @@ module ChronoZoom {
             ChronoZoom.Common.maxPermitedVerticalRange = { top: 0, bottom: 10000000 }; //temporary value until there is no data
 
             ChronoZoom.Common.regimeNavigator = $('#regime_navigator');
-            ChronoZoom.Common.regimeNavigator.click(ChronoZoom.Common.passThrough);
+            
             ChronoZoom.Common.regimesRatio = 300 / Math.abs(ChronoZoom.Settings.maxPermitedTimeRange.left - ChronoZoom.Settings.maxPermitedTimeRange.right);
 
             if (window.location.hash)

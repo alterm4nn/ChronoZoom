@@ -222,7 +222,7 @@ module ChronoZoom {
             // add breadcrumb to table
             var parent = $(".breadCrumbTable tr");
             $("<td class='breadCrumbTableCell' id='bc_" + length + "'>" +
-                    "<div class='breadCrumbLink' id='bc_link_" + element.id + "' onclick='clickOverBreadCrumb(\"" + element.id + "\", " + length + ")'>" + element.title + "</div>" +
+                    "<div class='breadCrumbLink' id='bc_link_" + element.id + "' onclick='ChronoZoom.BreadCrumbs.clickOverBreadCrumb(\"" + element.id + "\", " + length + ")'>" + element.title + "</div>" +
                     "<span class='breadCrumbSeparator' id='bc_'>&rsaquo;</span>" +
               "</td>")
                .appendTo(parent);
@@ -315,7 +315,7 @@ module ChronoZoom {
         // Handles click over breadcrumb link.
         // @param   timelineID          (string) id of timeline to navigate.
         // @param   breadCrumbLinkID    (string) id of table element which breadcrumb link was cliked.
-        function clickOverBreadCrumb(timelineID, breadCrumbLinkID) {
+        export function clickOverBreadCrumb(timelineID, breadCrumbLinkID) {
             ChronoZoom.Search.goToSearchResult(timelineID); // start EllipticalZoom to element
 
             var selector = "#bc_" + breadCrumbLinkID;

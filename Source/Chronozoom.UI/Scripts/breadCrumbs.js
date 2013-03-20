@@ -212,7 +212,7 @@ var ChronoZoom;
             var length = $(".breadCrumbTable tr td").length;
             // add breadcrumb to table
             var parent = $(".breadCrumbTable tr");
-            $("<td class='breadCrumbTableCell' id='bc_" + length + "'>" + "<div class='breadCrumbLink' id='bc_link_" + element.id + "' onclick='clickOverBreadCrumb(\"" + element.id + "\", " + length + ")'>" + element.title + "</div>" + "<span class='breadCrumbSeparator' id='bc_'>&rsaquo;</span>" + "</td>").appendTo(parent);
+            $("<td class='breadCrumbTableCell' id='bc_" + length + "'>" + "<div class='breadCrumbLink' id='bc_link_" + element.id + "' onclick='ChronoZoom.BreadCrumbs.clickOverBreadCrumb(\"" + element.id + "\", " + length + ")'>" + element.title + "</div>" + "<span class='breadCrumbSeparator' id='bc_'>&rsaquo;</span>" + "</td>").appendTo(parent);
             // select color of the text for this breadcrumb
             switch(element.regime) {
                 case "Cosmos":
@@ -313,6 +313,7 @@ var ChronoZoom;
                 showHiddenBreadCrumb("right", breadCrumbLinkID);
             }
         }
+        BreadCrumbs.clickOverBreadCrumb = clickOverBreadCrumb;
         // Functions to change breadcrumb's link color, to avoid bug when <class:hover> doesn't work in IE when mouse enter breadcrumb link
         // through image that is right to it.
         function breadCrumbMouseOut(element) {
