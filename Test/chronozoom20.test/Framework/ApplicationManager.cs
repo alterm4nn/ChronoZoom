@@ -5,14 +5,14 @@ namespace Framework
     public class ApplicationManager
     {
         private static ApplicationManager _singleton;
-        private Environment _environment;
-        private NavigationHelper _navigationHelper;
-        private BrowserStateManager _browserStateManager;
-        private ScreenshotManager _screenshotManager;
-        private HomePageHelper _homePageHelper;
-        private TourHelper _tourHelper;
-        private BookmarkHelper _bookmarkHelper;
-        private TimelineHelper _timelineHelper;
+        private static Environment _environment;
+        private static NavigationHelper _navigationHelper;
+        private static BrowserStateManager _browserStateManager;
+        private static ScreenshotManager _screenshotManager;
+        private static HomePageHelper _homePageHelper;
+        private static TourHelper _tourHelper;
+        private static BookmarkHelper _bookmarkHelper;
+        private static TimelineHelper _timelineHelper;
 
         public static ApplicationManager GetInstance()
         {

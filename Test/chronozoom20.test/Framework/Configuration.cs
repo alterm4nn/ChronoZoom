@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Xml;
 using Framework.Constants;
@@ -27,14 +28,14 @@ namespace Framework
             BrowserName = GetConfigProperty(ConfigProperties.BrowserName);
             BaseUrl = GetConfigProperty(ConfigProperties.BaseUrl);
             HubUrl = GetConfigProperty(ConfigProperties.HubUrl);
-            ImplicitWait = GetIntConfigProperty(ConfigProperties.ImplicitWait);
-            ExplicitWait = GetIntConfigProperty(ConfigProperties.ExplicitWait);
-            IsUsingGrid = GetBoolConfigProperty(ConfigProperties.IsUsingGrid);
+            ImplicitWait = GetProperty<int>(ConfigProperties.ImplicitWait);
+            ExplicitWait = GetProperty<int>(ConfigProperties.ExplicitWait);
+            IsUsingGrid = GetProperty<bool>(ConfigProperties.IsUsingGrid);
             BrowserVersion = GetConfigProperty(ConfigProperties.BrowserVersion);
             Platform = GetConfigProperty(ConfigProperties.PlatformName);
-            HighlightWait = GetIntConfigProperty(ConfigProperties.HighlightWait);
-            HasHighliting = GetBoolConfigProperty(ConfigProperties.HasHighliting);
-            ConnectionWait = GetIntConfigProperty(ConfigProperties.ConnectionWait);
+            HighlightWait = GetProperty<int>(ConfigProperties.HighlightWait);
+            HasHighliting = GetProperty<bool>(ConfigProperties.HasHighliting);
+            ConnectionWait = GetProperty<int>(ConfigProperties.ConnectionWait);
         }
 
         #region HelperMethods
@@ -58,15 +59,21 @@ namespace Framework
             return _keyValue;
         }
 
-        private static int GetIntConfigProperty(string property)
+        private static T GetProperty<T>(string property) where T : IConvertible
         {
-            return int.Parse(GetConfigProperty(property));
+            var thisType = default(T);
+            var typeCode = thisType.GetTypeCode();
+            if (typeCode == TypeCode.Boolean)
+            {
+                return (T)Convert.ChangeType(GetConfigProperty(property), typeCode);
+            }
+            if (typeCode == TypeCode.Int32)
+            {
+                return (T)Convert.ChangeType(GetConfigProperty(property), typeCode);
+            }
+            return thisType;
         }
 
-        private static bool GetBoolConfigProperty(string property)
-        {
-            return bool.Parse(GetConfigProperty(property));
-        }
         #endregion
 
     }

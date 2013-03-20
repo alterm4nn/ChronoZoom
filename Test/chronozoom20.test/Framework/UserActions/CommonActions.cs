@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using System.Net;
 using System.Threading;
-using System.Windows.Forms;
 using Framework.Extensions;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
@@ -196,6 +195,14 @@ namespace Framework.UserActions
             chain.Invoke().Build().Perform();
         }
 
+        private bool AreEqualViewports()
+        {
+            string v1 = GetJavaScriptExecutionResult("$('#vc').virtualCanvas('getViewport')");
+            Sleep(2);
+            string v2 = GetJavaScriptExecutionResult("$('#vc').virtualCanvas('getViewport')");
+            return v1 == v2;
+        }
+
         protected void ClickElementAndType(By by, string text)
         {
             IWebElement element = FindElement(by);
@@ -320,12 +327,5 @@ namespace Framework.UserActions
             WaitCondition(AreEqualViewports, 60);
         }
 
-        private bool AreEqualViewports()
-        {
-            string v1 = GetJavaScriptExecutionResult("$('#vc').virtualCanvas('getViewport')");
-            Sleep(2);
-            string v2 = GetJavaScriptExecutionResult("$('#vc').virtualCanvas('getViewport')");
-            return v1 == v2;
-        }
     }
 }
