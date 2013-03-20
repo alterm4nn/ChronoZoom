@@ -12,8 +12,27 @@ namespace Chronozoom.Api.Controllers
         {
             if (request.ids != null && request.ids.Count > 0)
             {
+                var dictIds = new Dictionary<string, bool>();
+                foreach (var id in request.ids) dictIds.Add(id, true);
+                var dictTimelines = new Dictionary<string, TimelineWithChildTimelineIds>();
+                var dictExhibits = new Dictionary<string, Exhibit>();
+                var dictContentItems = new Dictionary<string, ContentItem>();
+                FindElements(Globals.Root, dictIds, dictTimelines, dictExhibits, dictContentItems);
+
+                TimelineWithChildTimelineIds timeline;
+                Exhibit exhibit;
+                ContentItem contentItem;
+
                 var response = new PostDataResponse();
-                FindElements(Globals.Root, request.ids, ref response);
+                foreach (var id in request.ids)
+                {
+                    if (dictTimelines.TryGetValue(id, out timeline))
+                        response.timelines.Add(timeline);
+                    else if (dictExhibits.TryGetValue(id, out exhibit))
+                        response.exhibits.Add(exhibit);
+                    else if (dictContentItems.TryGetValue(id, out contentItem))
+                        response.contentItems.Add(contentItem);
+                }
                 return response;
             }
             else
@@ -22,23 +41,28 @@ namespace Chronozoom.Api.Controllers
             }
         }
      
-        private void FindElements(Timeline timeline, List<string> ids, ref PostDataResponse response)
+        private void FindElements(
+            Timeline timeline, 
+            Dictionary<string, bool> ids, 
+            Dictionary<string, TimelineWithChildTimelineIds> dictTimelines, 
+            Dictionary<string, Exhibit> dictExhibits, 
+            Dictionary<string, ContentItem> dictContentItems)
         {
-            if (ids.Contains(timeline.id))
-                response.timelines.Add(timeline.CloneData());
+            if (ids.ContainsKey(timeline.id))
+                dictTimelines.Add(timeline.id, timeline.CloneData());
 
             foreach (var exhibit in timeline.exhibits)
             {
-                if (ids.Contains(exhibit.id))
-                    response.exhibits.Add(exhibit.CloneData());
+                if (ids.ContainsKey(exhibit.id))
+                    dictExhibits.Add(exhibit.id, exhibit.CloneData());
 
                 foreach (var contentItem in exhibit.contentItems)
-                    if (ids.Contains(contentItem.id))
-                        response.contentItems.Add(contentItem.CloneData());
+                    if (ids.ContainsKey(contentItem.id))
+                        dictContentItems.Add(contentItem.id, contentItem.CloneData());
             }
 
             foreach (var childTimeline in timeline.timelines)
-                FindElements(childTimeline, ids, ref response);
+                FindElements(childTimeline, ids, dictTimelines, dictExhibits, dictContentItems);
         }
     }
 }

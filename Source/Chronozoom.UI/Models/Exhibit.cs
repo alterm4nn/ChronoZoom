@@ -32,7 +32,7 @@ namespace Chronozoom.Api.Models
                 time = exhibit.time,
                 title = exhibit.title,
                 description = exhibit.description,
-                contentItems = null,
+                contentItems = new List<ContentItem>(),
 
                 // extra properties for backward compatibility
                 UniqueID = exhibit.UniqueID

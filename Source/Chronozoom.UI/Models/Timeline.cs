@@ -56,8 +56,8 @@ namespace Chronozoom.Api.Models
                 start = timeline.start,
                 end = timeline.end,
                 title = timeline.title,
-                exhibits = null,
-                timelines = null,
+                exhibits = new List<Exhibit>(),
+                timelines = new List<Timeline>(),
 
                 // extra properties for backward compatibility
                 UniqueID = timeline.UniqueID,

@@ -18,57 +18,48 @@ namespace Chronozoom.Api.Controllers
             return FilterTimelines(tlca, start, end, minspan);
         }
 
-        private static Timeline FindTimeline(Timeline t1, string id)
+        private static Timeline FindTimeline(Timeline timeline, string id)
         {
-            if (t1 == null || string.IsNullOrEmpty(id))
+            if (timeline == null || string.IsNullOrEmpty(id))
                 return null;
 
-            if (t1.id == id)
+            if (timeline.id == id)
             {
-                return t1;
+                return timeline;
             }
             else
             {
-                foreach (var t2 in t1.timelines)
+                foreach (var childTimeline in timeline.timelines)
                 {
-                    var t3 = FindTimeline(t2, id);
-
-                    if (t3 != null)
-                        return t3;
+                    var timelineResult = FindTimeline(childTimeline, id);
+                    if (timelineResult != null)
+                        return timelineResult;
                 }
-
                 return null;
             }
         }
 
-        private static Timeline FilterTimelines(Timeline t1, double start, double end, double minspan)
+        private static Timeline FilterTimelines(Timeline timeline, double start, double end, double minspan)
         {
-            if (t1 == null)
+            if (timeline == null)
                 return null;
 
-            if (!(t1.start < start && t1.end < start || t1.start > end && t1.end > end) && (t1.end - t1.start >= minspan))
+            if (!(timeline.start < start && timeline.end < start || timeline.start > end && timeline.end > end) 
+                && (timeline.end - timeline.start >= minspan))
             {
-                var t2 = t1.CloneStructure();
-                t2.exhibits = new List<Exhibit>();
-                t2.timelines = new List<Timeline>();
-
-                foreach (var e1 in t1.exhibits)
-                {
-                    var e2 = e1.CloneStructure();
-                    t2.exhibits.Add(e2);
-                }
-
-                foreach (var t3 in t1.timelines)
-                {
-                    t2.timelines.Add(FilterTimelines(t3, start, end, minspan));
-                }
-
-                return t2;
+                var timelineResult = timeline.CloneStructure();
+                foreach (var exhibit in timeline.exhibits)
+                    timelineResult.exhibits.Add(exhibit.CloneStructure());
+                foreach (var childTimeline in timeline.timelines)
+                    timelineResult.timelines.Add(FilterTimelines(childTimeline, start, end, minspan));
+                return timelineResult;
             }
             else
             {
-                var t2 = t1.CloneStructure();
-                return t2;
+                var timelineResult = timeline.CloneStructure();
+                timelineResult.exhibits = null;
+                timelineResult.timelines = null;
+                return timelineResult;
             }
         }
     }
