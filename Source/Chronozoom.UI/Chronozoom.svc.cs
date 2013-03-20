@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -32,23 +33,55 @@ namespace UI
 
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public IEnumerable<Timeline> Get()
+        public IEnumerable<Timeline> Get(string start, string end, string timespan)
         {
-            Trace.TraceInformation("Get Timelines");
+            Trace.TraceInformation("Get Filtered Timelines");
 
             lock (Cache)
             {
-                if (!Cache.Contains("Timelines"))
+                // use the cached data if all data has to be retrieved
+                if (AllDataRequested(start, end, timespan) && Cache.Contains("Timelines"))
                 {
                     Trace.TraceInformation("Get Timelines Cache Miss");
-
-                    Timeline t = _storage.TimelinesQuery().Single(timeline => timeline.Id == Guid.Empty);
-                    Cache.Add("Timelines", new[] { t }, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
+                    return (IEnumerable<Timeline>) Cache["Timelines"];
                 }
 
-                return (IEnumerable<Timeline>)Cache["Timelines"];
+                // initialize filters
+                decimal startTime = string.IsNullOrWhiteSpace(start) ? -20000000000 : decimal.Parse(start);
+                decimal endTime = string.IsNullOrWhiteSpace(end) ? 9999 : decimal.Parse(end);
+                decimal span = string.IsNullOrWhiteSpace(timespan) ? 0 : decimal.Parse(timespan);
+
+                Collection<Timeline> timelines = _storage.TimelinesQuery(startTime, endTime, span);
+
+                // cache only when all data is requested
+                if (AllDataRequested(start, end, timespan))
+                {
+                    Timeline t; // only required for caching
+                    if (timelines.Any())
+                    {
+                        t = timelines.Single(timeline => timeline.Id == Guid.Empty); 
+                    }
+                    else
+                    {
+                        Trace.TraceInformation("No Timelines found");
+                        return null;
+                    }
+
+                    Trace.TraceInformation("Add Timelines to cache");
+                    Cache.Add("Timelines", new[] {t},
+                              DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"],
+                                                                CultureInfo.InvariantCulture)));
+                }
+
+                return (IEnumerable<Timeline>)timelines;
             }
         }
+
+        private static bool AllDataRequested(string start, string end, string timespan)
+        {
+            return string.IsNullOrWhiteSpace(start) && string.IsNullOrWhiteSpace(end) && string.IsNullOrWhiteSpace(timespan);
+        }
+
 
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
         [OperationContract]
