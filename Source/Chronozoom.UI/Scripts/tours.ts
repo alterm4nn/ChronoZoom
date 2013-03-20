@@ -152,7 +152,7 @@ module ChronoZoom {
                         if (isToursDebugEnabled && window.console && console.log("Tour " + self.title + " readystate 4"));
                     });
                     self.audio.addEventListener("progress", function () {
-                        if (self.audio.buffered.length > 0)
+                        if (self.audio && self.audio.buffered.length > 0)
                             if (isToursDebugEnabled && window.console && console.log("Tour " + self.title + " downloaded " + (self.audio.buffered.end(self.audio.buffered.length - 1) / self.audio.duration)));
                     });
 
