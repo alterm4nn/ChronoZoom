@@ -1,7 +1,5 @@
-﻿using Chronozoom.Models;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
-using System.Diagnostics;
 using System.IO;
 
 namespace ResponseDumpConverter
@@ -12,31 +10,112 @@ namespace ResponseDumpConverter
         {
             Console.Write("Converting ResponseDump ... ");
 
-            StreamReader file = null;
+            #region Read ResponseDump.txt
+            StreamReader fileIn = null;
             try
             {
-                file = File.OpenText(@"ResponseDump.txt");
+                fileIn = File.OpenText(@"..\..\..\Chronozoom.UI\ResponseDump.txt");
                 var serializer = new JsonSerializer();
-                var r = (ReponseDump)serializer.Deserialize(file, typeof(ReponseDump));
+                var r = (ReponseDump)serializer.Deserialize(fileIn, typeof(ReponseDump));
                 Chronozoom.Models.Globals.Root = r.d[0];
             }
             catch (Exception e)
             {
-                Debug.WriteLine(e.Message);
+                if (fileIn != null) fileIn.Close();
+                Console.WriteLine("[Fail]");
+                Console.WriteLine(e.Message);
+                Console.ReadKey();
+                return;
             }
             finally
             {
-                if (file != null)
-                    file.Close();
+                if (fileIn != null) fileIn.Close();
+            }
+            #endregion
+
+            # region Convert ResponseDump to ResponseDumpRest
+            try
+            {
+                Chronozoom.Models.Rest.Globals.Root = ConvertToRest(Chronozoom.Models.Globals.Root, null);
+            } 
+            catch (Exception e)
+            {
+                Console.WriteLine("[Fail]");
+                Console.WriteLine(e.Message);
+                Console.ReadKey();
+                return;
+            }
+            #endregion
+
+            #region Write ResponseDumpRest.txt
+            StreamWriter fileOut = null;
+            try
+            {
+                fileOut = File.CreateText(@"..\..\..\Chronozoom.UI\ResponseDumpRest.txt");
+                var serializer = new JsonSerializer();
+                serializer.Serialize(fileOut, Chronozoom.Models.Rest.Globals.Root);
+            }
+            catch (Exception e)
+            {
+                if (fileOut != null) fileOut.Close();
+                Console.WriteLine("[Fail]");
+                Console.WriteLine(e.Message);
+                Console.ReadKey();
+            }
+            finally
+            {
+                if (fileOut != null) fileOut.Close();
+            }
+            #endregion
+
+            Console.WriteLine("[Success]");
+            Console.ReadKey();
+        }
+
+        private static Chronozoom.Models.Rest.Timeline ConvertToRest(Chronozoom.Models.Timeline t1, Chronozoom.Models.Timeline p1)
+        {
+            var t2 = new Chronozoom.Models.Rest.Timeline();
+            t2.id = "t" + t1.UniqueID.ToString();
+            t2.parent = (p1 == null) ? "" : p1.ID;
+            t2.start = Utility.ParseDateTime(t1.FromTimeUnit, t1.FromDay, t1.FromMonth, t1.FromYear);
+            t2.end = Utility.ParseDateTime(t1.ToTimeUnit, t1.ToDay, t1.ToMonth, t1.ToYear);
+            t2.title = t1.Title;
+            t2.UniqueID = t1.UniqueID;
+            t2.Regime = t1.Regime;
+            t2.Height = t1.Height;
+
+            foreach (var e1 in t1.Exhibits)
+            {
+                var e2 = new Chronozoom.Models.Rest.Exhibit();
+                e2.id = "e" + e1.UniqueID.ToString();
+                e2.time = Utility.ParseDateTime(e1.TimeUnit, e1.Day, e1.Month, e1.Year);
+                e2.title = e1.Title;
+                e2.description = "";
+                e2.UniqueID = e1.UniqueID;
+
+                foreach (var c1 in e1.ContentItems)
+                {
+                    var c2 = new Chronozoom.Models.Rest.ContentItem();
+                    c2.id = "c" + c1.UniqueID.ToString();
+                    c2.title = c1.Title;
+                    c2.description = c1.Caption;
+                    c2.uri = c1.Uri;
+                    c2.mediaType = c1.MediaType;
+                    c2.UniqueID = c1.UniqueID;
+                    c2.guid = c1.ID;
+                    c2.order = c1.Order ?? 0;
+                    e2.contentItems.Add(c2);
+                }
+
+                t2.exhibits.Add(e2);
             }
 
-            // convert to rest based model
+            foreach (var child in t1.ChildTimelines)
+            {
+                t2.timelines.Add(ConvertToRest(child, t1));
+            }
 
-            // write rest model to file
-
-
-            Console.WriteLine("[Done]");
-            Console.ReadKey();
+            return t2;
         }
     }
 }

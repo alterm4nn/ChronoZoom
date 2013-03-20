@@ -30,24 +30,5 @@ namespace Chronozoom.Models
 
         public List<Timeline> ChildTimelines = new List<Timeline>();
         public List<Exhibit> Exhibits = new List<Exhibit>();
-
-        // additional properties and methods
-        [JsonIgnore]
-        public double left;
-        [JsonIgnore]
-        public double right;
-        [JsonIgnore]
-        public double width;
-
-        public bool isBuffered;
-        public int pathID = -1;
-
-        public Timeline clone()
-        {
-            var tl = (Timeline)this.MemberwiseClone();
-            tl.ChildTimelines = new List<Timeline>();
-            tl.Exhibits = new List<Exhibit>();
-            return tl;
-        }
     }
 }

@@ -23,14 +23,5 @@ namespace Chronozoom.Models
 
         public List<ContentItem> ContentItems = new List<ContentItem>();
         public List<Reference> References = new List<Reference>();
-
-        // additional properties and methods
-        public Exhibit clone()
-        {
-            var e = (Exhibit)this.MemberwiseClone();
-            e.ContentItems = new List<ContentItem>();
-            e.References = new List<Reference>();
-            return e;
-        }
     }
 }
