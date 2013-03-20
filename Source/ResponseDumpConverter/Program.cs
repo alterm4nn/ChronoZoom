@@ -75,11 +75,12 @@ namespace ResponseDumpConverter
         private static Chronozoom.Models.Rest.Timeline ConvertToRest(Chronozoom.Models.Timeline t1, Chronozoom.Models.Timeline p1)
         {
             var t2 = new Chronozoom.Models.Rest.Timeline();
-            t2.id = "t" + t1.UniqueID.ToString();
-            t2.parent = (p1 == null) ? "" : p1.ID;
+            t2.id = t1.ID;
+            t2.parent = (p1 == null) ? null : p1.ID;
             t2.start = Utility.ParseDateTime(t1.FromTimeUnit, t1.FromDay, t1.FromMonth, t1.FromYear);
             t2.end = Utility.ParseDateTime(t1.ToTimeUnit, t1.ToDay, t1.ToMonth, t1.ToYear);
             t2.title = t1.Title;
+            // extra timeline properties for backward compatibility
             t2.UniqueID = t1.UniqueID;
             t2.Regime = t1.Regime;
             t2.Height = t1.Height;
@@ -87,23 +88,26 @@ namespace ResponseDumpConverter
             foreach (var e1 in t1.Exhibits)
             {
                 var e2 = new Chronozoom.Models.Rest.Exhibit();
-                e2.id = "e" + e1.UniqueID.ToString();
+                e2.id = e1.ID;
+                e2.parent = t1.ID;
                 e2.time = Utility.ParseDateTime(e1.TimeUnit, e1.Day, e1.Month, e1.Year);
                 e2.title = e1.Title;
-                e2.description = "";
+                e2.description = string.Empty;
+                // extra exhibit properties for backward compatibility
                 e2.UniqueID = e1.UniqueID;
 
                 foreach (var c1 in e1.ContentItems)
                 {
                     var c2 = new Chronozoom.Models.Rest.ContentItem();
-                    c2.id = "c" + c1.UniqueID.ToString();
+                    c2.id = c1.ID;
+                    c2.parent = e1.ID;
                     c2.title = c1.Title;
                     c2.description = c1.Caption;
                     c2.uri = c1.Uri;
                     c2.mediaType = c1.MediaType;
+                    // extra ContentItem properties for backward compatibility
                     c2.UniqueID = c1.UniqueID;
-                    c2.guid = c1.ID;
-                    c2.order = c1.Order ?? 0;
+                    c2.Order = c1.Order;
                     e2.contentItems.Add(c2);
                 }
 
