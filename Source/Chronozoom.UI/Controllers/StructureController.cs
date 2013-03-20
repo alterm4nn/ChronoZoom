@@ -17,7 +17,7 @@ namespace Chronozoom.Api.Controllers
             return FilterTimelines(tlca, start, end, minspan);
         }
 
-        private static Timeline FindTimeline(this Timeline t1, string id)
+        private static Timeline FindTimeline(Timeline t1, string id)
         {
             if (t1 == null || string.IsNullOrEmpty(id))
                 return null;
@@ -40,7 +40,7 @@ namespace Chronozoom.Api.Controllers
             }
         }
 
-        private static Timeline FilterTimelines(this Timeline t1, double start, double end, double minspan)
+        private static Timeline FilterTimelines(Timeline t1, double start, double end, double minspan)
         {
             if (t1 == null)
                 return null;

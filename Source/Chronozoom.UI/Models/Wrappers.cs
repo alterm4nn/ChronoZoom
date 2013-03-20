@@ -12,8 +12,8 @@ namespace Chronozoom.Api.Wrappers
 
     public class PostDataResponse
     {
-        public List<Timeline> timelines;
-        public List<Exhibit> exhibits;
-        public List<ContentItem> contentItems;
+        public List<Timeline> timelines = new List<Timeline>();
+        public List<Exhibit> exhibits = new List<Exhibit>();
+        public List<ContentItem> contentItems = new List<ContentItem>();
     }   
 }
