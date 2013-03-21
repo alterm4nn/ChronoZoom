@@ -78,7 +78,6 @@ namespace Chronozoom.Entities
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Object property needs to be initialized externally")]
         public virtual Collection<Exhibit> Exhibits { get; set; }
 
-        [DataMember]
         public virtual Entities.Collection Collection { get; set; }
     }
 

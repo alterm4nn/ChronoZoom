@@ -56,10 +56,10 @@ namespace Chronozoom.Entities
 
         public DbSet<SuperCollection> SuperCollections { get; set; }
 
-        public Collection<Timeline> TimelinesQuery(decimal startTime, decimal endTime, decimal span)
+        public Collection<Timeline> TimelinesQuery(Guid collectionId, decimal startTime, decimal endTime, decimal span)
         {
             Dictionary<Guid, Timeline> timelinesMap = new Dictionary<Guid, Timeline>();
-            List<Timeline> timelines = FillTimelines(timelinesMap, startTime, endTime, span);
+            List<Timeline> timelines = FillTimelines(collectionId, timelinesMap, startTime, endTime, span);
 
             FillTimelineRelations(timelinesMap);
 
@@ -68,8 +68,15 @@ namespace Chronozoom.Entities
 
         private void FillTimelineRelations(Dictionary<Guid, Timeline> timelinesMap)
         {
+            if (!timelinesMap.Keys.Any())
+                return;
+
             // Populate Exhibits
-            string exhibitsQuery = "SELECT * FROM Exhibits";
+            string exhibitsQuery = string.Format(
+                CultureInfo.InvariantCulture,
+                "SELECT * FROM Exhibits WHERE Timeline_Id IN ('{0}')",
+                string.Join("', '", timelinesMap.Keys.ToArray()));
+
             var exhibitsRaw = Database.SqlQuery<ExhibitRaw>(exhibitsQuery);
             Dictionary<Guid, Exhibit> exhibits = new Dictionary<Guid, Exhibit>();
             foreach (ExhibitRaw exhibitRaw in exhibitsRaw)
@@ -85,39 +92,48 @@ namespace Chronozoom.Entities
                     timelinesMap[exhibitRaw.Timeline_ID].Exhibits.Add(exhibitRaw);
                     exhibits[exhibitRaw.Id] = exhibitRaw;
                 }
-        }
-
-            // Populate Content Items
-            string contentItemsQuery = "SELECT * FROM ContentItems";
-            var contentItemsRaw = Database.SqlQuery<ContentItemRaw>(contentItemsQuery);
-            foreach (ContentItemRaw contentItemRaw in contentItemsRaw)
-            {
-                if (exhibits.Keys.Contains(contentItemRaw.Exhibit_ID))
-                {
-                    exhibits[contentItemRaw.Exhibit_ID].ContentItems.Add(contentItemRaw);
-                }
             }
 
-            // Populate References
-            string referencesQuery = "SELECT * FROM [References]";
-            var referencesRaw = Database.SqlQuery<ReferenceRaw>(referencesQuery);
-            foreach (ReferenceRaw referenceRaw in referencesRaw)
+            if (exhibits.Keys.Any())
             {
-                if (exhibits.Keys.Contains(referenceRaw.Exhibit_ID))
+                // Populate Content Items
+                string contentItemsQuery = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "SELECT * FROM ContentItems WHERE Exhibit_Id IN ('{0}')",
+                    string.Join("', '", exhibits.Keys.ToArray()));
+                var contentItemsRaw = Database.SqlQuery<ContentItemRaw>(contentItemsQuery);
+                foreach (ContentItemRaw contentItemRaw in contentItemsRaw)
                 {
-                    exhibits[referenceRaw.Exhibit_ID].References.Add(referenceRaw);
+                    if (exhibits.Keys.Contains(contentItemRaw.Exhibit_ID))
+                    {
+                        exhibits[contentItemRaw.Exhibit_ID].ContentItems.Add(contentItemRaw);
+                    }
+                }
+
+                // Populate References
+                string referencesQuery = string.Format(CultureInfo.InvariantCulture,
+                    "SELECT * FROM [References] WHERE Exhibit_Id IN ('{0}')",
+                    string.Join("', '", exhibits.Keys.ToArray()));
+                var referencesRaw = Database.SqlQuery<ReferenceRaw>(referencesQuery);
+                foreach (ReferenceRaw referenceRaw in referencesRaw)
+                {
+                    if (exhibits.Keys.Contains(referenceRaw.Exhibit_ID))
+                    {
+                        exhibits[referenceRaw.Exhibit_ID].References.Add(referenceRaw);
+                    }
                 }
             }
         }
 
-        private List<Timeline> FillTimelines(Dictionary<Guid, Timeline> timelinesMap, decimal startTime, decimal endTime, decimal span)
+        private List<Timeline> FillTimelines(Guid collectionId, Dictionary<Guid, Timeline> timelinesMap, decimal startTime, decimal endTime, decimal span)
         {
             List<Timeline> timelines = new List<Timeline>();
             Dictionary<Guid, Guid?> timelinesParents = new Dictionary<Guid, Guid?>();
 
             // Populate References
-            string timelinesQuery = string.Format(CultureInfo.InvariantCulture, "SELECT * FROM Timelines WHERE FromYear >= {0} AND ToYear <= {1} AND ToYear-FromYear >= {2}", startTime, endTime, span);
-            var timelinesRaw = Database.SqlQuery<TimelineRaw>(timelinesQuery);
+            string timelinesQuery = "SELECT * FROM Timelines WHERE FromYear >= {0} AND ToYear <= {1} AND ToYear-FromYear >= {2} AND Collection_Id = {3}";
+            var timelinesRaw = Database.SqlQuery<TimelineRaw>(timelinesQuery, startTime, endTime, span, collectionId);
+
             foreach (TimelineRaw timelineRaw in timelinesRaw)
             {
                 if (timelineRaw.ChildTimelines == null)

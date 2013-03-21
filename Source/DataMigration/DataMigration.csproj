@@ -60,7 +60,13 @@
     <None Include="..\Settings.StyleCop">
       <Link>Settings.StyleCop</Link>
     </None>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Dumps\beta-get.json" />
+    <None Include="Dumps\beta-getthresholds.json" />
+    <None Include="Dumps\beta-gettours.json" />
+    <None Include="Dumps\aidsstandalone-get.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -75,6 +81,11 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <None Include="Dumps\aidstimeline-get.json" />
+    <None Include="Dumps\aidstimeline-gettours.json" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

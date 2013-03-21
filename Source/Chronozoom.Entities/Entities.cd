@@ -13,13 +13,13 @@
     </Members>
     <AssociationLine Name="ContentItems" Type="Chronozoom.Entities.ContentItem" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="6.625" Y="6.18" />
-        <Point X="6.625" Y="7.032" />
-        <Point X="7.25" Y="7.032" />
+        <Point X="6.625" Y="6.372" />
+        <Point X="6.625" Y="7.138" />
+        <Point X="7.25" Y="7.138" />
       </Path>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AAACAAAAJAAAAEAAAAAAAAAAAAAQAAAEAAAgAAEAQMA=</HashCode>
+      <HashCode>AAACAAAAJAAAQEAAAAAAAAAAAAAQAAAEAAAgAAEAQMA=</HashCode>
       <FileName>Exhibit.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
@@ -53,8 +53,8 @@
       <Path>
         <Point X="4.75" Y="4.125" />
         <Point X="5.125" Y="4.125" />
-        <Point X="5.125" Y="5.415" />
-        <Point X="5.5" Y="5.415" />
+        <Point X="5.125" Y="5.52" />
+        <Point X="5.5" Y="5.52" />
       </Path>
     </AssociationLine>
     <TypeIdentifier>
@@ -83,7 +83,7 @@
       <Property Name="Year" Hidden="true" />
     </Members>
     <TypeIdentifier>
-      <HashCode>AAECQAAARAAAAEgAAAQAAAAAAAAAAAAACAAgAAAAQMA=</HashCode>
+      <HashCode>AAECQAAARAAAQEgAAAQAAAAAAAAAAAAACAAgAAAAQMA=</HashCode>
       <FileName>ContentItem.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -113,7 +113,7 @@
       <Property Name="UniqueId" Hidden="true" />
     </Members>
     <TypeIdentifier>
-      <HashCode>BAACAAAAAABAAAAAAAAAAAQAAAAAAAAAAAAAAAEASAA=</HashCode>
+      <HashCode>BAACAAAAAABAQAAAAAAAAAQAAAAAAAAAAAAAAAEASAA=</HashCode>
       <FileName>Tour.cs</FileName>
     </TypeIdentifier>
   </Class>

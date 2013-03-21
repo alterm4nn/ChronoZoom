@@ -209,9 +209,9 @@ function search(searchString) {
 
     var url;
     switch (czDataSource) {
-        case 'db': url = "Chronozoom.svc/Search";
+        case 'db': url = "/Chronozoom.svc/Search";
             break;
-        default: url = "Chronozoom.svc/SearchRelay";
+        default: url = "/Chronozoom.svc/SearchRelay";
             break;
     }
     $.ajax({
@@ -219,7 +219,7 @@ function search(searchString) {
         type: "GET",
         async: true,
         dataType: "json",
-        data: { searchTerm: searchString },
+        data: { searchTerm: searchString, supercollection: supercollection, collection: collection },
         url: url,
         success: function (result) {
             if (czDataSource == 'db')

@@ -546,7 +546,7 @@ switch the tour in the paused state
 */
 function tourPause() {
     if (tour != undefined) {
-        $("#tour_playpause").attr("src", "Images/tour_play_off.jpg");
+        $("#tour_playpause").attr("src", "/Images/tour_play_off.jpg");
 
         // pause tour
         tour.pause();
@@ -562,7 +562,7 @@ function tourPause() {
 switch the tour in the running state
 */
 function tourResume() {
-    $("#tour_playpause").attr("src", "Images/tour_pause_off.jpg");
+    $("#tour_playpause").attr("src", "/Images/tour_pause_off.jpg");
     tour.play();
 }
 
@@ -641,10 +641,10 @@ function initializeToursContent() {
             var cat = $('<div class="category">' + tour.category + '</div>').appendTo(toursUI);
             
             // add category' UI
-            var img = $('<img src="Images/collapse-down.png" class="collapseButton" />').appendTo(cat);
+            var img = $('<img src="/Images/collapse-down.png" class="collapseButton" />').appendTo(cat);
             if (i == 0) {
                 cat.removeClass('category').addClass('categorySelected');
-                img[0].src = "Images/collapse-up.png";
+                img[0].src = "/Images/collapse-up.png";
             }
             categoryContent = $('<div class="itemContainer"></div>').appendTo(toursUI);
             category = tour.category;
@@ -686,14 +686,14 @@ function initializeToursContent() {
             ui.newHeader.addClass('categorySelected');
 
             var img = $(".collapseButton", ui.newHeader)[0];
-            if (img) img.src = "Images/collapse-up.png";
+            if (img) img.src = "/Images/collapse-up.png";
         }
         if (ui.oldHeader) {
             ui.oldHeader.removeClass('categorySelected');
             ui.oldHeader.addClass('category');
 
             var img = $(".collapseButton", ui.oldHeader)[0];
-            if (img) img.src = "Images/collapse-down.png";
+            if (img) img.src = "/Images/collapse-down.png";
         }
     });
 }
@@ -799,7 +799,7 @@ function collapseBookmarks() {
     $("#bookmarks .slideText").hide('slide', {}, 'fast');
     $("#bookmarks .slideFooter").hide('slide', {}, 'fast');
     $("#bookmarks").effect('size', { to: { width: 30} }, 'fast');
-    $("#bookmarksCollapse").attr("src", "Images/expand-right.png");
+    $("#bookmarksCollapse").attr("src", "/Images/expand-right.png");
 }
 
 /*
@@ -817,7 +817,7 @@ function expandBookmarks() {
                     $("#bookmarks .slideText").show('slide', {}, 'fast');
                     $("#bookmarks .slideFooter").show('slide', {}, 'fast');
                 });
-    $("#bookmarksCollapse").attr("src", "Images/collapse-left.png");
+    $("#bookmarksCollapse").attr("src", "/Images/collapse-left.png");
 
 }
 
@@ -960,7 +960,7 @@ function loadTourFromURL() {
 
 
         //showBookmark(tour, 0);
-        //$("#tour_playpause").attr("src", "Images/tour_play_off.jpg");
+        //$("#tour_playpause").attr("src", "/Images/tour_play_off.jpg");
 
     }
 }
