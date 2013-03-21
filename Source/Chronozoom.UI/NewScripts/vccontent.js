@@ -1248,7 +1248,7 @@ function CanvasText(vc, layerid, id, vx, vy, baseline, vh, text, settings, wv) {
 
 	if (typeof this.settings.textBaseline != 'undefined' &&
         this.settings.textBaseline === 'middle') {
-		this.baseline = this.y + this.height / 2;
+		this.newBaseline = this.newY + this.newHeight / 2;
 	}
 
 	this.initialized = false;
@@ -1262,8 +1262,8 @@ function CanvasText(vc, layerid, id, vx, vy, baseline, vh, text, settings, wv) {
 	@remarks The method is implemented for each particular VirtualCanvas element.
 	*/
 	this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
-		var p = viewport2d.pointVirtualToScreen(this.x, this.y);
-		var bp = viewport2d.pointVirtualToScreen(this.x, this.baseline).y;
+		var p = viewport2d.pointVirtualToScreen(this.x, this.newY);
+		var bp = viewport2d.pointVirtualToScreen(this.x, this.newBaseline).y;
 
 		ctx.globalAlpha = opacity;
 		ctx.fillStyle = this.settings.fillStyle;
@@ -1340,7 +1340,7 @@ function CanvasText(vc, layerid, id, vx, vy, baseline, vh, text, settings, wv) {
 					if (size.width > size_p.x) {
 						this.height = this.width * size_p.y / size.width;
 						if (this.settings.textBaseline === 'middle') {
-							this.y = this.baseline - this.height / 2;
+							this.newY = this.newBaseline - this.newHeight / 2;
 						}
 						fontSize = viewport2d.heightVirtualToScreen(this.height);
 
@@ -1356,7 +1356,7 @@ function CanvasText(vc, layerid, id, vx, vy, baseline, vh, text, settings, wv) {
 						}
 						this.width = nwidth;
 
-						p = viewport2d.pointVirtualToScreen(this.x, this.y);
+						p = viewport2d.pointVirtualToScreen(this.x, this.newY);
 						size_p.x = viewport2d.widthVirtualToScreen(this.width);
 					}
 				}
