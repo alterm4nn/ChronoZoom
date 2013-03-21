@@ -574,29 +574,34 @@ Next <div> is rendered on the top of previous one.
         /*
         Finds the LCA(Lowest Common Ancestor) timeline which contains wnd
         */
-        findLca: function (tl, wnd) {
+        _findLca: function (tl, wnd) {
             for (var i = 0; i < tl.children.length; i++) {
                 if (tl.children[i].type === 'timeline' && tl.children[i].contains(wnd)) {
-                    return this.findLca(tl.children[i], wnd);
+                    return this._findLca(tl.children[i], wnd);
                 }
             }
             return tl;
         },
 
+        findLca: function (wnd) {
+            var rootTimeline = this._layersContent.children[0];
+            return this._findLca(rootTimeline, wnd);
+        },
+
         /*
         Check if we have all the data to render wnd at vp.visible.scale
         */
-        hasContent: function HasContent(tl, wnd, scale) {
+        hasStructure: function (tl, wnd, scale) {
             var b = tl.isBuffered;
             for (var i = 0; i < tl.children.length; i++) {
                 if (tl.children[i].type === 'timeline' && tl.children[i].intersects(wnd) && tl.children[i].isVisibleOnScreen(scale)) {
-                    b = b && this.hasContent(tl.children[i], wnd, scale);
+                    b = b && this.hasStructure(tl.children[i], wnd, scale);
                 }
             }
             return b;
         },
 
-        isStructureMissing: function(wnd, scale) {
+        isStructureMissing: function (wnd, scale) {
             var rootTimeline = this._layersContent.children[0];
 
             if (!wnd.intersects(rootTimeline)) {
@@ -620,8 +625,7 @@ Next <div> is rendered on the top of previous one.
             }
 
             var lca = this.findLca(rootTimeline, wnd);
-            var hasContent = this.hasContent(lca, wnd, scale);
-            return hasContent;
+            return !this.hasStructure(lca, wnd, scale);
         },
 
         options: {

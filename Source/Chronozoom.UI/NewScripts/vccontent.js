@@ -722,7 +722,7 @@ function CanvasRectangle(vc, layerid, id, vx, vy, vw, vh, settings) {
     };
 
     this.isVisibleOnScreen = function (scale) {
-        return Math.min(this.width, this.height) / scale >= 20;
+        return Math.min(this.width, this.height) / scale >= minTimelineWidth;
     }
 }
 CanvasRectangle.prototype = new CanvasElement;

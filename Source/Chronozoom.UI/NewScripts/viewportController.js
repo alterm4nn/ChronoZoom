@@ -300,16 +300,11 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
                 var vbox = viewportToViewBox(newlyEstimatedViewport);
                 var wnd = new CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
 
-                //if (!vc.virtualCanvas("InBuffer", wnd, newlyEstimatedViewport.visible.scale)) {
-                var root = vc.virtualCanvas("getLayerContent");
-                if (root.children.length > 0) {
-                    var lca = vc.virtualCanvas("findLca", root.children[0], wnd);
+                if (vc.virtualCanvas("isStructureMissing", wnd, newlyEstimatedViewport.visible.scale)) {
+                    var lca = vc.virtualCanvas("findLca", wnd);
                     self.getMissingStructure(vbox, lca,
                         function (result) {
-                            var root = vc.virtualCanvas("getLayerContent");
-                            root.beginEdit();
-                            Merge(result, root.children[0]);
-                            root.endEdit(false);
+                            Merge(result, lca);
                         },
                         function (xhr) {
                             alert("Error connecting to service: " + xhr.responseText);
@@ -438,16 +433,12 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
 
         var vbox = viewportToViewBox(targetViewport);
         var wnd = new CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
-        //if (!vc.virtualCanvas("InBuffer", wnd, targetViewport.visible.scale)) {
-        var root = vc.virtualCanvas("getLayerContent");
-        if (root.children.length > 0) {
-            var lca = vc.virtualCanvas("findLca", root.children[0], wnd);
+        
+        if (vc.virtualCanvas("isStructureMissing", wnd, targetViewport.visible.scale)) {
+            var lca = vc.virtualCanvas("findLca", wnd);
             self.getMissingStructure(vbox, lca,
                 function (result) {
-                    var root = vc.virtualCanvas("getLayerContent");
-                    root.beginEdit();
-                    Merge(result, root.children[0]);
-                    root.endEdit(false);
+                    Merge(result, lca);
                 },
                 function (xhr) {
                     alert("Error connecting to service: " + xhr.responseText);
@@ -490,5 +481,4 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
     }
 
     //end of public fields
-
 }

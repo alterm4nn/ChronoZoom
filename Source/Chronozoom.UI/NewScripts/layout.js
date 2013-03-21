@@ -416,6 +416,7 @@ function Convert(parent, timeline) {
         regime: timeline.Regime,
         opacity: 0
     });
+    t1.isBuffered = timeline.timelines instanceof Array;
 
     //Creating Infodots
     if (timeline.exhibits instanceof Array) {
@@ -467,7 +468,6 @@ function Convert(parent, timeline) {
             Convert(t1, childTimeLine);
         });
     }
-
 }
 
 function buildDate(obj) {
@@ -788,6 +788,8 @@ function merge(src, dest) {
 
 
         if (srcChildTimelines.length === destChildTimelines.length) { // dest contains all src children
+            dest.isBuffered = true;
+
             // cal bbox (top, bottom) for child timelines and infodots
             var origTop = Number.MAX_VALUE;
             var origBottom = Number.MIN_VALUE;
@@ -878,6 +880,8 @@ function merge(src, dest) {
             dest.children.splice(0);
             for (var i = 0; i < t.children.length; i++)
                 dest.children.push(t.children[i]);
+
+            dest.isBuffered = true;
 
             // dest now contains all src children
             for (var i = 0; i < dest.children.length; i++)
