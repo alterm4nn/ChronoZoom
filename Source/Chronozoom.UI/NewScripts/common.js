@@ -305,7 +305,7 @@ function loadDataUrl() {
 function loadData() {
     var regimesUrl = serverUrlBase
                   + "/api/Structure?"
-                  + "lca=00000000-0000-0000-0000-000000000000"
+                  + "lca=" + cosmosTimelineID
                   + "&start=" + -5012
                   + "&end=" + 0
                   + "&minspan=" + 5013;

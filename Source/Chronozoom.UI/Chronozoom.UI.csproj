@@ -169,6 +169,7 @@
     <Content Include="Images\zoomout_hover.png" />
     <Content Include="Images\zoomout_pressed.png" />
     <Content Include="Images\zoomout_rest.png" />
+    <Content Include="oldResponseDump.txt" />
     <Content Include="Privacy.htm" />
     <Content Include="ResponseDumpRest.txt" />
     <Content Include="robots.txt" />

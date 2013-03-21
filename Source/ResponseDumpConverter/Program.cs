@@ -8,13 +8,13 @@ namespace ResponseDumpConverter
     {
         static void Main(string[] args)
         {
-            Console.Write("Converting ResponseDump ... ");
+            Console.Write("Converting oldResponseDump ... ");
 
             #region Read ResponseDump.txt
             StreamReader fileIn = null;
             try
             {
-                fileIn = File.OpenText(@"..\..\..\Chronozoom.UI\ResponseDump.txt");
+                fileIn = File.OpenText(@"..\..\..\Chronozoom.UI\oldResponseDump.txt");
                 var serializer = new JsonSerializer();
                 var r = (ReponseDump)serializer.Deserialize(fileIn, typeof(ReponseDump));
                 Chronozoom.Models.Globals.Root = r.d[0];
