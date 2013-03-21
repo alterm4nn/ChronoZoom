@@ -1,4 +1,4 @@
-﻿using Framework.Interfaces;
+﻿using Application.Helper.Interfaces;
 
 namespace Application.Helper.BrowserImpl
 {

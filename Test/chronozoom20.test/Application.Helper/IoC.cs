@@ -1,6 +1,6 @@
 ﻿using Application.Driver.Constants;
 using Application.Helper.BrowserImpl;
-using Framework.Interfaces;
+using Application.Helper.Interfaces;
 using Microsoft.Practices.Unity;
 
 namespace Application.Helper

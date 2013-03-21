@@ -1,4 +1,4 @@
-﻿namespace Framework.Interfaces
+﻿namespace Application.Helper.Interfaces
 {
     public interface IControls
     {

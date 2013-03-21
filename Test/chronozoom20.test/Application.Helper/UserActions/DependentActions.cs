@@ -1,7 +1,6 @@
 ﻿using Application.Driver;
 using Application.Driver.UserActions;
-using Framework;
-using Framework.Interfaces;
+using Application.Helper.Interfaces;
 
 namespace Application.Helper.UserActions
 {
