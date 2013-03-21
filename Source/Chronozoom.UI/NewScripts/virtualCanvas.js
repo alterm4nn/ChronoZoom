@@ -572,8 +572,8 @@ Next <div> is rendered on the top of previous one.
         },
 
         /*
-       Finds the LCA(Lowest Common Ancestor) timeline which contains wnd
-       */
+        Finds the LCA(Lowest Common Ancestor) timeline which contains wnd
+        */
         findLca: function (tl, wnd) {
             for (var i = 0; i < tl.children.length; i++) {
                 if (tl.children[i].type === 'timeline' && tl.children[i].contains(wnd)) {
@@ -596,13 +596,10 @@ Next <div> is rendered on the top of previous one.
             return b;
         },
 
-        /*
-        Check if we have all data to render vbox at the current viewport's scale
-        */
-        InBuffer: function (wnd, scale) {
-            var buffer = this._layersContent.children[0];
+        isStructureMissing: function(wnd, scale) {
+            var rootTimeline = this._layersContent.children[0];
 
-            if (!wnd.intersects(buffer)) {
+            if (!wnd.intersects(rootTimeline)) {
                 return false;
             } else {
                 var eps = 1; // TODO: analyticaly calculate the proper eps
@@ -622,126 +619,9 @@ Next <div> is rendered on the top of previous one.
                 wnd.height = Math.max(0, wnd.bottom - wnd.top);
             }
 
-            var lca = this.findLca(buffer, wnd);
+            var lca = this.findLca(rootTimeline, wnd);
             var hasContent = this.hasContent(lca, wnd, scale);
             return hasContent;
-        },
-
-
-        _addTimelineToSceneGraph: function (parent, timeline) {
-            var tlColor = GetTimelineColor(timeline);
-            var t1 = addTimeline(parent, "layerTimelines", 't' + timeline.UniqueID,
-            {
-                timeStart: timeline.left,
-                timeEnd: timeline.right,
-                top: timeline.y,
-                height: timeline.height,
-                header: timeline.Title,
-                fillStyle: "rgba(0,0,0,0.25)",
-                titleRect: timeline.titleRect,
-                strokeStyle: tlColor,
-                regime: timeline.Regime
-            });
-
-            return t1;
-        },
-
-        _addExhibitsToSceneGraph: function (parent, exhibits) {
-            var infodots = [];
-
-            exhibits.forEach(function (childInfodot) {
-                var date; // building a date to be shown in a title of the content item to the left of the title text.
-
-                var contentItems = new Array();
-                childInfodot.ContentItems.forEach(function (contentItemProt) {
-                    var mediaType = contentItemProt.MediaType;
-                    if (mediaType == "Picture")
-                        mediaType = 'image';
-                    else if (mediaType == "Video")
-                        mediaType = 'video';
-
-                    date = buildDate(contentItemProt);
-
-                    contentItems.push({
-                        id: 'c' + contentItemProt.UniqueID,
-                        title: contentItemProt.Title,
-                        mediaUrl: contentItemProt.Uri,
-                        mediaType: mediaType,
-                        description: contentItemProt.Caption,
-                        date: date,
-                        guid: contentItemProt.ID,
-                        attribution: contentItemProt.Attribution,
-                        mediaSource: contentItemProt.MediaSource,
-                        order: contentItemProt.Order ? contentItemProt.Order : 0
-                    });
-                });
-
-                date = buildDate(childInfodot);
-                var infodot = addInfodot(parent, "layerInfodots", 'e' + childInfodot.UniqueID,
-                    (childInfodot.left + childInfodot.right) / 2.0,
-                    childInfodot.y, 0.8 * childInfodot.size / 2.0,
-                    contentItems,
-                    {
-                        title: childInfodot.Title,
-                        date: date,
-                        guid: childInfodot.ID
-                    });
-                infodots.push(infodot);
-            });
-
-            return infodots;
-        },
-
-        _merge: function (src, dest) {
-            dest.isBuffered = dest.isBuffered || src.isBuffered;
-
-            for (var i = 0, j; i < src.ChildTimelines.length; i++) {
-                for (j = 0; j < dest.children.length; j++) {
-                    if (dest.children[j].type === "timeline")
-                        if (dest.children[j].id === 't' + src.ChildTimelines[i].UniqueID)
-                            break;
-                }
-
-                if (j < dest.children.length) { // found timeline
-                    if (!dest.children[j].isBuffered) // isBuffered == false => timeline is a placeholder => update
-                        this._addExhibitsToSceneGraph(dest.children[j], src.ChildTimelines[i].Exhibits);
-                    this._merge(src.ChildTimelines[i], dest.children[j]);
-                } else { // timeline not found => create new timeline
-                    var t = this._addTimelineToSceneGraph(dest, src.ChildTimelines[i]);
-                    this._addExhibitsToSceneGraph(t, src.ChildTimelines[i].Exhibits);
-                    this._merge(src.ChildTimelines[i], t);
-                }
-            }
-        },
-
-        /*
-        Merges missing data to the scenegraph.
-        */
-        Merge: function (src) {
-            if (!src) return;
-            var root = this._layersContent;
-
-            var rootHasSrc = false;
-            if (root.children.length > 0) {
-                for (var i = 0; i < root.children.length; i++)
-                    if (root.children[i].type === "timeline")
-                        if (root.children[i].id === 't' + src.UniqueID) {
-                            rootHasSrc = true;
-                            break;
-                        }
-            }
-
-            root.beginEdit();
-            if (rootHasSrc) {
-                if (!root.children[i].isBuffered)
-                    this._addExhibitsToSceneGraph(root.children[i], src.Exhibits);
-                this._merge(src, root.children[i]);
-            } else {
-                var t = this._addTimelineToSceneGraph(root, src);
-                this._addExhibitsToSceneGraph(t, src.Exhibits);
-                this._merge(src, t);
-            }
-            root.endEdit(true);
         },
 
         options: {
