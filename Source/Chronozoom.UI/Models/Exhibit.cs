@@ -19,7 +19,6 @@ namespace Chronozoom.Api.Models
 
         // extra properties for backward compatibility
         public int UniqueID;
-        public string parent;
     }
 
     public static class ExhibitExtensions

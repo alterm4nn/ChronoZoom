@@ -386,6 +386,7 @@
       <DependentUpon>Chronozoom.svc</DependentUpon>
     </Compile>
     <Compile Include="Controllers\CollectionController.cs" />
+    <Compile Include="Controllers\ContentItemController.cs" />
     <Compile Include="Controllers\DataController.cs" />
     <Compile Include="Controllers\ExhibitController.cs" />
     <Compile Include="Controllers\StructureController.cs" />

@@ -9,7 +9,6 @@ namespace UI.Controllers
 {
     public class ExhibitController : ApiController
     {
-
         public void Delete(string collection, Exhibit exhibitData)
         {
             if (collection == null || exhibitData == null)
@@ -23,7 +22,7 @@ namespace UI.Controllers
                     for (int i = 0; i < foundTimeline.exhibits.Count(); i++)
                     {
                         //Remove
-                        if (foundTimeline.exhibits[i].UniqueID == exhibitData.UniqueID)
+                        if (foundTimeline.exhibits[i].id == exhibitData.id)
                         {
                             foundTimeline.exhibits.RemoveAt(i);
                             return;
@@ -34,11 +33,13 @@ namespace UI.Controllers
                 }
                 else
                 {
+                    //No such parent timeline
                     throw new HttpResponseException(System.Net.HttpStatusCode.BadRequest);
                 }
             }
             else
             {
+                //Parent timeline not specified
                 throw new HttpResponseException(System.Net.HttpStatusCode.BadRequest);
             }
 
@@ -57,7 +58,7 @@ namespace UI.Controllers
                     for (int i = 0; i < foundTimeline.exhibits.Count(); i++)
                     {
                         //Update
-                        if (foundTimeline.exhibits[i].UniqueID == exhibitData.UniqueID)
+                        if (foundTimeline.exhibits[i].id == exhibitData.id)
                         {
                             foundTimeline.exhibits[i] = exhibitData;
                             return;
@@ -68,39 +69,15 @@ namespace UI.Controllers
                 }
                 else
                 {
+                    //No such parent timeline
                     throw new HttpResponseException(System.Net.HttpStatusCode.BadRequest);
                 }
             }
             else
             {
+                //Parent timeline not specified
                 throw new HttpResponseException(System.Net.HttpStatusCode.BadRequest);
             }
-        }
-
-
-        private bool FindExhibit(Timeline t1, int exhibitUniqueID, out Exhibit exh)
-        {
-            if (t1 == null)
-            {
-                exh = null;
-                return false;
-            }
-
-            for (int i = 0; i < t1.exhibits.Count; i++)
-            {
-                if (t1.exhibits[i].UniqueID == exhibitUniqueID)
-                {
-                    exh = t1.exhibits[i];
-                    return true;
-                }
-            }
-
-            foreach (var t3 in t1.timelines)
-                if (FindExhibit(t3, exhibitUniqueID, out exh))
-                    return true;
-
-            exh = null;
-            return false;
         }
 
         private bool FindTimeline(Timeline t1, string id, out Timeline t2)
@@ -111,7 +88,7 @@ namespace UI.Controllers
                 return false;
             }
 
-            if (t1. == id)
+            if (t1.id == id)
             {
                 t2 = t1;
                 return true;
