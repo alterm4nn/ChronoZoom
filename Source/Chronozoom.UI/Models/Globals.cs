@@ -5,10 +5,13 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
+using System.Collections.Generic;
+using UI.Models;
 namespace Chronozoom.Api.Models
 {
     public static class Globals
     {
         public static Timeline Root { get; set; }
+        public static List<Collection> Collections = new List<Collection>();
     }
 }

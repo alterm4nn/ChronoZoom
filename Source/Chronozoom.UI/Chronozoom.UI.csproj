@@ -385,8 +385,11 @@
     <Compile Include="Chronozoom.svc.cs">
       <DependentUpon>Chronozoom.svc</DependentUpon>
     </Compile>
+    <Compile Include="Controllers\CollectionController.cs" />
     <Compile Include="Controllers\DataController.cs" />
+    <Compile Include="Controllers\ExhibitController.cs" />
     <Compile Include="Controllers\StructureController.cs" />
+    <Compile Include="Controllers\TimelineController.cs" />
     <Compile Include="cz.aspx.cs">
       <DependentUpon>cz.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -395,6 +398,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Models\Collection.cs" />
     <Compile Include="Models\ContentItem.cs" />
     <Compile Include="Models\Exhibit.cs" />
     <Compile Include="Models\Globals.cs" />

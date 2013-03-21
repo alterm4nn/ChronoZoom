@@ -18,5 +18,6 @@ namespace Chronozoom.Api.Models
 
         // extra
         public int UniqueID;
+        public string parent;
     }
 }
