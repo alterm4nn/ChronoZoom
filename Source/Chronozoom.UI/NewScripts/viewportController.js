@@ -419,7 +419,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
         self.FPS = self.oneSecondFrames;
         self.oneSecondFrames = 0;
     }, 1000); //one call per second
-
+  
 
     //tests related accessors
     this.PanViewportAccessor = PanViewport;

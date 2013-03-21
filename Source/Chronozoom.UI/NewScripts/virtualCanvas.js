@@ -624,7 +624,7 @@ Next <div> is rendered on the top of previous one.
                 wnd.height = Math.max(0, wnd.bottom - wnd.top);
             }
 
-            var lca = this.findLca(rootTimeline, wnd);
+            var lca = this.findLca(wnd);
             return !this.hasStructure(lca, wnd, scale);
         },
 

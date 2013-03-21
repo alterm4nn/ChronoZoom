@@ -1,4 +1,4 @@
-﻿var isLayoutAnimation = true; // temp variable for debugging
+﻿var isLayoutAnimation = false; // temp variable for debugging
 var animatingElements = {}; // hashmap of animating elements of virtual canvas
 
 function Timeline(title, left, right, childTimelines, exhibits) {
@@ -788,7 +788,7 @@ function merge(src, dest) {
 
 
         if (srcChildTimelines.length === destChildTimelines.length) { // dest contains all src children
-            dest.isBuffered = true;
+            dest.isBuffered = dest.isBuffered || (src.timelines instanceof Array);
 
             // cal bbox (top, bottom) for child timelines and infodots
             var origTop = Number.MAX_VALUE;
@@ -881,7 +881,7 @@ function merge(src, dest) {
             for (var i = 0; i < t.children.length; i++)
                 dest.children.push(t.children[i]);
 
-            dest.isBuffered = true;
+            dest.isBuffered = dest.isBuffered || (src.timelines instanceof Array);
 
             // dest now contains all src children
             for (var i = 0; i < dest.children.length; i++)
