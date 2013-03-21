@@ -21,7 +21,7 @@ namespace Chronozoom.Api.Models
             StreamReader file = null;
             try
             {
-                file = File.OpenText(HostingEnvironment.ApplicationPhysicalPath + @"ResponseDump.txt");
+                file = File.OpenText(HostingEnvironment.ApplicationPhysicalPath + @"oldResponseDump.txt");
                 var serializer = new JsonSerializer();
                 var r = (ReponseDump)serializer.Deserialize(file, typeof(ReponseDump));
                 Root = r.d[0];

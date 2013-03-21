@@ -6,6 +6,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 
 namespace Chronozoom.Entities
@@ -14,8 +15,8 @@ namespace Chronozoom.Entities
     public class Reference
     {
         [Key]
-        [DataMember]
-        public Guid ID { get; set; }
+        [DataMember(Name="ID")]
+        public Guid Id { get; set; }
 
         [DataMember]
         public string Title { get; set; }
@@ -40,5 +41,14 @@ namespace Chronozoom.Entities
 
         [DataMember]
         public string Source { get; set; }
+    }
+
+    [DataContract]
+    [NotMapped]
+    public class ReferenceRaw : Reference
+    {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "Needs to match storage column name")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "ID", Justification = "Needs to match storage column name")]
+        public Guid Exhibit_ID { get; set; }
     }
 }

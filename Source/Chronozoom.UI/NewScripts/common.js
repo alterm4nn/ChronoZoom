@@ -294,7 +294,7 @@ function loadDataUrl() {
             case 'relay':
                 return "ChronozoomRelay";
             case 'dump':
-                return "ResponseDump.txt";
+                return "oldResponseDump.txt";
             default:
                 return null;
         }
