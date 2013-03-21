@@ -52,7 +52,7 @@ namespace Chronozoom.Api.Models
            var clone = new Timeline()
             {
                 id = timeline.id,
-                parent = timeline.id,
+                parent = timeline.parent,
                 start = timeline.start,
                 end = timeline.end,
                 title = timeline.title,
@@ -73,7 +73,7 @@ namespace Chronozoom.Api.Models
             var clone = new TimelineWithChildTimelineIds()
             {
                 id = timeline.id,
-                parent = timeline.id,
+                parent = timeline.parent,
                 start = timeline.start,
                 end = timeline.end,
                 title = timeline.title,

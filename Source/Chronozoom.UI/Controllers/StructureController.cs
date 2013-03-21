@@ -15,7 +15,8 @@ namespace Chronozoom.Api.Controllers
             if (tlca == null)
                 throw new HttpResponseException(System.Net.HttpStatusCode.BadRequest);
 
-            return FilterTimelines(tlca, start, end, minspan);
+            var r = FilterTimelines(tlca, start, end, minspan);
+            return r;
         }
 
         private static Timeline FindTimeline(Timeline timeline, string id)
