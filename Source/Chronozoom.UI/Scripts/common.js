@@ -33,6 +33,10 @@ var ChronoZoom;
         
         var tourNotParsed = undefined;// indicates that URL was checked at tour sharing after page load
         
+        Common.supercollection = "";// the supercollection associated with this url
+        
+        Common.collection = "";// the collection associated with this url
+        
         /* Initialize the JQuery UI Widgets
         */
         function initialize() {
@@ -288,7 +292,7 @@ var ChronoZoom;
             } else {
                 switch(Settings.czDataSource) {
                     case 'db':
-                        return "Chronozoom.svc/get";
+                        return "/Chronozoom.svc/get";
                     case 'relay':
                         return "ChronozoomRelay";
                     case 'dump':
@@ -301,11 +305,17 @@ var ChronoZoom;
         //loading the data from the service
         function loadData() {
             var url = loadDataUrl();
+            // load URL state
+            ChronoZoom.UrlNav.getURL();
             $.ajax({
                 cache: //main content fetching
                 false,
                 type: "GET",
                 async: true,
+                data: {
+                    supercollection: Common.supercollection,
+                    collection: Common.collection
+                },
                 dataType: "json",
                 url: url,
                 success: function (result) {
@@ -327,7 +337,7 @@ var ChronoZoom;
             var toursUrl;
             switch(Settings.czDataSource) {
                 case 'db':
-                    toursUrl = "Chronozoom.svc/getTours";
+                    toursUrl = "/Chronozoom.svc/getTours";
                     break;
                 case 'relay':
                     toursUrl = "ChronozoomRelay";
@@ -343,6 +353,10 @@ var ChronoZoom;
                 async: true,
                 dataType: "json",
                 url: toursUrl,
+                data: {
+                    supercollection: Common.supercollection,
+                    collection: Common.collection
+                },
                 success: function (result) {
                     ChronoZoom.Tours.parseTours(result);
                     ChronoZoom.Tours.initializeToursContent();

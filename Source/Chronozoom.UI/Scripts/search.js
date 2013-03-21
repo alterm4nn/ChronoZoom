@@ -220,10 +220,10 @@ var ChronoZoom;
             var url;
             switch(ChronoZoom.Settings.czDataSource) {
                 case 'db':
-                    url = "Chronozoom.svc/Search";
+                    url = "/Chronozoom.svc/Search";
                     break;
                 default:
-                    url = "Chronozoom.svc/SearchRelay";
+                    url = "/Chronozoom.svc/SearchRelay";
                     break;
             }
             $.ajax({
@@ -232,7 +232,9 @@ var ChronoZoom;
                 async: true,
                 dataType: "json",
                 data: {
-                    searchTerm: searchString
+                    searchTerm: searchString,
+                    supercollection: ChronoZoom.Common.supercollection,
+                    collection: ChronoZoom.Common.collection
                 },
                 url: url,
                 success: function (result) {

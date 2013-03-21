@@ -42,8 +42,6 @@ module ChronoZoom {
             }
         }
 
-
-
         export function initializeSearch() {
             $("#searchTextBox")
                     .focus(function () {
@@ -217,9 +215,9 @@ module ChronoZoom {
 
             var url;
             switch (ChronoZoom.Settings.czDataSource) {
-                case 'db': url = "Chronozoom.svc/Search";
+                case 'db': url = "/Chronozoom.svc/Search";
                     break;
-                default: url = "Chronozoom.svc/SearchRelay";
+                default: url = "/Chronozoom.svc/SearchRelay";
                     break;
             }
             $.ajax({
@@ -227,7 +225,7 @@ module ChronoZoom {
                 type: "GET",
                 async: true,
                 dataType: "json",
-                data: { searchTerm: searchString },
+                data: { searchTerm: searchString, supercollection: ChronoZoom.Common.supercollection, collection: ChronoZoom.Common.collection },
                 url: url,
                 success: function (result) {
                     if (ChronoZoom.Settings.czDataSource == 'db')

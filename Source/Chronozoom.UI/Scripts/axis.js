@@ -121,7 +121,7 @@ var ChronoZoom;
                     var axis = this;
                     switch(ChronoZoom.Settings.czDataSource) {
                         case 'db':
-                            url = "Chronozoom.svc/getthresholds";
+                            url = "/Chronozoom.svc/getthresholds";
                             break;
                         case 'relay':
                             url = "ChronozoomRelay";

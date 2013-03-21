@@ -26,7 +26,7 @@ var ChronoZoom;
         
         Settings.hoverAnimationSeconds = 2;//animation time between apearing of timeline color on mouse hover
         
-        Settings.fallbackImageUri = 'Images/Temp-Thumbnail2.png';// the image that is shown when thumbnail loading fails (e.g. database is unavailable)
+        Settings.fallbackImageUri = '/Images/Temp-Thumbnail2.png';// the image that is shown when thumbnail loading fails (e.g. database is unavailable)
         
         // Styles of timelines
         Settings.timelineHeaderMargin = 1.0 / 18.0;// size of left margins, relative to height of the timeline.
@@ -72,7 +72,7 @@ var ChronoZoom;
         
         Settings.infoDotFillColor = 'rgb(92,92,92)';// color of infdot's circle border
         
-        Settings.infoDotTinyContentImageUri = 'Images/tinyContent.png';
+        Settings.infoDotTinyContentImageUri = '/Images/tinyContent.png';
         Settings.mediaContentElementZIndex = 100;
         Settings.contentItemDescriptionNumberOfLines = 10;
         Settings.contentItemShowContentZoomLevel = 9;// zoom level (log_2 of size in pixel) when all content is shown

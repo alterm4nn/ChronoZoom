@@ -234,9 +234,18 @@ var ChronoZoom;
                 url = {
                     protocol: result[1],
                     host: result[2],
-                    port: result[3],
-                    path: result[4]
+                    port: result[3]
                 };
+                //If PATH parameters exist
+                if(result[4] != "") {
+                    url.path = result[4].split("/");
+                    if(url.path.length > 1) {
+                        ChronoZoom.Common.supercollection = url.path[0];
+                    }
+                    if(url.path.length > 2) {
+                        ChronoZoom.Common.collection = url.path[1];
+                    }
+                }
                 //If GET parameters exists
                 if(result[5] != "") {
                     url.params = [];
@@ -282,7 +291,7 @@ var ChronoZoom;
             if(url == null) {
                 window.location.href = "testFallBackPage.htm";
             }
-            var path = url.protocol + "://" + url.host + ((url.port != "") ? (":" + url.port) : ("")) + "/" + url.path;
+            var path = url.protocol + "://" + url.host + ((url.port != "") ? (":" + url.port) : ("")) + "/" + url.path.join('/');
             var params = new Array();
             for(var key in url.params) {
                 params.push(key + "=" + url.params[key]);

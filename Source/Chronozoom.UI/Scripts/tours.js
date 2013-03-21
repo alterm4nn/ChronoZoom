@@ -551,7 +551,7 @@ var ChronoZoom;
         */
         function tourPause() {
             if(Tours.tour != undefined) {
-                $("#tour_playpause").attr("src", "Images/tour_play_off.jpg");
+                $("#tour_playpause").attr("src", "/Images/tour_play_off.jpg");
                 // pause tour
                 Tours.tour.pause();
                 // stop active animation
@@ -566,7 +566,7 @@ var ChronoZoom;
         switch the tour in the running state
         */
         function tourResume() {
-            $("#tour_playpause").attr("src", "Images/tour_pause_off.jpg");
+            $("#tour_playpause").attr("src", "/Images/tour_pause_off.jpg");
             Tours.tour.play();
         }
         /*
@@ -630,10 +630,10 @@ var ChronoZoom;
                 if(tour.category !== category) {
                     var cat = $('<div class="category">' + tour.category + '</div>').appendTo(toursUI);
                     // add category' UI
-                    var img = $('<img src="Images/collapse-down.png" class="collapseButton" />').appendTo(cat);
+                    var img = $('<img src="/Images/collapse-down.png" class="collapseButton" />').appendTo(cat);
                     if(i == 0) {
                         cat.removeClass('category').addClass('categorySelected');
-                        (img[0]).src = "Images/collapse-up.png";
+                        (img[0]).src = "/Images/collapse-up.png";
                     }
                     categoryContent = $('<div class="itemContainer"></div>').appendTo(toursUI);
                     category = tour.category;
@@ -670,7 +670,7 @@ var ChronoZoom;
                     ui.newHeader.addClass('categorySelected');
                     var img = ($(".collapseButton", ui.newHeader)[0]);
                     if(img) {
-                        img.src = "Images/collapse-up.png";
+                        img.src = "/Images/collapse-up.png";
                     }
                 }
                 if(ui.oldHeader) {
@@ -678,7 +678,7 @@ var ChronoZoom;
                     ui.oldHeader.addClass('category');
                     var img = ($(".collapseButton", ui.oldHeader)[0]);
                     if(img) {
-                        img.src = "Images/collapse-down.png";
+                        img.src = "/Images/collapse-down.png";
                     }
                 }
             });
@@ -792,7 +792,7 @@ var ChronoZoom;
                     width: 30
                 }
             }, 'fast');
-            $("#bookmarksCollapse").attr("src", "Images/expand-right.png");
+            $("#bookmarksCollapse").attr("src", "/Images/expand-right.png");
         }
         /*
         Expands bookmark description window.
@@ -819,7 +819,7 @@ var ChronoZoom;
                 $("#bookmarks .slideFooter").show('slide', {
                 }, 'fast');
             });
-            $("#bookmarksCollapse").attr("src", "Images/collapse-left.png");
+            $("#bookmarksCollapse").attr("src", "/Images/collapse-left.png");
         }
         /*
         Collapses/expands bookmark description window.

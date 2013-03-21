@@ -172,10 +172,10 @@ var ChronoZoom;
             var url;
             switch(ChronoZoom.Settings.czDataSource) {
                 case 'db':
-                    url = "Chronozoom.svc/GetBibliography";
+                    url = "/Chronozoom.svc/GetBibliography";
                     break;
                 default:
-                    url = "Chronozoom.svc/GetBibliographyRelay";
+                    url = "/Chronozoom.svc/GetBibliographyRelay";
                     break;
             }
             $.ajax({
