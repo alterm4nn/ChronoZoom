@@ -211,6 +211,9 @@
       <DependentUpon>flash_detect.ts</DependentUpon>
     </Content>
     <Content Include="Scripts\flash_detect.ts" />
+    <Content Include="Scripts\gestures.min.js.map">
+      <DependentUpon>gestures.js</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-1.6.4-vsdoc.js" />
     <Content Include="Scripts\gestures.js">
       <DependentUpon>gestures.ts</DependentUpon>

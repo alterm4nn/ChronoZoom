@@ -185,8 +185,8 @@ var ChronoZoom;
             var pinController;
             if(window.navigator.msPointerEnabled) {
                 vcGestureObject = new MSGesture();
-                vcGestureObject.target = ChronoZoom.Common.vc;
-                ChronoZoom.Common.vc.addEventListener("MSPointerMove", addPointerToGesture, false);
+                vcGestureObject.target = ChronoZoom.Common.vc[0];
+                ChronoZoom.Common.vc[0].addEventListener("MSPointerMove", addPointerToGesture, false);
                 // win 8
                 panController = createTouchPanSubjectWin8(source);
                 var zoomControllerTouch = createTouchZoomSubjectWin8(source);
