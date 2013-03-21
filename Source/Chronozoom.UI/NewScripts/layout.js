@@ -880,6 +880,7 @@ function merge(src, dest) {
             dest.children.splice(0);
             for (var i = 0; i < t.children.length; i++)
                 dest.children.push(t.children[i]);
+            dest.titleObject = dest.children[0];
 
             dest.isBuffered = dest.isBuffered || (src.timelines instanceof Array);
 
