@@ -70,7 +70,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
     @param gesture      (PanGesture) The gesture to apply
     */
     function PanViewport(viewport, panGesture) {
-        if (CZ.Authoring.isActive) {
+        if (CZ.Authoring.isActive || CZ.Authoring._isActive) {
             return;
         }
         

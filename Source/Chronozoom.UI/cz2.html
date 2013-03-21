@@ -60,7 +60,9 @@
     <script type="text/javascript" src="NewScripts/search.js"></script>
     <script type="text/javascript" src="NewScripts/bibliography.js"></script>
     <script type="text/javascript" src="NewScripts/breadCrumbs.js"></script>
+
     <script type="text/javascript" src="NewScripts/authoring.js"></script>
+    <script type="text/javascript" src="NewScripts/newauthoring.js"></script>
 
     <script type="text/javascript" src="NewScripts/settings.js"></script>
     <script type="text/javascript" src="NewScripts/timescale.js"></script>
@@ -186,7 +188,12 @@
             initializeSearch();
             initializeBibliography();
             initializeToursUI();
+
             CZ.Authoring.initializeTimelineChangeName();
+            
+            CZ.Authoring.initialize(vc, {
+                showCreateTimelineForm: showCreateTimelineForm
+            });
 
             var canvasGestures = getGesturesStream(vc); //gesture sequence of the virtual canvas
             var axisGestures = applyAxisBehavior(getGesturesStream(ax)); //gesture sequence of axis (tranformed according to axis behavior logic)
@@ -566,12 +573,29 @@
             };
         });
 
-        function createTimeline() {
+        function showCreateTimelineForm() {
             $("#addTimelineDialog").dialog({ modal: true, height: 500, width: 500 });
             $("#timelineStartInput").spinner();
             $("#timelineEndInput").spinner();
             $("#timelineVerticalInput").spinner();
             $("#saveTimelineButton").button();
+        }
+
+        function createTimeline() {
+            CZ.Authoring._isActive = true;
+            CZ.Authoring.mode = "createTimeline";
+        }
+
+        function editTimeline() {
+            // body...
+        }
+
+        function createExhibit() {
+            // body...
+        }
+
+        function editExhibit() {
+            // body...
         }
     </script>
     <title>ChronoZoom</title>
