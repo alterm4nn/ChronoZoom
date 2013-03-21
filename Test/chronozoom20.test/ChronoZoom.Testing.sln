@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.UI", "Tests\Tests.UI.csproj", "{482D59BA-663E-46CF-B79F-F83CB4D9067D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.UI", "Tests.UI\Tests.UI.csproj", "{482D59BA-663E-46CF-B79F-F83CB4D9067D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3A81DC60-E939-4B89-A2FE-13606C393FF4}"
 EndProject
@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{37B416
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.BL", "BLTests\Tests.BL.csproj", "{D6228D33-1A86-474F-989A-AD6E85A5D4E4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.BL", "Tests.BL\Tests.BL.csproj", "{D6228D33-1A86-474F-989A-AD6E85A5D4E4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.Driver", "Application.Driver\Application.Driver.csproj", "{AC1310BD-EACC-4B45-BCAF-2D8A0260E2D1}"
 EndProject
