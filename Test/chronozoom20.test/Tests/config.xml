@@ -6,7 +6,7 @@
       <BaseUrl>http://depot.cs.msu.su:9090/axis_marker/test/html/testTimescale.htm</BaseUrl>
      <ImplicitWait>60</ImplicitWait>
       <ExplicitWait>60</ExplicitWait>
-      <BrowserName>internet explorer</BrowserName>
+      <BrowserName>firefox</BrowserName>
       <ConnectionWait>60</ConnectionWait>
     </Global>
     <IncludeTestCategories>
@@ -17,7 +17,7 @@
       <x86HubUrl>http://192.168.50.175:4445/wd/hub</x86HubUrl>
       <x64HubUrl>http://192.168.50.175:4444/wd/hub</x64HubUrl>
       <HubUrl>http://192.168.50.175:4444/wd/hub</HubUrl>
-      <BrowserVersion>24</BrowserVersion>
+      <BrowserVersion>18</BrowserVersion>
       <PlatformName>Vista</PlatformName>
       <GridCapabilities>
         <Capability Platform="Win8x64" Browser="chrome" Version="24" />
