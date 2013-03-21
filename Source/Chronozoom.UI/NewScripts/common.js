@@ -331,7 +331,29 @@ function ProcessContent(content) {
     root.beginEdit();
     Merge(content, root);
     root.endEdit(true);
+
     InitializeRegimes(content);
+
+    if (startHash) { // restoring the window's hash as it was on the page loading
+        visReg = navStringToVisible(startHash.substring(1), vc);
+    }
+
+    if (!visReg && cosmosVisible) {
+        window.location.hash = cosmosVisible;
+        visReg = navStringToVisible(cosmosVisible, vc);
+    }
+
+    if (visReg) {
+        controller.moveToVisible(visReg, true);
+        updateAxis(vc, ax);
+        var vp = vc.virtualCanvas("getViewport");
+        updateNavigator(vp);
+
+        if (startHash && window.location.hash !== startHash) {
+            hashChangeFromOutside = false;
+            window.location.hash = startHash; // synchronizing
+        }
+    }
 }
 
 function InitializeRegimes(content) {
