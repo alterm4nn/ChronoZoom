@@ -303,7 +303,8 @@ function loadDataUrl() {
 
 //loading the data from the service
 function loadData() {
-    var regimesUrl = "http://localhost:4949/api/Structure?"
+    var regimesUrl = serverUrlBase
+                  + "/api/Structure?"
                   + "lca=00000000-0000-0000-0000-000000000000"
                   + "&start=" + -5012
                   + "&end=" + 0

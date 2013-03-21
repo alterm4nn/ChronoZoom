@@ -730,16 +730,18 @@ CanvasRectangle.prototype = new CanvasElement;
 /*  A Timeline element that can be added to a VirtualCanvas (Rect + caption + bread crumbs tracing).
 @param layerid   (any type) id of the layer for this element
 @param id   (any type) id of an element
+@param guid (any type) guid of an element
 @param vx   (number) x of left top corner in virtual space
 @param vy   (number) y of left top corner in virtual space
 @param vw   (number) width of a bounding box in virtual space
 @param vh   (number) height of a bounding box in virtual space
 @param settings  ({strokeStyle,lineWidth,fillStyle}) Parameters of the rectangle appearance
 */
-function CanvasTimeline(vc, layerid, id, vx, vy, vw, vh, settings, timelineinfo) {
+function CanvasTimeline(vc, layerid, id, guid, vx, vy, vw, vh, settings, timelineinfo) {
 	this.base = CanvasRectangle;
 	this.base(vc, layerid, id, vx, vy, vw, vh);
-
+	this.guid = guid;
+	
 	this.isBuffered = false;
 	this.settings = settings;
 	this.parent = undefined;
@@ -1939,13 +1941,14 @@ SeadragonImage.prototype = new CanvasDomItem;
 @param element   (CanvasElement) Parent element, whose children is to be new timeline.
 @param layerid   (any type) id of the layer for this element
 @param id        (any type) id of an element
+@param guid      (any type) guid of an element
 @param timelineinfo  ({ timeStart (minus number of years BP), timeEnd (minus number of years BP), top (number), height (number),
 header (string), fillStyle (color) })
 @returns         root of the timeline tree
 */
-var addTimeline = function (element, layerid, id, timelineinfo) {
+var addTimeline = function (element, layerid, id, guid, timelineinfo) {
 	var width = timelineinfo.timeEnd - timelineinfo.timeStart;
-	var timeline = addChild(element, new CanvasTimeline(element.vc, layerid, id,
+	var timeline = addChild(element, new CanvasTimeline(element.vc, layerid, id, guid, 
                             timelineinfo.timeStart, timelineinfo.top,
                             width, timelineinfo.height, {
                                 strokeStyle: timelineinfo.strokeStyle ? timelineinfo.strokeStyle : timelineStrokeStyle,
@@ -1962,6 +1965,7 @@ var addTimeline = function (element, layerid, id, timelineinfo) {
 /*  Represents an image on a virtual canvas with support of dynamic level of detail.
 @param layerid   (any type) id of the layer for this element
 @param id   (any type) id of an element
+@param guid (any type) guid of an element
 @param vx   (number) x of left top corner in virtual space
 @param vy   (number) y of left top corner in virtual space
 @param vw   (number) width of a bounding box in virtual space
@@ -1973,10 +1977,11 @@ var addTimeline = function (element, layerid, id, timelineinfo) {
 - audio
 - pdf
 */
-function ContentItem(vc, layerid, id, vx, vy, vw, vh, contentItem) {
+function ContentItem(vc, layerid, id, guid, vx, vy, vw, vh, contentItem) {
 	this.base = CanvasDynamicLOD;
 	this.base(vc, layerid, id, vx, vy, vw, vh);
 	this.type = 'contentItem';
+	this.guid = guid;
 
 	// Building content of the item
 	var titleHeight = vh * contentItemTopTitleHeight * 0.8;
@@ -2145,6 +2150,7 @@ ContentItem.prototype = new CanvasDynamicLOD;
 /*  An Infodot element that can be added to a VirtualCanvas.
 @param layerid   (any type) id of the layer for this element
 @param id   (any type) id of an element
+@param guid (any type) guid of an element
 @param vx   (number) x of left top corner in virtual space
 @param vy   (number) y of left top corner in virtual space
 @param vw   (number) width of a bounding box in virtual space
@@ -2152,7 +2158,7 @@ ContentItem.prototype = new CanvasDynamicLOD;
 @param infodotDescription  ({title}) 
 */
 
-function CanvasInfodot(vc, layerid, id, time, vyc, radv, contentItems, infodotDescription) {
+function CanvasInfodot(vc, layerid, id, guid, time, vyc, radv, contentItems, infodotDescription) {
 	this.base = CanvasCircle;
 	this.base(vc, layerid, id, time, vyc, radv,
         { strokeStyle: infoDotBorderColor, lineWidth: infoDotBorderWidth * radv, fillStyle: infoDotFillColor, isLineWidthVirtual: true });
@@ -2161,7 +2167,7 @@ function CanvasInfodot(vc, layerid, id, time, vyc, radv, contentItems, infodotDe
 	this.infodotDescription = infodotDescription;
 	this.title = infodotDescription.title;
 	this.opacity = typeof infodotDescription.opacity !== 'undefined' ? infodotDescription.opacity : 1;
-
+	this.guid = guid;
 
 	contentItems.sort(function (a, b) {
 		return a.order - b.order;
@@ -2683,11 +2689,12 @@ var getContentItem = function (infodot, cid) {
 @param element   (CanvasElement) Parent element, whose children is to be new timeline.
 @param layerid   (any type) id of the layer for this element
 @param id        (any type) id of an element
+@param guid      (any type) guid of an element
 @param contentItems (array of { id, date (string), title (string), description (string), mediaUrl (string), mediaType (string) }) content items of the infodot, first is central.
 @returns         root of the content item tree
 */
-var addInfodot = function addInfodot(element, layerid, id, time, vyc, radv, contentItems, infodotDescription) {
-	var infodot = new CanvasInfodot(element.vc, layerid, id, time, vyc, radv, contentItems, infodotDescription);
+var addInfodot = function addInfodot(element, layerid, id, guid, time, vyc, radv, contentItems, infodotDescription) {
+	var infodot = new CanvasInfodot(element.vc, layerid, id, guid, time, vyc, radv, contentItems, infodotDescription);
 	return addChild(element, infodot, true);
 }
 
@@ -2715,7 +2722,7 @@ function buildVcContentItems(contentItems, xc, yc, rad, vc, layerid) {
 
 	// 0th is a central content item
 	vcitems.push(
-        new ContentItem(vc, layerid, contentItems[0].id,
+        new ContentItem(vc, layerid, contentItems[0].id, contentItems[0].guid, 
              -_wc / 2 * rad + xc, -_hc / 2 * rad + yc, _wc * rad, _hc * rad,
              contentItems[0]));
 
@@ -2732,21 +2739,21 @@ function buildVcContentItems(contentItems, xc, yc, rad, vc, layerid) {
 	var xl = xc + rad * (_xlc - _lw / 2);
 	for (var j = 0; j < nL; j++, i++) {
 		var ci = contentItems[i];
-		vcitems.push(new ContentItem(vc, layerid, ci.id, xl, yc + rad * arrange[j], lw, lh, ci));
+		vcitems.push(new ContentItem(vc, layerid, ci.id, ci.guid, xl, yc + rad * arrange[j], lw, lh, ci));
 	}
 	// Bottom field
 	arrange = arrangeContentItemsInField(nB, _lw);
 	var yb = yc + rad * (_ybc - _lh / 2);
 	for (var j = 0; j < nB; j++, i++) {
 		var ci = contentItems[i];
-		vcitems.push(new ContentItem(vc, layerid, ci.id, xc + rad * arrange[j], yb, lw, lh, ci));
+		vcitems.push(new ContentItem(vc, layerid, ci.id, ci.guid, xc + rad * arrange[j], yb, lw, lh, ci));
 	}
 	// Right field
 	arrange = arrangeContentItemsInField(nR, _lh);
 	var xr = xc + rad * (_xrc - _lw / 2);
 	for (var j = nR; --j >= 0; i++) {
 		var ci = contentItems[i];
-		vcitems.push(new ContentItem(vc, layerid, ci.id, xr, yc + rad * arrange[j], lw, lh, ci));
+		vcitems.push(new ContentItem(vc, layerid, ci.id, ci.guid, xr, yc + rad * arrange[j], lw, lh, ci));
 	}
 	return vcitems;
 

@@ -13,15 +13,8 @@ namespace Chronozoom.Api
 
             config.Routes.MapHttpRoute(
                 name: "RestApi",
-                routeTemplate: "api/{collection}",
-                defaults: new
-                {
-                    controller = "Collection"
-                }
+                routeTemplate: "api/{controller}"
             );
-
-
-
         }
     }
 }

@@ -258,14 +258,15 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
     }
 
     var requestTimer;
-    this.getMissingData = function (vbox, lca_id, onSuccess, onError) {
+    this.getMissingStructure = function (vbox, lca, onSuccess, onError) {
         window.clearTimeout(requestTimer);
         requestTimer = window.setTimeout(function () {
             var url = serverUrlBase
-                + "left=" + vbox.left
-                + "&right=" + vbox.right
-                + "&min_width=" + minTimelineWidth * vbox.scale
-                + "&lca_id=" + lca_id;
+                + "/api/Structure?"
+                + "lca=" + lca.guid
+                + "&start=" + vbox.left
+                + "&end=" + vbox.right
+                + "&minspan=" + minTimelineWidth * vbox.scale;
             console.log(url);
 
             $.ajax({
@@ -303,7 +304,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
                 var root = vc.virtualCanvas("getLayerContent");
                 if (root.children.length > 0) {
                     var lca = vc.virtualCanvas("findLca", root.children[0], wnd);
-                    self.getMissingData(vbox, lca.id.substring(1),
+                    self.getMissingStructure(vbox, lca,
                         function (result) {
                             var root = vc.virtualCanvas("getLayerContent");
                             root.beginEdit();
@@ -441,7 +442,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
         var root = vc.virtualCanvas("getLayerContent");
         if (root.children.length > 0) {
             var lca = vc.virtualCanvas("findLca", root.children[0], wnd);
-            self.getMissingData(vbox, lca.id.substring(1),
+            self.getMissingStructure(vbox, lca,
                 function (result) {
                     var root = vc.virtualCanvas("getLayerContent");
                     root.beginEdit();

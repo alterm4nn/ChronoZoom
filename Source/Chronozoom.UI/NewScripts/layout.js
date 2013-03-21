@@ -403,7 +403,7 @@ function GenerateTitleObject(tlHeight, timeline, measureContext) {
 function Convert(parent, timeline) {
     //Creating timeline
     var tlColor = GetTimelineColor(timeline);
-    var t1 = addTimeline(parent, "layerTimelines", 't' + timeline.UniqueID,
+    var t1 = addTimeline(parent, "layerTimelines", 't' + timeline.UniqueID, timeline.id, 
     {
         timeStart: timeline.left,
         timeEnd: timeline.right,
@@ -435,6 +435,7 @@ function Convert(parent, timeline) {
 
                     contentItems.push({
                         id: 'c' + contentItemProt.UniqueID,
+                        guid: contentItemProt.id,
                         title: contentItemProt.title,
                         mediaUrl: contentItemProt.uri,
                         mediaType: mediaType,
@@ -449,7 +450,7 @@ function Convert(parent, timeline) {
             }
 
             date = buildDate(childInfodot);
-            var infodot1 = addInfodot(t1, "layerInfodots", 'e' + childInfodot.UniqueID,
+            var infodot1 = addInfodot(t1, "layerInfodots", 'e' + childInfodot.UniqueID, childInfodot.id, 
                     (childInfodot.left + childInfodot.right) / 2.0, childInfodot.y, 0.8 * childInfodot.size / 2.0, contentItems,
                     {
                         title: childInfodot.title,
@@ -778,8 +779,8 @@ function numberWithCommas(n) {
 // 2. All Metadata. (isBuffered == false)
 // 3. All Content.  (isBuffered == true)
 function merge(src, dest) {
-    if ("t" + src.UniqueID === dest.id) {
-        var srcChildTimelines = src.ChildTimelines;
+    if (src.id === dest.guid) {
+        var srcChildTimelines = (src.timelines instanceof Array) ? src.timelines : [];
         var destChildTimelines = [];
         for (var i = 0; i < dest.children.length; i++)
             if (dest.children[i].type && dest.children[i].type === "timeline")
