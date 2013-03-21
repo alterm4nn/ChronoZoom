@@ -5,7 +5,6 @@ namespace Application.Driver
 {
     public class BrowserStateManager : CommonActions
     {
-        private DriverManager _driverManager;
         public bool HasInternetConnection { get; set; }
 
         public void RefreshState()

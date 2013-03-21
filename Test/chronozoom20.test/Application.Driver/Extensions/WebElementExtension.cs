@@ -7,13 +7,6 @@ namespace Application.Driver.Extensions
     public static class WebElementExtension
     {
         private static IJavaScriptExecutor _javaScriptExecutor;
-        private static DriverManager _driverManager;
-
-        //private static HelperManager ApplicationManager
-        //{
-        //    get { return ApplicationManager.GetEnvironmentInstance(); }
-        //}
-
         public static IJavaScriptExecutor JavaScriptExecutor
         {
             get { _javaScriptExecutor = DriverManager.GetEnvironmentInstance().GetJavaScriptExecutor(); return _javaScriptExecutor; }
