@@ -10,7 +10,7 @@ using System.Runtime.Serialization;
 namespace Chronozoom.Entities
 {
     [DataContract(Name = "ObjectType")]
-    public enum ObjectTypeEnum
+    public enum ObjectType
     {
         [EnumMember]
         Exhibit = 0,
@@ -23,16 +23,16 @@ namespace Chronozoom.Entities
     [DataContract]
     public class SearchResult
     {
-        [DataMember]
-        public Guid ID { get; set; }
+        [DataMember(Name="ID")]
+        public Guid Id { get; set; }
 
         [DataMember]
         public string Title { get; set; }
 
         [DataMember]
-        public ObjectTypeEnum ObjectType { get; set; }
+        public ObjectType ObjectType { get; set; }
 
-        [DataMember]
-        public int UniqueID { get; set; }
+        [DataMember(Name="UniqueID")]
+        public int UniqueId { get; set; }
     }
 }
