@@ -245,17 +245,15 @@ function LayoutContent(timeline, exhibitSize) {
     var sequencedContent = new Array();
     var unsequencedContent = new Array();
 
-    function PositionContent(contentArray, arrangedArray, intersectionFunc) {
-        if (timeline.timelines instanceof Array) {
-            timeline.timelines.forEach(function (tl) {
-                if (tl.Sequence)
-                    sequencedContent.push(tl);
-                else
-                    unsequencedContent.push(tl);
-            });
-        }
+    if (timeline.timelines instanceof Array) {
+        timeline.timelines.forEach(function (tl) {
+            if (tl.Sequence)
+                sequencedContent.push(tl);
+            else
+                unsequencedContent.push(tl);
+        });
     }
-
+    
     if (timeline.exhibits instanceof Array) {
         timeline.exhibits.forEach(function (eb) {
             eb.size = exhibitSize;
@@ -664,7 +662,7 @@ function animateElement(elem) {
 
         if (elem.baseline)
             elem.baseline = elem.newBaseline;
-    }    
+    }
 
     if (elem.newHeight != elem.height || elem.newY != elem.y) {
         args.push({
@@ -696,19 +694,19 @@ function animateElement(elem) {
     }
 
     if (isLayoutAnimation == false || args.length == 0)
-        duration = 0;    
-    
+        duration = 0;
+
     initializeAnimation(elem, duration, args);
 
     // first animate resize/transition of buffered content. skip new content
     if (elem.fadeIn == true) {
         for (var i = 0; i < elem.children.length; i++)
-            if (elem.children[i].fadeIn == true) 
+            if (elem.children[i].fadeIn == true)
                 animateElement(elem.children[i]);
     }
     else // animate new content (fadeIn = false)
         for (var i = 0; i < elem.children.length; i++)
-            animateElement(elem.children[i]);    
+            animateElement(elem.children[i]);
 }
 
 function initializeAnimation(elem, duration, args) {
@@ -883,7 +881,7 @@ function merge(src, dest) {
             // dest now contains all src children
             for (var i = 0; i < dest.children.length; i++)
                 convertRelativeToAbsoluteCoords(dest.children[i], dest.newY);
-            
+
             animateElement(dest);
         } else {
             dest.delta = 0;
@@ -909,40 +907,4 @@ function Merge(src, dest) {
             vc.virtualCanvas("requestInvalidate");
         }
     }
-}
-
-
-
-
-//loading the data from the service
-function loadData() {
-    var regimesUrl = "http://localhost:4949/api/Structure?"
-                 + "lca=00000000-0000-0000-0000-000000000000"
-                 + "&start=" + -5012
-                 + "&end=" + 0
-                 + "&minspan=" + 5013;
-    console.log(regimesUrl);
-
-    $.ajax({ // get basic skeleton (regime timelines)
-        cache: false,
-        type: "GET",
-        async: true,
-        dataType: "json",
-        url: regimesUrl,
-        success: function (result) {
-            ProcessContent(result);
-            vc.virtualCanvas("updateViewport");
-        },
-        error: function (xhr) {
-            alert("Error connecting to service:\n" + regimesUrl);
-        }
-    });
-}
-
-function ProcessContent(content) {
-    var root = vc.virtualCanvas("getLayerContent");
-    root.beginEdit();
-    Merge(content, root);
-    root.endEdit(true);
-    InitializeRegimes(content);
 }
