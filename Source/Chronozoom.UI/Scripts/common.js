@@ -25,6 +25,8 @@ var setNavigationStringTo; // { element or bookmark, id } identifies that we zoo
 var hashHandle = true; // Handle hash change event
 var tourNotParsed = undefined; // indicates that URL was checked at tour sharing after page load
 
+var supercollection = ""; // the supercollection associated with this url
+var collection = ""; // the collection associated with this url
 
 /* Calculates local offset of mouse cursor in specified jQuery element.
 @param jqelement  (JQuery to Dom element) jQuery element to get local offset for.
@@ -279,7 +281,7 @@ function loadDataUrl() {
     } else {
         switch (czDataSource) {
             case 'db':
-                return "Chronozoom.svc/get";
+                return "/Chronozoom.svc/get";
             case 'relay':
                 return "ChronozoomRelay";
             case 'dump':
@@ -295,10 +297,14 @@ function loadData() {
     timings.wcfRequestStarted = new Date();
     var url = loadDataUrl();
 
+    //load URL state
+    getURL();
+
     $.ajax({ //main content fetching
         cache: false,
         type: "GET",
         async: true,
+        data: { supercollection: supercollection, collection: collection },
         dataType: "json",
         url: url,
         success: function (result) {
@@ -320,7 +326,7 @@ function loadData() {
 
     var toursUrl;
     switch (czDataSource) {
-        case 'db': toursUrl = "Chronozoom.svc/getTours";
+        case 'db': toursUrl = "/Chronozoom.svc/getTours";
             break;
         case 'relay': toursUrl = "ChronozoomRelay";
             break;
@@ -334,6 +340,7 @@ function loadData() {
         async: true,
         dataType: "json",
         url: toursUrl,
+        data: { supercollection: supercollection, collection: collection },
         success: function (result) {
             parseTours(result);
             initializeToursContent();

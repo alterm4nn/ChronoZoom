@@ -225,7 +225,16 @@ function getURL() {
         url.protocol = result[1];
         url.host = result[2];
         url.port = result[3];
-        url.path = result[4];
+
+        //If PATH parameters exist
+        if (result[4] != "") {
+            url.path = result[4].split("/");
+
+            if (url.path.length > 1)
+                supercollection = url.path[0];
+            if (url.path.length > 2)
+                collection = url.path[1];
+        }
 
         //If GET parameters exists
         if (result[5] != "") {
@@ -283,7 +292,7 @@ function setURL(url, reload) {
 
     var path = url.protocol + "://" + url.host
         + ((url.port != "") ? (":" + url.port) : ("")) + "/"
-        + url.path;
+        + url.path.join("/");
 
     var params = new Array();
     for (var key in url.params) {

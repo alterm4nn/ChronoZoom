@@ -150,9 +150,9 @@ function getBibliography(exhibitID, contentItems) {
 
     var url;
     switch (czDataSource) {
-        case 'db': url = "Chronozoom.svc/GetBibliography";
+        case 'db': url = "/Chronozoom.svc/GetBibliography";
             break;
-        default: url = "Chronozoom.svc/GetBibliographyRelay";
+        default: url = "/Chronozoom.svc/GetBibliographyRelay";
             break;
     }
     $.ajax({
