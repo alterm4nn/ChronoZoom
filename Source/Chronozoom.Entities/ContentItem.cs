@@ -58,6 +58,8 @@ namespace Chronozoom.Entities
 
         [DataMember]
         public bool HasBibliography { get; set; }
+
+        public virtual Entities.Collection Collection { get; set; }
     }
 
     [DataContract]

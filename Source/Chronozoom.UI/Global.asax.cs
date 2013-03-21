@@ -9,6 +9,10 @@ using System.Diagnostics;
 using System.Web.Routing;
 using Chronozoom.Entities;
 using OuterCurve;
+using System.Web;
+using System.Web.Compilation;
+using System.Web.UI;
+using System.IO;
 
 namespace UI
 {
@@ -18,6 +22,30 @@ namespace UI
 
         internal static TraceSource Trace { get; set; }
 
+        public class WebFormRouteHandler<T> : IRouteHandler where T : IHttpHandler, new()
+        {
+            public string VirtualPath { get; set; }
+
+            public WebFormRouteHandler(string virtualPath)
+            {
+                this.VirtualPath = virtualPath;
+            }
+
+            public IHttpHandler GetHttpHandler(RequestContext requestContext)
+            {
+                return (VirtualPath != null)
+                    ? (IHttpHandler)BuildManager.CreateInstanceFromVirtualPath(VirtualPath, typeof(T))
+                    : new T();
+            }
+        }
+
+        public static void RegisterRoutes(RouteCollection routes)
+        {
+            var routeHandlerDetails = new WebFormRouteHandler<Page>("~/cz.aspx");
+
+            routes.Add(new Route("{supercollection}/{collection}/", routeHandlerDetails));
+        }
+
         public void Application_Start(object sender, EventArgs e)
         {
             Trace = new TraceSource("Global", SourceLevels.All);
@@ -25,6 +53,7 @@ namespace UI
             Storage.Trace.Listeners.Add(SignalRTraceListener);
 
             RouteTable.Routes.MapHubs();
+            RegisterRoutes(RouteTable.Routes);
 
             Trace.TraceInformation("Application Starting");
         }
