@@ -9,14 +9,14 @@ namespace Chronozoom.Models.Rest
     public class ContentItem
     {
         public string id;
+        public string parent;
         public string title;
         public string description;
         public string uri;
         public string mediaType;
 
-        // extra
+        // extra properties for backward compatibility
         public int UniqueID;
-        public string guid;
-        public int order;
+        public short? Order;
     }
 }
