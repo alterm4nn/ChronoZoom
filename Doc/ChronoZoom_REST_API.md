@@ -50,10 +50,10 @@ Use the **Get** command to return data within a specified range of years from a 
 ### GetThresholds ###
 Use the **GetThresholds** command to return the time thresholds that have been defined for a ChronoZoom instance.
 
+**Syntax**
     GetThresholds()
 
-For example:
-
+**HTTP**
     http://chronozoomproject.org/chronozoom.svc/GetThresholds
 
 **Parameters**
@@ -151,11 +151,12 @@ This command has no parameters.
 
 ----------
 ### Search ###
+Use the **Search** command to search for a specific term within a collection or a supercollection.
 
+**Syntax**
     Search(string supercollection, string collection, string searchTerm)
 
-For example:
-
+**HTTP**
     http://chronozoomproject.org/chronozoom.svc/Search?searchTerm=Pluto
 
 **Parameters**
@@ -173,3 +174,81 @@ For example:
 [top](#chronozoom-rest-api-reference)
 
 ----------
+### GetBibliography ###
+Use the **GetBibliography** command to return the bibliography for a given exhibit.
+
+**Syntax**
+    GetBibliography(string exhibitId)
+
+**HTTP**
+    http://chronozoomproject.org/chronozoom.svc/GetBibliography?exhibitId=[id]
+
+**Parameters**
+
+|Parameter|Type|Value|Required|
+|:--------|:---|:----|:-------|
+|exhibitId|string|ID of the exhibit.|Yes|
+
+**Example Result Data**
+
+!!! Todo: Need example data. !!!
+
+[top](#chronozoom-rest-api-reference)
+
+----------
+### GetTours ###
+Use the **GetTours** command to return a list of tours for a given collection or supercollection.
+!!! Todo: The parameter doesn't seem to have an effect on this command. Why? !!!
+
+**Syntax**
+    GetTours(string supercollection, string collection)
+
+**HTTP**
+    http://chronozoomproject.org/chronozoom.svc/GetTours?collection=Chronozoom.Entities
+
+**Parameters**
+
+|Parameter|Type|Value|Required|
+|:--------|:---|:----|:-------|
+|supercollection|string|Name of the supercollection to query.|No|
+|collection|string|Name of the collection to query.|No|
+
+**Example Result Data**
+!!! Todo: Add examples. !!!
+
+[top](#chronozoom-rest-api-reference)
+
+----------
+### GetSuperCollection ###
+Use the **GetSuperCollection** command to return the top supercollection for a given ChronoZoom deployment.
+!!! Todo: I am just guessing here, what does this really do? !!!
+
+**Syntax**
+    GetSuperCollection()
+
+**HTTP**
+    http://chronozoomproject.org/chronozoom.svc/GetSuperCollection
+
+**Parameters**
+This command has no parameters.
+
+**Example Result Data**
+    {
+       "d":{
+          "__type":"SuperCollection:#Chronozoom.Entities",
+          "Collections":[
+             {
+                "__type":"Collection:#Chronozoom.Entities",
+                "Id":"33ab754a-8252-4b98-82c8-bda86c14ac1a",
+                "Title":"TestUser",
+                "UserId":"TestUser"
+             }
+          ],
+          "Id":"c6689c5d-0ec5-d0d3-2a2f-cf54f63993b6",
+          "Title":"TestUser",
+          "UserId":"TestUser"
+       }
+    }
+
+
+[top](#chronozoom-rest-api-reference)
