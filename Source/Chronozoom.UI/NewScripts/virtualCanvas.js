@@ -584,48 +584,72 @@ Next <div> is rendered on the top of previous one.
         },
 
         findLca: function (wnd) {
-            var rootTimeline = this._layersContent.children[0];
-            return this._findLca(rootTimeline, wnd);
+            var cosmosTimeline = this._layersContent.children[0];
+
+            var eps = 1; // TODO: analyticaly calculate the proper eps
+            var cosmosLeft = cosmosTimeline.x + eps;
+            var cosmosRight = cosmosTimeline.x + cosmosTimeline.width - eps;
+            var cosmosTop = cosmosTimeline.y + eps;
+            var cosmosBottom = cosmosTimeline.y + cosmosTimeline.height - eps;
+
+            wnd.left = Math.max(cosmosLeft, Math.min(cosmosRight, wnd.x));
+            wnd.right = Math.max(cosmosLeft, Math.min(cosmosRight, wnd.x + wnd.width));
+            wnd.top = Math.max(cosmosTop, Math.min(cosmosBottom, wnd.y));
+            wnd.bottom = Math.max(cosmosTop, Math.min(cosmosBottom, wnd.y + wnd.height));
+
+            wnd.x = wnd.left;
+            wnd.y = wnd.top;
+            wnd.width = Math.max(0, wnd.right - wnd.left);
+            wnd.height = Math.max(0, wnd.bottom - wnd.top);
+
+            return this._findLca(cosmosTimeline, wnd);
         },
 
         /*
-        Check if we have all the data to render wnd at vp.visible.scale
+        Checks if we have all the data to render wnd at scale
         */
-        hasStructure: function (tl, wnd, scale) {
-            var b = tl.isBuffered;
-            for (var i = 0; i < tl.children.length; i++) {
-                if (tl.children[i].type === 'timeline' && tl.children[i].intersects(wnd) && tl.children[i].isVisibleOnScreen(scale)) {
-                    b = b && this.hasStructure(tl.children[i], wnd, scale);
+        _inBuffer: function (tl, wnd, scale) {
+            if (tl.intersects(wnd) && tl.isVisibleOnScreen(scale)) {
+                if (!tl.isBuffered) {
+                    return false;
+                } else {
+                    /*
+                    for (var i = 0; i < tl.children.length; i++) {
+                        if (tl.children[i].type === 'infodot')
+                            if (!tl.children[i].isBuffered)
+                                return false;
+                    }
+                    */
+                    var b = true;
+                    for (var i = 0; i < tl.children.length; i++) {
+                        if (tl.children[i].type === 'timeline')
+                            b = b && this._inBuffer(tl.children[i], wnd, scale);
+                    }
+                    return b;
                 }
             }
-            return b;
+            return true;
         },
 
-        isStructureMissing: function (wnd, scale) {
-            var rootTimeline = this._layersContent.children[0];
+        inBuffer: function(wnd, scale) {
+            var cosmosTimeline = this._layersContent.children[0];
 
-            if (!wnd.intersects(rootTimeline)) {
-                return false;
-            } else {
-                var eps = 1; // TODO: analyticaly calculate the proper eps
-                var cosmosTop = 0 + eps;
-                var cosmosLeft = -13700000000 + eps;
-                var cosmosRight = 0 - eps;
-                var cosmosBottom = 5535444444.444445 - eps;
+            var cosmosLeft = cosmosTimeline.x;
+            var cosmosRight = cosmosTimeline.x + cosmosTimeline.width;
+            var cosmosTop = cosmosTimeline.y;
+            var cosmosBottom = cosmosTimeline.y + cosmosTimeline.height;
 
-                wnd.left = Math.max(cosmosLeft, Math.min(cosmosRight, wnd.x));
-                wnd.right = Math.max(cosmosLeft, Math.min(cosmosRight, wnd.x + wnd.width));
-                wnd.top = Math.max(cosmosTop, Math.min(cosmosBottom, wnd.y));
-                wnd.bottom = Math.max(cosmosTop, Math.min(cosmosBottom, wnd.y + wnd.height));
+            wnd.left = Math.max(cosmosLeft, Math.min(cosmosRight, wnd.x));
+            wnd.right = Math.max(cosmosLeft, Math.min(cosmosRight, wnd.x + wnd.width));
+            wnd.top = Math.max(cosmosTop, Math.min(cosmosBottom, wnd.y));
+            wnd.bottom = Math.max(cosmosTop, Math.min(cosmosBottom, wnd.y + wnd.height));
 
-                wnd.x = wnd.left;
-                wnd.y = wnd.top;
-                wnd.width = Math.max(0, wnd.right - wnd.left);
-                wnd.height = Math.max(0, wnd.bottom - wnd.top);
-            }
+            wnd.x = wnd.left;
+            wnd.y = wnd.top;
+            wnd.width = Math.max(0, wnd.right - wnd.left);
+            wnd.height = Math.max(0, wnd.bottom - wnd.top);
 
-            var lca = this.findLca(wnd);
-            return !this.hasStructure(lca, wnd, scale);
+            return this._inBuffer(cosmosTimeline, wnd, scale);
         },
 
         options: {

@@ -257,8 +257,8 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
             ));
     }
 
-    var requestTimer;
-    this.getMissingStructure = function (vbox, lca, onSuccess, onError) {
+    var requestTimer = null;
+    this.getMissingData = function (vbox, lca, onSuccess1, onError1, onSuccess2, onError2) {
         window.clearTimeout(requestTimer);
         requestTimer = window.setTimeout(function () {
             var url = serverUrlBase
@@ -275,8 +275,17 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
                 async: true,
                 dataType: "json",
                 url: url,
-                success: onSuccess,
-                error: onError
+                context: { timerId: requestTimer },
+                success: function (result) {
+                    onSuccess1(result);
+                    if (this.timerId === requestTimer) {
+                        var url = serverUrlBase + "/api/Data?";
+                        console.log(url);
+                    }
+                },
+                error: function (xhr) {
+                    onError1(xhr);
+                }
             });
         }, 1000);
     }
@@ -300,9 +309,9 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
                 var vbox = viewportToViewBox(newlyEstimatedViewport);
                 var wnd = new CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
 
-                if (vc.virtualCanvas("isStructureMissing", wnd, newlyEstimatedViewport.visible.scale)) {
+                if (!vc.virtualCanvas("inBuffer", wnd, newlyEstimatedViewport.visible.scale)) {
                     var lca = vc.virtualCanvas("findLca", wnd);
-                    self.getMissingStructure(vbox, lca,
+                    self.getMissingData(vbox, lca,
                         function (result) {
                             Merge(result, lca);
                         },
@@ -434,9 +443,9 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
         var vbox = viewportToViewBox(targetViewport);
         var wnd = new CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
         
-        if (vc.virtualCanvas("isStructureMissing", wnd, targetViewport.visible.scale)) {
+        if (!vc.virtualCanvas("inBuffer", wnd, targetViewport.visible.scale)) {
             var lca = vc.virtualCanvas("findLca", wnd);
-            self.getMissingStructure(vbox, lca,
+            self.getMissingData(vbox, lca,
                 function (result) {
                     Merge(result, lca);
                 },
