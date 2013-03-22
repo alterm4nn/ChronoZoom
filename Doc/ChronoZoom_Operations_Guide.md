@@ -1,7 +1,7 @@
 # ChronoZoom Operations Guide #
 You can use the [Azure Management Portal](https://manage.windowsazure.com/) to configure and monitor your ChronoZoom site (and any other sites or resources that you have created on Azure). This guide summarizes the most common tasks that you will need to perform on Azure.
-
-## Common Operational Procedures ##
+ 
+## Common Operational Procedures ## 
 
 **To Monitor Performance Data:** Use the [Azure Management Portal](https://manage.windowsazure.com/) **DASHBOARD** management page. Here you can access performance data such as current service load, data flow, connections and requests. You can also download diagnostics logs under the quick glance section. Note that the option to generate logs must first be enabled from the **CONFIGURE** management page.
 
@@ -17,16 +17,16 @@ You can use the [Azure Management Portal](https://manage.windowsazure.com/) to c
 
 See the [Windows Azure Documentation](http://www.windowsazure.com/en-us/documentation/) for more detailed information.
 
-## Azure Managment Portal ##
+## Azure Management Portal ##
 
 When you first sign in to Azure, you are presented with a list of resources. The Web site that you are using to host ChronoZoom should appear within this list along with the associated SQL database.
 
 ![Azure Management Console: all items](images/ops_guide-1.png)
 
-Along the bottom of the page are several options: **New**, **Browse**, **Stop**, **Restart**, **Manage Domains**, **Delete**, and **Help**. Clicking the **Help** icon will display help content for whichever tab you are currently working in. The contents of the bottom bar will change depending on the tab you are in.
+Along the bottom of the page are several options: **New**, **Browse**, **Stop**, **Restart**, **Manage Domains**, **Delete**, and **Help**. Clicking the **Help** icon will display help content for whichever tab you are currently working in. The contents of the bottom bar will change depending on the tab you are in. 
 
 ![Bottom bar](images/ops_guide-0.png)
-
+ 
 ### DASHBOARD Management Page ###
 Click the name of your Web site to bring up the **DASHBOARD** management page. Here you can see all of the usage statistics for the site, as well as other useful information such as connection strings, URLs, FTP host name, and more.
 
