@@ -70,10 +70,6 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
     @param gesture      (PanGesture) The gesture to apply
     */
     function PanViewport(viewport, panGesture) {
-        if (CZ.Authoring.isActive || CZ.Authoring._isActive) {
-            return;
-        }
-        
         var virtualOffset = viewport.vectorScreenToVirtual(panGesture.xOffset, panGesture.yOffset);
         var oldVisible = viewport.visible;
         viewport.visible.centerX = oldVisible.centerX - virtualOffset.x;
@@ -85,10 +81,6 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
     @param gesture      (ZoomGesture) The gesture to apply
     */
     function ZoomViewport(viewport, zoomGesture) {
-        if (CZ.Authoring.isActive || CZ.Authoring._isActive) {
-            return;
-        }
-        
         var oldVisible = viewport.visible;
         var x = zoomGesture.xOrigin + (viewport.width / 2.0 - zoomGesture.xOrigin) * zoomGesture.scaleFactor;
         var y = zoomGesture.yOrigin + (viewport.height / 2.0 - zoomGesture.yOrigin) * zoomGesture.scaleFactor
@@ -347,7 +339,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
     }
 
     gesturesSource.Subscribe(function (gesture) {
-        if (typeof gesture != "undefined") {
+        if (typeof gesture != "undefined" && !(CZ.Authoring._isActive || CZ.Authoring.isActive)) {
             var isAnimationActive = self.activeAnimation;
             var oldId = isAnimationActive ? self.activeAnimation.ID : undefined;
 
