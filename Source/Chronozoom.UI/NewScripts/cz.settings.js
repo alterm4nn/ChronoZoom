@@ -143,4 +143,4 @@ longNavigationLength = 10; // length of navigation in long navigation regime
 
 // progresive loading
 serverUrlBase = document.URL.match(/((?:http:\/\/)?(?:[0-9a-zA-Z.:]+)(?:\/[^.]+\/)?)(.*)/)[1];
-minTimelineWidth = 20; // px
+minTimelineWidth = 100; // px

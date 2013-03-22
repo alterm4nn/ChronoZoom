@@ -403,8 +403,10 @@ function GenerateTitleObject(tlHeight, timeline, measureContext) {
 function Convert(parent, timeline) {
     //Creating timeline
     var tlColor = GetTimelineColor(timeline);
-    var t1 = addTimeline(parent, "layerTimelines", 't' + timeline.UniqueID, timeline.id, 
+    var t1 = addTimeline(parent, "layerTimelines", 't' + timeline.UniqueID,
     {
+        isBuffered: timeline.timelines instanceof Array,
+        guid: timeline.id,
         timeStart: timeline.left,
         timeEnd: timeline.right,
         top: timeline.y,
@@ -416,47 +418,18 @@ function Convert(parent, timeline) {
         regime: timeline.Regime,
         opacity: 0
     });
-    t1.isBuffered = timeline.timelines instanceof Array;
 
     //Creating Infodots
     if (timeline.exhibits instanceof Array) {
         timeline.exhibits.forEach(function (childInfodot) {
-            var date; // building a date to be shown in a title of the content item to the left of the title text.
-
-            var contentItems = new Array();
-            if (childInfodot.contentItems instanceof Array) {
-                childInfodot.contentItems.forEach(function (contentItemProt) {
-                    var mediaType = contentItemProt.mediaType;
-                    if (mediaType == "Picture")
-                        mediaType = 'image';
-                    else if (mediaType == "Video")
-                        mediaType = 'video';
-
-                    date = buildDate(contentItemProt);
-
-                    contentItems.push({
-                        id: 'c' + contentItemProt.UniqueID,
-                        guid: contentItemProt.id,
-                        title: contentItemProt.title,
-                        mediaUrl: contentItemProt.uri,
-                        mediaType: mediaType,
-                        description: contentItemProt.description,
-                        date: date,
-                        guid: contentItemProt.id,
-                        attribution: contentItemProt.Attribution,
-                        mediaSource: contentItemProt.MediaSource,
-                        order: contentItemProt.Order ? contentItemProt.Order : 0
-                    });
-                });
-            }
-
-            date = buildDate(childInfodot);
-            var infodot1 = addInfodot(t1, "layerInfodots", 'e' + childInfodot.UniqueID, childInfodot.id, 
+            var contentItems = [];
+            var infodot1 = addInfodot(t1, "layerInfodots", 'e' + childInfodot.UniqueID, 
                     (childInfodot.left + childInfodot.right) / 2.0, childInfodot.y, 0.8 * childInfodot.size / 2.0, contentItems,
                     {
-                        title: childInfodot.title,
-                        date: date,
+                        isBuffered: false,
                         guid: childInfodot.id,
+                        title: childInfodot.title,
+                        date: childInfodot.time,
                         opacity: 0
                     });
         });
@@ -468,19 +441,6 @@ function Convert(parent, timeline) {
             Convert(t1, childTimeLine);
         });
     }
-}
-
-function buildDate(obj) {
-    var date;
-    if (obj.Year) {
-        date = obj.Year;
-        if (obj.TimeUnit !== 'CE')
-            date += ' ' + obj.TimeUnit;
-    }
-    else {
-        date = obj.Date;
-    }
-    return date;
 }
 
 function GetTimelineColor(timeline) {

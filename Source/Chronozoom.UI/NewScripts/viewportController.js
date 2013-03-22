@@ -260,37 +260,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
     var requestTimer = null;
     this.getMissingData = function (vbox, lca) {
         window.clearTimeout(requestTimer);
-        requestTimer = window.setTimeout(getMissingTimelines(vbox, lca), 1000);
-    }
-
-    function extractExhibitIds(timeline) {
-        var ids = [];
-        if (timeline.exhibits instanceof Array) {
-            timeline.exhibits.forEach(function (childExhibit) {
-                ids.push(childExhibit.id);
-            });
-        }
-        if (timeline.timelines instanceof Array) {
-            timeline.timelines.forEach(function (childTimeline) {
-                ids = ids.concat(extractExhibitIds(childTimeline));
-            });
-        }
-        return ids;
-    }
-
-    function MergeContentItems(timeline, exhibitIds, exhibits) {
-        timeline.children.forEach(function (child) {
-            if (child.type === "infodot") {
-                var idx = exhibitIds.indexOf(child.guid);
-                if (idx !== -1)
-                    child.contentItems = exhibits[idx].contentItems;
-            }
-        });
-
-        timeline.children.forEach(function (child) {
-            if (child.type === "timeline")
-                MergeContentItems(child, exhibitIds, exhibits);
-        });
+        requestTimer = window.setTimeout(function () { getMissingTimelines(vbox, lca) }, 1000);
     }
 
     function getMissingTimelines(vbox, lca) {
@@ -300,7 +270,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
                 + "&start=" + vbox.left
                 + "&end=" + vbox.right
                 + "&minspan=" + minTimelineWidth * vbox.scale;
-        console.log(url);
+        console.log("[GET] " + url);
 
         $.ajax({
             type: "GET",
@@ -322,7 +292,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
 
     function getMissingExhibits(vbox, lca, exhibitIds) {
         var url = serverUrlBase + "/api/Data";
-        console.log(url);
+        console.log("[POST]" + url);
 
         $.ajax({
             type: "POST",
@@ -338,6 +308,37 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
             error: function (xhr) {
                 console.log("Error connecting to service:\n" + url);
             }
+        });
+    }
+
+    function extractExhibitIds(timeline) {
+        var ids = [];
+        if (timeline.exhibits instanceof Array) {
+            timeline.exhibits.forEach(function (childExhibit) {
+                ids.push(childExhibit.id);
+            });
+        }
+        if (timeline.timelines instanceof Array) {
+            timeline.timelines.forEach(function (childTimeline) {
+                ids = ids.concat(extractExhibitIds(childTimeline));
+            });
+        }
+        return ids;
+    }
+
+    function MergeContentItems(timeline, exhibitIds, exhibits) {
+        timeline.children.forEach(function (child) {
+            if (child.type === "infodot") {
+                var idx = exhibitIds.indexOf(child.guid);
+                if (idx !== -1) {
+                    child.contentItems = exhibits[idx].contentItems;
+                }
+            }
+        });
+
+        timeline.children.forEach(function (child) {
+            if (child.type === "timeline")
+                MergeContentItems(child, exhibitIds, exhibits);
         });
     }
 
