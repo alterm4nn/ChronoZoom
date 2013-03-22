@@ -5,7 +5,7 @@ The ChronoZoom Representational State Transfer (REST) API makes it possible to p
 ## Contents ##
 - Request URL Syntax
 - ChronoZoom REST Commands
-    - Get
+    - [Get](#get)
     - GetThresholds
     - Search
     - GetBibliography
@@ -25,7 +25,7 @@ For example:
 ## ChronoZoom REST Commands ##
 
 ### Get ###
-
+Use the **Get** command to return data within a specified range of years from a collection or a supercollection.
 
     Get(string supercollection, string collection, string start, string end, string timespan)
 
@@ -35,4 +35,6 @@ For example:
 |:--------|:---|:----|:-------|
 |supercollection|string|Name of the supercollection to query.|No|
 |collection|string|Name of the collection to query.|No|
-
+|start|float|Year at which to begin the search, between -20000000000 and 9999.|Yes|
+|end|float|Year at which to end the search, between -20000000000 and 9999.|Yes|
+|timespan|int|Filters the search results to a particular length of time.|Yes|
