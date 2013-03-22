@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright company="Outercurve Foundation">
+//   Copyright (c) 2013, The Outercurve Foundation
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
 
-namespace UI.Models
+namespace Chronozoom.Api.Models
 {
     public class Collection
     {

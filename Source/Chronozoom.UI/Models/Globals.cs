@@ -6,7 +6,7 @@
 
 
 using System.Collections.Generic;
-using UI.Models;
+
 namespace Chronozoom.Api.Models
 {
     public static class Globals

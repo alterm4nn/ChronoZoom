@@ -1,12 +1,8 @@
 ﻿using Chronozoom.Api.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Http;
-using UI.Models;
 
-namespace UI.Controllers
+namespace Chronozoom.Api.Controllers
 {
 
     public class CollectionController : ApiController
