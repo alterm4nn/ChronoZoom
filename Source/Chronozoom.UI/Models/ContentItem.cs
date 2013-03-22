@@ -8,20 +8,37 @@ namespace Chronozoom.Api.Models
 {
     public class ContentItem
     {
-        public string ID;
-        public string Title;
-        public string Caption;
-        public string Threshold;
-        public string Regime;
-        public string TimeUnit;
-        //public DateTime? Date;
-        public double? Year;
-        public string MediaType;
-        public string Uri;
-        public string MediaSource;
-        public string Attribution;
+        public string id;
+        public string parent;
+        public string title;
+        public string description;
+        public string uri;
+        public string mediaType;
+
+        // extra properties for backward compatibility
         public int UniqueID;
         public short? Order;
-        public bool HasBibliography;
+    }
+
+    public static class ContentItemExtensions
+    {
+        public static ContentItem CloneData(this ContentItem contentItem)
+        {
+            var clone = new ContentItem()
+            {
+                id = contentItem.id,
+                parent = contentItem.parent,
+                title = contentItem.title,
+                description = contentItem.description,
+                uri = contentItem.uri,
+                mediaType = contentItem.mediaType,
+
+                // extra properties for backward compatibility
+                UniqueID = contentItem.UniqueID,
+                Order = contentItem.Order
+            };
+
+            return clone;
+        }
     }
 }
