@@ -1,4 +1,4 @@
-﻿var isLayoutAnimation = false; // temp variable for debugging
+﻿var isLayoutAnimation = true; // temp variable for debugging
 var animatingElements = {}; // hashmap of animating elements of virtual canvas
 
 function Timeline(title, left, right, childTimelines, exhibits) {
@@ -510,7 +510,7 @@ var FindChildTimeline = function (timeline, id, recursive) {
         var n = timeline.timelines.length;
         for (var i = 0; i < n; i++) {
             var childTimeline = timeline.timelines[i];
-            if (childTimeline.ID == id) {
+            if (childTimeline.id == id) {
                 // timeline was found
                 result = childTimeline;
                 break;

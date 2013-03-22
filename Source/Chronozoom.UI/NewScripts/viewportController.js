@@ -258,36 +258,87 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
     }
 
     var requestTimer = null;
-    this.getMissingData = function (vbox, lca, onSuccess1, onError1, onSuccess2, onError2) {
+    this.getMissingData = function (vbox, lca) {
         window.clearTimeout(requestTimer);
-        requestTimer = window.setTimeout(function () {
-            var url = serverUrlBase
+        requestTimer = window.setTimeout(getMissingTimelines(vbox, lca), 1000);
+    }
+
+    function extractExhibitIds(timeline) {
+        var ids = [];
+        if (timeline.exhibits instanceof Array) {
+            timeline.exhibits.forEach(function (childExhibit) {
+                ids.push(childExhibit.id);
+            });
+        }
+        if (timeline.timelines instanceof Array) {
+            timeline.timelines.forEach(function (childTimeline) {
+                ids = ids.concat(extractExhibitIds(childTimeline));
+            });
+        }
+        return ids;
+    }
+
+    function MergeContentItems(timeline, exhibitIds, exhibits) {
+        timeline.children.forEach(function (child) {
+            if (child.type === "infodot") {
+                var idx = exhibitIds.indexOf(child.guid);
+                if (idx !== -1)
+                    child.contentItems = exhibits[idx].contentItems;
+            }
+        });
+
+        timeline.children.forEach(function (child) {
+            if (child.type === "timeline")
+                MergeContentItems(child, exhibitIds, exhibits);
+        });
+    }
+
+    function getMissingTimelines(vbox, lca) {
+        var url = serverUrlBase
                 + "/api/Structure?"
                 + "lca=" + lca.guid
                 + "&start=" + vbox.left
                 + "&end=" + vbox.right
                 + "&minspan=" + minTimelineWidth * vbox.scale;
-            console.log(url);
+        console.log(url);
 
-            $.ajax({
-                cache: false,
-                type: "GET",
-                async: true,
-                dataType: "json",
-                url: url,
-                context: { timerId: requestTimer },
-                success: function (result) {
-                    onSuccess1(result);
-                    if (this.timerId === requestTimer) {
-                        var url = serverUrlBase + "/api/Data?";
-                        console.log(url);
-                    }
-                },
-                error: function (xhr) {
-                    onError1(xhr);
-                }
-            });
-        }, 1000);
+        $.ajax({
+            type: "GET",
+            url: url,
+            async: true,
+            cache: false,
+            dataType: "json",
+            context: { timerId: requestTimer },
+            success: function (response) {
+                Merge(response, lca);
+                var exhibitIds = extractExhibitIds(response);
+                getMissingExhibits(vbox, lca, exhibitIds);
+            },
+            error: function (xhr) {
+                console.log("Error connecting to service:\n" + url);
+            }
+        });
+    }
+
+    function getMissingExhibits(vbox, lca, exhibitIds) {
+        var url = serverUrlBase + "/api/Data";
+        console.log(url);
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: JSON.stringify({ ids: exhibitIds }),
+            async: true,
+            cache: false,
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            success: function (response) {
+                MergeContentItems(lca, exhibitIds, response.exhibits);
+            },
+            error: function (xhr) {
+                console.log("Error connecting to service:\n" + url);
+            }
+        });
     }
 
     gesturesSource.Subscribe(function (gesture) {
@@ -311,14 +362,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
 
                 if (!vc.virtualCanvas("inBuffer", wnd, newlyEstimatedViewport.visible.scale)) {
                     var lca = vc.virtualCanvas("findLca", wnd);
-                    self.getMissingData(vbox, lca,
-                        function (result) {
-                            Merge(result, lca);
-                        },
-                        function (xhr) {
-                            alert("Error connecting to service: " + xhr.responseText);
-                        }
-                    );
+                    self.getMissingData(vbox, lca);
                 }
 
                 if (!self.estimatedViewport) { //if there is no ongoing PanZoom animation create it
@@ -445,14 +489,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
         
         if (!vc.virtualCanvas("inBuffer", wnd, targetViewport.visible.scale)) {
             var lca = vc.virtualCanvas("findLca", wnd);
-            self.getMissingData(vbox, lca,
-                function (result) {
-                    Merge(result, lca);
-                },
-                function (xhr) {
-                    alert("Error connecting to service: " + xhr.responseText);
-                }
-            );
+            self.getMissingData(vbox, lca);
         }
 
         if (noAnimation) {
