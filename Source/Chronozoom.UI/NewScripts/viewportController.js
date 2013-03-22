@@ -85,6 +85,10 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
     @param gesture      (ZoomGesture) The gesture to apply
     */
     function ZoomViewport(viewport, zoomGesture) {
+        if (CZ.Authoring.isActive || CZ.Authoring._isActive) {
+            return;
+        }
+        
         var oldVisible = viewport.visible;
         var x = zoomGesture.xOrigin + (viewport.width / 2.0 - zoomGesture.xOrigin) * zoomGesture.scaleFactor;
         var y = zoomGesture.yOrigin + (viewport.height / 2.0 - zoomGesture.yOrigin) * zoomGesture.scaleFactor

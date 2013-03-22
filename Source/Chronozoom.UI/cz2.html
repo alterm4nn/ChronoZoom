@@ -573,17 +573,63 @@
             };
         });
 
-        function showCreateTimelineForm() {
-            $("#addTimelineDialog").dialog({ modal: true, height: 500, width: 500 });
-            $("#timelineStartInput").spinner();
-            $("#timelineEndInput").spinner();
-            $("#timelineVerticalInput").spinner();
-            $("#saveTimelineButton").button();
+        function showCreateTimelineForm(t) {
+            var isCancel = true;
+            var titleInput = $("#timelineTitleInput");
+            var startInput = $("#timelineStartInput").spinner();
+            var endInput = $("#timelineEndInput").spinner();
+            //var saveButton = $("#saveTimelineButton").button();
+
+            titleInput.val(t.title);
+            startInput.val(t.x);
+            endInput.val(t.x + t.width);
+
+            $("#createTimelineForm").dialog({
+                modal: true,
+                height: 600,
+                width: 600,
+                buttons: {
+                    "save and close": function () {
+                        CZ.Authoring.updateTimeline(t, {
+                            title: titleInput.val(),
+                            start: startInput.val(),
+                            end: endInput.val(),
+                        });
+                        isCancel = false;
+                        CZ.Authoring._isActive = false;
+                        $(this).dialog("close");
+                        $("a:contains('create timeline')").removeClass("active");
+                    }
+                },
+                close: function () {
+                    if (isCancel) {
+                        CZ.Authoring.removeTimeline(t);
+                    }
+                    CZ.Authoring._isActive = false;
+                    $("a:contains('create timeline')").removeClass("active");
+                }
+            });
+
+            // saveButton.off("click");
+            // saveButton.on("click", function (event) {
+            //     CZ.Authoring.updateTimeline(t, {
+            //         title: titleInput.val(),
+            //         start: startInput.val(),
+            //         end: endInput.val(),
+            //     });
+            //     form.dialog("close");
+            // });
         }
 
         function createTimeline() {
-            CZ.Authoring._isActive = true;
+            CZ.Authoring._isActive = !CZ.Authoring._isActive;
             CZ.Authoring.mode = "createTimeline";
+
+            if (CZ.Authoring._isActive) {
+                $("a:contains('create timeline')").addClass("active");
+            } else {
+                $("a:contains('create timeline')").removeClass("active");
+            }
         }
 
         function editTimeline() {
@@ -814,7 +860,7 @@
             </a>
 
             <!--Create Timeline popup dialog-->
-            <div id="addTimelineDialog" title="create timeline" style="background-color: rgb(60, 95, 150); display: none; color: white;">
+            <div id="createTimelineForm" title="create timeline" style="background-color: rgb(60, 95, 150); display: none; color: white;">
                 <p>
                     <label style="display: block">title</label>
                     <input id="timelineTitleInput" style="display: block" type="text" />
@@ -838,14 +884,9 @@
                     </select>
                 </p>
 
-                <p style="display: inline-block">
-                    <label style="display: block">vertical units</label>
-                    <input id="timelineVerticalInput" style="display: block" />
-                </p>
-
-                <p>
+                <!-- <p>
                     <button id="saveTimelineButton" style="display: block">save and close</button>
-                </p>
+                </p> -->
             </div>
 
         </div>

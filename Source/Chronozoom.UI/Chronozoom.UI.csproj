@@ -169,6 +169,7 @@
     <Content Include="Images\zoomout_hover.png" />
     <Content Include="Images\zoomout_pressed.png" />
     <Content Include="Images\zoomout_rest.png" />
+    <Content Include="NewScripts\newauthoring.js" />
     <Content Include="Privacy.htm" />
     <Content Include="robots.txt" />
     <Content Include="ScriptsMobile\axis.mobile.js" />

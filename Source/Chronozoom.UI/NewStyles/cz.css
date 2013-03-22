@@ -1439,6 +1439,13 @@ img.fallbackBackground {
         cursor: default;
     }
 
+.footer-authoring-link.active {
+	color:              black;
+    background-color:   #BFBFBF;
+    text-decoration:    none;
+    cursor: default;
+}
+
 .authModeSwitch {
     background: grey;
     color: white;
