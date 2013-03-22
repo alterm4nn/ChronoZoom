@@ -1,5 +1,6 @@
 ﻿var isLayoutAnimation = true; // temp variable for debugging
-var animatingElements = {}; // hashmap of animating elements of virtual canvas
+var dynamicLayoutActive = false; // indicates wheter dynamic layout animation is active or no
+var dynamicLayoutTimeout; // reference to active timeout
 
 function Timeline(title, left, right, childTimelines, exhibits) {
     this.Title = title;
@@ -253,7 +254,7 @@ function LayoutContent(timeline, exhibitSize) {
                 unsequencedContent.push(tl);
         });
     }
-    
+
     if (timeline.exhibits instanceof Array) {
         timeline.exhibits.forEach(function (eb) {
             eb.size = exhibitSize;
@@ -423,13 +424,13 @@ function Convert(parent, timeline) {
     if (timeline.exhibits instanceof Array) {
         timeline.exhibits.forEach(function (childInfodot) {
             var contentItems = [];
-            var infodot1 = addInfodot(t1, "layerInfodots", 'e' + childInfodot.UniqueID, 
+            var infodot1 = addInfodot(t1, "layerInfodots", 'e' + childInfodot.UniqueID,
                     (childInfodot.left + childInfodot.right) / 2.0, childInfodot.y, 0.8 * childInfodot.size / 2.0, contentItems,
                     {
-                        isBuffered: false,
-                        guid: childInfodot.id,
-                        title: childInfodot.title,
-                        date: childInfodot.time,
+                            isBuffered: false,
+                            guid: childInfodot.id,
+                            title: childInfodot.title,
+                            date: childInfodot.time,
                         opacity: 0
                     });
         });
@@ -623,26 +624,19 @@ function animateElement(elem) {
 
         if (elem.baseline)
             elem.baseline = elem.newBaseline;
-    }
+    }    
 
-    if (elem.newHeight != elem.height || elem.newY != elem.y) {
+    if (elem.newY != elem.y && !elem.id.match("__header__")) 
         args.push({
             property: "y",
             startValue: elem.y,
             targetValue: elem.newY
         });
+    if (elem.newHeight != elem.height && !elem.id.match("__header__"))
         args.push({
             property: "height",
             startValue: elem.height,
             targetValue: elem.newHeight
-        });
-    }
-
-    if (elem.baseline)
-        args.push({
-            property: "baseline",
-            startValue: elem.baseline,
-            targetValue: elem.newBaseline
         });
 
     if (elem.opacity != 1 && elem.fadeIn == false) {
@@ -655,25 +649,23 @@ function animateElement(elem) {
     }
 
     if (isLayoutAnimation == false || args.length == 0)
-        duration = 0;
-
+        duration = 0;    
+    
     initializeAnimation(elem, duration, args);
 
     // first animate resize/transition of buffered content. skip new content
     if (elem.fadeIn == true) {
         for (var i = 0; i < elem.children.length; i++)
-            if (elem.children[i].fadeIn == true)
+            if (elem.children[i].fadeIn == true) 
                 animateElement(elem.children[i]);
     }
     else // animate new content (fadeIn = false)
         for (var i = 0; i < elem.children.length; i++)
-            animateElement(elem.children[i]);
+            animateElement(elem.children[i]);    
 }
 
 function initializeAnimation(elem, duration, args) {
     var startTime = (new Date()).getTime();
-
-    animatingElements[elem.id] = elem; // update/push element in hashmap
 
     elem.animation = {
         isAnimating: true, // indicates if there is ongoing animation
@@ -681,6 +673,18 @@ function initializeAnimation(elem, duration, args) {
         startTime: startTime, // start time of the animation
         args: args // arguments of canvas element that should be animated
     };
+
+    if (duration != 0) {
+        dynamicLayoutActive = true;
+
+        if (dynamicLayoutTimeout)
+            clearTimeout(dynamicLayoutTimeout);
+
+        // set new timeout (while animation is on dynamicLayoutActive is true otherwise its false)
+        dynamicLayoutTimeout = window.setTimeout(function () {
+            dynamicLayoutActive = false;
+        }, duration + 500);
+    }
 
     // calculates new animation frame of element
     elem.calculateNewFrame = function () {
@@ -703,7 +707,6 @@ function initializeAnimation(elem, duration, args) {
         if (t == 1.0) {
             elem.animation.isAnimating = false;
             elem.animation.args = [];
-            delete animatingElements[elem.id]; // remove element from hashmap
 
             if (elem.fadeIn == false)
                 elem.fadeIn = true;
@@ -802,8 +805,13 @@ function merge(src, dest) {
 
                 // update title pos after expansion
                 dest.delta = Math.max(0, (bottom - top) - (origBottom - origTop));
+                // hide animating text
+                // TODO: find the better way to fix text shacking bug if possible
                 dest.titleObject.newY += dest.delta;
                 dest.titleObject.newBaseline += dest.delta;
+                dest.titleObject.opacity = 0;
+                dest.titleObject.fadeIn = false;
+                delete dest.titleObject.animation;
 
                 // assert: child content cannot exceed parent
                 if (bottom > dest.titleObject.newY) {
@@ -828,8 +836,6 @@ function merge(src, dest) {
                         }
                     }
                 }
-
-                animateElement(dest);
             }
         } else if (srcChildTimelines.length > 0 && destChildTimelines.length === 0) { // dest does not contain any src children
             var t = generateLayout(src, dest);
@@ -847,8 +853,6 @@ function merge(src, dest) {
             // dest now contains all src children
             for (var i = 0; i < dest.children.length; i++)
                 convertRelativeToAbsoluteCoords(dest.children[i], dest.newY);
-
-            animateElement(dest);
         } else {
             dest.delta = 0;
         }
