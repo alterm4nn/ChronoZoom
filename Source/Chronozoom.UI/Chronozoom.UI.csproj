@@ -253,6 +253,12 @@
     <Content Include="Scripts\gestures.min.js.map">
       <DependentUpon>gestures.js</DependentUpon>
     </Content>
+    <Content Include="Dumps\aidsstandalone-get.json" />
+    <Content Include="Dumps\aidstimeline-get.json" />
+    <Content Include="Dumps\aidstimeline-gettours.json" />
+    <Content Include="Dumps\beta-get.json" />
+    <Content Include="Dumps\beta-getthresholds.json" />
+    <Content Include="Dumps\beta-gettours.json" />
     <None Include="Scripts\jquery-1.6.4-vsdoc.js" />
     <Content Include="Scripts\gestures.js">
       <DependentUpon>gestures.ts</DependentUpon>
@@ -389,9 +395,6 @@
     <Content Include="Images\tour_play_on.jpg" />
     <Content Include="Images\tour_prev_off.jpg" />
     <Content Include="Images\tour_prev_on.jpg" />
-    <Content Include="ResponseDumpThresholds.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="NewScripts\bibliography.js" />
     <Content Include="NewScripts\search.js" />
     <Content Include="Scripts\bibliography.ts" />
@@ -408,7 +411,6 @@
     <Content Include="testTour.htm" />
     <Content Include="testAudio.mp3" />
     <Content Include="testAudioPlayback.htm" />
-    <Content Include="ResponseDump.txt" />
     <Content Include="NewScripts\tours.js" />
     <Content Include="Scripts\tours.ts" />
     <Content Include="testAsyncImageLoad.htm" />
