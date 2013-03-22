@@ -1,17 +1,44 @@
 ﻿/// <reference path="../Utils/jquery-1.8.0.min.js" />
+/// <reference path="../Utils/jasmine-jquery.js" />
 /// <reference path="../Js/timescale.js" />
 /// <reference path="../Js/common.js" />
 /// <reference path="../Js/cz.settings.js" />
+/// <reference path="../Js/settings.js" />
 
-describe("Timescale constructor", function () {
-    it("should throw exception if container undifined", function () {
-        var container;
-        expect(function () { new CZ.Timescale(container) }).toThrow(new Error("Container parameter is undefined!"));
+describe("CZ.Timescale part", function () {
+    
+    describe("constructor", function () {
+        it("should throw exception if container undifined", function () {
+            var container;
+            expect(function () { new CZ.Timescale(container) }).toThrow(new Error("Container parameter is undefined!"));
+        });
+
+        it("should throw exception if container is no 'div'", function () {
+            var container = document.createElement('table');
+            expect(function () { new CZ.Timescale(container) }).toThrow(new Error("Container parameter is invalid! It should be DIV, or ID of DIV, or jQuery instance of DIV."));
+        });
     });
+    
+    describe("setTimeBorders() method should return", function () {
+        
+        beforeEach(function () {
+            setFixtures('<body></body>');
+            $('body').prepend('<div id="axis"></div>');
+            $('body').prepend('<p id="timescale_left_border"></p>');
+            $('body').prepend('<p id="timescale_right_border"></p>');
+            _width = 1904;
+            _height = 75;
+            _mode = "cosmos";
+            var range = { min: -4042918454.9356203, max: 2013 };
+            tm = new CZ.Timescale($('#axis'));
+            tm.update(range);
+        });
 
-    it("should throw exception if container is no 'div'", function () {
-        var container = document.createElement('table');
-        expect(function () { new CZ.Timescale(container) }).toThrow(new Error("Container parameter is invalid! It should be DIV, or ID of DIV, or jQuery instance of DIV."));
+        it("4042.9 Ma and 0.0 Ma when navigate to Life", function () {
+            tm.setTimeBorders();
+            expect("4042.9 Ma").toEqual($('#timescale_left_border').text());
+            expect("0.0 Ma").toEqual($('#timescale_right_border').text());
+        });
     });
 });
 
@@ -329,3 +356,4 @@ describe("CZ.ClockTickSource part", function () {
         
     });
 });
+
