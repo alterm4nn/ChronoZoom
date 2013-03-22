@@ -1,5 +1,6 @@
 ﻿var isLayoutAnimation = true; // temp variable for debugging
-var animatingElements = {}; // hashmap of animating elements of virtual canvas
+var dynamicLayoutActive = false; // indicates wheter dynamic layout animation is active or no
+var dynamicLayoutTimeout; // reference to active timeout
 
 function Timeline(title, left, right, childTimelines, exhibits) {
     this.Title = title;
@@ -19,17 +20,21 @@ function titleObject(name) {
 }
 
 function Prepare(timeline) {
-    GenerateProperty(timeline, "FromTimeUnit", "FromYear", "FromMonth", "FromDay", "left");
-    GenerateProperty(timeline, "ToTimeUnit", "ToYear", "ToMonth", "ToDay", "right");
+    timeline.left = timeline.start;
+    timeline.right = timeline.end;
 
-    timeline.Exhibits.forEach(function (exhibit) {
-        GenerateProperty(exhibit, "TimeUnit", "Year", "Month", "Day", "x");
-    });
+    if (timeline.exhibits instanceof Array) {
+        timeline.exhibits.forEach(function (exhibit) {
+            exhibit.x = exhibit.time;
+        });
+    }
 
-    timeline.ChildTimelines.forEach(function (childTimeline) {
-        childTimeline.ParentTimeline = timeline;
-        Prepare(childTimeline);
-    });
+    if (timeline.timelines instanceof Array) {
+        timeline.timelines.forEach(function (childTimeline) {
+            childTimeline.ParentTimeline = timeline;
+            Prepare(childTimeline);
+        });
+    }
 
     GenerateAspect(timeline);
     if (timeline.Height)
@@ -65,39 +70,45 @@ function LayoutTimeline(timeline, parentWidth, measureContext) {
         timeline.height = timelineWidth / timeline.AspectRatio;
     }
 
-    timeline.ChildTimelines.forEach(function (tl) {
-        //If child timeline has fixed aspect ratio, calculate its height according to it
-        if (tl.AspectRatio) {
-            tl.height = (tl.right - tl.left) / tl.AspectRatio;
-        } else if (timeline.height && tl.Height) {
-            //If Child timeline has height in percentage of parent, calculate it before layout pass
-            tl.height = timeline.height * tl.Height;
-        }
-        //Calculate layout for each child timeline
-        LayoutTimeline(tl, timelineWidth, measureContext);
-    });
+    if (timeline.timelines instanceof Array) {
+        timeline.timelines.forEach(function (tl) {
+            //If child timeline has fixed aspect ratio, calculate its height according to it
+            if (tl.AspectRatio) {
+                tl.height = (tl.right - tl.left) / tl.AspectRatio;
+            } else if (timeline.height && tl.Height) {
+                //If Child timeline has height in percentage of parent, calculate it before layout pass
+                tl.height = timeline.height * tl.Height;
+            }
+            //Calculate layout for each child timeline
+            LayoutTimeline(tl, timelineWidth, measureContext);
+        });
+    }
 
     if (!timeline.height) {
         //Searching for timeline with the biggest ratio between its height percentage and real height
         var scaleCoef = undefined;
-        timeline.ChildTimelines.forEach(function (tl) {
-            if (tl.Height && !tl.AspectRatio) {
-                var localScale = tl.height / tl.Height;
-                if (!scaleCoef || scaleCoef < localScale)
-                    scaleCoef = localScale;
-            }
-        });
-        //Scaling timelines to make their percentages corresponding to each other
-        if (scaleCoef) {
-            timeline.ChildTimelines.forEach(function (tl) {
+        if (timeline.timelines instanceof Array) {
+            timeline.timelines.forEach(function (tl) {
                 if (tl.Height && !tl.AspectRatio) {
-                    var scaleParam = scaleCoef * tl.Height / tl.height;
-                    if (scaleParam > 1) {
-                        tl.realY *= scaleParam;
-                        Scale(tl, scaleParam, measureContext);
-                    }
+                    var localScale = tl.height / tl.Height;
+                    if (!scaleCoef || scaleCoef < localScale)
+                        scaleCoef = localScale;
                 }
             });
+        }
+        //Scaling timelines to make their percentages corresponding to each other
+        if (scaleCoef) {
+            if (timeline.timelines instanceof Array) {
+                timeline.timelines.forEach(function (tl) {
+                    if (tl.Height && !tl.AspectRatio) {
+                        var scaleParam = scaleCoef * tl.Height / tl.height;
+                        if (scaleParam > 1) {
+                            tl.realY *= scaleParam;
+                            Scale(tl, scaleParam, measureContext);
+                        }
+                    }
+                });
+            }
             //Set final timelineHeight
             timeline.height = scaleCoef;
         }
@@ -112,15 +123,17 @@ function LayoutTimeline(timeline, parentWidth, measureContext) {
     if (timeline.height) {
         var titleObject = GenerateTitleObject(timeline.height, timeline, measureContext);
 
-        if (timeline.Exhibits.length > 0 && (tlRes.max - tlRes.min) < timeline.height) {
-            while ((res.max - res.min) > (timeline.height - titleObject.bboxHeight) && exhibitSize > timelineWidth / 20.0) {
-                exhibitSize /= 1.5;
-                res = LayoutContent(timeline, exhibitSize);
+        if (timeline.exhibits instanceof Array) {
+            if (timeline.exhibits.length > 0 && (tlRes.max - tlRes.min) < timeline.height) {
+                while ((res.max - res.min) > (timeline.height - titleObject.bboxHeight) && exhibitSize > timelineWidth / 20.0) {
+                    exhibitSize /= 1.5;
+                    res = LayoutContent(timeline, exhibitSize);
+                }
             }
         }
 
         if ((res.max - res.min) > (timeline.height - titleObject.bboxHeight) && Log) {
-            Log.push("Warning: Child timelines and exhibits doesn't fit into parent. Timeline name: " + timeline.Title);
+            Log.push("Warning: Child timelines and exhibits doesn't fit into parent. Timeline name: " + timeline.title);
             var contentHeight = res.max - res.min;
             var fullHeight = contentHeight / (1 - headerPercent);
             var titleObject = GenerateTitleObject(fullHeight, timeline, measureContext);
@@ -128,13 +141,13 @@ function LayoutTimeline(timeline, parentWidth, measureContext) {
         } else {
             //var scale = (timeline.height - titleObject.bboxHeight) / (res.max - res.min);
             //if (scale > 1) {
-            //    timeline.ChildTimelines.forEach(function (tl) {
+            //    timeline.timelines.forEach(function (tl) {
             //        tl.realY *= scale;
             //        if (!tl.AspectRatio)
             //            Scale(tl, scale, measureContext);
             //    });
 
-            //    timeline.Exhibits.forEach(function (eb) {
+            //    timeline.exhibits.forEach(function (eb) {
             //        eb.realY *= scale;
             //    });
             //}
@@ -161,13 +174,17 @@ function LayoutTimeline(timeline, parentWidth, measureContext) {
     timeline.realHeight = timeline.height + 2 * timeline.heightEps;
     timeline.realY = 0;
 
-    timeline.Exhibits.forEach(function (infodot) {
-        infodot.realY -= res.min;
-    });
+    if (timeline.exhibits instanceof Array) {
+        timeline.exhibits.forEach(function (infodot) {
+            infodot.realY -= res.min;
+        });
+    }
 
-    timeline.ChildTimelines.forEach(function (tl) {
-        tl.realY -= res.min;
-    });
+    if (timeline.timelines instanceof Array) {
+        timeline.timelines.forEach(function (tl) {
+            tl.realY -= res.min;
+        });
+    }
 }
 
 function PositionContent(contentArray, arrangedArray, intersectionFunc) {
@@ -229,34 +246,38 @@ function LayoutContent(timeline, exhibitSize) {
     var sequencedContent = new Array();
     var unsequencedContent = new Array();
 
-    timeline.ChildTimelines.forEach(function (tl) {
-        if (tl.Sequence)
-            sequencedContent.push(tl);
-        else
-            unsequencedContent.push(tl);
-    });
+    if (timeline.timelines instanceof Array) {
+        timeline.timelines.forEach(function (tl) {
+            if (tl.Sequence)
+                sequencedContent.push(tl);
+            else
+                unsequencedContent.push(tl);
+        });
+    }
 
-    timeline.Exhibits.forEach(function (eb) {
-        eb.size = exhibitSize;
-        eb.left = eb.x - eb.size / 2.0;
-        eb.right = eb.x + eb.size / 2.0;
-        eb.realHeight = exhibitSize;
+    if (timeline.exhibits instanceof Array) {
+        timeline.exhibits.forEach(function (eb) {
+            eb.size = exhibitSize;
+            eb.left = eb.x - eb.size / 2.0;
+            eb.right = eb.x + eb.size / 2.0;
+            eb.realHeight = exhibitSize;
 
-        if (eb.left < timeline.left) {
-            eb.left = timeline.left;
-            eb.right = eb.left + eb.size;
-            eb.isDeposed = true;
-        } else if (eb.right > timeline.right) {
-            eb.right = timeline.right;
-            eb.left = timeline.right - eb.size;
-            eb.isDeposed = true;
-        }
+            if (eb.left < timeline.left) {
+                eb.left = timeline.left;
+                eb.right = eb.left + eb.size;
+                eb.isDeposed = true;
+            } else if (eb.right > timeline.right) {
+                eb.right = timeline.right;
+                eb.left = timeline.right - eb.size;
+                eb.isDeposed = true;
+            }
 
-        if (eb.Sequence)
-            sequencedContent.push(eb);
-        else
-            unsequencedContent.push(eb);
-    });
+            if (eb.Sequence)
+                sequencedContent.push(eb);
+            else
+                unsequencedContent.push(eb);
+        });
+    }
 
     sequencedContent.sort(function (l, r) {
         return l.Sequence - r.Sequence;
@@ -288,7 +309,9 @@ function LayoutContent(timeline, exhibitSize) {
 
 function LayoutChildTimelinesOnly(timeline) {
     var arrangedElements = new Array();
-    PositionContent(timeline.ChildTimelines, arrangedElements, function (el, ael) { return !(el.left >= ael.right || ael.left >= el.right); });
+    if (timeline.timelines instanceof Array) {
+        PositionContent(timeline.timelines, arrangedElements, function (el, ael) { return !(el.left >= ael.right || ael.left >= el.right); });
+    }
 
     var min = Number.MAX_VALUE;
     var max = Number.MIN_VALUE;
@@ -316,28 +339,36 @@ function Scale(timeline, scale, mctx) {
     timeline.realHeight = timeline.height + 2 * timeline.heightEps;
     timeline.titleRect = GenerateTitleObject(timeline.height, timeline, mctx);
 
-    timeline.ChildTimelines.forEach(function (tl) {
-        tl.realY *= scale;
-        if (!tl.AspectRatio)
-            Scale(tl, scale, mctx);
-    });
+    if (timeline.timelines instanceof Array) {
+        timeline.timelines.forEach(function (tl) {
+            tl.realY *= scale;
+            if (!tl.AspectRatio)
+                Scale(tl, scale, mctx);
+        });
+    }
 
-    timeline.Exhibits.forEach(function (eb) {
-        eb.realY *= scale;
-    });
+    if (timeline.exhibits instanceof Array) {
+        timeline.exhibits.forEach(function (eb) {
+            eb.realY *= scale;
+        });
+    }
 }
 
 function Arrange(timeline) {
     timeline.y = timeline.realY + timeline.heightEps;
 
-    timeline.Exhibits.forEach(function (infodot) {
-        infodot.y = infodot.realY + infodot.size / 2.0 + timeline.y;
-    });
+    if (timeline.exhibits instanceof Array) {
+        timeline.exhibits.forEach(function (infodot) {
+            infodot.y = infodot.realY + infodot.size / 2.0 + timeline.y;
+        });
+    }
 
-    timeline.ChildTimelines.forEach(function (tl) {
-        tl.realY += timeline.y;
-        Arrange(tl);
-    });
+    if (timeline.timelines instanceof Array) {
+        timeline.timelines.forEach(function (tl) {
+            tl.realY += timeline.y;
+            Arrange(tl);
+        });
+    }
 }
 
 function CalcInfodotSize(timeline) {
@@ -348,7 +379,7 @@ function GenerateTitleObject(tlHeight, timeline, measureContext) {
     var tlW = timeline.right - timeline.left;
 
     measureContext.font = "100pt " + timelineHeaderFontName;
-    var size = measureContext.measureText(timeline.Title);
+    var size = measureContext.measureText(timeline.title);
     var height = timelineHeaderSize * tlHeight;
     var width = height * size.width / 100.0;
 
@@ -375,11 +406,13 @@ function Convert(parent, timeline) {
     var tlColor = GetTimelineColor(timeline);
     var t1 = addTimeline(parent, "layerTimelines", 't' + timeline.UniqueID,
     {
+        isBuffered: timeline.timelines instanceof Array,
+        guid: timeline.id,
         timeStart: timeline.left,
         timeEnd: timeline.right,
         top: timeline.y,
         height: timeline.height,
-        header: timeline.Title,
+        header: timeline.title,
         fillStyle: "rgba(0,0,0,0.25)",
         titleRect: timeline.titleRect,
         strokeStyle: tlColor,
@@ -388,62 +421,27 @@ function Convert(parent, timeline) {
     });
 
     //Creating Infodots
-    timeline.Exhibits.forEach(function (childInfodot) {
-        var date; // building a date to be shown in a title of the content item to the left of the title text.
-
-        var contentItems = new Array();
-        childInfodot.ContentItems.forEach(function (contentItemProt) {
-            var mediaType = contentItemProt.MediaType;
-            if (mediaType == "Picture")
-                mediaType = 'image';
-            else if (mediaType == "Video")
-                mediaType = 'video';
-
-            date = buildDate(contentItemProt);
-
-            contentItems.push({
-                id: 'c' + contentItemProt.UniqueID,
-                title: contentItemProt.Title,
-                mediaUrl: contentItemProt.Uri,
-                mediaType: mediaType,
-                description: contentItemProt.Caption,
-                date: date,
-                guid: contentItemProt.ID,
-                attribution: contentItemProt.Attribution,
-                mediaSource: contentItemProt.MediaSource,
-                order: contentItemProt.Order ? contentItemProt.Order : 0
-            });
+    if (timeline.exhibits instanceof Array) {
+        timeline.exhibits.forEach(function (childInfodot) {
+            var contentItems = [];
+            var infodot1 = addInfodot(t1, "layerInfodots", 'e' + childInfodot.UniqueID,
+                    (childInfodot.left + childInfodot.right) / 2.0, childInfodot.y, 0.8 * childInfodot.size / 2.0, contentItems,
+                    {
+                            isBuffered: false,
+                            guid: childInfodot.id,
+                            title: childInfodot.title,
+                            date: childInfodot.time,
+                        opacity: 0
+                    });
         });
-
-        date = buildDate(childInfodot);
-        var infodot1 = addInfodot(t1, "layerInfodots", 'e' + childInfodot.UniqueID,
-                (childInfodot.left + childInfodot.right) / 2.0, childInfodot.y, 0.8 * childInfodot.size / 2.0, contentItems,
-                {
-                    title: childInfodot.Title,
-                    date: date,
-                    guid: childInfodot.ID,
-                    opacity: 0
-                });
-    });
+    }
 
     //Filling child timelines
-    timeline.ChildTimelines.forEach(function (childTimeLine) {
-        Convert(t1, childTimeLine);
-    });
-
-}
-
-function buildDate(obj) {
-    var date;
-    if (obj.Year) {
-        date = obj.Year;
-        if (obj.TimeUnit !== 'CE')
-            date += ' ' + obj.TimeUnit;
+    if (timeline.timelines instanceof Array) {
+        timeline.timelines.forEach(function (childTimeLine) {
+            Convert(t1, childTimeLine);
+        });
     }
-    else {
-        date = obj.Date;
-    }
-    return date;
 }
 
 function GetTimelineColor(timeline) {
@@ -469,11 +467,11 @@ function GetTimelineColor(timeline) {
 var FindChildTimeline = function (timeline, id, recursive) {
     var result = undefined;
 
-    if (timeline) {
-        var n = timeline.ChildTimelines.length;
+    if (timeline && timeline.timelines instanceof Array) {
+        var n = timeline.timelines.length;
         for (var i = 0; i < n; i++) {
-            var childTimeline = timeline.ChildTimelines[i];
-            if (childTimeline.ID == id) {
+            var childTimeline = timeline.timelines[i];
+            if (childTimeline.id == id) {
                 // timeline was found
                 result = childTimeline;
                 break;
@@ -628,24 +626,17 @@ function animateElement(elem) {
             elem.baseline = elem.newBaseline;
     }    
 
-    if (elem.newHeight != elem.height || elem.newY != elem.y) {
+    if (elem.newY != elem.y && !elem.id.match("__header__")) 
         args.push({
             property: "y",
             startValue: elem.y,
             targetValue: elem.newY
         });
+    if (elem.newHeight != elem.height && !elem.id.match("__header__"))
         args.push({
             property: "height",
             startValue: elem.height,
             targetValue: elem.newHeight
-        });
-    }
-
-    if (elem.baseline)
-        args.push({
-            property: "baseline",
-            startValue: elem.baseline,
-            targetValue: elem.newBaseline
         });
 
     if (elem.opacity != 1 && elem.fadeIn == false) {
@@ -676,14 +667,24 @@ function animateElement(elem) {
 function initializeAnimation(elem, duration, args) {
     var startTime = (new Date()).getTime();
 
-    animatingElements[elem.id] = elem; // update/push element in hashmap
-
     elem.animation = {
         isAnimating: true, // indicates if there is ongoing animation
         duration: duration, // duration of the animation
         startTime: startTime, // start time of the animation
         args: args // arguments of canvas element that should be animated
     };
+
+    if (duration != 0) {
+        dynamicLayoutActive = true;
+
+        if (dynamicLayoutTimeout)
+            clearTimeout(dynamicLayoutTimeout);
+
+        // set new timeout (while animation is on dynamicLayoutActive is true otherwise its false)
+        dynamicLayoutTimeout = window.setTimeout(function () {
+            dynamicLayoutActive = false;
+        }, duration + 500);
+    }
 
     // calculates new animation frame of element
     elem.calculateNewFrame = function () {
@@ -706,7 +707,6 @@ function initializeAnimation(elem, duration, args) {
         if (t == 1.0) {
             elem.animation.isAnimating = false;
             elem.animation.args = [];
-            delete animatingElements[elem.id]; // remove element from hashmap
 
             if (elem.fadeIn == false)
                 elem.fadeIn = true;
@@ -742,8 +742,8 @@ function numberWithCommas(n) {
 // 2. All Metadata. (isBuffered == false)
 // 3. All Content.  (isBuffered == true)
 function merge(src, dest) {
-    if ("t" + src.UniqueID === dest.id) {
-        var srcChildTimelines = src.ChildTimelines;
+    if (src.id === dest.guid) {
+        var srcChildTimelines = (src.timelines instanceof Array) ? src.timelines : [];
         var destChildTimelines = [];
         for (var i = 0; i < dest.children.length; i++)
             if (dest.children[i].type && dest.children[i].type === "timeline")
@@ -751,6 +751,8 @@ function merge(src, dest) {
 
 
         if (srcChildTimelines.length === destChildTimelines.length) { // dest contains all src children
+            dest.isBuffered = dest.isBuffered || (src.timelines instanceof Array);
+
             // cal bbox (top, bottom) for child timelines and infodots
             var origTop = Number.MAX_VALUE;
             var origBottom = Number.MIN_VALUE;
@@ -803,8 +805,13 @@ function merge(src, dest) {
 
                 // update title pos after expansion
                 dest.delta = Math.max(0, (bottom - top) - (origBottom - origTop));
+                // hide animating text
+                // TODO: find the better way to fix text shacking bug if possible
                 dest.titleObject.newY += dest.delta;
                 dest.titleObject.newBaseline += dest.delta;
+                dest.titleObject.opacity = 0;
+                dest.titleObject.fadeIn = false;
+                delete dest.titleObject.animation;
 
                 // assert: child content cannot exceed parent
                 if (bottom > dest.titleObject.newY) {
@@ -829,8 +836,6 @@ function merge(src, dest) {
                         }
                     }
                 }
-
-                animateElement(dest);
             }
         } else if (srcChildTimelines.length > 0 && destChildTimelines.length === 0) { // dest does not contain any src children
             var t = generateLayout(src, dest);
@@ -841,12 +846,13 @@ function merge(src, dest) {
             dest.children.splice(0);
             for (var i = 0; i < t.children.length; i++)
                 dest.children.push(t.children[i]);
+            dest.titleObject = dest.children[0];
+
+            dest.isBuffered = dest.isBuffered || (src.timelines instanceof Array);
 
             // dest now contains all src children
             for (var i = 0; i < dest.children.length; i++)
                 convertRelativeToAbsoluteCoords(dest.children[i], dest.newY);
-            
-            animateElement(dest);
         } else {
             dest.delta = 0;
         }
@@ -871,103 +877,4 @@ function Merge(src, dest) {
             vc.virtualCanvas("requestInvalidate");
         }
     }
-}
-
-
-
-
-//loading the data from the service
-function loadData() {
-    timings.wcfRequestStarted = new Date();
-
-    var regimesUrl = serverUrlBase
-                + "left=" + -400
-                + "&right=" + 0
-                + "&min_width=" + 13700000000
-                + "&lca_id=" + 161;
-    console.log(regimesUrl);
-
-    $.ajax({ // get basic skeleton (regime timelines)
-        cache: false,
-        type: "GET",
-        async: true,
-        dataType: "json",
-        url: regimesUrl,
-        success: function (result) {
-            ProcessContent(result);
-            vc.virtualCanvas("updateViewport");
-        },
-        error: function (xhr) {
-            timings.RequestCompleted = new Date();
-            alert("Error connecting to service:\n" + regimesUrl);
-        }
-    });
-
-    /*
-    var toursUrl;
-    switch (czDataSource) {
-        case 'db': toursUrl = "Chronozoom.svc/getTours";
-            break;
-        case 'relay': toursUrl = "ChronozoomRelay";
-            break;
-        case 'dump': toursUrl = "Content/ResponseDumps/toursDump.txt";
-            break;
-    }
-
-    $.ajax({ //tours fetching
-        cache: false,
-        type: "GET",
-        async: true,
-        dataType: "json",
-        url: toursUrl,
-        success: function (result) {
-            parseTours(result);
-            initializeToursContent();
-
-            // check at shared tour
-            if (tourNotParsed == true) {
-                loadTourFromURL();
-                tourNotParsed = false;
-            }
-        },
-        error: function (xhr) {
-            $("tours_index").attr("onmouseup", function () {
-                alert("The tours failed to download. Please refresh the page later and try to activate tours again.");
-            });
-            initializeToursContent();
-        }
-    });
-    */
-}
-
-function ProcessContent(content) {
-    timings.wcfRequestCompleted = new Date();
-
-    var root = vc.virtualCanvas("getLayerContent");
-    root.beginEdit();
-    Merge(content, root);
-    root.endEdit(true);
-
-    timings.layoutCompleted = new Date();
-    if (startHash) { // restoring the window's hash as it was on the page loading
-        visReg = navStringToVisible(startHash.substring(1), vc);
-    }
-
-    InitializeRegimes(content);
-    if (!visReg && cosmosVisible) {
-        window.location.hash = cosmosVisible;
-        visReg = navStringToVisible(cosmosVisible, vc);
-    }
-    if (visReg) {
-        controller.moveToVisible(visReg, true);
-        updateAxis(vc, ax);
-        var vp = vc.virtualCanvas("getViewport");
-        updateNavigator(vp);
-
-        if (startHash && window.location.hash !== startHash) {
-            hashChangeFromOutside = false;
-            window.location.hash = startHash; // synchronizing
-        }
-    }
-    timings.canvasInited = new Date();
 }

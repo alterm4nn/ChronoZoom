@@ -1,120 +1,106 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright company="Outercurve Foundation">
-//   Copyright (c) 2013, The Outercurve Foundation
-// </copyright>
-// --------------------------------------------------------------------------------------------------------------------
-
-using Chronozoom.Api.Models;
+﻿using Chronozoom.Api.Models;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
 using System.Web.Http;
 
-namespace Chronozoom.Api.Controllers
+namespace UI.Controllers
 {
     public class TimelineController : ApiController
     {
-        // sample request
-        // http://localhost:4949/api/Timeline?left=-400&right=0&min_width=13700000000&lca_id=161
-        public Timeline Get(double left, double right, double min_width, int lca_id/*, string filter*/)
+        public void Delete(string collection, Timeline timelineData)
         {
-            if (left > right || min_width < 0 || lca_id < 0) return null;
+            if (collection == null || timelineData == null)
+                throw new HttpResponseException(System.Net.HttpStatusCode.BadRequest);
 
-            var root = Globals.Root;
-            if (root == null) return null;
-
-            if (left < root.left && right < root.left || left > root.right && right > root.right) return null;
-
-            left = Math.Max(root.left, left);
-            right = Math.Min(root.right, right);
-
-            Timeline lca = null;
-
-            var path = getPath(root, lca_id, ref lca);
-            if (path == null || lca == null) return null;
-
-            var content = getContent(lca, left, right, min_width);
-
-            Timeline plca;
-            for (plca = null, lca = path; lca.pathID != -1; plca = lca, lca = lca.ChildTimelines[lca.pathID]) ;
-            if (plca != null)
+            if (timelineData.parent != null)
             {
-                lca.ChildTimelines.Clear();
-                lca.Exhibits.Clear();
-                lca.ChildTimelines.AddRange(content.ChildTimelines);
-                lca.Exhibits.AddRange(content.Exhibits);
-            }
-            else
-            {
-                path = content;
-            }
-
-            return path;
-        }
-
-        private Timeline getPath(Timeline timeline, int lca_id, ref Timeline lca)
-        {
-            if (timeline.UniqueID == lca_id)
-            {
-                lca = timeline;
-                Timeline t1 = timeline.clone();
-                t1.isBuffered = false;
-                t1.pathID = -1;
-                return t1;
-            }
-            else
-            {
-                foreach (var child in timeline.ChildTimelines)
+                Timeline foundTimeline;
+                if (FindTimeline(Globals.Root, timelineData.parent, out foundTimeline))
                 {
-                    Timeline t1 = getPath(child, lca_id, ref lca);
-                    if (t1 != null)
+                    for (int i = 0; i < foundTimeline.timelines.Count(); i++)
                     {
-                        var t2 = timeline.clone();
-                        t2.isBuffered = false;
-
-                        var k = 0;
-                        foreach (var c in timeline.ChildTimelines)
+                        //Update
+                        if (foundTimeline.timelines[i].id == timelineData.id)
                         {
-                            if (c.UniqueID == t1.UniqueID)
-                            {
-                                t2.ChildTimelines.Add(t1);
-                                t2.pathID = k;
-                            }
-                            else
-                            {
-                                var t = c.clone();
-                                t.isBuffered = false;
-                                t2.ChildTimelines.Add(t);
-                            }
-                            k++;
+                            foundTimeline.timelines.RemoveAt(i);
+                            return;
                         }
-
-                        foreach (var e in timeline.Exhibits)
-                        {
-                            // var i = e.clone();
-                            t2.Exhibits.Add(e);
-                        }
-
-                        return t2;
                     }
+                    //No such parent timeline
+                    throw new HttpResponseException(System.Net.HttpStatusCode.BadRequest);
                 }
-                return null;
+                else
+                {
+                    //No such parent timeline
+                    throw new HttpResponseException(System.Net.HttpStatusCode.BadRequest);
+                }
+            }
+            else
+            {
+                //One more root timeline, in this prototype there is no way to do it
+                throw new HttpResponseException(System.Net.HttpStatusCode.BadRequest);
             }
         }
 
-        private Timeline getContent(Timeline timeline, double left, double right, double min_width)
+        public void Put(string collection, Timeline timelineData)
         {
-            var t1 = timeline.clone();
-            t1.isBuffered = true;
-            t1.Exhibits.AddRange(timeline.Exhibits);
+            if (collection == null || timelineData == null)
+                throw new HttpResponseException(System.Net.HttpStatusCode.BadRequest);
 
-            foreach (var child in timeline.ChildTimelines)
+            if (timelineData.parent != null)
             {
-                if (!(child.left < left && child.right < left || child.left > right && child.right > right) && child.width >= min_width)
-                    t1.ChildTimelines.Add(getContent(child, left, right, min_width));
+                Timeline foundTimeline;
+                if (FindTimeline(Globals.Root, timelineData.parent, out foundTimeline))
+                {
+                    for (int i = 0; i < foundTimeline.timelines.Count(); i++)
+                    {
+                        //Update
+                        if (foundTimeline.timelines[i].id == timelineData.id)
+                        {
+                            foundTimeline.timelines[i] = timelineData;
+                            return;
+                        }
+                    }
+                    //Create
+                    foundTimeline.timelines.Add(timelineData);
+                }
                 else
-                    t1.ChildTimelines.Add(child.clone());
+                {
+                    //No such parent timeline
+                    throw new HttpResponseException(System.Net.HttpStatusCode.BadRequest);
+                }
+            }
+            else
+            {
+                //One more root timeline, in this prototype there is no way to do it
+                throw new HttpResponseException(System.Net.HttpStatusCode.BadRequest);
+            }
+        }
+
+        private bool FindTimeline(Timeline t1, string id, out Timeline t2)
+        {
+            if (t1 == null || id == null)
+            {
+                t2 = null;
+                return false;
             }
 
-            return t1;
+            if (t1.id == id)
+            {
+                t2 = t1;
+                return true;
+            }
+            else
+            {
+                foreach (var t3 in t1.timelines)
+                    if (FindTimeline(t3, id, out t2))
+                        return true;
+
+                t2 = null;
+                return false;
+            }
         }
     }
 }

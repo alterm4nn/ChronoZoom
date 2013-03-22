@@ -14,7 +14,7 @@ using System.Windows.Forms;
 namespace Chronozoom.Test
 {
     [TestClass]
-    public abstract class CzTestBase
+    public abstract class CzTestBase : IDisposable
     {
         private TestContext context;
 
@@ -44,6 +44,24 @@ namespace Chronozoom.Test
                 StartPage = CzCommon.StartPagePrefix + attr.TestPage;
             }
             driver = null;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (driver != null)
+                {
+                    driver.Dispose();
+                    driver = null;
+                }
+            }
         }
 
         #region Test Methods and Properties

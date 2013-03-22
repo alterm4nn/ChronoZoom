@@ -118,10 +118,10 @@ gapLabelTick = 3; // gap between tick and label
 activeMarkSize = 10; // length of side of active triangle
 
 // IDs of regime timelines
-cosmosTimelineID = "00000000-0000-0000-0000-000000000000"; //"4fd1cb5e-39bf-4117-9737-d4f0f575e867";
+cosmosTimelineID = "468a8005-36e3-4676-9f52-312d8b6eb7b7";
 earthTimelineID = "48fbb8a8-7c5d-49c3-83e1-98939ae2ae67";
-lifeTimelineID = "d4809be4-3cf9-4ddd-9703-3ca24e4d3a26"; //"18d7204b-11a7-46fb-918c-edf603af778f";
-prehistoryTimelineID = "a6b821df-2a4d-4f0e-baf5-28e47ecb720b"; //"990e6392-11a2-4379-873a-71e787eeab6e";
+lifeTimelineID = "d4809be4-3cf9-4ddd-9703-3ca24e4d3a26";
+prehistoryTimelineID = "a6b821df-2a4d-4f0e-baf5-28e47ecb720b";
 humanityTimelineID = "4afb5bb6-1544-4416-a949-8c8f473e544d";
 
 //tours
@@ -142,7 +142,5 @@ navigateNextMaxCount = 2; // if navNext (left or right) button was pressed rapid
 longNavigationLength = 10; // length of navigation in long navigation regime
 
 // progresive loading
-serverUrlBase = document.URL.match(/((?:http:\/\/)?(?:[0-9a-zA-Z.:]+)(?:\/[^.]+\/)?)(.*)/)[1] + "/api/Timeline?";
-//serverUrlBase = "http://localhost:4949/api/Timeline?";
-//serverUrlBase = "http://depot.cs.msu.su:9090/cz_with_dynamic_layout/api/Timeline?";
+serverUrlBase = document.URL.match(/((?:http:\/\/)?(?:[0-9a-zA-Z.:]+)(?:\/[^.]+\/)?)(.*)/)[1];
 minTimelineWidth = 100; // px

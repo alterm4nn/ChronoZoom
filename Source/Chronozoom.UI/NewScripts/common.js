@@ -294,7 +294,7 @@ function loadDataUrl() {
             case 'relay':
                 return "ChronozoomRelay";
             case 'dump':
-                return "ResponseDump.txt";
+                return "oldResponseDump.txt";
             default:
                 return null;
         }
@@ -303,82 +303,49 @@ function loadDataUrl() {
 
 //loading the data from the service
 function loadData() {
-    timings.wcfRequestStarted = new Date();
-    var url = loadDataUrl();
+    var regimesUrl = serverUrlBase
+                  + "/api/Structure?"
+                  + "lca=" + cosmosTimelineID
+                  + "&start=" + -5012
+                  + "&end=" + 0
+                  + "&minspan=" + 5013;
+    console.log(regimesUrl);
 
-    $.ajax({ //main content fetching
+    $.ajax({ // get basic skeleton (regime timelines)
         cache: false,
         type: "GET",
         async: true,
         dataType: "json",
-        url: url,
+        url: regimesUrl,
         success: function (result) {
-            content = result;
             ProcessContent(result);
-
-            if (typeof tours !== 'undefined') { // tours are loaded, check at shared tour
-                loadTourFromURL();
-                tourNotParsed = false;
-            }
-            else // tours are not loaded yet, checking at shared tour will be after successful load of tours 
-                tourNotParsed = true;
+            vc.virtualCanvas("updateViewport");
         },
         error: function (xhr) {
-            timings.RequestCompleted = new Date();
-            alert("Error connecting to service: " + xhr.responseText);
-        }
-    });
-
-    var toursUrl;
-    switch (czDataSource) {
-        case 'db': toursUrl = "Chronozoom.svc/getTours";
-            break;
-        case 'relay': toursUrl = "ChronozoomRelay";
-            break;
-        case 'dump': toursUrl = "toursDump.txt";
-            break;
-    }
-
-    $.ajax({ //tours fetching
-        cache: false,
-        type: "GET",
-        async: true,
-        dataType: "json",
-        url: toursUrl,
-        success: function (result) {
-            parseTours(result);
-            initializeToursContent();
-
-            // check at shared tour
-            if (tourNotParsed == true) {
-                loadTourFromURL();
-                tourNotParsed = false;
-            }
-        },
-        error: function (xhr) {
-            $("tours_index").attr("onmouseup", function () {
-                alert("The tours failed to download. Please refresh the page later and try to activate tours again.");
-            });
-            initializeToursContent();
+            alert("Error connecting to service:\n" + regimesUrl);
         }
     });
 }
 
 function ProcessContent(content) {
-    timings.wcfRequestCompleted = new Date();
-    Load(vc, content.d);
-    timings.layoutCompleted = new Date();
+    var root = vc.virtualCanvas("getLayerContent");
+    root.beginEdit();
+    Merge(content, root);
+    root.endEdit(true);
+
+    InitializeRegimes(content);
+
     if (startHash) { // restoring the window's hash as it was on the page loading
         visReg = navStringToVisible(startHash.substring(1), vc);
     }
 
-    InitializeRegimes();
     if (!visReg && cosmosVisible) {
         window.location.hash = cosmosVisible;
         visReg = navStringToVisible(cosmosVisible, vc);
     }
+
     if (visReg) {
-        vc.virtualCanvas("setVisible", visReg);
+        controller.moveToVisible(visReg, true);
         updateAxis(vc, ax);
         var vp = vc.virtualCanvas("getViewport");
         updateNavigator(vp);
@@ -388,41 +355,36 @@ function ProcessContent(content) {
             window.location.hash = startHash; // synchronizing
         }
     }
-    timings.canvasInited = new Date();
 }
 
-function InitializeRegimes() {
-    if (content) {
-        if (content.d.length > 0) {
-            var f = function (timeline) {
-                if (!timeline) return null;
-                var v = vc.virtualCanvas("findElement", 't' + timeline.UniqueID);
-                regimes.push(v);
-                if (v) v = vcelementToNavString(v);
-                return v;
-            }
-
-            var cosmosTimeline = content.d[0];
-            cosmosVisible = f(cosmosTimeline);
-            navigationAnchor = vc.virtualCanvas("findElement", 't' + cosmosTimeline.UniqueID);
-
-            var earthTimeline = FindChildTimeline(cosmosTimeline, earthTimelineID);
-            earthVisible = f(earthTimeline);
-            var lifeTimeline = FindChildTimeline(earthTimeline, lifeTimelineID);
-            lifeVisible = f(lifeTimeline);
-            var prehistoryTimeline = FindChildTimeline(lifeTimeline, prehistoryTimelineID);
-            prehistoryVisible = f(prehistoryTimeline);
-            var humanityTimeline = FindChildTimeline(prehistoryTimeline, humanityTimelineID, true);
-            humanityVisible = f(humanityTimeline);
-
-            maxPermitedVerticalRange = {    //setting top and bottom observation constraints according to cosmos timeline
-                top: cosmosTimeline.y,
-                bottom: cosmosTimeline.y + cosmosTimeline.height
-            };
-
-            maxPermitedScale = navStringToVisible(cosmosVisible, vc).scale * 1.1;
-        }
+function InitializeRegimes(content) {
+    var f = function (timeline) {
+        if (!timeline) return null;
+        var v = vc.virtualCanvas("findElement", 't' + timeline.UniqueID);
+        regimes.push(v);
+        if (v) v = vcelementToNavString(v);
+        return v;
     }
+
+    var cosmosTimeline = content;
+    cosmosVisible = f(cosmosTimeline);
+    navigationAnchor = vc.virtualCanvas("findElement", 't' + cosmosTimeline.UniqueID);
+
+    var earthTimeline = FindChildTimeline(cosmosTimeline, earthTimelineID);
+    earthVisible = f(earthTimeline);
+    var lifeTimeline = FindChildTimeline(earthTimeline, lifeTimelineID);
+    lifeVisible = f(lifeTimeline);
+    var prehistoryTimeline = FindChildTimeline(lifeTimeline, prehistoryTimelineID);
+    prehistoryVisible = f(prehistoryTimeline);
+    var humanityTimeline = FindChildTimeline(prehistoryTimeline, humanityTimelineID, true);
+    humanityVisible = f(humanityTimeline);
+
+    maxPermitedVerticalRange = {    //setting top and bottom observation constraints according to cosmos timeline
+        top: cosmosTimeline.y,
+        bottom: cosmosTimeline.y + cosmosTimeline.height
+    };
+
+    maxPermitedScale = navStringToVisible(cosmosVisible, vc).scale * 1.1;
 }
 
 function updateLayout() {
@@ -453,7 +415,6 @@ function updateLayout() {
     var diff = Math.floor((window.innerHeight - welcomeScreenHeight) / 2);
     document.getElementById("welcomeScreenOut").style.top = diff + "px";
 
-    InitializeRegimes();
     vc.virtualCanvas("updateViewport");
     //ax.axis("updateWidth");
     updateAxis(vc, ax);
