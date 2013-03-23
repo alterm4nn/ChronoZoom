@@ -20,8 +20,8 @@ var CZ = (function (CZ, $, document) {
     var _dragPrev = {};
     var _dragCur = {};
     var _hovered = {};
-    var _rectPrev = {};
-    var _rectCur = {};
+    var _rectPrev = { type: "rectangle" };
+    var _rectCur = { type: "rectangle" };
     var _selectedTimeline = {};
     var _timelineCounter = 0;
 
@@ -59,6 +59,7 @@ var CZ = (function (CZ, $, document) {
      * @return {Boolean}    True in case of inclusion, False otherwise.
      */
     function isIncluded(tp, obj) {
+        console.log(obj.type);
         switch (obj.type) {
             case "timeline":
             case "rectangle":
