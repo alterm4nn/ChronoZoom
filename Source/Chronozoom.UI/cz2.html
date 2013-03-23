@@ -192,7 +192,8 @@
             CZ.Authoring.initializeTimelineChangeName();
             
             CZ.Authoring.initialize(vc, {
-                showCreateTimelineForm: showCreateTimelineForm
+                showCreateTimelineForm: showCreateTimelineForm,
+                showEditTimelineForm: showEditTimelineForm
             });
 
             var canvasGestures = getGesturesStream(vc); //gesture sequence of the virtual canvas
@@ -578,13 +579,13 @@
             var titleInput = $("#timelineTitleInput");
             var startInput = $("#timelineStartInput").spinner();
             var endInput = $("#timelineEndInput").spinner();
-            //var saveButton = $("#saveTimelineButton").button();
 
             titleInput.val(t.title);
             startInput.val(t.x);
             endInput.val(t.x + t.width);
 
             $("#createTimelineForm").dialog({
+                title: "create timeline",
                 modal: true,
                 height: 600,
                 width: 600,
@@ -596,9 +597,7 @@
                             end: endInput.val(),
                         });
                         isCancel = false;
-                        CZ.Authoring._isActive = false;
                         $(this).dialog("close");
-                        $("a:contains('create timeline')").removeClass("active");
                     }
                 },
                 close: function () {
@@ -609,21 +608,48 @@
                     $("a:contains('create timeline')").removeClass("active");
                 }
             });
+        }
 
-            // saveButton.off("click");
-            // saveButton.on("click", function (event) {
-            //     CZ.Authoring.updateTimeline(t, {
-            //         title: titleInput.val(),
-            //         start: startInput.val(),
-            //         end: endInput.val(),
-            //     });
-            //     form.dialog("close");
-            // });
+        function showEditTimelineForm(t) {
+            var titleInput = $("#timelineTitleInput");
+            var startInput = $("#timelineStartInput").spinner();
+            var endInput = $("#timelineEndInput").spinner();
+
+            titleInput.val(t.title);
+            startInput.val(t.x);
+            endInput.val(t.x + t.width);
+
+            $("#createTimelineForm").dialog({
+                title: "edit timeline",
+                modal: true,
+                height: 600,
+                width: 600,
+                buttons: {
+                    "save and close": function () {
+                        CZ.Authoring.updateTimeline(t, {
+                            title: titleInput.val(),
+                            start: startInput.val(),
+                            end: endInput.val(),
+                        });
+                        $(this).dialog("close");
+                    },
+                    "delete": function () {
+                        CZ.Authoring.removeTimeline(t);
+                        $(this).dialog("close");
+                    }
+                },
+                close: function () {
+                    CZ.Authoring._isActive = false;
+                    $("a:contains('edit timeline')").removeClass("active");
+                }
+            });
         }
 
         function createTimeline() {
-            CZ.Authoring._isActive = !CZ.Authoring._isActive;
+            CZ.Authoring._isActive = (CZ.Authoring.mode !== "createTimeline") || !CZ.Authoring._isActive;
             CZ.Authoring.mode = "createTimeline";
+
+            $("div #footer-authoring > a").removeClass("active");
 
             if (CZ.Authoring._isActive) {
                 $("a:contains('create timeline')").addClass("active");
@@ -633,7 +659,16 @@
         }
 
         function editTimeline() {
-            // body...
+            CZ.Authoring._isActive = (CZ.Authoring.mode !== "editTimeline") || !CZ.Authoring._isActive;
+            CZ.Authoring.mode = "editTimeline";
+
+            $("div #footer-authoring > a").removeClass("active");
+
+            if (CZ.Authoring._isActive) {
+                $("a:contains('edit timeline')").addClass("active");
+            } else {
+                $("a:contains('edit timeline')").removeClass("active");
+            }
         }
 
         function createExhibit() {
@@ -860,7 +895,7 @@
             </a>
 
             <!--Create Timeline popup dialog-->
-            <div id="createTimelineForm" title="create timeline" style="background-color: rgb(60, 95, 150); display: none; color: white;">
+            <div id="createTimelineForm" style="background-color: rgb(60, 95, 150); display: none; color: white;">
                 <p>
                     <label style="display: block">title</label>
                     <input id="timelineTitleInput" style="display: block" type="text" />
@@ -869,24 +904,12 @@
                 <p style="display: inline-block">
                     <label style="display: block">start</label>
                     <input id="timelineStartInput" style="display: block" />
-                    <select>
-                        <option value="CE">CE</option>
-                        <option value="BCE">BCE</option>
-                    </select>
                 </p>
 
                 <p style="display: inline-block">
                     <label style="display: block">end</label>
                     <input id="timelineEndInput" style="display: block" />
-                    <select>
-                        <option value="CE">CE</option>
-                        <option value="BCE">BCE</option>
-                    </select>
                 </p>
-
-                <!-- <p>
-                    <button id="saveTimelineButton" style="display: block">save and close</button>
-                </p> -->
             </div>
 
         </div>

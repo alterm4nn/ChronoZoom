@@ -626,7 +626,7 @@ function CanvasRectangle(vc, layerid, id, vx, vy, vw, vh, settings) {
     this.base = CanvasElement;
     this.base(vc, layerid, id, vx, vy, vw, vh);
     this.settings = settings;
-
+    this.type = "rectangle";
 
     /* Renders a rectangle.
 	@param ctx              (context2d) Canvas context2d to render on.
@@ -1246,6 +1246,7 @@ function CanvasText(vc, layerid, id, vx, vy, baseline, vh, text, settings, wv) {
 	this.newBaseline = baseline;
 	this.settings = settings;
 	this.opacity = settings.opacity || 0;
+	this.type = "text";
 
 	if (typeof this.settings.textBaseline != 'undefined' &&
         this.settings.textBaseline === 'middle') {
