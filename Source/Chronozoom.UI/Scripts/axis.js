@@ -127,7 +127,7 @@ var ChronoZoom;
                             url = "ChronozoomRelay";
                             break;
                         case 'dump':
-                            url = "ResponseDumpThresholds.txt";
+                            url = "/dumps/beta-getthresholds.json";
                             break;
                     }
                     $.ajax({
