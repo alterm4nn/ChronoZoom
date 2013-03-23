@@ -4,14 +4,18 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
-using System.Collections.Generic;
-
-namespace Chronozoom.Api.Models
+namespace Chronozoom.Models
 {
-    public static class Globals
+    public class Reference
     {
-        public static Timeline Root { get; set; }
-        public static List<Collection> Collections = new List<Collection>();
+        public string ID;
+        public string Title;
+        public string Authors;
+        public string BookChapters;
+        public string CitationType;
+        public string PageNumbers;
+        public string Publication;
+        public string PublicationDates;
+        public string Source;
     }
 }

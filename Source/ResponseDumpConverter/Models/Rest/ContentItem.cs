@@ -4,18 +4,19 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Chronozoom.Api.Models
+namespace Chronozoom.Models.Rest
 {
-    public class Reference
+    public class ContentItem
     {
-        public string ID;
-        public string Title;
-        public string Authors;
-        public string BookChapters;
-        public string CitationType;
-        public string PageNumbers;
-        public string Publication;
-        public string PublicationDates;
-        public string Source;
+        public string id;
+        public string parent;
+        public string title;
+        public string description;
+        public string uri;
+        public string mediaType;
+
+        // extra properties for backward compatibility
+        public int UniqueID;
+        public short? Order;
     }
 }

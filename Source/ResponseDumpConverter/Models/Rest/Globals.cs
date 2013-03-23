@@ -4,14 +4,10 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
-using System.Collections.Generic;
-
-namespace Chronozoom.Api.Models
+namespace Chronozoom.Models.Rest
 {
     public static class Globals
     {
         public static Timeline Root { get; set; }
-        public static List<Collection> Collections = new List<Collection>();
     }
 }
