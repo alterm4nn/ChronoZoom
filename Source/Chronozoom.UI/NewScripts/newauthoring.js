@@ -301,7 +301,8 @@ var CZ = (function (CZ, $, document) {
                 x: Number(prop.start),
                 y: t.y,
                 width: Number(prop.end - prop.start),
-                height: t.height
+                height: t.height,
+                type: "rectangle"
             };
 
             // TODO: Show error message in case of failed test!
