@@ -626,7 +626,7 @@ function CanvasRectangle(vc, layerid, id, vx, vy, vw, vh, settings) {
     this.base = CanvasElement;
     this.base(vc, layerid, id, vx, vy, vw, vh);
     this.settings = settings;
-
+    this.type = "rectangle";
 
     /* Renders a rectangle.
 	@param ctx              (context2d) Canvas context2d to render on.
@@ -778,7 +778,7 @@ function CanvasTimeline(vc, layerid, id, vx, vy, vw, vh, settings, timelineinfo)
 	this.title = this.titleObject.text;
 	this.regime = timelineinfo.regime;
 	this.settings.gradientOpacity = 0;
-	this.settings.gradientFillStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : timelineBorderColor;
+	this.settings.gradientFillStyle = timelineinfo.gradientFillStyle || timelineinfo.strokeStyle || timelineBorderColor;
 	this.opacity = timelineinfo.opacity;
 
 	this.reactsOnMouse = true;
@@ -1245,7 +1245,8 @@ function CanvasText(vc, layerid, id, vx, vy, baseline, vh, text, settings, wv) {
 	this.baseline = baseline;
 	this.newBaseline = baseline;
 	this.settings = settings;
-	this.opacity = 0;
+	this.opacity = settings.opacity || 0;
+	this.type = "text";
 
 	if (typeof this.settings.textBaseline != 'undefined' &&
         this.settings.textBaseline === 'middle') {

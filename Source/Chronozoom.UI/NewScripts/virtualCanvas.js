@@ -227,8 +227,7 @@ Next <div> is rendered on the top of previous one.
         RaiseInnerZoomConstraintChenged: function (e) {
             this.innerZoomConstraintChengedEvent.zoomValue = e;
             this.element.trigger(this.innerZoomConstraintChengedEvent);
-        }
-        ,
+        },
         /*
         Fires the event of cursor position changed
         */
