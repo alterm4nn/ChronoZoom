@@ -4,14 +4,20 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
 using System.Collections.Generic;
 
-namespace Chronozoom.Api.Models
+namespace Chronozoom.Models.Rest
 {
-    public static class Globals
+    public class Exhibit
     {
-        public static Timeline Root { get; set; }
-        public static List<Collection> Collections = new List<Collection>();
+        public string id;
+        public string parent;
+        public double time;
+        public string title;
+        public string description;
+        public List<ContentItem> contentItems = new List<ContentItem>();
+
+        // extra properties for backward compatibility
+        public int UniqueID;
     }
 }

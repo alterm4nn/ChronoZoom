@@ -10,27 +10,56 @@ namespace Chronozoom.Api.Models
 {
     public class Exhibit
     {
-        public string ID;
-        public string Title;
-        public string Threshold;
-        public string Regime;
-        public string TimeUnit;
-        public int? Day;
-        public int? Month;
-        public double? Year;
+        public string id;
+        public string parent;
+        public double time;
+        public string title;
+        public string description;
+        public List<ContentItem> contentItems = new List<ContentItem>();
+
+        // extra properties for backward compatibility
         public int UniqueID;
-        public int? Sequence;
+    }
 
-        public List<ContentItem> ContentItems = new List<ContentItem>();
-        public List<Reference> References = new List<Reference>();
-
-        // additional properties and methods
-        public Exhibit clone()
+    public static class ExhibitExtensions
+    {
+        public static Exhibit CloneStructure(this Exhibit exhibit)
         {
-            var e = (Exhibit)this.MemberwiseClone();
-            e.ContentItems = new List<ContentItem>();
-            e.References = new List<Reference>();
-            return e;
+            var clone = new Exhibit()
+            {
+                id = exhibit.id,
+                parent = exhibit.parent,
+                time = exhibit.time,
+                title = exhibit.title,
+                description = exhibit.description,
+                contentItems = new List<ContentItem>(),
+
+                // extra properties for backward compatibility
+                UniqueID = exhibit.UniqueID
+            };
+
+            return clone;
+        }
+
+        public static Exhibit CloneData(this Exhibit exhibit)
+        {
+            var clone = new Exhibit()
+            {
+                id = exhibit.id,
+                parent = exhibit.parent,
+                time = exhibit.time,
+                title = exhibit.title,
+                description = exhibit.description,
+                contentItems = new List<ContentItem>(),
+
+                // extra properties for backward compatibility
+                UniqueID = exhibit.UniqueID
+            };
+
+            foreach (var contentItem in exhibit.contentItems)
+                clone.contentItems.Add(contentItem.CloneData());
+
+            return clone;
         }
     }
 }
