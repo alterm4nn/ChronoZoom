@@ -188,6 +188,7 @@
     <Content Include="ScriptsMobile\vccontent.mobile.js" />
     <Content Include="ScriptsMobile\virtualCanvas.mobile.js" />
     <Content Include="NewScripts\authoring.js" />
+    <Content Include="NewScripts\newauthoring.js" />
     <Content Include="NewScripts\breadCrumbs.js" />
     <Content Include="NewScripts\flash_detect.js" />
     <None Include="NewScripts\jquery-1.6.4-vsdoc.js" />

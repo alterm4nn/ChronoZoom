@@ -70,10 +70,6 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
     @param gesture      (PanGesture) The gesture to apply
     */
     function PanViewport(viewport, panGesture) {
-        if (CZ.Authoring.isActive) {
-            return;
-        }
-        
         var virtualOffset = viewport.vectorScreenToVirtual(panGesture.xOffset, panGesture.yOffset);
         var oldVisible = viewport.visible;
         viewport.visible.centerX = oldVisible.centerX - virtualOffset.x;
@@ -343,7 +339,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
     }
 
     gesturesSource.Subscribe(function (gesture) {
-        if (typeof gesture != "undefined") {
+        if (typeof gesture != "undefined" && !(CZ.Authoring._isActive || CZ.Authoring.isActive)) {
             var isAnimationActive = self.activeAnimation;
             var oldId = isAnimationActive ? self.activeAnimation.ID : undefined;
 

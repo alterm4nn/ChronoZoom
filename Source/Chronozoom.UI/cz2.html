@@ -60,7 +60,9 @@
     <script type="text/javascript" src="NewScripts/search.js"></script>
     <script type="text/javascript" src="NewScripts/bibliography.js"></script>
     <script type="text/javascript" src="NewScripts/breadCrumbs.js"></script>
+
     <script type="text/javascript" src="NewScripts/authoring.js"></script>
+    <script type="text/javascript" src="NewScripts/newauthoring.js"></script>
 
     <script type="text/javascript" src="NewScripts/settings.js"></script>
     <script type="text/javascript" src="NewScripts/timescale.js"></script>
@@ -186,7 +188,13 @@
             initializeSearch();
             initializeBibliography();
             initializeToursUI();
+
             CZ.Authoring.initializeTimelineChangeName();
+            
+            CZ.Authoring.initialize(vc, {
+                showCreateTimelineForm: showCreateTimelineForm,
+                showEditTimelineForm: showEditTimelineForm
+            });
 
             var canvasGestures = getGesturesStream(vc); //gesture sequence of the virtual canvas
             var axisGestures = applyAxisBehavior(getGesturesStream(ax)); //gesture sequence of axis (tranformed according to axis behavior logic)
@@ -566,12 +574,109 @@
             };
         });
 
+        function showCreateTimelineForm(t) {
+            var isCancel = true;
+            var titleInput = $("#timelineTitleInput");
+            var startInput = $("#timelineStartInput").spinner();
+            var endInput = $("#timelineEndInput").spinner();
+
+            titleInput.val(t.title);
+            startInput.val(t.x);
+            endInput.val(t.x + t.width);
+
+            $("#createTimelineForm").dialog({
+                title: "create timeline",
+                modal: true,
+                height: 600,
+                width: 600,
+                buttons: {
+                    "save and close": function () {
+                        CZ.Authoring.updateTimeline(t, {
+                            title: titleInput.val(),
+                            start: startInput.val(),
+                            end: endInput.val(),
+                        });
+                        isCancel = false;
+                        $(this).dialog("close");
+                    }
+                },
+                close: function () {
+                    if (isCancel) {
+                        CZ.Authoring.removeTimeline(t);
+                    }
+                    CZ.Authoring._isActive = false;
+                    $("a:contains('create timeline')").removeClass("active");
+                }
+            });
+        }
+
+        function showEditTimelineForm(t) {
+            var titleInput = $("#timelineTitleInput");
+            var startInput = $("#timelineStartInput").spinner();
+            var endInput = $("#timelineEndInput").spinner();
+
+            titleInput.val(t.title);
+            startInput.val(t.x);
+            endInput.val(t.x + t.width);
+
+            $("#createTimelineForm").dialog({
+                title: "edit timeline",
+                modal: true,
+                height: 600,
+                width: 600,
+                buttons: {
+                    "save and close": function () {
+                        CZ.Authoring.updateTimeline(t, {
+                            title: titleInput.val(),
+                            start: startInput.val(),
+                            end: endInput.val(),
+                        });
+                        $(this).dialog("close");
+                    },
+                    "delete": function () {
+                        CZ.Authoring.removeTimeline(t);
+                        $(this).dialog("close");
+                    }
+                },
+                close: function () {
+                    CZ.Authoring._isActive = false;
+                    $("a:contains('edit timeline')").removeClass("active");
+                }
+            });
+        }
+
         function createTimeline() {
-            $("#addTimelineDialog").dialog({ modal: true, height: 500, width: 500 });
-            $("#timelineStartInput").spinner();
-            $("#timelineEndInput").spinner();
-            $("#timelineVerticalInput").spinner();
-            $("#saveTimelineButton").button();
+            CZ.Authoring._isActive = (CZ.Authoring.mode !== "createTimeline") || !CZ.Authoring._isActive;
+            CZ.Authoring.mode = "createTimeline";
+
+            $("div #footer-authoring > a").removeClass("active");
+
+            if (CZ.Authoring._isActive) {
+                $("a:contains('create timeline')").addClass("active");
+            } else {
+                $("a:contains('create timeline')").removeClass("active");
+            }
+        }
+
+        function editTimeline() {
+            CZ.Authoring._isActive = (CZ.Authoring.mode !== "editTimeline") || !CZ.Authoring._isActive;
+            CZ.Authoring.mode = "editTimeline";
+
+            $("div #footer-authoring > a").removeClass("active");
+
+            if (CZ.Authoring._isActive) {
+                $("a:contains('edit timeline')").addClass("active");
+            } else {
+                $("a:contains('edit timeline')").removeClass("active");
+            }
+        }
+
+        function createExhibit() {
+            // body...
+        }
+
+        function editExhibit() {
+            // body...
         }
     </script>
     <title>ChronoZoom</title>
@@ -580,7 +685,7 @@
     
     <div id="header" style="height: 67px">
         <div style="position: relative">
-            <button class="authSwitch" style="width: auto; left: 350px; position: absolute;" id="AT_button"
+            <button class="authSwitch" style="width: auto; left: 350px; position: absolute; display: none;" id="AT_button"
                 onmouseup="CZ.Authoring.atOnClicked();">Authoring</button>
             <div id="authoringToolsPanel" style="position: absolute; left: 500px; top: 0px; display: none; max-width: 800px;">
                 <button class="authModeSwitch" style="width: auto;"
@@ -790,7 +895,7 @@
             </a>
 
             <!--Create Timeline popup dialog-->
-            <div id="addTimelineDialog" title="create timeline" style="background-color: rgb(60, 95, 150); display: none; color: white;">
+            <div id="createTimelineForm" style="background-color: rgb(60, 95, 150); display: none; color: white;">
                 <p>
                     <label style="display: block">title</label>
                     <input id="timelineTitleInput" style="display: block" type="text" />
@@ -799,28 +904,11 @@
                 <p style="display: inline-block">
                     <label style="display: block">start</label>
                     <input id="timelineStartInput" style="display: block" />
-                    <select>
-                        <option value="CE">CE</option>
-                        <option value="BCE">BCE</option>
-                    </select>
                 </p>
 
                 <p style="display: inline-block">
                     <label style="display: block">end</label>
                     <input id="timelineEndInput" style="display: block" />
-                    <select>
-                        <option value="CE">CE</option>
-                        <option value="BCE">BCE</option>
-                    </select>
-                </p>
-
-                <p style="display: inline-block">
-                    <label style="display: block">vertical units</label>
-                    <input id="timelineVerticalInput" style="display: block" />
-                </p>
-
-                <p>
-                    <button id="saveTimelineButton" style="display: block">save and close</button>
                 </p>
             </div>
 
