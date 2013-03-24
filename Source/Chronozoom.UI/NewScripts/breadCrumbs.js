@@ -212,11 +212,19 @@ function addBreadCrumb(element) {
 
     // add breadcrumb to table
     var parent = $(".breadCrumbTable tr");
-    $("<td class='breadCrumbTableCell' id='bc_" + length + "'>" +
-            "<div class='breadCrumbLink' id='bc_link_" + element.id + "' onclick='clickOverBreadCrumb(\"" + element.id + "\", " + length + ")'>" + element.title + "</div>" +
-            "<span class='breadCrumbSeparator' id='bc_'>&rsaquo;</span>" +
-      "</td>")
-       .appendTo(parent);
+    var td = $("<td class='breadCrumbTableCell' id='bc_" + length + "'></td>");
+
+    // Without title, it will be added after appending.
+    var div = $("<div class='breadCrumbLink' id='bc_link_" + element.id +
+                "' onclick='clickOverBreadCrumb(\"" +
+                element.id + "\", " + length + ")'></div>");
+
+    var span = $("<span class='breadCrumbSeparator' id='bc_'>&rsaquo;</span>");
+
+    td.append(div);
+    td.append(span);
+    parent.append(td);
+    div.text(element.title); // As text to avoid script execution.
 
     // select color of the text for this breadcrumb
     switch (element.regime) {
