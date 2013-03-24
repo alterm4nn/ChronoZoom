@@ -646,6 +646,9 @@
         }
 
         function createTimeline() {
+            if (animatingElements.length != 0)
+                return;
+
             CZ.Authoring._isActive = (CZ.Authoring.mode !== "createTimeline") || !CZ.Authoring._isActive;
             CZ.Authoring.mode = "createTimeline";
 
@@ -659,6 +662,9 @@
         }
 
         function editTimeline() {
+            if (animatingElements.length != 0)
+                return;
+
             CZ.Authoring._isActive = (CZ.Authoring.mode !== "editTimeline") || !CZ.Authoring._isActive;
             CZ.Authoring.mode = "editTimeline";
 
