@@ -16,6 +16,8 @@
 var CZ = (function (CZ, $, document) {
     var Authoring = CZ.Authoring = CZ.Authoring || {};
 
+    var that = Authoring;
+    var _vcwidget;
     var _dragStart = {};
     var _dragPrev = {};
     var _dragCur = {};
@@ -134,11 +136,15 @@ var CZ = (function (CZ, $, document) {
 
         // Test on intersections and update timeline's rectangle if it passes the test.
         if (checkIntersections(_hovered, _rectCur)) {
+            // Set border's color of timeline's rectangle.
+            var settings = $.extend({}, _hovered.settings);
+            settings.strokeStyle = "red";
+
             $.extend(_rectPrev, _rectCur);
             removeChild(_hovered, "newTimelineRectangle");
             addRectangle(_hovered, _hovered.layerid,
                          "newTimelineRectangle", _rectCur.x, _rectCur.y,
-                         _rectCur.width, _rectCur.height, _hovered.settings);
+                         _rectCur.width, _rectCur.height, settings);
         } else {
             $.extend(_rectCur, _rectPrev);
         }
@@ -196,38 +202,55 @@ var CZ = (function (CZ, $, document) {
         showCreateTimelineForm: null,
         showEditTimelineForm: null,
 
-        /**
-         * The main function for binding UI and Authoring Tool.
-         * It assigns additional handlers for virtual canvas mouse
-         * events and forms' handlers.
-         * @param  {Object} vc           jQuery instance of virtual canvas.
-         * @param  {Object} formHandlers An object with the same "show..." methods as Authoring object.
-         */
-        initialize: function (vc, formHandlers) {
-            var that = this;
-            var vcwidget = vc.data("ui-virtualCanvas");
-
-            vcwidget.element.on("mousedown", function (event) {
-                if (that._isActive) {
-                    var viewport = vcwidget.getViewport();
-                    var origin = getXBrowserMouseOrigin(vcwidget.element, event);
-                    var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
-
-                    that._isDragging = true;
-                    _dragStart = posv;
-                    _dragPrev = {};
-                    _dragCur = posv;
-                    _hovered = null;
-
-                    if (vcwidget.hovered) {
-                        _hovered = vcwidget.hovered;
+        modeMouseHandlers: {
+            createTimeline: {
+                mousemove: function () {
+                    if (that._isDragging && _hovered.type === "timeline") {
+                        updateNewRectangle();
                     }
+                },
 
-                    if (that.mode === "createExhibit" && _hovered && _hovered.type === "timeline") {
+                mouseup: function () {
+                    if (_hovered.type === "timeline") {
+                        _selectedTimeline = createNewTimeline();
+                        that.showCreateTimelineForm(_selectedTimeline);
+                    }
+                }
+            },
+
+            editTimeline: {
+                mousemove: function () {
+                    _hovered = _vcwidget.hovered || {};
+                    if (_hovered.type === "timeline") {
+                        _hovered.settings.strokeStyle = "red";
+                    }
+                },
+
+                mouseup: function () {
+                    if (_hovered.type === "timeline") {
+                        _selectedTimeline = _hovered;
+                        that.showEditTimelineForm(_selectedTimeline);
+                    } else if (_hovered.type === "infodot" || _hovered.type === "contentItem") {
+                        _selectedTimeline = _hovered.parent;
+                        that.showEditTimelineForm(_selectedTimeline);
+                    }
+                }
+            },
+
+            createExhibit: {
+                mousemove: function () {
+                    if (that._isDragging && _hovered.type === "timeline") {
+                        // TODO: Show red circle?
+                        //updateNewCircle();
+                    }
+                },
+
+                mouseup: function () {
+                    if (_hovered.type === "timeline") {
                         console.log("createExhibit");
 
                         var radius;
-                        if (_hovered.width > _hovered.height) radius = _hovered.width / 10.0
+                        if (_hovered.width > _hovered.height) radius = _hovered.width / 10.0;
                         else radius = _hovered.height / 10.0;
 
                         while (radius > (_hovered.height / 10)) radius /= 1.5;
@@ -263,78 +286,75 @@ var CZ = (function (CZ, $, document) {
                                 title: 'Image'
                             }
                         });
-
                     }
+                }
+            },
+
+            editExhibit: {
+                mousemove: function () {
+                    // body...
+                },
+
+                mouseup: function () {
+                    // body...
+                }
+            }
+        },
+
+        /**
+         * The main function for binding UI and Authoring Tool.
+         * It assigns additional handlers for virtual canvas mouse
+         * events and forms' handlers.
+         * @param  {Object} vc           jQuery instance of virtual canvas.
+         * @param  {Object} formHandlers An object with the same "show..." methods as Authoring object.
+         */
+        initialize: function (vc, formHandlers) {
+            _vcwidget = vc.data("ui-virtualCanvas");
+
+            _vcwidget.element.on("mousedown", function (event) {
+                if (that._isActive) {
+                    var viewport = _vcwidget.getViewport();
+                    var origin = getXBrowserMouseOrigin(_vcwidget.element, event);
+                    var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
+
+                    that._isDragging = true;
+                    _dragStart = posv;
+                    _dragPrev = {};
+                    _dragCur = posv;
+                    _hovered = _vcwidget.hovered || {};
                 }
             });
 
-            vcwidget.element.on("mouseup", function (event) {
+            _vcwidget.element.on("mouseup", function (event) {
                 if (that._isActive) {
-                    var viewport = vcwidget.getViewport();
-                    var origin = getXBrowserMouseOrigin(vcwidget.element, event);
+                    var viewport = _vcwidget.getViewport();
+                    var origin = getXBrowserMouseOrigin(_vcwidget.element, event);
                     var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
 
                     that._isDragging = false;
                     _dragPrev = _dragCur;
                     _dragCur = posv;
 
-                    if (_dragCur.x === _dragStart.x && _dragCur.y === _dragStart.y) {
-                        onMouseClick();
-                        return;
-                    }
+                    // NOTE: Using global variable to disable animation on click!
+                    //       Sometimes doesn't work. Consider a better approach.
+                    controller.stopAnimation();
 
-                    if (that.mode === "createTimeline" && _hovered && _hovered.type === "timeline") {
-                        _selectedTimeline = createNewTimeline();
-                        that.showCreateTimelineForm(_selectedTimeline);
-                    }
-
-                    if (that.mode === "editExhibit" && _hovered && _hovered.type === "infodot") {
-                        console.log("editExhibit");
-                    }
-
+                    that.modeMouseHandlers[that.mode]["mouseup"]();
                 }
             });
 
-            vcwidget.element.on("mousemove", function (event) {
-                if (that._isActive && that._isDragging) {
-                    var viewport = vcwidget.getViewport();
-                    var origin = getXBrowserMouseOrigin(vcwidget.element, event);
+            _vcwidget.element.on("mousemove", function (event) {
+                if (that._isActive) {
+                    var viewport = _vcwidget.getViewport();
+                    var origin = getXBrowserMouseOrigin(_vcwidget.element, event);
                     var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
 
                     _dragPrev = _dragCur;
                     _dragCur = posv;
 
-                    if (that.mode === "createTimeline") {
-                        if (_hovered && _hovered.type === "timeline") {
-                            updateNewRectangle();
-                        }
-                    }
-                } else if (that._isActive) {
-                    if (that.mode === "editTimeline" && vcwidget.hovered) {
-                        _hovered = vcwidget.hovered;
-                        if (_hovered.type === "timeline") {
-                            _hovered.settings.strokeStyle = "red";
-                        }
-                    }
+                    that.modeMouseHandlers[that.mode]["mousemove"]();
                 }
             });
-
-            function onMouseClick() {
-                // NOTE: Using global variable to disable animation on click!
-                //       Sometimes doesn't work. Consider a better approach.
-                controller.stopAnimation();
-
-                if (that._isActive && that.mode === "editTimeline") {
-                    if (_hovered && _hovered.type === "timeline") {
-                        _selectedTimeline = _hovered;
-                    } else if (_hovered) {
-                        _selectedTimeline = _hovered.parent;
-                    }
-                    that.showEditTimelineForm(_selectedTimeline);
-                } else if (that._isActive) {
-
-                }
-            }
 
             this.showCreateTimelineForm = formHandlers && formHandlers.showCreateTimelineForm || function () { };
             this.showEditTimelineForm = formHandlers && formHandlers.showEditTimelineForm || function () { };
@@ -438,7 +458,7 @@ var CZ = (function (CZ, $, document) {
 
             return date;
         }
-});
+    });
 
     return CZ;
 })(CZ || {}, jQuery, document);
