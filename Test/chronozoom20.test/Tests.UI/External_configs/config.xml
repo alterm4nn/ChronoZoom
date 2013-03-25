@@ -2,7 +2,7 @@
   <Settings>
     <Global>
       <IsUsingGrid>true</IsUsingGrid>
-      <BaseUrl>http://depot.cs.msu.su:9090/axis_marker/test/html/testTimescale.htm</BaseUrl>
+      <BaseUrl>http://test.chronozoomproject.org/cz2.html</BaseUrl>
       <ImplicitWait>60</ImplicitWait>
       <ExplicitWait>60</ExplicitWait>
       <BrowserName>chrome</BrowserName>

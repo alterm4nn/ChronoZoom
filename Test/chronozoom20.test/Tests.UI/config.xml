@@ -6,7 +6,7 @@
       <BaseUrl>http://depot.cs.msu.su:9090/axis_marker/test/html/testTimescale.htm</BaseUrl>
      <ImplicitWait>60</ImplicitWait>
       <ExplicitWait>60</ExplicitWait>
-      <BrowserName>firefox</BrowserName>
+      <BrowserName>internet explorer</BrowserName>
       <ConnectionWait>60</ConnectionWait>
     </Global>
     <IncludeTestCategories>
