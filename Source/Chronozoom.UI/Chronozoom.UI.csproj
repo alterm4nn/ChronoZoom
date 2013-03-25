@@ -76,17 +76,39 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.4.0.20710.0\lib\net40\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web" />
     <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.4.0.20710.0\lib\net40\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.WebHost, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.4.0.20710.0\lib\net40\System.Web.Http.WebHost.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="BehindTheScenes.htm" />
     <Content Include="cz.aspx" />
+    <Content Include="cz2.html" />
+    <TypeScriptCompile Include="cz.ts" />
+    <Content Include="cz.js">
+      <DependentUpon>cz.ts</DependentUpon>
+    </Content>
+    <Content Include="cz.min.js">
+      <DependentUpon>cz.ts</DependentUpon>
+    </Content>
     <Content Include="czmobile.htm" />
     <Content Include="favicon.ico" />
     <Content Include="Images\A.png" />
@@ -157,23 +179,184 @@
     <Content Include="Images\zoomout_hover.png" />
     <Content Include="Images\zoomout_pressed.png" />
     <Content Include="Images\zoomout_rest.png" />
+    <Content Include="oldResponseDump.txt" />
+    <Content Include="ResponseDumpRest.txt" />
     <Content Include="Privacy.htm" />
     <Content Include="robots.txt" />
     <Content Include="ScriptsMobile\axis.mobile.js" />
     <Content Include="ScriptsMobile\cz.settings.mobile.js" />
     <Content Include="ScriptsMobile\vccontent.mobile.js" />
     <Content Include="ScriptsMobile\virtualCanvas.mobile.js" />
+    <Content Include="NewScripts\authoring.js" />
+    <Content Include="NewScripts\newauthoring.js" />
+    <Content Include="NewScripts\breadCrumbs.js" />
+    <Content Include="NewScripts\flash_detect.js" />
+    <None Include="NewScripts\jquery-1.6.4-vsdoc.js" />
+    <Content Include="NewScripts\jquery-1.6.4.js" />
+    <Content Include="NewScripts\jquery-1.6.4.min.js" />
+    <Content Include="NewScripts\jquery-1.7.2.min.js" />
+    <Content Include="NewScripts\jquery.cookie.js" />
+    <Content Include="NewScripts\jquery.signalR-1.0.0-rc2.js" />
+    <Content Include="NewScripts\jquery.signalR-1.0.0-rc2.min.js" />
+    <Content Include="NewScripts\regimesIE.js" />
+    <Content Include="NewScripts\seadragon-min.js" />
+    <Content Include="NewScripts\settings.js" />
+    <Content Include="NewScripts\timescale.js" />
+    <Content Include="NewStyles\timescale.css" />
+    <Content Include="Scripts\axis.js" />
+    <Content Include="Scripts\bibliography.js" />
     <Content Include="Scripts\breadCrumbs.js" />
+    <Content Include="Scripts\common.js" />
+    <Content Include="Scripts\cz.settings.js" />
     <Content Include="Scripts\flash_detect.js" />
+    <Content Include="Scripts\gestures.js" />
+    <None Include="Scripts\jquery-1.4.1-vsdoc.js" />
+    <Content Include="Scripts\jquery-1.4.1.js" />
+    <Content Include="Scripts\jquery-1.4.1.min.js" />
+    <Content Include="Scripts\jquery-1.6.2.min.js" />
+    <Content Include="Scripts\axis.js">
+      <DependentUpon>axis.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\axis.min.js">
+      <DependentUpon>axis.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\bibliography.js">
+      <DependentUpon>bibliography.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\bibliography.min.js">
+      <DependentUpon>bibliography.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\breadCrumbs.js">
+      <DependentUpon>breadCrumbs.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\breadCrumbs.min.js">
+      <DependentUpon>breadCrumbs.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\breadCrumbs.ts" />
+    <Content Include="Scripts\common.js">
+      <DependentUpon>common.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\common.min.js">
+      <DependentUpon>common.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\cz.settings.js">
+      <DependentUpon>cz.settings.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\cz.settings.min.js">
+      <DependentUpon>cz.settings.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\flash_detect.js">
+      <DependentUpon>flash_detect.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\flash_detect.min.js">
+      <DependentUpon>flash_detect.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\flash_detect.ts" />
+    <Content Include="Scripts\gestures.min.js.map">
+      <DependentUpon>gestures.js</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-1.6.4-vsdoc.js" />
+    <Content Include="Scripts\gestures.js">
+      <DependentUpon>gestures.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\gestures.min.js">
+      <DependentUpon>gestures.ts</DependentUpon>
+    </Content>
     <Content Include="Scripts\jquery-1.6.4.js" />
     <Content Include="Scripts\jquery-1.6.4.min.js" />
     <Content Include="Scripts\jquery-1.7.2.min.js" />
+    <Content Include="Scripts\jquery-ui-1.8.16.custom.min.js" />
     <Content Include="Scripts\jquery.cookie.js" />
     <Content Include="Scripts\jquery.signalR-1.0.0-rc2.js" />
     <Content Include="Scripts\jquery.signalR-1.0.0-rc2.min.js" />
+    <Content Include="Scripts\layout.js" />
+    <Content Include="Scripts\mouseWheelPlugin.js" />
     <Content Include="Scripts\regimesIE.js" />
+    <Content Include="Scripts\rx.jQuery.js" />
+    <Content Include="Scripts\rx.js" />
     <Content Include="Scripts\seadragon-min.js" />
+    <Content Include="Scripts\search.js" />
+    <Content Include="Scripts\tours.js" />
+    <Content Include="Scripts\urlnav.js" />
+    <Content Include="Scripts\vccontent.js" />
+    <Content Include="Scripts\viewport.js" />
+    <Content Include="Scripts\viewportAnimation.js" />
+    <Content Include="Scripts\viewportController.js" />
+    <Content Include="Scripts\virtualCanvas.js" />
+    <Content Include="Styles\axis.css" />
+    <Content Include="Styles\cz.css" />
+    <Content Include="Styles\Site.css" />
+    <Content Include="Scripts\layout.js">
+      <DependentUpon>layout.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\layout.min.js">
+      <DependentUpon>layout.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\mouseWheelPlugin.js">
+      <DependentUpon>mouseWheelPlugin.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\mouseWheelPlugin.min.js">
+      <DependentUpon>mouseWheelPlugin.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\regimesIE.js">
+      <DependentUpon>regimesIE.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\regimesIE.min.js">
+      <DependentUpon>regimesIE.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\regimesIE.ts" />
+    <Content Include="Scripts\seadragon-min.js" />
+    <Content Include="Scripts\search.js">
+      <DependentUpon>search.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\search.min.js">
+      <DependentUpon>search.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\tours.js">
+      <DependentUpon>tours.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\tours.min.js">
+      <DependentUpon>tours.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
+    <Content Include="Scripts\typings\jquery\jquery.d.ts" />
+    <Content Include="Scripts\typings\rx.js\rx.js.d.ts" />
+    <Content Include="Scripts\urlnav.js">
+      <DependentUpon>urlnav.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\urlnav.min.js">
+      <DependentUpon>urlnav.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\vccontent.js">
+      <DependentUpon>vccontent.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\vccontent.min.js">
+      <DependentUpon>vccontent.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\viewport.js">
+      <DependentUpon>viewport.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\viewport.min.js">
+      <DependentUpon>viewport.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\viewportAnimation.js">
+      <DependentUpon>viewportAnimation.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\viewportAnimation.min.js">
+      <DependentUpon>viewportAnimation.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\viewportController.js">
+      <DependentUpon>viewportController.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\viewportController.min.js">
+      <DependentUpon>viewportController.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\virtualCanvas.js">
+      <DependentUpon>virtualCanvas.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\virtualCanvas.min.js">
+      <DependentUpon>virtualCanvas.ts</DependentUpon>
+    </Content>
     <Content Include="TraceLog.html" />
     <Content Include="Trademark_Copyright.htm" />
     <Content Include="TermsOfUse.htm" />
@@ -211,8 +394,10 @@
     <Content Include="ResponseDumpThresholds.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\bibliography.js" />
-    <Content Include="Scripts\search.js" />
+    <Content Include="NewScripts\bibliography.js" />
+    <Content Include="NewScripts\search.js" />
+    <Content Include="Scripts\bibliography.ts" />
+    <Content Include="Scripts\search.ts" />
     <Content Include="ServiceResponse_2012_01_16.txt" />
     <Content Include="testAudio.htm" />
     <Content Include="testAudio2.mp3" />
@@ -226,13 +411,15 @@
     <Content Include="testAudio.mp3" />
     <Content Include="testAudioPlayback.htm" />
     <Content Include="ResponseDump.txt" />
-    <Content Include="Scripts\tours.js" />
+    <Content Include="NewScripts\tours.js" />
+    <Content Include="Scripts\tours.ts" />
     <Content Include="testAsyncImageLoad.htm" />
     <Content Include="testInfodotContent.htm" />
     <Content Include="testVirtualCanvasAudioVideoElements.htm" />
     <Content Include="axis.htm" />
     <Content Include="Chronozoom.svc" />
-    <Content Include="Scripts\urlnav.js" />
+    <Content Include="NewScripts\urlnav.js" />
+    <Content Include="Scripts\urlnav.ts" />
     <Content Include="testUrlNav.htm" />
     <Content Include="Images\chronozoom_title.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -247,7 +434,8 @@
     <Content Include="Images\4.png" />
     <Content Include="Images\flower16x16.png" />
     <Content Include="rihard_shtraus_zaratustra.mp3" />
-    <Content Include="Scripts\layout.js" />
+    <Content Include="NewScripts\layout.js" />
+    <Content Include="Scripts\layout.ts" />
     <Content Include="testDynamicLod.htm" />
     <Content Include="testGestures.htm" />
     <Content Include="testVirtualCanvasLayout.htm" />
@@ -269,20 +457,40 @@
     <Content Include="css\ui-lightness\jquery-ui-1.8.16.custom.css" />
     <Content Include="Global.asax" />
     <Content Include="Images\flower.png" />
-    <Content Include="Scripts\axis.js" />
-    <Content Include="Scripts\common.js" />
-    <Content Include="Scripts\cz.settings.js" />
-    <Content Include="Scripts\gestures.js" />
+    <Content Include="NewScripts\axis.js" />
+    <Content Include="NewScripts\common.js" />
+    <Content Include="NewScripts\cz.settings.js" />
+    <Content Include="NewScripts\gestures.js" />
+    <Content Include="NewScripts\jquery-1.6.2.min.js" />
+    <Content Include="NewScripts\jquery-ui-1.8.16.custom.min.js" />
+    <Content Include="NewScripts\mouseWheelPlugin.js" />
+    <Content Include="NewScripts\rx.jQuery.js" />
+    <Content Include="NewScripts\rx.js" />
+    <Content Include="NewScripts\vccontent.js" />
+    <Content Include="NewScripts\viewport.js" />
+    <Content Include="NewScripts\viewportAnimation.js" />
+    <Content Include="NewScripts\viewportController.js" />
+    <Content Include="NewScripts\virtualCanvas.js" />
+    <Content Include="NewStyles\axis.css" />
+    <Content Include="NewStyles\cz.css" />
+    <Content Include="NewStyles\Site.css" />
+    <Content Include="NewScripts\jquery-1.4.1-vsdoc.js" />
+    <Content Include="NewScripts\jquery-1.4.1.js" />
+    <Content Include="NewScripts\jquery-1.4.1.min.js" />
+    <Content Include="Scripts\axis.ts" />
+    <Content Include="Scripts\common.ts" />
+    <Content Include="Scripts\cz.settings.ts" />
+    <Content Include="Scripts\gestures.ts" />
     <Content Include="Scripts\jquery-1.6.2.min.js" />
     <Content Include="Scripts\jquery-ui-1.8.16.custom.min.js" />
-    <Content Include="Scripts\mouseWheelPlugin.js" />
+    <Content Include="Scripts\mouseWheelPlugin.ts" />
     <Content Include="Scripts\rx.jQuery.js" />
     <Content Include="Scripts\rx.js" />
-    <Content Include="Scripts\vccontent.js" />
-    <Content Include="Scripts\viewport.js" />
-    <Content Include="Scripts\viewportAnimation.js" />
-    <Content Include="Scripts\viewportController.js" />
-    <Content Include="Scripts\virtualCanvas.js" />
+    <Content Include="Scripts\vccontent.ts" />
+    <Content Include="Scripts\viewport.ts" />
+    <Content Include="Scripts\viewportAnimation.ts" />
+    <Content Include="Scripts\viewportController.ts" />
+    <Content Include="Scripts\virtualCanvas.ts" />
     <Content Include="Styles\axis.css" />
     <Content Include="Styles\cz.css" />
     <Content Include="Styles\Site.css" />
@@ -298,6 +506,12 @@
     </Content>
     <Content Include="toursDump.txt" />
     <Content Include="Web.config" />
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Account\ChangePassword.aspx.cs">
@@ -328,9 +542,16 @@
     <Compile Include="Account\Register.aspx.designer.cs">
       <DependentUpon>Register.aspx</DependentUpon>
     </Compile>
+    <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Chronozoom.svc.cs">
       <DependentUpon>Chronozoom.svc</DependentUpon>
     </Compile>
+    <Compile Include="Controllers\CollectionController.cs" />
+    <Compile Include="Controllers\ContentItemController.cs" />
+    <Compile Include="Controllers\DataController.cs" />
+    <Compile Include="Controllers\ExhibitController.cs" />
+    <Compile Include="Controllers\StructureController.cs" />
+    <Compile Include="Controllers\TimelineController.cs" />
     <Compile Include="cz.aspx.cs">
       <DependentUpon>cz.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -339,6 +560,12 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Models\Collection.cs" />
+    <Compile Include="Models\ContentItem.cs" />
+    <Compile Include="Models\Exhibit.cs" />
+    <Compile Include="Models\Globals.cs" />
+    <Compile Include="Models\Timeline.cs" />
+    <Compile Include="Models\Wrappers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Site.Master.cs">
       <DependentUpon>Site.Master</DependentUpon>
@@ -422,10 +649,16 @@
   </ProjectExtensions>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+
        Other similar extension points exist, see Microsoft.Common.targets.
+
   <Target Name="BeforeBuild">
+
   </Target>
+
   <Target Name="AfterBuild">
+
   </Target>
+
   -->
 </Project>

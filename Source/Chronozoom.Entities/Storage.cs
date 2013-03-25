@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Common;
 using System.Data.Entity;
@@ -55,20 +56,27 @@ namespace Chronozoom.Entities
 
         public DbSet<SuperCollection> SuperCollections { get; set; }
 
-        public List<Timeline> TimelinesQuery()
+        public Collection<Timeline> TimelinesQuery(Guid collectionId, decimal startTime, decimal endTime, decimal span)
         {
             Dictionary<Guid, Timeline> timelinesMap = new Dictionary<Guid, Timeline>();
-            List<Timeline> timelines = FillTimelines(timelinesMap);
+            List<Timeline> timelines = FillTimelines(collectionId, timelinesMap, startTime, endTime, span);
 
             FillTimelineRelations(timelinesMap);
 
-            return timelines;
+            return new Collection<Timeline>(timelines);
         }
 
         private void FillTimelineRelations(Dictionary<Guid, Timeline> timelinesMap)
         {
+            if (!timelinesMap.Keys.Any())
+                return;
+
             // Populate Exhibits
-            string exhibitsQuery = "SELECT * FROM Exhibits";
+            string exhibitsQuery = string.Format(
+                CultureInfo.InvariantCulture,
+                "SELECT * FROM Exhibits WHERE Timeline_Id IN ('{0}')",
+                string.Join("', '", timelinesMap.Keys.ToArray()));
+
             var exhibitsRaw = Database.SqlQuery<ExhibitRaw>(exhibitsQuery);
             Dictionary<Guid, Exhibit> exhibits = new Dictionary<Guid, Exhibit>();
             foreach (ExhibitRaw exhibitRaw in exhibitsRaw)
@@ -79,31 +87,53 @@ namespace Chronozoom.Entities
                 if (exhibitRaw.References == null)
                     exhibitRaw.References = new System.Collections.ObjectModel.Collection<Reference>();
 
-                timelinesMap[exhibitRaw.Timeline_ID].Exhibits.Add(exhibitRaw);
-                exhibits[exhibitRaw.ID] = exhibitRaw;
+                if (timelinesMap.Keys.Contains(exhibitRaw.Timeline_ID))
+                {
+                    timelinesMap[exhibitRaw.Timeline_ID].Exhibits.Add(exhibitRaw);
+                    exhibits[exhibitRaw.Id] = exhibitRaw;
+                }
             }
 
-            // Populate Content Items
-            string contentItemsQuery = "SELECT * FROM ContentItems";
-            var contentItemsRaw = Database.SqlQuery<ContentItemRaw>(contentItemsQuery);
-            foreach (ContentItemRaw contentItemRaw in contentItemsRaw)
-                exhibits[contentItemRaw.Exhibit_ID].ContentItems.Add(contentItemRaw);
+            if (exhibits.Keys.Any())
+            {
+                // Populate Content Items
+                string contentItemsQuery = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "SELECT * FROM ContentItems WHERE Exhibit_Id IN ('{0}')",
+                    string.Join("', '", exhibits.Keys.ToArray()));
+                var contentItemsRaw = Database.SqlQuery<ContentItemRaw>(contentItemsQuery);
+                foreach (ContentItemRaw contentItemRaw in contentItemsRaw)
+                {
+                    if (exhibits.Keys.Contains(contentItemRaw.Exhibit_ID))
+                    {
+                        exhibits[contentItemRaw.Exhibit_ID].ContentItems.Add(contentItemRaw);
+                    }
+                }
 
-            // Populate References
-            string referencesQuery = "SELECT * FROM [References]";
-            var referencesRaw = Database.SqlQuery<ReferenceRaw>(referencesQuery);
-            foreach (ReferenceRaw referenceRaw in referencesRaw)
-                exhibits[referenceRaw.Exhibit_ID].References.Add(referenceRaw);
+                // Populate References
+                string referencesQuery = string.Format(CultureInfo.InvariantCulture,
+                    "SELECT * FROM [References] WHERE Exhibit_Id IN ('{0}')",
+                    string.Join("', '", exhibits.Keys.ToArray()));
+                var referencesRaw = Database.SqlQuery<ReferenceRaw>(referencesQuery);
+                foreach (ReferenceRaw referenceRaw in referencesRaw)
+                {
+                    if (exhibits.Keys.Contains(referenceRaw.Exhibit_ID))
+                    {
+                        exhibits[referenceRaw.Exhibit_ID].References.Add(referenceRaw);
+                    }
+                }
+            }
         }
 
-        private List<Timeline> FillTimelines(Dictionary<Guid, Timeline> timelinesMap)
+        private List<Timeline> FillTimelines(Guid collectionId, Dictionary<Guid, Timeline> timelinesMap, decimal startTime, decimal endTime, decimal span)
         {
             List<Timeline> timelines = new List<Timeline>();
             Dictionary<Guid, Guid?> timelinesParents = new Dictionary<Guid, Guid?>();
 
             // Populate References
-            string timelinesQuery = "SELECT * FROM Timelines";
-            var timelinesRaw = Database.SqlQuery<TimelineRaw>(timelinesQuery);
+            string timelinesQuery = "SELECT * FROM Timelines WHERE FromYear >= {0} AND ToYear <= {1} AND ToYear-FromYear >= {2} AND Collection_Id = {3}";
+            var timelinesRaw = Database.SqlQuery<TimelineRaw>(timelinesQuery, startTime, endTime, span, collectionId);
+
             foreach (TimelineRaw timelineRaw in timelinesRaw)
             {
                 if (timelineRaw.ChildTimelines == null)
@@ -112,15 +142,15 @@ namespace Chronozoom.Entities
                 if (timelineRaw.Exhibits == null)
                     timelineRaw.Exhibits = new System.Collections.ObjectModel.Collection<Exhibit>();
 
-                timelinesParents[timelineRaw.ID] = timelineRaw.Timeline_ID;
-                timelinesMap[timelineRaw.ID] = timelineRaw;
+                timelinesParents[timelineRaw.Id] = timelineRaw.Timeline_ID;
+                timelinesMap[timelineRaw.Id] = timelineRaw;
             }
 
             // Build the timelines tree by assigning each timeline to its parent
             foreach (Timeline timeline in timelinesMap.Values)
             {
-                Guid? parentId = timelinesParents[timeline.ID];
-                if (parentId != null)
+                Guid? parentId = timelinesParents[timeline.Id];
+                if (parentId != null && timelinesMap.Keys.Contains((Guid)parentId))
                 {
                     timelinesMap[(Guid)parentId].ChildTimelines.Add(timeline);
                 }

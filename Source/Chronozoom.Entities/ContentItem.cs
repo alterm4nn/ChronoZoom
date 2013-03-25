@@ -16,8 +16,8 @@ namespace Chronozoom.Entities
     public class ContentItem
     {
         [Key]
-        [DataMember]
-        public Guid ID { get; set; }
+        [DataMember(Name="ID")]
+        public Guid Id { get; set; }
         
         [DataMember]
         public string Title { get; set; }
@@ -40,9 +40,8 @@ namespace Chronozoom.Entities
         [DataMember]
         public string MediaType { get; set; }
 
-        // TODO: Fix up this string Uri
-        [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "To be fixed when entities are revisited")]
         [DataMember]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification="Uri not supported in entity framework.")]
         public string Uri { get; set; }
         
         [DataMember]
@@ -51,20 +50,24 @@ namespace Chronozoom.Entities
         [DataMember]
         public string Attribution { get; set; }
 
-        [DataMember]
-        public int UniqueID { get; set; }
+        [DataMember(Name="UniqueID")]
+        public int UniqueId { get; set; }
 
         [DataMember]
         public short? Order { get; set; }
 
         [DataMember]
         public bool HasBibliography { get; set; }
+
+        public virtual Entities.Collection Collection { get; set; }
     }
 
     [DataContract]
     [NotMapped]
     public class ContentItemRaw : ContentItem
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "Needs to match storage column name")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "ID", Justification = "Needs to match storage column name")]
         public Guid Exhibit_ID { get; set; }
     }
 }

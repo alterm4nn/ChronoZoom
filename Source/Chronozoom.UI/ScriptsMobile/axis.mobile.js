@@ -89,7 +89,7 @@
             var url;
             var axis = this;
             switch (czDataSource) {
-                case 'db': url = "Chronozoom.svc/getthresholds";
+                case 'db': url = "/Chronozoom.svc/getthresholds";
                     break;
                 case 'relay': url = "ChronozoomRelay";
                     break;

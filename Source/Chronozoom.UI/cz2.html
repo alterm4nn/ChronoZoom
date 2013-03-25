@@ -1,0 +1,989 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta name="Description" content="ChronoZoom is an open-source community project dedicated to visualizing the history of everything." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <script type="text/javascript">
+        // Invoke timings.show() to get timings
+        var timings = new Object();
+        timings.parseStarted = new Date();
+        timings.show = function () {
+            var msg =
+                "External scripts loading: " + (timings.scriptsLoaded - timings.parseStarted) +
+                " ms\nDocument ready handler: " + (timings.readyStarted - timings.scriptsLoaded) +
+                " ms\n\nRequesting server for timelines data: " + (timings.wcfRequestCompleted - timings.wcfRequestStarted) +
+                " ms\nLayout algorithm: " + (timings.layoutCompleted - timings.wcfRequestCompleted) +
+                " ms\nPopulating virtual canvas: " + (timings.canvasInited - timings.layoutCompleted) + " ms";
+            alert(msg);
+        }
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29180487-2']);
+        _gaq.push(['_setDomainName', 'chronozoomproject.org']);
+        _gaq.push(['_setAllowLinker', true]);
+        _gaq.push(['_trackPageview']);
+        (function () {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+
+    <!--TODO: Download custom version of jQuery UI-->
+
+    <link rel="stylesheet" type="text/css" href="NewStyles/cz.css" />
+    <link rel="stylesheet" type="text/css" href="NewStyles/axis.css" />
+    <link rel="stylesheet" type="text/css" href="NewStyles/timescale.css" />
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
+
+    <script type="text/javascript" src="NewScripts/jquery-1.7.2.min.js"></script>
+    <!--<script type="text/javascript" src="NewScripts/jquery-ui-1.8.16.custom.min.js"></script>-->
+    <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+    <script type="text/javascript" src="NewScripts/jquery.cookie.js"></script>
+    <script type="text/javascript" src="NewScripts/rx.js"></script>
+    <script type="text/javascript" src="NewScripts/rx.jQuery.js"></script>
+    <script type="text/javascript" src="NewScripts/seadragon-min.js"></script>
+    <script type="text/javascript" src="NewScripts/cz.settings.js"></script>
+    <script type="text/javascript" src="NewScripts/common.js"></script>
+    <script type="text/javascript" src="NewScripts/viewport.js"></script>
+    <script type="text/javascript" src="NewScripts/viewportAnimation.js"></script>
+    <script type="text/javascript" src="NewScripts/mouseWheelPlugin.js"></script>
+    <script type="text/javascript" src="NewScripts/gestures.js"></script>
+    <script type="text/javascript" src="NewScripts/virtualCanvas.js"></script>
+    <script type="text/javascript" src="NewScripts/vccontent.js"></script>
+    <script type="text/javascript" src="NewScripts/viewportController.js"></script>
+    <script type="text/javascript" src="NewScripts/axis.js"></script>
+    <script type="text/javascript" src="NewScripts/urlnav.js"></script>
+    <script type="text/javascript" src="NewScripts/layout.js"></script>
+    <script type="text/javascript" src="NewScripts/tours.js"></script>
+    <script type="text/javascript" src="NewScripts/search.js"></script>
+    <script type="text/javascript" src="NewScripts/bibliography.js"></script>
+    <script type="text/javascript" src="NewScripts/breadCrumbs.js"></script>
+
+    <script type="text/javascript" src="NewScripts/authoring.js"></script>
+    <script type="text/javascript" src="NewScripts/newauthoring.js"></script>
+
+    <script type="text/javascript" src="NewScripts/settings.js"></script>
+    <script type="text/javascript" src="NewScripts/timescale.js"></script>
+
+    <!--[if IE]>
+    <script type="text/javascript" src="NewScripts/regimesIE.js"></script>
+    <![endif]-->
+    <script type="text/javascript">
+        timings.scriptsLoaded = new Date();
+
+        $(document).ready(function () {
+            $('.bubbleInfo').hide();
+            //("#axis").showThresholds = true;
+            var wlcmScrnCookie = getCookie("welcomeScreenDisallowed");
+            if (wlcmScrnCookie != null) {
+                hideWelcomeScreen();
+            }
+            else {
+                // click on gray area hides welcome screen
+                $("#welcomeScreenOut").click(function (e) {
+                    e.stopPropagation();
+                });
+
+                $("#welcomeScreenBack").click(function () {
+                    closeWelcomeScreen();
+                });
+            }
+
+            $(".authModeSwitch").mouseup(function () {
+                if ($(this).hasClass("buttonActive")) {
+                    $(this).removeClass("buttonActive");
+                    return;
+                }
+
+                $(".authModeSwitch").removeClass("buttonActive");
+                $(this).addClass("buttonActive");
+
+            });
+
+            $(".authSwitch").mouseup(function () {
+                if ($(this).hasClass("buttonActive")) {
+                    $(this).removeClass("buttonActive");
+                    return;
+                }
+
+                $(this).addClass("buttonActive");
+            });
+
+            if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
+                if (/Chrome[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
+                    var oprversion = new Number(RegExp.$1) // capture x.x portion and store as a number
+                    if (oprversion < 14.0) {
+                        var fallback_agreement = getCookie("new_bad_browser_agreement");
+                        if ((fallback_agreement == null) || (fallback_agreement == "")) {
+                            window.location = "testFallBackPage.htm";
+                            return;
+                        }
+                    }
+                }
+            }
+            else if (navigator.userAgent.toLowerCase().indexOf('version') > -1) {
+                if (/Version[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
+                    var oprversion = new Number(RegExp.$1) // capture x.x portion and store as a number
+                    if (oprversion < 5.0) {
+                        var fallback_agreement = getCookie("new_bad_browser_agreement");
+                        if ((fallback_agreement == null) || (fallback_agreement == "")) {
+                            window.location = "testFallBackPage.htm";
+                            return;
+                        }
+                    }
+                }
+            }
+            else {
+                var br = $.browser;
+                var isIe9 = br.msie && parseInt(br.version, 10) >= 9;
+                if (!isIe9) {
+                    var isFF9 = br.mozilla && parseInt(br.version, 10) >= 7;
+                    if (!isFF9) {
+                        var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+                        if (!is_chrome) {
+                            var fallback_agreement = getCookie("new_bad_browser_agreement");
+                            if ((fallback_agreement == null) || (fallback_agreement == "")) {
+                                window.location = "testFallBackPage.htm";
+                                return;
+                            }
+                        }
+                        return;
+                    }
+                }
+            }
+
+            if (navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
+                // Suppress the default iOS elastic pan/zoom actions.
+                document.addEventListener('touchmove', function (e) { e.preventDefault(); });
+            }
+
+            if (navigator.userAgent.indexOf('Mac') != -1) {
+                // Disable Mac OS Scrolling Bounce Effect
+                var body = document.getElementsByTagName('body')[0];
+                body.style.overflow = "hidden";
+            }
+
+            // init seadragon. set path to image resources for nav buttons 
+            Seadragon.Config.imagePath = seadragonImagePath;
+
+            maxPermitedVerticalRange = { top: 0, bottom: 10000000 }; //temporary value until there is no data
+            timings.readyStarted = new Date();
+
+            ax = $("#axis");
+            axis = new CZ.Timescale("axis");
+
+            vc = $("#vc");
+            vc.virtualCanvas();
+
+            regimeNavigator = $('#regime_navigator');
+            regimeNavigator.click(passThrough);
+            regimesRatio = 300 / Math.abs(maxPermitedTimeRange.left - maxPermitedTimeRange.right);
+
+            if (window.location.hash)
+                startHash = window.location.hash; // to be processes after the data is loaded
+            loadData(); //retrieving the data
+
+            initializeSearch();
+            initializeBibliography();
+            initializeToursUI();
+
+            CZ.Authoring.initializeTimelineChangeName();
+            
+            CZ.Authoring.initialize(vc, {
+                showCreateTimelineForm: showCreateTimelineForm,
+                showEditTimelineForm: showEditTimelineForm
+            });
+
+            var canvasGestures = getGesturesStream(vc); //gesture sequence of the virtual canvas
+            var axisGestures = applyAxisBehavior(getGesturesStream(ax)); //gesture sequence of axis (tranformed according to axis behavior logic)
+            var jointGesturesStream = canvasGestures.Merge(axisGestures);
+
+            controller = new ViewportController(
+                            function (visible) {
+                                var vp = vc.virtualCanvas("getViewport");
+                                var markerPos = axis.MarkerPosition();
+                                var oldMarkerPosInScreen = vp.pointVirtualToScreen(markerPos, 0).x;
+
+                                vc.virtualCanvas("setVisible", visible, controller.activeAnimation);
+                                updateAxis(vc, ax);
+                                vp = vc.virtualCanvas("getViewport");
+                                if (pauseTourAtAnyAnimation) { //watch for the user animation during playing of some tour bookmark
+                                    tourPause();
+                                    pauseTourAtAnyAnimation = false;
+                                }
+
+                                var hoveredInfodot = vc.virtualCanvas("getHoveredInfodot");
+                                var actAni = controller.activeAnimation != undefined;
+
+                                if (actAni && !hoveredInfodot.id) {
+                                    var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
+                                    updateMarker();
+                                    // ax.axis("setTimeMarker", newMarkerPos);
+                                }
+                                updateNavigator(vp);                                
+                            },
+                            function () {
+                                return vc.virtualCanvas("getViewport");
+                            },
+                            jointGesturesStream);
+
+            var hashChangeFromOutside = true; // True if url is changed externally
+
+            // URL Nav: update URL when animation is complete
+            controller.onAnimationComplete.push(function (id) {
+                hashChangeFromOutside = false;
+                if (setNavigationStringTo && setNavigationStringTo.bookmark) { // go to search result
+                    navigationAnchor = navStringTovcElement(setNavigationStringTo.bookmark, vc.virtualCanvas("getLayerContent"));
+                    window.location.hash = setNavigationStringTo.bookmark;
+                }
+                else {
+                    if (setNavigationStringTo && setNavigationStringTo.id == id)
+                        navigationAnchor = setNavigationStringTo.element;
+
+                    var vp = vc.virtualCanvas("getViewport");
+                    window.location.hash = vcelementToNavString(navigationAnchor, vp);
+                }
+                setNavigationStringTo = null;
+            });
+
+            // URL Nav: handle URL changes from outside
+            window.addEventListener("hashchange", function () {
+                if (window.location.hash && hashChangeFromOutside && hashHandle) {
+                    var hash = window.location.hash;
+                    var visReg = navStringToVisible(window.location.hash.substring(1), vc);
+                    if (visReg) {
+                        isAxisFreezed = true;
+                        controller.moveToVisible(visReg, true);
+                        // to make sure that the hash is correct (it can be incorrectly changed in onCurrentlyObservedInfodotChanged)
+                        if (window.location.hash != hash) {
+                            hashChangeFromOutside = false;
+                            window.location.hash = hash;
+                        }
+                    }
+                    hashHandle = true;
+                } else
+                    hashChangeFromOutside = true;
+            });
+
+
+            // Axis: enable showing thresholds
+            controller.onAnimationComplete.push(function () {
+                //ax.axis("enableThresholds", true);
+                //if (window.console && console.log("thresholds enabled"));
+            });
+            //Axis: disable showing thresholds
+            controller.onAnimationStarted.push(function () {
+                //ax.axis("enableThresholds", true);
+                //if (window.console && console.log("thresholds disabled"));
+            });
+            // Axis: enable showing thresholds
+            controller.onAnimationUpdated.push(function (oldId, newId) {
+                if (oldId != undefined && newId == undefined) { // animation interrupted
+                    setTimeout(function () {
+                        //ax.axis("enableThresholds", true);
+                        //if (window.console && console.log("thresholds enabled"));
+                    }, 500);
+                }
+            });
+
+            //Tour: notifyng tour that the bookmark is reached
+            controller.onAnimationComplete.push(
+                                function (id) {
+                                    if (tourBookmarkTransitionCompleted != undefined)
+                                        tourBookmarkTransitionCompleted(id);
+                                    if (tour != undefined && tour.state != "finished") //enabling wathcing for user activity while playing the bookmark
+                                        pauseTourAtAnyAnimation = true;
+                                });
+            //Tour: notifyng tour that the transition was interrupted
+            controller.onAnimationUpdated.push(
+                                function (oldId, newId) {
+                                    if (tour != undefined) {
+                                        if (tourBookmarkTransitionInterrupted != undefined) { //in transition
+                                            var prevState = tour.state;
+                                            tourBookmarkTransitionInterrupted(oldId);
+                                            var alteredState = tour.state;
+
+                                            if (prevState == "play" && alteredState == "pause") //interruption caused toue pausing. stop any animations, updating UI as well
+                                                tourPause();
+
+                                            setNavigationStringTo = null;
+                                        }
+                                    }
+                                }
+            );
+
+            updateLayout();
+
+            vc.bind("elementclick", function (e) {
+                navigateToElement(e);
+            });
+
+            vc.bind('cursorPositionChanged', function (cursorPositionChangedEvent) {
+                updateMarker();
+            });
+
+            ax.bind('thresholdBookmarkChanged', function (thresholdBookmark) {
+                var bookmark = navStringToVisible(thresholdBookmark.Bookmark, vc);
+                if (bookmark != undefined) {
+                    controller.moveToVisible(bookmark, false);
+                }
+            });
+
+            // Reacting on the event when one of the infodot exploration causes inner zoom constraint
+            vc.bind("innerZoomConstraintChenged", function (constraint) {
+                controller.effectiveExplorationZoomConstraint = constraint.zoomValue; // applying the constraint
+                //ax.axis("allowMarkerMovesOnHover", !constraint.zoomValue);
+            });
+
+            vc.bind("breadCrumbsChanged", function (breadCrumbsEvent) { //reacting on the event when the first timeline that contains whole visible region is changed
+                updateBreadCrumbsLabels(breadCrumbsEvent.breadCrumbs);
+            });
+
+            $(window).bind('resize', function () {
+                updateLayout();
+            });
+
+            timings.readyFinished = new Date();
+            var vp = vc.virtualCanvas("getViewport");
+            vc.virtualCanvas("setVisible", getVisibleForElement({ x: -13700000000, y: 0, width: 13700000000, height: 5535444444.444445 }, 1.0, vp));
+            updateAxis(vc, ax);
+
+            var bid = window.location.hash.match("b=([a-z0-9_]+)");
+            if (bid) {
+                //bid[0] - source string
+                //bid[1] - found match
+                $("#bibliography .sources").empty();
+                $("#bibliography .title").html("<span>Loading...</span>");
+                $("#bibliographyBack").css("display", "block");
+            }
+
+            // TODO: Move this code to virtualCanvas.js.
+            // drag desktop image to canvas
+            var holder = document.getElementById("vc");
+
+            holder.ondragover = function (e) {
+                var vp = vc.virtualCanvas("getViewport");
+                var origin = getXBrowserMouseOrigin(vc, e);
+                var posv = vp.pointScreenToVirtual(origin.x, origin.y);
+
+                // remove circle that marks the place where new infodot will be created
+                if (CZ.Authoring.hoveredTimeline != null) {
+                    // sometimes exception is being thrown
+                    // TODO: remove try-catch and repair exception
+                    try {
+                        removeChild(CZ.Authoring.hoveredTimeline, "newInfodotCircle");
+                    }
+                    catch (ex) {
+                        console.log(ex);
+                    }
+                }
+
+                // trigger mouseMove event to create a hovered timeline
+                vc.virtualCanvas("mouseMove", e);
+
+                CZ.Authoring.hoveredTimeline = vc.virtualCanvas("getHoveredTimeline"); // parent timeline
+                CZ.Authoring.hoveredInfodot = vc.virtualCanvas("getHoveredInfodot"); // parent infodot
+
+                if (CZ.Authoring.hoveredTimeline == null)
+                    return;
+
+                if (CZ.Authoring.hoveredInfodot && CZ.Authoring.hoveredInfodot.id) {
+                    if (CZ.Authoring.hoveredInfodot.contentItems.length == infodotMaxContentItems) {
+                        CZ.Authoring.hoveredInfodot.settings.strokeStyle = "red";
+                        return false;
+                    }
+                    CZ.Authoring.hoveredInfodot.settings.strokeStyle = "green";
+                }
+                else {
+                    var radius;
+                    if (CZ.Authoring.hoveredTimeline.width > CZ.Authoring.hoveredTimeline.height) radius = CZ.Authoring.hoveredTimeline.width / 10.0
+                    else radius = CZ.Authoring.hoveredTimeline.height / 10.0;
+
+                    while (radius > (CZ.Authoring.hoveredTimeline.height / 10)) radius /= 1.5;
+                    while (radius > (CZ.Authoring.hoveredTimeline.width / 10)) radius /= 1.5;
+                    for (var i = 0; i < CZ.Authoring.hoveredTimeline.children.length; i++) {
+                        if (CZ.Authoring.hoveredTimeline.children[i].type == "infodot") {
+                            radius = CZ.Authoring.hoveredTimeline.children[i].outerRad;
+                            break;
+                        }
+                    }
+
+                    for (var i = 0; i < CZ.Authoring.hoveredTimeline.children.length; i++) {
+                        if (CZ.Authoring.hoveredTimeline.children[i].type == "infodot") {
+                            radius = CZ.Authoring.hoveredTimeline.children[i].outerRad;
+                            break;
+                        }
+                    }
+
+                    // circle that marks the place where infodot will be created if mouse button will be released
+                    try {
+                        // sometimes exception is being thrown
+                        // TODO: remove try-catch and repair exception
+                        addCircle(CZ.Authoring.hoveredTimeline, "layerInfodots", "newInfodotCircle", posv.x, posv.y, radius,
+                        { strokeStyle: 'green', lineWidth: 1, fillStyle: 'rgba(0,140,140,0.5)' }, true);
+                    }
+                    catch (ex) {
+                        console.log(ex);
+                    }
+                }
+
+                return false;
+            };
+            holder.ondragleave = function (e) {
+                var vp = vc.virtualCanvas("getViewport");
+                var origin = getXBrowserMouseOrigin(vc, e);
+                var posv = vp.pointScreenToVirtual(origin.x, origin.y);
+
+                // remove circle that marks the place where new infodot will be created
+                if (CZ.Authoring.hoveredTimeline != null) {
+                    // sometimes exception is being thrown
+                    // TODO: remove try-catch and repair exception
+                    try {
+                        removeChild(CZ.Authoring.hoveredTimeline, "newInfodotCircle");
+                    }
+                    catch (ex) {
+                        console.log(ex);
+                    }
+                }
+
+                vc.virtualCanvas("mouseMove", e);
+
+                return false;
+            };
+            holder.ondragend = function () {
+                return false;
+            };
+            holder.ondrop = function (e) {
+                e.preventDefault();
+
+                // convert event's screen coordinates into virtual space coordinates
+                var vp = vc.virtualCanvas("getViewport");
+                var origin = getXBrowserMouseOrigin(vc, e);
+                var posv = vp.pointScreenToVirtual(origin.x, origin.y);
+
+                // remove circle that marks the place where new infodot will be created
+                if (CZ.Authoring.hoveredTimeline != null) {
+                    // sometimes exception is being thrown
+                    // TODO: remove try-catch and repair exception
+                    try {
+                        removeChild(CZ.Authoring.hoveredTimeline, "newInfodotCircle");
+                    }
+                    catch (ex) {
+                        console.log(ex);
+                    }
+                }
+
+                vc.virtualCanvas("mouseMove", e);
+
+                var file = e.dataTransfer.files[0];
+                if (!file || !file.type.match("image/"))
+                    return false;
+
+                var reader = new FileReader();
+
+                // callback
+                reader.onload = function (event) {
+                    desktopImageURL = event.target.result;
+
+                    if (!CZ.Authoring.hoveredTimeline || !CZ.Authoring.hoveredTimeline.id)
+                        return false;
+
+                    var radius;
+                    if (CZ.Authoring.hoveredTimeline.width > CZ.Authoring.hoveredTimeline.height) radius = CZ.Authoring.hoveredTimeline.width / 10.0
+                    else radius = CZ.Authoring.hoveredTimeline.height / 10.0;
+                   
+                    while (radius > (CZ.Authoring.hoveredTimeline.height / 10)) radius /= 1.5;
+                    while (radius > (CZ.Authoring.hoveredTimeline.width / 10)) radius /= 1.5;
+                    for (var i = 0; i < CZ.Authoring.hoveredTimeline.children.length; i++) {
+                        if (CZ.Authoring.hoveredTimeline.children[i].type == "infodot") {
+                            radius = CZ.Authoring.hoveredTimeline.children[i].outerRad;
+                            break;
+                        }
+                    }
+                    // sometimes exception is being thrown
+                    // TODO: remove try-catch and repair exception
+                    // UPDATE: throwing of the exception was fixed, but try-catch is still there to prevent unexpected errors
+                    try {
+                        if (CZ.Authoring.hoveredInfodot && CZ.Authoring.hoveredInfodot.id) { // adding CI into infodot
+                            if (CZ.Authoring.hoveredInfodot.contentItems.length == infodotMaxContentItems)
+                                return;
+
+                            CZ.Authoring.hoveredInfodot.contentItems.push({
+                                id: 'contentItem' + CZ.Authoring.contentItemCount++, title: 'Sample title',
+                                description: 'description',
+                                mediaUrl: desktopImageURL,
+                                mediaType: 'image'
+                            });
+
+                            var vyc = CZ.Authoring.hoveredInfodot.vyc;
+                            var time = CZ.Authoring.hoveredInfodot.x + CZ.Authoring.hoveredInfodot.width / 2;
+                            var id = CZ.Authoring.hoveredInfodot.id;
+                            var cis = CZ.Authoring.hoveredInfodot.contentItems;
+                            var descr = CZ.Authoring.hoveredInfodot.infodotDescription;
+
+                            try {
+                                // remove and then adding infodot to position content items properly
+                                removeChild(CZ.Authoring.hoveredTimeline, CZ.Authoring.hoveredInfodot.id);
+                                addInfodot(CZ.Authoring.hoveredTimeline, "layerInfodots", id, time, vyc, radius, cis, descr);
+                            }
+                            catch (ex) {
+                                console.log(ex);
+                            }
+
+                        } else { // adding new infodot
+                            var date = CZ.Authoring.getInfodotDate(posv.x);
+
+                            addInfodot(CZ.Authoring.hoveredTimeline, "layerInfodots", "infodot" + CZ.Authoring.infodotCount++,
+                                posv.x, posv.y, radius,
+                                [{
+                                    id: 'contentItem' + CZ.Authoring.contentItemCount++, title: 'Sample content item',
+                                    description: 'Content item created by dragging desktop image.',
+                                    mediaUrl: desktopImageURL,
+                                    mediaType: 'image'
+                                }], {
+                                    title: "Sample infodot",
+                                    date: date
+                                });
+                        }
+                    }
+                    catch (ex) {
+                        console.log(ex);
+                    }
+
+                    CZ.Authoring.createInfodot({
+                        regime: CZ.Authoring.hoveredTimeline.regime,
+                        threshold: CZ.Authoring.hoveredTimeline.threshold,
+                        year: -posv.x,
+                        contentItem: {
+                            uri: desktopImageURL,
+                            caption: 'Infodot created by dragging desktop image.',
+                            title: 'Image'
+                        }
+                    });
+                };
+
+                reader.onerror = function (event) {
+                    console.log("Reading of the desktop file failed.");
+                }
+
+                reader.readAsDataURL(file);
+
+                return false;
+            };
+        });
+
+        function showCreateTimelineForm(t) {
+            var isCancel = true;
+            var titleInput = $("#timelineTitleInput");
+            var startInput = $("#timelineStartInput").spinner();
+            var endInput = $("#timelineEndInput").spinner();
+
+            titleInput.val(t.title);
+            startInput.val(t.x);
+            endInput.val(t.x + t.width);
+
+            $("#createTimelineForm").dialog({
+                title: "create timeline",
+                modal: true,
+                height: 600,
+                width: 600,
+                buttons: {
+                    "save and close": function () {
+                        CZ.Authoring.updateTimeline(t, {
+                            title: titleInput.val(),
+                            start: startInput.val(),
+                            end: endInput.val(),
+                        });
+                        isCancel = false;
+                        $(this).dialog("close");
+                    }
+                },
+                close: function () {
+                    if (isCancel) {
+                        CZ.Authoring.removeTimeline(t);
+                    }
+                    CZ.Authoring._isActive = false;
+                    $("a:contains('create timeline')").removeClass("active");
+                }
+            });
+        }
+
+        function showEditTimelineForm(t) {
+            var titleInput = $("#timelineTitleInput");
+            var startInput = $("#timelineStartInput").spinner();
+            var endInput = $("#timelineEndInput").spinner();
+
+            titleInput.val(t.title);
+            startInput.val(t.x);
+            endInput.val(t.x + t.width);
+
+            $("#createTimelineForm").dialog({
+                title: "edit timeline",
+                modal: true,
+                height: 600,
+                width: 600,
+                buttons: {
+                    "save and close": function () {
+                        CZ.Authoring.updateTimeline(t, {
+                            title: titleInput.val(),
+                            start: startInput.val(),
+                            end: endInput.val(),
+                        });
+                        $(this).dialog("close");
+                    },
+                    "delete": function () {
+                        CZ.Authoring.removeTimeline(t);
+                        $(this).dialog("close");
+                    }
+                },
+                close: function () {
+                    CZ.Authoring._isActive = false;
+                    $("a:contains('edit timeline')").removeClass("active");
+                }
+            });
+        }
+
+        function createTimeline() {
+            CZ.Authoring._isActive = (CZ.Authoring.mode !== "createTimeline") || !CZ.Authoring._isActive;
+            CZ.Authoring.mode = "createTimeline";
+
+            $("div #footer-authoring > a").removeClass("active");
+
+            if (CZ.Authoring._isActive) {
+                $("a:contains('create timeline')").addClass("active");
+            } else {
+                $("a:contains('create timeline')").removeClass("active");
+            }
+        }
+
+        function editTimeline() {
+            CZ.Authoring._isActive = (CZ.Authoring.mode !== "editTimeline") || !CZ.Authoring._isActive;
+            CZ.Authoring.mode = "editTimeline";
+
+            $("div #footer-authoring > a").removeClass("active");
+
+            if (CZ.Authoring._isActive) {
+                $("a:contains('edit timeline')").addClass("active");
+            } else {
+                $("a:contains('edit timeline')").removeClass("active");
+            }
+        }
+
+        function createExhibit() {
+            // body...
+        }
+
+        function editExhibit() {
+            // body...
+        }
+    </script>
+    <title>ChronoZoom</title>
+</head>
+<body style="background-color: Black; min-width: 950px;" >
+    
+    <div id="header" style="height: 67px">
+        <div style="position: relative">
+            <button class="authSwitch" style="width: auto; left: 350px; position: absolute; display: none;" id="AT_button"
+                onmouseup="CZ.Authoring.atOnClicked();">Authoring</button>
+            <div id="authoringToolsPanel" style="position: absolute; left: 500px; top: 0px; display: none; max-width: 800px;">
+                <button class="authModeSwitch" style="width: auto;"
+                    onmouseup="CZ.Authoring.editModeChanged('addTimeline');">Create timeline</button>
+                <button class="authModeSwitch" style="width: auto;"
+                    onmouseup="CZ.Authoring.editModeChanged('editTimelineDate');">Edit timeline</button>
+                <button class="authModeSwitch" style="width: auto;"
+                    onmouseup="CZ.Authoring.editModeChanged('moveContent');">Move timeline</button>
+                <button class="authModeSwitch" style="width: auto;"
+                    onmouseup="CZ.Authoring.editModeChanged('moveInfodot');">Move Exhibit</button>
+                <button class="authModeSwitch" style="width: auto;"
+                    onmouseup="CZ.Authoring.editModeChanged('moveInfodotHorizontally');">Edit Exhibit</button>
+            </div>
+            <div style="left: 15px; height: 29px; position: absolute;">
+                <img style="margin: 9px 0 0 5px;  float: left" title="ChronoZoom" src="Images/chronzoom-200px-white.png" />
+                <img style="margin: 5px 0 0 14px; float: right" id="search_button" title="Search ChronoZoom" alt="Search ChronoZoom" src="Images/search_off.jpg"
+                    onmouseup="onSearchClicked();" onmouseover="searchHighlight(true);"
+                    onmouseout="searchHighlight(false);" />
+                <img style="margin: 5px 0 0 14px" title="Take a guided tour" id="tours_index" alt="Take a guided tour" src="Images/tour_off.jpg"
+                     onmouseover="tourButtonHighlight(true);" onmouseout="tourButtonHighlight(false);"
+                    onmouseup="onTourClicked();" />
+            </div>
+            <div class="regimes_rects" style="right: 0px; position: absolute; top: 0px; width: 302px; height: 62px;">
+                <div id="human_rect" class="regime_rect" style="position: absolute; top: 1px; width: 17px; left: 284px;
+                    height: 10px; background-color: rgba(212, 92, 70, 1.0); cursor: pointer;" onclick="navigateToBookmark(humanityVisible);">
+                </div>
+                <div id="prehuman_rect" class="regime_rect" style="position: absolute; top: 13px; width: 100px; left: 201px;
+                    height: 10px; background-color: rgba(237, 145, 50, 1.0); cursor: pointer;" onclick="navigateToBookmark(prehistoryVisible);">
+                </div>
+                <div id="life_rect" class="regime_rect" style="position: absolute; top: 25px; width: 255px; left: 46px;
+                    height: 10px; background-color: rgba(73, 150, 73, 1.0); cursor: pointer;" onclick="navigateToBookmark(lifeVisible);">
+                </div>
+                <div id="earth_rect" class="regime_rect" style="position: absolute; top: 37px; width: 260px; left: 41px;
+                    height: 10px; background-color: rgba(81, 127, 149, 1.0); cursor: pointer;" onclick="navigateToBookmark(earthVisible);">
+                </div>
+                <div id="cosmos_rect" class="regime_rect" style="position: absolute; top: 49px; width: 300px; left: 1px;
+                    height: 10px; background-color: rgba(152, 108, 157, 1.0); cursor: pointer;" onclick="navigateToBookmark(cosmosVisible);">
+                </div>
+                <div id="regime_navigator" style="position: absolute; top: 0px; left: 1px; width: 300px;
+                    height: 62px; background-color: White; opacity: 0.3; pointer-events: none;">
+                </div>
+            </div>
+            <!--<img alt="regimes_navigator" style="right: 0px; position: absolute; top: 0px" src="Images/regimes.png" />-->
+            <div class="regimes_titles" style="top: 0px; position: absolute; right: 309px; font-size: 11.5;">
+                <div style="position: relative; height: 12px;">
+                    <div class="regimes_title" onclick="navigateToBookmark(humanityVisible);">
+                        Humanity</div>
+                </div>
+                <div style="position: relative; height: 12px;">
+                    <div class="regimes_title" onclick="navigateToBookmark(prehistoryVisible);">
+                        Human&nbsp;Prehistory</div>
+                </div>
+                <div style="position: relative; height: 12px;">
+                    <div class="regimes_title" onclick="navigateToBookmark(lifeVisible);">
+                        Life</div>
+                </div>
+                <div style="position: relative; height: 12px;">
+                    <div class="regimes_title" onclick="navigateToBookmark(earthVisible);">
+                        Earth</div>
+                </div>
+                <div style="position: relative; height: 12px;">
+                    <div class="regimes_title" onclick="navigateToBookmark(cosmosVisible);">
+                        Cosmos</div>
+                </div>
+            </div>
+
+            
+            <div id="bc_navLeft"  onclick="breadCrumbNavLeft()" class="breadCrumbNavButton">&#171;</div> 
+            <div id="breadCrumbsPanel" class="breadCrumbPanel unselectable">
+                <table id="breadCrumbsTable" class="breadCrumbTable">
+                    <tr>
+                    </tr>
+                </table>
+            </div>
+            <div id="bc_navRight" onclick="breadCrumbNavRight()" class="breadCrumbNavButton">&#187;</div>
+            
+
+            <div id="tour_control" class="tour_control" style="display: none; top: 14px; position: relative;
+                margin: auto">
+                <img id="tour_prev" src="Images/tour_prev_off.jpg" alt="previous" onmouseout="toggleOffImage('tour_prev');"
+                    onmouseover="toggleOnImage('tour_prev');" onclick="tourPrev();" />
+                <img style="margin: 0 0 0 16px"
+                    id="tour_playpause" src="Images/tour_pause_off.jpg" alt="play/pause" onmouseout="toggleOffImage('tour_playpause');"
+                    onmouseover="toggleOnImage('tour_playpause');" onclick="tourPlayPause();" />
+                <img
+                    style="margin: 0 0 0 16px" id="tour_next" src="Images/tour_next_off.jpg" alt="next"
+                    onmouseout="toggleOffImage('tour_next');" onmouseover="toggleOnImage('tour_next');"
+                    onclick="tourNext();" />
+                <img style="margin: 0 0 0 10px" id="tour_exit" src="Images/tour_exit_off.jpg"
+                    alt="exit" onmouseout="toggleOffImage('tour_exit');" onmouseover="toggleOnImage('tour_exit');"
+                    onclick="tourAbort();" />
+            </div>
+        </div>
+    </div>
+
+    <div id="axis">
+    </div>
+    <div id="vc" style="width: 100%; height: auto; overflow: hidden; background-image: url('Images/background.jpg');
+        background-repeat: no-repeat; background-attachment: fixed; background-position: center center;
+        background-size: cover">
+        <div id="layerTimelines" onselectstart="return false;">
+        </div>
+                <!--for popup's-->
+          <p class="bubbleInfo" style="display:inline-block; z-index:3000;" id="defaultBox">
+            <span></span>
+          </p>
+        <!--//////////-->
+        <div id="layerInfodots" onselectstart="return false;">
+        </div>
+        <div id="iframe_layer" onselectstart="return false;">
+        </div>
+    </div>
+
+    <div id="timelineChangeName" class="czWindow" style="z-index: 2010;max-height:250px; display: none;">
+        <div class="header" onselectstart="return false;" style="display: inline-block;">
+            Input new name
+        </div>
+        <img id="editorCloseButton" style="display: inline-block; position: relative; top: 10px;" src="Images/close_off.png" alt="Close"
+            onmouseover="toggleOnImage('editorCloseButton', 'png');"
+            onmouseout="toggleOffImage('editorCloseButton', 'png');"
+            onclick="CZ.Authoring.hideTitleEditor()" 
+            onselectstart="return false;" />
+        <div>
+            <input id="ChangeNameTextBox" class="czTextBox emptyTextBox" style="margin: 10px 10px 10px 10px;
+                width: 190px" value="type here..." />
+        </div>
+    </div>
+    
+    <div id="search" class="czWindow" style="z-index: 2010;max-height:250px; display: none">
+        <div class="header" onselectstart="return false;">
+            Search</div>
+        <div>
+            <input id="searchTextBox" class="czTextBox emptyTextBox" style="margin: 10px 10px 10px 10px;
+                width: 190px" value="type here..." />
+        </div>
+        <div class="searchResults" style="height:auto;max-height:140px">
+        </div>
+        <div>
+            <!--<img src="Images/loading10.gif" style="width: 190px;margin-left: 10px; height: 20px;display:none;" alt="Searching..." id="loadingImage"/>-->
+            <img src="Images/loading.gif" style="width: 190px;margin-left: 10px; margin-bottom:10px;height: 20px;display:none;" alt="Searching..." id="loadingImage"/>
+        </div>
+    </div>
+    <div id="tours" class="czWindow" onselectstart="return false;" style="display: none">
+        <div class="header">
+            Tours</div>
+        <div id="tours-narration" class="narration" onclick="onNarrationClick();">
+            Narration: <span id="tours-narration-on" class="narration-selected">ON</span> |
+            <span id="tours-narration-off">OFF</span>
+        </div>
+        <div id="tours-content" class="content">
+        </div>
+    </div>
+    <div id="bookmarks" class="bookmarksWindow" onselectstart="return false;" style="display: none">
+        <img id="bookmarksCollapse" src="Images/collapse-left.png" class="headerButton" onclick="onBookmarksCollapse();" />
+        <div class="header">
+        </div>
+        <div class="slideHeader">
+        </div>
+        <div class="slideText">
+        </div>
+        <div class="slideFooter">
+        </div>
+    </div>
+    <div id="bibliographyBack" class="biblBack" style="display: none">
+        <div id="bibliographyOut" class="biblOuterWindow">
+             <div id="bibliography" class="biblWindow">
+                <img class="closeButton" id="biblCloseButton" src="Images/close_off.png" onmouseover="toggleOnImage('biblCloseButton', 'png');"
+                    onmouseout="toggleOffImage('biblCloseButton', 'png');" alt="Close" onselectstart="return false;" />
+                <div class="title" onselectstart="return false;">
+                    <span>Infodot name</span> &gt; Bibliography
+                </div>
+                <div class="sources">
+                </div>
+               </div>
+        </div>
+    </div>
+    
+    <div id="footer">
+        <div id="footer-left">
+            <span class="footer-text" >
+                Created by: 
+            </span>
+            <a href="http://research.microsoft.com/en-us/projects/chronozoom/default.aspx">
+                <img src="Images/mrclogo-17x53.png" title="Microsoft Research" />
+            </a>
+            <a href="http://eps.berkeley.edu">
+                <img src="Images/berkeley-logo-17-86.png" title="University of California Berkeley Department of Earth and Planetary Science" />
+            </a>
+            <a href="http://www.cs.msu.su" >
+                <img src="Images/MSU_logo-white17x74.png" title="Moscow State University" />
+            </a>
+        </div>
+
+        <div id="footer-authoring">
+
+            <a onclick="createTimeline()" class="footer-authoring-link">
+                create timeline
+            </a>
+            <a onclick="editTimeline()" class="footer-authoring-link">
+                edit timeline
+            </a>
+            <a onclick="createExhibit()" class="footer-authoring-link">
+                create exhibit
+            </a>
+            <a onclick="editExhibit()" class="footer-authoring-link">
+                edit exhibit
+            </a>
+
+            <!--Create Timeline popup dialog-->
+            <div id="createTimelineForm" style="background-color: rgb(60, 95, 150); display: none; color: white;">
+                <p>
+                    <label style="display: block">title</label>
+                    <input id="timelineTitleInput" style="display: block" type="text" />
+                </p>
+
+                <p style="display: inline-block">
+                    <label style="display: block">start</label>
+                    <input id="timelineStartInput" style="display: block" />
+                </p>
+
+                <p style="display: inline-block">
+                    <label style="display: block">end</label>
+                    <input id="timelineEndInput" style="display: block" />
+                </p>
+            </div>
+
+        </div>
+
+        <div id="footer-right">            
+            <a href="http://go.microsoft.com/?linkid=9797058" class="footer-survey">
+                Take Our Survey
+            </a>
+            <span class="footer-separator">
+                |
+            </span>
+            <a href="http://chronozoom.codeplex.com/workitem/list/basic" class="footer-link">
+                Report a Problem
+            </a>
+            <span class="footer-separator">
+                |
+            </span>
+            <a href="BehindTheScenes.htm" class="footer-link">
+                Behind the Scenes
+            </a>
+            <span class="footer-separator">
+                |
+            </span>
+            <a href="TermsOfUse.htm" class="footer-link">
+                Terms of Use
+            </a>      
+            <span class="footer-separator">
+                |
+            </span>
+            <a href="Privacy.htm" class="footer-link">
+                Privacy
+            </a>  
+            <span class="footer-separator">
+                |
+            </span>
+            <a href="Trademark_Copyright.htm" class="footer-link">
+                Trademark
+            </a>        
+        </div>
+
+        <div class="clearer"></div>       
+    </div>
+
+    <div id="welcomeScreenBack" class="welcomeScreenBack">
+        <div id="welcomeScreenOut" class="welcomeScreenOuterWindow">
+            <div id="welcomeScreen" class="welcomeScreen">
+                <div class="titleArea">
+                <img class="closeButton" id="welcomeScreenCloseButton" src="Images/wlcmScreen_close_off.png" onmouseover="toggleOnImage('welcomeScreenCloseButton', 'png');"
+                    onmouseout="toggleOffImage('welcomeScreenCloseButton', 'png');" alt="Close" onselectstart="return false;" 
+                    onclick="hideWelcomeScreen();"/>
+                <div class="title" onselectstart="return false;">
+                    <span>Welcome to ChronoZoom beta!</span>
+                </div>
+                </div>
+                <div class="content">
+                    <div class="description">
+                        ChronoZoom is an interactive timeline for all of history.
+                        <p>Explore all of the past - from the Big Bang, to the dinosours, to ancient and modern history.</p>
+                        Click or scroll to navigate through events and timelines. Watch our introduction video for a quick overview of this project.
+
+                        <div style="position: absolute; bottom: 0px;">
+                            <button class="button" onclick="closeWelcomeScreen()">Start Exploring!</button>
+                            <div>
+                                <input type="checkbox" id="welcomeScreenCheckbox" name="welcomeScreenCheckbox"/> 
+                                <label for="welcomeScreenCheckbox" unselectable="on" style="font-family: Arial; font-size: 16px;">Don't Show Again</label>
+                            </div> 
+                        </div>
+                    </div>
+                    <div class="media" id="welcomeScreenMedia">
+                        <iframe class="player" id="welcomeVideo" src="http://www.youtube.com/embed/3jvJD8Qv5ec" frameborder="0"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
