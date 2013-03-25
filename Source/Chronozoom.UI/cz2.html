@@ -190,7 +190,7 @@
             initializeToursUI();
 
             CZ.Authoring.initializeTimelineChangeName();
-            
+
             CZ.Authoring.initialize(vc, {
                 showCreateTimelineForm: showCreateTimelineForm,
                 showEditTimelineForm: showEditTimelineForm
@@ -222,7 +222,7 @@
                                     updateMarker();
                                     // ax.axis("setTimeMarker", newMarkerPos);
                                 }
-                                updateNavigator(vp);                                
+                                updateNavigator(vp);
                             },
                             function () {
                                 return vc.virtualCanvas("getViewport");
@@ -493,7 +493,7 @@
                     var radius;
                     if (CZ.Authoring.hoveredTimeline.width > CZ.Authoring.hoveredTimeline.height) radius = CZ.Authoring.hoveredTimeline.width / 10.0
                     else radius = CZ.Authoring.hoveredTimeline.height / 10.0;
-                   
+
                     while (radius > (CZ.Authoring.hoveredTimeline.height / 10)) radius /= 1.5;
                     while (radius > (CZ.Authoring.hoveredTimeline.width / 10)) radius /= 1.5;
                     for (var i = 0; i < CZ.Authoring.hoveredTimeline.children.length; i++) {
@@ -682,11 +682,39 @@
         }
 
         function createExhibit() {
-            // body...
+            // skip authoring during ongoing dynamic layout animation
+            if (animatingElements.length != 0) {
+                return;
+            }
+
+            CZ.Authoring._isActive = (CZ.Authoring.mode !== "createExhibit") || !CZ.Authoring._isActive;
+            CZ.Authoring.mode = "createExhibit";
+
+            $("div #footer-authoring > a").removeClass("active");
+
+            if (CZ.Authoring._isActive) {
+                $("a:contains('create exhibit')").addClass("active");
+            } else {
+                $("a:contains('create exhibit')").removeClass("active");
+            }
         }
 
         function editExhibit() {
-            // body...
+            // skip authoring during ongoing dynamic layout animation
+            if (animatingElements.length != 0) {
+                return;
+            }
+
+            CZ.Authoring._isActive = (CZ.Authoring.mode !== "editExhibit") || !CZ.Authoring._isActive;
+            CZ.Authoring.mode = "editExhibit";
+
+            $("div #footer-authoring > a").removeClass("active");
+
+            if (CZ.Authoring._isActive) {
+                $("a:contains('edit exhibit')").addClass("active");
+            } else {
+                $("a:contains('edit exhibit')").removeClass("active");
+            }
         }
     </script>
     <title>ChronoZoom</title>

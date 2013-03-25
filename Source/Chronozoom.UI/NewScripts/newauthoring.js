@@ -24,6 +24,8 @@ var CZ = (function (CZ, $, document) {
     var _rectCur = { type: "rectangle" };
     var _selectedTimeline = {};
     var _timelineCounter = 0;
+    var _infodotCounter = 0;
+    var _contentItemCounter = 0;
 
     /**
      * Tests a timeline on intersection with another virtual canvas object.
@@ -76,7 +78,7 @@ var CZ = (function (CZ, $, document) {
                         tp.x + tp.width > ec.x + 2 * ec.outerRad &&
                         tp.y + tp.height > ec.y + 2 * ec.outerRad);
             default:
-                return true;    
+                return true;
         }
     }
 
@@ -114,7 +116,7 @@ var CZ = (function (CZ, $, document) {
                 if (!isIncluded(tc, _selectedTimeline.children[i])) {
                     return false;
                 }
-            } 
+            }
         }
 
         return true;
@@ -175,9 +177,9 @@ var CZ = (function (CZ, $, document) {
 
         removeChild(t, t.id + "__header__");
         t.titleObject = addText(
-            t, t.layerid, t.id + "__header__", 
+            t, t.layerid, t.id + "__header__",
             t.x + marginLeft, t.y + marginTop,
-            baseline, headerSize, t.title, 
+            baseline, headerSize, t.title,
             {
                 fontName: timelineHeaderFontName,
                 fillStyle: timelineHeaderFontColor,
@@ -216,9 +218,52 @@ var CZ = (function (CZ, $, document) {
                     _dragPrev = {};
                     _dragCur = posv;
                     _hovered = null;
-                
+
                     if (vcwidget.hovered) {
                         _hovered = vcwidget.hovered;
+                    }
+
+                    if (that.mode === "createExhibit" && _hovered && _hovered.type === "timeline") {
+                        console.log("createExhibit");
+
+                        var radius;
+                        if (_hovered.width > _hovered.height) radius = _hovered.width / 10.0
+                        else radius = _hovered.height / 10.0;
+
+                        while (radius > (_hovered.height / 10)) radius /= 1.5;
+                        while (radius > (_hovered.width / 10)) radius /= 1.5;
+                        for (var i = 0; i < _hovered.children.length; i++) {
+                            if (_hovered.children[i].type == "infodot") {
+                                radius = _hovered.children[i].outerRad;
+                                break;
+                            }
+                        }
+
+                        var date = CZ.Authoring.getInfodotDate(_dragStart.x);
+
+                        addInfodot(_hovered, "layerInfodots", "infodot" + _infodotCounter++,
+                            _dragStart.x, _dragStart.y, radius,
+                            [{
+                                id: 'contentItem' + _contentItemCounter++, title: 'Sample content item',
+                                description: 'Content item created by dragging desktop image.',
+                                mediaUrl: "",
+                                mediaType: 'image'
+                            }], {
+                                title: "Sample infodot",
+                                date: date
+                            });
+
+                        CZ.Authoring.createInfodot({
+                            regime: _hovered.regime,
+                            threshold: _hovered.threshold,
+                            year: -_dragStart.x,
+                            contentItem: {
+                                uri: "http://www.spartacus.schoolnet.co.uk/RUSkalinin.gif",
+                                caption: 'Infodot created by dragging desktop image.',
+                                title: 'Image'
+                            }
+                        });
+
                     }
                 }
             });
@@ -242,6 +287,11 @@ var CZ = (function (CZ, $, document) {
                         _selectedTimeline = createNewTimeline();
                         that.showCreateTimelineForm(_selectedTimeline);
                     }
+
+                    if (that.mode === "editExhibit" && _hovered && _hovered.type === "infodot") {
+                        console.log("editExhibit");
+                    }
+
                 }
             });
 
@@ -286,8 +336,8 @@ var CZ = (function (CZ, $, document) {
                 }
             }
 
-            this.showCreateTimelineForm = formHandlers && formHandlers.showCreateTimelineForm || function () {};
-            this.showEditTimelineForm = formHandlers && formHandlers.showEditTimelineForm || function () {};
+            this.showCreateTimelineForm = formHandlers && formHandlers.showCreateTimelineForm || function () { };
+            this.showEditTimelineForm = formHandlers && formHandlers.showEditTimelineForm || function () { };
         },
 
         /**
@@ -323,6 +373,53 @@ var CZ = (function (CZ, $, document) {
          */
         removeTimeline: function (t) {
             removeChild(t.parent, t.id);
+        },
+
+        createInfodot: function (infodot) {
+            var k = 1000000000;
+
+            var exhibit = {
+                __type: "Exhibit:#Chronozoom.Entities",
+                ContentItems: [],
+                Day: 0,
+                ID: "",
+                Month: 0,
+                References: [],
+                Regime: infodot.regime,
+                Sequence: null,
+                Threshold: "1. Origins of the Universe",
+                Title: "New exhibit",
+                UniqueID: "_" + _timelineCounter++,
+                TimeUnit: "Ga",
+                Year: (infodot.year / k).toFixed(1)
+            };
+
+            var dateTime = {
+                __type: "DateTimeOffset:#System",
+                DateTime: "/Date(1316131200000)/",
+                OffsetMinutes: 0
+            };
+
+            var contentItem = {
+                __type: "ContentItem:#Chronozoom.Entities",
+                Attribution: "New content item",
+                Caption: infodot.contentItem.caption,
+                Date: dateTime,
+                HasBibliography: false,
+                ID: "",
+                MediaSource: "http://commons.wikimedia.org/wiki/File:A_False-Color_Topography_of_Vesta%27s_South_Pole.jpg",
+                MediaType: "Picture",
+                Order: 32767,
+                Regime: infodot.regime,
+                Threshold: "1. Origins of the Universe",
+                TimeUnit: "Ga",
+                Title: infodot.contentItem.title,
+                UniqueID: "_" + _timelineCounter++,
+                Uri: infodot.contentItem.uri,
+                Year: null
+            };
+
+            exhibit.ContentItems.push(contentItem);
         }
     });
 
