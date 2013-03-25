@@ -195,7 +195,7 @@ overflow: hidden;
 
 .biblWindow .closeButton
 {
-background-image: "Images/close.png";
+background-image: "/Images/close.png";
 position: absolute;
 right: 12px;
 top: 12px;
@@ -1023,7 +1023,7 @@ white-space: nowrap;
 
 .welcomeScreen .titleArea .closeButton
 {
-    background-image: "Images/close.png";
+    background-image: "/Images/close.png";
     position: absolute;
     top: 12px;
     right: 22px;

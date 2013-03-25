@@ -95,7 +95,6 @@
     <Compile Include="JsTypes\Couple.cs" />
     <Compile Include="JsTypes\JsContentItem.cs" />
     <Compile Include="JsTypes\JsCoordinates.cs" />
-    <Compile Include="GeneralTests\ServiceTests.cs" />
     <Compile Include="GeneralTests\UrlNavTests.cs" />
     <Compile Include="JsTypes\JsExhibit.cs" />
     <Compile Include="JsTypes\JsTimeline.cs" />
