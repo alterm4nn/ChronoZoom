@@ -239,7 +239,7 @@ var CZ = (function (CZ, $, document) {
                             }
                         }
 
-                        var date = CZ.Authoring.getInfodotDate(_dragStart.x);
+                        var date = that.getInfodotDate(_dragStart.x);
 
                         addInfodot(_hovered, "layerInfodots", "infodot" + _infodotCounter++,
                             _dragStart.x, _dragStart.y, radius,
@@ -253,7 +253,7 @@ var CZ = (function (CZ, $, document) {
                                 date: date
                             });
 
-                        CZ.Authoring.createInfodot({
+                        that.createInfodot({
                             regime: _hovered.regime,
                             threshold: _hovered.threshold,
                             year: -_dragStart.x,
@@ -420,8 +420,25 @@ var CZ = (function (CZ, $, document) {
             };
 
             exhibit.ContentItems.push(contentItem);
+        },
+        /* Returns the date string for the infodot header. 
+        @param x        (double) negative number, x component of virtual coordinates*/
+        getInfodotDate: function (x) {
+                // calculate date of the infodot
+            var date = Math.floor(-x) - 2012; // CE offset
+
+            if (date / 1000000000 >= 0.1)
+                date = (date / 1000000000).toFixed(1) + " Ga";
+            else if (date / 10000000 >= 0.1)
+                date = (date / 1000000).toFixed(1) + " Ma";
+            else if (date > 0) // in case of BCE
+                date = Math.abs(date) + " BCE";
+            else
+                date = date ? -date : 1;
+
+            return date;
         }
-    });
+});
 
     return CZ;
 })(CZ || {}, jQuery, document);
