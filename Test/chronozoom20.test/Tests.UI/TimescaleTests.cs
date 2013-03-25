@@ -86,6 +86,7 @@ namespace Tests
         [TestMethod]
         public void Roman_History_TimeLine_Borders_Ages()
         {
+            HomePageHelper.OpenHumanityTimeline();
             HomePageHelper.OpenRomanHistoryTimeline();
             const string leftBorderAge = "BCE";
             const string righBorderAge = "AD";
