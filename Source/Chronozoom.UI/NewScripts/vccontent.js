@@ -2495,8 +2495,13 @@ function CanvasInfodot(vc, layerid, id, time, vyc, radv, contentItems, infodotDe
             var infodotTitle = addText(contentItem, layerid, id + "__title", time - titleWidth / 2, titleTop, titleTop, titleHeight,
                 title,
                 {
-                    fontName: contentItemHeaderFontName, fillStyle: contentItemHeaderFontColor, textBaseline: 'middle', textAlign: 'center',
-                    wrapText: false, numberOfLines: 1
+                    fontName: contentItemHeaderFontName,
+                    fillStyle: contentItemHeaderFontColor,
+                    textBaseline: 'middle',
+                    textAlign: 'center',
+                    opacity: 1,
+                    wrapText: true,
+                    numberOfLines: 1
                 }, titleWidth);
             infodotTitle.reactsOnMouse = true;
 
@@ -2527,8 +2532,13 @@ function CanvasInfodot(vc, layerid, id, time, vyc, radv, contentItems, infodotDe
             var biblHeight = infodotBibliographyHeight * radv * 2;
             var biblWidth = titleWidth / 3;
             var bibl = addText(contentItem, layerid, id + "__bibliography", time - biblWidth / 2, biblBottom - biblHeight, biblBottom - biblHeight / 2, biblHeight,
-                "Bibliography",
-                { fontName: contentItemHeaderFontName, fillStyle: timelineBorderColor, textBaseline: 'middle', textAlign: 'center' }, biblWidth);
+                "Bibliography", {
+                    fontName: contentItemHeaderFontName,
+                    fillStyle: timelineBorderColor,
+                    textBaseline: 'middle',
+                    textAlign: 'center',
+                    opacity: 1
+                }, biblWidth);
             bibl.reactsOnMouse = true;
             bibl.onmouseclick = function (e) {
                 this.vc.element.css('cursor', 'default');
