@@ -1127,6 +1127,7 @@ function CanvasCircle(vc, layerid, id, vxc, vyc, vradius, settings) {
     this.base(vc, layerid, id, vxc - vradius, vyc - vradius, 2.0 * vradius, 2.0 * vradius);
     this.settings = settings;
     this.isObservedNow = false; //whether the circle is the largest circle under exploration,
+    this.type = "circle";
     //that takes large enough rendering space according to infoDotAxisFreezeThreshold var in settings.js
 
     /* Renders a circle.

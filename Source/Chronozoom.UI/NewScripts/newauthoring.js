@@ -13,72 +13,74 @@
  * The CZ submodule for Authoring Tool functionality.
  * Use initialize() method to bind UI with Authoring Tool.
  */
-var CZ = (function (CZ, $, document) {
+var CZ = (function (CZ, $) {
     var Authoring = CZ.Authoring = CZ.Authoring || {};
 
     var that = Authoring;
+
+    // Virtual canvas widget.
     var _vcwidget;
+
+    // Mouse position.
     var _dragStart = {};
     var _dragPrev = {};
     var _dragCur = {};
+
+    // Current hovered object in virtual canvas.
     var _hovered = {};
+
+    // New timeline rectangle.
     var _rectPrev = { type: "rectangle" };
     var _rectCur = { type: "rectangle" };
+
+    // New exhibit circle.
+    var _circlePrev = { type: "circle" };
+    var _circleCur = { type: "circle" };
+
+    // Selected objects for editing.
     var _selectedTimeline = {};
+    var _selectedExhibit = {};
+
+    // Temp counters for objects' ids.
     var _timelineCounter = 0;
     var _infodotCounter = 0;
     var _contentItemCounter = 0;
 
     /**
-     * Tests a timeline on intersection with another virtual canvas object.
-     * @param  {Object}  t   A timeline or rectangle to test.
-     * @param  {Object}  obj Another timeline or an exhibit.
-     * @return {Boolean}     True in case of intersection, False otherwise.
+     * Tests a timeline/exhibit on intersection with another virtual canvas object.
+     * @param  {Object}  te   A timeline/exhibit to test.
+     * @param  {Object}  obj  Virtual canvas object.
+     * @return {Boolean}      True in case of intersection, False otherwise.
      */
-    function isIntersecting(t, obj) {
+    function isIntersecting(te, obj) {
         switch (obj.type) {
             case "timeline":
-                var t1 = t;
-                var t2 = obj;
-                return (t1.x + t1.width > t2.x &&
-                        t1.x < t2.x + t2.width &&
-                        t1.y + t1.height > t2.y &&
-                        t1.y < t2.y + t2.height);
             case "infodot":
-                var e = obj;
-                // NOTE: e.x and e.y is not a center!
-                return (t.x + t.width > e.x &&
-                        t.x < e.x + 2 * e.outerRad &&
-                        t.y + t.height > e.y &&
-                        t.y < e.y + 2 * e.outerRad);
+                return (te.x + te.width > obj.x &&
+                        te.x < obj.x + obj.width &&
+                        te.y + te.height > obj.y &&
+                        te.y < obj.y + obj.height);
             default:
                 return false;
         }
     }
 
     /**
-     * Tests a timeline on inclusion in another timeline.
-     * @param  {Object}  tp An estimated parent timeline.
-     * @param  {Object}  tc An estimated child timeline.
-     * @return {Boolean}    True in case of inclusion, False otherwise.
+     * Tests a virtual canvas object on inclusion in a timeline.
+     * @param  {Object}  tp  An estimated parent timeline.
+     * @param  {Object}  obj An estimated child virtual canvas object.
+     * @return {Boolean}     True in case of inclusion, False otherwise.
      */
     function isIncluded(tp, obj) {
-        console.log(obj.type);
         switch (obj.type) {
             case "timeline":
             case "rectangle":
-                var tc = obj;
-                return (tp.x < tc.x &&
-                        tp.y < tc.y &&
-                        tp.x + tp.width > tc.x + tc.width &&
-                        tp.y + tp.height > tc.y + tc.height);
             case "infodot":
-                var ec = obj;
-                // NOTE: ec.x and ec.y is not a center!
-                return (tp.x < ec.x &&
-                        tp.y < ec.y &&
-                        tp.x + tp.width > ec.x + 2 * ec.outerRad &&
-                        tp.y + tp.height > ec.y + 2 * ec.outerRad);
+            case "circle":
+                return (tp.x < obj.x &&
+                        tp.y < obj.y &&
+                        tp.x + tp.width > obj.x + obj.width &&
+                        tp.y + tp.height > obj.y + obj.height);
             default:
                 return true;
         }
@@ -94,7 +96,7 @@ var CZ = (function (CZ, $, document) {
      * @param  {Boolean} editmode If true, it doesn't take into account edited timeline.
      * @return {Boolean}          True if test is passed, False otherwise.
      */
-    function checkIntersections(tp, tc, editmode) {
+    function checkTimelineIntersections(tp, tc, editmode) {
         var i = 0;
         var len = 0;
         var selfIntersection = false;
@@ -125,6 +127,36 @@ var CZ = (function (CZ, $, document) {
     }
 
     /**
+     * The main function to test an exhibit on intersections.
+     * First of all it tests on inclusion in parent timeline.
+     * Then it tests a timeline on intersection with each parent's child.
+     * @param  {Object} tp       An estimated parent timeline.
+     * @param  {Object} ec       An estimated child exhibit. This one will be tested.
+     * @param  {Boolean} editmode If true, it doesn't take into account edited exhibit.
+     * @return {Boolean}          True if test is passed, False otherwise.
+     */
+    function checkExhibitIntersections(tp, ec, editmode) {
+        var i = 0;
+        var len = 0;
+        var selfIntersection = false;
+
+        // Test on inclusion in parent.
+        if (!isIncluded(tp, ec)) {
+            return false;
+        }
+
+        // Test on intersections with parent's children.
+        for (i = 0, len = tp.children.length; i < len; ++i) {
+            selfIntersection = editmode ? (tp.children[i] === _selectedExhibit) : (tp.children[i] === ec);
+            if (!selfIntersection && isIntersecting(ec, tp.children[i])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Updates rectangle of new timeline during creation.
      */
     function updateNewRectangle() {
@@ -135,18 +167,61 @@ var CZ = (function (CZ, $, document) {
         _rectCur.height = Math.abs(_dragStart.y - _dragCur.y);
 
         // Test on intersections and update timeline's rectangle if it passes the test.
-        if (checkIntersections(_hovered, _rectCur)) {
+        if (checkTimelineIntersections(_hovered, _rectCur)) {
             // Set border's color of timeline's rectangle.
             var settings = $.extend({}, _hovered.settings);
             settings.strokeStyle = "red";
 
             $.extend(_rectPrev, _rectCur);
+
             removeChild(_hovered, "newTimelineRectangle");
-            addRectangle(_hovered, _hovered.layerid,
-                         "newTimelineRectangle", _rectCur.x, _rectCur.y,
-                         _rectCur.width, _rectCur.height, settings);
+            addRectangle(
+                _hovered,
+                _hovered.layerid,
+                "newTimelineRectangle",
+                _rectCur.x,
+                _rectCur.y,
+                _rectCur.width,
+                _rectCur.height,
+                settings
+            );
         } else {
             $.extend(_rectCur, _rectPrev);
+        }
+    }
+
+    /**
+     * Updates circle of new exhibit during creation.
+     */
+    function updateNewCircle() {
+        // Update circle's position and radius.
+        // NOTE: These values are heuristic.
+        _circleCur.r = (_hovered.width > _hovered.height) ? 
+                        _hovered.height / 27.7 :
+                        _hovered.width / 10.0;
+
+        _circleCur.x = _dragCur.x - _circleCur.r;
+        _circleCur.y = _dragCur.y - _circleCur.r;
+        _circleCur.width = _circleCur.height = 2 * _circleCur.r;
+
+        // Test on intersections and update exhibits's circle if it passes the test.
+        if (checkExhibitIntersections(_hovered, _circleCur)) {
+            $.extend(_circlePrev, _circleCur);
+            
+            removeChild(_hovered, "newExhibitCircle");
+            addCircle(
+                _hovered,
+                "layerInfodots",
+                "newExhibitCircle",
+                _circleCur.x + _circleCur.r,
+                _circleCur.y + _circleCur.r,
+                _circleCur.r,
+                {
+                    strokeStyle: "red"
+                }
+            );
+        } else {
+            $.extend(_circleCur, _circlePrev);
         }
     }
 
@@ -156,18 +231,52 @@ var CZ = (function (CZ, $, document) {
      */
     function createNewTimeline() {
         removeChild(_hovered, "newTimelineRectangle");
-        return addTimeline(_hovered, _hovered.layerid, "temp_" + _timelineCounter++, {
-            timeStart: _rectCur.x,
-            timeEnd: _rectCur.x + _rectCur.width,
-            header: "Timeline Title",
-            top: _rectCur.y,
-            height: _rectCur.height,
-            fillStyle: _hovered.settings.fillStyle,
-            regime: _hovered.regime,
-            gradientFillStyle: _hovered.settings.gradientFillStyle,
-            lineWidth: _hovered.settings.lineWidth,
-            strokeStyle: _hovered.settings.gradientFillStyle
-        });
+        return addTimeline(
+            _hovered,
+            _hovered.layerid,
+            "temp_" + _timelineCounter++,
+            {
+                timeStart: _rectCur.x,
+                timeEnd: _rectCur.x + _rectCur.width,
+                header: "Timeline Title",
+                top: _rectCur.y,
+                height: _rectCur.height,
+                fillStyle: _hovered.settings.fillStyle,
+                regime: _hovered.regime,
+                gradientFillStyle: _hovered.settings.gradientFillStyle,
+                lineWidth: _hovered.settings.lineWidth,
+                strokeStyle: _hovered.settings.gradientFillStyle
+            }
+        );
+    }
+
+    /**
+     * Creates new exhibit and adds it to virtual canvas.
+     * @return {Object} Created exhibit.
+     */
+    function createNewExhibit() {
+        var date = getInfodotDate(_circleCur.x);
+
+        removeChild(_hovered, "newExhibitCircle");
+        return addInfodot(
+            _hovered,
+            "layerInfodots",
+            "infodot" + _infodotCounter++,
+            _circleCur.x + _circleCur.r,
+            _circleCur.y + _circleCur.r,
+            _circleCur.r,
+            [{
+                id: "contentItem" + _contentItemCounter++,
+                title: "Content Item Title",
+                description: "Content Item Description",
+                mediaUrl: "",
+                mediaType: "image"
+            }],
+            {
+                title: "Exhibit Title",
+                date: date
+            }
+        );
     }
 
     /**
@@ -176,6 +285,7 @@ var CZ = (function (CZ, $, document) {
      * @param  {Object} t Edited timeline, whose title to update.
      */
     function updateTimelineTitle(t) {
+        // NOTE: This code from CanvasTimeline's constructor.
         var headerSize = timelineHeaderSize * t.height;
         var marginLeft = timelineHeaderMargin * t.height;
         var marginTop = (1 - timelineHeaderMargin) * t.height - headerSize;
@@ -183,9 +293,14 @@ var CZ = (function (CZ, $, document) {
 
         removeChild(t, t.id + "__header__");
         t.titleObject = addText(
-            t, t.layerid, t.id + "__header__",
-            t.x + marginLeft, t.y + marginTop,
-            baseline, headerSize, t.title,
+            t,
+            t.layerid,
+            t.id + "__header__",
+            t.x + marginLeft,
+            t.y + marginTop,
+            baseline,
+            headerSize,
+            t.title,
             {
                 fontName: timelineHeaderFontName,
                 fillStyle: timelineHeaderFontColor,
@@ -195,13 +310,46 @@ var CZ = (function (CZ, $, document) {
         );
     }
 
+    /**
+     * Returns the date string for the infodot header.
+     * @param  {Number} x Negative number, x component of virtual coordinates.
+     * @return {String}   Date string.
+     */
+    function getInfodotDate(x) {
+        // TODO: Refine date calculation!
+
+        // calculate date of the infodot
+        var date = Math.floor(-x) - 2012; // CE offset
+
+        if (date / 1000000000 >= 0.1) {
+            date = (date / 1000000000).toFixed(1) + " Ga";
+        } else if (date / 10000000 >= 0.1) {
+            date = (date / 1000000).toFixed(1) + " Ma";
+        } else if (date > 0) { // in case of BCE
+            date = Math.abs(date) + " BCE";
+        } else {
+            date = date ? -date : 1;
+        }
+
+        return date;
+    }
+
     $.extend(Authoring, {
         _isActive: false,
         _isDragging: false,
         mode: null,
+
+        // Forms' handlers.
         showCreateTimelineForm: null,
         showEditTimelineForm: null,
+        showCreateExhibitForm: null,
+        showEditExhibitForm: null,
 
+        /**
+         * Represents a collection of mouse events' handlers for each mode.
+         * Example of using: that.modeMouseHandlers[that.mode]["mouseup"]();
+         *                   (calls mouseup event handler for current mode)
+         */
         modeMouseHandlers: {
             createTimeline: {
                 mousemove: function () {
@@ -240,63 +388,38 @@ var CZ = (function (CZ, $, document) {
             createExhibit: {
                 mousemove: function () {
                     if (that._isDragging && _hovered.type === "timeline") {
-                        // TODO: Show red circle?
-                        //updateNewCircle();
+                        updateNewCircle();
                     }
                 },
 
                 mouseup: function () {
                     if (_hovered.type === "timeline") {
-                        console.log("createExhibit");
+                        updateNewCircle();
 
-                        var radius;
-                        if (_hovered.width > _hovered.height) radius = _hovered.width / 10.0;
-                        else radius = _hovered.height / 10.0;
-
-                        while (radius > (_hovered.height / 10)) radius /= 1.5;
-                        while (radius > (_hovered.width / 10)) radius /= 1.5;
-                        for (var i = 0; i < _hovered.children.length; i++) {
-                            if (_hovered.children[i].type == "infodot") {
-                                radius = _hovered.children[i].outerRad;
-                                break;
-                            }
+                        if (checkExhibitIntersections(_hovered, _circleCur)) {
+                            var _selectedExhibit = createNewExhibit();
+                            that.showCreateExhibitForm(_selectedExhibit);
                         }
-
-                        var date = that.getInfodotDate(_dragStart.x);
-
-                        addInfodot(_hovered, "layerInfodots", "infodot" + _infodotCounter++,
-                            _dragStart.x, _dragStart.y, radius,
-                            [{
-                                id: 'contentItem' + _contentItemCounter++, title: 'Sample content item',
-                                description: 'Content item created by dragging desktop image.',
-                                mediaUrl: "",
-                                mediaType: 'image'
-                            }], {
-                                title: "Sample infodot",
-                                date: date
-                            });
-
-                        that.createInfodot({
-                            regime: _hovered.regime,
-                            threshold: _hovered.threshold,
-                            year: -_dragStart.x,
-                            contentItem: {
-                                uri: "http://www.spartacus.schoolnet.co.uk/RUSkalinin.gif",
-                                caption: 'Infodot created by dragging desktop image.',
-                                title: 'Image'
-                            }
-                        });
                     }
                 }
             },
 
             editExhibit: {
                 mousemove: function () {
-                    // body...
+                    _hovered = _vcwidget.hovered || {};
+                    if (_hovered.type === "exhibit") {
+                        _hovered.settings.strokeStyle = "red";
+                    }
                 },
 
                 mouseup: function () {
-                    // body...
+                    if (_hovered.type === "infodot") {
+                        _selectedExhibit = _hovered;
+                        that.showEditExhibitForm(_selectedExhibit);
+                    } else if (_hovered.type === "contentItem") {
+                        _selectedExhibit = _hovered.parent;
+                        that.showEditExhibitForm(_selectedExhibit);
+                    }
                 }
             }
         },
@@ -336,7 +459,6 @@ var CZ = (function (CZ, $, document) {
                     _dragCur = posv;
 
                     // NOTE: Using global variable to disable animation on click!
-                    //       Sometimes doesn't work. Consider a better approach.
                     controller.stopAnimation();
 
                     that.modeMouseHandlers[that.mode]["mouseup"]();
@@ -356,8 +478,11 @@ var CZ = (function (CZ, $, document) {
                 }
             });
 
-            this.showCreateTimelineForm = formHandlers && formHandlers.showCreateTimelineForm || function () { };
-            this.showEditTimelineForm = formHandlers && formHandlers.showEditTimelineForm || function () { };
+            // Assign forms' handlers.
+            this.showCreateTimelineForm = formHandlers && formHandlers.showCreateTimelineForm || function () {};
+            this.showEditTimelineForm = formHandlers && formHandlers.showEditTimelineForm || function () {};
+            this.showCreateExhibitForm = formHandlers && formHandlers.showCreateExhibitForm || function () {};
+            this.showEditExhibitForm = formHandlers && formHandlers.showEditExhibitForm || function () {};
         },
 
         /**
@@ -376,7 +501,7 @@ var CZ = (function (CZ, $, document) {
             };
 
             // TODO: Show error message in case of failed test!
-            if (checkIntersections(t.parent, temp, true)) {
+            if (checkTimelineIntersections(t.parent, temp, true)) {
                 t.x = temp.x;
                 t.width = temp.width;
             }
@@ -395,70 +520,67 @@ var CZ = (function (CZ, $, document) {
             removeChild(t.parent, t.id);
         },
 
-        createInfodot: function (infodot) {
-            var k = 1000000000;
-
-            var exhibit = {
-                __type: "Exhibit:#Chronozoom.Entities",
-                ContentItems: [],
-                Day: 0,
-                ID: "",
-                Month: 0,
-                References: [],
-                Regime: infodot.regime,
-                Sequence: null,
-                Threshold: "1. Origins of the Universe",
-                Title: "New exhibit",
-                UniqueID: "_" + _timelineCounter++,
-                TimeUnit: "Ga",
-                Year: (infodot.year / k).toFixed(1)
+        /**
+         * Updates exhibit's properties.
+         * Use it externally from forms' handlers.
+         * @param  {Object} e    An exhibit to update.
+         * @param  {Object} prop An object with properties' values.
+         */
+        updateExhibit: function (e, prop) {
+            var temp = {
+                x: Number(prop.date),
+                y: e.y,
+                width: e.width,
+                height: e.height,
+                type: "circle"
             };
 
-            var dateTime = {
-                __type: "DateTimeOffset:#System",
-                DateTime: "/Date(1316131200000)/",
-                OffsetMinutes: 0
-            };
+            // TODO: Show error message in case of failed test!
+            if (checkExhibitIntersections(e.parent, temp, true)) {
+                // TODO: Change position of LOD, doodles and content items.
+                e.x = temp.x;
+            }
 
-            var contentItem = {
-                __type: "ContentItem:#Chronozoom.Entities",
-                Attribution: "New content item",
-                Caption: infodot.contentItem.caption,
-                Date: dateTime,
-                HasBibliography: false,
-                ID: "",
-                MediaSource: "http://commons.wikimedia.org/wiki/File:A_False-Color_Topography_of_Vesta%27s_South_Pole.jpg",
-                MediaType: "Picture",
-                Order: 32767,
-                Regime: infodot.regime,
-                Threshold: "1. Origins of the Universe",
-                TimeUnit: "Ga",
-                Title: infodot.contentItem.title,
-                UniqueID: "_" + _timelineCounter++,
-                Uri: infodot.contentItem.uri,
-                Year: null
-            };
-
-            exhibit.ContentItems.push(contentItem);
+            // TODO: Update title!
         },
-        /* Returns the date string for the infodot header. 
-        @param x        (double) negative number, x component of virtual coordinates*/
-        getInfodotDate: function (x) {
-                // calculate date of the infodot
-            var date = Math.floor(-x) - 2012; // CE offset
 
-            if (date / 1000000000 >= 0.1)
-                date = (date / 1000000000).toFixed(1) + " Ga";
-            else if (date / 10000000 >= 0.1)
-                date = (date / 1000000).toFixed(1) + " Ma";
-            else if (date > 0) // in case of BCE
-                date = Math.abs(date) + " BCE";
-            else
-                date = date ? -date : 1;
+        /**
+         * Removes an exhibit from virtual canvas.
+         * Use it externally from form's handlers.
+         * @param  {Object} e An exhibit to remove.
+         */
+        removeExhibit: function (e) {
+            removeChild(e.parent, e.id);
+        },
 
-            return date;
+        /**
+         * Adds a content item with a given properties to selected exhibit.
+         * Use it externally from forms' handlers.
+         * @param {Object} prop An object with properties' values.
+         */
+        addContentItem: function (prop) {
+            // TODO: Add content item to _selectedExhibit.
+        },
+
+        /**
+         * Updates i's content item's properties in selected timeline.
+         * Use it externally from forms' handlers.
+         * @param  {Number} i    Index of a content item in selected exhibit.
+         * @param  {Object} prop An object with properties' values.
+         */
+        updateContentItem: function (i, prop) {
+            // TODO: Update properties of i's content item in _selectedExhibit.
+        },
+
+        /**
+         * Removes i's content item from selected exhibit.
+         * Use it externally from form's handlers.
+         * @param  {Number} i Index of a content item in selected exhibit.
+         */
+        removeContentItem: function (i) {
+            // TODO: Remove i's content item from _selectedExhibit.
         }
     });
 
     return CZ;
-})(CZ || {}, jQuery, document);
+})(CZ || {}, jQuery);

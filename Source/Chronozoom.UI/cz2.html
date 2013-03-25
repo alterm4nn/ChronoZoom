@@ -193,7 +193,9 @@
 
             CZ.Authoring.initialize(vc, {
                 showCreateTimelineForm: showCreateTimelineForm,
-                showEditTimelineForm: showEditTimelineForm
+                showEditTimelineForm: showEditTimelineForm,
+                showCreateExhibitForm: showCreateExhibitForm,
+                showEditExhibitForm: showEditExhibitForm
             });
 
             var canvasGestures = getGesturesStream(vc); //gesture sequence of the virtual canvas
@@ -645,6 +647,71 @@
             });
         }
 
+        function showCreateExhibitForm(e) {
+            var isCancel = true;
+            var titleInput = $("#exhibitTitleInput");
+            var dateInput = $("#exhibitDateInput").spinner();
+
+            titleInput.val(e.title);
+            dateInput.val(e.x);
+
+            $("#createExhibitForm").dialog({
+                title: "create exhibit",
+                modal: true,
+                height: 600,
+                width: 600,
+                buttons: {
+                    "save and close": function () {
+                        CZ.Authoring.updateExhibit(e, {
+                            title: titleInput.val(),
+                            date: dateInput.val()
+                        });
+                        isCancel = false;
+                        $(this).dialog("close");
+                    }
+                },
+                close: function () {
+                    if (isCancel) {
+                        CZ.Authoring.removeExhibit(e);
+                    }
+                    CZ.Authoring._isActive = false;
+                    $("a:contains('create exhibit')").removeClass("active");
+                }
+            });
+        }
+
+        function showEditExhibitForm(e) {
+            var titleInput = $("#exhibitTitleInput");
+            var dateInput = $("#exhibitDateInput").spinner();
+
+            titleInput.val(e.title);
+            dateInput.val(e.x);
+
+            $("#createExhibitForm").dialog({
+                title: "edit exhibit",
+                modal: true,
+                height: 600,
+                width: 600,
+                buttons: {
+                    "save and close": function () {
+                        CZ.Authoring.updateExhibit(e, {
+                            title: titleInput.val(),
+                            date: dateInput.val()
+                        });
+                        $(this).dialog("close");
+                    },
+                    "delete": function () {
+                        CZ.Authoring.removeExhibit(e);
+                        $(this).dialog("close");
+                    }
+                },
+                close: function () {
+                    CZ.Authoring._isActive = false;
+                    $("a:contains('edit exhibit')").removeClass("active");
+                }
+            });
+        }
+
         function createTimeline() {
             // skip authoring during ongoing dynamic layout animation
             if (animatingElements.length != 0) {
@@ -947,6 +1014,19 @@
                 <p style="display: inline-block">
                     <label style="display: block">end</label>
                     <input id="timelineEndInput" style="display: block" />
+                </p>
+            </div>
+
+            <!--Create Exhibit popup dialog-->
+            <div id="createExhibitForm" style="background-color: rgb(60, 95, 150); display: none; color: white;">
+                <p>
+                    <label style="display: block">title</label>
+                    <input id="exhibitTitleInput" style="display: block" type="text" />
+                </p>
+
+                <p style="display: inline-block">
+                    <label style="display: block">date</label>
+                    <input id="exhibitDateInput" style="display: block" />
                 </p>
             </div>
 
