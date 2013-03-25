@@ -340,7 +340,7 @@ namespace UI
                     SetStatusCode(HttpStatusCode.Unauthorized);
                     return retval;
                 }
-
+ 
                 collection.Title = title;
             }
             _storage.SaveChanges();
@@ -385,7 +385,7 @@ namespace UI
 
         /// <summary>
         /// Creates or updates the timeline in a given collection.
-        /// If the collection does not exist, then fail.    
+        /// If the collection does not exist, then fail.
         ///
         /// If timeline id is not specified, then add a new timeline to the collection.
         /// For a new timeline, if the parent is not defined, set this to the root timeline.
@@ -440,7 +440,7 @@ namespace UI
                 // Update parent timeline.
                 _storage.Entry(parentTimeline).Collection(_ => _.ChildTimelines).Load();
                 if (parentTimeline.ChildTimelines == null)
-                {                        
+                {
                     parentTimeline.ChildTimelines = new System.Collections.ObjectModel.Collection<Timeline>();
                 }
                 parentTimeline.ChildTimelines.Add(newTimeline);
