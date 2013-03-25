@@ -24,7 +24,6 @@ using System.ServiceModel.Web;
 using System.Text;
 using System.Web.Script.Services;
 using Chronozoom.Entities;
-using System.Runtime.Serialization;
 
 namespace UI
 {
