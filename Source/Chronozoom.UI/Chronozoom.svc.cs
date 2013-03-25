@@ -5,12 +5,14 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.Caching;
@@ -20,8 +22,9 @@ using System.ServiceModel;
 using System.ServiceModel.Activation;
 using System.ServiceModel.Web;
 using System.Text;
-
+using System.Web.Script.Services;
 using Chronozoom.Entities;
+using System.Runtime.Serialization;
 
 namespace UI
 {
@@ -40,7 +43,7 @@ namespace UI
 
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public IEnumerable<Timeline> Get(string supercollection, string collection, string start, string end, string timespan)
+        public BaseJsonResult<IEnumerable<Timeline>> Get(string supercollection, string collection, string start, string end, string timespan)
         {
             Trace.TraceInformation("Get Filtered Timelines");
 
@@ -53,7 +56,7 @@ namespace UI
                 {
                     if (Cache.Contains(timelineCacheKey))
                     {
-                        return (IEnumerable<Timeline>)Cache[timelineCacheKey];
+                        return new BaseJsonResult<IEnumerable<Timeline>>((IEnumerable<Timeline>)Cache[timelineCacheKey]);
                     }
                 }
             }
@@ -83,8 +86,8 @@ namespace UI
                 }
             }
 
-            return timelines;
-        }
+            return new BaseJsonResult<IEnumerable<Timeline>>((IEnumerable<Timeline>)timelines);
+         }
 
         private static bool AllDataRequested(string start, string end, string timespan)
         {
@@ -94,7 +97,7 @@ namespace UI
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public IEnumerable<Threshold> GetThresholds()
+        public BaseJsonResult<List<Threshold>> GetThresholds()
         {
             Trace.TraceInformation("Get Thresholds");
 
@@ -106,13 +109,13 @@ namespace UI
                     Cache.Add("Thresholds", _storage.Thresholds.ToList(), DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
                 }
 
-                return (List<Threshold>)Cache["Thresholds"];
+                return new BaseJsonResult<List<Threshold>>((List<Threshold>)Cache["Thresholds"]);
             }
         }
 
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public IEnumerable<SearchResult> Search(string supercollection, string collection, string searchTerm)
+        public BaseJsonResult<IEnumerable<SearchResult>> Search(string supercollection, string collection, string searchTerm)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
             {
@@ -136,12 +139,13 @@ namespace UI
             searchResults.AddRange(contentItems.Select(contentItem => new SearchResult { Id = contentItem.Id, Title = contentItem.Title, ObjectType = ObjectType.ContentItem, UniqueId = contentItem.UniqueId }));
 
             Trace.TraceInformation("Search called for search term {0}", searchTerm);
-            return searchResults;
+
+            return new BaseJsonResult<IEnumerable<SearchResult>>((IEnumerable<SearchResult>)searchResults);
         }
 
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public IEnumerable<Reference> GetBibliography(string exhibitId)
+        public BaseJsonResult<IEnumerable<Reference>> GetBibliography(string exhibitId)
         {
             Guid guid;
             if (!Guid.TryParse(exhibitId, out guid))
@@ -159,13 +163,13 @@ namespace UI
 
             Trace.TraceInformation("GetBibliography called for Exhibit Id {0}", exhibitId);
             _storage.Entry(exhibit).Collection(_ => _.References).Load();
-            return exhibit.References.ToList();
+            return new BaseJsonResult<IEnumerable<Reference>>((IEnumerable<Reference>) exhibit.References.ToList());
         }
 
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public IEnumerable<Tour> GetTours(string supercollection, string collection)
+        public BaseJsonResult<List<Tour>> GetTours(string supercollection, string collection)
         {
             Trace.TraceInformation("Get Tours");
 
@@ -185,13 +189,13 @@ namespace UI
                     Cache.Add(toursCacheKey, tours, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
                 }
 
-                return (List<Tour>)Cache[toursCacheKey];
+                return new BaseJsonResult<List<Tour>>((List<Tour>)Cache[toursCacheKey]);
             }
         }
 
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public SuperCollection GetSuperCollection()
+        public BaseJsonResult<IEnumerable<SuperCollection>> GetSuperCollection()
         {
             Trace.TraceInformation("Get Collections.");
 
@@ -227,7 +231,7 @@ namespace UI
                 _storage.Entry(superCollection).Collection(_ => _.Collections).Load();
             }
 
-            return superCollection;
+            return new BaseJsonResult<IEnumerable<SuperCollection>>((IEnumerable<SuperCollection>)superCollection);
         }
 
         [SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly", Justification = "No unmanaged handles")]
