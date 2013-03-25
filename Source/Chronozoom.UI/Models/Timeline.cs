@@ -4,50 +4,95 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace Chronozoom.Api.Models
 {
     public class Timeline
     {
-        public string ID;
-        public string Title;
-        public string Threshold;
-        public string Regime;
-        public string FromTimeUnit;
-        public int? FromDay;
-        public int? FromMonth;
-        public double? FromYear;
-        public string ToTimeUnit;
-        public int? ToDay;
-        public int? ToMonth;
-        public double? ToYear;
+        public string id;
+        public string parent;
+        public double start;
+        public double end;
+        public string title;
+        public List<Exhibit> exhibits = new List<Exhibit>();
+        public List<Timeline> timelines = new List<Timeline>();
+
+        // extra properties for backward compatibility
         public int UniqueID;
-        public int? Sequence;
+        public string Regime;
         public double? Height;
-        public double? AspectRatio;
+    }
 
-        public List<Timeline> ChildTimelines = new List<Timeline>();
-        public List<Exhibit> Exhibits = new List<Exhibit>();
+    public class TimelineWithId
+    {
+        public string id;
+    }
 
-        // additional properties and methods
-        [JsonIgnore]
-        public double left;
-        [JsonIgnore]
-        public double right;
-        [JsonIgnore]
-        public double width;
+    public class TimelineWithChildTimelineIds
+    {
+        public string id;
+        public string parent;
+        public double start;
+        public double end;
+        public string title;
+        public List<Exhibit> exhibits = new List<Exhibit>();
+        public List<TimelineWithId> timelines = new List<TimelineWithId>();
 
-        public bool isBuffered;
-        public int pathID = -1;
+        // extra properties for backward compatibility
+        public int UniqueID;
+        public string Regime;
+        public double? Height;
+    }
 
-        public Timeline clone()
+    public static class TimelineExtensions
+    {
+        public static Timeline CloneStructure(this Timeline timeline)
         {
-            var tl = (Timeline)this.MemberwiseClone();
-            tl.ChildTimelines = new List<Timeline>();
-            tl.Exhibits = new List<Exhibit>();
-            return tl;
+           var clone = new Timeline()
+            {
+                id = timeline.id,
+                parent = timeline.parent,
+                start = timeline.start,
+                end = timeline.end,
+                title = timeline.title,
+                exhibits = new List<Exhibit>(),
+                timelines = new List<Timeline>(),
+
+                // extra properties for backward compatibility
+                UniqueID = timeline.UniqueID,
+                Regime = timeline.Regime,
+                Height = timeline.Height
+            };
+
+            return clone;
+        }
+
+        public static TimelineWithChildTimelineIds CloneData(this Timeline timeline)
+        {
+            var clone = new TimelineWithChildTimelineIds()
+            {
+                id = timeline.id,
+                parent = timeline.parent,
+                start = timeline.start,
+                end = timeline.end,
+                title = timeline.title,
+                exhibits = new List<Exhibit>(),
+                timelines = new List<TimelineWithId>(),
+
+                // extra properties for backward compatibility
+                UniqueID = timeline.UniqueID,
+                Regime = timeline.Regime,
+                Height = timeline.Height
+            };
+
+            foreach (var exhibit in timeline.exhibits)
+                clone.exhibits.Add(exhibit.CloneData());
+
+            foreach (var childTimeline in timeline.timelines)
+                clone.timelines.Add(new TimelineWithId() { id = childTimeline.id });
+
+            return clone;
         }
     }
 }

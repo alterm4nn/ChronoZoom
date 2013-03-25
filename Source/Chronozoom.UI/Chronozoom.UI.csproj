@@ -180,6 +180,7 @@
     <Content Include="Images\zoomout_pressed.png" />
     <Content Include="Images\zoomout_rest.png" />
     <Content Include="oldResponseDump.txt" />
+    <Content Include="ResponseDumpRest.txt" />
     <Content Include="Privacy.htm" />
     <Content Include="robots.txt" />
     <Content Include="ScriptsMobile\axis.mobile.js" />
@@ -187,6 +188,7 @@
     <Content Include="ScriptsMobile\vccontent.mobile.js" />
     <Content Include="ScriptsMobile\virtualCanvas.mobile.js" />
     <Content Include="NewScripts\authoring.js" />
+    <Content Include="NewScripts\newauthoring.js" />
     <Content Include="NewScripts\breadCrumbs.js" />
     <Content Include="NewScripts\flash_detect.js" />
     <None Include="NewScripts\jquery-1.6.4-vsdoc.js" />
@@ -504,6 +506,12 @@
     </Content>
     <Content Include="toursDump.txt" />
     <Content Include="Web.config" />
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Account\ChangePassword.aspx.cs">
@@ -538,6 +546,11 @@
     <Compile Include="Chronozoom.svc.cs">
       <DependentUpon>Chronozoom.svc</DependentUpon>
     </Compile>
+    <Compile Include="Controllers\CollectionController.cs" />
+    <Compile Include="Controllers\ContentItemController.cs" />
+    <Compile Include="Controllers\DataController.cs" />
+    <Compile Include="Controllers\ExhibitController.cs" />
+    <Compile Include="Controllers\StructureController.cs" />
     <Compile Include="Controllers\TimelineController.cs" />
     <Compile Include="cz.aspx.cs">
       <DependentUpon>cz.aspx</DependentUpon>
@@ -547,12 +560,12 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Models\Collection.cs" />
     <Compile Include="Models\ContentItem.cs" />
     <Compile Include="Models\Exhibit.cs" />
     <Compile Include="Models\Globals.cs" />
-    <Compile Include="Models\Reference.cs" />
     <Compile Include="Models\Timeline.cs" />
-    <Compile Include="Models\Utility.cs" />
+    <Compile Include="Models\Wrappers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Site.Master.cs">
       <DependentUpon>Site.Master</DependentUpon>
@@ -636,10 +649,16 @@
   </ProjectExtensions>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+
        Other similar extension points exist, see Microsoft.Common.targets.
+
   <Target Name="BeforeBuild">
+
   </Target>
+
   <Target Name="AfterBuild">
+
   </Target>
+
   -->
 </Project>

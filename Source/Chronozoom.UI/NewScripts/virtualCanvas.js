@@ -42,12 +42,14 @@ Next <div> is rendered on the top of previous one.
             this.canvasWidth = null; // width of canvas
             this.canvasHeight = null; // height of canvas
 
+            this.requestNewFrame = false; // indicates whether new frame is required or not
+
             self.cursorPositionChangedEvent = new jQuery.Event("cursorPositionChanged");
             self.breadCrumbsChengedEvent = jQuery.Event("breadCrumbsChanged");
             self.innerZoomConstraintChengedEvent = jQuery.Event("innerZoomConstraintChenged");
             self.currentlyHoveredInfodot = undefined;
             self.breadCrumbs = [];
-            self.recentBreadCrumb = { vcElement: { title: "initObject"} };
+            self.recentBreadCrumb = { vcElement: { title: "initObject" } };
 
             self.cursorPosition = 0.0;
 
@@ -227,8 +229,7 @@ Next <div> is rendered on the top of previous one.
         RaiseInnerZoomConstraintChenged: function (e) {
             this.innerZoomConstraintChengedEvent.zoomValue = e;
             this.element.trigger(this.innerZoomConstraintChengedEvent);
-        }
-        ,
+        },
         /*
         Fires the event of cursor position changed
         */
@@ -499,7 +500,8 @@ Next <div> is rendered on the top of previous one.
         /* Produces {width, height} object from actual width and height of widget's <div> (in pixels).
         */
         _getClientSize: function () {
-            return { width: this.element[0].clientWidth,
+            return {
+                width: this.element[0].clientWidth,
                 height: this.element[0].clientHeight
             };
         },
@@ -560,6 +562,17 @@ Next <div> is rendered on the top of previous one.
         otherwise, it sets the timeout to invalidate the image.
         */
         requestInvalidate: function () {
+            this.requestNewFrame = false;
+
+            // update parameters of animating elements and require new frame if needed
+            if (animatingElements.length != 0) {
+                for (id in animatingElements)
+                    if (animatingElements[id].animation && animatingElements[id].animation.isAnimating) {
+                        animatingElements[id].calculateNewFrame();
+                        this.requestNewFrame = true;
+                    }
+            }
+
             if (this.isInAnimation)
                 return;
 
@@ -568,180 +581,92 @@ Next <div> is rendered on the top of previous one.
             setTimeout(function () {
                 self.isInAnimation = false;
                 self.invalidate();
+
+                if (self.requestNewFrame)
+                    self.requestInvalidate();
             }, 1000.0 / targetFps); // 1/targetFps sec (targetFps is defined in a settings.js)
         },
 
         /*
        Finds the LCA(Lowest Common Ancestor) timeline which contains wnd
        */
-        findLca: function (tl, wnd) {
+       _findLca: function (tl, wnd) {
             for (var i = 0; i < tl.children.length; i++) {
                 if (tl.children[i].type === 'timeline' && tl.children[i].contains(wnd)) {
-                    return this.findLca(tl.children[i], wnd);
+                    return this._findLca(tl.children[i], wnd);
                 }
             }
             return tl;
         },
 
-        /*
-        Check if we have all the data to render wnd at vp.visible.scale
+		findLca: function (wnd) {
+            var cosmosTimeline = this._layersContent.children[0];
+
+            var eps = 1; // TODO: analyticaly calculate the proper eps
+            var cosmosLeft = cosmosTimeline.x + eps;
+            var cosmosRight = cosmosTimeline.x + cosmosTimeline.width - eps;
+            var cosmosTop = cosmosTimeline.y + eps;
+            var cosmosBottom = cosmosTimeline.y + cosmosTimeline.height - eps;
+
+            wnd.left = Math.max(cosmosLeft, Math.min(cosmosRight, wnd.x));
+            wnd.right = Math.max(cosmosLeft, Math.min(cosmosRight, wnd.x + wnd.width));
+            wnd.top = Math.max(cosmosTop, Math.min(cosmosBottom, wnd.y));
+            wnd.bottom = Math.max(cosmosTop, Math.min(cosmosBottom, wnd.y + wnd.height));
+
+            wnd.x = wnd.left;
+            wnd.y = wnd.top;
+            wnd.width = Math.max(0, wnd.right - wnd.left);
+            wnd.height = Math.max(0, wnd.bottom - wnd.top);
+
+            return this._findLca(cosmosTimeline, wnd);
+        },
+
+
+       /*
+        Checks if we have all the data to render wnd at scale
         */
-        hasContent: function HasContent(tl, wnd, scale) {
-            var b = tl.isBuffered;
-            for (var i = 0; i < tl.children.length; i++) {
-                if (tl.children[i].type === 'timeline' && tl.children[i].intersects(wnd) && tl.children[i].isVisibleOnScreen(scale)) {
-                    b = b && this.hasContent(tl.children[i], wnd, scale);
+        _inBuffer: function (tl, wnd, scale) {
+            if (tl.intersects(wnd) && tl.isVisibleOnScreen(scale)) {
+                if (!tl.isBuffered) {
+                    return false;
+                } else {
+                    /*
+                    for (var i = 0; i < tl.children.length; i++) {
+                        if (tl.children[i].type === 'infodot')
+                            if (!tl.children[i].isBuffered)
+                                return false;
+                    }
+                    */
+                    var b = true;
+                    for (var i = 0; i < tl.children.length; i++) {
+                        if (tl.children[i].type === 'timeline')
+                            b = b && this._inBuffer(tl.children[i], wnd, scale);
+                    }
+                    return b;
                 }
             }
-            return b;
+            return true;
         },
 
-        /*
-        Check if we have all data to render vbox at the current viewport's scale
-        */
-        InBuffer: function (wnd, scale) {
-            var buffer = this._layersContent.children[0];
+        inBuffer: function(wnd, scale) {
+            var cosmosTimeline = this._layersContent.children[0];
 
-            if (!wnd.intersects(buffer)) {
-                return false;
-            } else {
-                var eps = 1; // TODO: analyticaly calculate the proper eps
-                var cosmosTop = 0 + eps;
-                var cosmosLeft = -13700000000 + eps;
-                var cosmosRight = 0 - eps;
-                var cosmosBottom = 5535444444.444445 - eps;
+            var cosmosLeft = cosmosTimeline.x;
+            var cosmosRight = cosmosTimeline.x + cosmosTimeline.width;
+            var cosmosTop = cosmosTimeline.y;
+            var cosmosBottom = cosmosTimeline.y + cosmosTimeline.height;
 
-                wnd.left = Math.max(cosmosLeft, Math.min(cosmosRight, wnd.x));
-                wnd.right = Math.max(cosmosLeft, Math.min(cosmosRight, wnd.x + wnd.width));
-                wnd.top = Math.max(cosmosTop, Math.min(cosmosBottom, wnd.y));
-                wnd.bottom = Math.max(cosmosTop, Math.min(cosmosBottom, wnd.y + wnd.height));
+            wnd.left = Math.max(cosmosLeft, Math.min(cosmosRight, wnd.x));
+            wnd.right = Math.max(cosmosLeft, Math.min(cosmosRight, wnd.x + wnd.width));
+            wnd.top = Math.max(cosmosTop, Math.min(cosmosBottom, wnd.y));
+            wnd.bottom = Math.max(cosmosTop, Math.min(cosmosBottom, wnd.y + wnd.height));
 
-                wnd.x = wnd.left;
-                wnd.y = wnd.top;
-                wnd.width = Math.max(0, wnd.right - wnd.left);
-                wnd.height = Math.max(0, wnd.bottom - wnd.top);
-            }
+            wnd.x = wnd.left;
+            wnd.y = wnd.top;
+            wnd.width = Math.max(0, wnd.right - wnd.left);
+            wnd.height = Math.max(0, wnd.bottom - wnd.top);
 
-            var lca = this.findLca(buffer, wnd);
-            var hasContent = this.hasContent(lca, wnd, scale);
-            return hasContent;
-        },
-
-
-        _addTimelineToSceneGraph: function (parent, timeline) {
-            var tlColor = GetTimelineColor(timeline);
-            var t1 = addTimeline(parent, "layerTimelines", 't' + timeline.UniqueID,
-            {
-                timeStart: timeline.left,
-                timeEnd: timeline.right,
-                top: timeline.y,
-                height: timeline.height,
-                header: timeline.Title,
-                fillStyle: "rgba(0,0,0,0.25)",
-                titleRect: timeline.titleRect,
-                strokeStyle: tlColor,
-                regime: timeline.Regime
-            });
-
-            return t1;
-        },
-
-        _addExhibitsToSceneGraph: function (parent, exhibits) {
-            var infodots = [];
-
-            exhibits.forEach(function (childInfodot) {
-                var date; // building a date to be shown in a title of the content item to the left of the title text.
-
-                var contentItems = new Array();
-                childInfodot.ContentItems.forEach(function (contentItemProt) {
-                    var mediaType = contentItemProt.MediaType;
-                    if (mediaType == "Picture")
-                        mediaType = 'image';
-                    else if (mediaType == "Video")
-                        mediaType = 'video';
-
-                    date = buildDate(contentItemProt);
-
-                    contentItems.push({
-                        id: 'c' + contentItemProt.UniqueID,
-                        title: contentItemProt.Title,
-                        mediaUrl: contentItemProt.Uri,
-                        mediaType: mediaType,
-                        description: contentItemProt.Caption,
-                        date: date,
-                        guid: contentItemProt.ID,
-                        attribution: contentItemProt.Attribution,
-                        mediaSource: contentItemProt.MediaSource,
-                        order: contentItemProt.Order ? contentItemProt.Order : 0
-                    });
-                });
-
-                date = buildDate(childInfodot);
-                var infodot = addInfodot(parent, "layerInfodots", 'e' + childInfodot.UniqueID,
-                    (childInfodot.left + childInfodot.right) / 2.0,
-                    childInfodot.y, 0.8 * childInfodot.size / 2.0,
-                    contentItems,
-                    {
-                        title: childInfodot.Title,
-                        date: date,
-                        guid: childInfodot.ID
-                    });
-                infodots.push(infodot);
-            });
-
-            return infodots;
-        },
-
-        _merge: function (src, dest) {
-            dest.isBuffered = dest.isBuffered || src.isBuffered;
-
-            for (var i = 0, j; i < src.ChildTimelines.length; i++) {
-                for (j = 0; j < dest.children.length; j++) {
-                    if (dest.children[j].type === "timeline")
-                        if (dest.children[j].id === 't' + src.ChildTimelines[i].UniqueID)
-                            break;
-                }
-
-                if (j < dest.children.length) { // found timeline
-                    if (!dest.children[j].isBuffered) // isBuffered == false => timeline is a placeholder => update
-                        this._addExhibitsToSceneGraph(dest.children[j], src.ChildTimelines[i].Exhibits);
-                    this._merge(src.ChildTimelines[i], dest.children[j]);
-                } else { // timeline not found => create new timeline
-                    var t = this._addTimelineToSceneGraph(dest, src.ChildTimelines[i]);
-                    this._addExhibitsToSceneGraph(t, src.ChildTimelines[i].Exhibits);
-                    this._merge(src.ChildTimelines[i], t);
-                }
-            }
-        },
-
-        /*
-        Merges missing data to the scenegraph.
-        */
-        Merge: function (src) {
-            if (!src) return;
-            var root = this._layersContent;
-
-            var rootHasSrc = false;
-            if (root.children.length > 0) {
-                for (var i = 0; i < root.children.length; i++)
-                    if (root.children[i].type === "timeline")
-                        if (root.children[i].id === 't' + src.UniqueID) {
-                            rootHasSrc = true;
-                            break;
-                        }
-            }
-
-            root.beginEdit();
-            if (rootHasSrc) {
-                if (!root.children[i].isBuffered)
-                    this._addExhibitsToSceneGraph(root.children[i], src.Exhibits);
-                this._merge(src, root.children[i]);
-            } else {
-                var t = this._addTimelineToSceneGraph(root, src);
-                this._addExhibitsToSceneGraph(t, src.Exhibits);
-                this._merge(src, t);
-            }
-            root.endEdit(true);
+            return this._inBuffer(cosmosTimeline, wnd, scale);
         },
 
         options: {

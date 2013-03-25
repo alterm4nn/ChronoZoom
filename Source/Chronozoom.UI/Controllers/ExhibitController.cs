@@ -7,28 +7,28 @@ using System.Web.Http;
 
 namespace UI.Controllers
 {
-    public class TimelineController : ApiController
+    public class ExhibitController : ApiController
     {
-        public void Delete(string collection, Timeline timelineData)
+        public void Delete(string collection, Exhibit exhibitData)
         {
-            if (collection == null || timelineData == null)
+            if (collection == null || exhibitData == null)
                 throw new HttpResponseException(System.Net.HttpStatusCode.BadRequest);
 
-            if (timelineData.parent != null)
+            if (exhibitData.parent != null)
             {
                 Timeline foundTimeline;
-                if (FindTimeline(Globals.Root, timelineData.parent, out foundTimeline))
+                if (FindTimeline(Globals.Root, exhibitData.parent, out foundTimeline))
                 {
-                    for (int i = 0; i < foundTimeline.timelines.Count(); i++)
+                    for (int i = 0; i < foundTimeline.exhibits.Count(); i++)
                     {
-                        //Update
-                        if (foundTimeline.timelines[i].id == timelineData.id)
+                        //Remove
+                        if (foundTimeline.exhibits[i].id == exhibitData.id)
                         {
-                            foundTimeline.timelines.RemoveAt(i);
+                            foundTimeline.exhibits.RemoveAt(i);
                             return;
                         }
                     }
-                    //No such parent timeline
+                    //No such exhibit
                     throw new HttpResponseException(System.Net.HttpStatusCode.BadRequest);
                 }
                 else
@@ -39,32 +39,33 @@ namespace UI.Controllers
             }
             else
             {
-                //One more root timeline, in this prototype there is no way to do it
+                //Parent timeline not specified
                 throw new HttpResponseException(System.Net.HttpStatusCode.BadRequest);
             }
+
         }
 
-        public void Put(string collection, Timeline timelineData)
+        public void Put(string collection, Exhibit exhibitData)
         {
-            if (collection == null || timelineData == null)
+            if(collection == null || exhibitData == null)
                 throw new HttpResponseException(System.Net.HttpStatusCode.BadRequest);
-
-            if (timelineData.parent != null)
+            
+            if (exhibitData.parent != null)
             {
                 Timeline foundTimeline;
-                if (FindTimeline(Globals.Root, timelineData.parent, out foundTimeline))
+                if (FindTimeline(Globals.Root, exhibitData.parent, out foundTimeline))
                 {
-                    for (int i = 0; i < foundTimeline.timelines.Count(); i++)
+                    for (int i = 0; i < foundTimeline.exhibits.Count(); i++)
                     {
                         //Update
-                        if (foundTimeline.timelines[i].id == timelineData.id)
+                        if (foundTimeline.exhibits[i].id == exhibitData.id)
                         {
-                            foundTimeline.timelines[i] = timelineData;
+                            foundTimeline.exhibits[i] = exhibitData;
                             return;
                         }
                     }
                     //Create
-                    foundTimeline.timelines.Add(timelineData);
+                    foundTimeline.exhibits.Add(exhibitData);
                 }
                 else
                 {
@@ -74,7 +75,7 @@ namespace UI.Controllers
             }
             else
             {
-                //One more root timeline, in this prototype there is no way to do it
+                //Parent timeline not specified
                 throw new HttpResponseException(System.Net.HttpStatusCode.BadRequest);
             }
         }

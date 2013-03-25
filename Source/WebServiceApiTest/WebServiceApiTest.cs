@@ -7,6 +7,7 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Text.RegularExpressions;
+using System.Text;
 
 namespace WebServiceApiTest
 {
@@ -41,10 +42,11 @@ namespace WebServiceApiTest
     [TestClass]
     public class WebServiceApiTest
     {
-        static string endpointVerb = "http://{0}/chronozoom.svc/{1}";
+        static string endpointLocator = "http://{0}/chronozoom.svc/{1}";
         static string endpointSearch = "http://{0}/chronozoom.svc/search?searchTerm={1}";
 
-        static string serviceUrl = "test.chronozoomproject.org";
+        static string serviceUrl = "cz-july2013-javierluraschi-fixes.azurewebsites.net";
+        //        static string serviceUrl = "test.chronozoomproject.org";
 
         static string verbDefault = "get";
         static string verbThresholds = "getThresholds";
@@ -53,7 +55,7 @@ namespace WebServiceApiTest
         [TestMethod]
         public void TestFirstTimelineRequest()
         {
-            string endPoint = String.Format(endpointVerb, serviceUrl, verbDefault);
+            string endPoint = String.Format(endpointLocator, serviceUrl, verbDefault);
             HttpWebRequest request = CreateRequest(endPoint);
 
             WebResponse response = request.GetResponse();
@@ -70,7 +72,7 @@ namespace WebServiceApiTest
         [TestMethod]
         public void TestTimelineUniqueId()
         {
-            string endPoint = String.Format(endpointVerb, serviceUrl, verbDefault);
+            string endPoint = String.Format(endpointLocator, serviceUrl, verbDefault);
             HttpWebRequest request = CreateRequest(endPoint);
 
             WebResponse response = request.GetResponse();
@@ -86,14 +88,92 @@ namespace WebServiceApiTest
         }
 
         [TestMethod]
+        public void TestFilterValidStartDate()
+        {
+            HttpWebRequest request = CreateGetRequest(null, null, "-1000");
+
+            WebResponse response = request.GetResponse();
+            Stream responseStream = response.GetResponseStream();
+
+            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineQueryResult));
+            TimelineQueryResult timelines = (TimelineQueryResult)serializer.ReadObject(responseStream);
+
+            Assert.AreNotEqual<int>(0, timelines.d.Count, "No timelines returned");
+        }
+
+        [TestMethod]
+        public void TestFilterMalformedStartDate()
+        {
+            HttpWebRequest request = CreateGetRequest(null, null, "1000ASDF");
+
+            WebResponse response = request.GetResponse();
+            Stream responseStream = response.GetResponseStream();
+
+            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineQueryResult));
+            TimelineQueryResult timelines = (TimelineQueryResult)serializer.ReadObject(responseStream);
+        }
+
+        [TestMethod]
+        public void TestFilterValidEndDate()
+        {
+            HttpWebRequest request = CreateGetRequest(null, null, null, "1000");
+
+            WebResponse response = request.GetResponse();
+            Stream responseStream = response.GetResponseStream();
+
+            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineQueryResult));
+            TimelineQueryResult timelines = (TimelineQueryResult)serializer.ReadObject(responseStream);
+
+            Assert.AreNotEqual<int>(0, timelines.d.Count, "No timelines returned");
+        }
+
+        [TestMethod]
+        public void TestFilterMalformedEndDate()
+        {
+            HttpWebRequest request = CreateGetRequest(null, null, null, "1000ASDF");
+
+            WebResponse response = request.GetResponse();
+            Stream responseStream = response.GetResponseStream();
+
+            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineQueryResult));
+            TimelineQueryResult timelines = (TimelineQueryResult)serializer.ReadObject(responseStream);
+        }
+
+        [TestMethod]
+        public void TestFilterValidTimeSpan()
+        {
+            HttpWebRequest request = CreateGetRequest(null, null, null, null, "1000");
+
+            WebResponse response = request.GetResponse();
+            Stream responseStream = response.GetResponseStream();
+
+            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineQueryResult));
+            TimelineQueryResult timelines = (TimelineQueryResult)serializer.ReadObject(responseStream);
+
+            Assert.AreNotEqual<int>(0, timelines.d.Count, "No timelines returned");
+        }
+
+        [TestMethod]
+        public void TestFilterMalformedTimeSpan()
+        {
+            HttpWebRequest request = CreateGetRequest(null, null, null, null, "1000ASDF");
+
+            WebResponse response = request.GetResponse();
+            Stream responseStream = response.GetResponseStream();
+
+            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineQueryResult));
+            TimelineQueryResult timelines = (TimelineQueryResult)serializer.ReadObject(responseStream);
+        }
+
+        [TestMethod]
         public void TestContentItemReferences()
         {
-            string endPoint = String.Format(endpointVerb, serviceUrl, verbDefault);
+            string endPoint = String.Format(endpointLocator, serviceUrl, verbDefault);
             HttpWebRequest request = CreateRequest(endPoint);
 
             WebResponse response = request.GetResponse();
             Stream responseStream = response.GetResponseStream();
-            
+
             DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineQueryResult));
             TimelineQueryResult timelines = (TimelineQueryResult)serializer.ReadObject(responseStream);
 
@@ -112,7 +192,7 @@ namespace WebServiceApiTest
         [TestMethod]
         public void TestThresholdsRequest()
         {
-            string endPoint = String.Format(endpointVerb, serviceUrl, verbThresholds);
+            string endPoint = String.Format(endpointLocator, serviceUrl, verbThresholds);
             HttpWebRequest request = CreateRequest(endPoint);
 
             WebResponse response = request.GetResponse();
@@ -127,7 +207,7 @@ namespace WebServiceApiTest
         [TestMethod]
         public void TestToursRequest()
         {
-            string endPoint = String.Format(endpointVerb, serviceUrl, verbTours);
+            string endPoint = String.Format(endpointLocator, serviceUrl, verbTours);
             HttpWebRequest request = CreateRequest(endPoint);
 
             WebResponse response = request.GetResponse();
@@ -142,7 +222,7 @@ namespace WebServiceApiTest
         [TestMethod]
         public void TestToursBookmarkUrl()
         {
-            string endPoint = String.Format(endpointVerb, serviceUrl, verbTours);
+            string endPoint = String.Format(endpointLocator, serviceUrl, verbTours);
             HttpWebRequest request = CreateRequest(endPoint);
 
             WebResponse response = request.GetResponse();
@@ -197,5 +277,35 @@ namespace WebServiceApiTest
             request.Method = "GET";
             return request;
         }
+
+        private static HttpWebRequest CreateGetRequest(params string[] args)
+        {
+            string[] argNames = {
+                                      "supercollection",
+                                      "collection",
+                                      "start",
+                                      "end",
+                                      "timespan"
+                                  };
+
+            StringBuilder sb = new StringBuilder(verbDefault);
+
+            bool firstParam = true;
+
+            for (int i = 0; i < argNames.Length && i < args.Length; i++)
+            {
+                if (args[i] != null)
+                {
+                    sb.Append(firstParam ? '?' : '&');
+                    sb.AppendFormat("{0}={1}", argNames[i], args[i]);
+                    firstParam = false;
+                }
+            }
+
+            string endPoint = String.Format(endpointLocator, serviceUrl, sb.ToString());
+
+            return CreateRequest(endPoint);
+        }
+
     }
 }
