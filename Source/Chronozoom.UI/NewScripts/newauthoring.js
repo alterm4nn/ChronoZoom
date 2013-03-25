@@ -407,7 +407,7 @@ var CZ = (function (CZ, $) {
             editExhibit: {
                 mousemove: function () {
                     _hovered = _vcwidget.hovered || {};
-                    if (_hovered.type === "exhibit") {
+                    if (_hovered.type === "infodot") {
                         _hovered.settings.strokeStyle = "red";
                     }
                 },
