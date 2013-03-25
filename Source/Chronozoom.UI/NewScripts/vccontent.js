@@ -626,7 +626,7 @@ function CanvasRectangle(vc, layerid, id, vx, vy, vw, vh, settings) {
     this.base = CanvasElement;
     this.base(vc, layerid, id, vx, vy, vw, vh);
     this.settings = settings;
-
+    this.type = "rectangle";
 
     /* Renders a rectangle.
 	@param ctx              (context2d) Canvas context2d to render on.
@@ -722,7 +722,7 @@ function CanvasRectangle(vc, layerid, id, vx, vy, vw, vh, settings) {
     };
 
     this.isVisibleOnScreen = function (scale) {
-        return Math.min(this.width, this.height) / scale >= 20;
+        return this.width / scale >= minTimelineWidth;
     }
 }
 CanvasRectangle.prototype = new CanvasElement;
@@ -739,13 +739,14 @@ CanvasRectangle.prototype = new CanvasElement;
 function CanvasTimeline(vc, layerid, id, vx, vy, vw, vh, settings, timelineinfo) {
 	this.base = CanvasRectangle;
 	this.base(vc, layerid, id, vx, vy, vw, vh);
+	this.guid = timelineinfo.guid;
+	this.type = 'timeline';
 
-	this.isBuffered = false;
+	this.isBuffered = timelineinfo.isBuffered;
 	this.settings = settings;
 	this.parent = undefined;
 	this.currentlyObservedTimelineEvent = vc.currentlyObservedTimelineEvent;
 	this.settings.outline = true;
-	this.type = 'timeline';
 
 	var width = timelineinfo.timeEnd - timelineinfo.timeStart;
 
@@ -777,7 +778,7 @@ function CanvasTimeline(vc, layerid, id, vx, vy, vw, vh, settings, timelineinfo)
 	this.title = this.titleObject.text;
 	this.regime = timelineinfo.regime;
 	this.settings.gradientOpacity = 0;
-	this.settings.gradientFillStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : timelineBorderColor;
+	this.settings.gradientFillStyle = timelineinfo.gradientFillStyle || timelineinfo.strokeStyle || timelineBorderColor;
 	this.opacity = timelineinfo.opacity;
 
 	this.reactsOnMouse = true;
@@ -1244,7 +1245,8 @@ function CanvasText(vc, layerid, id, vx, vy, baseline, vh, text, settings, wv) {
 	this.baseline = baseline;
 	this.newBaseline = baseline;
 	this.settings = settings;
-	this.opacity = 0;
+	this.opacity = settings.opacity || 0;
+	this.type = "text";
 
 	if (typeof this.settings.textBaseline != 'undefined' &&
         this.settings.textBaseline === 'middle') {
@@ -1945,7 +1947,7 @@ header (string), fillStyle (color) })
 */
 var addTimeline = function (element, layerid, id, timelineinfo) {
 	var width = timelineinfo.timeEnd - timelineinfo.timeStart;
-	var timeline = addChild(element, new CanvasTimeline(element.vc, layerid, id,
+	var timeline = addChild(element, new CanvasTimeline(element.vc, layerid, id, 
                             timelineinfo.timeStart, timelineinfo.top,
                             width, timelineinfo.height, {
                                 strokeStyle: timelineinfo.strokeStyle ? timelineinfo.strokeStyle : timelineStrokeStyle,
@@ -1966,7 +1968,7 @@ var addTimeline = function (element, layerid, id, timelineinfo) {
 @param vy   (number) y of left top corner in virtual space
 @param vw   (number) width of a bounding box in virtual space
 @param vh   (number) height of a bounding box in virtual space
-@param contentItem ({ id, date (string), title (string), description (string), mediaUrl (string), mediaType (string) }) describes content of this content item
+@param contentItem ({ id, guid, date (string), title (string), description (string), mediaUrl (string), mediaType (string) }) describes content of this content item
 @remarks Supported media types (contentItem.mediaType) are:
 - image
 - video
@@ -1974,170 +1976,168 @@ var addTimeline = function (element, layerid, id, timelineinfo) {
 - pdf
 */
 function ContentItem(vc, layerid, id, vx, vy, vw, vh, contentItem) {
-	this.base = CanvasDynamicLOD;
-	this.base(vc, layerid, id, vx, vy, vw, vh);
-	this.type = 'contentItem';
+    this.base = CanvasDynamicLOD;
+    this.base(vc, layerid, id, vx, vy, vw, vh);
+    this.guid = contentItem.id;
+    this.type = 'contentItem';
 
-	// Building content of the item
-	var titleHeight = vh * contentItemTopTitleHeight * 0.8;
-	var mediaHeight = vh * contentItemMediaHeight;
-	var descrHeight = contentItemFontHeight * vh;
+    // Building content of the item
+    var titleHeight = vh * contentItemTopTitleHeight * 0.8;
+    var mediaHeight = vh * contentItemMediaHeight;
+    var descrHeight = contentItemFontHeight * vh;
 
-	var contentWidth = vw * contentItemContentWidth;
-	var leftOffset = (vw - contentWidth) / 2.0;
-	var verticalMargin = vh * contentItemVerticalMargin;
+    var contentWidth = vw * contentItemContentWidth;
+    var leftOffset = (vw - contentWidth) / 2.0;
+    var verticalMargin = vh * contentItemVerticalMargin;
 
-	var mediaTop = vy + verticalMargin;  //vy + titleHeight + 2 * verticalMargin;
-	var sourceVertMargin = verticalMargin * 0.4;
-	var sourceTop = mediaTop + mediaHeight + sourceVertMargin;
-	var sourceRight = vx + vw - leftOffset;
-	var sourceHeight = vh * contentItemSourceHeight * 0.8;
-	var titleTop = sourceTop + verticalMargin + sourceHeight;
+    var mediaTop = vy + verticalMargin;  //vy + titleHeight + 2 * verticalMargin;
+    var sourceVertMargin = verticalMargin * 0.4;
+    var sourceTop = mediaTop + mediaHeight + sourceVertMargin;
+    var sourceRight = vx + vw - leftOffset;
+    var sourceHeight = vh * contentItemSourceHeight * 0.8;
+    var titleTop = sourceTop + verticalMargin + sourceHeight;
 
-	// Bounding rectangle
-	var rect = addRectangle(this, layerid, id + "__rect__", vx, vy, vw, vh,
-                            { strokeStyle: contentItemBoundingBoxBorderColor, lineWidth: contentItemBoundingBoxBorderWidth * vw, fillStyle: contentItemBoundingBoxFillColor,
-                            	isLineWidthVirtual: true
+    // Bounding rectangle
+    var rect = addRectangle(this, layerid, id + "__rect__", vx, vy, vw, vh,
+                            {
+                                strokeStyle: contentItemBoundingBoxBorderColor, lineWidth: contentItemBoundingBoxBorderWidth * vw, fillStyle: contentItemBoundingBoxFillColor,
+                                isLineWidthVirtual: true
                             });
-	this.reactsOnMouse = true;
+    this.reactsOnMouse = true;
 
-	this.onmouseenter = function (e) {
-		rect.settings.strokeStyle = contentItemBoundingHoveredBoxBorderColor;
-		this.vc.currentlyHoveredContentItem = this;
-		this.vc.requestInvalidate();
-	};
+    this.onmouseenter = function (e) {
+        rect.settings.strokeStyle = contentItemBoundingHoveredBoxBorderColor;
+        this.vc.currentlyHoveredContentItem = this;
+        this.vc.requestInvalidate();
+    };
 
-	this.onmouseleave = function (e) {
-		rect.settings.strokeStyle = contentItemBoundingBoxBorderColor;
-		this.vc.currentlyHoveredContentItem = null;
-		this.isMouseIn = false;
-		this.vc.requestInvalidate();
-	};
-	this.onmouseclick = function (e) {
-		if (!CZ.Authoring.isActive) return zoomToElementHandler(this, e, 1.0);
-	};
+    this.onmouseleave = function (e) {
+        rect.settings.strokeStyle = contentItemBoundingBoxBorderColor;
+        this.vc.currentlyHoveredContentItem = null;
+        this.isMouseIn = false;
+        this.vc.requestInvalidate();
+    };
+    this.onmouseclick = function (e) {
+        return zoomToElementHandler(this, e, 1.0)
+    };
 
-	var self = this;
-	this.changeZoomLevel = function (curZl, newZl) {
-	    var vy = self.newY;
-	    var mediaTop = vy + verticalMargin;
-	    var sourceTop = mediaTop + mediaHeight + sourceVertMargin;
-	    var titleTop = sourceTop + verticalMargin + sourceHeight;
+    var self = this;
+    this.changeZoomLevel = function (curZl, newZl) {
+        var vy = self.newY;
+        var mediaTop = vy + verticalMargin;
+        var sourceTop = mediaTop + mediaHeight + sourceVertMargin;
+        var titleTop = sourceTop + verticalMargin + sourceHeight;
 
-		if (newZl >= contentItemShowContentZoomLevel) { // building content for an infodot
-			if (curZl >= contentItemShowContentZoomLevel) return null;
+        if (newZl >= contentItemShowContentZoomLevel) { // building content for an infodot
+            if (curZl >= contentItemShowContentZoomLevel) return null;
 
-			var container = new ContainerElement(vc, layerid, id + "__content", vx, vy, vw, vh);
+            var container = new ContainerElement(vc, layerid, id + "__content", vx, vy, vw, vh);
 
-			// Media
-			var mediaID = id + "__media__";
-			var imageElem = null;
-			if (contentItem.mediaType === 'image') {
-			    imageElem = addSeadragonImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, mediaContentElementZIndex, contentItem.mediaUrl);
-			}
-			else if (contentItem.mediaType === 'video') {
-				addVideo(container, layerid, mediaID, contentItem.mediaUrl, vx + leftOffset, mediaTop, contentWidth, mediaHeight, mediaContentElementZIndex);
-			}
-			else if (contentItem.mediaType === 'audio') {
-				mediaTop += contentItemAudioTopMargin * vh;
-				mediaHeight = vh * contentItemAudioHeight;
-				addAudio(container, layerid, mediaID, contentItem.mediaUrl, vx + leftOffset, mediaTop, contentWidth, mediaHeight, mediaContentElementZIndex);
-			}
-			else if (contentItem.mediaType === 'pdf') {
-				addPdf(container, layerid, mediaID, contentItem.mediaUrl, vx + leftOffset, mediaTop, contentWidth, mediaHeight, mediaContentElementZIndex);
-			}
+            // Media
+            var mediaID = id + "__media__";
+            var imageElem = null;
+            if (contentItem.mediaType.toLowerCase() === 'image' || contentItem.mediaType.toLowerCase() === 'picture') {
+                imageElem = addSeadragonImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, mediaContentElementZIndex, contentItem.uri);
+            }
+            else if (contentItem.mediaType.toLowerCase() === 'video') {
+                addVideo(container, layerid, mediaID, contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, mediaContentElementZIndex);
+            }
+            else if (contentItem.mediaType.toLowerCase() === 'audio') {
+                mediaTop += contentItemAudioTopMargin * vh;
+                mediaHeight = vh * contentItemAudioHeight;
+                addAudio(container, layerid, mediaID, contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, mediaContentElementZIndex);
+            }
+            else if (contentItem.mediaType.toLowerCase() === 'pdf') {
+                addPdf(container, layerid, mediaID, contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, mediaContentElementZIndex);
+            }
 
-			// Title
-			var titleText = contentItem.title;
-			addText(container, layerid, id + "__title__", vx + leftOffset, titleTop, titleTop + titleHeight / 2.0,
+            // Title
+            var titleText = contentItem.title;
+            addText(container, layerid, id + "__title__", vx + leftOffset, titleTop, titleTop + titleHeight / 2.0,
                     0.9 * titleHeight, titleText,
-                    { fontName: contentItemHeaderFontName, fillStyle: contentItemHeaderFontColor, textBaseline: 'middle', textAlign: 'center',
-                    	wrapText: true, numberOfLines: 1
+                    {
+                        fontName: contentItemHeaderFontName, fillStyle: contentItemHeaderFontColor, textBaseline: 'middle', textAlign: 'center',
+                        wrapText: true, numberOfLines: 1
                     },
                     contentWidth);
 
-			// Source
-			var sourceText = contentItem.attribution;
-			if (sourceText) {
-				var addSourceText = function (sx, sw, sy) {
-					var sourceItem = addText(container, layerid, id + "__source__", sx, sy, sy + sourceHeight / 2.0,
+            // Source
+            var sourceText = contentItem.attribution;
+            if (sourceText) {
+                var addSourceText = function (sx, sw, sy) {
+                    var sourceItem = addText(container, layerid, id + "__source__", sx, sy, sy + sourceHeight / 2.0,
                     0.9 * sourceHeight, sourceText,
-                    { fontName: contentItemHeaderFontName, fillStyle: contentItemSourceFontColor, textBaseline: 'middle', textAlign: 'right',
-                    	adjustWidth: true
+                    {
+                        fontName: contentItemHeaderFontName, fillStyle: contentItemSourceFontColor, textBaseline: 'middle', textAlign: 'right',
+                        adjustWidth: true
                     }, sw);
 
-					if (contentItem.mediaSource) { // we've got a URL here
-						sourceItem.reactsOnMouse = true;
-						sourceItem.onmouseclick = function (e) {
-							vc.element.css('cursor', 'default');
-							window.open(contentItem.mediaSource);
-							return true;
-						};
-						sourceItem.onmouseenter = function (pv, e) {
-							this.settings.fillStyle = contentItemSourceHoveredFontColor;
-							this.vc.requestInvalidate();
-							this.vc.element.css('cursor', 'pointer');
-						};
-						sourceItem.onmouseleave = function (pv, e) {
-							this.settings.fillStyle = contentItemSourceFontColor;
-							this.vc.requestInvalidate();
-							this.vc.element.css('cursor', 'default');
-						};
-					}
-				}
+                    if (contentItem.mediaSource) { // we've got a URL here
+                        sourceItem.reactsOnMouse = true;
+                        sourceItem.onmouseclick = function (e) {
+                            vc.element.css('cursor', 'default');
+                            window.open(contentItem.mediaSource);
+                            return true;
+                        };
+                        sourceItem.onmouseenter = function (pv, e) {
+                            this.settings.fillStyle = contentItemSourceHoveredFontColor;
+                            this.vc.requestInvalidate();
+                            this.vc.element.css('cursor', 'pointer');
+                        };
+                        sourceItem.onmouseleave = function (pv, e) {
+                            this.settings.fillStyle = contentItemSourceFontColor;
+                            this.vc.requestInvalidate();
+                            this.vc.element.css('cursor', 'default');
+                        };
+                    }
+                }
 
 
-				if (imageElem) {
-					imageElem.onLoad = function () {
-						var sx = this.x;
-						var sw = this.width;
-						var sy = this.y + this.height + sourceVertMargin;
-						addSourceText(sx, sw, sy);
-						this.onLoad = null;
-					}
-				} else {
-					addSourceText(vx + leftOffset, contentWidth, sourceTop);
-				}
-			}
+                if (imageElem) {
+                    imageElem.onLoad = function () {
+                        var sx = this.x;
+                        var sw = this.width;
+                        var sy = this.y + this.height + sourceVertMargin;
+                        addSourceText(sx, sw, sy);
+                        this.onLoad = null;
+                    }
+                } else {
+                    addSourceText(vx + leftOffset, contentWidth, sourceTop);
+                }
+            }
 
 
-			// Description
-			var descrTop = titleTop + titleHeight + verticalMargin;
-			addScrollText(container, layerid, id + "__description__", vx + leftOffset, descrTop,
+            // Description
+            var descrTop = titleTop + titleHeight + verticalMargin;
+            addScrollText(container, layerid, id + "__description__", vx + leftOffset, descrTop,
                             contentWidth,
                             descrHeight,
                             contentItem.description, 30,
                             {});
 
-			return { zoomLevel: contentItemShowContentZoomLevel,
-				content: container
-			};
-		} else { // building thumbnails
-			var zl = newZl;
-			if (zl >= contentItemThumbnailMaxLevel) {
-				if (curZl >= contentItemThumbnailMaxLevel && curZl < contentItemShowContentZoomLevel)
-					return null; // we already show this level
-				zl = contentItemThumbnailMaxLevel;
-			}
-			else if (zl <= contentItemThumbnailMinLevel) {
-				if (curZl <= contentItemThumbnailMinLevel && curZl > 0) return null;
-				zl = contentItemThumbnailMinLevel;
-			}
-			var sz = 1 << zl;
-			var thumbnailUri = contentItemThumbnailBaseUri + 'x' + sz + '/' + contentItem.guid + '.png';
-			
-			// show image itself if it was loaded by dragging desktop image
-            if (contentItem.mediaUrl.match("data:image"))
-                thumbnailUri = contentItem.mediaUrl;
-
-            imageElem = new CanvasImage(vc, layerid, id + "@" + 1, thumbnailUri, this.x, this.y, vw, vh);
-
+            return {
+                zoomLevel: contentItemShowContentZoomLevel,
+                content: container
+            };
+        } else { // building thumbnails
+            var zl = newZl;
+            if (zl >= contentItemThumbnailMaxLevel) {
+                if (curZl >= contentItemThumbnailMaxLevel && curZl < contentItemShowContentZoomLevel)
+                    return null; // we already show this level
+                zl = contentItemThumbnailMaxLevel;
+            }
+            else if (zl <= contentItemThumbnailMinLevel) {
+                if (curZl <= contentItemThumbnailMinLevel && curZl > 0) return null;
+                zl = contentItemThumbnailMinLevel;
+            }
+            var sz = 1 << zl;
+            var thumbnailUri = contentItemThumbnailBaseUri + 'x' + sz + '/' + this.guid + '.png';
             return {
                 zoomLevel: newZl,
-                content: imageElem
+                content: new CanvasImage(vc, layerid, id + "@" + 1, thumbnailUri, vx, vy, vw, vh)
             };
-		}
-	};
+        }
+    };
 }
 ContentItem.prototype = new CanvasDynamicLOD;
 
@@ -2156,12 +2156,15 @@ function CanvasInfodot(vc, layerid, id, time, vyc, radv, contentItems, infodotDe
 	this.base = CanvasCircle;
 	this.base(vc, layerid, id, time, vyc, radv,
         { strokeStyle: infoDotBorderColor, lineWidth: infoDotBorderWidth * radv, fillStyle: infoDotFillColor, isLineWidthVirtual: true });
+	this.guid = infodotDescription.guid;
+	this.type = 'infodot';
+
+	this.isBuffered = infodotDescription.isBuffered;
 	this.contentItems = contentItems;
 	this.hasContentItems = false;
 	this.infodotDescription = infodotDescription;
 	this.title = infodotDescription.title;
 	this.opacity = typeof infodotDescription.opacity !== 'undefined' ? infodotDescription.opacity : 1;
-
 
 	contentItems.sort(function (a, b) {
 		return a.order - b.order;
@@ -2171,7 +2174,6 @@ function CanvasInfodot(vc, layerid, id, time, vyc, radv, contentItems, infodotDe
 	var innerRad = radv - infoDotHoveredBorderWidth * radv;
 	this.outerRad = radv;
 
-	this.type = 'infodot';
 	this.reactsOnMouse = true;
 
 	this.tooltipEnabled = true; // indicates whether tooltip is enabled for this infodot at this moment or not
@@ -2477,14 +2479,14 @@ function CanvasInfodot(vc, layerid, id, time, vyc, radv, contentItems, infodotDe
 			var title = '';
 
 			if (infodotDescription && infodotDescription.title && infodotDescription.date) {
-				title = infodotDescription.title + '\n(' + infodotDescription.date + ')';
+			    title = infodotDescription.title;
 			}
 
 			var infodotTitle = addText(contentItem, layerid, id + "__title", time - titleWidth / 2, titleTop, titleTop, titleHeight,
                 title,
                 {
                     fontName: contentItemHeaderFontName, fillStyle: contentItemHeaderFontColor, textBaseline: 'middle', textAlign: 'center',
-                    wrapText: true, numberOfLines: 2
+                    wrapText: false, numberOfLines: 1
                 }, titleWidth);
             infodotTitle.reactsOnMouse = true;
 
@@ -2715,7 +2717,7 @@ function buildVcContentItems(contentItems, xc, yc, rad, vc, layerid) {
 
 	// 0th is a central content item
 	vcitems.push(
-        new ContentItem(vc, layerid, contentItems[0].id,
+        new ContentItem(vc, layerid, 'c' + contentItems[0].UniqueID,
              -_wc / 2 * rad + xc, -_hc / 2 * rad + yc, _wc * rad, _hc * rad,
              contentItems[0]));
 
@@ -2732,21 +2734,21 @@ function buildVcContentItems(contentItems, xc, yc, rad, vc, layerid) {
 	var xl = xc + rad * (_xlc - _lw / 2);
 	for (var j = 0; j < nL; j++, i++) {
 		var ci = contentItems[i];
-		vcitems.push(new ContentItem(vc, layerid, ci.id, xl, yc + rad * arrange[j], lw, lh, ci));
+		vcitems.push(new ContentItem(vc, layerid, 'c' + ci.UniqueID, xl, yc + rad * arrange[j], lw, lh, ci));
 	}
 	// Bottom field
 	arrange = arrangeContentItemsInField(nB, _lw);
 	var yb = yc + rad * (_ybc - _lh / 2);
 	for (var j = 0; j < nB; j++, i++) {
 		var ci = contentItems[i];
-		vcitems.push(new ContentItem(vc, layerid, ci.id, xc + rad * arrange[j], yb, lw, lh, ci));
+		vcitems.push(new ContentItem(vc, layerid, 'c' + ci.UniqueID, xc + rad * arrange[j], yb, lw, lh, ci));
 	}
 	// Right field
 	arrange = arrangeContentItemsInField(nR, _lh);
 	var xr = xc + rad * (_xrc - _lw / 2);
 	for (var j = nR; --j >= 0; i++) {
 		var ci = contentItems[i];
-		vcitems.push(new ContentItem(vc, layerid, ci.id, xr, yc + rad * arrange[j], lw, lh, ci));
+		vcitems.push(new ContentItem(vc, layerid, 'c' + ci.UniqueID, xr, yc + rad * arrange[j], lw, lh, ci));
 	}
 	return vcitems;
 
