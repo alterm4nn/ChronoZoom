@@ -233,6 +233,7 @@ Use the **GetSuperCollection** command to return the top supercollection for a g
 This command has no parameters.
 
 **Example Result Data**
+
     {
        "d":{
           "__type":"SuperCollection:#Chronozoom.Entities",
