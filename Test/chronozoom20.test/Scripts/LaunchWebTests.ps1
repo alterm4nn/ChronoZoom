@@ -6,7 +6,7 @@
 
 function Get-ConfigPath
 {
-	$ConfigPath = Join-Path $SrcFolderpath "Tests\config.xml"
+	$ConfigPath = Join-Path $SrcFolderpath "Tests.UI\config.xml"
 	$ValidConfigPath = ""
 	if(Test-Path($ConfigPath))
 	{
@@ -96,7 +96,7 @@ if (Test-Path($MSTest11Pathx86))
 
 $SrcFolderpath = Get-ScriptDirectory | Split-Path -Parent
 
-$AbsoleteTestDllPath = "Tests\bin\Debug\Tests.dll"
+$AbsoleteTestDllPath = "Tests.UI\bin\Debug\Tests.dll"
 
 $TestsLibraryPath = Join-Path $SrcFolderpath $AbsoleteTestDllPath
 $ConfigPath = Get-ConfigPath
