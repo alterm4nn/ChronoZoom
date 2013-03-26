@@ -749,8 +749,19 @@ function merge(src, dest) {
             if (dest.children[i].type && dest.children[i].type === "timeline")
                 destChildTimelines.push(dest.children[i]);
 
+        var destHasAllSrcTimelines = true;
+        for (var i = 0, j; i < srcChildTimelines.length; i++) {
+            for (j = 0; j < destChildTimelines.length; j++) {
+                if (srcChildTimelines[i].id === destChildTimelines[j].guid)
+                    break;
+            }
+            if (j === destChildTimelines.length) {
+                destHasAllSrcTimelines = false;
+                break;
+            }
+        }
 
-        if (srcChildTimelines.length === destChildTimelines.length) { // dest contains all src children
+        if (destHasAllSrcTimelines && destChildTimelines.length >= srcChildTimelines.length) { // dest contains all src children
             dest.isBuffered = dest.isBuffered || (src.timelines instanceof Array);
 
             // cal bbox (top, bottom) for child timelines and infodots
