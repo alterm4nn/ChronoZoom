@@ -415,10 +415,10 @@ var CZ = (function (CZ, $) {
                 mouseup: function () {
                     if (_hovered.type === "infodot") {
                         _selectedExhibit = _hovered;
-                        that.showEditExhibitForm(_selectedExhibit);
+                        that.showEditExhibitForm(_selectedExhibit);                        
                     } else if (_hovered.type === "contentItem") {
-                        _selectedExhibit = _hovered.parent;
-                        that.showEditExhibitForm(_selectedExhibit);
+                        _selectedExhibit = _hovered.parent.parent.parent;
+                        that.showEditContentItemForm(_hovered, _selectedExhibit);
                     }
                 }
             }
@@ -483,6 +483,7 @@ var CZ = (function (CZ, $) {
             this.showEditTimelineForm = formHandlers && formHandlers.showEditTimelineForm || function () {};
             this.showCreateExhibitForm = formHandlers && formHandlers.showCreateExhibitForm || function () {};
             this.showEditExhibitForm = formHandlers && formHandlers.showEditExhibitForm || function () {};
+            this.showEditContentItemForm = formHandlers && formHandlers.showEditContentItemForm || function () {};
         },
 
         /**
@@ -568,8 +569,34 @@ var CZ = (function (CZ, $) {
          * @param  {Number} i    Index of a content item in selected exhibit.
          * @param  {Object} prop An object with properties' values.
          */
-        updateContentItem: function (i, prop) {
-            // TODO: Update properties of i's content item in _selectedExhibit.
+        updateContentItem: function (c, e, args) {
+            for (prop in args)
+                if (c.contentItem.hasOwnProperty(prop))
+                    c.contentItem[prop] = args[prop];
+            
+            //var id = c.id;
+            //var x = c.x;
+            //var y = c.y;
+            //var h = c.height;
+            //var w = c.width;
+            //var ci = c.contentItem;
+            var vyc = e.y + e.height / 2;
+            var time = e.x + e.width / 2;
+            var id = e.id;
+            var cis = e.contentItems;
+            var descr = e.infodotDescription;
+            descr.opacity = 1;
+            var parent = e.parent;
+            var radv = e.outerRad;
+            try {
+                //clear(c);
+                // remove and then adding infodot to position content items properly
+                removeChild(parent, id);
+                addInfodot(parent, "layerInfodots", id, time, vyc, radv, cis, descr);
+            }
+            catch (ex) {
+
+            };
         },
 
         /**
@@ -578,7 +605,8 @@ var CZ = (function (CZ, $) {
          * @param  {Number} i Index of a content item in selected exhibit.
          */
         removeContentItem: function (i) {
-            // TODO: Remove i's content item from _selectedExhibit.
+            delete c.contentItem;
+            removeChild(c.parent, c.id);// TODO: Remove i's content item from _selectedExhibit.
         }
     });
 

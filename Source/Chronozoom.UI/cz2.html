@@ -195,7 +195,8 @@
                 showCreateTimelineForm: showCreateTimelineForm,
                 showEditTimelineForm: showEditTimelineForm,
                 showCreateExhibitForm: showCreateExhibitForm,
-                showEditExhibitForm: showEditExhibitForm
+                showEditExhibitForm: showEditExhibitForm,
+                showEditContentItemForm: showEditContentItemForm
             });
 
             var canvasGestures = getGesturesStream(vc); //gesture sequence of the virtual canvas
@@ -712,6 +713,62 @@
             });
         }
 
+        function showEditContentItemForm(c, e) {
+            var titleInput = $("#contentItemTitleInput");
+            var mediaInput = $("#contentItemMediaSourceInput");
+            var descriptionInput = $("#contentItemDescriptionInput");
+            var mediaTypeInput = $("#contentItemMediaTypeInput option");
+            var mediaType = c.contentItem.mediaType.toLowerCase();
+            if (mediaType === "picture") {
+                    mediaType = "image";
+            }
+            
+            titleInput.val(c.contentItem.title);
+            mediaInput.val(c.contentItem.uri);
+            descriptionInput.val(c.contentItem.description);
+            mediaTypeInput.each(function (option) {
+                if (this.value === mediaType) {
+                    $(this).attr("selected", "selected");
+                    return;
+                }
+            });
+                        
+            
+            
+            $("#editContentItemForm").dialog({
+                title: "Edit content item",
+                modal: true,
+                height: 600,
+                width: 600,
+                buttons: {
+                    "save and close": function () {
+                        var selected = mediaTypeInput[0];
+                        
+                        for (var i = 1; i < mediaTypeInput.length; i++)
+                            if (mediaTypeInput[i].selected) {
+                                    selected = mediaTypeInput[i];
+                                }
+                        
+                        CZ.Authoring.updateContentItem(c, e, {
+                                title: titleInput.val(),
+                                uri: mediaInput.val(),
+                                mediaType: selected.text,
+                                description: descriptionInput.val()
+                        });
+                        $(this).dialog("close");
+                    },
+                    "delete": function () {
+                        CZ.Authoring.removeContentItem(c);
+                        $(this).dialog("close");
+                    }
+            },
+            close: function () {
+                    CZ.Authoring._isActive = false;
+                    $("a:contains('edit exhibit')").removeClass("active");
+                }
+        });
+    }
+
         function createTimeline() {
             // skip authoring during ongoing dynamic layout animation
             if (animatingElements.length != 0) {
@@ -1030,6 +1087,35 @@
                 </p>
             </div>
 
+
+             <!--Edit Content Item popup dialog-->
+            <div id="editContentItemForm" style="background-color: rgb(60, 95, 150); display: none; color: white;">
+                <p>
+                    <label style="display: block">title</label>
+                    <input id="contentItemTitleInput" style="display: block" type="text" />
+                </p>
+
+                <p style="display: block">
+                    <label style="display: block">media source</label>
+                    <input type="url" id="contentItemMediaSourceInput" style="display: block" />
+                </p>
+
+                <p style="display: block">
+                    <label style="display: block">description</label>
+                    <textarea id="contentItemDescriptionInput" style="display: block" ></textarea>
+                </p>
+
+                <p style="display: block">
+                    <label style="display: block">media type</label>
+                    <select id="contentItemMediaTypeInput" style="display: block">
+                        <option value="pdf">PDF</option>
+                        <option value="image">Image</option>
+                        <option value="video">Video</option>
+                        <option value="audio">Audio</option>
+                    </select>
+                </p>
+
+            </div>
         </div>
 
         <div id="footer-right">            
