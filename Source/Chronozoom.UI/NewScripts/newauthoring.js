@@ -604,7 +604,7 @@ var CZ = (function (CZ, $) {
          * Use it externally from form's handlers.
          * @param  {Number} i Index of a content item in selected exhibit.
          */
-        removeContentItem: function (i) {
+        removeContentItem: function (c) {
             delete c.contentItem;
             removeChild(c.parent, c.id);// TODO: Remove i's content item from _selectedExhibit.
         }
