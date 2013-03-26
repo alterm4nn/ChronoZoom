@@ -63,6 +63,7 @@
 
     <script type="text/javascript" src="NewScripts/authoring.js"></script>
     <script type="text/javascript" src="NewScripts/newauthoring.js"></script>
+    <script type="text/javascript" src="NewScripts/czservice.js"></script>
 
     <script type="text/javascript" src="NewScripts/settings.js"></script>
     <script type="text/javascript" src="NewScripts/timescale.js"></script>
@@ -594,11 +595,16 @@
                 width: 600,
                 buttons: {
                     "save and close": function () {
-                        CZ.Authoring.updateTimeline(t, {
+                        CZ.Authoring.createTimeline(t, {
                             title: titleInput.val(),
                             start: startInput.val(),
                             end: endInput.val(),
                         });
+                        //CZ.Authoring.updateTimeline(t, {
+                        //    title: titleInput.val(),
+                        //    start: startInput.val(),
+                        //    end: endInput.val(),
+                        //});
                         isCancel = false;
                         $(this).dialog("close");
                     }

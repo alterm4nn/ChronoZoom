@@ -179,6 +179,7 @@
     <Content Include="Images\zoomout_hover.png" />
     <Content Include="Images\zoomout_pressed.png" />
     <Content Include="Images\zoomout_rest.png" />
+    <Content Include="NewScripts\czservice.js" />
     <Content Include="oldResponseDump.txt" />
     <Content Include="ResponseDumpRest.txt" />
     <Content Include="Privacy.htm" />
