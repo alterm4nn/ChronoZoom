@@ -225,15 +225,13 @@ var CZ = (function (CZ, $) {
         }
     }
 
-    
-
     /**
      * Removes and then adds exhibit and all of its nested content from canvas. Used to simplify
      * update of exhibit's info.
      * Use it in when you need to update exhibit's or some of its content item's info.
      * @param  {Object} e    An exhibit to renew.
      */
-    function _renewExhibit(e) {
+    function renewExhibit(e) {
         var vyc = e.y + e.height / 2;
         var time = e.x + e.width / 2;
         var id = e.id;
@@ -257,7 +255,7 @@ var CZ = (function (CZ, $) {
         return addTimeline(
             _hovered,
             _hovered.layerid,
-            "temp_" + _timelineCounter++,
+            "",
             {
                 timeStart: _rectCur.x,
                 timeEnd: _rectCur.x + _rectCur.width,
@@ -385,6 +383,10 @@ var CZ = (function (CZ, $) {
                 },
 
                 mouseup: function () {
+                    if (_dragCur.x === _dragStart.x && _dragCur.y === _dragStart.y) {
+                        return;
+                    }
+
                     if (_hovered.type === "timeline") {
                         _selectedTimeline = createNewTimeline();
                         that.showCreateTimelineForm(_selectedTimeline);
@@ -423,7 +425,7 @@ var CZ = (function (CZ, $) {
                         updateNewCircle();
 
                         if (checkExhibitIntersections(_hovered, _circleCur)) {
-                            var _selectedExhibit = createNewExhibit();
+                            _selectedExhibit = createNewExhibit();
                             that.showCreateExhibitForm(_selectedExhibit);
                         }
                     }
@@ -512,30 +514,6 @@ var CZ = (function (CZ, $) {
             this.showEditContentItemForm = formHandlers && formHandlers.showEditContentItemForm || function () {};
         },
 
-        createTimeline: function (t, prop) {
-            var temp = {
-                x: Number(prop.start),
-                y: t.y,
-                width: Number(prop.end - prop.start),
-                height: t.height,
-                type: "rectangle"
-            };
-
-            // TODO: Show error message in case of failed test!
-            if (checkTimelineIntersections(t.parent, temp, true)) {
-                t.x = temp.x;
-                t.width = temp.width;
-            }
-
-            // Update title.
-            t.title = prop.title;
-            updateTimelineTitle(t);
-            t.id = "";
-
-            CZ.Service.putTimeline(t);
-        }
-        ,
-
         /**
          * Updates timeline's properties.
          * Use it externally from forms' handlers.
@@ -561,8 +539,13 @@ var CZ = (function (CZ, $) {
             t.title = prop.title;
             updateTimelineTitle(t);
 
-
-            CZ.Service.putTimeline(t);
+            CZ.Service.putTimeline(_selectedTimeline).then(
+                (function (t) {
+                    return function (response) {
+                        removeChild(t.parent, t.id);
+                    };
+                })(_selectedTimeline)
+            );
         },
 
         /**
@@ -599,7 +582,7 @@ var CZ = (function (CZ, $) {
 
             e.contentItems = prop.contentItems;
 
-            _renewExhibit(e);
+            renewExhibit(e);
 
             // TODO: Update title!
         },
@@ -634,12 +617,11 @@ var CZ = (function (CZ, $) {
          * @param  {Object} prop An object with properties' values.
          */
         updateContentItem: function (c, e, args) {
-   
-            for (prop in args)
+            for (var prop in args)
                 if (c.contentItem.hasOwnProperty(prop))
                     c.contentItem[prop] = args[prop];
             
-            _renewExhibit(e);
+            renewExhibit(e);
         },
 
         /**
@@ -653,7 +635,7 @@ var CZ = (function (CZ, $) {
             delete c.contentItem;
             var e = c.parent.parent.parent;
             //removeChild(c.parent, c.id);// TODO: Remove i's content item from _selectedExhibit.
-            _renewExhibit(e);
+            renewExhibit(e);
         }
     });
 

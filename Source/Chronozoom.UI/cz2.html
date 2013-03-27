@@ -595,16 +595,11 @@
                 width: 600,
                 buttons: {
                     "save and close": function () {
-                        CZ.Authoring.createTimeline(t, {
-                            title: titleInput.val(),
-                            start: startInput.val(),
-                            end: endInput.val(),
+                        CZ.Authoring.updateTimeline(t, {
+                           title: titleInput.val(),
+                           start: startInput.val(),
+                           end: endInput.val(),
                         });
-                        //CZ.Authoring.updateTimeline(t, {
-                        //    title: titleInput.val(),
-                        //    start: startInput.val(),
-                        //    end: endInput.val(),
-                        //});
                         isCancel = false;
                         $(this).dialog("close");
                     }
