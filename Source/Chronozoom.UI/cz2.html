@@ -662,7 +662,7 @@
             var CItitleInput = $("#AddContentItem0TitleInput");
             var mediaInput = $("#AddContentItem0MediaSourceInput");
             var descriptionInput = $("#AddContentItem0DescriptionInput");
-            var mediaTypeInput = $("#AddContentItem0MediaTypeInput");
+            var mediaTypeInput = $("#AddContentItem0MediaTypeInput option");
             var CIcounter = 0;
  
             titleInput.val(e.title);
@@ -701,7 +701,7 @@
                             var CItitleInput1 = $("#AddContentItem" + i + "TitleInput");
                             var mediaInput1 = $("#AddContentItem" + i + "MediaSourceInput");
                             var descriptionInput1 = $("#AddContentItem" + i + "DescriptionInput");
-                            var mediaTypeInput1 = $("#AddContentItem" + i + "MediaTypeInput");
+                            var mediaTypeInput1 = $("#AddContentItem" + i + "MediaTypeInput option");
                             var selected1 = mediaTypeInput1[1];//{ text: "Image" };
                             for (var i1 = 0; i1 < mediaTypeInput.length; i1++)
                                 if (mediaTypeInput1[i1].selected) {
@@ -715,32 +715,32 @@
                                 description: descriptionInput1.val()
                             });
                         }
-                         isCancel = false;
+                        isCancel = false;
                         $(this).dialog("close");
                     },
-                    "more exhibits": function () {
+                    "more content items": function () {
                         var form = $("#createExhibitForm");
                         CIcounter++;
 
                         var newlabel = $(" <label style='display: block'>Content Item " + CIcounter + " media source</label>");
 
                         var newCITitle = $("<p style='display: inline-block'>" + 
-                           " <label style='display: block'>Content Item " + CIcounter  + " Title</label>" + 
+                           " <label id='AddContentItem" + CIcounter + "Title' style='display: block'>Content Item " + CIcounter + " Title</label>" +
                            " <input id='AddContentItem"+ CIcounter + "TitleInput' style='display: block' type='text'/>" +
                            " </p> ");
 
                         var newCIMediaSource = $("<p style='display: inline-block'>" +
-                           " <label style='display: block'>Content Item " + CIcounter + " media source</label>" +
+                           " <label id='AddContentItem" + CIcounter + "MediaSource' style='display: block'>Content Item " + CIcounter + " media source</label>" +
                            " <input id='AddContentItem" + CIcounter + "MediaSourceInput' style='display: block' type='text'/>" +
                            " </p> ");
 
                         var newCIDescription = $("<p style='display: inline-block'>" +
-                          " <label style='display: block'>Content Item " + CIcounter + " description</label>" +
+                          " <label id='AddContentItem" + CIcounter + "Description' style='display: block'>Content Item " + CIcounter + " description</label>" +
                           " <textarea id='AddContentItem" + CIcounter + "DescriptionInput' style='display: block' />" +
                           " </p> ");
 
                         var newCIMediaType = $(" <p style='display: block'>" + 
-                         " <label style='display: block'>Content Item " + CIcounter + " media type</label>" +
+                         " <label id='AddContentItem" + CIcounter + "MediaType' style='display: block'>Content Item " + CIcounter + " media type</label>" +
                          " <select id='AddContentItem" + CIcounter + "MediaTypeInput' style='display: block'>" +
                          " <option value='pdf'>PDF</option>" +
                          " <option value='image'>Image</option> " +
@@ -759,6 +759,29 @@
                 close: function () {
                     if (isCancel) {
                         CZ.Authoring.removeExhibit(e);
+                    }
+
+                    //delete fields for CI
+                    var form1 = ("#createExhibitForm");
+                    for (i = 1; i <= CIcounter; i++) {
+                        CItitleInput1 = $("#AddContentItem" + i + "TitleInput");
+                        mediaInput1 = $("#AddContentItem" + i + "MediaSourceInput");
+                        descriptionInput1 = $("#AddContentItem" + i + "DescriptionInput");
+                        mediaTypeInput1 = $("#AddContentItem" + i + "MediaTypeInput");
+                        var CItitle = $("#AddContentItem" + i + "Title");
+                        var media = $("#AddContentItem" + i + "MediaSource");
+                        var description = $("#AddContentItem" + i + "Description");
+                        var mediaType = $("#AddContentItem" + i + "MediaType");
+
+                        CItitleInput1.remove();
+                        mediaInput1.remove();
+                        descriptionInput1.remove();
+                        mediaTypeInput1.remove();
+                        CItitle.remove();
+                        media.remove();
+                        description.remove();
+                        mediaType.remove();
+
                     }
                     CZ.Authoring._isActive = false;
                     $("a:contains('create exhibit')").removeClass("active");
