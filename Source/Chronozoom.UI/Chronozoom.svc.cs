@@ -15,8 +15,10 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Runtime.Caching;
 using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
 using System.Security.Cryptography;
 using System.ServiceModel;
 using System.ServiceModel.Activation;
@@ -24,6 +26,7 @@ using System.ServiceModel.Web;
 using System.Text;
 using System.Web.Script.Services;
 using Chronozoom.Entities;
+using Newtonsoft.Json;
 
 namespace UI
 {
@@ -39,6 +42,20 @@ namespace UI
         private static MD5 _md5Hasher = MD5.Create();
         private const decimal _minYear = -20000000000;
         private const decimal _maxYear = 9999;
+
+        // error code descriptions
+        private static class ErrorDescription
+        {
+            public const string UnauthorizedUser = "Unauthorized User";
+            public const string CollectionNotFound = "Collection not found";
+            public const string ParentTimelineNotFound = "Parent timeline not found";
+            public const string TimelineNotFound = "Timeline not found";
+            public const string ParentTimelineUpdate = "Parent timeline update not allowed";
+            public const string TimelineNull = "Timeline cannot be null";
+            public const string ExhibitNotFound = "Exhibit not found";
+            public const string ContentItemNotFound = "Content item not found";
+            public const string ParentExhibitNotFound = "Parent exhibit not found";
+        }
 
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
@@ -290,47 +307,25 @@ namespace UI
 
 
         /// <summary>
-        /// If the specified supercollection does not exist the call is considered a bad request.
-        /// If collection does not exist then a new collection is created in the supercollection and the
+        /// If collection does not exist then a new collection is created the
         /// authenticated user is set as the author if no author is already registered.
         ///
-        /// If the collection exists in the supercollection and the authenticated user is its author then
+        /// If the collection exists and the authenticated user is its author then
         /// the title of the existing collection is modified.
         /// </summary>
         [OperationContract]
-        [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}?id={id}&title={title}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        public Guid PutCollection(string superCollectionName, string collectionName, string id, string title)
+        [WebInvoke(Method = "PUT", UriTemplate = "/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        public Guid PutCollectionName(string collectionName, Collection collectionRequest)
         {
-            Trace.TraceInformation("Put Collection");
-
             string user = "TestUser"; // TODO: Retrieve the correct user
-            Guid retval = Guid.Empty;
-            Guid superCollectionGuid = CollectionIdFromText(superCollectionName);
-            SuperCollection superCollection = _storage.SuperCollections.Find(superCollectionGuid);
-            if (superCollection == null)
-            {
-                // Supercollection does not exist.
-                SetStatusCode(HttpStatusCode.BadRequest);
-                return retval;
-            }
+            Trace.TraceInformation("Put Collection {0} from user {1}", collectionName, user);
 
+            Guid retval = Guid.Empty;
             Guid collectionGuid = CollectionIdFromText(collectionName);
             Collection collection = _storage.Collections.Find(collectionGuid);
             if (collection == null)
             {
-                if (superCollection.UserId != user)
-                {
-                    SetStatusCode(HttpStatusCode.Unauthorized);
-                    return retval;
-                }
-
                 collection = new Collection { Id = collectionGuid, Title = collectionName, UserId = user };
-                _storage.Entry(superCollection).Collection(_ => _.Collections).Load();
-                if (superCollection.Collections == null)
-                {
-                    superCollection.Collections = new System.Collections.ObjectModel.Collection<Chronozoom.Entities.Collection>();
-                }
-                superCollection.Collections.Add(collection);
                 _storage.Collections.Add(collection);
                 retval = collectionGuid;
             }
@@ -338,50 +333,49 @@ namespace UI
             {
                 if (collection.UserId != user)
                 {
-                    SetStatusCode(HttpStatusCode.Unauthorized);
+                    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                     return retval;
                 }
 
-                collection.Title = title;
+                collection.Title = collectionRequest.Title;
             }
             _storage.SaveChanges();
             return retval;
         }
 
         [OperationContract]
-        [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        public void DeleteCollection(string superCollectionName, string collectionName)
+        [WebInvoke(Method = "DELETE", UriTemplate = "/collectionName", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        public void DeleteCollection(Collection collectionRequest)
         {
-            Trace.TraceInformation("Delete Collection");
-
             string user = "TestUser"; // TODO: Retrieve the correct user
 
-            Guid superCollectionGuid = CollectionIdFromText(superCollectionName);
-            SuperCollection superCollection = _storage.SuperCollections.Find(superCollectionGuid);
-            if (superCollection == null)
-            {
-                // Supercollection does not exist.
-                SetStatusCode(HttpStatusCode.BadRequest);
-                return;
-            }
+            Trace.TraceInformation("Delete Collection {0} from user {1}", collectionRequest.Title, user);
 
-            Guid guid = CollectionIdFromText(collectionName);
+            Guid guid = CollectionIdFromText(collectionRequest.Title);
             Collection collection = _storage.Collections.Find(guid);
             if (collection == null)
             {
-                SetStatusCode(HttpStatusCode.NotFound);
+                SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
                 return;
             }
 
             if (collection.UserId != user)
             {
-                SetStatusCode(HttpStatusCode.Unauthorized);
+                SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                 return;
             }
 
-            superCollection.Collections.Remove(collection);
             _storage.Collections.Remove(collection);
             _storage.SaveChanges();
+        }
+
+        public class TimelineRequest
+        {
+            public string Id { get; set; }
+            public string Title { get; set; }
+            public string FromYear { get; set; }
+            public string ToYear { get; set; }
+            public string ParentTimelineId { get; set; }
         }
 
         /// <summary>
@@ -395,10 +389,8 @@ namespace UI
         // If id is specified and the timeline exists, then the existing timeline is updated.
         //
         [OperationContract]
-        [WebInvoke(Method = "PUT", UriTemplate = "/{collectionName}/timeline?id={id}&title={title}&start={start}&" +
-                                                 "end={end}&parent={parent}",
-                                                 RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        public Guid PutTimeline(string collectionName, string id, string title, string start, string end, string parent)
+        [WebInvoke(Method = "PUT", UriTemplate = "/{collectionName}/timeline", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        public Guid PutTimeline(string collectionName, TimelineRequest timelineRequest)
         {
             Trace.TraceInformation("Put Timeline");
 
@@ -410,32 +402,32 @@ namespace UI
             if (collection == null)
             {
                 // Collection does not exist
-                SetStatusCode(HttpStatusCode.BadRequest);
+                SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
                 return retval;
             }
 
             // Validate user
             if (collection.UserId != user)
             {
-                SetStatusCode(HttpStatusCode.Unauthorized);
+                SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                 return retval;
             }
 
-            if (id == null)
+            if (timelineRequest.Id == null)
             {
-                Timeline parentTimeline = FindParentTimeline(parent);
+                Timeline parentTimeline = FindParentTimeline(timelineRequest.ParentTimelineId);
                 if (parentTimeline == null)
                 {
-                    SetStatusCode(HttpStatusCode.BadRequest);
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
                     return retval;
                 }
 
                 // Parent timeline is valid - add new timeline
                 Guid newTimelineGuid = Guid.NewGuid();
-                Timeline newTimeline = new Timeline { Id = newTimelineGuid, Title = title };
+                Timeline newTimeline = new Timeline { Id = newTimelineGuid, Title = timelineRequest.Title };
                 //newTimeline.Title = title;
-                newTimeline.FromYear = (start == null) ? 0 : Decimal.Parse(start);
-                newTimeline.ToYear = (end == null) ? 0 : Decimal.Parse(end);
+                newTimeline.FromYear = (timelineRequest.FromYear == null) ? 0 : Decimal.Parse(timelineRequest.FromYear);
+                newTimeline.ToYear = (timelineRequest.ToYear == null) ? 0 : Decimal.Parse(timelineRequest.ToYear);
                 newTimeline.Collection = collection;
 
                 // Update parent timeline.
@@ -451,25 +443,25 @@ namespace UI
             }
             else
             {
-                Guid updateTimelineGuid = Guid.Parse(id);
+                Guid updateTimelineGuid = Guid.Parse(timelineRequest.Id);
                 Timeline updateTimeline = _storage.Timelines.Find(updateTimelineGuid);
                 if (updateTimeline == null)
                 {
-                    SetStatusCode(HttpStatusCode.NotFound);
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineNotFound);
                     return retval;
                 }
 
-                if (parent != null)
+                if (timelineRequest.ParentTimelineId != null)
                 {
                     // Parent timeline updating is currently not supported
-                    SetStatusCode(HttpStatusCode.NotImplemented);
+                    SetStatusCode(HttpStatusCode.NotImplemented, ErrorDescription.ParentTimelineUpdate);
                     return retval;
                 }
 
                 // Update the timeline fields
-                updateTimeline.Title = title;
-                updateTimeline.FromYear = start == null ? 0 : Decimal.Parse(start);
-                updateTimeline.ToYear = end == null ? 0 : Decimal.Parse(end);
+                updateTimeline.Title = timelineRequest.Title;
+                updateTimeline.FromYear = timelineRequest.FromYear == null ? 0 : Decimal.Parse(timelineRequest.FromYear);
+                updateTimeline.ToYear = timelineRequest.ToYear == null ? 0 : Decimal.Parse(timelineRequest.ToYear);
                 retval = updateTimelineGuid;
             }
             _storage.SaveChanges();
@@ -477,8 +469,8 @@ namespace UI
         }
 
         [OperationContract]
-        [WebInvoke(Method = "DELETE", UriTemplate = "/{collectionName}/timeline/id={id}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        public void DeleteTimeline(string collectionName, string id)
+        [WebInvoke(Method = "DELETE", UriTemplate = "/{collectionName}/timeline", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        public void DeleteTimeline(string collectionName, TimelineRequest timelineRequest)
         {
             Trace.TraceInformation("Delete Timeline");
 
@@ -487,32 +479,41 @@ namespace UI
             Collection collection = _storage.Collections.Find(collectionGuid);
             if (collection == null)
             {
-                SetStatusCode(HttpStatusCode.BadRequest);
+                SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
                 return;
             }
 
             if (collection.UserId != user)
             {
-                SetStatusCode(HttpStatusCode.Unauthorized);
+                SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                 return;
             }
 
-            if (id == null)
+            if (timelineRequest.Id == null)
             {
-                SetStatusCode(HttpStatusCode.BadRequest);
+                SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineNull);
                 return;
             }
 
-            Guid timelineGuid = Guid.Parse(id);
+            Guid timelineGuid = Guid.Parse(timelineRequest.Id);
             Timeline deleteTimeline = _storage.Timelines.Find(timelineGuid);
             if (deleteTimeline == null)
             {
-                SetStatusCode(HttpStatusCode.NotFound);
+                SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineNotFound);
                 return;
             }
 
             _storage.Timelines.Remove(deleteTimeline);
             _storage.SaveChanges();
+        }
+
+
+        public class ExhibitRequest
+        {
+            public string Id { get; set; }
+            public string Title { get; set; }
+            public string ParentTimelineId { get; set; }
+            public string Year { get; set; }
         }
 
         /// <summary>
@@ -528,9 +529,8 @@ namespace UI
         /// If id is specified and the exhibit exists, then the existing exhibit is updated.
         /// </summary>
         [OperationContract]
-        [WebInvoke(Method = "PUT", UriTemplate = "/{collectionName}/exhibit?id={id}&parent={parent}&title={title}&time={time}",
-                                                 RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        public Guid PutExhibit(string collectionName, string id, string parent, string title, string time)
+        [WebInvoke(Method = "PUT", UriTemplate = "/{collectionName}/exhibit", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        public Guid PutExhibit(string collectionName, ExhibitRequest exhibitRequest)
         {
             Trace.TraceInformation("Put Exhibit");
 
@@ -541,31 +541,31 @@ namespace UI
             if (collection == null)
             {
                 // Collection does not exist
-                SetStatusCode(HttpStatusCode.BadRequest);
+                SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
                 return retval;
             }
 
             // Validate user
             if (collection.UserId != user)
             {
-                SetStatusCode(HttpStatusCode.Unauthorized);
+                SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                 return retval;
             }
 
-            if (id == null)
+            if (exhibitRequest.Id == null)
             {
-                Timeline parentTimeline = FindParentTimeline(parent);
+                Timeline parentTimeline = FindParentTimeline(exhibitRequest.ParentTimelineId);
                 if (parentTimeline == null)
                 {
-                    SetStatusCode(HttpStatusCode.BadRequest);
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
                     return retval;
                 }
 
                 // Parent timeline is valid - add new exhibit
                 Guid newExhibitGuid = Guid.NewGuid();
                 Exhibit newExhibit = new Exhibit { Id = newExhibitGuid };
-                newExhibit.Title = title;
-                newExhibit.Year = (time == null) ? 0 : Decimal.Parse(time);
+                newExhibit.Title = exhibitRequest.Title;
+                newExhibit.Year = (exhibitRequest.Year == null) ? 0 : Decimal.Parse(exhibitRequest.Year);
                 newExhibit.Collection = collection;
 
                 // Update parent timeline.
@@ -581,24 +581,24 @@ namespace UI
             }
             else
             {
-                Guid updateExhibitGuid = Guid.Parse(id);
+                Guid updateExhibitGuid = Guid.Parse(exhibitRequest.Id);
                 Exhibit updateExhibit = _storage.Exhibits.Find(updateExhibitGuid);
                 if (updateExhibit == null)
                 {
-                    SetStatusCode(HttpStatusCode.NotFound);
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ExhibitNotFound);
                     return retval;
                 }
 
-                if (parent != null)
+                if (exhibitRequest.ParentTimelineId != null)
                 {
                     // Parent timeline updating is currently not supported
-                    SetStatusCode(HttpStatusCode.NotImplemented);
+                    SetStatusCode(HttpStatusCode.NotImplemented, ErrorDescription.ParentTimelineUpdate);
                     return retval;
                 }
 
                 // Update the exhibit fields
-                updateExhibit.Title = title;
-                updateExhibit.Year = (time == null) ? 0 : Decimal.Parse(time);
+                updateExhibit.Title = exhibitRequest.Title;
+                updateExhibit.Year = (exhibitRequest.Year == null) ? 0 : Decimal.Parse(exhibitRequest.Year);
                 retval = updateExhibitGuid;
             }
             _storage.SaveChanges();
@@ -606,8 +606,8 @@ namespace UI
         }
 
         [OperationContract]
-        [WebInvoke(Method = "DELETE", UriTemplate = "/{collectionName}/exhibit/id={id}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        public void DeleteExhibit(string collectionName, string id)
+        [WebInvoke(Method = "DELETE", UriTemplate = "/{collectionName}/exhibit", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        public void DeleteExhibit(string collectionName, ExhibitRequest exhibitRequest)
         {
             Trace.TraceInformation("Delete Exhibit");
 
@@ -617,31 +617,38 @@ namespace UI
             Collection collection = _storage.Collections.Find(collectionGuid);
             if (collection == null)
             {
-                SetStatusCode(HttpStatusCode.BadRequest);
+                SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
                 return;
             }
 
             if (collection.UserId != user)
             {
-                SetStatusCode(HttpStatusCode.Unauthorized);
+                SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                 return;
             }
 
-            if (id == null)
+            if (exhibitRequest.Id == null)
             {
-                SetStatusCode(HttpStatusCode.BadRequest);
+                SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ExhibitNotFound);
                 return;
             }
 
-            Guid exhibitGuid = Guid.Parse(id);
+            Guid exhibitGuid = Guid.Parse(exhibitRequest.Id);
             Exhibit deleteExhibit = _storage.Exhibits.Find(exhibitGuid);
             if (deleteExhibit == null)
             {
-                SetStatusCode(HttpStatusCode.NotFound);
+                SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ExhibitNotFound);
                 return;
             }
             _storage.Exhibits.Remove(deleteExhibit);
             _storage.SaveChanges();
+        }
+
+        public class ContentItemRequest
+        {
+            public string Id { get; set; }
+            public string Title { get; set; }
+            public string ParentExhibitId { get; set; }
         }
 
         /// <summary>
@@ -657,9 +664,8 @@ namespace UI
         /// If id is specified and the content item exists, then the existing content item is updated.
         /// </summary>
         [OperationContract]
-        [WebInvoke(Method = "PUT", UriTemplate = "/{collectionName}/contentitem?id={id}&parent={parent}&title={title}",
-                                                 RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        public Guid PutContentItem(string collectionName, string id, string parent, string title)
+        [WebInvoke(Method = "PUT", UriTemplate = "/{collectionName}/contentitem", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        public Guid PutContentItem(string collectionName, ContentItemRequest contentItemRequest)
         {
             Trace.TraceInformation("Put Content Item");
 
@@ -670,29 +676,29 @@ namespace UI
             if (collection == null)
             {
                 // Collection does not exist
-                SetStatusCode(HttpStatusCode.BadRequest);
+                SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
                 return retval;
             }
 
             // Validate user
             if (collection.UserId != user)
             {
-                SetStatusCode(HttpStatusCode.Unauthorized);
+                SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                 return retval;
             }
 
-            if (id == null)
+            if (contentItemRequest.Id == null)
             {
-                Exhibit parentExhibit = FindParentExhibit(parent);
+                Exhibit parentExhibit = FindParentExhibit(contentItemRequest.ParentExhibitId);
                 if (parentExhibit == null)
                 {
-                    SetStatusCode(HttpStatusCode.BadRequest);
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
                     return retval;
                 }
 
                 // Parent content item is valid - add new content item
                 Guid newContentItemGuid = Guid.NewGuid();
-                ContentItem newContentItem = new ContentItem { Id = newContentItemGuid, Title = title };
+                ContentItem newContentItem = new ContentItem { Id = newContentItemGuid, Title = contentItemRequest.Title };
                 newContentItem.Collection = collection;
 
                 // Update parent exhibit.
@@ -707,23 +713,23 @@ namespace UI
             }
             else
             {
-                Guid updateContentItemGuid = Guid.Parse(id);
+                Guid updateContentItemGuid = Guid.Parse(contentItemRequest.Id);
                 ContentItem updateContentItem = _storage.ContentItems.Find(updateContentItemGuid);
                 if (updateContentItem == null)
                 {
-                    SetStatusCode(HttpStatusCode.NotFound);
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ContentItemNotFound);
                     return retval;
                 }
 
-                if (parent != null)
+                if (contentItemRequest.ParentExhibitId != null)
                 {
                     // Parent exhibit updating is currently not supported
-                    SetStatusCode(HttpStatusCode.NotImplemented);
+                    SetStatusCode(HttpStatusCode.NotImplemented, ErrorDescription.ParentTimelineUpdate);
                     return retval;
                 }
 
                 // Update the content item fields
-                updateContentItem.Title = title;
+                updateContentItem.Title = contentItemRequest.Title;
                 retval = updateContentItemGuid;
             }
             _storage.SaveChanges();
@@ -731,8 +737,8 @@ namespace UI
         }
 
         [OperationContract]
-        [WebInvoke(Method = "DELETE", UriTemplate = "/{collectionName}/contentitem/id={id}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        public void DeleteContentItem(string collectionName, string id)
+        [WebInvoke(Method = "DELETE", UriTemplate = "/{collectionName}/contentitem", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        public void DeleteContentItem(string collectionName, ContentItemRequest contentItemRequest)
         {
             Trace.TraceInformation("Delete Content Item");
 
@@ -741,27 +747,27 @@ namespace UI
             Collection collection = _storage.Collections.Find(collectionGuid);
             if (collection == null)
             {
-                SetStatusCode(HttpStatusCode.BadRequest);
+                SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
                 return;
             }
 
             if (collection.UserId != user)
             {
-                SetStatusCode(HttpStatusCode.Unauthorized);
+                SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                 return;
             }
 
-            if (id == null)
+            if (contentItemRequest.Id == null)
             {
-                SetStatusCode(HttpStatusCode.BadRequest);
+                SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ContentItemNotFound);
                 return;
             }
 
-            Guid contentItemGuid = Guid.Parse(id);
+            Guid contentItemGuid = Guid.Parse(contentItemRequest.Id);
             ContentItem deleteContentItem = _storage.ContentItems.Find(contentItemGuid);
             if (deleteContentItem == null)
             {
-                SetStatusCode(HttpStatusCode.NotFound);
+                SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ContentItemNotFound);
                 return;
             }
             _storage.ContentItems.Remove(deleteContentItem);
@@ -777,7 +783,7 @@ namespace UI
             if (parentTimeline == null)
             {
                 // Parent id is not found so no timeline will be added
-                SetStatusCode(HttpStatusCode.NotImplemented);
+                SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
             }
             return parentTimeline;
         }
@@ -791,16 +797,17 @@ namespace UI
             if (parentExhibit == null)
             {
                 // Parent exhibit id is not found so no exhibit will be added
-                SetStatusCode(HttpStatusCode.NotImplemented);
+                SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentExhibitNotFound);
             }
             return parentExhibit;
         }
 
-        private static void SetStatusCode(HttpStatusCode status)
+        private static void SetStatusCode(HttpStatusCode status, string errorDescription)
         {
             if (WebOperationContext.Current != null)
             {
                 WebOperationContext.Current.OutgoingResponse.StatusCode = status;
+                WebOperationContext.Current.OutgoingResponse.StatusDescription = errorDescription;
             }
         }
 
