@@ -62,7 +62,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="External_configs\config.xml" />
+    <Content Include="External_configs\config.xml">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Application.Driver\Application.Driver.csproj">

@@ -6,7 +6,8 @@ namespace Tests
     [TestClass]
     public class TimescaleTests : TestBase
     {
-        const string Label3000Bce = "2000 BCE";
+        const string Label2000Bce = "2000 BCE";
+        const string Label2001Bce = "2001 BCE";
         const string Label2000Ce = "2000 AD";
         const string LabelMinus4000Ma = "-4000 Ma";
         const string LabelMinus500Ma = "-500 Ma";
@@ -50,8 +51,8 @@ namespace Tests
         {
             HomePageHelper.OpenLifeTimeline();
             List<string> labels = TimelineHelper.GetLabels();
-            CollectionAssert.Contains(labels, LabelMinus4000Ma, LabelMinus4000Ma + " is presented");
-            CollectionAssert.Contains(labels, LabelMinus500Ma, LabelMinus500Ma + "is presented");
+            CollectionAssert.Contains(labels, LabelMinus4000Ma, LabelMinus4000Ma + " is not presented");
+            CollectionAssert.Contains(labels, LabelMinus500Ma, LabelMinus500Ma + "is not presented");
         } 
         
         [TestMethod]
@@ -59,8 +60,9 @@ namespace Tests
         {
             HomePageHelper.OpenHumanityTimeline();
             List<string> labels = TimelineHelper.GetLabels();
-            CollectionAssert.Contains(labels, Label3000Bce, Label3000Bce + " is presented");
-            CollectionAssert.Contains(labels, Label2000Ce, Label2000Ce + " is presented");
+            CollectionAssert.Contains(labels, Label2000Bce, Label2000Bce + " is not presented");
+            CollectionAssert.Contains(labels, Label2000Ce, Label2000Ce + " is not presented");
+            CollectionAssert.DoesNotContain(labels, Label2001Bce, Label2001Bce + " is presented");
         }  
         
         [TestMethod]
@@ -68,8 +70,8 @@ namespace Tests
         {
             HomePageHelper.OpenBceCeArea();
             List<string> labels = TimelineHelper.GetLabels();
-            CollectionAssert.Contains(labels, Label1Bce, Label1Bce + " is presented");
-            CollectionAssert.Contains(labels, Label1Ce, Label1Ce + " is presented");
+            CollectionAssert.Contains(labels, Label1Bce, Label1Bce + " is not presented");
+            CollectionAssert.Contains(labels, Label1Ce, Label1Ce + " is not presented");
         }  
         
         [TestMethod]
