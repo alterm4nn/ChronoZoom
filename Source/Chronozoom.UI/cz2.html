@@ -674,17 +674,23 @@
                 width: 600,
                 buttons: {
                     "save and close": function () {
-                        CZ.Authoring.updateExhibit(e, {
-                            title: titleInput.val(),
-                            date: dateInput.val()
-                        });
 
                         var selected = mediaTypeInput[2];
-                      
+
                         for (var i = 0; i < mediaTypeInput.length; i++)
                             if (mediaTypeInput[i].selected) {
                                 selected = mediaTypeInput[i];
-                        }
+                            }
+                        CZ.Authoring.updateExhibit(e, {
+                            title: titleInput.val(),
+                            date: dateInput.val(),
+                            ci: {
+                                title: CItitleInput.val(),
+                                uri: mediaInput.val(),
+                                mediaType: selected.text,
+                                description: descriptionInput.val()
+                            }
+                        });
                       /*  CZ.Authoring.addContentItem(e, {
                             title: CItitleInput.val(),
                             uri: mediaInput.val(),

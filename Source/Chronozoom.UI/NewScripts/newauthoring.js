@@ -225,6 +225,29 @@ var CZ = (function (CZ, $) {
         }
     }
 
+    
+
+    /**
+     * Removes and then adds exhibit and all of its nested content from canvas. Used to simplify
+     * update of exhibit's info.
+     * Use it in when you need to update exhibit's or some of its content item's info.
+     * @param  {Object} e    An exhibit to renew.
+     */
+    function _renewExhibit(e) {
+        var vyc = e.y + e.height / 2;
+        var time = e.x + e.width / 2;
+        var id = e.id;
+        var cis = e.contentItems;
+        var descr = e.infodotDescription;
+        descr.opacity = 1;
+        var parent = e.parent;
+        var radv = e.outerRad;
+
+        // remove and then adding infodot to position content items properly
+        removeChild(parent, id);
+        addInfodot(parent, "layerInfodots", id, time, vyc, radv, cis, descr);            
+    }
+
     /**
      * Creates new timeline and adds it to virtual canvas.
      * @return {Object} Created timeline.
@@ -269,8 +292,9 @@ var CZ = (function (CZ, $) {
                 id: "contentItem" + _contentItemCounter++,
                 title: "Content Item Title",
                 description: "Content Item Description",
-                mediaUrl: "",
-                mediaType: "image"
+                uri: "",
+                mediaType: "image",
+                parent: _hovered.guid
             }],
             {
                 title: "Exhibit Title",
@@ -563,6 +587,8 @@ var CZ = (function (CZ, $) {
                 type: "circle"
             };
 
+            //e.contentItems.push(prop.ci);
+
             // TODO: Show error message in case of failed test!
             if (checkExhibitIntersections(e.parent, temp, true)) {
                 // TODO: Change position of LOD, doodles and content items.
@@ -619,29 +645,7 @@ var CZ = (function (CZ, $) {
                 if (c.contentItem.hasOwnProperty(prop))
                     c.contentItem[prop] = args[prop];
             
-            //var id = c.id;
-            //var x = c.x;
-            //var y = c.y;
-            //var h = c.height;
-            //var w = c.width;
-            //var ci = c.contentItem;
-            var vyc = e.y + e.height / 2;
-            var time = e.x + e.width / 2;
-            var id = e.id;
-            var cis = e.contentItems;
-            var descr = e.infodotDescription;
-            descr.opacity = 1;
-            var parent = e.parent;
-            var radv = e.outerRad;
-            try {
-                //clear(c);
-                // remove and then adding infodot to position content items properly
-                removeChild(parent, id);
-                addInfodot(parent, "layerInfodots", id, time, vyc, radv, cis, descr);
-            }
-            catch (ex) {
-
-            };
+            _renewExhibit(e);
         },
 
         /**
@@ -650,8 +654,12 @@ var CZ = (function (CZ, $) {
          * @param  {Number} i Index of a content item in selected exhibit.
          */
         removeContentItem: function (c) {
+           // var i = c.parent.parent.parent.contentItems.indexOf(c.contentItem);
+            c.parent.parent.parent.contentItems.splice(c.contentItem.index, 1);
             delete c.contentItem;
-            removeChild(c.parent, c.id);// TODO: Remove i's content item from _selectedExhibit.
+            var e = c.parent.parent.parent;
+            //removeChild(c.parent, c.id);// TODO: Remove i's content item from _selectedExhibit.
+            _renewExhibit(e);
         }
     });
 
