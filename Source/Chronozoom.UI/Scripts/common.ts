@@ -321,7 +321,7 @@ module ChronoZoom {
                     case 'relay':
                         return "ChronozoomRelay";
                     case 'dump':
-                        return "ResponseDump.txt";
+                        return "/dumps/beta-get.json";
                     default:
                         return null;
                 }

@@ -3,7 +3,7 @@ var ChronoZoom;
     (function (Settings) {
         Settings.czDataSource = 'db';// possible values: db, relay, dump
         
-        // configures whether we should use Chronozoom.svc (directly accesses the database) ['db'], or ChronozoomRelay.svc (using HTTP GET) ['relay'], or saved as local file ResponseDump.txt ['dump'].
+        // configures whether we should use Chronozoom.svc (directly accesses the database) ['db'], or ChronozoomRelay.svc (using HTTP GET) ['relay'], or saved as local file /dumps/beta-get.json ['dump'].
         Settings.czVersion = "main";//can be main or mobile.is needed for threshold rendering
         
         Settings.ellipticalZoomZoomoutFactor = 0.5;//configures how high the elliptic zoom zooms out while changing visible region

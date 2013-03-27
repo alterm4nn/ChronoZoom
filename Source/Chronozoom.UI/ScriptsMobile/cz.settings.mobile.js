@@ -1,5 +1,5 @@
 ﻿czDataSource = 'dump'; // possible values: db, relay, dump
-// configures whether we should use Chronozoom.svc (directly accesses the database) ['db'], or ChronozoomRelay.svc (using HTTP GET) ['relay'], or saved as local file ResponseDump.txt ['dump'].
+// configures whether we should use Chronozoom.svc (directly accesses the database) ['db'], or ChronozoomRelay.svc (using HTTP GET) ['relay'], or saved as local file /dumps/beta-get.json ['dump'].
 
 czVersion = "mobile"; //can be main or mobile.is needed for threshold rendering
 
