@@ -559,8 +559,25 @@ var CZ = (function (CZ, $) {
          * Use it externally from forms' handlers.
          * @param {Object} prop An object with properties' values.
          */
-        addContentItem: function (prop) {
+        addContentItem: function (e , args) {
             // TODO: Add content item to _selectedExhibit.
+            var vyc = e.y + e.height / 2;
+            var time = e.x + e.width / 2;
+            var id = e.id;
+            var cis = e.contentItems;
+            var descr = e.infodotDescription;
+            descr.opacity = 1;
+            var parent = e.parent;
+            var radv = e.outerRad;
+            try {
+                //clear(c);
+                // remove and then adding infodot to position content items properly
+               // removeChild(parent, id);
+                addInfodot(parent, "layerInfodots", id, time, vyc, radv, cis, descr);
+            }
+            catch (ex) {
+
+            };
         },
 
         /**
@@ -570,6 +587,7 @@ var CZ = (function (CZ, $) {
          * @param  {Object} prop An object with properties' values.
          */
         updateContentItem: function (c, e, args) {
+   
             for (prop in args)
                 if (c.contentItem.hasOwnProperty(prop))
                     c.contentItem[prop] = args[prop];

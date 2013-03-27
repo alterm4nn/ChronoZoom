@@ -653,6 +653,11 @@
             var titleInput = $("#exhibitTitleInput");
             var dateInput = $("#exhibitDateInput").spinner();
 
+            var CItitleInput = $("#AddContentItemTitleInput");
+            var mediaInput = $("#AddContentItemMediaSourceInput");
+            var descriptionInput = $("#AddContentItemDescriptionInput");
+            var mediaTypeInput = $("#AddContentItemMediaTypeInput option");
+ 
             titleInput.val(e.title);
             dateInput.val(e.x);
 
@@ -667,6 +672,29 @@
                             title: titleInput.val(),
                             date: dateInput.val()
                         });
+
+                        var selected = mediaTypeInput[2];
+                      
+                        for (var i = 0; i < mediaTypeInput.length; i++)
+                            if (mediaTypeInput[i].selected) {
+                                selected = mediaTypeInput[i];
+                        }
+                      /*  CZ.Authoring.addContentItem(e, {
+                            title: CItitleInput.val(),
+                            uri: mediaInput.val(),
+                            mediaType: selected.text,
+                            description: descriptionInput.val()
+                        });*/
+                        var c = e.children[0].content.children[0];
+ 
+                        CZ.Authoring.updateContentItem(c, e, {
+                            title: CItitleInput.val(),
+                            uri: mediaInput.val(),
+                            mediaType: selected.text,
+                            description: descriptionInput.val()
+                        });
+
+                        
                         isCancel = false;
                         $(this).dialog("close");
                     }
@@ -722,7 +750,6 @@
             if (mediaType === "picture") {
                     mediaType = "image";
             }
-            
             titleInput.val(c.contentItem.title);
             mediaInput.val(c.contentItem.uri);
             descriptionInput.val(c.contentItem.description);
@@ -748,7 +775,7 @@
                             if (mediaTypeInput[i].selected) {
                                     selected = mediaTypeInput[i];
                                 }
-                        
+                        console.log(c,e);
                         CZ.Authoring.updateContentItem(c, e, {
                                 title: titleInput.val(),
                                 uri: mediaInput.val(),
@@ -1085,6 +1112,35 @@
                     <label style="display: block">date</label>
                     <input id="exhibitDateInput" style="display: block" />
                 </p>
+
+              <p style="display: inline-block">
+                    <label style="display: block">Content Item 1 Title</label>
+                    <input id="AddContentItemTitleInput" style="display: block" type="text"/>
+              </p>
+            
+               <p style="display: block">
+                    <label style="display: block">Content Item 1 media source</label>
+                    <input type="url" id="AddContentItemMediaSourceInput" style="display: block" />
+                </p>
+
+               <p style="display: block">
+                    <label style="display: block">Content Item 1 description</label>
+                    <textarea id="AddContentItemDescriptionInput" style="display: block" ></textarea>
+               </p>
+
+               <p style="display: block">
+                    <label style="display: block">media type</label>
+                    <select id="AddContentItemMediaTypeInput" style="display: block">
+                        <option value="pdf">PDF</option>
+                        <option value="image">Image</option>
+                        <option value="video">Video</option>
+                        <option value="audio">Audio</option>
+                    </select>
+                </p>
+
+
+
+
             </div>
 
 
