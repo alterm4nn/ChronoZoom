@@ -654,6 +654,12 @@
             var titleInput = $("#exhibitTitleInput");
             var dateInput = $("#exhibitDateInput").spinner();
 
+            var CItitleInput = $("#AddContentItem0TitleInput");
+            var mediaInput = $("#AddContentItem0MediaSourceInput");
+            var descriptionInput = $("#AddContentItem0DescriptionInput");
+            var mediaTypeInput = $("#AddContentItem0MediaTypeInput option");
+            var CIcounter = 0;
+ 
             titleInput.val(e.title);
             dateInput.val(e.x);
 
@@ -670,14 +676,9 @@
                             title: titleInput.val(),
                             date: dateInput.val(),
                             contentItems: contentItems
-                        });                       
-                        
+                        });
                         isCancel = false;
                         $(this).dialog("close");
-                        $(this).find(".cz-auth-ci-container")
-                            .each(function () {
-                                $(this).remove();
-                            });
                     },
                     "add content item": function () {
                         if ($(this).find(".cz-auth-ci-container").length < infodotMaxContentItemsCount)
