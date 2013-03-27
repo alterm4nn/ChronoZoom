@@ -49,6 +49,7 @@ infoDotBorderColor = 'rgb(232,232,232)'; // color of infdot's circle border
 infoDotHoveredBorderColor = 'white'; // color of infdot's circle border when mouse cursor is over it
 infoDotFillColor = 'rgb(92,92,92)'; // color of infdot's circle border
 infoDotTinyContentImageUri = 'Images/tinyContent.png';
+infodotMaxContentItemsCount = 10;
 
 mediaContentElementZIndex = 100;
 contentItemDescriptionNumberOfLines = 10;

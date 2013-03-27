@@ -358,6 +358,8 @@ var CZ = (function (CZ, $) {
         return date;
     }
 
+    
+
     $.extend(Authoring, {
         _isActive: false,
         _isDragging: false,
@@ -595,6 +597,10 @@ var CZ = (function (CZ, $) {
                 e.x = temp.x;
             }
 
+            e.contentItems = prop.contentItems;
+
+            _renewExhibit(e);
+
             // TODO: Update title!
         },
 
@@ -612,26 +618,14 @@ var CZ = (function (CZ, $) {
          * Use it externally from forms' handlers.
          * @param {Object} prop An object with properties' values.
          */
-        addContentItem: function (e , args) {
-            // TODO: Add content item to _selectedExhibit.
-            var vyc = e.y + e.height / 2;
-            var time = e.x + e.width / 2;
-            var id = e.id;
-            var cis = e.contentItems;
-            var descr = e.infodotDescription;
-            descr.opacity = 1;
-            var parent = e.parent;
-            var radv = e.outerRad;
-            try {
-                //clear(c);
-                // remove and then adding infodot to position content items properly
-               // removeChild(parent, id);
-                addInfodot(parent, "layerInfodots", id, time, vyc, radv, cis, descr);
-            }
-            catch (ex) {
-
-            };
-        },
+        addContentItem: function (e, args) {
+            e.contentItems.push({
+                 id: 'contentItem' + CZ.Authoring.contentItemCounter++, title: args.title,
+                 description: args.description,
+                 uri: args.uri,
+                 mediaType: 'image'
+            });
+       },
 
         /**
          * Updates i's content item's properties in selected timeline.
