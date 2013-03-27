@@ -61,7 +61,7 @@ namespace UI
             WebApiConfig.Register(GlobalConfiguration.Configuration);
             RegisterRoutes(RouteTable.Routes);
 
-            using (StreamReader file = File.OpenText(HostingEnvironment.ApplicationPhysicalPath + @"ResponseDumpRest.txt"))
+            using (StreamReader file = File.OpenText(HostingEnvironment.ApplicationPhysicalPath + @"/Dumps/wahib-responsedumprest.json"))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 Globals.Root = (Chronozoom.Api.Models.Timeline)serializer.Deserialize(file, typeof(Chronozoom.Api.Models.Timeline));

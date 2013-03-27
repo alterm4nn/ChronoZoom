@@ -110,6 +110,9 @@
       <DependentUpon>cz.ts</DependentUpon>
     </Content>
     <Content Include="czmobile.htm" />
+    <Content Include="Dumps\wahib-responsedumprest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="favicon.ico" />
     <Content Include="Images\A.png" />
     <Content Include="Images\about-chronozoom.png" />
@@ -574,6 +577,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
