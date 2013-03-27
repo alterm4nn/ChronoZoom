@@ -46,6 +46,7 @@ namespace UI
         // error code descriptions
         private static class ErrorDescription
         {
+            public const string RequestBodyEmpty = "Request body empty";
             public const string UnauthorizedUser = "Unauthorized User";
             public const string CollectionNotFound = "Collection not found";
             public const string ParentTimelineNotFound = "Parent timeline not found";
@@ -321,6 +322,13 @@ namespace UI
             Trace.TraceInformation("Put Collection {0} from user {1}", collectionName, user);
 
             Guid retval = Guid.Empty;
+
+            if (collectionRequest == null)
+            {
+                SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
+                return retval;
+            }
+
             Guid collectionGuid = CollectionIdFromText(collectionName);
             Collection collection = _storage.Collections.Find(collectionGuid);
             if (collection == null)
@@ -348,6 +356,12 @@ namespace UI
         public void DeleteCollection(Collection collectionRequest)
         {
             string user = "TestUser"; // TODO: Retrieve the correct user
+
+            if (collectionRequest == null)
+            {
+                SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
+                return;
+            }
 
             Trace.TraceInformation("Delete Collection {0} from user {1}", collectionRequest.Title, user);
 
@@ -393,9 +407,14 @@ namespace UI
         public Guid PutTimeline(string collectionName, TimelineRequest timelineRequest)
         {
             Trace.TraceInformation("Put Timeline");
-
             string user = "TestUser"; // TODO: Retrieve the correct user
             Guid retval = Guid.Empty; // TODO: root timeline is currently using Guid.Empty - will that change? Currently all error cases return Guid.Empty
+
+            if (timelineRequest == null)
+            {
+                SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
+                return retval;
+            }
 
             Guid collectionGuid = CollectionIdFromText(collectionName);
             Collection collection = _storage.Collections.Find(collectionGuid);
@@ -474,6 +493,12 @@ namespace UI
         {
             Trace.TraceInformation("Delete Timeline");
 
+            if (timelineRequest == null)
+            {
+                SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
+                return;
+            }
+
             string user = "TestUser"; // TODO: Retrieve the correct user
             Guid collectionGuid = CollectionIdFromText(collectionName);
             Collection collection = _storage.Collections.Find(collectionGuid);
@@ -533,9 +558,15 @@ namespace UI
         public Guid PutExhibit(string collectionName, ExhibitRequest exhibitRequest)
         {
             Trace.TraceInformation("Put Exhibit");
+            Guid retval = Guid.Empty;
+
+            if (exhibitRequest == null)
+            {
+                SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
+                return retval;
+            }
 
             string user = "TestUser"; // TODO: Retrieve the correct user
-            Guid retval = Guid.Empty;
             Guid collectionGuid = CollectionIdFromText(collectionName);
             Collection collection = _storage.Collections.Find(collectionGuid);
             if (collection == null)
@@ -613,6 +644,12 @@ namespace UI
 
             string user = "TestUser"; // TODO: Retrieve the correct user
 
+            if (exhibitRequest == null)
+            {
+                SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
+                return;
+            }
+
             Guid collectionGuid = CollectionIdFromText(collectionName);
             Collection collection = _storage.Collections.Find(collectionGuid);
             if (collection == null)
@@ -669,10 +706,18 @@ namespace UI
         {
             Trace.TraceInformation("Put Content Item");
 
+            Guid retval = Guid.Empty;
+
+            if (contentItemRequest == null)
+            {
+                SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
+                return retval;
+            }
+
             string user = "TestUser"; // TODO: Retrieve the correct user
             Guid collectionGuid = CollectionIdFromText(collectionName);
             Collection collection = _storage.Collections.Find(collectionGuid);
-            Guid retval = Guid.Empty;
+
             if (collection == null)
             {
                 // Collection does not exist
@@ -741,6 +786,12 @@ namespace UI
         public void DeleteContentItem(string collectionName, ContentItemRequest contentItemRequest)
         {
             Trace.TraceInformation("Delete Content Item");
+
+            if (contentItemRequest == null)
+            {
+                SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
+                return;
+            }
 
             string user = "TestUser"; // TODO: Retrieve the correct user
             Guid collectionGuid = CollectionIdFromText(collectionName);
