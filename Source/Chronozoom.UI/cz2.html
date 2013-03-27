@@ -659,13 +659,15 @@
             var titleInput = $("#exhibitTitleInput");
             var dateInput = $("#exhibitDateInput").spinner();
 
-            var CItitleInput = $("#AddContentItemTitleInput");
-            var mediaInput = $("#AddContentItemMediaSourceInput");
-            var descriptionInput = $("#AddContentItemDescriptionInput");
-            var mediaTypeInput = $("#AddContentItemMediaTypeInput option");
+            var CItitleInput = $("#AddContentItem0TitleInput");
+            var mediaInput = $("#AddContentItem0MediaSourceInput");
+            var descriptionInput = $("#AddContentItem0DescriptionInput");
+            var mediaTypeInput = $("#AddContentItem0MediaTypeInput");
+            var CIcounter = 0;
  
             titleInput.val(e.title);
             dateInput.val(e.x);
+            //console.log("mti1"mediaTypeInput[0]);
 
             $("#createExhibitForm").dialog({
                 title: "create exhibit",
@@ -678,21 +680,17 @@
                             title: titleInput.val(),
                             date: dateInput.val()
                         });
+                   
+                        //var selected = mediaTypeInput[1];
+                        var selected = {text:"Image"};
 
-                        var selected = mediaTypeInput[2];
-                      
                         for (var i = 0; i < mediaTypeInput.length; i++)
                             if (mediaTypeInput[i].selected) {
                                 selected = mediaTypeInput[i];
                         }
-                      /*  CZ.Authoring.addContentItem(e, {
-                            title: CItitleInput.val(),
-                            uri: mediaInput.val(),
-                            mediaType: selected.text,
-                            description: descriptionInput.val()
-                        });*/
+                       
                         var c = e.children[0].content.children[0];
- 
+                        //console.log(mediaTypeInput,selected);
                         CZ.Authoring.updateContentItem(c, e, {
                             title: CItitleInput.val(),
                             uri: mediaInput.val(),
@@ -700,9 +698,68 @@
                             description: descriptionInput.val()
                         });
 
-                        
+                      //  console.log("cicounter",CIcounter);
+                        var i;
+                        for (i = 1; i <= CIcounter; i += 1) {
+                            console.log("i",i);
+                            var CItitleInput1 = $("#AddContentItem" + i + "TitleInput");
+                            var mediaInput1 = $("#AddContentItem" + i + "MediaSourceInput");
+                            var descriptionInput1 = $("#AddContentItem" + i + "DescriptionInput");
+                            var mediaTypeInput1 = $("#AddContentItem" + i + "MediaTypeInput");
+                            //var selected1 = mediaTypeInput[0];
+                            var selected1 = { text: "Image" };
+                            for (var i1 = 0; i1 < mediaTypeInput.length; i1++)
+                                if (mediaTypeInput[i1].selected) {
+                                    selected = mediaTypeInput[i1];
+                                }
+
+                            CZ.Authoring.addContentItem(e, {
+                                title: CItitleInput.val(),
+                                uri: mediaInput.val(),
+                                mediaType: selected.text,
+                                description: descriptionInput.val()
+                            });
+                        }
+                        console.log("i_finita", i);
                         isCancel = false;
                         $(this).dialog("close");
+                    },
+                    "more exhibits": function () {
+                        var form = $("#createExhibitForm");
+                        CIcounter++;
+
+                        var newlabel = $(" <label style='display: block'>Content Item " + CIcounter + " media source</label>");
+
+                        var newCITitle = $("<p style='display: inline-block'>" + 
+                           " <label style='display: block'>Content Item " + CIcounter  + " Title</label>" + 
+                           " <input id='AddContentItem"+ CIcounter + "TitleInput' style='display: block' type='text'/>" +
+                           " </p> ");
+
+                        var newCIMediaSource = $("<p style='display: inline-block'>" +
+                           " <label style='display: block'>Content Item " + CIcounter + " media source</label>" +
+                           " <input id='AddContentItem" + CIcounter + "MediaSourceInput' style='display: block' type='text'/>" +
+                           " </p> ");
+
+                        var newCIDescription = $("<p style='display: inline-block'>" +
+                          " <label style='display: block'>Content Item " + CIcounter + " description</label>" +
+                          " <textarea id='AddContentItem" + CIcounter + "DescriptionInput' style='display: block' />" +
+                          " </p> ");
+
+                        var newCIMediaType = $(" <p style='display: block'>" + 
+                         " <label style='display: block'>Content Item " + CIcounter + " media type</label>" +
+                         " <select id='AddContentItem" + CIcounter + "MediaTypeInput' style='display: block'>" +
+                         " <option value='pdf'>PDF</option>" +
+                         " <option value='image'>Image</option> " +
+                         " <option value='video'>Video</option>" +
+                         " <option value='audio'>Audio</option>" +
+                         " </select>" + 
+                         " </p>");
+
+                        
+                        form.append(newCITitle);
+                        form.append(newCIMediaSource);
+                        form.append(newCIDescription);
+                        form.append(newCIMediaType);
                     }
                 },
                 close: function () {
@@ -1120,32 +1177,29 @@
                 </p>
 
               <p style="display: inline-block">
-                    <label style="display: block">Content Item 1 Title</label>
-                    <input id="AddContentItemTitleInput" style="display: block" type="text"/>
+                    <label style="display: block">Content Item 0 Title</label>
+                    <input id="AddContentItem0TitleInput" style="display: block" type="text"/>
               </p>
             
                <p style="display: block">
-                    <label style="display: block">Content Item 1 media source</label>
-                    <input type="url" id="AddContentItemMediaSourceInput" style="display: block" />
+                    <label style="display: block">Content Item 0 media source</label>
+                    <input type="url" id="AddContentItem0MediaSourceInput" style="display: block" />
                 </p>
 
                <p style="display: block">
-                    <label style="display: block">Content Item 1 description</label>
-                    <textarea id="AddContentItemDescriptionInput" style="display: block" ></textarea>
+                    <label style="display: block">Content Item 0 description</label>
+                    <textarea id="AddContentItem0DescriptionInput" style="display: block" ></textarea>
                </p>
 
                <p style="display: block">
                     <label style="display: block">media type</label>
-                    <select id="AddContentItemMediaTypeInput" style="display: block">
+                    <select id="AddContentItem0MediaTypeInput" style="display: block">
                         <option value="pdf">PDF</option>
                         <option value="image">Image</option>
                         <option value="video">Video</option>
                         <option value="audio">Audio</option>
                     </select>
                 </p>
-
-
-
 
             </div>
 
