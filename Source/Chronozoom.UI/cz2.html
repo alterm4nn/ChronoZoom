@@ -620,7 +620,7 @@
         }
 
         function showEditTimelineForm(t) {
-            var titleInput = $("#timelineTitleInput");
+            var titleInput = $("#timelineTitleInput").spinner();
             var startInput = $("#timelineStartInput").spinner();
             var endInput = $("#timelineEndInput").spinner();
 
@@ -664,7 +664,7 @@
             var descriptionInput = $("#AddContentItem0DescriptionInput");
             var mediaTypeInput = $("#AddContentItem0MediaTypeInput option");
             var CIcounter = 0;
- 
+            
             titleInput.val(e.title);
             dateInput.val(e.x);
 
@@ -731,6 +731,8 @@
                     "save and close": function () {
                         contentItems = getContentItemsData();
 
+                        //if ((dateInput.val() > 0) || (dateInput.val() < - 13700000000))
+                        
                         CZ.Authoring.updateExhibit(e, {
                             title: titleInput.val(),
                             date: dateInput.val(),
@@ -1228,7 +1230,7 @@
             <div id="createExhibitForm" style="background-color: rgb(60, 95, 150); display: none; color: white;">
                 <p>
                     <label style="display: block">Exhibit's title</label>
-                    <input id="exhibitTitleInput" style="display: block" type="text" />
+                    <input id="exhibitTitleInput" style="display: block" />
                 </p>
 
                 <p style="display: inline-block">

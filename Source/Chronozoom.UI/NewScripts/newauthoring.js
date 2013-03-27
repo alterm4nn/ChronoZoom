@@ -240,6 +240,7 @@ var CZ = (function (CZ, $) {
         var cis = e.contentItems;
         var descr = e.infodotDescription;
         descr.opacity = 1;
+        descr.title = e.title;
         var parent = e.parent;
         var radv = e.outerRad;
 
@@ -582,21 +583,23 @@ var CZ = (function (CZ, $) {
          */
         updateExhibit: function (e, prop) {
             var temp = {
+                title: prop.title,
                 x: Number(prop.date),
                 y: e.y,
                 width: e.width,
                 height: e.height,
                 type: "circle"
             };
-
+            //console.log(prop.title);
             //e.contentItems.push(prop.ci);
 
             // TODO: Show error message in case of failed test!
             if (checkExhibitIntersections(e.parent, temp, true)) {
                 // TODO: Change position of LOD, doodles and content items.
-                e.x = temp.x;
+                     e.x = temp.x;
             }
 
+            e.title = temp.title;
             e.contentItems = prop.contentItems;
 
             _renewExhibit(e);
