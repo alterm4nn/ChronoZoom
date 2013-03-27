@@ -789,7 +789,7 @@ function CanvasTimeline(vc, layerid, id, vx, vy, vw, vh, settings, timelineinfo)
     this.regime = timelineinfo.regime;
     this.settings.gradientOpacity = 0;
 	this.settings.gradientFillStyle = timelineinfo.gradientFillStyle || timelineinfo.strokeStyle || timelineBorderColor;
-    this.opacity = timelineinfo.opacity;
+    //this.opacity = timelineinfo.opacity;
 
     this.reactsOnMouse = true;
 

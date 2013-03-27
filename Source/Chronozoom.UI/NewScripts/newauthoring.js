@@ -486,6 +486,30 @@ var CZ = (function (CZ, $) {
             this.showEditContentItemForm = formHandlers && formHandlers.showEditContentItemForm || function () {};
         },
 
+        createTimeline: function (t, prop) {
+            var temp = {
+                x: Number(prop.start),
+                y: t.y,
+                width: Number(prop.end - prop.start),
+                height: t.height,
+                type: "rectangle"
+            };
+
+            // TODO: Show error message in case of failed test!
+            if (checkTimelineIntersections(t.parent, temp, true)) {
+                t.x = temp.x;
+                t.width = temp.width;
+            }
+
+            // Update title.
+            t.title = prop.title;
+            updateTimelineTitle(t);
+            t.id = "";
+
+            CZ.Service.putTimeline(t);
+        }
+        ,
+
         /**
          * Updates timeline's properties.
          * Use it externally from forms' handlers.
@@ -510,6 +534,9 @@ var CZ = (function (CZ, $) {
             // Update title.
             t.title = prop.title;
             updateTimelineTitle(t);
+
+
+            CZ.Service.putTimeline(t);
         },
 
         /**

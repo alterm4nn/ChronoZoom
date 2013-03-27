@@ -290,24 +290,35 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
     }
 
     function getMissingExhibits(vbox, lca, exhibitIds) {
-        var url = serverUrlBase + "/api/Data";
-        console.log("[POST]" + url);
+        // var url = serverUrlBase + "/api/Data";
+        // console.log("[POST]" + url);
 
-        $.ajax({
-            type: "POST",
-            url: url,
-            data: JSON.stringify({ ids: exhibitIds }),
-            async: true,
-            cache: false,
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            success: function (response) {
+        // $.ajax({
+        //     type: "POST",
+        //     url: url,
+        //     data: JSON.stringify({ ids: exhibitIds }),
+        //     async: true,
+        //     cache: false,
+        //     contentType: "application/json; charset=utf-8",
+        //     dataType: 'json',
+        //     success: function (response) {
+        //         MergeContentItems(lca, exhibitIds, response.exhibits);
+        //     },
+        //     error: function (xhr) {
+        //         console.log("Error connecting to service:\n" + url);
+        //     }
+        // });
+
+        CZ.Service.postData({
+            ids: exhibitIds
+        }).then(
+            function (response) {
                 MergeContentItems(lca, exhibitIds, response.exhibits);
             },
-            error: function (xhr) {
-                console.log("Error connecting to service:\n" + url);
+            function (error) {
+                console.log("Error connecting to service:\n" + error.responseText);
             }
-        });
+        );
     }
 
     function extractExhibitIds(timeline) {
