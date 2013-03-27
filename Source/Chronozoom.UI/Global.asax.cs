@@ -61,17 +61,46 @@ namespace UI
             WebApiConfig.Register(GlobalConfiguration.Configuration);
             RegisterRoutes(RouteTable.Routes);
 
-            using (StreamReader file = File.OpenText(HostingEnvironment.ApplicationPhysicalPath + @"ResponseDumpRest.txt"))
+            String filename = String.Empty;
+            if (File.Exists(HostingEnvironment.ApplicationPhysicalPath + "ResponseDumpRest.txt"))
+                filename = "ResponseDumpRest.txt";
+            else if (File.Exists(HostingEnvironment.ApplicationPhysicalPath + "ResponseDumpRestBase.txt"))
+                filename = "ResponseDumpRestBase.txt";
+            else
+                throw new HttpResponseException(System.Net.HttpStatusCode.InternalServerError);
+
+            using (StreamReader file = File.OpenText(HostingEnvironment.ApplicationPhysicalPath + filename))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 Globals.Root = (Chronozoom.Api.Models.Timeline)serializer.Deserialize(file, typeof(Chronozoom.Api.Models.Timeline));
             }
 
+            Timer timer = new Timer();
+            timer.Interval = 15 * 60 * 1000;
+            timer.Tick += Timer_Tick;
+            timer.Enabled = true;
+
             Trace.TraceInformation("Application Starting");
+        }
+
+        void Timer_Tick(object sender, EventArgs e)
+        {
+            if (Globals.Root != null)
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                using (StreamWriter sw = new StreamWriter(HostingEnvironment.ApplicationPhysicalPath + "ResponseDumpRest.txt"))
+                using (JsonWriter writer = new JsonTextWriter(sw))
+                {
+                    Globals.Mutex.WaitOne();
+                    serializer.Serialize(writer, Globals.Root);
+                    Globals.Mutex.ReleaseMutex();
+                }
+            }
         }
 
         public void Application_End(object sender, EventArgs e)
         {
+            Timer_Tick(null, null);
         }
 
         public void Application_Error(object sender, EventArgs e)
