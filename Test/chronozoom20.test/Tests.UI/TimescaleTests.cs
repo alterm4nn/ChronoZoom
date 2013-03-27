@@ -30,7 +30,7 @@ namespace Tests
         {
             BrowserStateManager.RefreshState();
             NavigationHelper.OpenHomePage();
-            HomePageHelper.CloseWelcomePopup();
+            WelcomeScreenHelper.CloseWelcomePopup();
         }
 
         [ClassCleanup]

@@ -56,6 +56,7 @@
     <Compile Include="TestBase.cs" />
     <Compile Include="TimescaleTests.cs" />
     <Compile Include="TourTests.cs" />
+    <Compile Include="WelcomeScreenTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="config.xml">
