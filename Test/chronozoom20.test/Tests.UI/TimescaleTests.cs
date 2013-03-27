@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Application.Driver;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Tests
@@ -68,6 +69,7 @@ namespace Tests
         [TestMethod]
         public void Transition_BCE_to_CE_should_contain_1BCE_and_1CE_ticks()
         {
+            Logger.Log("Bug: https://github.com/alterm4nn/ChronoZoom/issues/87",LogType.Debug);
             HomePageHelper.OpenBceCeArea();
             List<string> labels = TimelineHelper.GetLabels();
             CollectionAssert.Contains(labels, Label1Bce, Label1Bce + " is not presented");
