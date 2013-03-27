@@ -679,6 +679,9 @@
                         
                         CZ.Authoring.updateExhibit(e, {
                             title: titleInput.val(),
+                            date: dateInput.val(),
+                            contentItems: contentItems
+                        });
                         isCancel = false;
                         $(this).dialog("close");
                     },
