@@ -305,12 +305,13 @@ function loadDataUrl() {
 
 //loading the data from the service
 function loadData() {
+<<<<<<< HEAD
     // var regimesUrl = serverUrlBase
-                + "/ChronoZoom.svc/GetTimelines?"
-                + "lca=" + cosmosTimelineID
-                + "&start=" + -50000000000
-                + "&end=" + 9999
-                + "&timespan=" + 5013;
+    //               + "/api/Structure?"
+    //               + "lca=" + cosmosTimelineID
+    //               + "&start=" + -5012
+    //               + "&end=" + 0
+    //               + "&minspan=" + 5013;
     // console.log(regimesUrl);
 
     // $.ajax({ // get basic skeleton (regime timelines)
@@ -330,12 +331,30 @@ function loadData() {
 
     CZ.Service.getStructure({
         lca: cosmosTimelineID,
-        start: -50000000000,
-        end: 9999,
+        start: -5012,
+        end: 0,
         minspan: 5013
     }).then(
         function (response) {
             ProcessContent(response);
+=======
+    var regimesUrl = serverUrlBase
+                + "/ChronoZoom.svc/GetTimelines?"
+                + "lca=" + cosmosTimelineID
+                + "&start=" + -50000000000
+                + "&end=" + 9999
+                + "&timespan=" + 5013;
+    console.log(regimesUrl);
+
+    $.ajax({ // get basic skeleton (regime timelines)
+        cache: false,
+        type: "GET",
+        async: true,
+        dataType: "json",
+        url: regimesUrl,
+        success: function (result) {
+            ProcessContent(result);
+>>>>>>> Integrate Read API
             vc.virtualCanvas("updateViewport");
 
             /**

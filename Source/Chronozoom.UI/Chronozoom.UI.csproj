@@ -103,6 +103,9 @@
     <Content Include="BehindTheScenes.htm" />
     <Content Include="cz.aspx" />
     <Content Include="cz2.html" />
+    <Content Include="Scripts\search.min.js.map">
+      <DependentUpon>search.js</DependentUpon>
+    </Content>
     <TypeScriptCompile Include="cz.ts" />
     <Content Include="cz.js">
       <DependentUpon>cz.ts</DependentUpon>

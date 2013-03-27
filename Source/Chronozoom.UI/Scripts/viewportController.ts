@@ -262,7 +262,7 @@ module ChronoZoom {
             gesturesSource.Subscribe(function (gesture) {
                 if (typeof gesture != "undefined") {
                     var isAnimationActive = self.activeAnimation;
-                    var oldId = isAnimationActive ? self.activeAnimation.ID : undefined;
+                    var oldId = isAnimationActive ? self.activeAnimation.id : undefined;
 
                     self.updateRecentViewport();
                     var latestViewport = self.recentViewport;
@@ -292,9 +292,9 @@ module ChronoZoom {
                     }
 
                     if (oldId != undefined)
-                        animationUpdated(oldId, self.activeAnimation.ID); //notifing that the animation was updated         
+                        animationUpdated(oldId, self.activeAnimation.id); //notifing that the animation was updated         
                     else
-                        AnimationStarted(self.activeAnimation.ID);
+                        AnimationStarted(self.activeAnimation.id);
 
                     if (!isAnimationActive) //start the animation cycle if it is not started yet
                         self.animationStep(self);
@@ -312,7 +312,7 @@ module ChronoZoom {
                     self.activeAnimation.isForciblyStoped = true;
                     self.activeAnimation.isActive = false;
 
-                    animationUpdated(self.activeAnimation.ID, undefined);
+                    animationUpdated(self.activeAnimation.id, undefined);
                 }
             }
 
@@ -340,7 +340,7 @@ module ChronoZoom {
                             self.animationStep(self);
                         });
                     else { //stop the animation cycle
-                        var stopAnimationID = self.activeAnimation.ID;
+                        var stopAnimationID = self.activeAnimation.id;
 
                         self.updateRecentViewport();
                         setVisible(
@@ -400,7 +400,7 @@ module ChronoZoom {
                 var oldId = undefined
                 if (this.activeAnimation) {
                     wasAnimationActive = this.activeAnimation.isActive;
-                    oldId = this.activeAnimation.ID;
+                    oldId = this.activeAnimation.id;
                 }
 
                 self.updateRecentViewport();
@@ -414,14 +414,14 @@ module ChronoZoom {
 
                 if (!wasAnimationActive) {
                     if (this.activeAnimation.isActive)
-                        AnimationStarted(this.activeAnimation.ID);
+                        AnimationStarted(this.activeAnimation.id);
                     self.animationStep(self);
                 }
                 else {
-                    animationUpdated(oldId, this.activeAnimation.ID);
+                    animationUpdated(oldId, this.activeAnimation.id);
                 }
 
-                return (this.activeAnimation) ? this.activeAnimation.ID : undefined;
+                return (this.activeAnimation) ? this.activeAnimation.id : undefined;
             }
 
             //end of public fields

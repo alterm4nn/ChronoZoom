@@ -56,10 +56,10 @@ namespace Chronozoom.Entities
 
         public DbSet<SuperCollection> SuperCollections { get; set; }
 
-        public Collection<Timeline> TimelinesQuery(Guid collectionId, decimal startTime, decimal endTime, decimal span)
+        public Collection<Timeline> TimelinesQuery(Guid collectionId, decimal startTime, decimal endTime, decimal span, Guid? commonAncestor)
         {
             Dictionary<Guid, Timeline> timelinesMap = new Dictionary<Guid, Timeline>();
-            List<Timeline> timelines = FillTimelines(collectionId, timelinesMap, startTime, endTime, span);
+            List<Timeline> timelines = FillTimelines(collectionId, timelinesMap, startTime, endTime, span, commonAncestor);
 
             FillTimelineRelations(timelinesMap);
 
@@ -74,7 +74,7 @@ namespace Chronozoom.Entities
             // Populate Exhibits
             string exhibitsQuery = string.Format(
                 CultureInfo.InvariantCulture,
-                "SELECT * FROM Exhibits WHERE Timeline_Id IN ('{0}')",
+                "SELECT *, Year as [Time] FROM Exhibits WHERE Timeline_Id IN ('{0}')",
                 string.Join("', '", timelinesMap.Keys.ToArray()));
 
             var exhibitsRaw = Database.SqlQuery<ExhibitRaw>(exhibitsQuery);
@@ -125,18 +125,19 @@ namespace Chronozoom.Entities
             }
         }
 
-        private List<Timeline> FillTimelines(Guid collectionId, Dictionary<Guid, Timeline> timelinesMap, decimal startTime, decimal endTime, decimal span)
+        private List<Timeline> FillTimelines(Guid collectionId, Dictionary<Guid, Timeline> timelinesMap, decimal startTime, decimal endTime, decimal span, Guid? commonAncestor)
         {
             List<Timeline> timelines = new List<Timeline>();
             Dictionary<Guid, Guid?> timelinesParents = new Dictionary<Guid, Guid?>();
 
             // Populate References
-            string timelinesQuery = "SELECT * FROM Timelines WHERE FromYear >= {0} AND ToYear <= {1} AND ToYear-FromYear >= {2} AND Collection_Id = {3}";
-            var timelinesRaw = Database.SqlQuery<TimelineRaw>(timelinesQuery, startTime, endTime, span, collectionId);
+            string timelinesQuery = "SELECT *, FromYear as [Start], ToYear as [End] FROM Timelines WHERE FromYear >= {0} AND ToYear <= {1} AND ToYear-FromYear >= {2} AND Collection_Id = {3} OR Id = {4}";
+            var timelinesRaw = Database.SqlQuery<TimelineRaw>(timelinesQuery, startTime, endTime, span, collectionId, commonAncestor);
 
             foreach (TimelineRaw timelineRaw in timelinesRaw)
             {
-                if (timelineRaw.ChildTimelines == null)
+                // This is being added for backcompatibility and should be removed once Beta API gets deprecated (Beta code does not support null timelines).
+                if (commonAncestor == null && timelineRaw.ChildTimelines == null)
                     timelineRaw.ChildTimelines = new System.Collections.ObjectModel.Collection<Timeline>();
 
                 if (timelineRaw.Exhibits == null)
@@ -150,13 +151,19 @@ namespace Chronozoom.Entities
             foreach (Timeline timeline in timelinesMap.Values)
             {
                 Guid? parentId = timelinesParents[timeline.Id];
-                if (parentId != null && timelinesMap.Keys.Contains((Guid)parentId))
+
+                // If the timeline should be a root timeline
+                if (timeline.Id == commonAncestor || parentId == null || !timelinesMap.Keys.Contains((Guid)parentId))
                 {
-                    timelinesMap[(Guid)parentId].ChildTimelines.Add(timeline);
+                    timelines.Add(timeline);
                 }
                 else
                 {
-                    timelines.Add(timeline);
+                    Timeline parentTimeline = timelinesMap[(Guid)parentId];
+                    if (parentTimeline.ChildTimelines == null)
+                        parentTimeline.ChildTimelines = new System.Collections.ObjectModel.Collection<Timeline>();
+
+                    parentTimeline.ChildTimelines.Add(timeline);
                 }
             }
 

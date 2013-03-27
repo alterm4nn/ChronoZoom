@@ -13,7 +13,7 @@ module ChronoZoom {
 
         function Infodot(x, contentItems) {
 	        this.x = x;
-	        this.ContentItems = contentItems;
+	        this.contentItems = contentItems;
         }
 
         function titleObject(name) {
@@ -24,11 +24,11 @@ module ChronoZoom {
 	        timeline.left = Common.getCoordinateFromDecimalYear(timeline.FromYear);
 	        timeline.right = Common.getCoordinateFromDecimalYear(timeline.ToYear);
 
-	        timeline.Exhibits.forEach(function (exhibit) {
+	        timeline.exhibits.forEach(function (exhibit) {
 	            exhibit.x = Common.getCoordinateFromDecimalYear(exhibit.Year);
 	        });
 	
-	        timeline.ChildTimelines.forEach(function (childTimeline) {
+	        timeline.timelines.forEach(function (childTimeline) {
 		        childTimeline.ParentTimeline = timeline;
 		        Prepare(childTimeline);
 	        });
@@ -41,17 +41,17 @@ module ChronoZoom {
         }
 
         function GenerateAspect(timeline) {
-	        if (timeline.ID == Settings.cosmosTimelineID) {
+	        if (timeline.id == Settings.cosmosTimelineID) {
 		        timeline.AspectRatio = 10; //64.0 / 33.0;
 	        } 
 	
-        //    else if (timeline.ID == earthTimelineID) {
+        //    else if (timeline.id == earthTimelineID) {
         //        timeline.AspectRatio = 1.0;
-        //    } else if (timeline.ID == lifeTimelineID) {
+        //    } else if (timeline.id == lifeTimelineID) {
         //        timeline.AspectRatio = 47.0 / 22.0;
-        //    } else if (timeline.ID == prehistoryTimelineID) {
+        //    } else if (timeline.id == prehistoryTimelineID) {
         //        timeline.AspectRatio = 37.0 / 11.0;
-        //    } else if (timeline.ID == humanityTimelineID) {
+        //    } else if (timeline.id == humanityTimelineID) {
         //        timeline.AspectRatio = 55.0 / 4.0;
         //    }
         }
@@ -66,7 +66,7 @@ module ChronoZoom {
 		        timeline.height = timelineWidth / timeline.AspectRatio;
 	        }
 
-	        timeline.ChildTimelines.forEach(function (tl) {
+	        timeline.timelines.forEach(function (tl) {
 		        //If child timeline has fixed aspect ratio, calculate its height according to it
 		        if (tl.AspectRatio) {
 			        tl.height = (tl.right - tl.left) / tl.AspectRatio;
@@ -81,7 +81,7 @@ module ChronoZoom {
 	        if (!timeline.height) {
 		        //Searching for timeline with the biggest ratio between its height percentage and real height
 		        var scaleCoef = undefined;
-		        timeline.ChildTimelines.forEach(function (tl) {
+		        timeline.timelines.forEach(function (tl) {
 			        if (tl.Height && !tl.AspectRatio) {
 				        var localScale = tl.height / tl.Height;
 				        if (!scaleCoef || scaleCoef < localScale)
@@ -90,7 +90,7 @@ module ChronoZoom {
 		        });
 		        //Scaling timelines to make their percentages corresponding to each other
 		        if (scaleCoef) {
-			        timeline.ChildTimelines.forEach(function (tl) {
+			        timeline.timelines.forEach(function (tl) {
 				        if (tl.Height && !tl.AspectRatio) {
 					        var scaleParam = scaleCoef * tl.Height / tl.height;
 					        if (scaleParam > 1) {
@@ -113,7 +113,7 @@ module ChronoZoom {
 	        if (timeline.height) {
 		        var titleObject = GenerateTitleObject(timeline.height, timeline, measureContext);
 
-		        if (timeline.Exhibits.length > 0 && (tlRes.max - tlRes.min) < timeline.height) {
+		        if (timeline.exhibits.length > 0 && (tlRes.max - tlRes.min) < timeline.height) {
 			        while ((res.max - res.min) > (timeline.height - titleObject.bboxHeight) && exhibitSize > timelineWidth / 20.0) {
 				        exhibitSize /= 1.5;
 				        res = LayoutContent(timeline, exhibitSize);
@@ -121,7 +121,7 @@ module ChronoZoom {
 		        }
 
 		        if ((res.max - res.min) > (timeline.height - titleObject.bboxHeight)) {
-			        console.log("Warning: Child timelines and exhibits doesn't fit into parent. Timeline name: " + timeline.Title);
+			        console.log("Warning: Child timelines and exhibits doesn't fit into parent. Timeline name: " + timeline.title);
 			        var contentHeight = res.max - res.min;
 			        var fullHeight = contentHeight / (1 - headerPercent);
 			        var titleObject = GenerateTitleObject(fullHeight, timeline, measureContext);
@@ -129,13 +129,13 @@ module ChronoZoom {
 		        } else {
 			        //var scale = (timeline.height - titleObject.bboxHeight) / (res.max - res.min);
 			        //if (scale > 1) {
-			        //    timeline.ChildTimelines.forEach(function (tl) {
+			        //    timeline.timelines.forEach(function (tl) {
 			        //        tl.realY *= scale;
 			        //        if (!tl.AspectRatio)
 			        //            Scale(tl, scale, measureContext);
 			        //    });
 
-			        //    timeline.Exhibits.forEach(function (eb) {
+			        //    timeline.exhibits.forEach(function (eb) {
 			        //        eb.realY *= scale;
 			        //    });
 			        //}
@@ -166,11 +166,11 @@ module ChronoZoom {
 	        timeline.realHeight = timeline.height + 2 * timeline.heightEps;
 	        timeline.realY = 0;
 
-	        timeline.Exhibits.forEach(function (infodot) {
+	        timeline.exhibits.forEach(function (infodot) {
 		        infodot.realY -= res.min;
 	        });
 
-	        timeline.ChildTimelines.forEach(function (tl) {
+	        timeline.timelines.forEach(function (tl) {
 		        tl.realY -= res.min;
 	        });
         }
@@ -234,14 +234,14 @@ module ChronoZoom {
 	        var sequencedContent = new Array();
 	        var unsequencedContent = new Array();
 
-	        timeline.ChildTimelines.forEach(function (tl) {
+	        timeline.timelines.forEach(function (tl) {
 		        if (tl.Sequence)
 			        sequencedContent.push(tl);
 		        else
 			        unsequencedContent.push(tl);
 	        });
 
-	        timeline.Exhibits.forEach(function (eb) {
+	        timeline.exhibits.forEach(function (eb) {
 		        eb.size = exhibitSize;
 		        eb.left = eb.x - eb.size / 2.0;
 		        eb.right = eb.x + eb.size / 2.0;
@@ -293,7 +293,7 @@ module ChronoZoom {
 
         function LayoutChildTimelinesOnly(timeline) {
 	        var arrangedElements = new Array();
-	        PositionContent(timeline.ChildTimelines, arrangedElements, function (el, ael) { return !(el.left >= ael.right || ael.left >= el.right); });
+	        PositionContent(timeline.timelines, arrangedElements, function (el, ael) { return !(el.left >= ael.right || ael.left >= el.right); });
 
 	        var min = Number.MAX_VALUE;
 	        var max = Number.MIN_VALUE;
@@ -321,13 +321,13 @@ module ChronoZoom {
 	        timeline.realHeight = timeline.height + 2 * timeline.heightEps;
 	        timeline.titleRect = GenerateTitleObject(timeline.height, timeline, mctx);
 
-	        timeline.ChildTimelines.forEach(function (tl) {
+	        timeline.timelines.forEach(function (tl) {
 		        tl.realY *= scale;
 		        if (!tl.AspectRatio)
 			        Scale(tl, scale, mctx);
 	        });
 
-	        timeline.Exhibits.forEach(function (eb) {
+	        timeline.exhibits.forEach(function (eb) {
 		        eb.realY *= scale;
 	        });
         }
@@ -335,11 +335,11 @@ module ChronoZoom {
         function Arrange(timeline) {
 	        timeline.y = timeline.realY + timeline.heightEps;
 
-	        timeline.Exhibits.forEach(function (infodot) {
+	        timeline.exhibits.forEach(function (infodot) {
 		        infodot.y = infodot.realY + infodot.size / 2.0 + timeline.y;
 	        });
 
-	        timeline.ChildTimelines.forEach(function (tl) {
+	        timeline.timelines.forEach(function (tl) {
 		        tl.realY += timeline.y;
 		        Arrange(tl);
 	        });
@@ -353,7 +353,7 @@ module ChronoZoom {
 	        var tlW = timeline.right - timeline.left;
 
 	        measureContext.font = "100pt " + Settings.timelineHeaderFontName;
-	        var size = measureContext.measureText(timeline.Title);
+	        var size = measureContext.measureText(timeline.title);
 	        var height = Settings.timelineHeaderSize * tlHeight;
 	        var width = height * size.width / 100.0;
 
@@ -384,7 +384,7 @@ module ChronoZoom {
 		        timeEnd: timeline.right,
 		        top: timeline.y,
 		        height: timeline.height,
-		        header: timeline.Title,
+		        header: timeline.title,
 		        fillStyle: "rgba(0,0,0,0.25)",
 		        titleRect: timeline.titleRect,
 		        strokeStyle: tlColor,
@@ -392,12 +392,12 @@ module ChronoZoom {
 	        });
 
 	        //Creating Infodots
-	        timeline.Exhibits.forEach(function (childInfodot) {
+	        timeline.exhibits.forEach(function (childInfodot) {
 		        var date; // building a date to be shown in a title of the content item to the left of the title text.
 
 		        var contentItems = new Array();
-		        if (!childInfodot.ContentItems) childInfodot.ContentItems = [];
-		        childInfodot.ContentItems.forEach(function (contentItemProt) {
+		        if (!childInfodot.contentItems) childInfodot.contentItems = [];
+		        childInfodot.contentItems.forEach(function (contentItemProt) {
 			        var mediaType = contentItemProt.MediaType;
 			        if (mediaType == "Picture")
 				        mediaType = 'image';
@@ -408,12 +408,12 @@ module ChronoZoom {
 
 			        contentItems.push({
 				        id: 'c' + contentItemProt.UniqueID,
-				        title: contentItemProt.Title,
+				        title: contentItemProt.title,
 				        mediaUrl: contentItemProt.Uri,
 				        mediaType: mediaType,
 				        description: contentItemProt.Caption,
 				        date: date,
-				        guid: contentItemProt.ID,
+				        guid: contentItemProt.id,
 				        attribution: contentItemProt.Attribution,
 				        mediaSource: contentItemProt.MediaSource,
 				        order: contentItemProt.Order ? contentItemProt.Order : 0
@@ -423,11 +423,11 @@ module ChronoZoom {
 		        date = buildDate(childInfodot);
 		        var infodot1 = VCContent.addInfodot(t1, "layerInfodots", 'e' + childInfodot.UniqueID,
 				        (childInfodot.left + childInfodot.right) / 2.0, childInfodot.y, 0.8 * childInfodot.size / 2.0, contentItems,
-				        { title: childInfodot.Title, date: date, guid: childInfodot.ID });
+				        { title: childInfodot.title, date: date, guid: childInfodot.id });
 	        });
 
 	        //Filling child timelines
-	        timeline.ChildTimelines.forEach(function (childTimeLine) {
+	        timeline.timelines.forEach(function (childTimeLine) {
 		        Convert(t1, childTimeLine);
 	        });
 
@@ -461,7 +461,7 @@ module ChronoZoom {
         }
 
         function GetParentLayer(timeline, parentID) {
-	        if (timeline.ID == parentID)
+	        if (timeline.id == parentID)
 		        return 0;
 
 	        if (!timeline.ParentTimeline)
@@ -469,12 +469,12 @@ module ChronoZoom {
 
 	        var index = 0;
 	        var parent = timeline;
-	        while (parent.ParentTimeline && parent.ID != parentID) {
+	        while (parent.ParentTimeline && parent.id != parentID) {
 		        parent = parent.ParentTimeline;
 		        index++;
 	        }
 
-	        if (parent.ID != parentID)
+	        if (parent.id != parentID)
 		        return -1;
 	        else
 		        return index;
@@ -521,7 +521,7 @@ module ChronoZoom {
 		        });
 
 		        for (i = 0; i < timelines.length - 1; i++) {
-			        timelines[i].ChildTimelines.push(timelines[i + 1]);
+			        timelines[i].timelines.push(timelines[i + 1]);
 		        }
 
 		        var measureContext = (<HTMLCanvasElement>(document.createElement("canvas"))).getContext('2d');
@@ -538,10 +538,10 @@ module ChronoZoom {
 	        var result = undefined;
 
 	        if (timeline) {
-		        var n = timeline.ChildTimelines.length;
+		        var n = timeline.timelines.length;
 		        for (var i = 0; i < n; i++) {
-			        var childTimeline = timeline.ChildTimelines[i];
-			        if (childTimeline.ID == id) {
+			        var childTimeline = timeline.timelines[i];
+			        if (childTimeline.id == id) {
 				        // timeline was found
 				        result = childTimeline;
 				        break;

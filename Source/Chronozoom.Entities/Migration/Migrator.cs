@@ -77,6 +77,7 @@ namespace Chronozoom.Entities.Migration
             return collection;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification="Incremental change, will refactor later if the import process is kept")]
         private void LoadData(Stream dataTimelines, Stream dataTours, Stream dataThresholds, Collection collection, bool replaceGuids)
         {
             var bjrTimelines = new DataContractJsonSerializer(typeof(BaseJsonResult<IEnumerable<Timeline>>)).ReadObject(dataTimelines) as BaseJsonResult<IEnumerable<Timeline>>;
@@ -100,14 +101,20 @@ namespace Chronozoom.Entities.Migration
                         {
                             exhibit.Id = Guid.NewGuid();
 
-                            foreach (ContentItem contentItem in exhibit.ContentItems)
+                            if (exhibit.ContentItems != null)
                             {
-                                contentItem.Id = Guid.NewGuid();
+                                foreach (ContentItem contentItem in exhibit.ContentItems)
+                                {
+                                    contentItem.Id = Guid.NewGuid();
+                                }
                             }
 
-                            foreach (Reference reference in exhibit.References)
+                            if (exhibit.References != null)
                             {
-                                reference.Id = Guid.NewGuid();
+                                foreach (Reference reference in exhibit.References)
+                                {
+                                    reference.Id = Guid.NewGuid();
+                                }
                             }
                         }
                     }
