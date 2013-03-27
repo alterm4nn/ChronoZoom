@@ -42,12 +42,14 @@ Next <div> is rendered on the top of previous one.
             this.canvasWidth = null; // width of canvas
             this.canvasHeight = null; // height of canvas
 
+            this.requestNewFrame = false; // indicates whether new frame is required or not
+
             self.cursorPositionChangedEvent = new jQuery.Event("cursorPositionChanged");
             self.breadCrumbsChengedEvent = jQuery.Event("breadCrumbsChanged");
             self.innerZoomConstraintChengedEvent = jQuery.Event("innerZoomConstraintChenged");
             self.currentlyHoveredInfodot = undefined;
             self.breadCrumbs = [];
-            self.recentBreadCrumb = { vcElement: { title: "initObject"} };
+            self.recentBreadCrumb = { vcElement: { title: "initObject" } };
 
             self.cursorPosition = 0.0;
 
@@ -498,7 +500,8 @@ Next <div> is rendered on the top of previous one.
         /* Produces {width, height} object from actual width and height of widget's <div> (in pixels).
         */
         _getClientSize: function () {
-            return { width: this.element[0].clientWidth,
+            return {
+                width: this.element[0].clientWidth,
                 height: this.element[0].clientHeight
             };
         },
@@ -559,6 +562,17 @@ Next <div> is rendered on the top of previous one.
         otherwise, it sets the timeout to invalidate the image.
         */
         requestInvalidate: function () {
+            this.requestNewFrame = false;
+
+            // update parameters of animating elements and require new frame if needed
+            if (animatingElements.length != 0) {
+                for (id in animatingElements)
+                    if (animatingElements[id].animation && animatingElements[id].animation.isAnimating) {
+                        animatingElements[id].calculateNewFrame();
+                        this.requestNewFrame = true;
+                    }
+            }
+
             if (this.isInAnimation)
                 return;
 
@@ -567,13 +581,16 @@ Next <div> is rendered on the top of previous one.
             setTimeout(function () {
                 self.isInAnimation = false;
                 self.invalidate();
+
+                if (self.requestNewFrame)
+                    self.requestInvalidate();
             }, 1000.0 / targetFps); // 1/targetFps sec (targetFps is defined in a settings.js)
         },
 
         /*
-        Finds the LCA(Lowest Common Ancestor) timeline which contains wnd
-        */
-        _findLca: function (tl, wnd) {
+       Finds the LCA(Lowest Common Ancestor) timeline which contains wnd
+       */
+       _findLca: function (tl, wnd) {
             for (var i = 0; i < tl.children.length; i++) {
                 if (tl.children[i].type === 'timeline' && tl.children[i].contains(wnd)) {
                     return this._findLca(tl.children[i], wnd);
@@ -582,7 +599,7 @@ Next <div> is rendered on the top of previous one.
             return tl;
         },
 
-        findLca: function (wnd) {
+		findLca: function (wnd) {
             var cosmosTimeline = this._layersContent.children[0];
 
             var eps = 1; // TODO: analyticaly calculate the proper eps
@@ -604,7 +621,8 @@ Next <div> is rendered on the top of previous one.
             return this._findLca(cosmosTimeline, wnd);
         },
 
-        /*
+
+       /*
         Checks if we have all the data to render wnd at scale
         */
         _inBuffer: function (tl, wnd, scale) {
