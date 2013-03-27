@@ -667,8 +667,7 @@
  
             titleInput.val(e.title);
             dateInput.val(e.x);
-            //console.log("mti1"mediaTypeInput[0]);
-
+   
             $("#createExhibitForm").dialog({
                 title: "create exhibit",
                 modal: true,
@@ -681,8 +680,8 @@
                             date: dateInput.val()
                         });
                    
-                        //var selected = mediaTypeInput[1];
-                        var selected = {text:"Image"};
+                        var selected = mediaTypeInput[1];
+                        //var selected = {text:"Image"};
 
                         for (var i = 0; i < mediaTypeInput.length; i++)
                             if (mediaTypeInput[i].selected) {
@@ -690,7 +689,6 @@
                         }
                        
                         var c = e.children[0].content.children[0];
-                        //console.log(mediaTypeInput,selected);
                         CZ.Authoring.updateContentItem(c, e, {
                             title: CItitleInput.val(),
                             uri: mediaInput.val(),
@@ -698,30 +696,26 @@
                             description: descriptionInput.val()
                         });
 
-                      //  console.log("cicounter",CIcounter);
                         var i;
-                        for (i = 1; i <= CIcounter; i += 1) {
-                            console.log("i",i);
+                        for (i = 1; i <= CIcounter; i++) {
                             var CItitleInput1 = $("#AddContentItem" + i + "TitleInput");
                             var mediaInput1 = $("#AddContentItem" + i + "MediaSourceInput");
                             var descriptionInput1 = $("#AddContentItem" + i + "DescriptionInput");
                             var mediaTypeInput1 = $("#AddContentItem" + i + "MediaTypeInput");
-                            //var selected1 = mediaTypeInput[0];
-                            var selected1 = { text: "Image" };
+                            var selected1 = mediaTypeInput1[1];//{ text: "Image" };
                             for (var i1 = 0; i1 < mediaTypeInput.length; i1++)
-                                if (mediaTypeInput[i1].selected) {
-                                    selected = mediaTypeInput[i1];
+                                if (mediaTypeInput1[i1].selected) {
+                                    selected1 = mediaTypeInput[i1];
                                 }
 
                             CZ.Authoring.addContentItem(e, {
-                                title: CItitleInput.val(),
-                                uri: mediaInput.val(),
-                                mediaType: selected.text,
-                                description: descriptionInput.val()
+                                title: CItitleInput1.val(),
+                                uri: mediaInput1.val(),
+                                mediaType: selected1.text,
+                                description: descriptionInput1.val()
                             });
                         }
-                        console.log("i_finita", i);
-                        isCancel = false;
+                         isCancel = false;
                         $(this).dialog("close");
                     },
                     "more exhibits": function () {
