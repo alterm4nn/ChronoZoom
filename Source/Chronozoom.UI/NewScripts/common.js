@@ -303,8 +303,8 @@ function loadDataUrl() {
 
 //loading the data from the service
 function loadData() {
-    var regimesUrl = serverUrlBase
-                  + "/api/Structure?"
+    // +serverUrlBase  
+    var regimesUrl =  "/api/Structure?"
                   + "lca=" + cosmosTimelineID
                   + "&start=" + -5012
                   + "&end=" + 0
