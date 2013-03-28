@@ -29,40 +29,57 @@ namespace Chronozoom.Api.Controllers
 
         }
 
-        [HttpGet]
-        public ActionResult Login()
-        {
-            //if (Request.IsAuthenticated)
-            //{
-            //    return Redirect("/");
-            //}
-            //else
-            //{
-                return RedirectToAction("IdentityProvidersWithClientSideCode", "Account");  
-            //}
-        }
 
-        [HttpPost]
-        [ValidateInput(false)]
-        public ActionResult SignIn(FormCollection forms)
+        public bool IsAuth()
         {
-            // We use return url as context
-            string returnUrl = GetUrlFromContext(forms);
-
-            // If there is a return URL, Redirect to it. Otherwise, Redirect to Home.   
-            if (!string.IsNullOrEmpty(returnUrl))
-            {
-                return Redirect(returnUrl);
-            }
+            if (Request.IsAuthenticated)
+                return true;
             else
-            {
-                return RedirectToAction("Index", "Home");
-            }
+                return false;
         }
 
-        // GET: /Account/SignOut
         [HttpGet]
-        public ActionResult SignOut()
+        public ActionResult Login(FormCollection forms)
+        {
+            if (Request.IsAuthenticated)
+            {
+                var user = (Microsoft.IdentityModel.Claims.IClaimsIdentity)HttpContext.User.Identity;
+
+                string NameIdentifier = "";
+                string IdentityProvider = "";
+
+                foreach (var item in user.Claims)
+                {
+                    if (item.ClaimType.EndsWith("nameidentifier"))
+                    {
+                        NameIdentifier = item.Value;
+                    }
+                    else if (item.ClaimType.EndsWith("identityprovider"))
+                    {
+                        IdentityProvider = item.Value;
+                    }
+                }
+
+                // We use return url as context
+                string returnUrl = GetUrlFromContext(forms);
+
+                if (!string.IsNullOrEmpty(returnUrl))
+                {
+                    return Redirect(returnUrl);
+                }
+            }
+
+            return Redirect("/cz2.html");
+        }
+
+        public void Success()
+        {
+
+        }
+
+        // GET: /Account/Logout
+        [HttpGet]
+        public ActionResult Logout()
         {
             WSFederationAuthenticationModule fam = FederatedAuthentication.WSFederationAuthenticationModule;
 
@@ -75,8 +92,7 @@ namespace Chronozoom.Api.Controllers
                 fam.SignOut(true);
             }
 
-            // Return to home after LogOff
-            return RedirectToAction("Index", "Home");
+            return Redirect("/");
         }
 
         //[ChildActionOnly]
@@ -113,8 +129,5 @@ namespace Chronozoom.Api.Controllers
             WSFederationMessage message = WSFederationMessage.CreateFromNameValueCollection(new Uri("http://www.notused.com"), form);
             return (message != null ? message.Context : null);
         }
-
-
-
     }
 }

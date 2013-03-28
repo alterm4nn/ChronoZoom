@@ -708,6 +708,22 @@
                      onmouseover="tourButtonHighlight(true);" onmouseout="tourButtonHighlight(false);"
                     onmouseup="onTourClicked();" />
             </div>
+            
+            <div style="margin-left:auto;margin-right:auto;width:200px;color:#DBDBDB" id="LoginPanel">
+            </div>
+            
+            <script language="javascript">
+                $.ajax({
+                    url: "/account/isauth"
+                }).done(function (data) {
+                    if (data != "True") {
+                        $("#LoginPanel").html('<a href="/account/login" style="color:#DBDBDB">Login</a>');
+                    } else {
+                        $("#LoginPanel").html('<a href="/account/logout" style="color:#DBDBDB">Logout</a>');
+                    }
+                });
+            </script>
+
             <div class="regimes_rects" style="right: 0px; position: absolute; top: 0px; width: 302px; height: 62px;">
                 <div id="human_rect" class="regime_rect" style="position: absolute; top: 1px; width: 17px; left: 284px;
                     height: 10px; background-color: rgba(212, 92, 70, 1.0); cursor: pointer;" onclick="navigateToBookmark(humanityVisible);">
