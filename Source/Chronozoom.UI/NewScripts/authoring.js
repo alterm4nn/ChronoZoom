@@ -505,25 +505,7 @@
 
             return dy;
         },
-
-        /* Returns the date string for the infodot header. 
-        @param x        (double) negative number, x component of virtual coordinates*/
-        getInfodotDate: function (x) {
-            // calculate date of the infodot
-            var date = Math.floor(-x) - 2012; // CE offset
-
-            if (date / 1000000000 >= 0.1)
-                date = (date / 1000000000).toFixed(1) + " Ga";
-            else if (date / 10000000 >= 0.1)
-                date = (date / 1000000).toFixed(1) + " Ma";
-            else if (date > 0) // in case of BCE
-                date = Math.abs(date) + " BCE";
-            else
-                date = date ? -date : 1;
-
-            return date;
-        }
-    });
+   });
 
     return CZ;
 })(CZ || {}, jQuery, document);
