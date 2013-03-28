@@ -24,7 +24,9 @@ namespace UI.Controllers
                         //Update
                         if (foundTimeline.timelines[i].id == timelineData.id)
                         {
+                            Globals.Mutex.WaitOne();
                             foundTimeline.timelines.RemoveAt(i);
+                            Globals.Mutex.ReleaseMutex();
                             return;
                         }
                     }
@@ -59,12 +61,16 @@ namespace UI.Controllers
                         //Update
                         if (foundTimeline.timelines[i].id == timelineData.id)
                         {
+                            Globals.Mutex.WaitOne();
                             foundTimeline.timelines[i] = timelineData;
+                            Globals.Mutex.ReleaseMutex();
                             return;
                         }
                     }
                     //Create
+                    Globals.Mutex.WaitOne();
                     foundTimeline.timelines.Add(timelineData);
+                    Globals.Mutex.ReleaseMutex();
                 }
                 else
                 {

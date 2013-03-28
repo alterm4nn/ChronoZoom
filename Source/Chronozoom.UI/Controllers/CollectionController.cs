@@ -13,7 +13,9 @@ namespace Chronozoom.Api.Controllers
             {
                 if (!String.IsNullOrEmpty(collection))
                 {
+                    Globals.Mutex.WaitOne();
                     Globals.Collections.Remove(collectionData);
+                    Globals.Mutex.ReleaseMutex();
                 }
             }
             else
@@ -26,7 +28,9 @@ namespace Chronozoom.Api.Controllers
         {
             if (collectionData != null && !String.IsNullOrEmpty(collectionData.name) && !String.IsNullOrEmpty(collectionData.description))
             {
+                Globals.Mutex.WaitOne();
                 Globals.Collections.Add(collectionData);
+                Globals.Mutex.ReleaseMutex();
             }
             else
             {

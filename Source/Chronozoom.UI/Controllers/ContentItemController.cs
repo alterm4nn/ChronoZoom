@@ -25,7 +25,9 @@ namespace UI.Controllers
                         //Remove ContentItem
                         if (exh.contentItems[j].id == contentItemData.id)
                         {
+                            Globals.Mutex.WaitOne();
                             exh.contentItems.RemoveAt(j);
+                            Globals.Mutex.ReleaseMutex();
                             return;
                         }
                     }
@@ -63,14 +65,17 @@ namespace UI.Controllers
                         //Remove ContentItem
                         if (exh.contentItems[j].id == contentItemData.id)
                         {
+                            Globals.Mutex.WaitOne();
                             exh.contentItems[j] = contentItemData;
-                            
+                            Globals.Mutex.ReleaseMutex();
                             return;
                         }
                     }
 
                     //Add new ContentItem
+                    Globals.Mutex.WaitOne();
                     exh.contentItems.Add(contentItemData);
+                    Globals.Mutex.ReleaseMutex();
                 }
                 else
                 {

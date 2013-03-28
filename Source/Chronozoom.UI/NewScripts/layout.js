@@ -1,6 +1,8 @@
 ﻿var isLayoutAnimation = true; // temp variable for debugging
-var dynamicLayoutActive = false; // indicates wheter dynamic layout animation is active or no
-var dynamicLayoutTimeout; // reference to active timeout
+
+var animatingElements = { // hashmap of animating elements in ongoing dynamic layout animation
+    length: 0 // length of hashmap
+};
 
 function Timeline(title, left, right, childTimelines, exhibits) {
     this.Title = title;
@@ -624,9 +626,9 @@ function animateElement(elem) {
 
         if (elem.baseline)
             elem.baseline = elem.newBaseline;
-    }    
+    }
 
-    if (elem.newY != elem.y && !elem.id.match("__header__")) 
+    if (elem.newY != elem.y && !elem.id.match("__header__"))
         args.push({
             property: "y",
             startValue: elem.y,
@@ -649,19 +651,19 @@ function animateElement(elem) {
     }
 
     if (isLayoutAnimation == false || args.length == 0)
-        duration = 0;    
-    
+        duration = 0;
+
     initializeAnimation(elem, duration, args);
 
     // first animate resize/transition of buffered content. skip new content
     if (elem.fadeIn == true) {
         for (var i = 0; i < elem.children.length; i++)
-            if (elem.children[i].fadeIn == true) 
+            if (elem.children[i].fadeIn == true)
                 animateElement(elem.children[i]);
     }
     else // animate new content (fadeIn = false)
         for (var i = 0; i < elem.children.length; i++)
-            animateElement(elem.children[i]);    
+            animateElement(elem.children[i]);
 }
 
 function initializeAnimation(elem, duration, args) {
@@ -674,16 +676,10 @@ function initializeAnimation(elem, duration, args) {
         args: args // arguments of canvas element that should be animated
     };
 
-    if (duration != 0) {
-        dynamicLayoutActive = true;
-
-        if (dynamicLayoutTimeout)
-            clearTimeout(dynamicLayoutTimeout);
-
-        // set new timeout (while animation is on dynamicLayoutActive is true otherwise its false)
-        dynamicLayoutTimeout = window.setTimeout(function () {
-            dynamicLayoutActive = false;
-        }, duration + 500);
+    // add elem to hash map
+    if (typeof animatingElements[elem.id] === 'undefined') {
+        animatingElements[elem.id] = elem;
+        animatingElements.length++;
     }
 
     // calculates new animation frame of element
@@ -708,6 +704,9 @@ function initializeAnimation(elem, duration, args) {
             elem.animation.isAnimating = false;
             elem.animation.args = [];
 
+            delete animatingElements[elem.id];
+            animatingElements.length--;
+
             if (elem.fadeIn == false)
                 elem.fadeIn = true;
 
@@ -718,11 +717,6 @@ function initializeAnimation(elem, duration, args) {
 
             return;
         }
-
-        // require new frame with respect to target fps rate if animation is not over 
-        setTimeout(function () {
-            elem.vc.requestInvalidate();
-        }, 1000.0 / targetFps);
     }
 }
 
@@ -749,8 +743,19 @@ function merge(src, dest) {
             if (dest.children[i].type && dest.children[i].type === "timeline")
                 destChildTimelines.push(dest.children[i]);
 
+        var destHasAllSrcTimelines = true;
+        for (var i = 0, j; i < srcChildTimelines.length; i++) {
+            for (j = 0; j < destChildTimelines.length; j++) {
+                if (srcChildTimelines[i].id === destChildTimelines[j].guid)
+                    break;
+            }
+            if (j === destChildTimelines.length) {
+                destHasAllSrcTimelines = false;
+                break;
+            }
+        }
 
-        if (srcChildTimelines.length === destChildTimelines.length) { // dest contains all src children
+        if (destHasAllSrcTimelines && destChildTimelines.length >= srcChildTimelines.length) { // dest contains all src children
             dest.isBuffered = dest.isBuffered || (src.timelines instanceof Array);
 
             // cal bbox (top, bottom) for child timelines and infodots
@@ -862,6 +867,10 @@ function merge(src, dest) {
 }
 
 function Merge(src, dest) {
+    // skip dynamic layout during active authoring session
+    if (typeof CZ.Authoring !== 'undefined' && CZ.Authoring._isActive)
+        return;
+
     if (src && dest) {
         if (dest.id === "__root__") {
             src.AspectRatio = 10;

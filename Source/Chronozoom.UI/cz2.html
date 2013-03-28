@@ -646,6 +646,11 @@
         }
 
         function createTimeline() {
+            // skip authoring during ongoing dynamic layout animation
+            if (animatingElements.length != 0) {
+                return;
+            }
+
             CZ.Authoring._isActive = (CZ.Authoring.mode !== "createTimeline") || !CZ.Authoring._isActive;
             CZ.Authoring.mode = "createTimeline";
 
@@ -659,6 +664,11 @@
         }
 
         function editTimeline() {
+            // skip authoring during ongoing dynamic layout animation
+            if (animatingElements.length != 0) {
+                return;
+            }
+
             CZ.Authoring._isActive = (CZ.Authoring.mode !== "editTimeline") || !CZ.Authoring._isActive;
             CZ.Authoring.mode = "editTimeline";
 
