@@ -93,7 +93,7 @@
                     break;
                 case 'relay': url = "ChronozoomRelay";
                     break;
-                case 'dump': url = "ResponseDumpThresholds.txt";
+                case 'dump': url = "/dumps/beta-getthresholds.json";
                     break;
             }
             $.ajax({

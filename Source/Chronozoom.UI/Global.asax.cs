@@ -62,7 +62,9 @@ namespace UI
             RegisterRoutes(RouteTable.Routes);
 
             String filename = String.Empty;
-            if (File.Exists(HostingEnvironment.ApplicationPhysicalPath + "ResponseDumpRest.txt"))
+            if (File.Exists(HostingEnvironment.ApplicationPhysicalPath + @"/Dumps/wahib-responsedumprest.json"))
+                filename = @"/Dumps/wahib-responsedumprest.json";
+            else if (File.Exists(HostingEnvironment.ApplicationPhysicalPath + "ResponseDumpRest.txt"))
                 filename = "ResponseDumpRest.txt";
             else if (File.Exists(HostingEnvironment.ApplicationPhysicalPath + "ResponseDumpRestBase.txt"))
                 filename = "ResponseDumpRestBase.txt";
