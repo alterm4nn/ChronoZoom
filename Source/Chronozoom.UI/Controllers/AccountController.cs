@@ -39,7 +39,12 @@ namespace Chronozoom.Api.Controllers
         }
 
         [HttpGet]
-        public ActionResult Login(FormCollection forms)
+        public void Login()
+        {
+
+        }
+
+        public ActionResult Success(FormCollection forms)
         {
             if (Request.IsAuthenticated)
             {
@@ -70,11 +75,6 @@ namespace Chronozoom.Api.Controllers
             }
 
             return Redirect("/cz2.html");
-        }
-
-        public void Success()
-        {
-
         }
 
         // GET: /Account/Logout
