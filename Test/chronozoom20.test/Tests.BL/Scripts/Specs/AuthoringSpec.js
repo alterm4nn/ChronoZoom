@@ -100,6 +100,7 @@ describe("CZ.Authoring", function () {
                 });
                 it("Then: The timeline should be expanded", function () {
                     expect(newTimeline.width).toEqual(propFake.end - propFake.start);
+                    
                 });
             });
 
