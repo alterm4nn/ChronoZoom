@@ -85,6 +85,7 @@
     <Reference Include="System.Net.Http.WebRequest" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Web.Extensions" />
@@ -182,6 +183,7 @@
     <Content Include="Images\zoomout_hover.png" />
     <Content Include="Images\zoomout_pressed.png" />
     <Content Include="Images\zoomout_rest.png" />
+    <Content Include="NewScripts\czservice.js" />
     <Content Include="oldResponseDump.txt" />
     <Content Include="Privacy.htm" />
     <Content Include="robots.txt" />

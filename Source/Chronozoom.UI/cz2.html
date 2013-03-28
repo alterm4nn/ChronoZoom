@@ -63,6 +63,7 @@
 
     <script type="text/javascript" src="NewScripts/authoring.js"></script>
     <script type="text/javascript" src="NewScripts/newauthoring.js"></script>
+    <script type="text/javascript" src="NewScripts/czservice.js"></script>
 
     <script type="text/javascript" src="NewScripts/settings.js"></script>
     <script type="text/javascript" src="NewScripts/timescale.js"></script>
@@ -190,10 +191,13 @@
             initializeToursUI();
 
             CZ.Authoring.initializeTimelineChangeName();
-            
+
             CZ.Authoring.initialize(vc, {
                 showCreateTimelineForm: showCreateTimelineForm,
-                showEditTimelineForm: showEditTimelineForm
+                showEditTimelineForm: showEditTimelineForm,
+                showCreateExhibitForm: showCreateExhibitForm,
+                showEditExhibitForm: showEditExhibitForm,
+                showEditContentItemForm: showEditContentItemForm
             });
 
             var canvasGestures = getGesturesStream(vc); //gesture sequence of the virtual canvas
@@ -222,7 +226,7 @@
                                     updateMarker();
                                     // ax.axis("setTimeMarker", newMarkerPos);
                                 }
-                                updateNavigator(vp);                                
+                                updateNavigator(vp);
                             },
                             function () {
                                 return vc.virtualCanvas("getViewport");
@@ -493,7 +497,7 @@
                     var radius;
                     if (CZ.Authoring.hoveredTimeline.width > CZ.Authoring.hoveredTimeline.height) radius = CZ.Authoring.hoveredTimeline.width / 10.0
                     else radius = CZ.Authoring.hoveredTimeline.height / 10.0;
-                   
+
                     while (radius > (CZ.Authoring.hoveredTimeline.height / 10)) radius /= 1.5;
                     while (radius > (CZ.Authoring.hoveredTimeline.width / 10)) radius /= 1.5;
                     for (var i = 0; i < CZ.Authoring.hoveredTimeline.children.length; i++) {
@@ -592,9 +596,9 @@
                 buttons: {
                     "save and close": function () {
                         CZ.Authoring.updateTimeline(t, {
-                            title: titleInput.val(),
-                            start: startInput.val(),
-                            end: endInput.val(),
+                           title: titleInput.val(),
+                           start: startInput.val(),
+                           end: endInput.val(),
                         });
                         isCancel = false;
                         $(this).dialog("close");
@@ -611,7 +615,7 @@
         }
 
         function showEditTimelineForm(t) {
-            var titleInput = $("#timelineTitleInput");
+            var titleInput = $("#timelineTitleInput").spinner();
             var startInput = $("#timelineStartInput").spinner();
             var endInput = $("#timelineEndInput").spinner();
 
@@ -644,6 +648,173 @@
                 }
             });
         }
+
+        function showCreateExhibitForm(e) {
+            var isCancel = true;
+            var titleInput = $("#exhibitTitleInput");
+            var dateInput = $("#exhibitDateInput").spinner();
+
+            var CItitleInput = $("#AddContentItem0TitleInput");
+            var mediaInput = $("#AddContentItem0MediaSourceInput");
+            var descriptionInput = $("#AddContentItem0DescriptionInput");
+            var mediaTypeInput = $("#AddContentItem0MediaTypeInput option");
+            var CIcounter = 0;
+            
+            titleInput.val(e.title);
+            dateInput.val(e.x);
+
+            $("#createExhibitForm").dialog({
+                title: "create exhibit",
+                modal: true,
+                height: 600,
+                width: 600,
+                buttons: {
+                    "save and close": function () {
+                        var contentItems = getContentItemsData();
+                        
+                        CZ.Authoring.updateExhibit(e, {
+                            title: titleInput.val(),
+                            date: dateInput.val(),
+                            contentItems: contentItems
+                        });
+                        isCancel = false;
+                        $(this).dialog("close");
+                    },
+                    "add content item": function () {
+                        if ($(this).find(".cz-auth-ci-container").length < infodotMaxContentItemsCount)
+                            addContentItemForm();
+                    }
+                },
+                close: function () {
+                    if (isCancel) {
+                        CZ.Authoring.removeExhibit(e);
+                    }
+                    CZ.Authoring._isActive = false;
+                    $("a:contains('create exhibit')").removeClass("active");
+
+                    $(this).find(".cz-auth-ci-container")
+                            .each(function () {
+                                $(this).remove();
+                            });
+                }
+            });
+        }
+
+        function showEditExhibitForm(e) {
+            var titleInput = $("#exhibitTitleInput");
+            var dateInput = $("#exhibitDateInput").spinner();
+
+            titleInput.val(e.title);
+            dateInput.val(e.x);
+
+            var contentItems = e.contentItems;
+
+            for (var i = 0; i < contentItems.length; i++) {
+                addContentItemForm();
+            }
+
+            $(".cz-auth-ci-container").each(function (index) {
+                fillContentItemForm($(this), contentItems[index]);
+            });
+
+            $("#createExhibitForm").dialog({
+                title: "edit exhibit",
+                modal: true,
+                height: 600,
+                width: 600,
+                buttons: {
+                    "save and close": function () {
+                        contentItems = getContentItemsData(e);                        
+
+                        //if ((dateInput.val() > 0) || (dateInput.val() < - 13700000000))
+                        
+                        CZ.Authoring.updateExhibit(e, {
+                            title: titleInput.val(),
+                            date: dateInput.val(),
+                            contentItems: contentItems
+                        });
+                        $(this).dialog("close");
+
+                        $(this).find(".cz-auth-ci-container")
+                           .each(function () {
+                               $(this).remove();
+                           });
+                    },
+                    "delete": function () {
+                        CZ.Authoring.removeExhibit(e);
+                        $(this).dialog("close");
+                    },
+                    "add content item": function () {
+                        if ($(this).find(".cz-auth-ci-container").length < infodotMaxContentItemsCount)
+                            addContentItemForm();
+                    }
+                },
+                close: function () {
+                    CZ.Authoring._isActive = false;
+                    $("a:contains('edit exhibit')").removeClass("active");
+
+                    $(this).find(".cz-auth-ci-container")
+                           .each(function () {
+                               $(this).remove();
+                           });
+                }
+            });
+        }
+
+        function showEditContentItemForm(c, e) {
+            var titleInput = $("#contentItemTitleInput");
+            var mediaInput = $("#contentItemMediaSourceInput");
+            var descriptionInput = $("#contentItemDescriptionInput");
+            var mediaTypeInput = $("#contentItemMediaTypeInput option");
+            var mediaType = c.contentItem.mediaType.toLowerCase();
+            if (mediaType === "picture") {
+                    mediaType = "image";
+            }
+            titleInput.val(c.contentItem.title);
+            mediaInput.val(c.contentItem.uri);
+            descriptionInput.val(c.contentItem.description);
+            mediaTypeInput.each(function (option) {
+                if (this.value === mediaType) {
+                    $(this).attr("selected", "selected");
+                    return;
+                }
+            });
+                        
+            
+            
+            $("#editContentItemForm").dialog({
+                title: "Edit content item",
+                modal: true,
+                height: 600,
+                width: 600,
+                buttons: {
+                    "save and close": function () {
+                        var selected = mediaTypeInput[0];
+                        
+                        for (var i = 1; i < mediaTypeInput.length; i++)
+                            if (mediaTypeInput[i].selected) {
+                                    selected = mediaTypeInput[i];
+                                }
+                        console.log(c,e);
+                        CZ.Authoring.updateContentItem(c, e, {
+                                title: titleInput.val(),
+                                uri: mediaInput.val(),
+                                mediaType: selected.text,
+                                description: descriptionInput.val()
+                        });
+                        $(this).dialog("close");
+                    },
+                    "delete": function () {
+                        CZ.Authoring.removeContentItem(c);
+                        $(this).dialog("close");
+                    }
+            },
+            close: function () {
+                    CZ.Authoring._isActive = false;
+                    $("a:contains('edit exhibit')").removeClass("active");
+                }
+        });
+    }
 
         function createTimeline() {
             // skip authoring during ongoing dynamic layout animation
@@ -682,11 +853,145 @@
         }
 
         function createExhibit() {
-            // body...
+            // skip authoring during ongoing dynamic layout animation
+            if (animatingElements.length != 0) {
+                return;
+            }
+
+            CZ.Authoring._isActive = (CZ.Authoring.mode !== "createExhibit") || !CZ.Authoring._isActive;
+            CZ.Authoring.mode = "createExhibit";
+
+            $("div #footer-authoring > a").removeClass("active");
+
+            if (CZ.Authoring._isActive) {
+                $("a:contains('create exhibit')").addClass("active");
+            } else {
+                $("a:contains('create exhibit')").removeClass("active");
+            }
         }
 
         function editExhibit() {
-            // body...
+            // skip authoring during ongoing dynamic layout animation
+            if (animatingElements.length != 0) {
+                return;
+            }
+
+            CZ.Authoring._isActive = (CZ.Authoring.mode !== "editExhibit") || !CZ.Authoring._isActive;
+            CZ.Authoring.mode = "editExhibit";
+
+            $("div #footer-authoring > a").removeClass("active");
+
+            if (CZ.Authoring._isActive) {
+                $("a:contains('edit exhibit')").addClass("active");
+            } else {
+                $("a:contains('edit exhibit')").removeClass("active");
+            }
+        }
+
+        // TODO: move this function to appropriate .js file
+        function addContentItemForm() {
+            var form = $("#createExhibitForm");
+
+            var container = $("<div class='cz-auth-ci-container'></div>");
+
+            var label = $("<label style='display: block'>Media source</label>");
+
+            var title = $("<p style='display: block'>" +
+               "<label style='display: block'>Title</label>" +
+               "<input class='cz-auth-ci-title' style='display: block' type='text'/>" +
+               "</p>");
+
+            var description = $("<p style='display: block'>" +
+              "<label style='display: block'>Description</label>" +
+              "<textarea class='cz-auth-ci-description' style='display: block' />" +
+              "</p>");
+
+            var mediaSource = $("<p style='display: block'>" +
+               "<label style='display: block'>Media source</label>" +
+               "<input class='cz-auth-ci-media-source' style='display: block' type='text'/>" +
+               "</p> ");
+
+            var mediaType = $("<p style='display: block'>" +
+             "<label style='display: block'>Media type</label>" +
+             "<select class='cz-auth-ci-media-type' style='display: block'>" +
+             "<option value='image'>Image</option>" +
+             "<option value='pdf'>PDF</option> " +
+             "<option value='video'>Video</option>" +
+             "<option value='audio'>Audio</option>" +
+             "</select>" +
+             "</p>");
+
+            var removeBtn = $("<button>Remove content item</button>");
+            removeBtn[0].onclick = function () {
+                container.remove();
+            };
+
+            var separator = $("<hr />");
+
+            container.append(title);
+            container.append(description);
+            container.append(mediaSource);
+            container.append(mediaType);
+            container.append(removeBtn);
+            container.append(separator);
+            form.append(container);
+        }
+
+        //TODO: move this function to appropriate .js file
+        function getContentItemsData() {
+            var contentItems = [];
+
+            var containers = $(".cz-auth-ci-container");
+            $(".cz-auth-ci-container").each(function () {
+                var CItitleInput = $(this).find(".cz-auth-ci-title");;
+                var mediaInput = $(this).find(".cz-auth-ci-media-source");
+                var mediaTypeInput = $(this).find(".cz-auth-ci-media-type option");
+                var descriptionInput = $(this).find(".cz-auth-ci-description");
+                var id = $(this).attr("cz-auth-ci-id") || "";
+
+                var selected = mediaTypeInput[0];
+
+                for (var i = 0; i < mediaTypeInput.length; i++)
+                    if (mediaTypeInput[i].selected) {
+                        selected = mediaTypeInput[i];
+                    }
+
+                contentItems.push({
+                    title: CItitleInput.val(),
+                    description: descriptionInput.val(),
+                    uri: mediaInput.val(),
+                    mediaType: selected.text,
+                    id: id,
+                    parent: "",
+                    UniqueID: ""
+                });
+            });
+
+            return contentItems;
+        }
+
+        //TODO: move this function to appropriate .js file
+        function fillContentItemForm(form, contentItem) {
+            var titleInput = form.find(".cz-auth-ci-title");
+            var mediaInput = form.find(".cz-auth-ci-media-source");
+            var mediaTypeInput = form.find(".cz-auth-ci-media-type option");
+            var descriptionInput = form.find(".cz-auth-ci-description");
+            var mediaType = contentItem.mediaType.toLowerCase();
+
+            if (mediaType === "picture") {
+                mediaType = "image";
+            }
+
+            form.attr("cz-auth-ci-id", contentItem.id);
+            titleInput.val(contentItem.title);
+            mediaInput.val(contentItem.uri);
+            descriptionInput.val(contentItem.description);
+            mediaTypeInput.each(function (option) {
+                if (this.value === mediaType) {
+                    $(this).attr("selected", "selected");
+                    return;
+                }
+            });
         }
     </script>
     <title>ChronoZoom</title>
@@ -922,6 +1227,78 @@
                 </p>
             </div>
 
+            <!--Create Exhibit popup dialog-->
+            <div id="createExhibitForm" style="background-color: rgb(60, 95, 150); display: none; color: white;">
+                <p>
+                    <label style="display: block">Exhibit's title</label>
+                    <input id="exhibitTitleInput" style="display: block" />
+                </p>
+
+                <p style="display: inline-block">
+                    <label style="display: block">Exhibit's date</label>
+                    <input id="exhibitDateInput" style="display: block" />
+                </p>
+
+                <hr />
+
+                <p>Content items:</p>
+
+                <!--<p style="display: inline-block">
+                    <label style="display: block">Content Item 0 Title</label>
+                    <input id="AddContentItem0TitleInput" style="display: block" type="text"/>
+                </p>
+            
+                <p style="display: block">
+                    <label style="display: block">Content Item 0 media source</label>
+                    <input type="url" id="AddContentItem0MediaSourceInput" style="display: block" />
+                </p>
+
+                <p style="display: block">
+                    <label style="display: block">Content Item 0 description</label>
+                    <textarea id="AddContentItem0DescriptionInput" style="display: block" ></textarea>
+                </p>
+
+                <p style="display: block">
+                    <label style="display: block">media type</label>
+                    <select id="AddContentItem0MediaTypeInput" style="display: block">
+                        <option value="pdf">PDF</option>
+                        <option value="image">Image</option>
+                        <option value="video">Video</option>
+                        <option value="audio">Audio</option>
+                    </select>
+                --></p>
+
+            </div>
+
+
+             <!--Edit Content Item popup dialog-->
+            <div id="editContentItemForm" style="background-color: rgb(60, 95, 150); display: none; color: white;">
+                <p>
+                    <label style="display: block">title</label>
+                    <input id="contentItemTitleInput" style="display: block" type="text" />
+                </p>
+
+                <p style="display: block">
+                    <label style="display: block">media source</label>
+                    <input type="url" id="contentItemMediaSourceInput" style="display: block" />
+                </p>
+
+                <p style="display: block">
+                    <label style="display: block">description</label>
+                    <textarea id="contentItemDescriptionInput" style="display: block" ></textarea>
+                </p>
+
+                <p style="display: block">
+                    <label style="display: block">media type</label>
+                    <select id="contentItemMediaTypeInput" style="display: block">
+                        <option value="pdf">PDF</option>
+                        <option value="image">Image</option>
+                        <option value="video">Video</option>
+                        <option value="audio">Audio</option>
+                    </select>
+                </p>
+
+            </div>
         </div>
 
         <div id="footer-right">            
