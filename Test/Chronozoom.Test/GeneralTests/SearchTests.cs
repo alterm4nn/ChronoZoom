@@ -26,7 +26,7 @@ namespace Chronozoom.Test.GeneralTests
         private const int NumberOfSearchQueries = 42;
         private const int StartIndex = 725;
 
-        private const string ResponseDumpPath = "../../../../Source/Chronozoom.UI/ResponseDump.txt";
+        private const string ResponseDumpPath = "../../../../Source/Chronozoom.UI/dumps/beta-get.json";
         private const string SearchResultXPath = ".//*[@class = 'searchResult'][1]";
         private const int WaitResultsMs = 3000;
         private const int WaitSearchMenuExpandingMs = 1000;
