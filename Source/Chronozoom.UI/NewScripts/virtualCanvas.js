@@ -371,6 +371,9 @@ Next <div> is rendered on the top of previous one.
                             if (!this.currentlyHoveredInfodot || (this.currentlyHoveredInfodot && this.currentlyHoveredInfodot.parent
                                 && this.currentlyHoveredInfodot.parent != this.hovered))
                                 this.hovered.onmouseunhover(posv, e);
+                        if (this.currentlyHoveredContentItem)
+                            this.hovered = this.currentlyHoveredContentItem;
+                        else
                         this.hovered = mouseInStack[n];
                         break;
                     }

@@ -49,6 +49,7 @@ infoDotBorderColor = 'rgb(232,232,232)'; // color of infdot's circle border
 infoDotHoveredBorderColor = 'white'; // color of infdot's circle border when mouse cursor is over it
 infoDotFillColor = 'rgb(92,92,92)'; // color of infdot's circle border
 infoDotTinyContentImageUri = 'Images/tinyContent.png';
+infodotMaxContentItemsCount = 10;
 
 mediaContentElementZIndex = 100;
 contentItemDescriptionNumberOfLines = 10;
@@ -87,7 +88,7 @@ deeperZoomConstraints = //the array of the constraints of the deep zoom level an
     { left: -14000000000, right: -1000000000, scale: 1000 }, //billions of years zoom in constraint
     {left: -1000000000, right: -1000000, scale: 1 }, //millions of years zoom in constraint
     {left: -1000000, right: -12000, scale: 0.001 }, //thousand of years zoom in constraint
-    { left: -12000 /*approx 10k BC */, right: 0, scale: 0.000006 } //single day zoom in constraint in human history scale
+    { left: -12000 /*approx 10k BC */, right: 0, scale: 0.00006 } //single day zoom in constraint in human history scale
 ];
 
 // axis constants
