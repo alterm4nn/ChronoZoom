@@ -18,6 +18,8 @@ using System.Web.Hosting;
 using System.Web.Http;
 using System.Web.Routing;
 using System.Web.UI;
+using System.Web.Mvc;
+using System.Text.RegularExpressions;
 
 namespace UI
 {
@@ -47,8 +49,13 @@ namespace UI
         public static void RegisterRoutes(RouteCollection routes)
         {
             var routeHandlerDetails = new WebFormRouteHandler<Page>("~/cz.aspx");
-
+            routes.MapRoute(
+                "Account", // Route name
+                "account/{action}", // URL with parameters
+                new { controller = "Account" } // Parameter defaults
+            );
             routes.Add(new Route("{supercollection}/{collection}/", routeHandlerDetails));
+
         }
 
         public void Application_Start(object sender, EventArgs e)
@@ -61,21 +68,67 @@ namespace UI
             WebApiConfig.Register(GlobalConfiguration.Configuration);
             RegisterRoutes(RouteTable.Routes);
 
-            using (StreamReader file = File.OpenText(HostingEnvironment.ApplicationPhysicalPath + @"/Dumps/wahib-responsedumprest.json"))
-            {
+ String filename = String.Empty;
+            if (File.Exists(HostingEnvironment.ApplicationPhysicalPath + @"/Dumps/wahib-responsedumprest.json"))
+                filename = @"/Dumps/wahib-responsedumprest.json";
+            else if (File.Exists(HostingEnvironment.ApplicationPhysicalPath + "ResponseDumpRest.txt"))
+                filename = "ResponseDumpRest.txt";
+            else if (File.Exists(HostingEnvironment.ApplicationPhysicalPath + "ResponseDumpRestBase.txt"))
+                filename = "ResponseDumpRestBase.txt";
+            else
+                throw new HttpResponseException(System.Net.HttpStatusCode.InternalServerError);
+
+            using (StreamReader file = File.OpenText(HostingEnvironment.ApplicationPhysicalPath + filename))            {
                 JsonSerializer serializer = new JsonSerializer();
                 Globals.Root = (Chronozoom.Api.Models.Timeline)serializer.Deserialize(file, typeof(Chronozoom.Api.Models.Timeline));
             }
 
+            Timer timer = new Timer();
+            timer.Interval = 15 * 60 * 1000;
+            timer.Tick += Timer_Tick;
+            timer.Enabled = true;
+
             Trace.TraceInformation("Application Starting");
+        }
+
+        void Timer_Tick(object sender, EventArgs e)
+        {
+            if (Globals.Root != null)
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                using (StreamWriter sw = new StreamWriter(HostingEnvironment.ApplicationPhysicalPath + "ResponseDumpRest.txt"))
+                using (JsonWriter writer = new JsonTextWriter(sw))
+                {
+                    Globals.Mutex.WaitOne();
+                    serializer.Serialize(writer, Globals.Root);
+                    Globals.Mutex.ReleaseMutex();
+                }
+            }
         }
 
         public void Application_End(object sender, EventArgs e)
         {
+            Timer_Tick(null, null);
         }
 
         public void Application_Error(object sender, EventArgs e)
         {
+        }
+
+        void Application_BeginRequest(object sender, EventArgs e)
+        {
+            Regex r = new Regex(@"^/[a-z\-_0-9]+/?$");
+
+            var app = (HttpApplication)sender;
+            if (app.Context.Request.Url.LocalPath=="/")
+            {
+                app.Context.RewritePath(
+                         string.Concat(app.Context.Request.Url.LocalPath, "cz.aspx"));
+            }
+            else if( r.IsMatch(app.Context.Request.Url.LocalPath))
+            {
+                app.Context.RewritePath(string.Concat(app.Context.Request.Url.LocalPath, "cz.aspx?new=1"));
+            }
         }
     }
 }

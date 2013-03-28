@@ -24,7 +24,9 @@ namespace UI.Controllers
                         //Remove
                         if (foundTimeline.exhibits[i].id == exhibitData.id)
                         {
+                            Globals.Mutex.WaitOne();
                             foundTimeline.exhibits.RemoveAt(i);
+                            Globals.Mutex.ReleaseMutex();
                             return;
                         }
                     }
@@ -60,7 +62,9 @@ namespace UI.Controllers
                         //Update
                         if (foundTimeline.exhibits[i].id == exhibitData.id)
                         {
+                            Globals.Mutex.WaitOne();
                             foundTimeline.exhibits[i] = exhibitData;
+                            Globals.Mutex.ReleaseMutex();
                             return;
                         }
                     }
@@ -71,7 +75,9 @@ namespace UI.Controllers
                     // TODO: fine better solution to create actually uniqueid or remove this field totally
                     var random = new Random();
                     exhibitData.UniqueID = random.Next(10000, int.MaxValue);
+                    Globals.Mutex.WaitOne();
                     foundTimeline.exhibits.Add(exhibitData);
+                    Globals.Mutex.ReleaseMutex();
                 }
                 else
                 {

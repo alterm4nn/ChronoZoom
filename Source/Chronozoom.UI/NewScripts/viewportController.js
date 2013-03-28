@@ -83,7 +83,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
     function ZoomViewport(viewport, zoomGesture) {
         var oldVisible = viewport.visible;
         var x = zoomGesture.xOrigin + (viewport.width / 2.0 - zoomGesture.xOrigin) * zoomGesture.scaleFactor;
-        var y = zoomGesture.yOrigin + (viewport.height / 2.0 - zoomGesture.yOrigin) * zoomGesture.scaleFactor
+        var y = zoomGesture.yOrigin + (viewport.height / 2.0 - zoomGesture.yOrigin) * zoomGesture.scaleFactor;
         var newCenter = viewport.pointScreenToVirtual(x, y);
         viewport.visible.centerX = newCenter.x;
         viewport.visible.centerY = newCenter.y;
@@ -152,7 +152,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
     this.saveScreenParameters = function (viewport) {
         self.viewportWidth = viewport.width;
         self.viewportHeight = viewport.height;
-    }
+    };
 
     /*
     Is used for coercing of the visible regions produced by the controller according to navigation constraints
@@ -167,7 +167,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
         this.coerceVisibleOuterZoom(vp, gesture);
         this.coerceVisibleHorizontalBound(vp);
         this.coerceVisibleVerticalBound(vp);
-    }
+    };
 
     this.coerceVisibleOuterZoom = function (vp, gesture) {
         if (gesture.Type === "Zoom") {
@@ -179,7 +179,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
                 }
             }
         }
-    }
+    };
 
     /*
     Applys out of bounds constraint to the visible region (Preventing the user from observing the future time and the past before set treshold)
@@ -194,7 +194,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
             else if (visible.centerX < maxPermitedTimeRange.left) //canvas left border in virtual coordinates is less than permited border
                 visible.centerX = maxPermitedTimeRange.left;
         }
-    }
+    };
 
     /*
     Applys out of bounds constraint to the visible region (Preventing the user from observing the future time and the past before set treshold)
@@ -209,7 +209,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
             else if (visible.centerY < maxPermitedVerticalRange.top) //canvas bottom border in virtual coordinates is less than permited border
                 visible.centerY = maxPermitedVerticalRange.top;
         }
-    }
+    };
 
     /*
     Applys a deeper zoom constraint to the visible region
@@ -221,7 +221,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
         var visible = vp.visible;
         var x = visible.centerX;
         var scale = visible.scale;
-        var constr = undefined; //constraint to apply
+        var constr; //constraint to apply
         if (this.effectiveExplorationZoomConstraint) //explicitly set content observation constraint overrides the constraints of timelines
             constr = this.effectiveExplorationZoomConstraint;
         else
@@ -237,7 +237,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
                 visible.scale = constr;
             }
         }
-    }
+    };
 
     self.updateRecentViewport = function () {
         var vp = getViewport();
@@ -251,42 +251,58 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
             vis.centerY,
             vis.scale
             ));
-    }
+    };
 
     var requestTimer = null;
     this.getMissingData = function (vbox, lca) {
         // request new data only in case if authoring is not active
-        if (typeof CZ.Authoring === 'undefined' || CZ.Authoring._isActive == false) {
+        if (typeof CZ.Authoring === 'undefined' || CZ.Authoring._isActive === false) {
             window.clearTimeout(requestTimer);
-            requestTimer = window.setTimeout(function () { getMissingTimelines(vbox, lca) }, 1000);
+            requestTimer = window.setTimeout(function () { getMissingTimelines(vbox, lca); }, 1000);
         }
-	}
+	};
 
     function getMissingTimelines(vbox, lca) {
-        var url = serverUrlBase
-                + "/api/Structure?"
-                + "lca=" + lca.guid
-                + "&start=" + vbox.left
-                + "&end=" + vbox.right
-                + "&minspan=" + minTimelineWidth * vbox.scale;
-        console.log("[GET] " + url);
+        // var url = serverUrlBase
+        //         + "/api/Structure?"
+        //         + "lca=" + lca.guid
+        //         + "&start=" + vbox.left
+        //         + "&end=" + vbox.right
+        //         + "&minspan=" + minTimelineWidth * vbox.scale;
+        // console.log("[GET] " + url);
 
-        $.ajax({
-            type: "GET",
-            url: url,
-            async: true,
-            cache: false,
-            dataType: "json",
-            context: { timerId: requestTimer },
-            success: function (response) {
+        // $.ajax({
+        //     type: "GET",
+        //     url: url,
+        //     async: true,
+        //     cache: false,
+        //     dataType: "json",
+        //     context: { timerId: requestTimer },
+        //     success: function (response) {
+        //         Merge(response, lca);
+        //         var exhibitIds = extractExhibitIds(response);
+        //         getMissingExhibits(vbox, lca, exhibitIds);
+        //     },
+        //     error: function (xhr) {
+        //         console.log("Error connecting to service:\n" + url);
+        //     }
+        // });
+
+        CZ.Service.getStructure({
+            lca: lca.guid,
+            start: vbox.left,
+            end: vbox.right,
+            minspan: minTimelineWidth * vbox.scale
+        }).then(
+            function (response) {
                 Merge(response, lca);
                 var exhibitIds = extractExhibitIds(response);
                 getMissingExhibits(vbox, lca, exhibitIds);
             },
-            error: function (xhr) {
-                console.log("Error connecting to service:\n" + url);
+            function (error) {
+                console.log("Error connecting to service:\n" + error.responseText);
             }
-        });
+        );
     }
 
     function getMissingExhibits(vbox, lca, exhibitIds) {
@@ -392,7 +408,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
                 self.estimatedViewport = newlyEstimatedViewport;
             }
 
-            if (oldId != undefined)
+            if (oldId !== undefined)
                 animationUpdated(oldId, self.activeAnimation.ID); //notifing that the animation was updated         
             else
                 AnimationStarted(self.activeAnimation.ID);
@@ -415,7 +431,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
 
             animationUpdated(self.activeAnimation.ID, undefined);
         }
-    }
+    };
 
     /*
     Notify all subscribers that the ongoiung animation is updated (or halted)
@@ -471,10 +487,10 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
 
         var vc = $("#vc");
         var e = vc.virtualCanvas("getLastEvent");
-        if (e != null) {
+        if (e !== null) {
             vc.virtualCanvas("mouseMove", e);
         }
-    }
+    };
 
     //FrameRate calculation related
     this.frames = 0;
@@ -510,7 +526,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
         }
 
         var wasAnimationActive = false;
-        var oldId = undefined
+        var oldId;
         if (this.activeAnimation) {
             wasAnimationActive = this.activeAnimation.isActive;
             oldId = this.activeAnimation.ID;
@@ -535,7 +551,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
         }
 
         return (this.activeAnimation) ? this.activeAnimation.ID : undefined;
-    }
+    };
 
     //end of public fields
 }

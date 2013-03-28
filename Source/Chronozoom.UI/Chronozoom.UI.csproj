@@ -59,6 +59,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.1.0.0-rc2\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.IdentityModel, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Owin.Host.SystemWeb">
       <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.1.0.0-rc2\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
     </Reference>
@@ -97,9 +98,12 @@
     <Reference Include="System.Web.Http.WebHost, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.4.0.20710.0\lib\net40\System.Web.Http.WebHost.dll</HintPath>
     </Reference>
+    <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Web.Routing" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="ACS\FederationMetadata\2007-06\FederationMetadata.xml" />
     <Content Include="BehindTheScenes.htm" />
     <Content Include="cz.aspx" />
     <Content Include="cz2.html" />
@@ -183,6 +187,7 @@
     <Content Include="Images\zoomout_hover.png" />
     <Content Include="Images\zoomout_pressed.png" />
     <Content Include="Images\zoomout_rest.png" />
+    <Content Include="Login.html" />
     <Content Include="NewScripts\czservice.js" />
     <Content Include="oldResponseDump.txt" />
     <Content Include="Privacy.htm" />
@@ -408,10 +413,6 @@
     <Content Include="ServiceResponse_2012_01_16.txt" />
     <Content Include="testAudio.htm" />
     <Content Include="testAudio2.mp3" />
-    <Content Include="Account\ChangePassword.aspx" />
-    <Content Include="Account\ChangePasswordSuccess.aspx" />
-    <Content Include="Account\Login.aspx" />
-    <Content Include="Account\Register.aspx" />
     <Content Include="Bibliography.htm" />
     <Content Include="testFallBackPage.htm" />
     <Content Include="testTour.htm" />
@@ -512,40 +513,25 @@
     </Content>
     <Content Include="toursDump.txt" />
     <Content Include="Web.config" />
-  </ItemGroup>
+    <Content Include="Views\Account\_IdentityProvidersWithClientSideCode.aspx" />
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>  </ItemGroup>
   <ItemGroup>
-    <Compile Include="Account\ChangePassword.aspx.cs">
-      <DependentUpon>ChangePassword.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Account\ChangePassword.aspx.designer.cs">
-      <DependentUpon>ChangePassword.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Account\ChangePasswordSuccess.aspx.cs">
-      <DependentUpon>ChangePasswordSuccess.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Account\ChangePasswordSuccess.aspx.designer.cs">
-      <DependentUpon>ChangePasswordSuccess.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Account\Login.aspx.cs">
-      <DependentUpon>Login.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Account\Login.aspx.designer.cs">
-      <DependentUpon>Login.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Account\Register.aspx.cs">
-      <DependentUpon>Register.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Account\Register.aspx.designer.cs">
-      <DependentUpon>Register.aspx</DependentUpon>
-    </Compile>
+    <Compile Include="ACS\Hrd\HrdClient.cs" />
+    <Compile Include="ACS\Hrd\HrdRequest.cs" />
+    <Compile Include="ACS\Models\HrdIdentityProvider.cs" />
+    <Compile Include="ACS\Models\User.cs" />
+    <Compile Include="ACS\Util\NameValueCollectionExtensions.cs" />
+    <Compile Include="ACS\Util\RequireAuthenticationAttribute.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Chronozoom.svc.cs">
       <DependentUpon>Chronozoom.svc</DependentUpon>
     </Compile>
+    <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CollectionController.cs" />
     <Compile Include="Controllers\ContentItemController.cs" />
     <Compile Include="Controllers\DataController.cs" />
@@ -586,9 +572,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Site.Master" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Account\Web.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Chronozoom.Entities\Chronozoom.Entities.csproj">

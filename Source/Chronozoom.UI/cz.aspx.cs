@@ -15,7 +15,10 @@ namespace UI
             if (Request.Browser["IsMobileDevice"] == "false" || Request.QueryString["full"] == "1")
             {
                 // Without redirect
-                Server.Transfer(Page.ResolveUrl("~/") + "/cz.htm");
+                if (Request.QueryString["new"] == "1")
+                    Server.Transfer(Page.ResolveUrl("~/") + "/cz2.html");
+                else
+                    Server.Transfer(Page.ResolveUrl("~/") + "/cz.htm");
             }
             else
             {

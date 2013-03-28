@@ -6,6 +6,7 @@
 
 
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Chronozoom.Api.Models
 {
@@ -13,5 +14,6 @@ namespace Chronozoom.Api.Models
     {
         public static Timeline Root { get; set; }
         public static List<Collection> Collections = new List<Collection>();
+        public static Mutex Mutex = new Mutex();
     }
 }

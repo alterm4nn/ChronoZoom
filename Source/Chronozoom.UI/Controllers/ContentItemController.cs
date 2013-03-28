@@ -25,7 +25,9 @@ namespace UI.Controllers
                         //Remove ContentItem
                         if (exh.contentItems[j].id == contentItemData.id)
                         {
+                            Globals.Mutex.WaitOne();
                             exh.contentItems.RemoveAt(j);
+                            Globals.Mutex.ReleaseMutex();
                             return;
                         }
                     }
@@ -63,8 +65,9 @@ namespace UI.Controllers
                         //Remove ContentItem
                         if (exh.contentItems[j].id == contentItemData.id)
                         {
+                            Globals.Mutex.WaitOne();
                             exh.contentItems[j] = contentItemData;
-                            
+                            Globals.Mutex.ReleaseMutex();
                             return;
                         }
                     }
@@ -76,7 +79,9 @@ namespace UI.Controllers
                     // TODO: fine better solution to create actually uniqueid or remove this field totally
                     var random = new Random();
                     contentItemData.UniqueID = random.Next(10000, int.MaxValue);
+                    Globals.Mutex.WaitOne();
                     exh.contentItems.Add(contentItemData);
+                    Globals.Mutex.ReleaseMutex();
                 }
                 else
                 {

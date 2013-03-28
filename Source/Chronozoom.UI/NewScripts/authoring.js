@@ -226,6 +226,7 @@
 
             if (width > 0 && height > 0) {
                 addTimeline(this.draggedObject, this.draggedObject.layerid, "t_" + this.timelineCount, {
+                    isBuffered: true,
                     timeStart: timelineX,
                     timeEnd: timelineX + width,
                     header: "Timeline " + this.timelineCount,

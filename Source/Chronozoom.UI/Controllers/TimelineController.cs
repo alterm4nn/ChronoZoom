@@ -24,7 +24,9 @@ namespace UI.Controllers
                         //Update
                         if (foundTimeline.timelines[i].id == timelineData.id)
                         {
+                            Globals.Mutex.WaitOne();
                             foundTimeline.timelines.RemoveAt(i);
+                            Globals.Mutex.ReleaseMutex();
                             return;
                         }
                     }
@@ -59,7 +61,9 @@ namespace UI.Controllers
                         //Update
                         if (foundTimeline.timelines[i].id == timelineData.id)
                         {
+                            Globals.Mutex.WaitOne();
                             foundTimeline.timelines[i] = timelineData;
+                            Globals.Mutex.ReleaseMutex();
                             return;
                         }
                     }
@@ -70,7 +74,9 @@ namespace UI.Controllers
                     // TODO: fine better solution to create actually uniqueid or remove this field totally
                     var random = new Random();
                     timelineData.UniqueID = random.Next(10000, int.MaxValue);
+                    Globals.Mutex.WaitOne();
                     foundTimeline.timelines.Add(timelineData);
+                    Globals.Mutex.ReleaseMutex();
                 }
                 else
                 {
