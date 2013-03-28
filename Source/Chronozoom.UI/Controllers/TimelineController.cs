@@ -68,6 +68,12 @@ namespace UI.Controllers
                         }
                     }
                     //Create
+                    // generating guid
+                    timelineData.id = Guid.NewGuid().ToString();
+                    // generating UniqueID
+                    // TODO: fine better solution to create actually uniqueid or remove this field totally
+                    var random = new Random();
+                    timelineData.UniqueID = random.Next(10000, int.MaxValue);
                     Globals.Mutex.WaitOne();
                     foundTimeline.timelines.Add(timelineData);
                     Globals.Mutex.ReleaseMutex();

@@ -789,7 +789,7 @@ function CanvasTimeline(vc, layerid, id, vx, vy, vw, vh, settings, timelineinfo)
     this.regime = timelineinfo.regime;
     this.settings.gradientOpacity = 0;
 	this.settings.gradientFillStyle = timelineinfo.gradientFillStyle || timelineinfo.strokeStyle || timelineBorderColor;
-    this.opacity = timelineinfo.opacity;
+    //this.opacity = timelineinfo.opacity;
 
     this.reactsOnMouse = true;
 
@@ -1127,6 +1127,7 @@ function CanvasCircle(vc, layerid, id, vxc, vyc, vradius, settings) {
     this.base(vc, layerid, id, vxc - vradius, vyc - vradius, 2.0 * vradius, 2.0 * vradius);
     this.settings = settings;
     this.isObservedNow = false; //whether the circle is the largest circle under exploration,
+    this.type = "circle";
     //that takes large enough rendering space according to infoDotAxisFreezeThreshold var in settings.js
 
     /* Renders a circle.
@@ -1989,6 +1990,7 @@ function ContentItem(vc, layerid, id, vx, vy, vw, vh, contentItem) {
     this.base(vc, layerid, id, vx, vy, vw, vh);
     this.guid = contentItem.id;
     this.type = 'contentItem';
+    this.contentItem = contentItem;
 
     // Building content of the item
     var titleHeight = vh * contentItemTopTitleHeight * 0.8;
@@ -2007,9 +2009,10 @@ function ContentItem(vc, layerid, id, vx, vy, vw, vh, contentItem) {
     var titleTop = sourceTop + verticalMargin + sourceHeight;
 
     // Bounding rectangle
-    var rect = addRectangle(this, layerid, id + "__rect__", vx, vy, vw, vh,
-                            {
-                                strokeStyle: contentItemBoundingBoxBorderColor, lineWidth: contentItemBoundingBoxBorderWidth * vw, fillStyle: contentItemBoundingBoxFillColor,
+    var rect = addRectangle(this, layerid, id + "__rect__", vx, vy, vw, vh, {
+                                strokeStyle: contentItemBoundingBoxBorderColor,
+                                lineWidth: contentItemBoundingBoxBorderWidth * vw,
+                                fillStyle: contentItemBoundingBoxFillColor,
                                 isLineWidthVirtual: true
                             });
     this.reactsOnMouse = true;
@@ -2045,47 +2048,54 @@ function ContentItem(vc, layerid, id, vx, vy, vw, vh, contentItem) {
             // Media
             var mediaID = id + "__media__";
             var imageElem = null;
-            if (contentItem.mediaType.toLowerCase() === 'image' || contentItem.mediaType.toLowerCase() === 'picture') {
-                imageElem = addSeadragonImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, mediaContentElementZIndex, contentItem.uri);
+            if (this.contentItem.mediaType.toLowerCase() === 'image' || this.contentItem.mediaType.toLowerCase() === 'picture') {
+                imageElem = addSeadragonImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, mediaContentElementZIndex, this.contentItem.uri);
             }
-            else if (contentItem.mediaType.toLowerCase() === 'video') {
-                addVideo(container, layerid, mediaID, contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, mediaContentElementZIndex);
+            else if (this.contentItem.mediaType.toLowerCase() === 'video') {
+                addVideo(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, mediaContentElementZIndex);
             }
-            else if (contentItem.mediaType.toLowerCase() === 'audio') {
+            else if (this.contentItem.mediaType.toLowerCase() === 'audio') {
                 mediaTop += contentItemAudioTopMargin * vh;
                 mediaHeight = vh * contentItemAudioHeight;
-                addAudio(container, layerid, mediaID, contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, mediaContentElementZIndex);
+                addAudio(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, mediaContentElementZIndex);
             }
-            else if (contentItem.mediaType.toLowerCase() === 'pdf') {
-                addPdf(container, layerid, mediaID, contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, mediaContentElementZIndex);
+            else if (this.contentItem.mediaType.toLowerCase() === 'pdf') {
+                addPdf(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, mediaContentElementZIndex);
             }
 
             // Title
-            var titleText = contentItem.title;
+            var titleText = this.contentItem.title;
             addText(container, layerid, id + "__title__", vx + leftOffset, titleTop, titleTop + titleHeight / 2.0,
-                    0.9 * titleHeight, titleText,
-                    {
-                        fontName: contentItemHeaderFontName, fillStyle: contentItemHeaderFontColor, textBaseline: 'middle', textAlign: 'center',
-                        wrapText: true, numberOfLines: 1
+                    0.9 * titleHeight, titleText, {
+                        fontName: contentItemHeaderFontName,
+                        fillStyle: contentItemHeaderFontColor,
+                        textBaseline: 'middle',
+                        textAlign: 'center',
+                        opacity: 1,
+                        wrapText: true,
+                        numberOfLines: 1
                     },
                     contentWidth);
 
             // Source
-            var sourceText = contentItem.attribution;
+            var sourceText = this.contentItem.attribution;
             if (sourceText) {
                 var addSourceText = function (sx, sw, sy) {
                     var sourceItem = addText(container, layerid, id + "__source__", sx, sy, sy + sourceHeight / 2.0,
-                    0.9 * sourceHeight, sourceText,
-                    {
-                        fontName: contentItemHeaderFontName, fillStyle: contentItemSourceFontColor, textBaseline: 'middle', textAlign: 'right',
+                    0.9 * sourceHeight, sourceText, {
+                        fontName: contentItemHeaderFontName,
+                        fillStyle: contentItemSourceFontColor,
+                        textBaseline: 'middle',
+                        textAlign: 'right',
+                        opacity: 1,
                         adjustWidth: true
                     }, sw);
 
-                    if (contentItem.mediaSource) { // we've got a URL here
+                    if (this.contentItem.mediaSource) { // we've got a URL here
                         sourceItem.reactsOnMouse = true;
                         sourceItem.onmouseclick = function (e) {
                             vc.element.css('cursor', 'default');
-                            window.open(contentItem.mediaSource);
+                            window.open(this.contentItem.mediaSource);
                             return true;
                         };
                         sourceItem.onmouseenter = function (pv, e) {
@@ -2121,7 +2131,7 @@ function ContentItem(vc, layerid, id, vx, vy, vw, vh, contentItem) {
             addScrollText(container, layerid, id + "__description__", vx + leftOffset, descrTop,
                             contentWidth,
                             descrHeight,
-                            contentItem.description, 30,
+                            this.contentItem.description, 30,
                             {});
 
             return {
@@ -2735,6 +2745,10 @@ function buildVcContentItems(contentItems, xc, yc, rad, vc, layerid) {
 
     var _ytc = -_hc / 2 - 9.0 * k - _lh / 2;
     var _ybc = -_ytc;
+
+    // save the order of content items
+    for (var i = 0; i < contentItems.length; i++)
+        contentItems[i].index = i;
 
     // 0th is a central content item
     vcitems.push(

@@ -73,6 +73,12 @@ namespace UI.Controllers
                     }
 
                     //Add new ContentItem
+                    // generating guid
+                    contentItemData.id = Guid.NewGuid().ToString();
+                    // generating UniqueID
+                    // TODO: fine better solution to create actually uniqueid or remove this field totally
+                    var random = new Random();
+                    contentItemData.UniqueID = random.Next(10000, int.MaxValue);
                     Globals.Mutex.WaitOne();
                     exh.contentItems.Add(contentItemData);
                     Globals.Mutex.ReleaseMutex();

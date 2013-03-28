@@ -433,7 +433,7 @@ function Convert(parent, timeline) {
                             guid: childInfodot.id,
                             title: childInfodot.title,
                             date: childInfodot.time,
-                        opacity: 0
+                        opacity: 1
                     });
         });
     }
