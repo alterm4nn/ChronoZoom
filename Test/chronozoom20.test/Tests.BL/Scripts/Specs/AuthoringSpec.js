@@ -10,62 +10,59 @@
 
 describe("CZ.Authoring", function () {
     var authoring;
+    var existedTimeline;
+    var parentTimeline = {};
+    parentTimeline.guid = "00000000-0000-0000-0000-000000000000";
+    parentTimeline.id = "t55";
+    parentTimeline.height = 10;
+    parentTimeline.width = 10;
+    parentTimeline.x = -10;
+    parentTimeline.y = 0;
+    parentTimeline.children = [];
     beforeEach(function () {
+        var editmode = true;
         authoring = CZ.Authoring;
     });
 
+    describe("Given: timelines are", function () {
+        describe("horizontal and parallel", function () {
+            existedTimeline = {y: 5,height: 2,x: -5,width: 3,parent: parentTimeline,title: "Timeline Title",type: "timeline",children: []};
+            var newTimeline = { y: 1, height: 2, x: -8, width: 1, parent: parentTimeline, title: "Timeline Title", type: "timeline", children: [] };
+            parentTimeline.children = [existedTimeline];
+            describe("When: user extends timeline without overlay", function () {
+                it("Then: The timeline should be extended", function () {
+                    var propFake = { title: "Timeline Title11", start: "-5", end: "-2" };
+                    _selectedTimeline = newTimeline;
+                    authoring.updateTimeline(newTimeline, propFake);
+                    expect(newTimeline.title).toEqual("Timeline Title11");
+                    expect(newTimeline.width).toEqual(propFake.end - propFake.start);
+                });
+            });
 
-    it("works fine", function () {
+            describe("When: user extends timeline with parent right border overlay ", function () {
+                it("Then: The timeline should not be extended", function () {
+                    var propFake = { title: "Timeline Title11", start: "-5", end: "0.01" };
+                    var widthBeforeChanges = newTimeline.width;
+                    _selectedTimeline = newTimeline;
+                    authoring.updateTimeline(newTimeline, propFake);
+                    expect(newTimeline.title).toEqual("Timeline Title11");
+                    expect(newTimeline.width).toEqual(widthBeforeChanges);
+                });
+            });
 
-        var tcfake = {};
-        
-        var tcfake1 = {
-            height: 630402910.1206665,
-            newHeight: 630402910.1206665,
-            newY: 3513332454.40149,
-            parent: tpfake,
-            title: "Timeline Title",
-            type: "timeline",
-            width: 1000,
-            x: -6850000000,
-            y: 3513332454.40149,
-            children: []
-        };
+            describe("When: user extends timeline with parent left border overlay ", function () {
+                it("Then: The timeline should not be extended", function () {
+                    var propFake = { title: "Timeline Title11", start: "-11.00000004", end: "-0.9" };
+                    var widthBeforeChanges = newTimeline.width;
+                    _selectedTimeline = newTimeline;
+                    authoring.updateTimeline(newTimeline, propFake);
+                    expect(newTimeline.title).toEqual("Timeline Title11");
+                    expect(newTimeline.width).toEqual(widthBeforeChanges);
+                });
+            });
 
-        var tpfake = {};
-        tpfake.guid = "00000000-0000-0000-0000-000000000000";
-        tpfake.id = "t55";
-        tpfake.height = 6743440911.46846;
-        tpfake.newHeight = 6743440911.46846;
-        tpfake.newY = 0;
-        tpfake.width = 13700000000;
-        tpfake.x = -13700000000;
-        tpfake.y = 0;
-        tpfake.children = [tcfake1];
-
-        var tcfake = {
-            height: 630402910.1206665,
-            newHeight: 630402910.1206665,
-            newY: 3513332454.40149,
-            parent: tpfake,
-            title: "Timeline Title",
-            type: "timeline",
-            width: 1489212671.7343273,
-            x: -12724623677.939362,
-            y: 3513332454.40149,
-            children: []
-        };
-
-      
-        
-        var editmode = true;
-        //var propFake = { title: "Timeline Title11", start: "-12724623677.939362", end: "-11235411006.205034" };
-        var propFake = { title: "Timeline Title11", start: "-12724623677.939362", end: "-11235411006.205034" };
-        
-        _selectedTimeline = tcfake;
-        var title = authoring.updateTimeline(tcfake, propFake);
-        expect(tcfake.title).toEqual("Timeline Title11");
-        expect(tcfake.width).toEqual(propFake.end - propFake.start);
+        });
     });
+
 
 });
