@@ -244,7 +244,7 @@ var CZ = (function (CZ, $) {
 
         // remove and then adding infodot to position content items properly
         removeChild(parent, id);
-        addInfodot(parent, "layerInfodots", id, time, vyc, radv, cis, descr);            
+        return addInfodot(parent, "layerInfodots", id, time, vyc, radv, cis, descr);            
     }
 
     /**
@@ -277,7 +277,8 @@ var CZ = (function (CZ, $) {
      * @return {Object} Created exhibit.
      */
     function createNewExhibit() {
-        var date = getInfodotDate(_circleCur.x);
+        // var date = getInfodotDate(_circleCur.x);
+        var date = _circleCur.x;
 
         removeChild(_hovered, "newExhibitCircle");
         return addInfodot(
@@ -540,13 +541,15 @@ var CZ = (function (CZ, $) {
             t.title = prop.title;
             updateTimelineTitle(t);
 
-            CZ.Service.putTimeline(_selectedTimeline).then(
-                (function (t) {
-                    return function (response) {
-                        removeChild(t.parent, t.id);
-                    };
-                })(_selectedTimeline)
-            );
+            CZ.Service.putTimeline(t);
+
+            //CZ.Service.putTimeline(_selectedTimeline).then(
+            //    (function (t) {
+            //        return function (response) {
+            //            removeChild(t.parent, t.id);
+            //        };
+            //    })(_selectedTimeline)
+            //);
         },
 
         /**
@@ -585,7 +588,8 @@ var CZ = (function (CZ, $) {
             e.title = temp.title;
             e.contentItems = prop.contentItems;
 
-            renewExhibit(e);
+            e = renewExhibit(e);
+            CZ.Service.putExhibit(e);
 
             // TODO: Update title!
         },

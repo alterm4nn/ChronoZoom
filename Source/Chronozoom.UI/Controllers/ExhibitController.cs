@@ -65,6 +65,12 @@ namespace UI.Controllers
                         }
                     }
                     //Create
+                    // generating guid
+                    exhibitData.id = Guid.NewGuid().ToString();
+                    // generating UniqueID
+                    // TODO: fine better solution to create actually uniqueid or remove this field totally
+                    var random = new Random();
+                    exhibitData.UniqueID = random.Next(10000, int.MaxValue);
                     foundTimeline.exhibits.Add(exhibitData);
                 }
                 else

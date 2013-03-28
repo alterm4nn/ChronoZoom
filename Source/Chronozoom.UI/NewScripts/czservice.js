@@ -50,14 +50,14 @@
                 time: e.infodotDescription.date,
                 title: e.title,
                 description: undefined,
-                contentItems: undefined
+                contentItems: e.contentItems
             };
         },
 
         contentItem: function (ci) {
             return {
                 id: ci.id,
-                parent: ci.parent,
+                parent: ci.parent.id,
                 title: ci.title,
                 description: ci.description,
                 uri: ci.uri,

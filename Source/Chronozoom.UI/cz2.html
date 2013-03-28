@@ -724,7 +724,7 @@
                 width: 600,
                 buttons: {
                     "save and close": function () {
-                        contentItems = getContentItemsData();
+                        contentItems = getContentItemsData(e);                        
 
                         //if ((dateInput.val() > 0) || (dateInput.val() < - 13700000000))
                         
@@ -947,7 +947,7 @@
                 var mediaInput = $(this).find(".cz-auth-ci-media-source");
                 var mediaTypeInput = $(this).find(".cz-auth-ci-media-type option");
                 var descriptionInput = $(this).find(".cz-auth-ci-description");
-
+                var id = $(this).attr("cz-auth-ci-id") || "";
 
                 var selected = mediaTypeInput[0];
 
@@ -960,7 +960,10 @@
                     title: CItitleInput.val(),
                     description: descriptionInput.val(),
                     uri: mediaInput.val(),
-                    mediaType: selected.text
+                    mediaType: selected.text,
+                    id: id,
+                    parent: "",
+                    UniqueID: ""
                 });
             });
 
@@ -974,9 +977,12 @@
             var mediaTypeInput = form.find(".cz-auth-ci-media-type option");
             var descriptionInput = form.find(".cz-auth-ci-description");
             var mediaType = contentItem.mediaType.toLowerCase();
+
             if (mediaType === "picture") {
                 mediaType = "image";
             }
+
+            form.attr("cz-auth-ci-id", contentItem.id);
             titleInput.val(contentItem.title);
             mediaInput.val(contentItem.uri);
             descriptionInput.val(contentItem.description);
