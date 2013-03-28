@@ -26,8 +26,8 @@ describe("CZ.Authoring", function () {
             parent: tpfake,
             title: "Timeline Title",
             type: "timeline",
-            width: 1,
-            x: -13700000000,
+            width: 1000,
+            x: -6850000000,
             y: 3513332454.40149,
             children: []
         };
@@ -60,7 +60,7 @@ describe("CZ.Authoring", function () {
         
         var editmode = true;
         //var propFake = { title: "Timeline Title11", start: "-12724623677.939362", end: "-11235411006.205034" };
-        var propFake = { title: "Timeline Title11", start: "-12724623677.939362", end: "-1" };
+        var propFake = { title: "Timeline Title11", start: "-12724623677.939362", end: "-11235411006.205034" };
         
         _selectedTimeline = tcfake;
         var title = authoring.updateTimeline(tcfake, propFake);
