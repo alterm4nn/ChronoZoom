@@ -685,6 +685,9 @@ namespace UI
         {
             public string Id { get; set; }
             public string Title { get; set; }
+            public string Caption { get; set; }
+            public string MediaType { get; set; }
+            public string Uri { get; set; }
             public string ParentExhibitId { get; set; }
         }
 
@@ -743,7 +746,14 @@ namespace UI
 
                 // Parent content item is valid - add new content item
                 Guid newContentItemGuid = Guid.NewGuid();
-                ContentItem newContentItem = new ContentItem { Id = newContentItemGuid, Title = contentItemRequest.Title };
+                ContentItem newContentItem = new ContentItem
+                    {
+                        Id = newContentItemGuid,
+                        Title = contentItemRequest.Title,
+                        Caption = contentItemRequest.Caption,
+                        MediaType = contentItemRequest.MediaType,
+                        Uri = contentItemRequest.Uri
+                    };
                 newContentItem.Collection = collection;
 
                 // Update parent exhibit.
@@ -775,6 +785,9 @@ namespace UI
 
                 // Update the content item fields
                 updateContentItem.Title = contentItemRequest.Title;
+                updateContentItem.Caption = contentItemRequest.Caption;
+                updateContentItem.MediaType = contentItemRequest.MediaType;
+                updateContentItem.Uri = contentItemRequest.Uri;
                 retval = updateContentItemGuid;
             }
             _storage.SaveChanges();
