@@ -66,6 +66,7 @@ namespace Tests
         [TestMethod]
         public void ReportAProblemLink()
         {
+            //Issue https://github.com/alterm4nn/ChronoZoom/issues/114
             HomePageHelper.OpenReportAProblemLink();
             Assert.AreEqual("Issues · alterm4nn/ChronoZoom", HomePageHelper.GetTitle());
         }
@@ -73,6 +74,7 @@ namespace Tests
         [TestMethod]
         public void BehindTheScenesLink()
         {
+            //issue https://github.com/alterm4nn/ChronoZoom/issues/115
             HomePageHelper.OpenBehindTheScenesLink();
             Assert.AreEqual("Behind the scenes", HomePageHelper.GetTitle());
         }
