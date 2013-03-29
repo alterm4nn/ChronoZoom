@@ -115,37 +115,35 @@ describe("CZ.Authoring", function () {
             });
         });
     });
-    
+
     describe("When: user changes title", function () {
         var title = "New title";
         var start;
         var end;
         existedTimeline = { y: 5, height: 2, x: -5, width: 3, parent: parentTimeline, title: "Timeline Title", type: "timeline", children: [] };
-        var newTimeline = { y: 1, height: 2, x: -8, width: 1, parent: parentTimeline, title: "Timeline Title", type: "timeline", children: [] };     
+        var newTimeline = { y: 1, height: 2, x: -8, width: 1, parent: parentTimeline, title: "Timeline Title", type: "timeline", children: [] };
         _selectedTimeline = newTimeline;
         var propFake = { title: title, start: start, end: end };
+        
+        data1 = ["-5", "-2", "title","incorrect timeline values"]
+        data2 = ["-8", "-6", "title", "correct timeline values"]
 
-        describe("And: timeline has incorrect values", function () {
-            start = "-5";
-            end = "-2";
-            propFake = { title: title, start: start, end: end };
-            beforeEach(function () {
+        using("When", [data1, data2], function (value1, value2, value3) {
+            it("The title should be changed", function () {
+                var propFake = { title: value3, start: value1, end: value2 };
                 authoring.updateTimeline(newTimeline, propFake);
-            });
-            it("Then: The title should be changed", function () {
-                expect(newTimeline.title).toEqual(title);
-            });
-        });
-        describe("And: timeline has correct values", function () {
-            start = "-5";
-            end = "-2";
-            propFake = { title: title, start: start, end: end };
-            beforeEach(function () {
-                authoring.updateTimeline(newTimeline, propFake);
-            });
-            it("Then: The title should be changed", function () {
-                expect(newTimeline.title).toEqual(title);
+                expect(newTimeline.title).toEqual(value3);
             });
         });
     });
 });
+
+function using(name, values, func) {
+    for (var i = 0, count = values.length; i < count; i++) {
+        if (Object.prototype.toString.call(values[i]) !== '[object Array]') {
+            values[i] = [values[i]];
+        }
+        func.apply(this, [values[i][0], values[i][1]]);
+        jasmine.currentEnv_.currentSpec.description += ' ' + name + ': ' + values[i][3].concat(' ');
+    }
+}
