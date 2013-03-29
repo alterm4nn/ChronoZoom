@@ -22,12 +22,12 @@ function titleObject(name) {
 }
 
 function Prepare(timeline) {
-    timeline.left = timeline.start;
-    timeline.right = timeline.end;
+    timeline.left = getCoordinateFromDecimalYear(timeline.start);
+    timeline.right = getCoordinateFromDecimalYear(timeline.end);
 
     if (timeline.exhibits instanceof Array) {
         timeline.exhibits.forEach(function (exhibit) {
-            exhibit.x = exhibit.time;
+            exhibit.x = getCoordinateFromDecimalYear(exhibit.time);
         });
     }
 
@@ -426,6 +426,10 @@ function Convert(parent, timeline) {
     if (timeline.exhibits instanceof Array) {
         timeline.exhibits.forEach(function (childInfodot) {
             var contentItems = [];
+			if (typeof childInfodot.contentItems !== 'undefined') {
+                contentItems = childInfodot.contentItems;
+			}
+
             var infodot1 = addInfodot(t1, "layerInfodots", 'e' + childInfodot.UniqueID,
                     (childInfodot.left + childInfodot.right) / 2.0, childInfodot.y, 0.8 * childInfodot.size / 2.0, contentItems,
                     {
