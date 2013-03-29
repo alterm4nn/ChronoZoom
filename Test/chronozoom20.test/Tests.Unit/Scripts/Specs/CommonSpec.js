@@ -46,6 +46,11 @@ describe("isLeapYear() method", function () {
             expect(true).toEqual(result);
         });
 
+        it("false, if year less than zero)", function () {
+            var year = -1600;
+            var result = isLeapYear(year);
+            expect(false).toEqual(result);
+        });
     });
 });
 
@@ -92,6 +97,28 @@ describe("getYearsBetweenDates() method", function () {
             var d2 = 28;
             var result = getYearsBetweenDates(y1,m1,d1,y2,m2,d2);
             expect(-1.0027397260273974).toEqual(result);
+        });
+        
+        it("19, if start date = (10)-1-1 and end date = (-10)-1-1", function () {
+            var y1 = 10;
+            var m1 = 1;
+            var d1 = 1;
+            var y2 = -10;
+            var m2 = 1;
+            var d2 = 1;
+            var result = getYearsBetweenDates(y1, m1, d1, y2, m2, d2);
+            expect(19).toEqual(result);
+        });
+        
+        it("-19, if start date = (-10)-1-1 and end date = (10)-1-1", function () {
+            var y1 = -10;
+            var m1 = 1;
+            var d1 = 1;
+            var y2 = 10;
+            var m2 = 1;
+            var d2 = 1;
+            var result = getYearsBetweenDates(y1, m1, d1, y2, m2, d2);
+            expect(-19).toEqual(result);
         });
     });
 });
