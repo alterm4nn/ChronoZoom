@@ -264,7 +264,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
 
     function getMissingTimelines(vbox, lca) {
         var url = serverUrlBase
-                + "/api/Structure?"
+                + "/ChronoZoom.svc/GetTimelines?"
                 + "lca=" + lca.guid
                 + "&start=" + vbox.left
                 + "&end=" + vbox.right
@@ -280,8 +280,10 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
             context: { timerId: requestTimer },
             success: function (response) {
                 Merge(response, lca);
-                var exhibitIds = extractExhibitIds(response);
-                getMissingExhibits(vbox, lca, exhibitIds);
+
+                // NYI: Server currently does not support incremental data. Consider/Future:
+                //      var exhibitIds = extractExhibitIds(response);
+                //      getMissingExhibits(vbox, lca, exhibitIds);
             },
             error: function (xhr) {
                 console.log("Error connecting to service:\n" + url);

@@ -12,7 +12,7 @@ module ChronoZoom {
         */
         export function PanZoomAnimation(startViewport) {
             this.isForciblyStoped = false;
-            this.ID = globalAnimationID++;
+            this.id = globalAnimationID++;
             var startVisible = startViewport.visible;
 
             this.velocity = 0.001; //affects animation speed, is to be overrided by the viewportController according to settings.js file
@@ -155,7 +155,7 @@ module ChronoZoom {
         */
         export function EllipticalZoom(startVisible, endVisible) {
             this.isForciblyStoped = false;
-            this.ID = globalAnimationID++;
+            this.id = globalAnimationID++;
             this.type = "EllipticalZoom";
             this.isActive = true;
             this.targetVisible = new ChronoZoom.Viewport.VisibleRegion2d(endVisible.centerX, endVisible.centerY, endVisible.scale);
