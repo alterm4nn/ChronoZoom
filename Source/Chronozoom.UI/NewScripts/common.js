@@ -64,18 +64,25 @@ function preventbubble(e) {
 }
 
 function getCoordinateFromDate(dateTime) {
-    var localPresent = getPresent();
-    return getYearsBetweenDates(dateTime.getFullYear(), dateTime.getMonth(), dateTime.getDay(), localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+	return getYearsBetweenDates(dateTime.getFullYear(), dateTime.getMonth(), dateTime.getDay(), 0, 0, 0);
 }
 
 function getCoordinateFromDMY(year, month, day) {
-    var localPresent = getPresent();
-    return getYearsBetweenDates(year, month, day, localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+    return getYearsBetweenDates(year, month, day, 0, 0, 0);
 }
 
 function getDMYFromCoordinate(coord) {
+    return getDateFrom(0, 0, 0, coord);
+}
+
+// convert date to virtual coordinate
+// 9999 -> present day
+function getCoordinateFromDecimalYear(decimalYear) {
+    // get virtual coordinate of present day
     var localPresent = getPresent();
-    return getDateFrom(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay, coord);
+    var presentDate = getYearsBetweenDates(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay, 0, 0, 0);
+
+    return decimalYear === 9999 ? presentDate : decimalYear;
 }
 
 var present = undefined;
@@ -444,6 +451,11 @@ function InitializeRegimes(content) {
         bottom: cosmosTimeline.y + cosmosTimeline.height
     };
 
+    // update virtual canvas horizontal borders
+    maxPermitedTimeRange = {
+        left: cosmosTimeline.left,
+        right: cosmosTimeline.right
+    };
     maxPermitedScale = navStringToVisible(cosmosVisible, vc).scale * 1.1;
 }
 
