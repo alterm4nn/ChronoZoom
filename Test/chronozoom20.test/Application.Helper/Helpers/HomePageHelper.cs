@@ -13,13 +13,6 @@ namespace Application.Helper.Helpers
         {
             _manager = new HelperManager();
         }
-        public void CloseWelcomePopup()
-        {
-            Logger.Log("<-");
-            ClickCloseButton();
-            WaitCondition(()=>Convert.ToBoolean(GetJavaScriptExecutionResult("visReg != undefined")),60);
-            Logger.Log("->");
-        }
 
         public string GetEukaryoticCellsDescription()
         {
@@ -89,7 +82,6 @@ namespace Application.Helper.Helpers
             double size = timescale.Size.Width;
             MoveToElementCoordinates(By.Id("axis"), (int)Math.Round(size/4), 0);
             Logger.Log("->");
-            
         }
     }
 }

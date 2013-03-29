@@ -2,17 +2,16 @@
 
 namespace Tests
 {
-    [TestClass]
-    public class PhanerozoicAgeTests : TestBase
+    public class FooterPageTests : TestBase
     {
-        public TestContext TestContext { get; set; }
 
         #region Initialize and Cleanup
+        public TestContext TestContext { get; set; }
 
         [ClassInitialize]
         public static void ClassInitialize(TestContext testContext)
         {
-            
+
         }
 
         [TestInitialize]
@@ -32,25 +31,8 @@ namespace Tests
         public void TestCleanup()
         {
             CreateScreenshotsIfTestFail(TestContext);
-            NavigationHelper.NavigateToCosmos();
         }
 
         #endregion
-
-        [TestMethod]
-        public void Test_Eukaryotic_Cells_Description()
-        {
-
-            string description = HomePageHelper.GetEukaryoticCellsDescription();
-            StringAssert.Contains(description, "Eukaryote cells");
-        }
-
-        [TestMethod]
-        public void Test_Navigate_To_Life()
-        {
-            HomePageHelper.OpenLifeTimeline();
-            string actual = HomePageHelper.GetLastBreadcrumbs();
-            Assert.AreEqual("Life", actual);
-        }
     }
 }

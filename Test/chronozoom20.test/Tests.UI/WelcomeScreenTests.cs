@@ -3,16 +3,15 @@
 namespace Tests
 {
     [TestClass]
-    public class PhanerozoicAgeTests : TestBase
+    public class WelcomeScreenTests : TestBase
     {
-        public TestContext TestContext { get; set; }
-
         #region Initialize and Cleanup
+        public TestContext TestContext { get; set; }
 
         [ClassInitialize]
         public static void ClassInitialize(TestContext testContext)
         {
-            
+
         }
 
         [TestInitialize]
@@ -20,7 +19,6 @@ namespace Tests
         {
             BrowserStateManager.RefreshState();
             NavigationHelper.OpenHomePage();
-            WelcomeScreenHelper.CloseWelcomePopup();
         }
 
         [ClassCleanup]
@@ -32,25 +30,15 @@ namespace Tests
         public void TestCleanup()
         {
             CreateScreenshotsIfTestFail(TestContext);
-            NavigationHelper.NavigateToCosmos();
         }
 
         #endregion
 
         [TestMethod]
-        public void Test_Eukaryotic_Cells_Description()
+        public void When_user_clicks_start_exploring_welcome_popup_is_closed()
         {
-
-            string description = HomePageHelper.GetEukaryoticCellsDescription();
-            StringAssert.Contains(description, "Eukaryote cells");
-        }
-
-        [TestMethod]
-        public void Test_Navigate_To_Life()
-        {
-            HomePageHelper.OpenLifeTimeline();
-            string actual = HomePageHelper.GetLastBreadcrumbs();
-            Assert.AreEqual("Life", actual);
+            WelcomeScreenHelper.StartExploring();
+            Assert.IsFalse(WelcomeScreenHelper.IsWelcomeScreenDispalyed(), "WelcomeScreen is not closed");
         }
     }
 }

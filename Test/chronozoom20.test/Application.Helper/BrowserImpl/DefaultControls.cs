@@ -21,7 +21,8 @@ namespace Application.Helper.BrowserImpl
             string script = String.Format("controller.moveToVisible(new VisibleRegion2d(-{0},222893683.28948474,0.0009286813988062588),false)", targetDate);
             Logger.Log("- script: " + script);
             ExecuteJavaScript(script);
-            WaitForElementIsDisplayed(By.Id("bc_link_t550"));
+            //Wait For Humanity in bread crumbs
+            WaitForElementIsDisplayed(By.Id("bc_link_t161"));
             WaitAnimation();
         }
     }
