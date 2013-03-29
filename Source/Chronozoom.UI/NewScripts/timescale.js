@@ -1167,12 +1167,9 @@
 
             this.startDate = this.present;
             this.endDate = this.present;
-            if (this.range.min < 0) {
-                this.startDate = getDMYFromCoordinate(this.range.min);
-            }
-            if (this.range.max < 0) {
-                this.endDate = getDMYFromCoordinate(this.range.max);
-            }
+
+            this.startDate = getDMYFromCoordinate(this.range.min);
+            this.endDate = getDMYFromCoordinate(this.range.max);
 
             // set default constant for arranging ticks
             this.delta = 1;
