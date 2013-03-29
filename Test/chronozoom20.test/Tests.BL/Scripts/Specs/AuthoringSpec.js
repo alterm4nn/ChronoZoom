@@ -115,4 +115,37 @@ describe("CZ.Authoring", function () {
             });
         });
     });
+    
+    describe("When: user changes title", function () {
+        var title = "New title";
+        var start;
+        var end;
+        existedTimeline = { y: 5, height: 2, x: -5, width: 3, parent: parentTimeline, title: "Timeline Title", type: "timeline", children: [] };
+        var newTimeline = { y: 1, height: 2, x: -8, width: 1, parent: parentTimeline, title: "Timeline Title", type: "timeline", children: [] };     
+        _selectedTimeline = newTimeline;
+        var propFake = { title: title, start: start, end: end };
+
+        describe("And: timeline has incorrect values", function () {
+            start = "-5";
+            end = "-2";
+            propFake = { title: title, start: start, end: end };
+            beforeEach(function () {
+                authoring.updateTimeline(newTimeline, propFake);
+            });
+            it("Then: The title should be changed", function () {
+                expect(newTimeline.title).toEqual(title);
+            });
+        });
+        describe("And: timeline has correct values", function () {
+            start = "-5";
+            end = "-2";
+            propFake = { title: title, start: start, end: end };
+            beforeEach(function () {
+                authoring.updateTimeline(newTimeline, propFake);
+            });
+            it("Then: The title should be changed", function () {
+                expect(newTimeline.title).toEqual(title);
+            });
+        });
+    });
 });
