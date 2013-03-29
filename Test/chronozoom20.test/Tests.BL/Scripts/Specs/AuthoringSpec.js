@@ -117,22 +117,27 @@ describe("CZ.Authoring", function () {
     });
 
     describe("When: user changes title", function () {
-        var title = "New title";
+        var title;
         var start;
         var end;
         existedTimeline = { y: 5, height: 2, x: -5, width: 3, parent: parentTimeline, title: "Timeline Title", type: "timeline", children: [] };
         var newTimeline = { y: 1, height: 2, x: -8, width: 1, parent: parentTimeline, title: "Timeline Title", type: "timeline", children: [] };
         _selectedTimeline = newTimeline;
-        var propFake = { title: title, start: start, end: end };
-        
-        data1 = ["-5", "-2", "title","incorrect timeline values"]
-        data2 = ["-8", "-6", "title", "correct timeline values"]
+        var propFake = { title: title, start: start, end: end };        
+        dataIncorrect = ["-5", "-2", "title","incorrect timeline values"]
+        dataCorrect = ["-8", "-6", "title", "correct timeline values"]
 
-        using("When", [data1, data2], function (value1, value2, value3) {
+        using("When", [dataIncorrect, dataCorrect], function (startValue, endValue, titleValue) {
             it("The title should be changed", function () {
-                var propFake = { title: value3, start: value1, end: value2 };
+                var propFake = { title: titleValue, start: startValue, end: endValue };
                 authoring.updateTimeline(newTimeline, propFake);
-                expect(newTimeline.title).toEqual(value3);
+                expect(newTimeline.title).toEqual(titleValue);
+            });
+        });
+        describe("And: title is empty", function () {
+            it("Then: error should be thrown", function () {
+                var propFake = { title: "", start: "-5", end: "-4" };                
+                expect(function () { authoring.updateTimeline(newTimeline, propFake); }).toThrow(new Error("Title is empty"));
             });
         });
     });
