@@ -168,7 +168,7 @@ module ChronoZoom {
                                 $("<div class='searchResultSection'>" + sectionTitle + "</div>").appendTo(output);
                                 first = false;
                             }
-                            $("<div class='searchResult' resultId='" + resultId + "'>" + results[i].Title + "</div>")
+                            $("<div class='searchResult' resultId='" + resultId + "'>" + results[i].title + "</div>")
                                     .appendTo(output)
                                     .click(function () {
                                         goToSearchResult(this.getAttribute('resultId'));

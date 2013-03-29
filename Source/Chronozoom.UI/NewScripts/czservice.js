@@ -83,7 +83,7 @@
         },
 
         getStructure: function (r) {
-            var request = new Service.Request(serverUrlBase + "/api/" + Service.collectionName + "/Structure");
+            var request = new Service.Request(serverUrlBase + "/ChronoZoom.svc/GetTimelines");
             request.addParameters(r);
 
             return $.ajax({

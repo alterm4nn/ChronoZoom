@@ -40,7 +40,7 @@ namespace UI
         private static readonly TraceSource Trace = new TraceSource("Service", SourceLevels.All) { Listeners = { Global.SignalRTraceListener } };
         private readonly Storage _storage = new Storage();
         private static MD5 _md5Hasher = MD5.Create();
-        private const decimal _minYear = -20000000000;
+        private const decimal _minYear = -13700000000;
         private const decimal _maxYear = 9999;
 
         // error code descriptions
@@ -59,62 +59,63 @@ namespace UI
         }
 
         [OperationContract]
+        [Obsolete]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public BaseJsonResult<IEnumerable<Timeline>> Get(string supercollection, string collection, string start, string end, string timespan)
+        public BaseJsonResult<IEnumerable<Timeline>> Get(string supercollection, string collection)
+        {
+            Trace.TraceInformation("Get Timelines");
+
+            Guid collectionId = CollectionIdOrDefault(supercollection, collection);
+
+            string timelineCacheKey = string.Format(CultureInfo.InvariantCulture, "Timeline {0}", collectionId);
+            lock (Cache)
+            {
+                if (Cache.Contains(timelineCacheKey))
+                {
+                    return new BaseJsonResult<IEnumerable<Timeline>>((IEnumerable<Timeline>)Cache[timelineCacheKey]);
+                }
+
+                Collection<Timeline> timelines = _storage.TimelinesQuery(collectionId, _minYear, _maxYear, 0, null);
+
+                // Remove Guid.Empty assignment once client supports multiple timelines
+                if (timelines.Any())
+                    timelines.FirstOrDefault().Id = Guid.Empty;
+
+                Trace.TraceInformation("Add Timelines to cache");
+                Cache.Add(timelineCacheKey,
+                    timelines,
+                    DateTime.Now.AddMinutes(
+                        int.Parse(ConfigurationManager.AppSettings["CacheDuration"],
+                        CultureInfo.InvariantCulture)));
+
+                return new BaseJsonResult<IEnumerable<Timeline>>(timelines);
+            }
+         }
+
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        public Timeline GetTimelines(string supercollection, string collection, string start, string end, string minspan, string lca)
         {
             Trace.TraceInformation("Get Filtered Timelines");
 
             Guid collectionId = CollectionIdOrDefault(supercollection, collection);
 
-            string timelineCacheKey = string.Format(CultureInfo.InvariantCulture, "Timeline {0}", collectionId);
-            if (AllDataRequested(start, end, timespan))
-            {
-                lock (Cache)
-                {
-                    if (Cache.Contains(timelineCacheKey))
-                    {
-                        return new BaseJsonResult<IEnumerable<Timeline>>((IEnumerable<Timeline>)Cache[timelineCacheKey]);
-                    }
-                }
-            }
-
             // initialize filters
             decimal startTime = string.IsNullOrWhiteSpace(start) ? _minYear : decimal.Parse(start);
             decimal endTime = string.IsNullOrWhiteSpace(end) ? _maxYear : decimal.Parse(end);
-            decimal span = string.IsNullOrWhiteSpace(timespan) ? 0 : decimal.Parse(timespan);
+            decimal span = string.IsNullOrWhiteSpace(minspan) ? 0 : decimal.Parse(minspan);
+            Guid lcaParsed = string.IsNullOrWhiteSpace(lca) ? Guid.Empty : Guid.Parse(lca);
 
-            Collection<Timeline> timelines = _storage.TimelinesQuery(collectionId, startTime, endTime, span);
+            Collection<Timeline> timelines = _storage.TimelinesQuery(collectionId, startTime, endTime, span, lcaParsed);
+            Timeline timeline = timelines.Where(candidate => candidate.Id == lcaParsed).FirstOrDefault();
 
-            // cache only when all data is requested
-            if (AllDataRequested(start, end, timespan))
-            {
-                lock (Cache)
-                {
-                    // Remove Guid.Empty assignment once client supports multiple timelines
-                    if (timelines.Any())
-                        timelines.FirstOrDefault().Id = Guid.Empty;
-
-                    Trace.TraceInformation("Add Timelines to cache");
-                    Cache.Add(timelineCacheKey,
-                        timelines,
-                        DateTime.Now.AddMinutes(
-                            int.Parse(ConfigurationManager.AppSettings["CacheDuration"],
-                            CultureInfo.InvariantCulture)));
-                }
-            }
-
-            return new BaseJsonResult<IEnumerable<Timeline>>((IEnumerable<Timeline>)timelines);
-         }
-
-        private static bool AllDataRequested(string start, string end, string timespan)
-        {
-            return string.IsNullOrWhiteSpace(start) && string.IsNullOrWhiteSpace(end) && string.IsNullOrWhiteSpace(timespan);
+            return timeline;
         }
 
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public BaseJsonResult<List<Threshold>> GetThresholds()
+        public BaseJsonResult<IEnumerable<Threshold>> GetThresholds()
         {
             Trace.TraceInformation("Get Thresholds");
 
@@ -126,7 +127,7 @@ namespace UI
                     Cache.Add("Thresholds", _storage.Thresholds.ToList(), DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
                 }
 
-                return new BaseJsonResult<List<Threshold>>((List<Threshold>)Cache["Thresholds"]);
+                return new BaseJsonResult<IEnumerable<Threshold>>((List<Threshold>)Cache["Thresholds"]);
             }
         }
 
@@ -156,8 +157,7 @@ namespace UI
             searchResults.AddRange(contentItems.Select(contentItem => new SearchResult { Id = contentItem.Id, Title = contentItem.Title, ObjectType = ObjectType.ContentItem, UniqueId = contentItem.UniqueId }));
 
             Trace.TraceInformation("Search called for search term {0}", searchTerm);
-
-            return new BaseJsonResult<IEnumerable<SearchResult>>((IEnumerable<SearchResult>)searchResults);
+            return new BaseJsonResult<IEnumerable<SearchResult>>(searchResults);
         }
 
         [OperationContract]
@@ -180,13 +180,13 @@ namespace UI
 
             Trace.TraceInformation("GetBibliography called for Exhibit Id {0}", exhibitId);
             _storage.Entry(exhibit).Collection(_ => _.References).Load();
-            return new BaseJsonResult<IEnumerable<Reference>>((IEnumerable<Reference>) exhibit.References.ToList());
+            return new BaseJsonResult<IEnumerable<Reference>>(exhibit.References.ToList());
         }
 
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public BaseJsonResult<List<Tour>> GetTours(string supercollection, string collection)
+        public BaseJsonResult<IEnumerable<Tour>> GetTours(string supercollection, string collection)
         {
             Trace.TraceInformation("Get Tours");
 
@@ -206,13 +206,13 @@ namespace UI
                     Cache.Add(toursCacheKey, tours, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
                 }
 
-                return new BaseJsonResult<List<Tour>>((List<Tour>)Cache[toursCacheKey]);
+                return new BaseJsonResult<IEnumerable<Tour>>((List<Tour>)Cache[toursCacheKey]);
             }
         }
 
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public BaseJsonResult<IEnumerable<SuperCollection>> GetSuperCollection()
+        public BaseJsonResult<SuperCollection> GetSuperCollection()
         {
             Trace.TraceInformation("Get Collections.");
 
@@ -248,7 +248,7 @@ namespace UI
                 _storage.Entry(superCollection).Collection(_ => _.Collections).Load();
             }
 
-            return new BaseJsonResult<IEnumerable<SuperCollection>>((IEnumerable<SuperCollection>)superCollection);
+            return new BaseJsonResult<SuperCollection>(superCollection);
         }
 
         [SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly", Justification = "No unmanaged handles")]
