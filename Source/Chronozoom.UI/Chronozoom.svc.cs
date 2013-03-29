@@ -387,6 +387,7 @@ namespace UI
         {
             public string Id { get; set; }
             public string Title { get; set; }
+            public string Regime { get; set; }
             public string FromYear { get; set; }
             public string ToYear { get; set; }
             public string ParentTimelineId { get; set; }
@@ -443,7 +444,7 @@ namespace UI
 
                 // Parent timeline is valid - add new timeline
                 Guid newTimelineGuid = Guid.NewGuid();
-                Timeline newTimeline = new Timeline { Id = newTimelineGuid, Title = timelineRequest.Title };
+                Timeline newTimeline = new Timeline { Id = newTimelineGuid, Title = timelineRequest.Title, Regime = timelineRequest.Regime };
                 //newTimeline.Title = title;
                 newTimeline.FromYear = (timelineRequest.FromYear == null) ? 0 : Decimal.Parse(timelineRequest.FromYear);
                 newTimeline.ToYear = (timelineRequest.ToYear == null) ? 0 : Decimal.Parse(timelineRequest.ToYear);
@@ -479,6 +480,7 @@ namespace UI
 
                 // Update the timeline fields
                 updateTimeline.Title = timelineRequest.Title;
+                updateTimeline.Regime = timelineRequest.Regime;
                 updateTimeline.FromYear = timelineRequest.FromYear == null ? 0 : Decimal.Parse(timelineRequest.FromYear);
                 updateTimeline.ToYear = timelineRequest.ToYear == null ? 0 : Decimal.Parse(timelineRequest.ToYear);
                 retval = updateTimelineGuid;
@@ -685,6 +687,9 @@ namespace UI
         {
             public string Id { get; set; }
             public string Title { get; set; }
+            public string Caption { get; set; }
+            public string MediaType { get; set; }
+            public string Uri { get; set; }
             public string ParentExhibitId { get; set; }
         }
 
@@ -743,7 +748,14 @@ namespace UI
 
                 // Parent content item is valid - add new content item
                 Guid newContentItemGuid = Guid.NewGuid();
-                ContentItem newContentItem = new ContentItem { Id = newContentItemGuid, Title = contentItemRequest.Title };
+                ContentItem newContentItem = new ContentItem
+                    {
+                        Id = newContentItemGuid,
+                        Title = contentItemRequest.Title,
+                        Caption = contentItemRequest.Caption,
+                        MediaType = contentItemRequest.MediaType,
+                        Uri = contentItemRequest.Uri
+                    };
                 newContentItem.Collection = collection;
 
                 // Update parent exhibit.
@@ -775,6 +787,9 @@ namespace UI
 
                 // Update the content item fields
                 updateContentItem.Title = contentItemRequest.Title;
+                updateContentItem.Caption = contentItemRequest.Caption;
+                updateContentItem.MediaType = contentItemRequest.MediaType;
+                updateContentItem.Uri = contentItemRequest.Uri;
                 retval = updateContentItemGuid;
             }
             _storage.SaveChanges();
