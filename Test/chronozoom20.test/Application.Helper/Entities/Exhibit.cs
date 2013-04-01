@@ -8,5 +8,10 @@ namespace Application.Helper.Entities
         public string Title  { get; set; }
         public string Description  { get; set; }
         public List<ContentItem> ContentItems = new List<ContentItem>();
+
+        public override string ToString()
+        {
+            return string.Format("[ContentItem: Title = {0}, Description = {1}, Time = {2}, ContentItems = {3}]", Title, Description, Time, ContentItems.ToString());
+        }
     }
 }
