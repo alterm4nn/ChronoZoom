@@ -39,7 +39,6 @@ namespace Application.Driver.UserActions
 
         protected CommonActions()
         {
-            
             _wait = Wait(Configuration.ExplicitWait);
         }
 
@@ -323,6 +322,13 @@ namespace Application.Driver.UserActions
         protected void WaitAnimation()
         {
             WaitCondition(AreEqualViewports, 60);
+        }
+
+
+        protected void MoveToElementAndDrugAndDrop(By by, int x = 0, int y = 0)
+        {
+            IWebElement element = FindElement(by);
+            InvokeChain(() => Builder.MoveToElement(element).DragAndDropToOffset(element, 50, 50));
         }
 
     }

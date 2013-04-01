@@ -16,14 +16,6 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
-        public void NavigateTotimeline()
-        {
-            Logger.Log("<-");
-            IWebElement element = FindElement(By.ClassName("virtualCanvasLayerCanvas"));
-            InvokeChain(() => Builder.MoveToElement(element, 1, 1).Click());
-            Logger.Log("->");
-        }
-
         public string GetLastTimelinename()
         {
             Logger.Log("<-");
@@ -42,15 +34,14 @@ namespace Application.Helper.Helpers
         private void SetTimelineName(string timelineName)
         {
             Logger.Log("<- name: " + timelineName);
-            TypeText(By.Id("timelineTitleInput"),timelineName);
+            TypeText(By.Id("timelineTitleInput"), timelineName);
             Logger.Log("->");
         }
 
         private void DrawTimeline()
         {
             Logger.Log("<-");
-            IWebElement element = FindElement(By.ClassName("virtualCanvasLayerCanvas"));
-            InvokeChain(() =>Builder.MoveToElement(element).DragAndDropToOffset(element, 50, 50));
+            MoveToElementAndDrugAndDrop(By.ClassName("virtualCanvasLayerCanvas"), 50, 50);
             Logger.Log("->");
         }
 

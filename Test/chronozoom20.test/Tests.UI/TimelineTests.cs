@@ -42,7 +42,6 @@ namespace Tests
         {
             const string name = "WebdriverTitle";
             TimelineHelper.AddTimeline(name);
-            TimelineHelper.NavigateTotimeline();
             Assert.AreEqual(name,TimelineHelper.GetLastTimelinename());
         }
     }
