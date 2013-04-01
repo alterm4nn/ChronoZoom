@@ -1,18 +1,18 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Application.Helper.Entities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Tests
 {
     [TestClass]
-    public class PhanerozoicAgeTests : TestBase
+    public class ExhibitsTests : TestBase
     {
-        public TestContext TestContext { get; set; }
-
         #region Initialize and Cleanup
+        public TestContext TestContext { get; set; }
 
         [ClassInitialize]
         public static void ClassInitialize(TestContext testContext)
         {
-            
+
         }
 
         [TestInitialize]
@@ -37,19 +37,13 @@ namespace Tests
 
         #endregion
 
-        [TestMethod]
-        public void Test_Eukaryotic_Cells_Description()
-        {
-            string description = HomePageHelper.GetEukaryoticCellsDescription();
-            StringAssert.Contains(description, "eukaryotic cells");
-        }
 
         [TestMethod]
-        public void Test_Navigate_To_Life()
+        public void CreateExhibits()
         {
-            HomePageHelper.OpenLifeTimeline();
-            string actual = HomePageHelper.GetLastBreadcrumbs();
-            Assert.AreEqual("Life", actual);
+            Exhibit exhibit = new Exhibit() {Title = "WebdriverExhibit"};
+            ExhibitHelper.AddExhibit(exhibit);
+            Assert.AreEqual(exhibit.Title, HomePageHelper.GetLastElementName());
         }
     }
 }

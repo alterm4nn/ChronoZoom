@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using Application.Driver;
+﻿using Application.Driver;
+using Application.Helper.Entities;
 using Application.Helper.UserActions;
 using OpenQA.Selenium;
 
@@ -10,72 +7,40 @@ namespace Application.Helper.Helpers
 {
     public class TimelineHelper : DependentActions
     {
-        public List<string> GetLabels()
+        public void AddTimeline(Timeline timeline)
         {
-            Logger.Log("<-");
-            ReadOnlyCollection<IWebElement> webElements = FindElements(By.XPath("//*[@class='cz-timescale-label' and contains(@style,'display: block;')]"));
-            List<string> labels = webElements.Select(label => label.Text).ToList();
-            foreach (string label in labels)
-            {
-                Logger.Log("-> label: " + label + "\r\n");
-            }
-            return labels;
+            Logger.Log("<- timeline: " + timeline);
+            InitTimelineCreationMode();
+            DrawTimeline();
+            SetTimelineName(timeline.Title);
+            SaveAndClose();
+            Logger.Log("->");
         }
 
-        public double GetLeftBorderDate()
+        private void SaveAndClose()
         {
-            Logger.Log("<-");
-            double value = GetBorderDate(By.Id("timescale_left_border"));
-            Logger.Log("-> text: " + value);
-            return value;
-        }
-        
-        public double GetRightBorderDate()
-        {
-            Logger.Log("<-");
-            double value = GetBorderDate(By.Id("timescale_right_border"));
-            Logger.Log("-> text: " + value);
-            return value;
+            Click(By.ClassName("ui-dialog-buttonset"));
         }
 
-        public string GetLeftBorderDateAge()
+        private void SetTimelineName(string timelineName)
         {
-            Logger.Log("<-");
-            string text = GetText(By.Id("timescale_left_border"));
-            Logger.Log("-- text: " + text);
-            return text.Split(' ')[1];
-        } 
-        
-        public string GetRightBorderDateAge()
-        {
-            Logger.Log("<-");
-            string text = GetText(By.Id("timescale_right_border"));
-            Logger.Log("-- text: " + text);
-            return text.Split(' ')[1];
+            Logger.Log("<- timeline: " + timelineName);
+            TypeText(By.Id("timelineTitleInput"), timelineName);
+            Logger.Log("->");
         }
 
-        public string GetMouseMarkerText()
+        private void DrawTimeline()
         {
             Logger.Log("<-");
-            string textMouseMarker = GetText(By.Id("timescale_marker"));
-            Logger.Log("-> text: " + textMouseMarker);
-            return textMouseMarker;
+            MoveToElementAndDrugAndDrop(By.ClassName("virtualCanvasLayerCanvas"), 50, 50);
+            Logger.Log("->");
         }
 
-        private double GetBorderDate(By by)
+        private void InitTimelineCreationMode()
         {
             Logger.Log("<-");
-            string timeText = GetText(by);
-            Logger.Log("-- timeText: " + timeText);
-            double value = ConvertDateToDouble(timeText.Split(' ')[0]);
-            Logger.Log("-> text: " + value);
-            return value;
-        }
-
-        private double ConvertDateToDouble(string date)
-        {
-            double value = Convert.ToDouble(date);
-            return value;
+            MoveToElementAndClick(By.XPath("//*[@id='footer-authoring']/a[1]"));
+            Logger.Log("->");
         }
     }
 }
