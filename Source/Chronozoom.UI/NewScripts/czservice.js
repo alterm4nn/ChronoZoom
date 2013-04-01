@@ -67,7 +67,8 @@
     });
 
     $.extend(Service, {
-        collectionName: "collection",
+        collectionName: null,
+        superCollectionName: null,
 
         /**
          * Information Retrieval.
