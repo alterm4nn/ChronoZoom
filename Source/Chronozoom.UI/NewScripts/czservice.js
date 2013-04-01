@@ -2,6 +2,8 @@
     var Service = CZ.Service = CZ.Service || {};
     Service.Map = Service.Map || {};
 
+    var _serviceUrl = serverUrlBase + "/Chronozoom.svc/"; 
+
     Service.Request = function (urlBase) {
         var _url = urlBase;
         var _hasParameters = false;
@@ -70,6 +72,24 @@
         collectionName: "collection",
 
         /**
+         * Chronozoom.svc Requests.
+         */
+
+        getTimelines: function (r) {
+            var request = new Service.Request(_serviceUrl + "GetTimelines");
+            request.addParameters(r);
+
+            console.log("[GET] " + request.url);
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        },
+
+        /**
          * Information Retrieval.
          */
         
@@ -78,12 +98,12 @@
                 type: "GET",
                 cache: false,
                 dataType: "json",
-                url: serverUrlBase + "/api/collections"
+                url: _serviceUrl + "collections"
             });
         },
 
         getStructure: function (r) {
-            var request = new Service.Request(serverUrlBase + "/ChronoZoom.svc/GetTimelines");
+            var request = new Service.Request(_serviceUrl + "Structure");
             request.addParameters(r);
 
             return $.ajax({
@@ -100,7 +120,7 @@
                 cache: false,
                 contentType: "application/json",
                 dataType: "json",
-                url: serverUrlBase + "/api/" + Service.collectionName + "/Data",
+                url: _serviceUrl + Service.collectionName + "/Data",
                 data: JSON.stringify(r)
             });
         },
@@ -115,7 +135,7 @@
                 cache: false,
                 contentType: "application/json",
                 dataType: "json",
-                url: serverUrlBase + "/api/" + c.name,
+                url: _serviceUrl + c.name,
                 data: JSON.stringify(c)
             });
         },
@@ -125,37 +145,29 @@
                 type: "DELETE",
                 cache: false,
                 contentType: "application/json",
-                url: serverUrlBase + "/api/" + c.name,
+                url: _serviceUrl + c.name,
                 data: JSON.stringify(c)
             });
         },
 
         putTimeline: function (t) {
-            // NOTE: Consider three cases on the server side:
-            //       1. GUID === null => Generate GUID on the server side.
-            //       2. GUID !== null && isNew(GUID) => ...?
-            //       3. GUID !== null && !isNew(GUID) => Update timeline with this GUID.
             return $.ajax({
                 type: "PUT",
                 cache: false,
                 contentType: "application/json",
                 dataType: "json",
-                url: serverUrlBase + "/api/" + Service.collectionName + "/Timeline",
+                url: _serviceUrl + Service.collectionName + "/Timeline",
                 data: JSON.stringify(Service.Map.timeline(t))
             });
         },
 
-        // TODO: According to spec the only parameter should be an id.
         deleteTimeline: function (t) {
             return $.ajax({
                 type: "DELETE",
                 cache: false,
                 contentType: "application/json",
-                url: serverUrlBase + "/api/" + Service.collectionName + "/Timeline",
-                data: JSON.stringify({
-                    id: t.guid,
-                    parent: t.parent.guid
-                })
+                url: _serviceUrl + Service.collectionName + "/Timeline",
+                data: JSON.stringify(Service.Map.timeline(t))
             });
         },
 
@@ -165,7 +177,7 @@
                 cache: false,
                 contentType: "application/json",
                 dataType: "json",
-                url: serverUrlBase + "/api/" + Service.collectionName + "/Exhibit",
+                url: _serviceUrl + Service.collectionName + "/Exhibit",
                 data: JSON.stringify(Service.Map.exhibit(e))
             });
         },
@@ -175,11 +187,8 @@
                 type: "DELETE",
                 cache: false,
                 contentType: "application/json",
-                url: serverUrlBase + "/api/" + Service.collectionName + "/Exhibit",
-                data: JSON.stringify({
-                    id: e.guid,
-                    parent: e.parent.guid
-                })
+                url: _serviceUrl + Service.collectionName + "/Exhibit",
+                data: JSON.stringify(Service.Map.exhibit(e))
             });
         },
 
@@ -189,7 +198,7 @@
                 cache: false,
                 contentType: "application/json",
                 dataType: "json",
-                url: serverUrlBase + "/api/" + Service.collectionName + "/ContentItem",
+                url: _serviceUrl + Service.collectionName + "/ContentItem",
                 data: JSON.stringify(Service.Map.contentItem(ci))
             });
         },
@@ -199,11 +208,8 @@
                 type: "DELETE",
                 cache: false,
                 contentType: "application/json",
-                url: serverUrlBase + "/api/" + Service.collectionName + "/ContentItem",
-                data: JSON.stringify({
-                    id: ci.id,
-                    parent: ci.parent
-                })
+                url: _serviceUrl + Service.collectionName + "/ContentItem",
+                data: JSON.stringify(Service.Map.contentItem(ci))
             });
         }
     });

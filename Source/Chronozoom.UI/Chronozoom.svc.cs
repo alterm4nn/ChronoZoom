@@ -101,9 +101,9 @@ namespace UI
             Guid collectionId = CollectionIdOrDefault(supercollection, collection);
 
             // initialize filters
-            decimal startTime = string.IsNullOrWhiteSpace(start) ? _minYear : decimal.Parse(start);
-            decimal endTime = string.IsNullOrWhiteSpace(end) ? _maxYear : decimal.Parse(end);
-            decimal span = string.IsNullOrWhiteSpace(minspan) ? 0 : decimal.Parse(minspan);
+            decimal startTime = string.IsNullOrWhiteSpace(start) ? _minYear : decimal.Parse(start, CultureInfo.InvariantCulture);
+            decimal endTime = string.IsNullOrWhiteSpace(end) ? _maxYear : decimal.Parse(end, CultureInfo.InvariantCulture);
+            decimal span = string.IsNullOrWhiteSpace(minspan) ? 0 : decimal.Parse(minspan, CultureInfo.InvariantCulture);
             Guid lcaParsed = string.IsNullOrWhiteSpace(lca) ? Guid.Empty : Guid.Parse(lca);
 
             Collection<Timeline> timelines = _storage.TimelinesQuery(collectionId, startTime, endTime, span, lcaParsed);
@@ -446,8 +446,8 @@ namespace UI
                 Guid newTimelineGuid = Guid.NewGuid();
                 Timeline newTimeline = new Timeline { Id = newTimelineGuid, Title = timelineRequest.Title, Regime = timelineRequest.Regime };
                 //newTimeline.Title = title;
-                newTimeline.FromYear = (timelineRequest.FromYear == null) ? 0 : Decimal.Parse(timelineRequest.FromYear);
-                newTimeline.ToYear = (timelineRequest.ToYear == null) ? 0 : Decimal.Parse(timelineRequest.ToYear);
+                newTimeline.FromYear = (timelineRequest.FromYear == null) ? 0 : Decimal.Parse(timelineRequest.FromYear, CultureInfo.InvariantCulture);
+                newTimeline.ToYear = (timelineRequest.ToYear == null) ? 0 : Decimal.Parse(timelineRequest.ToYear, CultureInfo.InvariantCulture);
                 newTimeline.Collection = collection;
 
                 // Update parent timeline.
@@ -481,8 +481,8 @@ namespace UI
                 // Update the timeline fields
                 updateTimeline.Title = timelineRequest.Title;
                 updateTimeline.Regime = timelineRequest.Regime;
-                updateTimeline.FromYear = timelineRequest.FromYear == null ? 0 : Decimal.Parse(timelineRequest.FromYear);
-                updateTimeline.ToYear = timelineRequest.ToYear == null ? 0 : Decimal.Parse(timelineRequest.ToYear);
+                updateTimeline.FromYear = timelineRequest.FromYear == null ? 0 : Decimal.Parse(timelineRequest.FromYear, CultureInfo.InvariantCulture);
+                updateTimeline.ToYear = timelineRequest.ToYear == null ? 0 : Decimal.Parse(timelineRequest.ToYear, CultureInfo.InvariantCulture);
                 retval = updateTimelineGuid;
             }
             _storage.SaveChanges();
@@ -598,7 +598,7 @@ namespace UI
                 Guid newExhibitGuid = Guid.NewGuid();
                 Exhibit newExhibit = new Exhibit { Id = newExhibitGuid };
                 newExhibit.Title = exhibitRequest.Title;
-                newExhibit.Year = (exhibitRequest.Year == null) ? 0 : Decimal.Parse(exhibitRequest.Year);
+                newExhibit.Year = (exhibitRequest.Year == null) ? 0 : Decimal.Parse(exhibitRequest.Year, CultureInfo.InvariantCulture);
                 newExhibit.Collection = collection;
 
                 // Update parent timeline.
@@ -631,7 +631,7 @@ namespace UI
 
                 // Update the exhibit fields
                 updateExhibit.Title = exhibitRequest.Title;
-                updateExhibit.Year = (exhibitRequest.Year == null) ? 0 : Decimal.Parse(exhibitRequest.Year);
+                updateExhibit.Year = (exhibitRequest.Year == null) ? 0 : Decimal.Parse(exhibitRequest.Year, CultureInfo.InvariantCulture);
                 retval = updateExhibitGuid;
             }
             _storage.SaveChanges();
