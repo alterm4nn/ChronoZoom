@@ -638,8 +638,10 @@
                         $(this).dialog("close");
                     },
                     "delete": function () {
-                        CZ.Authoring.removeTimeline(t);
-                        $(this).dialog("close");
+                        if (confirm("Are you sure want to delete timeline and all of its nested timelines and exhibits? Delete can't be undone!")) {
+                            CZ.Authoring.removeTimeline(t);
+                            $(this).dialog("close");
+                        }
                     }
                 },
                 close: function () {
@@ -725,8 +727,6 @@
                 buttons: {
                     "save and close": function () {
                         contentItems = getContentItemsData(e);                        
-
-                        //if ((dateInput.val() > 0) || (dateInput.val() < - 13700000000))
                         
                         CZ.Authoring.updateExhibit(e, {
                             title: titleInput.val(),
@@ -741,8 +741,10 @@
                            });
                     },
                     "delete": function () {
-                        CZ.Authoring.removeExhibit(e);
-                        $(this).dialog("close");
+                        if (confirm("Are you sure want to delete exhibit and all of its content items? Delete can't be undone!")) {
+                            CZ.Authoring.removeExhibit(e);
+                            $(this).dialog("close");
+                        }
                     },
                     "add content item": function () {
                         if ($(this).find(".cz-auth-ci-container").length < infodotMaxContentItemsCount)
@@ -805,8 +807,10 @@
                         $(this).dialog("close");
                     },
                     "delete": function () {
-                        CZ.Authoring.removeContentItem(c);
-                        $(this).dialog("close");
+                        if (confirm("Are you sure want to delete content item? Delete can't be undone!")) {
+                            CZ.Authoring.removeContentItem(c);
+                            $(this).dialog("close");
+                        }
                     }
             },
             close: function () {
