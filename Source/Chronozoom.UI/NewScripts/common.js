@@ -335,6 +335,9 @@ function loadData() {
     //     }
     // });
 
+    //load URL state
+    getURL();
+
     CZ.Service.getStructure({
         lca: cosmosTimelineID,
         start: -50000000000,
