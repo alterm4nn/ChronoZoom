@@ -524,7 +524,6 @@ namespace UI
                         SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
                         return;
                     }
-                    //collection.UserId = user; // TODO: 
 
                     if (collection.UserId != user && collection.UserId != null)
                     {
@@ -958,7 +957,8 @@ namespace UI
             if (claimsIdentity == null || !claimsIdentity.IsAuthenticated)
             {
                 SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.Unauthenticated);
-                return default(T);
+                operation(null);
+                //return default(T);
             }
 
             Microsoft.IdentityModel.Claims.Claim nameIdentifierClaim = claimsIdentity.Claims.Where(candidate => candidate.ClaimType.EndsWith("nameidentifier")).FirstOrDefault();
