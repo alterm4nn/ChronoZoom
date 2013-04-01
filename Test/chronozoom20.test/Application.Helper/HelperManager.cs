@@ -13,7 +13,7 @@ namespace Application.Helper
         private static HomePageHelper _homePageHelper;
         private static TourHelper _tourHelper;
         private static BookmarkHelper _bookmarkHelper;
-        private static TimelineHelper _timelineHelper;
+        private static TimescaleHelper _timescaleHelper;
         private static WelcomeScreenHelper _welcomeScreenHelper;
 
         public static void Stop()
@@ -65,9 +65,9 @@ namespace Application.Helper
             return _bookmarkHelper ?? (_bookmarkHelper = new BookmarkHelper());
         }
 
-        public TimelineHelper GetTimelineHelper()
+        public TimescaleHelper GetTimescaleHelper()
         {
-            return _timelineHelper ?? (_timelineHelper = new TimelineHelper());
+            return _timescaleHelper ?? (_timescaleHelper = new TimescaleHelper());
         }
 
         public WelcomeScreenHelper GetWelcomeScreenHelper()
