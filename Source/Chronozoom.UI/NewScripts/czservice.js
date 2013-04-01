@@ -42,12 +42,11 @@
         timeline: function (t) {
             return {
                 Id: t.guid,
-                parent: t.parent.guid,
-                start: t.x,
-                end: t.x + t.width,
-                title: t.title,
-                exhibits: undefined,
-                timelines: undefined
+                ParentTimelineId: t.parent.guid,
+                FromYear: t.x,
+                ToYear: t.x + t.width,
+                Title: t.title,
+                Regime: t.regime
             };
         },
 

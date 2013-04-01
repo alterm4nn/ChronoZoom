@@ -478,18 +478,19 @@ namespace UI
                             return retval;
                         }
 
-                        if (updateTimeline.Collection.Id != collectionGuid)
-                        {
-                            SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                            return retval;
-                        }
+                        //if (updateTimeline.Collection.Id != collectionGuid)
+                        //{
+                        //    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                        //    return retval;
+                        //}
 
-                        if (timelineRequest.ParentTimelineId != null)
-                        {
-                            // Parent timeline updating is currently not supported
-                            SetStatusCode(HttpStatusCode.NotImplemented, ErrorDescription.ParentTimelineUpdate);
-                            return retval;
-                        }
+                        // TODO: may be this check shall be removed?
+                        //if (timelineRequest.ParentTimelineId != null)
+                        //{
+                        //    // Parent timeline updating is currently not supported
+                        //    SetStatusCode(HttpStatusCode.NotImplemented, ErrorDescription.ParentTimelineUpdate);
+                        //    return retval;
+                        //}
 
                         // Update the timeline fields
                         updateTimeline.Title = timelineRequest.Title;
@@ -964,7 +965,7 @@ namespace UI
                 operation(null);
 
                 // TODO: temporary fix?
-                //return default(T);
+                return default(T);
             }
 
             Microsoft.IdentityModel.Claims.Claim nameIdentifierClaim = claimsIdentity.Claims.Where(candidate => candidate.ClaimType.EndsWith("nameidentifier")).FirstOrDefault();

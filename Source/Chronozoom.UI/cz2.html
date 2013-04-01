@@ -655,12 +655,6 @@
             var isCancel = true;
             var titleInput = $("#exhibitTitleInput");
             var dateInput = $("#exhibitDateInput").spinner();
-
-            var CItitleInput = $("#AddContentItem0TitleInput");
-            var mediaInput = $("#AddContentItem0MediaSourceInput");
-            var descriptionInput = $("#AddContentItem0DescriptionInput");
-            var mediaTypeInput = $("#AddContentItem0MediaTypeInput option");
-            var CIcounter = 0;
             
             titleInput.val(e.title);
             dateInput.val(e.infodotDescription.date);
@@ -973,8 +967,7 @@
                     uri: mediaInput.val(),
                     mediaType: selected.text,
                     id: id,
-                    parent: "",
-                    UniqueID: ""
+                    parent: ""
                 });
             });
 
