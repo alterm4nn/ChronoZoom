@@ -1,4 +1,5 @@
-﻿using Application.Helper.Interfaces;
+﻿using Application.Driver;
+using Application.Helper.Interfaces;
 
 namespace Application.Helper.BrowserImpl
 {
@@ -11,7 +12,7 @@ namespace Application.Helper.BrowserImpl
 
         public override void NavigateBceToCeEra()
         {
-            OpenUrl("http://depot.cs.msu.su:9090/axis_marker/test/html/testTimescale.htm#/t55@x=0.49999985312312956&y=-0.4671147974140981&w=1.2906637834504491e-10&h=1.1385983007469986e-10");
+            OpenUrl(Configuration.BaseUrl + @"#/t55/t174/t66/t46/t361/t364/t377/t161@x=0.09842277303042166&y=-0.04391631637999881&w=0.0002611895548267019&h=0.00039153105944797343");
         }
     }
 }

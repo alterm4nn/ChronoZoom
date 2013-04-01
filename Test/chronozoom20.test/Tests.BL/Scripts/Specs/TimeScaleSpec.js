@@ -88,6 +88,7 @@ describe("CZ.DateTickSource part", function () {
 
             expect(ticksLabels).toContain('29 February');
         });
+
     });
 });
 
@@ -104,6 +105,36 @@ describe("CZ.CalendarTickSource part", function () { //this is the class for cre
             calendarTickSrc.delta = 1;
             var ticks = calendarTickSrc.createTicks(this.range);
             expect(ticks.length).toBeGreaterThan(1);
+        });
+    });
+});
+
+describe("Axis", function () {
+    var calendarTickSrc;
+    var dateTickSource;
+    beforeEach(function () {
+        calendarTickSrc = new CZ.CalendarTickSource();
+        dateTickSource = new CZ.DateTickSource();
+
+    });
+
+    describe("should display", function () {
+        it("each small tick in one year", function () {
+            var start = -1600;
+            var end = -1600;
+            var days = 365;
+
+            for (var i = 1; i < days; i++) {
+                end += oneDay;
+                var range = { min: start, max: end };
+                var ticks = dateTickSource.getTicks(range);
+                var minors = dateTickSource.createSmallTicks(ticks);
+                expect(minors.length).toEqual(3);
+                expect(minors[0]).not.toEqual(minors[1]);
+                expect(minors[1]).not.toEqual(minors[2]);
+                expect(minors[2]).not.toEqual(minors[0]);
+                start += oneDay;
+            }
         });
     });
 });
