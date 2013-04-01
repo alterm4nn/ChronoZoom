@@ -183,6 +183,35 @@
             });
         },
 
+        putExhibitWithContent: function (e, oldContentItems) {
+            var newIds = e.contentItems.map(function (ci) {
+                return ci.id;
+            });
+
+            // Send PUT request for exhibit.
+            var promises = [ Service.putExhibit(e) ].concat(
+                // Send PUT request for all its content items.
+                e.contentItems.map(
+                    function (ci) {
+                        return Service.putContentItem(ci);
+                    }
+                )
+            ).concat(
+                // Filter deleted content items and send DELETE request for them.
+                oldContentItems.filter(
+                    function (ci) {
+                        return (newIds.indexOf(ci.id) === -1);
+                    }
+                ).map(
+                    function (ci) {
+                        return Service.deleteContentItem(ci);
+                    }
+                )
+            );
+
+            return $.when.apply($, promises);
+        },
+
         deleteExhibit: function (e) {
             return $.ajax({
                 type: "DELETE",
