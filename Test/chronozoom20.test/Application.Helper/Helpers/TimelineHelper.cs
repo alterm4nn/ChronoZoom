@@ -48,7 +48,7 @@ namespace Application.Helper.Helpers
         private void InitTimelineCreationMode()
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@id='footer-authoring']/a[1]"));
+            MoveToElementAndClick(By.XPath("//*[@id='footer-authoring']/a[1]"));
             Logger.Log("->");
         }
     }
