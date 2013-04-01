@@ -16,16 +16,6 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
-        public string GetLastTimelinename()
-        {
-            Logger.Log("<-");
-            string name =
-                GetJavaScriptExecutionResult(
-                    "vc.data('ui-virtualCanvas')._layersContent.children[0].children[vc.data('ui-virtualCanvas')._layersContent.children[0].children.length - 1].title");
-            Logger.Log("-> name: " + name);
-            return name;
-        }
-
         private void SaveAndClose()
         {
             Click(By.ClassName("ui-dialog-buttonset"));
