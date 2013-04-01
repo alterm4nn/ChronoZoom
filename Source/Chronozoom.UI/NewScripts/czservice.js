@@ -151,10 +151,9 @@
                 type: "DELETE",
                 cache: false,
                 contentType: "application/json",
-                url: serverUrlBase + "/api/" + Service.collectionName + "/Timeline",
+                url: serverUrlBase + "/ChronoZoom.svc/" + Service.collectionName + "/Timeline",
                 data: JSON.stringify({
-                    id: t.guid,
-                    parent: t.parent.guid
+                    Id: t.guid
                 })
             });
         },
@@ -175,10 +174,9 @@
                 type: "DELETE",
                 cache: false,
                 contentType: "application/json",
-                url: serverUrlBase + "/api/" + Service.collectionName + "/Exhibit",
+                url: serverUrlBase + "/ChronoZoom.Svc/" + Service.collectionName + "/Exhibit",
                 data: JSON.stringify({
-                    id: e.guid,
-                    parent: e.parent.guid
+                    Id: e.guid
                 })
             });
         },
@@ -199,10 +197,9 @@
                 type: "DELETE",
                 cache: false,
                 contentType: "application/json",
-                url: serverUrlBase + "/api/" + Service.collectionName + "/ContentItem",
+                url: serverUrlBase + "/ChronoZoom.Svc/" + Service.collectionName + "/ContentItem",
                 data: JSON.stringify({
-                    id: ci.id,
-                    parent: ci.parent
+                    Id: ci.guid
                 })
             });
         }

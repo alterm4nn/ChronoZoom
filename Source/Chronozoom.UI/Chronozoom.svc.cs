@@ -502,8 +502,9 @@ namespace UI
             }
 
             string user = "TestUser"; // TODO: Retrieve the correct user
-            Guid collectionGuid = CollectionIdFromText(collectionName);
+            Guid collectionGuid = CollectionIdOrDefault(null, collectionName);
             Collection collection = _storage.Collections.Find(collectionGuid);
+            collection.UserId = user;
             if (collection == null)
             {
                 SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
@@ -524,13 +525,15 @@ namespace UI
 
             Guid timelineGuid = Guid.Parse(timelineRequest.Id);
             Timeline deleteTimeline = _storage.Timelines.Find(timelineGuid);
+
             if (deleteTimeline == null)
             {
                 SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineNotFound);
                 return;
             }
 
-            _storage.Timelines.Remove(deleteTimeline);
+            _storage.DeleteTimeline(timelineGuid);
+            //_storage.Timelines.Remove(deleteTimeline);
             _storage.SaveChanges();
         }
 
@@ -652,8 +655,9 @@ namespace UI
                 return;
             }
 
-            Guid collectionGuid = CollectionIdFromText(collectionName);
+            Guid collectionGuid = CollectionIdOrDefault(null, collectionName);
             Collection collection = _storage.Collections.Find(collectionGuid);
+            collection.UserId = user;
             if (collection == null)
             {
                 SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
@@ -679,7 +683,8 @@ namespace UI
                 SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ExhibitNotFound);
                 return;
             }
-            _storage.Exhibits.Remove(deleteExhibit);
+            _storage.DeleteExhibit(exhibitGuid);
+            //_storage.Exhibits.Remove(deleteExhibit);
             _storage.SaveChanges();
         }
 
@@ -809,8 +814,9 @@ namespace UI
             }
 
             string user = "TestUser"; // TODO: Retrieve the correct user
-            Guid collectionGuid = CollectionIdFromText(collectionName);
+            Guid collectionGuid = CollectionIdOrDefault(null, collectionName);
             Collection collection = _storage.Collections.Find(collectionGuid);
+            collection.UserId = user;
             if (collection == null)
             {
                 SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
