@@ -1,18 +1,18 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Application.Helper.Entities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Tests
 {
     [TestClass]
-    public class PhanerozoicAgeTests : TestBase
+    public class TimelineTests : TestBase
     {
-        public TestContext TestContext { get; set; }
-
         #region Initialize and Cleanup
+        public TestContext TestContext { get; set; }
 
         [ClassInitialize]
         public static void ClassInitialize(TestContext testContext)
         {
-            
+
         }
 
         [TestInitialize]
@@ -37,19 +37,13 @@ namespace Tests
 
         #endregion
 
-        [TestMethod]
-        public void Test_Eukaryotic_Cells_Description()
-        {
-            string description = HomePageHelper.GetEukaryoticCellsDescription();
-            StringAssert.Contains(description, "eukaryotic cells");
-        }
 
         [TestMethod]
-        public void Test_Navigate_To_Life()
+        public void CreateTimeLine()
         {
-            HomePageHelper.OpenLifeTimeline();
-            string actual = HomePageHelper.GetLastBreadcrumbs();
-            Assert.AreEqual("Life", actual);
+            Timeline timeline = new Timeline() {Title = "WebdriverTitle"};
+            TimelineHelper.AddTimeline(timeline);
+            Assert.AreEqual(timeline.Title, HomePageHelper.GetLastElementName());
         }
     }
 }
