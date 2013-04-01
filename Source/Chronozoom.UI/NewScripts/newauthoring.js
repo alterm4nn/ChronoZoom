@@ -277,7 +277,6 @@ var CZ = (function (CZ, $) {
      * @return {Object} Created exhibit.
      */
     function createNewExhibit() {
-        // var date = getInfodotDate(_circleCur.x);
         var date = _circleCur.x;
 
         removeChild(_hovered, "newExhibitCircle");
@@ -333,32 +332,6 @@ var CZ = (function (CZ, $) {
             }
         );
     }
-
-    /**
-     * Returns the date string for the infodot header.
-     * @param  {Number} x Negative number, x component of virtual coordinates.
-     * @return {String}   Date string.
-     */
-    function getInfodotDate(x) {
-        // TODO: Refine date calculation!
-
-        // calculate date of the infodot
-        var date = Math.floor(-x) - 2012; // CE offset
-
-        if (date / 1000000000 >= 0.1) {
-            date = (date / 1000000000).toFixed(1) + " Ga";
-        } else if (date / 10000000 >= 0.1) {
-            date = (date / 1000000).toFixed(1) + " Ma";
-        } else if (date > 0) { // in case of BCE
-            date = Math.abs(date) + " BCE";
-        } else {
-            date = date ? -date : 1;
-        }
-
-        return date;
-    }
-
-    
 
     $.extend(Authoring, {
         _isActive: false,
@@ -576,22 +549,27 @@ var CZ = (function (CZ, $) {
                 height: e.height,
                 type: "circle"
             };
-            //console.log(prop.title);
-            //e.contentItems.push(prop.ci);
+            var oldContentItems = e.contentItems;
 
-            // TODO: Show error message in case of failed test!
             if (checkExhibitIntersections(e.parent, temp, true)) {
-                // TODO: Change position of LOD, doodles and content items.
-                     e.x = temp.x;
+                e.x = temp.x;
             }
 
             e.title = temp.title;
             e.contentItems = prop.contentItems;
 
             e = renewExhibit(e);
-            CZ.Service.putExhibit(e);
-
-            // TODO: Update title!
+            
+            CZ.Service.putExhibitWithContent(e, oldContentItems).then(
+                function () {
+                    for (var i = 0, len = arguments.length; i < len; ++i) {
+                        console.log(arguments[i][0]);
+                    }
+                },
+                function () {
+                    console.log("Error connecting to service: update exhibit.\n");
+                }
+            );
         },
 
         /**

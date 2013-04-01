@@ -251,66 +251,38 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
             vis.centerY,
             vis.scale
             ));
-    }
+    };
 
     var requestTimer = null;
     this.getMissingData = function (vbox, lca) {
         // request new data only in case if authoring is not active
-        if (typeof CZ.Authoring === 'undefined' || CZ.Authoring._isActive == false) {
+        if (typeof CZ.Authoring === 'undefined' || CZ.Authoring._isActive === false) {
             window.clearTimeout(requestTimer);
-            requestTimer = window.setTimeout(function () { getMissingTimelines(vbox, lca) }, 1000);
+            requestTimer = window.setTimeout(function () { getMissingTimelines(vbox, lca); }, 1000);
         }
-	}
+	};
 
     function getMissingTimelines(vbox, lca) {
-        var url = serverUrlBase
-                + "/ChronoZoom.svc/GetTimelines?"
-                + "lca=" + lca.guid
-                + "&start=" + vbox.left
-                + "&end=" + vbox.right
-                + "&minspan=" + minTimelineWidth * vbox.scale;
-        console.log("[GET] " + url);
-
-        $.ajax({
-            type: "GET",
-            url: url,
-            async: true,
-            cache: false,
-            dataType: "json",
-            context: { timerId: requestTimer },
-            success: function (response) {
+        CZ.Service.getTimelines({
+            lca: lca.guid,
+            start: vbox.left,
+            end: vbox.right,
+            minspan: minTimelineWidth * vbox.scale
+        }).then(
+            function (response) {
                 Merge(response, lca);
-
+                
                 // NYI: Server currently does not support incremental data. Consider/Future:
                 //      var exhibitIds = extractExhibitIds(response);
                 //      getMissingExhibits(vbox, lca, exhibitIds);
             },
-            error: function (xhr) {
-                console.log("Error connecting to service:\n" + url);
+            function (error) {
+                console.log("Error connecting to service:\n" + error.responseText);
             }
-        });
+        );
     }
 
     function getMissingExhibits(vbox, lca, exhibitIds) {
-        // var url = serverUrlBase + "/api/Data";
-        // console.log("[POST]" + url);
-
-        // $.ajax({
-        //     type: "POST",
-        //     url: url,
-        //     data: JSON.stringify({ ids: exhibitIds }),
-        //     async: true,
-        //     cache: false,
-        //     contentType: "application/json; charset=utf-8",
-        //     dataType: 'json',
-        //     success: function (response) {
-        //         MergeContentItems(lca, exhibitIds, response.exhibits);
-        //     },
-        //     error: function (xhr) {
-        //         console.log("Error connecting to service:\n" + url);
-        //     }
-        // });
-
         CZ.Service.postData({
             ids: exhibitIds
         }).then(
