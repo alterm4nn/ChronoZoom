@@ -17,7 +17,7 @@ namespace Tests
         public static ScreenshotManager ScreenshotManager { get; set; }
         public static WelcomeScreenHelper WelcomeScreenHelper { get; set; }
         public static TimelineHelper TimelineHelper { get; set; }
-        
+        public static ExhibitHelper ExhibitHelper { get; set; }
 
         public static HomePageHelper HomePageHelper { get; set; }
 
@@ -34,7 +34,10 @@ namespace Tests
             ScreenshotManager = HelperManager.GetScreenshotManager();
             WelcomeScreenHelper = HelperManager.GetWelcomeScreenHelper();
             TimelineHelper = HelperManager.GetTimelineHelper();
+            ExhibitHelper = HelperManager.GetExhibitHelper();
         }
+
+        
 
         [AssemblyCleanup]
         public static void AssemblyCleanup()

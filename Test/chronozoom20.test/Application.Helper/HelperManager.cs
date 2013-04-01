@@ -16,6 +16,7 @@ namespace Application.Helper
         private static TimescaleHelper _timescaleHelper;
         private static WelcomeScreenHelper _welcomeScreenHelper;
         private static TimelineHelper _timelineHelper;
+        private static ExhibitHelper _exhibitHelper;
 
         public static void Stop()
         {
@@ -79,6 +80,11 @@ namespace Application.Helper
         public TimelineHelper GetTimelineHelper()
         {
             return _timelineHelper ?? (_timelineHelper = new TimelineHelper());
+        }
+
+        public ExhibitHelper GetExhibitHelper()
+        {
+            return _exhibitHelper ?? (_exhibitHelper = new ExhibitHelper());
         }
     }
 }
