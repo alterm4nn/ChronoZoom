@@ -663,7 +663,7 @@
             var CIcounter = 0;
             
             titleInput.val(e.title);
-            dateInput.val(e.x);
+            dateInput.val(e.infodotDescription.date);
 
             $("#createExhibitForm").dialog({
                 title: "create exhibit",
@@ -707,7 +707,7 @@
             var dateInput = $("#exhibitDateInput").spinner();
 
             titleInput.val(e.title);
-            dateInput.val(e.x);
+            dateInput.val(e.infodotDescription.date);
 
             var contentItems = e.contentItems;
 
@@ -769,8 +769,9 @@
             var descriptionInput = $("#contentItemDescriptionInput");
             var mediaTypeInput = $("#contentItemMediaTypeInput option");
             var mediaType = c.contentItem.mediaType.toLowerCase();
+
             if (mediaType === "picture") {
-                    mediaType = "image";
+                mediaType = "image";
             }
             titleInput.val(c.contentItem.title);
             mediaInput.val(c.contentItem.uri);
@@ -781,8 +782,6 @@
                     return;
                 }
             });
-                        
-            
             
             $("#editContentItemForm").dialog({
                 title: "Edit content item",
@@ -817,8 +816,8 @@
                     CZ.Authoring._isActive = false;
                     $("a:contains('edit exhibit')").removeClass("active");
                 }
-        });
-    }
+            });
+        }
 
         function createTimeline() {
             // skip authoring during ongoing dynamic layout animation
@@ -900,30 +899,38 @@
 
             var label = $("<label style='display: block'>Media source</label>");
 
-            var title = $("<p style='display: block'>" +
-               "<label style='display: block'>Title</label>" +
-               "<input class='cz-auth-ci-title' style='display: block' type='text'/>" +
-               "</p>");
+            var title = $(
+                "<p style='display: block'>" +
+                    "<label style='display: block'>Title</label>" +
+                    "<input class='cz-auth-ci-title' style='display: block' type='text'/>" +
+                "</p>"
+            );
 
-            var description = $("<p style='display: block'>" +
-              "<label style='display: block'>Description</label>" +
-              "<textarea class='cz-auth-ci-description' style='display: block' />" +
-              "</p>");
+            var description = $(
+                "<p style='display: block'>" +
+                    "<label style='display: block'>Description</label>" +
+                    "<textarea class='cz-auth-ci-description' style='display: block' />" +
+                "</p>"
+            );
 
-            var mediaSource = $("<p style='display: block'>" +
-               "<label style='display: block'>Media source</label>" +
-               "<input class='cz-auth-ci-media-source' style='display: block' type='text'/>" +
-               "</p> ");
+            var mediaSource = $(
+                "<p style='display: block'>" +
+                    "<label style='display: block'>Media source</label>" +
+                    "<input class='cz-auth-ci-media-source' style='display: block' type='text'/>" +
+                "</p>"
+            );
 
-            var mediaType = $("<p style='display: block'>" +
-             "<label style='display: block'>Media type</label>" +
-             "<select class='cz-auth-ci-media-type' style='display: block'>" +
-             "<option value='image'>Image</option>" +
-             "<option value='pdf'>PDF</option> " +
-             "<option value='video'>Video</option>" +
-             "<option value='audio'>Audio</option>" +
-             "</select>" +
-             "</p>");
+            var mediaType = $(
+                "<p style='display: block'>" +
+                    "<label style='display: block'>Media type</label>" +
+                    "<select class='cz-auth-ci-media-type' style='display: block'>" +
+                        "<option value='image'>Image</option>" +
+                        "<option value='pdf'>PDF</option>" +
+                        "<option value='video'>Video</option>" +
+                        "<option value='audio'>Audio</option>" +
+                    "</select>" +
+                "</p>"
+            );
 
             var removeBtn = $("<button>Remove content item</button>");
             removeBtn[0].onclick = function () {

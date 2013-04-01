@@ -54,22 +54,22 @@
         exhibit: function (e) {
             return {
                 Id: e.guid,
-                parent: e.parent.guid,
-                time: e.infodotDescription.date,
-                title: e.title,
+                ParentTimelineId: undefined,
+                Year: e.infodotDescription.date,
+                Title: e.title,
                 description: undefined,
-                contentItems: e.contentItems
+                contentItems: undefined
             };
         },
 
         contentItem: function (ci) {
             return {
                 Id: ci.guid,
-                parent: ci.parent.id,
-                title: ci.title,
-                description: ci.description,
-                uri: ci.uri,
-                mediaType: ci.mediaType
+                ParentExhibitId: ci.parent.id,
+                Title: ci.title,
+                Caption: ci.description,
+                Uri: ci.uri,
+                MediaType: ci.mediaType
             };
         }
     });

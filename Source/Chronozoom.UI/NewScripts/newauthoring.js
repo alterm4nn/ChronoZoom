@@ -544,7 +544,7 @@ var CZ = (function (CZ, $) {
         updateExhibit: function (e, prop) {
             var temp = {
                 title: prop.title,
-                x: Number(prop.date),
+                x: Number(prop.date) - e.outerRad,
                 y: e.y,
                 width: e.width,
                 height: e.height,
@@ -554,21 +554,32 @@ var CZ = (function (CZ, $) {
 
             if (checkExhibitIntersections(e.parent, temp, true)) {
                 e.x = temp.x;
+                e.infodotDescription.date = temp.x + e.outerRad;
             }
 
             e.title = temp.title;
+            e.infodotDescription.title = temp.title;
             e.contentItems = prop.contentItems;
 
             e = renewExhibit(e);
             
-            CZ.Service.putExhibitWithContent(e, oldContentItems).then(
-                function () {
-                    for (var i = 0, len = arguments.length; i < len; ++i) {
-                        console.log(arguments[i][0]);
-                    }
+            // CZ.Service.putExhibitWithContent(e, oldContentItems).then(
+            //     function () {
+            //         for (var i = 0, len = arguments.length; i < len; ++i) {
+            //             console.log(arguments[i][0]);
+            //         }
+            //     },
+            //     function () {
+            //         console.log("Error connecting to service: update exhibit.\n");
+            //     }
+            // );
+
+            CZ.Service.putExhibit(e).then(
+                function (response) {
+                    console.log(response);
                 },
-                function () {
-                    console.log("Error connecting to service: update exhibit.\n");
+                function (error) {
+                    console.log("Error connecting to service: update exhibit.\n" + error.responseText);
                 }
             );
         },

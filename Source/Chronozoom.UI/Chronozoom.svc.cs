@@ -647,11 +647,12 @@ namespace UI
                             return retval;
                         }
 
-                        if (updateExhibit.Collection.Id != collectionGuid)
-                        {
-                            SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                            return retval;
-                        }
+                        // TODO: currently collection is null for every exhibit, fix it
+                        //if (updateExhibit.Collection.Id != collectionGuid)
+                        //{
+                        //    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                        //    return retval;
+                        //}
 
                         if (exhibitRequest.ParentTimelineId != null)
                         {
