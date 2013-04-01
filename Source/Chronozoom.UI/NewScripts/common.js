@@ -312,6 +312,9 @@ function loadDataUrl() {
 
 //loading the data from the service
 function loadData() {
+    //load URL state
+    getURL();
+    
     CZ.Service.getTimelines({
         lca: cosmosTimelineID,
         start: -50000000000,

@@ -69,7 +69,8 @@
     });
 
     $.extend(Service, {
-        collectionName: "collection",
+        collectionName: null,
+        superCollectionName: null,
 
         /**
          * Chronozoom.svc Requests.
