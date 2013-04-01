@@ -10,8 +10,8 @@ namespace Tests
         const string Label2000Bce = "2000 BCE";
         const string Label2001Bce = "2001 BCE";
         const string Label2000Ce = "2000 AD";
-        const string LabelMinus4000Ma = "-4000 Ma";
-        const string LabelMinus500Ma = "-500 Ma";
+        const string Label4000Ma = "4000 Ma";
+        const string Label500Ma = "500 Ma";
         const string Label1Bce = "1 BCE";
         const string Label1Ce = "1 AD";
 
@@ -52,8 +52,8 @@ namespace Tests
         {
             HomePageHelper.OpenLifeTimeline();
             List<string> labels = TimelineHelper.GetLabels();
-            CollectionAssert.Contains(labels, LabelMinus4000Ma, LabelMinus4000Ma + " is not presented");
-            CollectionAssert.Contains(labels, LabelMinus500Ma, LabelMinus500Ma + "is not presented");
+            CollectionAssert.Contains(labels, Label4000Ma, Label4000Ma + " is not presented");
+            CollectionAssert.Contains(labels, Label500Ma, Label500Ma + "is not presented");
         } 
         
         [TestMethod]
