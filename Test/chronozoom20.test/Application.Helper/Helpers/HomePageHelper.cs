@@ -31,8 +31,8 @@ namespace Application.Helper.Helpers
             WaitForElementIsDisplayed(By.Id("bc_link_t66"));
             WaitAnimation();
             Logger.Log("->");
-        } 
-        
+        }
+
         public void OpenHumanityTimeline()
         {
             Logger.Log("<-");
@@ -80,7 +80,79 @@ namespace Application.Helper.Helpers
             Logger.Log("<-");
             IWebElement timescale = FindElement(By.Id("axis"));
             double size = timescale.Size.Width;
-            MoveToElementCoordinates(By.Id("axis"), (int)Math.Round(size/4), 0);
+            MoveToElementCoordinates(By.Id("axis"), (int)Math.Round(size / 4), 0);
+            Logger.Log("->");
+        }
+
+        public void OpenMrcLink()
+        {
+            Logger.Log("<-");
+            Click(By.XPath("//*[@title='Microsoft Research']"));
+            Logger.Log("->");
+        }
+
+        public void OpenUcBerkelyLink()
+        {
+            Logger.Log("<-");
+            Click(By.XPath("//*[@title='University of California Berkeley Department of Earth and Planetary Science']"));
+            Logger.Log("->");
+        }
+
+        public void OpenMsuLink()
+        {
+            Logger.Log("<-");
+            Click(By.XPath("//*[@title='Moscow State University']"));
+            Logger.Log("->");
+        }
+
+        public string GetTitle()
+        {
+            Logger.Log("<-");
+            string title = GetPageTitle();
+            Logger.Log("-> title: " + title);
+            return title;
+        }
+
+
+        public void OpenTakeOurSurveyLink()
+        {
+            Logger.Log("<-");
+            Click(By.XPath("//*[@id='footer-right']/a[1]"));
+            Logger.Log("->");
+        }
+
+        public void OpenReportAProblemLink()
+        {
+            Logger.Log("<-");
+            Click(By.XPath("//*[@id='footer-right']/a[2]"));
+            Logger.Log("->");
+        }
+
+        public void OpenBehindTheScenesLink()
+        {
+            Logger.Log("<-");
+            Click(By.XPath("//*[@id='footer-right']/a[3]"));
+            Logger.Log("->");
+        }
+
+        public void OpenTermsOfUseLink()
+        {
+            Logger.Log("<-");
+            Click(By.XPath("//*[@id='footer-right']/a[4]"));
+            Logger.Log("->");
+        }
+
+        public void OpenPrivacyLink()
+        {
+            Logger.Log("<-");
+            Click(By.XPath("//*[@id='footer-right']/a[5]"));
+            Logger.Log("->");
+        }
+
+        public void OpenTrademarkLink()
+        {
+            Logger.Log("<-");
+            Click(By.XPath("//*[@id='footer-right']/a[6]"));
             Logger.Log("->");
         }
     }

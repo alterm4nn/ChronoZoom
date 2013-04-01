@@ -6,7 +6,7 @@
       <BaseUrl>http://test.chronozoomproject.org/cz2.html</BaseUrl>
      <ImplicitWait>60</ImplicitWait>
       <ExplicitWait>60</ExplicitWait>
-      <BrowserName>firefox</BrowserName>
+      <BrowserName>chrome</BrowserName>
       <ConnectionWait>60</ConnectionWait>
     </Global>
     <IncludeTestCategories>
