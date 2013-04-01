@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Text;
@@ -15,63 +16,49 @@ using System.Data;
 
 using Chronozoom.Entities;
 
-namespace DataMigration
+namespace Chronozoom.Entities.Migration
 {
-    class Program
+    class Migrator
     {
-        private static readonly Storage Storage = new Storage();
-        public static readonly Guid _oldRootID = new Guid("468a8005-36e3-4676-9f52-312d8b6eb7b7");
-        private const string _dumpsPath = @"..\..\dumps\";
+        private Storage _storage;
         private static MD5 _md5Hasher = MD5.Create();
 
-        static void Main(string[] args)
+        public Migrator(Storage storage)
         {
-            Migrate();
+            _storage = storage;
         }
 
-        public static void Migrate()
+        public void Migrate()
         {
-            Console.WriteLine("Migration Started\n");
-
-            // First remove the 'Hello World' timeline that is inserted into a new database
-            Storage.SuperCollections.Remove(Storage.SuperCollections.Find(Guid.Empty));
-            Storage.Collections.Remove(Storage.Collections.Find(Guid.Empty));
-            Storage.Timelines.Remove(Storage.Timelines.Find(Guid.Empty));
-
             // Load the Beta Content collection
             Collection betaCollection = LoadCollections("Beta Content", "Beta Content");
-            LoadDataFromFile(
-                File.OpenRead(_dumpsPath + @"beta-get.json"),
-                File.OpenRead(_dumpsPath + @"beta-gettours.json"),
-                File.OpenRead(_dumpsPath + @"beta-getthresholds.json"),
-                betaCollection,
-                false);
+            using (Stream betaGet = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\beta-get.json"))
+            using (Stream betaGetTours = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\beta-gettours.json"))
+            using (Stream betaGetThresholds = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\beta-getthresholds.json"))
+            {
+                LoadData(betaGet, betaGetTours, betaGetThresholds, betaCollection, false);
+            }
 
             // Load the AIDS Timeline collection
             Collection aidstimelineCollection = LoadCollections("AIDS Timeline", "AIDS Timeline");
-            LoadDataFromFile(
-                File.OpenRead(_dumpsPath + @"aidstimeline-get.json"),
-                File.OpenRead(_dumpsPath + @"aidstimeline-gettours.json"),
-                null,
-                aidstimelineCollection,
-                true);
+            using (Stream aidsTimelineGet = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\aidstimeline-get.json"))
+            using (Stream aidsTimelineGetTours = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\aidstimeline-get.json"))
+            {
+                LoadData(aidsTimelineGet, aidsTimelineGetTours, null, aidstimelineCollection, true);
+            }
 
             // Load the AIDS Timeline in standalone mode
             Collection aidsStandaloneCollection = LoadCollections("AIDS Standalone", "AIDS Standalone");
-            LoadDataFromFile(
-                File.OpenRead(_dumpsPath + @"aidsstandalone-get.json"),
-                null,
-                null,
-                aidsStandaloneCollection,
-                true);
+            using (Stream aidsStandalone = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\aidsstandalone-get.json"))
+            {
+                LoadData(aidsStandalone, null, null, aidsStandaloneCollection, true);
+            }
 
             // Save changes to storage
-            Storage.SaveChanges();
-
-            Console.WriteLine("Migration Completed\n");
+            _storage.SaveChanges();
         }
 
-        private static Collection LoadCollections(string superCollectionName, string collectionName)
+        private Collection LoadCollections(string superCollectionName, string collectionName)
         {
             // Load Collection
             Collection collection = new Collection();
@@ -85,21 +72,23 @@ namespace DataMigration
             
             superCollection.Collections = new System.Collections.ObjectModel.Collection<Collection>();
             superCollection.Collections.Add(collection);
-            Storage.SuperCollections.Add(superCollection);
+            _storage.SuperCollections.Add(superCollection);
 
             return collection;
         }
 
-        private static void LoadDataFromFile(Stream dataTimelines, Stream dataTours, Stream dataThresholds, Collection collection, bool replaceGuids)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification="Incremental change, will refactor later if the import process is kept")]
+        private void LoadData(Stream dataTimelines, Stream dataTours, Stream dataThresholds, Collection collection, bool replaceGuids)
         {
             var bjrTimelines = new DataContractJsonSerializer(typeof(BaseJsonResult<IEnumerable<Timeline>>)).ReadObject(dataTimelines) as BaseJsonResult<IEnumerable<Timeline>>;
 
-            Storage.Collections.Add(collection);
+            _storage.Collections.Add(collection);
 
             // Associate each timeline with the root collection
             TraverseTimelines(bjrTimelines.d, timeline =>
-                timeline.Collection = collection
-            );
+            {
+                timeline.Collection = collection;
+            });
 
             if (replaceGuids)
             {
@@ -112,11 +101,21 @@ namespace DataMigration
                         {
                             exhibit.Id = Guid.NewGuid();
 
-                            foreach (ContentItem contentItem in exhibit.ContentItems)
-                                contentItem.Id = Guid.NewGuid();
+                            if (exhibit.ContentItems != null)
+                            {
+                                foreach (ContentItem contentItem in exhibit.ContentItems)
+                                {
+                                    contentItem.Id = Guid.NewGuid();
+                                }
+                            }
 
-                            foreach (Reference reference in exhibit.References)
-                                reference.Id = Guid.NewGuid();
+                            if (exhibit.References != null)
+                            {
+                                foreach (Reference reference in exhibit.References)
+                                {
+                                    reference.Id = Guid.NewGuid();
+                                }
+                            }
                         }
                     }
                 );
@@ -128,7 +127,7 @@ namespace DataMigration
                 timeline.Collection = collection;
 
                 MigrateInPlace(timeline);
-                Storage.Timelines.Add(timeline);
+                _storage.Timelines.Add(timeline);
             }
 
             if (dataTours != null)
@@ -140,10 +139,15 @@ namespace DataMigration
                     if (replaceGuids) tour.Id = Guid.NewGuid();
                     tour.Collection = collection;
 
-                    foreach (var bookmark in tour.Bookmarks)
-                        bookmark.Id = Guid.NewGuid();
+                    if (tour.Bookmarks != null)
+                    {
+                        foreach (var bookmark in tour.Bookmarks)
+                        {
+                            bookmark.Id = Guid.NewGuid();
+                        }
+                    }
 
-                    Storage.Tours.Add(tour);
+                    _storage.Tours.Add(tour);
                 }
             }
 
@@ -154,12 +158,12 @@ namespace DataMigration
                 foreach (var threshold in bjrThresholds.d)
                 {
                     threshold.ThresholdYear = ConvertToDecimalYear(threshold.ThresholdDay, threshold.ThresholdMonth, threshold.ThresholdYear, threshold.ThresholdTimeUnit);
-                    Storage.Thresholds.Add(threshold);
+                    _storage.Thresholds.Add(threshold);
                 }
             }
         }
 
-        private static void MigrateInPlace(Timeline timeline)
+        private void MigrateInPlace(Timeline timeline)
         {
             timeline.FromYear = ConvertToDecimalYear(timeline.FromDay, timeline.FromMonth, timeline.FromYear, timeline.FromTimeUnit);
             timeline.ToYear = ConvertToDecimalYear(timeline.ToDay, timeline.ToMonth, timeline.ToYear, timeline.ToTimeUnit);
@@ -239,7 +243,7 @@ namespace DataMigration
                 }
                 else
                 {
-                    throw new DataException(string.Format("Unable to parse timeUnit: {0}", timeUnit));
+                    throw new DataException(string.Format(CultureInfo.InvariantCulture, "Unable to parse timeUnit: {0}", timeUnit));
                 }
             }
 
@@ -265,7 +269,7 @@ namespace DataMigration
         }
 
         private delegate void TraverseOperation(Timeline timeline);
-        private static void TraverseTimelines(IEnumerable<Timeline> timelines, TraverseOperation operation)
+        private void TraverseTimelines(IEnumerable<Timeline> timelines, TraverseOperation operation)
         {
             if (timelines == null)
                 return;
@@ -277,11 +281,17 @@ namespace DataMigration
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Justification = "Lowercase is URL friendly")]
         private static Guid CollectionIdFromSuperCollection(string supercollection, string collection)
         {
-            return CollectionIdFromText(supercollection.ToLower() + "|" + collection.ToLower());
+            return CollectionIdFromText(string.Format(
+                CultureInfo.InvariantCulture,
+                "{0}|{1}",
+                supercollection.ToLower(CultureInfo.InvariantCulture),
+                collection.ToLower(CultureInfo.InvariantCulture)));
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Justification="Lowercase is URL friendly")]
         private static Guid CollectionIdFromText(string value)
         {
             // Replace with URL friendly representations

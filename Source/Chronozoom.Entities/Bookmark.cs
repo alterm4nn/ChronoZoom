@@ -14,7 +14,7 @@ namespace Chronozoom.Entities
     [DataContract(Name="BookMark")]
     public class Bookmark
     {
-        [DataMember(Name="ID")]
+        [DataMember(Name="id")]
         public Guid Id { get; set; }
 
         [DataMember]

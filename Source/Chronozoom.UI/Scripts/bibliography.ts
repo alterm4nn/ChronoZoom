@@ -95,9 +95,9 @@ module ChronoZoom {
                     if (a.Authors && b.Authors) return a.Authors > b.Authors ? 1 : -1;
                     if (a.Authors) return 1;
                     if (b.Authors) return -1;
-                    if (a.Title && b.Title) return a.Title > b.Title ? 1 : -1;
-                    if (a.Title) return 1;
-                    if (b.Title) return -1;
+                    if (a.title && b.title) return a.title > b.title ? 1 : -1;
+                    if (a.title) return 1;
+                    if (b.title) return -1;
                     return 0;
                 });
 
@@ -111,9 +111,9 @@ module ChronoZoom {
 
                         // http://www.chicagomanualofstyle.org/tools_citationguide.html
                         var descr = r.Authors ? r.Authors : '';
-                        if (r.Title) {
+                        if (r.title) {
                             if (descr != '') descr += '<br>';
-                            descr += "<i>" + r.Title + "</i>";
+                            descr += "<i>" + r.title + "</i>";
                         }
                         if (r.Publication) {
                             if (descr != '') descr += '<br>';

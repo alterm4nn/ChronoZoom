@@ -49,6 +49,7 @@ infoDotBorderColor = 'rgb(232,232,232)'; // color of infdot's circle border
 infoDotHoveredBorderColor = 'white'; // color of infdot's circle border when mouse cursor is over it
 infoDotFillColor = 'rgb(92,92,92)'; // color of infdot's circle border
 infoDotTinyContentImageUri = 'Images/tinyContent.png';
+infodotMaxContentItemsCount = 10;
 
 mediaContentElementZIndex = 100;
 contentItemDescriptionNumberOfLines = 10;
@@ -87,7 +88,7 @@ deeperZoomConstraints = //the array of the constraints of the deep zoom level an
     { left: -14000000000, right: -1000000000, scale: 1000 }, //billions of years zoom in constraint
     {left: -1000000000, right: -1000000, scale: 1 }, //millions of years zoom in constraint
     {left: -1000000, right: -12000, scale: 0.001 }, //thousand of years zoom in constraint
-    { left: -12000 /*approx 10k BC */, right: 0, scale: 0.000006 } //single day zoom in constraint in human history scale
+    { left: -12000 /*approx 10k BC */, right: 0, scale: 0.00006 } //single day zoom in constraint in human history scale
 ];
 
 // axis constants
@@ -118,7 +119,7 @@ gapLabelTick = 3; // gap between tick and label
 activeMarkSize = 10; // length of side of active triangle
 
 // IDs of regime timelines
-cosmosTimelineID = "468a8005-36e3-4676-9f52-312d8b6eb7b7";
+cosmosTimelineID = "00000000-0000-0000-0000-000000000000";
 earthTimelineID = "48fbb8a8-7c5d-49c3-83e1-98939ae2ae67";
 lifeTimelineID = "d4809be4-3cf9-4ddd-9703-3ca24e4d3a26";
 prehistoryTimelineID = "a6b821df-2a4d-4f0e-baf5-28e47ecb720b";
@@ -142,5 +143,5 @@ navigateNextMaxCount = 2; // if navNext (left or right) button was pressed rapid
 longNavigationLength = 10; // length of navigation in long navigation regime
 
 // progresive loading
-serverUrlBase = document.URL.match(/((?:http:\/\/)?(?:[0-9a-zA-Z.:]+)(?:\/[^.]+\/)?)(.*)/)[1];
+serverUrlBase = document.URL.match(/((?:http:\/\/)?(?:[0-9a-zA-Z.:\-]+)(?:\/[^.]+\/)?)(.*)/)[1];
 minTimelineWidth = 100; // px

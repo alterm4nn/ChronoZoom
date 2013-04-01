@@ -151,7 +151,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
     */
     this.saveScreenParameters = function (viewport) {
         self.viewportWidth = viewport.width;
-        self.viewportHeight = viewport.height;        
+        self.viewportHeight = viewport.height;
     }
 
     /*
@@ -239,9 +239,9 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
         }
     }
 
-    self.updateRecentViewport = function() {        
+    self.updateRecentViewport = function () {
         var vp = getViewport();
-        var vis = vp.visible;        
+        var vis = vp.visible;
         self.recentViewport = new Viewport2d(
         vp.aspectRatio,
         vp.width,
@@ -255,13 +255,16 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
 
     var requestTimer = null;
     this.getMissingData = function (vbox, lca) {
-        window.clearTimeout(requestTimer);
-        requestTimer = window.setTimeout(function () { getMissingTimelines(vbox, lca) }, 1000);
-    }
+        // request new data only in case if authoring is not active
+        if (typeof CZ.Authoring === 'undefined' || CZ.Authoring._isActive == false) {
+            window.clearTimeout(requestTimer);
+            requestTimer = window.setTimeout(function () { getMissingTimelines(vbox, lca) }, 1000);
+        }
+	}
 
     function getMissingTimelines(vbox, lca) {
         var url = serverUrlBase
-                + "/api/Structure?"
+                + "/ChronoZoom.svc/GetTimelines?"
                 + "lca=" + lca.guid
                 + "&start=" + vbox.left
                 + "&end=" + vbox.right
@@ -277,8 +280,10 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
             context: { timerId: requestTimer },
             success: function (response) {
                 Merge(response, lca);
-                var exhibitIds = extractExhibitIds(response);
-                getMissingExhibits(vbox, lca, exhibitIds);
+
+                // NYI: Server currently does not support incremental data. Consider/Future:
+                //      var exhibitIds = extractExhibitIds(response);
+                //      getMissingExhibits(vbox, lca, exhibitIds);
             },
             error: function (xhr) {
                 console.log("Error connecting to service:\n" + url);
@@ -287,24 +292,35 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
     }
 
     function getMissingExhibits(vbox, lca, exhibitIds) {
-        var url = serverUrlBase + "/api/Data";
-        console.log("[POST]" + url);
+        // var url = serverUrlBase + "/api/Data";
+        // console.log("[POST]" + url);
 
-        $.ajax({
-            type: "POST",
-            url: url,
-            data: JSON.stringify({ ids: exhibitIds }),
-            async: true,
-            cache: false,
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            success: function (response) {
+        // $.ajax({
+        //     type: "POST",
+        //     url: url,
+        //     data: JSON.stringify({ ids: exhibitIds }),
+        //     async: true,
+        //     cache: false,
+        //     contentType: "application/json; charset=utf-8",
+        //     dataType: 'json',
+        //     success: function (response) {
+        //         MergeContentItems(lca, exhibitIds, response.exhibits);
+        //     },
+        //     error: function (xhr) {
+        //         console.log("Error connecting to service:\n" + url);
+        //     }
+        // });
+
+        CZ.Service.postData({
+            ids: exhibitIds
+        }).then(
+            function (response) {
                 MergeContentItems(lca, exhibitIds, response.exhibits);
             },
-            error: function (xhr) {
-                console.log("Error connecting to service:\n" + url);
+            function (error) {
+                console.log("Error connecting to service:\n" + error.responseText);
             }
-        });
+        );
     }
 
     function extractExhibitIds(timeline) {
@@ -469,7 +485,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
         self.FPS = self.oneSecondFrames;
         self.oneSecondFrames = 0;
     }, 1000); //one call per second
-  
+
 
     //tests related accessors
     this.PanViewportAccessor = PanViewport;
@@ -484,7 +500,7 @@ function ViewportController(setVisible, getViewport, gesturesSource) {
         var vbox = viewportToViewBox(targetViewport);
         var wnd = new CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
         
-        if (!vc.virtualCanvas("inBuffer", wnd, targetViewport.visible.scale)) {
+		if (!vc.virtualCanvas("inBuffer", wnd, targetViewport.visible.scale)) {
             var lca = vc.virtualCanvas("findLca", wnd);
             self.getMissingData(vbox, lca);
         }

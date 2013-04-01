@@ -64,25 +64,18 @@ function preventbubble(e) {
 }
 
 function getCoordinateFromDate(dateTime) {
-	return getYearsBetweenDates(dateTime.getFullYear(), dateTime.getMonth(), dateTime.getDay(), 0, 0, 0);
+    var localPresent = getPresent();
+    return getYearsBetweenDates(dateTime.getFullYear(), dateTime.getMonth(), dateTime.getDay(), localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
 }
 
 function getCoordinateFromDMY(year, month, day) {
-    return getYearsBetweenDates(year, month, day, 0, 0, 0);
+    var localPresent = getPresent();
+    return getYearsBetweenDates(year, month, day, localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
 }
 
 function getDMYFromCoordinate(coord) {
-    return getDateFrom(0, 0, 0, coord);
-}
-
-// convert date to virtual coordinate
-// 9999 -> present day
-function getCoordinateFromDecimalYear(decimalYear) {
-    // get virtual coordinate of present day
     var localPresent = getPresent();
-    var presentDate = getYearsBetweenDates(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay, 0, 0, 0);
-
-    return decimalYear === 9999 ? presentDate : decimalYear;
+    return getDateFrom(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay, coord);
 }
 
 var present = undefined;
@@ -312,12 +305,13 @@ function loadDataUrl() {
 
 //loading the data from the service
 function loadData() {
+<<<<<<< HEAD
     // var regimesUrl = serverUrlBase
-                + "/ChronoZoom.svc/GetTimelines?"
-                + "lca=" + cosmosTimelineID
-                + "&start=" + -50000000000
-                + "&end=" + 9999
-                + "&timespan=" + 5013;
+    //               + "/api/Structure?"
+    //               + "lca=" + cosmosTimelineID
+    //               + "&start=" + -5012
+    //               + "&end=" + 0
+    //               + "&minspan=" + 5013;
     // console.log(regimesUrl);
 
     // $.ajax({ // get basic skeleton (regime timelines)
@@ -337,12 +331,30 @@ function loadData() {
 
     CZ.Service.getStructure({
         lca: cosmosTimelineID,
-        start: -50000000000,
-        end: 9999,
+        start: -5012,
+        end: 0,
         minspan: 5013
     }).then(
         function (response) {
             ProcessContent(response);
+=======
+    var regimesUrl = serverUrlBase
+                + "/ChronoZoom.svc/GetTimelines?"
+                + "lca=" + cosmosTimelineID
+                + "&start=" + -50000000000
+                + "&end=" + 9999
+                + "&timespan=" + 5013;
+    console.log(regimesUrl);
+
+    $.ajax({ // get basic skeleton (regime timelines)
+        cache: false,
+        type: "GET",
+        async: true,
+        dataType: "json",
+        url: regimesUrl,
+        success: function (result) {
+            ProcessContent(result);
+>>>>>>> Integrate Read API
             vc.virtualCanvas("updateViewport");
 
             /**
@@ -451,11 +463,6 @@ function InitializeRegimes(content) {
         bottom: cosmosTimeline.y + cosmosTimeline.height
     };
 
-    // update virtual canvas horizontal borders
-    maxPermitedTimeRange = {
-        left: cosmosTimeline.left,
-        right: cosmosTimeline.right
-    };
     maxPermitedScale = navStringToVisible(cosmosVisible, vc).scale * 1.1;
 }
 

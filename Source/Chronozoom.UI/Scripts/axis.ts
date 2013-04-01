@@ -114,7 +114,7 @@ module ChronoZoom {
                             break;
                         case 'relay': url = "ChronozoomRelay";
                             break;
-                        case 'dump': url = "ResponseDumpThresholds.txt";
+                        case 'dump': url = "/dumps/beta-getthresholds.json";
                             break;
                     }
                     $.ajax({
@@ -138,7 +138,7 @@ module ChronoZoom {
                     for (var i = 0; i < this.numberOfThresholds; i++) {
                         content.d[i].time = ChronoZoom.Common.getCoordinateFromDecimalYear(content.d[i].ThresholdYear);
                         this.thresholds[i] = {
-                            'title': content.d[i].Title, 'description': (content.d[i].Description == null ? '' : content.d[i].Description),
+                            'title': content.d[i].title, 'description': (content.d[i].Description == null ? '' : content.d[i].Description),
                             'time': content.d[i].time, 'bookmark': content.d[i].BookmarkRelativePath,
                             'color': ChronoZoom.Settings.thresholdColors[i % ChronoZoom.Settings.thresholdColors.length], 'textColor': ChronoZoom.Settings.thresholdTextColors[i % ChronoZoom.Settings.thresholdTextColors.length],
                             'isVisible': false, 'showing': 'left', 'coordinate': 0
