@@ -16,6 +16,7 @@ namespace Tests
         public static BookmarkHelper BookmarkHelper { get; set; }
         public static ScreenshotManager ScreenshotManager { get; set; }
         public static WelcomeScreenHelper WelcomeScreenHelper { get; set; }
+        public static TimelineHelper TimelineHelper { get; set; }
         
 
         public static HomePageHelper HomePageHelper { get; set; }
@@ -32,6 +33,7 @@ namespace Tests
             TimescaleHelper = HelperManager.GetTimescaleHelper();
             ScreenshotManager = HelperManager.GetScreenshotManager();
             WelcomeScreenHelper = HelperManager.GetWelcomeScreenHelper();
+            TimelineHelper = HelperManager.GetTimelineHelper();
         }
 
         [AssemblyCleanup]

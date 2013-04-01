@@ -1,7 +1,46 @@
-﻿namespace Tests
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace Tests
 {
-    public class TimelineTests
+    [TestClass]
+    public class TimelineTests : TestBase
     {
-         
+        #region Initialize and Cleanup
+        public TestContext TestContext { get; set; }
+
+        [ClassInitialize]
+        public static void ClassInitialize(TestContext testContext)
+        {
+
+        }
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            BrowserStateManager.RefreshState();
+            NavigationHelper.OpenHomePage();
+            WelcomeScreenHelper.CloseWelcomePopup();
+        }
+
+        [ClassCleanup]
+        public static void ClassCleanup()
+        {
+        }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            CreateScreenshotsIfTestFail(TestContext);
+            NavigationHelper.NavigateToCosmos();
+        }
+
+        #endregion
+
+
+        [TestMethod]
+        public void CreateTimeLine()
+        {
+            TimelineHelper.AddTimeline();
+        }
     }
 }

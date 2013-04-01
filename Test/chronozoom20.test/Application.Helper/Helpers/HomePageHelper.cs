@@ -70,7 +70,6 @@ namespace Application.Helper.Helpers
         public void MoveMouseToCenter()
         {
             Logger.Log("<-");
-            IWebElement timescale = FindElement(By.Id("axis"));
             MoveToElementAndClick(By.Id("axis"));
             Logger.Log("->");
         }

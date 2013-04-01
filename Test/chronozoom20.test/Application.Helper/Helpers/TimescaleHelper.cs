@@ -8,7 +8,7 @@ using OpenQA.Selenium;
 
 namespace Application.Helper.Helpers
 {
-    public class TimelineHelper : DependentActions
+    public class TimescaleHelper : DependentActions
     {
         public List<string> GetLabels()
         {

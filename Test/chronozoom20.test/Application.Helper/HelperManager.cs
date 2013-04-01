@@ -15,6 +15,7 @@ namespace Application.Helper
         private static BookmarkHelper _bookmarkHelper;
         private static TimescaleHelper _timescaleHelper;
         private static WelcomeScreenHelper _welcomeScreenHelper;
+        private static TimelineHelper _timelineHelper;
 
         public static void Stop()
         {
@@ -75,5 +76,9 @@ namespace Application.Helper
             return _welcomeScreenHelper ?? (_welcomeScreenHelper = new WelcomeScreenHelper());
         }
 
+        public TimelineHelper GetTimelineHelper()
+        {
+            return _timelineHelper ?? (_timelineHelper = new TimelineHelper());
+        }
     }
 }

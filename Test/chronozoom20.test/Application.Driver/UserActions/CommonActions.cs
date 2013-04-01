@@ -188,7 +188,7 @@ namespace Application.Driver.UserActions
             WebDriver.Navigate().Refresh();
         }
 
-        private static void InvokeChain(Func<Actions> chain)
+        protected static void InvokeChain(Func<Actions> chain)
         {
             chain.Invoke().Build().Perform();
         }
