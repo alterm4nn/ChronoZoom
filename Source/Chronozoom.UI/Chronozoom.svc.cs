@@ -545,13 +545,15 @@ namespace UI
                         return;
                     }
 
-                    if (deleteTimeline.Collection.Id != collectionGuid)
-                    {
-                        SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                        return;
-                    }
+                    // TODO: currently collection is null for every timeline, fix it
+                    //if (deleteTimeline.Collection.Id != collectionGuid)
+                    //{
+                    //    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                    //    return;
+                    //}
 
-                    _storage.Timelines.Remove(deleteTimeline);
+                    _storage.DeleteTimeline(timelineGuid);
+                    //_storage.Timelines.Remove(deleteTimeline);
                     _storage.SaveChanges();
                 });
         }
@@ -710,13 +712,15 @@ namespace UI
                         return;
                     }
 
-                    if (deleteExhibit.Collection.Id != collectionGuid)
-                    {
-                        SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                        return;
-                    }
+                    // TODO: currently collection is null for every exhibit, fix it
+                    //if (deleteExhibit.Collection.Id != collectionGuid)
+                    //{
+                    //    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                    //    return;
+                    //}
 
-                    _storage.Exhibits.Remove(deleteExhibit);
+                    _storage.DeleteExhibit(exhibitGuid);
+                    //_storage.Exhibits.Remove(deleteExhibit);
                     _storage.SaveChanges();
                 });
         }
@@ -884,11 +888,12 @@ namespace UI
                         return;
                     }
 
-                    if (deleteContentItem.Collection.Id != collectionGuid)
-                    {
-                        SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                        return;
-                    }
+                    // TODO: currently collectino is null for every content item, fix it
+                    //if (deleteContentItem.Collection.Id != collectionGuid)
+                    //{
+                    //    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                    //    return;
+                    //}
 
                     _storage.ContentItems.Remove(deleteContentItem);
                     _storage.SaveChanges();
@@ -955,7 +960,10 @@ namespace UI
             if (claimsIdentity == null || !claimsIdentity.IsAuthenticated)
             {
                 SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.Unauthenticated);
-                return default(T);
+                operation(null);
+
+                // TODO: temporary fix?
+                //return default(T);
             }
 
             Microsoft.IdentityModel.Claims.Claim nameIdentifierClaim = claimsIdentity.Claims.Where(candidate => candidate.ClaimType.EndsWith("nameidentifier")).FirstOrDefault();

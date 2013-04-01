@@ -16,11 +16,13 @@
         });
 
         this.addToPath = function (item) {
-            _url += _url.match(/\/$/) ? item : "/" + item;
+            if (item) {
+                _url += _url.match(/\/$/) ? item : "/" + item;
+            }
         };
 
         this.addParameter = function (name, value) { 
-            if (value !== "undefined") {
+            if (value !== "undefined" && value !== null) {
                 _url += _hasParameters ? "&" : "?";
                 _url += name + "=" + value;
                 _hasParameters = true;
@@ -39,7 +41,7 @@
     $.extend(Service.Map, {
         timeline: function (t) {
             return {
-                id: t.guid,
+                Id: t.guid,
                 parent: t.parent.guid,
                 start: t.x,
                 end: t.x + t.width,
@@ -51,7 +53,7 @@
 
         exhibit: function (e) {
             return {
-                id: e.guid,
+                Id: e.guid,
                 parent: e.parent.guid,
                 time: e.infodotDescription.date,
                 title: e.title,
@@ -62,7 +64,7 @@
 
         contentItem: function (ci) {
             return {
-                id: ci.id,
+                Id: ci.guid,
                 parent: ci.parent.id,
                 title: ci.title,
                 description: ci.description,
