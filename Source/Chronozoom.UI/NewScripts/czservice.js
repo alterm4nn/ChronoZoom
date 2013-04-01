@@ -16,11 +16,13 @@
         });
 
         this.addToPath = function (item) {
-            _url += _url.match(/\/$/) ? item : "/" + item;
+            if (item) {
+                _url += _url.match(/\/$/) ? item : "/" + item;
+            }
         };
 
         this.addParameter = function (name, value) { 
-            if (value !== "undefined") {
+            if (value !== "undefined" && value !== null) {
                 _url += _hasParameters ? "&" : "?";
                 _url += name + "=" + value;
                 _hasParameters = true;
