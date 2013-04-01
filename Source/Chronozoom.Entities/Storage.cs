@@ -169,5 +169,125 @@ namespace Chronozoom.Entities
 
             return timelines;
         }
+
+
+
+        // Recursively deletes every child timeline and exhibit (with references and content items) form timeline with given guid. 
+        public void DeleteTimeline(Guid id)
+        {
+            var timelineIDs = GetChildTimelinesIDs(id); // list of ids of child timelines
+            var exhibitIDs = GetChildExhibitsIDs(id); // list of ids of exhibits
+
+            // recursively delete timelines
+            while (timelineIDs.Count != 0)
+            {
+                DeleteTimeline(timelineIDs.First());
+                timelineIDs.RemoveAt(0);
+            }
+
+            // recursively delete exhibits
+            while (exhibitIDs.Count != 0)
+            {
+                DeleteExhibit(exhibitIDs.First());
+                exhibitIDs.RemoveAt(0);
+            }
+
+            Timeline removeTimeline = this.Timelines.Find(id);
+            this.Timelines.Remove(removeTimeline);
+        }
+
+        // Deletes every content item and reference from exhibit with given guid.
+        public void DeleteExhibit(Guid id)
+        {
+            var exhibitsIDs = GetChildContentItemsIDs(id); // list of ids of content items
+            var referencesIDs = GetChildReferencesIDs(id); // list of ids of references
+
+            // delete references
+            while (referencesIDs.Count != 0)
+            {
+                var r = this.References.Find(referencesIDs.First());
+                this.References.Remove(r);
+                referencesIDs.RemoveAt(0);
+            }
+
+            // delete content items
+            while (exhibitsIDs.Count != 0)
+            {
+                var e = this.ContentItems.Find(exhibitsIDs.First());
+                this.ContentItems.Remove(e);
+                exhibitsIDs.RemoveAt(0);
+            }
+
+            Exhibit deleteExhibit = this.Exhibits.Find(id);
+            this.Exhibits.Remove(deleteExhibit);
+        }
+
+        // Returns list of ids of chilt timelines of timeline with given id.
+        public List<Guid> GetChildTimelinesIDs(Guid id)
+        {
+            var timelines = new List<Guid>();
+
+            string timelinesQuery = string.Format(
+                CultureInfo.InvariantCulture,
+                "SELECT * FROM Timelines WHERE Timeline_Id IN ('{0}')",
+                string.Join("', '", id));
+            var timelinesRaw = Database.SqlQuery<TimelineRaw>(timelinesQuery);
+           
+            foreach (TimelineRaw timelineRaw in timelinesRaw)
+                timelines.Add(timelineRaw.Id);
+
+            return timelines;
+        }
+
+        // Returns list of ids of child exhibits of timeline with given id.
+        public List<Guid> GetChildExhibitsIDs(Guid id)
+        {
+            var exhibits = new List<Guid>();
+
+            string exhibitsQuery = string.Format(
+                CultureInfo.InvariantCulture,
+                "SELECT *, Year as [Time] FROM Exhibits WHERE Timeline_Id IN ('{0}')",
+                string.Join("', '", id));
+            var exhibitsRaw = Database.SqlQuery<ExhibitRaw>(exhibitsQuery);
+
+            foreach (ExhibitRaw exhibitRaw in exhibitsRaw)
+                exhibits.Add(exhibitRaw.Id);
+
+            return exhibits;
+        }
+
+        // Returns list of ids of child content items of exhibit with given id.
+        public List<Guid> GetChildContentItemsIDs(Guid id)
+        {
+            var contentItems = new List<Guid>();
+
+            // Find child content items
+            string contentItemsQuery = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "SELECT * FROM ContentItems WHERE Exhibit_Id IN ('{0}')",
+                    string.Join("', '", id));
+            var contentItemsRaw = Database.SqlQuery<ContentItemRaw>(contentItemsQuery);
+
+            foreach (ContentItemRaw contentItemRaw in contentItemsRaw)
+                contentItems.Add(contentItemRaw.Id);      
+            return contentItems;
+        }
+
+        // Returns list of ids of child references of exhibit with given id.
+        public List<Guid> GetChildReferencesIDs(Guid id)
+        {
+            var references = new List<Guid>();
+
+            // Find exhibit's references
+            string referencesQuery = string.Format(CultureInfo.InvariantCulture,
+                "SELECT * FROM [References] WHERE Exhibit_Id IN ('{0}')",
+                string.Join("', '", id));
+            var referencesRaw = Database.SqlQuery<ReferenceRaw>(referencesQuery);
+
+            foreach (ReferenceRaw referenceRaw in referencesRaw)
+                references.Add(referenceRaw.Id);
+
+            return references;
+        }
     }
 }

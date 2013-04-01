@@ -531,6 +531,7 @@ var CZ = (function (CZ, $) {
          * @param  {Object} t A timeline to remove.
          */
         removeTimeline: function (t) {
+            CZ.Service.deleteTimeline(t);
             removeChild(t.parent, t.id);
         },
 
@@ -578,6 +579,7 @@ var CZ = (function (CZ, $) {
          * @param  {Object} e An exhibit to remove.
          */
         removeExhibit: function (e) {
+            CZ.Service.deleteExhibit(e);
             removeChild(e.parent, e.id);
         },
 
@@ -615,7 +617,8 @@ var CZ = (function (CZ, $) {
          * @param  {Number} i Index of a content item in selected exhibit.
          */
         removeContentItem: function (c) {
-           // var i = c.parent.parent.parent.contentItems.indexOf(c.contentItem);
+            // var i = c.parent.parent.parent.contentItems.indexOf(c.contentItem);
+            CZ.Service.deleteContentItem(c);
             c.parent.parent.parent.contentItems.splice(c.contentItem.index, 1);
             delete c.contentItem;
             var e = c.parent.parent.parent;
