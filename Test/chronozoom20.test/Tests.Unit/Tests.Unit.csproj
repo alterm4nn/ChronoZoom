@@ -80,6 +80,7 @@
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <PropertyGroup>
     <PreBuildEvent>cd $(ProjectDir)
+mkdir .\Scripts\Js
 copy "..\..\..\Source\Chronozoom.UI\NewScripts\*.js" "$(ProjectDir)Scripts\Js\" /y</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
