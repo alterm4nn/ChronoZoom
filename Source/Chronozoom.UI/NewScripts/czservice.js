@@ -67,7 +67,8 @@
     });
 
     $.extend(Service, {
-        collectionName: "collection",
+        collectionName: null,
+        superCollectionName: null,
 
         /**
          * Information Retrieval.
@@ -151,7 +152,7 @@
                 type: "DELETE",
                 cache: false,
                 contentType: "application/json",
-                url: serverUrlBase + "/ChronoZoom.svc/" + Service.collectionName + "/Timeline",
+                url: serverUrlBase + "/ChronoZoom.svc/" + Service.collectionName + "/" + Service.superCollectionName + "/Timeline",
                 data: JSON.stringify({
                     Id: t.guid
                 })
@@ -174,7 +175,7 @@
                 type: "DELETE",
                 cache: false,
                 contentType: "application/json",
-                url: serverUrlBase + "/ChronoZoom.Svc/" + Service.collectionName + "/Exhibit",
+                url: serverUrlBase + "/ChronoZoom.Svc/" + Service.collectionName + "/" + Service.superCollectionName + "/Exhibit",
                 data: JSON.stringify({
                     Id: e.guid
                 })
@@ -197,7 +198,7 @@
                 type: "DELETE",
                 cache: false,
                 contentType: "application/json",
-                url: serverUrlBase + "/ChronoZoom.Svc/" + Service.collectionName + "/ContentItem",
+                url: serverUrlBase + "/ChronoZoom.Svc/" + Service.collectionName + "/" + Service.superCollectionName + "/ContentItem",
                 data: JSON.stringify({
                     Id: ci.guid
                 })
