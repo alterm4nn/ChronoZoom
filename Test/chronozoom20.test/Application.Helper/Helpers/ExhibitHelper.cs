@@ -1,4 +1,5 @@
 ﻿using Application.Driver;
+using Application.Helper.Entities;
 using Application.Helper.UserActions;
 using OpenQA.Selenium;
 
@@ -6,12 +7,12 @@ namespace Application.Helper.Helpers
 {
     public class ExhibitHelper : DependentActions
     {
-        public void AddExhibit(string name)
+        public void AddExhibit(Exhibit exhibit)
         {
-            Logger.Log("<- name: " + name);
+            Logger.Log("<- " + exhibit);
             InitExhibitCreationMode();
             SetExhibitPoint();
-            SetExhibitTitle(name);
+            SetExhibitTitle(exhibit.Title);
             SaveAndClose();
             Logger.Log("->");
         }

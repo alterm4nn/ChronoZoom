@@ -1,4 +1,5 @@
 ﻿using Application.Driver;
+using Application.Helper.Entities;
 using Application.Helper.UserActions;
 using OpenQA.Selenium;
 
@@ -6,12 +7,12 @@ namespace Application.Helper.Helpers
 {
     public class TimelineHelper : DependentActions
     {
-        public void AddTimeline(string name)
+        public void AddTimeline(Timeline timeline)
         {
-            Logger.Log("<- name: " + name);
+            Logger.Log("<- timeline: " + timeline);
             InitTimelineCreationMode();
             DrawTimeline();
-            SetTimelineName(name);
+            SetTimelineName(timeline.Title);
             SaveAndClose();
             Logger.Log("->");
         }
@@ -23,7 +24,7 @@ namespace Application.Helper.Helpers
 
         private void SetTimelineName(string timelineName)
         {
-            Logger.Log("<- name: " + timelineName);
+            Logger.Log("<- timeline: " + timelineName);
             TypeText(By.Id("timelineTitleInput"), timelineName);
             Logger.Log("->");
         }

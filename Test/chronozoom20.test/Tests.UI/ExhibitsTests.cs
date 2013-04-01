@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Application.Helper.Entities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Tests
 {
@@ -40,9 +41,9 @@ namespace Tests
         [TestMethod]
         public void CreateExhibits()
         {
-            const string name = "WebdriverTitle";
-            ExhibitHelper.AddExhibit(name);
-            Assert.AreEqual(name, HomePageHelper.GetLastElementName());
+            Exhibit exhibit = new Exhibit() {Title = "WebdriverExhibit"};
+            ExhibitHelper.AddExhibit(exhibit);
+            Assert.AreEqual(exhibit.Title, HomePageHelper.GetLastElementName());
         }
     }
 }

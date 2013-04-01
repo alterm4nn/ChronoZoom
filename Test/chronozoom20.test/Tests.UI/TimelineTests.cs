@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Application.Helper.Entities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Tests
 {
@@ -40,9 +41,9 @@ namespace Tests
         [TestMethod]
         public void CreateTimeLine()
         {
-            const string name = "WebdriverTitle";
-            TimelineHelper.AddTimeline(name);
-            Assert.AreEqual(name, HomePageHelper.GetLastElementName());
+            Timeline timeline = new Timeline() {Title = "WebdriverTitle"};
+            TimelineHelper.AddTimeline(timeline);
+            Assert.AreEqual(timeline.Title, HomePageHelper.GetLastElementName());
         }
     }
 }

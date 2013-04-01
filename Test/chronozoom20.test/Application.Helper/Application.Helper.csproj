@@ -52,6 +52,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\ContentItem.cs" />
+    <Compile Include="Entities\Exhibit.cs" />
+    <Compile Include="Entities\Timeline.cs" />
     <Compile Include="HelperManager.cs" />
     <Compile Include="BrowserImpl\ChromeControls.cs" />
     <Compile Include="BrowserImpl\DefaultControls.cs" />
@@ -72,9 +75,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserActions\DependentActions.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Entities\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\Application.Driver\Application.Driver.csproj">
       <Project>{ac1310bd-eacc-4b45-bcaf-2d8a0260e2d1}</Project>
