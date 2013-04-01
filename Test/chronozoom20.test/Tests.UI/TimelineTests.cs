@@ -40,7 +40,10 @@ namespace Tests
         [TestMethod]
         public void CreateTimeLine()
         {
-            TimelineHelper.AddTimeline();
+            const string name = "WebdriverTitle";
+            TimelineHelper.AddTimeline(name);
+            TimelineHelper.NavigateTotimeline();
+            Assert.AreEqual(name,TimelineHelper.GetLastTimelinename());
         }
     }
 }
