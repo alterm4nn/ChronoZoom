@@ -11,7 +11,10 @@ namespace Application.Helper.Entities
 
         public override string ToString()
         {
-            return string.Format("[Exhibit: Title = {0}, Description = {1}, Time = {2}, ContentItems = {3}]", Title, Description, Time, ContentItems.ToString());
+
+            string description = (Description == null) ? "" : ", Description = " + Description;
+            var contentItems = (ContentItems == null) ? "" : ",  ContentItems = " + ContentItems;
+            return string.Format("[Exhibit: Title = {0}{1}, Time = {2}{3}]", Title, description, Time, contentItems);
         }
     }
 }
