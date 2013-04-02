@@ -108,10 +108,13 @@ namespace UI
             decimal startTime = string.IsNullOrWhiteSpace(start) ? _minYear : decimal.Parse(start, CultureInfo.InvariantCulture);
             decimal endTime = string.IsNullOrWhiteSpace(end) ? _maxYear : decimal.Parse(end, CultureInfo.InvariantCulture);
             decimal span = string.IsNullOrWhiteSpace(minspan) ? 0 : decimal.Parse(minspan, CultureInfo.InvariantCulture);
-            Guid lcaParsed = string.IsNullOrWhiteSpace(lca) ? Guid.Empty : Guid.Parse(lca);
+            Guid? lcaParsed = string.IsNullOrWhiteSpace(lca) ? (Guid?)null : Guid.Parse(lca);
 
             Collection<Timeline> timelines = _storage.TimelinesQuery(collectionId, startTime, endTime, span, lcaParsed);
             Timeline timeline = timelines.Where(candidate => candidate.Id == lcaParsed).FirstOrDefault();
+
+            if (timeline == null)
+                timeline = timelines.FirstOrDefault();
 
             return timeline;
         }
@@ -478,19 +481,18 @@ namespace UI
                             return retval;
                         }
 
-                        //if (updateTimeline.Collection.Id != collectionGuid)
-                        //{
-                        //    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                        //    return retval;
-                        //}
+                        if (updateTimeline.Collection.Id != collectionGuid)
+                        {
+                            SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                            return retval;
+                        }
 
-                        // TODO: may be this check shall be removed?
-                        //if (timelineRequest.ParentTimelineId != null)
-                        //{
-                        //    // Parent timeline updating is currently not supported
-                        //    SetStatusCode(HttpStatusCode.NotImplemented, ErrorDescription.ParentTimelineUpdate);
-                        //    return retval;
-                        //}
+                        if (timelineRequest.ParentTimelineId != null)
+                        {
+                            // Parent timeline updating is currently not supported
+                            SetStatusCode(HttpStatusCode.NotImplemented, ErrorDescription.ParentTimelineUpdate);
+                            return retval;
+                        }
 
                         // Update the timeline fields
                         updateTimeline.Title = timelineRequest.Title;
@@ -546,15 +548,13 @@ namespace UI
                         return;
                     }
 
-                    // TODO: currently collection is null for every timeline, fix it
-                    //if (deleteTimeline.Collection.Id != collectionGuid)
-                    //{
-                    //    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                    //    return;
-                    //}
+                    if (deleteTimeline.Collection.Id != collectionGuid)
+                    {
+                        SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                        return;
+                    }
 
                     _storage.DeleteTimeline(timelineGuid);
-                    //_storage.Timelines.Remove(deleteTimeline);
                     _storage.SaveChanges();
                 });
         }
@@ -648,12 +648,11 @@ namespace UI
                             return retval;
                         }
 
-                        // TODO: currently collection is null for every exhibit, fix it
-                        //if (updateExhibit.Collection.Id != collectionGuid)
-                        //{
-                        //    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                        //    return retval;
-                        //}
+                        if (updateExhibit.Collection.Id != collectionGuid)
+                        {
+                            SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                            return retval;
+                        }
 
                         if (exhibitRequest.ParentTimelineId != null)
                         {
@@ -714,15 +713,13 @@ namespace UI
                         return;
                     }
 
-                    // TODO: currently collection is null for every exhibit, fix it
-                    //if (deleteExhibit.Collection.Id != collectionGuid)
-                    //{
-                    //    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                    //    return;
-                    //}
+                    if (deleteExhibit.Collection.Id != collectionGuid)
+                    {
+                        SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                        return;
+                    }
 
                     _storage.DeleteExhibit(exhibitGuid);
-                    //_storage.Exhibits.Remove(deleteExhibit);
                     _storage.SaveChanges();
                 });
         }
@@ -890,12 +887,11 @@ namespace UI
                         return;
                     }
 
-                    // TODO: currently collectino is null for every content item, fix it
-                    //if (deleteContentItem.Collection.Id != collectionGuid)
-                    //{
-                    //    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                    //    return;
-                    //}
+                    if (deleteContentItem.Collection.Id != collectionGuid)
+                    {
+                        SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                        return;
+                    }
 
                     _storage.ContentItems.Remove(deleteContentItem);
                     _storage.SaveChanges();
@@ -957,14 +953,20 @@ namespace UI
         private delegate T AuthenticatedOperationDelegate<T>(string user);
         private static T AuthenticatedOperation<T>(AuthenticatedOperationDelegate<T> operation)
         {
+            return operation(null);
+
+            /* TODO: Pending ACS Integration in Azure WebSite
             Microsoft.IdentityModel.Claims.ClaimsIdentity claimsIdentity = HttpContext.Current.User.Identity as Microsoft.IdentityModel.Claims.ClaimsIdentity;
 
-            if (claimsIdentity == null || !claimsIdentity.IsAuthenticated)
+            if (claimsIdentity == null)
+            {
+                // ClaimsIdentity not configured, falling back to annonimous user
+                return operation(null);
+            }
+
+            if (!claimsIdentity.IsAuthenticated)
             {
                 SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.Unauthenticated);
-                operation(null);
-
-                // TODO: temporary fix?
                 return default(T);
             }
 
@@ -976,6 +978,7 @@ namespace UI
             }
 
             return operation(nameIdentifierClaim.Value);
+            */
         }
 
         /// <summary>
