@@ -406,7 +406,7 @@ function GenerateTitleObject(tlHeight, timeline, measureContext) {
 function Convert(parent, timeline) {
     //Creating timeline
     var tlColor = GetTimelineColor(timeline);
-    var t1 = addTimeline(parent, "layerTimelines", 't' + timeline.UniqueID,
+    var t1 = addTimeline(parent, "layerTimelines", 't' + timeline.id,
     {
         isBuffered: timeline.timelines instanceof Array,
         guid: timeline.id,
@@ -430,7 +430,7 @@ function Convert(parent, timeline) {
                 contentItems = childInfodot.contentItems;
 			}
 
-            var infodot1 = addInfodot(t1, "layerInfodots", 'e' + childInfodot.UniqueID,
+            var infodot1 = addInfodot(t1, "layerInfodots", 'e' + childInfodot.id,
                     (childInfodot.left + childInfodot.right) / 2.0, childInfodot.y, 0.8 * childInfodot.size / 2.0, contentItems,
                     {
                             isBuffered: false,
