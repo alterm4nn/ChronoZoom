@@ -786,11 +786,12 @@
                     "save and close": function () {
                         var selected = mediaTypeInput[0];
                         
-                        for (var i = 1; i < mediaTypeInput.length; i++)
+                        for (var i = 1; i < mediaTypeInput.length; i++) {
                             if (mediaTypeInput[i].selected) {
-                                    selected = mediaTypeInput[i];
-                                }
-                        console.log(c,e);
+                                selected = mediaTypeInput[i];
+                            }
+                        }
+                        
                         CZ.Authoring.updateContentItem(c, e, {
                                 title: titleInput.val(),
                                 uri: mediaInput.val(),

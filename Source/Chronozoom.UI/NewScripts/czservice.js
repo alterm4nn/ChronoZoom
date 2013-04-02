@@ -64,11 +64,11 @@
         contentItem: function (ci) {
             return {
                 Id: ci.guid,
-                ParentExhibitId: ci.parent.id,
-                Title: ci.title,
-                Caption: ci.description,
-                Uri: ci.uri,
-                MediaType: ci.mediaType
+                ParentExhibitId: undefined,
+                Title: ci.contentItem ? ci.contentItem.title : ci.title,
+                Caption: ci.contentItem ? ci.contentItem.description : ci.description,
+                Uri: ci.contentItem ? ci.contentItem.uri : ci.uri,
+                MediaType: ci.contentItem ? ci.contentItem.mediaType : ci.mediaType
             };
         }
     });
@@ -211,6 +211,8 @@
             request.addToPath(Service.collectionName);
             request.addToPath("timeline");
 
+            console.log("[PUT] " + request.url);
+
             return $.ajax({
                 type: "PUT",
                 cache: false,
@@ -228,6 +230,8 @@
             request.addToPath(Service.collectionName);
             request.addToPath("timeline");
 
+            console.log("[DELETE] " + request.url);
+
             return $.ajax({
                 type: "DELETE",
                 cache: false,
@@ -243,6 +247,8 @@
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
             request.addToPath("exhibit");
+
+            console.log("[PUT] " + request.url);
 
             return $.ajax({
                 type: "PUT",
@@ -261,6 +267,8 @@
             request.addToPath(Service.collectionName);
             request.addToPath("exhibit");
 
+            console.log("[DELETE] " + request.url);
+
             return $.ajax({
                 type: "DELETE",
                 cache: false,
@@ -276,6 +284,8 @@
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
             request.addToPath("contentitem");
+
+            console.log("[PUT] " + request.url);
 
             return $.ajax({
                 type: "PUT",
@@ -293,6 +303,8 @@
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
             request.addToPath("contentitem");
+
+            console.log("[DELETE] " + request.url);
 
             return $.ajax({
                 type: "DELETE",

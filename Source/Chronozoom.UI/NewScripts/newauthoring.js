@@ -563,25 +563,25 @@ var CZ = (function (CZ, $) {
 
             e = renewExhibit(e);
             
-            // CZ.Service.putExhibitWithContent(e, oldContentItems).then(
-            //     function () {
-            //         for (var i = 0, len = arguments.length; i < len; ++i) {
-            //             console.log(arguments[i][0]);
-            //         }
-            //     },
-            //     function () {
-            //         console.log("Error connecting to service: update exhibit.\n");
-            //     }
-            // );
-
-            CZ.Service.putExhibit(e).then(
-                function (response) {
-                    console.log(response);
+            CZ.Service.putExhibitWithContent(e, oldContentItems).then(
+                function () {
+                    for (var i = 0, len = arguments.length; i < len; ++i) {
+                        console.log(arguments[i][0]);
+                    }
                 },
-                function (error) {
-                    console.log("Error connecting to service: update exhibit.\n" + error.responseText);
+                function () {
+                    console.log("Error connecting to service: update exhibit.\n");
                 }
             );
+
+            // CZ.Service.putExhibit(e).then(
+            //     function (response) {
+            //         console.log(response);
+            //     },
+            //     function (error) {
+            //         console.log("Error connecting to service: update exhibit.\n" + error.responseText);
+            //     }
+            // );
         },
 
         /**
@@ -620,6 +620,15 @@ var CZ = (function (CZ, $) {
                     c.contentItem[prop] = args[prop];
             
             renewExhibit(e);
+
+            CZ.Service.putContentItem(c).then(
+                function (response) {
+                    console.log(response);
+                },
+                function (error) {
+                    console.log("Error connecting to service: update content item.\n" + error.responseText);
+                }
+            );
         },
 
         /**
