@@ -2,6 +2,7 @@
 /// <reference path="../Utils/jquery-1.8.0.min.js" />
 /// <reference path="../Utils/jasmine-jquery.js" />
 /// <reference path="../Js/timescale.js" />
+/// <reference path="../Js/czservice.js" />
 /// <reference path="../Js/newauthoring.js" />
 /// <reference path="../Js/vccontent.js" />
 /// <reference path="../Js/cz.settings.js" />
@@ -10,6 +11,7 @@
 
 describe("CZ.Authoring", function () {
     var authoring;
+    var service;
     var existedTimeline;
     var parentTimeline = {};
     parentTimeline.guid = "00000000-0000-0000-0000-000000000000";
@@ -22,6 +24,7 @@ describe("CZ.Authoring", function () {
     beforeEach(function () {
         var editmode = true;
         authoring = CZ.Authoring;
+        service = CZ.Service;
     });
 
     describe("Given: timelines are", function () {
