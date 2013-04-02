@@ -38,10 +38,10 @@ namespace Chronozoom.Api.Controllers
                 return false;
         }
 
-        [HttpGet]
-        public void Login()
-        {
 
+        public ActionResult Login()
+        {
+            return Redirect("/cz2.html");
         }
 
         public ActionResult Success(FormCollection forms)
@@ -66,12 +66,12 @@ namespace Chronozoom.Api.Controllers
                 }
 
                 // We use return url as context
-                string returnUrl = GetUrlFromContext(forms);
+                //string returnUrl = GetUrlFromContext(forms);
 
-                if (!string.IsNullOrEmpty(returnUrl))
-                {
-                    return Redirect(returnUrl);
-                }
+                //if (!string.IsNullOrEmpty(returnUrl))
+                //{
+                //    return Redirect(returnUrl);
+                //}
             }
 
             return Redirect("/cz2.html");
@@ -92,7 +92,7 @@ namespace Chronozoom.Api.Controllers
                 fam.SignOut(true);
             }
 
-            return Redirect("/");
+            return Redirect("/cz2.html");
         }
 
         //[ChildActionOnly]

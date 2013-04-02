@@ -82,6 +82,8 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Entity" />
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.IdentityModel.Services" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.4.0.20710.0\lib\net40\System.Net.Http.Formatting.dll</HintPath>
@@ -138,6 +140,7 @@
     <Content Include="BehindTheScenes.htm" />
     <Content Include="cz.aspx" />
     <Content Include="cz2.html" />
+    <Content Include="YuriyTest.pfx" />
     <TypeScriptCompile Include="cz.ts" />
     <Content Include="cz.js">
       <DependentUpon>cz.ts</DependentUpon>
@@ -610,6 +613,10 @@
       <Project>{B995D3CF-E31F-4986-A7F7-77988EA275D3}</Project>
       <Name>Chronozoom.Entities</Name>
     </ProjectReference>
+    <ProjectReference Include="..\IdentityModel\Thinktecture.IdentityModel\Thinktecture.IdentityModel.csproj">
+      <Project>{ac9a74df-4aab-43c8-b0ed-b7602721e545}</Project>
+      <Name>Thinktecture.IdentityModel</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SignalRTraceListener\OuterCurve.SignalRTraceListener.csproj">
       <Project>{e9c7a64b-d03b-47d7-89dd-48d046de564c}</Project>
       <Name>OuterCurve.SignalRTraceListener</Name>
@@ -643,6 +650,12 @@
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>YuriyTest.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
