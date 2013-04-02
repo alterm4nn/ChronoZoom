@@ -316,7 +316,6 @@ function loadData() {
     getURL();
     
     CZ.Service.getTimelines({
-        lca: cosmosTimelineID,
         start: -50000000000,
         end: 9999,
         minspan: 5013
