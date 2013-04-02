@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Application.Driver;
 using Application.Helper.Entities;
 using Application.Helper.UserActions;
@@ -36,7 +37,7 @@ namespace Application.Helper.Helpers
                 "vc.data('ui-virtualCanvas')._layersContent.children[0].children[vc.data('ui-virtualCanvas')._layersContent.children[0].children.length - 1]";
             Exhibit exhibit = new Exhibit();
             ContentItem contentItem = new ContentItem();
-            exhibit.ContentItems = new List<ContentItem>();
+            exhibit.ContentItems = new Collection<Chronozoom.Entities.ContentItem>();
             exhibit.Title =
                 GetJavaScriptExecutionResult(script + ".title");
             int contentItemsCount = int.Parse(GetJavaScriptExecutionResult(script + ".contentItems.length"));
@@ -45,8 +46,8 @@ namespace Application.Helper.Helpers
             {
                 string item = string.Format("{0}.contentItems[{1}].", script, i);
                 contentItem.Title = GetJavaScriptExecutionResult(item + "title");
-                contentItem.Description = GetJavaScriptExecutionResult(item + "description");
-                contentItem.MediaSourse = GetJavaScriptExecutionResult(item + "uri");
+                contentItem.Caption = GetJavaScriptExecutionResult(item + "description");
+                contentItem.MediaSource = GetJavaScriptExecutionResult(item + "uri");
                 contentItem.MediaType = GetJavaScriptExecutionResult(item + "mediaType");
                 exhibit.ContentItems.Add(contentItem);
             }
@@ -82,15 +83,15 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
-        private void AddContentItems(IList<ContentItem> contentItems)
+        private void AddContentItems(Collection<Chronozoom.Entities.ContentItem> contentItems)
         {
             Logger.Log("<- name: " + contentItems);
             for (int i = 0; i <= contentItems.Count - 1; i++)
             {
                 ClickAddContentItem();
                 SetTitle(contentItems[i].Title, i + 1);
-                SetDescription(contentItems[i].Description, i + 1);
-                SetMediaSourse(contentItems[i].MediaSourse, i + 1);
+                SetCaption(contentItems[i].Caption, i + 1);
+                SetMediaSourse(contentItems[i].MediaSource, i + 1);
                 SelectMediaType(contentItems[i].MediaType, i + 1);
             }
             Logger.Log("->");
@@ -106,7 +107,7 @@ namespace Application.Helper.Helpers
             TypeText(By.XPath(string.Format("(//*[@class='cz-auth-ci-media-source'])[{0}]", index)), mediaSourse);
         }
 
-        private void SetDescription(string description, int index)
+        private void SetCaption(string description, int index)
         {
             TypeText(By.XPath(string.Format("(//*[@class='cz-auth-ci-description'])[{0}]", index)), description);
         }

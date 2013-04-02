@@ -1,15 +1,10 @@
 ﻿namespace Application.Helper.Entities
 {
-    public class ContentItem
+    public class ContentItem : Chronozoom.Entities.ContentItem
     {
-        public string Title { get; set; }
-        public string Description { get; set; }
-        public string MediaSourse { get; set; }
-        public string MediaType { get; set; }
-
         public override string ToString()
         {
-            return string.Format("[ContentItem: Title = {0}, Description = {1}, MediaSourse = {2}, MediaType = {3}]", Title, Description, MediaSourse, MediaType);
+            return string.Format("[ContentItem: Title = {0}, Caption = {1}, MediaSource = {2}, MediaType = {3}]", Title, Caption, MediaSource, MediaType);
         }
     }
 }

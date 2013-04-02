@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using Application.Helper.Entities;
+﻿using Application.Helper.Entities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.ObjectModel;
 
 namespace Tests
 {
@@ -51,14 +51,14 @@ namespace Tests
             ContentItem contentItem = new ContentItem()
                 {
                     Title = "contentItem",
-                    Description = "This is a test item",
-                    MediaSourse = "https://www.youtube.com/watch?v=eVpXkyN0zOE",
+                    Caption = "This is a test item",
+                    MediaSource = "https://www.youtube.com/watch?v=eVpXkyN0zOE",
                     MediaType = "Video"
                 };
             Exhibit exhibit = new Exhibit()
                 {
                     Title = "ExhibitWithContent",
-                    ContentItems = new List<ContentItem> {contentItem}
+                    ContentItems = new Collection<Chronozoom.Entities.ContentItem> { contentItem }
                 };
             ExhibitHelper.AddExhibitWithContentItem(exhibit);
             Exhibit newExhibit = ExhibitHelper.GetNewExhibit();
@@ -67,8 +67,8 @@ namespace Tests
             for (int i = 0; i < exhibit.ContentItems.Count; i++)
             {
                 Assert.AreEqual(exhibit.ContentItems[i].Title, newExhibit.ContentItems[i].Title, "Content items titles are not equal");
-                Assert.AreEqual(exhibit.ContentItems[i].Description, newExhibit.ContentItems[i].Description, "Content items descriptions are not equal");
-                Assert.AreEqual(exhibit.ContentItems[i].MediaSourse, newExhibit.ContentItems[i].MediaSourse, "Content items mediaSourses are not equal");
+                Assert.AreEqual(exhibit.ContentItems[i].Caption, newExhibit.ContentItems[i].Caption, "Content items descriptions are not equal");
+                Assert.AreEqual(exhibit.ContentItems[i].MediaSource, newExhibit.ContentItems[i].MediaSource, "Content items mediaSourses are not equal");
                 Assert.AreEqual(exhibit.ContentItems[i].MediaType, newExhibit.ContentItems[i].MediaType, "Content items mediaTypes are not equal");
             }
             

@@ -41,7 +41,7 @@ namespace Tests
         [TestMethod]
         public void CreateTimeLine()
         {
-            Timeline timeline = new Timeline() {Title = "WebdriverTitle"};
+            var timeline = new Timeline() {Title = "WebdriverTitle"};
             TimelineHelper.AddTimeline(timeline);
             Assert.AreEqual(timeline.Title, HomePageHelper.GetLastElementName());
         }
