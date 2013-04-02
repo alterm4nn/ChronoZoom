@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using Application.Driver;
+using Application.Helper.Entities;
 using Application.Helper.UserActions;
 using OpenQA.Selenium;
 
