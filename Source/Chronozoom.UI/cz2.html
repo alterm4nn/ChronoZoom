@@ -595,13 +595,13 @@
                 width: 600,
                 buttons: {
                     "save and close": function () {
+                        isCancel = false;
                         CZ.Authoring.updateTimeline(t, {
                            title: titleInput.val(),
                            start: startInput.val(),
                            end: endInput.val(),
-                        });
-                        isCancel = false;
-                        $(this).dialog("close");
+                        },
+                        $(this));
                     }
                 },
                 close: function () {
@@ -634,8 +634,8 @@
                             title: titleInput.val(),
                             start: startInput.val(),
                             end: endInput.val(),
-                        });
-                        $(this).dialog("close");
+                        },
+                        $(this));
                     },
                     "delete": function () {
                         if (confirm("Are you sure want to delete timeline and all of its nested timelines and exhibits? Delete can't be undone!")) {
