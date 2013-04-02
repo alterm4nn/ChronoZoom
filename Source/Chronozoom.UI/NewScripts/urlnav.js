@@ -230,10 +230,12 @@ function getURL() {
         if (result[4] != "") {
             url.path = result[4].split("/");
 
-            if (url.path.length > 1)
+            if (url.path.length > 1) {
                 Service.superCollectionName = url.path[0];
-            if (url.path.length > 2)
+            }
+            if (url.path.length > 2) {
                 Service.collectionName = url.path[1];
+            }
         }
 
         //If GET parameters exists

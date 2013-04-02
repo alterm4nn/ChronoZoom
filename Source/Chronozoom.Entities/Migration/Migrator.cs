@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
@@ -23,8 +24,11 @@ namespace Chronozoom.Entities.Migration
         private Storage _storage;
         private static MD5 _md5Hasher = MD5.Create();
 
-        // Content administrator set to javierluraschi to avoid content being modified. Consider, assigning to a ChronoZoom account.
-        private const string _baseContentAdmin = "cyZ8WE0oZ7g7k7Qb6cTTPoBsNBjluVeabqpfufS6Fcw=";
+        // The user that is able to modify the base collections (e.g. Beta Content, AIDS Quilt)
+        private static Lazy<string> _baseContentAdmin = new Lazy<string>(() =>
+            {
+                return ConfigurationManager.AppSettings["BaseCollectionsAdministrator"];
+            });
 
         public Migrator(Storage storage)
         {
@@ -35,7 +39,7 @@ namespace Chronozoom.Entities.Migration
         {
 
             // Load the Beta Content collection
-            Collection betaCollection = LoadCollections("Beta Content", "Beta Content", _baseContentAdmin);
+            Collection betaCollection = LoadCollections("Beta Content", "Beta Content", _baseContentAdmin.Value);
             using (Stream betaGet = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\beta-get.json"))
             using (Stream betaGetTours = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\beta-gettours.json"))
             using (Stream betaGetThresholds = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\beta-getthresholds.json"))
@@ -53,7 +57,7 @@ namespace Chronozoom.Entities.Migration
             }
 
             // Load the AIDS Timeline collection
-            Collection aidstimelineCollection = LoadCollections("AIDS Timeline", "AIDS Timeline", _baseContentAdmin);
+            Collection aidstimelineCollection = LoadCollections("AIDS Timeline", "AIDS Timeline", _baseContentAdmin.Value);
             using (Stream aidsTimelineGet = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\aidstimeline-get.json"))
             using (Stream aidsTimelineGetTours = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\aidstimeline-get.json"))
             {
@@ -61,7 +65,7 @@ namespace Chronozoom.Entities.Migration
             }
 
             // Load the AIDS Timeline in standalone mode
-            Collection aidsStandaloneCollection = LoadCollections("AIDS Standalone", "AIDS Standalone", _baseContentAdmin);
+            Collection aidsStandaloneCollection = LoadCollections("AIDS Standalone", "AIDS Standalone", _baseContentAdmin.Value);
             using (Stream aidsStandalone = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\aidsstandalone-get.json"))
             {
                 LoadData(aidsStandalone, null, null, aidsStandaloneCollection, true);
@@ -103,6 +107,14 @@ namespace Chronozoom.Entities.Migration
             TraverseTimelines(bjrTimelines.d, timeline =>
             {
                 timeline.Collection = collection;
+                foreach (Exhibit exhibit in timeline.Exhibits)
+                {
+                    exhibit.Collection = collection;
+                    foreach (ContentItem contentItem in exhibit.ContentItems)
+                    {
+                        contentItem.Collection = collection;
+                    }
+                }
             });
 
             if (replaceGuids)
