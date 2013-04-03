@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Application.Driver;
 using Application.Helper.Entities;
@@ -51,6 +52,7 @@ namespace Application.Helper.Helpers
                 contentItem.MediaType = GetJavaScriptExecutionResult(item + "mediaType");
                 exhibit.ContentItems.Add(contentItem);
             }
+            exhibit.ExhibitId = GetJavaScriptExecutionResult(script + ".id");
             Logger.Log("->" + exhibit);
             return exhibit;
         }

@@ -1,4 +1,5 @@
-﻿using Application.Driver;
+﻿using System;
+using Application.Driver;
 using Application.Helper.Entities;
 using Application.Helper.UserActions;
 using OpenQA.Selenium;
@@ -15,6 +16,18 @@ namespace Application.Helper.Helpers
             SetTimelineName(timeline.Title);
             SaveAndClose();
             Logger.Log("->");
+        }
+
+        public Timeline GetLastTimeline()
+        {
+            Logger.Log("<-");
+            Timeline timeline = new Timeline();
+            const string script =
+                "vc.data('ui-virtualCanvas')._layersContent.children[0].children[vc.data('ui-virtualCanvas')._layersContent.children[0].children.length - 1]";
+            timeline.Title = GetJavaScriptExecutionResult(script + ".title");
+            timeline.TimelineId = GetJavaScriptExecutionResult(script + ".id");
+            Logger.Log("-> " + timeline);
+            return timeline;
         }
 
         private void SaveAndClose()

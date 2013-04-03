@@ -8,42 +8,51 @@ namespace Tests
     {
         #region Initialize and Cleanup
         public TestContext TestContext { get; set; }
+        private static Timeline _newTimeline;
+        private static Timeline _timeline;
 
         [ClassInitialize]
         public static void ClassInitialize(TestContext testContext)
         {
+            BrowserStateManager.RefreshState();
+            NavigationHelper.OpenHomePage();
+            WelcomeScreenHelper.CloseWelcomePopup();
 
+            _timeline = new Timeline() { Title = "WebdriverTitle" };
+            TimelineHelper.AddTimeline(_timeline);
+            _newTimeline = TimelineHelper.GetLastTimeline();
         }
 
         [TestInitialize]
         public void TestInitialize()
         {
-            BrowserStateManager.RefreshState();
-            NavigationHelper.OpenHomePage();
-            WelcomeScreenHelper.CloseWelcomePopup();
+           
         }
 
         [ClassCleanup]
         public static void ClassCleanup()
         {
+            NavigationHelper.NavigateToCosmos();
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
             CreateScreenshotsIfTestFail(TestContext);
-            NavigationHelper.NavigateToCosmos();
         }
 
         #endregion
 
-
         [TestMethod]
-        public void CreateTimeLine()
+        public void new_timeline_should_have_a_title()
         {
-            var timeline = new Timeline() {Title = "WebdriverTitle"};
-            TimelineHelper.AddTimeline(timeline);
-            Assert.AreEqual(timeline.Title, HomePageHelper.GetLastElementName());
+            Assert.AreEqual(_timeline.Title, _newTimeline.Title);
+        }
+        
+        [TestMethod]
+        public void new_timline_should_not_have_null_id()
+        {
+            Assert.IsNotNull(_newTimeline.Id);
         }
     }
 }

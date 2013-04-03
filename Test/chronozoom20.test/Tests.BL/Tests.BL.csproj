@@ -60,6 +60,7 @@
     <Content Include="Scripts\Js\common.js" />
     <Content Include="Scripts\Js\csvUtils.js" />
     <Content Include="Scripts\Js\cz.html.js" />
+    <Content Include="Scripts\Js\czservice.js" />
     <Content Include="Scripts\Js\layout.js" />
     <Content Include="Scripts\Js\newauthoring.js" />
     <Content Include="Scripts\Js\settings.js" />

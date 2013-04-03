@@ -64,6 +64,7 @@ namespace Tests
             Exhibit newExhibit = ExhibitHelper.GetNewExhibit();
             Assert.AreEqual(exhibit.Title,newExhibit.Title, "Titles are not equal");
             Assert.AreEqual(exhibit.ContentItems.Count, newExhibit.ContentItems.Count, "Content items count are not equal");
+            Assert.IsNotNull(newExhibit.ExhibitId);
             for (int i = 0; i < exhibit.ContentItems.Count; i++)
             {
                 Assert.AreEqual(exhibit.ContentItems[i].Title, newExhibit.ContentItems[i].Title, "Content items titles are not equal");
@@ -71,8 +72,6 @@ namespace Tests
                 Assert.AreEqual(exhibit.ContentItems[i].MediaSource, newExhibit.ContentItems[i].MediaSource, "Content items mediaSourses are not equal");
                 Assert.AreEqual(exhibit.ContentItems[i].MediaType, newExhibit.ContentItems[i].MediaType, "Content items mediaTypes are not equal");
             }
-            
-            
         }
     }
 }
