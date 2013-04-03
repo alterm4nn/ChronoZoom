@@ -39,6 +39,7 @@ namespace Tests
         public void TestCleanup()
         {
             CreateScreenshotsIfTestFail(TestContext);
+            HomePageHelper.DeleteLastElement(_newTimeline.TimelineId);
         }
 
         #endregion
@@ -52,7 +53,7 @@ namespace Tests
         [TestMethod]
         public void new_timline_should_not_have_null_id()
         {
-            Assert.IsNotNull(_newTimeline.Id);
+            Assert.IsNotNull(_newTimeline.TimelineId);
         }
     }
 }
