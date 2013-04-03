@@ -595,13 +595,22 @@
                 width: 600,
                 buttons: {
                     "save and close": function () {
-                        isCancel = false;
-                        CZ.Authoring.updateTimeline(t, {
-                            title: titleInput.val(),
-                            start: startInput.val(),
-                            end: endInput.val(),
-                        },
-                        $(this));
+
+                        var isValid = CZ.Authoring.ValidateNumber(startInput.val()) && CZ.Authoring.ValidateNumber(endInput.val());
+                        isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(startInput.val()) && CZ.Authoring.IsNotEmpty(endInput.val());
+                    
+                         if (!isValid) {
+                             $("#TimelineErrorSpan").css("display","block");
+                         }
+                         if (isValid) {
+                             CZ.Authoring.updateTimeline(t, {
+                                 title: titleInput.val(),
+                                 start: startInput.val(),
+                                 end: endInput.val(),
+                             });
+                             isCancel = false;
+                             $(this).dialog("close");
+                         }
                     }
                 },
                 close: function () {
@@ -609,6 +618,7 @@
                         CZ.Authoring.removeTimeline(t);
                     }
                     CZ.Authoring._isActive = false;
+                    $("#TimelineErrorSpan").css("display", "none");
                     $("a:contains('create timeline')").removeClass("active");
                 }
             });
@@ -630,12 +640,21 @@
                 width: 600,
                 buttons: {
                     "save and close": function () {
-                        CZ.Authoring.updateTimeline(t, {
-                            title: titleInput.val(),
-                            start: startInput.val(),
-                            end: endInput.val(),
-                        },
-                        $(this));
+
+                        var isValid = CZ.Authoring.ValidateNumber(startInput.val()) && CZ.Authoring.ValidateNumber(endInput.val());
+                        isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(startInput.val()) && CZ.Authoring.IsNotEmpty(endInput.val());
+                        
+                        if (!isValid) {
+                            $("#TimelineErrorSpan").css("display", "block");
+                        }
+                        if (isValid) {
+                            CZ.Authoring.updateTimeline(t, {
+                                title: titleInput.val(),
+                                start: startInput.val(),
+                                end: endInput.val(),
+                            },
+                            $(this));
+                        }
                     },
                     "delete": function () {
                         if (confirm("Are you sure want to delete timeline and all of its nested timelines and exhibits? Delete can't be undone!")) {
@@ -646,6 +665,7 @@
                 },
                 close: function () {
                     CZ.Authoring._isActive = false;
+                    $("#TimelineErrorSpan").css("display", "none");
                     $("a:contains('edit timeline')").removeClass("active");
                 }
             });
@@ -677,14 +697,23 @@
                 buttons: {
                     "save and close": function () {
                         var contentItems = getContentItemsData();
+                        var isValid = CZ.Authoring.ValidateNumber(dateInput.val());
+                        isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(dateInput.val());
+                        isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
 
-                        CZ.Authoring.updateExhibit(e, {
-                            title: titleInput.val(),
-                            date: dateInput.val(),
-                            contentItems: contentItems
-                        });
-                        isCancel = false;
-                        $(this).dialog("close");
+                        if (!isValid) {
+                            $("#ExhibitErrorSpan").css("display", "block");
+                        }
+                        
+                        if (isValid) {
+                            CZ.Authoring.updateExhibit(e, {
+                                title: titleInput.val(),
+                                date: dateInput.val(),
+                                contentItems: contentItems
+                            });
+                            isCancel = false;
+                            $(this).dialog("close");
+                        }
                     },
                     "add content item": function () {
                         if ($(this).find(".cz-auth-ci-container").length < infodotMaxContentItemsCount)
@@ -697,6 +726,7 @@
                     }
                     CZ.Authoring._isActive = false;
                     $("a:contains('create exhibit')").removeClass("active");
+                    $("#ExhibitErrorSpan").css("display", "none");
 
                     $(this).find(".cz-auth-ci-container")
                             .each(function () {
@@ -730,19 +760,28 @@
                 width: 600,
                 buttons: {
                     "save and close": function () {
-                        contentItems = getContentItemsData(e);
+                        contentItems = getContentItemsData();
+                        var isValid = CZ.Authoring.ValidateNumber(dateInput.val());
+                        isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(dateInput.val());
+                        isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
 
-                        CZ.Authoring.updateExhibit(e, {
-                            title: titleInput.val(),
-                            date: dateInput.val(),
-                            contentItems: contentItems
-                        });
-                        $(this).dialog("close");
+                        if (!isValid) {
+                            $("#ExhibitErrorSpan").css("display", "block");
+                        }
 
-                        $(this).find(".cz-auth-ci-container")
-                           .each(function () {
-                               $(this).remove();
-                           });
+                        if (isValid) {
+                            CZ.Authoring.updateExhibit(e, {
+                                title: titleInput.val(),
+                                date: dateInput.val(),
+                                contentItems: contentItems
+                            });
+                            $(this).dialog("close");
+
+                            $(this).find(".cz-auth-ci-container")
+                               .each(function () {
+                                   $(this).remove();
+                               });
+                        }
                     },
                     "delete": function () {
                         if (confirm("Are you sure want to delete exhibit and all of its content items? Delete can't be undone!")) {
@@ -758,7 +797,7 @@
                 close: function () {
                     CZ.Authoring._isActive = false;
                     $("a:contains('edit exhibit')").removeClass("active");
-
+                    $("#ExhibitErrorSpan").css("display", "none");
                     $(this).find(".cz-auth-ci-container")
                            .each(function () {
                                $(this).remove();
@@ -986,7 +1025,6 @@
 
             return contentItems;
         }
-
         //TODO: move this function to appropriate .js file
         function fillContentItemForm(form, contentItem) {
             var titleInput = form.find(".cz-auth-ci-title");
@@ -1263,6 +1301,9 @@
                     <label style="display: block">end</label>
                     <input id="timelineEndInput" style="display: block" />
                 </p>
+                <span id ="TimelineErrorSpan" style="color:red; display:none"> 
+                    Input error
+                </span>
             </div>
 
             <!--Create Exhibit popup dialog-->
@@ -1276,6 +1317,10 @@
                     <label style="display: block">Exhibit's date</label>
                     <input id="exhibitDateInput" style="display: block" />
                 </p>
+                 <span id ="ExhibitErrorSpan" style="color:red; display:none"> 
+                    Input error
+                </span>
+
 
                 <hr />
 
