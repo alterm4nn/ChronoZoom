@@ -156,5 +156,12 @@ namespace Application.Helper.Helpers
             Click(By.XPath("//*[@id='footer-right']/a[6]"));
             Logger.Log("->");
         }
+
+        public void DeleteLastElement(string id)
+        {
+            Logger.Log("<- id: ");
+            string result = GetJavaScriptExecutionResult(string.Format("removeChild(vc.data('ui-virtualCanvas')._layersContent.children[0].children[vc.data('ui-virtualCanvas')._layersContent.children[0].children.length - 1].parent,'{0}')",id));
+            Logger.Log("-> result: " + result);
+        }
     }
 }
