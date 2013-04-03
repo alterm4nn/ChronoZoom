@@ -647,8 +647,38 @@ var CZ = (function (CZ, $) {
             c.parent.parent.parent.contentItems.splice(c.contentItem.index, 1);
             delete c.contentItem;
             renewExhibit(e);
+        },
+        /**
+         * Validates,if number is valid.
+        */
+        ValidateNumber: function (number) {
+            return !isNaN(Number(number));
+        },
+        /**
+         * Validates,if field is empty.
+        */
+        IsNotEmpty: function (obj) {
+            return (obj !== '' && obj !== null);
+        },
+        /**
+         * Validates,if content item data is correct.
+        */
+        ValidateContentItems: function (contentItems) {
+            var isValid = true;
+            if (contentItems == "[]") return true;
+            var i = 0;
+            while (contentItems[i] != null) {
+                var CI = contentItems[i];
+                isValid = isValid && CZ.Authoring.IsNotEmpty(CI.title) && CZ.Authoring.IsNotEmpty(CI.uri) && CZ.Authoring.IsNotEmpty(CI.mediaType);
+                if (!isValid) return false;
+                i++;
+            }
+            return isValid;
         }
+
+
     });
+
 
     return CZ;
 })(CZ || {}, jQuery);
