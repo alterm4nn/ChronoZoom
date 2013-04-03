@@ -1,6 +1,4 @@
-﻿/// <reference path="czservice.js" />
-
-var CZ = (function (CZ, $) {
+﻿var CZ = (function (CZ, $) {
     var Authoring = CZ.Authoring = CZ.Authoring || {};
     var UI = Authoring.UI = Authoring.UI || {};
 
@@ -11,34 +9,32 @@ var CZ = (function (CZ, $) {
      * @param {Boolean}  addSeparator  Indicates whether separator is required.
      */
     function _addContentItemForm(form, addSeparator) {
-        var container = $("<div class='cz-auth-ci-container'></div>");
+        var container = $("<div class='cz-authoring-ci-container'></div>");
 
-        var label = $("<label style='display: block'>Media source</label>");
+        var title = $("<p>" +
+                "<label>Title</label>" +
+                "<input class='cz-authoring-ci-title' style='display: block' type='text'/>" +
+            "</p>");
 
-        var title = $("<p style='display: block'>" +
-           "<label style='display: block'>Title</label>" +
-           "<input class='cz-auth-ci-title' style='display: block' type='text'/>" +
-           "</p>");
+        var description = $("<p>" +
+                "<label style='display: block'>Description</label>" +
+                "<textarea class='cz-authoring-ci-description' style='display: block' />" +
+            "</p>");
 
-        var description = $("<p style='display: block'>" +
-          "<label style='display: block'>Description</label>" +
-          "<textarea class='cz-auth-ci-description' style='display: block' />" +
-          "</p>");
+        var mediaSource = $("<p>" +
+                "<label>Media source</label>" +
+                "<input class='cz-authoring-ci-media-source' style='display: block' type='text'/>" +
+            "</p>");
 
-        var mediaSource = $("<p style='display: block'>" +
-           "<label style='display: block'>Media source</label>" +
-           "<input class='cz-auth-ci-media-source' style='display: block' type='text'/>" +
-           "</p> ");
-
-        var mediaType = $("<p style='display: block'>" +
-         "<label style='display: block'>Media type</label>" +
-         "<select class='cz-auth-ci-media-type' style='display: block'>" +
-         "<option value='image'>Image</option>" +
-         "<option value='pdf'>PDF</option> " +
-         "<option value='video'>Video</option>" +
-         "<option value='audio'>Audio</option>" +
-         "</select>" +
-         "</p>");
+        var mediaType = $("<p>" +
+            "<label>Media type</label>" +
+                "<select class='cz-authoring-ci-media-type' style='display: block'>" +
+                    "<option value='image'>Image</option>" +
+                     "<option value='pdf'>PDF</option> " +
+                     "<option value='video'>Video</option>" +
+                     "<option value='audio'>Audio</option>" +
+                "</select>" +
+            "</p>");
 
         var removeBtn = $("<button>Remove content item</button>");
         removeBtn[0].onclick = function () {
@@ -66,13 +62,13 @@ var CZ = (function (CZ, $) {
     function _getContentItemsData() {
         var contentItems = [];
 
-        var containers = $(".cz-auth-ci-container");
-        $(".cz-auth-ci-container").each(function () {
-            var CItitleInput = $(this).find(".cz-auth-ci-title");;
-            var mediaInput = $(this).find(".cz-auth-ci-media-source");
-            var mediaTypeInput = $(this).find(".cz-auth-ci-media-type option");
-            var descriptionInput = $(this).find(".cz-auth-ci-description");
-            var id = $(this).attr("cz-auth-ci-id") || "";
+        var containers = $(".cz-authoring-ci-container");
+        $(".cz-authoring-ci-container").each(function () {
+            var CItitleInput = $(this).find(".cz-authoring-ci-title");;
+            var mediaInput = $(this).find(".cz-authoring-ci-media-source");
+            var mediaTypeInput = $(this).find(".cz-authoring-ci-media-type option");
+            var descriptionInput = $(this).find(".cz-authoring-ci-description");
+            var id = $(this).attr("cz-authoring-ci-id") || "";
 
             var selected = mediaTypeInput[0];
 
@@ -100,17 +96,17 @@ var CZ = (function (CZ, $) {
      * @param {Object}  contentItem  ContentItem which data is taken.
      */
     function _fillContentItemForm(form, contentItem) {
-        var titleInput = form.find(".cz-auth-ci-title");
-        var mediaInput = form.find(".cz-auth-ci-media-source");
-        var mediaTypeInput = form.find(".cz-auth-ci-media-type option");
-        var descriptionInput = form.find(".cz-auth-ci-description");
+        var titleInput = form.find(".cz-authoring-ci-title");
+        var mediaInput = form.find(".cz-authoring-ci-media-source");
+        var mediaTypeInput = form.find(".cz-authoring-ci-media-type option");
+        var descriptionInput = form.find(".cz-authoring-ci-description");
         var mediaType = contentItem.mediaType.toLowerCase();
 
         if (mediaType === "picture") {
             mediaType = "image";
         }
 
-        form.attr("cz-auth-ci-id", contentItem.id);
+        form.attr("cz-authoring-ci-id", contentItem.id);
         titleInput.val(contentItem.title);
         mediaInput.val(contentItem.uri);
         descriptionInput.val(contentItem.description);
@@ -121,7 +117,7 @@ var CZ = (function (CZ, $) {
             }
         });
     }
-   
+
     $.extend(UI, {
         showCreateTimelineForm: function (t) {
             var isCancel = true;
@@ -196,7 +192,7 @@ var CZ = (function (CZ, $) {
                             function (error) {
                                 alert("Unable to save changes. Please try again later.");
                                 console.log(error);
-                            });    
+                            });
                     },
                     "delete": function () {
                         if (confirm("Are you sure want to delete timeline and all of its nested timelines and exhibits? Delete can't be undone!")) {
@@ -205,7 +201,7 @@ var CZ = (function (CZ, $) {
                         }
                     }
                 },
-                close: function () {                    
+                close: function () {
                     CZ.Authoring._isActive = false;
                     $("a:contains('edit timeline')").removeClass("active");
                 }
@@ -216,7 +212,7 @@ var CZ = (function (CZ, $) {
             var isCancel = true;
             var titleInput = $("#exhibitTitleInput");
             var dateInput = $("#exhibitDateInput").spinner();
-            
+
             titleInput.val(e.title);
             dateInput.val(e.x);
 
@@ -228,7 +224,7 @@ var CZ = (function (CZ, $) {
                 buttons: {
                     "save and close": function () {
                         var contentItems = _getContentItemsData();
-                        
+
                         CZ.Authoring.updateExhibit(e, {
                             title: titleInput.val(),
                             date: dateInput.val(),
@@ -238,7 +234,7 @@ var CZ = (function (CZ, $) {
                         $(this).dialog("close");
                     },
                     "add content item": function () {
-                        if ($(this).find(".cz-auth-ci-container").length < infodotMaxContentItemsCount)
+                        if ($(this).find(".cz-authoring-ci-container").length < infodotMaxContentItemsCount)
                             _addContentItemForm($(this), true);
                     }
                 },
@@ -249,7 +245,7 @@ var CZ = (function (CZ, $) {
                     CZ.Authoring._isActive = false;
                     $("a:contains('create exhibit')").removeClass("active");
 
-                    $(this).find(".cz-auth-ci-container")
+                    $(this).find(".cz-authoring-ci-container")
                             .each(function () {
                                 $(this).remove();
                             });
@@ -270,7 +266,7 @@ var CZ = (function (CZ, $) {
                 _addContentItemForm($("#createExhibitForm"), true);
             }
 
-            $(".cz-auth-ci-container").each(function (index) {
+            $(".cz-authoring-ci-container").each(function (index) {
                 _fillContentItemForm($(this), contentItems[index]);
             });
 
@@ -281,8 +277,8 @@ var CZ = (function (CZ, $) {
                 width: 600,
                 buttons: {
                     "save and close": function () {
-                        contentItems = _getContentItemsData(e);                        
-                        
+                        contentItems = _getContentItemsData(e);
+
                         CZ.Authoring.updateExhibit(e, {
                             title: titleInput.val(),
                             date: dateInput.val(),
@@ -290,7 +286,7 @@ var CZ = (function (CZ, $) {
                         });
                         $(this).dialog("close");
 
-                        $(this).find(".cz-auth-ci-container")
+                        $(this).find(".cz-authoring-ci-container")
                            .each(function () {
                                $(this).remove();
                            });
@@ -335,9 +331,9 @@ var CZ = (function (CZ, $) {
                     $(this).attr("selected", "selected");
                     return;
                 }
-            });                     
-            
-            
+            });
+
+
             $("#editContentItemForm").dialog({
                 title: "Edit content item",
                 modal: true,
@@ -346,12 +342,12 @@ var CZ = (function (CZ, $) {
                 buttons: {
                     "save and close": function () {
                         var selected = mediaTypeInput[0];
-                        
+
                         for (var i = 1; i < mediaTypeInput.length; i++)
                             if (mediaTypeInput[i].selected) {
                                 selected = mediaTypeInput[i];
                             }
-                        console.log(c,e);
+                        console.log(c, e);
                         CZ.Authoring.updateContentItem(c, e, {
                             title: titleInput.val(),
                             uri: mediaInput.val(),
@@ -377,7 +373,7 @@ var CZ = (function (CZ, $) {
 
         // Mouseup handlers.
 
-        createTimeline: function() {
+        createTimeline: function () {
             // skip authoring during ongoing dynamic layout animation
             if (animatingElements.length != 0) {
                 return;
@@ -449,6 +445,6 @@ var CZ = (function (CZ, $) {
             }
         }
     });
-    
+
     return CZ;
 })(CZ || {}, jQuery);

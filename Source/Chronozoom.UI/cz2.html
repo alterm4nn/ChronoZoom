@@ -93,26 +93,6 @@
                 });
             }
 
-            $(".authModeSwitch").mouseup(function () {
-                if ($(this).hasClass("buttonActive")) {
-                    $(this).removeClass("buttonActive");
-                    return;
-                }
-
-                $(".authModeSwitch").removeClass("buttonActive");
-                $(this).addClass("buttonActive");
-
-            });
-
-            $(".authSwitch").mouseup(function () {
-                if ($(this).hasClass("buttonActive")) {
-                    $(this).removeClass("buttonActive");
-                    return;
-                }
-
-                $(this).addClass("buttonActive");
-            });
-
             if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
                 if (/Chrome[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
                     var oprversion = new Number(RegExp.$1) // capture x.x portion and store as a number
@@ -628,7 +608,6 @@
                         <option value="audio">Audio</option>
                     </select>
                 </p>
-
             </div>
         </div>
 
