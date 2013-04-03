@@ -595,12 +595,6 @@
                 width: 600,
                 buttons: {
                     "save and close": function () {
-                        var isValid = (CZ.Authoring.ValidateNumber(startInput.val()) && CZ.Authoring.ValidateNumber(endInput.val()));
-                        if (!isValid) {
-                            console.log("input error");
-                            return;
-                        }
-
                         CZ.Authoring.updateTimeline(t, {
                            title: titleInput.val(),
                            start: startInput.val(),
@@ -640,8 +634,8 @@
                             title: titleInput.val(),
                             start: startInput.val(),
                             end: endInput.val(),
-                        });
-                        $(this).dialog("close");
+                        },
+                        $(this));
                     },
                     "delete": function () {
                         if (confirm("Are you sure want to delete timeline and all of its nested timelines and exhibits? Delete can't be undone!")) {
@@ -662,12 +656,6 @@
             var titleInput = $("#exhibitTitleInput");
             var dateInput = $("#exhibitDateInput").spinner();
 
-            var CItitleInput = $("#AddContentItem0TitleInput");
-            var mediaInput = $("#AddContentItem0MediaSourceInput");
-            var descriptionInput = $("#AddContentItem0DescriptionInput");
-            var mediaTypeInput = $("#AddContentItem0MediaTypeInput option");
-            var CIcounter = 0;
-            
             titleInput.val(e.title);
             dateInput.val(e.x);
 
@@ -679,7 +667,6 @@
                 buttons: {
                     "save and close": function () {
                         var contentItems = getContentItemsData();
-
                         var isValid = CZ.Authoring.ValidateNumber(dateInput.val());
                         if (!isValid) {
                             console.log("input error");
@@ -740,6 +727,7 @@
                     "save and close": function () {
                         contentItems = getContentItemsData(e);
 
+                        
                         var isValid = CZ.Authoring.ValidateNumber(dateInput.val());
                         if (!isValid) {
                             console.log("input error");
@@ -789,7 +777,7 @@
             var mediaTypeInput = $("#contentItemMediaTypeInput option");
             var mediaType = c.contentItem.mediaType.toLowerCase();
             if (mediaType === "picture") {
-                    mediaType = "image";
+                mediaType = "image";
             }
             titleInput.val(c.contentItem.title);
             mediaInput.val(c.contentItem.uri);
@@ -800,9 +788,9 @@
                     return;
                 }
             });
-                        
-            
-            
+
+
+
             $("#editContentItemForm").dialog({
                 title: "Edit content item",
                 modal: true,
@@ -811,17 +799,23 @@
                 buttons: {
                     "save and close": function () {
                         var selected = mediaTypeInput[0];
-                        
+
                         for (var i = 1; i < mediaTypeInput.length; i++)
                             if (mediaTypeInput[i].selected) {
                                     selected = mediaTypeInput[i];
                                 }
+                        console.log(c,e);
+                                    selected = mediaTypeInput[i];
+                                }
 //                        console.log(c,e);
+                                selected = mediaTypeInput[i];
+                            }
+                        console.log(c, e);
                         CZ.Authoring.updateContentItem(c, e, {
-                                title: titleInput.val(),
-                                uri: mediaInput.val(),
-                                mediaType: selected.text,
-                                description: descriptionInput.val()
+                            title: titleInput.val(),
+                            uri: mediaInput.val(),
+                            mediaType: selected.text,
+                            description: descriptionInput.val()
                         });
                         $(this).dialog("close");
                     },
@@ -831,13 +825,13 @@
                             $(this).dialog("close");
                         }
                     }
-            },
-            close: function () {
+                },
+                close: function () {
                     CZ.Authoring._isActive = false;
                     $("a:contains('edit exhibit')").removeClass("active");
                 }
-        });
-    }
+            });
+        }
 
         function createTimeline() {
             // skip authoring during ongoing dynamic layout animation
@@ -985,8 +979,7 @@
                     uri: mediaInput.val(),
                     mediaType: selected.text,
                     id: id,
-                    parent: "",
-                    UniqueID: ""
+                    parent: ""
                 });
             });
 
@@ -1019,79 +1012,106 @@
     </script>
     <title>ChronoZoom</title>
 </head>
-<body style="background-color: Black; min-width: 950px;" >
-    
+<body style="background-color: Black; min-width: 950px;">
+
     <div id="header" style="height: 67px">
         <div style="position: relative">
             <button class="authSwitch" style="width: auto; left: 350px; position: absolute; display: none;" id="AT_button"
-                onmouseup="CZ.Authoring.atOnClicked();">Authoring</button>
+                onmouseup="CZ.Authoring.atOnClicked();">
+                Authoring
+            </button>
             <div id="authoringToolsPanel" style="position: absolute; left: 500px; top: 0px; display: none; max-width: 800px;">
                 <button class="authModeSwitch" style="width: auto;"
-                    onmouseup="CZ.Authoring.editModeChanged('addTimeline');">Create timeline</button>
+                    onmouseup="CZ.Authoring.editModeChanged('addTimeline');">
+                    Create timeline</button>
                 <button class="authModeSwitch" style="width: auto;"
-                    onmouseup="CZ.Authoring.editModeChanged('editTimelineDate');">Edit timeline</button>
+                    onmouseup="CZ.Authoring.editModeChanged('editTimelineDate');">
+                    Edit timeline</button>
                 <button class="authModeSwitch" style="width: auto;"
-                    onmouseup="CZ.Authoring.editModeChanged('moveContent');">Move timeline</button>
+                    onmouseup="CZ.Authoring.editModeChanged('moveContent');">
+                    Move timeline</button>
                 <button class="authModeSwitch" style="width: auto;"
-                    onmouseup="CZ.Authoring.editModeChanged('moveInfodot');">Move Exhibit</button>
+                    onmouseup="CZ.Authoring.editModeChanged('moveInfodot');">
+                    Move Exhibit</button>
                 <button class="authModeSwitch" style="width: auto;"
-                    onmouseup="CZ.Authoring.editModeChanged('moveInfodotHorizontally');">Edit Exhibit</button>
+                    onmouseup="CZ.Authoring.editModeChanged('moveInfodotHorizontally');">
+                    Edit Exhibit</button>
             </div>
             <div style="left: 15px; height: 29px; position: absolute;">
-                <img style="margin: 9px 0 0 5px;  float: left" title="ChronoZoom" src="Images/chronzoom-200px-white.png" />
+                <img style="margin: 9px 0 0 5px; float: left" title="ChronoZoom" src="Images/chronzoom-200px-white.png" />
                 <img style="margin: 5px 0 0 14px; float: right" id="search_button" title="Search ChronoZoom" alt="Search ChronoZoom" src="Images/search_off.jpg"
                     onmouseup="onSearchClicked();" onmouseover="searchHighlight(true);"
                     onmouseout="searchHighlight(false);" />
                 <img style="margin: 5px 0 0 14px" title="Take a guided tour" id="tours_index" alt="Take a guided tour" src="Images/tour_off.jpg"
-                     onmouseover="tourButtonHighlight(true);" onmouseout="tourButtonHighlight(false);"
+                    onmouseover="tourButtonHighlight(true);" onmouseout="tourButtonHighlight(false);"
                     onmouseup="onTourClicked();" />
             </div>
+
+            <div style="margin-left: auto; margin-right: auto; width: 200px; color: #DBDBDB" id="LoginPanel">
+            </div>
+
+            <script language="javascript">
+                $.ajax({
+                    url: "/account/isauth"
+                }).done(function (data) {
+                    if (data != "True") {
+                        $("#LoginPanel").html('<a href="/account/login" style="color:#DBDBDB">Login</a>');
+                    } else {
+                        $("#LoginPanel").html('<a href="/account/logout" style="color:#DBDBDB">Logout</a>');
+                    }
+                });
+            </script>
+
             <div class="regimes_rects" style="right: 0px; position: absolute; top: 0px; width: 302px; height: 62px;">
-                <div id="human_rect" class="regime_rect" style="position: absolute; top: 1px; width: 17px; left: 284px;
-                    height: 10px; background-color: rgba(212, 92, 70, 1.0); cursor: pointer;" onclick="navigateToBookmark(humanityVisible);">
+                <div id="human_rect" class="regime_rect" style="position: absolute; top: 1px; width: 17px; left: 284px; height: 10px; background-color: rgba(212, 92, 70, 1.0); cursor: pointer;"
+                    onclick="navigateToBookmark(humanityVisible);">
                 </div>
-                <div id="prehuman_rect" class="regime_rect" style="position: absolute; top: 13px; width: 100px; left: 201px;
-                    height: 10px; background-color: rgba(237, 145, 50, 1.0); cursor: pointer;" onclick="navigateToBookmark(prehistoryVisible);">
+                <div id="prehuman_rect" class="regime_rect" style="position: absolute; top: 13px; width: 100px; left: 201px; height: 10px; background-color: rgba(237, 145, 50, 1.0); cursor: pointer;"
+                    onclick="navigateToBookmark(prehistoryVisible);">
                 </div>
-                <div id="life_rect" class="regime_rect" style="position: absolute; top: 25px; width: 255px; left: 46px;
-                    height: 10px; background-color: rgba(73, 150, 73, 1.0); cursor: pointer;" onclick="navigateToBookmark(lifeVisible);">
+                <div id="life_rect" class="regime_rect" style="position: absolute; top: 25px; width: 255px; left: 46px; height: 10px; background-color: rgba(73, 150, 73, 1.0); cursor: pointer;"
+                    onclick="navigateToBookmark(lifeVisible);">
                 </div>
-                <div id="earth_rect" class="regime_rect" style="position: absolute; top: 37px; width: 260px; left: 41px;
-                    height: 10px; background-color: rgba(81, 127, 149, 1.0); cursor: pointer;" onclick="navigateToBookmark(earthVisible);">
+                <div id="earth_rect" class="regime_rect" style="position: absolute; top: 37px; width: 260px; left: 41px; height: 10px; background-color: rgba(81, 127, 149, 1.0); cursor: pointer;"
+                    onclick="navigateToBookmark(earthVisible);">
                 </div>
-                <div id="cosmos_rect" class="regime_rect" style="position: absolute; top: 49px; width: 300px; left: 1px;
-                    height: 10px; background-color: rgba(152, 108, 157, 1.0); cursor: pointer;" onclick="navigateToBookmark(cosmosVisible);">
+                <div id="cosmos_rect" class="regime_rect" style="position: absolute; top: 49px; width: 300px; left: 1px; height: 10px; background-color: rgba(152, 108, 157, 1.0); cursor: pointer;"
+                    onclick="navigateToBookmark(cosmosVisible);">
                 </div>
-                <div id="regime_navigator" style="position: absolute; top: 0px; left: 1px; width: 300px;
-                    height: 62px; background-color: White; opacity: 0.3; pointer-events: none;">
+                <div id="regime_navigator" style="position: absolute; top: 0px; left: 1px; width: 300px; height: 62px; background-color: White; opacity: 0.3; pointer-events: none;">
                 </div>
             </div>
             <!--<img alt="regimes_navigator" style="right: 0px; position: absolute; top: 0px" src="Images/regimes.png" />-->
             <div class="regimes_titles" style="top: 0px; position: absolute; right: 309px; font-size: 11.5;">
                 <div style="position: relative; height: 12px;">
                     <div class="regimes_title" onclick="navigateToBookmark(humanityVisible);">
-                        Humanity</div>
+                        Humanity
+                    </div>
                 </div>
                 <div style="position: relative; height: 12px;">
                     <div class="regimes_title" onclick="navigateToBookmark(prehistoryVisible);">
-                        Human&nbsp;Prehistory</div>
+                        Human&nbsp;Prehistory
+                    </div>
                 </div>
                 <div style="position: relative; height: 12px;">
                     <div class="regimes_title" onclick="navigateToBookmark(lifeVisible);">
-                        Life</div>
+                        Life
+                    </div>
                 </div>
                 <div style="position: relative; height: 12px;">
                     <div class="regimes_title" onclick="navigateToBookmark(earthVisible);">
-                        Earth</div>
+                        Earth
+                    </div>
                 </div>
                 <div style="position: relative; height: 12px;">
                     <div class="regimes_title" onclick="navigateToBookmark(cosmosVisible);">
-                        Cosmos</div>
+                        Cosmos
+                    </div>
                 </div>
             </div>
 
-            
-            <div id="bc_navLeft"  onclick="breadCrumbNavLeft()" class="breadCrumbNavButton">&#171;</div> 
+
+            <div id="bc_navLeft" onclick="breadCrumbNavLeft()" class="breadCrumbNavButton">&#171;</div>
             <div id="breadCrumbsPanel" class="breadCrumbPanel unselectable">
                 <table id="breadCrumbsTable" class="breadCrumbTable">
                     <tr>
@@ -1099,10 +1119,9 @@
                 </table>
             </div>
             <div id="bc_navRight" onclick="breadCrumbNavRight()" class="breadCrumbNavButton">&#187;</div>
-            
 
-            <div id="tour_control" class="tour_control" style="display: none; top: 14px; position: relative;
-                margin: auto">
+
+            <div id="tour_control" class="tour_control" style="display: none; top: 14px; position: relative; margin: auto">
                 <img id="tour_prev" src="Images/tour_prev_off.jpg" alt="previous" onmouseout="toggleOffImage('tour_prev');"
                     onmouseover="toggleOnImage('tour_prev');" onclick="tourPrev();" />
                 <img style="margin: 0 0 0 16px"
@@ -1121,15 +1140,13 @@
 
     <div id="axis">
     </div>
-    <div id="vc" style="width: 100%; height: auto; overflow: hidden; background-image: url('Images/background.jpg');
-        background-repeat: no-repeat; background-attachment: fixed; background-position: center center;
-        background-size: cover">
+    <div id="vc" style="width: 100%; height: auto; overflow: hidden; background-image: url('Images/background.jpg'); background-repeat: no-repeat; background-attachment: fixed; background-position: center center; background-size: cover">
         <div id="layerTimelines" onselectstart="return false;">
         </div>
-                <!--for popup's-->
-          <p class="bubbleInfo" style="display:inline-block; z-index:3000;" id="defaultBox">
+        <!--for popup's-->
+        <p class="bubbleInfo" style="display: inline-block; z-index: 3000;" id="defaultBox">
             <span></span>
-          </p>
+        </p>
         <!--//////////-->
         <div id="layerInfodots" onselectstart="return false;">
         </div>
@@ -1137,38 +1154,40 @@
         </div>
     </div>
 
-    <div id="timelineChangeName" class="czWindow" style="z-index: 2010;max-height:250px; display: none;">
+    <div id="timelineChangeName" class="czWindow" style="z-index: 2010; max-height: 250px; display: none;">
         <div class="header" onselectstart="return false;" style="display: inline-block;">
             Input new name
         </div>
         <img id="editorCloseButton" style="display: inline-block; position: relative; top: 10px;" src="Images/close_off.png" alt="Close"
             onmouseover="toggleOnImage('editorCloseButton', 'png');"
             onmouseout="toggleOffImage('editorCloseButton', 'png');"
-            onclick="CZ.Authoring.hideTitleEditor()" 
+            onclick="CZ.Authoring.hideTitleEditor()"
             onselectstart="return false;" />
         <div>
-            <input id="ChangeNameTextBox" class="czTextBox emptyTextBox" style="margin: 10px 10px 10px 10px;
-                width: 190px" value="type here..." />
+            <input id="ChangeNameTextBox" class="czTextBox emptyTextBox" style="margin: 10px 10px 10px 10px; width: 190px"
+                value="type here..." />
         </div>
     </div>
-    
-    <div id="search" class="czWindow" style="z-index: 2010;max-height:250px; display: none">
+
+    <div id="search" class="czWindow" style="z-index: 2010; max-height: 250px; display: none">
         <div class="header" onselectstart="return false;">
-            Search</div>
-        <div>
-            <input id="searchTextBox" class="czTextBox emptyTextBox" style="margin: 10px 10px 10px 10px;
-                width: 190px" value="type here..." />
+            Search
         </div>
-        <div class="searchResults" style="height:auto;max-height:140px">
+        <div>
+            <input id="searchTextBox" class="czTextBox emptyTextBox" style="margin: 10px 10px 10px 10px; width: 190px"
+                value="type here..." />
+        </div>
+        <div class="searchResults" style="height: auto; max-height: 140px">
         </div>
         <div>
             <!--<img src="Images/loading10.gif" style="width: 190px;margin-left: 10px; height: 20px;display:none;" alt="Searching..." id="loadingImage"/>-->
-            <img src="Images/loading.gif" style="width: 190px;margin-left: 10px; margin-bottom:10px;height: 20px;display:none;" alt="Searching..." id="loadingImage"/>
+            <img src="Images/loading.gif" style="width: 190px; margin-left: 10px; margin-bottom: 10px; height: 20px; display: none;" alt="Searching..." id="loadingImage" />
         </div>
     </div>
     <div id="tours" class="czWindow" onselectstart="return false;" style="display: none">
         <div class="header">
-            Tours</div>
+            Tours
+        </div>
         <div id="tours-narration" class="narration" onclick="onNarrationClick();">
             Narration: <span id="tours-narration-on" class="narration-selected">ON</span> |
             <span id="tours-narration-off">OFF</span>
@@ -1189,7 +1208,7 @@
     </div>
     <div id="bibliographyBack" class="biblBack" style="display: none">
         <div id="bibliographyOut" class="biblOuterWindow">
-             <div id="bibliography" class="biblWindow">
+            <div id="bibliography" class="biblWindow">
                 <img class="closeButton" id="biblCloseButton" src="Images/close_off.png" onmouseover="toggleOnImage('biblCloseButton', 'png');"
                     onmouseout="toggleOffImage('biblCloseButton', 'png');" alt="Close" onselectstart="return false;" />
                 <div class="title" onselectstart="return false;">
@@ -1197,14 +1216,13 @@
                 </div>
                 <div class="sources">
                 </div>
-               </div>
+            </div>
         </div>
     </div>
-    
+
     <div id="footer">
         <div id="footer-left">
-            <span class="footer-text" >
-                Created by: 
+            <span class="footer-text">Created by: 
             </span>
             <a href="http://research.microsoft.com/en-us/projects/chronozoom/default.aspx">
                 <img src="Images/mrclogo-17x53.png" title="Microsoft Research" />
@@ -1212,24 +1230,20 @@
             <a href="http://eps.berkeley.edu">
                 <img src="Images/berkeley-logo-17-86.png" title="University of California Berkeley Department of Earth and Planetary Science" />
             </a>
-            <a href="http://www.cs.msu.su" >
+            <a href="http://www.cs.msu.su">
                 <img src="Images/MSU_logo-white17x74.png" title="Moscow State University" />
             </a>
         </div>
 
         <div id="footer-authoring">
 
-            <a onclick="createTimeline()" class="footer-authoring-link">
-                create timeline
+            <a onclick="createTimeline()" class="footer-authoring-link">create timeline
             </a>
-            <a onclick="editTimeline()" class="footer-authoring-link">
-                edit timeline
+            <a onclick="editTimeline()" class="footer-authoring-link">edit timeline
             </a>
-            <a onclick="createExhibit()" class="footer-authoring-link">
-                create exhibit
+            <a onclick="createExhibit()" class="footer-authoring-link">create exhibit
             </a>
-            <a onclick="editExhibit()" class="footer-authoring-link">
-                edit exhibit
+            <a onclick="editExhibit()" class="footer-authoring-link">edit exhibit
             </a>
 
             <!--Create Timeline popup dialog-->
@@ -1289,12 +1303,13 @@
                         <option value="video">Video</option>
                         <option value="audio">Audio</option>
                     </select>
-                --></p>
+                -->
+                </p>
 
             </div>
 
 
-             <!--Edit Content Item popup dialog-->
+            <!--Edit Content Item popup dialog-->
             <div id="editContentItemForm" style="background-color: rgb(60, 95, 150); display: none; color: white;">
                 <p>
                     <label style="display: block">title</label>
@@ -1308,7 +1323,7 @@
 
                 <p style="display: block">
                     <label style="display: block">description</label>
-                    <textarea id="contentItemDescriptionInput" style="display: block" ></textarea>
+                    <textarea id="contentItemDescriptionInput" style="display: block"></textarea>
                 </p>
 
                 <p style="display: block">
@@ -1324,55 +1339,44 @@
             </div>
         </div>
 
-        <div id="footer-right">            
-            <a href="http://go.microsoft.com/?linkid=9797058" class="footer-survey">
-                Take Our Survey
+        <div id="footer-right">
+            <a href="http://go.microsoft.com/?linkid=9797058" class="footer-survey">Take Our Survey
             </a>
-            <span class="footer-separator">
-                |
+            <span class="footer-separator">|
             </span>
-            <a href="http://chronozoom.codeplex.com/workitem/list/basic" class="footer-link">
-                Report a Problem
+            <a href="http://chronozoom.codeplex.com/workitem/list/basic" class="footer-link">Report a Problem
             </a>
-            <span class="footer-separator">
-                |
+            <span class="footer-separator">|
             </span>
-            <a href="BehindTheScenes.htm" class="footer-link">
-                Behind the Scenes
+            <a href="BehindTheScenes.htm" class="footer-link">Behind the Scenes
             </a>
-            <span class="footer-separator">
-                |
+            <span class="footer-separator">|
             </span>
-            <a href="TermsOfUse.htm" class="footer-link">
-                Terms of Use
-            </a>      
-            <span class="footer-separator">
-                |
+            <a href="TermsOfUse.htm" class="footer-link">Terms of Use
+            </a>
+            <span class="footer-separator">|
             </span>
-            <a href="Privacy.htm" class="footer-link">
-                Privacy
-            </a>  
-            <span class="footer-separator">
-                |
+            <a href="Privacy.htm" class="footer-link">Privacy
+            </a>
+            <span class="footer-separator">|
             </span>
-            <a href="Trademark_Copyright.htm" class="footer-link">
-                Trademark
-            </a>        
+            <a href="Trademark_Copyright.htm" class="footer-link">Trademark
+            </a>
         </div>
 
-        <div class="clearer"></div>       
+        <div class="clearer"></div>
     </div>
 
     <div id="welcomeScreenBack" class="welcomeScreenBack">
         <div id="welcomeScreenOut" class="welcomeScreenOuterWindow">
             <div id="welcomeScreen" class="welcomeScreen">
                 <div class="titleArea">
-                <img class="closeButton" id="welcomeScreenCloseButton" src="Images/wlcmScreen_close_off.png" onmouseover="toggleOnImage('welcomeScreenCloseButton', 'png');"
-                    onmouseout="toggleOffImage('welcomeScreenCloseButton', 'png');" alt="Close" onselectstart="return false;" 
-                    onclick="hideWelcomeScreen();"/>
-                <div class="title" onselectstart="return false;">
-                    <span>Welcome to ChronoZoom beta!</span>
-                </div>
+                    <img class="closeButton" id="welcomeScreenCloseButton" src="Images/wlcmScreen_close_off.png" onmouseover="toggleOnImage('welcomeScreenCloseButton', 'png');"
+                        onmouseout="toggleOffImage('welcomeScreenCloseButton', 'png');" alt="Close" onselectstart="return false;"
+                        onclick="hideWelcomeScreen();" />
+                    <div class="title" onselectstart="return false;">
+                        <span>Welcome to ChronoZoom beta!</span>
+                    </div>
                 </div>
                 <div class="content">
                     <div class="description">
@@ -1383,9 +1387,9 @@
                         <div style="position: absolute; bottom: 0px;">
                             <button class="button" onclick="closeWelcomeScreen()">Start Exploring!</button>
                             <div>
-                                <input type="checkbox" id="welcomeScreenCheckbox" name="welcomeScreenCheckbox"/> 
+                                <input type="checkbox" id="welcomeScreenCheckbox" name="welcomeScreenCheckbox" />
                                 <label for="welcomeScreenCheckbox" unselectable="on" style="font-family: Arial; font-size: 16px;">Don't Show Again</label>
-                            </div> 
+                            </div>
                         </div>
                     </div>
                     <div class="media" id="welcomeScreenMedia">
