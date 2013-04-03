@@ -24,7 +24,6 @@ describe("CZ.Authoring", function () {
     parentTimeline.children = [];
     beforeEach(function () {
         var editmode = true;
-        service = CZ.Service;
         authoring = CZ.Authoring;
     });
 
