@@ -56,9 +56,12 @@
   <ItemGroup>
     <Content Include="Content\jasmine\jasmine.css" />
     <Content Include="Content\jasmine\jasmine_favicon.png" />
+    <Content Include="Scripts\Js\authoring.js" />
     <Content Include="Scripts\Js\common.js" />
     <Content Include="Scripts\Js\csvUtils.js" />
     <Content Include="Scripts\Js\cz.html.js" />
+    <Content Include="Scripts\Js\layout.js" />
+    <Content Include="Scripts\Js\newauthoring.js" />
     <Content Include="Scripts\Js\settings.js" />
     <Content Include="Scripts\Specs\AuthoringSpec.js" />
     <Content Include="Scripts\Utils\jasmine-jquery.js" />

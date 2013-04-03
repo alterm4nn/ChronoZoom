@@ -2,11 +2,11 @@
 /// <reference path="../Utils/jquery-1.8.0.min.js" />
 /// <reference path="../Utils/jasmine-jquery.js" />
 /// <reference path="../Js/timescale.js" />
-/// <reference path="../Js/czservice.js" />
 /// <reference path="../Js/newauthoring.js" />
 /// <reference path="../Js/vccontent.js" />
 /// <reference path="../Js/cz.settings.js" />
 /// <reference path="../Js/settings.js" />
+/// <reference path="../Js/czservice.js" />
 
 
 describe("CZ.Authoring", function () {
@@ -23,8 +23,8 @@ describe("CZ.Authoring", function () {
     parentTimeline.children = [];
     beforeEach(function () {
         var editmode = true;
-        authoring = CZ.Authoring;
         service = CZ.Service;
+        authoring = CZ.Authoring;
     });
 
     describe("Given: timelines are", function () {
