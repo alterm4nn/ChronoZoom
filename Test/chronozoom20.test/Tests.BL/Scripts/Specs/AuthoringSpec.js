@@ -1,11 +1,12 @@
 ﻿/// <reference path="../Utils/jquery-1.7.2.min.js" />
 /// <reference path="../Utils/jquery-1.8.0.min.js" />
 /// <reference path="../Utils/jasmine-jquery.js" />
+/// <reference path="../Js/layout.js" />
 /// <reference path="../Js/timescale.js" />
-/// <reference path="../Js/newauthoring.js" />
 /// <reference path="../Js/vccontent.js" />
 /// <reference path="../Js/cz.settings.js" />
 /// <reference path="../Js/settings.js" />
+/// <reference path="../Js/newauthoring.js" />
 /// <reference path="../Js/czservice.js" />
 
 
