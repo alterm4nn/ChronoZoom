@@ -677,7 +677,17 @@
             var dateInput = $("#exhibitDateInput").spinner();
 
             titleInput.val(e.title);
-            dateInput.val(e.x);
+            dateInput.val(e.infodotDescription.date);
+
+            var contentItems = e.contentItems;
+
+            for (var i = 0; i < contentItems.length; i++) {
+                addContentItemForm();
+            }
+
+            $(".cz-auth-ci-container").each(function (index) {
+                fillContentItemForm($(this), contentItems[index]);
+            });
 
             $("#createExhibitForm").dialog({
                 title: "create exhibit",
@@ -731,7 +741,7 @@
             var dateInput = $("#exhibitDateInput").spinner();
 
             titleInput.val(e.title);
-            dateInput.val(e.x);
+            dateInput.val(e.infodotDescription.date);
 
             var contentItems = e.contentItems;
 
@@ -802,6 +812,7 @@
             var descriptionInput = $("#contentItemDescriptionInput");
             var mediaTypeInput = $("#contentItemMediaTypeInput option");
             var mediaType = c.contentItem.mediaType.toLowerCase();
+
             if (mediaType === "picture") {
                 mediaType = "image";
             }
@@ -814,9 +825,7 @@
                     return;
                 }
             });
-
-
-
+            
             $("#editContentItemForm").dialog({
                 title: "Edit content item",
                 modal: true,
@@ -826,11 +835,13 @@
                     "save and close": function () {
                         var selected = mediaTypeInput[0];
 
-                        for (var i = 1; i < mediaTypeInput.length; i++)
+                        for (var i = 1; i < mediaTypeInput.length; i++) {
                             if (mediaTypeInput[i].selected) {
-                                    selected = mediaTypeInput[i];
-                                }
-                        CZ.Authoring.updateContentItem(c, e, {
+                                selected = mediaTypeInput[i];
+                            }
+                        }
+                        
+                        CZ.Authoring.updateContentItem(c, {
                             title: titleInput.val(),
                             uri: mediaInput.val(),
                             mediaType: selected.text,
@@ -932,30 +943,40 @@
 
             var label = $("<label style='display: block'>Media source</label>");
 
-            var title = $("<p style='display: block'>" +
-               "<label style='display: block'>Title</label>" +
-               "<input class='cz-auth-ci-title' style='display: block' type='text'/>" +
-               "</p>");
+            var title = $(
+                "<p style='display: block'>" +
+                    "<label style='display: block'>Title</label>" +
+                    "<input class='cz-auth-ci-title' style='display: block' type='text' value='Content Item Title'/>" +
+                "</p>"
+            );
 
-            var description = $("<p style='display: block'>" +
-              "<label style='display: block'>Description</label>" +
-              "<textarea class='cz-auth-ci-description' style='display: block' />" +
-              "</p>");
+            var description = $(
+                "<p style='display: block'>" +
+                    "<label style='display: block'>Description</label>" +
+                    "<textarea class='cz-auth-ci-description' style='display: block'>" +
+                        "Content Item Description" +
+                    "</textarea>" +
+                "</p>"
+            );
 
-            var mediaSource = $("<p style='display: block'>" +
-               "<label style='display: block'>Media source</label>" +
-               "<input class='cz-auth-ci-media-source' style='display: block' type='text'/>" +
-               "</p> ");
+            var mediaSource = $(
+                "<p style='display: block'>" +
+                    "<label style='display: block'>Media source</label>" +
+                    "<input class='cz-auth-ci-media-source' style='display: block' type='text'/>" +
+                "</p>"
+            );
 
-            var mediaType = $("<p style='display: block'>" +
-             "<label style='display: block'>Media type</label>" +
-             "<select class='cz-auth-ci-media-type' style='display: block'>" +
-             "<option value='image'>Image</option>" +
-             "<option value='pdf'>PDF</option> " +
-             "<option value='video'>Video</option>" +
-             "<option value='audio'>Audio</option>" +
-             "</select>" +
-             "</p>");
+            var mediaType = $(
+                "<p style='display: block'>" +
+                    "<label style='display: block'>Media type</label>" +
+                    "<select class='cz-auth-ci-media-type' style='display: block'>" +
+                        "<option value='image'>Image</option>" +
+                        "<option value='pdf'>PDF</option>" +
+                        "<option value='video'>Video</option>" +
+                        "<option value='audio'>Audio</option>" +
+                    "</select>" +
+                "</p>"
+            );
 
             var removeBtn = $("<button>Remove content item</button>");
             removeBtn[0].onclick = function () {
@@ -983,7 +1004,7 @@
                 var mediaInput = $(this).find(".cz-auth-ci-media-source");
                 var mediaTypeInput = $(this).find(".cz-auth-ci-media-type option");
                 var descriptionInput = $(this).find(".cz-auth-ci-description");
-                var id = $(this).attr("cz-auth-ci-id") || "";
+                var guid = $(this).attr("cz-auth-ci-guid") || null;
 
                 var selected = mediaTypeInput[0];
 
@@ -997,8 +1018,8 @@
                     description: descriptionInput.val(),
                     uri: mediaInput.val(),
                     mediaType: selected.text,
-                    id: id,
-                    parent: ""
+                    guid: guid,
+                    parent: null
                 });
             });
 
@@ -1016,7 +1037,7 @@
                 mediaType = "image";
             }
 
-            form.attr("cz-auth-ci-id", contentItem.id);
+            form.attr("cz-auth-ci-guid", contentItem.guid);
             titleInput.val(contentItem.title);
             mediaInput.val(contentItem.uri);
             descriptionInput.val(contentItem.description);
@@ -1342,13 +1363,13 @@
                 </p>
 
                 <p style="display: block">
-                    <label style="display: block">media source</label>
-                    <input type="url" id="contentItemMediaSourceInput" style="display: block" />
+                    <label style="display: block">description</label>
+                    <textarea id="contentItemDescriptionInput" style="display: block"></textarea>
                 </p>
 
                 <p style="display: block">
-                    <label style="display: block">description</label>
-                    <textarea id="contentItemDescriptionInput" style="display: block"></textarea>
+                    <label style="display: block">media source</label>
+                    <input type="url" id="contentItemMediaSourceInput" style="display: block" />
                 </p>
 
                 <p style="display: block">
