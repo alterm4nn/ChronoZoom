@@ -277,7 +277,6 @@ var CZ = (function (CZ, $) {
      * @return {Object} Created exhibit.
      */
     function createNewExhibit() {
-        // var date = getInfodotDate(_circleCur.x);
         var date = _circleCur.x;
 
         removeChild(_hovered, "newExhibitCircle");
@@ -333,32 +332,6 @@ var CZ = (function (CZ, $) {
             }
         );
     }
-
-    /**
-     * Returns the date string for the infodot header.
-     * @param  {Number} x Negative number, x component of virtual coordinates.
-     * @return {String}   Date string.
-     */
-    function getInfodotDate(x) {
-        // TODO: Refine date calculation!
-
-        // calculate date of the infodot
-        var date = Math.floor(-x) - 2012; // CE offset
-
-        if (date / 1000000000 >= 0.1) {
-            date = (date / 1000000000).toFixed(1) + " Ga";
-        } else if (date / 10000000 >= 0.1) {
-            date = (date / 1000000).toFixed(1) + " Ma";
-        } else if (date > 0) { // in case of BCE
-            date = Math.abs(date) + " BCE";
-        } else {
-            date = date ? -date : 1;
-        }
-
-        return date;
-    }
-
-    
 
     $.extend(Authoring, {
         _isActive: false,
@@ -521,8 +494,9 @@ var CZ = (function (CZ, $) {
          * Use it externally from forms' handlers.
          * @param  {Object} t    A timeline to update.
          * @param  {Object} prop An object with properties' values.
+         * @param  {Widget} form A dialog form for editing timeline.
          */
-        updateTimeline: function (t, prop) {
+        updateTimeline: function (t, prop, form) {
             var temp = {
                 x: Number(prop.start),
                 y: t.y,
@@ -541,15 +515,22 @@ var CZ = (function (CZ, $) {
             t.title = prop.title;
             updateTimelineTitle(t);
 
-            CZ.Service.putTimeline(t);
+            CZ.Service.putTimeline(t).then(
+                function (success) {
+                    // update ids if existing elements with returned from server
+                    t.id = "t" + success;
+                    t.guid = success;
+                    t.titleObject.id = "t" + success + "__header__";
 
-            //CZ.Service.putTimeline(_selectedTimeline).then(
-            //    (function (t) {
-            //        return function (response) {
-            //            removeChild(t.parent, t.id);
-            //        };
-            //    })(_selectedTimeline)
-            //);
+                    // close editing dialong window
+                    if (form) {
+                        form.dialog("close");
+                    }
+                },
+                function (error) {
+                    alert("Unable to save changes. Please try again later.");
+                    console.log(error);
+                });
         },
 
         /**
@@ -558,6 +539,7 @@ var CZ = (function (CZ, $) {
          * @param  {Object} t A timeline to remove.
          */
         removeTimeline: function (t) {
+            CZ.Service.deleteTimeline(t);
             removeChild(t.parent, t.id);
         },
 
@@ -576,22 +558,27 @@ var CZ = (function (CZ, $) {
                 height: e.height,
                 type: "circle"
             };
-            //console.log(prop.title);
-            //e.contentItems.push(prop.ci);
+            var oldContentItems = e.contentItems;
 
-            // TODO: Show error message in case of failed test!
             if (checkExhibitIntersections(e.parent, temp, true)) {
-                // TODO: Change position of LOD, doodles and content items.
-                     e.x = temp.x;
+                e.x = temp.x;
             }
 
             e.title = temp.title;
             e.contentItems = prop.contentItems;
 
             e = renewExhibit(e);
-            CZ.Service.putExhibit(e);
-
-            // TODO: Update title!
+            
+            CZ.Service.putExhibitWithContent(e, oldContentItems).then(
+                function () {
+                    for (var i = 0, len = arguments.length; i < len; ++i) {
+                        console.log(arguments[i][0]);
+                    }
+                },
+                function () {
+                    console.log("Error connecting to service: update exhibit.\n");
+                }
+            );
         },
 
         /**
@@ -600,6 +587,7 @@ var CZ = (function (CZ, $) {
          * @param  {Object} e An exhibit to remove.
          */
         removeExhibit: function (e) {
+            CZ.Service.deleteExhibit(e);
             removeChild(e.parent, e.id);
         },
 
@@ -637,7 +625,8 @@ var CZ = (function (CZ, $) {
          * @param  {Number} i Index of a content item in selected exhibit.
          */
         removeContentItem: function (c) {
-           // var i = c.parent.parent.parent.contentItems.indexOf(c.contentItem);
+            // var i = c.parent.parent.parent.contentItems.indexOf(c.contentItem);
+            CZ.Service.deleteContentItem(c);
             c.parent.parent.parent.contentItems.splice(c.contentItem.index, 1);
             delete c.contentItem;
             var e = c.parent.parent.parent;

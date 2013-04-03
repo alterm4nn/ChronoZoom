@@ -312,31 +312,10 @@ function loadDataUrl() {
 
 //loading the data from the service
 function loadData() {
-    // var regimesUrl = serverUrlBase
-                + "/ChronoZoom.svc/GetTimelines?"
-                + "lca=" + cosmosTimelineID
-                + "&start=" + -50000000000
-                + "&end=" + 9999
-                + "&timespan=" + 5013;
-    // console.log(regimesUrl);
-
-    // $.ajax({ // get basic skeleton (regime timelines)
-    //     cache: false,
-    //     type: "GET",
-    //     async: true,
-    //     dataType: "json",
-    //     url: regimesUrl,
-    //     success: function (result) {
-    //         ProcessContent(result);
-    //         vc.virtualCanvas("updateViewport");
-    //     },
-    //     error: function (xhr) {
-    //         alert("Error connecting to service:\n" + regimesUrl);
-    //     }
-    // });
-
-    CZ.Service.getStructure({
-        lca: cosmosTimelineID,
+    //load URL state
+    getURL();
+    
+    CZ.Service.getTimelines({
         start: -50000000000,
         end: 9999,
         minspan: 5013
@@ -344,49 +323,6 @@ function loadData() {
         function (response) {
             ProcessContent(response);
             vc.virtualCanvas("updateViewport");
-
-            /**
-             * Examples of using Service module.
-             */
-
-            var t = $.extend(true, {}, vc.virtualCanvas("getLayerContent").children[0].children[19]);
-            t.title = "Moscow State University";
-            t.x = -13000000000;
-
-            var e = $.extend(true, {}, vc.virtualCanvas("getLayerContent").children[0].children[4]);
-            e.title = "Moscow State University";
-            e.infodotDescription.date = -13000000000;
-
-            var ci = {
-                rder: 1,
-                UniqueID: 525,
-                description: "Earth is the third planet from the Sun, fifth-largest of the eight planets in the Solar System, and the densest. It is also the largest of the Solar System's four terrestrial planets. It is sometimes referred to as the world, the Blue Planet, or by its Latin name, Terra.",
-                id: "4462a325-f23a-4e56-9308-718577863608",
-                mediaType: "Picture",
-                parent: "41705533-76c9-4b8f-8f66-ff0c56a527ca",
-                title: "Earth",
-                uri: "http://czbeta.blob.core.windows.net/images/4462a325-f23a-4e56-9308-718577863608_829-earth.jpg"
-            };
-            ci.title = "Moscow State University";
-            ci.description = "Moscow State University";
-
-            // CZ.Service.putTimeline(t).then(
-            //     function (result) {
-            //         vc.virtualCanvas("updateViewport");
-            //     }
-            // );
-
-            // CZ.Service.putExhibit(e).then(
-            //     function (result) {
-            //         vc.virtualCanvas("updateViewport");
-            //     }
-            // );
-
-            // CZ.Service.putContentItem(ci).then(
-            //     function (result) {
-            //         vc.virtualCanvas("updateViewport");
-            //     }
-            // );
         },
         function (error) {
             alert("Error connecting to service:\n" + error.responseText);
@@ -427,7 +363,7 @@ function ProcessContent(content) {
 function InitializeRegimes(content) {
     var f = function (timeline) {
         if (!timeline) return null;
-        var v = vc.virtualCanvas("findElement", 't' + timeline.UniqueID);
+        var v = vc.virtualCanvas("findElement", 't' + timeline.id);
         regimes.push(v);
         if (v) v = vcelementToNavString(v);
         return v;
@@ -435,7 +371,7 @@ function InitializeRegimes(content) {
 
     var cosmosTimeline = content;
     cosmosVisible = f(cosmosTimeline);
-    navigationAnchor = vc.virtualCanvas("findElement", 't' + cosmosTimeline.UniqueID);
+    navigationAnchor = vc.virtualCanvas("findElement", 't' + cosmosTimeline.id);
 
     var earthTimeline = FindChildTimeline(cosmosTimeline, earthTimelineID);
     earthVisible = f(earthTimeline);

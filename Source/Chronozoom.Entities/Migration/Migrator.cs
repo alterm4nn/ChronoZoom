@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
@@ -23,6 +24,12 @@ namespace Chronozoom.Entities.Migration
         private Storage _storage;
         private static MD5 _md5Hasher = MD5.Create();
 
+        // The user that is able to modify the base collections (e.g. Beta Content, AIDS Quilt)
+        private static Lazy<string> _baseContentAdmin = new Lazy<string>(() =>
+            {
+                return ConfigurationManager.AppSettings["BaseCollectionsAdministrator"];
+            });
+
         public Migrator(Storage storage)
         {
             _storage = storage;
@@ -30,8 +37,9 @@ namespace Chronozoom.Entities.Migration
 
         public void Migrate()
         {
+
             // Load the Beta Content collection
-            Collection betaCollection = LoadCollections("Beta Content", "Beta Content");
+            Collection betaCollection = LoadCollections("Beta Content", "Beta Content", _baseContentAdmin.Value);
             using (Stream betaGet = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\beta-get.json"))
             using (Stream betaGetTours = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\beta-gettours.json"))
             using (Stream betaGetThresholds = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\beta-getthresholds.json"))
@@ -39,8 +47,17 @@ namespace Chronozoom.Entities.Migration
                 LoadData(betaGet, betaGetTours, betaGetThresholds, betaCollection, false);
             }
 
+            // Load the Beta Content collection (sandbox mode - everyone can edit)
+            Collection betaCollectionSandbox = LoadCollections("Sandbox", "Sandbox", null);
+            using (Stream betaGet = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\beta-get.json"))
+            using (Stream betaGetTours = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\beta-gettours.json"))
+            using (Stream betaGetThresholds = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\beta-getthresholds.json"))
+            {
+                LoadData(betaGet, betaGetTours, betaGetThresholds, betaCollectionSandbox, true);
+            }
+
             // Load the AIDS Timeline collection
-            Collection aidstimelineCollection = LoadCollections("AIDS Timeline", "AIDS Timeline");
+            Collection aidstimelineCollection = LoadCollections("AIDS Timeline", "AIDS Timeline", _baseContentAdmin.Value);
             using (Stream aidsTimelineGet = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\aidstimeline-get.json"))
             using (Stream aidsTimelineGetTours = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\aidstimeline-get.json"))
             {
@@ -48,7 +65,7 @@ namespace Chronozoom.Entities.Migration
             }
 
             // Load the AIDS Timeline in standalone mode
-            Collection aidsStandaloneCollection = LoadCollections("AIDS Standalone", "AIDS Standalone");
+            Collection aidsStandaloneCollection = LoadCollections("AIDS Standalone", "AIDS Standalone", _baseContentAdmin.Value);
             using (Stream aidsStandalone = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\aidsstandalone-get.json"))
             {
                 LoadData(aidsStandalone, null, null, aidsStandaloneCollection, true);
@@ -58,17 +75,19 @@ namespace Chronozoom.Entities.Migration
             _storage.SaveChanges();
         }
 
-        private Collection LoadCollections(string superCollectionName, string collectionName)
+        private Collection LoadCollections(string superCollectionName, string collectionName, string userId)
         {
             // Load Collection
             Collection collection = new Collection();
             collection.Title = collectionName;
             collection.Id = CollectionIdFromSuperCollection(superCollectionName, collectionName);
+            collection.UserId = userId;
 
             // Load SuperCollection
             SuperCollection superCollection = new SuperCollection();
             superCollection.Title = superCollectionName;
             superCollection.Id = CollectionIdFromText(superCollectionName);
+            superCollection.UserId = userId;
             
             superCollection.Collections = new System.Collections.ObjectModel.Collection<Collection>();
             superCollection.Collections.Add(collection);
@@ -88,6 +107,14 @@ namespace Chronozoom.Entities.Migration
             TraverseTimelines(bjrTimelines.d, timeline =>
             {
                 timeline.Collection = collection;
+                foreach (Exhibit exhibit in timeline.Exhibits)
+                {
+                    exhibit.Collection = collection;
+                    foreach (ContentItem contentItem in exhibit.ContentItems)
+                    {
+                        contentItem.Collection = collection;
+                    }
+                }
             });
 
             if (replaceGuids)
