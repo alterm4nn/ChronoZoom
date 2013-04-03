@@ -2362,6 +2362,10 @@ function buildVcContentItems(contentItems, xc, yc, rad, vc, layerid) {
     var _ytc = -_hc / 2 - 9.0 * k - _lh / 2;
     var _ybc = -_ytc;
 
+    // save the order of content items
+    for (var i = 0; i < contentItems.length; i++)
+        contentItems[i].index = i;
+
     // 0th is a central content item
     vcitems.push(
         new ContentItem(vc, layerid, 'c' + contentItems[0].UniqueID,
