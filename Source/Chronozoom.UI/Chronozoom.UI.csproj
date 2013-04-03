@@ -61,7 +61,7 @@
     </Reference>
     <Reference Include="Microsoft.IdentityModel, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <Private>True</Private>
+      <HintPath>..\..\External\IdentityModel\Microsoft.IdentityModel.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Owin.Host.SystemWeb">
       <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.1.0.0-rc2\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
@@ -141,7 +141,6 @@
       <HintPath>..\..\External\Thinktecture.IdentityModel\Thinktecture.IdentityModel.dll</HintPath>
     </Reference>
     <Content Include="ACS\FederationMetadata\2007-06\FederationMetadata.xml" />
-
   </ItemGroup>
   <ItemGroup>
     <Content Include="BehindTheScenes.htm" />
@@ -270,8 +269,6 @@
     <Content Include="Scripts\cz.settings.js" />
     <Content Include="Scripts\flash_detect.js" />
     <Content Include="Scripts\gestures.js" />
-    <None Include="Properties\PublishProfiles\czazurepb - FTP.pubxml" />
-    <None Include="Properties\PublishProfiles\czazurepb - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-1.4.1-vsdoc.js" />
     <Content Include="Scripts\jquery-1.4.1.js" />
     <Content Include="Scripts\jquery-1.4.1.min.js" />
