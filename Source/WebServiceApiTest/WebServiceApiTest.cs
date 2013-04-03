@@ -45,8 +45,7 @@ namespace WebServiceApiTest
         static string endpointLocator = "http://{0}/chronozoom.svc/{1}";
         static string endpointSearch = "http://{0}/chronozoom.svc/search?searchTerm={1}";
 
-        static string serviceUrl = "cz-july2013-javierluraschi-fixes.azurewebsites.net";
-        //        static string serviceUrl = "test.chronozoomproject.org";
+        static string serviceUrl = "test.chronozoomproject.org";
 
         static string verbDefault = "get";
         static string verbThresholds = "getThresholds";
