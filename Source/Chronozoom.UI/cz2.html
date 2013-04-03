@@ -596,12 +596,21 @@
                 buttons: {
                     "save and close": function () {
                         isCancel = false;
+
+                        var self = this;
+
                         CZ.Authoring.updateTimeline(t, {
-                           title: titleInput.val(),
-                           start: startInput.val(),
-                           end: endInput.val(),
-                        },
-                        $(this));
+                            title: titleInput.val(),
+                            start: startInput.val(),
+                            end: endInput.val(),
+                        }).then(
+                            function (success) {
+                                $(self).dialog("close");
+                            },
+                            function (error) {
+                                alert("Unable to save changes. Please try again later.");
+                                console.log(error);
+                            });                            
                     }
                 },
                 close: function () {
@@ -630,12 +639,19 @@
                 width: 600,
                 buttons: {
                     "save and close": function () {
+                        var self = this;
                         CZ.Authoring.updateTimeline(t, {
                             title: titleInput.val(),
                             start: startInput.val(),
                             end: endInput.val(),
-                        },
-                        $(this));
+                        }).then(
+                            function (success) {
+                                $(self).dialog("close");
+                            },
+                            function (error) {
+                                alert("Unable to save changes. Please try again later.");
+                                console.log(error);
+                            });    
                     },
                     "delete": function () {
                         if (confirm("Are you sure want to delete timeline and all of its nested timelines and exhibits? Delete can't be undone!")) {
@@ -644,7 +660,7 @@
                         }
                     }
                 },
-                close: function () {
+                close: function () {                    
                     CZ.Authoring._isActive = false;
                     $("a:contains('edit timeline')").removeClass("active");
                 }
