@@ -635,12 +635,22 @@ var CZ = (function (CZ, $) {
         },
         /**
          * Validates,if number is valid.
-          */
+        */
         ValidateNumber: function (number) {
             if (isNaN(Number(number))) { return false; }
             return true;
-        }
+        },
+        /**
+         * Validates,if field is empty.
+        */
+        IsNotEmpty: function (obj) {
+            if (obj == '') return false;
+            if (obj == null) return false; 
+            return true;
+    }
+
     });
+
 
     return CZ;
 })(CZ || {}, jQuery);
