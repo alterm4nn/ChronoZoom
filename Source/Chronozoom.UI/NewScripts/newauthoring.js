@@ -41,11 +41,6 @@ var CZ = (function (CZ, $) {
     var _selectedTimeline = {};
     var _selectedExhibit = {};
 
-    // Temp counters for objects' ids.
-    var _timelineCounter = 0;
-    var _infodotCounter = 0;
-    var _contentItemCounter = 0;
-
     /**
      * Tests a timeline/exhibit on intersection with another virtual canvas object.
      * @param  {Object}  te   A timeline/exhibit to test.
@@ -239,6 +234,7 @@ var CZ = (function (CZ, $) {
         var descr = e.infodotDescription;
         descr.opacity = 1;
         descr.title = e.title;
+        descr.guid = e.guid;
         var parent = e.parent;
         var radv = e.outerRad;
 
@@ -256,7 +252,7 @@ var CZ = (function (CZ, $) {
         return addTimeline(
             _hovered,
             _hovered.layerid,
-            "",
+            null,
             {
                 timeStart: _rectCur.x,
                 timeEnd: _rectCur.x + _rectCur.width,
@@ -281,12 +277,13 @@ var CZ = (function (CZ, $) {
         return addInfodot(
             _hovered,
             "layerInfodots",
-            "infodot" + _infodotCounter++,
+            null,
             _circleCur.x + _circleCur.r,
             _circleCur.y + _circleCur.r,
             _circleCur.r,
             [{
-                id: "contentItem" + _contentItemCounter++,
+                id: null,
+                guid: null,
                 title: "Content Item Title",
                 description: "Content Item Description",
                 uri: "",
@@ -295,7 +292,8 @@ var CZ = (function (CZ, $) {
             }],
             {
                 title: "Exhibit Title",
-                date: _circleCur.x + _circleCur.r
+                date: _circleCur.x + _circleCur.r,
+                guid: null
             }
         );
     }
@@ -586,9 +584,7 @@ var CZ = (function (CZ, $) {
                     CZ.Service.putExhibitContent(e, oldContentItems).then(
                         function () {
                             for (i = 0; i < len; ++i) {
-                                contentItems[i].guid = arguments[i][0];
-                                contentItems[i].id = arguments[i][0];
-                                console.log(arguments[i][0]);
+                                contentItems[i].guid = arguments[i];
                             }
                         },
                         function () {
@@ -613,35 +609,25 @@ var CZ = (function (CZ, $) {
         },
 
         /**
-         * Adds a content item with a given properties to selected exhibit.
+         * Updates content item's properties in selected exhibit.
          * Use it externally from forms' handlers.
-         * @param {Object} prop An object with properties' values.
+         * @param  {Object} c    A content item in selected exhibit.
+         * @param  {Object} args An object with properties' values.
          */
-        addContentItem: function (e, args) {
-            e.contentItems.push({
-                 id: 'contentItem' + CZ.Authoring.contentItemCounter++, title: args.title,
-                 description: args.description,
-                 uri: args.uri,
-                 mediaType: 'image'
-            });
-       },
+        updateContentItem: function (c, args) {
+            var e = c.parent.parent.parent;
 
-        /**
-         * Updates i's content item's properties in selected timeline.
-         * Use it externally from forms' handlers.
-         * @param  {Number} i    Index of a content item in selected exhibit.
-         * @param  {Object} prop An object with properties' values.
-         */
-        updateContentItem: function (c, e, args) {
-            for (var prop in args)
-                if (c.contentItem.hasOwnProperty(prop))
+            for (var prop in args) {
+                if (c.contentItem.hasOwnProperty(prop)) {
                     c.contentItem[prop] = args[prop];
+                }
+            }
             
             renewExhibit(e);
 
             CZ.Service.putContentItem(c).then(
                 function (response) {
-                    console.log(response);
+                    c.guid = response;
                 },
                 function (error) {
                     console.log("Error connecting to service: update content item.\n" + error.responseText);
@@ -650,17 +636,16 @@ var CZ = (function (CZ, $) {
         },
 
         /**
-         * Removes i's content item from selected exhibit.
+         * Removes content item from selected exhibit.
          * Use it externally from form's handlers.
-         * @param  {Number} i Index of a content item in selected exhibit.
+         * @param  {Object} c A content item in selected exhibit.
          */
         removeContentItem: function (c) {
-            // var i = c.parent.parent.parent.contentItems.indexOf(c.contentItem);
+            var e = c.parent.parent.parent;
+
             CZ.Service.deleteContentItem(c);
             c.parent.parent.parent.contentItems.splice(c.contentItem.index, 1);
             delete c.contentItem;
-            var e = c.parent.parent.parent;
-            //removeChild(c.parent, c.id);// TODO: Remove i's content item from _selectedExhibit.
             renewExhibit(e);
         }
     });

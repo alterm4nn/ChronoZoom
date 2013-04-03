@@ -52,7 +52,7 @@
 
         exhibit: function (e) {
             return {
-                Id: e.guid,
+                Id: e.guid || null,
                 ParentTimelineId: e.parent.guid,
                 Year: e.infodotDescription.date,
                 Title: e.title,
@@ -63,7 +63,7 @@
 
         contentItem: function (ci) {
             return {
-                Id: ci.guid || ci.id,
+                Id: ci.guid || null,
                 ParentExhibitId: ci.parent,
                 Title: ci.contentItem ? ci.contentItem.title : ci.title,
                 Caption: ci.contentItem ? ci.contentItem.description : ci.description,
@@ -320,8 +320,8 @@
          */
         
         putExhibitContent: function (e, oldContentItems) {
-            var newIds = e.contentItems.map(function (ci) {
-                return ci.id;
+            var newGuids = e.contentItems.map(function (ci) {
+                return ci.guid;
             });
 
             // Send PUT request for all exhibit's content items.
@@ -333,7 +333,7 @@
                 // Filter deleted content items and send DELETE request for them.
                 oldContentItems.filter(
                     function (ci) {
-                        return (newIds.indexOf(ci.id) === -1);
+                        return (newGuids.indexOf(ci.guid) === -1);
                     }
                 ).map(
                     function (ci) {

@@ -258,12 +258,12 @@ namespace UI
                 });
         }
 
-        [SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly", Justification = "No unmanaged handles")]
         public void Dispose()
         {
-            _storage.Dispose();
-
-            GC.SuppressFinalize(this);
+            if (_storage != null)
+            {
+                _storage.Dispose();
+            }
         }
 
         private Guid CollectionIdOrDefault(string supercollection, string collection)
