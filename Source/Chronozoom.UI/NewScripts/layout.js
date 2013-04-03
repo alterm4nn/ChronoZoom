@@ -428,6 +428,10 @@ function Convert(parent, timeline) {
             var contentItems = [];
 			if (typeof childInfodot.contentItems !== 'undefined') {
                 contentItems = childInfodot.contentItems;
+                // NOTE: Consider to remove id completely.
+                for (var i = 0; i < contentItems.length; ++i) {
+                    contentItems[i].guid = contentItems[i].id;
+                }
 			}
 
             var infodot1 = addInfodot(t1, "layerInfodots", 'e' + childInfodot.id,

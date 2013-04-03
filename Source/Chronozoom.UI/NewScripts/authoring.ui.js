@@ -30,9 +30,9 @@
             "<label>Media type</label>" +
                 "<select class='cz-authoring-ci-media-type' style='display: block'>" +
                     "<option value='image'>Image</option>" +
-                     "<option value='pdf'>PDF</option> " +
-                     "<option value='video'>Video</option>" +
-                     "<option value='audio'>Audio</option>" +
+                    "<option value='pdf'>PDF</option> " +
+                    "<option value='video'>Video</option>" +
+                    "<option value='audio'>Audio</option>" +
                 "</select>" +
             "</p>");
 
@@ -68,7 +68,7 @@
             var mediaInput = $(this).find(".cz-authoring-ci-media-source");
             var mediaTypeInput = $(this).find(".cz-authoring-ci-media-type option");
             var descriptionInput = $(this).find(".cz-authoring-ci-description");
-            var id = $(this).attr("cz-authoring-ci-id") || "";
+            var guid = $(this).attr("cz-authoring-ci-guid") || "";
 
             var selected = mediaTypeInput[0];
 
@@ -82,8 +82,8 @@
                 description: descriptionInput.val(),
                 uri: mediaInput.val(),
                 mediaType: selected.text,
-                id: id,
-                parent: ""
+                guid: guid,
+                parent: null
             });
         });
 
@@ -106,7 +106,7 @@
             mediaType = "image";
         }
 
-        form.attr("cz-authoring-ci-id", contentItem.id);
+        form.attr("cz-authoring-ci-guid", contentItem.guid);
         titleInput.val(contentItem.title);
         mediaInput.val(contentItem.uri);
         descriptionInput.val(contentItem.description);
@@ -214,7 +214,17 @@
             var dateInput = $("#exhibitDateInput").spinner();
 
             titleInput.val(e.title);
-            dateInput.val(e.x);
+            dateInput.val(e.infodotDescription.date);
+
+            var contentItems = e.contentItems;
+
+            for (var i = 0; i < contentItems.length; i++) {
+                _addContentItemForm($("#createExhibitForm"), true);
+            }
+
+            $(".cz-authoring-ci-container").each(function (index) {
+                _fillContentItemForm($(this), contentItems[index]);
+            });
 
             $("#createExhibitForm").dialog({
                 title: "create exhibit",
@@ -258,7 +268,7 @@
             var dateInput = $("#exhibitDateInput").spinner();
 
             titleInput.val(e.title);
-            dateInput.val(e.x);
+            dateInput.val(e.infodotDescription.date);
 
             var contentItems = e.contentItems;
 
@@ -298,15 +308,15 @@
                         }
                     },
                     "add content item": function () {
-                        if ($(this).find(".cz-auth-ci-container").length < infodotMaxContentItemsCount)
-                            _addContentItemForm();
+                        if ($(this).find(".cz-authoring-ci-container").length < infodotMaxContentItemsCount)
+                            _addContentItemForm($("#createExhibitForm"), true);
                     }
                 },
                 close: function () {
                     CZ.Authoring._isActive = false;
                     $("a:contains('edit exhibit')").removeClass("active");
 
-                    $(this).find(".cz-auth-ci-container")
+                    $(this).find(".cz-authoring-ci-container")
                            .each(function () {
                                $(this).remove();
                            });
