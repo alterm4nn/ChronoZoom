@@ -136,22 +136,29 @@
                 width: 600,
                 buttons: {
                     "save and close": function () {
-                        isCancel = false;
+                        var isValid = CZ.Authoring.ValidateNumber(startInput.val()) && CZ.Authoring.ValidateNumber(endInput.val());
+                        isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(startInput.val()) && CZ.Authoring.IsNotEmpty(endInput.val());
+                    
+                        if (!isValid) {
+                            $("#TimelineErrorSpan").css("display","block");
+                        }
+                        if (isValid) {
+                            var self = this;
+                            isCancel = false;
 
-                        var self = this;
-
-                        CZ.Authoring.updateTimeline(t, {
-                            title: titleInput.val(),
-                            start: startInput.val(),
-                            end: endInput.val(),
-                        }).then(
-                            function (success) {
-                                $(self).dialog("close");
-                            },
-                            function (error) {
-                                alert("Unable to save changes. Please try again later.");
-                                console.log(error);
-                            });
+                            CZ.Authoring.updateTimeline(t, {
+                                title: titleInput.val(),
+                                start: startInput.val(),
+                                end: endInput.val(),
+                            }).then(
+                                function (success) {
+                                    $(self).dialog("close");
+                                },
+                                function (error) {
+                                    alert("Unable to save changes. Please try again later.");
+                                    console.log(error);
+                                });
+                        }
                     }
                 },
                 close: function () {
@@ -159,6 +166,7 @@
                         CZ.Authoring.removeTimeline(t);
                     }
                     CZ.Authoring._isActive = false;
+                    $("#TimelineErrorSpan").css("display", "none");
                     $("a:contains('create timeline')").removeClass("active");
                 }
             });
@@ -179,20 +187,27 @@
                 height: 600,
                 width: 600,
                 buttons: {
-                    "save and close": function () {
-                        var self = this;
-                        CZ.Authoring.updateTimeline(t, {
-                            title: titleInput.val(),
-                            start: startInput.val(),
-                            end: endInput.val(),
-                        }).then(
-                            function (success) {
-                                $(self).dialog("close");
-                            },
-                            function (error) {
-                                alert("Unable to save changes. Please try again later.");
-                                console.log(error);
-                            });
+                    "save and close": function () {var isValid = CZ.Authoring.ValidateNumber(startInput.val()) && CZ.Authoring.ValidateNumber(endInput.val());
+                        isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(startInput.val()) && CZ.Authoring.IsNotEmpty(endInput.val());
+                        
+                        if (!isValid) {
+                            $("#TimelineErrorSpan").css("display", "block");
+                        }
+                        if (isValid) {
+                            var self = this;
+                            CZ.Authoring.updateTimeline(t, {
+                                title: titleInput.val(),
+                                start: startInput.val(),
+                                end: endInput.val(),
+                            }).then(
+                                function (success) {
+                                    $(self).dialog("close");
+                                },
+                                function (error) {
+                                    alert("Unable to save changes. Please try again later.");
+                                    console.log(error);
+                                });
+                        }
                     },
                     "delete": function () {
                         if (confirm("Are you sure want to delete timeline and all of its nested timelines and exhibits? Delete can't be undone!")) {
@@ -204,6 +219,7 @@
                 close: function () {
                     CZ.Authoring._isActive = false;
                     $("a:contains('edit timeline')").removeClass("active");
+                    $("#TimelineErrorSpan").css("display", "none");
                 }
             });
         },
@@ -235,13 +251,22 @@
                     "save and close": function () {
                         var contentItems = _getContentItemsData();
 
-                        CZ.Authoring.updateExhibit(e, {
-                            title: titleInput.val(),
-                            date: dateInput.val(),
-                            contentItems: contentItems
-                        });
-                        isCancel = false;
-                        $(this).dialog("close");
+                        var isValid = CZ.Authoring.ValidateNumber(dateInput.val());
+                        isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(dateInput.val());
+                        isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
+
+                        if (!isValid) {
+                            $("#ExhibitErrorSpan").css("display", "block");
+                        }
+                        else {
+                            CZ.Authoring.updateExhibit(e, {
+                                title: titleInput.val(),
+                                date: dateInput.val(),
+                                contentItems: contentItems
+                            });
+                            isCancel = false;
+                            $(this).dialog("close");
+                        }
                     },
                     "add content item": function () {
                         if ($(this).find(".cz-authoring-ci-container").length < infodotMaxContentItemsCount)
@@ -254,6 +279,7 @@
                     }
                     CZ.Authoring._isActive = false;
                     $("a:contains('create exhibit')").removeClass("active");
+                    $("#ExhibitErrorSpan").css("display", "none");
 
                     $(this).find(".cz-authoring-ci-container")
                             .each(function () {
@@ -289,17 +315,26 @@
                     "save and close": function () {
                         contentItems = _getContentItemsData(e);
 
-                        CZ.Authoring.updateExhibit(e, {
-                            title: titleInput.val(),
-                            date: dateInput.val(),
-                            contentItems: contentItems
-                        });
-                        $(this).dialog("close");
+                        var isValid = CZ.Authoring.ValidateNumber(dateInput.val());
+                        isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(dateInput.val());
+                        isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
 
-                        $(this).find(".cz-authoring-ci-container")
-                           .each(function () {
-                               $(this).remove();
-                           });
+                        if (!isValid) {
+                            $("#ExhibitErrorSpan").css("display", "block");
+                        }
+                        else {
+                            CZ.Authoring.updateExhibit(e, {
+                                title: titleInput.val(),
+                                date: dateInput.val(),
+                                contentItems: contentItems
+                            });
+                            $(this).dialog("close");
+
+                            $(this).find(".cz-authoring-ci-container")
+                               .each(function () {
+                                   $(this).remove();
+                               });
+                        }
                     },
                     "delete": function () {
                         if (confirm("Are you sure want to delete exhibit and all of its content items? Delete can't be undone!")) {
@@ -315,6 +350,7 @@
                 close: function () {
                     CZ.Authoring._isActive = false;
                     $("a:contains('edit exhibit')").removeClass("active");
+                    $("#ExhibitErrorSpan").css("display", "none");
 
                     $(this).find(".cz-authoring-ci-container")
                            .each(function () {
