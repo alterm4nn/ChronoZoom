@@ -2150,7 +2150,9 @@ function ContentItem(vc, layerid, id, vx, vy, vw, vh, contentItem) {
                 zl = contentItemThumbnailMinLevel;
             }
             var sz = 1 << zl;
-             var thumbnailUri = contentItemThumbnailBaseUri + 'x' + sz + '/' + this.guid + '.png';
+            var thumbnailUri = contentItemThumbnailBaseUri + 'x' + sz + '/' + this.guid + '.png';
+            // NOTE: Temporary fix until new thumbnails will be implemented!
+            return null;
             return {
                 zoomLevel: newZl,
                 content: new CanvasImage(vc, layerid, id + "@" + 1, thumbnailUri, vx, vy, vw, vh)
