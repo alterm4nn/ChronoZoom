@@ -595,6 +595,12 @@
                 width: 600,
                 buttons: {
                     "save and close": function () {
+                        var isValid = (CZ.Authoring.ValidateNumber(startInput.val()) && CZ.Authoring.ValidateNumber(endInput.val()));
+                        if (!isValid) {
+                            console.log("input error");
+                            return;
+                        }
+
                         CZ.Authoring.updateTimeline(t, {
                            title: titleInput.val(),
                            start: startInput.val(),
@@ -673,6 +679,12 @@
                 buttons: {
                     "save and close": function () {
                         var contentItems = getContentItemsData();
+
+                        var isValid = CZ.Authoring.ValidateNumber(dateInput.val());
+                        if (!isValid) {
+                            console.log("input error");
+                            return;
+                        }
                         
                         CZ.Authoring.updateExhibit(e, {
                             title: titleInput.val(),
@@ -726,7 +738,14 @@
                 width: 600,
                 buttons: {
                     "save and close": function () {
-                        contentItems = getContentItemsData(e);                        
+                        contentItems = getContentItemsData(e);
+
+                        var isValid = CZ.Authoring.ValidateNumber(dateInput.val());
+                        if (!isValid) {
+                            console.log("input error");
+                            return;
+                        }
+
                         
                         CZ.Authoring.updateExhibit(e, {
                             title: titleInput.val(),
@@ -797,7 +816,7 @@
                             if (mediaTypeInput[i].selected) {
                                     selected = mediaTypeInput[i];
                                 }
-                        console.log(c,e);
+//                        console.log(c,e);
                         CZ.Authoring.updateContentItem(c, e, {
                                 title: titleInput.val(),
                                 uri: mediaInput.val(),

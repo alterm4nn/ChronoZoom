@@ -624,6 +624,13 @@ var CZ = (function (CZ, $) {
             var e = c.parent.parent.parent;
             //removeChild(c.parent, c.id);// TODO: Remove i's content item from _selectedExhibit.
             renewExhibit(e);
+        },
+        /**
+         * Validates,if number is valid.
+          */
+        ValidateNumber: function (number) {
+            if (isNaN(Number(number))) { return false; }
+            return true;
         }
     });
 
