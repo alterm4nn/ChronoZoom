@@ -768,23 +768,6 @@ function CanvasTimeline(vc, layerid, id, vx, vy, vw, vh, settings, timelineinfo)
     this.titleObject = addText(this, layerid, id + "__header__", timelineinfo.timeStart + marginLeft, timelineinfo.top + marginTop, baseline, headerSize,
         timelineinfo.header, { fontName: timelineHeaderFontName, fillStyle: timelineHeaderFontColor, textBaseline: 'middle' });
 
-    this.titleObject.reactsOnMouse = true;
-    this.titleObject.onmouseclick = function (e) {
-        if (CZ.Authoring.isActive) CZ.Authoring.onTimelineChangeNameClicked(this.id);
-    };
-    this.titleObject.onmouseenter = function (pv, e) {
-        if (CZ.Authoring.isActive) {
-            this.vc.requestInvalidate();
-            this.vc.element.css('cursor', 'pointer');
-        }
-    };
-    this.titleObject.onmouseleave = function (pv, e) {
-        if (CZ.Authoring.isActive) {
-            this.vc.requestInvalidate();
-            this.vc.element.css('cursor', 'default');
-        }
-    };
-
     this.title = this.titleObject.text;
     this.regime = timelineinfo.regime;
     this.settings.gradientOpacity = 0;
@@ -799,127 +782,10 @@ function CanvasTimeline(vc, layerid, id, vx, vy, vw, vh, settings, timelineinfo)
     this.prevPosition = null;
 
     this.onmouseclick = function (pv, e) {
-        if ((CZ.Authoring.state == "delete") && (CZ.Authoring.isActive)) {
-            removeChild(this.parent, this.id);
-        }
-
-        if (!CZ.Authoring.isActive)
-            return zoomToElementHandler(this, e, 1.0);
-
-        if (CZ.Authoring.state == "addInfodot" && CZ.Authoring.isActive && !this.vc.currentlyHoveredInfodot) {
-            // TODO: find better solution to computate radius of the infodot
-            var radius = this.width / 80.0;
-
-            for (var i = 0; i < this.children.length; i++) {
-                if (this.children[i].type == "infodot") {
-                    radius = this.children[i].outerRad;
-                    break;
-                }
-            }
-
-            var date = CZ.Authoring.getInfodotDate(pv.x);
-
-            addInfodot(this.vc.currentlyHoveredTimeline, "layerInfodots", "infodot" + CZ.Authoring.infodotCount++,
-                pv.x, pv.y, radius, [], {
-                    title: "Sample Infodot",
-                    date: date
-                });
-        }
-
+        return zoomToElementHandler(this, e, 1.0);
     };
 
     this.onmousehover = function (pv, e) {
-        hoveredCircle = null;
-        if (CZ.Authoring.isDragging) {
-            if (CZ.Authoring.state == "moveContent") { // changing vertical positioning of timeline
-                if (this.prevPosition != null) {
-                    var x2_left, x1_left = this.x;
-                    var x2_right, x1_right = this.x + this.width;
-                    var y2_up, y1_up = this.y;
-                    var y2_down, y1_down = this.y + this.height;
-                    var canmove = true;
-
-                    var dy = pv.y - this.prevPosition.y;
-
-                    if (this.y + dy < this.parent.y)
-                        dy = this.parent.y - this.y;
-                    if (this.y + this.height + dy > this.parent.y + this.parent.height)
-                        dy = this.parent.y + this.parent.height - this.y - this.height;
-
-                    var y1_up_new = y1_up + dy;
-                    var y1_down_new = y1_down + dy;
-
-                    var self = this;
-                    this.parent.children.forEach(function (child) {
-                        if (child == self)
-                            return;
-
-                        x2_left = child.x;
-                        x2_right = child.x + child.width;
-                        y2_up = child.y;
-                        y2_down = child.y + child.height;
-
-                        if (dy > 0) {                                    //down move
-                            if ((y2_down >= y1_down_new) && (y1_down_new >= y2_up)) {
-                                if (((x2_left < x1_right) && (x1_right <= x2_right)) || ((x2_left <= x1_left) && (x1_left < x2_right))) {
-                                    canmove = false;
-                                }
-                            }
-                        }
-
-                        if (dy < 0) {                                    //up move
-                            if ((y2_down >= y1_up_new) && (y1_up_new >= y2_up)) {
-                                if (((x2_left < x1_right) && (x1_right <= x2_right)) || ((x2_left <= x1_left) && (x1_left < x2_right))) {
-                                    canmove = false;
-                                }
-                            }
-                        }
-                    });
-
-                    if (canmove) {
-                        this.y += dy;
-                        this.titleObject.y += dy;
-                        this.titleObject.baseline += dy;
-
-                        var moveChildren = function (root, dy) {
-                            if (root.baseline)
-                                root.baseline += dy;
-
-                            if (root.vyc)
-                                root.vyc += dy;
-
-                            // hack to prevent positioning errors because of async image loading. Dramaticly reduces overall perfomance
-                            if (root.removeWhenInvisible)
-                                root.removeWhenInvisible = false;
-
-                            root.y += dy;
-
-                            if (root.type == "contentItem") {
-                                root.mediaTop += dy;
-                                root.sourceTop += dy;
-                                root.titleTop += dy;
-                            }
-
-                            for (var i = 0; i < root.children.length; i++)
-                                moveChildren(root.children[i], dy);
-                        }
-
-                        for (var i = 0; i < this.children.length; i++)
-                            if (this.children[i].id != this.id + "__header__")
-                                moveChildren(this.children[i], dy);
-                    }
-                }
-            }
-
-            this.prevPosition = {
-                x: pv.x,
-                y: pv.y
-            }
-        }
-        else {
-            this.prevPosition = null;
-        }
-
         //previous timeline also hovered and mouse leave don't appear, hide it
         //if infodot is null or undefined, we should stop animation
         //if it's ok, infodot's tooltip don't wink
@@ -1063,27 +929,6 @@ function CanvasTimeline(vc, layerid, id, vx, vy, vw, vh, settings, timelineinfo)
             //ctx.fillRect(this.startPoint.x, this.startPoint.y, this.prevPosition.x, this.prevPosition.y);
         }
 
-        /*********                Draw date line                  *********/
-        if (CZ.Authoring.draggedObject && CZ.Authoring.draggedObject.id == this.id && CZ.Authoring.isActive && CZ.Authoring.state == "editTimelineDate" && CZ.Authoring.isDragging) {
-            if (CZ.Authoring.direction && (CZ.Authoring.direction == "left" || CZ.Authoring.direction == "right")) {
-                var sp = viewport2d.pointVirtualToScreen(this.x, this.y + this.height); // start point
-                sp.x += 1;
-
-                if (CZ.Authoring.direction == "right") {
-                    var sp = viewport2d.pointVirtualToScreen(this.x + this.width, this.y + this.height); // start point
-                    sp.x -= 1;
-                }
-
-                ctx.beginPath();
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = "grey";
-                ctx.moveTo(sp.x, sp.y);
-                ctx.lineTo(sp.x, 0);
-                ctx.stroke();
-            }
-        }
-        /********************************************************************/
-
         var p = viewport2d.pointVirtualToScreen(this.x, this.y);
         var p2 = { x: p.x + size_p.x, y: p.y + size_p.y };
 
@@ -1164,31 +1009,6 @@ function CanvasCircle(vc, layerid, id, vxc, vyc, vradius, settings) {
             ctx.fillStyle = this.settings.fillStyle;
             ctx.fill();
         }
-
-        /********              Draw date line           *********/
-        if (this.id == "newInfodotCircle") {
-            var vp = viewport2d.pointVirtualToScreen(this.x + this.width / 2, this.y);
-
-            ctx.beginPath();
-            ctx.lineWidth = 1;
-            ctx.strokeStyle = "grey";
-            ctx.moveTo(vp.x, vp.y);
-            ctx.lineTo(vp.x, 0);
-            ctx.stroke();
-        }
-
-        /*******************************************************/
-        /********              Draw date line if dragging infodot          *********/
-        if (CZ.Authoring.isActive && CZ.Authoring.state == "moveInfodotHorizontally" && this.id == hoveredCircle) {
-            var vp = viewport2d.pointVirtualToScreen(this.x + this.width / 2, this.y);
-            ctx.beginPath();
-            ctx.lineWidth = 1;
-            ctx.strokeStyle = "grey";
-            ctx.moveTo(vp.x, vp.y);
-            ctx.lineTo(vp.x, 0);
-            ctx.stroke();
-        }
-        /*******************************************************/
     };
 
     /* Checks whether the given point (virtual) is inside the object
@@ -2202,166 +2022,10 @@ function CanvasInfodot(vc, layerid, id, time, vyc, radv, contentItems, infodotDe
     this.onmousehover = function (pv, e) {
         this.vc.currentlyHoveredInfodot = this;
         this.vc.requestInvalidate();
-        hoveredCircle = null;
-        if ((CZ.Authoring.isDragging) && (CZ.Authoring.state == "moveInfodot")) {
-            var dy = pv.y - this.prevPosition.y;
-
-            var x2_left, x1_left = this.x;
-            var x2_right, x1_right = this.x + this.width;
-
-            var y2_up, y1_up = this.y;
-            var y2_down, y1_down = this.y + this.height;
-            var canmove = true;
-
-            if (this.y + dy < this.parent.y)
-                dy = this.parent.y - this.y;
-            if (this.y + this.height + dy > this.parent.y + this.parent.height)
-                dy = this.parent.y + this.parent.height - this.y - this.height;
-
-            var y1_up_new = y1_up + dy;
-            var y1_down_new = y1_down + dy;
-
-            var self = this;
-            this.parent.children.forEach(function (child) {
-                if (child != self.parent.children[0]) {
-                    x2_left = child.x;
-                    x2_right = child.x + child.width;
-                    y2_up = child.y;
-                    y2_down = child.y + child.height;
-
-                    if (dy > 0) {                                    //down move
-                        if ((y2_down >= y1_down_new) && (y1_down_new >= y2_up)) {
-                            if (((x2_left < x1_right) && (x1_right <= x2_right)) || ((x2_left <= x1_left) && (x1_left < x2_right))) {
-                                dy = 0;
-                            }
-                        }
-                    }
-
-                    if (dy < 0) {                                    //up move
-                        if ((y2_down >= y1_up_new) && (y1_up_new >= y2_up)) {
-                            if (((x2_left < x1_right) && (x1_right <= x2_right)) || ((x2_left <= x1_left) && (x1_left < x2_right))) {
-                                dy = 0;
-                            }
-                        }
-                    }
-                }
-            });
-
-            this.y += dy;
-            this.vyc += dy;
-
-            var moveChildren = function (root, dy) {
-                if (root.removeWhenInvisible)
-                    root.removeWhenInvisible = false;
-
-                root.y += dy;
-
-                if (root.type == "contentItem") {
-                    root.mediaTop += dy;
-                    root.sourceTop += dy;
-                    root.titleTop += dy;
-                }
-
-                for (var i = 0; i < root.children.length; i++)
-                    moveChildren(root.children[i], dy);
-            }
-
-            for (var i = 0; i < this.children.length; i++)
-                moveChildren(this.children[i], dy);
-
-
-            this.vc._setConstraintsByInfodotHover(this);
-            this.vc.RaiseCursorChanged();
-        }
-
-        if ((CZ.Authoring.isDragging) && (CZ.Authoring.state == "moveInfodotHorizontally")) {
-
-            var dy = pv.y - this.prevPosition.y;
-            var dx = pv.x - this.prevPosition.x;
-            hoveredCircle = this.id;
-            var x2_left, x1_left = this.x;
-            var x2_right, x1_right = this.x + this.width;
-
-            var y2_up, y1_up = this.y;
-            var y2_down, y1_down = this.y + this.height;
-            var canmove = true;
-
-            if (this.x + dx <= this.parent.x)
-                dx = 0;
-            if (this.x + this.width + dx >= this.parent.x + this.parent.width)
-                dx = 0;
-
-            var x1_left_new = x1_left + dx;
-            var x1_right_new = x1_right + dx;
-
-            var self = this;
-            this.parent.children.forEach(function (child) {     //запрет на задевание соседей
-                if (child != self.parent.children[0]) {
-                    x2_left = child.x;
-                    x2_right = child.x + child.width;
-                    y2_up = child.y;
-                    y2_down = child.y + child.height;
-
-                    if (dx < 0) {                                    //left move
-                        if ((x2_left <= x1_left_new) && (x1_left_new <= x2_right)) {
-                            if (((y1_up >= y2_up) && (y1_up <= y2_down)) || ((y1_down >= y2_down) && (y1_down <= y2_up))) {
-                                dx = 0;
-                            }
-                        }
-                    }
-
-                    if (dx > 0) {                                    //right move
-                        if ((x2_left <= x1_right_new) && (x1_right_new <= x2_right)) {
-                            if (((y1_up >= y2_up) && (y1_up <= y2_down)) || ((y1_down >= y2_down) && (y1_down <= y2_up))) {
-                                dx = 0;
-                            }
-                        }
-                    }
-                }
-            });
-
-            this.x += dx;
-            this.time += dx;
-            this.vxc += dx;
-
-            var date = CZ.Authoring.getInfodotDate(this.time);
-            this.infodotDescription.date = date; // update date for infodot title
-            this.vc.cursorPosition = this.time; // update marker
-            try { // update title if it's shown
-                var root = getChild(this, id + "_dlod");
-                var container = getChild(root, id + "__contentItems");
-                var title = getChild(container, id + "__title")
-                title.text = infodot.infodotDescription.title + '\n(' + infodot.infodotDescription.date + ')';
-                title.initialized = false;
-            }
-            catch (ex) { };
-
-            var moveChildrenHor = function (root, dx) {
-                if (root.removeWhenInvisible)
-                    root.removeWhenInvisible = false;
-
-                root.x += dx;
-
-                for (var i = 0; i < root.children.length; i++)
-                    moveChildrenHor(root.children[i], dx);
-            }
-
-            for (var i = 0; i < this.children.length; i++)
-                moveChildrenHor(this.children[i], dx);
-
-            this.vc._setConstraintsByInfodotHover(this);
-            this.vc.RaiseCursorChanged();
-        }
-
-        this.prevPosition = {
-            x: pv.x,
-            y: pv.y
-        }
     };
 
     this.onmouseclick = function (e) {
-        if ((CZ.Authoring.state == "delete") && (CZ.Authoring.isActive == true)) { var self = this; removeChild(self.parent, self.id); }//removeTimeline(self); }
-        if (CZ.Authoring.isActive == false) return zoomToElementHandler(this, e, 1.0);
+        return zoomToElementHandler(this, e, 1.0);
     };
 
     this.onmouseenter = function (e) {
@@ -2513,30 +2177,6 @@ function CanvasInfodot(vc, layerid, id, time, vyc, radv, contentItems, infodotDe
                     wrapText: true,
                     numberOfLines: 1
                 }, titleWidth);
-            infodotTitle.reactsOnMouse = true;
-
-            infodotTitle.onmouseclick = function (e) {
-                if (CZ.Authoring.isActive) {
-                    CZ.Authoring.changeInfodotTitle(this.id, infodot.infodotDescription);
-                    this.vc.requestInvalidate();
-                }
-            };
-
-            infodotTitle.onmouseenter = function (pv, e) {
-                if (CZ.Authoring.isActive) {
-                    this.settings.fillStyle = infoDotHoveredBorderColor;
-                    this.vc.requestInvalidate();
-                    this.vc.element.css('cursor', 'pointer');
-                }
-            };
-
-            infodotTitle.onmouseleave = function (pv, e) {
-                if (CZ.Authoring.isActive) {
-                    this.settings.fillStyle = infoDotBorderColor;
-                    this.vc.requestInvalidate();
-                    this.vc.element.css('cursor', 'default');
-                }
-            };
 
             var biblBottom = vyc + centralSquareSize + 63.0 / 450 * 2 * radv;
             var biblHeight = infodotBibliographyHeight * radv * 2;
@@ -2657,30 +2297,6 @@ function CanvasInfodot(vc, layerid, id, time, vyc, radv, contentItems, infodotDe
 
         ctx.lineWidth = sw;
         ctx.strokeStyle = contentItemBoundingBoxFillColor;
-
-        /********              Draw date line if dragging infodot          *********/
-        if (CZ.Authoring.active && CZ.Authoring.state == "moveInfodotHorizontally" && this.id == hoveredCircle) {
-            ctx.strokeStyle = "grey";
-        }
-        /*******************************************************/
-
-        // Rendering additional graphics for the infodot
-        ctx.beginPath();
-        ctx.moveTo(pl0.x, pl0.y);
-        ctx.lineTo(pl0.x - sl, pl0.y - sl);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(pl1.x, pl1.y);
-        ctx.lineTo(pl1.x + sl, pl1.y + sl);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(pl0.x, pl1.y);
-        ctx.lineTo(pl0.x - sl, pl1.y + sl);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(pl1.x, pl0.y);
-        ctx.lineTo(pl1.x + sl, pl0.y - sl);
-        ctx.stroke();
     };
 
     /* Checks whether the given point (virtual) is inside the object
@@ -2745,10 +2361,6 @@ function buildVcContentItems(contentItems, xc, yc, rad, vc, layerid) {
 
     var _ytc = -_hc / 2 - 9.0 * k - _lh / 2;
     var _ybc = -_ytc;
-
-    // save the order of content items
-    for (var i = 0; i < contentItems.length; i++)
-        contentItems[i].index = i;
 
     // 0th is a central content item
     vcitems.push(
