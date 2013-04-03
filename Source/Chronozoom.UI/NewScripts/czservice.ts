@@ -2,7 +2,7 @@
     var Service = CZ.Service = CZ.Service || {};
     Service.Map = Service.Map || {};
 
-    var _serviceUrl = serverUrlBase + "/chronozoom.svc/"; 
+    var _serviceUrl = serverUrlHost + "/chronozoom.svc/"; 
 
     Service.Request = function (urlBase) {
         var _url = urlBase;
@@ -86,8 +86,8 @@
         get: function () {
             var request = new Service.Request(_serviceUrl);
             request.addToPath("get");
-            request.addParameter("supercollection", Service.superCollectionName);
-            request.addParameter("collection", Service.collectionName);
+            request.addParameter("supercollection", CZ.Service.superCollectionName);
+            request.addParameter("collection", CZ.Service.collectionName);
 
             return $.ajax({
                 type: "GET",
