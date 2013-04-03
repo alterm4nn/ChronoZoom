@@ -52,23 +52,23 @@
 
         exhibit: function (e) {
             return {
-                Id: e.guid,
-                parent: e.parent.guid,
-                time: e.infodotDescription.date,
-                title: e.title,
+                Id: e.guid || null,
+                ParentTimelineId: e.parent.guid,
+                Year: e.infodotDescription.date,
+                Title: e.title,
                 description: undefined,
-                contentItems: e.contentItems
+                contentItems: undefined
             };
         },
 
         contentItem: function (ci) {
             return {
-                Id: ci.guid,
-                parent: ci.parent.id,
-                title: ci.title,
-                description: ci.description,
-                uri: ci.uri,
-                mediaType: ci.mediaType
+                Id: ci.guid || null,
+                ParentExhibitId: ci.parent,
+                Title: ci.contentItem ? ci.contentItem.title : ci.title,
+                Caption: ci.contentItem ? ci.contentItem.description : ci.description,
+                Uri: ci.contentItem ? ci.contentItem.uri : ci.uri,
+                MediaType: ci.contentItem ? ci.contentItem.mediaType : ci.mediaType
             };
         }
     });
@@ -211,6 +211,8 @@
             request.addToPath(Service.collectionName);
             request.addToPath("timeline");
 
+            console.log("[PUT] " + request.url);
+
             return $.ajax({
                 type: "PUT",
                 cache: false,
@@ -228,6 +230,8 @@
             request.addToPath(Service.collectionName);
             request.addToPath("timeline");
 
+            console.log("[DELETE] " + request.url);
+
             return $.ajax({
                 type: "DELETE",
                 cache: false,
@@ -243,6 +247,8 @@
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
             request.addToPath("exhibit");
+
+            console.log("[PUT] " + request.url);
 
             return $.ajax({
                 type: "PUT",
@@ -261,6 +267,8 @@
             request.addToPath(Service.collectionName);
             request.addToPath("exhibit");
 
+            console.log("[DELETE] " + request.url);
+
             return $.ajax({
                 type: "DELETE",
                 cache: false,
@@ -276,6 +284,8 @@
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
             request.addToPath("contentitem");
+
+            console.log("[PUT] " + request.url);
 
             return $.ajax({
                 type: "PUT",
@@ -294,6 +304,8 @@
             request.addToPath(Service.collectionName);
             request.addToPath("contentitem");
 
+            console.log("[DELETE] " + request.url);
+
             return $.ajax({
                 type: "DELETE",
                 cache: false,
@@ -307,24 +319,21 @@
          * Auxiliary Methods.
          */
         
-        putExhibitWithContent: function (e, oldContentItems) {
-            var newIds = e.contentItems.map(function (ci) {
-                return ci.id;
+        putExhibitContent: function (e, oldContentItems) {
+            var newGuids = e.contentItems.map(function (ci) {
+                return ci.guid;
             });
 
-            // Send PUT request for exhibit.
-            var promises = [ Service.putExhibit(e) ].concat(
-                // Send PUT request for all its content items.
-                e.contentItems.map(
-                    function (ci) {
-                        return Service.putContentItem(ci);
-                    }
-                )
+            // Send PUT request for all exhibit's content items.
+            var promises = e.contentItems.map(
+                function (ci) {
+                    return Service.putContentItem(ci);
+                }
             ).concat(
                 // Filter deleted content items and send DELETE request for them.
                 oldContentItems.filter(
                     function (ci) {
-                        return (newIds.indexOf(ci.id) === -1);
+                        return (newGuids.indexOf(ci.guid) === -1);
                     }
                 ).map(
                     function (ci) {
