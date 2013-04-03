@@ -637,17 +637,30 @@ var CZ = (function (CZ, $) {
          * Validates,if number is valid.
         */
         ValidateNumber: function (number) {
-            if (isNaN(Number(number))) { return false; }
-            return true;
+            return !isNaN(Number(number));
         },
         /**
          * Validates,if field is empty.
         */
         IsNotEmpty: function (obj) {
-            if (obj == '') return false;
-            if (obj == null) return false; 
-            return true;
-    }
+            return (obj !== '' && obj !== null);
+        },
+        /**
+         * Validates,if content item data is correct.
+        */
+        ValidateContentItems: function (contentItems) {
+            var isValid = true;
+            if (contentItems == "[]") return true;
+            var i = 0;
+            while (contentItems[i] != null) {
+                var CI = contentItems[i];
+                isValid = isValid && CZ.Authoring.IsNotEmpty(CI.title) && CZ.Authoring.IsNotEmpty(CI.uri) && CZ.Authoring.IsNotEmpty(CI.mediaType);
+                if (!isValid) return false;
+                i++;
+            }
+            return isValid;
+        }
+
 
     });
 

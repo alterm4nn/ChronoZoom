@@ -689,7 +689,7 @@
                         var contentItems = getContentItemsData();
                         var isValid = CZ.Authoring.ValidateNumber(dateInput.val());
                         isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(dateInput.val());
-                        isValid = isValid && ValidateContentItems(contentItems);
+                        isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
 
                         if (!isValid) {
                             $("#ExhibitErrorSpan").css("display", "block");
@@ -753,7 +753,7 @@
                         contentItems = getContentItemsData();
                         var isValid = CZ.Authoring.ValidateNumber(dateInput.val());
                         isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(dateInput.val());
-                        isValid = isValid && ValidateContentItems(contentItems);
+                        isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
 
                         if (!isValid) {
                             $("#ExhibitErrorSpan").css("display", "block");
@@ -1004,21 +1004,6 @@
 
             return contentItems;
         }
-
-        //validates if content item data is correct
-        function ValidateContentItems(contentItems) {
-            var isValid = true;
-            if (contentItems == "[]") return true;
-            var i = 0;
-            while (contentItems[i] != null) {
-                var CI = contentItems[i];
-                isValid = isValid && CZ.Authoring.IsNotEmpty(CI.title) && CZ.Authoring.IsNotEmpty(CI.uri) && CZ.Authoring.IsNotEmpty(CI.mediaType);
-                if (!isValid) return false;
-                i++;
-            }
-            return isValid;
-        }
-
         //TODO: move this function to appropriate .js file
         function fillContentItemForm(form, contentItem) {
             var titleInput = form.find(".cz-auth-ci-title");
