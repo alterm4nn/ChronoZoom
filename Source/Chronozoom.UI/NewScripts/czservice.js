@@ -53,7 +53,7 @@
         exhibit: function (e) {
             return {
                 Id: e.guid,
-                ParentTimelineId: undefined,
+                ParentTimelineId: e.parent.guid,
                 Year: e.infodotDescription.date,
                 Title: e.title,
                 description: undefined,
@@ -63,8 +63,8 @@
 
         contentItem: function (ci) {
             return {
-                Id: ci.guid,
-                ParentExhibitId: undefined,
+                Id: ci.guid || ci.id,
+                ParentExhibitId: ci.parent,
                 Title: ci.contentItem ? ci.contentItem.title : ci.title,
                 Caption: ci.contentItem ? ci.contentItem.description : ci.description,
                 Uri: ci.contentItem ? ci.contentItem.uri : ci.uri,
@@ -319,19 +319,16 @@
          * Auxiliary Methods.
          */
         
-        putExhibitWithContent: function (e, oldContentItems) {
+        putExhibitContent: function (e, oldContentItems) {
             var newIds = e.contentItems.map(function (ci) {
                 return ci.id;
             });
 
-            // Send PUT request for exhibit.
-            var promises = [ Service.putExhibit(e) ].concat(
-                // Send PUT request for all its content items.
-                e.contentItems.map(
-                    function (ci) {
-                        return Service.putContentItem(ci);
-                    }
-                )
+            // Send PUT request for all exhibit's content items.
+            var promises = e.contentItems.map(
+                function (ci) {
+                    return Service.putContentItem(ci);
+                }
             ).concat(
                 // Filter deleted content items and send DELETE request for them.
                 oldContentItems.filter(

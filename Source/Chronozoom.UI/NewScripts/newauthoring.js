@@ -277,8 +277,6 @@ var CZ = (function (CZ, $) {
      * @return {Object} Created exhibit.
      */
     function createNewExhibit() {
-        var date = _circleCur.x;
-
         removeChild(_hovered, "newExhibitCircle");
         return addInfodot(
             _hovered,
@@ -297,7 +295,7 @@ var CZ = (function (CZ, $) {
             }],
             {
                 title: "Exhibit Title",
-                date: date
+                date: _circleCur.x + _circleCur.r
             }
         );
     }
@@ -571,25 +569,37 @@ var CZ = (function (CZ, $) {
 
             e = renewExhibit(e);
             
-            CZ.Service.putExhibitWithContent(e, oldContentItems).then(
-                function () {
-                    for (var i = 0, len = arguments.length; i < len; ++i) {
-                        console.log(arguments[i][0]);
+            CZ.Service.putExhibit(e).then(
+                function (response) {
+                    var contentItems = e.contentItems;
+                    var len = contentItems.length;
+                    var i = 0;
+                    e.guid = response;
+                    
+                    // Set parent's guid for all content items.
+                    for (i = 0; i < len; ++i) {
+                        contentItems[i].parent = e.guid;
                     }
+
+                    // Send PUT/DELETE requests for all content items and
+                    // set guids for them.
+                    CZ.Service.putExhibitContent(e, oldContentItems).then(
+                        function () {
+                            for (i = 0; i < len; ++i) {
+                                contentItems[i].guid = arguments[i][0];
+                                contentItems[i].id = arguments[i][0];
+                                console.log(arguments[i][0]);
+                            }
+                        },
+                        function () {
+                            console.log("Error connecting to service: update content item.\n");
+                        }
+                    );
                 },
-                function () {
+                function (error) {
                     console.log("Error connecting to service: update exhibit.\n");
                 }
             );
-
-            // CZ.Service.putExhibit(e).then(
-            //     function (response) {
-            //         console.log(response);
-            //     },
-            //     function (error) {
-            //         console.log("Error connecting to service: update exhibit.\n" + error.responseText);
-            //     }
-            // );
         },
 
         /**
