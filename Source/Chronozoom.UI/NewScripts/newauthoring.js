@@ -494,8 +494,9 @@ var CZ = (function (CZ, $) {
          * Use it externally from forms' handlers.
          * @param  {Object} t    A timeline to update.
          * @param  {Object} prop An object with properties' values.
+         * @param  {Widget} form A dialog form for editing timeline.
          */
-        updateTimeline: function (t, prop) {
+        updateTimeline: function (t, prop, form) {
             var temp = {
                 x: Number(prop.start),
                 y: t.y,
@@ -514,15 +515,22 @@ var CZ = (function (CZ, $) {
             t.title = prop.title;
             updateTimelineTitle(t);
 
-            CZ.Service.putTimeline(t);
+            CZ.Service.putTimeline(t).then(
+                function (success) {
+                    // update ids if existing elements with returned from server
+                    t.id = "t" + success;
+                    t.guid = success;
+                    t.titleObject.id = "t" + success + "__header__";
 
-            //CZ.Service.putTimeline(_selectedTimeline).then(
-            //    (function (t) {
-            //        return function (response) {
-            //            removeChild(t.parent, t.id);
-            //        };
-            //    })(_selectedTimeline)
-            //);
+                    // close editing dialong window
+                    if (form) {
+                        form.dialog("close");
+                    }
+                },
+                function (error) {
+                    alert("Unable to save changes. Please try again later.");
+                    console.log(error);
+                });
         },
 
         /**

@@ -363,7 +363,7 @@ function ProcessContent(content) {
 function InitializeRegimes(content) {
     var f = function (timeline) {
         if (!timeline) return null;
-        var v = vc.virtualCanvas("findElement", 't' + timeline.UniqueID);
+        var v = vc.virtualCanvas("findElement", 't' + timeline.id);
         regimes.push(v);
         if (v) v = vcelementToNavString(v);
         return v;
@@ -371,7 +371,7 @@ function InitializeRegimes(content) {
 
     var cosmosTimeline = content;
     cosmosVisible = f(cosmosTimeline);
-    navigationAnchor = vc.virtualCanvas("findElement", 't' + cosmosTimeline.UniqueID);
+    navigationAnchor = vc.virtualCanvas("findElement", 't' + cosmosTimeline.id);
 
     var earthTimeline = FindChildTimeline(cosmosTimeline, earthTimelineID);
     earthVisible = f(earthTimeline);
