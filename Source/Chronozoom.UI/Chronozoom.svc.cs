@@ -487,13 +487,6 @@ namespace UI
                             return retval;
                         }
 
-                        if (timelineRequest.ParentTimelineId != null)
-                        {
-                            // Parent timeline updating is currently not supported
-                            SetStatusCode(HttpStatusCode.NotImplemented, ErrorDescription.ParentTimelineUpdate);
-                            return retval;
-                        }
-
                         // Update the timeline fields
                         updateTimeline.Title = timelineRequest.Title;
                         updateTimeline.Regime = timelineRequest.Regime;
