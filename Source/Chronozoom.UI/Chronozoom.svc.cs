@@ -258,12 +258,12 @@ namespace UI
                 });
         }
 
-        [SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly", Justification = "No unmanaged handles")]
         public void Dispose()
         {
-            _storage.Dispose();
-
-            GC.SuppressFinalize(this);
+            if (_storage != null)
+            {
+                _storage.Dispose();
+            }
         }
 
         private Guid CollectionIdOrDefault(string supercollection, string collection)
@@ -647,13 +647,6 @@ namespace UI
                             return retval;
                         }
 
-                        if (exhibitRequest.ParentTimelineId != null)
-                        {
-                            // Parent timeline updating is currently not supported
-                            SetStatusCode(HttpStatusCode.NotImplemented, ErrorDescription.ParentTimelineUpdate);
-                            return retval;
-                        }
-
                         // Update the exhibit fields
                         updateExhibit.Title = exhibitRequest.Title;
                         updateExhibit.Year = (exhibitRequest.Year == null) ? 0 : Decimal.Parse(exhibitRequest.Year, CultureInfo.InvariantCulture);
@@ -816,13 +809,6 @@ namespace UI
                         if (updateContentItem.Collection.Id != collectionGuid)
                         {
                             SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                            return retval;
-                        }
-
-                        if (contentItemRequest.ParentExhibitId != null)
-                        {
-                            // Parent exhibit updating is currently not supported
-                            SetStatusCode(HttpStatusCode.NotImplemented, ErrorDescription.ParentTimelineUpdate);
                             return retval;
                         }
 
