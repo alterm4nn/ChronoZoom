@@ -28,14 +28,8 @@ namespace Chronozoom.Entities
 
             Trace.TraceInformation("Entering storage seed stage");
 
-            // If initial data is missing, seed initial data.
-            if (context.Timelines.Where(timeline => timeline.Id == Guid.Empty).FirstOrDefault() == null)
-            {
-                Trace.TraceInformation("Seeding database with data");
-
-                Migrator migrator = new Migrator(context);
-                migrator.Migrate();
-            }
+            Migrator migrator = new Migrator(context);
+            migrator.Migrate();
         }
 
         public StorageMigrationsConfiguration()
