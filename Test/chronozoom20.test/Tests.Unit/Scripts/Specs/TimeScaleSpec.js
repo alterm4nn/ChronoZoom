@@ -163,26 +163,6 @@ describe("CZ.CosmosTickSource part", function () { //this is the class for creat
             expect(defaultValue).toEqual(cosmosTickSrc.range.min);
         });
     });
-
-    describe("createTicks() method should", function () {  //TODO: test bug: not return ticks
-        //describe("return", function () {
-        //    it("2 tiks", function () {
-        //        var _range = { min: -13923856209.150328, max: 223856209.15032768 };
-        //        cosmosTickSrc.regime = "Ga";
-        //        cosmosTickSrc.beta = 6;
-        //        var result = cosmosTickSrc.createTicks(_range);
-        //        expect(2).toEqual(result.length);
-        //    });
-
-        //});
-        describe("call", function () {
-            it("refreshDivs() method", function () {
-                spyOn(cosmosTickSrc, 'createTicks');
-                cosmosTickSrc.createTicks();
-                expect(cosmosTickSrc.createTicks).toHaveBeenCalled();
-            });
-        });
-    });
 });
 
 describe("CZ.CalendarTickSource part", function () { //this is the class for creating ticks

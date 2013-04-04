@@ -71,7 +71,6 @@
     <Content Include="Scripts\Specs\CsvParseSpec.js" />
     <Content Include="Scripts\jasmine\jasmine-html.js" />
     <Content Include="Scripts\jasmine\jasmine.js" />
-    <Content Include="Scripts\cz.html" />
     <Content Include="Scripts\Specs\cz.html.js.Spec.js" />
     <Content Include="Scripts\Specs\CommonSpec.js" />
     <Content Include="Scripts\Js\cz.settings.js" />
