@@ -202,7 +202,7 @@ right: 25px;
 
 .biblWindow .closeButton
 {
-background-image: "Images/close.png";
+background-image: "/Images/close.png";
 position: absolute;
 right: 12px;
 top: 12px;
@@ -925,7 +925,7 @@ border-top: 1px solid #BFBFBF;
 
 .welcomeScreen .titleArea .closeButton
 {
-	background-image: "Images/close.png";
+	background-image: "/Images/close.png";
 	position: absolute;
 	top: 12px;
 	right: 22px;

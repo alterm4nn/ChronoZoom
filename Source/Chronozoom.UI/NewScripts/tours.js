@@ -401,7 +401,7 @@ function tourNext() {
 }
 function tourPause() {
     if(tour != undefined) {
-        $("#tour_playpause").attr("src", "Images/tour_play_off.jpg");
+        $("#tour_playpause").attr("src", "/Images/tour_play_off.jpg");
         tour.pause();
         controller.stopAnimation();
         tourBookmarkTransitionInterrupted = undefined;
@@ -409,7 +409,7 @@ function tourPause() {
     }
 }
 function tourResume() {
-    $("#tour_playpause").attr("src", "Images/tour_pause_off.jpg");
+    $("#tour_playpause").attr("src", "/Images/tour_pause_off.jpg");
     tour.play();
 }
 function tourPlayPause() {
@@ -451,10 +451,10 @@ function initializeToursContent() {
         });
         if(tour.category !== category) {
             var cat = $('<div class="category">' + tour.category + '</div>').appendTo(toursUI);
-            var img = $('<img src="Images/collapse-down.png" class="collapseButton" />').appendTo(cat);
+            var img = $('<img src="/Images/collapse-down.png" class="collapseButton" />').appendTo(cat);
             if(i == 0) {
                 cat.removeClass('category').addClass('categorySelected');
-                img[0].src = "Images/collapse-up.png";
+                img[0].src = "/Images/collapse-up.png";
             }
             categoryContent = $('<div class="itemContainer"></div>').appendTo(toursUI);
             category = tour.category;
@@ -482,7 +482,7 @@ function initializeToursContent() {
             ui.newHeader.addClass('categorySelected');
             var img = $(".collapseButton", ui.newHeader)[0];
             if(img) {
-                img.src = "Images/collapse-up.png";
+                img.src = "/Images/collapse-up.png";
             }
         }
         if(ui.oldHeader) {
@@ -490,7 +490,7 @@ function initializeToursContent() {
             ui.oldHeader.addClass('category');
             var img = $(".collapseButton", ui.oldHeader)[0];
             if(img) {
-                img.src = "Images/collapse-down.png";
+                img.src = "/Images/collapse-down.png";
             }
         }
     });
@@ -580,7 +580,6 @@ function collapseBookmarks() {
             width: 30
         }
     }, 'fast');
-    $("#bookmarksCollapse").attr("src", "Images/expand-right.png");
 }
 function expandBookmarks() {
     if(isBookmarksWindowExpanded) {
@@ -603,7 +602,7 @@ function expandBookmarks() {
         $("#bookmarks .slideFooter").show('slide', {
         }, 'fast');
     });
-    $("#bookmarksCollapse").attr("src", "Images/collapse-left.png");
+    $("#bookmarksCollapse").attr("src", "/Images/collapse-left.png");
 }
 function onBookmarksCollapse() {
     if(!isBookmarksWindowExpanded) {
