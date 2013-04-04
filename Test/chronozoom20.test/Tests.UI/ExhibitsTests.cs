@@ -9,7 +9,6 @@ namespace Tests
     {
         #region Initialize and Cleanup
         public TestContext TestContext { get; set; }
-        private string _id;
 
         [ClassInitialize]
         public static void ClassInitialize(TestContext testContext)
@@ -40,15 +39,6 @@ namespace Tests
         #endregion
 
         [TestMethod]
-        public void Create_exhibit()
-        {
-            Exhibit exhibit = new Exhibit() {Title = "WebdriverExhibit"};
-            ExhibitHelper.AddExhibit(exhibit);
-            _id = ExhibitHelper.GetNewExhibit().ExhibitId;
-            Assert.AreEqual(exhibit.Title, ExhibitHelper.GetNewExhibit().Title);
-        }
-
-        [TestMethod]
         public void Create_exibit_with_one_content_item()
         {
             ContentItem contentItem = new ContentItem()
@@ -65,10 +55,9 @@ namespace Tests
                 };
             ExhibitHelper.AddExhibitWithContentItem(exhibit);
             Exhibit newExhibit = ExhibitHelper.GetNewExhibit();
-            _id = newExhibit.ExhibitId;
             Assert.AreEqual(exhibit.Title,newExhibit.Title, "Titles are not equal");
             Assert.AreEqual(exhibit.ContentItems.Count, newExhibit.ContentItems.Count, "Content items count are not equal");
-            Assert.IsNotNull(_id);
+            Assert.IsNotNull(newExhibit.Id);
             for (int i = 0; i < exhibit.ContentItems.Count; i++)
             {
                 Assert.AreEqual(exhibit.ContentItems[i].Title, newExhibit.ContentItems[i].Title, "Content items titles are not equal");

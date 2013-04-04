@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using Application.Driver;
 using Application.Helper.Constants;
 using Application.Helper.Entities;
@@ -25,7 +26,7 @@ namespace Application.Helper.Helpers
             InitExhibitCreationMode();
             SetExhibitPoint();
             SetExhibitTitle(exhibit.Title);
-            AddContentItems(exhibit.ContentItems);
+            FillContentItems(exhibit.ContentItems,0);
             SaveAndClose();
             Logger.Log("->");
         }
@@ -44,12 +45,17 @@ namespace Application.Helper.Helpers
             {
                 string item = string.Format("{0}.contentItems[{1}].", script, i);
                 contentItem.Title = GetJavaScriptExecutionResult(item + "title");
+                Logger.Log("- contentItem.Title: " + contentItem.Title);
                 contentItem.Caption = GetJavaScriptExecutionResult(item + "description");
+                Logger.Log("- contentItem.Caption: " + contentItem.Caption);
                 contentItem.MediaSource = GetJavaScriptExecutionResult(item + "uri");
+                Logger.Log("- contentItem.MediaSource: " + contentItem.MediaSource);
                 contentItem.MediaType = GetJavaScriptExecutionResult(item + "mediaType");
+                Logger.Log("- contentItem.MediaType: " + contentItem.MediaType);
                 exhibit.ContentItems.Add(contentItem);
             }
-            exhibit.ExhibitId = GetJavaScriptExecutionResult(script + ".id");
+            exhibit.Id = new Guid(GetJavaScriptExecutionResult(script + ".guid"));
+            Logger.Log("- exhibit.Id: " + exhibit.Id);
             Logger.Log("->" + exhibit);
             return exhibit;
         }
@@ -88,32 +94,37 @@ namespace Application.Helper.Helpers
             for (int i = 0; i <= contentItems.Count - 1; i++)
             {
                 ClickAddContentItem();
-                SetTitle(contentItems[i].Title, i + 1);
-                SetCaption(contentItems[i].Caption, i + 1);
-                SetMediaSourse(contentItems[i].MediaSource, i + 1);
-                SelectMediaType(contentItems[i].MediaType, i + 1);
+                FillContentItems(contentItems, i);
             }
             Logger.Log("->");
         }
 
+        private void FillContentItems(Collection<Chronozoom.Entities.ContentItem> contentItems, int i)
+        {
+            SetTitle(contentItems[i].Title, i + 1);
+            SetCaption(contentItems[i].Caption, i + 1);
+            SetMediaSourse(contentItems[i].MediaSource, i + 1);
+            SelectMediaType(contentItems[i].MediaType, i + 1);
+        }
+
         private void SelectMediaType(string mediaType, int index)
         {
-            Select(By.XPath(string.Format("(//*[@class='cz-auth-ci-media-type'])[{0}]", index)), mediaType);
+            Select(By.XPath(string.Format("(//*[@class='cz-authoring-ci-media-type'])[{0}]", index)), mediaType);
         }
 
         private void SetMediaSourse(string mediaSourse, int index)
         {
-            TypeText(By.XPath(string.Format("(//*[@class='cz-auth-ci-media-source'])[{0}]", index)), mediaSourse);
+            TypeText(By.XPath(string.Format("(//*[@class='cz-authoring-ci-media-source'])[{0}]", index)), mediaSourse);
         }
 
         private void SetCaption(string description, int index)
         {
-            TypeText(By.XPath(string.Format("(//*[@class='cz-auth-ci-description'])[{0}]", index)), description);
+            TypeText(By.XPath(string.Format("(//*[@class='cz-authoring-ci-description'])[{0}]", index)), description);
         }
 
         private void SetTitle(string title, int index)
         {
-            TypeText(By.XPath(string.Format("(//*[@class='cz-auth-ci-title'])[{0}]", index)), title);
+            TypeText(By.XPath(string.Format("(//*[@class='cz-authoring-ci-title'])[{0}]", index)), title);
         }
 
         private void ClickAddContentItem()
