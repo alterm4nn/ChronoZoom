@@ -19,6 +19,7 @@ namespace Tests
             WelcomeScreenHelper.CloseWelcomePopup();
 
             _timeline = new Timeline() { Title = "WebdriverTitle" };
+            HomePageHelper.DeleteAllElementsLocally();
             TimelineHelper.AddTimeline(_timeline);
             _newTimeline = TimelineHelper.GetLastTimeline();
         }
@@ -39,7 +40,6 @@ namespace Tests
         public void TestCleanup()
         {
             CreateScreenshotsIfTestFail(TestContext);
-            HomePageHelper.DeleteLastElement(_newTimeline.TimelineId);
         }
 
         #endregion

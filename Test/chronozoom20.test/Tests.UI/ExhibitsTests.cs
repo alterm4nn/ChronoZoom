@@ -23,6 +23,7 @@ namespace Tests
             BrowserStateManager.RefreshState();
             NavigationHelper.OpenHomePage();
             WelcomeScreenHelper.CloseWelcomePopup();
+            HomePageHelper.DeleteAllElementsLocally();
         }
 
         [ClassCleanup]
@@ -34,7 +35,6 @@ namespace Tests
         public void TestCleanup()
         {
             CreateScreenshotsIfTestFail(TestContext);
-            HomePageHelper.DeleteLastElement(_id);
         }
 
         #endregion

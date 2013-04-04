@@ -157,10 +157,19 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
-        public void DeleteLastElement(string id)
+        public void DeleteLastElementLocally(string id)
         {
             Logger.Log("<- id: ");
             string result = GetJavaScriptExecutionResult(string.Format("removeChild(vc.data('ui-virtualCanvas')._layersContent.children[0].children[vc.data('ui-virtualCanvas')._layersContent.children[0].children.length - 1].parent,'{0}')",id));
+            Logger.Log("-> result: " + result);
+        }
+
+        public void DeleteAllElementsLocally()
+        {
+            Logger.Log("<-");
+            string result =
+                GetJavaScriptExecutionResult(
+                    "removeChild(vc.data('ui-virtualCanvas')._layersContent.children[0].children[vc.data('ui-virtualCanvas')._layersContent.children[0].children.length - 1].parent.parent,(vc.data('ui-virtualCanvas')._layersContent.children[0].children[vc.data('ui-virtualCanvas')._layersContent.children[0].children.length - 1]).parent.id)");
             Logger.Log("-> result: " + result);
         }
     }

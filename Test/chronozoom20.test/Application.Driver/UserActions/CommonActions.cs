@@ -79,7 +79,7 @@ namespace Application.Driver.UserActions
         protected void Select(By by, String text)
         {
             if (String.IsNullOrEmpty(text))
-                throw new ArgumentNullException("text");
+                throw new ArgumentException("text");
             new SelectElement(FindElement(by)).SelectByText(text);
         }
 
