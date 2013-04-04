@@ -1,3 +1,4 @@
+//http://www.featureblend.com/license.txt
 var FlashDetect = new function () {
     var self = this;
     self.installed = false;
