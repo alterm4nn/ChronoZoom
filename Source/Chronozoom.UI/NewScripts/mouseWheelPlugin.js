@@ -1,3 +1,9 @@
+/// <reference path='typings/jquery/jquery.d.ts'/>
+/**
+* @param {Object} up
+* @param {Object} down
+* @param {Object} preventDefault
+*/
 jQuery.fn.extend({
     mousewheel: function (up, down, preventDefault) {
         return this.hover(function () {

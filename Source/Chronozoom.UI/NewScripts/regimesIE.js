@@ -1,3 +1,6 @@
+/// <reference path='typings/jquery/jquery.d.ts'/>
+//IE9 trick
+//This script passes mouse events over the div#regime_navigator to div.regime_rect's
 ((function ($, undefined) {
     function isInside(e, elem) {
         var mouseX = e.pageX;
