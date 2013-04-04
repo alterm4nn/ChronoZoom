@@ -68,7 +68,7 @@
             var mediaInput = $(this).find(".cz-authoring-ci-media-source");
             var mediaTypeInput = $(this).find(".cz-authoring-ci-media-type option");
             var descriptionInput = $(this).find(".cz-authoring-ci-description");
-            var guid = $(this).attr("cz-authoring-ci-guid") || "";
+            var guid = $(this).attr("cz-authoring-ci-guid") || null;
 
             var selected = mediaTypeInput[0];
 
@@ -394,7 +394,7 @@
                                 selected = mediaTypeInput[i];
                             }
                         console.log(c, e);
-                        CZ.Authoring.updateContentItem(c, e, {
+                        CZ.Authoring.updateContentItem(c, {
                             title: titleInput.val(),
                             uri: mediaInput.val(),
                             mediaType: selected.text,
