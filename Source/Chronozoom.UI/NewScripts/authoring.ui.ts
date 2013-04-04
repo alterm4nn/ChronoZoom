@@ -131,6 +131,7 @@ module CZ {
                 var titleInput = $("#timelineTitleInput");
                 var startInput = new CZ.UI.DatePicker($("#timelineStartInput"));
                 var endInput = new CZ.UI.DatePicker($("#timelineEndInput"));
+                endInput.addEditMode_Infinite();
 
                 titleInput.val(t.title);
                 startInput.setDate(t.x);
@@ -186,6 +187,7 @@ module CZ {
                 var titleInput = $("#timelineTitleInput");
                 var startInput = new CZ.UI.DatePicker($("#timelineStartInput"));
                 var endInput = new CZ.UI.DatePicker($("#timelineEndInput"));
+                endInput.addEditMode_Infinite();
 
                 titleInput.val(t.title);
                 startInput.setDate(t.x);

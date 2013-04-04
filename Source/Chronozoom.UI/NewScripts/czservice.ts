@@ -11,7 +11,7 @@ module CZ {
                     id: t.guid,
                     ParentTimelineId: t.parent.guid,
                     FromYear: t.x,
-                    ToYear: t.x + t.width,
+                    ToYear: typeof t.endDate !== 'undefined' ? t.endDate : (t.x + t.width),
                     title: t.title,
                     Regime: t.regime
                 };

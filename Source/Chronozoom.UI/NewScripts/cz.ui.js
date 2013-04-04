@@ -22,6 +22,9 @@ var CZ;
                             self.editModeDate();
                             self.setDate_DateMode(self.coordinate);
                             break;
+                        case "infinite":
+                            self.editModeInfinite();
+                            break;
                     }
                 });
                 this.modeSelector.append(optionYear);
@@ -34,6 +37,10 @@ var CZ;
             DatePicker.prototype.remove = function () {
                 this.modeSelector.remove();
                 this.container.remove();
+            };
+            DatePicker.prototype.addEditMode_Infinite = function () {
+                var optionIntinite = $("<option value='infinite'>Infinite</option>");
+                this.modeSelector.append(optionIntinite);
             };
             DatePicker.prototype.setDate = function (coordinate) {
                 this.coordinate = coordinate;
@@ -55,6 +62,9 @@ var CZ;
                         break;
                     case "date":
                         return this.getDate_DateMode();
+                        break;
+                    case "infinite":
+                        return 9999;
                         break;
                 }
             };
@@ -93,6 +103,9 @@ var CZ;
                 this.container.append(this.monthSelector);
                 this.container.append(this.daySelector);
                 this.container.append(this.yearSelector);
+            };
+            DatePicker.prototype.editModeInfinite = function () {
+                this.container.empty();
             };
             DatePicker.prototype.setDate_YearMode = function (coordinate) {
                 var date = CZ.Common.convertCoordinateToYear(coordinate);

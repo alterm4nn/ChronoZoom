@@ -39,7 +39,11 @@ module CZ {
                         case "date":
                             self.editModeDate();
                             self.setDate_DateMode(self.coordinate);
-                            break;                       
+                            break;
+                        // this option might be disabled
+                        case "infinite":
+                            self.editModeInfinite();
+                            break;
                     }
                 });
 
@@ -56,6 +60,11 @@ module CZ {
             public remove() {
                 this.modeSelector.remove();
                 this.container.remove();
+            }
+
+            public addEditMode_Infinite() {
+                var optionIntinite: JQuery = $("<option value='infinite'>Infinite</option>");
+                this.modeSelector.append(optionIntinite);
             }
 
             public setDate(coordinate: number) {
@@ -81,6 +90,10 @@ module CZ {
                         break;
                     case "date":
                         return this.getDate_DateMode();
+                        break;
+                    // this option might be disabled
+                    case "infinite":
+                        return 9999;
                         break;
                 }
             }
@@ -135,6 +148,10 @@ module CZ {
                 this.container.append(this.monthSelector);
                 this.container.append(this.daySelector);
                 this.container.append(this.yearSelector);
+            }
+
+            private editModeInfinite() {
+                this.container.empty();
             }
 
             private setDate_YearMode(coordinate: number) {

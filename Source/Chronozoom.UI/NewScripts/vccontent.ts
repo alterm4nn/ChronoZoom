@@ -761,6 +761,8 @@ module CZ {
             this.settings.outline = true;
             this.type = 'timeline';
 
+            this.endDate = timelineinfo.endDate;
+
             var width = timelineinfo.timeEnd - timelineinfo.timeStart;
 
             var headerSize = timelineinfo.titleRect ? timelineinfo.titleRect.height : CZ.Settings.timelineHeaderSize * timelineinfo.height;
