@@ -146,7 +146,34 @@
     <Content Include="BehindTheScenes.htm" />
     <Content Include="cz.aspx" />
     <Content Include="cz2.html" />
+    <Content Include="NewScripts\authoring.ts" />
     <Content Include="NewScripts\authoring.ui.js" />
+    <Content Include="NewScripts\authoring.ui.ts" />
+    <Content Include="NewScripts\axis.ts" />
+    <Content Include="NewScripts\bibliography.ts" />
+    <Content Include="NewScripts\breadCrumbs.ts" />
+    <Content Include="NewScripts\common.ts" />
+    <Content Include="NewScripts\cz.settings.ts" />
+    <Content Include="NewScripts\czservice.ts" />
+    <Content Include="NewScripts\flash_detect.ts" />
+    <Content Include="NewScripts\gestures.ts" />
+    <Content Include="NewScripts\layout.ts" />
+    <Content Include="NewScripts\mouseWheelPlugin.ts" />
+    <Content Include="NewScripts\newauthoring.ts" />
+    <Content Include="NewScripts\regimesIE.ts" />
+    <Content Include="NewScripts\search.ts" />
+    <Content Include="NewScripts\settings.ts" />
+    <Content Include="NewScripts\timescale.ts" />
+    <Content Include="NewScripts\tours.ts" />
+    <Content Include="NewScripts\typings\jqueryui\jqueryui.d.ts" />
+    <Content Include="NewScripts\typings\jquery\jquery.d.ts" />
+    <Content Include="NewScripts\typings\rx.js\rx.js.d.ts" />
+    <Content Include="NewScripts\urlnav.ts" />
+    <Content Include="NewScripts\vccontent.ts" />
+    <Content Include="NewScripts\viewport.ts" />
+    <Content Include="NewScripts\viewportAnimation.ts" />
+    <Content Include="NewScripts\viewportController.ts" />
+    <Content Include="NewScripts\virtualCanvas.ts" />
     <Content Include="Scripts\search.min.js.map">
       <DependentUpon>search.js</DependentUpon>
     </Content>
