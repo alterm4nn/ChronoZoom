@@ -99,15 +99,6 @@ Next <div> is rendered on the top of previous one.
         /* Handles mouse down event within the widget
         */
         _mouseDown: function (e) {
-            if (CZ.Authoring.isActive) {
-                CZ.Authoring.isDragging = true;
-                CZ.Authoring.direction = null;
-                CZ.Authoring.prevPosition = null;
-
-                if (this.hovered)
-                    CZ.Authoring.draggedObject = this.hovered;
-            }
-
             var origin = getXBrowserMouseOrigin(this.element, e);
             this.lastClickPosition = { // saving a position where the mouse was clicked last time
                 x: origin.x,
@@ -128,11 +119,6 @@ Next <div> is rendered on the top of previous one.
             var viewport = this.getViewport();
             var origin = getXBrowserMouseOrigin(this.element, e);
             var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
-
-            CZ.Authoring.isDragging = false;
-            if (CZ.Authoring.isActive === true && CZ.Authoring.state === "addTimeline") {
-                CZ.Authoring.createNewRectangle(posv);
-            }
 
             if (this.lastClickPosition && this.lastClickPosition.x == origin.x && this.lastClickPosition.y == origin.y)
                 this._mouseClick(e);
@@ -292,19 +278,6 @@ Next <div> is rendered on the top of previous one.
                 this.RaiseCursorChanged();
             }
 
-            if (CZ.Authoring.isDragging) {
-                if (CZ.Authoring.state == "addTimeline") {
-                    CZ.Authoring.updateNewRectangle(posv);
-                    return;
-                }
-                else if (CZ.Authoring.state == "editTimelineDate") {
-                    if (!this.currentlyHoveredInfodot) {
-                        CZ.Authoring.updateTimelineDate(posv);
-                    }
-                    return;
-                }
-            }
-
             var mouseInStack = [];
 
             // the function handle mouse move event
@@ -351,34 +324,29 @@ Next <div> is rendered on the top of previous one.
 
             // Start handling the event from root element
             _mouseMoveNode(this._layersContent, false, posv);
-
-            if (CZ.Authoring.isDragging && this.hovered && this.hovered.onmousehover) {
-                this.hovered.onmousehover(posv, e);
-            }
-            else {
-                // Notifying the deepest timeline which has mouse hover
-                if (mouseInStack.length == 0) {
-                    if (this.hovered && this.hovered.onmouseunhover) {
-                        this.hovered.onmouseunhover(posv, e);
-                        this.hovered = null;
-                    }
-                }
-                for (var n = mouseInStack.length; --n >= 0;) {
-                    if (mouseInStack[n].onmousehover) {
-                        mouseInStack[n].onmousehover(posv, e);
-                        if (this.hovered && this.hovered != mouseInStack[n] && this.hovered.onmouseunhover)
-                            // dont unhover timeline if its child infodot is hovered
-                            if (!this.currentlyHoveredInfodot || (this.currentlyHoveredInfodot && this.currentlyHoveredInfodot.parent
-                                && this.currentlyHoveredInfodot.parent != this.hovered))
-                                this.hovered.onmouseunhover(posv, e);
-                        if (this.currentlyHoveredContentItem)
-                            this.hovered = this.currentlyHoveredContentItem;
-                        else
-                        this.hovered = mouseInStack[n];
-                        break;
-                    }
+            
+            // Notifying the deepest timeline which has mouse hover
+            if (mouseInStack.length == 0) {
+                if (this.hovered && this.hovered.onmouseunhover) {
+                    this.hovered.onmouseunhover(posv, e);
+                    this.hovered = null;
                 }
             }
+            for (var n = mouseInStack.length; --n >= 0;) {
+                if (mouseInStack[n].onmousehover) {
+                    mouseInStack[n].onmousehover(posv, e);
+                    if (this.hovered && this.hovered != mouseInStack[n] && this.hovered.onmouseunhover)
+                        // dont unhover timeline if its child infodot is hovered
+                        if (!this.currentlyHoveredInfodot || (this.currentlyHoveredInfodot && this.currentlyHoveredInfodot.parent
+                            && this.currentlyHoveredInfodot.parent != this.hovered))
+                            this.hovered.onmouseunhover(posv, e);
+                    if (this.currentlyHoveredContentItem)
+                        this.hovered = this.currentlyHoveredContentItem;
+                    else
+                    this.hovered = mouseInStack[n];
+                    break;
+                }
+            }            
 
             // update tooltip for currently tooltiped infodot|t if tooltip is enabled for this infodot|timeline
             if ((this.currentlyHoveredInfodot != null && this.currentlyHoveredInfodot.tooltipEnabled == true)
