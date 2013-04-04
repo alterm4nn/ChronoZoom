@@ -1,5 +1,5 @@
-﻿using System;
-using Application.Driver;
+﻿using Application.Driver;
+using Application.Helper.Constants;
 using Application.Helper.Entities;
 using Application.Helper.UserActions;
 using OpenQA.Selenium;
@@ -21,9 +21,8 @@ namespace Application.Helper.Helpers
         public Timeline GetLastTimeline()
         {
             Logger.Log("<-");
-            Timeline timeline = new Timeline();
-            const string script =
-                "vc.data('ui-virtualCanvas')._layersContent.children[0].children[vc.data('ui-virtualCanvas')._layersContent.children[0].children.length - 1]";
+            var timeline = new Timeline();
+            const string script = Javascripts.LastCanvasElement;
             timeline.Title = GetJavaScriptExecutionResult(script + ".title");
             timeline.TimelineId = GetJavaScriptExecutionResult(script + ".id");
             Logger.Log("-> " + timeline);

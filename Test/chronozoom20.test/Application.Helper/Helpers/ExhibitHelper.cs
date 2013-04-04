@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using Application.Driver;
+using Application.Helper.Constants;
 using Application.Helper.Entities;
 using Application.Helper.UserActions;
 using OpenQA.Selenium;
@@ -34,13 +33,11 @@ namespace Application.Helper.Helpers
         public Exhibit GetNewExhibit()
         {
             Logger.Log("<-");
-            const string script =
-                "vc.data('ui-virtualCanvas')._layersContent.children[0].children[vc.data('ui-virtualCanvas')._layersContent.children[0].children.length - 1]";
-            Exhibit exhibit = new Exhibit();
-            ContentItem contentItem = new ContentItem();
+            const string script = Javascripts.LastCanvasElement;
+            var exhibit = new Exhibit();
+            var contentItem = new ContentItem();
             exhibit.ContentItems = new Collection<Chronozoom.Entities.ContentItem>();
-            exhibit.Title =
-                GetJavaScriptExecutionResult(script + ".title");
+            exhibit.Title = GetJavaScriptExecutionResult(script + ".title");
             int contentItemsCount = int.Parse(GetJavaScriptExecutionResult(script + ".contentItems.length"));
             Logger.Log("- contentItemsCount: " + contentItemsCount);
             for (int i = 0; i < contentItemsCount; i++)

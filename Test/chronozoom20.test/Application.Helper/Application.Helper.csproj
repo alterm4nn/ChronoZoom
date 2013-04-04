@@ -56,6 +56,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants\Javascripts.cs" />
     <Compile Include="Entities\ContentItem.cs" />
     <Compile Include="Entities\Exhibit.cs" />
     <Compile Include="Entities\Timeline.cs" />

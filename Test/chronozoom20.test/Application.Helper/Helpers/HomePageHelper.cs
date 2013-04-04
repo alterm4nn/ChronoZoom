@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using Application.Driver;
-using Application.Helper.Entities;
+using Application.Helper.Constants;
 using Application.Helper.UserActions;
 using OpenQA.Selenium;
 
@@ -160,7 +159,7 @@ namespace Application.Helper.Helpers
         public void DeleteLastElementLocally(string id)
         {
             Logger.Log("<- id: ");
-            string result = GetJavaScriptExecutionResult(string.Format("removeChild(vc.data('ui-virtualCanvas')._layersContent.children[0].children[vc.data('ui-virtualCanvas')._layersContent.children[0].children.length - 1].parent,'{0}')",id));
+            string result = GetJavaScriptExecutionResult(string.Format("removeChild({0}.parent,'{1}')", Javascripts.LastCanvasElement, id));
             Logger.Log("-> result: " + result);
         }
 
@@ -168,8 +167,7 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<-");
             string result =
-                GetJavaScriptExecutionResult(
-                    "removeChild(vc.data('ui-virtualCanvas')._layersContent.children[0].children[vc.data('ui-virtualCanvas')._layersContent.children[0].children.length - 1].parent.parent,(vc.data('ui-virtualCanvas')._layersContent.children[0].children[vc.data('ui-virtualCanvas')._layersContent.children[0].children.length - 1]).parent.id)");
+                GetJavaScriptExecutionResult(string.Format("removeChild({0}.parent.parent,({0}).parent.id)", Javascripts.LastCanvasElement));
             Logger.Log("-> result: " + result);
         }
     }
