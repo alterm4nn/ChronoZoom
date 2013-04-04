@@ -170,7 +170,6 @@
     <Content Include="NewScripts\newauthoring.ts" />
     <Content Include="NewScripts\regimesIE.ts" />
     <Content Include="NewScripts\search.ts" />
-    <Content Include="NewScripts\settings.ts" />
     <Content Include="NewScripts\timescale.ts" />
     <Content Include="NewScripts\tours.ts" />
     <Content Include="NewScripts\typings\jqueryui\jqueryui.d.ts" />
@@ -295,9 +294,6 @@
     </Content>
     <Content Include="NewScripts\regimesIE.js">
       <DependentUpon>regimesIE.ts</DependentUpon>
-    </Content>
-    <Content Include="NewScripts\settings.js">
-      <DependentUpon>settings.ts</DependentUpon>
     </Content>
     <Content Include="NewScripts\timescale.js">
       <DependentUpon>timescale.ts</DependentUpon>

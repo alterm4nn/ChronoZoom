@@ -66,14 +66,9 @@ var CZ = (function (CZ, $) {
         }
     });
     $.extend(Service, {
-        collectionName: // NOTE: Set to sandbox for debug purposes.
-        "sandbox",
+        collectionName: "sandbox",
         superCollectionName: "sandbox",
-        get: /**
-        * Chronozoom.svc Requests.
-        */
-        // .../get?supercollection=&collection=
-        function () {
+        get: function () {
             var request = new Service.Request(_serviceUrl);
             request.addToPath("get");
             request.addParameter("supercollection", Service.superCollectionName);
@@ -85,8 +80,7 @@ var CZ = (function (CZ, $) {
                 url: request.url
             });
         },
-        getTimelines: // .../gettimelines?supercollection=&collection=&start=&end=&minspan=&lca=
-        function (r) {
+        getTimelines: function (r) {
             var request = new Service.Request(_serviceUrl);
             request.addToPath("gettimelines");
             request.addParameter("supercollection", Service.superCollectionName);
@@ -100,12 +94,7 @@ var CZ = (function (CZ, $) {
                 url: request.url
             });
         },
-        getCollections: /**
-        * Information Retrieval.
-        */
-        // .../{supercollection}/collections
-        // NOTE: Not implemented in current API.
-        function () {
+        getCollections: function () {
             var request = new Service.Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath("collections");
@@ -116,9 +105,7 @@ var CZ = (function (CZ, $) {
                 url: request.url
             });
         },
-        getStructure: // .../{supercollection}/{collection}/structure?start=&end=&minspan=&lca=
-        // NOTE: Not implemented in current API.
-        function (r) {
+        getStructure: function (r) {
             var request = new Service.Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -131,9 +118,7 @@ var CZ = (function (CZ, $) {
                 url: request.url
             });
         },
-        postData: // .../{supercollection}/{collection}/data
-        // NOTE: Not implemented in current API.
-        function (r) {
+        postData: function (r) {
             var request = new Service.Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -147,11 +132,7 @@ var CZ = (function (CZ, $) {
                 data: JSON.stringify(r)
             });
         },
-        putCollection: /**
-        * Information Modification.
-        */
-        // .../{supercollection}/{collection}
-        function (c) {
+        putCollection: function (c) {
             var request = new Service.Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(c.name);
@@ -164,8 +145,7 @@ var CZ = (function (CZ, $) {
                 data: JSON.stringify(c)
             });
         },
-        deleteCollection: // .../{supercollection}/{collection}
-        function (c) {
+        deleteCollection: function (c) {
             var request = new Service.Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(c.name);
@@ -177,8 +157,7 @@ var CZ = (function (CZ, $) {
                 data: JSON.stringify(c)
             });
         },
-        putTimeline: // .../{supercollection}/{collection}/timeline
-        function (t) {
+        putTimeline: function (t) {
             var request = new Service.Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -193,8 +172,7 @@ var CZ = (function (CZ, $) {
                 data: JSON.stringify(Service.Map.timeline(t))
             });
         },
-        deleteTimeline: // .../{supercollection}/{collection}/timeline
-        function (t) {
+        deleteTimeline: function (t) {
             var request = new Service.Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -208,8 +186,7 @@ var CZ = (function (CZ, $) {
                 data: JSON.stringify(Service.Map.timeline(t))
             });
         },
-        putExhibit: // .../{supercollection}/{collection}/exhibit
-        function (e) {
+        putExhibit: function (e) {
             var request = new Service.Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -224,8 +201,7 @@ var CZ = (function (CZ, $) {
                 data: JSON.stringify(Service.Map.exhibit(e))
             });
         },
-        deleteExhibit: // .../{supercollection}/{collection}/exhibit
-        function (e) {
+        deleteExhibit: function (e) {
             var request = new Service.Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -239,8 +215,7 @@ var CZ = (function (CZ, $) {
                 data: JSON.stringify(Service.Map.exhibit(e))
             });
         },
-        putContentItem: // .../{supercollection}/{collection}/contentitem
-        function (ci) {
+        putContentItem: function (ci) {
             var request = new Service.Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -255,8 +230,7 @@ var CZ = (function (CZ, $) {
                 data: JSON.stringify(Service.Map.contentItem(ci))
             });
         },
-        deleteContentItem: // .../{supercollection}/{collection}/contentitem
-        function (ci) {
+        deleteContentItem: function (ci) {
             var request = new Service.Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -270,18 +244,13 @@ var CZ = (function (CZ, $) {
                 data: JSON.stringify(Service.Map.contentItem(ci))
             });
         },
-        putExhibitContent: /**
-        * Auxiliary Methods.
-        */
-        function (e, oldContentItems) {
+        putExhibitContent: function (e, oldContentItems) {
             var newGuids = e.contentItems.map(function (ci) {
                 return ci.guid;
             });
-            // Send PUT request for all exhibit's content items.
             var promises = e.contentItems.map(function (ci) {
                 return Service.putContentItem(ci);
-            }).concat(// Filter deleted content items and send DELETE request for them.
-            oldContentItems.filter(function (ci) {
+            }).concat(oldContentItems.filter(function (ci) {
                 return (newGuids.indexOf(ci.guid) === -1);
             }).map(function (ci) {
                 return Service.deleteContentItem(ci);

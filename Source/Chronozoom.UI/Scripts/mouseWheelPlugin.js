@@ -1,12 +1,6 @@
-/// <reference path='typings/jquery/jquery.d.ts'/>
 var ChronoZoom;
 (function (ChronoZoom) {
     (function (MouseWheelPlugin) {
-        /**
-        * @param {Object} up
-        * @param {Object} down
-        * @param {Object} preventDefault
-        */
         $.fn.extend({
             mousewheel: function (up, down, preventDefault) {
                 return this.hover(function () {
