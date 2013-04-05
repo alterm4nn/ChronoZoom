@@ -335,12 +335,12 @@ namespace UI
                 {
                     Trace.TraceInformation("Put Collection {0} from user {1} in supercollection {2}", collectionName, user, superCollectionName);
 
-                    Guid retval = Guid.Empty;
+                    Guid returnValue;
 
                     if (collectionRequest == null)
                     {
                         SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
-                        return retval;
+                        return Guid.Empty;
                     }
 
                     Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
@@ -349,20 +349,21 @@ namespace UI
                     {
                         collection = new Collection { Id = collectionGuid, Title = collectionName, UserId = user };
                         _storage.Collections.Add(collection);
-                        retval = collectionGuid;
+                        returnValue = collectionGuid;
                     }
                     else
                     {
                         if (collection.UserId != user)
                         {
                             SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                            return retval;
+                            return Guid.Empty;
                         }
 
                         collection.Title = collectionRequest.Title;
+                        returnValue = collection.Id;
                     }
                     _storage.SaveChanges();
-                    return retval;
+                    return returnValue;
                 });
         }
 
@@ -420,12 +421,12 @@ namespace UI
             return AuthenticatedOperation(user =>
                 {
                     Trace.TraceInformation("Put Timeline");
-                    Guid retval = Guid.Empty;
+                    Guid returnValue;
 
                     if (timelineRequest == null)
                     {
                         SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
-                        return retval;
+                        return Guid.Empty;
                     }
 
                     Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
@@ -434,14 +435,14 @@ namespace UI
                     {
                         // Collection does not exist
                         SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
-                        return retval;
+                        return Guid.Empty;
                     }
 
                     // Validate user for timelines that require validation
                     if (collection.UserId != user && collection.UserId != null)
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                        return retval;
+                        return Guid.Empty;
                     }
 
                     if (timelineRequest.Id == null)
@@ -450,7 +451,7 @@ namespace UI
                         if (parentTimeline == null)
                         {
                             SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
-                            return retval;
+                            return Guid.Empty;
                         }
 
                         // Parent timeline is valid - add new timeline
@@ -470,7 +471,7 @@ namespace UI
                         parentTimeline.ChildTimelines.Add(newTimeline);
 
                         _storage.Timelines.Add(newTimeline);
-                        retval = newTimelineGuid;
+                        returnValue = newTimelineGuid;
                     }
                     else
                     {
@@ -479,13 +480,13 @@ namespace UI
                         if (updateTimeline == null)
                         {
                             SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineNotFound);
-                            return retval;
+                            return Guid.Empty;
                         }
 
                         if (updateTimeline.Collection.Id != collectionGuid)
                         {
                             SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                            return retval;
+                            return Guid.Empty;
                         }
 
                         // Update the timeline fields
@@ -493,10 +494,10 @@ namespace UI
                         updateTimeline.Regime = timelineRequest.Regime;
                         updateTimeline.FromYear = timelineRequest.FromYear == null ? 0 : Decimal.Parse(timelineRequest.FromYear, CultureInfo.InvariantCulture);
                         updateTimeline.ToYear = timelineRequest.ToYear == null ? 0 : Decimal.Parse(timelineRequest.ToYear, CultureInfo.InvariantCulture);
-                        retval = updateTimelineGuid;
+                        returnValue = updateTimelineGuid;
                     }
                     _storage.SaveChanges();
-                    return retval;
+                    return returnValue;
                 });
         }
 
@@ -582,12 +583,12 @@ namespace UI
             return AuthenticatedOperation(user =>
                 {
                     Trace.TraceInformation("Put Exhibit");
-                    var retval = new List<Guid>();
+                    var returnValue = new List<Guid>();
 
                     if (exhibitRequest == null)
                     {
                         SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
-                        return retval;
+                        return returnValue;
                     }
 
                     Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
@@ -596,14 +597,14 @@ namespace UI
                     {
                         // Collection does not exist
                         SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
-                        return retval;
+                        return returnValue;
                     }
 
                     // Validate user, if required.
                     if (collection.UserId != user && collection.UserId != null)
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                        return retval;
+                        return returnValue;
                     }
 
                     if (exhibitRequest.Id == null)
@@ -612,7 +613,7 @@ namespace UI
                         if (parentTimeline == null)
                         {
                             SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
-                            return retval;
+                            return returnValue;
                         }
 
                         // Parent timeline is valid - add new exhibit
@@ -632,21 +633,22 @@ namespace UI
 
                         _storage.Exhibits.Add(newExhibit);
                         _storage.SaveChanges();
-                        retval.Add(newExhibitGuid);
+                        returnValue.Add(newExhibitGuid);
 
                         // Populate the content items
                         foreach (ContentItemRequest contentItemRequest in exhibitRequest.ContentItems)
                         {
-                            if (contentItemRequest.ParentExhibitId != null) // parent should not be specified for a new exhibit
+                            // Parent should not be specified for a new exhibit
+                            if (contentItemRequest.ParentExhibitId != null)
                             {
                                 SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentExhibitNonEmpty);
-                                return retval;
+                                return returnValue;
                             }
 
                             // Parent exhibit item is null hence it is valid and equal to the newly added
                             // exhibit so add a new content item.
                             var newContentItemGuid = AddContentItem(collection, newExhibit, contentItemRequest);
-                            retval.Add(newContentItemGuid);
+                            returnValue.Add(newContentItemGuid);
                         }
 
                     }
@@ -657,19 +659,19 @@ namespace UI
                         if (updateExhibit == null)
                         {
                             SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ExhibitNotFound);
-                            return retval;
+                            return returnValue;
                         }
 
                         if (updateExhibit.Collection.Id != collectionGuid)
                         {
                             SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                            return retval;
+                            return returnValue;
                         }
 
                         // Update the exhibit fields
                         updateExhibit.Title = exhibitRequest.Title;
                         updateExhibit.Year = (exhibitRequest.Year == null) ? 0 : Decimal.Parse(exhibitRequest.Year, CultureInfo.InvariantCulture);
-                        retval.Add(updateExhibitGuid);
+                        returnValue.Add(updateExhibitGuid);
 
                         // Populate the content items
                         foreach (ContentItemRequest contentItemRequest in exhibitRequest.ContentItems)
@@ -677,34 +679,29 @@ namespace UI
                             Guid updateContentItemGuid = UpdateContentItem(collectionGuid, contentItemRequest);
                             if (updateContentItemGuid != Guid.Empty)
                             {
-                                retval.Add(updateContentItemGuid);
+                                returnValue.Add(updateContentItemGuid);
                             }
                         }
                     }
                     _storage.SaveChanges();
-                    return retval;
+                    return returnValue;
                 });
         }
 
         private Guid UpdateContentItem(Guid collectionGuid, ContentItemRequest contentItemRequest)
         {
             Guid updateContentItemGuid = Guid.Parse(contentItemRequest.Id);
-            Guid retval = Guid.Empty;
             ContentItem updateContentItem = _storage.ContentItems.Find(updateContentItemGuid);
             if (updateContentItem == null)
             {
                 SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ContentItemNotFound);
-                {
-                    return retval;
-                }
+                return Guid.Empty;
             }
 
             if (updateContentItem.Collection.Id != collectionGuid)
             {
                 SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                {
-                    return retval;
-                }
+                return Guid.Empty;
             }
 
             // Update the content item fields
@@ -821,12 +818,12 @@ namespace UI
                 {
                     Trace.TraceInformation("Put Content Item");
 
-                    Guid retval = Guid.Empty;
+                    Guid returnValue;
 
                     if (contentItemRequest == null)
                     {
                         SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
-                        return retval;
+                        return Guid.Empty;
                     }
 
                     Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
@@ -836,14 +833,14 @@ namespace UI
                     {
                         // Collection does not exist
                         SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
-                        return retval;
+                        return Guid.Empty;
                     }
 
                     // Validate user, if required.
                     if (collection.UserId != user && collection.UserId != null)
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                        return retval;
+                        return Guid.Empty;
                     }
 
                     if (contentItemRequest.Id == null)
@@ -852,20 +849,20 @@ namespace UI
                         if (parentExhibit == null)
                         {
                             SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
-                            return retval;
+                            return Guid.Empty;
                         }
 
                         // Parent content item is valid - add new content item
                         var newContentItemGuid = AddContentItem(collection, parentExhibit, contentItemRequest);
-                        retval = newContentItemGuid;
+                        returnValue = newContentItemGuid;
                     }
                     else
                     {
                         Guid updateContentItemGuid = UpdateContentItem(collectionGuid, contentItemRequest);
-                        retval = updateContentItemGuid;
+                        returnValue = updateContentItemGuid;
                     }
                     _storage.SaveChanges();
-                    return retval;
+                    return returnValue;
                 });
         }
 
