@@ -33,24 +33,357 @@ var CZ;
                     var mediaTypeInput = $(this).find(".cz-authoring-ci-media-type option");
                     var descriptionInput = $(this).find(".cz-authoring-ci-description");
                     var guid = $(this).attr("cz-authoring-ci-guid") || null;
-                    var selected = $(mediaTypeInput)[0];
+                    var selected = mediaTypeInput[0];
                     for(var i = 0; i < mediaTypeInput.length; i++) {
-                        if(mediaTypeInput[i].getAttribute("selected") === "selected") {
+                        if(mediaTypeInput[i].selected) {
                             selected = mediaTypeInput[i];
-                            break;
                         }
                     }
                     contentItems.push({
                         title: CItitleInput.val(),
                         description: descriptionInput.val(),
                         uri: mediaInput.val(),
-                        mediaType: selected.innerText,
+                        mediaType: selected.text,
                         guid: guid,
                         parent: null
                     });
                 });
                 return contentItems;
             }
+            function _fillContentItemForm(form, contentItem) {
+                var titleInput = form.find(".cz-authoring-ci-title");
+                var mediaInput = form.find(".cz-authoring-ci-media-source");
+                var mediaTypeInput = form.find(".cz-authoring-ci-media-type option");
+                var descriptionInput = form.find(".cz-authoring-ci-description");
+                var mediaType = contentItem.mediaType.toLowerCase();
+                if(mediaType === "picture") {
+                    mediaType = "image";
+                }
+                form.attr("cz-authoring-ci-guid", contentItem.guid);
+                titleInput.val(contentItem.title);
+                mediaInput.val(contentItem.uri);
+                descriptionInput.val(contentItem.description);
+                mediaTypeInput.each(function (option) {
+                    if(this.value === mediaType) {
+                        $(this).attr("selected", "selected");
+                        return;
+                    }
+                });
+            }
+            $.extend(UI, {
+                showCreateTimelineForm: function (t) {
+                    var isCancel = true;
+                    var titleInput = $("#timelineTitleInput");
+                    var startInput = $("#timelineStartInput").spinner();
+                    var endInput = $("#timelineEndInput").spinner();
+                    titleInput.val(t.title);
+                    startInput.val(t.x);
+                    endInput.val(t.x + t.width);
+                    $("#createTimelineForm").dialog({
+                        title: "create timeline",
+                        modal: true,
+                        height: 600,
+                        width: 600,
+                        buttons: {
+                            "save and close": function () {
+                                var isValid = CZ.Authoring.ValidateNumber(startInput.val()) && CZ.Authoring.ValidateNumber(endInput.val());
+                                isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(startInput.val()) && CZ.Authoring.IsNotEmpty(endInput.val());
+                                if(!isValid) {
+                                    $("#TimelineErrorSpan").css("display", "block");
+                                }
+                                if(isValid) {
+                                    var self = this;
+                                    isCancel = false;
+                                    CZ.Authoring.updateTimeline(t, {
+                                        title: titleInput.val(),
+                                        start: startInput.val(),
+                                        end: endInput.val()
+                                    }).then(function (success) {
+                                        $(self).dialog("close");
+                                    }, function (error) {
+                                        alert("Unable to save changes. Please try again later.");
+                                        console.log(error);
+                                    });
+                                }
+                            }
+                        },
+                        close: function () {
+                            if(isCancel) {
+                                CZ.Authoring.removeTimeline(t);
+                            }
+                            CZ.Authoring._isActive = false;
+                            $("#TimelineErrorSpan").css("display", "none");
+                            $("a:contains('create timeline')").removeClass("active");
+                        }
+                    });
+                },
+                showEditTimelineForm: function (t) {
+                    var titleInput = $("#timelineTitleInput").spinner();
+                    var startInput = $("#timelineStartInput").spinner();
+                    var endInput = $("#timelineEndInput").spinner();
+                    titleInput.val(t.title);
+                    startInput.val(t.x);
+                    endInput.val(t.x + t.width);
+                    $("#createTimelineForm").dialog({
+                        title: "edit timeline",
+                        modal: true,
+                        height: 600,
+                        width: 600,
+                        buttons: {
+                            "save and close": function () {
+                                var isValid = CZ.Authoring.ValidateNumber(startInput.val()) && CZ.Authoring.ValidateNumber(endInput.val());
+                                isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(startInput.val()) && CZ.Authoring.IsNotEmpty(endInput.val());
+                                if(!isValid) {
+                                    $("#TimelineErrorSpan").css("display", "block");
+                                }
+                                if(isValid) {
+                                    var self = this;
+                                    CZ.Authoring.updateTimeline(t, {
+                                        title: titleInput.val(),
+                                        start: startInput.val(),
+                                        end: endInput.val()
+                                    }).then(function (success) {
+                                        $(self).dialog("close");
+                                    }, function (error) {
+                                        alert("Unable to save changes. Please try again later.");
+                                        console.log(error);
+                                    });
+                                }
+                            },
+                            "delete": function () {
+                                if(confirm("Are you sure want to delete timeline and all of its nested timelines and exhibits? Delete can't be undone!")) {
+                                    CZ.Authoring.removeTimeline(t);
+                                    $(this).dialog("close");
+                                }
+                            }
+                        },
+                        close: function () {
+                            CZ.Authoring._isActive = false;
+                            $("a:contains('edit timeline')").removeClass("active");
+                            $("#TimelineErrorSpan").css("display", "none");
+                        }
+                    });
+                },
+                showCreateExhibitForm: function (e) {
+                    var isCancel = true;
+                    var titleInput = $("#exhibitTitleInput");
+                    var dateInput = $("#exhibitDateInput").spinner();
+                    titleInput.val(e.title);
+                    dateInput.val(e.infodotDescription.date);
+                    var contentItems = e.contentItems;
+                    for(var i = 0; i < contentItems.length; i++) {
+                        _addContentItemForm($("#createExhibitForm"), true);
+                    }
+                    $(".cz-authoring-ci-container").each(function (index) {
+                        _fillContentItemForm($(this), contentItems[index]);
+                    });
+                    $("#createExhibitForm").dialog({
+                        title: "create exhibit",
+                        modal: true,
+                        height: 600,
+                        width: 600,
+                        buttons: {
+                            "save and close": function () {
+                                var contentItems = _getContentItemsData();
+                                var isValid = CZ.Authoring.ValidateNumber(dateInput.val());
+                                isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(dateInput.val());
+                                isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
+                                if(!isValid) {
+                                    $("#ExhibitErrorSpan").css("display", "block");
+                                } else {
+                                    CZ.Authoring.updateExhibit(e, {
+                                        title: titleInput.val(),
+                                        date: dateInput.val(),
+                                        contentItems: contentItems
+                                    });
+                                    isCancel = false;
+                                    $(this).dialog("close");
+                                }
+                            },
+                            "add content item": function () {
+                                if($(this).find(".cz-authoring-ci-container").length < infodotMaxContentItemsCount) {
+                                    _addContentItemForm($(this), true);
+                                }
+                            }
+                        },
+                        close: function () {
+                            if(isCancel) {
+                                CZ.Authoring.removeExhibit(e);
+                            }
+                            CZ.Authoring._isActive = false;
+                            $("a:contains('create exhibit')").removeClass("active");
+                            $("#ExhibitErrorSpan").css("display", "none");
+                            $(this).find(".cz-authoring-ci-container").each(function () {
+                                $(this).remove();
+                            });
+                        }
+                    });
+                },
+                showEditExhibitForm: function (e) {
+                    var titleInput = $("#exhibitTitleInput");
+                    var dateInput = $("#exhibitDateInput").spinner();
+                    titleInput.val(e.title);
+                    dateInput.val(e.infodotDescription.date);
+                    var contentItems = e.contentItems;
+                    for(var i = 0; i < contentItems.length; i++) {
+                        _addContentItemForm($("#createExhibitForm"), true);
+                    }
+                    $(".cz-authoring-ci-container").each(function (index) {
+                        _fillContentItemForm($(this), contentItems[index]);
+                    });
+                    $("#createExhibitForm").dialog({
+                        title: "edit exhibit",
+                        modal: true,
+                        height: 600,
+                        width: 600,
+                        buttons: {
+                            "save and close": function () {
+                                contentItems = _getContentItemsData(e);
+                                var isValid = CZ.Authoring.ValidateNumber(dateInput.val());
+                                isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(dateInput.val());
+                                isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
+                                if(!isValid) {
+                                    $("#ExhibitErrorSpan").css("display", "block");
+                                } else {
+                                    CZ.Authoring.updateExhibit(e, {
+                                        title: titleInput.val(),
+                                        date: dateInput.val(),
+                                        contentItems: contentItems
+                                    });
+                                    $(this).dialog("close");
+                                    $(this).find(".cz-authoring-ci-container").each(function () {
+                                        $(this).remove();
+                                    });
+                                }
+                            },
+                            "delete": function () {
+                                if(confirm("Are you sure want to delete exhibit and all of its content items? Delete can't be undone!")) {
+                                    CZ.Authoring.removeExhibit(e);
+                                    $(this).dialog("close");
+                                }
+                            },
+                            "add content item": function () {
+                                if($(this).find(".cz-authoring-ci-container").length < infodotMaxContentItemsCount) {
+                                    _addContentItemForm($("#createExhibitForm"), true);
+                                }
+                            }
+                        },
+                        close: function () {
+                            CZ.Authoring._isActive = false;
+                            $("a:contains('edit exhibit')").removeClass("active");
+                            $("#ExhibitErrorSpan").css("display", "none");
+                            $(this).find(".cz-authoring-ci-container").each(function () {
+                                $(this).remove();
+                            });
+                        }
+                    });
+                },
+                showEditContentItemForm: function (c, e) {
+                    var titleInput = $("#contentItemTitleInput");
+                    var mediaInput = $("#contentItemMediaSourceInput");
+                    var descriptionInput = $("#contentItemDescriptionInput");
+                    var mediaTypeInput = $("#contentItemMediaTypeInput option");
+                    var mediaType = c.contentItem.mediaType.toLowerCase();
+                    if(mediaType === "picture") {
+                        mediaType = "image";
+                    }
+                    titleInput.val(c.contentItem.title);
+                    mediaInput.val(c.contentItem.uri);
+                    descriptionInput.val(c.contentItem.description);
+                    mediaTypeInput.each(function (option) {
+                        if(this.value === mediaType) {
+                            $(this).attr("selected", "selected");
+                            return;
+                        }
+                    });
+                    $("#editContentItemForm").dialog({
+                        title: "Edit content item",
+                        modal: true,
+                        height: 600,
+                        width: 600,
+                        buttons: {
+                            "save and close": function () {
+                                var selected = mediaTypeInput[0];
+                                for(var i = 1; i < mediaTypeInput.length; i++) {
+                                    if(mediaTypeInput[i].selected) {
+                                        selected = mediaTypeInput[i];
+                                    }
+                                }
+                                console.log(c, e);
+                                CZ.Authoring.updateContentItem(c, {
+                                    title: titleInput.val(),
+                                    uri: mediaInput.val(),
+                                    mediaType: selected.text,
+                                    description: descriptionInput.val()
+                                });
+                                $(this).dialog("close");
+                            },
+                            "delete": function () {
+                                if(confirm("Are you sure want to delete content item? Delete can't be undone!")) {
+                                    CZ.Authoring.removeContentItem(c);
+                                    $(this).dialog("close");
+                                }
+                            }
+                        },
+                        close: function () {
+                            CZ.Authoring._isActive = false;
+                            $("a:contains('edit exhibit')").removeClass("active");
+                        }
+                    });
+                },
+                createTimeline: function () {
+                    if(animatingElements.length != 0) {
+                        return;
+                    }
+                    CZ.Authoring._isActive = (CZ.Authoring.mode !== "createTimeline") || !CZ.Authoring._isActive;
+                    CZ.Authoring.mode = "createTimeline";
+                    $("div #footer-authoring > a").removeClass("active");
+                    if(CZ.Authoring._isActive) {
+                        $("a:contains('create timeline')").addClass("active");
+                    } else {
+                        $("a:contains('create timeline')").removeClass("active");
+                    }
+                },
+                editTimeline: function () {
+                    if(animatingElements.length != 0) {
+                        return;
+                    }
+                    CZ.Authoring._isActive = (CZ.Authoring.mode !== "editTimeline") || !CZ.Authoring._isActive;
+                    CZ.Authoring.mode = "editTimeline";
+                    $("div #footer-authoring > a").removeClass("active");
+                    if(CZ.Authoring._isActive) {
+                        $("a:contains('edit timeline')").addClass("active");
+                    } else {
+                        $("a:contains('edit timeline')").removeClass("active");
+                    }
+                },
+                createExhibit: function () {
+                    if(animatingElements.length != 0) {
+                        return;
+                    }
+                    CZ.Authoring._isActive = (CZ.Authoring.mode !== "createExhibit") || !CZ.Authoring._isActive;
+                    CZ.Authoring.mode = "createExhibit";
+                    $("div #footer-authoring > a").removeClass("active");
+                    if(CZ.Authoring._isActive) {
+                        $("a:contains('create exhibit')").addClass("active");
+                    } else {
+                        $("a:contains('create exhibit')").removeClass("active");
+                    }
+                },
+                editExhibit: function () {
+                    if(animatingElements.length != 0) {
+                        return;
+                    }
+                    CZ.Authoring._isActive = (CZ.Authoring.mode !== "editExhibit") || !CZ.Authoring._isActive;
+                    CZ.Authoring.mode = "editExhibit";
+                    $("div #footer-authoring > a").removeClass("active");
+                    if(CZ.Authoring._isActive) {
+                        $("a:contains('edit exhibit')").addClass("active");
+                    } else {
+                        $("a:contains('edit exhibit')").removeClass("active");
+                    }
+                }
+            });
         })(Authoring.UI || (Authoring.UI = {}));
         var UI = Authoring.UI;
     })(CZ.Authoring || (CZ.Authoring = {}));

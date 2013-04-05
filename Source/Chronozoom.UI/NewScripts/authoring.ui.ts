@@ -1,5 +1,5 @@
-﻿/// <reference path='authoring.ts'/>
-/// <reference path='cz.settings'/>
+﻿/// <reference path='newauthoring.'/>
+/// <reference path='cz.settings.ts'/>
 /// <reference path='layout.ts'/>
 
 /// <reference path='typings/jqueryui/jqueryui.d.ts'/>
