@@ -26,7 +26,7 @@ using System.ServiceModel.Web;
 using System.Text;
 using System.Web;
 using System.Web.Script.Services;
-
+using ASC.Models;
 using Chronozoom.Entities;
 using Newtonsoft.Json;
 
@@ -564,6 +564,12 @@ namespace UI
             public Collection<ContentItemRequest> ContentItems { get; set; }
         }
 
+        public class PutExhibitResult
+        {
+            public Guid ExhibitId { get; set; }
+            public List<Guid> ContentItemId { get; set; }
+        }
+
         /// <summary>
         /// Creates or updates the exhibit and its content items in a given collection.
         /// If the collection does not exist, then fail.
@@ -578,12 +584,12 @@ namespace UI
         /// </summary>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/exhibit", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        public List<Guid> PutExhibit(string superCollectionName, string collectionName, ExhibitRequest exhibitRequest)
+        public PutExhibitResult PutExhibit(string superCollectionName, string collectionName, ExhibitRequest exhibitRequest)
         {
             return AuthenticatedOperation(user =>
                 {
                     Trace.TraceInformation("Put Exhibit");
-                    var returnValue = new List<Guid>();
+                    var returnValue = new PutExhibitResult(); // List<Guid>();
 
                     if (exhibitRequest == null)
                     {
@@ -633,7 +639,7 @@ namespace UI
 
                         _storage.Exhibits.Add(newExhibit);
                         _storage.SaveChanges();
-                        returnValue.Add(newExhibitGuid);
+                        returnValue.ExhibitId = newExhibitGuid;
 
                         // Populate the content items
                         foreach (ContentItemRequest contentItemRequest in exhibitRequest.ContentItems)
@@ -648,7 +654,7 @@ namespace UI
                             // Parent exhibit item is null hence it is valid and equal to the newly added
                             // exhibit so add a new content item.
                             var newContentItemGuid = AddContentItem(collection, newExhibit, contentItemRequest);
-                            returnValue.Add(newContentItemGuid);
+                            returnValue.ContentItemId.Add(newContentItemGuid);
                         }
 
                     }
@@ -671,7 +677,7 @@ namespace UI
                         // Update the exhibit fields
                         updateExhibit.Title = exhibitRequest.Title;
                         updateExhibit.Year = (exhibitRequest.Year == null) ? 0 : Decimal.Parse(exhibitRequest.Year, CultureInfo.InvariantCulture);
-                        returnValue.Add(updateExhibitGuid);
+                        returnValue.ExhibitId = updateExhibitGuid;
 
                         // Populate the content items
                         foreach (ContentItemRequest contentItemRequest in exhibitRequest.ContentItems)
@@ -679,7 +685,7 @@ namespace UI
                             Guid updateContentItemGuid = UpdateContentItem(collectionGuid, contentItemRequest);
                             if (updateContentItemGuid != Guid.Empty)
                             {
-                                returnValue.Add(updateContentItemGuid);
+                                returnValue.ContentItemId.Add(updateContentItemGuid);
                             }
                         }
                     }
