@@ -932,32 +932,20 @@ namespace UI
         private delegate T AuthenticatedOperationDelegate<T>(string user);
         private static T AuthenticatedOperation<T>(AuthenticatedOperationDelegate<T> operation)
         {
-            return operation(null);
-
-            /* TODO: Pending ACS Integration in Azure WebSite
             Microsoft.IdentityModel.Claims.ClaimsIdentity claimsIdentity = HttpContext.Current.User.Identity as Microsoft.IdentityModel.Claims.ClaimsIdentity;
 
-            if (claimsIdentity == null)
+            if (claimsIdentity == null || !claimsIdentity.IsAuthenticated)
             {
-                // ClaimsIdentity not configured, falling back to annonimous user
                 return operation(null);
-            }
-
-            if (!claimsIdentity.IsAuthenticated)
-            {
-                SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.Unauthenticated);
-                return default(T);
             }
 
             Microsoft.IdentityModel.Claims.Claim nameIdentifierClaim = claimsIdentity.Claims.Where(candidate => candidate.ClaimType.EndsWith("nameidentifier")).FirstOrDefault();
             if (nameIdentifierClaim == null)
             {
-                SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.MissingClaim);
-                return default(T);
+                return operation(null);
             }
 
             return operation(nameIdentifierClaim.Value);
-            */
         }
 
         /// <summary>
