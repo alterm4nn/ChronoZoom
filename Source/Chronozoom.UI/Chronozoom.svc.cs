@@ -60,6 +60,7 @@ namespace UI
             public const string ParentExhibitNotFound = "Parent exhibit not found";
             public const string Unauthenticated = "User is not authenticated";
             public const string MissingClaim = "User missing expected claim";
+            public const string ParentExhibitNonEmpty = "Parent exhibit should not be specified";
         }
 
         [OperationContract]
@@ -559,10 +560,11 @@ namespace UI
             public string Title { get; set; }
             public string ParentTimelineId { get; set; }
             public string Year { get; set; }
+            public Collection<ContentItemRequest> ContentItems { get; set; }
         }
 
         /// <summary>
-        /// Creates or updates the exhibit in a given collection.
+        /// Creates or updates the exhibit and its content items in a given collection.
         /// If the collection does not exist, then fail.
         ///
         /// If exhibit id is not specified, then add a new exhibit to the collection.
@@ -575,12 +577,12 @@ namespace UI
         /// </summary>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/exhibit", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        public Guid PutExhibit(string superCollectionName, string collectionName, ExhibitRequest exhibitRequest)
+        public List<Guid> PutExhibit(string superCollectionName, string collectionName, ExhibitRequest exhibitRequest)
         {
             return AuthenticatedOperation(user =>
                 {
                     Trace.TraceInformation("Put Exhibit");
-                    Guid retval = Guid.Empty;
+                    var retval = new List<Guid>();
 
                     if (exhibitRequest == null)
                     {
@@ -629,7 +631,24 @@ namespace UI
                         parentTimeline.Exhibits.Add(newExhibit);
 
                         _storage.Exhibits.Add(newExhibit);
-                        retval = newExhibitGuid;
+                        _storage.SaveChanges();
+                        retval.Add(newExhibitGuid);
+
+                        // Populate the content items
+                        foreach (ContentItemRequest contentItemRequest in exhibitRequest.ContentItems)
+                        {
+                            if (contentItemRequest.ParentExhibitId != null) // parent should not be specified for a new exhibit
+                            {
+                                SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentExhibitNonEmpty);
+                                return retval;
+                            }
+
+                            // Parent exhibit item is null hence it is valid and equal to the newly added
+                            // exhibit so add a new content item.
+                            var newContentItemGuid = AddContentItem(collection, newExhibit, contentItemRequest);
+                            retval.Add(newContentItemGuid);
+                        }
+
                     }
                     else
                     {
@@ -650,11 +669,74 @@ namespace UI
                         // Update the exhibit fields
                         updateExhibit.Title = exhibitRequest.Title;
                         updateExhibit.Year = (exhibitRequest.Year == null) ? 0 : Decimal.Parse(exhibitRequest.Year, CultureInfo.InvariantCulture);
-                        retval = updateExhibitGuid;
+                        retval.Add(updateExhibitGuid);
+
+                        // Populate the content items
+                        foreach (ContentItemRequest contentItemRequest in exhibitRequest.ContentItems)
+                        {
+                            Guid updateContentItemGuid = UpdateContentItem(collectionGuid, contentItemRequest);
+                            if (updateContentItemGuid != Guid.Empty)
+                            {
+                                retval.Add(updateContentItemGuid);
+                            }
+                        }
                     }
                     _storage.SaveChanges();
                     return retval;
                 });
+        }
+
+        private Guid UpdateContentItem(Guid collectionGuid, ContentItemRequest contentItemRequest)
+        {
+            Guid updateContentItemGuid = Guid.Parse(contentItemRequest.Id);
+            Guid retval = Guid.Empty;
+            ContentItem updateContentItem = _storage.ContentItems.Find(updateContentItemGuid);
+            if (updateContentItem == null)
+            {
+                SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ContentItemNotFound);
+                {
+                    return retval;
+                }
+            }
+
+            if (updateContentItem.Collection.Id != collectionGuid)
+            {
+                SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                {
+                    return retval;
+                }
+            }
+
+            // Update the content item fields
+            updateContentItem.Title = contentItemRequest.Title;
+            updateContentItem.Caption = contentItemRequest.Caption;
+            updateContentItem.MediaType = contentItemRequest.MediaType;
+            updateContentItem.Uri = contentItemRequest.Uri;
+            return updateContentItemGuid;
+        }
+
+        private Guid AddContentItem(Collection collection, Exhibit newExhibit, ContentItemRequest contentItemRequest)
+        {
+            Guid newContentItemGuid = Guid.NewGuid();
+            ContentItem newContentItem = new ContentItem
+                {
+                    Id = newContentItemGuid,
+                    Title = contentItemRequest.Title,
+                    Caption = contentItemRequest.Caption,
+                    MediaType = contentItemRequest.MediaType,
+                    Uri = contentItemRequest.Uri
+                };
+            newContentItem.Collection = collection;
+
+            // Update parent exhibit.
+            _storage.Entry(newExhibit).Collection(_ => _.ContentItems).Load();
+            if (newExhibit.ContentItems == null)
+            {
+                newExhibit.ContentItems = new System.Collections.ObjectModel.Collection<ContentItem>();
+            }
+            newExhibit.ContentItems.Add(newContentItem);
+            _storage.ContentItems.Add(newContentItem);
+            return newContentItemGuid;
         }
 
         [OperationContract]
@@ -704,9 +786,8 @@ namespace UI
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                         return;
                     }
-
-                    _storage.DeleteExhibit(exhibitGuid);
-                    _storage.SaveChanges();
+                _storage.DeleteExhibit(exhibitGuid);
+                _storage.SaveChanges();
                 });
         }
 
@@ -775,48 +856,12 @@ namespace UI
                         }
 
                         // Parent content item is valid - add new content item
-                        Guid newContentItemGuid = Guid.NewGuid();
-                        ContentItem newContentItem = new ContentItem
-                            {
-                                Id = newContentItemGuid,
-                                Title = contentItemRequest.Title,
-                                Caption = contentItemRequest.Caption,
-                                MediaType = contentItemRequest.MediaType,
-                                Uri = contentItemRequest.Uri
-                            };
-                        newContentItem.Collection = collection;
-
-                        // Update parent exhibit.
-                        _storage.Entry(parentExhibit).Collection(_ => _.ContentItems).Load();
-                        if (parentExhibit.ContentItems == null)
-                        {
-                            parentExhibit.ContentItems = new System.Collections.ObjectModel.Collection<ContentItem>();
-                        }
-                        parentExhibit.ContentItems.Add(newContentItem);
-                        _storage.ContentItems.Add(newContentItem);
+                        var newContentItemGuid = AddContentItem(collection, parentExhibit, contentItemRequest);
                         retval = newContentItemGuid;
                     }
                     else
                     {
-                        Guid updateContentItemGuid = Guid.Parse(contentItemRequest.Id);
-                        ContentItem updateContentItem = _storage.ContentItems.Find(updateContentItemGuid);
-                        if (updateContentItem == null)
-                        {
-                            SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ContentItemNotFound);
-                            return retval;
-                        }
-
-                        if (updateContentItem.Collection.Id != collectionGuid)
-                        {
-                            SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                            return retval;
-                        }
-
-                        // Update the content item fields
-                        updateContentItem.Title = contentItemRequest.Title;
-                        updateContentItem.Caption = contentItemRequest.Caption;
-                        updateContentItem.MediaType = contentItemRequest.MediaType;
-                        updateContentItem.Uri = contentItemRequest.Uri;
+                        Guid updateContentItemGuid = UpdateContentItem(collectionGuid, contentItemRequest);
                         retval = updateContentItemGuid;
                     }
                     _storage.SaveChanges();
