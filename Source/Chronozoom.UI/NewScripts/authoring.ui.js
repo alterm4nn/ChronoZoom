@@ -1,3 +1,52 @@
+var CZ = (function (CZ, $) {
+    var Authoring = CZ.Authoring = CZ.Authoring || {
+    };
+    var UI = Authoring.UI = Authoring.UI || {
+    };
+    /**
+    * Appends editable field of content item to element.
+    * @param {Object}   form          Target DOM element found with jQuery.
+    * @param {Boolean}  addSeparator  Indicates whether separator is required.
+    */
+    function _addContentItemForm(form, addSeparator) {
+        var container = $("<div class='cz-authoring-ci-container'></div>");
+        var title = $("<p>" + "<label>Title</label>" + "<input class='cz-authoring-ci-title' style='display: block' type='text'/>" + "</p>");
+        var description = $("<p>" + "<label style='display: block'>Description</label>" + "<textarea class='cz-authoring-ci-description' style='display: block' />" + "</p>");
+        var mediaSource = $("<p>" + "<label>Media source</label>" + "<input class='cz-authoring-ci-media-source' style='display: block' type='text'/>" + "</p>");
+        var mediaType = $("<p>" + "<label>Media type</label>" + "<select class='cz-authoring-ci-media-type' style='display: block'>" + "<option value='image'>Image</option>" + "<option value='pdf'>PDF</option> " + "<option value='video'>Video</option>" + "<option value='audio'>Audio</option>" + "</select>" + "</p>");
+        var removeBtn = $("<button>Remove content item</button>");
+        removeBtn[0].onclick = function () {
+            container.remove();
+        };
+        container.append(title);
+        container.append(description);
+        container.append(mediaSource);
+        container.append(mediaType);
+        container.append(removeBtn);
+        if(addSeparator == true) {
+            var separator = $("<hr />");
+            container.append(separator);
+        }
+        form.append(container);
+    }
+    /**
+    * Returns an array of contentItems filled with user data.
+    * @return {Array}  An array of contentItems.
+    */
+    function _getContentItemsData() {
+        var contentItems = [];
+        var containers = $(".cz-authoring-ci-container");
+        $(".cz-authoring-ci-container").each(function () {
+            var CItitleInput = $(this).find(".cz-authoring-ci-title");
+            ;
+            var mediaInput = $(this).find(".cz-authoring-ci-media-source");
+            var mediaTypeInput = $(this).find(".cz-authoring-ci-media-type option");
+            var descriptionInput = $(this).find(".cz-authoring-ci-description");
+            var guid = $(this).attr("cz-authoring-ci-guid") || null;
+            var selected = mediaTypeInput[0];
+            for(var i = 0; i < mediaTypeInput.length; i++) {
+                if(mediaTypeInput[i].selected) {
+                    selected = mediaTypeInput[i];
 var CZ;
 (function (CZ) {
     (function (Authoring) {
@@ -20,9 +69,119 @@ var CZ;
                 if(addSeparator == true) {
                     var separator = $("<hr />");
                     container.append(separator);
+var CZ = (function (CZ, $) {
+    var Authoring = CZ.Authoring = CZ.Authoring || {
+    };
+    var UI = Authoring.UI = Authoring.UI || {
+    };
+    function _addContentItemForm(form, addSeparator) {
+        var container = $("<div class='cz-authoring-ci-container'></div>");
+        var title = $("<p>" + "<label>Title</label>" + "<input class='cz-authoring-ci-title' style='display: block' type='text'/>" + "</p>");
+        var description = $("<p>" + "<label style='display: block'>Description</label>" + "<textarea class='cz-authoring-ci-description' style='display: block' />" + "</p>");
+        var mediaSource = $("<p>" + "<label>Media source</label>" + "<input class='cz-authoring-ci-media-source' style='display: block' type='text'/>" + "</p>");
+        var mediaType = $("<p>" + "<label>Media type</label>" + "<select class='cz-authoring-ci-media-type' style='display: block'>" + "<option value='image'>Image</option>" + "<option value='pdf'>PDF</option> " + "<option value='video'>Video</option>" + "<option value='audio'>Audio</option>" + "</select>" + "</p>");
+        var removeBtn = $("<button>Remove content item</button>");
+        removeBtn[0].onclick = function () {
+            container.remove();
+        };
+        container.append(title);
+        container.append(description);
+        container.append(mediaSource);
+        container.append(mediaType);
+        container.append(removeBtn);
+        if(addSeparator == true) {
+            var separator = $("<hr />");
+            container.append(separator);
+        }
+        form.append(container);
+    }
+    function _getContentItemsData() {
+        var contentItems = [];
+        var containers = $(".cz-authoring-ci-container");
+        $(".cz-authoring-ci-container").each(function () {
+            var CItitleInput = $(this).find(".cz-authoring-ci-title");
+            ;
+            var mediaInput = $(this).find(".cz-authoring-ci-media-source");
+            var mediaTypeInput = $(this).find(".cz-authoring-ci-media-type option");
+            var descriptionInput = $(this).find(".cz-authoring-ci-description");
+            var guid = $(this).attr("cz-authoring-ci-guid") || null;
+            var selected = mediaTypeInput[0];
+            for(var i = 0; i < mediaTypeInput.length; i++) {
+                if(mediaTypeInput[i].selected) {
+                    selected = mediaTypeInput[i];
                 }
                 form.append(container);
             }
+            contentItems.push({
+                title: CItitleInput.val(),
+                description: descriptionInput.val(),
+                uri: mediaInput.val(),
+                mediaType: selected.text,
+                guid: guid,
+                parent: null
+            });
+        });
+        return contentItems;
+    }
+    /**
+    * Fills contentItem form with data taken from given contentItem.
+    * @param {Object}  form         Target DOM element found with jQuery.
+    * @param {Object}  contentItem  ContentItem which data is taken.
+    */
+    function _fillContentItemForm(form, contentItem) {
+        var titleInput = form.find(".cz-authoring-ci-title");
+        var mediaInput = form.find(".cz-authoring-ci-media-source");
+        var mediaTypeInput = form.find(".cz-authoring-ci-media-type option");
+        var descriptionInput = form.find(".cz-authoring-ci-description");
+        var mediaType = contentItem.mediaType.toLowerCase();
+        if(mediaType === "picture") {
+            mediaType = "image";
+        }
+        form.attr("cz-authoring-ci-guid", contentItem.guid);
+        titleInput.val(contentItem.title);
+        mediaInput.val(contentItem.uri);
+        descriptionInput.val(contentItem.description);
+        mediaTypeInput.each(function (option) {
+            if(this.value === mediaType) {
+                $(this).attr("selected", "selected");
+                return;
+            }
+        });
+    }
+    $.extend(UI, {
+        showCreateTimelineForm: function (t) {
+            var isCancel = true;
+            var titleInput = $("#timelineTitleInput");
+            var startInput = $("#timelineStartInput").spinner();
+            var endInput = $("#timelineEndInput").spinner();
+            titleInput.val(t.title);
+            startInput.val(t.x);
+            endInput.val(t.x + t.width);
+            $("#createTimelineForm").dialog({
+                title: "create timeline",
+                modal: true,
+                height: 600,
+                width: 600,
+                buttons: {
+                    "save and close": function () {
+                        var isValid = CZ.Authoring.ValidateNumber(startInput.val()) && CZ.Authoring.ValidateNumber(endInput.val());
+                        isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(startInput.val()) && CZ.Authoring.IsNotEmpty(endInput.val());
+                        if(!isValid) {
+                            $("#TimelineErrorSpan").css("display", "block");
+                        }
+                        if(isValid) {
+                            var self = this;
+                            isCancel = false;
+                            CZ.Authoring.updateTimeline(t, {
+                                title: titleInput.val(),
+                                start: startInput.val(),
+                                end: endInput.val()
+                            }).then(function (success) {
+                                $(self).dialog("close");
+                            }, function (error) {
+                                alert("Unable to save changes. Please try again later.");
+                                console.log(error);
+                            });
             function _getContentItemsData() {
                 var contentItems = [];
                 var containers = $(".cz-authoring-ci-container");
@@ -37,6 +196,71 @@ var CZ;
                     for(var i = 0; i < mediaTypeInput.length; i++) {
                         if(mediaTypeInput[i].selected) {
                             selected = mediaTypeInput[i];
+            contentItems.push({
+                title: CItitleInput.val(),
+                description: descriptionInput.val(),
+                uri: mediaInput.val(),
+                mediaType: selected.text,
+                guid: guid,
+                parent: null
+            });
+        });
+        return contentItems;
+    }
+    function _fillContentItemForm(form, contentItem) {
+        var titleInput = form.find(".cz-authoring-ci-title");
+        var mediaInput = form.find(".cz-authoring-ci-media-source");
+        var mediaTypeInput = form.find(".cz-authoring-ci-media-type option");
+        var descriptionInput = form.find(".cz-authoring-ci-description");
+        var mediaType = contentItem.mediaType.toLowerCase();
+        if(mediaType === "picture") {
+            mediaType = "image";
+        }
+        form.attr("cz-authoring-ci-guid", contentItem.guid);
+        titleInput.val(contentItem.title);
+        mediaInput.val(contentItem.uri);
+        descriptionInput.val(contentItem.description);
+        mediaTypeInput.each(function (option) {
+            if(this.value === mediaType) {
+                $(this).attr("selected", "selected");
+                return;
+            }
+        });
+    }
+    $.extend(UI, {
+        showCreateTimelineForm: function (t) {
+            var isCancel = true;
+            var titleInput = $("#timelineTitleInput");
+            var startInput = $("#timelineStartInput").spinner();
+            var endInput = $("#timelineEndInput").spinner();
+            titleInput.val(t.title);
+            startInput.val(t.x);
+            endInput.val(t.x + t.width);
+            $("#createTimelineForm").dialog({
+                title: "create timeline",
+                modal: true,
+                height: 600,
+                width: 600,
+                buttons: {
+                    "save and close": function () {
+                        var isValid = CZ.Authoring.ValidateNumber(startInput.val()) && CZ.Authoring.ValidateNumber(endInput.val());
+                        isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(startInput.val()) && CZ.Authoring.IsNotEmpty(endInput.val());
+                        if(!isValid) {
+                            $("#TimelineErrorSpan").css("display", "block");
+                        }
+                        if(isValid) {
+                            var self = this;
+                            isCancel = false;
+                            CZ.Authoring.updateTimeline(t, {
+                                title: titleInput.val(),
+                                start: startInput.val(),
+                                end: endInput.val()
+                            }).then(function (success) {
+                                $(self).dialog("close");
+                            }, function (error) {
+                                alert("Unable to save changes. Please try again later.");
+                                console.log(error);
+                            });
                         }
                     }
                     contentItems.push({
@@ -384,8 +608,127 @@ var CZ;
                     }
                 }
             });
+        },
+        createTimeline: // Mouseup handlers.
+        function () {
+            // skip authoring during ongoing dynamic layout animation
+            if(animatingElements.length != 0) {
+                return;
+            }
+            CZ.Authoring._isActive = (CZ.Authoring.mode !== "createTimeline") || !CZ.Authoring._isActive;
+            CZ.Authoring.mode = "createTimeline";
+            $("div #footer-authoring > a").removeClass("active");
+            if(CZ.Authoring._isActive) {
+                $("a:contains('create timeline')").addClass("active");
+            } else {
+                $("a:contains('create timeline')").removeClass("active");
+            }
+        },
+        editTimeline: function () {
+            // skip authoring during ongoing dynamic layout animation
+            if(animatingElements.length != 0) {
+                return;
+            }
+            CZ.Authoring._isActive = (CZ.Authoring.mode !== "editTimeline") || !CZ.Authoring._isActive;
+            CZ.Authoring.mode = "editTimeline";
+            $("div #footer-authoring > a").removeClass("active");
+            if(CZ.Authoring._isActive) {
+                $("a:contains('edit timeline')").addClass("active");
+            } else {
+                $("a:contains('edit timeline')").removeClass("active");
+            }
+        },
+        createExhibit: function () {
+            // skip authoring during ongoing dynamic layout animation
+            if(animatingElements.length != 0) {
+                return;
+            }
+            CZ.Authoring._isActive = (CZ.Authoring.mode !== "createExhibit") || !CZ.Authoring._isActive;
+            CZ.Authoring.mode = "createExhibit";
+            $("div #footer-authoring > a").removeClass("active");
+            if(CZ.Authoring._isActive) {
+                $("a:contains('create exhibit')").addClass("active");
+            } else {
+                $("a:contains('create exhibit')").removeClass("active");
+            }
+        },
+        editExhibit: function () {
+            // skip authoring during ongoing dynamic layout animation
+            if(animatingElements.length != 0) {
+                return;
+            }
+            CZ.Authoring._isActive = (CZ.Authoring.mode !== "editExhibit") || !CZ.Authoring._isActive;
+            CZ.Authoring.mode = "editExhibit";
+            $("div #footer-authoring > a").removeClass("active");
+            if(CZ.Authoring._isActive) {
+                $("a:contains('edit exhibit')").addClass("active");
+            } else {
+                $("a:contains('edit exhibit')").removeClass("active");
+            }
+        }
+    });
+    return CZ;
+})(CZ || {
+}, jQuery);
         })(Authoring.UI || (Authoring.UI = {}));
         var UI = Authoring.UI;
     })(CZ.Authoring || (CZ.Authoring = {}));
     var Authoring = CZ.Authoring;
 })(CZ || (CZ = {}));
+        },
+        createTimeline: function () {
+            if(animatingElements.length != 0) {
+                return;
+            }
+            CZ.Authoring._isActive = (CZ.Authoring.mode !== "createTimeline") || !CZ.Authoring._isActive;
+            CZ.Authoring.mode = "createTimeline";
+            $("div #footer-authoring > a").removeClass("active");
+            if(CZ.Authoring._isActive) {
+                $("a:contains('create timeline')").addClass("active");
+            } else {
+                $("a:contains('create timeline')").removeClass("active");
+            }
+        },
+        editTimeline: function () {
+            if(animatingElements.length != 0) {
+                return;
+            }
+            CZ.Authoring._isActive = (CZ.Authoring.mode !== "editTimeline") || !CZ.Authoring._isActive;
+            CZ.Authoring.mode = "editTimeline";
+            $("div #footer-authoring > a").removeClass("active");
+            if(CZ.Authoring._isActive) {
+                $("a:contains('edit timeline')").addClass("active");
+            } else {
+                $("a:contains('edit timeline')").removeClass("active");
+            }
+        },
+        createExhibit: function () {
+            if(animatingElements.length != 0) {
+                return;
+            }
+            CZ.Authoring._isActive = (CZ.Authoring.mode !== "createExhibit") || !CZ.Authoring._isActive;
+            CZ.Authoring.mode = "createExhibit";
+            $("div #footer-authoring > a").removeClass("active");
+            if(CZ.Authoring._isActive) {
+                $("a:contains('create exhibit')").addClass("active");
+            } else {
+                $("a:contains('create exhibit')").removeClass("active");
+            }
+        },
+        editExhibit: function () {
+            if(animatingElements.length != 0) {
+                return;
+            }
+            CZ.Authoring._isActive = (CZ.Authoring.mode !== "editExhibit") || !CZ.Authoring._isActive;
+            CZ.Authoring.mode = "editExhibit";
+            $("div #footer-authoring > a").removeClass("active");
+            if(CZ.Authoring._isActive) {
+                $("a:contains('edit exhibit')").addClass("active");
+            } else {
+                $("a:contains('edit exhibit')").removeClass("active");
+            }
+        }
+    });
+    return CZ;
+})(CZ || {
+}, jQuery);

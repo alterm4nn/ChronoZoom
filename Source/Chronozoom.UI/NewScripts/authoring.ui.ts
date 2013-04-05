@@ -1,4 +1,4 @@
-﻿/// <reference path='newauthoring.'/>
+﻿/// <reference path='authoring.ts'/>
 /// <reference path='cz.settings.ts'/>
 /// <reference path='layout.ts'/>
 
