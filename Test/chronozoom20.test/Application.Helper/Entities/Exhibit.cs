@@ -1,17 +1,14 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Application.Helper.Entities
 {
-    public class Exhibit
+    public class Exhibit : Chronozoom.Entities.Exhibit
     {
-        public double Time { get; set; }
-        public string Title  { get; set; }
-        public string Description  { get; set; }
-        public List<ContentItem> ContentItems { get; set; }
-
         public override string ToString()
         {
-            return string.Format("[Exhibit: Title = {0}, Description = {1}, Time = {2}, ContentItems = {3}]", Title, Description, Time, ContentItems.ToString());
+            var contentItemsCount = (ContentItems == null) ? "" : ",  ContentItemsCount = " + ContentItems.Count;
+            return string.Format("[Exhibit: Title = {0}, Time = {1}{2}]", Title, Time, contentItemsCount);
         }
     }
 }

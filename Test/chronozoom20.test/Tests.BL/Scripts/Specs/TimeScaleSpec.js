@@ -29,9 +29,9 @@ describe("CZ.Timescale part", function () {
 
         beforeEach(function () {
             setFixtures('<body></body>');
-            $('body').prepend('<div id="axis"></div>');
-            $('body').prepend('<p id="timescale_left_border"></p>');
-            $('body').prepend('<p id="timescale_right_border"></p>');
+            $('body').prepend('<div id="axis" style="display:none;"></div>');
+            $('body').prepend('<p id="timescale_left_border" style="display:none;"></p>');
+            $('body').prepend('<p id="timescale_right_border" style="display:none;"></p>');
             _width = 1904;
             _height = 75;
             _mode = "cosmos";
@@ -74,9 +74,9 @@ describe("CZ.DateTickSource part", function () {
 
         it("should contain 29 February in leap year (1600)", function () {
             var diff = getYearsBetweenDates(1600, 1, 27, curY, curM, curD);
-
-            var rangeMax = diff + oneDay * 4;
-            var rangeMin = diff - oneDay * 4;
+                
+            var rangeMax = diff + oneDay * 5;
+            var rangeMin = diff - oneDay * 5;
 
             var range = { min: rangeMin, max: rangeMax };
             var ticks = dateTickSource.getTicks(range);
@@ -85,7 +85,7 @@ describe("CZ.DateTickSource part", function () {
             for (var i in ticks) {
                 ticksLabels.push(ticks[i].label[0].innerHTML);
             }
-
+            
             expect(ticksLabels).toContain('29 February');
         });
 
@@ -135,6 +135,23 @@ describe("Axis", function () {
                 expect(minors[2]).not.toEqual(minors[0]);
                 start += oneDay;
             }
+        });
+    });
+});
+
+
+describe("CZ.CosmosTickSource", function () {
+    var cosmosTickSrc;
+    beforeEach(function () {
+        cosmosTickSrc = new CZ.CosmosTickSource();
+    });
+    describe("createTicks() method should", function () {  //TODO: test bug: not return ticks
+        describe("call", function () {
+            it("refreshDivs() method", function () {
+                spyOn(cosmosTickSrc, 'createTicks');
+                cosmosTickSrc.createTicks();
+                expect(cosmosTickSrc.createTicks).toHaveBeenCalled();
+            });
         });
     });
 });
