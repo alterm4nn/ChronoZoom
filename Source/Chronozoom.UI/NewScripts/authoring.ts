@@ -1,3 +1,8 @@
+/// <reference path='cz.settings.ts'/>
+/// <reference path='common.ts'/>
+/// <reference path='vccontent.ts'/>
+/// <reference path='czservice.ts'/>
+
 /**
  * The CZ submodule for Authoring Tool functionality.
  * Use initialize() method to bind UI with Authoring Tool.
@@ -5,27 +10,27 @@
 module CZ {
     export module Authoring {
         // Virtual canvas widget.
-        var _vcwidget;
+        var _vcwidget : any;
 
         // Mouse position.
-        var _dragStart = {};
-        var _dragPrev = {};
-        var _dragCur = {};
+        var _dragStart : any = {};
+        var _dragPrev : any = {};
+        var _dragCur : any = {};
 
         // Current hovered object in virtual canvas.
-        var _hovered = {};
+        var _hovered : any = {};
 
         // New timeline rectangle.
-        var _rectPrev = { type: "rectangle" };
-        var _rectCur = { type: "rectangle" };
+        var _rectPrev : any = { type: "rectangle" };
+        var _rectCur : any = { type: "rectangle" };
 
         // New exhibit circle.
-        var _circlePrev = { type: "circle" };
-        var _circleCur = { type: "circle" };
+        var _circlePrev : any = { type: "circle" };
+        var _circleCur : any = { type: "circle" };
 
         // Selected objects for editing.
-        var _selectedTimeline = {};
-        var _selectedExhibit = {};
+        var _selectedTimeline : any = {};
+        var _selectedExhibit : any = {};
 
         /**
          * Tests a timeline/exhibit on intersection with another virtual canvas object.
@@ -148,9 +153,9 @@ module CZ {
             _rectCur.height = Math.abs(_dragStart.y - _dragCur.y);
 
             // Test on intersections and update timeline's rectangle if it passes the test.
-            if (checkTimelineIntersections(_hovered, _rectCur)) {
+            if (checkTimelineIntersections(_hovered, _rectCur, false)) {
                 // Set border's color of timeline's rectangle.
-                var settings = $.extend({}, _hovered.settings);
+                var settings : any = $.extend({}, _hovered.settings);
                 settings.strokeStyle = "red";
 
                 $.extend(_rectPrev, _rectCur);
@@ -186,7 +191,7 @@ module CZ {
             _circleCur.width = _circleCur.height = 2 * _circleCur.r;
 
             // Test on intersections and update exhibits's circle if it passes the test.
-            if (checkExhibitIntersections(_hovered, _circleCur)) {
+            if (checkExhibitIntersections(_hovered, _circleCur, false)) {
                 $.extend(_circlePrev, _circleCur);
                 
                 CZ.VCContent.removeChild(_hovered, "newExhibitCircle");
@@ -291,9 +296,9 @@ module CZ {
          */
         function updateTimelineTitle(t) {
             // NOTE: This code from CanvasTimeline's constructor.
-            var headerSize = timelineHeaderSize * t.height;
-            var marginLeft = timelineHeaderMargin * t.height;
-            var marginTop = (1 - timelineHeaderMargin) * t.height - headerSize;
+            var headerSize = CZ.Settings.timelineHeaderSize * t.height;
+            var marginLeft = CZ.Settings.timelineHeaderMargin * t.height;
+            var marginTop = (1 - CZ.Settings.timelineHeaderMargin) * t.height - headerSize;
             var baseline = t.y + marginTop + headerSize / 2.0;
 
             CZ.VCContent.removeChild(t, t.id + "__header__");
@@ -307,8 +312,8 @@ module CZ {
                 headerSize,
                 t.title,
                 {
-                    fontName: timelineHeaderFontName,
-                    fillStyle: timelineHeaderFontColor,
+                    fontName: CZ.Settings.timelineHeaderFontName,
+                    fillStyle: CZ.Settings.timelineHeaderFontColor,
                     textBaseline: "middle",
                     opacity: 1
                 }
@@ -316,15 +321,16 @@ module CZ {
         }
 
         // Authoring Tool state.
-        export var _isActive = false;
-        export var _isDragging = false;
-        export var mode = null;
+        export var _isActive : any = false;
+        export var _isDragging : any = false;
+        export var mode : any = null;
 
         // Forms' handlers.
-        export var showCreateTimelineForm = null;
-        export var showEditTimelineForm = null;
-        export var showCreateExhibitForm = null;
-        export var showEditExhibitForm = null;
+        export var showCreateTimelineForm : any = null;
+        export var showEditTimelineForm : any = null;
+        export var showCreateExhibitForm : any = null;
+        export var showEditExhibitForm : any = null;
+        export var showEditContentItemForm : any = null;
 
         /**
          * Represents a collection of mouse events' handlers for each mode.
@@ -346,7 +352,7 @@ module CZ {
 
                     if (_hovered.type === "timeline") {
                         _selectedTimeline = createNewTimeline();
-                        CZ.Authoring.showCreateTimelineForm(_selectedTimeline);
+                        showCreateTimelineForm(_selectedTimeline);
                     }
                 }
             },
@@ -362,10 +368,10 @@ module CZ {
                 mouseup: function () {
                     if (_hovered.type === "timeline") {
                         _selectedTimeline = _hovered;
-                        CZ.Authoring.showEditTimelineForm(_selectedTimeline);
+                        showEditTimelineForm(_selectedTimeline);
                     } else if (_hovered.type === "infodot" || _hovered.type === "contentItem") {
                         _selectedTimeline = _hovered.parent;
-                        CZ.Authoring.showEditTimelineForm(_selectedTimeline);
+                        showEditTimelineForm(_selectedTimeline);
                     }
                 }
             },
@@ -381,9 +387,9 @@ module CZ {
                     if (_hovered.type === "timeline") {
                         updateNewCircle();
 
-                        if (checkExhibitIntersections(_hovered, _circleCur)) {
+                        if (checkExhibitIntersections(_hovered, _circleCur, false)) {
                             _selectedExhibit = createNewExhibit();
-                            CZ.Authoring.showCreateExhibitForm(_selectedExhibit);
+                            showCreateExhibitForm(_selectedExhibit);
                         }
                     }
                 }
@@ -400,10 +406,10 @@ module CZ {
                 mouseup: function () {
                     if (_hovered.type === "infodot") {
                         _selectedExhibit = _hovered;
-                        CZ.Authoring.showEditExhibitForm(_selectedExhibit);                        
+                        showEditExhibitForm(_selectedExhibit);                        
                     } else if (_hovered.type === "contentItem") {
                         _selectedExhibit = _hovered.parent.parent.parent;
-                        CZ.Authoring.showEditContentItemForm(_hovered, _selectedExhibit);
+                        showEditContentItemForm(_hovered, _selectedExhibit);
                     }
                 }
             }
@@ -464,11 +470,11 @@ module CZ {
             });
 
             // Assign forms' handlers.
-            CZ.Authoring.showCreateTimelineForm = formHandlers && formHandlers.showCreateTimelineForm || function () {};
-            CZ.Authoring.showEditTimelineForm = formHandlers && formHandlers.showEditTimelineForm || function () {};
-            CZ.Authoring.showCreateExhibitForm = formHandlers && formHandlers.showCreateExhibitForm || function () {};
-            CZ.Authoring.showEditExhibitForm = formHandlers && formHandlers.showEditExhibitForm || function () {};
-            CZ.Authoring.showEditContentItemForm = formHandlers && formHandlers.showEditContentItemForm || function () {};
+            showCreateTimelineForm = formHandlers && formHandlers.showCreateTimelineForm || function () {};
+            showEditTimelineForm = formHandlers && formHandlers.showEditTimelineForm || function () {};
+            showCreateExhibitForm = formHandlers && formHandlers.showCreateExhibitForm || function () {};
+            showEditExhibitForm = formHandlers && formHandlers.showEditExhibitForm || function () {};
+            showEditContentItemForm = formHandlers && formHandlers.showEditContentItemForm || function () {};
         }
 
         /**

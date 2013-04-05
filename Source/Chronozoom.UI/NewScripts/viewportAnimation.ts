@@ -110,7 +110,7 @@ module CZ {
 
                 //updating previous frame info. This will be returned as the requested animation frame
                 var prevFrameVisible = this.previousFrameViewport.visible;
-                var updatedVisible = new CZ.Viewpoer.VisibleRegion2d(
+                var updatedVisible = new CZ.Viewport.VisibleRegion2d(
                     prevFrameVisible.centerX,
                     prevFrameVisible.centerY,
                     prevFrameVisible.scale

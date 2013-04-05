@@ -2,6 +2,7 @@
 /// <reference path='vccontent.ts'/>
 /// <reference path='common.ts'/>
 /// <reference path='viewport.ts'/>
+/// <reference path='viewportAnimation.ts'/>
 
 module CZ {
     export module Layout {
@@ -174,7 +175,7 @@ module CZ {
                 var min = res.min;
                 var max = res.max;
 
-                var minAspect = 1.0 / timelineMinAspect;
+                var minAspect = 1.0 / CZ.Settings.timelineMinAspect;
                 var minHeight = timelineWidth / minAspect;
 
                 //Measure title
@@ -185,7 +186,7 @@ module CZ {
                 timeline.height = fullHeight;
             }
 
-            timeline.heightEps = parentWidth * timelineContentMargin;
+            timeline.heightEps = parentWidth * CZ.Settings.timelineContentMargin;
             timeline.realHeight = timeline.height + 2 * timeline.heightEps;
             timeline.realY = 0;
 
@@ -521,7 +522,7 @@ module CZ {
                 var width = timeline.right - timeline.left;
                 var scaleX = vp.visible.scale * width / vp.width;
                 var scaleY = vp.visible.scale * timeline.height / vp.height;
-                return new VisibleRegion2d(timeline.left + (timeline.right - timeline.left) / 2.0, timeline.y + timeline.height / 2.0, Math.max(scaleX, scaleY));
+                return new CZ.Viewport.VisibleRegion2d(timeline.left + (timeline.right - timeline.left) / 2.0, timeline.y + timeline.height / 2.0, Math.max(scaleX, scaleY));
             }
         }
 
@@ -536,7 +537,7 @@ module CZ {
                 //Transform timeline start and end dates
                 Prepare(timeline);
                 //Measure child content for each timiline in tree
-                var measureContext = document.createElement("canvas").getContext('2d');
+                var measureContext = (<any>document.createElement("canvas")).getContext('2d');
                 LayoutTimeline(timeline, 0, measureContext);
                 //Calculating final placement of the data
                 Arrange(timeline);
@@ -557,7 +558,7 @@ module CZ {
         function generateLayout(tmd, tsg) {
             try {
                 if (!tmd.AspectRatio) tmd.height = tsg.height;
-                var root = new CanvasRootElement(tsg.vc, undefined, "__root__", -Infinity, -Infinity, Infinity, Infinity);
+                var root = new CZ.VCContent.CanvasRootElement(tsg.vc, undefined, "__root__", -Infinity, -Infinity, Infinity, Infinity);
                 Load(root, tmd);
                 return root.children[0];
             } catch (msg) {
@@ -713,7 +714,7 @@ module CZ {
                 else
                     t = 1.0;
 
-                t = animationEase(t);
+                t = CZ.ViewportAnimation.animationEase(t);
 
                 for (var i = 0; i < args.length; i++) {
                     if (typeof elem[args[i].property] !== 'undefined')
@@ -888,12 +889,12 @@ module CZ {
                     convertRelativeToAbsoluteCoords(t, 0);
                     dest.children.push(t);
                     animateElement(dest);
-                    vc.virtualCanvas("requestInvalidate");
+                    CZ.Common.vc.virtualCanvas("requestInvalidate");
                 } else {
                     merge(src, dest);
                     dest.newHeight += dest.delta;
                     animateElement(dest);
-                    vc.virtualCanvas("requestInvalidate");
+                    CZ.Common.vc.virtualCanvas("requestInvalidate");
                 }
             }
         }
