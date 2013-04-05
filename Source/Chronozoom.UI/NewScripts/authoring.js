@@ -1,3 +1,7 @@
+/// <reference path='cz.settings.ts'/>
+/// <reference path='common.ts'/>
+/// <reference path='vccontent.ts'/>
+/// <reference path='czservice.ts'/>
 /**
 * The CZ submodule for Authoring Tool functionality.
 * Use initialize() method to bind UI with Authoring Tool.
@@ -139,7 +143,7 @@ var CZ;
             _rectCur.width = Math.abs(_dragStart.x - _dragCur.x);
             _rectCur.height = Math.abs(_dragStart.y - _dragCur.y);
             // Test on intersections and update timeline's rectangle if it passes the test.
-            if(checkTimelineIntersections(_hovered, _rectCur)) {
+            if(checkTimelineIntersections(_hovered, _rectCur, false)) {
                 // Set border's color of timeline's rectangle.
                 var settings = $.extend({
                 }, _hovered.settings);
@@ -162,7 +166,7 @@ var CZ;
             _circleCur.y = _dragCur.y - _circleCur.r;
             _circleCur.width = _circleCur.height = 2 * _circleCur.r;
             // Test on intersections and update exhibits's circle if it passes the test.
-            if(checkExhibitIntersections(_hovered, _circleCur)) {
+            if(checkExhibitIntersections(_hovered, _circleCur, false)) {
                 $.extend(_circlePrev, _circleCur);
                 CZ.VCContent.removeChild(_hovered, "newExhibitCircle");
                 CZ.VCContent.addCircle(_hovered, "layerInfodots", "newExhibitCircle", _circleCur.x + _circleCur.r, _circleCur.y + _circleCur.r, _circleCur.r, {
@@ -241,14 +245,14 @@ var CZ;
         */
         function updateTimelineTitle(t) {
             // NOTE: This code from CanvasTimeline's constructor.
-            var headerSize = timelineHeaderSize * t.height;
-            var marginLeft = timelineHeaderMargin * t.height;
-            var marginTop = (1 - timelineHeaderMargin) * t.height - headerSize;
+            var headerSize = CZ.Settings.timelineHeaderSize * t.height;
+            var marginLeft = CZ.Settings.timelineHeaderMargin * t.height;
+            var marginTop = (1 - CZ.Settings.timelineHeaderMargin) * t.height - headerSize;
             var baseline = t.y + marginTop + headerSize / 2.0;
             CZ.VCContent.removeChild(t, t.id + "__header__");
             t.titleObject = CZ.VCContent.addText(t, t.layerid, t.id + "__header__", t.x + marginLeft, t.y + marginTop, baseline, headerSize, t.title, {
-                fontName: timelineHeaderFontName,
-                fillStyle: timelineHeaderFontColor,
+                fontName: CZ.Settings.timelineHeaderFontName,
+                fillStyle: CZ.Settings.timelineHeaderFontColor,
                 textBaseline: "middle",
                 opacity: 1
             });
@@ -262,6 +266,7 @@ var CZ;
         Authoring.showEditTimelineForm = null;
         Authoring.showCreateExhibitForm = null;
         Authoring.showEditExhibitForm = null;
+        Authoring.showEditContentItemForm = null;
         /**
         * Represents a collection of mouse events' handlers for each mode.
         * Example of using: CZ.Authoring.modeMouseHandlers[CZ.Authoring.mode]["mouseup"]();
@@ -280,7 +285,7 @@ var CZ;
                     }
                     if(_hovered.type === "timeline") {
                         _selectedTimeline = createNewTimeline();
-                        CZ.Authoring.showCreateTimelineForm(_selectedTimeline);
+                        Authoring.showCreateTimelineForm(_selectedTimeline);
                     }
                 }
             },
@@ -295,10 +300,10 @@ var CZ;
                 mouseup: function () {
                     if(_hovered.type === "timeline") {
                         _selectedTimeline = _hovered;
-                        CZ.Authoring.showEditTimelineForm(_selectedTimeline);
+                        Authoring.showEditTimelineForm(_selectedTimeline);
                     } else if(_hovered.type === "infodot" || _hovered.type === "contentItem") {
                         _selectedTimeline = _hovered.parent;
-                        CZ.Authoring.showEditTimelineForm(_selectedTimeline);
+                        Authoring.showEditTimelineForm(_selectedTimeline);
                     }
                 }
             },
@@ -311,9 +316,9 @@ var CZ;
                 mouseup: function () {
                     if(_hovered.type === "timeline") {
                         updateNewCircle();
-                        if(checkExhibitIntersections(_hovered, _circleCur)) {
+                        if(checkExhibitIntersections(_hovered, _circleCur, false)) {
                             _selectedExhibit = createNewExhibit();
-                            CZ.Authoring.showCreateExhibitForm(_selectedExhibit);
+                            Authoring.showCreateExhibitForm(_selectedExhibit);
                         }
                     }
                 }
@@ -329,10 +334,10 @@ var CZ;
                 mouseup: function () {
                     if(_hovered.type === "infodot") {
                         _selectedExhibit = _hovered;
-                        CZ.Authoring.showEditExhibitForm(_selectedExhibit);
+                        Authoring.showEditExhibitForm(_selectedExhibit);
                     } else if(_hovered.type === "contentItem") {
                         _selectedExhibit = _hovered.parent.parent.parent;
-                        CZ.Authoring.showEditContentItemForm(_hovered, _selectedExhibit);
+                        Authoring.showEditContentItemForm(_hovered, _selectedExhibit);
                     }
                 }
             }
@@ -384,15 +389,15 @@ var CZ;
                 }
             });
             // Assign forms' handlers.
-            CZ.Authoring.showCreateTimelineForm = formHandlers && formHandlers.showCreateTimelineForm || function () {
+            Authoring.showCreateTimelineForm = formHandlers && formHandlers.showCreateTimelineForm || function () {
             };
-            CZ.Authoring.showEditTimelineForm = formHandlers && formHandlers.showEditTimelineForm || function () {
+            Authoring.showEditTimelineForm = formHandlers && formHandlers.showEditTimelineForm || function () {
             };
-            CZ.Authoring.showCreateExhibitForm = formHandlers && formHandlers.showCreateExhibitForm || function () {
+            Authoring.showCreateExhibitForm = formHandlers && formHandlers.showCreateExhibitForm || function () {
             };
-            CZ.Authoring.showEditExhibitForm = formHandlers && formHandlers.showEditExhibitForm || function () {
+            Authoring.showEditExhibitForm = formHandlers && formHandlers.showEditExhibitForm || function () {
             };
-            CZ.Authoring.showEditContentItemForm = formHandlers && formHandlers.showEditContentItemForm || function () {
+            Authoring.showEditContentItemForm = formHandlers && formHandlers.showEditContentItemForm || function () {
             };
         }
         Authoring.initialize = initialize;
