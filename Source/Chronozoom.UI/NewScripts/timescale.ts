@@ -1,7 +1,7 @@
 ﻿/// <reference path='cz.settings.ts'/>
 /// <reference path='common.ts'/>
 
-module ChronoZoom {
+module CZ {
     export module Timescale {
 
         var that = this;

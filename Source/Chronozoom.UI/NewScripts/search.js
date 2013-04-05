@@ -1,76 +1,18 @@
-var isSearchWindowVisible = false;
-var delayedSearchRequest = null;
-function onSearchClicked() {
-    if(isTourWindowVisible && onTourClicked) {
-        onTourClicked();
-    }
-    if(isSearchWindowVisible) {
-        toggleOffImage('search_button');
-        $("#search").hide('slide', {
-        }, 'slow');
-    } else {
-        toggleOnImage('search_button');
-        $("#search").show('slide', {
-        }, 'slow', function () {
-            $("#searchTextBox").focus();
-        });
-    }
-    isSearchWindowVisible = !isSearchWindowVisible;
-}
-function searchHighlight(isOn) {
-    if(isOn) {
-        toggleOnImage('search_button');
-    } else {
-        if(!isSearchWindowVisible) {
-            toggleOffImage('search_button');
-/// <reference path='urlnav.ts'/>
-/// <reference path='cz.settings.ts'/>
-/// <reference path='common.ts'/>
-/// <reference path='vccontent.ts'/>
-/* This file contains code to perform search over the Chronozoom database and show the results in UI.
-The page design must correspond to the schema and naming conventions presented here.
-*/
-var isSearchWindowVisible = false;
-var delayedSearchRequest = null;
-// The method is called when the search button is clicked
-function onSearchClicked() {
-    if(isTourWindowVisible && onTourClicked) {
-        onTourClicked();
-    }
-    if(isSearchWindowVisible) {
-        toggleOffImage('search_button');
-        $("#search").hide('slide', {
-        }, 'slow');
-    } else {
-        toggleOnImage('search_button');
-        $("#search").show('slide', {
-        }, 'slow', function () {
-            $("#searchTextBox").focus();
-        });
-    }
-    isSearchWindowVisible = !isSearchWindowVisible;
-}
-function searchHighlight(isOn) {
-    if(isOn) {
-        toggleOnImage('search_button');
-    } else {
-        if(!isSearchWindowVisible) {
-            toggleOffImage('search_button');
-var ChronoZoom;
-(function (ChronoZoom) {
+var CZ;
+(function (CZ) {
     (function (Search) {
         Search.isSearchWindowVisible = false;
         var delayedSearchRequest = null;
         function onSearchClicked() {
-            if(ChronoZoom.Tours.isTourWindowVisible && ChronoZoom.Tours.onTourClicked) {
-                ChronoZoom.Tours.onTourClicked();
+            if(CZ.Tours.isTourWindowVisible && CZ.Tours.onTourClicked) {
+                CZ.Tours.onTourClicked();
             }
             if(Search.isSearchWindowVisible) {
-                ChronoZoom.Common.toggleOffImage('search_button');
+                CZ.Common.toggleOffImage('search_button');
                 $("#search").hide('slide', {
                 }, 'slow');
             } else {
-                ChronoZoom.Common.toggleOnImage('search_button');
+                CZ.Common.toggleOnImage('search_button');
                 $("#search").show('slide', {
                 }, 'slow', function () {
                     $("#searchTextBox").focus();
@@ -81,10 +23,10 @@ var ChronoZoom;
         Search.onSearchClicked = onSearchClicked;
         function searchHighlight(isOn) {
             if(isOn) {
-                ChronoZoom.Common.toggleOnImage('search_button');
+                CZ.Common.toggleOnImage('search_button');
             } else {
                 if(!Search.isSearchWindowVisible) {
-                    ChronoZoom.Common.toggleOffImage('search_button');
+                    CZ.Common.toggleOffImage('search_button');
                 }
             }
         }
@@ -120,129 +62,24 @@ var ChronoZoom;
             });
             $("#search").hide();
         }
-        delayedSearchRequest = setTimeout(function () {
-            if($('#searchTextBox').val() != "") {
-                $("#loadingImage").fadeIn('slow');
-            }
-            search(escapeSearchString($("#searchTextBox")[0].value.substr(0, 700)));
-        }, 300);
-    });
-    $("#search").hide();
-}
-function navigateToElement(e) {
-    var animId = setVisibleByUserDirectly(e.newvisible);
-    if(animId) {
-        setNavigationStringTo = {
-            element: e.element,
-            id: animId
-        };
-    }
-}
-function navigateToBookmark(bookmark) {
-    if(bookmark) {
-        var visible = navStringToVisible(bookmark, vc);
-        if(visible) {
-            var animId = setVisibleByUserDirectly(visible);
-        delayedSearchRequest = setTimeout(function () {
-            if($('#searchTextBox').val() != "") {
-                $("#loadingImage").fadeIn('slow');
-            }
-            search(escapeSearchString($("#searchTextBox")[0].value.substr(0, 700)))// limit the search to the first 700 characters
-            ;
-        }, 300);
-    });
-    $("#search").hide();
-}
-function navigateToElement(e) {
-    var animId = setVisibleByUserDirectly(e.newvisible);
-    if(animId) {
-        setNavigationStringTo = {
-            element: e.element,
-            id: animId
-        };
-    }
-}
-function navigateToBookmark(bookmark) {
-    if(bookmark) {
-        var visible = navStringToVisible(bookmark, vc);
-        if(visible) {
-            var animId = setVisibleByUserDirectly(visible);
         Search.initializeSearch = initializeSearch;
         function navigateToElement(e) {
-            var animId = ChronoZoom.Common.setVisibleByUserDirectly(e.newvisible);
+            var animId = CZ.Common.setVisibleByUserDirectly(e.newvisible);
             if(animId) {
-                ChronoZoom.Common.setNavigationStringTo = {
+                CZ.Common.setNavigationStringTo = {
                     element: e.element,
                     id: animId
                 };
             }
         }
-    }
-}
-function goToSearchResult(id) {
-    var elem = findVCElement(vc.virtualCanvas("getLayerContent"), id);
-    if(!elem) {
-        alert('Element not found in the content.');
-    } else {
-        var visible = getVisibleForElement(elem, 1.0, vc.virtualCanvas("getViewport"));
-        navigateToElement({
-            element: elem,
-            newvisible: visible
-        });
-    }
-}
-function findVCElement(root, id) {
-    var lookingForCI = id.charAt(0) === 'c';
-    var rfind = function (el, id) {
-        if(el.id === id) {
-            return el;
-        }
-        if(!el.children) {
-            return null;
-        }
-        var n = el.children.length;
-        for(var i = 0; i < n; i++) {
-            var child = el.children[i];
-            if(child.id === id) {
-                return child;
-    }
-}
-function goToSearchResult(id) {
-    var elem = findVCElement(vc.virtualCanvas("getLayerContent"), id);
-    if(!elem) {
-        alert('Element not found in the content.');
-    } else {
-        var visible = getVisibleForElement(elem, 1.0, vc.virtualCanvas("getViewport"));
-        navigateToElement({
-            element: elem,
-            newvisible: visible
-        });
-    }
-}
-// Recursively finds and returns an element with given id.
-// If not found, returns null.
-function findVCElement(root, id) {
-    var lookingForCI = id.charAt(0) === 'c';
-    var rfind = function (el, id) {
-        if(el.id === id) {
-            return el;
-        }
-        if(!el.children) {
-            return null;
-        }
-        var n = el.children.length;
-        for(var i = 0; i < n; i++) {
-            var child = el.children[i];
-            if(child.id === id) {
-                return child;
         Search.navigateToElement = navigateToElement;
         function navigateToBookmark(bookmark) {
             if(bookmark) {
-                var visible = ChronoZoom.UrlNav.navStringToVisible(bookmark, ChronoZoom.Common.vc);
+                var visible = CZ.UrlNav.navStringToVisible(bookmark, CZ.Common.vc);
                 if(visible) {
-                    var animId = ChronoZoom.Common.setVisibleByUserDirectly(visible);
+                    var animId = CZ.Common.setVisibleByUserDirectly(visible);
                     if(animId) {
-                        ChronoZoom.Common.setNavigationStringTo = {
+                        CZ.Common.setNavigationStringTo = {
                             bookmark: bookmark,
                             id: animId
                         };
@@ -252,11 +89,11 @@ function findVCElement(root, id) {
         }
         Search.navigateToBookmark = navigateToBookmark;
         function goToSearchResult(id) {
-            var elem = findVCElement(ChronoZoom.Common.vc.virtualCanvas("getLayerContent"), id);
+            var elem = findVCElement(CZ.Common.vc.virtualCanvas("getLayerContent"), id);
             if(!elem) {
                 alert('Element not found in the content.');
             } else {
-                var visible = ChronoZoom.VCContent.getVisibleForElement(elem, 1.0, ChronoZoom.Common.vc.virtualCanvas("getViewport"));
+                var visible = CZ.VCContent.getVisibleForElement(elem, 1.0, CZ.Common.vc.virtualCanvas("getViewport"));
                 navigateToElement({
                     element: elem,
                     newvisible: visible
@@ -279,36 +116,6 @@ function findVCElement(root, id) {
                     if(child.id === id) {
                         return child;
                     }
-                    var resultId;
-                    switch(item.ObjectType) {
-                        case 0:
-                            resultId = 'e' + item.UniqueID;
-                            break;
-                        case 1:
-                            resultId = 't' + item.UniqueID;
-                            break;
-                        case 2:
-                            resultId = 'c' + item.UniqueID;
-                            break;
-                        default:
-                            continue;
-                    var resultId;
-                    switch(item.ObjectType) {
-                        case 0:
-                            resultId = 'e' + item.UniqueID;
-                            break;// exhibit
-                            
-                        case 1:
-                            resultId = 't' + item.UniqueID;
-                            break;// timeline
-                            
-                        case 2:
-                            resultId = 'c' + item.UniqueID;
-                            break;// content item
-                            
-                        default:
-                            continue;// unknown type of result item
-                            
                 }
                 for(var i = 0; i < n; i++) {
                     var child = el.children[i];
@@ -318,7 +125,7 @@ function findVCElement(root, id) {
                     }
                 }
                 if(lookingForCI && el.type === 'infodot') {
-                    var ci = ChronoZoom.VCContent.getContentItem(el, id);
+                    var ci = CZ.VCContent.getContentItem(el, id);
                     if(ci != null) {
                         return ci;
                     }
@@ -395,12 +202,12 @@ function findVCElement(root, id) {
                 return;
             }
             var url;
-            switch(ChronoZoom.Settings.czDataSource) {
+            switch(CZ.Settings.czDataSource) {
                 case 'db':
-                    url = "/Chronozoom.svc/Search";
+                    url = "/CZ.svc/Search";
                     break;
                 default:
-                    url = "/Chronozoom.svc/SearchRelay";
+                    url = "/CZ.svc/SearchRelay";
                     break;
             }
             $.ajax({
@@ -410,12 +217,12 @@ function findVCElement(root, id) {
                 dataType: "json",
                 data: {
                     searchTerm: searchString,
-                    supercollection: ChronoZoom.Common.supercollection,
-                    collection: ChronoZoom.Common.collection
+                    supercollection: CZ.Common.supercollection,
+                    collection: CZ.Common.collection
                 },
                 url: url,
                 success: function (result) {
-                    if(ChronoZoom.Settings.czDataSource == 'db') {
+                    if(CZ.Settings.czDataSource == 'db') {
                         onSearchResults(searchString, result.d);
                     } else {
                         onSearchResults(searchString, eval(result.d));
@@ -426,103 +233,6 @@ function findVCElement(root, id) {
                 }
             });
         }
-    }
-    if(isSearching) {
-        isSearching = false;
-    }
-    if(pendingSearch != null) {
-        var q = pendingSearch;
-        pendingSearch = null;
-        search(q);
-    }
-    $("#loadingImage").fadeOut('slow');
-}
-var pendingSearch = null;
-var isSearching = false;
-function search(searchString) {
-    if(isSearching) {
-        pendingSearch = searchString;
-        return;
-    }
-    isSearching = true;
-    if(!searchString || searchString === '') {
-        setTimeout(function () {
-            onSearchResults(searchString, null);
-        }, 1);
-        return;
-    }
-    var url;
-    switch(czDataSource) {
-        case 'db':
-            url = "Chronozoom.svc/Search";
-            break;
-        default:
-            url = "Chronozoom.svc/SearchRelay";
-            break;
-    }
-    $.ajax({
-        cache: false,
-        type: "GET",
-        async: true,
-        dataType: "json",
-        data: {
-            searchTerm: searchString
-        },
-        url: url,
-        success: function (result) {
-            if(czDataSource == 'db') {
-                onSearchResults(searchString, result.d);
-            } else {
-                onSearchResults(searchString, eval(result.d));
-    }
-    if(isSearching) {
-        isSearching = false;
-    }
-    if(pendingSearch != null) {
-        var q = pendingSearch;
-        pendingSearch = null;
-        search(q);
-    }
-    $("#loadingImage").fadeOut('slow');
-}
-var pendingSearch = null;
-var isSearching = false;
-function search(searchString) {
-    if(isSearching) {
-        pendingSearch = searchString;
-        return;
-    }
-    // isSearching is false
-    isSearching = true;
-    if(!searchString || searchString === '') {
-        setTimeout(function () {
-            onSearchResults(searchString, null);
-        }, 1);
-        return;
-    }
-    var url;
-    switch(czDataSource) {
-        case 'db':
-            url = "Chronozoom.svc/Search";
-            break;
-        default:
-            url = "Chronozoom.svc/SearchRelay";
-            break;
-    }
-    $.ajax({
-        cache: false,
-        type: "GET",
-        async: true,
-        dataType: "json",
-        data: {
-            searchTerm: searchString
-        },
-        url: url,
-        success: function (result) {
-            if(czDataSource == 'db') {
-                onSearchResults(searchString, result.d);
-            } else {
-                onSearchResults(searchString, eval(result.d));
         function escapeSearchString(searchString) {
             if(searchString === null) {
                 return '';
@@ -532,6 +242,6 @@ function search(searchString) {
             }
             return searchString;
         }
-    })(ChronoZoom.Search || (ChronoZoom.Search = {}));
-    var Search = ChronoZoom.Search;
-})(ChronoZoom || (ChronoZoom = {}));
+    })(CZ.Search || (CZ.Search = {}));
+    var Search = CZ.Search;
+})(CZ || (CZ = {}));

@@ -30,7 +30,6 @@ module CZ {
         /*
         Array for logging of inners messages and exceptions
         */
-        var Log = new [];
 
         var searchString;
         export var ax;
@@ -46,7 +45,7 @@ module CZ {
 
         var firstTimeWelcomeChecked = true; // if welcome screen checkbox checked or not
 
-        var regimes = new [];
+        var regimes = [];
         export var regimesRatio;
         export var regimeNavigator;
 
@@ -61,7 +60,8 @@ module CZ {
         /* Initialize the JQuery UI Widgets
         */
         export function initialize() {
-            ax = CZ.Timescale("axis");
+            ax = (<any>$)('#axis');
+            CZ.Timescale.Initialize(ax);
             ax.axis();
 
             CZ.VirtualCanvas.initialize();

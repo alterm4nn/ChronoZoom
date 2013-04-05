@@ -72,11 +72,11 @@ module CZ {
                 $(".cz-authoring-ci-container").each(function () {
                     var CItitleInput = $(this).find(".cz-authoring-ci-title");;
                     var mediaInput = $(this).find(".cz-authoring-ci-media-source");
-                    var mediaTypeInput = $(this).find(".cz-authoring-ci-media-type option");
+                    var mediaTypeInput = (<any>$)(this).find(".cz-authoring-ci-media-type option");
                     var descriptionInput = $(this).find(".cz-authoring-ci-description");
                     var guid = $(this).attr("cz-authoring-ci-guid") || null;
 
-                    var selected = $(mediaTypeInput)[0];
+                    var selected = (<any>$)(mediaTypeInput)[0];
 
                     for (var i = 0; i < mediaTypeInput.length; i++)
                         if (mediaTypeInput[i].selected) {
@@ -320,7 +320,7 @@ module CZ {
                     width: 600,
                     buttons: {
                         "save and close": function () {
-                            contentItems = _getContentItemsData(e);
+                            contentItems = _getContentItemsData();
 
                             var isValid = CZ.Authoring.ValidateNumber(dateInput.val());
                             isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(dateInput.val());
@@ -371,7 +371,7 @@ module CZ {
                 var titleInput = $("#contentItemTitleInput");
                 var mediaInput = $("#contentItemMediaSourceInput");
                 var descriptionInput = $("#contentItemDescriptionInput");
-                var mediaTypeInput = $("#contentItemMediaTypeInput option");
+                var mediaTypeInput = (<any>$)("#contentItemMediaTypeInput option");
                 var mediaType = c.contentItem.mediaType.toLowerCase();
                 if (mediaType === "picture") {
                     mediaType = "image";
