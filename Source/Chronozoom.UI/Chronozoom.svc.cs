@@ -786,8 +786,8 @@ namespace UI
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                         return;
                     }
-                _storage.DeleteExhibit(exhibitGuid);
-                _storage.SaveChanges();
+                    _storage.DeleteExhibit(exhibitGuid);
+                    _storage.SaveChanges();
                 });
         }
 
