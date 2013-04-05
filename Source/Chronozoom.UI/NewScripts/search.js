@@ -1,5 +1,13 @@
+/// <reference path='urlnav.ts'/>
+/// <reference path='cz.settings.ts'/>
+/// <reference path='common.ts'/>
+/// <reference path='vccontent.ts'/>
+/* This file contains code to perform search over the Chronozoom database and show the results in UI.
+The page design must correspond to the schema and naming conventions presented here.
+*/
 var isSearchWindowVisible = false;
 var delayedSearchRequest = null;
+// The method is called when the search button is clicked
 function onSearchClicked() {
     if(isTourWindowVisible && onTourClicked) {
         onTourClicked();
@@ -52,7 +60,8 @@ function initializeSearch() {
             if($('#searchTextBox').val() != "") {
                 $("#loadingImage").fadeIn('slow');
             }
-            search(escapeSearchString($("#searchTextBox")[0].value.substr(0, 700)));
+            search(escapeSearchString($("#searchTextBox")[0].value.substr(0, 700)))// limit the search to the first 700 characters
+            ;
         }, 300);
     });
     $("#search").hide();
@@ -92,6 +101,8 @@ function goToSearchResult(id) {
         });
     }
 }
+// Recursively finds and returns an element with given id.
+// If not found, returns null.
 function findVCElement(root, id) {
     var lookingForCI = id.charAt(0) === 'c';
     var rfind = function (el, id) {
@@ -144,15 +155,19 @@ function onSearchResults(searchString, results) {
                     switch(item.ObjectType) {
                         case 0:
                             resultId = 'e' + item.UniqueID;
-                            break;
+                            break;// exhibit
+                            
                         case 1:
                             resultId = 't' + item.UniqueID;
-                            break;
+                            break;// timeline
+                            
                         case 2:
                             resultId = 'c' + item.UniqueID;
-                            break;
+                            break;// content item
+                            
                         default:
-                            continue;
+                            continue;// unknown type of result item
+                            
                     }
                     if(first) {
                         $("<div class='searchResultSection'>" + sectionTitle + "</div>").appendTo(output);
@@ -185,6 +200,7 @@ function search(searchString) {
         pendingSearch = searchString;
         return;
     }
+    // isSearching is false
     isSearching = true;
     if(!searchString || searchString === '') {
         setTimeout(function () {

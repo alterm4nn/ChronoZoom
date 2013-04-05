@@ -2,9 +2,8 @@
   <Settings>
     <Global>
       <IsUsingGrid>false</IsUsingGrid>
-      <!--<BaseUrl>http://depot.cs.msu.su:9090/czcurrent/cz2.html#/t55</BaseUrl>-->
       <BaseUrl>http://test.chronozoomproject.org/cz2.html</BaseUrl>
-     <ImplicitWait>60</ImplicitWait>
+      <ImplicitWait>60</ImplicitWait>
       <ExplicitWait>60</ExplicitWait>
       <BrowserName>chrome</BrowserName>
       <ConnectionWait>60</ConnectionWait>

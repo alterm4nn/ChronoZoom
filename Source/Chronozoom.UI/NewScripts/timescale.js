@@ -1,5 +1,8 @@
-var CZ = (function (CZ, $, document) {
+﻿var CZ = (function (CZ, $, document) {
     CZ.Timescale = function (container) {
+        /**
+        * Input parameter must be jQuery object, DIV element or ID. Convert it to jQuery object.
+        */
         if(!container) {
             throw "Container parameter is undefined!";
         }
@@ -13,9 +16,24 @@ var CZ = (function (CZ, $, document) {
         } else if(!(container instanceof jQuery && container.is("div"))) {
             throw "Container parameter is invalid! It should be DIV, or ID of DIV, or jQuery instance of DIV.";
         }
+        //    var self = this;
         container.mousemove(function (e) {
             mouseMove(e);
         });
+        // TODO:
+        // Visual color: #0388E5
+        // Implement data transform for rotation.
+        // axis.dataTransform = new DataTransform(
+        //         function (x) {
+        //             return -x;
+        //         },
+        //         function (y) {
+        //             return -y;
+        //         },
+        //         undefined);
+        /**
+        * Private variables of timescale.
+        */
         var that = this;
         var _container = container;
         var _range = {
@@ -27,6 +45,7 @@ var CZ = (function (CZ, $, document) {
         var _mode = "cosmos";
         var _position = "top";
         var _deltaRange;
+        // TODO: Consider to remove or replace.
         var _size;
         var _canvasHeight;
         var _tickSources = {
@@ -44,14 +63,20 @@ var CZ = (function (CZ, $, document) {
         var leftDate = $("<p id='timescale_left_border'></p>");
         var rightDatePanel = $("<div clas='cz-timescale-panel cz-timescale-left'></div>");
         var rightDate = $("<p id='timescale_right_border'></p>");
+        // TODO: Consider to rename.
         var canvasSize = CZ.Settings.tickLength + CZ.Settings.timescaleThickness;
+        // TODO: Consider to rename.
         var text_size;
         var fontSize;
         var strokeStyle;
         var ctx;
         init();
+        /*
+        * Properties of timescale.
+        */
         Object.defineProperties(this, {
-            position: {
+            position: // TODO: Consider to update orientation of timescale.
+            {
                 configurable: false,
                 get: function () {
                     return _position;
@@ -102,7 +127,11 @@ var CZ = (function (CZ, $, document) {
                 }
             }
         });
+        /**
+        * Initializes timescale.
+        */
         function init() {
+            // TODO: #50, change timescale position.
             _container.addClass("cz-timescale");
             _container.addClass("unselectable");
             rightDatePanel.addClass("cz-timescale-right");
@@ -119,6 +148,7 @@ var CZ = (function (CZ, $, document) {
             _container[0].appendChild(leftDatePanel[0]);
             _container[0].appendChild(rightDatePanel[0]);
             canvas[0].height = canvasSize;
+            // TODO: #99-121, refine it.
             text_size = -1;
             strokeStyle = _container ? _container.css("color") : "Black";
             ctx = canvas[0].getContext("2d");
@@ -134,7 +164,11 @@ var CZ = (function (CZ, $, document) {
                 ctx.font = fontSize + _container.style["font-family"];
             }
         }
+        /**
+        * Updates timescale size or its embedded elements' sizes.
+        */
         function updateSize() {
+            // Updates container's children sizes if container's size is changed.
             var prevSize = _size;
             _width = _container.outerWidth(true);
             _height = _container.outerHeight(true);
@@ -153,13 +187,18 @@ var CZ = (function (CZ, $, document) {
             }
             _deltaRange = (_size - 1) / (_range.max - _range.min);
             _canvasHeight = canvas[0].height;
+            // Updates container's size according to text size in labels.
             if(isHorizontal) {
+                // NOTE: No need to calculate max text size of all labels.
                 text_size = (_ticksInfo[0] && _ticksInfo[0].height !== text_size) ? _ticksInfo[0].height : 0;
                 if(text_size !== 0) {
                     labelsDiv.css("height", text_size);
                     canvas[0].height = canvasSize;
-                }
+                    //_height = text_size + canvasSize;
+                    //_container.css("height", _height);
+                                    }
             } else {
+                // NOTE: No need to calculate max text size of all labels.
                 text_size = (_ticksInfo[0] && _ticksInfo[0].width !== text_size) ? _ticksInfo[0].width : 0;
                 if(text_size !== old_text_size && text_size !== 0) {
                     labelsDiv.css("width", text_size);
@@ -169,12 +208,18 @@ var CZ = (function (CZ, $, document) {
                 }
             }
         }
+        /**
+        * Sets mode of timescale according to zoom level.
+        * In different zoom levels it allows to use different
+        * ticksources.
+        */
         function setMode() {
             var beta;
             if(_range.min <= -10000) {
                 that.mode = "cosmos";
             } else {
                 beta = Math.floor(Math.log(_range.max - _range.min) * (1 / Math.log(10)));
+                // BCE or CE years
                 if(beta < 0) {
                     that.mode = "date";
                 } else {
@@ -182,6 +227,9 @@ var CZ = (function (CZ, $, document) {
                 }
             }
         }
+        /**
+        * Calculates and caches positions of ticks and labels' size.
+        */
         function getTicksInfo() {
             var len = _ticks.length;
             var size;
@@ -218,6 +266,9 @@ var CZ = (function (CZ, $, document) {
                 }
             }
         }
+        /**
+        * Adds new labels to container and apply styles to them.
+        */
         function addNewLabels() {
             var label;
             var labelDiv;
@@ -234,6 +285,10 @@ var CZ = (function (CZ, $, document) {
                 }
             }
         }
+        /**
+        * Checks whether labels are overlayed or not.
+        * @return {[type]}       [description]
+        */
         function checkLabelsArrangement() {
             var delta;
             var deltaSize;
@@ -275,12 +330,20 @@ var CZ = (function (CZ, $, document) {
             }
             return false;
         }
+        /**
+        * Updates collection of major ticks.
+        * Iteratively insert new ticks and stops when ticks are overlayed.
+        * Or decrease number of ticks until ticks are not overlayed.
+        */
         function updateMajorTicks() {
             var i;
+            // Get ticks from current ticksource.
             _ticks = _tickSources[_mode].getTicks(_range);
+            // Adjust number of labels and ticks in timescale.
             addNewLabels();
             getTicksInfo();
             if(checkLabelsArrangement()) {
+                // If labels overlay each other then decrease number of ticks.
                 for(i = 0; i < CZ.Settings.maxTickArrangeIterations; ++i) {
                     _ticks = _tickSources[_mode].decreaseTickCount();
                     addNewLabels();
@@ -290,10 +353,12 @@ var CZ = (function (CZ, $, document) {
                     }
                 }
             } else {
+                // If labels don't overlay each other then increase number of ticks.
                 for(i = 0; i < CZ.Settings.maxTickArrangeIterations; ++i) {
                     _ticks = _tickSources[_mode].increaseTickCount();
                     addNewLabels();
                     getTicksInfo();
+                    // There is no more space to insert new ticks. Decrease number of ticks.
                     if(checkLabelsArrangement(_ticks)) {
                         _ticks = _tickSources[_mode].decreaseTickCount();
                         getTicksInfo();
@@ -303,6 +368,9 @@ var CZ = (function (CZ, $, document) {
                 }
             }
         }
+        /**
+        * Render base line of timescale.
+        */
         function renderBaseLine() {
             if(isHorizontal) {
                 if(_position == "bottom") {
@@ -318,6 +386,10 @@ var CZ = (function (CZ, $, document) {
                 }
             }
         }
+        /**
+        * Renders ticks and labels. If range is a single point then renders
+        * only label in the middle of timescale.
+        */
         function renderMajorTicks() {
             var x;
             var shift;
@@ -357,6 +429,9 @@ var CZ = (function (CZ, $, document) {
             ctx.stroke();
             ctx.closePath();
         }
+        /**
+        * Gets and renders small ticks between major ticks.
+        */
         function renderSmallTicks() {
             var minDelta;
             var i;
@@ -364,6 +439,7 @@ var CZ = (function (CZ, $, document) {
             var smallTicks = _tickSources[_mode].getSmallTicks(_ticks);
             ctx.beginPath();
             if(smallTicks && smallTicks.length > 0) {
+                // check for enough space
                 minDelta = Math.abs(that.getCoordinateFromTick(smallTicks[1]) - that.getCoordinateFromTick(smallTicks[0]));
                 len = smallTicks.length;
                 for(i = 1; i < len - 1; i++) {
@@ -413,6 +489,9 @@ var CZ = (function (CZ, $, document) {
             that.setTimeBorders();
         }
         this.markerPosition = -1;
+        /**
+        * Renders marker.
+        */
         this.setTimeMarker = function (time) {
             if(time > maxPermitedTimeRange.right) {
                 time = maxPermitedTimeRange.right;
@@ -443,6 +522,8 @@ var CZ = (function (CZ, $, document) {
             } else {
                 var left_pos = (left_time - _range.max) / k + _width;
             }
+            //$('#timescale_left_border').css("left", left_pos);
+            //$('#timescale_right_border').css("left", right_pos);
             var left_text = _tickSources[_mode].getMarkerLabel(_range, left_time);
             var right_text = _tickSources[_mode].getMarkerLabel(_range, right_time);
             document.getElementById('timescale_left_border').innerHTML = left_text;
@@ -451,10 +532,18 @@ var CZ = (function (CZ, $, document) {
         this.MarkerPosition = function () {
             return this.markerPosition;
         };
+        /**
+        * Main function for timescale rendering.
+        * Updates timescale's visual state.
+        */
         function render() {
+            // Set mode of timescale. Enabled mode depends on zoom level.
             setMode();
+            // Update major ticks collection.
             updateMajorTicks();
+            // Update size of timescale and its embedded elements.
             updateSize();
+            // Setup canvas' context before rendering.
             ctx.strokeStyle = strokeStyle;
             ctx.fillStyle = strokeStyle;
             ctx.lineWidth = CZ.Settings.timescaleThickness;
@@ -463,10 +552,17 @@ var CZ = (function (CZ, $, document) {
             } else {
                 ctx.clearRect(0, 0, canvasSize, _size);
             }
+            // Render timescale.
+            // NOTE: http://jsperf.com/fill-vs-fillrect-vs-stroke
             renderBaseLine();
             renderMajorTicks();
             renderSmallTicks();
         }
+        /**
+        * Get screen coordinates of tick.
+        * @param  {number} x [description]
+        * @return {[type]}   [description]
+        */
         this.getCoordinateFromTick = function (x) {
             var delta = _deltaRange;
             var k = _size / (_range.max - _range.min);
@@ -475,28 +571,42 @@ var CZ = (function (CZ, $, document) {
             var beta;
             var firstYear;
             if(_range.min >= -10000) {
-                beta = Math.log(_range.max - _range.min) * log10;
+                beta = Math.log(_range.max - _range.min) * log10//Math.floor(Math.log(_range.max - _range.min) * log10);
+                ;
                 firstYear = getCoordinateFromDMY(0, 0, 1);
                 if(beta >= 0) {
                     x1 += k * firstYear;
                 }
-            }
+                /*if (beta < 0) {
+                x1 -= k * firstYear;
+                }*/
+                            }
             if(isFinite(delta)) {
                 return x1;
             } else {
                 return _size / 2;
             }
         };
+        /**
+        * Rerender timescale with new ticks.
+        * @param  {object} range { min, max } values of new range.
+        */
         this.update = function (range) {
             _range = range;
             render();
             this.setTimeBorders();
         };
+        /**
+        * Clears container DIV.
+        */
         this.destroy = function () {
             _container[0].innerHTML = "";
             _container.removeClass("cz-timescale");
             _container.removeClass("unselectable");
         };
+        /**
+        * Destroys timescale and removes it from parend node.
+        */
         this.remove = function () {
             var parent = _container[0].parentElement;
             if(parent) {
@@ -505,6 +615,7 @@ var CZ = (function (CZ, $, document) {
             this.destroy();
         };
     };
+    //this is the class for creating ticks
     CZ.TickSource = function () {
         this.delta , this.beta;
         this.range = {
@@ -512,9 +623,13 @@ var CZ = (function (CZ, $, document) {
             max: 0
         };
         this.log10 = 1 / Math.log(10);
-        this.startDate = null , this.endDate = null , this.firstYear = null;
-        this.regime = "";
-        this.level = 1;
+        this.startDate = null , // start date of range in 'date' mode
+        this.endDate = null , // end date of range in 'date' mode
+        this.firstYear = null;
+        this.regime = ""// "Ga", "Ma", "ka" for 'cosmos' mode, "BCE/CE" for 'calendar' mode, "Date" for 'date' mode
+        ;
+        this.level = 1// divider for each regime
+        ;
         this.present;
         var divPool = [];
         var isUsedPool = [];
@@ -524,6 +639,7 @@ var CZ = (function (CZ, $, document) {
         this.start;
         this.finish;
         this.width = 900;
+        // gets first available div (not used) or creates new one
         this.getDiv = function (x) {
             var inner = this.getLabel(x);
             var i = inners.indexOf(inner);
@@ -556,6 +672,7 @@ var CZ = (function (CZ, $, document) {
                 }
             }
         };
+        // make all not used divs invisible (final step)
         this.refreshDivs = function () {
             for(var i = 0; i < len; i++) {
                 if(isUsedPool[i]) {
@@ -574,6 +691,10 @@ var CZ = (function (CZ, $, document) {
             this.getRegime(range.min, range.max);
             return this.createTicks(range);
         };
+        /*    this.getMinTicks = function () {
+        this.getRegime(this.range.min, this.range.max);
+        return this.createTicks(this.range);
+        };*/
         this.getLabel = function (x) {
             return x;
         };
@@ -627,6 +748,7 @@ var CZ = (function (CZ, $, document) {
                 return val;
             }
         };
+        //returns text for marker label
         this.getMarkerLabel = function (range, time) {
             return time;
         };
@@ -637,7 +759,9 @@ var CZ = (function (CZ, $, document) {
         var that = this;
         this.getLabel = function (x) {
             var text;
+            // maximum number of decimal digits
             var n = Math.max(Math.floor(Math.log(this.delta * Math.pow(10, this.beta) / this.level) * this.log10), -4);
+            // divide tick coordinate by level of cosmos zoom
             text = -x / this.level;
             if(n < 0) {
                 text = (new Number(text)).toFixed(-n);
@@ -650,6 +774,7 @@ var CZ = (function (CZ, $, document) {
                 this.range.min = l;
                 this.range.max = r;
             } else {
+                // default range
                 this.range.min = maxPermitedTimeRange.left;
                 this.range.max = maxPermitedTimeRange.right;
             }
@@ -659,16 +784,20 @@ var CZ = (function (CZ, $, document) {
             if(this.range.max > maxPermitedTimeRange.right) {
                 this.range.max = maxPermitedTimeRange.right;
             }
+            // set present date
             var localPresent = getPresent();
             this.present = {
                 year: localPresent.getUTCFullYear(),
                 month: localPresent.getUTCMonth(),
                 day: localPresent.getUTCDate()
             };
+            // remember value in virtual coordinates when 1CE starts
             this.firstYear = getCoordinateFromDMY(0, 0, 1);
+            // set default constant for arranging ticks
             this.delta = 1;
             this.beta = Math.floor(Math.log(this.range.max - this.range.min) * this.log10);
             if(this.range.min <= -10000000000) {
+                // billions of years ago
                 this.regime = "Ga";
                 this.level = 1000000000;
                 if(this.beta < 7) {
@@ -676,15 +805,18 @@ var CZ = (function (CZ, $, document) {
                     this.level = 1000000;
                 }
             } else if(this.range.min <= -10000000) {
+                // millions of years ago
                 this.regime = "Ma";
                 this.level = 1000000;
             } else if(this.range.min <= -10000) {
+                // thousands of years ago
                 this.regime = "ka";
                 this.level = 1000;
             }
         };
         this.createTicks = function (range) {
             var ticks = new Array();
+            // prevent zooming deeper than 4 decimal digits
             if(this.regime == "Ga" && this.beta < 7) {
                 this.beta = 7;
             } else if(this.regime == "Ma" && this.beta < 2) {
@@ -693,11 +825,15 @@ var CZ = (function (CZ, $, document) {
                 this.beta = -1;
             }
             var dx = this.delta * Math.pow(10, this.beta);
+            // calculate count of ticks to create
             var min = Math.floor(this.range.min / dx);
             var max = Math.floor(this.range.max / dx);
             var count = max - min + 1;
+            // calculate rounded ticks values
+            // they are in virtual coordinates (years from present date)
             var num = 0;
-            var x0 = min * dx;
+            var x0 = min * dx;//coord of first tick
+            
             if(dx == 2) {
                 count++;
             }
@@ -715,7 +851,11 @@ var CZ = (function (CZ, $, document) {
             return ticks;
         };
         this.createSmallTicks = function (ticks) {
+            // function to create minor ticks
             var minors = new Array();
+            //       var start = Math.max(this.range.left, maxPermitedTimeRange.left);
+            //       var end = Math.min(this.range.right, maxPermitedTimeRange.right);
+            //the amount of small ticks
             var n = 4;
             var k = this.width / (this.range.max - this.range.min);
             var nextStep = true;
@@ -725,17 +865,22 @@ var CZ = (function (CZ, $, document) {
                 return null;
             }
             var tick = ticks[0].position - step;
+            // create little ticks before first big tick
             while(tick > this.range.min) {
                 minors.push(tick);
                 tick -= step;
             }
             for(var i = 0; i < ticks.length - 1; i++) {
                 var t = ticks[i].position;
+                /*    // Count minor ticks from 1BCE, not from 1CE if step between large ticks greater than 1
+                if (step > 1e-10 + 1 / (n + 1) && Math.abs(t - 1.0) < 1e-10)
+                t = 0;*/
                 for(var k = 1; k <= n; k++) {
                     tick = t + step * k;
                     minors.push(tick);
                 }
             }
+            // create little ticks after last big tick
             tick = ticks[ticks.length - 1].position + step;
             while(tick < this.range.max) {
                 minors.push(tick);
@@ -766,11 +911,16 @@ var CZ = (function (CZ, $, document) {
     CZ.CalendarTickSource = function (params) {
         this.base = CZ.TickSource;
         this.base();
+        /*    this.getTicks = function (range) {
+        this.getRegime(range.min, range.max);
+        return this.createTicks(range);
+        };*/
         this.getLabel = function (x) {
             var text;
             if(x <= 0) {
                 text = -x + 1 + " BCE";
             } else {
+                //text = x - 1;
                 text = x + " AD";
             }
             return text;
@@ -780,6 +930,7 @@ var CZ = (function (CZ, $, document) {
                 this.range.min = l;
                 this.range.max = r;
             } else {
+                // default range
                 this.range.min = maxPermitedTimeRange.left;
                 this.range.max = maxPermitedTimeRange.right;
             }
@@ -789,12 +940,14 @@ var CZ = (function (CZ, $, document) {
             if(this.range.max > maxPermitedTimeRange.right) {
                 this.range.max = maxPermitedTimeRange.right;
             }
+            // set present date
             var localPresent = getPresent();
             this.present = {
                 year: localPresent.getUTCFullYear(),
                 month: localPresent.getUTCMonth(),
                 day: localPresent.getUTCDate()
             };
+            // remember value in virtual coordinates when 1CE starts
             this.firstYear = getCoordinateFromDMY(0, 0, 1);
             this.range.max -= this.firstYear;
             this.range.min -= this.firstYear;
@@ -806,6 +959,7 @@ var CZ = (function (CZ, $, document) {
             if(this.range.max < 0) {
                 this.endDate = getDMYFromCoordinate(this.range.max);
             }
+            // set default constant for arranging ticks
             this.delta = 1;
             this.beta = Math.floor(Math.log(this.range.max - this.range.min) * this.log10);
             this.regime = "BCE/CE";
@@ -813,13 +967,18 @@ var CZ = (function (CZ, $, document) {
         };
         this.createTicks = function (range) {
             var ticks = new Array();
+            // shift range limits as in calendar mode we count from present year
+            // prevent zooming deeper than 1 year span
             if(this.beta < 0) {
                 this.beta = 0;
             }
             var dx = this.delta * Math.pow(10, this.beta);
+            // calculate count of ticks to create
             var min = Math.floor(this.range.min / dx);
             var max = Math.floor(this.range.max / dx);
             var count = max - min + 1;
+            // calculate rounded ticks values
+            // they are in virtual coordinates (years from present date)
             var num = 0;
             var x0 = min * dx;
             if(dx == 2) {
@@ -827,9 +986,11 @@ var CZ = (function (CZ, $, document) {
             }
             for(var i = 0; i < count + 1; i++) {
                 var tick_position = this.round(x0 + i * dx, this.beta);
+                //if (tick_position <=0 ) tick_position += 1;
                 if(tick_position < 1e-10 && dx > 1) {
                     tick_position += 1;
-                }
+                }// Move tick from 1BCE to 1CE
+                
                 if(tick_position >= this.range.min && tick_position <= this.range.max && tick_position != ticks[ticks.length - 1]) {
                     ticks[num] = {
                         position: tick_position,
@@ -842,7 +1003,11 @@ var CZ = (function (CZ, $, document) {
             return ticks;
         };
         this.createSmallTicks = function (ticks) {
+            // function to create minor ticks
             var minors = new Array();
+            //       var start = Math.max(this.range.left, maxPermitedTimeRange.left);
+            //       var end = Math.min(this.range.right, maxPermitedTimeRange.right);
+            //the amount of small ticks
             var n = 4;
             var beta1 = Math.floor(Math.log(this.range.max - this.range.min) * this.log10);
             if(beta1 <= 0.3) {
@@ -856,20 +1021,24 @@ var CZ = (function (CZ, $, document) {
                 return null;
             }
             var tick = ticks[0].position - step;
+            // create little ticks before first big tick
             while(tick > this.range.min) {
                 minors.push(tick);
                 tick -= step;
             }
             for(var i = 0; i < ticks.length - 1; i++) {
                 var t = ticks[i].position;
+                // Count minor ticks from 1BCE, not from 1CE if step between large ticks greater than 1
                 if(step > 1e-10 + 1 / (n + 1) && Math.abs(t - 1.0) < 1e-10) {
                     t = 0;
                 }
                 for(var k = 1; k <= n; k++) {
                     tick = t + step * k;
+                    //if (tick < 0) tick += 1;
                     minors.push(tick);
                 }
             }
+            // create little ticks after last big tick
             tick = ticks[ticks.length - 1].position + step;
             while(tick < this.range.max) {
                 minors.push(tick);
@@ -900,12 +1069,14 @@ var CZ = (function (CZ, $, document) {
         this.base = CZ.TickSource;
         this.base();
         var year, month, day;
+        // span between two rendering neighboring days
         var tempDays = 0;
         this.getRegime = function (l, r) {
             if(l < r) {
                 this.range.min = l;
                 this.range.max = r;
             } else {
+                // default range
                 this.range.min = maxPermitedTimeRange.left;
                 this.range.max = maxPermitedTimeRange.right;
             }
@@ -915,18 +1086,22 @@ var CZ = (function (CZ, $, document) {
             if(this.range.max > maxPermitedTimeRange.right) {
                 this.range.max = maxPermitedTimeRange.right;
             }
+            // set present date
             var localPresent = getPresent();
             this.present = {
                 year: localPresent.getUTCFullYear(),
                 month: localPresent.getUTCMonth(),
                 day: localPresent.getUTCDate()
             };
+            // remember value in virtual coordinates when 1CE starts
             this.firstYear = getCoordinateFromDMY(0, 0, 1);
             this.startDate = this.present;
             this.endDate = this.present;
             this.startDate = getDMYFromCoordinate(this.range.min);
             this.endDate = getDMYFromCoordinate(this.range.max);
+            // set default constant for arranging ticks
             this.delta = 1;
+            //  this.beta = Math.floor(Math.log(this.range.max - this.range.min) * this.log10);
             this.beta = Math.log(this.range.max - this.range.min) * this.log10;
             if(this.beta >= -0.2) {
                 this.regime = "Quarters_Month";
@@ -970,8 +1145,11 @@ var CZ = (function (CZ, $, document) {
             tempDays = 0;
             var ticks = new Array();
             var num = 0;
+            // count number of months to render
             var countMonths = 0;
+            // count number of days to render
             var countDays = 0;
+            //current year and month to start counting
             var tempYear = this.startDate.year;
             var tempMonth = this.startDate.month;
             while(tempYear < this.endDate.year || (tempYear == this.endDate.year && tempMonth <= this.endDate.month)) {
@@ -982,21 +1160,29 @@ var CZ = (function (CZ, $, document) {
                     tempYear++;
                 }
             }
+            // calculate ticks values
+            // they are in virtual coordinates (years from present date)
             year = this.startDate.year;
+            // create month ticks
             month = this.startDate.month - 1;
-            var month_step = 1;
-            var date_step = 1;
+            var month_step = 1;//step to render month
+            
+            var date_step = 1;//step to render days
+            
             for(var j = 0; j <= countMonths + 2; j += month_step) {
                 month += month_step;
                 if(month >= 12) {
                     month = 0;
                     year++;
                 }
+                //if (year == 0) year--;
                 if((this.regime == "Quarters_Month") || (this.regime == "Month_Weeks")) {
+                    //if (year == 0) year--;
                     var tick = getCoordinateFromDMY(year, month, 1);
                     if(tick >= this.range.min && tick <= this.range.max) {
                         if(tempDays != 1) {
                             if((month % 3 == 0) || (this.regime == "Month_Weeks")) {
+                                //  if (year < this.firstYear) year++;
                                 ticks[num] = {
                                     position: tick,
                                     label: this.getDiv(tick)
@@ -1006,6 +1192,7 @@ var CZ = (function (CZ, $, document) {
                         }
                     }
                 }
+                // create days ticks for this month
                 if((this.regime == "Weeks_Days") || (this.regime == "Days_Quarters")) {
                     countDays = Math.floor(daysInMonth[month]);
                     tempDays = 1;
@@ -1036,22 +1223,30 @@ var CZ = (function (CZ, $, document) {
             return ticks;
         };
         this.createSmallTicks = function (ticks) {
+            // function to create minor ticks
             var minors = new Array();
+            //       var start = Math.max(this.range.left, maxPermitedTimeRange.left);
+            //       var end = Math.min(this.range.right, maxPermitedTimeRange.right);
+            //the amount of small ticks
             var k = this.width / (this.range.max - this.range.min);
             var nextStep = true;
             var step;
-            var n;
+            var n;//Math.floor(daysInMonth[date.month] / step);
+            
             var tick = ticks[0].position;
             var date = getDMYFromCoordinate(tick);
             if(this.regime == "Quarters_Month") {
                 n = 2;
             } else if(this.regime == "Month_Weeks") {
                 n = daysInMonth[date.month];
-            } else if(this.regime == "Weeks_Days") {
+            } else //step = 5 / daysInMonth[date.month];
+            if(this.regime == "Weeks_Days") {
                 n = 7;
-            } else if(this.regime == "Days_Quarters") {
+            } else //step = 5 / 7;
+            if(this.regime == "Days_Quarters") {
                 n = 4;
-            }
+            }//step = 5 / 4;
+            
             if(this.regime == "Quarters_Month") {
                 step = Math.floor(2 * daysInMonth[date.month] / n);
             } else if(this.regime == "Month_Weeks") {
@@ -1088,7 +1283,9 @@ var CZ = (function (CZ, $, document) {
                 var date = getDMYFromCoordinate(tick);
                 var j_step = 1;
                 for(var j = 1; j <= n; j += j_step) {
+                    //date.day += j_step * step;
                     date.day += step;
+                    //if (date.day == step + 1 && step != 1) date.day--;
                     tick = getCoordinateFromDMY(date.year, date.month, date.day);
                     if(this.regime != "Month_Weeks") {
                         if(minors.length == 0 || k * (ticks[i + 1].position - tick) > CZ.Settings.minSmallTickSpace) {
@@ -1142,15 +1339,18 @@ var CZ = (function (CZ, $, document) {
                 this.range.min = l;
                 this.range.max = r;
             } else {
+                // default range
                 this.range.min = maxPermitedTimeRange.left;
                 this.range.max = maxPermitedTimeRange.right;
             }
+            // set present date
             var localPresent = getPresent();
             this.present = {
                 year: localPresent.getUTCFullYear(),
                 month: localPresent.getUTCMonth(),
                 day: localPresent.getUTCDate()
             };
+            // remember value in virtual coordinates when 1CE starts
             this.firstYear = getCoordinateFromDMY(0, 0, 1);
             this.startDate = this.present;
             this.endDate = this.present;
@@ -1160,8 +1360,10 @@ var CZ = (function (CZ, $, document) {
             if(this.range.max < 0) {
                 this.endDate = getDMYFromCoordinate(this.range.max);
             }
+            // set default constant for arranging ticks
             this.delta = 1;
             this.beta = Math.log(this.range.max - this.range.min) * this.log10;
+            //äîïóñòèì date çàêîí÷èòñÿ â 1.8
             if(this.beta >= -2.2) {
                 this.regime = "QuarterDays_Hours";
             }
@@ -1174,16 +1376,23 @@ var CZ = (function (CZ, $, document) {
             if(this.beta <= -3.8 && this.beta >= -4.4) {
                 this.regime = "10mins_mins";
             }
+            /* if (this.beta <= -4.4 && this.beta >= -5.4) this.regime = "mins_10secs";
+            if (this.beta <= -5.4 && this.beta >= -6.4) this.regime = "10secs_secs";
+            if (this.beta <= -6.4) this.regime = "secs_quarters";*/
             this.level = 1;
         };
         this.getLabel = function (x) {
         };
+        //ïåðåäåëàòü!
         this.createTicks = function (range) {
             tempDays = 0;
             var ticks = new Array();
             var num = 0;
+            // count number of months to render
             var countMonths = 0;
+            // count number of days to render
             var countDays = 0;
+            //current year and month to start counting
             var tempYear = this.startDate.year;
             var tempMonth = this.startDate.month;
             while(tempYear < this.endDate.year || (tempYear == this.endDate.year && tempMonth <= this.endDate.month)) {
@@ -1194,16 +1403,22 @@ var CZ = (function (CZ, $, document) {
                     tempYear++;
                 }
             }
+            // calculate ticks values
+            // they are in virtual coordinates (years from present date)
             year = this.startDate.year;
+            // create month ticks
             month = this.startDate.month - 1;
-            var month_step = 1;
-            var date_step = 1;
+            var month_step = 1;//step to render month
+            
+            var date_step = 1;//step to render days
+            
             for(var j = 0; j <= countMonths + 2; j += month_step) {
                 month += month_step;
                 if(month >= 12) {
                     month = 0;
                     year++;
                 }
+                //      if (year >= 0) year--;
                 if((this.regime == "Quarters_Month") || (this.regime == "Month_Weeks")) {
                     var tick = getCoordinateFromDMY(year, month, 1);
                     if(tick >= this.range.min && tick <= this.range.max) {
@@ -1218,6 +1433,7 @@ var CZ = (function (CZ, $, document) {
                         }
                     }
                 }
+                // create days ticks for this month
                 if((this.regime == "Weeks_Days") || (this.regime == "Days_Quarters")) {
                     countDays = Math.floor(daysInMonth[month]);
                     tempDays = 1;

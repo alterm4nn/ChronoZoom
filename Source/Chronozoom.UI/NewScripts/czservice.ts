@@ -90,8 +90,8 @@ module CZ {
         export function get () {
             var request = new Service.Request(_serviceUrl);
             request.addToPath("get");
-            request.addParameter("supercollection", Service.superCollectionName);
-            request.addParameter("collection", Service.collectionName);
+            request.addParameter("supercollection", CZ.Service.superCollectionName);
+            request.addParameter("collection", CZ.Service.collectionName);
 
             return $.ajax({
                 type: "GET",

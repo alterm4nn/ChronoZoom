@@ -1,28 +1,59 @@
+/// <reference path='cz.settings.ts'/>
+/// <reference path='tours.ts'/>
+/// <reference path='breadcrumbs.ts'/>
+/// <reference path='search.ts'/>
+/// <reference path='urlnav.ts'/>
+/// <reference path='layout.ts'/>
+/// <reference path='axis.ts'/>
+/// <reference path='timescale.ts'/>
+/// <reference path='virtualcanvas.ts'/>
+/*
+Array for logging of inners messages and exceptions
+*/
 var Log = new Array();
-var controller;
-var isAxisFreezed = true;
+var controller;//a controller to perform smooth navigation
+
+var isAxisFreezed = true;//indicates whether the axis moves together with canvas during navigation or not
+
 var startHash;
 var searchString;
 var ax, vc;
 var visReg;
 var cosmosVisible, earthVisible, lifeVisible, prehistoryVisible, humanityVisible;
 var content;
-var breadCrumbs;
-var firstTimeWelcomeChecked = true;
+var breadCrumbs;//titles and visibles of the recent breadcrumbs
+
+var firstTimeWelcomeChecked = true;// if welcome screen checkbox checked or not
+
 var regimes = new Array();
 var regimesRatio;
 var regimeNavigator;
 var k = 1000000000;
-var setNavigationStringTo;
-var hashHandle = true;
-var tourNotParsed = undefined;
-var supercollection = "";
-var collection = "";
+var setNavigationStringTo;// { element or bookmark, id } identifies that we zoom into this element and when (if) finish the zoom, we should put the element's path into navigation string
+
+var hashHandle = true;// Handle hash change event
+
+var tourNotParsed = undefined;// indicates that URL was checked at tour sharing after page load
+
+var supercollection = "";// the supercollection associated with this url
+
+var collection = "";// the collection associated with this url
+
+/* Calculates local offset of mouse cursor in specified jQuery element.
+@param jqelement  (JQuery to Dom element) jQuery element to get local offset for.
+@param event   (Mouse event args) mouse event args describing mouse cursor.
+*/
 function getXBrowserMouseOrigin(jqelement, event) {
     var offsetX;
+    ///if (!event.offsetX)
     offsetX = event.pageX - jqelement[0].offsetLeft;
+    //else
+    //    offsetX = event.offsetX;
     var offsetY;
+    //if (!event.offsetY)
     offsetY = event.pageY - jqelement[0].offsetTop;
+    //else
+    //    offsetY = event.offsetY;
     return {
         x: offsetX,
         y: offsetY
@@ -31,8 +62,12 @@ function getXBrowserMouseOrigin(jqelement, event) {
 function sqr(d) {
     return d * d;
 }
+// Prevents the event from bubbling.
+// In non IE browsers, use e.stopPropagation() instead.
+// To cancel event bubbling across browsers, you should check for support for e.stopPropagation(), and proceed accordingly:
 function preventbubble(e) {
     if(e && e.stopPropagation) {
+        //if stopPropagation method supported
         e.stopPropagation();
     } else {
         e.cancelBubble = true;
@@ -47,7 +82,10 @@ function getCoordinateFromDMY(year, month, day) {
 function getDMYFromCoordinate(coord) {
     return getDateFrom(0, 0, 0, coord);
 }
+// convert date to virtual coordinate
+// 9999 -> present day
 function getCoordinateFromDecimalYear(decimalYear) {
+    // get virtual coordinate of present day
     var localPresent = getPresent();
     var presentDate = getYearsBetweenDates(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay, 0, 0, 0);
     return decimalYear === 9999 ? presentDate : decimalYear;
@@ -62,7 +100,12 @@ function getPresent() {
     }
     return present;
 }
+// gets the gap between two dates
+// y1, m1, d1 is first date (year, month, day)
+// y2, m2, d2 is second date (year, month, day)
+// returns count of years between given dates
 function getYearsBetweenDates(y1, m1, d1, y2, m2, d2) {
+    // get full years and month passed
     var years = y2 - y1;
     if(y2 > 0 && y1 < 0) {
         years -= 1;
@@ -74,6 +117,7 @@ function getYearsBetweenDates(y1, m1, d1, y2, m2, d2) {
     }
     var month = m1;
     var days = -d1;
+    // calculate count of passed days
     for(var i = 0; i < months; i++) {
         if(month == 12) {
             month = 0;
@@ -85,12 +129,18 @@ function getYearsBetweenDates(y1, m1, d1, y2, m2, d2) {
     var res = years + days / 365;
     return -res;
 }
+// gets the end date by given start date and gap between them
+// year, month, day is known date
+// n is count of years between known and result dates; n is negative, so result date in earlier then given
 function getDateFrom(year, month, day, n) {
     var endYear = year;
     var endMonth = month;
     var endDay = day;
+    // get full year of result date
     endYear -= Math.floor(-n);
+    // get count of days in a gap
     var nDays = (n + Math.floor(-n)) * 365;
+    // calculate how many full months have passed
     while(nDays < 0) {
         var tempMonth = endMonth > 0 ? endMonth - 1 : 11;
         nDays += daysInMonth[tempMonth];
@@ -101,10 +151,12 @@ function getDateFrom(year, month, day, n) {
         }
     }
     endDay += Math.round(nDays);
+    // get count of days in current month
     var tempDays = daysInMonth[endMonth];
     if(isLeapYear(endYear)) {
         tempDays++;
     }
+    // if result day is bigger than count of days then one more month has passed too
     while(endDay > tempDays) {
         endDay -= tempDays;
         endMonth++;
@@ -176,6 +228,7 @@ function GenerateProperty(dateContainer, timeUnit, year, month, day, propName) {
     }
 }
 function closeWelcomeScreen() {
+    //if ($('input[name=welcomeScreenCheckbox]').is(':checked'))
     setCookie("welcomeScreenDisallowed", "1", 365);
     hideWelcomeScreen();
 }
@@ -183,8 +236,10 @@ function hideWelcomeScreen() {
     document.getElementById("welcomeVideo").src = "";
     $("#welcomeScreenBack").css("display", "none");
 }
+/*Animation tooltip parameter*/
 var animationTooltipRunning = null;
-var tooltipMode = "default";
+var tooltipMode = "default";//['infodot'], ['timeline'] indicates whether tooltip is refers to timeline or to infodot
+
 function stopAnimationTooltip() {
     if(animationTooltipRunning != null) {
         $('.bubbleInfo').stop();
@@ -192,13 +247,19 @@ function stopAnimationTooltip() {
         $(".bubbleInfo").css("filter", "alpha(opacity=90)");
         $(".bubbleInfo").css("-moz-opacity", "0.9");
         animationTooltipRunning = null;
+        //tooltipMode = "default"; //default
+        //tooltipIsShown = false;
         $(".bubbleInfo").attr("id", "defaultBox");
         $(".bubbleInfo").hide();
     }
 }
+// Compares 2 visibles. Returns true if they are equal with an allowable imprecision
 function compareVisibles(vis1, vis2) {
     return vis2 != null ? (Math.abs(vis1.centerX - vis2.centerX) < allowedVisibileImprecision && Math.abs(vis1.centerY - vis2.centerY) < allowedVisibileImprecision && Math.abs(vis1.scale - vis2.scale) < allowedVisibileImprecision) : false;
 }
+/*
+Is called by direct user actions like links, bread crumbs clicking, etc.
+*/
 function setVisibleByUserDirectly(visible) {
     pauseTourAtAnyAnimation = false;
     if(tour != undefined && tour.state == "play") {
@@ -208,10 +269,13 @@ function setVisibleByUserDirectly(visible) {
 }
 function setVisible(visible) {
     if(visible) {
+        //ax.axis("enableThresholds", false);
         return controller.moveToVisible(visible);
     }
 }
+// Retrieves the URL to download the data from
 function loadDataUrl() {
+    // The following regexp extracts the pattern dataurl=url from the page hash to enable loading timelines from arbitrary sources.
     var match = /dataurl=([^\/]*)/g.exec(window.location.hash);
     if(match) {
         return unescape(match[1]);
@@ -228,13 +292,16 @@ function loadDataUrl() {
         }
     }
 }
+//loading the data from the service
 function loadData() {
+    //load URL state
     getURL();
     CZ.Service.getTimelines({
         start: -50000000000,
         end: 9999,
-        minspan: 5013
-    }).then(function (response) {
+        minspan: null
+    }).then(// Can't specify minspan on first load since the timeline span will vary significantly.
+    function (response) {
         ProcessContent(response);
         vc.virtualCanvas("updateViewport");
     }, function (error) {
@@ -248,6 +315,7 @@ function ProcessContent(content) {
     root.endEdit(true);
     InitializeRegimes(content);
     if(startHash) {
+        // restoring the window's hash as it was on the page loading
         visReg = navStringToVisible(startHash.substring(1), vc);
     }
     if(!visReg && cosmosVisible) {
@@ -261,7 +329,8 @@ function ProcessContent(content) {
         updateNavigator(vp);
         if(startHash && window.location.hash !== startHash) {
             hashChangeFromOutside = false;
-            window.location.hash = startHash;
+            window.location.hash = startHash// synchronizing
+            ;
         }
     }
 }
@@ -289,9 +358,11 @@ function InitializeRegimes(content) {
     var humanityTimeline = FindChildTimeline(prehistoryTimeline, humanityTimelineID, true);
     humanityVisible = f(humanityTimeline);
     maxPermitedVerticalRange = {
-        top: cosmosTimeline.y,
+        top: //setting top and bottom observation constraints according to cosmos timeline
+        cosmosTimeline.y,
         bottom: cosmosTimeline.y + cosmosTimeline.height
     };
+    // update virtual canvas horizontal borders
     maxPermitedTimeRange = {
         left: cosmosTimeline.left,
         right: cosmosTimeline.right
@@ -299,26 +370,33 @@ function InitializeRegimes(content) {
     maxPermitedScale = navStringToVisible(cosmosVisible, vc).scale * 1.1;
 }
 function updateLayout() {
-    var topHeight = $("#header").outerHeight(true) + $("#axis").outerHeight(true);
-    var bottomHeight = $("#footer").outerHeight(true);
+    var topHeight = $("#header").outerHeight(true) + $("#axis").outerHeight(true);// height of header and axis
+    
+    var bottomHeight = $("#footer").outerHeight(true);// height of footer
+    
     var bodyTopMargin = parseFloat($("body").css("marginTop").replace('px', ''));
     var bodyBottomMargin = parseFloat($("body").css("marginBottom").replace('px', ''));
-    var bodyMargin = bodyTopMargin + bodyBottomMargin;
-    var occupiedHeight = topHeight + bottomHeight + bodyMargin;
+    var bodyMargin = bodyTopMargin + bodyBottomMargin;// calculated top and bottom margin of body tag
+    
+    var occupiedHeight = topHeight + bottomHeight + bodyMargin;// occupied height of the page
+    
     document.getElementById("vc").style.height = (window.innerHeight - occupiedHeight) + "px";
     $(".breadCrumbPanel").css("width", Math.round(($("#vc").width() / 2 - 50)));
     $("#bc_navRight").css("left", ($(".breadCrumbPanel").width() + $(".breadCrumbPanel").position().left + 2) + "px");
     visibleAreaWidth = $(".breadCrumbPanel").width();
     updateHiddenBreadCrumbs();
     var offset = window.innerHeight - occupiedHeight;
-    var biblOutTopMargin = 25;
-    var biblOutBottomMargin = 15;
+    var biblOutTopMargin = 25;// top margin of bibliography outer window
+    
+    var biblOutBottomMargin = 15;// bottom margin of bibliography outer window
+    
     document.getElementById("bibliographyOut").style.top = (topHeight + bodyTopMargin + 25) + "px";
     document.getElementById("bibliographyOut").style.height = (window.innerHeight - occupiedHeight - biblOutTopMargin - biblOutBottomMargin) + "px";
     var welcomeScreenHeight = $("#welcomeScreenOut").outerHeight();
     var diff = Math.floor((window.innerHeight - welcomeScreenHeight) / 2);
     document.getElementById("welcomeScreenOut").style.top = diff + "px";
     vc.virtualCanvas("updateViewport");
+    //ax.axis("updateWidth");
     updateAxis(vc, ax);
     updateBreadCrumbsLabels();
 }
@@ -376,8 +454,11 @@ function updateNavigator(vp) {
         if(Math.abs(coordinate) < 0.00000000001) {
             return 0;
         }
+        //Get log10 from coordinate
         var log = Math.log(coordinate) / 2.302585092994046;
+        //Get pow from log10
         var pow = Math.pow(log, 3) * Math.exp(-log * 0.001);
+        //Get final width of the column
         return (log + pow) * 13700000000 / 1041.2113538234402;
     };
     var left = vp.pointScreenToVirtual(0, 0).x;

@@ -56,10 +56,10 @@ namespace Chronozoom.Entities
 
         public DbSet<SuperCollection> SuperCollections { get; set; }
 
-        public Collection<Timeline> TimelinesQuery(Guid collectionId, decimal startTime, decimal endTime, decimal span, Guid? commonAncestor)
+        public Collection<Timeline> TimelinesQuery(Guid collectionId, decimal startTime, decimal endTime, decimal span, Guid? commonAncestor, int maxElements)
         {
             Dictionary<Guid, Timeline> timelinesMap = new Dictionary<Guid, Timeline>();
-            List<Timeline> timelines = FillTimelines(collectionId, timelinesMap, startTime, endTime, span, commonAncestor);
+            List<Timeline> timelines = FillTimelines(collectionId, timelinesMap, startTime, endTime, span, commonAncestor, maxElements);
 
             FillTimelineRelations(timelinesMap);
 
@@ -125,21 +125,17 @@ namespace Chronozoom.Entities
             }
         }
 
-        private List<Timeline> FillTimelines(Guid collectionId, Dictionary<Guid, Timeline> timelinesMap, decimal startTime, decimal endTime, decimal span, Guid? commonAncestor)
+        private List<Timeline> FillTimelines(Guid collectionId, Dictionary<Guid, Timeline> timelinesMap, decimal startTime, decimal endTime, decimal span, Guid? commonAncestor, int maxElements)
         {
             List<Timeline> timelines = new List<Timeline>();
             Dictionary<Guid, Guid?> timelinesParents = new Dictionary<Guid, Guid?>();
 
             // Populate References
-            string timelinesQuery = "SELECT *, FromYear as [Start], ToYear as [End] FROM Timelines WHERE FromYear >= {0} AND ToYear <= {1} AND ToYear-FromYear >= {2} AND Collection_Id = {3} OR Id = {4}";
-            var timelinesRaw = Database.SqlQuery<TimelineRaw>(timelinesQuery, startTime, endTime, span, collectionId, commonAncestor);
+            string timelinesQuery = "SELECT TOP({0}) *, FromYear as [Start], ToYear as [End] FROM Timelines WHERE FromYear >= {1} AND ToYear <= {2} AND ToYear-FromYear >= {3} AND Collection_Id = {4} OR Id = {5} ORDER BY ToYear-FromYear DESC";
+            var timelinesRaw = Database.SqlQuery<TimelineRaw>(timelinesQuery, maxElements, startTime, endTime, span, collectionId, commonAncestor);
 
             foreach (TimelineRaw timelineRaw in timelinesRaw)
             {
-                // This is being added for backcompatibility and should be removed once Beta API gets deprecated (Beta code does not support null timelines).
-                if (commonAncestor == null && timelineRaw.ChildTimelines == null)
-                    timelineRaw.ChildTimelines = new System.Collections.ObjectModel.Collection<Timeline>();
-
                 if (timelineRaw.Exhibits == null)
                     timelineRaw.Exhibits = new System.Collections.ObjectModel.Collection<Exhibit>();
 
@@ -170,13 +166,11 @@ namespace Chronozoom.Entities
             return timelines;
         }
 
-
-
         // Recursively deletes every child timeline and exhibit (with references and content items) form timeline with given guid. 
         public void DeleteTimeline(Guid id)
         {
-            var timelineIDs = GetChildTimelinesIDs(id); // list of ids of child timelines
-            var exhibitIDs = GetChildExhibitsIDs(id); // list of ids of exhibits
+            var timelineIDs = GetChildTimelinesIds(id); // list of ids of child timelines
+            var exhibitIDs = GetChildExhibitsIds(id); // list of ids of exhibits
 
             // recursively delete timelines
             while (timelineIDs.Count != 0)
@@ -199,8 +193,8 @@ namespace Chronozoom.Entities
         // Deletes every content item and reference from exhibit with given guid.
         public void DeleteExhibit(Guid id)
         {
-            var exhibitsIDs = GetChildContentItemsIDs(id); // list of ids of content items
-            var referencesIDs = GetChildReferencesIDs(id); // list of ids of references
+            var exhibitsIDs = GetChildContentItemsIds(id); // list of ids of content items
+            var referencesIDs = GetChildReferencesIds(id); // list of ids of references
 
             // delete references
             while (referencesIDs.Count != 0)
@@ -223,7 +217,7 @@ namespace Chronozoom.Entities
         }
 
         // Returns list of ids of chilt timelines of timeline with given id.
-        public List<Guid> GetChildTimelinesIDs(Guid id)
+        private List<Guid> GetChildTimelinesIds(Guid id)
         {
             var timelines = new List<Guid>();
 
@@ -240,7 +234,7 @@ namespace Chronozoom.Entities
         }
 
         // Returns list of ids of child exhibits of timeline with given id.
-        public List<Guid> GetChildExhibitsIDs(Guid id)
+        private List<Guid> GetChildExhibitsIds(Guid id)
         {
             var exhibits = new List<Guid>();
 
@@ -257,7 +251,7 @@ namespace Chronozoom.Entities
         }
 
         // Returns list of ids of child content items of exhibit with given id.
-        public List<Guid> GetChildContentItemsIDs(Guid id)
+        private List<Guid> GetChildContentItemsIds(Guid id)
         {
             var contentItems = new List<Guid>();
 
@@ -274,7 +268,7 @@ namespace Chronozoom.Entities
         }
 
         // Returns list of ids of child references of exhibit with given id.
-        public List<Guid> GetChildReferencesIDs(Guid id)
+        private List<Guid> GetChildReferencesIds(Guid id)
         {
             var references = new List<Guid>();
 
