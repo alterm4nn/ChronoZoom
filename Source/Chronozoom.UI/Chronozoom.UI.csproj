@@ -514,6 +514,9 @@
       <Link>Settings.StyleCop</Link>
     </Content>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Dumps\cern-get.json" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
