@@ -165,9 +165,9 @@
                 startHash = window.location.hash; // to be processes after the data is loaded
             loadData(); //retrieving the data
 
-            initializeSearch();
-            initializeBibliography();
-            initializeToursUI();
+            CZ.Search.initializeSearch();
+            CZ.Bibliography.initializeBibliography();
+            CZ.Tours.initializeToursUI();
 
             CZ.Authoring.initialize(vc, {
                 showCreateTimelineForm: CZ.Authoring.UI.showCreateTimelineForm,

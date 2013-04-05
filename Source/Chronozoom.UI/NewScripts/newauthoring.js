@@ -302,7 +302,7 @@ var CZ = (function (CZ, $) {
             this.showEditContentItemForm = formHandlers && formHandlers.showEditContentItemForm || function () {
             };
         },
-        updateTimeline: function (t, prop, form) {
+        updateTimeline: function (t, prop) {
             var temp = {
                 x: Number(prop.start),
                 y: t.y,
@@ -316,16 +316,11 @@ var CZ = (function (CZ, $) {
             }
             t.title = prop.title;
             updateTimelineTitle(t);
-            CZ.Service.putTimeline(t).then(function (success) {
+            return CZ.Service.putTimeline(t).then(function (success) {
                 t.id = "t" + success;
                 t.guid = success;
                 t.titleObject.id = "t" + success + "__header__";
-                if(form) {
-                    form.dialog("close");
-                }
             }, function (error) {
-                alert("Unable to save changes. Please try again later.");
-                console.log(error);
             });
         },
         removeTimeline: function (t) {

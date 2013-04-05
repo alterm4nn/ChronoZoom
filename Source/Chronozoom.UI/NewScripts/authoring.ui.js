@@ -3,11 +3,6 @@ var CZ = (function (CZ, $) {
     };
     var UI = Authoring.UI = Authoring.UI || {
     };
-    /**
-    * Appends editable field of content item to element.
-    * @param {Object}   form          Target DOM element found with jQuery.
-    * @param {Boolean}  addSeparator  Indicates whether separator is required.
-    */
     function _addContentItemForm(form, addSeparator) {
         var container = $("<div class='cz-authoring-ci-container'></div>");
         var title = $("<p>" + "<label>Title</label>" + "<input class='cz-authoring-ci-title' style='display: block' type='text'/>" + "</p>");
@@ -29,10 +24,6 @@ var CZ = (function (CZ, $) {
         }
         form.append(container);
     }
-    /**
-    * Returns an array of contentItems filled with user data.
-    * @return {Array}  An array of contentItems.
-    */
     function _getContentItemsData() {
         var contentItems = [];
         var containers = $(".cz-authoring-ci-container");
@@ -60,11 +51,6 @@ var CZ = (function (CZ, $) {
         });
         return contentItems;
     }
-    /**
-    * Fills contentItem form with data taken from given contentItem.
-    * @param {Object}  form         Target DOM element found with jQuery.
-    * @param {Object}  contentItem  ContentItem which data is taken.
-    */
     function _fillContentItemForm(form, contentItem) {
         var titleInput = form.find(".cz-authoring-ci-title");
         var mediaInput = form.find(".cz-authoring-ci-media-source");
@@ -346,9 +332,7 @@ var CZ = (function (CZ, $) {
                 }
             });
         },
-        createTimeline: // Mouseup handlers.
-        function () {
-            // skip authoring during ongoing dynamic layout animation
+        createTimeline: function () {
             if(animatingElements.length != 0) {
                 return;
             }
@@ -362,7 +346,6 @@ var CZ = (function (CZ, $) {
             }
         },
         editTimeline: function () {
-            // skip authoring during ongoing dynamic layout animation
             if(animatingElements.length != 0) {
                 return;
             }
@@ -376,7 +359,6 @@ var CZ = (function (CZ, $) {
             }
         },
         createExhibit: function () {
-            // skip authoring during ongoing dynamic layout animation
             if(animatingElements.length != 0) {
                 return;
             }
@@ -390,7 +372,6 @@ var CZ = (function (CZ, $) {
             }
         },
         editExhibit: function () {
-            // skip authoring during ongoing dynamic layout animation
             if(animatingElements.length != 0) {
                 return;
             }
