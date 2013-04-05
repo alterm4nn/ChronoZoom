@@ -76,6 +76,13 @@ namespace Application.Driver.UserActions
             FindElement(by).Click();
         }
 
+        protected void Select(By by, String text)
+        {
+            if (String.IsNullOrEmpty(text))
+                throw new ArgumentException("text");
+            new SelectElement(FindElement(by)).SelectByText(text);
+        }
+
         protected void OpenUrl(string url)
         {
             WebDriver.Navigate().GoToUrl(url);
