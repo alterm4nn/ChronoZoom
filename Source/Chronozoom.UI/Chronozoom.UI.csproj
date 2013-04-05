@@ -153,7 +153,11 @@
     <Content Include="NewScripts\bibliography.ts" />
     <Content Include="NewScripts\breadCrumbs.ts" />
     <Content Include="NewScripts\common.ts" />
+    <Content Include="NewScripts\cz.js">
+      <DependentUpon>cz.ts</DependentUpon>
+    </Content>
     <Content Include="NewScripts\cz.settings.ts" />
+    <TypeScriptCompile Include="NewScripts\cz.ts" />
     <Content Include="NewScripts\czservice.ts" />
     <Content Include="NewScripts\external\jquery-1.7.2.min.js" />
     <Content Include="NewScripts\external\jquery-ui-1.8.16.custom.min.js" />
