@@ -232,8 +232,7 @@ function loadData() {
     getURL();
     CZ.Service.getTimelines({
         start: -50000000000,
-        end: 9999,
-        minspan: 5013
+        end: 9999
     }).then(function (response) {
         ProcessContent(response);
         vc.virtualCanvas("updateViewport");

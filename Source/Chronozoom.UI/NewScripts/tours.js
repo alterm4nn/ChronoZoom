@@ -580,6 +580,7 @@ function collapseBookmarks() {
             width: 30
         }
     }, 'fast');
+    $("#bookmarksCollapse").attr("src", "/Images/expand-right.png");
 }
 function expandBookmarks() {
     if(isBookmarksWindowExpanded) {
