@@ -61,6 +61,7 @@ namespace UI
             public const string Unauthenticated = "User is not authenticated";
             public const string MissingClaim = "User missing expected claim";
             public const string ParentExhibitNonEmpty = "Parent exhibit should not be specified";
+            public const string CollectionIdMismatch = "Collection id mismatch";
         }
 
         [OperationContract]
@@ -394,16 +395,6 @@ namespace UI
                 });
         }
 
-        public class TimelineRequest
-        {
-            public string Id { get; set; }
-            public string Title { get; set; }
-            public string Regime { get; set; }
-            public string FromYear { get; set; }
-            public string ToYear { get; set; }
-            public string ParentTimelineId { get; set; }
-        }
-
         /// <summary>
         /// Creates or updates the timeline in a given collection.
         /// If the collection does not exist, then fail.
@@ -416,7 +407,7 @@ namespace UI
         //
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/timeline", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        public Guid PutTimeline(string superCollectionName, string collectionName, TimelineRequest timelineRequest)
+        public Guid PutTimeline(string superCollectionName, string collectionName, TimelineRaw timelineRequest)
         {
             return AuthenticatedOperation(user =>
                 {
@@ -445,9 +436,9 @@ namespace UI
                         return Guid.Empty;
                     }
 
-                    if (timelineRequest.Id == null)
+                    if (timelineRequest.Id == Guid.Empty)
                     {
-                        Timeline parentTimeline = FindParentTimeline(timelineRequest.ParentTimelineId);
+                        Timeline parentTimeline = FindParentTimeline(timelineRequest.Timeline_ID);
                         if (parentTimeline == null)
                         {
                             SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
@@ -457,9 +448,8 @@ namespace UI
                         // Parent timeline is valid - add new timeline
                         Guid newTimelineGuid = Guid.NewGuid();
                         Timeline newTimeline = new Timeline { Id = newTimelineGuid, Title = timelineRequest.Title, Regime = timelineRequest.Regime };
-                        //newTimeline.Title = title;
-                        newTimeline.FromYear = (timelineRequest.FromYear == null) ? 0 : Decimal.Parse(timelineRequest.FromYear, CultureInfo.InvariantCulture);
-                        newTimeline.ToYear = (timelineRequest.ToYear == null) ? 0 : Decimal.Parse(timelineRequest.ToYear, CultureInfo.InvariantCulture);
+                        newTimeline.FromYear = timelineRequest.FromYear;
+                        newTimeline.ToYear = timelineRequest.ToYear;
                         newTimeline.Collection = collection;
 
                         // Update parent timeline.
@@ -475,7 +465,7 @@ namespace UI
                     }
                     else
                     {
-                        Guid updateTimelineGuid = Guid.Parse(timelineRequest.Id);
+                        Guid updateTimelineGuid = timelineRequest.Id;
                         Timeline updateTimeline = _storage.Timelines.Find(updateTimelineGuid);
                         if (updateTimeline == null)
                         {
@@ -492,8 +482,8 @@ namespace UI
                         // Update the timeline fields
                         updateTimeline.Title = timelineRequest.Title;
                         updateTimeline.Regime = timelineRequest.Regime;
-                        updateTimeline.FromYear = timelineRequest.FromYear == null ? 0 : Decimal.Parse(timelineRequest.FromYear, CultureInfo.InvariantCulture);
-                        updateTimeline.ToYear = timelineRequest.ToYear == null ? 0 : Decimal.Parse(timelineRequest.ToYear, CultureInfo.InvariantCulture);
+                        updateTimeline.FromYear = timelineRequest.FromYear;
+                        updateTimeline.ToYear = timelineRequest.ToYear;
                         returnValue = updateTimelineGuid;
                     }
                     _storage.SaveChanges();
@@ -503,7 +493,7 @@ namespace UI
 
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/timeline", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        public void DeleteTimeline(string superCollectionName, string collectionName, TimelineRequest timelineRequest)
+        public void DeleteTimeline(string superCollectionName, string collectionName, Timeline timelineRequest)
         {
             AuthenticatedOperation(user =>
                 {
@@ -529,14 +519,13 @@ namespace UI
                         return;
                     }
 
-                    if (timelineRequest.Id == null)
+                    if (timelineRequest.Id == Guid.Empty)
                     {
                         SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineNull);
                         return;
                     }
 
-                    Guid timelineGuid = Guid.Parse(timelineRequest.Id);
-                    Timeline deleteTimeline = _storage.Timelines.Find(timelineGuid);
+                    Timeline deleteTimeline = _storage.Timelines.Find(timelineRequest.Id);
                     if (deleteTimeline == null)
                     {
                         SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineNotFound);
@@ -549,19 +538,9 @@ namespace UI
                         return;
                     }
 
-                    _storage.DeleteTimeline(timelineGuid);
+                    _storage.DeleteTimeline(timelineRequest.Id);
                     _storage.SaveChanges();
                 });
-        }
-
-
-        public class ExhibitRequest
-        {
-            public string Id { get; set; }
-            public string Title { get; set; }
-            public string ParentTimelineId { get; set; }
-            public string Year { get; set; }
-            public Collection<ContentItemRequest> ContentItems { get; set; }
         }
 
         public class PutExhibitResult
@@ -584,12 +563,12 @@ namespace UI
         /// </summary>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/exhibit", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        public PutExhibitResult PutExhibit(string superCollectionName, string collectionName, ExhibitRequest exhibitRequest)
+        public PutExhibitResult PutExhibit(string superCollectionName, string collectionName, ExhibitRaw exhibitRequest)
         {
             return AuthenticatedOperation(user =>
                 {
                     Trace.TraceInformation("Put Exhibit");
-                    var returnValue = new PutExhibitResult(); // List<Guid>();
+                    var returnValue = new PutExhibitResult();
 
                     if (exhibitRequest == null)
                     {
@@ -613,9 +592,9 @@ namespace UI
                         return returnValue;
                     }
 
-                    if (exhibitRequest.Id == null)
+                    if (exhibitRequest.Id == Guid.Empty)
                     {
-                        Timeline parentTimeline = FindParentTimeline(exhibitRequest.ParentTimelineId);
+                        Timeline parentTimeline = FindParentTimeline(exhibitRequest.Timeline_ID);
                         if (parentTimeline == null)
                         {
                             SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
@@ -626,7 +605,7 @@ namespace UI
                         Guid newExhibitGuid = Guid.NewGuid();
                         Exhibit newExhibit = new Exhibit { Id = newExhibitGuid };
                         newExhibit.Title = exhibitRequest.Title;
-                        newExhibit.Year = (exhibitRequest.Year == null) ? 0 : Decimal.Parse(exhibitRequest.Year, CultureInfo.InvariantCulture);
+                        newExhibit.Year = exhibitRequest.Year;
                         newExhibit.Collection = collection;
 
                         // Update parent timeline.
@@ -642,26 +621,24 @@ namespace UI
                         returnValue.ExhibitId = newExhibitGuid;
 
                         // Populate the content items
-                        foreach (ContentItemRequest contentItemRequest in exhibitRequest.ContentItems)
+                        if (exhibitRequest.ContentItems != null)
                         {
-                            // Parent should not be specified for a new exhibit
-                            if (contentItemRequest.ParentExhibitId != null)
+                            foreach (ContentItem contentItemRequest in exhibitRequest.ContentItems)
                             {
-                                SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentExhibitNonEmpty);
-                                return returnValue;
+                                // Parent exhibit item will be equal to the newly added exhibit
+                                var newContentItemGuid = AddContentItem(collection, newExhibit, contentItemRequest);
+                                if (returnValue.ContentItemId == null)
+                                {
+                                    returnValue.ContentItemId = new List<Guid>();
+                                }
+                                returnValue.ContentItemId.Add(newContentItemGuid);
                             }
-
-                            // Parent exhibit item is null hence it is valid and equal to the newly added
-                            // exhibit so add a new content item.
-                            var newContentItemGuid = AddContentItem(collection, newExhibit, contentItemRequest);
-                            returnValue.ContentItemId.Add(newContentItemGuid);
                         }
 
                     }
                     else
                     {
-                        Guid updateExhibitGuid = Guid.Parse(exhibitRequest.Id);
-                        Exhibit updateExhibit = _storage.Exhibits.Find(updateExhibitGuid);
+                        Exhibit updateExhibit = _storage.Exhibits.Find(exhibitRequest.Id);
                         if (updateExhibit == null)
                         {
                             SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ExhibitNotFound);
@@ -676,16 +653,23 @@ namespace UI
 
                         // Update the exhibit fields
                         updateExhibit.Title = exhibitRequest.Title;
-                        updateExhibit.Year = (exhibitRequest.Year == null) ? 0 : Decimal.Parse(exhibitRequest.Year, CultureInfo.InvariantCulture);
-                        returnValue.ExhibitId = updateExhibitGuid;
+                        updateExhibit.Year = exhibitRequest.Year;
+                        returnValue.ExhibitId = exhibitRequest.Id;
 
-                        // Populate the content items
-                        foreach (ContentItemRequest contentItemRequest in exhibitRequest.ContentItems)
+                        // Update the content items
+                        if (exhibitRequest.ContentItems != null)
                         {
-                            Guid updateContentItemGuid = UpdateContentItem(collectionGuid, contentItemRequest);
-                            if (updateContentItemGuid != Guid.Empty)
+                            foreach (ContentItem contentItemRequest in exhibitRequest.ContentItems)
                             {
-                                returnValue.ContentItemId.Add(updateContentItemGuid);
+                                Guid updateContentItemGuid = UpdateContentItem(collectionGuid, contentItemRequest);
+                                if (updateContentItemGuid != Guid.Empty)
+                                {
+                                    if (returnValue.ContentItemId == null)
+                                    {
+                                        returnValue.ContentItemId = new List<Guid>();
+                                    }
+                                    returnValue.ContentItemId.Add(updateContentItemGuid);
+                                }
                             }
                         }
                     }
@@ -694,10 +678,9 @@ namespace UI
                 });
         }
 
-        private Guid UpdateContentItem(Guid collectionGuid, ContentItemRequest contentItemRequest)
+        private Guid UpdateContentItem(Guid collectionGuid, ContentItem contentItemRequest)
         {
-            Guid updateContentItemGuid = Guid.Parse(contentItemRequest.Id);
-            ContentItem updateContentItem = _storage.ContentItems.Find(updateContentItemGuid);
+            ContentItem updateContentItem = _storage.ContentItems.Find(contentItemRequest.Id);
             if (updateContentItem == null)
             {
                 SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ContentItemNotFound);
@@ -715,20 +698,20 @@ namespace UI
             updateContentItem.Caption = contentItemRequest.Caption;
             updateContentItem.MediaType = contentItemRequest.MediaType;
             updateContentItem.Uri = contentItemRequest.Uri;
-            return updateContentItemGuid;
+            return contentItemRequest.Id;
         }
 
-        private Guid AddContentItem(Collection collection, Exhibit newExhibit, ContentItemRequest contentItemRequest)
+        private Guid AddContentItem(Collection collection, Exhibit newExhibit, ContentItem contentItemRequest)
         {
             Guid newContentItemGuid = Guid.NewGuid();
             ContentItem newContentItem = new ContentItem
-                {
-                    Id = newContentItemGuid,
-                    Title = contentItemRequest.Title,
-                    Caption = contentItemRequest.Caption,
-                    MediaType = contentItemRequest.MediaType,
-                    Uri = contentItemRequest.Uri
-                };
+                                        {
+                                            Id = newContentItemGuid,
+                                            Title = contentItemRequest.Title,
+                                            Caption = contentItemRequest.Caption,
+                                            MediaType = contentItemRequest.MediaType,
+                                            Uri = contentItemRequest.Uri
+                                        };
             newContentItem.Collection = collection;
 
             // Update parent exhibit.
@@ -744,7 +727,7 @@ namespace UI
 
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/exhibit", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        public void DeleteExhibit(string superCollectionName, string collectionName, ExhibitRequest exhibitRequest)
+        public void DeleteExhibit(string superCollectionName, string collectionName, Exhibit exhibitRequest)
         {
             AuthenticatedOperation(user =>
                 {
@@ -770,38 +753,27 @@ namespace UI
                         return;
                     }
 
-                    if (exhibitRequest.Id == null)
+                    if (exhibitRequest.Id == Guid.Empty)
                     {
                         SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ExhibitNotFound);
                         return;
                     }
 
-                    Guid exhibitGuid = Guid.Parse(exhibitRequest.Id);
-                    Exhibit deleteExhibit = _storage.Exhibits.Find(exhibitGuid);
+                    Exhibit deleteExhibit = _storage.Exhibits.Find(exhibitRequest.Id);
                     if (deleteExhibit == null)
                     {
                         SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ExhibitNotFound);
                         return;
                     }
 
-                    if (deleteExhibit.Collection.Id != collectionGuid)
+                    if (deleteExhibit.Collection == null || deleteExhibit.Collection.Id != collectionGuid)
                     {
-                        SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionIdMismatch);
                         return;
                     }
-                    _storage.DeleteExhibit(exhibitGuid);
+                    _storage.DeleteExhibit(exhibitRequest.Id);
                     _storage.SaveChanges();
                 });
-        }
-
-        public class ContentItemRequest
-        {
-            public string Id { get; set; }
-            public string Title { get; set; }
-            public string Caption { get; set; }
-            public string MediaType { get; set; }
-            public string Uri { get; set; }
-            public string ParentExhibitId { get; set; }
         }
 
         /// <summary>
@@ -818,7 +790,7 @@ namespace UI
         /// </summary>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/contentitem", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        public Guid PutContentItem(string superCollectionName, string collectionName, ContentItemRequest contentItemRequest)
+        public Guid PutContentItem(string superCollectionName, string collectionName, ContentItemRaw contentItemRequest)
         {
             return AuthenticatedOperation(user =>
                 {
@@ -849,9 +821,9 @@ namespace UI
                         return Guid.Empty;
                     }
 
-                    if (contentItemRequest.Id == null)
+                    if (contentItemRequest.Id == Guid.Empty)
                     {
-                        Exhibit parentExhibit = FindParentExhibit(contentItemRequest.ParentExhibitId);
+                        Exhibit parentExhibit = FindParentExhibit(contentItemRequest.Exhibit_ID);
                         if (parentExhibit == null)
                         {
                             SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
@@ -874,7 +846,7 @@ namespace UI
 
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/contentitem", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        public void DeleteContentItem(string superCollectionName, string collectionName, ContentItemRequest contentItemRequest)
+        public void DeleteContentItem(string superCollectionName, string collectionName, ContentItem contentItemRequest)
         {
             AuthenticatedOperation(user =>
                 {
@@ -900,23 +872,22 @@ namespace UI
                         return;
                     }
 
-                    if (contentItemRequest.Id == null)
+                    if (contentItemRequest.Id == Guid.Empty)
                     {
                         SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ContentItemNotFound);
                         return;
                     }
 
-                    Guid contentItemGuid = Guid.Parse(contentItemRequest.Id);
-                    ContentItem deleteContentItem = _storage.ContentItems.Find(contentItemGuid);
+                    ContentItem deleteContentItem = _storage.ContentItems.Find(contentItemRequest.Id);
                     if (deleteContentItem == null)
                     {
                         SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ContentItemNotFound);
                         return;
                     }
 
-                    if (deleteContentItem.Collection.Id != collectionGuid)
+                    if (deleteContentItem.Collection == null || deleteContentItem.Collection.Id != collectionGuid)
                     {
-                        SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionIdMismatch);
                         return;
                     }
 
@@ -925,11 +896,13 @@ namespace UI
                 });
         }
 
-        private Timeline FindParentTimeline(string parentTimelineId)
+        private Timeline FindParentTimeline(Guid? parentTimelineGuid)
         {
             // Validate parent timeline
-            Guid parentTimelineGuid = parentTimelineId == null ? Guid.Empty : Guid.Parse(parentTimelineId);
-
+            if (parentTimelineGuid == null)
+            {
+                parentTimelineGuid = Guid.Empty;
+            }
             Timeline parentTimeline = _storage.Timelines.Find(parentTimelineGuid);
             if (parentTimeline == null)
             {
@@ -939,11 +912,8 @@ namespace UI
             return parentTimeline;
         }
 
-        private Exhibit FindParentExhibit(string parentExhibitId)
+        private Exhibit FindParentExhibit(Guid parentExhibitGuid)
         {
-            // Validate parent exhibit timeline
-            Guid parentExhibitGuid = parentExhibitId == null ? Guid.Empty : Guid.Parse(parentExhibitId);
-
             Exhibit parentExhibit = _storage.Exhibits.Find(parentExhibitGuid);
             if (parentExhibit == null)
             {
