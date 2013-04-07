@@ -69,7 +69,10 @@ namespace Chronozoom.Entities
 
         [DataMember]
         public decimal ToYear { get; set; }
-        
+
+        [DataMember]
+        public decimal ForkNode { get; set; }
+
         [DataMember(Name="UniqueID")]
         public int UniqueId { get; set; }
         
