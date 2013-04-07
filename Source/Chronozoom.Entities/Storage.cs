@@ -40,6 +40,8 @@ namespace Chronozoom.Entities
 
         public static TraceSource Trace { get; private set; }
 
+        public DbSet<Bitmask> Bitmasks { get; set; }
+
         public DbSet<Timeline> Timelines { get; set; }
 
         public DbSet<Threshold> Thresholds { get; set; }
@@ -64,6 +66,19 @@ namespace Chronozoom.Entities
             FillTimelineRelations(timelinesMap);
 
             return new Collection<Timeline>(timelines);
+        }
+
+        public static long ForkNode(long FromYear, long ToYear)
+        {
+            long node = ((FromYear - 1) ^ ToYear) >> 1;
+            node = node | node >> 1;
+            node = node | node >> 2;
+            node = node | node >> 4;
+            node = node | node >> 8;
+            node = node | node >> 16;
+            node = node | node >> 32;
+            node = ToYear & ~node;
+            return node;
         }
 
         private void FillTimelineRelations(Dictionary<Guid, Timeline> timelinesMap)
@@ -131,7 +146,29 @@ namespace Chronozoom.Entities
             Dictionary<Guid, Guid?> timelinesParents = new Dictionary<Guid, Guid?>();
 
             // Populate References
-            string timelinesQuery = "SELECT TOP({0}) *, FromYear as [Start], ToYear as [End] FROM Timelines WHERE FromYear >= {1} AND ToYear <= {2} AND ToYear-FromYear >= {3} AND Collection_Id = {4} OR Id = {5} ORDER BY ToYear-FromYear DESC";
+            
+            //string timelinesQuery = "SELECT TOP({0}) *, FromYear as [Start], ToYear as [End] FROM Timelines WHERE FromYear >= {1} AND ToYear <= {2} AND ToYear-FromYear >= {3} AND Collection_Id = {4} OR Id = {5} ORDER BY ToYear-FromYear DESC";
+
+            /* note: there are 4 cases of a given timeline intersecting the current canvas: [<]>, <[>], [<>], and <[]> (<> denotes the timeline, and [] denotes the canvas) */
+
+            string timelinesQuery = @"
+            SELECT TOP({0}) * FROM (
+                SELECT DISTINCT [Timelines].*, [Timelines].[FromYear] as [Start], [Timelines].[ToYear] as [End], [Timelines].[ToYear] - [Timelines].[FromYear] AS [TimeSpan] FROM [Timelines] JOIN
+	            (
+                    SELECT ([b1] & {1}) AS [node] FROM [Bitmasks] WHERE ({1} & [b2]) <> 0
+	            ) AS [left_nodes] ON [Timelines].[ForkNode] = [left_nodes].[node] AND [Timelines].[ToYear] >= {1} AND [Timelines].[ToYear] - [Timelines].[FromYear] >= {3} AND [Timelines].[Collection_Id] = {4} OR [Timelines].[Id] = {5}
+                UNION ALL
+	            SELECT DISTINCT [Timelines].*, [Timelines].[FromYear] as [Start], [Timelines].[ToYear] as [End], [Timelines].[ToYear] - [Timelines].[FromYear] AS [TimeSpan] FROM [Timelines] JOIN
+	            (
+                    SELECT (([b1] & {2}) | [b3]) AS [node] FROM [bitmasks] WHERE ({2} & [b3]) = 0
+	            )
+	            AS [right_nodes] ON [Timelines].[ForkNode] = [right_nodes].[node] AND [Timelines].[FromYear] <= {2} AND [Timelines].[ToYear] - [Timelines].[FromYear] >= {3} AND [Timelines].[Collection_Id] = {4} OR [Timelines].[Id] = {5}
+                UNION ALL
+	            SELECT DISTINCT [Timelines].*, [Timelines].[FromYear] as [Start], [Timelines].[ToYear] as [End], [Timelines].[ToYear] - [Timelines].[FromYear] AS [TimeSpan] FROM [Timelines] WHERE [Timelines].[ForkNode] BETWEEN {1} AND {2} AND [Timelines].[ToYear] - [Timelines].[FromYear] >= {3} AND [Timelines].[Collection_Id] = {4} OR [Timelines].[Id] = {5}
+            )
+            AS [CanvasTimelines] ORDER BY [CanvasTimelines].[TimeSpan] DESC 
+            ";
+
             var timelinesRaw = Database.SqlQuery<TimelineRaw>(timelinesQuery, maxElements, startTime, endTime, span, collectionId, commonAncestor);
 
             foreach (TimelineRaw timelineRaw in timelinesRaw)

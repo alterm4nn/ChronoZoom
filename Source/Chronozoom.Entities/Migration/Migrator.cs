@@ -37,6 +37,33 @@ namespace Chronozoom.Entities.Migration
 
         public void Migrate()
         {
+            /* insert bitmask constants */
+            _storage.Bitmasks.SqlQuery("delete from Bitmasks");
+            long v = 1;
+            foreach (var b in _storage.Bitmasks)
+            {
+                _storage.Bitmasks.Remove(b);
+            }
+            _storage.SaveChanges();
+            for (int r = 0; r < 34; ++r)
+            {
+                Bitmask b = new Bitmask();
+                b.b1 = -v * 2;
+                b.b2 = v;
+                b.b3 = v * 2;
+                _storage.Bitmasks.Add(b);
+                v *= 2;
+            }
+            _storage.SaveChanges();
+            
+            /*
+                // those indexes already exist in current DB, so not creating them again
+
+                CREATE NONCLUSTERED INDEX [start_time_idx] ON [timeline]([node], [start_time]);
+                CREATE NONCLUSTERED INDEX [end_time_idx] ON [timeline]([node], [end_time]);
+             
+             */
+
             LoadDataFromDump("Beta Content", "beta-get.json", "beta-gettours.json", "beta-getthresholds.json", false, _baseContentAdmin.Value);
             LoadDataFromDump("Sandbox", "beta-get.json", "beta-gettours.json", "beta-getthresholds.json", true, null);
             LoadDataFromDump("AIDS Timeline", "aidstimeline-get.json", "aidstimeline-gettours.json", null, true, _baseContentAdmin.Value);
@@ -145,6 +172,8 @@ namespace Chronozoom.Entities.Migration
             {
                 if (replaceGuids) timeline.Id = Guid.NewGuid();
                 timeline.Collection = collection;
+
+                timeline.ForkNode = Storage.ForkNode((long)timeline.FromYear, (long)timeline.ToYear);
 
                 MigrateInPlace(timeline);
                 _storage.Timelines.Add(timeline);
