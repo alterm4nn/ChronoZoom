@@ -70,14 +70,16 @@ namespace Chronozoom.Entities
 
         public static long ForkNode(long FromYear, long ToYear)
         {
-            long node = ((FromYear - 1) ^ ToYear) >> 1;
+            long start = FromYear + 13700000001;  //note: this value must be a positive integer (sign bit must be 0)
+            long end = ToYear + 13700000001;  //note: this value must be a positive integer (sign bit must be 0)
+            long node = ((start - 1) ^ end) >> 1;
             node = node | node >> 1;
             node = node | node >> 2;
             node = node | node >> 4;
             node = node | node >> 8;
             node = node | node >> 16;
             node = node | node >> 32;
-            node = ToYear & ~node;
+            node = end & ~node;
             return node;
         }
 
@@ -164,7 +166,7 @@ namespace Chronozoom.Entities
 	            )
 	            AS [right_nodes] ON [Timelines].[ForkNode] = [right_nodes].[node] AND [Timelines].[FromYear] <= {2} AND [Timelines].[ToYear] - [Timelines].[FromYear] >= {3} AND [Timelines].[Collection_Id] = {4} OR [Timelines].[Id] = {5}
                 UNION ALL
-	            SELECT DISTINCT [Timelines].*, [Timelines].[FromYear] as [Start], [Timelines].[ToYear] as [End], [Timelines].[ToYear] - [Timelines].[FromYear] AS [TimeSpan] FROM [Timelines] WHERE [Timelines].[ForkNode] BETWEEN {1} AND {2} AND [Timelines].[ToYear] - [Timelines].[FromYear] >= {3} AND [Timelines].[Collection_Id] = {4} OR [Timelines].[Id] = {5}
+	            SELECT DISTINCT [Timelines].*, [Timelines].[FromYear] as [Start], [Timelines].[ToYear] as [End], [Timelines].[ToYear] - [Timelines].[FromYear] AS [TimeSpan] FROM [Timelines] WHERE [Timelines].[ForkNode] BETWEEN ({1} + 13700000001) AND ({2} + 13700000001) AND [Timelines].[ToYear] - [Timelines].[FromYear] >= {3} AND [Timelines].[Collection_Id] = {4} OR [Timelines].[Id] = {5}
             )
             AS [CanvasTimelines] ORDER BY [CanvasTimelines].[TimeSpan] DESC 
             ";

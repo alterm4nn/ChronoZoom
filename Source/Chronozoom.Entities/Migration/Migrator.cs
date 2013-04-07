@@ -172,10 +172,8 @@ namespace Chronozoom.Entities.Migration
             {
                 if (replaceGuids) timeline.Id = Guid.NewGuid();
                 timeline.Collection = collection;
-
-                timeline.ForkNode = Storage.ForkNode((long)timeline.FromYear, (long)timeline.ToYear);
-
                 MigrateInPlace(timeline);
+                timeline.ForkNode = Storage.ForkNode((long)timeline.FromYear, (long)timeline.ToYear);
                 _storage.Timelines.Add(timeline);
             }
 
