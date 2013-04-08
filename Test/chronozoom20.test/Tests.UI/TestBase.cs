@@ -18,7 +18,7 @@ namespace Tests
         public static WelcomeScreenHelper WelcomeScreenHelper { get; set; }
         public static TimelineHelper TimelineHelper { get; set; }
         public static ExhibitHelper ExhibitHelper { get; set; }
-
+        public static AuthorizationHelper AuthorizationHelper { get; set; }
         public static HomePageHelper HomePageHelper { get; set; }
 
         [AssemblyInitialize]
@@ -35,6 +35,7 @@ namespace Tests
             WelcomeScreenHelper = HelperManager.GetWelcomeScreenHelper();
             TimelineHelper = HelperManager.GetTimelineHelper();
             ExhibitHelper = HelperManager.GetExhibitHelper();
+            AuthorizationHelper = HelperManager.GetAuthorizationHelper();
         }
 
         

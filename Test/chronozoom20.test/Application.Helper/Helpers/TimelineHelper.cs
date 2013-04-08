@@ -1,4 +1,5 @@
-﻿using Application.Driver;
+﻿using System;
+using Application.Driver;
 using Application.Helper.Constants;
 using Application.Helper.Entities;
 using Application.Helper.UserActions;
@@ -29,6 +30,70 @@ namespace Application.Helper.Helpers
             return timeline;
         }
 
+        public void DeleteTimeline(Timeline timeline)
+        {
+            Logger.Log("<- timeline: " + timeline);
+            NavigateToTimeLine(timeline);
+            InitTimelineEditMode();
+            InitEditForm();
+            ClickDelete();
+            ConfirmDeletion();
+            Logger.Log("->");
+        }
+
+
+        public void DeleteTimelineByJavaScript(Timeline timeline)
+        {
+            Logger.Log("<-");
+            ExecuteJavaScript(string.Format("CZ.Service.deleteTimeline({0})", Javascripts.LastCanvasElement));
+            Logger.Log("->");
+        }
+
+        public bool IsTimelineFound(Timeline newTimeline)
+        {
+            Logger.Log("<- timeline: " + newTimeline);
+            try
+            {
+                string id = GetJavaScriptExecutionResult(string.Format("findVCElement(vc.data('ui-virtualCanvas')._layersContent.children[0],'{0}').id",newTimeline.TimelineId));
+                Logger.Log("- id: " + id);
+                bool result = !String.IsNullOrEmpty(id);
+                Logger.Log("-> result: " + result);
+                return result;
+            }
+            catch (Exception)
+            {
+                Logger.Log("-> result false");
+                return false;
+            }
+        }
+
+        private void ConfirmDeletion()
+        {
+            AcceptAlert();
+        }
+
+        private void ClickDelete()
+        {
+            Click(By.XPath("//*[text()='delete']"));
+        }
+
+        private void InitEditForm()
+        {
+            MoveToElementAndClick(By.ClassName("virtualCanvasLayerCanvas"));
+        }
+
+        private void InitTimelineEditMode()
+        {
+            MoveToElementAndClick(By.XPath("//*[@id='footer-authoring']/a[2]"));
+        }
+
+        private void NavigateToTimeLine(Timeline timeline)
+        {
+            Logger.Log("<-");
+            ExecuteJavaScript(string.Format("goToSearchResult('{0}')", timeline.TimelineId));
+            Logger.Log("->");
+        }
+
         private void SaveAndClose()
         {
             Click(By.ClassName("ui-dialog-buttonset"));
@@ -54,5 +119,6 @@ namespace Application.Helper.Helpers
             MoveToElementAndClick(By.XPath("//*[@id='footer-authoring']/a[1]"));
             Logger.Log("->");
         }
+
     }
 }
