@@ -186,7 +186,7 @@ module CZ {
             CZ.Common.controller = new CZ.ViewportController.ViewportController2(
                             function (visible) {
                                 var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                                var markerPos = CZ.Common.ax.axis("MarkerPosition");
+                                var markerPos = CZ.Common.axis.MarkerPosition();
                                 var oldMarkerPosInScreen = vp.pointVirtualToScreen(markerPos, 0).x;
 
                                 CZ.Common.vc.virtualCanvas("setVisible", visible, CZ.Common.controller.activeAnimation);
@@ -202,7 +202,7 @@ module CZ {
 
                                 if (actAni && !hoveredInfodot.id) {
                                     var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
-                                    CZ.Common.ax.axis("setTimeMarker", newMarkerPos);
+                                    CZ.Common.updateMarker();
                                 }
 
                                 CZ.Common.updateNavigator(vp);

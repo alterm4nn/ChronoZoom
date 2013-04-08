@@ -632,7 +632,7 @@ module CZ {
         @param vh   (number) height of a bounding box in virtual space
         @param settings  ({strokeStyle,lineWidth,fillStyle,outline:boolean}) Parameters of the rectangle appearance
         */
-        function CanvasRectangle(vc, layerid, id, vx, vy, vw, vh, settings) {
+        export function CanvasRectangle(vc, layerid, id, vx, vy, vw, vh, settings) {
             this.base = CanvasElement;
             this.base(vc, layerid, id, vx, vy, vw, vh);
             this.settings = settings;
