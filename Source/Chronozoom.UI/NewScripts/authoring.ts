@@ -205,7 +205,8 @@ module CZ {
                     _circleCur.r,
                     {
                         strokeStyle: "red"
-                    }
+                    },
+                    false
                 );
             } else {
                 $.extend(_circleCur, _circlePrev);

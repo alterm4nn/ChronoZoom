@@ -215,7 +215,7 @@ module CZ {
         };
 
         export function addScrollText(element, layerid, id, vx, vy, vw, vh, text, z, settings) {
-            return addChild(element, new CanvasScrollTextItem(element.vc, layerid, id, vx, vy, vw, vh, text, z, settings), false);
+            return addChild(element, new CanvasScrollTextItem(element.vc, layerid, id, vx, vy, vw, vh, text, z), false);
         };
 
         /*  Adds a multiline text element as a child of the given virtual canvas element.
@@ -231,7 +231,7 @@ module CZ {
         Text width is adjusted using measureText() on first render call. 
         */
         export function addMultiLineText(element, layerid, id, vx, vy, baseline, vh, text, lineWidth, settings) {
-            return addChild(element, new CanvasMultiLineTextItem(element.vc, layerid, id, vx, vy, baseline, vh, text, lineWidth, settings), false);
+            return addChild(element, new CanvasMultiLineTextItem(element.vc, layerid, id, vx, vy, vh, text, lineWidth, settings), false);
         };
 
         function turnIsRenderedOff(element) {
