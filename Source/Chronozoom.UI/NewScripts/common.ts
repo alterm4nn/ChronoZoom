@@ -33,6 +33,7 @@ module CZ {
 
         var searchString;
         export var ax;
+        export var axis;
         export var vc;
         var visReg;
         export var cosmosVisible;
@@ -61,8 +62,8 @@ module CZ {
         */
         export function initialize() {
             ax = (<any>$)('#axis');
-            CZ.Timescale.Initialize(ax);
-            ax.axis();
+            axis = CZ.Timescale(ax);
+           // ax.axis();
 
             CZ.VirtualCanvas.initialize();
             vc = (<any>$)('#vc');
@@ -555,7 +556,7 @@ module CZ {
             document.cookie = c_name + "=" + c_value;
         }
 
-        function getCookie(c_name) {
+        export function getCookie(c_name) {
             var i, x, y, ARRcookies = document.cookie.split(";");
             for (i = 0; i < ARRcookies.length; i++) {
                 x = ARRcookies[i].substr(0, ARRcookies[i].indexOf("="));
@@ -568,7 +569,7 @@ module CZ {
             return null;
         }
 
-        function viewportToViewBox(vp) {
+        export function viewportToViewBox(vp) {
             var w = vp.widthScreenToVirtual(vp.width);
             var h = vp.heightScreenToVirtual(vp.height);
             var x = vp.visible.centerX - w / 2;

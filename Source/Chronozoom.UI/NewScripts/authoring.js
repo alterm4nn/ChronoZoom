@@ -1,15 +1,3 @@
-/**
-* The CZ submodule for Authoring Tool functionality.
-* Use initialize() method to bind UI with Authoring Tool.
-*/
-/// <reference path='cz.settings.ts'/>
-/// <reference path='common.ts'/>
-/// <reference path='vccontent.ts'/>
-/// <reference path='czservice.ts'/>
-/**
-* The CZ submodule for Authoring Tool functionality.
-* Use initialize() method to bind UI with Authoring Tool.
-*/
 var CZ;
 (function (CZ) {
     (function (Authoring) {
@@ -100,11 +88,7 @@ var CZ;
             _rectCur.y = Math.min(_dragStart.y, _dragCur.y);
             _rectCur.width = Math.abs(_dragStart.x - _dragCur.x);
             _rectCur.height = Math.abs(_dragStart.y - _dragCur.y);
-            if(checkTimelineIntersections(_hovered, _rectCur)) {
-                // Set border's color of timeline's rectangle.
-            if(checkTimelineIntersections(_hovered, _rectCur)) {
             if(checkTimelineIntersections(_hovered, _rectCur, false)) {
-                // Set border's color of timeline's rectangle.
                 var settings = $.extend({
                 }, _hovered.settings);
                 settings.strokeStyle = "red";
@@ -197,17 +181,7 @@ var CZ;
         Authoring.showEditTimelineForm = null;
         Authoring.showCreateExhibitForm = null;
         Authoring.showEditExhibitForm = null;
-        /**
-        * Represents a collection of mouse events' handlers for each mode.
-        * Example of using: CZ.Authoring.modeMouseHandlers[CZ.Authoring.mode]["mouseup"]();
-        *                   (calls mouseup event handler for current mode)
-        */
         Authoring.showEditContentItemForm = null;
-        /**
-        * Represents a collection of mouse events' handlers for each mode.
-        * Example of using: CZ.Authoring.modeMouseHandlers[CZ.Authoring.mode]["mouseup"]();
-        *                   (calls mouseup event handler for current mode)
-        */
         Authoring.modeMouseHandlers = {
             createTimeline: {
                 mousemove: function () {

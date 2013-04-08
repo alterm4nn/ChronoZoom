@@ -487,7 +487,7 @@ module CZ {
                     if (!this.viewport) {
                         var size = this._getClientSize();
                         var o = this.options;
-                        this.viewport = new CZ.Common.Viewport2d(o.aspectRatio, size.width, size.height, o.visible);
+                        this.viewport = new CZ.Viewport.Viewport2d(o.aspectRatio, size.width, size.height, o.visible);
                     }
                     return this.viewport;
                 },

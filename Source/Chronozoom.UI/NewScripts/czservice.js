@@ -1,5 +1,3 @@
-/// <reference path='cz.settings.ts'/>
-/// <reference path='typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
     (function (Service) {
@@ -72,13 +70,8 @@ var CZ;
         }
         Service.Request = Request;
         ;
-        // NOTE: Set to sandbox for debug purposes.
         Service.collectionName = "sandbox";
         Service.superCollectionName = "sandbox";
-        /**
-        * Chronozoom.svc Requests.
-        */
-        // .../get?supercollection=&collection=
         function get() {
             var request = new Service.Request(_serviceUrl);
             request.addToPath("get");
@@ -92,7 +85,6 @@ var CZ;
             });
         }
         Service.get = get;
-        // .../gettimelines?supercollection=&collection=&start=&end=&minspan=&lca=
         function getTimelines(r) {
             var request = new Request(_serviceUrl);
             request.addToPath("gettimelines");
@@ -108,11 +100,6 @@ var CZ;
             });
         }
         Service.getTimelines = getTimelines;
-        /**
-        * Information Retrieval.
-        */
-        // .../{supercollection}/collections
-        // NOTE: Not implemented in current API.
         function getCollections() {
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
@@ -125,8 +112,6 @@ var CZ;
             });
         }
         Service.getCollections = getCollections;
-        // .../{supercollection}/{collection}/structure?start=&end=&minspan=&lca=
-        // NOTE: Not implemented in current API.
         function getStructure(r) {
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
@@ -141,8 +126,6 @@ var CZ;
             });
         }
         Service.getStructure = getStructure;
-        // .../{supercollection}/{collection}/data
-        // NOTE: Not implemented in current API.
         function postData(r) {
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
@@ -158,10 +141,6 @@ var CZ;
             });
         }
         Service.postData = postData;
-        /**
-        * Information Modification.
-        */
-        // .../{supercollection}/{collection}
         function putCollection(c) {
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
@@ -176,7 +155,6 @@ var CZ;
             });
         }
         Service.putCollection = putCollection;
-        // .../{supercollection}/{collection}
         function deleteCollection(c) {
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
@@ -190,7 +168,6 @@ var CZ;
             });
         }
         Service.deleteCollection = deleteCollection;
-        // .../{supercollection}/{collection}/timeline
         function putTimeline(t) {
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
@@ -207,7 +184,6 @@ var CZ;
             });
         }
         Service.putTimeline = putTimeline;
-        // .../{supercollection}/{collection}/timeline
         function deleteTimeline(t) {
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
@@ -223,7 +199,6 @@ var CZ;
             });
         }
         Service.deleteTimeline = deleteTimeline;
-        // .../{supercollection}/{collection}/exhibit
         function putExhibit(e) {
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
@@ -240,7 +215,6 @@ var CZ;
             });
         }
         Service.putExhibit = putExhibit;
-        // .../{supercollection}/{collection}/exhibit
         function deleteExhibit(e) {
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
@@ -256,7 +230,6 @@ var CZ;
             });
         }
         Service.deleteExhibit = deleteExhibit;
-        // .../{supercollection}/{collection}/contentitem
         function putContentItem(ci) {
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
@@ -273,7 +246,6 @@ var CZ;
             });
         }
         Service.putContentItem = putContentItem;
-        // .../{supercollection}/{collection}/contentitem
         function deleteContentItem(ci) {
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
@@ -289,18 +261,13 @@ var CZ;
             });
         }
         Service.deleteContentItem = deleteContentItem;
-        /**
-        * Auxiliary Methods.
-        */
         function putExhibitContent(e, oldContentItems) {
             var newGuids = e.contentItems.map(function (ci) {
                 return ci.guid;
             });
-            // Send PUT request for all exhibit's content items.
             var promises = e.contentItems.map(function (ci) {
                 return putContentItem(ci);
-            }).concat(// Filter deleted content items and send DELETE request for them.
-            oldContentItems.filter(function (ci) {
+            }).concat(oldContentItems.filter(function (ci) {
                 return (newGuids.indexOf(ci.guid) === -1);
             }).map(function (ci) {
                 return deleteContentItem(ci);
