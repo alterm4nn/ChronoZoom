@@ -295,8 +295,8 @@ module CZ {
                            (element.x >= parent.x && element.x + element.width <= parent.x + parent.width) &&
                            (element.y >= parent.y && element.y + element.height <= parent.y + parent.height);
 
-            //if (!isWithin && Log)
-            //    Log.push("Child element does not belong to the parent element " + parent.id + " " + element.ID);
+            if (!isWithin)
+                console.log("Child element does not belong to the parent element " + parent.id + " " + element.ID);
 
             //if (!suppresCheck && !isWithin) throw "Child element does not belong to the parent element";
             parent.children.push(element);
@@ -1925,8 +1925,9 @@ module CZ {
                                     this.contentItem.description, 30,
                                     {});
 
-                    return { zoomLevel: CZ.Settings.contentItemShowContentZoomLevel,
-                     content: container
+                    return {
+                        zoomLevel: CZ.Settings.contentItemShowContentZoomLevel,
+                        content: container
                     };
                 } else { // building thumbnails
                     var zl = newZl;
@@ -2278,7 +2279,7 @@ module CZ {
                 var len2 = CZ.Common.sqr(point_v.x - this.x - (this.width / 2)) + CZ.Common.sqr(point_v.y - this.y - (this.height / 2));
                 var rad = this.width / 2.0;
                 return len2 <= rad * rad;
-            }
+            };
 
             this.prototype = new CanvasCircle(vc, layerid, id, time, vyc, radv,
                 { strokeStyle: CZ.Settings.infoDotBorderColor, lineWidth: CZ.Settings.infoDotBorderWidth * radv, fillStyle: CZ.Settings.infoDotFillColor, isLineWidthVirtual: true });
