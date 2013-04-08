@@ -406,13 +406,13 @@ module CZ {
             cosmosVisible = f(cosmosTimeline);
             CZ.UrlNav.navigationAnchor = vc.virtualCanvas("findElement", 't' + cosmosTimeline.id);
 
-            var earthTimeline = CZ.Layout.FindChildTimeline(cosmosTimeline, earthTimelineID);
+            var earthTimeline = CZ.Layout.FindChildTimeline(cosmosTimeline, CZ.Settings.earthTimelineID);
             earthVisible = f(earthTimeline);
-            var lifeTimeline = CZ.Layout.FindChildTimeline(earthTimeline, lifeTimelineID);
+            var lifeTimeline = CZ.Layout.FindChildTimeline(earthTimeline, CZ.Settings.lifeTimelineID);
             lifeVisible = f(lifeTimeline);
-            var prehistoryTimeline = CZ.Layout.FindChildTimeline(lifeTimeline, prehistoryTimelineID);
+            var prehistoryTimeline = CZ.Layout.FindChildTimeline(lifeTimeline, CZ.Settings.prehistoryTimelineID);
             prehistoryVisible = f(prehistoryTimeline);
-            var humanityTimeline = CZ.Layout.FindChildTimeline(prehistoryTimeline, humanityTimelineID, true);
+            var humanityTimeline = CZ.Layout.FindChildTimeline(prehistoryTimeline, CZ.Settings.humanityTimelineID, true);
             humanityVisible = f(humanityTimeline);
 
             maxPermitedVerticalRange = {    //setting top and bottom observation constraints according to cosmos timeline

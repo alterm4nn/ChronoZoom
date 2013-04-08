@@ -1925,8 +1925,9 @@ module CZ {
                                     this.contentItem.description, 30,
                                     {});
 
-                    return { zoomLevel: CZ.Settings.contentItemShowContentZoomLevel,
-                     this.   content: container
+                    return {
+                        zoomLevel: CZ.Settings.contentItemShowContentZoomLevel,
+                        content: container
                     };
                 } else { // building thumbnails
                     var zl = newZl;
@@ -2278,6 +2279,7 @@ module CZ {
                 var len2 = sqr(point_v.x - this.x - (this.width / 2)) + sqr(point_v.y - this.y - (this.height / 2));
                 var rad = this.width / 2.0;
                 return len2 <= rad * rad;
+            };
 
             this.prototype = new CanvasCircle(vc, layerid, id, time, vyc, radv,
                 { strokeStyle: CZ.Settings.infoDotBorderColor, lineWidth: CZ.Settings.infoDotBorderWidth * radv, fillStyle: CZ.Settings.infoDotFillColor, isLineWidthVirtual: true });

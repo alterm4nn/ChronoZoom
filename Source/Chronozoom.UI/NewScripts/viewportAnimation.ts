@@ -303,7 +303,7 @@ module CZ {
 
         //function to make animation EaseInOut. [0,1] -> [0,1]
         //@param t    (number)      changes between [0;1]. 0 coresponds to the beginig of the animatoin. 1 coresponds to the end of the animation
-        function animationEase(t) {
+        export function animationEase(t) {
             return -2 * t * t * t + 3 * t * t;
         }
     }

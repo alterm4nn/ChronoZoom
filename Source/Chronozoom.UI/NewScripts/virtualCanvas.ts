@@ -487,7 +487,7 @@ module CZ {
                     if (!this.viewport) {
                         var size = this._getClientSize();
                         var o = this.options;
-                        this.viewport = new CZ.Common.Viewport2d(o.aspectRatio, size.width, size.height, o.visible);
+                        this.viewport = new CZ.Viewport.Viewport2d(o.aspectRatio, size.width, size.height, o.visible);
                     }
                     return this.viewport;
                 },
@@ -539,7 +539,7 @@ module CZ {
 
                     // update parameters of animating elements and require new frame if needed
                     if (CZ.Layout.animatingElements.length != 0) {
-                        for (id in CZ.Layout.animatingElements)
+                        for (var id in CZ.Layout.animatingElements)
                             if (CZ.Layout.animatingElements[id].animation && CZ.Layout.animatingElements[id].animation.isAnimating) {
                                 CZ.Layout.animatingElements[id].calculateNewFrame();
                                 this.requestNewFrame = true;
