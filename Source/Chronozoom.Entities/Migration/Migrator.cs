@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Text;
@@ -28,6 +29,14 @@ namespace Chronozoom.Entities.Migration
         private static Lazy<string> _baseContentAdmin = new Lazy<string>(() =>
         {
             return ConfigurationManager.AppSettings["BaseCollectionsAdministrator"];
+        });
+
+        private static Lazy<string> _baseDirectory = new Lazy<string>(() =>
+        {
+            if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["BaseDataMigrationDirectory"]))
+                return ConfigurationManager.AppSettings["BaseDataMigrationDirectory"];
+
+            return AppDomain.CurrentDomain.BaseDirectory;
         });
 
         public Migrator(Storage storage)
@@ -77,9 +86,9 @@ namespace Chronozoom.Entities.Migration
             {
                 // Load the Beta Content collection
                 Collection collection = LoadCollections(superCollectionName, superCollectionName, contentAdminId);
-                using (Stream getData = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\" + getFileName))
-                using (Stream getToursData = getToursFileName == null ? null : File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\" + getToursFileName))
-                using (Stream getThresholdsData = getThresholdsFileName == null ? null : File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\" + getThresholdsFileName))
+                using (Stream getData = File.OpenRead(_baseDirectory.Value + @"Dumps\" + getFileName))
+                using (Stream getToursData = getToursFileName == null ? null : File.OpenRead(_baseDirectory.Value + @"Dumps\" + getToursFileName))
+                using (Stream getThresholdsData = getThresholdsFileName == null ? null : File.OpenRead(_baseDirectory.Value + @"Dumps\" + getThresholdsFileName))
                 {
                     LoadData(getData, getToursData, getThresholdsData, collection, replaceGuids);
                 }
@@ -325,16 +334,11 @@ namespace Chronozoom.Entities.Migration
             public T d { get; set; }
         }
 
-        private delegate void TraverseOperation(Timeline timeline);
-        private void TraverseTimelines(IEnumerable<Timeline> timelines, TraverseOperation operation)
+        public static void TraverseTimelines(IEnumerable<Timeline> timelines, TraverseOperation operation)
         {
-            if (timelines == null)
-                return;
-
             foreach (Timeline timeline in timelines)
             {
-                operation(timeline);
-                TraverseTimelines(timeline.ChildTimelines, operation);
+                timeline.Traverse(operation);
             }
         }
 
