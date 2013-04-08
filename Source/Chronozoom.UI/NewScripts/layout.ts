@@ -7,11 +7,6 @@
 module CZ {
     export module Layout {
 
-        var Settings = CZ.Settings;
-        var VCContent = CZ.VCContent;
-        var Common = CZ.Common;
-        var Viewport = CZ.Viewport;
-
         var isLayoutAnimation = true; // temp variable for debugging
 
         export var animatingElements = { // hashmap of animating elements in ongoing dynamic layout animation
@@ -36,12 +31,12 @@ module CZ {
         }
 
         function Prepare(timeline) {
-            timeline.left = Common.getCoordinateFromDecimalYear(timeline.start);
-            timeline.right = Common.getCoordinateFromDecimalYear(timeline.end);
+            timeline.left = CZ.Common.getCoordinateFromDecimalYear(timeline.start);
+            timeline.right = CZ.Common.getCoordinateFromDecimalYear(timeline.end);
 
             if (timeline.exhibits instanceof Array) {
                 timeline.exhibits.forEach(function (exhibit) {
-                    exhibit.x = Common.getCoordinateFromDecimalYear(exhibit.time);
+                    exhibit.x = CZ.Common.getCoordinateFromDecimalYear(exhibit.time);
                 });
             }
 
@@ -60,7 +55,7 @@ module CZ {
         }
 
         function GenerateAspect(timeline) {
-            if (timeline.ID == Settings.cosmosTimelineID) {
+            if (timeline.ID == CZ.Settings.cosmosTimelineID) {
                 timeline.AspectRatio = 10;
             }
             /*
@@ -77,7 +72,7 @@ module CZ {
         }
 
         function LayoutTimeline(timeline, parentWidth, measureContext) {
-            var headerPercent = Settings.timelineHeaderSize + 2 * Settings.timelineHeaderMargin;
+            var headerPercent = CZ.Settings.timelineHeaderSize + 2 * CZ.Settings.timelineHeaderMargin;
             var timelineWidth = timeline.right - timeline.left;
             timeline.width = timelineWidth;
 
@@ -394,12 +389,12 @@ module CZ {
         function GenerateTitleObject(tlHeight, timeline, measureContext) {
             var tlW = timeline.right - timeline.left;
 
-            measureContext.font = "100pt " + Settings.timelineHeaderFontName;
+            measureContext.font = "100pt " + CZ.Settings.timelineHeaderFontName;
             var size = measureContext.measureText(timeline.title);
-            var height = Settings.timelineHeaderSize * tlHeight;
+            var height = CZ.Settings.timelineHeaderSize * tlHeight;
             var width = height * size.width / 100.0;
 
-            var margin = Math.min(tlHeight, tlW) * Settings.timelineHeaderMargin;
+            var margin = Math.min(tlHeight, tlW) * CZ.Settings.timelineHeaderMargin;
 
             if (width + 2 * margin > tlW) {
                 width = tlW - 2 * margin;
@@ -420,7 +415,7 @@ module CZ {
         function Convert(parent, timeline) {
             //Creating timeline
             var tlColor = GetTimelineColor(timeline);
-            var t1 = VCContent.addTimeline(parent, "layerTimelines", 't' + timeline.id,
+            var t1 = CZ.VCContent.addTimeline(parent, "layerTimelines", 't' + timeline.id,
             {
                 isBuffered: timeline.timelines instanceof Array,
                 guid: timeline.id,
@@ -448,7 +443,7 @@ module CZ {
                         }
                     }
 
-                    var infodot1 = VCContent.addInfodot(t1, "layerInfodots", 'e' + childInfodot.id,
+                    var infodot1 = CZ.VCContent.addInfodot(t1, "layerInfodots", 'e' + childInfodot.id,
                             (childInfodot.left + childInfodot.right) / 2.0, childInfodot.y, 0.8 * childInfodot.size / 2.0, contentItems,
                             {
                                 isBuffered: false,
@@ -639,7 +634,7 @@ module CZ {
 
 
         function animateElement(elem) {
-            var duration = Settings.canvasElementAnimationTime;
+            var duration = CZ.Settings.canvasElementAnimationTime;
             var args = [];
 
             if (elem.fadeIn == false && typeof elem.animation === 'undefined') {
@@ -669,7 +664,7 @@ module CZ {
                     startValue: elem.opacity,
                     targetValue: 1
                 });
-                duration = Settings.canvasElementFadeInTime;
+                duration = CZ.Settings.canvasElementFadeInTime;
             }
 
             if (isLayoutAnimation == false || args.length == 0)
@@ -855,7 +850,7 @@ module CZ {
                     }
                 } else if (srcChildTimelines.length > 0 && destChildTimelines.length === 0) { // dest does not contain any src children
                     var t = generateLayout(src, dest);
-                    var margin = Math.min(t.width, t.newHeight) * Settings.timelineHeaderMargin;
+                    var margin = Math.min(t.width, t.newHeight) * CZ.Settings.timelineHeaderMargin;
                     dest.delta = Math.max(0, t.newHeight - dest.newHeight); // timelines can only grow, never shrink
 
                     // replace dest.children (timelines, infodots, titleObject) with matching t.children

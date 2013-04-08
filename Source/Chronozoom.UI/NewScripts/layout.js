@@ -1,10 +1,6 @@
 var CZ;
 (function (CZ) {
     (function (Layout) {
-        var Settings = CZ.Settings;
-        var VCContent = CZ.VCContent;
-        var Common = CZ.Common;
-        var Viewport = CZ.Viewport;
         var isLayoutAnimation = true;
         Layout.animatingElements = {
             length: 0
@@ -24,11 +20,11 @@ var CZ;
             this.name = name;
         }
         function Prepare(timeline) {
-            timeline.left = Common.getCoordinateFromDecimalYear(timeline.start);
-            timeline.right = Common.getCoordinateFromDecimalYear(timeline.end);
+            timeline.left = CZ.Common.getCoordinateFromDecimalYear(timeline.start);
+            timeline.right = CZ.Common.getCoordinateFromDecimalYear(timeline.end);
             if(timeline.exhibits instanceof Array) {
                 timeline.exhibits.forEach(function (exhibit) {
-                    exhibit.x = Common.getCoordinateFromDecimalYear(exhibit.time);
+                    exhibit.x = CZ.Common.getCoordinateFromDecimalYear(exhibit.time);
                 });
             }
             if(timeline.timelines instanceof Array) {
@@ -45,12 +41,12 @@ var CZ;
             }
         }
         function GenerateAspect(timeline) {
-            if(timeline.ID == Settings.cosmosTimelineID) {
+            if(timeline.ID == CZ.Settings.cosmosTimelineID) {
                 timeline.AspectRatio = 10;
             }
         }
         function LayoutTimeline(timeline, parentWidth, measureContext) {
-            var headerPercent = Settings.timelineHeaderSize + 2 * Settings.timelineHeaderMargin;
+            var headerPercent = CZ.Settings.timelineHeaderSize + 2 * CZ.Settings.timelineHeaderMargin;
             var timelineWidth = timeline.right - timeline.left;
             timeline.width = timelineWidth;
             if(timeline.AspectRatio && !timeline.height) {
@@ -328,11 +324,11 @@ var CZ;
         }
         function GenerateTitleObject(tlHeight, timeline, measureContext) {
             var tlW = timeline.right - timeline.left;
-            measureContext.font = "100pt " + Settings.timelineHeaderFontName;
+            measureContext.font = "100pt " + CZ.Settings.timelineHeaderFontName;
             var size = measureContext.measureText(timeline.title);
-            var height = Settings.timelineHeaderSize * tlHeight;
+            var height = CZ.Settings.timelineHeaderSize * tlHeight;
             var width = height * size.width / 100.0;
-            var margin = Math.min(tlHeight, tlW) * Settings.timelineHeaderMargin;
+            var margin = Math.min(tlHeight, tlW) * CZ.Settings.timelineHeaderMargin;
             if(width + 2 * margin > tlW) {
                 width = tlW - 2 * margin;
                 height = width * 100.0 / size.width;
@@ -348,7 +344,7 @@ var CZ;
         }
         function Convert(parent, timeline) {
             var tlColor = GetTimelineColor(timeline);
-            var t1 = VCContent.addTimeline(parent, "layerTimelines", 't' + timeline.id, {
+            var t1 = CZ.VCContent.addTimeline(parent, "layerTimelines", 't' + timeline.id, {
                 isBuffered: timeline.timelines instanceof Array,
                 guid: timeline.id,
                 timeStart: timeline.left,
@@ -371,7 +367,7 @@ var CZ;
                             contentItems[i].guid = contentItems[i].id;
                         }
                     }
-                    var infodot1 = VCContent.addInfodot(t1, "layerInfodots", 'e' + childInfodot.id, (childInfodot.left + childInfodot.right) / 2.0, childInfodot.y, 0.8 * childInfodot.size / 2.0, contentItems, {
+                    var infodot1 = CZ.VCContent.addInfodot(t1, "layerInfodots", 'e' + childInfodot.id, (childInfodot.left + childInfodot.right) / 2.0, childInfodot.y, 0.8 * childInfodot.size / 2.0, contentItems, {
                         isBuffered: false,
                         guid: childInfodot.id,
                         title: childInfodot.title,
@@ -526,7 +522,7 @@ var CZ;
             }
         }
         function animateElement(elem) {
-            var duration = Settings.canvasElementAnimationTime;
+            var duration = CZ.Settings.canvasElementAnimationTime;
             var args = [];
             if(elem.fadeIn == false && typeof elem.animation === 'undefined') {
                 elem.height = elem.newHeight;
@@ -555,7 +551,7 @@ var CZ;
                     startValue: elem.opacity,
                     targetValue: 1
                 });
-                duration = Settings.canvasElementFadeInTime;
+                duration = CZ.Settings.canvasElementFadeInTime;
             }
             if(isLayoutAnimation == false || args.length == 0) {
                 duration = 0;
@@ -704,7 +700,7 @@ var CZ;
                     }
                 } else if(srcChildTimelines.length > 0 && destChildTimelines.length === 0) {
                     var t = generateLayout(src, dest);
-                    var margin = Math.min(t.width, t.newHeight) * Settings.timelineHeaderMargin;
+                    var margin = Math.min(t.width, t.newHeight) * CZ.Settings.timelineHeaderMargin;
                     dest.delta = Math.max(0, t.newHeight - dest.newHeight);
                     dest.children.splice(0);
                     for(var i = 0; i < t.children.length; i++) {

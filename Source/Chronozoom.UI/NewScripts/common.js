@@ -1,7 +1,6 @@
 var CZ;
 (function (CZ) {
     (function (Common) {
-        var Settings = CZ.Settings;
         Common.maxPermitedScale;
         Common.maxPermitedVerticalRange;
         Common.controller;
@@ -112,7 +111,7 @@ var CZ;
                 if(month == 12) {
                     month = 0;
                 }
-                days += Settings.daysInMonth[month];
+                days += CZ.Settings.daysInMonth[month];
                 month++;
             }
             days += d2;
@@ -127,7 +126,7 @@ var CZ;
             var nDays = (n + Math.floor(-n)) * 365;
             while(nDays < 0) {
                 var tempMonth = endMonth > 0 ? endMonth - 1 : 11;
-                nDays += Settings.daysInMonth[tempMonth];
+                nDays += CZ.Settings.daysInMonth[tempMonth];
                 endMonth--;
                 if(endMonth < 0) {
                     endYear--;
@@ -135,7 +134,7 @@ var CZ;
                 }
             }
             endDay += Math.round(nDays);
-            var tempDays = Settings.daysInMonth[endMonth];
+            var tempDays = CZ.Settings.daysInMonth[endMonth];
             if(isLeapYear(endYear)) {
                 tempDays++;
             }
@@ -146,7 +145,7 @@ var CZ;
                     endMonth = 0;
                     endYear++;
                 }
-                tempDays = Settings.daysInMonth[endMonth];
+                tempDays = CZ.Settings.daysInMonth[endMonth];
                 if(isLeapYear(endYear)) {
                     tempDays++;
                 }
@@ -223,7 +222,7 @@ var CZ;
         }
         Common.stopAnimationTooltip = stopAnimationTooltip;
         function compareVisibles(vis1, vis2) {
-            return vis2 != null ? (Math.abs(vis1.centerX - vis2.centerX) < Settings.allowedVisibileImprecision && Math.abs(vis1.centerY - vis2.centerY) < Settings.allowedVisibileImprecision && Math.abs(vis1.scale - vis2.scale) < Settings.allowedVisibileImprecision) : false;
+            return vis2 != null ? (Math.abs(vis1.centerX - vis2.centerX) < CZ.Settings.allowedVisibileImprecision && Math.abs(vis1.centerY - vis2.centerY) < CZ.Settings.allowedVisibileImprecision && Math.abs(vis1.scale - vis2.scale) < CZ.Settings.allowedVisibileImprecision) : false;
         }
         Common.compareVisibles = compareVisibles;
         function setVisibleByUserDirectly(visible) {
@@ -250,7 +249,7 @@ var CZ;
             if(match) {
                 return unescape(match[1]);
             } else {
-                switch(Settings.czDataSource) {
+                switch(CZ.Settings.czDataSource) {
                     case 'db':
                         return "/Chronozoom.svc/get";
                     case 'relay':
@@ -327,7 +326,7 @@ var CZ;
                 top: cosmosTimeline.y,
                 bottom: cosmosTimeline.y + cosmosTimeline.height
             };
-            Settings.maxPermitedTimeRange = {
+            CZ.Settings.maxPermitedTimeRange = {
                 left: cosmosTimeline.left,
                 right: cosmosTimeline.right
             };
@@ -419,12 +418,12 @@ var CZ;
                 return (log + pow) * 13700000000 / 1041.2113538234402;
             };
             var left = vp.pointScreenToVirtual(0, 0).x;
-            if(left < Settings.maxPermitedTimeRange.left) {
-                left = Settings.maxPermitedTimeRange.left;
+            if(left < CZ.Settings.maxPermitedTimeRange.left) {
+                left = CZ.Settings.maxPermitedTimeRange.left;
             }
             var right = vp.pointScreenToVirtual(vp.width, vp.height).x;
-            if(right > Settings.maxPermitedTimeRange.right) {
-                right = Settings.maxPermitedTimeRange.right;
+            if(right > CZ.Settings.maxPermitedTimeRange.right) {
+                right = CZ.Settings.maxPermitedTimeRange.right;
             }
             var newRight = navigatorFunc(Math.abs(right));
             var newLeft = navigatorFunc(Math.abs(left));

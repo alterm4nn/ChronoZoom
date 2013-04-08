@@ -17,8 +17,6 @@ declare var hashChangeFromOutside: any;
 module CZ {
     export module Common {
 
-        var Settings = CZ.Settings;
-
         export var maxPermitedScale;
         export var maxPermitedVerticalRange;
 
@@ -173,7 +171,7 @@ module CZ {
                 if (month == 12) {
                     month = 0;
                 }
-                days += Settings.daysInMonth[month];
+                days += CZ.Settings.daysInMonth[month];
                 month++;
             }
             days += d2;
@@ -198,7 +196,7 @@ module CZ {
             // calculate how many full months have passed
             while (nDays < 0) {
                 var tempMonth = endMonth > 0 ? endMonth - 1 : 11;
-                nDays += Settings.daysInMonth[tempMonth];
+                nDays += CZ.Settings.daysInMonth[tempMonth];
                 endMonth--;
                 if (endMonth < 0) {
                     endYear--;
@@ -208,7 +206,7 @@ module CZ {
 
             endDay += Math.round(nDays);
             // get count of days in current month
-            var tempDays = Settings.daysInMonth[endMonth];
+            var tempDays = CZ.Settings.daysInMonth[endMonth];
             if (isLeapYear(endYear)) tempDays++;
             // if result day is bigger than count of days then one more month has passed too            
             while (endDay > tempDays) {
@@ -218,7 +216,7 @@ module CZ {
                     endMonth = 0;
                     endYear++;
                 }
-                tempDays = Settings.daysInMonth[endMonth];
+                tempDays = CZ.Settings.daysInMonth[endMonth];
                 if (isLeapYear(endYear)) tempDays++;
             }
             if (endYear < 0 && year > 0)
@@ -295,9 +293,9 @@ module CZ {
         // Compares 2 visibles. Returns true if they are equal with an allowable imprecision
         export function compareVisibles(vis1, vis2) {
             return vis2 != null ?
-                    (Math.abs(vis1.centerX - vis2.centerX) < Settings.allowedVisibileImprecision &&
-                    Math.abs(vis1.centerY - vis2.centerY) < Settings.allowedVisibileImprecision &&
-                    Math.abs(vis1.scale - vis2.scale) < Settings.allowedVisibileImprecision)
+                    (Math.abs(vis1.centerX - vis2.centerX) < CZ.Settings.allowedVisibileImprecision &&
+                    Math.abs(vis1.centerY - vis2.centerY) < CZ.Settings.allowedVisibileImprecision &&
+                    Math.abs(vis1.scale - vis2.scale) < CZ.Settings.allowedVisibileImprecision)
                     : false;
         }
 
@@ -330,7 +328,7 @@ module CZ {
             if (match) {
                 return unescape(match[1]);
             } else {
-                switch (Settings.czDataSource) {
+                switch (CZ.Settings.czDataSource) {
                     case 'db':
                         return "/Chronozoom.svc/get";
                     case 'relay':
@@ -421,7 +419,7 @@ module CZ {
             };
 
             // update virtual canvas horizontal borders
-            Settings.maxPermitedTimeRange = {
+            CZ.Settings.maxPermitedTimeRange = {
                 left: cosmosTimeline.left,
                 right: cosmosTimeline.right
             };
@@ -528,9 +526,9 @@ module CZ {
             }
 
             var left = vp.pointScreenToVirtual(0, 0).x;
-            if (left < Settings.maxPermitedTimeRange.left) left = Settings.maxPermitedTimeRange.left;
+            if (left < CZ.Settings.maxPermitedTimeRange.left) left = CZ.Settings.maxPermitedTimeRange.left;
             var right = vp.pointScreenToVirtual(vp.width, vp.height).x;
-            if (right > Settings.maxPermitedTimeRange.right) right = Settings.maxPermitedTimeRange.right;
+            if (right > CZ.Settings.maxPermitedTimeRange.right) right = CZ.Settings.maxPermitedTimeRange.right;
             var newRight = navigatorFunc(Math.abs(right));
             var newLeft = navigatorFunc(Math.abs(left));
             var newWidth = Math.max(2.0 / regimesRatio, Math.abs(newRight - newLeft));

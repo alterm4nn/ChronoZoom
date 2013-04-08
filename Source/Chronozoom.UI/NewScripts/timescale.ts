@@ -58,7 +58,6 @@
             "date": new CZ.DateTickSource()
         };
 
-        var that = this;
         var isHorizontal = (_position === "bottom" || _position === "top");
         var canvas = $("<canvas></canvas>");
         var labelsDiv = $("<div></div>");
@@ -1380,5 +1379,4 @@
         };
     };
     CZ.DateTickSource.prototype = new CZ.TickSource;
-    //return CZ;
-}//)(CZ || {}, jQuery, document);
+}
