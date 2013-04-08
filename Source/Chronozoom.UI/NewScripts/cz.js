@@ -13,7 +13,7 @@ var CZ;
             $('#tours_index').mouseup(CZ.Tours.onTourClicked).mouseover(function () {
                 CZ.Tours.tourButtonHighlight(true);
             }).mouseout(function () {
-                CZ.Tours.tourButtonHighlight(true);
+                CZ.Tours.tourButtonHighlight(false);
             });
             $('#human_rect').click(function () {
                 CZ.Search.navigateToBookmark(CZ.Common.humanityVisible);

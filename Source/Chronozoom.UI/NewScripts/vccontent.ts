@@ -438,7 +438,7 @@ module CZ {
                     render(this.children[i], contexts, visibleBox_v, viewport2d, 1.0);
                 }
 
-                if (this.vc.breadCrumbs.length > 0 && (this.vc.recentBreadCrumb == undefined || this.vc.breadCrumbs[vc.breadCrumbs.length - 1].vcElement.title != this.vc.recentBreadCrumb.vcElement.title)) { //the deepest bread crumb is chenged
+                if (this.vc.breadCrumbs.length > 0 && (this.vc.recentBreadCrumb == undefined || this.vc.breadCrumbs[vc.breadCrumbs.length - 1].vcElement.id != this.vc.recentBreadCrumb.vcElement.id)) { //the deepest bread crumb is chenged
                     this.vc.recentBreadCrumb = this.vc.breadCrumbs[vc.breadCrumbs.length - 1];
                     this.vc.breadCrumbsChanged();
                 }

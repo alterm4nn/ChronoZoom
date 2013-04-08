@@ -351,7 +351,7 @@ module CZ {
             CZ.Service.getTimelines({
                 start: -50000000000,
                 end: 9999,
-                minspan: 5013
+                minspan: null // Can't specify minspan on first load since the timeline span will vary significantly.
             }).then(
                 function (response) {
                     ProcessContent(response);

@@ -41,7 +41,7 @@ module CZ {
         }
 
         var Settings = CZ.Settings;
-        var _serviceUrl = Settings.serverUrlBase + "/chronozoom.svc/";
+        var _serviceUrl = Settings.serverUrlHost + "/chronozoom.svc/";
 
         export function Request (urlBase) {
             var _url = urlBase;

@@ -21,7 +21,7 @@
         export var targetFps = 60; //the frames per second target value for animation and transitions
         export var hoverAnimationSeconds = 2; //animation time between apearing of timeline color on mouse hover
 
-        export var fallbackImageUri = 'Images/Temp-Thumbnail2.png'; // the image that is shown when thumbnail loading fails (e.g. database is unavailable)
+        export var fallbackImageUri = '/Images/Temp-Thumbnail2.png'; // the image that is shown when thumbnail loading fails (e.g. database is unavailable)
 
         // Styles of timelines
         export var timelineHeaderMargin = 1.0 / 18.0;  // size of left margins, relative to height of the timeline.
@@ -50,7 +50,7 @@
         export var infoDotBorderColor = 'rgb(232,232,232)'; // color of infdot's circle border
         export var infoDotHoveredBorderColor = 'white'; // color of infdot's circle border when mouse cursor is over it
         export var infoDotFillColor = 'rgb(92,92,92)'; // color of infdot's circle border
-        export var infoDotTinyContentImageUri = 'Images/tinyContent.png';
+        export var infoDotTinyContentImageUri = '/Images/tinyContent.png';
         export var infodotMaxContentItemsCount = 10;
 
         export var mediaContentElementZIndex = 100;
@@ -149,7 +149,7 @@
         export var longNavigationLength = 10; // length of navigation in long navigation regime
 
         // progresive loading
-        export var serverUrlBase = document.URL.match(/((?:http:\/\/)?(?:[0-9a-zA-Z.:\-]+)(?:\/[^.]+\/)?)(.*)/)[1];
+        export var serverUrlHost = location.protocol + "//" + location.host;
         export var minTimelineWidth = 100; // px
     }
 }

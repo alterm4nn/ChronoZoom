@@ -38,7 +38,7 @@ var CZ;
             Map.contentItem = contentItem;
         })(Map || (Map = {}));
         var Settings = CZ.Settings;
-        var _serviceUrl = Settings.serverUrlBase + "/chronozoom.svc/";
+        var _serviceUrl = Settings.serverUrlHost + "/chronozoom.svc/";
         function Request(urlBase) {
             var _url = urlBase;
             var _hasParameters = false;

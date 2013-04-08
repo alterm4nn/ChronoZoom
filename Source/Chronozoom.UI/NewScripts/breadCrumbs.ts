@@ -223,9 +223,10 @@ module CZ {
             var td = $("<td class='breadCrumbTableCell' id='bc_" + length + "'></td>");
 
             // Without title, it will be added after appending.
-            var div = $("<div class='breadCrumbLink' id='bc_link_" + element.id +
-                        "' onclick='clickOverBreadCrumb(\"" +
-                        element.id + "\", " + length + ")'></div>");
+            var div = $("<div class='breadCrumbLink' id='bc_link_" + element.id + "'></div>")
+                .click(function () {
+                    clickOverBreadCrumb(element.id, length);
+                });
 
             var span = $("<span class='breadCrumbSeparator' id='bc_'>&rsaquo;</span>");
 

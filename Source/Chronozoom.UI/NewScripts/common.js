@@ -267,7 +267,7 @@ var CZ;
             CZ.Service.getTimelines({
                 start: -50000000000,
                 end: 9999,
-                minspan: 5013
+                minspan: null
             }).then(function (response) {
                 ProcessContent(response);
                 Common.vc.virtualCanvas("updateViewport");

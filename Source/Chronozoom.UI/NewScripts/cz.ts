@@ -27,7 +27,7 @@ module CZ {
             $('#tours_index')
                 .mouseup(CZ.Tours.onTourClicked)
                 .mouseover(() => { CZ.Tours.tourButtonHighlight(true); })
-                .mouseout(() => { CZ.Tours.tourButtonHighlight(true); });
+                .mouseout(() => { CZ.Tours.tourButtonHighlight(false); });
 
             $('#human_rect')
                 .click(() => { CZ.Search.navigateToBookmark(CZ.Common.humanityVisible); });
