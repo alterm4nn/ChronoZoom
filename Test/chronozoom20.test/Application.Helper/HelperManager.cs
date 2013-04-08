@@ -17,6 +17,7 @@ namespace Application.Helper
         private static WelcomeScreenHelper _welcomeScreenHelper;
         private static TimelineHelper _timelineHelper;
         private static ExhibitHelper _exhibitHelper;
+        private static AuthorizationHelper _authorizationHelper;
 
         public static void Stop()
         {
@@ -85,6 +86,11 @@ namespace Application.Helper
         public ExhibitHelper GetExhibitHelper()
         {
             return _exhibitHelper ?? (_exhibitHelper = new ExhibitHelper());
+        }
+
+        public AuthorizationHelper GetAuthorizationHelper()
+        {
+            return _authorizationHelper ?? (_authorizationHelper = new AuthorizationHelper());
         }
     }
 }

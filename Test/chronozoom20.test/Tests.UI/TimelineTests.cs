@@ -1,4 +1,5 @@
-﻿using Application.Helper.Entities;
+﻿using System;
+using Application.Helper.Entities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Tests
@@ -18,7 +19,7 @@ namespace Tests
             NavigationHelper.OpenHomePage();
             WelcomeScreenHelper.CloseWelcomePopup();
 
-            _timeline = new Timeline() { Title = "WebdriverTitle" };
+            _timeline = new Timeline { Title = "WebdriverTitle" };
             HomePageHelper.DeleteAllElementsLocally();
             TimelineHelper.AddTimeline(_timeline);
             _newTimeline = TimelineHelper.GetLastTimeline();
@@ -27,13 +28,15 @@ namespace Tests
         [TestInitialize]
         public void TestInitialize()
         {
-           
         }
 
         [ClassCleanup]
         public static void ClassCleanup()
         {
-            NavigationHelper.NavigateToCosmos();
+            if (TimelineHelper.IsTimelineFound(_newTimeline))
+            {
+                TimelineHelper.DeleteTimelineByJavaScript(_newTimeline);
+            }
         }
 
         [TestCleanup]
@@ -49,11 +52,18 @@ namespace Tests
         {
             Assert.AreEqual(_timeline.Title, _newTimeline.Title);
         }
-        
+
         [TestMethod]
         public void new_timline_should_not_have_null_id()
         {
             Assert.IsNotNull(_newTimeline.TimelineId);
+        }
+
+        [TestMethod]
+        public void new_timline_should_be_deleted()
+        {
+            TimelineHelper.DeleteTimeline(_newTimeline);
+            Assert.IsFalse(TimelineHelper.IsTimelineFound(_newTimeline));
         }
     }
 }
