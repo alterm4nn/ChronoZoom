@@ -156,6 +156,13 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
+        public void OpenLoginPage()
+        {
+            Logger.Log("<-");
+            Click(By.XPath("//*[@id='LoginPanel']/a"));
+            Logger.Log("->");
+        }
+
         public void DeleteLastElementLocally(string id)
         {
             Logger.Log("<- id: ");
@@ -169,6 +176,11 @@ namespace Application.Helper.Helpers
             Sleep(1);
             ExecuteJavaScript(string.Format("clear({0})",Javascripts.Cosmos));
             Logger.Log("-> result: ");
+        }
+
+        public void WaitWhileHomePageIsLoaded()
+        {
+            WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("visReg != undefined")), 60);
         }
     }
 }

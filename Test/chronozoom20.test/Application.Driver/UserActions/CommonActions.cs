@@ -6,6 +6,7 @@ using Application.Driver.Extensions;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
+using Cookie = OpenQA.Selenium.Cookie;
 
 namespace Application.Driver.UserActions
 {
@@ -96,6 +97,11 @@ namespace Application.Driver.UserActions
         protected string GetPageTitle()
         {
             return WebDriver.Title;
+        }
+
+        protected ReadOnlyCollection<Cookie> GetAllCookies()
+        {
+            return WebDriver.Manage().Cookies.AllCookies;
         }
 
         protected int GetItemsCount(By by)
@@ -240,7 +246,6 @@ namespace Application.Driver.UserActions
         {
             return WebDriver.Title;
         }
-
 
         protected void MoveToElementAndClick(By by)
         {
