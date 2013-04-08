@@ -57,15 +57,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants\Javascripts.cs" />
+    <Compile Include="Constants\UsersInfo.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>UsersInfo.settings</DependentUpon>
+    </Compile>
     <Compile Include="Entities\ContentItem.cs" />
     <Compile Include="Entities\Exhibit.cs" />
     <Compile Include="Entities\Timeline.cs" />
+    <Compile Include="Entities\User.cs" />
     <Compile Include="HelperManager.cs" />
     <Compile Include="BrowserImpl\ChromeControls.cs" />
     <Compile Include="BrowserImpl\DefaultControls.cs" />
     <Compile Include="BrowserImpl\FirefoxControls.cs" />
     <Compile Include="BrowserImpl\IeControls.cs" />
     <Compile Include="BrowserImpl\SafariControls.cs" />
+    <Compile Include="Helpers\AuthorizationHelper.cs" />
     <Compile Include="Helpers\BookmarkHelper.cs" />
     <Compile Include="Helpers\DateTimeHelper.cs" />
     <Compile Include="Helpers\ExhibitHelper.cs" />
@@ -88,6 +95,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Constants\UsersInfo.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>UsersInfo.Designer.cs</LastGenOutput>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
