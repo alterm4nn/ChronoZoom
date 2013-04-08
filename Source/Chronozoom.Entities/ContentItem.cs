@@ -16,13 +16,13 @@ namespace Chronozoom.Entities
     public class ContentItem
     {
         [Key]
-        [DataMember(Name="ID")]
+        [DataMember(Name="id")]
         public Guid Id { get; set; }
-        
-        [DataMember]
+
+        [DataMember(Name = "title")]
         public string Title { get; set; }
-        
-        [DataMember]
+
+        [DataMember(Name = "description")]
         public string Caption { get; set; }
         
         [DataMember]
@@ -36,11 +36,11 @@ namespace Chronozoom.Entities
         
         [DataMember]
         public decimal? Year { get; set; }
-        
-        [DataMember]
+
+        [DataMember(Name = "mediaType")]
         public string MediaType { get; set; }
 
-        [DataMember]
+        [DataMember(Name="uri")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification="Uri not supported in entity framework.")]
         public string Uri { get; set; }
         
@@ -58,6 +58,8 @@ namespace Chronozoom.Entities
 
         [DataMember]
         public bool HasBibliography { get; set; }
+
+        public virtual Entities.Collection Collection { get; set; }
     }
 
     [DataContract]

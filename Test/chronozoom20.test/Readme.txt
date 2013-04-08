@@ -1,0 +1,1 @@
+For run tests launch LaunchWebTests.bat from "Scripts" folder.

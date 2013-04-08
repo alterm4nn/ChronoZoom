@@ -1,5 +1,5 @@
 ﻿czDataSource = 'dump'; // possible values: db, relay, dump
-// configures whether we should use Chronozoom.svc (directly accesses the database) ['db'], or ChronozoomRelay.svc (using HTTP GET) ['relay'], or saved as local file ResponseDump.txt ['dump'].
+// configures whether we should use Chronozoom.svc (directly accesses the database) ['db'], or ChronozoomRelay.svc (using HTTP GET) ['relay'], or saved as local file /dumps/beta-get.json ['dump'].
 
 czVersion = "mobile"; //can be main or mobile.is needed for threshold rendering
 
@@ -17,7 +17,7 @@ renderThreshold = 2;    // minimum size of either width or height (pixels) of an
 targetFps = 60; //the frames per second target value for animation and transitions
 hoverAnimationSeconds = 2; //animation time between apearing of timeline color on mouse hover
 
-fallbackImageUri = 'Images/Temp-Thumbnail2.png'; // the image that is shown when thumbnail loading fails (e.g. database is unavailable)
+fallbackImageUri = '/Images/Temp-Thumbnail2.png'; // the image that is shown when thumbnail loading fails (e.g. database is unavailable)
 
 // Styles of timelines
 timelineHeaderMargin = 1.0 / 18.0;  // size of left margins, relative to height of the timeline.
@@ -46,7 +46,7 @@ infodotBibliographyHeight = 10.0 / 489;
 infoDotBorderColor = 'rgb(232,232,232)'; // color of infdot's circle border
 infoDotHoveredBorderColor = 'white'; // color of infdot's circle border when mouse cursor is over it
 infoDotFillColor = 'rgb(92,92,92)'; // color of infdot's circle border
-infoDotTinyContentImageUri = 'Images/tinyContent.png';
+infoDotTinyContentImageUri = '/Images/tinyContent.png';
 
 mediaContentElementZIndex = 100;
 contentItemDescriptionNumberOfLines = 10;

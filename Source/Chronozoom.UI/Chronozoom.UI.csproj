@@ -22,6 +22,11 @@
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
+  <PropertyGroup>
+    <RunCodeAnalysis>Always</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -59,6 +64,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.1.0.0-rc2\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.IdentityModel, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\External\IdentityModel\Microsoft.IdentityModel.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Owin.Host.SystemWeb">
       <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.1.0.0-rc2\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
     </Reference>
@@ -76,18 +85,120 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Data.Entity" />
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.identitymodel.services" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.4.0.20710.0\lib\net40\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Caching" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.ServiceModel.Web" />
-    <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Web" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.ServiceModel.Web">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Abstractions">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Extensions">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web">
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.4.0.20710.0\lib\net40\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.WebHost, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.4.0.20710.0\lib\net40\System.Web.Http.WebHost.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Helpers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Routing">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="Thinktecture.IdentityModel, Version=2.3.2.0, Culture=neutral, PublicKeyToken=0532effe7fc7da1f, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\External\Thinktecture.IdentityModel\Thinktecture.IdentityModel.dll</HintPath>
+    </Reference>
+    <Content Include="ACS\FederationMetadata\2007-06\FederationMetadata.xml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="BehindTheScenes.htm" />
     <Content Include="cz.aspx" />
-    <Content Include="czmobile.htm" />
+    <Content Include="cz2.html" />
+    <Content Include="NewScripts\authoring.ui.js">
+      <DependentUpon>authoring.ui.ts</DependentUpon>
+    </Content>
+    <Content Include="NewScripts\authoring.ui.ts" />
+    <Content Include="NewScripts\bibliography.ts" />
+    <Content Include="NewScripts\breadCrumbs.ts" />
+    <Content Include="NewScripts\common.ts" />
+    <Content Include="NewScripts\cz.settings.ts" />
+    <Content Include="NewScripts\czservice.ts" />
+    <Content Include="NewScripts\external\jquery-1.7.2.min.js" />
+    <Content Include="NewScripts\external\jquery-ui-1.8.16.custom.min.js" />
+    <Content Include="NewScripts\external\jquery.cookie.js" />
+    <Content Include="NewScripts\external\jquery.signalR-1.0.0-rc2.js" />
+    <Content Include="NewScripts\external\jquery.signalR-1.0.0-rc2.min.js" />
+    <Content Include="NewScripts\external\rx.jQuery.js" />
+    <Content Include="NewScripts\external\rx.js" />
+    <Content Include="NewScripts\external\seadragon-min.js" />
+    <Content Include="NewScripts\flash_detect.ts" />
+    <Content Include="NewScripts\gestures.ts" />
+    <Content Include="NewScripts\layout.ts" />
+    <Content Include="NewScripts\mouseWheelPlugin.ts" />
+    <Content Include="NewScripts\newauthoring.ts" />
+    <Content Include="NewScripts\regimesIE.ts" />
+    <Content Include="NewScripts\search.ts" />
+    <Content Include="NewScripts\settings.ts" />
+    <Content Include="NewScripts\timescale.ts" />
+    <Content Include="NewScripts\tours.ts" />
+    <Content Include="NewScripts\typings\jqueryui\jqueryui.d.ts" />
+    <Content Include="NewScripts\typings\jquery\jquery.d.ts" />
+    <Content Include="NewScripts\typings\rx.js\rx.js.d.ts" />
+    <Content Include="NewScripts\urlnav.ts" />
+    <Content Include="NewScripts\vccontent.ts" />
+    <Content Include="NewScripts\viewport.ts" />
+    <Content Include="NewScripts\viewportAnimation.ts" />
+    <Content Include="NewScripts\viewportController.ts" />
+    <Content Include="NewScripts\virtualCanvas.ts" />
+    <Content Include="Dumps\wahib-responsedumprest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Login.html" />
+    <Compile Include="ACS\Hrd\HrdClient.cs" />
+    <Compile Include="ACS\Hrd\HrdRequest.cs" />
+    <Compile Include="ACS\Models\HrdIdentityProvider.cs" />
+    <Compile Include="ACS\Models\User.cs" />
+    <Compile Include="ACS\Util\NameValueCollectionExtensions.cs" />
+    <Compile Include="ACS\Util\RequireAuthenticationAttribute.cs" />
+    <Content Include="ACS\FederationMetadata\2007-06\FederationMetadata.xml" />
+    <Content Include="Views\Account\_IdentityProvidersWithClientSideCode.aspx" />
     <Content Include="favicon.ico" />
     <Content Include="Images\A.png" />
     <Content Include="Images\about-chronozoom.png" />
@@ -157,27 +268,44 @@
     <Content Include="Images\zoomout_hover.png" />
     <Content Include="Images\zoomout_pressed.png" />
     <Content Include="Images\zoomout_rest.png" />
+    <Content Include="NewScripts\czservice.js">
+      <DependentUpon>czservice.ts</DependentUpon>
+    </Content>
+    <Content Include="oldResponseDump.txt" />
     <Content Include="Privacy.htm" />
     <Content Include="robots.txt" />
     <Content Include="ScriptsMobile\axis.mobile.js" />
     <Content Include="ScriptsMobile\cz.settings.mobile.js" />
     <Content Include="ScriptsMobile\vccontent.mobile.js" />
     <Content Include="ScriptsMobile\virtualCanvas.mobile.js" />
-    <Content Include="Scripts\breadCrumbs.js" />
-    <Content Include="Scripts\flash_detect.js" />
-    <None Include="Scripts\jquery-1.6.4-vsdoc.js" />
-    <Content Include="Scripts\jquery-1.6.4.js" />
-    <Content Include="Scripts\jquery-1.6.4.min.js" />
-    <Content Include="Scripts\jquery-1.7.2.min.js" />
-    <Content Include="Scripts\jquery.cookie.js" />
-    <Content Include="Scripts\jquery.signalR-1.0.0-rc2.js" />
-    <Content Include="Scripts\jquery.signalR-1.0.0-rc2.min.js" />
-    <Content Include="Scripts\regimesIE.js" />
-    <Content Include="Scripts\seadragon-min.js" />
+    <Content Include="NewScripts\breadCrumbs.js">
+      <DependentUpon>breadCrumbs.ts</DependentUpon>
+    </Content>
+    <Content Include="NewScripts\flash_detect.js">
+      <DependentUpon>flash_detect.ts</DependentUpon>
+    </Content>
+    <Content Include="NewScripts\newauthoring.js">
+      <DependentUpon>newauthoring.ts</DependentUpon>
+    </Content>
+    <Content Include="NewScripts\regimesIE.js">
+      <DependentUpon>regimesIE.ts</DependentUpon>
+    </Content>
+    <Content Include="NewScripts\settings.js">
+      <DependentUpon>settings.ts</DependentUpon>
+    </Content>
+    <Content Include="NewScripts\timescale.js">
+      <DependentUpon>timescale.ts</DependentUpon>
+    </Content>
+    <Content Include="NewStyles\timescale.css" />
+    <Content Include="Dumps\aidsstandalone-get.json" />
+    <Content Include="Dumps\aidstimeline-get.json" />
+    <Content Include="Dumps\aidstimeline-gettours.json" />
+    <Content Include="Dumps\beta-get.json" />
+    <Content Include="Dumps\beta-getthresholds.json" />
+    <Content Include="Dumps\beta-gettours.json" />
     <Content Include="TraceLog.html" />
     <Content Include="Trademark_Copyright.htm" />
     <Content Include="TermsOfUse.htm" />
-    <Content Include="cztransfer.htm" />
     <Content Include="Images\03cztitle_beta_grey_bold_italic.png" />
     <Content Include="Images\1280px-CMB_Timeline300_no_WMAP.jpg" />
     <Content Include="Images\bkmrk_off.jpg" />
@@ -208,31 +336,31 @@
     <Content Include="Images\tour_play_on.jpg" />
     <Content Include="Images\tour_prev_off.jpg" />
     <Content Include="Images\tour_prev_on.jpg" />
-    <Content Include="ResponseDumpThresholds.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <Content Include="NewScripts\bibliography.js">
+      <DependentUpon>bibliography.ts</DependentUpon>
     </Content>
-    <Content Include="Scripts\bibliography.js" />
-    <Content Include="Scripts\search.js" />
+    <Content Include="NewScripts\search.js">
+      <DependentUpon>search.ts</DependentUpon>
+    </Content>
     <Content Include="ServiceResponse_2012_01_16.txt" />
     <Content Include="testAudio.htm" />
     <Content Include="testAudio2.mp3" />
-    <Content Include="Account\ChangePassword.aspx" />
-    <Content Include="Account\ChangePasswordSuccess.aspx" />
-    <Content Include="Account\Login.aspx" />
-    <Content Include="Account\Register.aspx" />
     <Content Include="Bibliography.htm" />
     <Content Include="testFallBackPage.htm" />
     <Content Include="testTour.htm" />
     <Content Include="testAudio.mp3" />
     <Content Include="testAudioPlayback.htm" />
-    <Content Include="ResponseDump.txt" />
-    <Content Include="Scripts\tours.js" />
+    <Content Include="NewScripts\tours.js">
+      <DependentUpon>tours.ts</DependentUpon>
+    </Content>
     <Content Include="testAsyncImageLoad.htm" />
     <Content Include="testInfodotContent.htm" />
     <Content Include="testVirtualCanvasAudioVideoElements.htm" />
     <Content Include="axis.htm" />
     <Content Include="Chronozoom.svc" />
-    <Content Include="Scripts\urlnav.js" />
+    <Content Include="NewScripts\urlnav.js">
+      <DependentUpon>urlnav.ts</DependentUpon>
+    </Content>
     <Content Include="testUrlNav.htm" />
     <Content Include="Images\chronozoom_title.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -243,11 +371,12 @@
     <Content Include="testVCTree.htm">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="cz.htm" />
     <Content Include="Images\4.png" />
     <Content Include="Images\flower16x16.png" />
     <Content Include="rihard_shtraus_zaratustra.mp3" />
-    <Content Include="Scripts\layout.js" />
+    <Content Include="NewScripts\layout.js">
+      <DependentUpon>layout.ts</DependentUpon>
+    </Content>
     <Content Include="testDynamicLod.htm" />
     <Content Include="testGestures.htm" />
     <Content Include="testVirtualCanvasLayout.htm" />
@@ -269,26 +398,35 @@
     <Content Include="css\ui-lightness\jquery-ui-1.8.16.custom.css" />
     <Content Include="Global.asax" />
     <Content Include="Images\flower.png" />
-    <Content Include="Scripts\axis.js" />
-    <Content Include="Scripts\common.js" />
-    <Content Include="Scripts\cz.settings.js" />
-    <Content Include="Scripts\gestures.js" />
-    <Content Include="Scripts\jquery-1.6.2.min.js" />
-    <Content Include="Scripts\jquery-ui-1.8.16.custom.min.js" />
-    <Content Include="Scripts\mouseWheelPlugin.js" />
-    <Content Include="Scripts\rx.jQuery.js" />
-    <Content Include="Scripts\rx.js" />
-    <Content Include="Scripts\vccontent.js" />
-    <Content Include="Scripts\viewport.js" />
-    <Content Include="Scripts\viewportAnimation.js" />
-    <Content Include="Scripts\viewportController.js" />
-    <Content Include="Scripts\virtualCanvas.js" />
-    <Content Include="Styles\axis.css" />
-    <Content Include="Styles\cz.css" />
-    <Content Include="Styles\Site.css" />
-    <Content Include="Scripts\jquery-1.4.1-vsdoc.js" />
-    <Content Include="Scripts\jquery-1.4.1.js" />
-    <Content Include="Scripts\jquery-1.4.1.min.js" />
+    <Content Include="NewScripts\common.js">
+      <DependentUpon>common.ts</DependentUpon>
+    </Content>
+    <Content Include="NewScripts\cz.settings.js">
+      <DependentUpon>cz.settings.ts</DependentUpon>
+    </Content>
+    <Content Include="NewScripts\gestures.js">
+      <DependentUpon>gestures.ts</DependentUpon>
+    </Content>
+    <Content Include="NewScripts\mouseWheelPlugin.js">
+      <DependentUpon>mouseWheelPlugin.ts</DependentUpon>
+    </Content>
+    <Content Include="NewScripts\vccontent.js">
+      <DependentUpon>vccontent.ts</DependentUpon>
+    </Content>
+    <Content Include="NewScripts\viewport.js">
+      <DependentUpon>viewport.ts</DependentUpon>
+    </Content>
+    <Content Include="NewScripts\viewportAnimation.js">
+      <DependentUpon>viewportAnimation.ts</DependentUpon>
+    </Content>
+    <Content Include="NewScripts\viewportController.js">
+      <DependentUpon>viewportController.ts</DependentUpon>
+    </Content>
+    <Content Include="NewScripts\virtualCanvas.js">
+      <DependentUpon>virtualCanvas.ts</DependentUpon>
+    </Content>
+    <Content Include="NewStyles\cz.css" />
+    <Content Include="NewStyles\Site.css" />
     <Content Include="testFunctions.htm" />
     <Content Include="testViewportController.htm" />
     <Content Include="testVirtualCanvas.htm" />
@@ -300,37 +438,17 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Account\ChangePassword.aspx.cs">
-      <DependentUpon>ChangePassword.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Account\ChangePassword.aspx.designer.cs">
-      <DependentUpon>ChangePassword.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Account\ChangePasswordSuccess.aspx.cs">
-      <DependentUpon>ChangePasswordSuccess.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Account\ChangePasswordSuccess.aspx.designer.cs">
-      <DependentUpon>ChangePasswordSuccess.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Account\Login.aspx.cs">
-      <DependentUpon>Login.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Account\Login.aspx.designer.cs">
-      <DependentUpon>Login.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Account\Register.aspx.cs">
-      <DependentUpon>Register.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Account\Register.aspx.designer.cs">
-      <DependentUpon>Register.aspx</DependentUpon>
-    </Compile>
+    <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Chronozoom.svc.cs">
       <DependentUpon>Chronozoom.svc</DependentUpon>
     </Compile>
+    <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\CollectionController.cs" />
+    <Compile Include="Controllers\ContentItemController.cs" />
+    <Compile Include="Controllers\DataController.cs" />
+    <Compile Include="Controllers\ExhibitController.cs" />
+    <Compile Include="Controllers\StructureController.cs" />
+    <Compile Include="Controllers\TimelineController.cs" />
     <Compile Include="cz.aspx.cs">
       <DependentUpon>cz.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -339,7 +457,16 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Models\ContentItem.cs" />
+    <Compile Include="Models\Exhibit.cs" />
+    <Compile Include="Models\Globals.cs" />
+    <Compile Include="Models\Wrappers.cs" />
+    <Compile Include="Models\Collection.cs" />
+    <!--<Compile Include="Models\Reference.cs" />-->
+    <Compile Include="Models\Timeline.cs" />
+    <!--<Compile Include="Models\Utility.cs" />-->
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RequireAuthenticationAttribute.cs" />
     <Compile Include="Site.Master.cs">
       <DependentUpon>Site.Master</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -356,9 +483,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Site.Master" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Account\Web.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Chronozoom.Entities\Chronozoom.Entities.csproj">
@@ -394,6 +518,9 @@
     <Content Include="..\Settings.StyleCop">
       <Link>Settings.StyleCop</Link>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Dumps\cern-get.json" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

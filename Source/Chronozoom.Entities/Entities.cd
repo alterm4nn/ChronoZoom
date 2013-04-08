@@ -13,13 +13,13 @@
     </Members>
     <AssociationLine Name="ContentItems" Type="Chronozoom.Entities.ContentItem" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="6.625" Y="6.18" />
-        <Point X="6.625" Y="7.032" />
-        <Point X="7.25" Y="7.032" />
+        <Point X="6.625" Y="6.372" />
+        <Point X="6.625" Y="7.138" />
+        <Point X="7.25" Y="7.138" />
       </Path>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AAACAAAAJAAAAEAAAAAAAAAAAAAQAAAEAAAgAAEAQMA=</HashCode>
+      <HashCode>AAACAAAAJAAAQEAAAAAAAAAAAAAQAAAEAAAgAAEAQMA=</HashCode>
       <FileName>Exhibit.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
@@ -27,7 +27,7 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="Chronozoom.Entities.Timeline">
-    <Position X="3.25" Y="2.5" Width="1.5" />
+    <Position X="3.25" Y="3" Width="1.5" />
     <Members>
       <Property Name="FromDay" Hidden="true" />
       <Property Name="FromMonth" Hidden="true" />
@@ -43,24 +43,27 @@
     </Members>
     <AssociationLine Name="ChildTimelines" Type="Chronozoom.Entities.Timeline" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="3.782" Y="4.372" />
-        <Point X="3.782" Y="4.622" />
-        <Point X="4.562" Y="4.622" />
-        <Point X="4.562" Y="4.372" />
+        <Point X="3.782" Y="4.68" />
+        <Point X="3.782" Y="4.93" />
+        <Point X="4.562" Y="4.93" />
+        <Point X="4.562" Y="4.68" />
       </Path>
     </AssociationLine>
     <AssociationLine Name="Exhibits" Type="Chronozoom.Entities.Exhibit" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="4.75" Y="3.754" />
-        <Point X="5.125" Y="3.754" />
-        <Point X="5.125" Y="5.415" />
-        <Point X="5.5" Y="5.415" />
+        <Point X="4.75" Y="4.125" />
+        <Point X="5.125" Y="4.125" />
+        <Point X="5.125" Y="5.52" />
+        <Point X="5.5" Y="5.52" />
       </Path>
     </AssociationLine>
     <TypeIdentifier>
       <HashCode>AAACAgAABgBAQGAIAAAAAAAEAAABAAAAAAQgAEEAQIE=</HashCode>
       <FileName>Timeline.cs</FileName>
     </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Collection" />
+    </ShowAsAssociation>
     <ShowAsCollectionAssociation>
       <Property Name="ChildTimelines" />
       <Property Name="Exhibits" />
@@ -80,7 +83,7 @@
       <Property Name="Year" Hidden="true" />
     </Members>
     <TypeIdentifier>
-      <HashCode>AAECQAAARAAAAEgAAAQAAAAAAAAAAAAACAAgAAAAQMA=</HashCode>
+      <HashCode>AAECQAAARAAAQEgAAAQAAAAAAAAAAAAACAAgAAAAQMA=</HashCode>
       <FileName>ContentItem.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -110,23 +113,26 @@
       <Property Name="UniqueId" Hidden="true" />
     </Members>
     <TypeIdentifier>
-      <HashCode>BAACAAAAAABAAAAAAAAAAAQAAAAAAAAAAAAAAAEASAA=</HashCode>
+      <HashCode>BAACAAAAAABAQAAAAAAAAAQAAAAAAAAAAAAAAAEASAA=</HashCode>
       <FileName>Tour.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Chronozoom.Entities.Collection">
-    <Position X="0.75" Y="0.75" Width="1.5" />
+    <Position X="0.5" Y="2.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAAAEAAAAAAAAgAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Collection.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Chronozoom.Entities.SuperCollection">
-    <Position X="3.25" Y="0.75" Width="1.5" />
+    <Position X="0.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAIAAAAA=</HashCode>
       <FileName>SuperCollection.cs</FileName>
     </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Collections" />
+    </ShowAsCollectionAssociation>
   </Class>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>

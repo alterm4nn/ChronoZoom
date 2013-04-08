@@ -18,10 +18,10 @@ namespace Chronozoom.Entities
     public class Timeline
     {
         [Key]
-        [DataMember(Name="ID")]
+        [DataMember(Name="id")]
         public Guid Id { get; set; }
 
-        [DataMember]
+        [DataMember(Name = "title")]
         public string Title { get; set; }
 
         [DataMember]
@@ -30,31 +30,49 @@ namespace Chronozoom.Entities
         [DataMember]
         public string Regime { get; set; }
 
+        [NotMapped]
         [DataMember]
         public string FromTimeUnit { get; set; }
 
+        [NotMapped]
         [DataMember]
+        [Obsolete("Only available in Beta")]
         public int? FromDay { get; set; }
 
+        [NotMapped]
         [DataMember]
         public int? FromMonth { get; set; }
 
         [DataMember]
-        public decimal? FromYear { get; set; }
+        public decimal FromYear { get; set; }
 
+        [NotMapped]
+        [DataMember(Name="start")]
+        public decimal Start { get; set; }
+
+        [NotMapped]
+        [DataMember(Name = "end")]
+        public decimal End { get; set; }
+
+        [NotMapped]
         [DataMember]
         public string ToTimeUnit { get; set; }
 
+        [NotMapped]
         [DataMember]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ToDay", Justification="This property will be removed soon")]
         public int? ToDay { get; set; }
 
+        [NotMapped]
         [DataMember]
         public int? ToMonth { get; set; }
 
         [DataMember]
-        public decimal? ToYear { get; set; }
-        
+        public decimal ToYear { get; set; }
+
+        [DataMember]
+        public decimal ForkNode { get; set; }
+
         [DataMember(Name="UniqueID")]
         public int UniqueId { get; set; }
         
@@ -64,15 +82,19 @@ namespace Chronozoom.Entities
         [DataMember]
         public decimal? Height { get; set; }
 
-        [DataMember]
+        [DataMember(Name="timelines")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Object property needs to be initialized externally")]
         public virtual Collection<Timeline> ChildTimelines { get; set; }
 
-        [DataMember]
+        [DataMember(Name = "ChildTimelines")]
+        [NotMapped]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Object property needs to be initialized externally")]
+        public virtual Collection<Timeline> ChildTimelinesBeta { get; set; }
+
+        [DataMember(Name = "exhibits")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Object property needs to be initialized externally")]
         public virtual Collection<Exhibit> Exhibits { get; set; }
 
-        [DataMember]
         public virtual Entities.Collection Collection { get; set; }
     }
 

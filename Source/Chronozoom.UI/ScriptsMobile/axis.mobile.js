@@ -89,11 +89,11 @@
             var url;
             var axis = this;
             switch (czDataSource) {
-                case 'db': url = "Chronozoom.svc/getthresholds";
+                case 'db': url = "/Chronozoom.svc/getthresholds";
                     break;
                 case 'relay': url = "ChronozoomRelay";
                     break;
-                case 'dump': url = "ResponseDumpThresholds.txt";
+                case 'dump': url = "/dumps/beta-getthresholds.json";
                     break;
             }
             $.ajax({

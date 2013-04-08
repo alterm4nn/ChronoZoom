@@ -9,6 +9,8 @@ using System.Data.Entity.Migrations;
 using System.Diagnostics;
 using System.Linq;
 
+using Chronozoom.Entities.Migration;
+
 namespace Chronozoom.Entities
 {
     /// <summary>
@@ -26,12 +28,8 @@ namespace Chronozoom.Entities
 
             Trace.TraceInformation("Entering storage seed stage");
 
-            // If initial data is missing, seed initial data.
-            if (context.Timelines.Where(timeline => timeline.Id == Guid.Empty).FirstOrDefault() == null)
-            {
-                Trace.TraceInformation("Seeding database with data");
-                context.Timelines.Add(new Timeline { Id = Guid.Empty, UniqueId = 655, Title = "Hello world", FromYear = 711, ToYear = 1492, Height = 20, FromTimeUnit = "CE", ToTimeUnit = "CE" });
-            }
+            Migrator migrator = new Migrator(context);
+            migrator.Migrate();
         }
 
         public StorageMigrationsConfiguration()
