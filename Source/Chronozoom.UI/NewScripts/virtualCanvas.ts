@@ -222,7 +222,7 @@ module CZ {
                 Fires the event of cursor position changed
                 */
                 RaiseCursorChanged: function () {
-                    this.cursorPositionChangedEvent.Time = self.cursorPosition;
+                    this.cursorPositionChangedEvent.Time = this.cursorPosition;
                     this.element.trigger(this.cursorPositionChangedEvent);
                 },
 
@@ -539,7 +539,7 @@ module CZ {
 
                     // update parameters of animating elements and require new frame if needed
                     if (CZ.Layout.animatingElements.length != 0) {
-                        for (id in CZ.Layout.animatingElements)
+                        for (var id in CZ.Layout.animatingElements)
                             if (CZ.Layout.animatingElements[id].animation && CZ.Layout.animatingElements[id].animation.isAnimating) {
                                 CZ.Layout.animatingElements[id].calculateNewFrame();
                                 this.requestNewFrame = true;

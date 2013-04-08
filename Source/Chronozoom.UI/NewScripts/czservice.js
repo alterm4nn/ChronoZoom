@@ -25,7 +25,7 @@ var CZ;
                 };
             }
             Map.exhibit = exhibit;
-            function contentitem(ci) {
+            function contentItem(ci) {
                 return {
                     Id: ci.guid || null,
                     ParentExhibitId: ci.parent,
@@ -35,7 +35,7 @@ var CZ;
                     MediaType: ci.contentItem ? ci.contentItem.mediaType : ci.mediaType
                 };
             }
-            Map.contentitem = contentitem;
+            Map.contentItem = contentItem;
         })(Map || (Map = {}));
         var Settings = CZ.Settings;
         var _serviceUrl = Settings.serverUrlBase + "/chronozoom.svc/";

@@ -28,7 +28,7 @@ module CZ {
                 };
             }
 
-            export function contentitem(ci) {
+            export function contentItem(ci) {
                 return {
                     Id: ci.guid || null,
                     ParentExhibitId: ci.parent,

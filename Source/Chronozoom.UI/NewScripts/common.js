@@ -31,7 +31,7 @@ var CZ;
         Common.collection = "";
         function initialize() {
             Common.ax = ($)('#axis');
-            Common.axis = CZ.Timescale(Common.ax);
+            Common.axis = new CZ.Timescale(Common.ax);
             CZ.VirtualCanvas.initialize();
             Common.vc = ($)('#vc');
             Common.vc.virtualCanvas();
@@ -315,13 +315,13 @@ var CZ;
             var cosmosTimeline = content;
             Common.cosmosVisible = f(cosmosTimeline);
             CZ.UrlNav.navigationAnchor = Common.vc.virtualCanvas("findElement", 't' + cosmosTimeline.id);
-            var earthTimeline = CZ.Layout.FindChildTimeline(cosmosTimeline, earthTimelineID);
+            var earthTimeline = CZ.Layout.FindChildTimeline(cosmosTimeline, CZ.Settings.earthTimelineID);
             Common.earthVisible = f(earthTimeline);
-            var lifeTimeline = CZ.Layout.FindChildTimeline(earthTimeline, lifeTimelineID);
+            var lifeTimeline = CZ.Layout.FindChildTimeline(earthTimeline, CZ.Settings.lifeTimelineID);
             Common.lifeVisible = f(lifeTimeline);
-            var prehistoryTimeline = CZ.Layout.FindChildTimeline(lifeTimeline, prehistoryTimelineID);
+            var prehistoryTimeline = CZ.Layout.FindChildTimeline(lifeTimeline, CZ.Settings.prehistoryTimelineID);
             Common.prehistoryVisible = f(prehistoryTimeline);
-            var humanityTimeline = CZ.Layout.FindChildTimeline(prehistoryTimeline, humanityTimelineID, true);
+            var humanityTimeline = CZ.Layout.FindChildTimeline(prehistoryTimeline, CZ.Settings.humanityTimelineID, true);
             Common.humanityVisible = f(humanityTimeline);
             Common.maxPermitedVerticalRange = {
                 top: cosmosTimeline.y,

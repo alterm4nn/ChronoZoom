@@ -53,50 +53,53 @@ var CZ;
             this.render = function (ctx, visibleBox_v, viewport2d, size_p, opacity) {
             };
         }
-        var addRectangle = function (element, layerid, id, vx, vy, vw, vh, settings) {
-            return addChild(element, new CanvasRectangle(element.vc, layerid, id, vx, vy, vw, vh, settings), false);
+        VCContent.addRectangle = function (element, layerid, id, vx, vy, vw, vh, settings) {
+            return VCContent.addChild(element, new CanvasRectangle(element.vc, layerid, id, vx, vy, vw, vh, settings), false);
         };
-        var addCircle = function (element, layerid, id, vxc, vyc, vradius, settings, suppressCheck) {
-            return addChild(element, new CanvasCircle(element.vc, layerid, id, vxc, vyc, vradius, settings), suppressCheck);
+        VCContent.addCircle = function (element, layerid, id, vxc, vyc, vradius, settings, suppressCheck) {
+            return VCContent.addChild(element, new CanvasCircle(element.vc, layerid, id, vxc, vyc, vradius, settings), suppressCheck);
         };
-        var addImage = function (element, layerid, id, vx, vy, vw, vh, imgSrc, onload) {
+        VCContent.addImage = function (element, layerid, id, vx, vy, vw, vh, imgSrc, onload) {
             if(vw <= 0 || vh <= 0) {
                 throw "Image size must be positive";
             }
-            return addChild(element, new CanvasImage(element.vc, layerid, id, imgSrc, vx, vy, vw, vh, onload), false);
+            return VCContent.addChild(element, new CanvasImage(element.vc, layerid, id, imgSrc, vx, vy, vw, vh, onload), false);
         };
-        var addLodImage = function (element, layerid, id, vx, vy, vw, vh, imgSources, onload) {
+        VCContent.addLodImage = function (element, layerid, id, vx, vy, vw, vh, imgSources, onload) {
             if(vw <= 0 || vh <= 0) {
                 throw "Image size must be positive";
             }
-            return addChild(element, new CanvasLODImage(element.vc, layerid, id, imgSources, vx, vy, vw, vh, onload), false);
+            return VCContent.addChild(element, new CanvasLODImage(element.vc, layerid, id, imgSources, vx, vy, vw, vh, onload), false);
         };
-        var addSeadragonImage = function (element, layerid, id, vx, vy, vw, vh, z, imgSrc, onload) {
+        VCContent.addSeadragonImage = function (element, layerid, id, vx, vy, vw, vh, z, imgSrc, onload) {
             if(vw <= 0 || vh <= 0) {
                 throw "Image size must be positive";
             }
-            return addChild(element, new SeadragonImage(element.vc, element, layerid, id, imgSrc, vx, vy, vw, vh, z, onload), false);
+            return VCContent.addChild(element, new SeadragonImage(element.vc, element, layerid, id, imgSrc, vx, vy, vw, vh, z, onload), false);
         };
-        var addVideo = function (element, layerid, id, videoSource, vx, vy, vw, vh, z) {
-            return addChild(element, new CanvasVideoItem(element.vc, layerid, id, videoSource, vx, vy, vw, vh, z), false);
+        VCContent.addVideo = function (element, layerid, id, videoSource, vx, vy, vw, vh, z) {
+            return VCContent.addChild(element, new CanvasVideoItem(element.vc, layerid, id, videoSource, vx, vy, vw, vh, z), false);
         };
-        var addPdf = function (element, layerid, id, pdfSource, vx, vy, vw, vh, z) {
-            return addChild(element, new CanvasPdfItem(element.vc, layerid, id, pdfSource, vx, vy, vw, vh, z), false);
+        VCContent.addPdf = function (element, layerid, id, pdfSource, vx, vy, vw, vh, z) {
+            return VCContent.addChild(element, new CanvasPdfItem(element.vc, layerid, id, pdfSource, vx, vy, vw, vh, z), false);
         };
         var addAudio = function (element, layerid, id, audioSource, vx, vy, vw, vh, z) {
-            return addChild(element, new CanvasAudioItem(element.vc, layerid, id, audioSource, vx, vy, vw, vh, z), false);
+            return VCContent.addChild(element, new CanvasAudioItem(element.vc, layerid, id, audioSource, vx, vy, vw, vh, z), false);
         };
         function addText(element, layerid, id, vx, vy, baseline, vh, text, settings, vw) {
-            return addChild(element, new CanvasText(element.vc, layerid, id, vx, vy, baseline, vh, text, settings, vw), false);
+            return VCContent.addChild(element, new CanvasText(element.vc, layerid, id, vx, vy, baseline, vh, text, settings, vw), false);
         }
+        VCContent.addText = addText;
         ;
         function addScrollText(element, layerid, id, vx, vy, vw, vh, text, z, settings) {
-            return addChild(element, new CanvasScrollTextItem(element.vc, layerid, id, vx, vy, vw, vh, text, z, settings), false);
+            return VCContent.addChild(element, new CanvasScrollTextItem(element.vc, layerid, id, vx, vy, vw, vh, text, z, settings), false);
         }
+        VCContent.addScrollText = addScrollText;
         ;
         function addMultiLineText(element, layerid, id, vx, vy, baseline, vh, text, lineWidth, settings) {
-            return addChild(element, new CanvasMultiLineTextItem(element.vc, layerid, id, vx, vy, baseline, vh, text, lineWidth, settings), false);
+            return VCContent.addChild(element, new CanvasMultiLineTextItem(element.vc, layerid, id, vx, vy, baseline, vh, text, lineWidth, settings), false);
         }
+        VCContent.addMultiLineText = addMultiLineText;
         ;
         function turnIsRenderedOff(element) {
             element.isRendered = false;
@@ -110,7 +113,7 @@ var CZ;
                 }
             }
         }
-        var render = function (element, contexts, visibleBox_v, viewport2d, opacity) {
+        VCContent.render = function (element, contexts, visibleBox_v, viewport2d, opacity) {
             if(!element.isVisible(visibleBox_v)) {
                 if(element.isRendered) {
                     turnIsRenderedOff(element);
@@ -138,26 +141,23 @@ var CZ;
             var children = element.children;
             var n = children.length;
             for(var i = 0; i < n; i++) {
-                render(children[i], contexts, visibleBox_v, viewport2d, opacity);
+                VCContent.render(children[i], contexts, visibleBox_v, viewport2d, opacity);
             }
         };
-        var addChild = function (parent, element, suppresCheck) {
+        VCContent.addChild = function (parent, element, suppresCheck) {
             var isWithin = parent.width == Infinity || (element.x >= parent.x && element.x + element.width <= parent.x + parent.width) && (element.y >= parent.y && element.y + element.height <= parent.y + parent.height);
-            if(!isWithin && Log) {
-                Log.push("Child element does not belong to the parent element " + parent.id + " " + element.ID);
-            }
             parent.children.push(element);
             element.parent = parent;
             return element;
         };
-        var removeChild = function (parent, id) {
+        VCContent.removeChild = function (parent, id) {
             var n = parent.children.length;
             for(var i = 0; i < n; i++) {
                 var child = parent.children[i];
                 if(child.id == id) {
-                    if(typeof animatingElements[child.id] !== 'undefined') {
-                        delete animatingElements[child.id];
-                        animatingElements.length--;
+                    if(typeof CZ.Layout.animatingElements[child.id] !== 'undefined') {
+                        delete CZ.Layout.animatingElements[child.id];
+                        CZ.Layout.animatingElements.length--;
                     }
                     parent.children.splice(i, 1);
                     clear(child);
@@ -185,9 +185,9 @@ var CZ;
             var n = element.children.length;
             for(var i = 0; i < n; i++) {
                 var child = element.children[i];
-                if(typeof animatingElements[child.id] !== 'undefined') {
-                    delete animatingElements[child.id];
-                    animatingElements.length--;
+                if(typeof CZ.Layout.animatingElements[child.id] !== 'undefined') {
+                    delete CZ.Layout.animatingElements[child.id];
+                    CZ.Layout.animatingElements.length--;
                 }
                 clear(child);
                 if(child.onRemove) {
@@ -234,7 +234,7 @@ var CZ;
                 }
                 var n = this.children.length;
                 for(var i = 0; i < n; i++) {
-                    render(this.children[i], contexts, visibleBox_v, viewport2d, 1.0);
+                    VCContent.render(this.children[i], contexts, visibleBox_v, viewport2d, 1.0);
                 }
                 if(this.vc.breadCrumbs.length > 0 && (this.vc.recentBreadCrumb == undefined || this.vc.breadCrumbs[vc.breadCrumbs.length - 1].vcElement.title != this.vc.recentBreadCrumb.vcElement.title)) {
                     this.vc.recentBreadCrumb = this.vc.breadCrumbs[vc.breadCrumbs.length - 1];
@@ -283,7 +283,7 @@ var CZ;
                 self.lastRenderTime = new Date();
                 self.prevContent = self.content;
                 self.content = newContent.content;
-                addChild(self, self.content, false);
+                VCContent.addChild(self, self.content, false);
                 if(self.prevContent) {
                     if(!self.prevContent.opacity) {
                         self.prevContent.opacity = 1.0;
@@ -330,7 +330,7 @@ var CZ;
                         doInvalidate = true;
                     }
                     if(lopacity == 0) {
-                        removeChild(this, this.prevContent.id);
+                        VCContent.removeChild(this, this.prevContent.id);
                         this.prevContent = null;
                     } else {
                         this.prevContent.opacity = lopacity;
@@ -355,16 +355,16 @@ var CZ;
                         this.asyncContent = null;
                     }
                     if(this.prevContent) {
-                        removeChild(this, this.prevContent.id);
+                        VCContent.removeChild(this, this.prevContent.id);
                         this.prevContent = null;
                     }
                     if(this.newContent) {
-                        removeChild(this, this.newContent.id);
+                        VCContent.removeChild(this, this.newContent.id);
                         this.newContent.content.onLoad = null;
                         this.newContent = null;
                     }
                     if(this.content) {
-                        removeChild(this, this.content.id);
+                        VCContent.removeChild(this, this.content.id);
                         this.content = null;
                     }
                     this.zoomLevel = 0;
@@ -464,7 +464,7 @@ var CZ;
                 return (rect.x > this.x && rect.x + rect.width < this.x + this.width && rect.y > this.y && rect.y + rect.height < this.y + this.height);
             };
             this.isVisibleOnScreen = function (scale) {
-                return this.width / scale >= minTimelineWidth;
+                return this.width / scale >= CZ.Settings.minTimelineWidth;
             };
             this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
         }
@@ -1179,15 +1179,15 @@ var CZ;
                     clearTimeout(self.timeoutHandles[i]);
                 }
                 self.onRemove();
-                removeChild(parent, self.id);
-                addImage(parent, layerid, id, vx, vy, vw, vh, imageSource);
+                VCContent.removeChild(parent, self.id);
+                VCContent.addImage(parent, layerid, id, vx, vy, vw, vh, imageSource);
             };
             self.requestDZI();
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
         function addTimeline(element, layerid, id, timelineinfo) {
             var width = timelineinfo.timeEnd - timelineinfo.timeStart;
-            var timeline = addChild(element, new CanvasTimeline(element.vc, layerid, id, timelineinfo.timeStart, timelineinfo.top, width, timelineinfo.height, {
+            var timeline = VCContent.addChild(element, new CanvasTimeline(element.vc, layerid, id, timelineinfo.timeStart, timelineinfo.top, width, timelineinfo.height, {
                 strokeStyle: timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineStrokeStyle,
                 lineWidth: CZ.Settings.timelineLineWidth,
                 fillStyle: timelineinfo.fillStyle,
@@ -1214,7 +1214,7 @@ var CZ;
             var sourceRight = vx + vw - leftOffset;
             var sourceHeight = vh * CZ.Settings.contentItemSourceHeight * 0.8;
             var titleTop = sourceTop + verticalMargin + sourceHeight;
-            var rect = addRectangle(this, layerid, id + "__rect__", vx, vy, vw, vh, {
+            var rect = VCContent.addRectangle(this, layerid, id + "__rect__", vx, vy, vw, vh, {
                 strokeStyle: CZ.Settings.contentItemBoundingBoxBorderColor,
                 lineWidth: CZ.Settings.contentItemBoundingBoxBorderWidth * vw,
                 fillStyle: CZ.Settings.contentItemBoundingBoxFillColor,
@@ -1249,15 +1249,15 @@ var CZ;
                     var mediaID = id + "__media__";
                     var imageElem = null;
                     if(this.contentItem.mediaType.toLowerCase() === 'image' || this.contentItem.mediaType.toLowerCase() === 'picture') {
-                        imageElem = addSeadragonImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);
+                        imageElem = VCContent.addSeadragonImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);
                     } else if(this.contentItem.mediaType.toLowerCase() === 'video') {
-                        addVideo(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
+                        VCContent.addVideo(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     } else if(this.contentItem.mediaType.toLowerCase() === 'audio') {
                         mediaTop += CZ.Settings.contentItemAudioTopMargin * vh;
                         mediaHeight = vh * CZ.Settings.contentItemAudioHeight;
                         addAudio(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     } else if(this.contentItem.mediaType.toLowerCase() === 'pdf') {
-                        addPdf(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
+                        VCContent.addPdf(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     }
                     var titleText = this.contentItem.title;
                     addText(container, layerid, id + "__title__", vx + leftOffset, titleTop, titleTop + titleHeight / 2.0, 0.9 * titleHeight, titleText, {
@@ -1417,7 +1417,7 @@ var CZ;
             var infodot = this;
             var root = new CanvasDynamicLOD(vc, layerid, id + "_dlod", time - innerRad, vyc - innerRad, 2 * innerRad, 2 * innerRad);
             root.removeWhenInvisible = true;
-            addChild(this, root, false);
+            VCContent.addChild(this, root, false);
             root.firstLoad = true;
             root.changeZoomLevel = function (curZl, newZl) {
                 var vyc = infodot.newY + radv;
@@ -1436,7 +1436,7 @@ var CZ;
                         var items = buildVcContentItems(infodot.contentItems, time, vyc, innerRad, vc, layerid);
                         if(items) {
                             for(var i = 0; i < items.length; i++) {
-                                addChild(contentItem, items[i], false);
+                                VCContent.addChild(contentItem, items[i], false);
                             }
                         }
                     }
@@ -1464,7 +1464,7 @@ var CZ;
                         var items = buildVcContentItems(infodot.contentItems, time, vyc, innerRad, vc, layerid);
                         if(items) {
                             for(var i = 0; i < items.length; i++) {
-                                addChild(contentItem, items[i], false);
+                                VCContent.addChild(contentItem, items[i], false);
                             }
                         }
                     }
@@ -1597,7 +1597,7 @@ var CZ;
                 ctx.strokeStyle = CZ.Settings.contentItemBoundingBoxFillColor;
             };
             this.isInside = function (point_v) {
-                var len2 = sqr(point_v.x - this.x - (this.width / 2)) + sqr(point_v.y - this.y - (this.height / 2));
+                var len2 = CZ.Common.sqr(point_v.x - this.x - (this.width / 2)) + CZ.Common.sqr(point_v.y - this.y - (this.height / 2));
                 var rad = this.width / 2.0;
                 return len2 <= rad * rad;
             };
@@ -1634,7 +1634,7 @@ var CZ;
         VCContent.getContentItem = getContentItem;
         function addInfodot(element, layerid, id, time, vyc, radv, contentItems, infodotDescription) {
             var infodot = new CanvasInfodot(element.vc, layerid, id, time, vyc, radv, contentItems, infodotDescription);
-            return addChild(element, infodot, true);
+            return VCContent.addChild(element, infodot, true);
         }
         VCContent.addInfodot = addInfodot;
         function buildVcContentItems(contentItems, xc, yc, rad, vc, layerid) {

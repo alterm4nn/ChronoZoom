@@ -106,7 +106,7 @@ module CZ {
         @param vh   (number) height of a bounding box in virtual space
         @param settings  ({strokeStyle,lineWidth,fillStyle}) Parameters of the rectangle appearance
         */
-        var addRectangle = function (element, layerid, id, vx, vy, vw, vh, settings) {
+        export var addRectangle = function (element, layerid, id, vx, vy, vw, vh, settings) {
             return addChild(element, new CanvasRectangle(element.vc, layerid, id, vx, vy, vw, vh, settings), false);
         };
 
@@ -122,7 +122,7 @@ module CZ {
         The element is always rendered as a circle and ignores the aspect ratio of the viewport.
         For this, circle radius in pixels is computed from its virtual width.
         */
-        var addCircle = function (element, layerid, id, vxc, vyc, vradius, settings, suppressCheck) {
+        export var addCircle = function (element, layerid, id, vxc, vyc, vradius, settings, suppressCheck) {
             return addChild(element, new CanvasCircle(element.vc, layerid, id, vxc, vyc, vradius, settings), suppressCheck);
         };
 
@@ -139,15 +139,15 @@ module CZ {
         @param onload (optional callback function) called when image is loaded
         @param parent (CanvasElement) Parent element, whose children is to be new element.
         */
-        var addImage = function (element, layerid, id, vx, vy, vw, vh, imgSrc, onload?) {
+        export var addImage = function (element, layerid, id, vx, vy, vw, vh, imgSrc, onload?) {
             if (vw <= 0 || vh <= 0) throw "Image size must be positive";
             return addChild(element, new CanvasImage(element.vc, layerid, id, imgSrc, vx, vy, vw, vh, onload), false);
         };
-        var addLodImage = function (element, layerid, id, vx, vy, vw, vh, imgSources, onload?) {
+        export var addLodImage = function (element, layerid, id, vx, vy, vw, vh, imgSources, onload?) {
             if (vw <= 0 || vh <= 0) throw "Image size must be positive";
             return addChild(element, new CanvasLODImage(element.vc, layerid, id, imgSources, vx, vy, vw, vh, onload), false);
         };
-        var addSeadragonImage = function (element, layerid, id, vx, vy, vw, vh, z, imgSrc, onload?) {
+        export var addSeadragonImage = function (element, layerid, id, vx, vy, vw, vh, z, imgSrc, onload?) {
             if (vw <= 0 || vh <= 0) throw "Image size must be positive";
             return addChild(element, new SeadragonImage(element.vc, /*parent*/element, layerid, id, imgSrc, vx, vy, vw, vh, z, onload), false);
         };
@@ -163,7 +163,7 @@ module CZ {
         @param vh   (number) height of a bounding box in virtual space
         @param z (number) z-index
         */
-        var addVideo = function (element, layerid, id, videoSource, vx, vy, vw, vh, z) {
+        export var addVideo = function (element, layerid, id, videoSource, vx, vy, vw, vh, z) {
             return addChild(element, new CanvasVideoItem(element.vc, layerid, id, videoSource, vx, vy, vw, vh, z), false);
         };
 
@@ -178,7 +178,7 @@ module CZ {
         @param vh   (number) height of a bounding box in virtual space
         @param z (number) z-index
         */
-        var addPdf = function (element, layerid, id, pdfSource, vx, vy, vw, vh, z) {
+        export var addPdf = function (element, layerid, id, pdfSource, vx, vy, vw, vh, z) {
             return addChild(element, new CanvasPdfItem(element.vc, layerid, id, pdfSource, vx, vy, vw, vh, z), false);
         };
 
@@ -210,11 +210,11 @@ module CZ {
         @remarks
         Text width is adjusted using measureText() on first render call. 
         */
-        function addText(element, layerid, id, vx, vy, baseline, vh, text, settings, vw?) {
+        export function addText(element, layerid, id, vx, vy, baseline, vh, text, settings, vw?) {
             return addChild(element, new CanvasText(element.vc, layerid, id, vx, vy, baseline, vh, text, settings, vw), false);
         };
 
-        function addScrollText(element, layerid, id, vx, vy, vw, vh, text, z, settings) {
+        export function addScrollText(element, layerid, id, vx, vy, vw, vh, text, z, settings) {
             return addChild(element, new CanvasScrollTextItem(element.vc, layerid, id, vx, vy, vw, vh, text, z, settings), false);
         };
 
@@ -230,7 +230,7 @@ module CZ {
         @remarks
         Text width is adjusted using measureText() on first render call. 
         */
-        function addMultiLineText(element, layerid, id, vx, vy, baseline, vh, text, lineWidth, settings) {
+        export function addMultiLineText(element, layerid, id, vx, vy, baseline, vh, text, lineWidth, settings) {
             return addChild(element, new CanvasMultiLineTextItem(element.vc, layerid, id, vx, vy, baseline, vh, text, lineWidth, settings), false);
         };
 
@@ -252,7 +252,7 @@ module CZ {
         @param viewport2d       (Viewport2d) current viewport
         @param opacity          (float in [0,1]) 0 means transparent, 1 means opaque.
         */
-        var render = function (element, contexts, visibleBox_v, viewport2d, opacity) {
+        export var render = function (element, contexts, visibleBox_v, viewport2d, opacity) {
             if (!element.isVisible(visibleBox_v)) {
                 if (element.isRendered) turnIsRenderedOff(element);
                 return;
@@ -290,13 +290,13 @@ module CZ {
         @remarks    Bounding box of element must be included in bounding box of the this element. Otherwise, throws an exception.
         The method must be called within the BeginEdit/EndEdit of the root item.
         */
-        var addChild = function (parent, element, suppresCheck) {
+        export var addChild = function (parent, element, suppresCheck) {
             var isWithin = parent.width == Infinity ||
                            (element.x >= parent.x && element.x + element.width <= parent.x + parent.width) &&
                            (element.y >= parent.y && element.y + element.height <= parent.y + parent.height);
 
-            if (!isWithin && Log)
-                Log.push("Child element does not belong to the parent element " + parent.id + " " + element.ID);
+            //if (!isWithin && Log)
+            //    Log.push("Child element does not belong to the parent element " + parent.id + " " + element.ID);
 
             //if (!suppresCheck && !isWithin) throw "Child element does not belong to the parent element";
             parent.children.push(element);
@@ -310,15 +310,15 @@ module CZ {
         @remarks    The method must be called within the BeginEdit/EndEdit of the root item.
         If a child has onRemove() method, it is called right after removing of the child and clearing of all its children (recursively).
         */
-        var removeChild = function (parent, id) {
+        export var removeChild = function (parent, id) {
             var n = parent.children.length;
             for (var i = 0; i < n; i++) {
                 var child = parent.children[i];
                 if (child.id == id) {
                     // remove element from hash map of animating elements in dynamic layout animation
-                    if (typeof animatingElements[child.id] !== 'undefined') {
-                        delete animatingElements[child.id];
-                        animatingElements.length--;
+                    if (typeof CZ.Layout.animatingElements[child.id] !== 'undefined') {
+                        delete CZ.Layout.animatingElements[child.id];
+                        CZ.Layout.animatingElements.length--;
                     }
 
                     parent.children.splice(i, 1);
@@ -353,9 +353,9 @@ module CZ {
                 var child = element.children[i];
 
                 // remove element from hash map of animating elements in dynamic layout animation
-                if (typeof animatingElements[child.id] !== 'undefined') {
-                    delete animatingElements[child.id];
-                    animatingElements.length--;
+                if (typeof CZ.Layout.animatingElements[child.id] !== 'undefined') {
+                    delete CZ.Layout.animatingElements[child.id];
+                    CZ.Layout.animatingElements.length--;
                 }
 
                 clear(child);
@@ -733,7 +733,7 @@ module CZ {
             };
 
             this.isVisibleOnScreen = function (scale) {
-                return this.width / scale >= minTimelineWidth;
+                return this.width / scale >= CZ.Settings.minTimelineWidth;
             }
 
             this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
@@ -2275,7 +2275,7 @@ module CZ {
             /* Checks whether the given point (virtual) is inside the object
                (should take into account the shape) */
             this.isInside = function (point_v) {
-                var len2 = sqr(point_v.x - this.x - (this.width / 2)) + sqr(point_v.y - this.y - (this.height / 2));
+                var len2 = CZ.Common.sqr(point_v.x - this.x - (this.width / 2)) + CZ.Common.sqr(point_v.y - this.y - (this.height / 2));
                 var rad = this.width / 2.0;
                 return len2 <= rad * rad;
             }

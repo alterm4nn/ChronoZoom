@@ -2,6 +2,7 @@
 /// <reference path='common.ts'/>
 /// <reference path='vccontent.ts'/>
 /// <reference path='czservice.ts'/>
+/// <reference path='vccontent.ts'/>
 
 /**
  * The CZ submodule for Authoring Tool functionality.

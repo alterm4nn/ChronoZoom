@@ -134,7 +134,7 @@ var CZ;
                     this.element.trigger(this.innerZoomConstraintChengedEvent);
                 },
                 RaiseCursorChanged: function () {
-                    this.cursorPositionChangedEvent.Time = self.cursorPosition;
+                    this.cursorPositionChangedEvent.Time = this.cursorPosition;
                     this.element.trigger(this.cursorPositionChangedEvent);
                 },
                 updateTooltipPosition: function (posv) {
@@ -386,7 +386,7 @@ var CZ;
                 requestInvalidate: function () {
                     this.requestNewFrame = false;
                     if(CZ.Layout.animatingElements.length != 0) {
-                        for(id in CZ.Layout.animatingElements) {
+                        for(var id in CZ.Layout.animatingElements) {
                             if(CZ.Layout.animatingElements[id].animation && CZ.Layout.animatingElements[id].animation.isAnimating) {
                                 CZ.Layout.animatingElements[id].calculateNewFrame();
                                 this.requestNewFrame = true;
