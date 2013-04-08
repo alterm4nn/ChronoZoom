@@ -170,9 +170,10 @@ var CZ;
             } else {
                 window.location.href = "testFallBackPage.htm";
             }
-            url.hash = new Object();
-            url.hash.params = [];
-            url.hash.path = "";
+            url.hash = {
+                params: [],
+                path: ""
+            };
             if(typeof hash != 'undefined') {
                 var h = hash.split("@");
                 url.hash = {

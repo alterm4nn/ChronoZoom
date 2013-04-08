@@ -109,7 +109,7 @@ var CZ;
                 CZ.VCContent.removeChild(_hovered, "newExhibitCircle");
                 CZ.VCContent.addCircle(_hovered, "layerInfodots", "newExhibitCircle", _circleCur.x + _circleCur.r, _circleCur.y + _circleCur.r, _circleCur.r, {
                     strokeStyle: "red"
-                });
+                }, false);
             } else {
                 $.extend(_circleCur, _circlePrev);
             }

@@ -93,12 +93,12 @@ var CZ;
         VCContent.addText = addText;
         ;
         function addScrollText(element, layerid, id, vx, vy, vw, vh, text, z, settings) {
-            return VCContent.addChild(element, new CanvasScrollTextItem(element.vc, layerid, id, vx, vy, vw, vh, text, z, settings), false);
+            return VCContent.addChild(element, new CanvasScrollTextItem(element.vc, layerid, id, vx, vy, vw, vh, text, z), false);
         }
         VCContent.addScrollText = addScrollText;
         ;
         function addMultiLineText(element, layerid, id, vx, vy, baseline, vh, text, lineWidth, settings) {
-            return VCContent.addChild(element, new CanvasMultiLineTextItem(element.vc, layerid, id, vx, vy, baseline, vh, text, lineWidth, settings), false);
+            return VCContent.addChild(element, new CanvasMultiLineTextItem(element.vc, layerid, id, vx, vy, vh, text, lineWidth, settings), false);
         }
         VCContent.addMultiLineText = addMultiLineText;
         ;

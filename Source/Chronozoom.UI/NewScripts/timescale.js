@@ -129,9 +129,9 @@ var CZ;
             if(_container.currentStyle) {
                 fontSize = _container.currentStyle["font-size"];
                 ctx.font = fontSize + _container.currentStyle["font-family"];
-            } else if(document.defaultView && document.defaultView.getComputedStyle) {
-                fontSize = document.defaultView.getComputedStyle(_container[0], null).getPropertyValue("font-size");
-                ctx.font = fontSize + document.defaultView.getComputedStyle(_container[0], null).getPropertyValue("font-family");
+            } else if(document.defaultView && (document.defaultView).getComputedStyle) {
+                fontSize = (document.defaultView).getComputedStyle(_container[0], null).getPropertyValue("font-size");
+                ctx.font = fontSize + (document.defaultView).getComputedStyle(_container[0], null).getPropertyValue("font-family");
             } else if(_container.style) {
                 fontSize = _container.style["font-size"];
                 ctx.font = fontSize + _container.style["font-family"];
