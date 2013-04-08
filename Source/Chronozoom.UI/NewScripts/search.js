@@ -1,10 +1,8 @@
-/* This file contains code to perform search over the CZ database and show the results in UI.
 var CZ;
 (function (CZ) {
     (function (Search) {
         Search.isSearchWindowVisible = false;
         var delayedSearchRequest = null;
-        // The method is called when the search button is clicked
         function onSearchClicked() {
             if(CZ.Tours.isTourWindowVisible && CZ.Tours.onTourClicked) {
                 CZ.Tours.onTourClicked();
@@ -59,8 +57,7 @@ var CZ;
                     if($('#searchTextBox').val() != "") {
                         $("#loadingImage").fadeIn('slow');
                     }
-                    search(escapeSearchString(($("#searchTextBox")[0]).value.substr(0, 700)))// limit the search to the first 700 characters
-                    ;
+                    search(escapeSearchString(($("#searchTextBox")[0]).value.substr(0, 700)));
                 }, 300);
             });
             $("#search").hide();
@@ -104,8 +101,6 @@ var CZ;
             }
         }
         Search.goToSearchResult = goToSearchResult;
-        // Recursively finds and returns an element with given id.
-        // If not found, returns null.
         function findVCElement(root, id) {
             var lookingForCI = id.charAt(0) === 'c';
             var rfind = function (el, id) {
@@ -158,19 +153,15 @@ var CZ;
                             switch(item.ObjectType) {
                                 case 0:
                                     resultId = 'e' + item.UniqueID;
-                                    break;// exhibit
-                                    
+                                    break;
                                 case 1:
                                     resultId = 't' + item.UniqueID;
-                                    break;// timeline
-                                    
+                                    break;
                                 case 2:
                                     resultId = 'c' + item.UniqueID;
-                                    break;// content item
-                                    
+                                    break;
                                 default:
-                                    continue;// unknown type of result item
-                                    
+                                    continue;
                             }
                             if(first) {
                                 $("<div class='searchResultSection'>" + sectionTitle + "</div>").appendTo(output);
@@ -203,7 +194,6 @@ var CZ;
                 pendingSearch = searchString;
                 return;
             }
-            // isSearching is false
             isSearching = true;
             if(!searchString || searchString === '') {
                 setTimeout(function () {
