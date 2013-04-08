@@ -169,34 +169,23 @@
       <DependentUpon>czservice.ts</DependentUpon>
     </Content>
     <Content Include="NewScripts\czservice.ts" />
+    <Content Include="NewScripts\external\flash_detect.js" />
     <Content Include="NewScripts\external\jquery-1.7.2.min.js" />
     <Content Include="NewScripts\external\jquery-ui-1.8.16.custom.min.js" />
     <Content Include="NewScripts\external\jquery.cookie.js" />
     <Content Include="NewScripts\external\jquery.signalR-1.0.0-rc2.js" />
     <Content Include="NewScripts\external\jquery.signalR-1.0.0-rc2.min.js" />
+    <Content Include="NewScripts\external\mouseWheelPlugin.js" />
     <Content Include="NewScripts\external\rx.jQuery.js" />
     <Content Include="NewScripts\external\rx.js" />
     <Content Include="NewScripts\external\seadragon-min.js" />
-    <Content Include="NewScripts\flash_detect.min.js">
-      <DependentUpon>flash_detect.ts</DependentUpon>
-    </Content>
-    <Content Include="NewScripts\flash_detect.ts" />
     <Content Include="NewScripts\gestures.ts" />
     <Content Include="NewScripts\layout.ts" />
-    <Content Include="NewScripts\mouseWheelPlugin.min.js">
-      <DependentUpon>mouseWheelPlugin.ts</DependentUpon>
-    </Content>
-    <Content Include="NewScripts\mouseWheelPlugin.ts" />
-    <Content Include="NewScripts\newauthoring.ts" />
     <Content Include="NewScripts\regimesIE.min.js">
       <DependentUpon>regimesIE.ts</DependentUpon>
     </Content>
     <Content Include="NewScripts\regimesIE.ts" />
     <Content Include="NewScripts\search.ts" />
-    <Content Include="NewScripts\settings.min.js">
-      <DependentUpon>settings.ts</DependentUpon>
-    </Content>
-    <Content Include="NewScripts\settings.ts" />
     <Content Include="NewScripts\timescale.ts" />
     <Content Include="NewScripts\tours.ts" />
     <Content Include="NewScripts\typings\jqueryui\jqueryui.d.ts" />
@@ -304,12 +293,6 @@
     <Content Include="ScriptsMobile\virtualCanvas.mobile.js" />
     <Content Include="NewScripts\breadCrumbs.js">
       <DependentUpon>breadCrumbs.ts</DependentUpon>
-    </Content>
-    <Content Include="NewScripts\flash_detect.js">
-      <DependentUpon>flash_detect.ts</DependentUpon>
-    </Content>
-    <Content Include="NewScripts\newauthoring.js">
-      <DependentUpon>newauthoring.ts</DependentUpon>
     </Content>
     <Content Include="NewScripts\regimesIE.js">
       <DependentUpon>regimesIE.ts</DependentUpon>
@@ -427,9 +410,6 @@
     </Content>
     <Content Include="NewScripts\gestures.js">
       <DependentUpon>gestures.ts</DependentUpon>
-    </Content>
-    <Content Include="NewScripts\mouseWheelPlugin.js">
-      <DependentUpon>mouseWheelPlugin.ts</DependentUpon>
     </Content>
     <Content Include="NewScripts\vccontent.js">
       <DependentUpon>vccontent.ts</DependentUpon>
