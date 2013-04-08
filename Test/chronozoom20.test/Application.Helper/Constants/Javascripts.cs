@@ -4,5 +4,7 @@
     {
         public const string LastCanvasElement =
               "vc.data('ui-virtualCanvas')._layersContent.children[0].children[vc.data('ui-virtualCanvas')._layersContent.children[0].children.length - 1]";
+
+        public const string Cosmos = "vc.data('ui-virtualCanvas')._layersContent.children[0]";
     }
 }

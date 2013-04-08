@@ -336,6 +336,11 @@ namespace Application.Driver.UserActions
         {
             IWebElement element = FindElement(by);
             InvokeChain(() => Builder.MoveToElement(element).DragAndDropToOffset(element, 50, 50));
+        } 
+        
+        protected void AcceptAlert()
+        {
+            WebDriver.SwitchTo().Alert().Accept();
         }
 
     }

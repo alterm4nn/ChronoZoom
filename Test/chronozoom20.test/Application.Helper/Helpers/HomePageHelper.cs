@@ -166,9 +166,9 @@ namespace Application.Helper.Helpers
         public void DeleteAllElementsLocally()
         {
             Logger.Log("<-");
-            string result =
-                GetJavaScriptExecutionResult(string.Format("removeChild({0}.parent.parent,({0}).parent.id)", Javascripts.LastCanvasElement));
-            Logger.Log("-> result: " + result);
+            Sleep(1);
+            ExecuteJavaScript(string.Format("clear({0})",Javascripts.Cosmos));
+            Logger.Log("-> result: ");
         }
     }
 }
