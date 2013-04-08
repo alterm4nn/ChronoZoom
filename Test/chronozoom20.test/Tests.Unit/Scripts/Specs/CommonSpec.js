@@ -21,6 +21,12 @@ describe("isLeapYear() method", function () {
             var result = isLeapYear(year);
             expect(true).toEqual(result);
         });
+
+        it("false, if year is 1700", function () {
+            var year = 1700;
+            var result = isLeapYear(year);
+            expect(false).toEqual(result);
+        });
         
         it("false, if year is not leap and less zero", function () {
             var year = -1990;
