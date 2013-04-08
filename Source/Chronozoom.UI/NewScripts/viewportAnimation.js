@@ -188,6 +188,7 @@ var CZ;
         function animationEase(t) {
             return -2 * t * t * t + 3 * t * t;
         }
+        ViewportAnimation.animationEase = animationEase;
     })(CZ.ViewportAnimation || (CZ.ViewportAnimation = {}));
     var ViewportAnimation = CZ.ViewportAnimation;
 })(CZ || (CZ = {}));

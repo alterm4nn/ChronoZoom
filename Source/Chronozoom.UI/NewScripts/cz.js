@@ -160,7 +160,7 @@ var CZ;
             var jointGesturesStream = canvasGestures.Merge(axisGestures);
             CZ.Common.controller = new CZ.ViewportController.ViewportController2(function (visible) {
                 var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                var markerPos = CZ.Common.ax.axis("MarkerPosition");
+                var markerPos = CZ.Common.axis.markerPosition;
                 var oldMarkerPosInScreen = vp.pointVirtualToScreen(markerPos, 0).x;
                 CZ.Common.vc.virtualCanvas("setVisible", visible, CZ.Common.controller.activeAnimation);
                 CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
@@ -173,7 +173,7 @@ var CZ;
                 var actAni = CZ.Common.controller.activeAnimation != undefined;
                 if(actAni && !hoveredInfodot.id) {
                     var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
-                    CZ.Common.ax.axis("setTimeMarker", newMarkerPos);
+                    CZ.Common.axis.setTimeMarker(newMarkerPos);
                 }
                 CZ.Common.updateNavigator(vp);
             }, function () {
@@ -257,7 +257,7 @@ var CZ;
             });
             CZ.Common.vc.bind("innerZoomConstraintChenged", function (constraint) {
                 CZ.Common.controller.effectiveExplorationZoomConstraint = constraint.zoomValue;
-                CZ.Common.ax.axis("allowMarkerMovesOnHover", !constraint.zoomValue);
+                CZ.Common.axis.allowMarkerMovesOnHover = !constraint.zoomValue;
             });
             CZ.Common.vc.bind("breadCrumbsChanged", function (breadCrumbsEvent) {
                 CZ.BreadCrumbs.updateBreadCrumbsLabels(breadCrumbsEvent.breadCrumbs);

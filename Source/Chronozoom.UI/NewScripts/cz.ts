@@ -186,7 +186,7 @@ module CZ {
             CZ.Common.controller = new CZ.ViewportController.ViewportController2(
                             function (visible) {
                                 var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                                var markerPos = CZ.Common.ax.axis("MarkerPosition");
+                                var markerPos = CZ.Common.axis.markerPosition;
                                 var oldMarkerPosInScreen = vp.pointVirtualToScreen(markerPos, 0).x;
 
                                 CZ.Common.vc.virtualCanvas("setVisible", visible, CZ.Common.controller.activeAnimation);
@@ -202,7 +202,7 @@ module CZ {
 
                                 if (actAni && !hoveredInfodot.id) {
                                     var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
-                                    CZ.Common.ax.axis("setTimeMarker", newMarkerPos);
+                                    CZ.Common.axis.setTimeMarker(newMarkerPos); //("setTimeMarker", newMarkerPos);
                                 }
 
                                 CZ.Common.updateNavigator(vp);
@@ -317,7 +317,7 @@ module CZ {
             // Reacting on the event when one of the infodot exploration causes inner zoom constraint
             CZ.Common.vc.bind("innerZoomConstraintChenged", function (constraint) {
                 CZ.Common.controller.effectiveExplorationZoomConstraint = constraint.zoomValue; // applying the constraint
-                CZ.Common.ax.axis("allowMarkerMovesOnHover", !constraint.zoomValue);
+                CZ.Common.axis.allowMarkerMovesOnHover = !constraint.zoomValue;
             });
 
             CZ.Common.vc.bind("breadCrumbsChanged", function (breadCrumbsEvent) { //reacting on the event when the first timeline that contains whole visible region is changed

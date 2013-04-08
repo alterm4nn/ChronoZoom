@@ -52,7 +52,7 @@ module CZ {
         If element.isRendered defined and true, the element was actually rendered on a canvas.
         If element.onIsRenderedChanged defined, it is called when isRendered changes.
         */
-        function CanvasElement(vc, layerid, id, vx, vy, vw, vh) {
+        export function CanvasElement(vc, layerid, id, vx, vy, vw, vh) {
             this.vc = vc;
             this.id = id;
             this.layerid = layerid;
@@ -632,7 +632,7 @@ module CZ {
         @param vh   (number) height of a bounding box in virtual space
         @param settings  ({strokeStyle,lineWidth,fillStyle,outline:boolean}) Parameters of the rectangle appearance
         */
-        function CanvasRectangle(vc, layerid, id, vx, vy, vw, vh, settings) {
+        export function CanvasRectangle(vc, layerid, id, vx, vy, vw, vh, settings) {
             this.base = CanvasElement;
             this.base(vc, layerid, id, vx, vy, vw, vh);
             this.settings = settings;

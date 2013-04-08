@@ -53,6 +53,7 @@ var CZ;
             this.render = function (ctx, visibleBox_v, viewport2d, size_p, opacity) {
             };
         }
+        VCContent.CanvasElement = CanvasElement;
         VCContent.addRectangle = function (element, layerid, id, vx, vy, vw, vh, settings) {
             return VCContent.addChild(element, new CanvasRectangle(element.vc, layerid, id, vx, vy, vw, vh, settings), false);
         };
@@ -146,6 +147,9 @@ var CZ;
         };
         VCContent.addChild = function (parent, element, suppresCheck) {
             var isWithin = parent.width == Infinity || (element.x >= parent.x && element.x + element.width <= parent.x + parent.width) && (element.y >= parent.y && element.y + element.height <= parent.y + parent.height);
+            if(!isWithin) {
+                console.log("Child element does not belong to the parent element " + parent.id + " " + element.ID);
+            }
             parent.children.push(element);
             element.parent = parent;
             return element;
@@ -468,6 +472,7 @@ var CZ;
             };
             this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
         }
+        VCContent.CanvasRectangle = CanvasRectangle;
         function CanvasTimeline(vc, layerid, id, vx, vy, vw, vh, settings, timelineinfo) {
             this.base = CanvasRectangle;
             this.base(vc, layerid, id, vx, vy, vw, vh);
