@@ -44,6 +44,7 @@ namespace UI
         private static MD5 _md5Hasher = MD5.Create();
         private const decimal _minYear = -13700000000;
         private const decimal _maxYear = 9999;
+        private const int _maxElements = 500;
 
         // error code descriptions
         private static class ErrorDescription
@@ -81,7 +82,7 @@ namespace UI
                     return new BaseJsonResult<IEnumerable<Timeline>>((IEnumerable<Timeline>)Cache[timelineCacheKey]);
                 }
 
-                Collection<Timeline> timelines = _storage.TimelinesQuery(collectionId, _minYear, _maxYear, 0, null);
+                Collection<Timeline> timelines = _storage.TimelinesQuery(collectionId, _minYear, _maxYear, 0, null, _maxElements);
 
                 // Remove Guid.Empty assignment once client supports multiple timelines
                 if (timelines.Any())
@@ -100,7 +101,7 @@ namespace UI
 
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public Timeline GetTimelines(string supercollection, string collection, string start, string end, string minspan, string lca)
+        public Timeline GetTimelines(string supercollection, string collection, string start, string end, string minspan, string lca, string maxElements)
         {
             Trace.TraceInformation("Get Filtered Timelines");
 
@@ -111,8 +112,9 @@ namespace UI
             decimal endTime = string.IsNullOrWhiteSpace(end) ? _maxYear : decimal.Parse(end, CultureInfo.InvariantCulture);
             decimal span = string.IsNullOrWhiteSpace(minspan) ? 0 : decimal.Parse(minspan, CultureInfo.InvariantCulture);
             Guid? lcaParsed = string.IsNullOrWhiteSpace(lca) ? (Guid?)null : Guid.Parse(lca);
+            int maxElementsParsed = string.IsNullOrWhiteSpace(maxElements) ? _maxElements : int.Parse(maxElements);
 
-            Collection<Timeline> timelines = _storage.TimelinesQuery(collectionId, startTime, endTime, span, lcaParsed);
+            Collection<Timeline> timelines = _storage.TimelinesQuery(collectionId, startTime, endTime, span, lcaParsed, maxElementsParsed);
             Timeline timeline = timelines.Where(candidate => candidate.Id == lcaParsed).FirstOrDefault();
 
             if (timeline == null)
@@ -262,9 +264,25 @@ namespace UI
 
         public void Dispose()
         {
-            if (_storage != null)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~ChronozoomSVC() 
+        {
+            // Finalizer calls Dispose(false)
+            Dispose(false);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
             {
-                _storage.Dispose();
+                // Free managed resources
+                if (_storage != null)
+                {
+                    _storage.Dispose();
+                }
             }
         }
 
@@ -950,32 +968,20 @@ namespace UI
         private delegate T AuthenticatedOperationDelegate<T>(string user);
         private static T AuthenticatedOperation<T>(AuthenticatedOperationDelegate<T> operation)
         {
-            return operation(null);
-
-            /* TODO: Pending ACS Integration in Azure WebSite
             Microsoft.IdentityModel.Claims.ClaimsIdentity claimsIdentity = HttpContext.Current.User.Identity as Microsoft.IdentityModel.Claims.ClaimsIdentity;
 
-            if (claimsIdentity == null)
+            if (claimsIdentity == null || !claimsIdentity.IsAuthenticated)
             {
-                // ClaimsIdentity not configured, falling back to annonimous user
                 return operation(null);
-            }
-
-            if (!claimsIdentity.IsAuthenticated)
-            {
-                SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.Unauthenticated);
-                return default(T);
             }
 
             Microsoft.IdentityModel.Claims.Claim nameIdentifierClaim = claimsIdentity.Claims.Where(candidate => candidate.ClaimType.EndsWith("nameidentifier")).FirstOrDefault();
             if (nameIdentifierClaim == null)
             {
-                SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.MissingClaim);
-                return default(T);
+                return operation(null);
             }
 
             return operation(nameIdentifierClaim.Value);
-            */
         }
 
         /// <summary>

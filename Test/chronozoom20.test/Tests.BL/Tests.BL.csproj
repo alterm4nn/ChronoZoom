@@ -56,9 +56,13 @@
   <ItemGroup>
     <Content Include="Content\jasmine\jasmine.css" />
     <Content Include="Content\jasmine\jasmine_favicon.png" />
+    <Content Include="Scripts\Js\authoring.js" />
     <Content Include="Scripts\Js\common.js" />
     <Content Include="Scripts\Js\csvUtils.js" />
     <Content Include="Scripts\Js\cz.html.js" />
+    <Content Include="Scripts\Js\czservice.js" />
+    <Content Include="Scripts\Js\layout.js" />
+    <Content Include="Scripts\Js\newauthoring.js" />
     <Content Include="Scripts\Js\settings.js" />
     <Content Include="Scripts\Specs\AuthoringSpec.js" />
     <Content Include="Scripts\Utils\jasmine-jquery.js" />
@@ -67,7 +71,6 @@
     <Content Include="Scripts\Specs\CsvParseSpec.js" />
     <Content Include="Scripts\jasmine\jasmine-html.js" />
     <Content Include="Scripts\jasmine\jasmine.js" />
-    <Content Include="Scripts\cz.html" />
     <Content Include="Scripts\Specs\cz.html.js.Spec.js" />
     <Content Include="Scripts\Specs\CommonSpec.js" />
     <Content Include="Scripts\Js\cz.settings.js" />

@@ -1,4 +1,5 @@
 ﻿using Application.Driver;
+using Application.Helper.Constants;
 using Application.Helper.Entities;
 using Application.Helper.UserActions;
 using OpenQA.Selenium;
@@ -15,6 +16,17 @@ namespace Application.Helper.Helpers
             SetTimelineName(timeline.Title);
             SaveAndClose();
             Logger.Log("->");
+        }
+
+        public Timeline GetLastTimeline()
+        {
+            Logger.Log("<-");
+            var timeline = new Timeline();
+            const string script = Javascripts.LastCanvasElement;
+            timeline.Title = GetJavaScriptExecutionResult(script + ".title");
+            timeline.TimelineId = GetJavaScriptExecutionResult(script + ".id");
+            Logger.Log("-> " + timeline);
+            return timeline;
         }
 
         private void SaveAndClose()

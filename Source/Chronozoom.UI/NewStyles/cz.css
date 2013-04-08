@@ -202,7 +202,7 @@ right: 25px;
 
 .biblWindow .closeButton
 {
-background-image: "Images/close.png";
+background-image: "/Images/close.png";
 position: absolute;
 right: 12px;
 top: 12px;
@@ -925,7 +925,7 @@ border-top: 1px solid #BFBFBF;
 
 .welcomeScreen .titleArea .closeButton
 {
-	background-image: "Images/close.png";
+	background-image: "/Images/close.png";
 	position: absolute;
 	top: 12px;
 	right: 22px;
@@ -1458,32 +1458,6 @@ img.fallbackBackground {
         text-decoration:    none;
         cursor: default;
     }
-
-.authModeSwitch {
-    background: grey;
-    color: white;
-    border: 2px solid #BFBFBF;
-    margin-left: 25px;
-    margin-top: 5px;
-    width: 55px;
-    height: 25px;
-}
-
-
-.authSwitch {
-    background: grey;
-    color: white;
-    border: 2px solid #BFBFBF;
-    margin-left: 50px;
-    margin-top: 5px;
-    width: 55px;
-    height: 25px;
-}
-
-
-.buttonActive {
-    border:2px solid green;
-}
 
 /************************************
 *               Auxilary            *
