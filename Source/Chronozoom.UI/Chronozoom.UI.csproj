@@ -151,31 +151,46 @@
     <Content Include="BehindTheScenes.htm" />
     <Content Include="cz.aspx" />
     <Content Include="cz2.html" />
+    <Content Include="NewScripts\authoring.ts" />
+    <Content Include="NewScripts\authoring.js">
+      <DependentUpon>authoring.ts</DependentUpon>
+    </Content>
     <Content Include="NewScripts\authoring.ui.js">
+      <DependentUpon>authoring.ui.ts</DependentUpon>
+    </Content>
+    <Content Include="NewScripts\authoring.ui.min.js">
       <DependentUpon>authoring.ui.ts</DependentUpon>
     </Content>
     <Content Include="NewScripts\authoring.ui.ts" />
     <Content Include="NewScripts\bibliography.ts" />
     <Content Include="NewScripts\breadCrumbs.ts" />
     <Content Include="NewScripts\common.ts" />
+    <Content Include="NewScripts\cz.js">
+      <DependentUpon>cz.ts</DependentUpon>
+    </Content>
     <Content Include="NewScripts\cz.settings.ts" />
+    <TypeScriptCompile Include="NewScripts\cz.ts" />
+    <Content Include="NewScripts\czservice.min.js">
+      <DependentUpon>czservice.ts</DependentUpon>
+    </Content>
     <Content Include="NewScripts\czservice.ts" />
+    <Content Include="NewScripts\external\flash_detect.js" />
     <Content Include="NewScripts\external\jquery-1.7.2.min.js" />
     <Content Include="NewScripts\external\jquery-ui-1.8.16.custom.min.js" />
     <Content Include="NewScripts\external\jquery.cookie.js" />
     <Content Include="NewScripts\external\jquery.signalR-1.0.0-rc2.js" />
     <Content Include="NewScripts\external\jquery.signalR-1.0.0-rc2.min.js" />
+    <Content Include="NewScripts\external\mouseWheelPlugin.js" />
     <Content Include="NewScripts\external\rx.jQuery.js" />
     <Content Include="NewScripts\external\rx.js" />
     <Content Include="NewScripts\external\seadragon-min.js" />
-    <Content Include="NewScripts\flash_detect.ts" />
     <Content Include="NewScripts\gestures.ts" />
     <Content Include="NewScripts\layout.ts" />
-    <Content Include="NewScripts\mouseWheelPlugin.ts" />
-    <Content Include="NewScripts\newauthoring.ts" />
+    <Content Include="NewScripts\regimesIE.min.js">
+      <DependentUpon>regimesIE.ts</DependentUpon>
+    </Content>
     <Content Include="NewScripts\regimesIE.ts" />
     <Content Include="NewScripts\search.ts" />
-    <Content Include="NewScripts\settings.ts" />
     <Content Include="NewScripts\timescale.ts" />
     <Content Include="NewScripts\tours.ts" />
     <Content Include="NewScripts\typings\jqueryui\jqueryui.d.ts" />
@@ -183,6 +198,9 @@
     <Content Include="NewScripts\typings\rx.js\rx.js.d.ts" />
     <Content Include="NewScripts\urlnav.ts" />
     <Content Include="NewScripts\vccontent.ts" />
+    <Content Include="NewScripts\viewport.min.js">
+      <DependentUpon>viewport.ts</DependentUpon>
+    </Content>
     <Content Include="NewScripts\viewport.ts" />
     <Content Include="NewScripts\viewportAnimation.ts" />
     <Content Include="NewScripts\viewportController.ts" />
@@ -281,17 +299,8 @@
     <Content Include="NewScripts\breadCrumbs.js">
       <DependentUpon>breadCrumbs.ts</DependentUpon>
     </Content>
-    <Content Include="NewScripts\flash_detect.js">
-      <DependentUpon>flash_detect.ts</DependentUpon>
-    </Content>
-    <Content Include="NewScripts\newauthoring.js">
-      <DependentUpon>newauthoring.ts</DependentUpon>
-    </Content>
     <Content Include="NewScripts\regimesIE.js">
       <DependentUpon>regimesIE.ts</DependentUpon>
-    </Content>
-    <Content Include="NewScripts\settings.js">
-      <DependentUpon>settings.ts</DependentUpon>
     </Content>
     <Content Include="NewScripts\timescale.js">
       <DependentUpon>timescale.ts</DependentUpon>
@@ -406,9 +415,6 @@
     </Content>
     <Content Include="NewScripts\gestures.js">
       <DependentUpon>gestures.ts</DependentUpon>
-    </Content>
-    <Content Include="NewScripts\mouseWheelPlugin.js">
-      <DependentUpon>mouseWheelPlugin.ts</DependentUpon>
     </Content>
     <Content Include="NewScripts\vccontent.js">
       <DependentUpon>vccontent.ts</DependentUpon>
