@@ -273,7 +273,7 @@ module CZ {
                     lca: lca.guid,
                     start: vbox.left,
                     end: vbox.right,
-                    minspan: minTimelineWidth * vbox.scale
+                    minspan: CZ.Settings.minTimelineWidth * vbox.scale
                 }).then(
                     function (response) {
                         CZ.Layout.Merge(response, lca);
@@ -333,7 +333,7 @@ module CZ {
             }
 
             gesturesSource.Subscribe(function (gesture) {
-                if (typeof gesture != "undefined" && !(CZ.Authoring._isActive || CZ.Authoring.isActive)) {
+                if (typeof gesture != "undefined" && !(CZ.Authoring._isActive)) {
                     var isAnimationActive = self.activeAnimation;
                     var oldId = isAnimationActive ? self.activeAnimation.ID : undefined;
 
@@ -348,10 +348,10 @@ module CZ {
                     if (gesture.Type == "Pan" || gesture.Type == "Zoom") {
                         var newlyEstimatedViewport = calculateTargetViewport(latestViewport, gesture, self.estimatedViewport);
 
-                        var vbox = CZ.Viewport.viewportToViewBox(newlyEstimatedViewport);
-                        var wnd = new CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
+                        var vbox = CZ.Common.viewportToViewBox(newlyEstimatedViewport);
+                        var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
 
-                        if (!vc.virtualCanvas("inBuffer", wnd, newlyEstimatedViewport.visible.scale)) {
+                        if (!CZ.Common.vc.virtualCanvas("inBuffer", wnd, newlyEstimatedViewport.visible.scale)) {
                             var lca = CZ.Common.vc.virtualCanvas("findLca", wnd);
                             self.getMissingData(vbox, lca);
                         }
@@ -474,8 +474,8 @@ module CZ {
                 var currentViewport = getViewport();
                 var targetViewport = new CZ.Viewport.Viewport2d(currentViewport.aspectRatio, currentViewport.width, currentViewport.height, visible);
 
-                var vbox = CZ.Viewport.viewportToViewBox(targetViewport);
-                var wnd = new CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
+                var vbox = CZ.Common.viewportToViewBox(targetViewport);
+                var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
 
                 if (!CZ.Common.vc.virtualCanvas("inBuffer", wnd, targetViewport.visible.scale)) {
                     var lca = CZ.Common.vc.virtualCanvas("findLca", wnd);

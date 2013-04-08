@@ -295,8 +295,8 @@ module CZ {
                            (element.x >= parent.x && element.x + element.width <= parent.x + parent.width) &&
                            (element.y >= parent.y && element.y + element.height <= parent.y + parent.height);
 
-            if (!isWithin && Log)
-                Log.push("Child element does not belong to the parent element " + parent.id + " " + element.ID);
+            if (!isWithin)
+                console.log("Child element does not belong to the parent element " + parent.id + " " + element.ID);
 
             //if (!suppresCheck && !isWithin) throw "Child element does not belong to the parent element";
             parent.children.push(element);
@@ -316,9 +316,9 @@ module CZ {
                 var child = parent.children[i];
                 if (child.id == id) {
                     // remove element from hash map of animating elements in dynamic layout animation
-                    if (typeof animatingElements[child.id] !== 'undefined') {
-                        delete animatingElements[child.id];
-                        animatingElements.length--;
+                    if (typeof CZ.Layout.animatingElements[child.id] !== 'undefined') {
+                        delete CZ.Layout.animatingElements[child.id];
+                        CZ.Layout.animatingElements.length--;
                     }
 
                     parent.children.splice(i, 1);
@@ -353,9 +353,9 @@ module CZ {
                 var child = element.children[i];
 
                 // remove element from hash map of animating elements in dynamic layout animation
-                if (typeof animatingElements[child.id] !== 'undefined') {
-                    delete animatingElements[child.id];
-                    animatingElements.length--;
+                if (typeof CZ.Layout.animatingElements[child.id] !== 'undefined') {
+                    delete CZ.Layout.animatingElements[child.id];
+                    CZ.Layout.animatingElements.length--;
                 }
 
                 clear(child);
@@ -733,7 +733,7 @@ module CZ {
             };
 
             this.isVisibleOnScreen = function (scale) {
-                return this.width / scale >= minTimelineWidth;
+                return this.width / scale >= CZ.Settings.minTimelineWidth;
             }
 
             this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
@@ -2276,7 +2276,7 @@ module CZ {
             /* Checks whether the given point (virtual) is inside the object
                (should take into account the shape) */
             this.isInside = function (point_v) {
-                var len2 = sqr(point_v.x - this.x - (this.width / 2)) + sqr(point_v.y - this.y - (this.height / 2));
+                var len2 = CZ.Common.sqr(point_v.x - this.x - (this.width / 2)) + CZ.Common.sqr(point_v.y - this.y - (this.height / 2));
                 var rad = this.width / 2.0;
                 return len2 <= rad * rad;
             };

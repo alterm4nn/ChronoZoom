@@ -62,8 +62,7 @@ module CZ {
         */
         export function initialize() {
             ax = (<any>$)('#axis');
-            axis = CZ.Timescale(ax);
-           // ax.axis();
+            axis = new CZ.Timescale(ax);
 
             CZ.VirtualCanvas.initialize();
             vc = (<any>$)('#vc');
