@@ -214,9 +214,10 @@ function search(searchString) {
 
     var url;
     switch (czDataSource) {
+    	case 'dump':
         case 'db': url = "Chronozoom.svc/Search";
             break;
-        default: url = "Chronozoom.svc/SearchRelay";
+        default: url = "Chronozoom.svc/SearchRelay";  /* do we need this branch ? */
             break;
     }
     $.ajax({
