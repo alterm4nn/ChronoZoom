@@ -9,7 +9,6 @@
 /// <reference path="../Js/newauthoring.js" />
 /// <reference path="../Js/czservice.js" />
 
-
 describe("CZ.Authoring", function () {
     var authoring;
     var service;
@@ -22,6 +21,7 @@ describe("CZ.Authoring", function () {
     parentTimeline.x = -10;
     parentTimeline.y = 0;
     parentTimeline.children = [];
+    alert = function () { };
     beforeEach(function () {
         var editmode = true;
         authoring = CZ.Authoring;
