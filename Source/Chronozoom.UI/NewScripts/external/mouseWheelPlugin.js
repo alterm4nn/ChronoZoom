@@ -1,4 +1,3 @@
-/// <reference path='typings/jquery/jquery.d.ts'/>
 /**
 * @param {Object} up
 * @param {Object} down
