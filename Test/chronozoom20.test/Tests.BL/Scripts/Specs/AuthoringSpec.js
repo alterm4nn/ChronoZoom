@@ -9,7 +9,6 @@
 /// <reference path="../Js/newauthoring.js" />
 /// <reference path="../Js/czservice.js" />
 
-
 describe("CZ.Authoring", function () {
     var authoring;
     var service;
@@ -22,6 +21,7 @@ describe("CZ.Authoring", function () {
     parentTimeline.x = -10;
     parentTimeline.y = 0;
     parentTimeline.children = [];
+    alert = function () { };
     beforeEach(function () {
         var editmode = true;
         authoring = CZ.Authoring;
@@ -146,14 +146,15 @@ describe("CZ.Authoring", function () {
     });
     
     describe("Exhibit are", function () {
-        parentTimeline.guid = "00000000-0000-0000-0000-000000000000";
-        parentTimeline.id = "t55";
-        parentTimeline.height = 10;
-        parentTimeline.width = 10;
-        parentTimeline.x = 0;
-        parentTimeline.y = 0;
-        parentTimeline.children = [];
-        parentTimeline.type = "timeline";
+        var exhibitParentTimeline = {};
+        exhibitParentTimeline.guid = "00000000-0000-0000-0000-000000000000";
+        exhibitParentTimeline.id = "t55";
+        exhibitParentTimeline.height = 10;
+        exhibitParentTimeline.width = 10;
+        exhibitParentTimeline.x = 0;
+        exhibitParentTimeline.y = 0;
+        exhibitParentTimeline.children = [];
+        exhibitParentTimeline.type = "timeline";
 
         describe("should be created", function () {
             _hovered = parentTimeline;
@@ -162,7 +163,7 @@ describe("CZ.Authoring", function () {
             beforeEach(function () {
                 setFixtures('<body></body>');
                 $('body').prepend('<div id="vc"></div>');
-                $('#vc').data('ui-virtualCanvas', { hovered: parentTimeline, element: $('#vc'), getViewport: function () { return { pointScreenToVirtual: function (xvalue, yvalue) { return { x: xvalue, y: yvalue }; } }; } });
+                $('#vc').data('ui-virtualCanvas', { hovered: exhibitParentTimeline, element: $('#vc'), getViewport: function () { return { pointScreenToVirtual: function (xvalue, yvalue) { return { x: xvalue, y: yvalue }; } }; } });
                 var vc = $('#vc');
                 getXBrowserMouseOrigin = function (jqelement, event) { return { x: 2, y: 2 }; };
                 authoring._isActive = true;

@@ -60,6 +60,21 @@ namespace Application.Helper.Helpers
             return exhibit;
         }
 
+        public void DeleteExhibit(Exhibit exhibit)
+        {
+            int childrenCount = int.Parse(GetJavaScriptExecutionResult(Javascripts.CosmosChildrenCount));
+            for (int i = 0; i < childrenCount; i++)
+            {
+                string title =
+                    GetJavaScriptExecutionResult(
+                        string.Format("vc.data('ui-virtualCanvas')._layersContent.children[0].children[{0}].title", i));
+                if (title == exhibit.Title)
+                {
+                    ExecuteJavaScript(string.Format("CZ.Service.deleteExhibit(vc.data('ui-virtualCanvas')._layersContent.children[0].children[{0}])",i));
+                }
+            }
+        }
+
         private void SaveAndClose()
         {
             Logger.Log("<-");
