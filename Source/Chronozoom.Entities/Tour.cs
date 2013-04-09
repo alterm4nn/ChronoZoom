@@ -16,7 +16,7 @@ namespace Chronozoom.Entities
     public class Tour
     {
         [Key]
-        [DataMember(Name="ID")]
+        [DataMember(Name="id")]
         public Guid Id { get; set; }
 
         [DataMember]

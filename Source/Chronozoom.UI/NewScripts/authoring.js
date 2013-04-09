@@ -1,511 +1,425 @@
-﻿var CZ = (function (CZ, $, document) {
-    var Authoring = CZ.Authoring = CZ.Authoring || {};
-
-    // TODO: vc variable is global!
-
-    $.extend(Authoring, {
-        isTimelineChangeNameWindowVisible: false,
-        isDragging: false,
-        isActive: false,
-        state: null,
-        draggedObject: null,
-        startPoint: null,
-        prevPosition: null,
-        direction: null,
-        hoveredTimeline: null,
-        hoveredInfodot: null,
-        infodotCount: 1, // number of added infodots
-        contentItemCount: 1, // number of added content items
-        timelineCount: 1, // number of added timelines
-
-        onTimelineChangeNameClicked: function (id) {
-            var timelineId = id.split("__header__")[0];
-
-            var header = vc.virtualCanvas("findElement", id); // header of timeline to be changed
-            var timeline = vc.virtualCanvas("findElement", timelineId); // timeline that header to be changed
-
-            document.getElementById("ChangeNameTextBox").value = header.text;
-
-            document.getElementById("ChangeNameTextBox").oninput = function () {
-                header.text = this.value;
-                timeline.title = this.value;
-                header.vc.requestInvalidate();
-            };
-
-            if (!this.isTimelineChangeNameWindowVisible) {
-                $("#timelineChangeName").show('slide', {}, 'slow',
-                    function () {
-                        $("#ChangeNameTextBox").focus();
-                    });
-                this.toggleTitleEditor();
+var CZ;
+(function (CZ) {
+    (function (Authoring) {
+        var _vcwidget;
+        var _dragStart = {
+        };
+        var _dragPrev = {
+        };
+        var _dragCur = {
+        };
+        var _hovered = {
+        };
+        var _rectPrev = {
+            type: "rectangle"
+        };
+        var _rectCur = {
+            type: "rectangle"
+        };
+        var _circlePrev = {
+            type: "circle"
+        };
+        var _circleCur = {
+            type: "circle"
+        };
+        var _selectedTimeline = {
+        };
+        var _selectedExhibit = {
+        };
+        function isIntersecting(te, obj) {
+            switch(obj.type) {
+                case "timeline":
+                case "infodot":
+                    return (te.x + te.width > obj.x && te.x < obj.x + obj.width && te.y + te.height > obj.y && te.y < obj.y + obj.height);
+                default:
+                    return false;
             }
-        },
-
-        changeInfodotTitle: function (id, infodotDescription) {
-            var infodotID = id.split("__title")[0];
-
-            var header = vc.virtualCanvas("findElement", id); // header of infodot to be changed
-            var infodot = vc.virtualCanvas("findElement", infodotID); // infodot that header to be changed
-
-            document.getElementById("ChangeNameTextBox").value = infodotDescription.title;
-
-            document.getElementById("ChangeNameTextBox").oninput = function () {
-                header.text = this.value + '\n(' + infodotDescription.date + ')';
-                header.initialized = false;
-                infodotDescription.title = this.value;
-                header.vc.requestInvalidate();
-            };
-
-            if (!this.isTimelineChangeNameWindowVisible) {
-                $("#timelineChangeName").show('slide', {}, 'slow',
-                    function () {
-                        $("#ChangeNameTextBox").focus();
-                    });
-                this.toggleTitleEditor();
+        }
+        function isIncluded(tp, obj) {
+            switch(obj.type) {
+                case "timeline":
+                case "rectangle":
+                case "infodot":
+                case "circle":
+                    return (tp.x < obj.x && tp.y < obj.y && tp.x + tp.width > obj.x + obj.width && tp.y + tp.height > obj.y + obj.height);
+                default:
+                    return true;
             }
-        },
-
-        toggleTitleEditor: function () {
-            this.isTimelineChangeNameWindowVisible = !this.isTimelineChangeNameWindowVisible;
-        },
-
-        hideTitleEditor: function () {
-            this.toggleTitleEditor();
-            $("#timelineChangeName").hide('slide', {}, 'slow');
-        },
-
-        initializeTimelineChangeName: function () {
-            $("#ChangeNameTextBox")
-                    .focus(function () {
-                        if ($(this).hasClass('emptyTextBox')) {
-                            $(this).removeClass('emptyTextBox');
+        }
+        function checkTimelineIntersections(tp, tc, editmode) {
+            var i = 0;
+            var len = 0;
+            var selfIntersection = false;
+            if(!isIncluded(tp, tc)) {
+                return false;
+            }
+            for(i = 0 , len = tp.children.length; i < len; ++i) {
+                selfIntersection = editmode ? (tp.children[i] === _selectedTimeline) : (tp.children[i] === tc);
+                if(!selfIntersection && isIntersecting(tc, tp.children[i])) {
+                    return false;
+                }
+            }
+            if(editmode && _selectedTimeline.children && _selectedTimeline.children.length > 0) {
+                for(i = 0 , len = _selectedTimeline.children.length; i < len; ++i) {
+                    if(!isIncluded(tc, _selectedTimeline.children[i])) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        function checkExhibitIntersections(tp, ec, editmode) {
+            var i = 0;
+            var len = 0;
+            var selfIntersection = false;
+            if(!isIncluded(tp, ec)) {
+                return false;
+            }
+            for(i = 0 , len = tp.children.length; i < len; ++i) {
+                selfIntersection = editmode ? (tp.children[i] === _selectedExhibit) : (tp.children[i] === ec);
+                if(!selfIntersection && isIntersecting(ec, tp.children[i])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        function updateNewRectangle() {
+            _rectCur.x = Math.min(_dragStart.x, _dragCur.x);
+            _rectCur.y = Math.min(_dragStart.y, _dragCur.y);
+            _rectCur.width = Math.abs(_dragStart.x - _dragCur.x);
+            _rectCur.height = Math.abs(_dragStart.y - _dragCur.y);
+            if(checkTimelineIntersections(_hovered, _rectCur, false)) {
+                var settings = $.extend({
+                }, _hovered.settings);
+                settings.strokeStyle = "red";
+                $.extend(_rectPrev, _rectCur);
+                CZ.VCContent.removeChild(_hovered, "newTimelineRectangle");
+                CZ.VCContent.addRectangle(_hovered, _hovered.layerid, "newTimelineRectangle", _rectCur.x, _rectCur.y, _rectCur.width, _rectCur.height, settings);
+            } else {
+                $.extend(_rectCur, _rectPrev);
+            }
+        }
+        function updateNewCircle() {
+            _circleCur.r = (_hovered.width > _hovered.height) ? _hovered.height / 27.7 : _hovered.width / 10.0;
+            _circleCur.x = _dragCur.x - _circleCur.r;
+            _circleCur.y = _dragCur.y - _circleCur.r;
+            _circleCur.width = _circleCur.height = 2 * _circleCur.r;
+            if(checkExhibitIntersections(_hovered, _circleCur, false)) {
+                $.extend(_circlePrev, _circleCur);
+                CZ.VCContent.removeChild(_hovered, "newExhibitCircle");
+                CZ.VCContent.addCircle(_hovered, "layerInfodots", "newExhibitCircle", _circleCur.x + _circleCur.r, _circleCur.y + _circleCur.r, _circleCur.r, {
+                    strokeStyle: "red"
+                }, false);
+            } else {
+                $.extend(_circleCur, _circlePrev);
+            }
+        }
+        function renewExhibit(e) {
+            var vyc = e.y + e.height / 2;
+            var time = e.x + e.width / 2;
+            var id = e.id;
+            var cis = e.contentItems;
+            var descr = e.infodotDescription;
+            descr.opacity = 1;
+            descr.title = e.title;
+            descr.guid = e.guid;
+            var parent = e.parent;
+            var radv = e.outerRad;
+            CZ.VCContent.removeChild(parent, id);
+            return CZ.VCContent.addInfodot(parent, "layerInfodots", id, time, vyc, radv, cis, descr);
+        }
+        function createNewTimeline() {
+            CZ.VCContent.removeChild(_hovered, "newTimelineRectangle");
+            return CZ.VCContent.addTimeline(_hovered, _hovered.layerid, null, {
+                timeStart: _rectCur.x,
+                timeEnd: _rectCur.x + _rectCur.width,
+                header: "Timeline Title",
+                top: _rectCur.y,
+                height: _rectCur.height,
+                fillStyle: _hovered.settings.fillStyle,
+                regime: _hovered.regime,
+                gradientFillStyle: _hovered.settings.gradientFillStyle,
+                lineWidth: _hovered.settings.lineWidth,
+                strokeStyle: _hovered.settings.gradientFillStyle
+            });
+        }
+        function createNewExhibit() {
+            CZ.VCContent.removeChild(_hovered, "newExhibitCircle");
+            return CZ.VCContent.addInfodot(_hovered, "layerInfodots", null, _circleCur.x + _circleCur.r, _circleCur.y + _circleCur.r, _circleCur.r, [
+                {
+                    id: null,
+                    guid: null,
+                    title: "Content Item Title",
+                    description: "Content Item Description",
+                    uri: "",
+                    mediaType: "image",
+                    parent: _hovered.guid
+                }
+            ], {
+                title: "Exhibit Title",
+                date: _circleCur.x + _circleCur.r,
+                guid: null
+            });
+        }
+        function updateTimelineTitle(t) {
+            var headerSize = CZ.Settings.timelineHeaderSize * t.height;
+            var marginLeft = CZ.Settings.timelineHeaderMargin * t.height;
+            var marginTop = (1 - CZ.Settings.timelineHeaderMargin) * t.height - headerSize;
+            var baseline = t.y + marginTop + headerSize / 2.0;
+            CZ.VCContent.removeChild(t, t.id + "__header__");
+            t.titleObject = CZ.VCContent.addText(t, t.layerid, t.id + "__header__", t.x + marginLeft, t.y + marginTop, baseline, headerSize, t.title, {
+                fontName: CZ.Settings.timelineHeaderFontName,
+                fillStyle: CZ.Settings.timelineHeaderFontColor,
+                textBaseline: "middle",
+                opacity: 1
+            });
+        }
+        Authoring._isActive = false;
+        Authoring._isDragging = false;
+        Authoring.mode = null;
+        Authoring.showCreateTimelineForm = null;
+        Authoring.showEditTimelineForm = null;
+        Authoring.showCreateExhibitForm = null;
+        Authoring.showEditExhibitForm = null;
+        Authoring.showEditContentItemForm = null;
+        Authoring.modeMouseHandlers = {
+            createTimeline: {
+                mousemove: function () {
+                    if(CZ.Authoring._isDragging && _hovered.type === "timeline") {
+                        updateNewRectangle();
+                    }
+                },
+                mouseup: function () {
+                    if(_dragCur.x === _dragStart.x && _dragCur.y === _dragStart.y) {
+                        return;
+                    }
+                    if(_hovered.type === "timeline") {
+                        _selectedTimeline = createNewTimeline();
+                        Authoring.showCreateTimelineForm(_selectedTimeline);
+                    }
+                }
+            },
+            editTimeline: {
+                mousemove: function () {
+                    _hovered = _vcwidget.hovered || {
+                    };
+                    if(_hovered.type === "timeline") {
+                        _hovered.settings.strokeStyle = "red";
+                    }
+                },
+                mouseup: function () {
+                    if(_hovered.type === "timeline") {
+                        _selectedTimeline = _hovered;
+                        Authoring.showEditTimelineForm(_selectedTimeline);
+                    } else if(_hovered.type === "infodot" || _hovered.type === "contentItem") {
+                        _selectedTimeline = _hovered.parent;
+                        Authoring.showEditTimelineForm(_selectedTimeline);
+                    }
+                }
+            },
+            createExhibit: {
+                mousemove: function () {
+                    if(CZ.Authoring._isDragging && _hovered.type === "timeline") {
+                        updateNewCircle();
+                    }
+                },
+                mouseup: function () {
+                    if(_hovered.type === "timeline") {
+                        updateNewCircle();
+                        if(checkExhibitIntersections(_hovered, _circleCur, false)) {
+                            _selectedExhibit = createNewExhibit();
+                            Authoring.showCreateExhibitForm(_selectedExhibit);
                         }
-                    });
-            $("#timelineChangeName").hide();
-            $("#authoringToolsPanel").hide();
-        },
-
-        createInfodot: function (infodot) {
-            var k = 1000000000;
-
-            var exhibit = {
-                __type: "Exhibit:#Chronozoom.Entities",
-                ContentItems: [],
-                Day: 0,
-                ID: "",
-                Month: 0,
-                References: [],
-                Regime: infodot.regime,
-                Sequence: null,
-                Threshold: "1. Origins of the Universe",
-                Title: "New exhibit",
-                UniqueID: "_" + this.timelineCount++,
-                TimeUnit: "Ga",
-                Year: (infodot.year / k).toFixed(1)
-            };
-
-            var dateTime = {
-                __type: "DateTimeOffset:#System",
-                DateTime: "/Date(1316131200000)/",
-                OffsetMinutes: 0
-            };
-
-            var contentItem = {
-                __type: "ContentItem:#Chronozoom.Entities",
-                Attribution: "New content item",
-                Caption: infodot.contentItem.caption,
-                Date: dateTime,
-                HasBibliography: false,
-                ID: "",
-                MediaSource: "http://commons.wikimedia.org/wiki/File:A_False-Color_Topography_of_Vesta%27s_South_Pole.jpg",
-                MediaType: "Picture",
-                Order: 32767,
-                Regime: infodot.regime,
-                Threshold: "1. Origins of the Universe",
-                TimeUnit: "Ga",
-                Title: infodot.contentItem.title,
-                UniqueID: "_" + this.timelineCount++,
-                Uri: infodot.contentItem.uri,
-                Year: null
-            };
-
-            exhibit.ContentItems.push(contentItem);
-        },
-
-        atOnClicked: function () {
-            this.isActive = !this.isActive;
-
-            if (this.isActive)
-                $("#authoringToolsPanel").slideDown();
-            else
-                $("#authoringToolsPanel").slideUp();
-        },
-
-        editModeChanged: function (newMode) {
-            if (this.state == newMode)
-                this.state = null;
-            else
-                this.state = newMode;
-        },
-
-        updateNewRectangle: function (pv) {
-            if (this.startPoint === null || this.startPoint === false)
-                this.startPoint = {
-                    x: pv.x,
-                    y: pv.y
-                };
-
-            if (this.startPoint !== null && this.startPoint !== false && this.draggedObject.prevPosition !== null) {
-                removeChild(this.draggedObject, "newTimelineRectangle");
-
-                // prevent exceed of horizontal borders
-                if (pv.x < this.draggedObject.x)
-                    pv.x = this.draggedObject.x;
-                if (pv.x > this.draggedObject.x + this.draggedObject.width)
-                    pv.x = this.draggedObject.x + this.draggedObject.width;
-
-                // prevent exceed of vertical borders
-                if (pv.y < this.draggedObject.y)
-                    pv.y = this.draggedObject.y;
-                if (pv.y > this.draggedObject.y + this.draggedObject.height)
-                    pv.y = this.draggedObject.y + this.draggedObject.height;
-
-                var timelineX = Math.min(this.startPoint.x, pv.x);
-                var timelineY = Math.min(this.startPoint.y, pv.y);
-                var width = Math.abs(this.startPoint.x - pv.x);
-                var height = Math.abs(this.startPoint.y - pv.y);
-
-                // rectangle can go out of parent's boundaries while rapidly creating new timelines. It will throw an exception.
-                try {
-                    addRectangle(this.draggedObject, this.draggedObject.layerid, "newTimelineRectangle", timelineX, timelineY,
-                        width, height, this.draggedObject.settings);
+                    }
                 }
-                catch (ex) {
-                    console.log(ex);
+            },
+            editExhibit: {
+                mousemove: function () {
+                    _hovered = _vcwidget.hovered || {
+                    };
+                    if(_hovered.type === "infodot") {
+                        _hovered.settings.strokeStyle = "red";
+                    }
+                },
+                mouseup: function () {
+                    if(_hovered.type === "infodot") {
+                        _selectedExhibit = _hovered;
+                        Authoring.showEditExhibitForm(_selectedExhibit);
+                    } else if(_hovered.type === "contentItem") {
+                        _selectedExhibit = _hovered.parent.parent.parent;
+                        Authoring.showEditContentItemForm(_hovered, _selectedExhibit);
+                    }
                 }
             }
-
-            this.draggedObject.prevPosition = {
-                x: pv.x,
-                y: pv.y
+        };
+        function initialize(vc, formHandlers) {
+            _vcwidget = vc.data("ui-virtualCanvas");
+            _vcwidget.element.on("mousedown", function (event) {
+                if(CZ.Authoring._isActive) {
+                    var viewport = _vcwidget.getViewport();
+                    var origin = CZ.Common.getXBrowserMouseOrigin(_vcwidget.element, event);
+                    var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
+                    CZ.Authoring._isDragging = true;
+                    _dragStart = posv;
+                    _dragPrev = {
+                    };
+                    _dragCur = posv;
+                    _hovered = _vcwidget.hovered || {
+                    };
+                }
+            });
+            _vcwidget.element.on("mouseup", function (event) {
+                if(CZ.Authoring._isActive) {
+                    var viewport = _vcwidget.getViewport();
+                    var origin = CZ.Common.getXBrowserMouseOrigin(_vcwidget.element, event);
+                    var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
+                    CZ.Authoring._isDragging = false;
+                    _dragPrev = _dragCur;
+                    _dragCur = posv;
+                    CZ.Common.controller.stopAnimation();
+                    CZ.Authoring.modeMouseHandlers[CZ.Authoring.mode]["mouseup"]();
+                }
+            });
+            _vcwidget.element.on("mousemove", function (event) {
+                if(CZ.Authoring._isActive) {
+                    var viewport = _vcwidget.getViewport();
+                    var origin = CZ.Common.getXBrowserMouseOrigin(_vcwidget.element, event);
+                    var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
+                    _dragPrev = _dragCur;
+                    _dragCur = posv;
+                    CZ.Authoring.modeMouseHandlers[CZ.Authoring.mode]["mousemove"]();
+                }
+            });
+            Authoring.showCreateTimelineForm = formHandlers && formHandlers.showCreateTimelineForm || function () {
             };
-        },
-
-        createNewRectangle: function (pv) {
-            removeChild(this.draggedObject, "newTimelineRectangle");
-
-            if (!this.draggedObject && !this.draggedObject.prevPosition)
-                return;
-
-            if (!this.startPoint)
-                return;
-
-            // prevent exceed of horizontal borders
-            if (pv.x < this.draggedObject.x)
-                pv.x = this.draggedObject.x;
-            if (pv.x > this.draggedObject.x + this.draggedObject.width)
-                pv.x = this.draggedObject.x + this.draggedObject.width;
-
-            // prevent exceed of vertical borders
-            if (pv.y < this.draggedObject.y)
-                pv.y = this.draggedObject.y;
-            if (pv.y > this.draggedObject.y + this.draggedObject.height)
-                pv.y = this.draggedObject.y + this.draggedObject.height;
-
-            var timelineX = Math.min(this.startPoint.x, pv.x);
-            var timelineY = Math.min(this.startPoint.y, pv.y);
-            var width = Math.abs(this.startPoint.x - pv.x);
-            var height = Math.abs(this.startPoint.y - pv.y);
-
-            var intersection = this.checkIntersections(pv);
-
-            timelineX = intersection.timelineX;
-            timelineY = intersection.timelineY;
-            width = intersection.width;
-            height = intersection.height;
-
-            if (width > 0 && height > 0) {
-                addTimeline(this.draggedObject, this.draggedObject.layerid, "t_" + this.timelineCount, {
-                    timeStart: timelineX,
-                    timeEnd: timelineX + width,
-                    header: "Timeline " + this.timelineCount,
-                    top: timelineY,
-                    height: height,
-                    fillStyle: this.draggedObject.settings.fillStyle,
-                    regime: this.draggedObject.regime,
-                    gradientFillStyle: this.draggedObject.settings.gradientFillStyle,
-                    lineWidth: this.draggedObject.settings.lineWidth,
-                    strokeStyle: timelineStrokeStyle
+            Authoring.showEditTimelineForm = formHandlers && formHandlers.showEditTimelineForm || function () {
+            };
+            Authoring.showCreateExhibitForm = formHandlers && formHandlers.showCreateExhibitForm || function () {
+            };
+            Authoring.showEditExhibitForm = formHandlers && formHandlers.showEditExhibitForm || function () {
+            };
+            Authoring.showEditContentItemForm = formHandlers && formHandlers.showEditContentItemForm || function () {
+            };
+        }
+        Authoring.initialize = initialize;
+        function updateTimeline(t, prop) {
+            var temp = {
+                x: Number(prop.start),
+                y: t.y,
+                width: Number(prop.end - prop.start),
+                height: t.height,
+                type: "rectangle"
+            };
+            if(checkTimelineIntersections(t.parent, temp, true)) {
+                t.x = temp.x;
+                t.width = temp.width;
+            }
+            t.title = prop.title;
+            updateTimelineTitle(t);
+            return CZ.Service.putTimeline(t).then(function (success) {
+                t.id = "t" + success;
+                t.guid = success;
+                t.titleObject.id = "t" + success + "__header__";
+            }, function (error) {
+            });
+        }
+        Authoring.updateTimeline = updateTimeline;
+        function removeTimeline(t) {
+            CZ.Service.deleteTimeline(t);
+            CZ.VCContent.removeChild(t.parent, t.id);
+        }
+        Authoring.removeTimeline = removeTimeline;
+        function updateExhibit(e, prop) {
+            var temp = {
+                title: prop.title,
+                x: Number(prop.date) - e.outerRad,
+                y: e.y,
+                width: e.width,
+                height: e.height,
+                type: "circle"
+            };
+            var oldContentItems = e.contentItems;
+            if(checkExhibitIntersections(e.parent, temp, true)) {
+                e.x = temp.x;
+                e.infodotDescription.date = temp.x + e.outerRad;
+            }
+            e.title = temp.title;
+            e.infodotDescription.title = temp.title;
+            e.contentItems = prop.contentItems;
+            e = renewExhibit(e);
+            CZ.Service.putExhibit(e).then(function (response) {
+                var contentItems = e.contentItems;
+                var len = contentItems.length;
+                var i = 0;
+                e.guid = response;
+                for(i = 0; i < len; ++i) {
+                    contentItems[i].parent = e.guid;
+                }
+                CZ.Service.putExhibitContent(e, oldContentItems).then(function () {
+                    for(i = 0; i < len; ++i) {
+                        contentItems[i].guid = arguments[i];
+                    }
+                }, function () {
+                    console.log("Error connecting to service: update content item.\n");
                 });
-
-                var k = 1000000000;
-
-                var timeline = {
-                    __type: "Timeline:#Chronozoom.Entities",
-                    ChildTimelines: [],
-                    Exhibits: [],
-                    FromDay: 0,
-                    FromMonth: 0,
-                    FromTimeUnit: "Ga",
-                    FromYear: -timelineX / k,
-                    Height: 40.000,
-                    ID: "",
-                    Regime: this.draggedObject.regime,
-                    Sequence: null,
-                    Threshold: "1. Origins of the Universe",
-                    Title: "Timeline " + this.timelineCount,
-                    ToDay: 0,
-                    ToMonth: 0,
-                    ToTimeUnit: "Ga",
-                    ToYear: -(timelineX + width) / k,
-                    UniqueID: "_" + this.timelineCount++
-                };
-            }
-
-            this.draggedObject = null;
-            this.startPoint = null;
-        },
-
-        updateTimelineDate: function (pv) {
-            if (this.draggedObject.type != "timeline")
-                return;
-
-            if (!this.direction) {
-                if (this.draggedObject.x <= pv.x && pv.x <= this.draggedObject.x + this.draggedObject.width / 5)
-                    this.direction = "left";
-                else if (this.draggedObject.x + 4 * this.draggedObject.width / 5 <= pv.x && pv.x <= this.draggedObject.x + this.draggedObject.width)
-                    this.direction = "right";
-                else {
-                    if (Math.abs(pv.y - this.draggedObject.y) <= this.draggedObject.height / 2)
-                        this.direction = "top";
-                    else
-                        this.direction = "down";
+            }, function (error) {
+                console.log("Error connecting to service: update exhibit.\n");
+            });
+        }
+        Authoring.updateExhibit = updateExhibit;
+        function removeExhibit(e) {
+            CZ.Service.deleteExhibit(e);
+            CZ.VCContent.removeChild(e.parent, e.id);
+        }
+        Authoring.removeExhibit = removeExhibit;
+        function updateContentItem(c, args) {
+            var e = c.parent.parent.parent;
+            for(var prop in args) {
+                if(c.contentItem.hasOwnProperty(prop)) {
+                    c.contentItem[prop] = args[prop];
                 }
             }
-
-            var dx = 0;
-            var dy = 0;
-
-            if (this.prevPosition) {
-                dx = this.prevPosition.x - pv.x;
-                dy = this.prevPosition.y - pv.y;
+            renewExhibit(e);
+            CZ.Service.putContentItem(c).then(function (response) {
+                c.guid = response;
+            }, function (error) {
+                console.log("Error connecting to service: update content item.\n" + error.responseText);
+            });
+        }
+        Authoring.updateContentItem = updateContentItem;
+        function removeContentItem(c) {
+            var e = c.parent.parent.parent;
+            CZ.Service.deleteContentItem(c);
+            c.parent.parent.parent.contentItems.splice(c.contentItem.index, 1);
+            delete c.contentItem;
+            renewExhibit(e);
+        }
+        Authoring.removeContentItem = removeContentItem;
+        function ValidateNumber(number) {
+            return !isNaN(Number(number));
+        }
+        Authoring.ValidateNumber = ValidateNumber;
+        function IsNotEmpty(obj) {
+            return (obj !== '' && obj !== null);
+        }
+        Authoring.IsNotEmpty = IsNotEmpty;
+        function ValidateContentItems(contentItems) {
+            var isValid = true;
+            if(contentItems == "[]") {
+                return true;
             }
-
-            this.prevPosition = {
-                x: pv.x,
-                y: pv.y
-            };
-
-            dx = this.checkHorizontalIntersection(this.direction, dx);
-            dy = this.checkVerticalIntersection(this.direction, dy);
-
-            switch (this.direction) {
-                case "left":
-                    this.draggedObject.x -= dx;
-                    this.draggedObject.width += dx;
-                    this.draggedObject.titleObject.x -= dx;
-                    break;
-                case "right":
-                    dx = -dx;
-                    this.draggedObject.width += dx;
-                    break;
-                case "top":
-                    this.draggedObject.y -= dy;
-                    this.draggedObject.height += dy;
-                    break;
-                case "down":
-                    this.draggedObject.height -= dy;
-                    this.draggedObject.titleObject.y -= dy;
-                    this.draggedObject.titleObject.baseline -= dy;
-                    break;
-            }
-        },
-
-        /* Checks for intersections between new timeline and some child of parent timeline. */
-        checkIntersections: function (pv) {
-            var timelineX = Math.min(this.startPoint.x, pv.x);
-            var timelineY = Math.min(this.startPoint.y, pv.y);
-            var width = Math.abs(this.startPoint.x - pv.x);
-            var height = Math.abs(this.startPoint.y - pv.y);
-
-            var x1 = timelineX, x2 = x1 + width; // left and right X coords of rectangle
-            var y1 = timelineY, y2 = y1 + height; // top and bottom Y coords of rectangle
-
-            // skip header object, so first index is 1
-            // TODO: check intersection with header obect too
-            for (var i = 1; i < this.draggedObject.children.length; i++) {
-                var c_x1 = this.draggedObject.children[i].x; // left X coord of child
-                var c_x2 = this.draggedObject.children[i].x + this.draggedObject.children[i].width; // right X coord of child
-                var c_y1 = this.draggedObject.children[i].y; // top Y coord of child
-                var c_y2 = this.draggedObject.children[i].y + this.draggedObject.children[i].height; // bottom Y coord of child
-
-                // horizontal borders of one timelines doesn't exceed horizontal border of another one
-                if ((x1 >= c_x1 && x2 <= c_x2) || (c_x1 >= x1 && c_x2 <= x2)) {
-                    if (y1 <= c_y2 && y1 > c_y1) { // moving from bottom to top
-                        timelineY = c_y2;
-                        height = y2 - timelineY;
-                    }
-                    else if (y2 >= c_y1 && y2 < c_y2) { // moving from top to bottom
-                        height = c_y1 - timelineY;
-                    }
+            var i = 0;
+            while(contentItems[i] != null) {
+                var CI = contentItems[i];
+                isValid = isValid && CZ.Authoring.IsNotEmpty(CI.title) && CZ.Authoring.IsNotEmpty(CI.uri) && CZ.Authoring.IsNotEmpty(CI.mediaType);
+                if(!isValid) {
+                    return false;
                 }
-                    // new timeline intersect right border of another timeline
-                else if ((x2 >= c_x1 && x2 < c_x2)) {
-                    if (y1 <= c_y2 && y1 > c_y1) { // moving from bottom to top
-                        timelineY = c_y2;
-                        height = y2 - timelineY;
-                    }
-                    else if (y2 >= c_y1 && y2 < c_y2) { // moving from top to bottom
-                        height = c_y1 - timelineY;
-                    }
-                }
-                    // new timeline intersect left border of another timeline
-                else if ((x1 >= c_x1 && x1 < c_x2)) {
-                    if (y1 <= c_y2 && y1 > c_y1) { // moving from bottom to top
-                        timelineY = c_y2;
-                        height = y2 - timelineY;
-                    }
-                    else if (y2 >= c_y1 && y2 < c_y2) { // moving from top to bottom
-                        height = c_y1 - timelineY;
-                    }
-                }
-
-                if ((y1 >= c_y1 && y2 <= c_y2) || (c_y1 >= y1 && c_y2 <= y2)) {
-                    if (x2 >= c_x1 && x2 < c_x2) {
-                        width = c_x1 - timelineX;
-                    }
-                    else if (x1 > c_x1 && x1 <= c_x2) {
-                        timelineX = c_x2;
-                        width = x2 - timelineX;
-                    }
-                }
+                i++;
             }
-
-            return {
-                timelineX: timelineX,
-                timelineY: timelineY,
-                width: width,
-                height: height
-            };
-        },
-
-        /* Checks for horizontal intersection */
-        checkHorizontalIntersection: function (direction, dx) {
-            var x1 = this.draggedObject.x; // left border of edited timeline
-            var x2 = this.draggedObject.width + x1; // right border of edited timeline
-
-            var y1 = this.draggedObject.y;
-            var y2 = y1 + this.draggedObject.height;
-
-            if (this.direction == "left")
-                x1 -= dx;
-            else if (this.direction == "right")
-                x2 -= dx;
-
-            if (x1 < this.draggedObject.parent.x) {
-                dx = this.draggedObject.x - this.draggedObject.parent.x;
-                x1 = this.draggedObject.parent.x;
-            }
-            else if (x2 > this.draggedObject.parent.x + this.draggedObject.parent.width) {
-                dx = this.draggedObject.x + this.draggedObject.width - this.draggedObject.parent.width - this.draggedObject.parent.x;
-                x2 = this.draggedObject.parent.x + this.draggedObject.parent.width;
-            }
-
-            var candidates = this.draggedObject.parent.children;
-
-            // check for intersections with other timelines of that parent
-            for (var i = 1; i < candidates.length; i++) {
-                if (candidates[i].id == this.draggedObject.id)
-                    continue;
-
-                var c_x1 = candidates[i].x;
-                var c_x2 = c_x1 + candidates[i].width;
-
-                var c_y1 = candidates[i].y;
-                var c_y2 = c_y1 + candidates[i].height;
-
-                if ((((x1 < c_x1 || x1 < c_x2) && x2 > c_x2) ||
-                    ((x2 > c_x1 || x2 > c_x2) && x1 < c_x1)) &&
-                    !(y1 > c_y2 || y2 < c_y1)) {
-                        dx = 0;
-                }
-            }
-
-            candidates = this.draggedObject.children;
-
-            // check for intersections with child elements
-            for (var i = 1; i < candidates.length; i++) {
-                var c_x1 = candidates[i].x;
-                var c_x2 = c_x1 + candidates[i].width;
-
-                if (x1 > c_x1 || x2 < c_x2) {
-                    dx = 0;
-                }
-            }
-
-            return dx;
-        },
-
-        /* Checks for vertical intersection */
-        checkVerticalIntersection: function (direction, dy) {
-            var y1 = this.draggedObject.y; // top border of edited timeline
-            var y2 = this.draggedObject.height + y1; // bottom border of edited timeline
-
-            var x1 = this.draggedObject.x;
-            var x2 = x1 + this.draggedObject.width;
-
-            if (this.direction == "top")
-                y1 -= dy;
-            else if (this.direction == "down")
-                y2 -= dy;
-
-            if (y1 < this.draggedObject.parent.y) {
-                dy = this.draggedObject.y - this.draggedObject.parent.y;
-                y1 = this.draggedObject.parent.y;
-            }
-            else if (y2 > this.draggedObject.parent.y + this.draggedObject.parent.height) {
-                dy = this.draggedObject.y + this.draggedObject.height - this.draggedObject.parent.height - this.draggedObject.parent.y;
-                y2 = this.draggedObject.parent.y + this.draggedObject.parent.height;
-            }
-
-            var candidates = this.draggedObject.parent.children;
-
-            // check for intersections with other timelines of that parent
-            for (var i = 1; i < candidates.length; i++) {
-                if (candidates[i].id == this.draggedObject.id)
-                    continue;
-
-                var c_x1 = candidates[i].x;
-                var c_x2 = c_x1 + candidates[i].width;
-
-                var c_y1 = candidates[i].y;
-                var c_y2 = c_y1 + candidates[i].height;
-
-                if ((((y1 < c_y1 || y1 < c_y2) && y2 > c_y2) ||
-                    ((y2 > c_y1 || y2 > c_y2) && y1 < c_y1)) &&
-                    !(x1 >= c_x2 || x2 <= c_x1)) {
-                        dy = 0;
-                }
-            }
-
-            candidates = this.draggedObject.children;
-
-            // check for intersections with child elements
-            for (var i = 1; i < candidates.length; i++) {
-                var c_y1 = candidates[i].y;
-                var c_y2 = c_y1 + candidates[i].height;
-
-                if (y1 > c_y1 || y2 < c_y2) {
-                    dy = 0;
-                }
-            }
-
-            if (y2 / y1 <= 1.1)
-                dy = 0;
-
-            return dy;
-        },
-   });
-
-    return CZ;
-})(CZ || {}, jQuery, document);
+            return isValid;
+        }
+        Authoring.ValidateContentItems = ValidateContentItems;
+    })(CZ.Authoring || (CZ.Authoring = {}));
+    var Authoring = CZ.Authoring;
+})(CZ || (CZ = {}));

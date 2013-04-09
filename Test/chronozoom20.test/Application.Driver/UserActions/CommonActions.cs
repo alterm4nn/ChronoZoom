@@ -6,6 +6,7 @@ using Application.Driver.Extensions;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
+using Cookie = OpenQA.Selenium.Cookie;
 
 namespace Application.Driver.UserActions
 {
@@ -39,7 +40,6 @@ namespace Application.Driver.UserActions
 
         protected CommonActions()
         {
-            
             _wait = Wait(Configuration.ExplicitWait);
         }
 
@@ -77,6 +77,13 @@ namespace Application.Driver.UserActions
             FindElement(by).Click();
         }
 
+        protected void Select(By by, String text)
+        {
+            if (String.IsNullOrEmpty(text))
+                throw new ArgumentException("text");
+            new SelectElement(FindElement(by)).SelectByText(text);
+        }
+
         protected void OpenUrl(string url)
         {
             WebDriver.Navigate().GoToUrl(url);
@@ -90,6 +97,11 @@ namespace Application.Driver.UserActions
         protected string GetPageTitle()
         {
             return WebDriver.Title;
+        }
+
+        protected ReadOnlyCollection<Cookie> GetAllCookies()
+        {
+            return WebDriver.Manage().Cookies.AllCookies;
         }
 
         protected int GetItemsCount(By by)
@@ -188,7 +200,7 @@ namespace Application.Driver.UserActions
             WebDriver.Navigate().Refresh();
         }
 
-        private static void InvokeChain(Func<Actions> chain)
+        protected static void InvokeChain(Func<Actions> chain)
         {
             chain.Invoke().Build().Perform();
         }
@@ -234,7 +246,6 @@ namespace Application.Driver.UserActions
         {
             return WebDriver.Title;
         }
-
 
         protected void MoveToElementAndClick(By by)
         {
@@ -323,6 +334,18 @@ namespace Application.Driver.UserActions
         protected void WaitAnimation()
         {
             WaitCondition(AreEqualViewports, 60);
+        }
+
+
+        protected void MoveToElementAndDrugAndDrop(By by, int x = 0, int y = 0)
+        {
+            IWebElement element = FindElement(by);
+            InvokeChain(() => Builder.MoveToElement(element).DragAndDropToOffset(element, 50, 50));
+        } 
+        
+        protected void AcceptAlert()
+        {
+            WebDriver.SwitchTo().Alert().Accept();
         }
 
     }

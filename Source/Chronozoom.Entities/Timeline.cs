@@ -18,10 +18,10 @@ namespace Chronozoom.Entities
     public class Timeline
     {
         [Key]
-        [DataMember(Name="ID")]
+        [DataMember(Name="id")]
         public Guid Id { get; set; }
 
-        [DataMember]
+        [DataMember(Name = "title")]
         public string Title { get; set; }
 
         [DataMember]
@@ -36,6 +36,7 @@ namespace Chronozoom.Entities
 
         [NotMapped]
         [DataMember]
+        [Obsolete("Only available in Beta")]
         public int? FromDay { get; set; }
 
         [NotMapped]
@@ -44,6 +45,14 @@ namespace Chronozoom.Entities
 
         [DataMember]
         public decimal FromYear { get; set; }
+
+        [NotMapped]
+        [DataMember(Name="start")]
+        public decimal Start { get; set; }
+
+        [NotMapped]
+        [DataMember(Name = "end")]
+        public decimal End { get; set; }
 
         [NotMapped]
         [DataMember]
@@ -60,7 +69,10 @@ namespace Chronozoom.Entities
 
         [DataMember]
         public decimal ToYear { get; set; }
-        
+
+        [DataMember]
+        public decimal ForkNode { get; set; }
+
         [DataMember(Name="UniqueID")]
         public int UniqueId { get; set; }
         
@@ -70,11 +82,16 @@ namespace Chronozoom.Entities
         [DataMember]
         public decimal? Height { get; set; }
 
-        [DataMember]
+        [DataMember(Name="timelines")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Object property needs to be initialized externally")]
         public virtual Collection<Timeline> ChildTimelines { get; set; }
 
-        [DataMember]
+        [DataMember(Name = "ChildTimelines")]
+        [NotMapped]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Object property needs to be initialized externally")]
+        public virtual Collection<Timeline> ChildTimelinesBeta { get; set; }
+
+        [DataMember(Name = "exhibits")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Object property needs to be initialized externally")]
         public virtual Collection<Exhibit> Exhibits { get; set; }
 

@@ -16,12 +16,14 @@ namespace Application.Helper.BrowserImpl
 
         public virtual void NavigateBceToCeEra()
         {
-            string targetDate = (DateTimeHelper.GetCurrentTimeInYearFormat() - 1).ToString(CultureInfo.InvariantCulture);
+            string targetDate = "0";
             Logger.Log("- targetDate: " + targetDate);
-            string script = String.Format("controller.moveToVisible(new VisibleRegion2d(-{0},222893683.28948474,0.0009286813988062588),false)", targetDate);
+            string script = String.Format("controller.moveToVisible(new VisibleRegion2d(-{0},224031781.9944986,0.0009286813988062588),false)", targetDate);
             Logger.Log("- script: " + script);
             ExecuteJavaScript(script);
-            WaitForElementIsDisplayed(By.Id("bc_link_t550"));
+            //Wait For Humanity in bread crumbs
+            WaitForElementIsDisplayed(By.Id("bc_link_t161"));
+            Sleep(2);
             WaitAnimation();
         }
     }

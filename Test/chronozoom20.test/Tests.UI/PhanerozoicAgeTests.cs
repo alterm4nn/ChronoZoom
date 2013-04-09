@@ -20,7 +20,7 @@ namespace Tests
         {
             BrowserStateManager.RefreshState();
             NavigationHelper.OpenHomePage();
-            HomePageHelper.CloseWelcomePopup();
+            WelcomeScreenHelper.CloseWelcomePopup();
         }
 
         [ClassCleanup]
@@ -40,9 +40,8 @@ namespace Tests
         [TestMethod]
         public void Test_Eukaryotic_Cells_Description()
         {
-
             string description = HomePageHelper.GetEukaryoticCellsDescription();
-            StringAssert.Contains(description, "Eukaryote cells");
+            StringAssert.Contains(description, "eukaryotic cells");
         }
 
         [TestMethod]

@@ -12,11 +12,13 @@ namespace Tests
         public static NavigationHelper NavigationHelper { get; set; }
         public static BrowserStateManager BrowserStateManager { get; set; }
         public static TourHelper TourHelper { get; set; }
-        public static TimelineHelper TimelineHelper { get; set; }
+        public static TimescaleHelper TimescaleHelper { get; set; }
         public static BookmarkHelper BookmarkHelper { get; set; }
         public static ScreenshotManager ScreenshotManager { get; set; }
-        
-
+        public static WelcomeScreenHelper WelcomeScreenHelper { get; set; }
+        public static TimelineHelper TimelineHelper { get; set; }
+        public static ExhibitHelper ExhibitHelper { get; set; }
+        public static AuthorizationHelper AuthorizationHelper { get; set; }
         public static HomePageHelper HomePageHelper { get; set; }
 
         [AssemblyInitialize]
@@ -28,9 +30,15 @@ namespace Tests
             HomePageHelper = HelperManager.GetHomePageHelper();
             TourHelper = HelperManager.GetTourHelper();
             BookmarkHelper = HelperManager.GetBookmarkHelper();
-            TimelineHelper = HelperManager.GetTimelineHelper();
+            TimescaleHelper = HelperManager.GetTimescaleHelper();
             ScreenshotManager = HelperManager.GetScreenshotManager();
+            WelcomeScreenHelper = HelperManager.GetWelcomeScreenHelper();
+            TimelineHelper = HelperManager.GetTimelineHelper();
+            ExhibitHelper = HelperManager.GetExhibitHelper();
+            AuthorizationHelper = HelperManager.GetAuthorizationHelper();
         }
+
+        
 
         [AssemblyCleanup]
         public static void AssemblyCleanup()

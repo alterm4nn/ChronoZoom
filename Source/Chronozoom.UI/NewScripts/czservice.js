@@ -1,212 +1,279 @@
-﻿var CZ = (function (CZ, $) {
-    var Service = CZ.Service = CZ.Service || {};
-    Service.Map = Service.Map || {};
-
-    Service.Request = function (urlBase) {
-        var _url = urlBase;
-        var _hasParameters = false;
-
-        Object.defineProperty(this, "url", {
-            configurable: false,
-            get: function () {
-                return _url;
+var CZ;
+(function (CZ) {
+    (function (Service) {
+        var Map;
+        (function (Map) {
+            function timeline(t) {
+                return {
+                    Id: t.guid,
+                    ParentTimelineId: t.parent.guid,
+                    FromYear: t.x,
+                    ToYear: t.x + t.width,
+                    Title: t.title,
+                    Regime: t.regime
+                };
             }
-        });
-
-        this.addParameter = function (name, value) { 
-            if (value !== "undefined") {
-                _url += _hasParameters ? "&" : "?";
-                _url += name + "=" + value;
-                _hasParameters = true;
+            Map.timeline = timeline;
+            function exhibit(e) {
+                return {
+                    Id: e.guid || null,
+                    ParentTimelineId: e.parent.guid,
+                    Year: e.infodotDescription.date,
+                    Title: e.title,
+                    description: undefined,
+                    contentItems: undefined
+                };
             }
-        };
-
-        this.addParameters = function (params) {
-            for (var p in params) {
-                if (params.hasOwnProperty(p)) {
-                    this.addParameter(p, params[p]);
+            Map.exhibit = exhibit;
+            function contentItem(ci) {
+                return {
+                    Id: ci.guid || null,
+                    ParentExhibitId: ci.parent,
+                    Title: ci.contentItem ? ci.contentItem.title : ci.title,
+                    Caption: ci.contentItem ? ci.contentItem.description : ci.description,
+                    Uri: ci.contentItem ? ci.contentItem.uri : ci.uri,
+                    MediaType: ci.contentItem ? ci.contentItem.mediaType : ci.mediaType
+                };
+            }
+            Map.contentItem = contentItem;
+        })(Map || (Map = {}));
+        var _serviceUrl = CZ.Settings.serverUrlHost + "/chronozoom.svc/";
+        function Request(urlBase) {
+            var _url = urlBase;
+            var _hasParameters = false;
+            Object.defineProperty(this, "url", {
+                configurable: false,
+                get: function () {
+                    return _url;
                 }
-            }
-        };
-    };
-
-    $.extend(Service.Map, {
-        timeline: function (t) {
-            return {
-                id: t.guid,
-                parent: t.parent.guid,
-                start: t.x,
-                end: t.x + t.width,
-                title: t.title,
-                exhibits: undefined,
-                timelines: undefined
+            });
+            this.addToPath = function (item) {
+                if(item) {
+                    _url += _url.match(/\/$/) ? item : "/" + item;
+                }
             };
-        },
-
-        exhibit: function (e) {
-            return {
-                id: e.guid,
-                parent: e.parent.guid,
-                time: e.infodotDescription.date,
-                title: e.title,
-                description: undefined,
-                contentItems: e.contentItems
+            this.addParameter = function (name, value) {
+                if(value !== undefined && value !== null) {
+                    _url += _hasParameters ? "&" : "?";
+                    _url += name + "=" + value;
+                    _hasParameters = true;
+                }
             };
-        },
-
-        contentItem: function (ci) {
-            return {
-                id: ci.id,
-                parent: ci.parent.id,
-                title: ci.title,
-                description: ci.description,
-                uri: ci.uri,
-                mediaType: ci.mediaType
+            this.addParameters = function (params) {
+                for(var p in params) {
+                    if(params.hasOwnProperty(p)) {
+                        this.addParameter(p, params[p]);
+                    }
+                }
             };
         }
-    });
-
-    $.extend(Service, {
-        collectionName: "collection",
-
-        /**
-         * Information Retrieval.
-         */
-        
-        getCollections: function () {
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                dataType: "json",
-                url: serverUrlBase + "/api/collections"
-            });
-        },
-
-        getStructure: function (r) {
-            var request = new Service.Request(serverUrlBase + "/api/" + Service.collectionName + "/Structure");
-            request.addParameters(r);
-
+        Service.Request = Request;
+        ;
+        Service.collectionName = "sandbox";
+        Service.superCollectionName = "sandbox";
+        function get() {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("get");
+            request.addParameter("supercollection", CZ.Service.superCollectionName);
+            request.addParameter("collection", CZ.Service.collectionName);
             return $.ajax({
                 type: "GET",
                 cache: false,
                 dataType: "json",
                 url: request.url
             });
-        },
-
-        postData: function (r) {
+        }
+        Service.get = get;
+        function getTimelines(r) {
+            var request = new Request(_serviceUrl);
+            request.addToPath("gettimelines");
+            request.addParameter("supercollection", Service.superCollectionName);
+            request.addParameter("collection", Service.collectionName);
+            request.addParameters(r);
+            console.log("[GET] " + request.url);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getTimelines = getTimelines;
+        function getCollections() {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath("collections");
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getCollections = getCollections;
+        function getStructure(r) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("structure");
+            request.addParameters(r);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getStructure = getStructure;
+        function postData(r) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("data");
             return $.ajax({
                 type: "POST",
                 cache: false,
                 contentType: "application/json",
                 dataType: "json",
-                url: serverUrlBase + "/api/" + Service.collectionName + "/Data",
+                url: request.url,
                 data: JSON.stringify(r)
             });
-        },
-
-        /**
-         * Information Modification.
-         */
-
-        putCollection: function (c) {
+        }
+        Service.postData = postData;
+        function putCollection(c) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(c.name);
             return $.ajax({
                 type: "PUT",
                 cache: false,
                 contentType: "application/json",
                 dataType: "json",
-                url: serverUrlBase + "/api/" + c.name,
+                url: request.url,
                 data: JSON.stringify(c)
-            });
-        },
-
-        deleteCollection: function (c) {
-            return $.ajax({
-                type: "DELETE",
-                cache: false,
-                contentType: "application/json",
-                url: serverUrlBase + "/api/" + c.name,
-                data: JSON.stringify(c)
-            });
-        },
-
-        putTimeline: function (t) {
-            // NOTE: Consider three cases on the server side:
-            //       1. GUID === null => Generate GUID on the server side.
-            //       2. GUID !== null && isNew(GUID) => ...?
-            //       3. GUID !== null && !isNew(GUID) => Update timeline with this GUID.
-            return $.ajax({
-                type: "PUT",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: serverUrlBase + "/api/" + Service.collectionName + "/Timeline",
-                data: JSON.stringify(Service.Map.timeline(t))
-            });
-        },
-
-        // TODO: According to spec the only parameter should be an id.
-        deleteTimeline: function (t) {
-            return $.ajax({
-                type: "DELETE",
-                cache: false,
-                contentType: "application/json",
-                url: serverUrlBase + "/api/" + Service.collectionName + "/Timeline",
-                data: JSON.stringify({
-                    id: t.guid,
-                    parent: t.parent.guid
-                })
-            });
-        },
-
-        putExhibit: function (e) {
-            return $.ajax({
-                type: "PUT",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: serverUrlBase + "/api/" + Service.collectionName + "/Exhibit",
-                data: JSON.stringify(Service.Map.exhibit(e))
-            });
-        },
-
-        deleteExhibit: function (e) {
-            return $.ajax({
-                type: "DELETE",
-                cache: false,
-                contentType: "application/json",
-                url: serverUrlBase + "/api/" + Service.collectionName + "/Exhibit",
-                data: JSON.stringify({
-                    id: e.guid,
-                    parent: e.parent.guid
-                })
-            });
-        },
-
-        putContentItem: function (ci) {
-            return $.ajax({
-                type: "PUT",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: serverUrlBase + "/api/" + Service.collectionName + "/ContentItem",
-                data: JSON.stringify(Service.Map.contentItem(ci))
-            });
-        },
-
-        deleteContentItem: function (ci) {
-            return $.ajax({
-                type: "DELETE",
-                cache: false,
-                contentType: "application/json",
-                url: serverUrlBase + "/api/" + Service.collectionName + "/ContentItem",
-                data: JSON.stringify({
-                    id: ci.id,
-                    parent: ci.parent
-                })
             });
         }
-    });
-
-    return CZ;
-})(CZ || {}, jQuery);
+        Service.putCollection = putCollection;
+        function deleteCollection(c) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(c.name);
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                data: JSON.stringify(c)
+            });
+        }
+        Service.deleteCollection = deleteCollection;
+        function putTimeline(t) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("timeline");
+            console.log("[PUT] " + request.url);
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(Map.timeline(t))
+            });
+        }
+        Service.putTimeline = putTimeline;
+        function deleteTimeline(t) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("timeline");
+            console.log("[DELETE] " + request.url);
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                data: JSON.stringify(Map.timeline(t))
+            });
+        }
+        Service.deleteTimeline = deleteTimeline;
+        function putExhibit(e) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("exhibit");
+            console.log("[PUT] " + request.url);
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(Map.exhibit(e))
+            });
+        }
+        Service.putExhibit = putExhibit;
+        function deleteExhibit(e) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("exhibit");
+            console.log("[DELETE] " + request.url);
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                data: JSON.stringify(Map.exhibit(e))
+            });
+        }
+        Service.deleteExhibit = deleteExhibit;
+        function putContentItem(ci) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("contentitem");
+            console.log("[PUT] " + request.url);
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(Map.contentItem(ci))
+            });
+        }
+        Service.putContentItem = putContentItem;
+        function deleteContentItem(ci) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("contentitem");
+            console.log("[DELETE] " + request.url);
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                data: JSON.stringify(Map.contentItem(ci))
+            });
+        }
+        Service.deleteContentItem = deleteContentItem;
+        function putExhibitContent(e, oldContentItems) {
+            var newGuids = e.contentItems.map(function (ci) {
+                return ci.guid;
+            });
+            var promises = e.contentItems.map(function (ci) {
+                return putContentItem(ci);
+            }).concat(oldContentItems.filter(function (ci) {
+                return (newGuids.indexOf(ci.guid) === -1);
+            }).map(function (ci) {
+                return deleteContentItem(ci);
+            }));
+            return $.when.apply($, promises);
+        }
+        Service.putExhibitContent = putExhibitContent;
+    })(CZ.Service || (CZ.Service = {}));
+    var Service = CZ.Service;
+})(CZ || (CZ = {}));

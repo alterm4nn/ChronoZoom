@@ -37,6 +37,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Chronozoom.Entities">
+      <HintPath>..\..\..\Source\Chronozoom.Entities\bin\Chronozoom.Entities.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\CommonServiceLocator.1.0\lib\NET35\Microsoft.Practices.ServiceLocation.dll</HintPath>
@@ -51,18 +54,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AuthorizationTests.cs" />
+    <Compile Include="ExhibitsTests.cs" />
+    <Compile Include="FooterTests.cs" />
     <Compile Include="PhanerozoicAgeTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestBase.cs" />
+    <Compile Include="TimelineTests.cs" />
     <Compile Include="TimescaleTests.cs" />
     <Compile Include="TourTests.cs" />
+    <Compile Include="WelcomeScreenTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="config.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="External_configs\config.xml" />
+    <Content Include="External_configs\config.xml">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Application.Driver\Application.Driver.csproj">

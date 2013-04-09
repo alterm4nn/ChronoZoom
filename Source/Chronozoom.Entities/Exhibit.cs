@@ -18,10 +18,10 @@ namespace Chronozoom.Entities
     public class Exhibit
     {
         [Key]
-        [DataMember(Name="ID")]
+        [DataMember(Name="id")]
         public Guid Id { get; set; }
 
-        [DataMember]
+        [DataMember(Name = "title")]
         public string Title { get; set; }
 
         [DataMember]
@@ -45,20 +45,24 @@ namespace Chronozoom.Entities
         [DataMember]
         public decimal Year { get; set; }
 
+        [NotMapped]
+        [DataMember(Name = "time")]
+        public decimal Time { get; set; }
+
         [DataMember(Name="UniqueID")]
         public int UniqueId { get; set; }
 
         [DataMember]
         public int? Sequence { get; set; }
 
-        [DataMember]
+        [DataMember(Name = "contentItems")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification="Object property needs to be initialized externally")]
         public virtual Collection<ContentItem> ContentItems { get; set; }
 
-        [DataMember]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification="Object property needs to be initialized externally")]
         public virtual Collection<Reference> References { get; set; }
 
+        [DataMember(Name = "collection")]
         public virtual Entities.Collection Collection { get; set; }
     }
 
