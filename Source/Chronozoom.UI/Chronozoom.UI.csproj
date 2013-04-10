@@ -170,9 +170,6 @@
     </Content>
     <Content Include="NewScripts\cz.settings.ts" />
     <TypeScriptCompile Include="NewScripts\cz.ts" />
-    <Content Include="NewScripts\czservice.min.js">
-      <DependentUpon>czservice.ts</DependentUpon>
-    </Content>
     <Content Include="NewScripts\czservice.ts" />
     <Content Include="NewScripts\external\flash_detect.js" />
     <Content Include="NewScripts\external\jquery-1.7.2.min.js" />
@@ -186,9 +183,6 @@
     <Content Include="NewScripts\external\seadragon-min.js" />
     <Content Include="NewScripts\gestures.ts" />
     <Content Include="NewScripts\layout.ts" />
-    <Content Include="NewScripts\regimesIE.min.js">
-      <DependentUpon>regimesIE.ts</DependentUpon>
-    </Content>
     <Content Include="NewScripts\regimesIE.ts" />
     <Content Include="NewScripts\search.ts" />
     <Content Include="NewScripts\timescale.ts" />

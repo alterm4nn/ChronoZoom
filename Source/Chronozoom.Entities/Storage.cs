@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Configuration;
 using System.Data.Common;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
@@ -27,6 +28,15 @@ namespace Chronozoom.Entities
     /// </summary>
     public class Storage : DbContext
     {
+        // Enables RI-Tree queries.
+        private static Lazy<bool> _useRiTreeQuery = new Lazy<bool>(() =>
+        {
+            string useRiTreeQuery = ConfigurationManager.AppSettings["UseRiTreeQuery"];
+
+            return string.IsNullOrEmpty(useRiTreeQuery) ? false : bool.Parse(useRiTreeQuery);
+        });
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
         static Storage()
         {
             Trace = new TraceSource("Storage", SourceLevels.All);
@@ -61,26 +71,42 @@ namespace Chronozoom.Entities
         public Collection<Timeline> TimelinesQuery(Guid collectionId, decimal startTime, decimal endTime, decimal span, Guid? commonAncestor, int maxElements)
         {
             Dictionary<Guid, Timeline> timelinesMap = new Dictionary<Guid, Timeline>();
-            List<Timeline> timelines = FillTimelines(collectionId, timelinesMap, startTime, endTime, span, commonAncestor, maxElements);
+
+            List<Timeline> timelines = null;
+            if (_useRiTreeQuery.Value)
+            {
+                Trace.TraceInformation("Using RI-Tree Query");
+                timelines = FillTimelinesRiTreeQuery(collectionId, timelinesMap, startTime, endTime, span, commonAncestor, maxElements);
+            }
+            else
+            {
+                timelines = FillTimelinesRangeQuery(collectionId, timelinesMap, startTime, endTime, span, commonAncestor, maxElements);
+            }
 
             FillTimelineRelations(timelinesMap);
 
             return new Collection<Timeline>(timelines);
         }
 
-        public static long ForkNode(long FromYear, long ToYear)
+        public static long ForkNode(long fromYear, long toYear)
         {
-            long start = FromYear + 13700000001;  //note: this value must be a positive integer (sign bit must be 0)
-            long end = ToYear + 13700000001;  //note: this value must be a positive integer (sign bit must be 0)
-            long node = ((start - 1) ^ end) >> 1;
-            node = node | node >> 1;
-            node = node | node >> 2;
-            node = node | node >> 4;
-            node = node | node >> 8;
-            node = node | node >> 16;
-            node = node | node >> 32;
-            node = end & ~node;
-            return node;
+            checked
+            {
+                // Start/End values must be a positive integer (sign bit must be 0)
+                const long limit = 13700000001;
+                long start = fromYear + limit;
+                long end = toYear + limit;
+
+                long node = ((start - 1) ^ end) >> 1;
+                node = node | node >> 1;
+                node = node | node >> 2;
+                node = node | node >> 4;
+                node = node | node >> 8;
+                node = node | node >> 16;
+                node = node | node >> 32;
+                node = end & ~node;
+                return node;
+            }
         }
 
         private void FillTimelineRelations(Dictionary<Guid, Timeline> timelinesMap)
@@ -142,27 +168,41 @@ namespace Chronozoom.Entities
             }
         }
 
-        private List<Timeline> FillTimelines(Guid collectionId, Dictionary<Guid, Timeline> timelinesMap, decimal startTime, decimal endTime, decimal span, Guid? commonAncestor, int maxElements)
+        /// <summary>
+        /// Keeping this commented until RI-Tree performance is validated.
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+        private List<Timeline> FillTimelinesRangeQuery(Guid collectionId, Dictionary<Guid, Timeline> timelinesMap, decimal startTime, decimal endTime, decimal span, Guid? commonAncestor, int maxElements)
         {
-            List<Timeline> timelines = new List<Timeline>();
-            Dictionary<Guid, Guid?> timelinesParents = new Dictionary<Guid, Guid?>();
+            string timelinesQuery = "SELECT TOP({0}) *, FromYear as [Start], ToYear as [End] FROM Timelines WHERE FromYear >= {1} AND ToYear <= {2} AND ToYear-FromYear >= {3} AND Collection_Id = {4} OR Id = {5} ORDER BY ToYear-FromYear DESC";
 
-            // Populate References
-            
-            //string timelinesQuery = "SELECT TOP({0}) *, FromYear as [Start], ToYear as [End] FROM Timelines WHERE FromYear >= {1} AND ToYear <= {2} AND ToYear-FromYear >= {3} AND Collection_Id = {4} OR Id = {5} ORDER BY ToYear-FromYear DESC";
+            return FillTimelinesFromFlatList(
+                Database.SqlQuery<TimelineRaw>(timelinesQuery, maxElements, startTime, endTime, span, collectionId, commonAncestor),
+                timelinesMap,
+                commonAncestor);
+        }
 
-            /* note: there are 4 cases of a given timeline intersecting the current canvas: [<]>, <[>], [<>], and <[]> (<> denotes the timeline, and [] denotes the canvas) */
+        /// <summary>
+        /// TODO (Yitao):
+        ///     1) Investigate performance from FillTimelinesRiTreeQuery vs FillTimelinesRangeQuery.
+        ///     2) Based on performance results, we will consider splitting queries into RI-Queries/Simple-Queries
+        ///     3) Add references to understanding RI-Trees here.
+        ///     4) Send code review and approve.
+        /// </summary>
+        private List<Timeline> FillTimelinesRiTreeQuery(Guid collectionId, Dictionary<Guid, Timeline> timelinesMap, decimal startTime, decimal endTime, decimal span, Guid? commonAncestor, int maxElements)
+        {
+            /* There are 4 cases of a given timeline intersecting the current canvas: [<]>, <[>], [<>], and <[]> (<> denotes the timeline, and [] denotes the canvas) */
 
             string timelinesQuery = @"
             SELECT TOP({0}) * FROM (
                 SELECT DISTINCT [Timelines].*, [Timelines].[FromYear] as [Start], [Timelines].[ToYear] as [End], [Timelines].[ToYear] - [Timelines].[FromYear] AS [TimeSpan] FROM [Timelines] JOIN
 	            (
-                    SELECT ([b1] & {1}) AS [node] FROM [Bitmasks] WHERE ({1} & [b2]) <> 0
+                    SELECT ([B1] & {1}) AS [node] FROM [Bitmasks] WHERE ({1} & [B2]) <> 0
 	            ) AS [left_nodes] ON [Timelines].[ForkNode] = [left_nodes].[node] AND [Timelines].[ToYear] >= {1} AND [Timelines].[ToYear] - [Timelines].[FromYear] >= {3} AND [Timelines].[Collection_Id] = {4} OR [Timelines].[Id] = {5}
                 UNION ALL
 	            SELECT DISTINCT [Timelines].*, [Timelines].[FromYear] as [Start], [Timelines].[ToYear] as [End], [Timelines].[ToYear] - [Timelines].[FromYear] AS [TimeSpan] FROM [Timelines] JOIN
 	            (
-                    SELECT (([b1] & {2}) | [b3]) AS [node] FROM [bitmasks] WHERE ({2} & [b3]) = 0
+                    SELECT (([B1] & {2}) | [B3]) AS [node] FROM [Bitmasks] WHERE ({2} & [B3]) = 0
 	            )
 	            AS [right_nodes] ON [Timelines].[ForkNode] = [right_nodes].[node] AND [Timelines].[FromYear] <= {2} AND [Timelines].[ToYear] - [Timelines].[FromYear] >= {3} AND [Timelines].[Collection_Id] = {4} OR [Timelines].[Id] = {5}
                 UNION ALL
@@ -171,7 +211,16 @@ namespace Chronozoom.Entities
             AS [CanvasTimelines] ORDER BY [CanvasTimelines].[TimeSpan] DESC 
             ";
 
-            var timelinesRaw = Database.SqlQuery<TimelineRaw>(timelinesQuery, maxElements, startTime, endTime, span, collectionId, commonAncestor);
+            return FillTimelinesFromFlatList(
+                Database.SqlQuery<TimelineRaw>(timelinesQuery, maxElements, startTime, endTime, span, collectionId, commonAncestor),
+                timelinesMap,
+                commonAncestor);
+        }
+
+        private static List<Timeline> FillTimelinesFromFlatList(IEnumerable<TimelineRaw> timelinesRaw, Dictionary<Guid, Timeline> timelinesMap, Guid? commonAncestor)
+        {
+            List<Timeline> timelines = new List<Timeline>();
+            Dictionary<Guid, Guid?> timelinesParents = new Dictionary<Guid, Guid?>();
 
             foreach (TimelineRaw timelineRaw in timelinesRaw)
             {
