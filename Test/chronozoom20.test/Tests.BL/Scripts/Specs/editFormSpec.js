@@ -4,6 +4,7 @@
 /// <reference path="../Utils/jquery-ui.js" />
 /// <reference path="../Js/cz.settings.js" />
 /// <reference path="../Js/settings.js" />
+/// <reference path="../Js/vccontent.js" />
 /// <reference path="../Js/authoring.ui.js" />
 /// <reference path="../Js/newauthoring.js" />
 /// <reference path="../Js/czservice.js"/>
@@ -19,11 +20,11 @@ describe("Given:  'edit timeline' form is opened: ", function () {
     parentTimeline.x = -10;
     parentTimeline.y = 0;
     parentTimeline.children = [];
-    var newTimeline = { y: 1, height: 2, x: -8, width: 1, parent: parentTimeline, title: "dddd", type: "timeline", children: [] };
+   
 
     beforeEach(function () {
         authoring = CZ.Authoring;
-
+        var newTimeline = { y: 1, height: 2, x: -8, width: 1, parent: parentTimeline, title: "dddd", type: "timeline", children: [] };
         $('body').prepend('<div id="createTimelineForm">');
         $('body').prepend('<span id="TimelineErrorSpan" style="color:red; display:none">Input error</span>');
         $('body').prepend('<span id="timelineStartInput"</span>');
@@ -81,25 +82,36 @@ describe("Given:  'edit timeline' form is opened: ", function () {
     //    });
     //});
 
+    //"data = ['timeline title', 'start value', 'end value', 'description']"
     dataTitle = ["", "5", "10", "empty 'title'"];
     dataStart = ["titlename", "", "5", "empty 'start'"];
     dataEnd = ["title", "45", "", "empty 'end'"];
+    dataStartNotNumber = ["title", "45", "abc", "'end' is not number"];
+    dataNotNumber = ["title", "!@#", "789", "'start' is not number"];
+    dataEndLessStart = ["title", "5", "2", "start is less than end"];
 
-    using("Data set: ", [dataTitle, dataStart, dataEnd], function (title, start, end, conditional) {
+    using("Data set: ", [dataEndLessStart,dataTitle, dataStart, dataEnd, dataStartNotNumber, dataNotNumber], function (title, start, end, conditional) {
 
         beforeEach(function () {
-            $('#timelineTitleInput').val(title);
-            $('#timelineStartInput').val(start);
-            $('#timelineEndInput').val(end);
+           
         });
 
         describe("When: User set: " + conditional + " and save changes", function () {
             beforeEach(function () {
+                $('#timelineTitleInput').val(title);
+                $('#timelineStartInput').val(start);
+                $('#timelineEndInput').val(end);
+                
                 $('.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only:first').click();
             });
             it("Then: Error message should be thrown.", function () {
+                
                 expect('block').toEqual($('#TimelineErrorSpan').css('display'));
             });
+        });
+        
+        afterEach(function () {
+            $('.ui-button-icon-primary.ui-icon.ui-icon-closethick').click();
         });
     });
 });
