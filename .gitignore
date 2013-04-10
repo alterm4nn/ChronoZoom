@@ -67,3 +67,7 @@ packages/
 *.testsettings
 *_Chutzpah*
 *UsersInfo.settings
+*Test/chronozoom20.test/Tests.BL/Scripts/Js/*
+*Test/chronozoom20.test/Tests.BL/Scripts/Utils/*
+*Test/chronozoom20.test/Tests.Unit/Scripts/Js/*
+*Test/chronozoom20.test/Tests.Unit/Scripts/Utils/*

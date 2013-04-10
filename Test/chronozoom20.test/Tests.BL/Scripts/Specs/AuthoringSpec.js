@@ -8,6 +8,7 @@
 /// <reference path="../Js/settings.js" />
 /// <reference path="../Js/newauthoring.js" />
 /// <reference path="../Js/czservice.js" />
+/// <reference path="../Js/js-ignore.js" />
 
 describe("CZ.Authoring", function () {
     var authoring;
@@ -21,7 +22,6 @@ describe("CZ.Authoring", function () {
     parentTimeline.x = -10;
     parentTimeline.y = 0;
     parentTimeline.children = [];
-    alert = function () { };
     beforeEach(function () {
         var editmode = true;
         authoring = CZ.Authoring;
