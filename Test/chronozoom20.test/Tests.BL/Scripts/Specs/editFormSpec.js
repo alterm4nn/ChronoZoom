@@ -9,39 +9,109 @@
 /// <reference path="../Js/czservice.js"/>
 /// <reference path="../Js/js-ignore.js"/>
 
-    describe("CZ.Authoring", function () {
-        var existedTimeline;
-        var parentTimeline = {};
-        parentTimeline.guid = "00000000-0000-0000-0000-000000000000";
-        parentTimeline.id = "t55";
-        parentTimeline.height = 10;
-        parentTimeline.width = 10;
-        parentTimeline.x = -10;
-        parentTimeline.y = 0;
-        parentTimeline.children = [];
+describe("Given:  'edit timeline' form is opened: ", function () {
+    var existedTimeline;
+    var parentTimeline = {};
+    parentTimeline.guid = "00000000-0000-0000-0000-000000000000";
+    parentTimeline.id = "t55";
+    parentTimeline.height = 10;
+    parentTimeline.width = 10;
+    parentTimeline.x = -10;
+    parentTimeline.y = 0;
+    parentTimeline.children = [];
+    var newTimeline = { y: 1, height: 2, x: -8, width: 1, parent: parentTimeline, title: "dddd", type: "timeline", children: [] };
+
+    beforeEach(function () {
+        authoring = CZ.Authoring;
+
+        $('body').prepend('<div id="createTimelineForm">');
+        $('body').prepend('<span id="TimelineErrorSpan" style="color:red; display:none">Input error</span>');
+        $('body').prepend('<span id="timelineStartInput"</span>');
+        $('body').prepend('<span id="timelineEndInput"</span>');
+        $('body').prepend('<span id="timelineTitleInput"</span>');
+        authoring.UI.showEditTimelineForm(newTimeline);
+    });
+    afterEach(function () {
+        $('.ui-button-icon-primary.ui-icon.ui-icon-closethick').click();
+    });
+
+    //describe("When: User set empty value to title", function () {
+    //    beforeEach(function () {
+    //        $('#timelineStartInput').val("456");
+    //        $('#timelineEndInput').val("123");
+    //        $('#timelineTitleInput').val("");
+    //    });
+    //    describe("And: save changes", function () {
+    //        beforeEach(function () {
+    //            $('.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only:first').click();
+    //        });
+    //        it("Then: Error message should be thrown", function () {
+    //            expect('block').toEqual($('#TimelineErrorSpan').css('display'));
+    //        });
+    //    });
+    //});
+    //describe("When: User set empty value to 'start'", function () {
+    //    beforeEach(function () {
+    //        $('#timelineStartInput').val("");
+    //        $('#timelineEndInput').val("123");
+    //        $('#timelineTitleInput').val("timelinename");
+    //    });
+    //    describe("And: save changes", function () {
+    //        beforeEach(function () {
+    //            $('.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only:first').click();
+    //        });
+    //        it("Then: Error message should be thrown", function () {
+    //            expect('block').toEqual($('#TimelineErrorSpan').css('display'));
+    //        });
+    //    });
+    //});
+    //describe("When: User set empty value to 'end'", function () {
+    //    beforeEach(function () {
+    //        $('#timelineStartInput').val("456");
+    //        $('#timelineEndInput').val("");
+    //        $('#timelineTitleInput').val("timelinename");
+    //    });
+    //    describe("And: save changes", function () {
+    //        beforeEach(function () {
+    //            $('.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only:first').click();
+    //        });
+    //        it("Then: Error message should be thrown", function () {
+    //            expect('block').toEqual($('#TimelineErrorSpan').css('display'));
+    //        });
+    //    });
+    //});
+
+    dataTitle = ["", "5", "10", "empty 'title'"];
+    dataStart = ["titlename", "", "5", "empty 'start'"];
+    dataEnd = ["title", "45", "", "empty 'end'"];
+
+    using("Data set: ", [dataTitle, dataStart, dataEnd], function (title, start, end, conditional) {
 
         beforeEach(function () {
-            authoring = CZ.Authoring;
-            existedTimeline = { y: 5, height: 2, x: -5, width: 3, parent: parentTimeline, title: "Timeline Title", type: "timeline", children: [] };
-            var newTimeline = { y: 1, height: 2, x: -8, width: 1, parent: parentTimeline, title: "dddd", type: "timeline", children: [] };
-            parentTimeline.children = [existedTimeline];
-            $('body').prepend('<div id="createTimelineForm">');
-            $('body').prepend('<span id="TimelineErrorSpan" style="color:red; display:none">Input error</span>');
-            $('body').prepend('<span id="timelineStartInput"</span>');
-            $('body').prepend('<span id="timelineEndInput"</span>');
-            $('body').prepend('<span id="timelineTitleInput"</span>');
-            authoring.UI.showEditTimelineForm(newTimeline);
+            $('#timelineTitleInput').val(title);
+            $('#timelineStartInput').val(start);
+            $('#timelineEndInput').val(end);
         });
 
-        afterEach(function () {
-            $('.ui-button-icon-primary.ui-icon.ui-icon-closethick:first').click();
-        });
-
-        it("1", function () {
-            $('#timelineStartInput').val("eee");
-            $('#timelineEndInput').val("123");
-            $('#timelineTitleInput').val("ddd");
-            $('.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only:first').click();            
-            expect('block').toEqual($('#TimelineErrorSpan').css('display'));
+        describe("When: User set: " + conditional + " and save changes", function () {
+            beforeEach(function () {
+                $('.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only:first').click();
+            });
+            it("Then: Error message should be thrown.", function () {
+                expect('block').toEqual($('#TimelineErrorSpan').css('display'));
+            });
         });
     });
+});
+
+
+
+function using(name, values, func) {
+    for (var i = 0, count = values.length; i < count; i++) {
+        if (Object.prototype.toString.call(values[i]) !== '[object Array]') {
+            values[i] = [values[i]];
+        }
+        func.apply(this, [values[i][0], values[i][1], values[i][2], values[i][3]]);
+        jasmine.currentEnv_.currentSpec.description += ' ' + name + '[' + "title: " + values[i][0] + ", start: " + values[i][1] + ", end: " + values[i][2] + " , description: " + values[i][3].concat(']');
+    }
+}
