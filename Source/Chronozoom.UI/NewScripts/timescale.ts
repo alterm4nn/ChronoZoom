@@ -1,4 +1,8 @@
-﻿module CZ {
+﻿/// <reference path='cz.settings.ts'/>
+/// <reference path='common.ts'/>
+
+
+module CZ {
 
     export function Timescale(container) {
         /**
@@ -66,7 +70,7 @@
         var markerText = $("<p id='marker-text'></p>");
         var leftDatePanel = $("<div class='cz-timescale-panel cz-timescale-left'></div>");
         var leftDate = $("<p id='timescale_left_border'></p>");
-        var rightDatePanel = $("<div clas='cz-timescale-panel cz-timescale-left'></div>");
+        var rightDatePanel = $("<div class='cz-timescale-panel cz-timescale-right'></div>");
         var rightDate = $("<p id='timescale_right_border'></p>");
 
         // TODO: Consider to rename.
@@ -148,6 +152,7 @@
             leftDatePanel.addClass("cz-timescale-left");
             leftDatePanel.addClass("cz-timescale-panel");
             marker.addClass("cz-timescale-marker");
+            labelsDiv.addClass("cz-timescale-labels-container");
 
             marker[0].appendChild(markerText[0]);
             leftDatePanel[0].appendChild(leftDate[0]);
@@ -556,7 +561,7 @@
             var k = (_range.max - _range.min) / _width;
             var point = (time - _range.max) / k + _width;
             this.markerPosition = point;
-            $('#timescale_marker').css("left", point - 80);
+            $('#timescale_marker').css("left", point - 47);
             var text = _tickSources[_mode].getMarkerLabel(_range, time);
             document.getElementById('marker-text').innerHTML = text;
         }
