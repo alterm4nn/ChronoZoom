@@ -1,4 +1,5 @@
-﻿using Application.Helper.Entities;
+﻿using System;
+using Application.Helper.Entities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.ObjectModel;
 
@@ -9,6 +10,20 @@ namespace Tests
     {
         #region Initialize and Cleanup
         public TestContext TestContext { get; set; }
+
+        readonly static ContentItem ContentItem = new ContentItem
+        {
+            Title = "contentItem",
+            Caption = "This is a test item",
+            MediaSource = "https://www.youtube.com/watch?v=eVpXkyN0zOE",
+            MediaType = "Video"
+        };
+
+        readonly Exhibit _exhibit = new Exhibit
+        {
+            Title = "WebdriverExhibitWithContent",
+            ContentItems = new Collection<Chronozoom.Entities.ContentItem> { ContentItem }
+        };
 
         [ClassInitialize]
         public static void ClassInitialize(TestContext testContext)
@@ -33,7 +48,15 @@ namespace Tests
         [TestCleanup]
         public void TestCleanup()
         {
-            CreateScreenshotsIfTestFail(TestContext);
+            try
+            {
+                ExhibitHelper.DeleteExhibit(_exhibit);
+            }
+            finally
+            {
+                CreateScreenshotsIfTestFail(TestContext);
+            }
+            
         }
 
         #endregion
@@ -41,29 +64,18 @@ namespace Tests
         [TestMethod]
         public void Create_exibit_with_one_content_item()
         {
-            ContentItem contentItem = new ContentItem()
-                {
-                    Title = "contentItem",
-                    Caption = "This is a test item",
-                    MediaSource = "https://www.youtube.com/watch?v=eVpXkyN0zOE",
-                    MediaType = "Video"
-                };
-            Exhibit exhibit = new Exhibit()
-                {
-                    Title = "ExhibitWithContent",
-                    ContentItems = new Collection<Chronozoom.Entities.ContentItem> { contentItem }
-                };
-            ExhibitHelper.AddExhibitWithContentItem(exhibit);
+           
+            ExhibitHelper.AddExhibitWithContentItem(_exhibit);
             Exhibit newExhibit = ExhibitHelper.GetNewExhibit();
-            Assert.AreEqual(exhibit.Title,newExhibit.Title, "Titles are not equal");
-            Assert.AreEqual(exhibit.ContentItems.Count, newExhibit.ContentItems.Count, "Content items count are not equal");
+            Assert.AreEqual(_exhibit.Title,newExhibit.Title, "Titles are not equal");
+            Assert.AreEqual(_exhibit.ContentItems.Count, newExhibit.ContentItems.Count, "Content items count are not equal");
             Assert.IsNotNull(newExhibit.Id);
-            for (int i = 0; i < exhibit.ContentItems.Count; i++)
+            for (int i = 0; i < _exhibit.ContentItems.Count; i++)
             {
-                Assert.AreEqual(exhibit.ContentItems[i].Title, newExhibit.ContentItems[i].Title, "Content items titles are not equal");
-                Assert.AreEqual(exhibit.ContentItems[i].Caption, newExhibit.ContentItems[i].Caption, "Content items descriptions are not equal");
-                Assert.AreEqual(exhibit.ContentItems[i].MediaSource, newExhibit.ContentItems[i].MediaSource, "Content items mediaSourses are not equal");
-                Assert.AreEqual(exhibit.ContentItems[i].MediaType, newExhibit.ContentItems[i].MediaType, "Content items mediaTypes are not equal");
+                Assert.AreEqual(_exhibit.ContentItems[i].Title, newExhibit.ContentItems[i].Title, "Content items titles are not equal");
+                Assert.AreEqual(_exhibit.ContentItems[i].Caption, newExhibit.ContentItems[i].Caption, "Content items descriptions are not equal");
+                Assert.AreEqual(_exhibit.ContentItems[i].MediaSource, newExhibit.ContentItems[i].MediaSource, "Content items mediaSourses are not equal");
+                Assert.AreEqual(_exhibit.ContentItems[i].MediaType, newExhibit.ContentItems[i].MediaType, "Content items mediaTypes are not equal");
             }
         }
     }

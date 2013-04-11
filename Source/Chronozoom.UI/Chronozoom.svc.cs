@@ -344,7 +344,9 @@ namespace UI
         /// authenticated user is set as the author if no author is already registered.
         ///
         /// If the collection exists and the authenticated user is its author then
-        /// the title of the existing collection is modified.
+        /// the collection is modified.
+        /// 
+        /// The title field can't be modified since it's part of the URL and the URL is indexable by 3rd parties.
         /// </summary>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
@@ -378,8 +380,7 @@ namespace UI
                             return Guid.Empty;
                         }
 
-                        collection.Title = collectionRequest.Title;
-                        returnValue = collection.Id;
+                        // Modify collection fields. However, title can't be modified since it would change the URL and break indexing.
                     }
                     _storage.SaveChanges();
                     return returnValue;

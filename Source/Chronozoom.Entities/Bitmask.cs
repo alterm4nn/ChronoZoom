@@ -10,13 +10,13 @@ namespace Chronozoom.Entities
     {
         [Key]
         [DataMember]
-        public long b1 { get; set; }
+        public long B1 { get; set; }
 
         [DataMember]
-        public long b2 { get; set; }
+        public long B2 { get; set; }
 
         [DataMember]
-        public long b3 { get; set; }
+        public long B3 { get; set; }
 
     }
 
