@@ -17,7 +17,7 @@ How run UI tests on local machine
     2. Build project Chronozoom.Entities
     3. Open solution ChronoZoom.Testing.sln
     4. Build the solution  (All requirement packages will be installed)
-    5. Setup config (
+    5. Setup config "Test.UI/config.xml" (
         a. Set BaseUrl(http://test.chronozoomproject.org) 
         b. BrowserName("chrome", "firefox" or "internet explorer")
     6. Add rules for chromedriver and iedriver in Windows Firewall
