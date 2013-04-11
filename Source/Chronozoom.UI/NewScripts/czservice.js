@@ -5,34 +5,34 @@ var CZ;
         (function (Map) {
             function timeline(t) {
                 return {
-                    Id: t.guid,
+                    id: t.guid,
                     ParentTimelineId: t.parent.guid,
                     FromYear: t.x,
                     ToYear: t.x + t.width,
-                    Title: t.title,
+                    title: t.title,
                     Regime: t.regime
                 };
             }
             Map.timeline = timeline;
             function exhibit(e) {
                 return {
-                    Id: e.guid || null,
+                    id: e.guid,
                     ParentTimelineId: e.parent.guid,
                     Year: e.infodotDescription.date,
-                    Title: e.title,
+                    title: e.title,
                     description: undefined,
-                    contentItems: undefined
+                    contentItems: e.contentItems
                 };
             }
             Map.exhibit = exhibit;
             function contentItem(ci) {
                 return {
-                    Id: ci.guid || null,
+                    id: ci.guid,
                     ParentExhibitId: ci.parent,
-                    Title: ci.contentItem ? ci.contentItem.title : ci.title,
-                    Caption: ci.contentItem ? ci.contentItem.description : ci.description,
-                    Uri: ci.contentItem ? ci.contentItem.uri : ci.uri,
-                    MediaType: ci.contentItem ? ci.contentItem.mediaType : ci.mediaType
+                    title: ci.contentItem ? ci.contentItem.title : ci.title,
+                    description: ci.contentItem ? ci.contentItem.description : ci.description,
+                    uri: ci.contentItem ? ci.contentItem.uri : ci.uri,
+                    mediaType: ci.contentItem ? ci.contentItem.mediaType : ci.mediaType
                 };
             }
             Map.contentItem = contentItem;
@@ -260,20 +260,18 @@ var CZ;
             });
         }
         Service.deleteContentItem = deleteContentItem;
-        function putExhibitContent(e, oldContentItems) {
+        function deleteExhibitContent(e, oldContentItems) {
             var newGuids = e.contentItems.map(function (ci) {
                 return ci.guid;
             });
-            var promises = e.contentItems.map(function (ci) {
-                return putContentItem(ci);
-            }).concat(oldContentItems.filter(function (ci) {
-                return (newGuids.indexOf(ci.guid) === -1);
+            var promises = oldContentItems.filter(function (ci) {
+                return (ci.guid && newGuids.indexOf(ci.guid) === -1);
             }).map(function (ci) {
                 return deleteContentItem(ci);
-            }));
+            });
             return $.when.apply($, promises);
         }
-        Service.putExhibitContent = putExhibitContent;
+        Service.deleteExhibitContent = deleteExhibitContent;
     })(CZ.Service || (CZ.Service = {}));
     var Service = CZ.Service;
 })(CZ || (CZ = {}));

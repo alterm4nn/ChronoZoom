@@ -356,7 +356,7 @@ namespace UI
                 {
                     Trace.TraceInformation("Put Collection {0} from user {1} in supercollection {2}", collectionName, user, superCollectionName);
 
-                    Guid returnValue;
+                    Guid returnValue = Guid.Empty;
 
                     if (collectionRequest == null)
                     {
