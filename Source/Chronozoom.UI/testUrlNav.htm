@@ -263,7 +263,7 @@
             });
 
             // Reacting on the event when one of the infodot exploration causes inner zoom constraint
-            vc.bind("innerZoomConstraintChenged", function (constraint) {
+            vc.bind("innerZoomConstraintChanged", function (constraint) {
                 controller.effectiveExplorationZoomConstraint = constraint.zoomValue; // applying the constraint
                 ax.axis("allowMarkerMovesOnHover", !constraint.zoomValue);
             });

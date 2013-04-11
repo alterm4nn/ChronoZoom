@@ -1,6 +1,6 @@
-﻿var CZ = (function (CZ, $, document) {
+﻿module CZ {
 
-    CZ.Timescale = function (container) {
+    export function Timescale(container) {
         /**
          * Input parameter must be jQuery object, DIV element or ID. Convert it to jQuery object.
          */
@@ -48,6 +48,8 @@
         var _deltaRange;
         // TODO: Consider to remove or replace.
         var _size;
+        var _width;
+        var _height;
         var _canvasHeight;
 
         var _tickSources = {
@@ -56,7 +58,6 @@
             "date": new CZ.DateTickSource()
         };
 
-        var that = this;
         var isHorizontal = (_position === "bottom" || _position === "top");
         var canvas = $("<canvas></canvas>");
         var labelsDiv = $("<div></div>");
@@ -156,20 +157,20 @@
             _container[0].appendChild(marker[0]);
             _container[0].appendChild(leftDatePanel[0]);
             _container[0].appendChild(rightDatePanel[0]);
-            canvas[0].height = canvasSize;
+            (<any>canvas[0]).height = canvasSize;
 
             // TODO: #99-121, refine it.
             text_size = -1;
             strokeStyle = _container ? _container.css("color") : "Black";
-            ctx = canvas[0].getContext("2d");
+            ctx = (<any>canvas[0]).getContext("2d");
             fontSize = 45;
             if (_container.currentStyle) {
                 fontSize = _container.currentStyle["font-size"];
                 ctx.font = fontSize + _container.currentStyle["font-family"];
             }
-            else if (document.defaultView && document.defaultView.getComputedStyle) {
-                fontSize = document.defaultView.getComputedStyle(_container[0], null).getPropertyValue("font-size");
-                ctx.font = fontSize + document.defaultView.getComputedStyle(_container[0], null).getPropertyValue("font-family");
+            else if (document.defaultView && (<any>document.defaultView).getComputedStyle) {
+                fontSize = (<any>document.defaultView).getComputedStyle(_container[0], null).getPropertyValue("font-size");
+                ctx.font = fontSize + (<any>document.defaultView).getComputedStyle(_container[0], null).getPropertyValue("font-family");
             }
             else if (_container.style) {
                 fontSize = _container.style["font-size"];
@@ -189,19 +190,19 @@
             if (isHorizontal) {
                 _size = _width;
                 if (_size != prevSize) {
-                    canvas[0].width = _size;
+                    (<any>canvas[0]).width = _size;
                     labelsDiv.css("width", _size);
                 }
             }
             else {
                 _size = _height;
                 if (_size != prevSize) {
-                    canvas[0].height = _size;
+                    (<any>canvas[0]).height = _size;
                     labelsDiv.css("height", _size);
                 }
             }
             _deltaRange = (_size - 1) / (_range.max - _range.min);
-            _canvasHeight = canvas[0].height;
+            _canvasHeight = (<any>canvas[0]).height;
 
             // Updates container's size according to text size in labels.
             if (isHorizontal) {
@@ -209,7 +210,7 @@
                 text_size = (_ticksInfo[0] && _ticksInfo[0].height !== text_size) ? _ticksInfo[0].height : 0;
                 if (text_size !== 0) {
                     labelsDiv.css("height", text_size);
-                    canvas[0].height = canvasSize;
+                    (<any>canvas[0]).height = canvasSize;
                     //_height = text_size + canvasSize;
                     //_container.css("height", _height);
                 }
@@ -217,9 +218,11 @@
             else {
                 // NOTE: No need to calculate max text size of all labels.
                 text_size = (_ticksInfo[0] && _ticksInfo[0].width !== text_size) ? _ticksInfo[0].width : 0;
-                if (text_size !== old_text_size && text_size !== 0) {
+                //if (text_size !== old_text_size && text_size !== 0) {
+                if (text_size !== 0) {
                     labelsDiv.css("width", text_size);
-                    canvas[0].width = canvasSize;
+                    (<any>canvas[0]).width = canvasSize;
+                    var textOffset = 0;
                     _width = text_size + canvasSize + textOffset;
                     _container.css("width", _width);
                 }
@@ -395,7 +398,7 @@
                     addNewLabels();
                     getTicksInfo();
                     // There is no more space to insert new ticks. Decrease number of ticks.
-                    if (checkLabelsArrangement(_ticks)) {
+                    if (checkLabelsArrangement()) {
                         _ticks = _tickSources[_mode].decreaseTickCount();
                         getTicksInfo();
                         addNewLabels();
@@ -485,7 +488,7 @@
             var i;
             var len;
             var smallTicks = _tickSources[_mode].getSmallTicks(_ticks);
-
+            var x;
             ctx.beginPath();
 
             if (smallTicks && smallTicks.length > 0) {
@@ -536,7 +539,7 @@
         }
 
         function mouseMove(e) {
-            var point = getXBrowserMouseOrigin(container, e);
+            var point = CZ.Common.getXBrowserMouseOrigin(container, e);
             var k = (_range.max - _range.min) / _width;
             var time = _range.max - k * (_width - point.x);
             that.setTimeMarker(time);
@@ -548,8 +551,8 @@
          * Renders marker.
         */
         this.setTimeMarker = function (time) {
-            if (time > maxPermitedTimeRange.right) time = maxPermitedTimeRange.right;
-            if (time < maxPermitedTimeRange.left) time = maxPermitedTimeRange.left;
+            if (time > CZ.Settings.maxPermitedTimeRange.right) time = CZ.Settings.maxPermitedTimeRange.right;
+            if (time < CZ.Settings.maxPermitedTimeRange.left) time = CZ.Settings.maxPermitedTimeRange.left;
             var k = (_range.max - _range.min) / _width;
             var point = (time - _range.max) / k + _width;
             this.markerPosition = point;
@@ -564,14 +567,14 @@
             var left_time = _range.min;
             var right_time = _range.max;
 
-            if (right_time > maxPermitedTimeRange.right) {
-                right_time = maxPermitedTimeRange.right;
+            if (right_time > CZ.Settings.maxPermitedTimeRange.right) {
+                right_time = CZ.Settings.maxPermitedTimeRange.right;
                 var right_pos = (right_time - _range.max) / k + _width;
             } else {
                 var right_pos = (right_time - _range.max) / k + _width - 73;
             }
-            if (left_time < maxPermitedTimeRange.left) {
-                left_time = maxPermitedTimeRange.left;
+            if (left_time < CZ.Settings.maxPermitedTimeRange.left) {
+                left_time = CZ.Settings.maxPermitedTimeRange.left;
                 var left_pos = (left_time - _range.max) / k + _width;
             } else {
                 var left_pos = (left_time - _range.max) / k + _width;
@@ -637,7 +640,7 @@
 
             if (_range.min >= -10000) {
                 beta = Math.log(_range.max - _range.min) * log10;//Math.floor(Math.log(_range.max - _range.min) * log10);
-                firstYear = getCoordinateFromDMY(0, 0, 1);
+                firstYear = CZ.Common.getCoordinateFromDMY(0, 0, 1);
                 if (beta >= 0) {
                     x1 += k * firstYear;
                 }
@@ -684,9 +687,8 @@
         };
     };
 
-
     //this is the class for creating ticks 
-    CZ.TickSource = function () {
+    export function TickSource() {
 
         this.delta, this.beta;
         this.range = { min: -1, max: 0 }
@@ -836,9 +838,9 @@
         this.getMarkerLabel = function (range, time) {
             return time;
         };
-    }
+    };
 
-    CZ.CosmosTickSource = function (params) {
+    export function CosmosTickSource() {
         this.base = CZ.TickSource;
         this.base();
         var that = this;
@@ -861,18 +863,18 @@
             }
             else {
                 // default range
-                this.range.min = maxPermitedTimeRange.left;
-                this.range.max = maxPermitedTimeRange.right;
+                this.range.min = CZ.Settings.maxPermitedTimeRange.left;
+                this.range.max = CZ.Settings.maxPermitedTimeRange.right;
             }
-            if (this.range.min < maxPermitedTimeRange.left) this.range.min = maxPermitedTimeRange.left;
-            if (this.range.max > maxPermitedTimeRange.right) this.range.max = maxPermitedTimeRange.right;
+            if (this.range.min < CZ.Settings.maxPermitedTimeRange.left) this.range.min = CZ.Settings.maxPermitedTimeRange.left;
+            if (this.range.max > CZ.Settings.maxPermitedTimeRange.right) this.range.max = CZ.Settings.maxPermitedTimeRange.right;
 
             // set present date
-            var localPresent = getPresent();
+            var localPresent = CZ.Common.getPresent();
             this.present = { year: localPresent.getUTCFullYear(), month: localPresent.getUTCMonth(), day: localPresent.getUTCDate() };
 
             // remember value in virtual coordinates when 1CE starts
-            this.firstYear = getCoordinateFromDMY(0, 0, 1);
+            this.firstYear = CZ.Common.getCoordinateFromDMY(0, 0, 1);
 
             // set default constant for arranging ticks
             this.delta = 1;
@@ -986,7 +988,7 @@
     };
     CZ.CosmosTickSource.prototype = new CZ.TickSource;
 
-    CZ.CalendarTickSource = function (params) {
+    export function CalendarTickSource() {
         this.base = CZ.TickSource;
         this.base();
 
@@ -1010,20 +1012,20 @@
             }
             else {
                 // default range
-                this.range.min = maxPermitedTimeRange.left;
-                this.range.max = maxPermitedTimeRange.right;
+                this.range.min = CZ.Settings.maxPermitedTimeRange.left;
+                this.range.max = CZ.Settings.maxPermitedTimeRange.right;
             }
 
-            if (this.range.min < maxPermitedTimeRange.left) this.range.min = maxPermitedTimeRange.left;
-            if (this.range.max > maxPermitedTimeRange.right) this.range.max = maxPermitedTimeRange.right;
+            if (this.range.min < CZ.Settings.maxPermitedTimeRange.left) this.range.min = CZ.Settings.maxPermitedTimeRange.left;
+            if (this.range.max > CZ.Settings.maxPermitedTimeRange.right) this.range.max = CZ.Settings.maxPermitedTimeRange.right;
 
 
             // set present date
-            var localPresent = getPresent();
+            var localPresent = CZ.Common.getPresent();
             this.present = { year: localPresent.getUTCFullYear(), month: localPresent.getUTCMonth(), day: localPresent.getUTCDate() };
 
             // remember value in virtual coordinates when 1CE starts
-            this.firstYear = getCoordinateFromDMY(0, 0, 1);
+            this.firstYear = CZ.Common.getCoordinateFromDMY(0, 0, 1);
 
             this.range.max -= this.firstYear;
             this.range.min -= this.firstYear;
@@ -1031,10 +1033,10 @@
             this.startDate = this.present;
             this.endDate = this.present;
             if (this.range.min < 0) {
-                this.startDate = getDMYFromCoordinate(this.range.min);
+                this.startDate = CZ.Common.getDMYFromCoordinate(this.range.min);
             }
             if (this.range.max < 0) {
-                this.endDate = getDMYFromCoordinate(this.range.max);
+                this.endDate = CZ.Common.getDMYFromCoordinate(this.range.max);
             }
 
             // set default constant for arranging ticks
@@ -1135,7 +1137,7 @@
     };
     CZ.CalendarTickSource.prototype = new CZ.TickSource;
 
-    CZ.DateTickSource = function (params) {
+    export function DateTickSource() {
         this.base = CZ.TickSource;
         this.base();
 
@@ -1150,26 +1152,26 @@
             }
             else {
                 // default range
-                this.range.min = maxPermitedTimeRange.left;
-                this.range.max = maxPermitedTimeRange.right;
+                this.range.min = CZ.Settings.maxPermitedTimeRange.left;
+                this.range.max = CZ.Settings.maxPermitedTimeRange.right;
             }
 
-            if (this.range.min < maxPermitedTimeRange.left) this.range.min = maxPermitedTimeRange.left;
-            if (this.range.max > maxPermitedTimeRange.right) this.range.max = maxPermitedTimeRange.right;
+            if (this.range.min < CZ.Settings.maxPermitedTimeRange.left) this.range.min = CZ.Settings.maxPermitedTimeRange.left;
+            if (this.range.max > CZ.Settings.maxPermitedTimeRange.right) this.range.max = CZ.Settings.maxPermitedTimeRange.right;
 
 
             // set present date
-            var localPresent = getPresent();
+            var localPresent = CZ.Common.getPresent();
             this.present = { year: localPresent.getUTCFullYear(), month: localPresent.getUTCMonth(), day: localPresent.getUTCDate() };
 
             // remember value in virtual coordinates when 1CE starts
-            this.firstYear = getCoordinateFromDMY(0, 0, 1);
+            this.firstYear = CZ.Common.getCoordinateFromDMY(0, 0, 1);
 
             this.startDate = this.present;
             this.endDate = this.present;
 
-            this.startDate = getDMYFromCoordinate(this.range.min);
-            this.endDate = getDMYFromCoordinate(this.range.max);
+            this.startDate = CZ.Common.getDMYFromCoordinate(this.range.min);
+            this.endDate = CZ.Common.getDMYFromCoordinate(this.range.max);
 
             // set default constant for arranging ticks
             this.delta = 1;
@@ -1185,11 +1187,11 @@
         };
 
         this.getLabel = function (x) {
-            var text = months[month];
+            var text = CZ.Settings.months[month];
             var year_temp = year;
             if (year == 0) year_temp--;
             if (text == "January") text += " " + year_temp;
-            if (tempDays == 1) text = day + " " + months[month];
+            if (tempDays == 1) text = day + " " + CZ.Settings.months[month];
             if ((this.regime == "Weeks_Days") && (day == 3)) text += ", " + year_temp;
             if ((this.regime == "Days_Quarters") && (day == 1)) text += ", " + year_temp;
             return text;
@@ -1238,7 +1240,7 @@
 
                 if ((this.regime == "Quarters_Month") || (this.regime == "Month_Weeks")) {
                     //if (year == 0) year--;
-                    var tick = getCoordinateFromDMY(year, month, 1);
+                    var tick = CZ.Common.getCoordinateFromDMY(year, month, 1);
                     if (tick >= this.range.min && tick <= this.range.max) {
                         if (tempDays != 1) {
                             if ((month % 3 == 0) || (this.regime == "Month_Weeks")) {
@@ -1251,11 +1253,11 @@
                 }
                 // create days ticks for this month
                 if ((this.regime == "Weeks_Days") || (this.regime == "Days_Quarters")) {
-                    countDays = Math.floor(daysInMonth[month]);
+                    countDays = Math.floor(CZ.Settings.daysInMonth[month]);
                     tempDays = 1;
                     for (var k = 1; k <= countDays; k += date_step) {
                         day = k;
-                        tick = getCoordinateFromDMY(year, month, day);
+                        tick = CZ.Common.getCoordinateFromDMY(year, month, day);
                         if (tick >= this.range.min && tick <= this.range.max) {
                             if (this.regime == "Weeks_Days") {
                                 if ((k == 3) || (k == 10) || (k == 17) || (k == 24) || (k == 28)) {
@@ -1289,14 +1291,14 @@
 
             var n;//Math.floor(daysInMonth[date.month] / step);
             var tick = ticks[0].position;
-            var date = getDMYFromCoordinate(tick);
+            var date = CZ.Common.getDMYFromCoordinate(tick);
 
             if (this.regime == "Quarters_Month") n = 2;
-            else if (this.regime == "Month_Weeks") n = daysInMonth[date.month];//step = 5 / daysInMonth[date.month];
+            else if (this.regime == "Month_Weeks") n = CZ.Settings.daysInMonth[date.month];//step = 5 / daysInMonth[date.month];
             else if (this.regime == "Weeks_Days") n = 7;//step = 5 / 7;
             else if (this.regime == "Days_Quarters") n = 4; //step = 5 / 4;
 
-            if (this.regime == "Quarters_Month") step = Math.floor(2 * daysInMonth[date.month] / n);
+            if (this.regime == "Quarters_Month") step = Math.floor(2 * CZ.Settings.daysInMonth[date.month] / n);
             else if (this.regime == "Month_Weeks") step = 1;
             else if (this.regime == "Weeks_Days") step = 1;
             else if (this.regime == "Days_Quarters") step = 0.25;
@@ -1304,36 +1306,36 @@
             if (k * step < CZ.Settings.minSmallTickSpace) return null;
 
             date.day -= step;
-            tick = getCoordinateFromDMY(date.year, date.month, date.day);
+            tick = CZ.Common.getCoordinateFromDMY(date.year, date.month, date.day);
 
 
             if (this.regime != "Month_Weeks") {
                 while (tick > this.range.min) {
                     minors.push(tick);
                     date.day -= step;
-                    tick = getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = CZ.Common.getCoordinateFromDMY(date.year, date.month, date.day);
                 }
             } else {
-                var j = daysInMonth[date.month];
+                var j = CZ.Settings.daysInMonth[date.month];
                 while (tick > this.range.min) {
                     if ((j == 2) || (j == 9) || (j == 16) || (j == 23) || (j == 27)) {
                         minors.push(tick);
                     }
                     date.day -= step;
-                    tick = getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = CZ.Common.getCoordinateFromDMY(date.year, date.month, date.day);
                     j--;
                 }
             }
 
             for (var i = 0; i < ticks.length - 1; i++) {
                 var tick = ticks[i].position;
-                var date = getDMYFromCoordinate(tick);
+                var date = CZ.Common.getDMYFromCoordinate(tick);
                 var j_step = 1;
                 for (var j = 1; j <= n; j += j_step) {
                     //date.day += j_step * step;
                     date.day += step;
                     //if (date.day == step + 1 && step != 1) date.day--;
-                    tick = getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = CZ.Common.getCoordinateFromDMY(date.year, date.month, date.day);
                     if (this.regime != "Month_Weeks") {
                         if (minors.length == 0 || k * (ticks[i + 1].position - tick) > CZ.Settings.minSmallTickSpace) minors.push(tick);
                     } else {
@@ -1344,15 +1346,15 @@
                 }
             }
             var tick = ticks[ticks.length - 1].position;
-            var date = getDMYFromCoordinate(tick);
+            var date = CZ.Common.getDMYFromCoordinate(tick);
             date.day += step;
-            tick = getCoordinateFromDMY(date.year, date.month, date.day);
+            tick = CZ.Common.getCoordinateFromDMY(date.year, date.month, date.day);
 
             if (this.regime != "Month_Weeks") {
                 while (tick < this.range.max) {
                     minors.push(tick);
                     date.day += step;
-                    tick = getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = CZ.Common.getCoordinateFromDMY(date.year, date.month, date.day);
                 }
             } else {
                 var j = 0;
@@ -1361,7 +1363,7 @@
                         minors.push(tick);
                     }
                     date.day += step;
-                    tick = getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = CZ.Common.getCoordinateFromDMY(date.year, date.month, date.day);
                     j++;
                 }
             }
@@ -1371,138 +1373,10 @@
 
         this.getMarkerLabel = function (range, time) {
             this.getRegime(range.min, range.max);
-            var date = getDMYFromCoordinate(time);
+            var date = CZ.Common.getDMYFromCoordinate(time);
             var text = (this.beta > -3 ? date.month + 1 + "." : "") + date.day;
             return text;
         };
     };
     CZ.DateTickSource.prototype = new CZ.TickSource;
-
-    CZ.ClockTickSource = function (params) {
-        this.base = CZ.TickSource;
-        this.base();
-
-        this.getRegime = function (l, r) {
-            if (l < r) {
-                this.range.min = l;
-                this.range.max = r;
-            }
-            else {
-                // default range
-                this.range.min = maxPermitedTimeRange.left;
-                this.range.max = maxPermitedTimeRange.right;
-            }
-
-            // set present date
-            var localPresent = getPresent();
-            this.present = { year: localPresent.getUTCFullYear(), month: localPresent.getUTCMonth(), day: localPresent.getUTCDate() };
-
-            // remember value in virtual coordinates when 1CE starts
-            this.firstYear = getCoordinateFromDMY(0, 0, 1);
-
-            this.startDate = this.present;
-            this.endDate = this.present;
-            if (this.range.min < 0) {
-                this.startDate = getDMYFromCoordinate(this.range.min);
-            }
-            if (this.range.max < 0) {
-                this.endDate = getDMYFromCoordinate(this.range.max);
-            }
-
-            // set default constant for arranging ticks
-            this.delta = 1;
-            this.beta = Math.log(this.range.max - this.range.min) * this.log10;
-            //äîïóñòèì date çàêîí÷èòñÿ â 1.8
-
-            if (this.beta >= -2.2) this.regime = "QuarterDays_Hours";
-            if (this.beta <= -2.2 && this.beta >= -2.7) this.regime = "Hours_10mins";
-            if (this.beta <= -2.7 && this.beta >= -3.4) this.regime = "10mins_mins";
-            if (this.beta <= -3.8 && this.beta >= -4.4) this.regime = "10mins_mins";
-            /* if (this.beta <= -4.4 && this.beta >= -5.4) this.regime = "mins_10secs";
-             if (this.beta <= -5.4 && this.beta >= -6.4) this.regime = "10secs_secs";
-             if (this.beta <= -6.4) this.regime = "secs_quarters";*/
-
-            this.level = 1;
-        };
-
-        this.getLabel = function (x) {
-        };
-        //ïåðåäåëàòü!
-        this.createTicks = function (range) {
-            tempDays = 0;
-            var ticks = new Array();
-            var num = 0;
-            // count number of months to render
-            var countMonths = 0;
-            // count number of days to render
-            var countDays = 0;
-            //current year and month to start counting 
-            var tempYear = this.startDate.year;
-            var tempMonth = this.startDate.month;
-            while (tempYear < this.endDate.year || (tempYear == this.endDate.year && tempMonth <= this.endDate.month)) {
-                countMonths++;
-                tempMonth++;
-                if (tempMonth == 12) {
-                    tempMonth = 0;
-                    tempYear++;
-                }
-            }
-
-            // calculate ticks values
-            // they are in virtual coordinates (years from present date)
-            year = this.startDate.year;
-            // create month ticks
-            month = this.startDate.month - 1;
-            var month_step = 1; //step to render month
-            var date_step = 1; //step to render days
-            for (var j = 0; j <= countMonths + 2; j += month_step) {
-                month += month_step;
-                if (month >= 12) {
-                    month = 0;
-                    year++;
-                }
-                //      if (year >= 0) year--;
-
-                if ((this.regime == "Quarters_Month") || (this.regime == "Month_Weeks")) {
-                    var tick = getCoordinateFromDMY(year, month, 1);
-                    if (tick >= this.range.min && tick <= this.range.max) {
-                        if (tempDays != 1) {
-                            if ((month % 3 == 0) || (this.regime == "Month_Weeks")) {
-                                ticks[num] = { position: tick, label: this.getDiv(tick) };
-                                num++;
-                            }
-                        }
-                    }
-                }
-                // create days ticks for this month
-                if ((this.regime == "Weeks_Days") || (this.regime == "Days_Quarters")) {
-                    countDays = Math.floor(daysInMonth[month]);
-                    tempDays = 1;
-                    for (var k = 1; k <= countDays; k += date_step) {
-                        day = k;
-                        tick = getCoordinateFromDMY(year, month, day);
-                        if (tick >= this.range.min && tick <= this.range.max) {
-                            if (this.regime == "Weeks_Days") {
-                                if ((k == 3) || (k == 10) || (k == 17) || (k == 24) || (k == 28)) {
-                                    ticks[num] = { position: tick, label: this.getDiv(tick) };
-                                    num++;
-                                }
-                            } else {
-                                ticks[num] = { position: tick, label: this.getDiv(tick) };
-                                num++;
-                            }
-                        }
-                    }
-                }
-            }
-            this.refreshDivs();
-            return ticks;
-        };
-
-        this.createSmallTicks = function (ticks) {
-        };
-    };
-    CZ.ClockTickSource.prototype = new CZ.TickSource;
-
-    return CZ;
-})(CZ || {}, jQuery, document);
+}
