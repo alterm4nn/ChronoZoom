@@ -47,8 +47,8 @@ module CZ {
                     this.requestNewFrame = false; // indicates whether new frame is required or not
 
                     self.cursorPositionChangedEvent = new (<any>$).Event("cursorPositionChanged");
-                    self.breadCrumbsChengedEvent = $.Event("breadCrumbsChanged");
-                    self.innerZoomConstraintChengedEvent = $.Event("innerZoomConstraintChenged");
+                    self.breadCrumbsChangedEvent = $.Event("breadCrumbsChanged");
+                    self.innerZoomConstraintChangedEvent = $.Event("innerZoomConstraintChanged");
                     self.currentlyHoveredInfodot = undefined;
                     self.breadCrumbs = [];
                     self.recentBreadCrumb = { vcElement: { title: "initObject" } };
@@ -209,14 +209,14 @@ module CZ {
                     }
                     else
                         val = undefined;
-                    this.RaiseInnerZoomConstraintChenged(val);
+                    this.RaiseInnerZoomConstraintChanged(val);
                 },
                 /*
                 Fires the event with a new inner zoom constrainted value        
                 */
-                RaiseInnerZoomConstraintChenged: function (e) {
-                    this.innerZoomConstraintChengedEvent.zoomValue = e;
-                    this.element.trigger(this.innerZoomConstraintChengedEvent);
+                RaiseInnerZoomConstraintChanged: function (e) {
+                    this.innerZoomConstraintChangedEvent.zoomValue = e;
+                    this.element.trigger(this.innerZoomConstraintChangedEvent);
                 },
                 /*
                 Fires the event of cursor position changed
@@ -527,8 +527,8 @@ module CZ {
                 Fires the trigger that currently observed (the visible region is inside this timeline) timeline is changed
                 */
                 breadCrumbsChanged: function () {
-                    this.breadCrumbsChengedEvent.breadCrumbs = this.breadCrumbs;
-                    this.element.trigger(this.breadCrumbsChengedEvent);
+                    this.breadCrumbsChangedEvent.breadCrumbs = this.breadCrumbs;
+                    this.element.trigger(this.breadCrumbsChangedEvent);
                 }
                 ,
                 /* If virtual canvas is during animation now, the method does nothing;

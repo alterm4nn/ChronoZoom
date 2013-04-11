@@ -43,8 +43,8 @@ Next <div> is rendered on the top of previous one.
             this.canvasHeight = null; // height of canvas
 
             self.cursorPositionChangedEvent = new jQuery.Event("cursorPositionChanged");
-            self.breadCrumbsChengedEvent = jQuery.Event("breadCrumbsChanged");
-            self.innerZoomConstraintChengedEvent = jQuery.Event("innerZoomConstraintChenged");
+            self.breadCrumbsChangedEvent = jQuery.Event("breadCrumbsChanged");
+            self.innerZoomConstraintChangedEvent = jQuery.Event("innerZoomConstraintChanged");
             self.currentlyHoveredInfodot = undefined;
             self.breadCrumbs = [];
             self.recentBreadCrumb = { vcElement: { title: "initObject"} };
@@ -196,14 +196,14 @@ Next <div> is rendered on the top of previous one.
             }
             else
                 val = undefined;
-            this.RaiseInnerZoomConstraintChenged(val);
+            this.RaiseInnerZoomConstraintChanged(val);
         },
         /*
         Fires the event with a new inner zoom constrainted value        
         */
-        RaiseInnerZoomConstraintChenged: function (e) {
-            this.innerZoomConstraintChengedEvent.zoomValue = e;
-            this.element.trigger(this.innerZoomConstraintChengedEvent);
+        RaiseInnerZoomConstraintChanged: function (e) {
+            this.innerZoomConstraintChangedEvent.zoomValue = e;
+            this.element.trigger(this.innerZoomConstraintChangedEvent);
         }
         ,
         /*
@@ -451,8 +451,8 @@ Next <div> is rendered on the top of previous one.
         Fires the trigger that currently observed (the visible region is inside this timeline) timeline is changed
         */
         breadCrumbsChanged: function () {
-            this.breadCrumbsChengedEvent.breadCrumbs = this.breadCrumbs;
-            this.element.trigger(this.breadCrumbsChengedEvent);
+            this.breadCrumbsChangedEvent.breadCrumbs = this.breadCrumbs;
+            this.element.trigger(this.breadCrumbsChangedEvent);
         }
         ,
         /* If virtual canvas is during animation now, the method does nothing;

@@ -37,7 +37,6 @@ var CZ;
             "calendar": new CZ.CalendarTickSource(),
             "date": new CZ.DateTickSource()
         };
-        var that = this;
         var isHorizontal = (_position === "bottom" || _position === "top");
         var canvas = $("<canvas></canvas>");
         var labelsDiv = $("<div></div>");

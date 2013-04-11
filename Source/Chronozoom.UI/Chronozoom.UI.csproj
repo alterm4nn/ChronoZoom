@@ -192,6 +192,9 @@
     <Content Include="NewScripts\viewport.ts" />
     <Content Include="NewScripts\viewportAnimation.ts" />
     <Content Include="NewScripts\viewportController.ts" />
+    <Content Include="NewScripts\virtualCanvas.min.js">
+      <DependentUpon>virtualCanvas.ts</DependentUpon>
+    </Content>
     <Content Include="NewScripts\virtualCanvas.ts" />
     <Content Include="Dumps\wahib-responsedumprest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
