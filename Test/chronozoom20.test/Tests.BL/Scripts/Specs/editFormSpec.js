@@ -8,7 +8,7 @@
 /// <reference path="../Js/authoring.ui.js" />
 /// <reference path="../Js/newauthoring.js" />
 /// <reference path="../Js/czservice.js"/>
-/// <reference path="../Js/js-ignore.js"/>
+/// <reference path="js-ignore.js"/>
 
 describe("Given:  'edit timeline' form is opened: ", function () {
     var existedTimeline;
