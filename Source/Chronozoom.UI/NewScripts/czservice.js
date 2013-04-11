@@ -21,14 +21,16 @@ var CZ;
                     Year: e.infodotDescription.date,
                     title: e.title,
                     description: undefined,
-                    contentItems: e.contentItems
+                    contentItems: e.contentItems.map(function (ci) {
+                        return Map.contentItem(ci);
+                    })
                 };
             }
             Map.exhibit = exhibit;
             function contentItem(ci) {
                 return {
                     id: ci.guid,
-                    ParentExhibitId: ci.parent,
+                    ParentExhibitId: ci.contentItem ? ci.contentItem.ParentExhibitId : ci.parent,
                     title: ci.contentItem ? ci.contentItem.title : ci.title,
                     description: ci.contentItem ? ci.contentItem.description : ci.description,
                     uri: ci.contentItem ? ci.contentItem.uri : ci.uri,
