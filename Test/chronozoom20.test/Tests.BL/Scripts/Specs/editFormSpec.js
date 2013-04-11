@@ -68,8 +68,9 @@ function using(name, values, func) {
 
 function init() {
     $('#createTimelineForm').length == 0 ? $('body').prepend('<div id="createTimelineForm" >') : "";
-    $('#TimelineErrorSpan').length  == 0 ? $('body').prepend('<span id="TimelineErrorSpan" style="color:red; display:none">Input error</span>') : "";
+    $('#TimelineErrorSpan').length == 0 ? $('body').prepend('<span id="TimelineErrorSpan" style="color:red; display:none">Input error</span>') : "";
     $('#timelineStartInput').length == 0 ? $('body').prepend('<span id="timelineStartInput"</span>') : "";
-    $('#timelineEndInput').length   == 0 ? $('body').prepend('<span id="timelineEndInput"</span>') : "";
+    $('#timelineEndInput').length == 0 ? $('body').prepend('<span id="timelineEndInput"</span>') : "";
     $('#timelineTitleInput').length == 0 ? $('body').prepend('<span id="timelineTitleInput"</span>') : "";
+
 }
