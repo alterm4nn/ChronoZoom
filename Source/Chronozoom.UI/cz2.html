@@ -5,19 +5,6 @@
     <meta name="Description" content="ChronoZoom is an open-source community project dedicated to visualizing the history of everything." />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <script type="text/javascript">
-        // Invoke timings.show() to get timings
-        var timings = new Object();
-        timings.parseStarted = new Date();
-        timings.show = function () {
-            var msg =
-                "External scripts loading: " + (timings.scriptsLoaded - timings.parseStarted) +
-                " ms\nDocument ready handler: " + (timings.readyStarted - timings.scriptsLoaded) +
-                " ms\n\nRequesting server for timelines data: " + (timings.wcfRequestCompleted - timings.wcfRequestStarted) +
-                " ms\nLayout algorithm: " + (timings.layoutCompleted - timings.wcfRequestCompleted) +
-                " ms\nPopulating virtual canvas: " + (timings.canvasInited - timings.layoutCompleted) + " ms";
-            alert(msg);
-        }
-
         var _gaq = _gaq || [];
         _gaq.push(['_setAccount', 'UA-29180487-2']);
         _gaq.push(['_setDomainName', 'chronozoomproject.org']);
@@ -41,14 +28,14 @@
     <script type="text/javascript" src="/NewScripts/external/jquery.cookie.js"></script>
     <script type="text/javascript" src="/NewScripts/external/rx.js"></script>
     <script type="text/javascript" src="/NewScripts/external/rx.jQuery.js"></script>
-    <script type="text/javascript" src="/NewScripts/external/seadragon-min.js"></script>
+    <script type="text/javascript" src="/NewScripts/external/seadragon-min.js"></script>    
+    <script type="text/javascript" src="/NewScripts/external/mouseWheelPlugin.js"></script>
     <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
     <script type="text/javascript" src="/NewScripts/cz.settings.js"></script>
     <script type="text/javascript" src="/NewScripts/common.js"></script>
     <script type="text/javascript" src="/NewScripts/viewport.js"></script>
     <script type="text/javascript" src="/NewScripts/viewportAnimation.js"></script>
-    <script type="text/javascript" src="/NewScripts/mouseWheelPlugin.js"></script>
     <script type="text/javascript" src="/NewScripts/gestures.js"></script>
     <script type="text/javascript" src="/NewScripts/virtualCanvas.js"></script>
     <script type="text/javascript" src="/NewScripts/vccontent.js"></script>
@@ -60,301 +47,25 @@
     <script type="text/javascript" src="/NewScripts/bibliography.js"></script>
     <script type="text/javascript" src="/NewScripts/breadCrumbs.js"></script>
 
-    <script type="text/javascript" src="/NewScripts/newauthoring.js"></script>
+    <script type="text/javascript" src="/NewScripts/authoring.js"></script>
     <script type="text/javascript" src="/NewScripts/authoring.ui.js"></script>
     <script type="text/javascript" src="/NewScripts/czservice.js"></script>
-
-    <script type="text/javascript" src="/NewScripts/settings.js"></script>
     <script type="text/javascript" src="/NewScripts/timescale.js"></script>
 
     <!--[if IE]>
     <script type="text/javascript" src="/NewScripts/regimesIE.js"></script>
     <![endif]-->
-    <script type="text/javascript">
-        timings.scriptsLoaded = new Date();
 
-        $(document).ready(function () {
-            $('.bubbleInfo').hide();
-            //("#axis").showThresholds = true;
-            var wlcmScrnCookie = getCookie("welcomeScreenDisallowed");
-            if (wlcmScrnCookie != null) {
-                hideWelcomeScreen();
-            }
-            else {
-                // click on gray area hides welcome screen
-                $("#welcomeScreenOut").click(function (e) {
-                    e.stopPropagation();
-                });
-
-                $("#welcomeScreenBack").click(function () {
-                    closeWelcomeScreen();
-                });
-            }
-
-            if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
-                if (/Chrome[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
-                    var oprversion = new Number(RegExp.$1) // capture x.x portion and store as a number
-                    if (oprversion < 14.0) {
-                        var fallback_agreement = getCookie("new_bad_browser_agreement");
-                        if ((fallback_agreement == null) || (fallback_agreement == "")) {
-                            window.location = "testFallBackPage.htm";
-                            return;
-                        }
-                    }
-                }
-            }
-            else if (navigator.userAgent.toLowerCase().indexOf('version') > -1) {
-                if (/Version[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
-                    var oprversion = new Number(RegExp.$1) // capture x.x portion and store as a number
-                    if (oprversion < 5.0) {
-                        var fallback_agreement = getCookie("new_bad_browser_agreement");
-                        if ((fallback_agreement == null) || (fallback_agreement == "")) {
-                            window.location = "testFallBackPage.htm";
-                            return;
-                        }
-                    }
-                }
-            }
-            else {
-                var br = $.browser;
-                var isIe9 = br.msie && parseInt(br.version, 10) >= 9;
-                if (!isIe9) {
-                    var isFF9 = br.mozilla && parseInt(br.version, 10) >= 7;
-                    if (!isFF9) {
-                        var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
-                        if (!is_chrome) {
-                            var fallback_agreement = getCookie("new_bad_browser_agreement");
-                            if ((fallback_agreement == null) || (fallback_agreement == "")) {
-                                window.location = "testFallBackPage.htm";
-                                return;
-                            }
-                        }
-                        return;
-                    }
-                }
-            }
-
-            if (navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
-                // Suppress the default iOS elastic pan/zoom actions.
-                document.addEventListener('touchmove', function (e) { e.preventDefault(); });
-            }
-
-            if (navigator.userAgent.indexOf('Mac') != -1) {
-                // Disable Mac OS Scrolling Bounce Effect
-                var body = document.getElementsByTagName('body')[0];
-                body.style.overflow = "hidden";
-            }
-
-            // init seadragon. set path to image resources for nav buttons 
-            Seadragon.Config.imagePath = seadragonImagePath;
-
-            maxPermitedVerticalRange = { top: 0, bottom: 10000000 }; //temporary value until there is no data
-            timings.readyStarted = new Date();
-
-            ax = $("#axis");
-            axis = new CZ.Timescale("axis");
-
-            vc = $("#vc");
-            vc.virtualCanvas();
-
-            regimeNavigator = $('#regime_navigator');
-            regimeNavigator.click(passThrough);
-            regimesRatio = 300 / Math.abs(maxPermitedTimeRange.left - maxPermitedTimeRange.right);
-
-            if (window.location.hash)
-                startHash = window.location.hash; // to be processes after the data is loaded
-            loadData(); //retrieving the data
-
-            initializeSearch();
-            initializeBibliography();
-            initializeToursUI();
-
-            CZ.Authoring.initialize(vc, {
-                showCreateTimelineForm: CZ.Authoring.UI.showCreateTimelineForm,
-                showEditTimelineForm: CZ.Authoring.UI.showEditTimelineForm,
-                showCreateExhibitForm: CZ.Authoring.UI.showCreateExhibitForm,
-                showEditExhibitForm: CZ.Authoring.UI.showEditExhibitForm,
-                showEditContentItemForm: CZ.Authoring.UI.showEditContentItemForm
-            });
-
-            var canvasGestures = getGesturesStream(vc); //gesture sequence of the virtual canvas
-            var axisGestures = applyAxisBehavior(getGesturesStream(ax)); //gesture sequence of axis (tranformed according to axis behavior logic)
-            var jointGesturesStream = canvasGestures.Merge(axisGestures);
-
-            controller = new ViewportController(
-                            function (visible) {
-                                var vp = vc.virtualCanvas("getViewport");
-                                var markerPos = axis.MarkerPosition();
-                                var oldMarkerPosInScreen = vp.pointVirtualToScreen(markerPos, 0).x;
-
-                                vc.virtualCanvas("setVisible", visible, controller.activeAnimation);
-                                updateAxis(vc, ax);
-                                vp = vc.virtualCanvas("getViewport");
-                                if (pauseTourAtAnyAnimation) { //watch for the user animation during playing of some tour bookmark
-                                    tourPause();
-                                    pauseTourAtAnyAnimation = false;
-                                }
-
-                                var hoveredInfodot = vc.virtualCanvas("getHoveredInfodot");
-                                var actAni = controller.activeAnimation != undefined;
-
-                                if (actAni && !hoveredInfodot.id) {
-                                    var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
-                                    updateMarker();
-                                    // ax.axis("setTimeMarker", newMarkerPos);
-                                }
-                                updateNavigator(vp);
-                            },
-                            function () {
-                                return vc.virtualCanvas("getViewport");
-                            },
-                            jointGesturesStream);
-
-            var hashChangeFromOutside = true; // True if url is changed externally
-
-            // URL Nav: update URL when animation is complete
-            controller.onAnimationComplete.push(function (id) {
-                hashChangeFromOutside = false;
-                if (setNavigationStringTo && setNavigationStringTo.bookmark) { // go to search result
-                    navigationAnchor = navStringTovcElement(setNavigationStringTo.bookmark, vc.virtualCanvas("getLayerContent"));
-                    window.location.hash = setNavigationStringTo.bookmark;
-                }
-                else {
-                    if (setNavigationStringTo && setNavigationStringTo.id == id)
-                        navigationAnchor = setNavigationStringTo.element;
-
-                    var vp = vc.virtualCanvas("getViewport");
-                    window.location.hash = vcelementToNavString(navigationAnchor, vp);
-                }
-                setNavigationStringTo = null;
-            });
-
-            // URL Nav: handle URL changes from outside
-            window.addEventListener("hashchange", function () {
-                if (window.location.hash && hashChangeFromOutside && hashHandle) {
-                    var hash = window.location.hash;
-                    var visReg = navStringToVisible(window.location.hash.substring(1), vc);
-                    if (visReg) {
-                        isAxisFreezed = true;
-                        controller.moveToVisible(visReg, true);
-                        // to make sure that the hash is correct (it can be incorrectly changed in onCurrentlyObservedInfodotChanged)
-                        if (window.location.hash != hash) {
-                            hashChangeFromOutside = false;
-                            window.location.hash = hash;
-                        }
-                    }
-                    hashHandle = true;
-                } else
-                    hashChangeFromOutside = true;
-            });
-
-
-            // Axis: enable showing thresholds
-            controller.onAnimationComplete.push(function () {
-                //ax.axis("enableThresholds", true);
-                //if (window.console && console.log("thresholds enabled"));
-            });
-            //Axis: disable showing thresholds
-            controller.onAnimationStarted.push(function () {
-                //ax.axis("enableThresholds", true);
-                //if (window.console && console.log("thresholds disabled"));
-            });
-            // Axis: enable showing thresholds
-            controller.onAnimationUpdated.push(function (oldId, newId) {
-                if (oldId != undefined && newId == undefined) { // animation interrupted
-                    setTimeout(function () {
-                        //ax.axis("enableThresholds", true);
-                        //if (window.console && console.log("thresholds enabled"));
-                    }, 500);
-                }
-            });
-
-            //Tour: notifyng tour that the bookmark is reached
-            controller.onAnimationComplete.push(
-                                function (id) {
-                                    if (tourBookmarkTransitionCompleted != undefined)
-                                        tourBookmarkTransitionCompleted(id);
-                                    if (tour != undefined && tour.state != "finished") //enabling wathcing for user activity while playing the bookmark
-                                        pauseTourAtAnyAnimation = true;
-                                });
-            //Tour: notifyng tour that the transition was interrupted
-            controller.onAnimationUpdated.push(
-                                function (oldId, newId) {
-                                    if (tour != undefined) {
-                                        if (tourBookmarkTransitionInterrupted != undefined) { //in transition
-                                            var prevState = tour.state;
-                                            tourBookmarkTransitionInterrupted(oldId);
-                                            var alteredState = tour.state;
-
-                                            if (prevState == "play" && alteredState == "pause") //interruption caused toue pausing. stop any animations, updating UI as well
-                                                tourPause();
-
-                                            setNavigationStringTo = null;
-                                        }
-                                    }
-                                }
-            );
-
-            updateLayout();
-
-            vc.bind("elementclick", function (e) {
-                navigateToElement(e);
-            });
-
-            vc.bind('cursorPositionChanged', function (cursorPositionChangedEvent) {
-                updateMarker();
-            });
-
-            ax.bind('thresholdBookmarkChanged', function (thresholdBookmark) {
-                var bookmark = navStringToVisible(thresholdBookmark.Bookmark, vc);
-                if (bookmark != undefined) {
-                    controller.moveToVisible(bookmark, false);
-                }
-            });
-
-            // Reacting on the event when one of the infodot exploration causes inner zoom constraint
-            vc.bind("innerZoomConstraintChenged", function (constraint) {
-                controller.effectiveExplorationZoomConstraint = constraint.zoomValue; // applying the constraint
-                //ax.axis("allowMarkerMovesOnHover", !constraint.zoomValue);
-            });
-
-            vc.bind("breadCrumbsChanged", function (breadCrumbsEvent) { //reacting on the event when the first timeline that contains whole visible region is changed
-                updateBreadCrumbsLabels(breadCrumbsEvent.breadCrumbs);
-            });
-
-            $(window).bind('resize', function () {
-                updateLayout();
-            });
-
-            timings.readyFinished = new Date();
-            var vp = vc.virtualCanvas("getViewport");
-            vc.virtualCanvas("setVisible", getVisibleForElement({ x: -13700000000, y: 0, width: 13700000000, height: 5535444444.444445 }, 1.0, vp));
-            updateAxis(vc, ax);
-
-            var bid = window.location.hash.match("b=([a-z0-9_]+)");
-            if (bid) {
-                //bid[0] - source string
-                //bid[1] - found match
-                $("#bibliography .sources").empty();
-                $("#bibliography .title").html("<span>Loading...</span>");
-                $("#bibliographyBack").css("display", "block");
-            }
-        });
-    </script>
+    <script type="text/javascript" src="/NewScripts/cz.js"></script>
     <title>ChronoZoom</title>
 </head>
 <body style="background-color: Black; min-width: 950px;">
-
     <div id="header" style="height: 67px">
         <div style="position: relative">
             <div style="left: 15px; height: 29px; position: absolute;">
                 <img style="margin: 9px 0 0 5px; float: left" title="ChronoZoom" src="/Images/chronzoom-200px-white.png" />
-                <img style="margin: 5px 0 0 14px; float: right" id="search_button" title="Search ChronoZoom" alt="Search ChronoZoom" src="/Images/search_off.jpg"
-                    onmouseup="onSearchClicked();" onmouseover="searchHighlight(true);"
-                    onmouseout="searchHighlight(false);" />
-                <img style="margin: 5px 0 0 14px" title="Take a guided tour" id="tours_index" alt="Take a guided tour" src="/Images/tour_off.jpg"
-                    onmouseover="tourButtonHighlight(true);" onmouseout="tourButtonHighlight(false);"
-                    onmouseup="onTourClicked();" />
+                <img style="margin: 5px 0 0 14px; float: right" id="search_button" title="Search ChronoZoom" alt="Search ChronoZoom" src="/Images/search_off.jpg" />
+                <img style="margin: 5px 0 0 14px" title="Take a guided tour" id="tours_index" alt="Take a guided tour" src="/Images/tour_off.jpg" />
             </div>
 
             <div style="margin-left: auto; margin-right: auto; width: 200px; color: #DBDBDB" id="LoginPanel">
@@ -373,20 +84,15 @@
             </script>
 
             <div class="regimes_rects" style="right: 0px; position: absolute; top: 0px; width: 302px; height: 62px;">
-                <div id="human_rect" class="regime_rect" style="position: absolute; top: 1px; width: 17px; left: 284px; height: 10px; background-color: rgba(212, 92, 70, 1.0); cursor: pointer;"
-                    onclick="navigateToBookmark(humanityVisible);">
+                <div id="human_rect" class="regime_rect" style="position: absolute; top: 1px; width: 17px; left: 284px; height: 10px; background-color: rgba(212, 92, 70, 1.0); cursor: pointer;">
                 </div>
-                <div id="prehuman_rect" class="regime_rect" style="position: absolute; top: 13px; width: 100px; left: 201px; height: 10px; background-color: rgba(237, 145, 50, 1.0); cursor: pointer;"
-                    onclick="navigateToBookmark(prehistoryVisible);">
+                <div id="prehuman_rect" class="regime_rect" style="position: absolute; top: 13px; width: 100px; left: 201px; height: 10px; background-color: rgba(237, 145, 50, 1.0); cursor: pointer;">
                 </div>
-                <div id="life_rect" class="regime_rect" style="position: absolute; top: 25px; width: 255px; left: 46px; height: 10px; background-color: rgba(73, 150, 73, 1.0); cursor: pointer;"
-                    onclick="navigateToBookmark(lifeVisible);">
+                <div id="life_rect" class="regime_rect" style="position: absolute; top: 25px; width: 255px; left: 46px; height: 10px; background-color: rgba(73, 150, 73, 1.0); cursor: pointer;">
                 </div>
-                <div id="earth_rect" class="regime_rect" style="position: absolute; top: 37px; width: 260px; left: 41px; height: 10px; background-color: rgba(81, 127, 149, 1.0); cursor: pointer;"
-                    onclick="navigateToBookmark(earthVisible);">
+                <div id="earth_rect" class="regime_rect" style="position: absolute; top: 37px; width: 260px; left: 41px; height: 10px; background-color: rgba(81, 127, 149, 1.0); cursor: pointer;">
                 </div>
-                <div id="cosmos_rect" class="regime_rect" style="position: absolute; top: 49px; width: 300px; left: 1px; height: 10px; background-color: rgba(152, 108, 157, 1.0); cursor: pointer;"
-                    onclick="navigateToBookmark(cosmosVisible);">
+                <div id="cosmos_rect" class="regime_rect" style="position: absolute; top: 49px; width: 300px; left: 1px; height: 10px; background-color: rgba(152, 108, 157, 1.0); cursor: pointer;">
                 </div>
                 <div id="regime_navigator" style="position: absolute; top: 0px; left: 1px; width: 300px; height: 62px; background-color: White; opacity: 0.3; pointer-events: none;">
                 </div>
@@ -394,56 +100,52 @@
             <!--<img alt="regimes_navigator" style="right: 0px; position: absolute; top: 0px" src="/Images/regimes.png" />-->
             <div class="regimes_titles" style="top: 0px; position: absolute; right: 309px; font-size: 11.5;">
                 <div style="position: relative; height: 12px;">
-                    <div class="regimes_title" onclick="navigateToBookmark(humanityVisible);">
+                    <div class="regimes_title">
                         Humanity
                     </div>
                 </div>
                 <div style="position: relative; height: 12px;">
-                    <div class="regimes_title" onclick="navigateToBookmark(prehistoryVisible);">
+                    <div class="regimes_title">
                         Human&nbsp;Prehistory
                     </div>
                 </div>
                 <div style="position: relative; height: 12px;">
-                    <div class="regimes_title" onclick="navigateToBookmark(lifeVisible);">
+                    <div class="regimes_title">
                         Life
                     </div>
                 </div>
                 <div style="position: relative; height: 12px;">
-                    <div class="regimes_title" onclick="navigateToBookmark(earthVisible);">
+                    <div class="regimes_title">
                         Earth
                     </div>
                 </div>
                 <div style="position: relative; height: 12px;">
-                    <div class="regimes_title" onclick="navigateToBookmark(cosmosVisible);">
+                    <div class="regimes_title">
                         Cosmos
                     </div>
                 </div>
             </div>
 
 
-            <div id="bc_navLeft" onclick="breadCrumbNavLeft()" class="breadCrumbNavButton">&#171;</div>
+            <div id="bc_navLeft" class="breadCrumbNavButton">&#171;</div>
             <div id="breadCrumbsPanel" class="breadCrumbPanel unselectable">
                 <table id="breadCrumbsTable" class="breadCrumbTable">
                     <tr>
                     </tr>
                 </table>
             </div>
-            <div id="bc_navRight" onclick="breadCrumbNavRight()" class="breadCrumbNavButton">&#187;</div>
+            <div id="bc_navRight" class="breadCrumbNavButton">&#187;</div>
 
 
             <div id="tour_control" class="tour_control" style="display: none; top: 14px; position: relative; margin: auto">
-                <img id="tour_prev" src="/Images/tour_prev_off.jpg" alt="previous" onmouseout="toggleOffImage('tour_prev');"
-                    onmouseover="toggleOnImage('tour_prev');" onclick="tourPrev();" />
+                <img id="tour_prev" src="/Images/tour_prev_off.jpg" alt="previous" />
                 <img style="margin: 0 0 0 16px"
-                    id="tour_playpause" src="/Images/tour_pause_off.jpg" alt="play/pause" onmouseout="toggleOffImage('tour_playpause');"
-                    onmouseover="toggleOnImage('tour_playpause');" onclick="tourPlayPause();" />
+                    id="tour_playpause" src="/Images/tour_pause_off.jpg" alt="play/pause" />
                 <img
                     style="margin: 0 0 0 16px" id="tour_next" src="/Images/tour_next_off.jpg" alt="next"
-                    onmouseout="toggleOffImage('tour_next');" onmouseover="toggleOnImage('tour_next');"
-                    onclick="tourNext();" />
+                     />
                 <img style="margin: 0 0 0 10px" id="tour_exit" src="/Images/tour_exit_off.jpg"
-                    alt="exit" onmouseout="toggleOffImage('tour_exit');" onmouseover="toggleOnImage('tour_exit');"
-                    onclick="tourAbort();" />
+                    alt="exit" />
             </div>
         </div>
     </div>
@@ -483,7 +185,7 @@
         <div class="header">
             Tours
         </div>
-        <div id="tours-narration" class="narration" onclick="onNarrationClick();">
+        <div id="tours-narration" class="narration">
             Narration: <span id="tours-narration-on" class="narration-selected">ON</span> |
             <span id="tours-narration-off">OFF</span>
         </div>
@@ -491,7 +193,7 @@
         </div>
     </div>
     <div id="bookmarks" class="bookmarksWindow" onselectstart="return false;" style="display: none">
-        <img id="bookmarksCollapse" src="/Images/collapse-left.png" class="headerButton" onclick="onBookmarksCollapse();" />
+        <img id="bookmarksCollapse" src="/Images/collapse-left.png" class="headerButton" />
         <div class="header">
         </div>
         <div class="slideHeader">
@@ -504,8 +206,7 @@
     <div id="bibliographyBack" class="biblBack" style="display: none">
         <div id="bibliographyOut" class="biblOuterWindow">
             <div id="bibliography" class="biblWindow">
-                <img class="closeButton" id="biblCloseButton" src="/Images/close_off.png" onmouseover="toggleOnImage('biblCloseButton', 'png');"
-                    onmouseout="toggleOffImage('biblCloseButton', 'png');" alt="Close" onselectstart="return false;" />
+                <img class="closeButton" id="biblCloseButton" src="/Images/close_off.png" alt="Close" onselectstart="return false;" />
                 <div class="title" onselectstart="return false;">
                     <span>Infodot name</span> &gt; Bibliography
                 </div>
@@ -622,7 +323,7 @@
             </a>
             <span class="footer-separator">|
             </span>
-            <a href="http://chronozoom.codeplex.com/workitem/list/basic" class="footer-link">Report a Problem
+            <a href="https://github.com/alterm4nn/ChronoZoom/issues" class="footer-link">Report a Problem
             </a>
             <span class="footer-separator">|
             </span>
@@ -649,9 +350,8 @@
         <div id="welcomeScreenOut" class="welcomeScreenOuterWindow">
             <div id="welcomeScreen" class="welcomeScreen">
                 <div class="titleArea">
-                    <img class="closeButton" id="welcomeScreenCloseButton" src="/Images/wlcmScreen_close_off.png" onmouseover="toggleOnImage('welcomeScreenCloseButton', 'png');"
-                        onmouseout="toggleOffImage('welcomeScreenCloseButton', 'png');" alt="Close" onselectstart="return false;"
-                        onclick="hideWelcomeScreen();" />
+                    <img class="closeButton" id="welcomeScreenCloseButton" src="/Images/wlcmScreen_close_off.png"
+                        alt="Close" onselectstart="return false;" />
                     <div class="title" onselectstart="return false;">
                         <span>Welcome to ChronoZoom beta!</span>
                     </div>
@@ -663,7 +363,7 @@
                         Click or scroll to navigate through events and timelines. Watch our introduction video for a quick overview of this project.
 
                         <div style="position: absolute; bottom: 0px;">
-                            <button class="button" onclick="closeWelcomeScreen()">Start Exploring!</button>
+                            <button class="button">Start Exploring!</button>
                             <div>
                                 <input type="checkbox" id="welcomeScreenCheckbox" name="welcomeScreenCheckbox" />
                                 <label for="welcomeScreenCheckbox" unselectable="on" style="font-family: Arial; font-size: 16px;">Don't Show Again</label>
