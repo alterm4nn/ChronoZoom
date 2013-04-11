@@ -74,9 +74,8 @@ namespace Tests
         [TestMethod]
         public void BehindTheScenesLink()
         {
-            //issue https://github.com/alterm4nn/ChronoZoom/issues/115
             HomePageHelper.OpenBehindTheScenesLink();
-            Assert.AreEqual("Behind the scenes", HomePageHelper.GetTitle());
+            Assert.AreEqual("ChronoZoom - Behing The Scenes", HomePageHelper.GetTitle());
         }
 
         [TestMethod]
