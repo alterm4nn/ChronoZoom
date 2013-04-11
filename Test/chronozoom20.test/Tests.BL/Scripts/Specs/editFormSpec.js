@@ -3,8 +3,9 @@
 /// <reference path="../Utils/jquery-ui.js" />
 /// <reference path="../Js/cz.settings.js" />
 /// <reference path="../Js/settings.js" />
+/// <reference path="../Js/vccontent.js" />
 /// <reference path="../Js/authoring.ui.js" />
-/// <reference path="../Js/newauthoring.js" />
+/// <reference path="../Js/authoring.js" />
 /// <reference path="../Js/czservice.js"/>
 /// <reference path="js-ignore.js"/>
 
