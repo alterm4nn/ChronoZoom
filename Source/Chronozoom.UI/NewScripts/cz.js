@@ -255,7 +255,7 @@ var CZ;
                     CZ.Common.controller.moveToVisible(bookmark, false);
                 }
             });
-            CZ.Common.vc.bind("innerZoomConstraintChenged", function (constraint) {
+            CZ.Common.vc.bind("innerZoomConstraintChanged", function (constraint) {
                 CZ.Common.controller.effectiveExplorationZoomConstraint = constraint.zoomValue;
                 CZ.Common.axis.allowMarkerMovesOnHover = !constraint.zoomValue;
             });

@@ -407,7 +407,7 @@ function CanvasRootElement(vc, layerid, id, vx, vy, vw, vh) {
             render(this.children[i], contexts, visibleBox_v, viewport2d, 1.0);
         }
 
-        if (this.vc.breadCrumbs.length > 0 && (this.vc.recentBreadCrumb == undefined || this.vc.breadCrumbs[vc.breadCrumbs.length - 1].vcElement.title != this.vc.recentBreadCrumb.vcElement.title)) { //the deepest bread crumb is chenged
+        if (this.vc.breadCrumbs.length > 0 && (this.vc.recentBreadCrumb == undefined || this.vc.breadCrumbs[vc.breadCrumbs.length - 1].vcElement.title != this.vc.recentBreadCrumb.vcElement.title)) { //the deepest bread crumb is Changed
             this.vc.recentBreadCrumb = this.vc.breadCrumbs[vc.breadCrumbs.length - 1];
             this.vc.breadCrumbsChanged();
         }

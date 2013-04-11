@@ -315,7 +315,7 @@ module CZ {
             });
 
             // Reacting on the event when one of the infodot exploration causes inner zoom constraint
-            CZ.Common.vc.bind("innerZoomConstraintChenged", function (constraint) {
+            CZ.Common.vc.bind("innerZoomConstraintChanged", function (constraint) {
                 CZ.Common.controller.effectiveExplorationZoomConstraint = constraint.zoomValue; // applying the constraint
                 CZ.Common.axis.allowMarkerMovesOnHover = !constraint.zoomValue;
             });

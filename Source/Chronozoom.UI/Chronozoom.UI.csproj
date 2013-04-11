@@ -158,9 +158,6 @@
     <Content Include="NewScripts\authoring.ui.js">
       <DependentUpon>authoring.ui.ts</DependentUpon>
     </Content>
-    <Content Include="NewScripts\authoring.ui.min.js">
-      <DependentUpon>authoring.ui.ts</DependentUpon>
-    </Content>
     <Content Include="NewScripts\authoring.ui.ts" />
     <Content Include="NewScripts\bibliography.ts" />
     <Content Include="NewScripts\breadCrumbs.ts" />
@@ -169,10 +166,7 @@
       <DependentUpon>cz.ts</DependentUpon>
     </Content>
     <Content Include="NewScripts\cz.settings.ts" />
-    <TypeScriptCompile Include="NewScripts\cz.ts" />
-    <Content Include="NewScripts\czservice.min.js">
-      <DependentUpon>czservice.ts</DependentUpon>
-    </Content>
+    <Content Include="NewScripts\cz.ts" />
     <Content Include="NewScripts\czservice.ts" />
     <Content Include="NewScripts\external\flash_detect.js" />
     <Content Include="NewScripts\external\jquery-1.7.2.min.js" />
@@ -186,9 +180,6 @@
     <Content Include="NewScripts\external\seadragon-min.js" />
     <Content Include="NewScripts\gestures.ts" />
     <Content Include="NewScripts\layout.ts" />
-    <Content Include="NewScripts\regimesIE.min.js">
-      <DependentUpon>regimesIE.ts</DependentUpon>
-    </Content>
     <Content Include="NewScripts\regimesIE.ts" />
     <Content Include="NewScripts\search.ts" />
     <Content Include="NewScripts\timescale.ts" />
@@ -198,9 +189,6 @@
     <Content Include="NewScripts\typings\rx.js\rx.js.d.ts" />
     <Content Include="NewScripts\urlnav.ts" />
     <Content Include="NewScripts\vccontent.ts" />
-    <Content Include="NewScripts\viewport.min.js">
-      <DependentUpon>viewport.ts</DependentUpon>
-    </Content>
     <Content Include="NewScripts\viewport.ts" />
     <Content Include="NewScripts\viewportAnimation.ts" />
     <Content Include="NewScripts\viewportController.ts" />
