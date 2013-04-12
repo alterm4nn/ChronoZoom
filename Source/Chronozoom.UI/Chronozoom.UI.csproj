@@ -177,7 +177,6 @@
     <Content Include="NewScripts\external\mouseWheelPlugin.js" />
     <Content Include="NewScripts\external\rx.jQuery.js" />
     <Content Include="NewScripts\external\rx.js" />
-    <Content Include="NewScripts\external\seadragon-min.js" />
     <Content Include="NewScripts\gestures.ts" />
     <Content Include="NewScripts\layout.ts" />
     <Content Include="NewScripts\regimesIE.ts" />
