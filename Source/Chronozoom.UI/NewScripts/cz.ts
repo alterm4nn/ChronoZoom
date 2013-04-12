@@ -167,10 +167,6 @@ module CZ {
 
             CZ.Common.maxPermitedVerticalRange = { top: 0, bottom: 10000000 }; //temporary value until there is no data
 
-            CZ.Common.regimeNavigator = $('#regime_navigator');
-
-            CZ.Common.regimesRatio = 300 / Math.abs(CZ.Settings.maxPermitedTimeRange.left - CZ.Settings.maxPermitedTimeRange.right);
-
             if (window.location.hash)
                 CZ.Common.startHash = window.location.hash; // to be processes after the data is loaded
             CZ.Common.loadData(); //retrieving the data
@@ -204,8 +200,6 @@ module CZ {
                                     var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
                                     CZ.Common.updateMarker();
                                 }
-
-                                CZ.Common.updateNavigator(vp);
                             },
                             function () {
                                 return CZ.Common.vc.virtualCanvas("getViewport");
