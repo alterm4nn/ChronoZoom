@@ -2,7 +2,7 @@
   <Settings>
     <Global>
       <IsUsingGrid>false</IsUsingGrid>
-      <BaseUrl>http://test.chronozoomproject.org/cz2.html</BaseUrl>
+      <BaseUrl>http://test.chronozoomproject.org/</BaseUrl>
       <ImplicitWait>60</ImplicitWait>
       <ExplicitWait>60</ExplicitWait>
       <BrowserName>chrome</BrowserName>
