@@ -8,21 +8,21 @@ module CZ {
         module Map {
             export function timeline(t) {
                 return {
-                    Id: t.guid,
+                    id: t.guid,
                     ParentTimelineId: t.parent.guid,
                     FromYear: t.x,
                     ToYear: t.x + t.width,
-                    Title: t.title,
+                    title: t.title,
                     Regime: t.regime
                 };
             }
 
             export function exhibit(e) {
                 return {
-                    Id: e.guid || null,
+                    id: e.guid,
                     ParentTimelineId: e.parent.guid,
                     Year: e.infodotDescription.date,
-                    Title: e.title,
+                    title: e.title,
                     description: undefined,
                     contentItems: undefined
                 };
@@ -30,12 +30,12 @@ module CZ {
 
             export function contentItem(ci) {
                 return {
-                    Id: ci.guid || null,
-                    ParentExhibitId: ci.parent,
-                    Title: ci.contentItem ? ci.contentItem.title : ci.title,
-                    Caption: ci.contentItem ? ci.contentItem.description : ci.description,
-                    Uri: ci.contentItem ? ci.contentItem.uri : ci.uri,
-                    MediaType: ci.contentItem ? ci.contentItem.mediaType : ci.mediaType
+                    id: ci.guid,
+                    ParentExhibitId: ci.contentItem ? ci.contentItem.ParentExhibitId : ci.parent,
+                    title: ci.contentItem ? ci.contentItem.title : ci.title,
+                    description: ci.contentItem ? ci.contentItem.description : ci.description,
+                    uri: ci.contentItem ? ci.contentItem.uri : ci.uri,
+                    mediaType: ci.contentItem ? ci.contentItem.mediaType : ci.mediaType
                 };
             }
         }
@@ -82,8 +82,8 @@ module CZ {
         export var superCollectionName = "sandbox";
 
         /**
-            * Chronozoom.svc Requests.
-            */
+        * Chronozoom.svc Requests.
+        */
 
         // .../get?supercollection=&collection=
         export function get () {
@@ -173,8 +173,8 @@ module CZ {
         }
 
         /**
-            * Information Modification.
-            */
+        * Information Modification.
+        */
 
         // .../{supercollection}/{collection}
         export function putCollection (c) {
@@ -319,8 +319,8 @@ module CZ {
         }
 
         /**
-            * Auxiliary Methods.
-            */
+        * Auxiliary Methods.
+        */
 
         export function putExhibitContent (e, oldContentItems) {
             var newGuids = e.contentItems.map(function (ci) {
@@ -336,14 +336,14 @@ module CZ {
                 // Filter deleted content items and send DELETE request for them.
                 oldContentItems.filter(
                     function (ci) {
-                        return (newGuids.indexOf(ci.guid) === -1);
+                        return (ci.guid && newGuids.indexOf(ci.guid) === -1);
                     }
                 ).map(
                     function (ci) {
                         return deleteContentItem(ci);
                     }
                 )
-            );
+             );
 
             return $.when.apply($, promises);
         }
