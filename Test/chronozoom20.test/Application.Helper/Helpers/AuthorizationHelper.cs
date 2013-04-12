@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Text;
+using System.Xml;
 using Application.Driver;
 using Application.Helper.Entities;
 using Application.Helper.UserActions;
@@ -18,8 +20,9 @@ namespace Application.Helper.Helpers
                 Click(By.XPath("//*[@id='MoreOptions']/a"));
             }
             Click(By.XPath("//*[@name='Google']"));
-            
-            var user = new User { Login = Constants.UsersInfo.Default.google_login, Password = Constants.UsersInfo.Default.google_password, Type = UserType.Google };
+
+            var user = new User { Type = UserType.Google };
+            FillUserCredentials(user);
             Logger.Log(user.ToString());
             SetUserInfoAndSubmit(user);
             Sleep(10);
@@ -35,8 +38,9 @@ namespace Application.Helper.Helpers
                 Click(By.XPath("//*[@id='MoreOptions']/a"));
             }
             Click(By.XPath("//*[@name='Yahoo!']"));
-            
-            var user = new User { Login = Constants.UsersInfo.Default.yahoo_login, Password = Constants.UsersInfo.Default.yahoo_password, Type = UserType.Yahoo };
+
+            var user = new User { Type = UserType.Yahoo };
+            FillUserCredentials(user);
             Logger.Log(user.ToString());
             SetUserInfoAndSubmit(user);
             Logger.Log("->");
@@ -52,7 +56,8 @@ namespace Application.Helper.Helpers
             }
             Click(By.XPath("//*[@name='Windows Live™ ID']"));
 
-            var user = new User { Login = Constants.UsersInfo.Default.wlid_login, Password = Constants.UsersInfo.Default.wlid_password, Type = UserType.Ms };
+            var user = new User { Type = UserType.Ms };
+            FillUserCredentials(user);
             Logger.Log(user.ToString());
             SetUserInfoAndSubmit(user);
             Logger.Log("->");
@@ -146,6 +151,51 @@ namespace Application.Helper.Helpers
                 }
             }
             return result;
+        }
+
+        protected User FillUserCredentials(User user)
+        {
+            var document = new XmlDocument();
+            document.Load(GetValidAcountsXmlPath());
+
+            switch (user.Type)
+            {
+                case UserType.Google:
+                    user.Login = document.SelectSingleNode("//Accounts/google/login").InnerText;
+                    user.Login = document.SelectSingleNode("//Accounts/google/password").InnerText;
+                    break;
+                case UserType.Ms:
+                    user.Login = document.SelectSingleNode("//Accounts/ms/login").InnerText;
+                    user.Login = document.SelectSingleNode("//Accounts/ms/password").InnerText;
+                    break;
+                case UserType.Yahoo:
+                    user.Login = document.SelectSingleNode("//Accounts/yahoo/login").InnerText;
+                    user.Login = document.SelectSingleNode("//Accounts/yahoo/password").InnerText;
+                    break;
+                default:
+                    throw new Exception("Can not find user credentials, user: " + user);
+                    break;
+            }
+
+            return user;
+        }
+
+        private string GetValidAcountsXmlPath()
+        {
+            var lavidFilePath = string.Empty;
+
+            const string accountsPathVsRun = @".\..\..\Constants\Accounts.xml";
+            const string accountsPathConsoleRun = @".\..\..\..\..\Application.Helper\Constants\Accounts.xml";
+
+            if (File.Exists(accountsPathVsRun))
+                lavidFilePath = accountsPathVsRun;
+            if (File.Exists(accountsPathConsoleRun))
+                lavidFilePath = accountsPathConsoleRun;
+            if (string.IsNullOrEmpty(lavidFilePath))
+            {
+                throw new Exception("Cannot find Accounts.xml file");
+            }
+            return lavidFilePath;
         }
     }
 }
