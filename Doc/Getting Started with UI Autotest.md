@@ -6,8 +6,8 @@ This document shows you how to use [Selenium WebDriver](http://docs.seleniumhq.o
 - WebDriver as application driver
     - Chrome: https://code.google.com/p/selenium/wiki/ChromeDriver
     - Internet Explorer: https://code.google.com/p/selenium/wiki/InternetExplorerDriver
-- Mstests as test runner <!-- Need more info about MSTest. Where to get, how to use? -->
-- Visual Studio 2012 (or latest)
+- [Mstest](http://msdn.microsoft.com/en-us/library/ms182489(v=vs.80).aspx) to run tests.
+- [Visual Studio 2012](http://www.microsoft.com/visualstudio/eng/products/visual-studio-overview) (or latest).
 
 ## Supported browsers ##
 - Firefox
@@ -17,18 +17,19 @@ This document shows you how to use [Selenium WebDriver](http://docs.seleniumhq.o
 
 **How to run UI tests on your local computer**
 
-1. Get code from github https://github.com/alterm4nn/ChronoZoom.
-2. Build the Chronozoom.Entities project.
-3. Open ChronoZoom.Testing.sln.
-4. Build the solution  (All required packages will be installed).
-5. Configure settings <!-- Where? Which file/setting do I modify? -->
+1. Get the source code from github (fork https://github.com/alterm4nn/ChronoZoom).
+2. Open **Source\Chronozoom.sln**
+3. Build the **Source\Chronozoom.Entities\Chronozoom.Entities.csproj** project.
+4. Open **Test\chronozoom20.test\ChronoZoom.Testing.sln**.
+5. Build the solution  (All required packages will be installed).
+6. Configure settings <!-- Where? Which file/setting do I modify? -->
     a. Set BaseUrl(http://test.chronozoomproject.org) 
     b. BrowserName("chrome", "firefox" or "internet explorer")
 
-6. Add rules for chromedriver and iedriver in Windows Firewall <!-- Need more details -->
-7. Fill UsersInfo.settings - this file is required for AuthorizationTests (The file is added to .gitignore) <!-- Need more details -->
-8. Launch Visual Studio and open Test Explorer.
-9. Run one test.
+7. Add rules for chromedriver and iedriver in Windows Firewall <!-- Need more details about how to set the rules up. -->
+8. Fill UsersInfo.settings - this file is required for AuthorizationTests (The file is added to .gitignore) <!-- Need more details -->
+9. Launch Visual Studio and open Test Explorer.
+10. Run a test.
     a. Browser will be started
     b. Homepage will be opened
     c. Test will do something
