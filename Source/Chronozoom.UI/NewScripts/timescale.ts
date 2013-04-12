@@ -561,7 +561,7 @@ module CZ {
             var k = (_range.max - _range.min) / _width;
             var point = (time - _range.max) / k + _width;
             this.markerPosition = point;
-            $('#timescale_marker').css("left", point - 47);
+            $('#timescale_marker').css("left", point - CZ.Settings.markerWidth/2);
             var text = _tickSources[_mode].getMarkerLabel(_range, time);
             document.getElementById('marker-text').innerHTML = text;
         }

@@ -86,8 +86,7 @@ var CZ;
                     width: 600,
                     buttons: {
                         "save and close": function () {
-                            var isValid = CZ.Authoring.ValidateNumber(startInput.val()) && CZ.Authoring.ValidateNumber(endInput.val());
-                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(startInput.val()) && CZ.Authoring.IsNotEmpty(endInput.val());
+                            var isValid = CZ.Authoring.ValidateTimelineData(startInput.val(), endInput.val(), titleInput.val());
                             if(!isValid) {
                                 $("#TimelineErrorSpan").css("display", "block");
                             }
@@ -132,8 +131,7 @@ var CZ;
                     width: 600,
                     buttons: {
                         "save and close": function () {
-                            var isValid = CZ.Authoring.ValidateNumber(startInput.val()) && CZ.Authoring.ValidateNumber(endInput.val());
-                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(startInput.val()) && CZ.Authoring.IsNotEmpty(endInput.val());
+                            var isValid = CZ.Authoring.ValidateTimelineData(startInput.val(), endInput.val(), titleInput.val());
                             if(!isValid) {
                                 $("#TimelineErrorSpan").css("display", "block");
                             }
@@ -187,9 +185,7 @@ var CZ;
                     buttons: {
                         "save and close": function () {
                             var contentItems = _getContentItemsData();
-                            var isValid = CZ.Authoring.ValidateNumber(dateInput.val());
-                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(dateInput.val());
-                            isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
+                            var isValid = CZ.Authoring.ValidateExhibitData(dateInput.val(), titleInput.val(), contentItems);
                             if(!isValid) {
                                 $("#ExhibitErrorSpan").css("display", "block");
                             } else {
@@ -242,9 +238,7 @@ var CZ;
                     buttons: {
                         "save and close": function () {
                             contentItems = _getContentItemsData();
-                            var isValid = CZ.Authoring.ValidateNumber(dateInput.val());
-                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(dateInput.val());
-                            isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
+                            var isValid = CZ.Authoring.ValidateExhibitData(dateInput.val(), titleInput.val(), contentItems);
                             if(!isValid) {
                                 $("#ExhibitErrorSpan").css("display", "block");
                             } else {
@@ -313,7 +307,6 @@ var CZ;
                                     selected = mediaTypeInput[i];
                                 }
                             }
-                            console.log(c, e);
                             CZ.Authoring.updateContentItem(c, {
                                 title: titleInput.val(),
                                 uri: mediaInput.val(),
