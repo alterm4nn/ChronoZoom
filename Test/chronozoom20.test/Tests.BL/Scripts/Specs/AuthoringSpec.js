@@ -1,12 +1,11 @@
 ﻿/// <reference path="../Utils/jquery-1.7.2.min.js" />
-/// <reference path="../Utils/jquery-1.8.0.min.js" />
 /// <reference path="../Utils/jasmine-jquery.js" />
 /// <reference path="../Js/layout.js" />
 /// <reference path="../Js/timescale.js" />
 /// <reference path="../Js/vccontent.js" />
 /// <reference path="../Js/cz.settings.js" />
 /// <reference path="../Js/settings.js" />
-/// <reference path="../Js/newauthoring.js" />
+/// <reference path="../Js/authoring.js" />
 /// <reference path="../Js/czservice.js" />
 /// <reference path="js-ignore.js" />
 
@@ -161,7 +160,7 @@ describe("CZ.Authoring", function () {
             var _selectedExhibit = {};
 
             beforeEach(function () {
-                setFixtures('<body></body>');
+                //setFixtures('<body></body>');
                 $('body').prepend('<div id="vc"></div>');
                 $('#vc').data('ui-virtualCanvas', { hovered: exhibitParentTimeline, element: $('#vc'), getViewport: function () { return { pointScreenToVirtual: function (xvalue, yvalue) { return { x: xvalue, y: yvalue }; } }; } });
                 var vc = $('#vc');
