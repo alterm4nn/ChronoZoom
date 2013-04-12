@@ -31,10 +31,11 @@ namespace Tests
         [TestCleanup]
         public void TestCleanup()
         {
-            NavigationHelper.OpenHomePage();
+            HomePageHelper.WaitWhileHomePageIsLoaded();
             WelcomeScreenHelper.CloseWelcomePopup();
             AuthorizationHelper.Logout();
             HomePageHelper.WaitWhileHomePageIsLoaded();
+            WelcomeScreenHelper.CloseWelcomePopup();
             CreateScreenshotsIfTestFail(TestContext);
         }
 

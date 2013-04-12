@@ -57,11 +57,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants\Javascripts.cs" />
-    <Compile Include="Constants\UsersInfo.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>UsersInfo.settings</DependentUpon>
-    </Compile>
     <Compile Include="Entities\ContentItem.cs" />
     <Compile Include="Entities\Exhibit.cs" />
     <Compile Include="Entities\Timeline.cs" />
@@ -87,7 +82,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserActions\DependentActions.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Constants\Accounts.xml" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Application.Driver\Application.Driver.csproj">
       <Project>{ac1310bd-eacc-4b45-bcaf-2d8a0260e2d1}</Project>
@@ -95,11 +92,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
-    <None Include="Constants\UsersInfo.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>UsersInfo.Designer.cs</LastGenOutput>
-    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
