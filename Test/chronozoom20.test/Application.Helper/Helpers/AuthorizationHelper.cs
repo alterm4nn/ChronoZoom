@@ -81,16 +81,16 @@ namespace Application.Helper.Helpers
             var isLogoutPresent = FindElement(By.XPath("//*[@id='LoginPanel']/a")).Text == "Logout";
             Logger.Log("isLogoutPresent: " + isLogoutPresent);
 
-            WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("visReg != undefined")), 60);
-            OpenUrl(GetParentUriString(new Uri(Configuration.BaseUrl)) + "account/isauth");
-            WaitForElementIsExisted(By.TagName("body"));
-            var isApiAuth = bool.Parse(GetText(By.TagName("body")));
-            Logger.Log("isApiAuth: " + isApiAuth);
+            //WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("CZ.Common.cosmosVisible != undefined")), 60);
+            //OpenUrl(GetParentUriString(new Uri(Configuration.BaseUrl)) + "account/isauth");
+            //WaitForElementIsExisted(By.TagName("body"));
+            //var isApiAuth = bool.Parse(GetText(By.TagName("body")));
+            //Logger.Log("isApiAuth: " + isApiAuth);
 
             var isCookieExist = IsUserCookieExist();
             Logger.Log("isCookieExist: " + isCookieExist);
 
-            var result = isLogoutPresent && isApiAuth && isCookieExist;
+            var result = isLogoutPresent && isCookieExist;
             Logger.Log("-> result: " + result);
 
             return result;
@@ -162,15 +162,15 @@ namespace Application.Helper.Helpers
             {
                 case UserType.Google:
                     user.Login = document.SelectSingleNode("//Accounts/google/login").InnerText;
-                    user.Login = document.SelectSingleNode("//Accounts/google/password").InnerText;
+                    user.Password = document.SelectSingleNode("//Accounts/google/password").InnerText;
                     break;
                 case UserType.Ms:
                     user.Login = document.SelectSingleNode("//Accounts/ms/login").InnerText;
-                    user.Login = document.SelectSingleNode("//Accounts/ms/password").InnerText;
+                    user.Password = document.SelectSingleNode("//Accounts/ms/password").InnerText;
                     break;
                 case UserType.Yahoo:
                     user.Login = document.SelectSingleNode("//Accounts/yahoo/login").InnerText;
-                    user.Login = document.SelectSingleNode("//Accounts/yahoo/password").InnerText;
+                    user.Password = document.SelectSingleNode("//Accounts/yahoo/password").InnerText;
                     break;
                 default:
                     throw new Exception("Can not find user credentials, user: " + user);
@@ -185,7 +185,7 @@ namespace Application.Helper.Helpers
             var lavidFilePath = string.Empty;
 
             const string accountsPathVsRun = @".\..\..\Constants\Accounts.xml";
-            const string accountsPathConsoleRun = @".\..\..\..\..\Application.Helper\Constants\Accounts.xml";
+            const string accountsPathConsoleRun = @"..\..\..\Application.Helper\Constants\Accounts.xml";
 
             if (File.Exists(accountsPathVsRun))
                 lavidFilePath = accountsPathVsRun;
