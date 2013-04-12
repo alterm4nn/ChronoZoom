@@ -24,9 +24,7 @@ module CZ {
                     Year: e.infodotDescription.date,
                     title: e.title,
                     description: undefined,
-                    contentItems: e.contentItems.map(function (ci) {
-                        return Map.contentItem(ci);
-                    })
+                    contentItems: undefined
                 };
             }
 
@@ -247,7 +245,6 @@ module CZ {
         }
 
         // .../{supercollection}/{collection}/exhibit
-        // NOTE: Updates content items, but doesn't delete them.
         export function putExhibit (e) {
             var request = new Request(_serviceUrl);
             request.addToPath(superCollectionName);
@@ -325,21 +322,28 @@ module CZ {
         * Auxiliary Methods.
         */
 
-        export function deleteExhibitContent (e, oldContentItems) {
+        export function putExhibitContent (e, oldContentItems) {
             var newGuids = e.contentItems.map(function (ci) {
                 return ci.guid;
             });
 
-            // Filter deleted content items and send DELETE request for them.
-            var promises = oldContentItems.filter(
+            // Send PUT request for all exhibit's content items.
+            var promises = e.contentItems.map(
                 function (ci) {
-                    return (ci.guid && newGuids.indexOf(ci.guid) === -1);
+                    return putContentItem(ci);
                 }
-            ).map(
-                function (ci) {
-                    return deleteContentItem(ci);
-                }
-            );
+            ).concat(
+                // Filter deleted content items and send DELETE request for them.
+                oldContentItems.filter(
+                    function (ci) {
+                        return (ci.guid && newGuids.indexOf(ci.guid) === -1);
+                    }
+                ).map(
+                    function (ci) {
+                        return deleteContentItem(ci);
+                    }
+                )
+             );
 
             return $.when.apply($, promises);
         }

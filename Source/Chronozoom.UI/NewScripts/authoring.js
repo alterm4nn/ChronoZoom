@@ -355,9 +355,12 @@ var CZ;
                 e.id = "e" + response.ExhibitId;
                 for(i = 0; i < len; ++i) {
                     contentItems[i].parent = e.guid;
-                    contentItems[i].guid = response.ContentItemId[i];
                 }
-                CZ.Service.deleteExhibitContent(e, oldContentItems).fail(function () {
+                CZ.Service.putExhibitContent(e, oldContentItems).then(function () {
+                    for(i = 0; i < len; ++i) {
+                        contentItems[i].guid = arguments[i];
+                    }
+                }, function () {
                     console.log("Error connecting to service: update content item.\n");
                 });
             }, function (error) {

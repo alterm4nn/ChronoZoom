@@ -563,14 +563,19 @@ module CZ {
                     e.guid = response.ExhibitId;
                     e.id = "e" + response.ExhibitId;
                     
-                    // Set parent's guid and guid for all content items.
+                    // Set parent's guid for all content items.
                     for (i = 0; i < len; ++i) {
                         contentItems[i].parent = e.guid;
-                        contentItems[i].guid = response.ContentItemId[i];
                     }
 
-                    // Send DELETE requests for all content items that were deleted.
-                    CZ.Service.deleteExhibitContent(e, oldContentItems).fail(
+                    // Send PUT/DELETE requests for all content items and
+                    // set guids for them.
+                    CZ.Service.putExhibitContent(e, oldContentItems).then(
+                        function () {
+                            for (i = 0; i < len; ++i) {
+                                contentItems[i].guid = arguments[i];
+                            }
+                        },
                         function () {
                             console.log("Error connecting to service: update content item.\n");
                         }

@@ -21,9 +21,7 @@ var CZ;
                     Year: e.infodotDescription.date,
                     title: e.title,
                     description: undefined,
-                    contentItems: e.contentItems.map(function (ci) {
-                        return Map.contentItem(ci);
-                    })
+                    contentItems: undefined
                 };
             }
             Map.exhibit = exhibit;
@@ -262,18 +260,20 @@ var CZ;
             });
         }
         Service.deleteContentItem = deleteContentItem;
-        function deleteExhibitContent(e, oldContentItems) {
+        function putExhibitContent(e, oldContentItems) {
             var newGuids = e.contentItems.map(function (ci) {
                 return ci.guid;
             });
-            var promises = oldContentItems.filter(function (ci) {
+            var promises = e.contentItems.map(function (ci) {
+                return putContentItem(ci);
+            }).concat(oldContentItems.filter(function (ci) {
                 return (ci.guid && newGuids.indexOf(ci.guid) === -1);
             }).map(function (ci) {
                 return deleteContentItem(ci);
-            });
+            }));
             return $.when.apply($, promises);
         }
-        Service.deleteExhibitContent = deleteExhibitContent;
+        Service.putExhibitContent = putExhibitContent;
     })(CZ.Service || (CZ.Service = {}));
     var Service = CZ.Service;
 })(CZ || (CZ = {}));
