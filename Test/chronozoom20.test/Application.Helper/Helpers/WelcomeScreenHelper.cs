@@ -11,7 +11,7 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<-");
             ClickCloseButton();
-            WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("visReg != undefined")), 60);
+            WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("CZ.Common.cosmosVisible != undefined")), 60);
             Logger.Log("->");
         }
 
