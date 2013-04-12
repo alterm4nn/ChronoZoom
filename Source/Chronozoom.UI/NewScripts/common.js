@@ -330,15 +330,8 @@ var CZ;
             Common.maxPermitedScale = CZ.UrlNav.navStringToVisible(Common.cosmosVisible, Common.vc).scale * 1.1;
         }
         function updateLayout() {
-            var topHeight = $("#header").outerHeight(true) + $("#axis").outerHeight(true);
-            var bottomHeight = $("#footer").outerHeight(true);
-            var bodyTopMargin = parseFloat($("body").css("marginTop").replace('px', ''));
-            var bodyBottomMargin = parseFloat($("body").css("marginBottom").replace('px', ''));
-            var bodyMargin = bodyTopMargin + bodyBottomMargin;
-            var occupiedHeight = topHeight + bottomHeight + bodyMargin;
-            var offset = window.innerHeight - occupiedHeight;
-            var biblOutTopMargin = 25;
-            var biblOutBottomMargin = 15;
+            CZ.BreadCrumbs.visibleAreaWidth = $(".breadcrumbs-container").width();
+            CZ.BreadCrumbs.updateHiddenBreadCrumbs();
             Common.vc.virtualCanvas("updateViewport");
             updateAxis(Common.vc, Common.ax);
             CZ.BreadCrumbs.updateBreadCrumbsLabels();

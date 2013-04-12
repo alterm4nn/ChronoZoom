@@ -1260,161 +1260,115 @@ img.fallbackBackground {
         cursor: pointer;
     }
 
-#breadcrumbs-container {
-    width: 50%;
-    padding-left: 5px;
-    height: 100%;
-    display: inline-block;
-    margin: 0px;
-
-    -webkit-box-sizing: border-box;
-       -moz-box-sizing: border-box;
-            box-sizing: border-box;
-}
-
 		
 /********************************************
 *               breadcrumbs                 *
 ********************************************/
 
-.breadCrumbNavButton 
-{
-	display: inline-block;
-	/*position: absolute;
-	left: 26px;
-	bottom: 5px;*/
-	font-size: 23px;
-	margin: 0px;
-	padding: 0px;
-	color: #bfbfbf; 
-	cursor: pointer;
+.breadcrumbs-nav {
     width: 25px;
+    height: 25px;
+    text-align: center;
+    line-height: 100%;
+    font-size: 20px;
+    color: #BFBFBF;
 }
 
-.breadCrumbNavButton:hover
-{
-	color: white;
+    .breadcrumbs-nav:hover {
+        color: white;
+    }
+
+#breadcrumbs-nav-left {    
+	cursor: pointer;
+    display: none;
 }
 
-.temp {
-    max-width: 100%;
-	width: auto;
-    display: inline-block;
+#breadcrumbs-nav-right {    
+	cursor: pointer;
+    display: none;
+}
+
+.breadcrumbs-container {
+    width: 50%;
+    height: 100%;
+    
     overflow: hidden;
-    margin-left: -25px;
-    padding-left: 25px;
-    margin-right: -25px;
-    padding-right: 25px;
+    line-height: 100%;
 }
 
-.breadCrumbPanel
-{
-	overflow: hidden;
-	/*position: absolute;
-	margin: 0px;
-	padding: 0px;
-	left: 40px;*/
-	/*bottom: 15px;*/
-    display: inline-block;
-    width: 100%;
-    -webkit-box-sizing: border-box;
-       -moz-box-sizing: border-box;
-            box-sizing: border-box;
-}
-		
-.breadCrumbPanel .breadCrumbTable 
-{
+#breadcrumbs-table {
 	position: relative; 
 	cellspacing: 0px;
 	cellpadding: 0px;
-	border-collapse: collapse;			
+	border-collapse: collapse;	
+    border-spacing: 0px;	
 	margin: 0px;
 	padding: 0px;	
+    height: 100%;
+    width: auto;
 }
-		
-.breadCrumbTable .breadCrumbTableCell 
-{
-	vertical-align: top;
-	padding: 0px;
-	margin: 0px;
-	position: relative;
-	white-space: nowrap;
-}
+	
+    #breadcrumbs-table tr {
+        position: absolute;
+        white-space: nowrap;
+        height: 100%;
+    }
 
-.breadCrumbSeparator 
+        #breadcrumbs-table tr td {
+            height: 25px;
+            padding: 0;
+            margin: 0;
+            line-height: 100%;
+	        white-space: nowrap;
+        }
+
+.breadcrumb-separator 
 {
 	margin-left: 3px;
 	margin-right: 3px;
 	color: #bfbfbf; 
-	position: relative;
-	left: 0px;
-	top: 0px;
-	vertical-align: super;	
+    height: 100%;
+    line-height: 100%;
 	font-size: 12.5px;
 	font-family: verdana;
 	cursor: default;
 }
   
-.breadCrumbLink 
+.breadcrumb-link 
 {
 	display: inline-block;
-	margin: 0px;
-	padding: 0px;
 	position: relative;
-	left: 0px;
-	top: 0px;
-	vertical-align: super;	
+	line-height: 25px;
+    height: 25px;
 	font-size: 12.5px;
-	/*font-family: arial;*/
-	/*font-weight: bold;*/
 	font-family: verdana;
 	cursor: pointer;
 }
 
-.breadCrumbLinkCosmosRegime 
-{	   
-	color: rgba(152, 108, 157, 1.0);
+.breadcrumb-cosmos {	   
+	color: #986C9D;
 }
 
-.breadCrumbLinkEarthRegime 
-{	   
-	color: rgba(81, 127, 149, 1.0);
+.breadcrumb-earth {	   
+	color: #517F95;
 }
 
-.breadCrumbLinkLifeRegime 
-{	   
-	color: rgba(73, 150, 73, 1.0);
+.breadcrumb-life {	   
+	color: #499649;
 }
 
-.breadCrumbLinkPreHumanRegime 
-{	   
-	color: rgba(237, 145, 50, 1.0);
+.breadcrumb-prehistory {	   
+	color: #ED9132;
 }
 
-.breadCrumbLinkHumanityRegime 
-{	   
-	color: rgba(212, 92, 70, 1.0);
+.breadcrumb-humanity {	   
+	color: #D45C46;
 }
 
-.breadCrumbHover
-{
+.breadcrumb-hover {
 	color: white;
 }
 
-
-/***********************************
-*          Welcome Screen          *   
-************************************/
-.welcomeScreenBack
-{   
-	width: 100%;
-	height: 100%;
-	z-index: 5000;
-	background-color: rgba(255,255,255,0.2);
-	position: absolute;
-	left: 0;
-	top: 0;
-}
 
 /************************************
 *              Authoring            *

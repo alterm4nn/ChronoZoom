@@ -424,32 +424,8 @@ module CZ {
         }
 
         export function updateLayout() {
-            var topHeight = $("#header").outerHeight(true) + $("#axis").outerHeight(true); // height of header and axis
-            var bottomHeight = $("#footer").outerHeight(true); // height of footer
-            var bodyTopMargin = parseFloat($("body").css("marginTop").replace('px', ''));
-            var bodyBottomMargin = parseFloat($("body").css("marginBottom").replace('px', ''));
-            var bodyMargin = bodyTopMargin + bodyBottomMargin; // calculated top and bottom margin of body tag
-            var occupiedHeight = topHeight + bottomHeight + bodyMargin; // occupied height of the page
-
-            //document.getElementById("vc").style.height = (window.innerHeight - occupiedHeight) + "px";
-
-            //$(".breadCrumbPanel").css("width", Math.round(($("#vc").width() / 2 - 50)));
-            //$("#bc_navRight").css("left", ($(".breadCrumbPanel").width() + $(".breadCrumbPanel").position().left + 2) + "px");
-            //CZ.BreadCrumbs.visibleAreaWidth = $(".breadCrumbPanel").width();
-            //CZ.BreadCrumbs.updateHiddenBreadCrumbs();
-
-            var offset = window.innerHeight - occupiedHeight;
-
-            var biblOutTopMargin = 25; // top margin of bibliography outer window
-            var biblOutBottomMargin = 15; // bottom margin of bibliography outer window
-
-            //document.getElementById("bibliographyOut").style.top = (topHeight + bodyTopMargin + 25) + "px";
-            //document.getElementById("bibliographyOut").style.height = (window.innerHeight - occupiedHeight -
-            //    biblOutTopMargin - biblOutBottomMargin) + "px";
-
-            //var welcomeScreenHeight = $("#welcomeScreenOut").outerHeight();
-            //var diff = Math.floor((window.innerHeight - welcomeScreenHeight) / 2);
-            //document.getElementById("welcomeScreenOut").style.top = diff + "px";
+            CZ.BreadCrumbs.visibleAreaWidth = $(".breadcrumbs-container").width();
+            CZ.BreadCrumbs.updateHiddenBreadCrumbs();
 
             vc.virtualCanvas("updateViewport");
             //ax.axis("updateWidth");
