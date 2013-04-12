@@ -1,15 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Accounts>
   <google>
-    <login>chronozoomtest@gmail.com</login>
-    <password>!QAZ2wsx#EDC</password>
+    <login></login>
+    <password></password>
   </google>
   <yahoo>
-    <login>chronozoom@yahoo.com</login>
-    <password>!QAZ2wsx#EDC</password>
+    <login></login>
+    <password></password>
   </yahoo>
   <ms>
-    <login>chronozoom@outlook.com</login>
-    <password>!QAZ1qaz</password>
+    <login></login>
+    <password></password>
   </ms>
 </Accounts>
