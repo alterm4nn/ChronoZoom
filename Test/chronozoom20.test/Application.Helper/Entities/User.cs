@@ -16,6 +16,6 @@
     {
         Google,
         Yahoo,
-        Ms
+        Microsoft
     }
 }
