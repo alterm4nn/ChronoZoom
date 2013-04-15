@@ -126,10 +126,10 @@
 
         // IDs of regime timelines
         export var cosmosTimelineID = "00000000-0000-0000-0000-000000000000";
-        export var earthTimelineID = "48fbb8a8-7c5d-49c3-83e1-98939ae2ae67";
-        export var lifeTimelineID = "d4809be4-3cf9-4ddd-9703-3ca24e4d3a26";
-        export var prehistoryTimelineID = "a6b821df-2a4d-4f0e-baf5-28e47ecb720b";
-        export var humanityTimelineID = "4afb5bb6-1544-4416-a949-8c8f473e544d";
+        export var earthTimelineID = "7f9656a7-a3f8-48cc-8b1c-18c9779ef232";
+        export var lifeTimelineID = "aa6538d2-9ad0-4d42-b3cc-47bfed233bca";
+        export var prehistoryTimelineID = "f502a3aa-dbdc-43c8-8863-a8205db7fef5";
+        export var humanityTimelineID = "8c24447f-1072-465d-b03b-1cac269b5ded";
 
         //tours
         export var toursAudioFormats =
