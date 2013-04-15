@@ -166,10 +166,10 @@ var CZ;
         Settings.minSmallTickSpace = 8;
         Settings.timescaleThickness = 2;
         Settings.cosmosTimelineID = "00000000-0000-0000-0000-000000000000";
-        Settings.earthTimelineID = "48fbb8a8-7c5d-49c3-83e1-98939ae2ae67";
-        Settings.lifeTimelineID = "d4809be4-3cf9-4ddd-9703-3ca24e4d3a26";
-        Settings.prehistoryTimelineID = "a6b821df-2a4d-4f0e-baf5-28e47ecb720b";
-        Settings.humanityTimelineID = "4afb5bb6-1544-4416-a949-8c8f473e544d";
+        Settings.earthTimelineID = "7f9656a7-a3f8-48cc-8b1c-18c9779ef232";
+        Settings.lifeTimelineID = "aa6538d2-9ad0-4d42-b3cc-47bfed233bca";
+        Settings.prehistoryTimelineID = "f502a3aa-dbdc-43c8-8863-a8205db7fef5";
+        Settings.humanityTimelineID = "8c24447f-1072-465d-b03b-1cac269b5ded";
         Settings.toursAudioFormats = [
             {
                 ext: 'mp3'
