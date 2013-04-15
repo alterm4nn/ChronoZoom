@@ -10,14 +10,15 @@ This document shows you how to use [Selenium WebDriver](http://docs.seleniumhq.o
 - [Visual Studio 2012](http://www.microsoft.com/visualstudio/eng/products/visual-studio-overview) (or latest).
 
 ## Supported browsers ##
-- Firefox
-- Chrome
-- Internet Explorer
-- Safari (Mac only)
+- Firefox (native WebDriver support)
+- Safari (Mac only, native WebDriver support)
+- Chrome (Chromedriver required)
+- Internet Explorer (InternetExplorerDriver required)
+
 
 **How to run UI tests on your local computer**
 
-1. Get the source code from github (fork https://github.com/alterm4nn/ChronoZoom).
+1. Get the source code from github (fork https://github.com/alterm4nn/ChronoZoom). For more information, see [Clone the ChronoZoom GitHub Repository](https://github.com/willum070/ChronoZoom/blob/master/Doc/ChronoZoom_Developer_Guide.md#clone-the-chronozoom-github-repository).
 2. Open **Source\Chronozoom.sln**
 3. Build the **Source\Chronozoom.Entities\Chronozoom.Entities.csproj** project.
 4. Open **Test\chronozoom20.test\ChronoZoom.Testing.sln**.
