@@ -26,9 +26,12 @@ This document shows you how to use [Selenium WebDriver](http://docs.seleniumhq.o
 	a. Open a file **Test\chronozoom20.test\Tests.UI\config.xml
 	b. Set BaseUrl(http://test.chronozoomproject.org) 
 	c. BrowserName("chrome", "firefox" or "internet explorer")
-
 7. Add rules for chromedriver and iedriver in Windows Firewall <!-- Need more details about how to set the rules up. -->
-8. Fill UsersInfo.settings - this file is required for AuthorizationTests (The file is added to .gitignore) <!-- Need more details -->
+8. Configure setting for AuthorizationTests 
+	a. Open file **Test\chronozoom20.test\Application.Helper\Constants\Accounts.xml**
+	b. Set Login and Password for Google, Yahoo and Microsoft accounts. **Please, Don't use own accounts. You can create accounts for tests**
+	c. Save file
+	d. Dont commit changes of the file to github. You can to add the file to git unstage (git update-index --assume-unchanged **PathToFile**/Accounts.xml)
 9. Launch Visual Studio and open Test Explorer.
 10. Run a test.
     a. Browser will be started
