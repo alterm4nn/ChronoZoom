@@ -1,4 +1,4 @@
-﻿/// <reference path="../Utils/jquery-1.8.0.min.js" />
+﻿/// <reference path="../Utils/jquery-1.7.2.min.js" />
 /// <reference path="../Utils/jasmine-jquery.js" />
 /// <reference path="../Js/timescale.js" />
 /// <reference path="../Js/common.js" />
@@ -28,7 +28,7 @@ describe("CZ.Timescale part", function () {
     describe("setTimeBorders() method should return", function () {
 
         beforeEach(function () {
-            setFixtures('<body></body>');
+            //setFixtures('<body></body>');
             $('body').prepend('<div id="axis" style="display:none;"></div>');
             $('body').prepend('<p id="timescale_left_border" style="display:none;"></p>');
             $('body').prepend('<p id="timescale_right_border" style="display:none;"></p>');
@@ -55,7 +55,7 @@ describe("CZ.DateTickSource part", function () {
     });
     describe("GetTicks() method", function () {
         it("should return 1 year after -1 year (not zero year)", function () {
-            var diff = getYearsBetweenDates(1, 0, 0, curY, curM, curD);
+            var diff = getYearsBetweenDates(1, 3, 10, curY, curM, curD);
 
             var rangeMax = diff + oneDay * 4;
             var rangeMin = diff - oneDay * 4;
@@ -69,17 +69,16 @@ describe("CZ.DateTickSource part", function () {
             }
 
             expect(ticksLabels).not.toContain('1 January, 0');
-            expect(ticksLabels).toContain('1 January, 1');
+            expect(ticksLabels).toContain('1 January, -2012');
         });
 
         it("should contain 29 February in leap year (1600)", function () {
-            var diff = getYearsBetweenDates(1600, 1, 27, curY, curM, curD);
-                
-            var rangeMax = diff + oneDay * 5;
-            var rangeMin = diff - oneDay * 5;
+            var diff = getYearsBetweenDates(1600, 5, 10, curY, curM, curD);
 
-            var range = { min: rangeMin, max: rangeMax };
-            var ticks = dateTickSource.getTicks(range);
+            var rangeMax = diff + oneDay * 4;
+            var rangeMin = diff - oneDay * 4;
+            
+            var ticks = dateTickSource.getTicks({ min: rangeMin, max: rangeMax });
             var ticksLabels = [];
 
             for (var i in ticks) {
@@ -155,3 +154,29 @@ describe("CZ.CosmosTickSource", function () {
         });
     });
 });
+
+//Helpers
+function getYearsBetweenDates(y1, m1, d1, y2, m2, d2) {
+    var years = y2 - y1;
+    if (y2 > 0 && y1 < 0) {
+        years -= 1;
+    }
+    var months = m2 - m1;
+    if (m1 > m2 || (m1 == m2 && d1 > d2)) {
+        years--;
+        months += 12;
+    }
+    var month = m1;
+    var days = -d1;
+    for (var i = 0; i < months; i++) {
+        if (month == 12) {
+            month = 0;
+        }
+        days += CZ.Settings.daysInMonth[month];
+        month++;
+    }
+    days += d2;
+    var res = years + days / 365;
+    return -res;
+}
+//Helpers

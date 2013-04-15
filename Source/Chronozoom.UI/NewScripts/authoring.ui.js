@@ -32,7 +32,7 @@ var CZ;
                     var mediaInput = $(this).find(".cz-authoring-ci-media-source");
                     var mediaTypeInput = ($)(this).find(".cz-authoring-ci-media-type option");
                     var descriptionInput = $(this).find(".cz-authoring-ci-description");
-                    var guid = $(this).attr("cz-authoring-ci-guid") || null;
+                    var guid = $(this).attr("cz-authoring-ci-guid") || undefined;
                     var selected = ($)(mediaTypeInput)[0];
                     for(var i = 0; i < mediaTypeInput.length; i++) {
                         if(mediaTypeInput[i].selected) {
@@ -46,7 +46,7 @@ var CZ;
                         uri: mediaInput.val(),
                         mediaType: selected.text,
                         guid: guid,
-                        parent: null
+                        parent: undefined
                     });
                 });
                 return contentItems;

@@ -51,9 +51,9 @@ module CZ {
             $('#cosmosBookmark')
                 .click(() => { CZ.Search.navigateToBookmark(CZ.Common.cosmosVisible); });
 
-            $('#bc_navLeft')
+            $('#breadcrumbs-nav-left')
                 .click(CZ.BreadCrumbs.breadCrumbNavLeft);
-            $('#bc_navRight')
+            $('#breadcrumbs-nav-right')
                 .click(CZ.BreadCrumbs.breadCrumbNavRight);
 
             $('#tour_prev')
@@ -83,30 +83,28 @@ module CZ {
                 .mouseout(() => { CZ.Common.toggleOffImage('biblCloseButton', 'png'); })
                 .mouseover(() => { CZ.Common.toggleOnImage('biblCloseButton', 'png'); })
 
-            $('#welcomeScreenCloseButton')
-                .mouseover(() => { CZ.Common.toggleOnImage('welcomeScreenCloseButton', 'png'); })
-                .mouseout(() => { CZ.Common.toggleOffImage('welcomeScreenCloseButton', 'png'); })
-                .click(CZ.Common.hideWelcomeScreen);
-            $('#closeWelcomeScreenButton')
-                .click(CZ.Common.closeWelcomeScreen);
+            // TODO: remove splash screen totaly and replace it with new UX.
+            //$('#welcomeScreenCloseButton')
+            //    .mouseover(() => { CZ.Common.toggleOnImage('welcomeScreenCloseButton', 'png'); })
+            //    .mouseout(() => { CZ.Common.toggleOffImage('welcomeScreenCloseButton', 'png'); })
+            //    .click(CZ.Common.hideWelcomeScreen);
+            //$('#closeWelcomeScreenButton')
+            //    .click(CZ.Common.closeWelcomeScreen);
 
-            $('#regime_navigator')
-                .click(CZ.Common.passThrough);
+            //var wlcmScrnCookie = CZ.Common.getCookie("welcomeScreenDisallowed");
+            //if (wlcmScrnCookie != null) {
+            //    CZ.Common.hideWelcomeScreen();
+            //}
+            //else {
+            //    // click on gray area hides welcome screen
+            //    $("#welcomeScreenOut").click(function (e) {
+            //        e.stopPropagation();
+            //    });
 
-            var wlcmScrnCookie = CZ.Common.getCookie("welcomeScreenDisallowed");
-            if (wlcmScrnCookie != null) {
-                CZ.Common.hideWelcomeScreen();
-            }
-            else {
-                // click on gray area hides welcome screen
-                $("#welcomeScreenOut").click(function (e) {
-                    e.stopPropagation();
-                });
-
-                $("#welcomeScreenBack").click(function () {
-                    CZ.Common.closeWelcomeScreen();
-                });
-            }
+            //    $("#welcomeScreenBack").click(function () {
+            //        CZ.Common.closeWelcomeScreen();
+            //    });
+            //}
 
             if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
                 if (/Chrome[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
@@ -167,10 +165,6 @@ module CZ {
 
             CZ.Common.maxPermitedVerticalRange = { top: 0, bottom: 10000000 }; //temporary value until there is no data
 
-            CZ.Common.regimeNavigator = $('#regime_navigator');
-
-            CZ.Common.regimesRatio = 300 / Math.abs(CZ.Settings.maxPermitedTimeRange.left - CZ.Settings.maxPermitedTimeRange.right);
-
             if (window.location.hash)
                 CZ.Common.startHash = window.location.hash; // to be processes after the data is loaded
             CZ.Common.loadData(); //retrieving the data
@@ -204,8 +198,6 @@ module CZ {
                                     var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
                                     CZ.Common.updateMarker();
                                 }
-
-                                CZ.Common.updateNavigator(vp);
                             },
                             function () {
                                 return CZ.Common.vc.virtualCanvas("getViewport");
@@ -315,7 +307,7 @@ module CZ {
             });
 
             // Reacting on the event when one of the infodot exploration causes inner zoom constraint
-            CZ.Common.vc.bind("innerZoomConstraintChenged", function (constraint) {
+            CZ.Common.vc.bind("innerZoomConstraintChanged", function (constraint) {
                 CZ.Common.controller.effectiveExplorationZoomConstraint = constraint.zoomValue; // applying the constraint
                 CZ.Common.axis.allowMarkerMovesOnHover = !constraint.zoomValue;
             });

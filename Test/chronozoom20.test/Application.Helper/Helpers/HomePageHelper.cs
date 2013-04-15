@@ -180,7 +180,7 @@ namespace Application.Helper.Helpers
 
         public void WaitWhileHomePageIsLoaded()
         {
-            WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("visReg != undefined")), 60);
+            WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("CZ.Common.cosmosVisible != undefined")), 60);
         }
     }
 }

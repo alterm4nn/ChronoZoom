@@ -14,8 +14,8 @@ var CZ;
                     this.canvasHeight = null;
                     this.requestNewFrame = false;
                     self.cursorPositionChangedEvent = new ($).Event("cursorPositionChanged");
-                    self.breadCrumbsChengedEvent = $.Event("breadCrumbsChanged");
-                    self.innerZoomConstraintChengedEvent = $.Event("innerZoomConstraintChenged");
+                    self.breadCrumbsChangedEvent = $.Event("breadCrumbsChanged");
+                    self.innerZoomConstraintChangedEvent = $.Event("innerZoomConstraintChanged");
                     self.currentlyHoveredInfodot = undefined;
                     self.breadCrumbs = [];
                     self.recentBreadCrumb = {
@@ -127,11 +127,11 @@ var CZ;
                     } else {
                         val = undefined;
                     }
-                    this.RaiseInnerZoomConstraintChenged(val);
+                    this.RaiseInnerZoomConstraintChanged(val);
                 },
-                RaiseInnerZoomConstraintChenged: function (e) {
-                    this.innerZoomConstraintChengedEvent.zoomValue = e;
-                    this.element.trigger(this.innerZoomConstraintChengedEvent);
+                RaiseInnerZoomConstraintChanged: function (e) {
+                    this.innerZoomConstraintChangedEvent.zoomValue = e;
+                    this.element.trigger(this.innerZoomConstraintChangedEvent);
                 },
                 RaiseCursorChanged: function () {
                     this.cursorPositionChangedEvent.Time = this.cursorPosition;
@@ -380,8 +380,8 @@ var CZ;
                     this._renderCanvas(this._layersContent, viewbox_v, viewport);
                 },
                 breadCrumbsChanged: function () {
-                    this.breadCrumbsChengedEvent.breadCrumbs = this.breadCrumbs;
-                    this.element.trigger(this.breadCrumbsChengedEvent);
+                    this.breadCrumbsChangedEvent.breadCrumbs = this.breadCrumbs;
+                    this.element.trigger(this.breadCrumbsChangedEvent);
                 },
                 requestInvalidate: function () {
                     this.requestNewFrame = false;

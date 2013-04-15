@@ -130,7 +130,7 @@ var CZ;
         }
         function createNewTimeline() {
             CZ.VCContent.removeChild(_hovered, "newTimelineRectangle");
-            return CZ.VCContent.addTimeline(_hovered, _hovered.layerid, null, {
+            return CZ.VCContent.addTimeline(_hovered, _hovered.layerid, undefined, {
                 timeStart: _rectCur.x,
                 timeEnd: _rectCur.x + _rectCur.width,
                 header: "Timeline Title",
@@ -145,10 +145,10 @@ var CZ;
         }
         function createNewExhibit() {
             CZ.VCContent.removeChild(_hovered, "newExhibitCircle");
-            return CZ.VCContent.addInfodot(_hovered, "layerInfodots", null, _circleCur.x + _circleCur.r, _circleCur.y + _circleCur.r, _circleCur.r, [
+            return CZ.VCContent.addInfodot(_hovered, "layerInfodots", undefined, _circleCur.x + _circleCur.r, _circleCur.y + _circleCur.r, _circleCur.r, [
                 {
-                    id: null,
-                    guid: null,
+                    id: undefined,
+                    guid: undefined,
                     title: "Content Item Title",
                     description: "Content Item Description",
                     uri: "",
@@ -158,7 +158,7 @@ var CZ;
             ], {
                 title: "Exhibit Title",
                 date: _circleCur.x + _circleCur.r,
-                guid: null
+                guid: undefined
             });
         }
         function updateTimelineTitle(t) {
@@ -351,7 +351,8 @@ var CZ;
                 var contentItems = e.contentItems;
                 var len = contentItems.length;
                 var i = 0;
-                e.guid = response;
+                e.guid = response.ExhibitId;
+                e.id = "e" + response.ExhibitId;
                 for(i = 0; i < len; ++i) {
                     contentItems[i].parent = e.guid;
                 }
