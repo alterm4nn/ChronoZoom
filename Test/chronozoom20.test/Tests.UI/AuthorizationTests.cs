@@ -61,7 +61,7 @@ namespace Tests
         public void Test_Login_as_Ms_user()
         {
             HomePageHelper.OpenLoginPage();
-            AuthorizationHelper.AuthenticateAsMsUser();
+            AuthorizationHelper.AuthenticateAsMicrosoftUser();
             Assert.IsTrue(AuthorizationHelper.IsUserAuthenticated());
         }
     }
