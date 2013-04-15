@@ -58,9 +58,9 @@ module CZ {
             hiddenFromLeft = [];
             hiddenFromRight = [];
 
-            var tableOffset = $(".breadCrumbTable").position().left; // breadcrumbs table offset from breadcrumbs visible area
+            var tableOffset = $("#breadcrumbs-table tr").position().left; // breadcrumbs table offset from breadcrumbs visible area
 
-            $(".breadCrumbTable tr td").each(function (index) {
+            $("#breadcrumbs-table tr td").each(function (index) {
                 // element is not hidden if it is moving to be shown already
                 if ($(this).attr("moving") != "left" && $(this).attr("moving") != "right") {
 
@@ -73,7 +73,7 @@ module CZ {
                             hiddenFromLeft.push(index);
                     }
                         // if at least 1 px of last breadcrumb link is hidden, then this breadcrumb is hidden
-                    else if (index == $(".breadCrumbTable tr td").length - 1) {
+                    else if (index == $("#breadcrumbs-table tr td").length - 1) {
                         if (elementOffset + elementWidth > visibleAreaWidth)
                             hiddenFromRight.push(index);
                     }
@@ -91,15 +91,15 @@ module CZ {
 
             // hide (show) left nav button if no hidden (at least 1 hidden) breadcrumb from left 
             if (hiddenFromLeft.length != 0)
-                $("#bc_navLeft").stop(true, true).fadeIn('fast');
+                $("#breadcrumbs-nav-left").stop(true, true).fadeIn('fast');
             else
-                $("#bc_navLeft").stop(true, true).fadeOut('fast');
+                $("#breadcrumbs-nav-left").stop(true, true).fadeOut('fast');
 
             // hide (show) right nav button if no hidden (at least 1 hidden) breadcrumb from right
             if (hiddenFromRight.length != 0)
-                $("#bc_navRight").stop(true, true).fadeIn('fast');
+                $("#breadcrumbs-nav-right").stop(true, true).fadeIn('fast');
             else
-                $("#bc_navRight").stop(true, true).fadeOut('fast');
+                $("#breadcrumbs-nav-right").stop(true, true).fadeOut('fast');
         }
 
         // Moves hidden from left (right) breadcrumb to left (right) side of breadcrumb panel.
@@ -125,10 +125,10 @@ module CZ {
                 }
             }
 
-            $(".breadCrumbTable").stop();
+            $("#breadcrumbs-table tr").stop();
 
             var element = $("#bc_" + index);
-            var tableOffset = $(".breadCrumbTable").position().left; // breadcrumbs table offset from breadcrumbs visible area
+            var tableOffset = $("#breadcrumbs-table tr").position().left; // breadcrumbs table offset from breadcrumbs visible area
             var elementOffset = element.position().left + tableOffset; // breadcrumb element offset from breadcrumbs visible area 
             var offset = 0; // offset for showing hidden breadcrumb element
 
@@ -146,8 +146,8 @@ module CZ {
                 var str = "+=" + offset + "px";
                 element.attr("moving", direction); // apply "moving" attribute to this breadcrumb element
 
-                $(".breadCrumbTable").animate({ "left": str }, "slow", function () {
-                    $(".breadCrumbTable tr td").each(function () {
+                $("#breadcrumbs-table tr").animate({ "left": str }, "slow", function () {
+                    $("#breadcrumbs-table tr td").each(function () {
                         // clear "moving" attributes for each breadcrumb
                         $(this).attr("moving", "false");
                     });
@@ -159,8 +159,8 @@ module CZ {
         // Moves breadcrumbs path to the right edge of visible area of breadcrumbs if it is allowed.
         // @param   callback            (function) callback function at the end of animation.
         function moveToRightEdge(callback?) {
-            var tableOffset = $(".breadCrumbTable").position().left; // breadcrumbs table offset from breadcrumbs visible area (<= 0 in px)
-            var tableWidth = $(".breadCrumbTable").width(); // width of breadcrumbs table (>= 0 in px)
+            var tableOffset = $("#breadcrumbs-table tr").position().left; // breadcrumbs table offset from breadcrumbs visible area (<= 0 in px)
+            var tableWidth = $("#breadcrumbs-table tr").width(); // width of breadcrumbs table (>= 0 in px)
 
             if (tableOffset <= 0) {
                 // some breadcrumbs are hidden
@@ -179,13 +179,13 @@ module CZ {
                     // width of hidden part is not enought to fill whole visible area
                     difference = -tableOffset;
 
-                $(".breadCrumbTable").stop();
+                $("#breadcrumbs-table tr").stop();
 
                 if (difference != 0) {
                     var str = "+=" + difference + "px";
 
-                    $(".breadCrumbTable").animate({ "left": str }, "fast", function () {
-                        $(".breadCrumbTable tr td").each(function () {
+                    $("#breadcrumbs-table tr").animate({ "left": str }, "fast", function () {
+                        $("#breadcrumbs-table tr td").each(function () {
                             // clear "moving" attributes for each breadcrumb
                             $(this).attr("moving", "false");
                         });
@@ -200,7 +200,7 @@ module CZ {
 
         // Removes last breadcrumb link.
         function removeBreadCrumb() {
-            var length = $(".breadCrumbTable tr td").length;
+            var length = $("#breadcrumbs-table tr td").length;
 
             if (length > 0) {
                 var selector = "#bc_" + (length - 1);
@@ -208,7 +208,7 @@ module CZ {
 
                 if (length > 1) {
                     selector = "#bc_" + (length - 2);
-                    $(selector + " .breadCrumbSeparator").hide();
+                    $(selector + " .breadcrumb-separator").hide();
                 }
             }
         }
@@ -216,19 +216,19 @@ module CZ {
         // Adds new breadcrumb link.
         // @param  element      (object) breadcrumb to be added.
         function addBreadCrumb(element) {
-            var length = $(".breadCrumbTable tr td").length;
+            var length = $("#breadcrumbs-table tr td").length;
 
             // add breadcrumb to table
-            var parent = $(".breadCrumbTable tr");
-            var td = $("<td class='breadCrumbTableCell' id='bc_" + length + "'></td>");
+            var parent = $("#breadcrumbs-table tr");
+            var td = $("<td id='bc_" + length + "'></td>");
 
             // Without title, it will be added after appending.
-            var div = $("<div class='breadCrumbLink' id='bc_link_" + element.id + "'></div>")
+            var div = $("<div class='breadcrumb-link' id='bc_link_" + element.id + "'></div>")
                 .click(function () {
                     clickOverBreadCrumb(element.id, length);
                 });
 
-            var span = $("<span class='breadCrumbSeparator' id='bc_'>&rsaquo;</span>");
+            var span = $("<span class='breadcrumb-separator' id='bc_'>&rsaquo;</span>");
 
             td.append(div);
             td.append(span);
@@ -238,27 +238,27 @@ module CZ {
             // select color of the text for this breadcrumb
             switch (element.regime) {
                 case "Cosmos":
-                    $("#bc_link_" + element.id).addClass("breadCrumbLinkCosmosRegime");
+                    $("#bc_link_" + element.id).addClass("breadcrumb-cosmos");
                     break;
                 case "Earth":
-                    $("#bc_link_" + element.id).addClass("breadCrumbLinkEarthRegime");
+                    $("#bc_link_" + element.id).addClass("breadcrumb-earth");
                     break;
                 case "Life":
-                    $("#bc_link_" + element.id).addClass("breadCrumbLinkLifeRegime");
+                    $("#bc_link_" + element.id).addClass("breadcrumb-life");
                     break;
                 case "Pre-history":
-                    $("#bc_link_" + element.id).addClass("breadCrumbLinkPreHumanRegime");
+                    $("#bc_link_" + element.id).addClass("breadcrumb-prehistory");
                     break;
                 case "Humanity":
-                    $("#bc_link_" + element.id).addClass("breadCrumbLinkHumanityRegime");
+                    $("#bc_link_" + element.id).addClass("breadcrumb-humanity");
                     break;
             }
 
             // hide context search button for new breadcrumb element
-            $("#bc_" + length + " .breadCrumbSeparator").hide();
+            $("#bc_" + length + " .breadcrumb-separator").hide();
 
             if (length > 0) // show context search button for previous breadcrumb element
-                $("#bc_" + (length - 1) + " .breadCrumbSeparator").show();
+                $("#bc_" + (length - 1) + " .breadcrumb-separator").show();
 
             $("#bc_link_" + element.id).mouseover(function () {
                 breadCrumbMouseOver(this);
@@ -272,19 +272,19 @@ module CZ {
         // Handles click over navigate to left button.
         export function breadCrumbNavLeft() {
             var movingLeftBreadCrumbs = 0; // counter of currently moving to left breadcrumbs
-            var number = 0; // index of first moving to left breadcrumb
+            var num = 0; // index of first moving to left breadcrumb
 
-            $(".breadCrumbTable tr td").each(function (index) {
+            $("#breadcrumbs-table tr td").each(function (index) {
                 if ($(this).attr("moving") == "left") {
                     movingLeftBreadCrumbs++;
-                    if (number == 0)
-                        number = index;
+                    if (num == 0)
+                        num = index;
                 }
             });
 
             // perform long navigation if enough breadcrumbs are moving at one time
             if (movingLeftBreadCrumbs == CZ.Settings.navigateNextMaxCount) {
-                var index = number - CZ.Settings.longNavigationLength;
+                var index = num - CZ.Settings.longNavigationLength;
                 if (index < 0)
                     index = 0;
 
@@ -298,20 +298,20 @@ module CZ {
         // Handles click over navigate to right button.
         export function breadCrumbNavRight() {
             var movingRightBreadCrumbs = 0; // counter of currently moving to right breadcrumbs
-            var number = 0; // index of first moving to right breadcrumb
+            var num = 0; // index of first moving to right breadcrumb
 
-            $(".breadCrumbTable tr td").each(function (index) {
+            $("#breadcrumbs-table tr td").each(function (index) {
                 if ($(this).attr("moving") == "right") {
                     movingRightBreadCrumbs++;
-                    number = index;
+                    num = index;
                 }
             });
 
             // perform long navigation if enough breadcrumbs are moving at one time
             if (movingRightBreadCrumbs == CZ.Settings.navigateNextMaxCount) {
-                var index = number + CZ.Settings.longNavigationLength;
-                if (index >= $(".breadCrumbTable tr td").length)
-                    index = $(".breadCrumbTable tr td").length - 1;
+                var index = num + CZ.Settings.longNavigationLength;
+                if (index >= $("#breadcrumbs-table tr td").length)
+                    index = $("#breadcrumbs-table tr td").length - 1;
 
                 showHiddenBreadCrumb("right", index);
             }
@@ -328,7 +328,7 @@ module CZ {
 
             var selector = "#bc_" + breadCrumbLinkID;
 
-            var tableOffset = $(".breadCrumbTable").position().left;
+            var tableOffset = $("#breadcrumbs-table tr").position().left;
             var elementOffset = $(selector).position().left + tableOffset;
             var elementWidth = $(selector).width();
 
@@ -342,11 +342,11 @@ module CZ {
         // Functions to change breadcrumb's link color, to avoid bug when <class:hover> doesn't work in IE when mouse enter breadcrumb link
         // through image that is right to it. 
         function breadCrumbMouseOut(element) {
-            $(element).removeClass("breadCrumbHover");
+            $(element).removeClass("breadcrumb-hover");
         }
 
         function breadCrumbMouseOver(element) {
-            $(element).addClass("breadCrumbHover");
+            $(element).addClass("breadcrumb-hover");
         }
 
         // Changes image from <off> state to <on> state

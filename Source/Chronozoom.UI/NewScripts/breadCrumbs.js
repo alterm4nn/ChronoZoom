@@ -41,8 +41,8 @@ var CZ;
         function updateHiddenBreadCrumbs() {
             hiddenFromLeft = [];
             hiddenFromRight = [];
-            var tableOffset = $(".breadCrumbTable").position().left;
-            $(".breadCrumbTable tr td").each(function (index) {
+            var tableOffset = $("#breadcrumbs-table tr").position().left;
+            $("#breadcrumbs-table tr td").each(function (index) {
                 if($(this).attr("moving") != "left" && $(this).attr("moving") != "right") {
                     var elementOffset = $(this).position().left + tableOffset;
                     var elementWidth = $(this).width();
@@ -50,7 +50,7 @@ var CZ;
                         if(elementOffset < 0) {
                             hiddenFromLeft.push(index);
                         }
-                    } else if(index == $(".breadCrumbTable tr td").length - 1) {
+                    } else if(index == $("#breadcrumbs-table tr td").length - 1) {
                         if(elementOffset + elementWidth > BreadCrumbs.visibleAreaWidth) {
                             hiddenFromRight.push(index);
                         }
@@ -65,14 +65,14 @@ var CZ;
             });
             hiddenFromRight.reverse();
             if(hiddenFromLeft.length != 0) {
-                $("#bc_navLeft").stop(true, true).fadeIn('fast');
+                $("#breadcrumbs-nav-left").stop(true, true).fadeIn('fast');
             } else {
-                $("#bc_navLeft").stop(true, true).fadeOut('fast');
+                $("#breadcrumbs-nav-left").stop(true, true).fadeOut('fast');
             }
             if(hiddenFromRight.length != 0) {
-                $("#bc_navRight").stop(true, true).fadeIn('fast');
+                $("#breadcrumbs-nav-right").stop(true, true).fadeIn('fast');
             } else {
-                $("#bc_navRight").stop(true, true).fadeOut('fast');
+                $("#breadcrumbs-nav-right").stop(true, true).fadeOut('fast');
             }
         }
         BreadCrumbs.updateHiddenBreadCrumbs = updateHiddenBreadCrumbs;
@@ -96,9 +96,9 @@ var CZ;
                         break;
                 }
             }
-            $(".breadCrumbTable").stop();
+            $("#breadcrumbs-table tr").stop();
             var element = $("#bc_" + index);
-            var tableOffset = $(".breadCrumbTable").position().left;
+            var tableOffset = $("#breadcrumbs-table tr").position().left;
             var elementOffset = element.position().left + tableOffset;
             var offset = 0;
             switch(direction) {
@@ -113,10 +113,10 @@ var CZ;
             if(offset != 0) {
                 var str = "+=" + offset + "px";
                 element.attr("moving", direction);
-                $(".breadCrumbTable").animate({
+                $("#breadcrumbs-table tr").animate({
                     "left": str
                 }, "slow", function () {
-                    $(".breadCrumbTable tr td").each(function () {
+                    $("#breadcrumbs-table tr td").each(function () {
                         $(this).attr("moving", "false");
                     });
                     updateHiddenBreadCrumbs();
@@ -124,8 +124,8 @@ var CZ;
             }
         }
         function moveToRightEdge(callback) {
-            var tableOffset = $(".breadCrumbTable").position().left;
-            var tableWidth = $(".breadCrumbTable").width();
+            var tableOffset = $("#breadcrumbs-table tr").position().left;
+            var tableWidth = $("#breadcrumbs-table tr").width();
             if(tableOffset <= 0) {
                 var tableVisible = tableWidth + tableOffset;
                 var difference = 0;
@@ -138,13 +138,13 @@ var CZ;
                 } else {
                     difference = -tableOffset;
                 }
-                $(".breadCrumbTable").stop();
+                $("#breadcrumbs-table tr").stop();
                 if(difference != 0) {
                     var str = "+=" + difference + "px";
-                    $(".breadCrumbTable").animate({
+                    $("#breadcrumbs-table tr").animate({
                         "left": str
                     }, "fast", function () {
-                        $(".breadCrumbTable tr td").each(function () {
+                        $("#breadcrumbs-table tr td").each(function () {
                             $(this).attr("moving", "false");
                         });
                         updateHiddenBreadCrumbs();
@@ -156,48 +156,48 @@ var CZ;
             }
         }
         function removeBreadCrumb() {
-            var length = $(".breadCrumbTable tr td").length;
+            var length = $("#breadcrumbs-table tr td").length;
             if(length > 0) {
                 var selector = "#bc_" + (length - 1);
                 $(selector).remove();
                 if(length > 1) {
                     selector = "#bc_" + (length - 2);
-                    $(selector + " .breadCrumbSeparator").hide();
+                    $(selector + " .breadcrumb-separator").hide();
                 }
             }
         }
         function addBreadCrumb(element) {
-            var length = $(".breadCrumbTable tr td").length;
-            var parent = $(".breadCrumbTable tr");
-            var td = $("<td class='breadCrumbTableCell' id='bc_" + length + "'></td>");
-            var div = $("<div class='breadCrumbLink' id='bc_link_" + element.id + "'></div>").click(function () {
+            var length = $("#breadcrumbs-table tr td").length;
+            var parent = $("#breadcrumbs-table tr");
+            var td = $("<td id='bc_" + length + "'></td>");
+            var div = $("<div class='breadcrumb-link' id='bc_link_" + element.id + "'></div>").click(function () {
                 clickOverBreadCrumb(element.id, length);
             });
-            var span = $("<span class='breadCrumbSeparator' id='bc_'>&rsaquo;</span>");
+            var span = $("<span class='breadcrumb-separator' id='bc_'>&rsaquo;</span>");
             td.append(div);
             td.append(span);
             parent.append(td);
             div.text(element.title);
             switch(element.regime) {
                 case "Cosmos":
-                    $("#bc_link_" + element.id).addClass("breadCrumbLinkCosmosRegime");
+                    $("#bc_link_" + element.id).addClass("breadcrumb-cosmos");
                     break;
                 case "Earth":
-                    $("#bc_link_" + element.id).addClass("breadCrumbLinkEarthRegime");
+                    $("#bc_link_" + element.id).addClass("breadcrumb-earth");
                     break;
                 case "Life":
-                    $("#bc_link_" + element.id).addClass("breadCrumbLinkLifeRegime");
+                    $("#bc_link_" + element.id).addClass("breadcrumb-life");
                     break;
                 case "Pre-history":
-                    $("#bc_link_" + element.id).addClass("breadCrumbLinkPreHumanRegime");
+                    $("#bc_link_" + element.id).addClass("breadcrumb-prehistory");
                     break;
                 case "Humanity":
-                    $("#bc_link_" + element.id).addClass("breadCrumbLinkHumanityRegime");
+                    $("#bc_link_" + element.id).addClass("breadcrumb-humanity");
                     break;
             }
-            $("#bc_" + length + " .breadCrumbSeparator").hide();
+            $("#bc_" + length + " .breadcrumb-separator").hide();
             if(length > 0) {
-                $("#bc_" + (length - 1) + " .breadCrumbSeparator").show();
+                $("#bc_" + (length - 1) + " .breadcrumb-separator").show();
             }
             $("#bc_link_" + element.id).mouseover(function () {
                 breadCrumbMouseOver(this);
@@ -208,17 +208,17 @@ var CZ;
         }
         function breadCrumbNavLeft() {
             var movingLeftBreadCrumbs = 0;
-            var number = 0;
-            $(".breadCrumbTable tr td").each(function (index) {
+            var num = 0;
+            $("#breadcrumbs-table tr td").each(function (index) {
                 if($(this).attr("moving") == "left") {
                     movingLeftBreadCrumbs++;
-                    if(number == 0) {
-                        number = index;
+                    if(num == 0) {
+                        num = index;
                     }
                 }
             });
             if(movingLeftBreadCrumbs == CZ.Settings.navigateNextMaxCount) {
-                var index = number - CZ.Settings.longNavigationLength;
+                var index = num - CZ.Settings.longNavigationLength;
                 if(index < 0) {
                     index = 0;
                 }
@@ -230,17 +230,17 @@ var CZ;
         BreadCrumbs.breadCrumbNavLeft = breadCrumbNavLeft;
         function breadCrumbNavRight() {
             var movingRightBreadCrumbs = 0;
-            var number = 0;
-            $(".breadCrumbTable tr td").each(function (index) {
+            var num = 0;
+            $("#breadcrumbs-table tr td").each(function (index) {
                 if($(this).attr("moving") == "right") {
                     movingRightBreadCrumbs++;
-                    number = index;
+                    num = index;
                 }
             });
             if(movingRightBreadCrumbs == CZ.Settings.navigateNextMaxCount) {
-                var index = number + CZ.Settings.longNavigationLength;
-                if(index >= $(".breadCrumbTable tr td").length) {
-                    index = $(".breadCrumbTable tr td").length - 1;
+                var index = num + CZ.Settings.longNavigationLength;
+                if(index >= $("#breadcrumbs-table tr td").length) {
+                    index = $("#breadcrumbs-table tr td").length - 1;
                 }
                 showHiddenBreadCrumb("right", index);
             } else if(movingRightBreadCrumbs < CZ.Settings.navigateNextMaxCount) {
@@ -251,7 +251,7 @@ var CZ;
         function clickOverBreadCrumb(timelineID, breadCrumbLinkID) {
             CZ.Search.goToSearchResult(timelineID);
             var selector = "#bc_" + breadCrumbLinkID;
-            var tableOffset = $(".breadCrumbTable").position().left;
+            var tableOffset = $("#breadcrumbs-table tr").position().left;
             var elementOffset = $(selector).position().left + tableOffset;
             var elementWidth = $(selector).width();
             if(elementOffset < 0) {
@@ -262,10 +262,10 @@ var CZ;
         }
         BreadCrumbs.clickOverBreadCrumb = clickOverBreadCrumb;
         function breadCrumbMouseOut(element) {
-            $(element).removeClass("breadCrumbHover");
+            $(element).removeClass("breadcrumb-hover");
         }
         function breadCrumbMouseOver(element) {
-            $(element).addClass("breadCrumbHover");
+            $(element).addClass("breadcrumb-hover");
         }
         function changeToOff(element) {
             var src = element.getAttribute("src");

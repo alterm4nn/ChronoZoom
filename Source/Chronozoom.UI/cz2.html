@@ -59,177 +59,55 @@
     <script type="text/javascript" src="/NewScripts/cz.js"></script>
     <title>ChronoZoom</title>
 </head>
-<body style="background-color: Black; min-width: 950px;">
-    <div id="header" style="height: 67px">
-        <div style="position: relative">
-            <div style="left: 15px; height: 29px; position: absolute;">
-                <img style="margin: 9px 0 0 5px; float: left" title="ChronoZoom" src="/Images/chronzoom-200px-white.png" />
-                <img style="margin: 5px 0 0 14px; float: right" id="search_button" title="Search ChronoZoom" alt="Search ChronoZoom" src="/Images/search_off.jpg" />
-                <img style="margin: 5px 0 0 14px" title="Take a guided tour" id="tours_index" alt="Take a guided tour" src="/Images/tour_off.jpg" />
-            </div>
+<body>
+    <div id="header" class="unselectable">
+        <div class="fleft">
+            <ul>
+                <li class="fleft">
+                    <img style="margin-top: 3px; margin-right: 40px;" title="ChronoZoom" src="/Images/chronzoom-200px-white.png" />
+                </li>
+                <li class="fleft">
+                    <div id="regime-link-cosmos" class="regime-link">cosmos</div>
+                </li>
+                <li class="fleft">
+                    <div id="regime-link-earth" class="regime-link">earth</div>
+                </li>
+                <li class="fleft">
+                    <div id="regime-link-life" class="regime-link">life</div>
+                </li>
+                <li class="fleft">
+                    <div id="regime-link-prehistory" class="regime-link">prehistory</div>
+                </li>
+                <li class="fleft">
+                    <div id="regime-link-humanity" class="regime-link">humanity</div>
+                </li>
+            </ul>
+        </div>
+        <div class="fright">
+            <ul>                
+                <li class="fleft">
+                    <div id="login-panel" />
+                </li>
+                <li class="fleft">
+                    <img id="search_button" title="Search ChronoZoom" alt="Search ChronoZoom" src="/Images/search_off.jpg" />
+                </li>
+                <li class="fleft">
+                    <img title="Take a guided tour" id="tours_index" alt="Take a guided tour" src="/Images/tour_off.jpg" />
+                </li>
+            </ul>
+        </div>
 
-            <div style="margin-left: auto; margin-right: auto; width: 200px; color: #DBDBDB" id="LoginPanel">
-            </div>
-
-            <script language="javascript">
-                $.ajax({
-                    url: "/account/isauth"
-                }).done(function (data) {
-                    if (data != "True") {
-                        $("#LoginPanel").html('<a href="/account/login" style="color:#DBDBDB">Login</a>');
-                    } else {
-                        $("#LoginPanel").html('<a href="/account/logout" style="color:#DBDBDB">Logout</a>');
-                    }
-                });
-            </script>
-
-            <div class="regimes_rects" style="right: 0px; position: absolute; top: 0px; width: 302px; height: 62px;">
-                <div id="human_rect" class="regime_rect" style="position: absolute; top: 1px; width: 17px; left: 284px; height: 10px; background-color: rgba(212, 92, 70, 1.0); cursor: pointer;">
-                </div>
-                <div id="prehuman_rect" class="regime_rect" style="position: absolute; top: 13px; width: 100px; left: 201px; height: 10px; background-color: rgba(237, 145, 50, 1.0); cursor: pointer;">
-                </div>
-                <div id="life_rect" class="regime_rect" style="position: absolute; top: 25px; width: 255px; left: 46px; height: 10px; background-color: rgba(73, 150, 73, 1.0); cursor: pointer;">
-                </div>
-                <div id="earth_rect" class="regime_rect" style="position: absolute; top: 37px; width: 260px; left: 41px; height: 10px; background-color: rgba(81, 127, 149, 1.0); cursor: pointer;">
-                </div>
-                <div id="cosmos_rect" class="regime_rect" style="position: absolute; top: 49px; width: 300px; left: 1px; height: 10px; background-color: rgba(152, 108, 157, 1.0); cursor: pointer;">
-                </div>
-                <div id="regime_navigator" style="position: absolute; top: 0px; left: 1px; width: 300px; height: 62px; background-color: White; opacity: 0.3; pointer-events: none;">
-                </div>
-            </div>
-            <!--<img alt="regimes_navigator" style="right: 0px; position: absolute; top: 0px" src="/Images/regimes.png" />-->
-            <div class="regimes_titles" style="top: 0px; position: absolute; right: 309px; font-size: 11.5;">
-                <div style="position: relative; height: 12px;">
-                    <div class="regimes_title">
-                        Humanity
-                    </div>
-                </div>
-                <div style="position: relative; height: 12px;">
-                    <div class="regimes_title">
-                        Human&nbsp;Prehistory
-                    </div>
-                </div>
-                <div style="position: relative; height: 12px;">
-                    <div class="regimes_title">
-                        Life
-                    </div>
-                </div>
-                <div style="position: relative; height: 12px;">
-                    <div class="regimes_title">
-                        Earth
-                    </div>
-                </div>
-                <div style="position: relative; height: 12px;">
-                    <div class="regimes_title">
-                        Cosmos
-                    </div>
-                </div>
-            </div>
-
-
-            <div id="bc_navLeft" class="breadCrumbNavButton">&#171;</div>
-            <div id="breadCrumbsPanel" class="breadCrumbPanel unselectable">
-                <table id="breadCrumbsTable" class="breadCrumbTable">
-                    <tr>
-                    </tr>
-                </table>
-            </div>
-            <div id="bc_navRight" class="breadCrumbNavButton">&#187;</div>
-
-
-            <div id="tour_control" class="tour_control" style="display: none; top: 14px; position: relative; margin: auto">
-                <img id="tour_prev" src="/Images/tour_prev_off.jpg" alt="previous" />
-                <img style="margin: 0 0 0 16px"
-                    id="tour_playpause" src="/Images/tour_pause_off.jpg" alt="play/pause" />
-                <img
-                    style="margin: 0 0 0 16px" id="tour_next" src="/Images/tour_next_off.jpg" alt="next"
-                     />
-                <img style="margin: 0 0 0 10px" id="tour_exit" src="/Images/tour_exit_off.jpg"
-                    alt="exit" />
-            </div>
-        </div>
-    </div>
-
-    <div id="axis">
-    </div>
-    <div id="vc" style="width: 100%; height: auto; overflow: hidden; background-image: url('/Images/background.jpg'); background-repeat: no-repeat; background-attachment: fixed; background-position: center center; background-size: cover">
-        <div id="layerTimelines" onselectstart="return false;">
-        </div>
-        <!--for popup's-->
-        <p class="bubbleInfo" style="display: inline-block; z-index: 3000;" id="defaultBox">
-            <span></span>
-        </p>
-        <!--//////////-->
-        <div id="layerInfodots" onselectstart="return false;">
-        </div>
-        <div id="iframe_layer" onselectstart="return false;">
-        </div>
-    </div>
-
-    <div id="search" class="czWindow" style="z-index: 2010;max-height:250px; display: none">
-        <div class="header" onselectstart="return false;">
-            Search
-        </div>
-        <div>
-            <input id="searchTextBox" class="czTextBox emptyTextBox" style="margin: 10px 10px 10px 10px; width: 190px"
-                value="type here..." />
-        </div>
-        <div class="searchResults" style="height: auto; max-height: 140px">
-        </div>
-        <div>
-            <!--<img src="/Images/loading10.gif" style="width: 190px;margin-left: 10px; height: 20px;display:none;" alt="Searching..." id="loadingImage"/>-->
-            <img src="/Images/loading.gif" style="width: 190px; margin-left: 10px; margin-bottom: 10px; height: 20px; display: none;" alt="Searching..." id="loadingImage" />
-        </div>
-    </div>
-    <div id="tours" class="czWindow" onselectstart="return false;" style="display: none">
-        <div class="header">
-            Tours
-        </div>
-        <div id="tours-narration" class="narration">
-            Narration: <span id="tours-narration-on" class="narration-selected">ON</span> |
-            <span id="tours-narration-off">OFF</span>
-        </div>
-        <div id="tours-content" class="content">
-        </div>
-    </div>
-    <div id="bookmarks" class="bookmarksWindow" onselectstart="return false;" style="display: none">
-        <img id="bookmarksCollapse" src="/Images/collapse-left.png" class="headerButton" />
-        <div class="header">
-        </div>
-        <div class="slideHeader">
-        </div>
-        <div class="slideText">
-        </div>
-        <div class="slideFooter">
-        </div>
-    </div>
-    <div id="bibliographyBack" class="biblBack" style="display: none">
-        <div id="bibliographyOut" class="biblOuterWindow">
-            <div id="bibliography" class="biblWindow">
-                <img class="closeButton" id="biblCloseButton" src="/Images/close_off.png" alt="Close" onselectstart="return false;" />
-                <div class="title" onselectstart="return false;">
-                    <span>Infodot name</span> &gt; Bibliography
-                </div>
-                <div class="sources">
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="footer">
-        <div id="footer-left">
-            <span class="footer-text">Created by: 
-            </span>
-            <a href="http://research.microsoft.com/en-us/projects/chronozoom/default.aspx">
-                <img src="/Images/mrclogo-17x53.png" title="Microsoft Research" />
-            </a>
-            <a href="http://eps.berkeley.edu">
-                <img src="/Images/berkeley-logo-17-86.png" title="University of California Berkeley Department of Earth and Planetary Science" />
-            </a>
-            <a href="http://www.cs.msu.su">
-                <img src="/Images/MSU_logo-white17x74.png" title="Moscow State University" />
-            </a>
-        </div>
+        <script language="javascript">
+            $.ajax({
+                url: "/account/isauth"
+            }).done(function (data) {
+                if (data != "True") {
+                    $("#login-panel").html('<a href="/account/login" style="color:#E9E9E9">login</a>');
+                } else {
+                    $("#login-panel").html('<a href="/account/logout" style="color:#E9E9E9">logout</a>');
+                }
+            });
+        </script>        
 
         <div id="footer-authoring">
 
@@ -317,36 +195,125 @@
                 </p>
             </div>
         </div>
-
-        <div id="footer-right">
-            <a href="http://go.microsoft.com/?linkid=9797058" class="footer-survey">Take Our Survey
-            </a>
-            <span class="footer-separator">|
-            </span>
-            <a href="https://github.com/alterm4nn/ChronoZoom/issues" class="footer-link">Report a Problem
-            </a>
-            <span class="footer-separator">|
-            </span>
-            <a href="BehindTheScenes.htm" class="footer-link">Behind the Scenes
-            </a>
-            <span class="footer-separator">|
-            </span>
-            <a href="TermsOfUse.htm" class="footer-link">Terms of Use
-            </a>
-            <span class="footer-separator">|
-            </span>
-            <a href="Privacy.htm" class="footer-link">Privacy
-            </a>
-            <span class="footer-separator">|
-            </span>
-            <a href="Trademark_Copyright.htm" class="footer-link">Trademark
-            </a>
+        <div id="tour_control" class="tour_control" style="display: none; top: 14px; position: relative; margin: auto">
+            <img id="tour_prev" src="/Images/tour_prev_off.jpg" alt="previous" />
+            <img style="margin: 0 0 0 16px"
+                id="tour_playpause" src="/Images/tour_pause_off.jpg" alt="play/pause" />
+            <img
+                style="margin: 0 0 0 16px" id="tour_next" src="/Images/tour_next_off.jpg" alt="next"
+                    />
+            <img style="margin: 0 0 0 10px" id="tour_exit" src="/Images/tour_exit_off.jpg"
+                alt="exit" />
         </div>
-
-        <div class="clearer"></div>
     </div>
 
-    <div id="welcomeScreenBack" class="welcomeScreenBack">
+    <div id="content">
+        <div id="axis" style="position: relative;">
+        </div>
+
+        <div id="vc-container">
+            <div id="vc">
+                <div id="layerTimelines" onselectstart="return false;">
+                </div>
+                <!--for popup's-->
+                <p class="bubbleInfo" style="display: inline-block; z-index: 3000;" id="defaultBox">
+                    <span></span>
+                </p>
+                <!--//////////-->
+                <div id="layerInfodots" onselectstart="return false;">
+                </div>
+                <div id="iframe_layer" onselectstart="return false;">
+                </div>
+            </div>
+        </div>
+
+        <div id="search" class="czWindow" style="z-index: 2010;max-height:250px; display: none">
+            <div class="header" onselectstart="return false;">
+                Search
+            </div>
+            <div>
+                <input id="searchTextBox" class="czTextBox emptyTextBox" style="margin: 10px 10px 10px 10px; width: 190px"
+                    value="type here..." />
+            </div>
+            <div class="searchResults" style="height: auto; max-height: 140px">
+            </div>
+            <div>
+                <img src="/Images/loading.gif" style="width: 190px; margin-left: 10px; margin-bottom: 10px; height: 20px; display: none;" alt="Searching..." id="loadingImage" />
+            </div>
+        </div>
+
+        <div id="tours" class="czWindow" onselectstart="return false;" style="display: none">
+            <div class="header">
+                Tours
+            </div>
+            <div id="tours-narration" class="narration">
+                Narration: <span id="tours-narration-on" class="narration-selected">ON</span> |
+                <span id="tours-narration-off">OFF</span>
+            </div>
+            <div id="tours-content" class="content">
+            </div>
+        </div>
+
+        <div id="bookmarks" class="bookmarksWindow" onselectstart="return false;" style="display: none">
+            <img id="bookmarksCollapse" src="/Images/collapse-left.png" class="headerButton" />
+            <div class="header">
+            </div>
+            <div class="slideHeader">
+            </div>
+            <div class="slideText">
+            </div>
+            <div class="slideFooter">
+            </div>
+        </div>
+
+        <div id="bibliographyBack" class="biblBack" style="display: none">
+            <div id="bibliographyOut" class="biblOuterWindow">
+                <div id="bibliography" class="biblWindow">
+                    <img class="closeButton" id="biblCloseButton" src="/Images/close_off.png" alt="Close" onselectstart="return false;" />
+                    <div class="title" onselectstart="return false;">
+                        <span>Infodot name</span> &gt; Bibliography
+                    </div>
+                    <div class="sources">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer">
+            <div class="breadcrumbs-nav fleft">
+                <div id="breadcrumbs-nav-left">&#171;</div>
+            </div>
+            <div class="breadcrumbs-container fleft">
+                <table id="breadcrumbs-table">
+                    <tr />
+                </table>
+            </div>
+            <div class="breadcrumbs-nav fleft">
+                <div id="breadcrumbs-nav-right" class="">&#187;</div>
+            </div>
+
+        <div class="fright">
+            <ul>
+                <li class="fright">
+                    <div class="footer-link">about</div>
+                </li>
+                <li class="fright">
+                    <div class="footer-link">feedback</div>
+                </li>
+                <li class="fright">
+                    <div class="footer-link">privacy</div>
+                </li>
+                <li class="fright">
+                    <div class="footer-link">help</div>
+                </li>
+            </ul>
+        </div>
+                
+        <div class="clearer" />
+    </div>
+
+    <!--<div id="welcomeScreenBack" class="welcomeScreenBack">
         <div id="welcomeScreenOut" class="welcomeScreenOuterWindow">
             <div id="welcomeScreen" class="welcomeScreen">
                 <div class="titleArea">
@@ -376,6 +343,6 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>-->
 </body>
 </html>

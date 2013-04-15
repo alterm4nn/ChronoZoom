@@ -20,8 +20,6 @@ var CZ;
         var breadCrumbs;
         var firstTimeWelcomeChecked = true;
         var regimes = [];
-        Common.regimesRatio;
-        Common.regimeNavigator;
         var k = 1000000000;
         Common.setNavigationStringTo;
         Common.hashHandle = true;
@@ -292,7 +290,6 @@ var CZ;
                 Common.controller.moveToVisible(visReg, true);
                 updateAxis(Common.vc, Common.ax);
                 var vp = Common.vc.virtualCanvas("getViewport");
-                updateNavigator(vp);
                 if(Common.startHash && window.location.hash !== Common.startHash) {
                     hashChangeFromOutside = false;
                     window.location.hash = Common.startHash;
@@ -333,70 +330,13 @@ var CZ;
             Common.maxPermitedScale = CZ.UrlNav.navStringToVisible(Common.cosmosVisible, Common.vc).scale * 1.1;
         }
         function updateLayout() {
-            var topHeight = $("#header").outerHeight(true) + $("#axis").outerHeight(true);
-            var bottomHeight = $("#footer").outerHeight(true);
-            var bodyTopMargin = parseFloat($("body").css("marginTop").replace('px', ''));
-            var bodyBottomMargin = parseFloat($("body").css("marginBottom").replace('px', ''));
-            var bodyMargin = bodyTopMargin + bodyBottomMargin;
-            var occupiedHeight = topHeight + bottomHeight + bodyMargin;
-            document.getElementById("vc").style.height = (window.innerHeight - occupiedHeight) + "px";
-            $(".breadCrumbPanel").css("width", Math.round(($("#vc").width() / 2 - 50)));
-            $("#bc_navRight").css("left", ($(".breadCrumbPanel").width() + $(".breadCrumbPanel").position().left + 2) + "px");
-            CZ.BreadCrumbs.visibleAreaWidth = $(".breadCrumbPanel").width();
+            CZ.BreadCrumbs.visibleAreaWidth = $(".breadcrumbs-container").width();
             CZ.BreadCrumbs.updateHiddenBreadCrumbs();
-            var offset = window.innerHeight - occupiedHeight;
-            var biblOutTopMargin = 25;
-            var biblOutBottomMargin = 15;
-            document.getElementById("bibliographyOut").style.top = (topHeight + bodyTopMargin + 25) + "px";
-            document.getElementById("bibliographyOut").style.height = (window.innerHeight - occupiedHeight - biblOutTopMargin - biblOutBottomMargin) + "px";
-            var welcomeScreenHeight = $("#welcomeScreenOut").outerHeight();
-            var diff = Math.floor((window.innerHeight - welcomeScreenHeight) / 2);
-            document.getElementById("welcomeScreenOut").style.top = diff + "px";
             Common.vc.virtualCanvas("updateViewport");
             updateAxis(Common.vc, Common.ax);
             CZ.BreadCrumbs.updateBreadCrumbsLabels();
         }
         Common.updateLayout = updateLayout;
-        function passThrough(e) {
-            var mouseX = e.pageX;
-            var mouseY = e.pageY;
-            var cosmos_rect = $("#cosmos_rect");
-            var offset_space = cosmos_rect.offset();
-            var width_space = cosmos_rect.width();
-            var height_space = cosmos_rect.height();
-            if(mouseX > offset_space.left && mouseX < offset_space.left + width_space && mouseY > offset_space.top && mouseY < offset_space.top + height_space) {
-                CZ.Search.navigateToBookmark(Common.cosmosVisible);
-            }
-            var earth_rect = $("#earth_rect");
-            var offset_earth = earth_rect.offset();
-            var width_earth = earth_rect.width();
-            var height_earth = earth_rect.height();
-            if(mouseX > offset_earth.left && mouseX < offset_earth.left + width_earth && mouseY > offset_earth.top && mouseY < offset_earth.top + height_earth) {
-                CZ.Search.navigateToBookmark(Common.earthVisible);
-            }
-            var life_rect = $("#life_rect");
-            var offset_life = life_rect.offset();
-            var width_life = life_rect.width();
-            var height_life = life_rect.height();
-            if(mouseX > offset_life.left && mouseX < offset_life.left + width_life && mouseY > offset_life.top && mouseY < offset_life.top + height_life) {
-                CZ.Search.navigateToBookmark(Common.lifeVisible);
-            }
-            var prehuman_rect = $("#prehuman_rect");
-            var offset_prehuman = prehuman_rect.offset();
-            var width_prehuman = prehuman_rect.width();
-            var height_prehuman = prehuman_rect.height();
-            if(mouseX > offset_prehuman.left && mouseX < offset_prehuman.left + width_prehuman && mouseY > offset_prehuman.top && mouseY < offset_prehuman.top + height_prehuman) {
-                CZ.Search.navigateToBookmark(Common.prehistoryVisible);
-            }
-            var human_rect = $("#human_rect");
-            var offset_human = human_rect.offset();
-            var width_human = human_rect.width();
-            var height_human = human_rect.height();
-            if(mouseX > offset_human.left && mouseX < offset_human.left + width_human && mouseY > offset_human.top && mouseY < offset_human.top + height_human) {
-                CZ.Search.navigateToBookmark(Common.humanityVisible);
-            }
-        }
-        Common.passThrough = passThrough;
         function updateAxis(vc, ax) {
             var vp = vc.virtualCanvas("getViewport");
             var lt = vp.pointScreenToVirtual(0, 0);
@@ -408,37 +348,6 @@ var CZ;
             Common.axis.update(newrange);
         }
         Common.updateAxis = updateAxis;
-        function updateNavigator(vp) {
-            var navigatorFunc = function (coordinate) {
-                if(Math.abs(coordinate) < 0.00000000001) {
-                    return 0;
-                }
-                var log = Math.log(coordinate) / 2.302585092994046;
-                var pow = Math.pow(log, 3) * Math.exp(-log * 0.001);
-                return (log + pow) * 13700000000 / 1041.2113538234402;
-            };
-            var left = vp.pointScreenToVirtual(0, 0).x;
-            if(left < CZ.Settings.maxPermitedTimeRange.left) {
-                left = CZ.Settings.maxPermitedTimeRange.left;
-            }
-            var right = vp.pointScreenToVirtual(vp.width, vp.height).x;
-            if(right > CZ.Settings.maxPermitedTimeRange.right) {
-                right = CZ.Settings.maxPermitedTimeRange.right;
-            }
-            var newRight = navigatorFunc(Math.abs(right));
-            var newLeft = navigatorFunc(Math.abs(left));
-            var newWidth = Math.max(2.0 / Common.regimesRatio, Math.abs(newRight - newLeft));
-            var min = 0;
-            var max = document.getElementById("cosmos_rect").clientWidth;
-            var l = 301 - Common.regimesRatio * newLeft;
-            var w = Common.regimesRatio * newWidth;
-            if(l < 0 || l + w > max + 5) {
-                return;
-            }
-            Common.regimeNavigator.css('left', l);
-            Common.regimeNavigator.css('width', w);
-        }
-        Common.updateNavigator = updateNavigator;
         function setCookie(c_name, value, exdays) {
             var exdate = new Date();
             exdate.setDate(exdate.getDate() + exdays);
