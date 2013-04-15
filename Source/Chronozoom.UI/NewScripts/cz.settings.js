@@ -125,8 +125,8 @@ var CZ;
             30, 
             31
         ];
-        Settings.tickLength = 25;
-        Settings.smallTickLength = 12.5;
+        Settings.tickLength = 14;
+        Settings.smallTickLength = 7;
         Settings.strokeWidth = 3;
         Settings.thresholdHeight = 10;
         Settings.thresholdWidth = 8;

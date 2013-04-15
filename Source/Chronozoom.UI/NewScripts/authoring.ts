@@ -245,7 +245,7 @@ module CZ {
             return CZ.VCContent.addTimeline(
                 _hovered,
                 _hovered.layerid,
-                null,
+                undefined,
                 {
                     timeStart: _rectCur.x,
                     timeEnd: _rectCur.x + _rectCur.width,
@@ -270,13 +270,13 @@ module CZ {
             return CZ.VCContent.addInfodot(
                 _hovered,
                 "layerInfodots",
-                null,
+                undefined,
                 _circleCur.x + _circleCur.r,
                 _circleCur.y + _circleCur.r,
                 _circleCur.r,
                 [{
-                    id: null,
-                    guid: null,
+                    id: undefined,
+                    guid: undefined,
                     title: "Content Item Title",
                     description: "Content Item Description",
                     uri: "",
@@ -286,7 +286,7 @@ module CZ {
                 {
                     title: "Exhibit Title",
                     date: _circleCur.x + _circleCur.r,
-                    guid: null
+                    guid: undefined
                 }
             );
         }
@@ -560,7 +560,8 @@ module CZ {
                     var contentItems = e.contentItems;
                     var len = contentItems.length;
                     var i = 0;
-                    e.guid = response;
+                    e.guid = response.ExhibitId;
+                    e.id = "e" + response.ExhibitId;
                     
                     // Set parent's guid for all content items.
                     for (i = 0; i < len; ++i) {

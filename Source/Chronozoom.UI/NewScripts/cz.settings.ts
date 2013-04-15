@@ -101,8 +101,8 @@
         export var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
         // array of numbers of days for each month, 28 days in february by default
         export var daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-        export var tickLength = 25; // length of big tick
-        export var smallTickLength = 12.5; // length of small tick
+        export var tickLength = 14; // length of big tick
+        export var smallTickLength = 7; // length of small tick
         export var strokeWidth = 3; // width of ticks and lines
         export var thresholdHeight = 10; // height of threshold when not active
         export var thresholdWidth = 8;
