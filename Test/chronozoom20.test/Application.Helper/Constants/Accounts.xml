@@ -8,8 +8,8 @@
     <login></login>
     <password></password>
   </yahoo>
-  <ms>
+  <microsoft>
     <login></login>
     <password></password>
-  </ms>
+  </microsoft>
 </Accounts>
