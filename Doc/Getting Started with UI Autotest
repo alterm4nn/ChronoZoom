@@ -1,31 +1,38 @@
-Tests work with browser, interact with ui and emulate user. 
+# Getting Started with UI Autotest #
 
-Test project can be opened by Visual Studio 2012 or newest 
+This document shows you how to use [Selenium WebDriver](http://docs.seleniumhq.org/docs/03_webdriver.jsp) to run tests that emulate user actions within the browser. You can run tests locally, or remotely by using WebDriver Grid.
 
-Ui test uses next tools:
-    1. Webdriver as application driver
-    2. Mstests as testrunner
+## Tools ##
+- WebDriver as application driver
+    - Chrome: https://code.google.com/p/selenium/wiki/ChromeDriver
+    - Internet Explorer: https://code.google.com/p/selenium/wiki/InternetExplorerDriver
+- [Mstest](http://msdn.microsoft.com/en-us/library/ms182489(v=vs.80).aspx) to run tests.
+- [Visual Studio 2012](http://www.microsoft.com/visualstudio/eng/products/visual-studio-overview) (or latest).
 
-You can run tests on local machine or remote (using Webdriver Grid). 
-Tests can be to run against Firefox, Chrome, Internet explorer, Safari (for mac only) 
-		
-Requirements for Chrome - https://code.google.com/p/selenium/wiki/ChromeDriver
-Requirements for Internet explorer - https://code.google.com/p/selenium/wiki/InternetExplorerDriver
+## Supported browsers ##
+- Firefox
+- Chrome
+- Internet Explorer
+- Safari (Mac only)
 
-How run UI tests on local machine
-    1. Get code from github https://github.com/alterm4nn/ChronoZoom
-    2. Build project Chronozoom.Entities
-    3. Open solution ChronoZoom.Testing.sln
-    4. Build the solution  (All requirement packages will be installed)
-    5. Setup config "Test.UI/config.xml" (
-        a. Set BaseUrl(http://test.chronozoomproject.org) 
-        b. BrowserName("chrome", "firefox" or "internet explorer")
-    6. Add rules for chromedriver and iedriver in Windows Firewall
-    7. Fill UsersInfo.settings - this file is required for AuthorizationTests (The file is added to .gitignore)
-    8. Open Visual Studio tests explorer
-    9. Run one test
-        a. Browser will be started
-        b. Homepage will be opened
-        c. Test will do something
-        d. Browser will be closed
-        e. Test will be pass (or may be failed)
+**How to run UI tests on your local computer**
+
+1. Get the source code from github (fork https://github.com/alterm4nn/ChronoZoom).
+2. Open **Source\Chronozoom.sln**
+3. Build the **Source\Chronozoom.Entities\Chronozoom.Entities.csproj** project.
+4. Open **Test\chronozoom20.test\ChronoZoom.Testing.sln**.
+5. Build the solution  (All required packages will be installed).
+6. Configure settings:
+	a. Open a file **Test\chronozoom20.test\Tests.UI\config.xml
+	b. Set BaseUrl(http://test.chronozoomproject.org) 
+	c. BrowserName("chrome", "firefox" or "internet explorer")
+
+7. Add rules for chromedriver and iedriver in Windows Firewall <!-- Need more details about how to set the rules up. -->
+8. Fill UsersInfo.settings - this file is required for AuthorizationTests (The file is added to .gitignore) <!-- Need more details -->
+9. Launch Visual Studio and open Test Explorer.
+10. Run a test.
+    a. Browser will be started
+    b. Homepage will be opened
+    c. Test will do something
+    d. Browser will be closed
+    e. Test results will be shown
