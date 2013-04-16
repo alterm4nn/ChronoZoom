@@ -47,7 +47,6 @@ namespace Chronozoom.Entities.Migration
         public void Migrate()
         {
             MigrateRiTree();
-
             LoadDataFromDump("Beta Content", "beta-get.json", "beta-gettours.json", "beta-getthresholds.json", false, _baseContentAdmin.Value);
             LoadDataFromDump("Sandbox", "beta-get.json", "beta-gettours.json", "beta-getthresholds.json", true, null);
             LoadDataFromDump("AIDS Timeline", "aidstimeline-get.json", "aidstimeline-gettours.json", null, true, _baseContentAdmin.Value);
@@ -65,7 +64,7 @@ namespace Chronozoom.Entities.Migration
                     _storage.Bitmasks.Remove(b);
                 }
                 _storage.SaveChanges();
-                for (int r = 0; r < 34; ++r)
+                for (int r = 0; r < 63; ++r)
                 {
                     Bitmask b = new Bitmask();
                     b.B1 = -v * 2;
