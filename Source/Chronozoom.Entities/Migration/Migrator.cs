@@ -54,6 +54,7 @@ namespace Chronozoom.Entities.Migration
             LoadDataFromDump("CERN", "cern-get.json", null, null, true, null);
         }
 
+
         private void MigrateRiTree()
         {
             if (!_storage.Bitmasks.Any())
