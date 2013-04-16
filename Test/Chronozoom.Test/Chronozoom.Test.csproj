@@ -107,7 +107,6 @@
     <Compile Include="RITreeTest\RITreeTestStorage.cs" />
     <Compile Include="RITreeTest\RITreeTest.cs" />
     <Compile Include="TourTests\TourInteraction.cs" />
-    <Compile Include="UnitTest1.cs" />
     <Compile Include="VirtualCanvasTests\VirtualCanvasLayoutTest.cs" />
     <Compile Include="VirtualCanvasTests\VirtualCanvasTreeTests.cs" />
     <Compile Include="VirtualCanvasTests\VirtualCanvasAdvancedElementsTests.cs" />
