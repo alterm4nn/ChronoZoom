@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Text;
 using System.Xml;
 using Application.Driver;
 using Application.Helper.Entities;
@@ -46,7 +45,7 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
-        public void AuthenticateAsMsUser()
+        public void AuthenticateAsMicrosoftUser()
         {
             Logger.Log("<-");
 
@@ -56,7 +55,7 @@ namespace Application.Helper.Helpers
             }
             Click(By.XPath("//*[@name='Windows Live™ ID']"));
 
-            var user = new User { Type = UserType.Ms };
+            var user = new User { Type = UserType.Microsoft };
             FillUserCredentials(user);
             Logger.Log(user.ToString());
             SetUserInfoAndSubmit(user);
@@ -96,47 +95,6 @@ namespace Application.Helper.Helpers
             return result;
         }
 
-        private void SetUserInfoAndSubmit(User user)
-        {
-            Logger.Log("<- user type: " + user.Type);
-
-            switch (user.Type)
-            {
-                case UserType.Google:
-                    TypeText(By.Id("Email"), user.Login);
-                    TypeText(By.Id("Passwd"), user.Password);
-                    Click(By.Id("signIn"));
-                    break;
-                case UserType.Yahoo:
-                    TypeText(By.Id("username"), user.Login);
-                    TypeText(By.Id("passwd"), user.Password);
-                    Click(By.Id(".save"));
-                    WaitForElementIsDisplayed(By.XPath("//*[@id='LoginPanel']/a"));
-                    break;
-                case UserType.Ms:
-                    ClickElementAndType(By.Id("idDiv_PWD_UsernameExample"), user.Login);
-                    ClickElementAndType(By.Id("idDiv_PWD_PasswordExample"), user.Password);
-                    Click(By.XPath("//*[@id='idSIButton9']"));
-                    break;
-            }
-
-            Logger.Log("->");
-        }
-
-        private string GetParentUriString(Uri uri)
-        {
-            var parentName = new StringBuilder();
-            parentName.Append(uri.Scheme);
-            parentName.Append("://");
-            parentName.Append(uri.Host);
-
-            for (int i = 0; i < uri.Segments.Length - 1; i++)
-            {
-                parentName.Append(uri.Segments[i]);
-            }
-            return parentName.ToString();
-        }
-
         protected bool IsUserCookieExist()
         {
             var result = false;
@@ -164,9 +122,9 @@ namespace Application.Helper.Helpers
                     user.Login = document.SelectSingleNode("//Accounts/google/login").InnerText;
                     user.Password = document.SelectSingleNode("//Accounts/google/password").InnerText;
                     break;
-                case UserType.Ms:
-                    user.Login = document.SelectSingleNode("//Accounts/ms/login").InnerText;
-                    user.Password = document.SelectSingleNode("//Accounts/ms/password").InnerText;
+                case UserType.Microsoft:
+                    user.Login = document.SelectSingleNode("//Accounts/micorsoft/login").InnerText;
+                    user.Password = document.SelectSingleNode("//Accounts/micorsoft/password").InnerText;
                     break;
                 case UserType.Yahoo:
                     user.Login = document.SelectSingleNode("//Accounts/yahoo/login").InnerText;
@@ -174,10 +132,35 @@ namespace Application.Helper.Helpers
                     break;
                 default:
                     throw new Exception("Can not find user credentials, user: " + user);
-                    break;
             }
 
             return user;
+        }
+
+        private void SetUserInfoAndSubmit(User user)
+        {
+            Logger.Log("<- user type: " + user.Type);
+
+            switch (user.Type)
+            {
+                case UserType.Google:
+                    TypeText(By.Id("Email"), user.Login);
+                    TypeText(By.Id("Passwd"), user.Password);
+                    Click(By.Id("signIn"));
+                    break;
+                case UserType.Yahoo:
+                    TypeText(By.Id("username"), user.Login);
+                    TypeText(By.Id("passwd"), user.Password);
+                    Click(By.Id(".save"));
+                    WaitForElementIsDisplayed(By.XPath("//*[@id='LoginPanel']/a"));
+                    break;
+                case UserType.Microsoft:
+                    ClickElementAndType(By.Id("idDiv_PWD_UsernameExample"), user.Login);
+                    ClickElementAndType(By.Id("idDiv_PWD_PasswordExample"), user.Password);
+                    Click(By.XPath("//*[@id='idSIButton9']"));
+                    break;
+            }
+            Logger.Log("->");
         }
 
         private string GetValidAcountsXmlPath()

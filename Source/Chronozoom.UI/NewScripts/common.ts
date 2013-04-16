@@ -400,15 +400,38 @@ module CZ {
             var cosmosTimeline = content;
             cosmosVisible = f(cosmosTimeline);
             CZ.UrlNav.navigationAnchor = vc.virtualCanvas("findElement", 't' + cosmosTimeline.id);
+            $("#regime-link-cosmos").click(function () {
+                var visible = CZ.UrlNav.navStringToVisible(cosmosVisible, vc);
+                setVisible(visible);
+            });
 
-            var earthTimeline = CZ.Layout.FindChildTimeline(cosmosTimeline, CZ.Settings.earthTimelineID);
+            var earthTimeline = CZ.Layout.FindChildTimeline(cosmosTimeline, CZ.Settings.earthTimelineID, true);
             earthVisible = f(earthTimeline);
+            $("#regime-link-earth").click(function () {
+                var visible = CZ.UrlNav.navStringToVisible(earthVisible, vc);
+                setVisible(visible);
+            });
+            
             var lifeTimeline = CZ.Layout.FindChildTimeline(earthTimeline, CZ.Settings.lifeTimelineID);
             lifeVisible = f(lifeTimeline);
+            $("#regime-link-life").click(function () {
+                var visible = CZ.UrlNav.navStringToVisible(lifeVisible, vc);
+                setVisible(visible);
+            });
+
             var prehistoryTimeline = CZ.Layout.FindChildTimeline(lifeTimeline, CZ.Settings.prehistoryTimelineID);
             prehistoryVisible = f(prehistoryTimeline);
+            $("#regime-link-prehistory").click(function () {
+                var visible = CZ.UrlNav.navStringToVisible(prehistoryVisible, vc);
+                setVisible(visible);
+            });
+
             var humanityTimeline = CZ.Layout.FindChildTimeline(prehistoryTimeline, CZ.Settings.humanityTimelineID, true);
             humanityVisible = f(humanityTimeline);
+            $("#regime-link-humanity").click(function () {
+                var visible = CZ.UrlNav.navStringToVisible(humanityVisible, vc);
+                setVisible(visible);
+            });
 
             maxPermitedVerticalRange = {    //setting top and bottom observation constraints according to cosmos timeline
                 top: cosmosTimeline.y,
