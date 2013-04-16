@@ -46,6 +46,30 @@ describe("CZ.Timescale part", function () {
             expect("0.0 Ma").toEqual($('#timescale_right_border').text());
         });
     });
+
+    describe("When user set mouse to timescale point", function () {
+
+        beforeEach(function () {
+            //setFixtures('<body></body>');
+            $('body').prepend('<div id="axis" style="display:none;"></div>');
+            $('body').prepend('<p id="timescale_marker" style="display:none;"></p>');
+            _width = 1904;
+            _height = 75;
+            _mode = "calendar";
+            time = "2000";
+            CZ.Settings.maxPermitedTimeRange = {
+                left: -13700000000,
+                right: 2013.25
+            };
+            var range = { min: 1969.5394928592248, max: 2013.7481783736519 };
+            tm = new CZ.Timescale($('#axis'));
+            tm.update(range);
+        });
+        it("marker value should be corrected", function () {
+            tm.setTimeMarker(time);
+            expect("2000 AD").toEqual($('#marker-text').text());
+        });
+    });
 });
 
 describe("CZ.DateTickSource part", function () {
@@ -77,14 +101,14 @@ describe("CZ.DateTickSource part", function () {
 
             var rangeMax = diff + oneDay * 4;
             var rangeMin = diff - oneDay * 4;
-            
+
             var ticks = dateTickSource.getTicks({ min: rangeMin, max: rangeMax });
             var ticksLabels = [];
 
             for (var i in ticks) {
                 ticksLabels.push(ticks[i].label[0].innerHTML);
             }
-            
+
             expect(ticksLabels).toContain('29 February');
         });
 
