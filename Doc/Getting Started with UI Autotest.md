@@ -18,18 +18,28 @@ This document shows you how to use [Selenium WebDriver](http://docs.seleniumhq.o
 
 **How to run UI tests on your local computer**
 
-1. Get the source code from github (fork https://github.com/alterm4nn/ChronoZoom). For more information, see [Clone the ChronoZoom GitHub Repository](https://github.com/willum070/ChronoZoom/blob/master/Doc/ChronoZoom_Developer_Guide.md#clone-the-chronozoom-github-repository).
+1. Get the source code from github (fork https://github.com/alterm4nn/ChronoZoom).
 2. Open **Source\Chronozoom.sln**
 3. Build the **Source\Chronozoom.Entities\Chronozoom.Entities.csproj** project.
 4. Open **Test\chronozoom20.test\ChronoZoom.Testing.sln**.
 5. Build the solution  (All required packages will be installed).
-6. Configure settings <!-- Where? Which file/setting do I modify? -->
-    a. Set BaseUrl(http://test.chronozoomproject.org) 
-    b. BrowserName("chrome", "firefox" or "internet explorer")
-
-7. Add rules for chromedriver and iedriver in Windows Firewall <!-- Need more details about how to set the rules up. -->
-8. Fill UsersInfo.settings - this file is required for AuthorizationTests (The file is added to .gitignore) <!-- Need more details -->
-9. Launch Visual Studio and open Test Explorer.
+6. Configure tests settings:
+	a. Open a file **Test\chronozoom20.test\Tests.UI\config.xml
+	b. Set BaseUrl(http://test.chronozoomproject.org) 
+	c. BrowserName("chrome", "firefox" or "internet explorer")
+7. Add rules for chromedriver and iedriver in Windows Firewall:
+	a. Open Windows Firewall
+	b. Open Advanced Settings
+	c. Open Inbound Rules
+	d. Create new rule for programs (chromedriver and iedriver)
+		i. Path to program: **Test\chronozoom20.test\ThirdParty\** + chromedriver.exe or IEDriverServer.exe
+		ii. Set by default others settings
+8. Configure setting for AuthorizationTests: 
+	a. Open file **Test\chronozoom20.test\Application.Helper\Constants\Accounts.xml**
+	b. Set Login and Password for Google, Yahoo and Microsoft accounts. **Please, Don't use own accounts. You can create accounts for tests**
+	c. Save file
+	d. Dont commit changes of the file to github. You can to add the file to git unstage (git update-index --assume-unchanged **PathToFile**/Accounts.xml)
+9. Open Test Explorer and run UI tests (Tests from project Tests.UI)
 10. Run a test.
     a. Browser will be started
     b. Homepage will be opened
