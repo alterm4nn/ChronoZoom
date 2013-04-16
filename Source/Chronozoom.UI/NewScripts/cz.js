@@ -45,8 +45,8 @@ var CZ;
             $('#cosmosBookmark').click(function () {
                 CZ.Search.navigateToBookmark(CZ.Common.cosmosVisible);
             });
-            $('#bc_navLeft').click(CZ.BreadCrumbs.breadCrumbNavLeft);
-            $('#bc_navRight').click(CZ.BreadCrumbs.breadCrumbNavRight);
+            $('#breadcrumbs-nav-left').click(CZ.BreadCrumbs.breadCrumbNavLeft);
+            $('#breadcrumbs-nav-right').click(CZ.BreadCrumbs.breadCrumbNavRight);
             $('#tour_prev').mouseout(function () {
                 CZ.Common.toggleOffImage('tour_prev');
             }).mouseover(function () {
@@ -74,24 +74,6 @@ var CZ;
             }).mouseover(function () {
                 CZ.Common.toggleOnImage('biblCloseButton', 'png');
             });
-            $('#welcomeScreenCloseButton').mouseover(function () {
-                CZ.Common.toggleOnImage('welcomeScreenCloseButton', 'png');
-            }).mouseout(function () {
-                CZ.Common.toggleOffImage('welcomeScreenCloseButton', 'png');
-            }).click(CZ.Common.hideWelcomeScreen);
-            $('#closeWelcomeScreenButton').click(CZ.Common.closeWelcomeScreen);
-            $('#regime_navigator').click(CZ.Common.passThrough);
-            var wlcmScrnCookie = CZ.Common.getCookie("welcomeScreenDisallowed");
-            if(wlcmScrnCookie != null) {
-                CZ.Common.hideWelcomeScreen();
-            } else {
-                $("#welcomeScreenOut").click(function (e) {
-                    e.stopPropagation();
-                });
-                $("#welcomeScreenBack").click(function () {
-                    CZ.Common.closeWelcomeScreen();
-                });
-            }
             if(navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
                 if(/Chrome[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
                     var oprversion = new Number(RegExp.$1);
@@ -146,8 +128,6 @@ var CZ;
                 top: 0,
                 bottom: 10000000
             };
-            CZ.Common.regimeNavigator = $('#regime_navigator');
-            CZ.Common.regimesRatio = 300 / Math.abs(CZ.Settings.maxPermitedTimeRange.left - CZ.Settings.maxPermitedTimeRange.right);
             if(window.location.hash) {
                 CZ.Common.startHash = window.location.hash;
             }
@@ -175,7 +155,6 @@ var CZ;
                     var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
                     CZ.Common.updateMarker();
                 }
-                CZ.Common.updateNavigator(vp);
             }, function () {
                 return CZ.Common.vc.virtualCanvas("getViewport");
             }, jointGesturesStream);
