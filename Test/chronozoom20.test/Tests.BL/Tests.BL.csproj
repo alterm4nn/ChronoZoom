@@ -56,22 +56,27 @@
   <ItemGroup>
     <Content Include="Content\jasmine\jasmine.css" />
     <Content Include="Content\jasmine\jasmine_favicon.png" />
+    <Content Include="Scripts\Js\authoring.js" />
     <Content Include="Scripts\Js\common.js" />
     <Content Include="Scripts\Js\csvUtils.js" />
     <Content Include="Scripts\Js\cz.html.js" />
+    <Content Include="Scripts\Js\czservice.js" />
+    <Content Include="Scripts\Js\layout.js" />
+    <Content Include="Scripts\Js\newauthoring.js" />
     <Content Include="Scripts\Js\settings.js" />
-    <Content Include="Scripts\Specs\AuthoringSpec.js" />
+    <Content Include="Scripts\Specs\authoringSpec.js" />
+    <Content Include="Scripts\Specs\commonSpec.js" />
+    <Content Include="Scripts\Specs\contentItemEditFormSpec.js" />
+    <Content Include="Scripts\Specs\csvParseSpec.js" />
+    <Content Include="Scripts\Specs\exhibitEditFormSpec.js" />
+    <Content Include="Scripts\Specs\timelineEditFormSpec.js" />
+    <Content Include="Scripts\Specs\timescaleSpec.js" />
     <Content Include="Scripts\Utils\jasmine-jquery.js" />
     <Content Include="Scripts\Utils\jquery-1.8.0.min.js" />
     <Content Include="Scripts\Utils\jquery.cookie.js" />
-    <Content Include="Scripts\Specs\CsvParseSpec.js" />
     <Content Include="Scripts\jasmine\jasmine-html.js" />
     <Content Include="Scripts\jasmine\jasmine.js" />
-    <Content Include="Scripts\cz.html" />
-    <Content Include="Scripts\Specs\cz.html.js.Spec.js" />
-    <Content Include="Scripts\Specs\CommonSpec.js" />
     <Content Include="Scripts\Js\cz.settings.js" />
-    <Content Include="Scripts\Specs\TimeScaleSpec.js" />
     <Content Include="Scripts\Js\timescale.js" />
   </ItemGroup>
   <ItemGroup>
@@ -102,7 +107,10 @@
   <PropertyGroup>
     <PreBuildEvent>cd $(ProjectDir)
 mkdir .\Scripts\Js
-copy "..\..\..\Source\Chronozoom.UI\NewScripts\*.js" "$(ProjectDir)Scripts\Js\" /y</PreBuildEvent>
+mkdir .\Scripts\Utils
+
+copy "..\..\..\Source\Chronozoom.UI\NewScripts\*.js" "$(ProjectDir)Scripts\Js\" /y
+copy "..\..\..\Source\Chronozoom.UI\NewScripts\external\*.js" "$(ProjectDir)Scripts\Utils\" /y</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

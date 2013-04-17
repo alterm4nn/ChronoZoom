@@ -1,15 +1,17 @@
 ﻿/// <reference path="../Utils/jquery-1.7.2.min.js" />
-/// <reference path="../Utils/jquery-1.8.0.min.js" />
 /// <reference path="../Utils/jasmine-jquery.js" />
+/// <reference path="../Js/layout.js" />
 /// <reference path="../Js/timescale.js" />
-/// <reference path="../Js/newauthoring.js" />
 /// <reference path="../Js/vccontent.js" />
 /// <reference path="../Js/cz.settings.js" />
 /// <reference path="../Js/settings.js" />
-
+/// <reference path="../Js/authoring.js" />
+/// <reference path="../Js/czservice.js" />
+/// <reference path="js-ignore.js" />
 
 describe("CZ.Authoring", function () {
     var authoring;
+    var service;
     var existedTimeline;
     var parentTimeline = {};
     parentTimeline.guid = "00000000-0000-0000-0000-000000000000";
@@ -138,6 +140,39 @@ describe("CZ.Authoring", function () {
             it("Then: error should be thrown", function () {
                 var propFake = { title: "", start: "-5", end: "-4" };                
                 expect(function () { authoring.updateTimeline(newTimeline, propFake); }).toThrow(new Error("Title is empty"));
+            });
+        });
+    });
+    
+    describe("Exhibit are", function () {
+        var exhibitParentTimeline = {};
+        exhibitParentTimeline.guid = "00000000-0000-0000-0000-000000000000";
+        exhibitParentTimeline.id = "t55";
+        exhibitParentTimeline.height = 10;
+        exhibitParentTimeline.width = 10;
+        exhibitParentTimeline.x = 0;
+        exhibitParentTimeline.y = 0;
+        exhibitParentTimeline.children = [];
+        exhibitParentTimeline.type = "timeline";
+
+        describe("should be created", function () {
+            _hovered = parentTimeline;
+            var _selectedExhibit = {};
+
+            beforeEach(function () {
+                //setFixtures('<body></body>');
+                $('body').prepend('<div id="vc"></div>');
+                $('#vc').data('ui-virtualCanvas', { hovered: exhibitParentTimeline, element: $('#vc'), getViewport: function () { return { pointScreenToVirtual: function (xvalue, yvalue) { return { x: xvalue, y: yvalue }; } }; } });
+                var vc = $('#vc');
+                getXBrowserMouseOrigin = function (jqelement, event) { return { x: 2, y: 2 }; };
+                authoring._isActive = true;
+                authoring.initialize(vc);
+                $('#vc').trigger('mousedown');
+            });
+
+            it("if 'mouseup' event is fired", function () {
+                authoring.modeMouseHandlers["createExhibit"]["mouseup"]();
+                expect(authoring._selectedExhibit.title).toEqual('Exhibit Title');
             });
         });
     });

@@ -1,4 +1,5 @@
-﻿/// <reference path="../Utils/jquery-1.8.0.min.js" />
+﻿/// <reference path="../Utils/jquery-1.7.2.min.js" />
+/// <reference path="../Utils/j" />
 /// <reference path="../Utils/jasmine-jquery.js" />
 /// <reference path="../Js/timescale.js" />
 /// <reference path="../Js/common.js" />
@@ -150,8 +151,8 @@ describe("CZ.CosmosTickSource part", function () { //this is the class for creat
             var l = 10;
             var r = 20;
             cosmosTickSrc.getRegime(l, r);
-            expect(cosmosTickSrc.range.max).toEqual(maxPermitedTimeRange.right); //test bug, cosmosTickSrc.range.max not changed
-            expect(cosmosTickSrc.range.min).toEqual(maxPermitedTimeRange.left); //test bug, cosmosTickSrc.range.min not changed
+            expect(cosmosTickSrc.range.max).toEqual(CZ.Settings.maxPermitedTimeRange.right); //test bug, cosmosTickSrc.range.max not changed
+            expect(cosmosTickSrc.range.min).toEqual(CZ.Settings.maxPermitedTimeRange.left); //test bug, cosmosTickSrc.range.min not changed
         });
 
         it("range.min and range.max to default value if l>r", function () {
@@ -161,26 +162,6 @@ describe("CZ.CosmosTickSource part", function () { //this is the class for creat
             cosmosTickSrc.getRegime(l, r);
             expect(0).toEqual(cosmosTickSrc.range.max);
             expect(defaultValue).toEqual(cosmosTickSrc.range.min);
-        });
-    });
-
-    describe("createTicks() method should", function () {  //TODO: test bug: not return ticks
-        //describe("return", function () {
-        //    it("2 tiks", function () {
-        //        var _range = { min: -13923856209.150328, max: 223856209.15032768 };
-        //        cosmosTickSrc.regime = "Ga";
-        //        cosmosTickSrc.beta = 6;
-        //        var result = cosmosTickSrc.createTicks(_range);
-        //        expect(2).toEqual(result.length);
-        //    });
-
-        //});
-        describe("call", function () {
-            it("refreshDivs() method", function () {
-                spyOn(cosmosTickSrc, 'createTicks');
-                cosmosTickSrc.createTicks();
-                expect(cosmosTickSrc.createTicks).toHaveBeenCalled();
-            });
         });
     });
 });
@@ -240,62 +221,62 @@ describe("CZ.CalendarTickSource part", function () { //this is the class for cre
     });
 });
 
-describe("CZ.ClockTickSource part", function () {
-    var clockTickSrc;
-    beforeEach(function () {
-        clockTickSrc = new CZ.ClockTickSource();
-    });
+//describe("CZ.ClockTickSource part", function () {
+//    var clockTickSrc;
+//    beforeEach(function () {
+//        clockTickSrc = new CZ.ClockTickSource();
+//    });
 
-    describe("getRegime() method should set regime to", function () {
-        it("'QuarterDays_Hours' if beta >= -2.2", function () {
-            var l = 0.9;
-            var r = 1;
-            clockTickSrc.getRegime(l, r);
-            expect("QuarterDays_Hours").toEqual(clockTickSrc.regime);
-        });
+//    describe("getRegime() method should set regime to", function () {
+//        it("'QuarterDays_Hours' if beta >= -2.2", function () {
+//            var l = 0.9;
+//            var r = 1;
+//            clockTickSrc.getRegime(l, r);
+//            expect("QuarterDays_Hours").toEqual(clockTickSrc.regime);
+//        });
 
-        it("'QuarterDays_Hours' if beta <= -2.2 && beta >= -2.7", function () {
-            var l = 0.996;
-            var r = 1;
-            clockTickSrc.getRegime(l, r);
-            expect("Hours_10mins").toEqual(clockTickSrc.regime);
-        });
+//        it("'QuarterDays_Hours' if beta <= -2.2 && beta >= -2.7", function () {
+//            var l = 0.996;
+//            var r = 1;
+//            clockTickSrc.getRegime(l, r);
+//            expect("Hours_10mins").toEqual(clockTickSrc.regime);
+//        });
 
-        it("'QuarterDays_Hours' if beta <= -2.7 && beta >= -3.4", function () {
-            var l = 0.9991;
-            var r = 1;
-            clockTickSrc.getRegime(l, r);
-            expect("10mins_mins").toEqual(clockTickSrc.regime);
-        });
+//        it("'QuarterDays_Hours' if beta <= -2.7 && beta >= -3.4", function () {
+//            var l = 0.9991;
+//            var r = 1;
+//            clockTickSrc.getRegime(l, r);
+//            expect("10mins_mins").toEqual(clockTickSrc.regime);
+//        });
 
-        it("'QuarterDays_Hours' if beta <= -3.8 && beta >= -4.4", function () {
-            var l = 0.99991;
-            var r = 1;
-            clockTickSrc.getRegime(l, r);
-            expect("10mins_mins").toEqual(clockTickSrc.regime);
-        });
+//        it("'QuarterDays_Hours' if beta <= -3.8 && beta >= -4.4", function () {
+//            var l = 0.99991;
+//            var r = 1;
+//            clockTickSrc.getRegime(l, r);
+//            expect("10mins_mins").toEqual(clockTickSrc.regime);
+//        });
 
-        it("'10mins_mins' if beta = -3.6 ", function () {  //Hole in verification
-            var l = 0.99975;
-            var r = 1;
-            clockTickSrc.getRegime(l, r);
-            expect("10mins_mins").toEqual(clockTickSrc.regime);
-        });
+//        it("'10mins_mins' if beta = -3.6 ", function () {  //Hole in verification
+//            var l = 0.99975;
+//            var r = 1;
+//            clockTickSrc.getRegime(l, r);
+//            expect("10mins_mins").toEqual(clockTickSrc.regime);
+//        });
 
-        it("'QuarterDays_Hours' if l > r ", function () {
-            var l = 2;
-            var r = 1;
-            clockTickSrc.getRegime(l, r);
-            expect("QuarterDays_Hours").toEqual(clockTickSrc.regime);
-        });
+//        it("'QuarterDays_Hours' if l > r ", function () {
+//            var l = 2;
+//            var r = 1;
+//            clockTickSrc.getRegime(l, r);
+//            expect("QuarterDays_Hours").toEqual(clockTickSrc.regime);
+//        });
 
-        it("'QuarterDays_Hours' if l = r ", function () {
-            var l = 1;
-            var r = 1;
-            clockTickSrc.getRegime(l, r);
-            expect("QuarterDays_Hours").toEqual(clockTickSrc.regime);
-        });
+//        it("'QuarterDays_Hours' if l = r ", function () {
+//            var l = 1;
+//            var r = 1;
+//            clockTickSrc.getRegime(l, r);
+//            expect("QuarterDays_Hours").toEqual(clockTickSrc.regime);
+//        });
 
-    });
-});
+//    });
+//});
 

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Text;
@@ -26,9 +27,17 @@ namespace Chronozoom.Entities.Migration
 
         // The user that is able to modify the base collections (e.g. Beta Content, AIDS Quilt)
         private static Lazy<string> _baseContentAdmin = new Lazy<string>(() =>
-            {
-                return ConfigurationManager.AppSettings["BaseCollectionsAdministrator"];
-            });
+        {
+            return ConfigurationManager.AppSettings["BaseCollectionsAdministrator"];
+        });
+
+        private static Lazy<string> _baseDirectory = new Lazy<string>(() =>
+        {
+            if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["BaseDataMigrationDirectory"]))
+                return ConfigurationManager.AppSettings["BaseDataMigrationDirectory"];
+
+            return AppDomain.CurrentDomain.BaseDirectory;
+        });
 
         public Migrator(Storage storage)
         {
@@ -37,42 +46,54 @@ namespace Chronozoom.Entities.Migration
 
         public void Migrate()
         {
+            MigrateRiTree();
 
-            // Load the Beta Content collection
-            Collection betaCollection = LoadCollections("Beta Content", "Beta Content", _baseContentAdmin.Value);
-            using (Stream betaGet = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\beta-get.json"))
-            using (Stream betaGetTours = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\beta-gettours.json"))
-            using (Stream betaGetThresholds = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\beta-getthresholds.json"))
+            LoadDataFromDump("Beta Content", "beta-get.json", "beta-gettours.json", "beta-getthresholds.json", false, _baseContentAdmin.Value);
+            LoadDataFromDump("Sandbox", "beta-get.json", "beta-gettours.json", "beta-getthresholds.json", true, null);
+            LoadDataFromDump("AIDS Timeline", "aidstimeline-get.json", "aidstimeline-gettours.json", null, true, _baseContentAdmin.Value);
+            LoadDataFromDump("AIDS Standalone", "aidsstandalone-get.json", null, null, true, _baseContentAdmin.Value);
+            LoadDataFromDump("CERN", "cern-get.json", null, null, true, null);
+        }
+
+        private void MigrateRiTree()
+        {
+            if (!_storage.Bitmasks.Any())
             {
-                LoadData(betaGet, betaGetTours, betaGetThresholds, betaCollection, false);
+                long v = 1;
+                foreach (var b in _storage.Bitmasks)
+                {
+                    _storage.Bitmasks.Remove(b);
+                }
+                _storage.SaveChanges();
+                for (int r = 0; r < 34; ++r)
+                {
+                    Bitmask b = new Bitmask();
+                    b.B1 = -v * 2;
+                    b.B2 = v;
+                    b.B3 = v * 2;
+                    _storage.Bitmasks.Add(b);
+                    v *= 2;
+                }
+                _storage.SaveChanges();
             }
+        }
 
-            // Load the Beta Content collection (sandbox mode - everyone can edit)
-            Collection betaCollectionSandbox = LoadCollections("Sandbox", "Sandbox", null);
-            using (Stream betaGet = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\beta-get.json"))
-            using (Stream betaGetTours = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\beta-gettours.json"))
-            using (Stream betaGetThresholds = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\beta-getthresholds.json"))
+        private void LoadDataFromDump(string superCollectionName, string getFileName, string getToursFileName, string getThresholdsFileName, bool replaceGuids, string contentAdminId)
+        {
+            if (_storage.SuperCollections.Find(CollectionIdFromText(superCollectionName)) == null)
             {
-                LoadData(betaGet, betaGetTours, betaGetThresholds, betaCollectionSandbox, true);
-            }
+                // Load the Beta Content collection
+                Collection collection = LoadCollections(superCollectionName, superCollectionName, contentAdminId);
+                using (Stream getData = File.OpenRead(_baseDirectory.Value + @"Dumps\" + getFileName))
+                using (Stream getToursData = getToursFileName == null ? null : File.OpenRead(_baseDirectory.Value + @"Dumps\" + getToursFileName))
+                using (Stream getThresholdsData = getThresholdsFileName == null ? null : File.OpenRead(_baseDirectory.Value + @"Dumps\" + getThresholdsFileName))
+                {
+                    LoadData(getData, getToursData, getThresholdsData, collection, replaceGuids);
+                }
 
-            // Load the AIDS Timeline collection
-            Collection aidstimelineCollection = LoadCollections("AIDS Timeline", "AIDS Timeline", _baseContentAdmin.Value);
-            using (Stream aidsTimelineGet = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\aidstimeline-get.json"))
-            using (Stream aidsTimelineGetTours = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\aidstimeline-get.json"))
-            {
-                LoadData(aidsTimelineGet, aidsTimelineGetTours, null, aidstimelineCollection, true);
+                // Save changes to storage
+                _storage.SaveChanges();
             }
-
-            // Load the AIDS Timeline in standalone mode
-            Collection aidsStandaloneCollection = LoadCollections("AIDS Standalone", "AIDS Standalone", _baseContentAdmin.Value);
-            using (Stream aidsStandalone = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + @"Dumps\aidsstandalone-get.json"))
-            {
-                LoadData(aidsStandalone, null, null, aidsStandaloneCollection, true);
-            }
-
-            // Save changes to storage
-            _storage.SaveChanges();
         }
 
         private Collection LoadCollections(string superCollectionName, string collectionName, string userId)
@@ -88,7 +109,7 @@ namespace Chronozoom.Entities.Migration
             superCollection.Title = superCollectionName;
             superCollection.Id = CollectionIdFromText(superCollectionName);
             superCollection.UserId = userId;
-            
+
             superCollection.Collections = new System.Collections.ObjectModel.Collection<Collection>();
             superCollection.Collections.Add(collection);
             _storage.SuperCollections.Add(superCollection);
@@ -96,7 +117,7 @@ namespace Chronozoom.Entities.Migration
             return collection;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification="Incremental change, will refactor later if the import process is kept")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Incremental change, will refactor later if the import process is kept")]
         private void LoadData(Stream dataTimelines, Stream dataTours, Stream dataThresholds, Collection collection, bool replaceGuids)
         {
             var bjrTimelines = new DataContractJsonSerializer(typeof(BaseJsonResult<IEnumerable<Timeline>>)).ReadObject(dataTimelines) as BaseJsonResult<IEnumerable<Timeline>>;
@@ -110,9 +131,12 @@ namespace Chronozoom.Entities.Migration
                 foreach (Exhibit exhibit in timeline.Exhibits)
                 {
                     exhibit.Collection = collection;
-                    foreach (ContentItem contentItem in exhibit.ContentItems)
+                    if (exhibit.ContentItems != null)
                     {
-                        contentItem.Collection = collection;
+                        foreach (ContentItem contentItem in exhibit.ContentItems)
+                        {
+                            contentItem.Collection = collection;
+                        }
                     }
                 }
             });
@@ -121,9 +145,11 @@ namespace Chronozoom.Entities.Migration
             {
                 // Replace GUIDs to ensure multiple collections can be imported
                 TraverseTimelines(bjrTimelines.d, timeline =>
-                    {
-                        timeline.Id = Guid.NewGuid();
+                {
+                    timeline.Id = Guid.NewGuid();
 
+                    if (timeline.Exhibits != null)
+                    {
                         foreach (Exhibit exhibit in timeline.Exhibits)
                         {
                             exhibit.Id = Guid.NewGuid();
@@ -145,6 +171,7 @@ namespace Chronozoom.Entities.Migration
                             }
                         }
                     }
+                }
                 );
             }
 
@@ -152,8 +179,8 @@ namespace Chronozoom.Entities.Migration
             {
                 if (replaceGuids) timeline.Id = Guid.NewGuid();
                 timeline.Collection = collection;
-
                 MigrateInPlace(timeline);
+                timeline.ForkNode = Storage.ForkNode((long)timeline.FromYear, (long)timeline.ToYear);
                 _storage.Timelines.Add(timeline);
             }
 
@@ -195,14 +222,20 @@ namespace Chronozoom.Entities.Migration
             timeline.FromYear = ConvertToDecimalYear(timeline.FromDay, timeline.FromMonth, timeline.FromYear, timeline.FromTimeUnit);
             timeline.ToYear = ConvertToDecimalYear(timeline.ToDay, timeline.ToMonth, timeline.ToYear, timeline.ToTimeUnit);
 
-            foreach (var exhibit in timeline.Exhibits)
+            if (timeline.Exhibits != null)
             {
-                exhibit.Year = ConvertToDecimalYear(exhibit.Day, exhibit.Month, exhibit.Year, exhibit.TimeUnit);
+                foreach (var exhibit in timeline.Exhibits)
+                {
+                    exhibit.Year = ConvertToDecimalYear(exhibit.Day, exhibit.Month, exhibit.Year, exhibit.TimeUnit);
+                }
             }
 
-            foreach (var child in timeline.ChildTimelines)
+            if (timeline.ChildTimelines != null)
             {
-                MigrateInPlace(child);
+                foreach (var child in timeline.ChildTimelines)
+                {
+                    MigrateInPlace(child);
+                }
             }
         }
 
@@ -221,7 +254,7 @@ namespace Chronozoom.Entities.Migration
             if (timeUnit != null)
             {
                 // if the timeunit is CE
-                if (string.Compare(timeUnit, "ce", StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.Compare(timeUnit, "ce", StringComparison.OrdinalIgnoreCase) == 0 && day != null && month != null)
                 {
                     int tempmonth = 1;
                     int tempday = 1;
@@ -238,6 +271,10 @@ namespace Chronozoom.Entities.Migration
 
                     var dt = new DateTime((int)decimalyear, tempmonth, tempday);
                     decimalyear = ConvertToDecimalYear(dt);
+                }
+                else if (string.Compare(timeUnit, "ce", StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    // decimalyear is already in decimal year
                 }
                 else if (string.Compare(timeUnit, "bce", StringComparison.OrdinalIgnoreCase) == 0)
                 {
@@ -295,16 +332,11 @@ namespace Chronozoom.Entities.Migration
             public T d { get; set; }
         }
 
-        private delegate void TraverseOperation(Timeline timeline);
-        private void TraverseTimelines(IEnumerable<Timeline> timelines, TraverseOperation operation)
+        public static void TraverseTimelines(IEnumerable<Timeline> timelines, TraverseOperation operation)
         {
-            if (timelines == null)
-                return;
-
             foreach (Timeline timeline in timelines)
             {
-                operation(timeline);
-                TraverseTimelines(timeline.ChildTimelines, operation);
+                timeline.Traverse(operation);
             }
         }
 
@@ -318,7 +350,7 @@ namespace Chronozoom.Entities.Migration
                 collection.ToLower(CultureInfo.InvariantCulture)));
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Justification="Lowercase is URL friendly")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Justification = "Lowercase is URL friendly")]
         private static Guid CollectionIdFromText(string value)
         {
             // Replace with URL friendly representations

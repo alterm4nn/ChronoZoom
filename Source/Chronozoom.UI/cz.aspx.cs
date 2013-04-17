@@ -14,16 +14,11 @@ namespace UI
         {
             if (Request.Browser["IsMobileDevice"] == "false" || Request.QueryString["full"] == "1")
             {
-                // Without redirect
-                if (Request.QueryString["new"] == "1")
-                    Server.Transfer(Page.ResolveUrl("~/") + "/cz2.html");
-                else
-                    Server.Transfer(Page.ResolveUrl("~/") + "/cz.htm");
+                Server.Transfer(Page.ResolveUrl("~/") + "/cz2.html");
             }
             else
             {
-                // Redirect 301
-                Server.Transfer(Page.ResolveUrl("~/") + "/czmobile.htm");
+                Server.Transfer(Page.ResolveUrl("~/") + "/cz2.html?experience=mobile");
             }
         }
     }

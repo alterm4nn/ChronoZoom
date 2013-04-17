@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Accounts>
+  <google>
+    <login></login>
+    <password></password>
+  </google>
+  <yahoo>
+    <login></login>
+    <password></password>
+  </yahoo>
+  <microsoft>
+    <login></login>
+    <password></password>
+  </microsoft>
+</Accounts>
+
