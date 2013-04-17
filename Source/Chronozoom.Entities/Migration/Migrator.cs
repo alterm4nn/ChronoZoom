@@ -68,11 +68,11 @@ namespace Chronozoom.Entities.Migration
                 for (int r = 0; r < 63; ++r)
                 {
                     Bitmask b = new Bitmask();
-                    b.B1 = -v * 2;
+                    b.B1 = -(v << 1);
                     b.B2 = v;
-                    b.B3 = v * 2;
+                    b.B3 = v << 1;
                     _storage.Bitmasks.Add(b);
-                    v *= 2;
+                    v <<= 1;
                 }
                 _storage.SaveChanges();
             }
