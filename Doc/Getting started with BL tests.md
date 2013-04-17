@@ -1,5 +1,5 @@
 # Getting Started with UI Autotest #
-This document shows you how to use Buisness Logic tests (BLTs).
+This document shows you how to use Business Logic tests (BLTs).
 BLTs were been implemented by javascript and Jasmine framework and check base functionality of Chronozoom project.
 
 ## Tools ##
