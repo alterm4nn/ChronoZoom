@@ -52,7 +52,6 @@ If you are new to GitHub, we recommend reading [Learning to use GitHub for Chron
     - Use Mixed Mode Authentication, Azure doesn't support Integrated Mode security
 - Internet Information Server
 - [Azure SDK for .NET](http://www.windowsazure.com/en-us/develop/downloads/)
-- >>>>> [charuch] Might want to mention the TypeScript Visual Studio plugin at TypeScript http://www.typescriptlang.org/#Download 
 - [TypeScript Visual Studio plugin](http://www.typescriptlang.org/#Download)
 
 <!--
