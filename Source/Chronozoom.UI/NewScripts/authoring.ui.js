@@ -28,7 +28,6 @@ var CZ;
                 var containers = $(".cz-authoring-ci-container");
                 $(".cz-authoring-ci-container").each(function () {
                     var CItitleInput = $(this).find(".cz-authoring-ci-title");
-                    ;
                     var mediaInput = $(this).find(".cz-authoring-ci-media-source");
                     var mediaTypeInput = ($)(this).find(".cz-authoring-ci-media-type option");
                     var descriptionInput = $(this).find(".cz-authoring-ci-description");
@@ -74,11 +73,11 @@ var CZ;
             function showCreateTimelineForm(t) {
                 var isCancel = true;
                 var titleInput = $("#timelineTitleInput");
-                var startInput = $("#timelineStartInput").spinner();
-                var endInput = $("#timelineEndInput").spinner();
+                var startInput = new CZ.UI.DatePicker($("#timelineStartInput"));
+                var endInput = new CZ.UI.DatePicker($("#timelineEndInput"));
                 titleInput.val(t.title);
-                startInput.val(t.x);
-                endInput.val(t.x + t.width);
+                startInput.setDate(t.x);
+                endInput.setDate(t.x + t.width);
                 $("#createTimelineForm").dialog({
                     title: "create timeline",
                     modal: true,
@@ -86,8 +85,8 @@ var CZ;
                     width: 600,
                     buttons: {
                         "save and close": function () {
-                            var isValid = CZ.Authoring.ValidateNumber(startInput.val()) && CZ.Authoring.ValidateNumber(endInput.val());
-                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(startInput.val()) && CZ.Authoring.IsNotEmpty(endInput.val());
+                            var isValid = CZ.Authoring.ValidateNumber(startInput.getDate()) && CZ.Authoring.ValidateNumber(endInput.getDate());
+                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(startInput.getDate()) && CZ.Authoring.IsNotEmpty(endInput.getDate());
                             if(!isValid) {
                                 $("#TimelineErrorSpan").css("display", "block");
                             }
@@ -96,8 +95,8 @@ var CZ;
                                 isCancel = false;
                                 CZ.Authoring.updateTimeline(t, {
                                     title: titleInput.val(),
-                                    start: startInput.val(),
-                                    end: endInput.val()
+                                    start: startInput.getDate(),
+                                    end: endInput.getDate()
                                 }).then(function (success) {
                                     $(self).dialog("close");
                                 }, function (error) {
@@ -112,6 +111,8 @@ var CZ;
                             CZ.Authoring.removeTimeline(t);
                         }
                         CZ.Authoring._isActive = false;
+                        startInput.remove();
+                        endInput.remove();
                         $("#TimelineErrorSpan").css("display", "none");
                         $("a:contains('create timeline')").removeClass("active");
                     }
@@ -119,12 +120,12 @@ var CZ;
             }
             UI.showCreateTimelineForm = showCreateTimelineForm;
             function showEditTimelineForm(t) {
-                var titleInput = $("#timelineTitleInput").spinner();
-                var startInput = $("#timelineStartInput").spinner();
-                var endInput = $("#timelineEndInput").spinner();
+                var titleInput = $("#timelineTitleInput");
+                var startInput = new CZ.UI.DatePicker($("#timelineStartInput"));
+                var endInput = new CZ.UI.DatePicker($("#timelineEndInput"));
                 titleInput.val(t.title);
-                startInput.val(t.x);
-                endInput.val(t.x + t.width);
+                startInput.setDate(t.x);
+                endInput.setDate(t.x + t.width);
                 $("#createTimelineForm").dialog({
                     title: "edit timeline",
                     modal: true,
@@ -132,8 +133,8 @@ var CZ;
                     width: 600,
                     buttons: {
                         "save and close": function () {
-                            var isValid = CZ.Authoring.ValidateNumber(startInput.val()) && CZ.Authoring.ValidateNumber(endInput.val());
-                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(startInput.val()) && CZ.Authoring.IsNotEmpty(endInput.val());
+                            var isValid = CZ.Authoring.ValidateNumber(startInput.getDate()) && CZ.Authoring.ValidateNumber(endInput.getDate());
+                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(startInput.getDate()) && CZ.Authoring.IsNotEmpty(endInput.getDate());
                             if(!isValid) {
                                 $("#TimelineErrorSpan").css("display", "block");
                             }
@@ -141,8 +142,8 @@ var CZ;
                                 var self = this;
                                 CZ.Authoring.updateTimeline(t, {
                                     title: titleInput.val(),
-                                    start: startInput.val(),
-                                    end: endInput.val()
+                                    start: startInput.getDate(),
+                                    end: endInput.getDate()
                                 }).then(function (success) {
                                     $(self).dialog("close");
                                 }, function (error) {
@@ -160,6 +161,8 @@ var CZ;
                     },
                     close: function () {
                         CZ.Authoring._isActive = false;
+                        startInput.remove();
+                        endInput.remove();
                         $("a:contains('edit timeline')").removeClass("active");
                         $("#TimelineErrorSpan").css("display", "none");
                     }
@@ -169,9 +172,9 @@ var CZ;
             function showCreateExhibitForm(e) {
                 var isCancel = true;
                 var titleInput = $("#exhibitTitleInput");
-                var dateInput = $("#exhibitDateInput").spinner();
+                var dateInput = new CZ.UI.DatePicker($("#exhibitDateInput"));
                 titleInput.val(e.title);
-                dateInput.val(e.infodotDescription.date);
+                dateInput.setDate(e.infodotDescription.date);
                 var contentItems = e.contentItems;
                 for(var i = 0; i < contentItems.length; i++) {
                     _addContentItemForm($("#createExhibitForm"), true);
@@ -187,15 +190,15 @@ var CZ;
                     buttons: {
                         "save and close": function () {
                             var contentItems = _getContentItemsData();
-                            var isValid = CZ.Authoring.ValidateNumber(dateInput.val());
-                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(dateInput.val());
+                            var isValid = CZ.Authoring.ValidateNumber(dateInput.getDate());
+                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(dateInput.getDate());
                             isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
                             if(!isValid) {
                                 $("#ExhibitErrorSpan").css("display", "block");
                             } else {
                                 CZ.Authoring.updateExhibit(e, {
                                     title: titleInput.val(),
-                                    date: dateInput.val(),
+                                    date: dateInput.getDate(),
                                     contentItems: contentItems
                                 });
                                 isCancel = false;
@@ -213,6 +216,7 @@ var CZ;
                             CZ.Authoring.removeExhibit(e);
                         }
                         CZ.Authoring._isActive = false;
+                        dateInput.remove();
                         $("a:contains('create exhibit')").removeClass("active");
                         $("#ExhibitErrorSpan").css("display", "none");
                         $(this).find(".cz-authoring-ci-container").each(function () {
@@ -224,9 +228,9 @@ var CZ;
             UI.showCreateExhibitForm = showCreateExhibitForm;
             function showEditExhibitForm(e) {
                 var titleInput = $("#exhibitTitleInput");
-                var dateInput = $("#exhibitDateInput").spinner();
+                var dateInput = new CZ.UI.DatePicker($("#exhibitDateInput"));
                 titleInput.val(e.title);
-                dateInput.val(e.infodotDescription.date);
+                dateInput.setDate(e.infodotDescription.date);
                 var contentItems = e.contentItems;
                 for(var i = 0; i < contentItems.length; i++) {
                     _addContentItemForm($("#createExhibitForm"), true);
@@ -242,15 +246,15 @@ var CZ;
                     buttons: {
                         "save and close": function () {
                             contentItems = _getContentItemsData();
-                            var isValid = CZ.Authoring.ValidateNumber(dateInput.val());
-                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(dateInput.val());
+                            var isValid = CZ.Authoring.ValidateNumber(dateInput.getDate());
+                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(dateInput.getDate());
                             isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
                             if(!isValid) {
                                 $("#ExhibitErrorSpan").css("display", "block");
                             } else {
                                 CZ.Authoring.updateExhibit(e, {
                                     title: titleInput.val(),
-                                    date: dateInput.val(),
+                                    date: dateInput.getDate(),
                                     contentItems: contentItems
                                 });
                                 $(this).dialog("close");
@@ -273,6 +277,7 @@ var CZ;
                     },
                     close: function () {
                         CZ.Authoring._isActive = false;
+                        dateInput.remove();
                         $("a:contains('edit exhibit')").removeClass("active");
                         $("#ExhibitErrorSpan").css("display", "none");
                         $(this).find(".cz-authoring-ci-container").each(function () {

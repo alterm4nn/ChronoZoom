@@ -131,6 +131,52 @@ module CZ {
             return decimalYear === 9999 ? presentDate : decimalYear;
         }
 
+        export function convertCoordinateToYear(coordinate) {
+            var year = {
+                year: coordinate,
+                regime: "CE"
+            }
+
+            if (coordinate < 0) {
+                if (coordinate < -999999999) {
+                    year.year /= -1000000000;
+                    year.regime = 'GA';
+                } else if (coordinate < -999999) {
+                    year.year /= -1000000;
+                    year.regime = 'MA';
+                } else if (coordinate < -999) {
+                    year.year /= -1000;
+                    year.regime = 'KA';
+                } else {
+                    year.year /= -1;
+                    year.regime = 'BCE';
+                }
+            }            
+
+            return year;
+        }
+
+        export function convertYearToCoordinate(year, regime) {
+            var coordinate = year;
+
+            switch (regime.toLowerCase()) {
+                case "ga":
+                    coordinate *= -1000000000;
+                    break;
+                case "ma":
+                    coordinate *= -1000000;
+                    break;
+                case "ka":
+                    coordinate *= -1000;
+                    break;
+                case "bce":
+                    coordinate *= -1;
+                    break;
+            }
+
+            return coordinate;
+        }
+
         var present = undefined;
         export function getPresent() {
             if (!present) {

@@ -19,7 +19,8 @@
 
     <!--TODO: Download custom version of jQuery UI-->
 
-    <link rel="stylesheet" type="text/css" href="/NewStyles/cz.css" />
+    <link rel="stylesheet" type="text/css" href="/NewStyles/cz.css" />    
+    <link rel="stylesheet" type="text/css" href="/NewStyles/cz.ui.css" />
     <link rel="stylesheet" type="text/css" href="/NewStyles/timescale.css" />
     
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
@@ -51,6 +52,8 @@
     <script type="text/javascript" src="/NewScripts/authoring.ui.js"></script>
     <script type="text/javascript" src="/NewScripts/czservice.js"></script>
     <script type="text/javascript" src="/NewScripts/timescale.js"></script>
+
+    <script type="text/javascript" src="/NewScripts/cz.ui.js"></script>
 
     <!--[if IE]>
     <script type="text/javascript" src="/NewScripts/regimesIE.js"></script>
@@ -126,20 +129,18 @@
 
             <!--Create Timeline popup dialog-->
             <div id="createTimelineForm" style="background-color: rgb(60, 95, 150); display: none; color: white;">
-                <p>
-                    <label style="display: block">title</label>
-                    <input id="timelineTitleInput" style="display: block" type="text" />
-                </p>
+                <label style="display: block">title</label>
+                <input id="timelineTitleInput" style="display: block" type="text" />
+                
+                <br />
+                <label style="display: block">start</label>
+                <div id="timelineStartInput" style="display: block" ></div>
 
-                <p style="display: inline-block">
-                    <label style="display: block">start</label>
-                    <input id="timelineStartInput" style="display: block" />
-                </p>
+                <br />
+                <label style="display: block">end</label>
+                <div id="timelineEndInput" style="display: block"></div>
 
-                <p style="display: inline-block">
-                    <label style="display: block">end</label>
-                    <input id="timelineEndInput" style="display: block" />
-                </p>
+                <br />
                 <span id ="TimelineErrorSpan" style="color:red; display:none"> 
                     Input error
                 </span>
@@ -147,19 +148,17 @@
 
             <!--Create Exhibit popup dialog-->
             <div id="createExhibitForm" style="background-color: rgb(60, 95, 150); display: none; color: white;">
-                <p>
-                    <label style="display: block">Exhibit's title</label>
-                    <input id="exhibitTitleInput" style="display: block" />
-                </p>
-
-                <p style="display: inline-block">
-                    <label style="display: block">Exhibit's date</label>
-                    <input id="exhibitDateInput" style="display: block" />
-                </p>
-                 <span id ="ExhibitErrorSpan" style="color:red; display:none"> 
+                <label style="display: block">Exhibit's title</label>
+                <input id="exhibitTitleInput" style="display: block" />
+                                
+                <br />
+                <label style="display: block">Exhibit's date</label>
+                <div id="exhibitDateInput" style="display: block"></div>
+                
+                <br />
+                <span id ="ExhibitErrorSpan" style="color:red; display:none"> 
                     Input error
                 </span>
-
 
                 <hr />
 
@@ -169,21 +168,18 @@
 
             <!--Edit Content Item popup dialog-->
             <div id="editContentItemForm" style="background-color: rgb(60, 95, 150); display: none; color: white;">
-                <p>
-                    <label style="display: block">title</label>
-                    <input id="contentItemTitleInput" style="display: block" type="text" />
-                </p>
+                <label style="display: block">title</label>
+                <input id="contentItemTitleInput" style="display: block" type="text" />
 
-                <p style="display: block">
-                    <label style="display: block">description</label>
-                    <textarea id="contentItemDescriptionInput" style="display: block"></textarea>
-                </p>
+                <br />
+                <label style="display: block">description</label>
+                <textarea id="contentItemDescriptionInput" style="display: block"></textarea>
 
-                <p style="display: block">
-                    <label style="display: block">media source</label>
-                    <input type="url" id="contentItemMediaSourceInput" style="display: block" />
-                </p>
+                <br />
+                <label style="display: block">media source</label>
+                <input type="url" id="contentItemMediaSourceInput" style="display: block" />
 
+                <br />
                 <p style="display: block">
                     <label style="display: block">media type</label>
                     <select id="contentItemMediaTypeInput" style="display: block">
