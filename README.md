@@ -28,6 +28,7 @@ Installation
 
 * Make a fork of https://github.com/alterm4nn/ChronoZoom
 * git clone git://github.com/<your-username>/ChronoZoom.git (Case Sensitive)
+* Install Windows Identity Foundation (Control Panel, Programs and Features, Turn Windows Feature on or off, Turn on Windows Identity Foundation 3.5)
 * Launch source\chronozoom.sln
 * Enable EnableNuGetPackageRestore (Right click on VS Solution - Enable NuGet Package Restore)
 * Use [F5] to compile and run ChronoZoom locally
