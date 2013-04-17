@@ -76,10 +76,10 @@ namespace Chronozoom.Test.RITreeTest
         {   /* test correctness of ForkNode computations */
             Int64 count1, count2, test_start_time = -7333311, test_end_time = 2013;
             Int64 start = test_start_time + 13700000001, end = test_end_time + 13700000001;
-            Debug.Assert(Storage.ForkNode(offset + 3, offset + 7) == 4);
-            Debug.Assert(Storage.ForkNode(offset + 29515, offset + 30500) == 29696);
-            Debug.Assert(Storage.ForkNode(offset + 13700005424, offset + 13700005585) == 13700005504);
-            Debug.Assert(Storage.ForkNode(offset + 3970765138, offset + 6840749504) == 4294967296);
+            Assert.AreEqual(Storage.ForkNode(offset + 3, offset + 7), 4);
+            Assert.AreEqual(Storage.ForkNode(offset + 29515, offset + 30500), 29696);
+            Assert.AreEqual(Storage.ForkNode(offset + 13700005424, offset + 13700005585), 13700005504);
+            Assert.AreEqual(Storage.ForkNode(offset + 3970765138, offset + 6840749504), 4294967296);
             /* check (via random sampling) that the correct ForkNode computation is actually applied to records in DB */
             var r = _storage.Database.SqlQuery<Timeline>("SELECT TOP 10 * FROM Timelines ORDER BY NEWID()");
             foreach (Timeline t in r)
@@ -115,7 +115,7 @@ namespace Chronozoom.Test.RITreeTest
             }
             Console.WriteLine("time elapsed: " + ((t4 - t3) * 1.0 / TimeSpan.TicksPerMillisecond) + "ms");
             Console.WriteLine(count2 + " timeline(s) returned");
-            Debug.Assert(count1 == count2);
+            Assert.AreEqual(count1, count2);
         }
     }
 }
