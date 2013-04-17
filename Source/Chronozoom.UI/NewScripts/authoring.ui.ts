@@ -130,14 +130,10 @@ module CZ {
                 var isCancel = true;
                 var titleInput = $("#timelineTitleInput");
                 var startInput = new CZ.UI.DatePicker($("#timelineStartInput"));
-                //var startInput = $("#timelineStartInput").spinner();
                 var endInput = new CZ.UI.DatePicker($("#timelineEndInput"));
-                //var endInput = $("#timelineEndInput").spinner();
 
                 titleInput.val(t.title);
-                //startInput.val(t.x);
                 startInput.setDate(t.x);
-                //endInput.val(t.x + t.width);
                 endInput.setDate(t.x + t.width);
 
                 $("#createTimelineForm").dialog({
@@ -189,15 +185,11 @@ module CZ {
             export function showEditTimelineForm (t) {
                 var titleInput = $("#timelineTitleInput");
                 var startInput = new CZ.UI.DatePicker($("#timelineStartInput"));
-                //var startInput = $("#timelineStartInput").spinner();
                 var endInput = new CZ.UI.DatePicker($("#timelineEndInput"));
-                //var endInput = $("#timelineEndInput").spinner();
 
                 titleInput.val(t.title);
-                //startInput.val(t.x);
                 startInput.setDate(t.x);
                 endInput.setDate(t.x + t.width);
-                //endInput.val(t.x + t.width);
 
                 $("#createTimelineForm").dialog({
                     title: "edit timeline",
@@ -250,7 +242,6 @@ module CZ {
                 var isCancel = true;
                 var titleInput = $("#exhibitTitleInput");
                 var dateInput = new CZ.UI.DatePicker($("#exhibitDateInput"));
-                //var dateInput = $("#exhibitDateInput").spinner();
 
                 titleInput.val(e.title);
                 dateInput.setDate(e.infodotDescription.date);
