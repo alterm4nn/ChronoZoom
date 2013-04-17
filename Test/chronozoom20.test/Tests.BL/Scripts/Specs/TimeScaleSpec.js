@@ -46,30 +46,6 @@ describe("CZ.Timescale part", function () {
             expect("0.0 Ma").toEqual($('#timescale_right_border').text());
         });
     });
-
-    describe("When user set mouse to timescale point", function () {
-
-        beforeEach(function () {
-            //setFixtures('<body></body>');
-            $('body').prepend('<div id="axis" style="display:none;"></div>');
-            $('body').prepend('<p id="timescale_marker" style="display:none;"></p>');
-            _width = 1904;
-            _height = 75;
-            _mode = "calendar";
-            time = "2000";
-            CZ.Settings.maxPermitedTimeRange = {
-                left: -13700000000,
-                right: 2013.25
-            };
-            var range = { min: 1969.5394928592248, max: 2013.7481783736519 };
-            tm = new CZ.Timescale($('#axis'));
-            tm.update(range);
-        });
-        it("marker value should be corrected", function () {
-            tm.setTimeMarker(time);
-            expect("2000 AD").toEqual($('#marker-text').text());
-        });
-    });
 });
 
 describe("CZ.DateTickSource part", function () {
@@ -179,28 +155,87 @@ describe("CZ.CosmosTickSource", function () {
     });
 });
 
-//Helpers
-function getYearsBetweenDates(y1, m1, d1, y2, m2, d2) {
-    var years = y2 - y1;
-    if (y2 > 0 && y1 < 0) {
-        years -= 1;
-    }
-    var months = m2 - m1;
-    if (m1 > m2 || (m1 == m2 && d1 > d2)) {
-        years--;
-        months += 12;
-    }
-    var month = m1;
-    var days = -d1;
-    for (var i = 0; i < months; i++) {
-        if (month == 12) {
-            month = 0;
+describe("When user set mouse to timescale point", function() {
+
+    beforeEach(function() {
+        //setFixtures('<body></body>');
+        $('body').prepend('<div id="axis" style="display:none;"></div>');
+        $('body').prepend('<p id="timescale_marker" style="display:none;"></p>');
+        _width = 1904;
+        _height = 75;
+
+        CZ.Settings.maxPermitedTimeRange = {
+            left: -13700000000,
+            right: 2013.25
+        };
+
+        //var range = { min: -17184876455.565926, max: 3484878468.8159504 };
+        tm = new CZ.Timescale($('#axis'));
+    });
+    describe("in cosmos mode", function() {
+        describe("and Ma regime", function() {
+            beforeEach(function() {
+                time = -2252824056.1538224;
+                expectedResult = 2252.8 + " Ma";
+                var range = { min: -5226707537.317015, max: 656709550.6101665 };
+                tm.update(range);
+            });
+            it("Then: marker value should be corrected", function() {
+                tm.setTimeMarker(time);
+                expect(expectedResult).toEqual($('#marker-text').text());
+            });
+        });
+        describe("and Ga regime", function() {
+            beforeEach(function() {
+                time = -9722580060.656828;
+                expectedResult = 9.7 + " Ga";
+                var range = { min: -13920967774.407955, max: 220969787.70110416 };
+                tm.update(range);
+            });
+            it("Then: marker value should be corrected", function() {
+                tm.setTimeMarker(time);
+                expect(expectedResult).toEqual($('#marker-text').text());
+            });
+            describe("and ka regime", function() {
+                beforeEach(function() {
+                    time = -5405.34945727703;
+                    expectedResult = 5.4 + " ka";
+                    var range = { min: -11613.371118660096, max: 23861.03837495743 };
+                    tm.update(range);
+                });
+                it("Then: marker value should be corrected", function() {
+                    tm.setTimeMarker(time);
+                    expect(expectedResult).toEqual($('#marker-text').text());
+                });
+            });
+
+        });
+
+    });
+});
+
+    //Helpers
+    function getYearsBetweenDates(y1, m1, d1, y2, m2, d2) {
+        var years = y2 - y1;
+        if (y2 > 0 && y1 < 0) {
+            years -= 1;
         }
-        days += CZ.Settings.daysInMonth[month];
-        month++;
+        var months = m2 - m1;
+        if (m1 > m2 || (m1 == m2 && d1 > d2)) {
+            years--;
+            months += 12;
+        }
+        var month = m1;
+        var days = -d1;
+        for (var i = 0; i < months; i++) {
+            if (month == 12) {
+                month = 0;
+            }
+            days += CZ.Settings.daysInMonth[month];
+            month++;
+        }
+        days += d2;
+        var res = years + days / 365;
+        return -res;
     }
-    days += d2;
-    var res = years + days / 365;
-    return -res;
-}
-//Helpers
+    //Helpers
