@@ -1,4 +1,5 @@
 /// <reference path='common.ts'/>
+/// <reference path='cz.settings.ts'/>
 
 /// <reference path='typings/jquery/jquery.d.ts'/>
 
@@ -6,29 +7,71 @@ module CZ {
     export module UI {
 
         export class DatePicker {
-            public coordinate: number;
-            public date: {
-                day: number;
-                month: string;
-                year: number;
-            };
+            private mode: JQuery;
+            private container: JQuery;
 
             constructor(public datePicker: JQuery) {
                 this.initialize();
             };
 
             public initialize() {
-                var mode: JQuery = $("<select class='cz-datepicker-mode'></select>");
+                this.mode = $("<select class='cz-datepicker-mode'></select>");
                 
                 var optionYear: JQuery = $("<option value='year'>Year</option>");
                 var optionDate: JQuery = $("<option value='date'>Date</option>");
 
-                mode.append(optionYear);
-                mode.append(optionDate);
+                var self = this;
+                this.mode.change(function (event) {
+                    var mode = self.mode.find(":selected").val();
 
-                this.datePicker.append(mode);
+                    switch (mode) {
+                        case "year":
+                            self.editModeYear();
+                            break;
+                        case "date":
+                            self.editModeDate();
+                            break;                       
+                    }
+                });
 
-                var container: JQuery = $("<div class='cz-datepicker-container'></div>");
+                this.mode.append(optionYear);
+                this.mode.append(optionDate);
+
+                this.datePicker.append(this.mode);
+
+                this.container = $("<div class='cz-datepicker-container'></div>");               
+
+                this.datePicker.append(this.container);
+
+                this.editModeYear();
+            }
+
+
+            public setDate(coordinate: number) {
+                var date = CZ.Common.convertCoordinateToYear(coordinate);
+
+                this.datePicker.find(".cz-datepicker-year").val(date.year);
+                this.datePicker.find(".cz-datepicker-regime option").each(function () {
+                    if (this.value == date.regime.toLowerCase()) {
+                        $(this).attr("selected", "selected");
+                    }
+                });
+            }
+
+            public getDate() {
+                var year = this.datePicker.find(".cz-datepicker-year").val();
+                var regime = this.datePicker.find(".cz-datepicker-regime :selected").val();
+
+                return CZ.Common.convertYearToCoordinate(year, regime);
+            }
+
+            public remove() {
+                this.mode.remove();
+                this.container.remove();
+            }
+
+            private editModeYear() {
+                this.container.empty();
 
                 var yearBox: JQuery = $("<input type='text' class='cz-datepicker-year'></input>");
                 var regimesSelect: JQuery = $("<select class='cz-datepicker-regime'></select>");
@@ -45,38 +88,40 @@ module CZ {
                     .append(optionBCE)
                     .append(optionCE);
 
-                container.append(yearBox);
-                container.append(regimesSelect);
-
-                this.datePicker.append(container);
+                this.container.append(yearBox);
+                this.container.append(regimesSelect);
             }
 
-            public setDate(coordinate: number) {
-                this.coordinate = coordinate;
-                var date = CZ.Common.convertCoordinateToYear(coordinate);
+            private editModeDate() {
+                this.container.empty();
 
-                this.datePicker.find(".cz-datepicker-year").val(date.year);
-                this.datePicker.find(".cz-datepicker-regime option").each(function () {
-                    if (this.value == date.regime.toLowerCase()) {
-                        $(this).attr("selected", "selected");
+                var daySelector: JQuery = $("<select class='cz-datepicker-day-selector'></select>");
+                var monthSelector: JQuery = $("<select class='cz-datepicker-month-selector'></select>");
+                var yearBox: JQuery = $("<input type='text' class='cz-datepicker-year'></input>");
+
+                monthSelector.change(function (event) {
+                    daySelector.empty();
+
+                    var selectedIndex = (<HTMLSelectElement>monthSelector[0]).selectedIndex;
+                    for (var i = 0; i < CZ.Settings.daysInMonth[selectedIndex]; i++) {
+                        var dayOption: JQuery = $("<option value='" + (i + 1) + "'>" + (i + 1) + "</option>");
+                        daySelector.append(dayOption);
                     }
                 });
+
+                for (var i = 0; i < CZ.Settings.months.length; i++) {
+                    var monthOption: JQuery = $("<option value='" + CZ.Settings.months[i] + "'>" + CZ.Settings.months[i] + "</option>");
+
+                    monthSelector.append(monthOption);
+                }
+
+                this.container.append(monthSelector);
+                this.container.append(daySelector);
+                this.container.append(yearBox);
             }
 
-            public getDate() {
-                var year = this.datePicker.find(".cz-datepicker-year").val();
-                var regime = <any>$(this.datePicker.find(".cz-datepicker-regime option")[0]).val();
-                this.datePicker.find(".cz-datepicker-regime option").each(function () {
-                    if (this.selected)
-                        regime = <any>$(this).val();
-                });
-
-                return CZ.Common.convertYearToCoordinate(year, regime);
-            }
-
-            public remove() {
-                this.datePicker.find(".cz-datepicker-mode").remove();
-                this.datePicker.find(".cz-datepicker-container").remove();
+            private editModeNone() {
+                this.container.empty();
             }
         }
     }
