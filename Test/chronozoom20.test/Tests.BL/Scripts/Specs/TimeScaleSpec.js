@@ -208,7 +208,6 @@ describe("When user set mouse to timescale point", function() {
                     expect(expectedResult).toEqual($('#marker-text').text());
                 });
             });
-
         });
 
     });
