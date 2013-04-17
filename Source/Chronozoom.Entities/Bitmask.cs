@@ -10,7 +10,7 @@ namespace Chronozoom.Entities
     {
         [Key]
         [DataMember]
-        public int ID { get; set; }
+        public int Id { get; set; }
 
         [DataMember]
         public Int64 B1 { get; set; }

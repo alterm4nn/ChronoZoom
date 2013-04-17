@@ -88,10 +88,11 @@ namespace Chronozoom.Entities
             return new Collection<Timeline>(timelines);
         }
 
-        public static Int64 ForkNode(Int64 FromYear, Int64 ToYear)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "FromYear+13700000001"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "ToYear+13700000001")]
+        public static Int64 ForkNode(Int64 fromYear, Int64 toYear)
         {
-            Int64 start = FromYear + 13700000001;  //note: this value must be a positive integer (sign bit must be 0)
-            Int64 end = ToYear + 13700000001;  //note: this value must be a positive integer (sign bit must be 0)
+            Int64 start = fromYear + 13700000001;  //note: this value must be a positive integer (sign bit must be 0)
+            Int64 end = toYear + 13700000001;  //note: this value must be a positive integer (sign bit must be 0)
             Int64 node = ((start - 1) ^ end) >> 1;
             node = node | node >> 1;
             node = node | node >> 2;
