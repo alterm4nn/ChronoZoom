@@ -104,8 +104,8 @@
     <Compile Include="JsTypes\JsExhibit.cs" />
     <Compile Include="JsTypes\JsTimeline.cs" />
     <Compile Include="JsTypes\JsTitleRectangle.cs" />
-    <Compile Include="RITreeTest\RITreeTestStorage.cs" />
-    <Compile Include="RITreeTest\RITreeTest.cs" />
+    <Compile Include="RITreeTestStorage.cs" />
+    <Compile Include="RITreeTest.cs" />
     <Compile Include="TourTests\TourInteraction.cs" />
     <Compile Include="VirtualCanvasTests\VirtualCanvasLayoutTest.cs" />
     <Compile Include="VirtualCanvasTests\VirtualCanvasTreeTests.cs" />
