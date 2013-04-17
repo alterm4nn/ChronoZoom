@@ -158,7 +158,6 @@ describe("CZ.CosmosTickSource", function () {
 describe("When user set mouse to timescale point", function() {
 
     beforeEach(function() {
-        //setFixtures('<body></body>');
         $('body').prepend('<div id="axis" style="display:none;"></div>');
         $('body').prepend('<p id="timescale_marker" style="display:none;"></p>');
         _width = 1904;
@@ -168,8 +167,6 @@ describe("When user set mouse to timescale point", function() {
             left: -13700000000,
             right: 2013.25
         };
-
-        //var range = { min: -17184876455.565926, max: 3484878468.8159504 };
         tm = new CZ.Timescale($('#axis'));
     });
     describe("in cosmos mode", function() {
@@ -209,7 +206,6 @@ describe("When user set mouse to timescale point", function() {
                 });
             });
         });
-
     });
 });
 
