@@ -232,12 +232,38 @@ describe("When user set mouse to timescale point", function () {
                 expect(expectedResult).toEqual($('#marker-text').text());
             });
         });
-
         describe("and time = 0", function () {
             beforeEach(function () {
                 time = 0.5027397260273974;
                 expectedResult = 1 + " BCE";
                 var range = { min: -3447.996412540633, max: 2461.289563225633 };
+                tm.update(range);
+            });
+            it("Then: marker value should be corrected", function () {
+                tm.setTimeMarker(time);
+                expect(expectedResult).toEqual($('#marker-text').text());
+            });
+        });
+    });
+    describe("in date mode", function () {
+        describe("and one year area", function () {
+            beforeEach(function () {
+                time = 2012.1946866592516;
+                expectedResult = '3.12';
+                var range = { min: 2011.5541057045, max: 2012.5469000468117 };
+                tm.update(range);
+            });
+            it("Then: marker value should be corrected", function () {
+                tm.setTimeMarker(time);
+                expect(expectedResult).toEqual($('#marker-text').text());
+            });
+        });
+
+        describe("and one day area", function () {
+            beforeEach(function () {
+                time = 197.72385213591;
+                expectedResult = '21';
+                var range = { min: 198.16175542755357, max: 198.16255773500498 };
                 tm.update(range);
             });
             it("Then: marker value should be corrected", function () {
