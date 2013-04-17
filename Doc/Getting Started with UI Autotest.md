@@ -28,21 +28,25 @@ This document shows you how to use [Selenium WebDriver](http://docs.seleniumhq.o
 	b. Set BaseUrl(http://test.chronozoomproject.org) 
 	c. BrowserName("chrome", "firefox" or "internet explorer")
 7. Add rules for chromedriver and iedriver in Windows Firewall:
-	a. Open Windows Firewall
-	b. Open Advanced Settings
-	c. Open Inbound Rules
-	d. Create new rule for programs (chromedriver and iedriver)
-		i. Path to program: **Test\chronozoom20.test\ThirdParty\** + chromedriver.exe or IEDriverServer.exe
-		ii. Set by default others settings
+	1. Open Windows Firewall.
+	2. Click **Advanced settings**.
+	3. Click **Inbound Rules**, then click **New Rule...**.
+    4. Click **Programs**, then click **Next**
+    5. Create a new rule for chromedriver using the following program path:
+        `Test\chronozoom20.test\ThirdParty\chromedriver.exe`
+    6. Complete the remaining wizard steps (accept default values).
+    7. Repeat steps 2-6 to create a new rule for iedriver, using the following program path:
+    	`Test\chronozoom20.test\ThirdParty\IEDriverServer.exe`
 8. Configure setting for AuthorizationTests: 
-	a. Open file **Test\chronozoom20.test\Application.Helper\Constants\Accounts.xml**
-	b. Set Login and Password for Google, Yahoo and Microsoft accounts. **Please, Don't use own accounts. You can create accounts for tests**
-	c. Save file
-	d. Dont commit changes of the file to github. You can to add the file to git unstage (git update-index --assume-unchanged **PathToFile**/Accounts.xml)
-9. Open Test Explorer and run UI tests (Tests from project Tests.UI)
+	1. Open file `Test\chronozoom20.test\Application.Helper\Constants\Accounts.xml`
+	2. Set Login and Password for Google, Yahoo and Microsoft accounts. **Please, Don't use your own accounts. You can create separate accounts for testing.**
+	3. Save Accounts.xml.
+	4. Don't commit these changes to github. Add the file to git unstage:
+	   `git update-index --assume-unchanged **Test\chronozoom20.test\Application.Helper\Constants\Accounts.xml`
+9. Open Test Explorer and run UI tests (tests are located within the **Tests.UI** project.).
 10. Run a test.
-    a. Browser will be started
-    b. Homepage will be opened
-    c. Test will do something
-    d. Browser will be closed
-    e. Test results will be shown
+    1. Browser will be started.
+    2. Homepage will be opened.
+    3. Test will do something.
+    4. Browser will be closed.
+    5. Test results will be shown.
