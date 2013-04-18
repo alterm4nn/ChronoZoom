@@ -118,7 +118,7 @@ module CZ {
         }
 
         export function getDMYFromCoordinate(coord) {
-            return getDateFrom(0, 0, 0, coord);
+            return getDateFrom(0, 0, 1, coord);
         }
 
         // convert date to virtual coordinate
@@ -219,6 +219,9 @@ module CZ {
                 month++;
             }
             days += d2;
+
+            // add plus 1 day to make 1 january as 0 offset from year
+            days += 1;
             var res = years + days / 365;
             return -res;
         }

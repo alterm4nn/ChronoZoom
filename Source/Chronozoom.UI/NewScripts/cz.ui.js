@@ -130,7 +130,7 @@ var CZ;
                 var month = this.monthSelector.find(":selected").val();
                 month = CZ.Settings.months.indexOf(month);
                 var day = this.daySelector.find(":selected").val();
-                return CZ.Common.getCoordinateFromDMY(parseInt(year), month, parseInt(day));
+                return CZ.Common.getCoordinateFromDMY(year, month, day);
             };
             return DatePicker;
         })();

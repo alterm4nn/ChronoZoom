@@ -73,7 +73,7 @@ var CZ;
         }
         Common.getCoordinateFromDMY = getCoordinateFromDMY;
         function getDMYFromCoordinate(coord) {
-            return getDateFrom(0, 0, 0, coord);
+            return getDateFrom(0, 0, 1, coord);
         }
         Common.getDMYFromCoordinate = getDMYFromCoordinate;
         function getCoordinateFromDecimalYear(decimalYear) {
@@ -155,6 +155,7 @@ var CZ;
                 month++;
             }
             days += d2;
+            days += 1;
             var res = years + days / 365;
             return -res;
         }
