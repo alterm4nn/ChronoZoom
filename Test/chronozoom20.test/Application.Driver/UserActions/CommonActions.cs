@@ -347,6 +347,5 @@ namespace Application.Driver.UserActions
         {
             WebDriver.SwitchTo().Alert().Accept();
         }
-
     }
 }
