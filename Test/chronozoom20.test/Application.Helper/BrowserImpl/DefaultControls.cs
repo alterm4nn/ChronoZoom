@@ -18,7 +18,7 @@ namespace Application.Helper.BrowserImpl
         {
             string targetDate = "0";
             Logger.Log("- targetDate: " + targetDate);
-            string script = String.Format("controller.moveToVisible(new VisibleRegion2d(-{0},224031781.9944986,0.0009286813988062588),false)", targetDate);
+            string script = String.Format("CZ.Common.controller.moveToVisible(new CZ.Viewport.VisibleRegion2d(-{0},224031781.9944986,0.0009286813988062588),false)", targetDate);
             Logger.Log("- script: " + script);
             ExecuteJavaScript(script);
             //Wait For Humanity in bread crumbs
