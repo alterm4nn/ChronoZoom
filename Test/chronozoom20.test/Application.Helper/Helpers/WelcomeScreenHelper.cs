@@ -12,6 +12,8 @@ namespace Application.Helper.Helpers
             Logger.Log("<-");
            // ClickCloseButton();
             WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("CZ.Common.cosmosVisible != undefined")), 60);
+            Sleep(2);
+            WaitAjaxComplete(10);
             Logger.Log("->");
         }
 
