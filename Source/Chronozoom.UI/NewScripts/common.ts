@@ -137,21 +137,25 @@ module CZ {
                 regime: "CE"
             }
 
-            if (coordinate < 0) {
-                if (coordinate < -999999999) {
-                    year.year /= -1000000000;
-                    year.regime = 'GA';
-                } else if (coordinate < -999999) {
-                    year.year /= -1000000;
-                    year.regime = 'MA';
-                } else if (coordinate < -999) {
-                    year.year /= -1000;
-                    year.regime = 'KA';
-                } else {
-                    year.year /= -1;
-                    year.regime = 'BCE';
-                }
-            }            
+            if (coordinate < -999999999) {
+                year.year /= -1000000000;
+                year.regime = 'GA';
+            } else if (coordinate < -999999) {
+                year.year /= -1000000;
+                year.regime = 'MA';
+            } else if (coordinate < -999) {
+                year.year /= -1000;
+                year.regime = 'KA';
+            } else if (coordinate < 0) {
+                year.year /= -1;
+                // remove fraction part of year
+                year.year.toFixed();
+                year.regime = 'BCE';
+            }
+            else {
+                // remove fraction part of year
+                year.year.toFixed();
+            }         
 
             return year;
         }
