@@ -9,7 +9,7 @@
 /// <reference path="../Js/czservice.js"/>
 /// <reference path="js-ignore.js"/>
 
-describe("Given:  'edit exhibit' form is opened: ", function () {
+describe("Given:  'edit content item' form is opened: ", function () {
     var parentTimeline = {};
     parentTimeline.guid = "00000000-0000-0000-0000-000000000000";
     parentTimeline.id = "t55";
