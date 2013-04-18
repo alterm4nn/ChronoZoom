@@ -347,20 +347,5 @@ namespace Application.Driver.UserActions
         {
             WebDriver.SwitchTo().Alert().Accept();
         }
-
-        protected bool IsAlertPresent()
-        {
-            try
-            {
-                WebDriver.SwitchTo().Alert();
-                AcceptAlert();
-                return true;
-            }
-            catch (NoAlertPresentException e)
-            {
-                return false;
-            }
-        } 
-
     }
 }
