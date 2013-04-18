@@ -717,6 +717,8 @@ namespace UI
             updateContentItem.Caption = contentItemRequest.Caption;
             updateContentItem.MediaType = contentItemRequest.MediaType;
             updateContentItem.Uri = contentItemRequest.Uri;
+            updateContentItem.MediaSource = contentItemRequest.MediaSource;
+            updateContentItem.Attribution = contentItemRequest.Attribution;
             return contentItemRequest.Id;
         }
 
@@ -729,7 +731,9 @@ namespace UI
                                             Title = contentItemRequest.Title,
                                             Caption = contentItemRequest.Caption,
                                             MediaType = contentItemRequest.MediaType,
-                                            Uri = contentItemRequest.Uri
+                                            Uri = contentItemRequest.Uri,
+                                            MediaSource = contentItemRequest.MediaSource,
+                                            Attribution = contentItemRequest.Attribution
                                         };
             newContentItem.Collection = collection;
 
