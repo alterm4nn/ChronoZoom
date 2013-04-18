@@ -159,7 +159,7 @@ namespace Application.Helper.Helpers
         public void OpenLoginPage()
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@id='LoginPanel']/a"));
+            Click(By.Id("login-panel"));
             Logger.Log("->");
         }
 
