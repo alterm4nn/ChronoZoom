@@ -45,8 +45,6 @@ module CZ {
         var firstTimeWelcomeChecked = true; // if welcome screen checkbox checked or not
 
         var regimes = [];
-        export var regimesRatio;
-        export var regimeNavigator;
 
         var k = 1000000000;
         export var setNavigationStringTo; // { element or bookmark, id } identifies that we zoom into this element and when (if) finish the zoom, we should put the element's path into navigation string
@@ -382,7 +380,6 @@ module CZ {
                 controller.moveToVisible(visReg, true);
                 updateAxis(vc, ax);
                 var vp = vc.virtualCanvas("getViewport");
-                updateNavigator(vp);
 
                 if (startHash && window.location.hash !== startHash) {
                     hashChangeFromOutside = false;
@@ -403,15 +400,38 @@ module CZ {
             var cosmosTimeline = content;
             cosmosVisible = f(cosmosTimeline);
             CZ.UrlNav.navigationAnchor = vc.virtualCanvas("findElement", 't' + cosmosTimeline.id);
+            $("#regime-link-cosmos").click(function () {
+                var visible = CZ.UrlNav.navStringToVisible(cosmosVisible, vc);
+                setVisible(visible);
+            });
 
-            var earthTimeline = CZ.Layout.FindChildTimeline(cosmosTimeline, CZ.Settings.earthTimelineID);
+            var earthTimeline = CZ.Layout.FindChildTimeline(cosmosTimeline, CZ.Settings.earthTimelineID, true);
             earthVisible = f(earthTimeline);
+            $("#regime-link-earth").click(function () {
+                var visible = CZ.UrlNav.navStringToVisible(earthVisible, vc);
+                setVisible(visible);
+            });
+            
             var lifeTimeline = CZ.Layout.FindChildTimeline(earthTimeline, CZ.Settings.lifeTimelineID);
             lifeVisible = f(lifeTimeline);
+            $("#regime-link-life").click(function () {
+                var visible = CZ.UrlNav.navStringToVisible(lifeVisible, vc);
+                setVisible(visible);
+            });
+
             var prehistoryTimeline = CZ.Layout.FindChildTimeline(lifeTimeline, CZ.Settings.prehistoryTimelineID);
             prehistoryVisible = f(prehistoryTimeline);
+            $("#regime-link-prehistory").click(function () {
+                var visible = CZ.UrlNav.navStringToVisible(prehistoryVisible, vc);
+                setVisible(visible);
+            });
+
             var humanityTimeline = CZ.Layout.FindChildTimeline(prehistoryTimeline, CZ.Settings.humanityTimelineID, true);
             humanityVisible = f(humanityTimeline);
+            $("#regime-link-humanity").click(function () {
+                var visible = CZ.UrlNav.navStringToVisible(humanityVisible, vc);
+                setVisible(visible);
+            });
 
             maxPermitedVerticalRange = {    //setting top and bottom observation constraints according to cosmos timeline
                 top: cosmosTimeline.y,
@@ -427,82 +447,13 @@ module CZ {
         }
 
         export function updateLayout() {
-            var topHeight = $("#header").outerHeight(true) + $("#axis").outerHeight(true); // height of header and axis
-            var bottomHeight = $("#footer").outerHeight(true); // height of footer
-            var bodyTopMargin = parseFloat($("body").css("marginTop").replace('px', ''));
-            var bodyBottomMargin = parseFloat($("body").css("marginBottom").replace('px', ''));
-            var bodyMargin = bodyTopMargin + bodyBottomMargin; // calculated top and bottom margin of body tag
-            var occupiedHeight = topHeight + bottomHeight + bodyMargin; // occupied height of the page
-
-            document.getElementById("vc").style.height = (window.innerHeight - occupiedHeight) + "px";
-
-            $(".breadCrumbPanel").css("width", Math.round(($("#vc").width() / 2 - 50)));
-            $("#bc_navRight").css("left", ($(".breadCrumbPanel").width() + $(".breadCrumbPanel").position().left + 2) + "px");
-            CZ.BreadCrumbs.visibleAreaWidth = $(".breadCrumbPanel").width();
+            CZ.BreadCrumbs.visibleAreaWidth = $(".breadcrumbs-container").width();
             CZ.BreadCrumbs.updateHiddenBreadCrumbs();
-
-            var offset = window.innerHeight - occupiedHeight;
-
-            var biblOutTopMargin = 25; // top margin of bibliography outer window
-            var biblOutBottomMargin = 15; // bottom margin of bibliography outer window
-
-            document.getElementById("bibliographyOut").style.top = (topHeight + bodyTopMargin + 25) + "px";
-            document.getElementById("bibliographyOut").style.height = (window.innerHeight - occupiedHeight -
-                biblOutTopMargin - biblOutBottomMargin) + "px";
-
-            var welcomeScreenHeight = $("#welcomeScreenOut").outerHeight();
-            var diff = Math.floor((window.innerHeight - welcomeScreenHeight) / 2);
-            document.getElementById("welcomeScreenOut").style.top = diff + "px";
 
             vc.virtualCanvas("updateViewport");
             //ax.axis("updateWidth");
             updateAxis(vc, ax);
             CZ.BreadCrumbs.updateBreadCrumbsLabels();
-        }
-
-        export function passThrough(e) {
-            var mouseX = e.pageX;
-            var mouseY = e.pageY;
-
-            var cosmos_rect = $("#cosmos_rect");
-            var offset_space = cosmos_rect.offset();
-            var width_space = cosmos_rect.width();
-            var height_space = cosmos_rect.height();
-            if (mouseX > offset_space.left && mouseX < offset_space.left + width_space
-             && mouseY > offset_space.top && mouseY < offset_space.top + height_space)
-                CZ.Search.navigateToBookmark(cosmosVisible);
-
-            var earth_rect = $("#earth_rect");
-            var offset_earth = earth_rect.offset();
-            var width_earth = earth_rect.width();
-            var height_earth = earth_rect.height();
-            if (mouseX > offset_earth.left && mouseX < offset_earth.left + width_earth
-             && mouseY > offset_earth.top && mouseY < offset_earth.top + height_earth)
-                CZ.Search.navigateToBookmark(earthVisible);
-
-            var life_rect = $("#life_rect");
-            var offset_life = life_rect.offset();
-            var width_life = life_rect.width();
-            var height_life = life_rect.height();
-            if (mouseX > offset_life.left && mouseX < offset_life.left + width_life
-             && mouseY > offset_life.top && mouseY < offset_life.top + height_life)
-                CZ.Search.navigateToBookmark(lifeVisible);
-
-            var prehuman_rect = $("#prehuman_rect");
-            var offset_prehuman = prehuman_rect.offset();
-            var width_prehuman = prehuman_rect.width();
-            var height_prehuman = prehuman_rect.height();
-            if (mouseX > offset_prehuman.left && mouseX < offset_prehuman.left + width_prehuman
-             && mouseY > offset_prehuman.top && mouseY < offset_prehuman.top + height_prehuman)
-                CZ.Search.navigateToBookmark(prehistoryVisible);
-
-            var human_rect = $("#human_rect");
-            var offset_human = human_rect.offset();
-            var width_human = human_rect.width();
-            var height_human = human_rect.height();
-            if (mouseX > offset_human.left && mouseX < offset_human.left + width_human
-             && mouseY > offset_human.top && mouseY < offset_human.top + height_human)
-                CZ.Search.navigateToBookmark(humanityVisible);
         }
 
         export function updateAxis(vc, ax) {
@@ -511,39 +462,6 @@ module CZ {
             var rb = vp.pointScreenToVirtual(vp.width, vp.height);
             var newrange = { min: lt.x, max: rb.x };
             axis.update(newrange);
-        }
-
-        export function updateNavigator(vp) {
-            var navigatorFunc = function (coordinate) {
-                if (Math.abs(coordinate) < 0.00000000001)
-                    return 0;
-                //Get log10 from coordinate
-                var log = Math.log(coordinate) / 2.302585092994046;
-                //Get pow from log10
-                var pow = Math.pow(log, 3) * Math.exp(-log * 0.001);
-                //Get final width of the column
-                return (log + pow) * 13700000000 / 1041.2113538234402;
-            }
-
-            var left = vp.pointScreenToVirtual(0, 0).x;
-            if (left < CZ.Settings.maxPermitedTimeRange.left) left = CZ.Settings.maxPermitedTimeRange.left;
-            var right = vp.pointScreenToVirtual(vp.width, vp.height).x;
-            if (right > CZ.Settings.maxPermitedTimeRange.right) right = CZ.Settings.maxPermitedTimeRange.right;
-            var newRight = navigatorFunc(Math.abs(right));
-            var newLeft = navigatorFunc(Math.abs(left));
-            var newWidth = Math.max(2.0 / regimesRatio, Math.abs(newRight - newLeft));
-
-            var min = 0;
-            var max = document.getElementById("cosmos_rect").clientWidth;
-
-            var l = 301 - regimesRatio * newLeft;
-            var w = regimesRatio * newWidth;
-
-            if (l < 0 || l + w > max + 5)
-                return;
-
-            regimeNavigator.css('left', l);
-            regimeNavigator.css('width', w);
         }
 
         export function setCookie(c_name, value, exdays) {
