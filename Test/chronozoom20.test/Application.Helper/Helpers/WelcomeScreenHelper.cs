@@ -10,7 +10,7 @@ namespace Application.Helper.Helpers
         public void CloseWelcomePopup()
         {
             Logger.Log("<-");
-            ClickCloseButton();
+           // ClickCloseButton();
             WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("CZ.Common.cosmosVisible != undefined")), 60);
             Logger.Log("->");
         }
