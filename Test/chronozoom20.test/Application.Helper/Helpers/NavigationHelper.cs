@@ -7,10 +7,9 @@ namespace Application.Helper.Helpers
 {
     public class NavigationHelper : DependentActions
     {
-        public void OpenHomePage()
+        public void OpenHomePage(bool wait = true)
         {
             OpenUrl(Configuration.BaseUrl);
-            WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("visReg != undefined")), 60);
         }
 
         public void OpenExhibitEukaryoticCells()

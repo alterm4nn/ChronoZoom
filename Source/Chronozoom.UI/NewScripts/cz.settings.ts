@@ -101,8 +101,8 @@
         export var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
         // array of numbers of days for each month, 28 days in february by default
         export var daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-        export var tickLength = 25; // length of big tick
-        export var smallTickLength = 12.5; // length of small tick
+        export var tickLength = 14; // length of big tick
+        export var smallTickLength = 7; // length of small tick
         export var strokeWidth = 3; // width of ticks and lines
         export var thresholdHeight = 10; // height of threshold when not active
         export var thresholdWidth = 8;
@@ -126,10 +126,10 @@
 
         // IDs of regime timelines
         export var cosmosTimelineID = "00000000-0000-0000-0000-000000000000";
-        export var earthTimelineID = "48fbb8a8-7c5d-49c3-83e1-98939ae2ae67";
-        export var lifeTimelineID = "d4809be4-3cf9-4ddd-9703-3ca24e4d3a26";
-        export var prehistoryTimelineID = "a6b821df-2a4d-4f0e-baf5-28e47ecb720b";
-        export var humanityTimelineID = "4afb5bb6-1544-4416-a949-8c8f473e544d";
+        export var earthTimelineID = "8c8f294e-b09e-4506-94a3-5a51f0fb7a0b";
+        export var lifeTimelineID = "06541ae4-1095-4658-a8eb-e2cbc1371d82";
+        export var prehistoryTimelineID = "753022cb-1fac-4814-8abe-1cf0918f3f12";
+        export var humanityTimelineID = "a14d474d-121f-470d-b101-1c7727f1b69d";
 
         //tours
         export var toursAudioFormats =

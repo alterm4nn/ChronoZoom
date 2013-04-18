@@ -125,8 +125,8 @@ var CZ;
             30, 
             31
         ];
-        Settings.tickLength = 25;
-        Settings.smallTickLength = 12.5;
+        Settings.tickLength = 14;
+        Settings.smallTickLength = 7;
         Settings.strokeWidth = 3;
         Settings.thresholdHeight = 10;
         Settings.thresholdWidth = 8;
@@ -166,10 +166,10 @@ var CZ;
         Settings.minSmallTickSpace = 8;
         Settings.timescaleThickness = 2;
         Settings.cosmosTimelineID = "00000000-0000-0000-0000-000000000000";
-        Settings.earthTimelineID = "48fbb8a8-7c5d-49c3-83e1-98939ae2ae67";
-        Settings.lifeTimelineID = "d4809be4-3cf9-4ddd-9703-3ca24e4d3a26";
-        Settings.prehistoryTimelineID = "a6b821df-2a4d-4f0e-baf5-28e47ecb720b";
-        Settings.humanityTimelineID = "4afb5bb6-1544-4416-a949-8c8f473e544d";
+        Settings.earthTimelineID = "8c8f294e-b09e-4506-94a3-5a51f0fb7a0b";
+        Settings.lifeTimelineID = "06541ae4-1095-4658-a8eb-e2cbc1371d82";
+        Settings.prehistoryTimelineID = "753022cb-1fac-4814-8abe-1cf0918f3f12";
+        Settings.humanityTimelineID = "a14d474d-121f-470d-b101-1c7727f1b69d";
         Settings.toursAudioFormats = [
             {
                 ext: 'mp3'

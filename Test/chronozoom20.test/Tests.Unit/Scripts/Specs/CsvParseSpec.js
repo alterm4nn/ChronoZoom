@@ -1,4 +1,4 @@
-﻿/// <reference path="../Utils/jquery-1.8.0.min.js" />
+﻿/// <reference path="../Utils/jquery-1.7.2.min.js" />
 /// <reference path="../Js/csvUtils.js" />
 
 

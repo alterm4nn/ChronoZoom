@@ -74,7 +74,7 @@ module CZ {
                     var mediaInput = $(this).find(".cz-authoring-ci-media-source");
                     var mediaTypeInput = (<any>$)(this).find(".cz-authoring-ci-media-type option");
                     var descriptionInput = $(this).find(".cz-authoring-ci-description");
-                    var guid = $(this).attr("cz-authoring-ci-guid") || null;
+                    var guid = $(this).attr("cz-authoring-ci-guid") || undefined;
 
                     var selected = (<any>$)(mediaTypeInput)[0];
 
@@ -90,7 +90,7 @@ module CZ {
                         uri: mediaInput.val(),
                         mediaType: selected.text,
                         guid: guid,
-                        parent: null
+                        parent: undefined
                     });
                 });
 
@@ -400,7 +400,6 @@ module CZ {
                                 if (mediaTypeInput[i].selected) {
                                     selected = mediaTypeInput[i];
                                 }
-                            console.log(c, e);
                             CZ.Authoring.updateContentItem(c, {
                                 title: titleInput.val(),
                                 uri: mediaInput.val(),

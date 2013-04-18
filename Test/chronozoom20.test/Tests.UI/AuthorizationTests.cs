@@ -31,10 +31,11 @@ namespace Tests
         [TestCleanup]
         public void TestCleanup()
         {
-            NavigationHelper.OpenHomePage();
+            HomePageHelper.WaitWhileHomePageIsLoaded();
             WelcomeScreenHelper.CloseWelcomePopup();
             AuthorizationHelper.Logout();
             HomePageHelper.WaitWhileHomePageIsLoaded();
+            WelcomeScreenHelper.CloseWelcomePopup();
             CreateScreenshotsIfTestFail(TestContext);
         }
 
@@ -60,7 +61,7 @@ namespace Tests
         public void Test_Login_as_Ms_user()
         {
             HomePageHelper.OpenLoginPage();
-            AuthorizationHelper.AuthenticateAsMsUser();
+            AuthorizationHelper.AuthenticateAsMicrosoftUser();
             Assert.IsTrue(AuthorizationHelper.IsUserAuthenticated());
         }
     }

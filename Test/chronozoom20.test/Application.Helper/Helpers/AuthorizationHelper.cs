@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Text;
+using System.IO;
+using System.Xml;
 using Application.Driver;
 using Application.Helper.Entities;
 using Application.Helper.UserActions;
@@ -18,8 +19,9 @@ namespace Application.Helper.Helpers
                 Click(By.XPath("//*[@id='MoreOptions']/a"));
             }
             Click(By.XPath("//*[@name='Google']"));
-            
-            var user = new User { Login = Constants.UsersInfo.Default.google_login, Password = Constants.UsersInfo.Default.google_password, Type = UserType.Google };
+
+            var user = new User { Type = UserType.Google };
+            FillUserCredentials(user);
             Logger.Log(user.ToString());
             SetUserInfoAndSubmit(user);
             Sleep(10);
@@ -35,14 +37,15 @@ namespace Application.Helper.Helpers
                 Click(By.XPath("//*[@id='MoreOptions']/a"));
             }
             Click(By.XPath("//*[@name='Yahoo!']"));
-            
-            var user = new User { Login = Constants.UsersInfo.Default.yahoo_login, Password = Constants.UsersInfo.Default.yahoo_password, Type = UserType.Yahoo };
+
+            var user = new User { Type = UserType.Yahoo };
+            FillUserCredentials(user);
             Logger.Log(user.ToString());
             SetUserInfoAndSubmit(user);
             Logger.Log("->");
         }
 
-        public void AuthenticateAsMsUser()
+        public void AuthenticateAsMicrosoftUser()
         {
             Logger.Log("<-");
 
@@ -52,7 +55,8 @@ namespace Application.Helper.Helpers
             }
             Click(By.XPath("//*[@name='Windows Live™ ID']"));
 
-            var user = new User { Login = Constants.UsersInfo.Default.wlid_login, Password = Constants.UsersInfo.Default.wlid_password, Type = UserType.Ms };
+            var user = new User { Type = UserType.Microsoft };
+            FillUserCredentials(user);
             Logger.Log(user.ToString());
             SetUserInfoAndSubmit(user);
             Logger.Log("->");
@@ -76,19 +80,61 @@ namespace Application.Helper.Helpers
             var isLogoutPresent = FindElement(By.XPath("//*[@id='LoginPanel']/a")).Text == "Logout";
             Logger.Log("isLogoutPresent: " + isLogoutPresent);
 
-            WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("visReg != undefined")), 60);
-            OpenUrl(GetParentUriString(new Uri(Configuration.BaseUrl)) + "account/isauth");
-            WaitForElementIsExisted(By.TagName("body"));
-            var isApiAuth = bool.Parse(GetText(By.TagName("body")));
-            Logger.Log("isApiAuth: " + isApiAuth);
+            //WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("CZ.Common.cosmosVisible != undefined")), 60);
+            //OpenUrl(GetParentUriString(new Uri(Configuration.BaseUrl)) + "account/isauth");
+            //WaitForElementIsExisted(By.TagName("body"));
+            //var isApiAuth = bool.Parse(GetText(By.TagName("body")));
+            //Logger.Log("isApiAuth: " + isApiAuth);
 
             var isCookieExist = IsUserCookieExist();
             Logger.Log("isCookieExist: " + isCookieExist);
 
-            var result = isLogoutPresent && isApiAuth && isCookieExist;
+            var result = isLogoutPresent && isCookieExist;
             Logger.Log("-> result: " + result);
 
             return result;
+        }
+
+        protected bool IsUserCookieExist()
+        {
+            var result = false;
+            var userCookieNames = new[] { "FedAuth", "FedAuth1" };
+
+            var cookies = GetAllCookies();
+            foreach (var cookie in cookies)
+            {
+                if (userCookieNames[0] == cookie.Name || userCookieNames[1] == cookie.Name)
+                {
+                    result = true;
+                }
+            }
+            return result;
+        }
+
+        protected User FillUserCredentials(User user)
+        {
+            var document = new XmlDocument();
+            document.Load(GetValidAcountsXmlPath());
+
+            switch (user.Type)
+            {
+                case UserType.Google:
+                    user.Login = document.SelectSingleNode("//Accounts/google/login").InnerText;
+                    user.Password = document.SelectSingleNode("//Accounts/google/password").InnerText;
+                    break;
+                case UserType.Microsoft:
+                    user.Login = document.SelectSingleNode("//Accounts/micorsoft/login").InnerText;
+                    user.Password = document.SelectSingleNode("//Accounts/micorsoft/password").InnerText;
+                    break;
+                case UserType.Yahoo:
+                    user.Login = document.SelectSingleNode("//Accounts/yahoo/login").InnerText;
+                    user.Password = document.SelectSingleNode("//Accounts/yahoo/password").InnerText;
+                    break;
+                default:
+                    throw new Exception("Can not find user credentials, user: " + user);
+            }
+
+            return user;
         }
 
         private void SetUserInfoAndSubmit(User user)
@@ -108,44 +154,31 @@ namespace Application.Helper.Helpers
                     Click(By.Id(".save"));
                     WaitForElementIsDisplayed(By.XPath("//*[@id='LoginPanel']/a"));
                     break;
-                case UserType.Ms:
+                case UserType.Microsoft:
                     ClickElementAndType(By.Id("idDiv_PWD_UsernameExample"), user.Login);
                     ClickElementAndType(By.Id("idDiv_PWD_PasswordExample"), user.Password);
                     Click(By.XPath("//*[@id='idSIButton9']"));
                     break;
             }
-
             Logger.Log("->");
         }
 
-        private string GetParentUriString(Uri uri)
+        private string GetValidAcountsXmlPath()
         {
-            var parentName = new StringBuilder();
-            parentName.Append(uri.Scheme);
-            parentName.Append("://");
-            parentName.Append(uri.Host);
+            var lavidFilePath = string.Empty;
 
-            for (int i = 0; i < uri.Segments.Length - 1; i++)
+            const string accountsPathVsRun = @".\..\..\Constants\Accounts.xml";
+            const string accountsPathConsoleRun = @"..\..\..\Application.Helper\Constants\Accounts.xml";
+
+            if (File.Exists(accountsPathVsRun))
+                lavidFilePath = accountsPathVsRun;
+            if (File.Exists(accountsPathConsoleRun))
+                lavidFilePath = accountsPathConsoleRun;
+            if (string.IsNullOrEmpty(lavidFilePath))
             {
-                parentName.Append(uri.Segments[i]);
+                throw new Exception("Cannot find Accounts.xml file");
             }
-            return parentName.ToString();
-        }
-
-        protected bool IsUserCookieExist()
-        {
-            var result = false;
-            var userCookieNames = new[] { "FedAuth", "FedAuth1" };
-
-            var cookies = GetAllCookies();
-            foreach (var cookie in cookies)
-            {
-                if (userCookieNames[0] == cookie.Name || userCookieNames[1] == cookie.Name)
-                {
-                    result = true;
-                }
-            }
-            return result;
+            return lavidFilePath;
         }
     }
 }

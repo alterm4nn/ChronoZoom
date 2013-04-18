@@ -159,7 +159,7 @@ namespace Application.Helper.Helpers
         public void OpenLoginPage()
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@id='LoginPanel']/a"));
+            Click(By.Id("login-panel"));
             Logger.Log("->");
         }
 
@@ -180,7 +180,7 @@ namespace Application.Helper.Helpers
 
         public void WaitWhileHomePageIsLoaded()
         {
-            WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("visReg != undefined")), 60);
+            WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("CZ.Common.cosmosVisible != undefined")), 60);
         }
     }
 }
