@@ -1869,7 +1869,7 @@ module CZ {
                             contentWidth);
 
                     // Source
-                    var sourceText = this.contentItem.attribution;
+                    var sourceText = this.contentItem.Attribution;
                     if (sourceText) {
                         var addSourceText = function (sx, sw, sy) {
                             var sourceItem = addText(container, layerid, id + "__source__", sx, sy, sy + sourceHeight / 2.0,
@@ -1882,11 +1882,11 @@ module CZ {
                                 adjustWidth: true
                             }, sw);
 
-                            if (this.contentItem.mediaSource) { // we've got a URL here
+                            if (contentItem.MediaSource) { // we've got a URL here
                                 sourceItem.reactsOnMouse = true;
                                 sourceItem.onmouseclick = function (e) {
                                     vc.element.css('cursor', 'default');
-                                    window.open(this.contentItem.mediaSource);
+                                    window.open(contentItem.MediaSource);
                                     return true;
                                 };
                                 sourceItem.onmouseenter = function (pv, e) {
@@ -1902,18 +1902,7 @@ module CZ {
                             }
                         }
 
-
-                        if (imageElem) {
-                            imageElem.onLoad = function () {
-                                var sx = this.x;
-                                var sw = this.width;
-                                var sy = this.y + this.height + sourceVertMargin;
-                                addSourceText(sx, sw, sy);
-                                this.onLoad = null;
-                            }
-                        } else {
-                            addSourceText(vx + leftOffset, contentWidth, sourceTop);
-                        }
+                        addSourceText(vx + leftOffset, contentWidth, sourceTop);
                     }
 
 

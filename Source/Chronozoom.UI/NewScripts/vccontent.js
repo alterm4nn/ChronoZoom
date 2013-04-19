@@ -1274,7 +1274,7 @@ var CZ;
                         wrapText: true,
                         numberOfLines: 1
                     }, contentWidth);
-                    var sourceText = this.contentItem.attribution;
+                    var sourceText = this.contentItem.Attribution;
                     if(sourceText) {
                         var addSourceText = function (sx, sw, sy) {
                             var sourceItem = addText(container, layerid, id + "__source__", sx, sy, sy + sourceHeight / 2.0, 0.9 * sourceHeight, sourceText, {
@@ -1285,11 +1285,11 @@ var CZ;
                                 opacity: 1,
                                 adjustWidth: true
                             }, sw);
-                            if(this.contentItem.mediaSource) {
+                            if(contentItem.MediaSource) {
                                 sourceItem.reactsOnMouse = true;
                                 sourceItem.onmouseclick = function (e) {
                                     vc.element.css('cursor', 'default');
-                                    window.open(this.contentItem.mediaSource);
+                                    window.open(contentItem.MediaSource);
                                     return true;
                                 };
                                 sourceItem.onmouseenter = function (pv, e) {
@@ -1304,17 +1304,7 @@ var CZ;
                                 };
                             }
                         };
-                        if(imageElem) {
-                            imageElem.onLoad = function () {
-                                var sx = this.x;
-                                var sw = this.width;
-                                var sy = this.y + this.height + sourceVertMargin;
-                                addSourceText(sx, sw, sy);
-                                this.onLoad = null;
-                            };
-                        } else {
-                            addSourceText(vx + leftOffset, contentWidth, sourceTop);
-                        }
+                        addSourceText(vx + leftOffset, contentWidth, sourceTop);
                     }
                     var descrTop = titleTop + titleHeight + verticalMargin;
                     addScrollText(container, layerid, id + "__description__", vx + leftOffset, descrTop, contentWidth, descrHeight, this.contentItem.description, 30, {
