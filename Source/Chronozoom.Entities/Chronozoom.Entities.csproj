@@ -73,6 +73,7 @@
     <Compile Include="Timeline.cs" />
     <Compile Include="TimelineExtensions.cs" />
     <Compile Include="Tour.cs" />
+    <Compile Include="User.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Settings.StyleCop">

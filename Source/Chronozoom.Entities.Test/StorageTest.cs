@@ -9,7 +9,7 @@ namespace Chronozoom.Entities.Test
     [TestClass]
     public class StorageTest
     {
-        Storage _storage = new Storage();
+        protected Storage _storage = new Storage();
         Collection _betaCollection = null;
 
         [TestInitialize]
