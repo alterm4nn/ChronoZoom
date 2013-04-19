@@ -31,15 +31,15 @@ module CZ {
         }
 
         function Prepare(timeline) {
-            timeline.left = CZ.Common.getCoordinateFromDecimalYear(timeline.start);
-            timeline.right = CZ.Common.getCoordinateFromDecimalYear(timeline.end);
+            timeline.left = CZ.Dates.getCoordinateFromDecimalYear(timeline.start);
+            timeline.right = CZ.Dates.getCoordinateFromDecimalYear(timeline.end);
 
             // save timeline end date in case if it is '9999'
             timeline.endDate = timeline.end;
 
             if (timeline.exhibits instanceof Array) {
                 timeline.exhibits.forEach(function (exhibit) {
-                    exhibit.x = CZ.Common.getCoordinateFromDecimalYear(exhibit.time);
+                    exhibit.x = CZ.Dates.getCoordinateFromDecimalYear(exhibit.time);
                 });
             }
 

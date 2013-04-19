@@ -97,10 +97,6 @@
         export var maxTickArrangeIterations = 3; // max iterations constant used in creating ticks
         export var spaceBetweenLabels = 15; // constant to calculate when ticks count should be increased or decreased
         export var spaceBetweenSmallTicks = 10;  // canstant to calculate when small ticks count should be increased or decreased
-        // array of month names to use in labels
-        export var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        // array of numbers of days for each month, 28 days in february by default
-        export var daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
         export var tickLength = 14; // length of big tick
         export var smallTickLength = 7; // length of small tick
         export var strokeWidth = 3; // width of ticks and lines

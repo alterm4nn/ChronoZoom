@@ -306,7 +306,7 @@ var CZ;
             var temp = {
                 x: Number(prop.start),
                 y: t.y,
-                width: Number(CZ.Common.getCoordinateFromDecimalYear(prop.end) - prop.start),
+                width: Number(CZ.Dates.getCoordinateFromDecimalYear(prop.end) - prop.start),
                 height: t.height,
                 type: "rectangle"
             };

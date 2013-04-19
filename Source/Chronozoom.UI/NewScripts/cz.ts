@@ -82,8 +82,6 @@ module CZ {
             $('#biblCloseButton')
                 .mouseout(() => { CZ.Common.toggleOffImage('biblCloseButton', 'png'); })
                 .mouseover(() => { CZ.Common.toggleOnImage('biblCloseButton', 'png'); })
-
-            //var datepicker = new CZ.UI.DatePicker($("#datepicker"));
             
             // TODO: remove splash screen totaly and replace it with new UX.
             //$('#welcomeScreenCloseButton')

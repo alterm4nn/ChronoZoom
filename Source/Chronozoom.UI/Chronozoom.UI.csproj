@@ -162,6 +162,10 @@
     <Content Include="NewScripts\bibliography.ts" />
     <Content Include="NewScripts\breadCrumbs.ts" />
     <Content Include="NewScripts\common.ts" />
+    <TypeScriptCompile Include="NewScripts\cz.dates.ts" />
+    <Content Include="NewScripts\cz.dates.js">
+      <DependentUpon>cz.dates.ts</DependentUpon>
+    </Content>
     <Content Include="NewScripts\cz.js">
       <DependentUpon>cz.ts</DependentUpon>
     </Content>

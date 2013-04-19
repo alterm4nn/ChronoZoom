@@ -3,6 +3,7 @@
 /// <reference path='vccontent.ts'/>
 /// <reference path='czservice.ts'/>
 /// <reference path='vccontent.ts'/>
+/// <reference path='cz.dates.ts' />
 
 /**
  * The CZ submodule for Authoring Tool functionality.
@@ -490,7 +491,7 @@ module CZ {
             var temp = {
                 x: Number(prop.start),
                 y: t.y,
-                width: Number(CZ.Common.getCoordinateFromDecimalYear(prop.end) - prop.start),
+                width: Number(CZ.Dates.getCoordinateFromDecimalYear(prop.end) - prop.start),
                 height: t.height,
                 type: "rectangle"
             };

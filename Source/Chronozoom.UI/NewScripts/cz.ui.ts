@@ -1,6 +1,3 @@
-/// <reference path='common.ts'/>
-/// <reference path='cz.settings.ts'/>
-
 /// <reference path='typings/jquery/jquery.d.ts'/>
 
 module CZ {
@@ -132,14 +129,14 @@ module CZ {
                     self.daySelector.empty();
 
                     var selectedIndex = (<HTMLSelectElement>self.monthSelector[0]).selectedIndex;
-                    for (var i = 0; i < CZ.Settings.daysInMonth[selectedIndex]; i++) {
+                    for (var i = 0; i < CZ.Dates.daysInMonth[selectedIndex]; i++) {
                         var dayOption: JQuery = $("<option value='" + (i + 1) + "'>" + (i + 1) + "</option>");
                         self.daySelector.append(dayOption);
                     }
                 });
 
-                for (var i = 0; i < CZ.Settings.months.length; i++) {
-                    var monthOption: JQuery = $("<option value='" + CZ.Settings.months[i] + "'>" + CZ.Settings.months[i] + "</option>");
+                for (var i = 0; i < CZ.Dates.months.length; i++) {
+                    var monthOption: JQuery = $("<option value='" + CZ.Dates.months[i] + "'>" + CZ.Dates.months[i] + "</option>");
                     this.monthSelector.append(monthOption);
                 }
 
@@ -155,7 +152,7 @@ module CZ {
             }
 
             private setDate_YearMode(coordinate: number) {
-                var date = CZ.Common.convertCoordinateToYear(coordinate);
+                var date = CZ.Dates.convertCoordinateToYear(coordinate);
 
                 this.yearSelector.val(date.year);
                 this.regimeSelector.find("option").each(function () {
@@ -166,12 +163,12 @@ module CZ {
             }
 
             private setDate_DateMode(coordinate: number) {
-                var date = CZ.Common.getDMYFromCoordinate(coordinate);
+                var date = CZ.Dates.getDMYFromCoordinate(coordinate);
 
                 this.yearSelector.val(date.year);
                 var self = this;
                 this.monthSelector.find("option").each(function (index) {
-                    if (this.value === CZ.Settings.months[date.month]) {
+                    if (this.value === CZ.Dates.months[date.month]) {
                         $(this).attr("selected", "selected");
                         $.when(self.monthSelector.trigger("change")).done(function () {
                             self.daySelector.find("option").each(function () {
@@ -188,16 +185,16 @@ module CZ {
                 var year = this.yearSelector.val();
                 var regime = this.regimeSelector.find(":selected").val();
 
-                return CZ.Common.convertYearToCoordinate(year, regime);
+                return CZ.Dates.convertYearToCoordinate(year, regime);
             }
 
             private getDate_DateMode() {
                 var year = this.yearSelector.val();
                 var month = this.monthSelector.find(":selected").val();
-                month = CZ.Settings.months.indexOf(month);
+                month = CZ.Dates.months.indexOf(month);
                 var day = this.daySelector.find(":selected").val();
 
-                return CZ.Common.getCoordinateFromDMY(year, month, day);
+                return CZ.Dates.getCoordinateFromDMY(year, month, day);
             }
         }
     }
