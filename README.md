@@ -23,6 +23,8 @@ Work items and goals are managed on Trello [here](https://trello.com/chronozoom)
 
 Project workflow and developer guidelines are available [here](Doc/ChronoZoom_Developer_Guide.md).
 
+Skype "ChronoZoom Development" group [here](skype:?chat&blob=zzTEF-H_3Be_mkI2LO-vhWMIdOMjRCf01z4BwcCq_eYDqbspqX8Pu2rlYo3-M5Qqvdi60eFg57Z8p-kETiu5XQ48XtVVW0t8pgmdUBoJr-KRPNd-DIV9PLrcVqxtWaQ7iiSCEiOS5oVMw-nS_X_nlsk1Vg-jgDBKi7QaB3YlXGpRNTPyZft3C3U4MF_3A6gePBGZ1pp-7BlM4vuH-JF03cOaX5WDNNXRjrvZzQFZ4ka6).
+
 Installation
 ----------
 
