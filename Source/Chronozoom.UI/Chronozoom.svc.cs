@@ -26,7 +26,6 @@ using System.ServiceModel.Web;
 using System.Text;
 using System.Web;
 using System.Web.Script.Services;
-using ASC.Models;
 using Chronozoom.Entities;
 using Newtonsoft.Json;
 
@@ -45,6 +44,7 @@ namespace UI
         private const decimal _minYear = -13700000000;
         private const decimal _maxYear = 9999;
         private const int _maxElements = 500;
+        private const string _defaultUserCollectionName = "default";
 
         // error code descriptions
         private static class ErrorDescription
@@ -221,45 +221,58 @@ namespace UI
             }
         }
 
+        /// <summary>
+        /// Updates user information and associated personal collection.
+        /// </summary>
+        /// <param name="user">User information to update</param>
+        /// <returns>The URL for the new user collection.</returns>
         [OperationContract]
-        [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public BaseJsonResult<SuperCollection> GetSuperCollection()
+        [WebInvoke(Method = "PUT", UriTemplate = "/user", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        public String PutUser(User user)
         {
-            return AuthenticatedOperation(userId =>
-                {
-                    Trace.TraceInformation("Get Collections.");
-                    
-                    SuperCollection superCollection = _storage.SuperCollections.Where(candidate => candidate.UserId == userId).FirstOrDefault();
-                    if (superCollection == null)
-                    {
-                        // Create the personal supercollection
-                        superCollection = new SuperCollection();
-                        superCollection.Title = userId;
-                        superCollection.Id = CollectionIdFromText(superCollection.Title);
-                        superCollection.UserId = userId;
-                        superCollection.Collections = new Collection<Collection>();
+            return AuthenticatedOperation<String>(delegate(string userId)
+            {
+                Uri collectionUri = UpdatePersonalCollection(userId, user);
 
-                        // Create the personal collection
-                        Collection personalCollection = new Collection();
-                        personalCollection.Title = userId;
-                        personalCollection.Id = Guid.NewGuid();
-                        personalCollection.UserId = userId;
+                // TODO: Persist user changes, validation, etc. Initial check-in provides API stub.
 
-                        superCollection.Collections.Add(personalCollection);
+                Uri uriRequest = System.ServiceModel.OperationContext.Current.RequestContext.RequestMessage.Headers.To;
+                return new Uri(new Uri(uriRequest.GetLeftPart(UriPartial.Authority)), collectionUri.ToString()).ToString();
+            });
+        }
 
-                        _storage.SuperCollections.Add(superCollection);
-                        _storage.Collections.Add(personalCollection);
-                        _storage.SaveChanges();
+        private Uri UpdatePersonalCollection(string userId, User user)
+        {
+            SuperCollection superCollection = _storage.SuperCollections.Where(candidate => candidate.UserId == userId).FirstOrDefault();
+            if (superCollection == null)
+            {
+                // Create the personal supercollection
+                superCollection = new SuperCollection();
+                superCollection.Title = user.DisplayName;
+                superCollection.Id = CollectionIdFromText(user.DisplayName);
+                superCollection.UserId = userId;
+                superCollection.Collections = new Collection<Collection>();
 
-                        Trace.TraceInformation("Personal collection saved.");
-                    }
-                    else
-                    {
-                        _storage.Entry(superCollection).Collection(_ => _.Collections).Load();
-                    }
+                // Create the personal collection
+                Collection personalCollection = new Collection();
+                personalCollection.Title = _defaultUserCollectionName;
+                personalCollection.Id = CollectionIdFromSuperCollection(user.DisplayName, _defaultUserCollectionName);
+                personalCollection.UserId = userId;
 
-            return new BaseJsonResult<SuperCollection>(superCollection);
-                });
+                superCollection.Collections.Add(personalCollection);
+
+                _storage.SuperCollections.Add(superCollection);
+                _storage.Collections.Add(personalCollection);
+                _storage.SaveChanges();
+
+                Trace.TraceInformation("Personal collection saved.");
+            }
+
+            return new Uri(string.Format(
+                CultureInfo.InvariantCulture,
+                @"{0}\{1}\",
+                FriendlyUrlReplacements(superCollection.Title),
+                _defaultUserCollectionName), UriKind.Relative);
         }
 
         public void Dispose()
@@ -323,11 +336,19 @@ namespace UI
                 supercollection.ToLower(),
                 collection.ToLower()));
         }
+        
+        /// <summary>
+        /// Replace with URL friendly representations. For instance, converts space to '-'.
+        /// </summary>
+        private static string FriendlyUrlReplacements(string value)
+        {
+            return Uri.EscapeDataString(value.Replace(' ', '-'));
+        }
 
         private static Guid CollectionIdFromText(string value)
         {
             // Replace with URL friendly representations
-            value = value.Replace(' ', '-');
+            value = FriendlyUrlReplacements(value);
 
             byte[] data = null;
             lock (_md5Hasher)
