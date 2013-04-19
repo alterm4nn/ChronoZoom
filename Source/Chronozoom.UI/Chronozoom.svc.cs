@@ -348,7 +348,7 @@ namespace UI
         private static Guid CollectionIdFromText(string value)
         {
             // Replace with URL friendly representations
-            value = FriendlyUrlReplacements(value);
+            value = value.Replace(' ', '-');
 
             byte[] data = null;
             lock (_md5Hasher)
