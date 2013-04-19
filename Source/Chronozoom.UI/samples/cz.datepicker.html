@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>CZ Datepicker Sample</title>
+
+    <script type="text/javascript" src="../NewScripts/external/jquery-1.7.2.min.js"></script>
+
+    <script type="text/javascript" src="../NewScripts/controls/cz.datepicker.js"></script>
+    <script type="text/javascript" src="../NewScripts/cz.dates.js"></script>
+
+    <style type="text/css">
+        #datepicker {
+            width: 400px;
+            height: 70px;
+            background-color: #eee;
+            padding-top: 50px;
+        }
+
+        .cz-datepicker-mode {
+            display: inline-block;
+            margin: 0 30px 0 20px;
+        }
+
+        .cz-datepicker-container {
+            display: inline-block;
+        }
+    </style>
+
+    <script type="text/javascript">
+        var datepicker;
+        
+        function pageOnLoad() {
+            datepicker = new CZ.UI.DatePicker($("#datepicker"));
+
+            $("#input-date-btn").click(function () {
+                datepicker.setDate($("#input-date").val());
+            });
+
+            $("#output-date-btn").click(function () {
+                $("#output-date").val(datepicker.getDate());
+            });
+        }
+    </script>
+</head>
+<body onload="pageOnLoad()">
+    <div id="datepicker"></div>
+    <div style="margin: 20px 10px 20px 10px;">
+        <span>Date to set:</span>
+        <input type="text" id="input-date" />
+        <button id="input-date-btn">Set date</button>
+    </div>
+    <div style="margin: 20px 10px 20px 10px;">
+        <span>Result date:</span>
+        <input type="text" id="output-date" />
+        <button id="output-date-btn">Get date</button>
+    </div>
+</body>
+</html>

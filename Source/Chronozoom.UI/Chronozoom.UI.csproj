@@ -211,6 +211,7 @@
     <Compile Include="ACS\Util\NameValueCollectionExtensions.cs" />
     <Compile Include="ACS\Util\RequireAuthenticationAttribute.cs" />
     <Content Include="ACS\FederationMetadata\2007-06\FederationMetadata.xml" />
+    <Content Include="samples\cz.datepicker.html" />
     <Content Include="Views\Account\_IdentityProvidersWithClientSideCode.aspx" />
     <Content Include="favicon.ico" />
     <Content Include="Images\A.png" />
