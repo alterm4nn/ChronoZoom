@@ -36,8 +36,8 @@ module CZ {
                     description: ci.contentItem ? ci.contentItem.description : ci.description,
                     uri: ci.contentItem ? ci.contentItem.uri : ci.uri,
                     mediaType: ci.contentItem ? ci.contentItem.mediaType : ci.mediaType,
-                    Attribution: ci.contentItem ? ci.contentItem.Attribution : ci.Attribution,
-                    MediaSource: ci.contentItem ? ci.contentItem.MediaSource : ci.MediaSource
+                    attribution: ci.contentItem ? ci.contentItem.attribution : ci.attribution,
+                    mediaSource: ci.contentItem ? ci.contentItem.mediaSource : ci.mediaSource
                 };
             }
         }

@@ -103,8 +103,8 @@ module CZ {
                         description: descriptionInput.val(),
                         uri: mediaInput.val(),
                         mediaType: selected.text,
-                        Attribution: attributionInput.val(),
-                        MediaSource: mediaSourceInput.val(),
+                        attribution: attributionInput.val(),
+                        mediaSource: mediaSourceInput.val(),
                         guid: guid,
                         parent: undefined
                     });
@@ -135,8 +135,8 @@ module CZ {
                 titleInput.val(contentItem.title);
                 mediaInput.val(contentItem.uri);
                 descriptionInput.val(contentItem.description);
-                attributionInput.val(contentItem.Attribution);
-                mediaSourceInput.val(contentItem.MediaSource);
+                attributionInput.val(contentItem.attribution);
+                mediaSourceInput.val(contentItem.mediaSource);
                 mediaTypeInput.each(function (option) {
                     if (this.value === mediaType) {
                         $(this).attr("selected", "selected");
@@ -401,8 +401,8 @@ module CZ {
                 titleInput.val(c.contentItem.title);
                 mediaInput.val(c.contentItem.uri);
                 descriptionInput.val(c.contentItem.description);
-                attributionInput.val(c.contentItem.Attribution);
-                mediaSourceInput.val(c.contentItem.MediaSource);
+                attributionInput.val(c.contentItem.attribution);
+                mediaSourceInput.val(c.contentItem.mediaSource);
                 mediaTypeInput.each(function (option) {
                     if (this.value === mediaType) {
                         $(this).attr("selected", "selected");
@@ -429,8 +429,8 @@ module CZ {
                                 uri: mediaInput.val(),
                                 mediaType: selected.text,
                                 description: descriptionInput.val(),
-                                Attribution: attributionInput.val(),
-                                MediaSource: mediaSourceInput.val(),
+                                attribution: attributionInput.val(),
+                                mediaSource: mediaSourceInput.val(),
                             });
                             $(this).dialog("close");
                         },

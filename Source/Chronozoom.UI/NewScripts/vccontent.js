@@ -1274,7 +1274,7 @@ var CZ;
                         wrapText: true,
                         numberOfLines: 1
                     }, contentWidth);
-                    var sourceText = this.contentItem.Attribution;
+                    var sourceText = this.contentItem.attribution;
                     if(sourceText) {
                         var addSourceText = function (sx, sw, sy) {
                             var sourceItem = addText(container, layerid, id + "__source__", sx, sy, sy + sourceHeight / 2.0, 0.9 * sourceHeight, sourceText, {
@@ -1285,11 +1285,11 @@ var CZ;
                                 opacity: 1,
                                 adjustWidth: true
                             }, sw);
-                            if(contentItem.MediaSource) {
+                            if(contentItem.mediaSource) {
                                 sourceItem.reactsOnMouse = true;
                                 sourceItem.onmouseclick = function (e) {
                                     vc.element.css('cursor', 'default');
-                                    window.open(contentItem.MediaSource);
+                                    window.open(contentItem.mediaSource);
                                     return true;
                                 };
                                 sourceItem.onmouseenter = function (pv, e) {

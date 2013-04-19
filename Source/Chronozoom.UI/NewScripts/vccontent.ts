@@ -1869,7 +1869,7 @@ module CZ {
                             contentWidth);
 
                     // Source
-                    var sourceText = this.contentItem.Attribution;
+                    var sourceText = this.contentItem.attribution;
                     if (sourceText) {
                         var addSourceText = function (sx, sw, sy) {
                             var sourceItem = addText(container, layerid, id + "__source__", sx, sy, sy + sourceHeight / 2.0,
@@ -1882,11 +1882,11 @@ module CZ {
                                 adjustWidth: true
                             }, sw);
 
-                            if (contentItem.MediaSource) { // we've got a URL here
+                            if (contentItem.mediaSource) { // we've got a URL here
                                 sourceItem.reactsOnMouse = true;
                                 sourceItem.onmouseclick = function (e) {
                                     vc.element.css('cursor', 'default');
-                                    window.open(contentItem.MediaSource);
+                                    window.open(contentItem.mediaSource);
                                     return true;
                                 };
                                 sourceItem.onmouseenter = function (pv, e) {
