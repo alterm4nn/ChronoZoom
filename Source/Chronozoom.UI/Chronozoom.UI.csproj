@@ -162,7 +162,11 @@
     <Content Include="NewScripts\bibliography.ts" />
     <Content Include="NewScripts\breadCrumbs.ts" />
     <Content Include="NewScripts\common.ts" />
-    <TypeScriptCompile Include="NewScripts\cz.dates.ts" />
+    <Content Include="NewScripts\cz.dates.ts" />
+    <Content Include="NewScripts\controls\cz.datepicker.ts" />
+    <Content Include="NewScripts\controls\cz.datepicker.js">
+      <DependentUpon>cz.datepicker.ts</DependentUpon>
+    </Content>
     <Content Include="NewScripts\cz.dates.js">
       <DependentUpon>cz.dates.ts</DependentUpon>
     </Content>
@@ -171,10 +175,6 @@
     </Content>
     <Content Include="NewScripts\cz.settings.ts" />
     <Content Include="NewScripts\cz.ts" />
-    <TypeScriptCompile Include="NewScripts\cz.ui.ts" />
-    <Content Include="NewScripts\cz.ui.js">
-      <DependentUpon>cz.ui.ts</DependentUpon>
-    </Content>
     <Content Include="NewScripts\czservice.ts" />
     <Content Include="NewScripts\external\flash_detect.js" />
     <Content Include="NewScripts\external\jquery-1.7.2.min.js" />
