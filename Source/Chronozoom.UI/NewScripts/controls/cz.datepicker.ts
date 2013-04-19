@@ -9,8 +9,12 @@ module CZ {
             // Value that represents infinity date
             private Infinity = 9999;
 
+            // Error messages
+            private WrongYearInput = "Year should be a number.";
+
             private modeSelector: JQuery;
-            private container: JQuery;
+            private dateContainer: JQuery;
+            private errorMsg: JQuery;
 
             private daySelector: JQuery;
             private monthSelector: JQuery;
@@ -23,31 +27,38 @@ module CZ {
                 if (!(datePicker instanceof jQuery && datePicker.is("div")))
                     throw "DatePicker parameter is invalid! It should be jQuery instance of DIV.";
 
+                this.coordinate = 0;
+
                 this.initialize();
             };
 
-            private initialize() {
+            /**
+            * Creates datepicker based on given JQuery instance of div
+            */
+            private initialize(): void {
+                this.datePicker.addClass("cz-datepicker");
+
                 this.modeSelector = $("<select class='cz-datepicker-mode'></select>");
                 
                 var optionYear: JQuery = $("<option value='year'>Year</option>");
                 var optionDate: JQuery = $("<option value='date'>Date</option>");
 
-                var self = this;
-                this.modeSelector.change(function (event) {
-                    var mode = self.modeSelector.find(":selected").val();
+                this.modeSelector.change(event => {
+                    var mode = this.modeSelector.find(":selected").val();
+                    this.errorMsg.text("");
 
                     switch (mode) {
                         case "year":
-                            self.editModeYear();
-                            self.setDate(self.coordinate);
+                            this.editModeYear();
+                            this.setDate(this.coordinate);
                             break;
                         case "date":
-                            self.editModeDate();
-                            self.setDate_DateMode(self.coordinate);
+                            this.editModeDate();
+                            this.setDate_DateMode(this.coordinate);
                             break;
                         // optional mode, it can be disabled
                         case "infinite":
-                            self.editModeInfinite();
+                            this.editModeInfinite();
                             break;
                     }
                 });
@@ -55,24 +66,44 @@ module CZ {
                 this.modeSelector.append(optionYear);
                 this.modeSelector.append(optionDate);
 
-                this.container = $("<div class='cz-datepicker-container'></div>");
+                this.dateContainer = $("<div class='cz-datepicker-container'></div>");
+                this.errorMsg = $("<div class='cz-datepicker-errormsg'></div>");
                 this.datePicker.append(this.modeSelector);         
-                this.datePicker.append(this.container);
+                this.datePicker.append(this.dateContainer);
+                this.datePicker.append(this.errorMsg);
 
+                // set "year" mode by default
                 this.editModeYear();
+                this.setDate(this.coordinate);
             }
             
-            public remove() {
-                this.modeSelector.remove();
-                this.container.remove();
+            /**
+            * Removes datepicker object
+            */
+            public remove(): void {
+                this.datePicker.empty();
+
+                this.datePicker.removeClass("cz-datepicker");
             }
 
-            public addEditMode_Infinite() {
+            /**
+            * Adds edit mode "infinite"
+            */
+            public addEditMode_Infinite(): void {
                 var optionIntinite: JQuery = $("<option value='infinite'>Infinite</option>");
                 this.modeSelector.append(optionIntinite);
             }
             
-            public setDate(coordinate: number) {
+            /**
+            * Sets date corresponding to given virtual coordinate
+            */
+            public setDate(coordinate: any) {
+                // invalid input
+                if (!this.validateNumber(coordinate))
+                    return false;
+
+                coordinate = parseFloat(coordinate);
+
                 this.coordinate = coordinate;
                 var mode = this.modeSelector.find(":selected").val();
 
@@ -86,6 +117,9 @@ module CZ {
                 }
             }
 
+            /**
+            * Returns date converted to virtual coordinate if date is valid, otherwise returns false.
+            */
             public getDate() {
                 var mode = this.modeSelector.find(":selected").val();
 
@@ -103,11 +137,24 @@ module CZ {
                 }
             }
 
-            private editModeYear() {
-                this.container.empty();
+            /**
+            * Modify date container to match "year" edit mode
+            */
+            private editModeYear(): void {
+                this.dateContainer.empty();
 
                 this.yearSelector = $("<input type='text' class='cz-datepicker-year'></input>");
                 this.regimeSelector = $("<select class='cz-datepicker-regime'></select>");
+
+                this.yearSelector.focus(event => {
+                    this.errorMsg.text("");
+                });
+
+                this.yearSelector.blur(event => {
+                    if (!this.validateNumber(this.yearSelector.val())) {
+                        this.errorMsg.text(this.WrongYearInput);
+                    }
+                });
 
                 var optionGa: JQuery = $("<option value='ga'>Ga</option>");
                 var optionMa: JQuery = $("<option value='ma'>Ma</option>");
@@ -121,21 +168,34 @@ module CZ {
                     .append(optionBCE)
                     .append(optionCE);
 
-                this.container.append(this.yearSelector);
-                this.container.append(this.regimeSelector);
+                this.dateContainer.append(this.yearSelector);
+                this.dateContainer.append(this.regimeSelector);
             }
 
-            private editModeDate() {
-                this.container.empty();
+            /**
+            * Modify date container to match "date" edit mode
+            */
+            private editModeDate(): void {
+                this.dateContainer.empty();
 
                 this.daySelector = $("<select class='cz-datepicker-day-selector'></select>");
                 this.monthSelector = $("<select class='cz-datepicker-month-selector'></select>");
                 this.yearSelector = $("<input type='text' class='cz-datepicker-year'></input>");
 
+                this.yearSelector.focus(event => {
+                    this.errorMsg.text("");
+                });
+
+                this.yearSelector.blur(event => {
+                    if (!this.validateNumber(this.yearSelector.val()))
+                        this.errorMsg.text(this.WrongYearInput);
+                });
+
                 var self = this;
                 this.monthSelector.change(function (event) {
                     self.daySelector.empty();
 
+                    // update days in days select to match current month
                     var selectedIndex = (<HTMLSelectElement>self.monthSelector[0]).selectedIndex;
                     for (var i = 0; i < CZ.Dates.daysInMonth[selectedIndex]; i++) {
                         var dayOption: JQuery = $("<option value='" + (i + 1) + "'>" + (i + 1) + "</option>");
@@ -148,18 +208,25 @@ module CZ {
                     this.monthSelector.append(monthOption);
                 }
 
+                // raise change event to initialize days select element
                 self.monthSelector.trigger("change");
 
-                this.container.append(this.monthSelector);
-                this.container.append(this.daySelector);
-                this.container.append(this.yearSelector);
+                this.dateContainer.append(this.monthSelector);
+                this.dateContainer.append(this.daySelector);
+                this.dateContainer.append(this.yearSelector);
             }
 
-            private editModeInfinite() {
-                this.container.empty();
+            /**
+            * Modify date container to match "infinite" edit mode
+            */
+            private editModeInfinite(): void {
+                this.dateContainer.empty();
             }
 
-            private setDate_YearMode(coordinate: number) {
+            /**
+            * Sets year corresponding to given virtual coordinate
+            */
+            private setDate_YearMode(coordinate: number): void {
                 var date = CZ.Dates.convertCoordinateToYear(coordinate);
 
                 this.yearSelector.val(date.year);
@@ -170,15 +237,23 @@ module CZ {
                 });
             }
 
-            private setDate_DateMode(coordinate: number) {
+            /**
+            * Sets date corresponding to given virtual coordinate
+            */
+            private setDate_DateMode(coordinate: number): void {
                 var date = CZ.Dates.getDMYFromCoordinate(coordinate);
 
                 this.yearSelector.val(date.year);
                 var self = this;
+
+                // set corresponding month in month select element
                 this.monthSelector.find("option").each(function (index) {
                     if (this.value === CZ.Dates.months[date.month]) {
                         $(this).attr("selected", "selected");
+
+                        // event handler of "month changed" is async. using $.promise to update days selection element as callback
                         $.when(self.monthSelector.trigger("change")).done(function () {
+                            // month was set, now set corresponding day
                             self.daySelector.find("option").each(function () {
                                 if (parseInt(this.value) === date.day) {
                                     $(this).attr("selected", "selected");
@@ -189,20 +264,40 @@ module CZ {
                 });
             }
 
+            /**
+            * Returns year converted to virtual coordinate if input is valid, otherwise returns false
+            */
             private getDate_YearMode() {
                 var year = this.yearSelector.val();
+                if (!this.validateNumber(year))
+                    return false;
+
                 var regime = this.regimeSelector.find(":selected").val();
 
-                return CZ.Dates.convertYearToCoordinate(year, regime);
+                return <any>CZ.Dates.convertYearToCoordinate(year, regime);
             }
 
+            /**
+            * Returns date converted to virtual coordinate if input is valid, otherwise returns false
+            */
             private getDate_DateMode() {
                 var year = this.yearSelector.val();
+                if (!this.validateNumber(year))
+                    return false;
+
                 var month = this.monthSelector.find(":selected").val();
                 month = CZ.Dates.months.indexOf(month);
                 var day = this.daySelector.find(":selected").val();
 
-                return CZ.Dates.getCoordinateFromDMY(year, month, day);
+                return <any>CZ.Dates.getCoordinateFromDMY(year, month, day);
+            }
+
+            /**
+            * Validates that given string is a non infinite number, returns false if not
+            */
+            private validateNumber(year: string) {
+                var parsed = parseFloat(year);
+                return !isNaN(parsed) && parsed !== Infinity;
             }
         }
     }

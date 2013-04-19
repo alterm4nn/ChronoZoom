@@ -53,7 +53,7 @@ module CZ {
             return decimalYear === 9999 ? presentDate : decimalYear;
         }
 
-        export function convertCoordinateToYear(coordinate) {
+        export function convertCoordinateToYear(coordinate: number) {
             var year = {
                 year: coordinate,
                 regime: "CE"
@@ -71,18 +71,18 @@ module CZ {
             } else if (coordinate < 0) {
                 year.year /= -1;
                 // remove fraction part of year
-                year.year.toFixed();
+                year.year = Math.floor(year.year);
                 year.regime = 'BCE';
             }
             else {
                 // remove fraction part of year
-                year.year.toFixed();
+                year.year = Math.floor(year.year);
             }
 
             return year;
         }
 
-        export function convertYearToCoordinate(year, regime) {
+        export function convertYearToCoordinate(year: number, regime: string) {
             var coordinate = year;
 
             switch (regime.toLowerCase()) {

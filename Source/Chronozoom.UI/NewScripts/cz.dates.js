@@ -63,10 +63,10 @@ var CZ;
                 year.regime = 'KA';
             } else if(coordinate < 0) {
                 year.year /= -1;
-                year.year.toFixed();
+                year.year = Math.floor(year.year);
                 year.regime = 'BCE';
             } else {
-                year.year.toFixed();
+                year.year = Math.floor(year.year);
             }
             return year;
         }

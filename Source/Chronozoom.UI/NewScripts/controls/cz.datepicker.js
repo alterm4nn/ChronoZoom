@@ -5,48 +5,59 @@ var CZ;
             function DatePicker(datePicker) {
                 this.datePicker = datePicker;
                 this.Infinity = 9999;
+                this.WrongYearInput = "Year should be a number.";
                 if(!(datePicker instanceof jQuery && datePicker.is("div"))) {
                     throw "DatePicker parameter is invalid! It should be jQuery instance of DIV.";
                 }
+                this.coordinate = 0;
                 this.initialize();
             }
             DatePicker.prototype.initialize = function () {
+                var _this = this;
+                this.datePicker.addClass("cz-datepicker");
                 this.modeSelector = $("<select class='cz-datepicker-mode'></select>");
                 var optionYear = $("<option value='year'>Year</option>");
                 var optionDate = $("<option value='date'>Date</option>");
-                var self = this;
                 this.modeSelector.change(function (event) {
-                    var mode = self.modeSelector.find(":selected").val();
+                    var mode = _this.modeSelector.find(":selected").val();
+                    _this.errorMsg.text("");
                     switch(mode) {
                         case "year":
-                            self.editModeYear();
-                            self.setDate(self.coordinate);
+                            _this.editModeYear();
+                            _this.setDate(_this.coordinate);
                             break;
                         case "date":
-                            self.editModeDate();
-                            self.setDate_DateMode(self.coordinate);
+                            _this.editModeDate();
+                            _this.setDate_DateMode(_this.coordinate);
                             break;
                         case "infinite":
-                            self.editModeInfinite();
+                            _this.editModeInfinite();
                             break;
                     }
                 });
                 this.modeSelector.append(optionYear);
                 this.modeSelector.append(optionDate);
-                this.container = $("<div class='cz-datepicker-container'></div>");
+                this.dateContainer = $("<div class='cz-datepicker-container'></div>");
+                this.errorMsg = $("<div class='cz-datepicker-errormsg'></div>");
                 this.datePicker.append(this.modeSelector);
-                this.datePicker.append(this.container);
+                this.datePicker.append(this.dateContainer);
+                this.datePicker.append(this.errorMsg);
                 this.editModeYear();
+                this.setDate(this.coordinate);
             };
             DatePicker.prototype.remove = function () {
-                this.modeSelector.remove();
-                this.container.remove();
+                this.datePicker.empty();
+                this.datePicker.removeClass("cz-datepicker");
             };
             DatePicker.prototype.addEditMode_Infinite = function () {
                 var optionIntinite = $("<option value='infinite'>Infinite</option>");
                 this.modeSelector.append(optionIntinite);
             };
             DatePicker.prototype.setDate = function (coordinate) {
+                if(!this.validateNumber(coordinate)) {
+                    return false;
+                }
+                coordinate = parseFloat(coordinate);
                 this.coordinate = coordinate;
                 var mode = this.modeSelector.find(":selected").val();
                 switch(mode) {
@@ -73,23 +84,41 @@ var CZ;
                 }
             };
             DatePicker.prototype.editModeYear = function () {
-                this.container.empty();
+                var _this = this;
+                this.dateContainer.empty();
                 this.yearSelector = $("<input type='text' class='cz-datepicker-year'></input>");
                 this.regimeSelector = $("<select class='cz-datepicker-regime'></select>");
+                this.yearSelector.focus(function (event) {
+                    _this.errorMsg.text("");
+                });
+                this.yearSelector.blur(function (event) {
+                    if(!_this.validateNumber(_this.yearSelector.val())) {
+                        _this.errorMsg.text(_this.WrongYearInput);
+                    }
+                });
                 var optionGa = $("<option value='ga'>Ga</option>");
                 var optionMa = $("<option value='ma'>Ma</option>");
                 var optionKa = $("<option value='ka'>Ka</option>");
                 var optionBCE = $("<option value='bce'>BCE</option>");
                 var optionCE = $("<option value='ce'>CE</option>");
                 this.regimeSelector.append(optionGa).append(optionMa).append(optionKa).append(optionBCE).append(optionCE);
-                this.container.append(this.yearSelector);
-                this.container.append(this.regimeSelector);
+                this.dateContainer.append(this.yearSelector);
+                this.dateContainer.append(this.regimeSelector);
             };
             DatePicker.prototype.editModeDate = function () {
-                this.container.empty();
+                var _this = this;
+                this.dateContainer.empty();
                 this.daySelector = $("<select class='cz-datepicker-day-selector'></select>");
                 this.monthSelector = $("<select class='cz-datepicker-month-selector'></select>");
                 this.yearSelector = $("<input type='text' class='cz-datepicker-year'></input>");
+                this.yearSelector.focus(function (event) {
+                    _this.errorMsg.text("");
+                });
+                this.yearSelector.blur(function (event) {
+                    if(!_this.validateNumber(_this.yearSelector.val())) {
+                        _this.errorMsg.text(_this.WrongYearInput);
+                    }
+                });
                 var self = this;
                 this.monthSelector.change(function (event) {
                     self.daySelector.empty();
@@ -104,12 +133,12 @@ var CZ;
                     this.monthSelector.append(monthOption);
                 }
                 self.monthSelector.trigger("change");
-                this.container.append(this.monthSelector);
-                this.container.append(this.daySelector);
-                this.container.append(this.yearSelector);
+                this.dateContainer.append(this.monthSelector);
+                this.dateContainer.append(this.daySelector);
+                this.dateContainer.append(this.yearSelector);
             };
             DatePicker.prototype.editModeInfinite = function () {
-                this.container.empty();
+                this.dateContainer.empty();
             };
             DatePicker.prototype.setDate_YearMode = function (coordinate) {
                 var date = CZ.Dates.convertCoordinateToYear(coordinate);
@@ -139,15 +168,25 @@ var CZ;
             };
             DatePicker.prototype.getDate_YearMode = function () {
                 var year = this.yearSelector.val();
+                if(!this.validateNumber(year)) {
+                    return false;
+                }
                 var regime = this.regimeSelector.find(":selected").val();
                 return CZ.Dates.convertYearToCoordinate(year, regime);
             };
             DatePicker.prototype.getDate_DateMode = function () {
                 var year = this.yearSelector.val();
+                if(!this.validateNumber(year)) {
+                    return false;
+                }
                 var month = this.monthSelector.find(":selected").val();
                 month = CZ.Dates.months.indexOf(month);
                 var day = this.daySelector.find(":selected").val();
                 return CZ.Dates.getCoordinateFromDMY(year, month, day);
+            };
+            DatePicker.prototype.validateNumber = function (year) {
+                var parsed = parseFloat(year);
+                return !isNaN(parsed) && parsed !== Infinity;
             };
             return DatePicker;
         })();

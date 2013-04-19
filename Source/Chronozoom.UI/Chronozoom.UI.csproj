@@ -525,7 +525,7 @@
     <Content Include="Dumps\cern-get.json" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="NewStyles\cz.ui.css" />
+    <Content Include="NewStyles\cz.datepicker.css" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
