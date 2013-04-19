@@ -28,8 +28,8 @@ module CZ {
                     "</p>");
 
                 var mediaSource = $("<p>" +
-                        "<label>Media source</label>" +
-                        "<input class='cz-authoring-ci-media-source' style='display: block' type='text'/>" +
+                        "<label>URL of image or video</label>" +
+                        "<input class='cz-authoring-ci-uri' style='display: block' type='text'/>" +
                     "</p>");
 
                 var mediaType = $("<p>" +
@@ -42,6 +42,16 @@ module CZ {
                         "</select>" +
                     "</p>");
 
+                var attribution = $("<p>" +
+                        "<label>Attribution</label>" +
+                        "<input type='text' class='cz-authoring-ci-attribution' style='display: block;' />" +
+                    "</p>");
+
+                var mediaSourceURL = $("<p>" +
+                        "<label>Media Source</label>" +
+                        "<input type='text' class='cz-authoring-ci-media-source' style='display: block;' />" +
+                    "</p>");
+
                 var removeBtn = $("<button>Remove content item</button>");
                 removeBtn[0].onclick = function () {
                     container.remove();
@@ -51,6 +61,8 @@ module CZ {
                 container.append(description);
                 container.append(mediaSource);
                 container.append(mediaType);
+                container.append(attribution);
+                container.append(mediaSourceURL);
                 container.append(removeBtn);
 
                 if (addSeparator == true) {
@@ -71,10 +83,12 @@ module CZ {
                 var containers = $(".cz-authoring-ci-container");
                 $(".cz-authoring-ci-container").each(function () {
                     var CItitleInput = $(this).find(".cz-authoring-ci-title");;
-                    var mediaInput = $(this).find(".cz-authoring-ci-media-source");
+                    var mediaInput = $(this).find(".cz-authoring-ci-uri");
                     var mediaTypeInput = (<any>$)(this).find(".cz-authoring-ci-media-type option");
                     var descriptionInput = $(this).find(".cz-authoring-ci-description");
                     var guid = $(this).attr("cz-authoring-ci-guid") || undefined;
+                    var attributionInput = $(this).find(".cz-authoring-ci-attribution");
+                    var mediaSourceInput = $(this).find(".cz-authoring-ci-media-source");
 
                     var selected = (<any>$)(mediaTypeInput)[0];
 
@@ -89,6 +103,8 @@ module CZ {
                         description: descriptionInput.val(),
                         uri: mediaInput.val(),
                         mediaType: selected.text,
+                        attribution: attributionInput.val(),
+                        mediaSource: mediaSourceInput.val(),
                         guid: guid,
                         parent: undefined
                     });
@@ -104,9 +120,11 @@ module CZ {
                 */
             function _fillContentItemForm(form, contentItem) {
                 var titleInput = form.find(".cz-authoring-ci-title");
-                var mediaInput = form.find(".cz-authoring-ci-media-source");
+                var mediaInput = form.find(".cz-authoring-ci-uri");
                 var mediaTypeInput = form.find(".cz-authoring-ci-media-type option");
                 var descriptionInput = form.find(".cz-authoring-ci-description");
+                var attributionInput = form.find(".cz-authoring-ci-attribution");
+                var mediaSourceInput = form.find(".cz-authoring-ci-media-source");
                 var mediaType = contentItem.mediaType.toLowerCase();
 
                 if (mediaType === "picture") {
@@ -117,6 +135,8 @@ module CZ {
                 titleInput.val(contentItem.title);
                 mediaInput.val(contentItem.uri);
                 descriptionInput.val(contentItem.description);
+                attributionInput.val(contentItem.attribution);
+                mediaSourceInput.val(contentItem.mediaSource);
                 mediaTypeInput.each(function (option) {
                     if (this.value === mediaType) {
                         $(this).attr("selected", "selected");
@@ -372,6 +392,8 @@ module CZ {
                 var mediaInput = $("#contentItemMediaSourceInput");
                 var descriptionInput = $("#contentItemDescriptionInput");
                 var mediaTypeInput = (<any>$)("#contentItemMediaTypeInput option");
+                var attributionInput = $("#cz-authoring-ci-attribution");
+                var mediaSourceInput = $("#cz-authoring-ci-media-source");
                 var mediaType = c.contentItem.mediaType.toLowerCase();
                 if (mediaType === "picture") {
                     mediaType = "image";
@@ -379,6 +401,8 @@ module CZ {
                 titleInput.val(c.contentItem.title);
                 mediaInput.val(c.contentItem.uri);
                 descriptionInput.val(c.contentItem.description);
+                attributionInput.val(c.contentItem.attribution);
+                mediaSourceInput.val(c.contentItem.mediaSource);
                 mediaTypeInput.each(function (option) {
                     if (this.value === mediaType) {
                         $(this).attr("selected", "selected");
@@ -404,7 +428,9 @@ module CZ {
                                 title: titleInput.val(),
                                 uri: mediaInput.val(),
                                 mediaType: selected.text,
-                                description: descriptionInput.val()
+                                description: descriptionInput.val(),
+                                attribution: attributionInput.val(),
+                                mediaSource: mediaSourceInput.val(),
                             });
                             $(this).dialog("close");
                         },
