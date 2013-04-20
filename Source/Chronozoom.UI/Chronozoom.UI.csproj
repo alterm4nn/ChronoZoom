@@ -499,6 +499,7 @@
   <ItemGroup>
     <Content Include="Web.Sandbox.config">
       <DependentUpon>Web.config</DependentUpon>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>

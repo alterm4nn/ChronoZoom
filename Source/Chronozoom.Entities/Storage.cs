@@ -88,25 +88,20 @@ namespace Chronozoom.Entities
             return new Collection<Timeline>(timelines);
         }
 
-        public static long ForkNode(long fromYear, long toYear)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "FromYear+13700000001"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "ToYear+13700000001")]
+        public static Int64 ForkNode(Int64 fromYear, Int64 toYear)
         {
-            checked
-            {
-                // Start/End values must be a positive integer (sign bit must be 0)
-                const long limit = 13700000001;
-                long start = fromYear + limit;
-                long end = toYear + limit;
-
-                long node = ((start - 1) ^ end) >> 1;
-                node = node | node >> 1;
-                node = node | node >> 2;
-                node = node | node >> 4;
-                node = node | node >> 8;
-                node = node | node >> 16;
-                node = node | node >> 32;
-                node = end & ~node;
-                return node;
-            }
+            Int64 start = fromYear + 13700000001;  //note: this value must be a positive integer (sign bit must be 0)
+            Int64 end = toYear + 13700000001;  //note: this value must be a positive integer (sign bit must be 0)
+            Int64 node = ((start - 1) ^ end) >> 1;
+            node = node | node >> 1;
+            node = node | node >> 2;
+            node = node | node >> 4;
+            node = node | node >> 8;
+            node = node | node >> 16;
+            node = node | node >> 32;
+            node = end & ~node;
+            return node;
         }
 
         private void FillTimelineRelations(Dictionary<Guid, Timeline> timelinesMap)
@@ -193,16 +188,15 @@ namespace Chronozoom.Entities
         {
             /* There are 4 cases of a given timeline intersecting the current canvas: [<]>, <[>], [<>], and <[]> (<> denotes the timeline, and [] denotes the canvas) */
 
-            string timelinesQuery = @"
-            SELECT TOP({0}) * FROM (
+            string timelinesQuery = @"SELECT TOP({0}) * FROM (
                 SELECT DISTINCT [Timelines].*, [Timelines].[FromYear] as [Start], [Timelines].[ToYear] as [End], [Timelines].[ToYear] - [Timelines].[FromYear] AS [TimeSpan] FROM [Timelines] JOIN
 	            (
-                    SELECT ([B1] & {1}) AS [node] FROM [Bitmasks] WHERE ({1} & [B2]) <> 0
+                    SELECT ([b1] & CAST(({1} + 13700000001) AS BIGINT)) AS [node] FROM [Bitmasks] WHERE (CAST(({1} + 13700000001) AS BIGINT) & [b2]) <> 0
 	            ) AS [left_nodes] ON [Timelines].[ForkNode] = [left_nodes].[node] AND [Timelines].[ToYear] >= {1} AND [Timelines].[ToYear] - [Timelines].[FromYear] >= {3} AND [Timelines].[Collection_Id] = {4} OR [Timelines].[Id] = {5}
                 UNION ALL
 	            SELECT DISTINCT [Timelines].*, [Timelines].[FromYear] as [Start], [Timelines].[ToYear] as [End], [Timelines].[ToYear] - [Timelines].[FromYear] AS [TimeSpan] FROM [Timelines] JOIN
 	            (
-                    SELECT (([B1] & {2}) | [B3]) AS [node] FROM [Bitmasks] WHERE ({2} & [B3]) = 0
+                    SELECT (([b1] & CAST(({2} + 13700000001) AS BIGINT)) | [b3]) AS [node] FROM [bitmasks] WHERE (CAST (({2} + 13700000001) AS BIGINT) & [b3]) = 0
 	            )
 	            AS [right_nodes] ON [Timelines].[ForkNode] = [right_nodes].[node] AND [Timelines].[FromYear] <= {2} AND [Timelines].[ToYear] - [Timelines].[FromYear] >= {3} AND [Timelines].[Collection_Id] = {4} OR [Timelines].[Id] = {5}
                 UNION ALL
