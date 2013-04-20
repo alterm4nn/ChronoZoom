@@ -1,0 +1,34 @@
+﻿.cz-datepicker {
+}
+
+.cz-datepicker-mode {
+    display: inline-block;
+    margin-right: 30px;
+}
+
+.cz-datepicker-container {
+     display: inline-block;
+}
+
+.cz-datepicker-regime {
+    margin-right: 10px;
+}
+
+.cz-datepicker-year {
+    margin-right: 10px;
+    width: 80px;
+}
+
+.cz-datepicker-day-selector {
+    max-height: 200px;
+    height: auto;
+    margin-right: 10px;
+}
+
+.cz-datepicker-month-selector {
+    margin-right: 10px;
+}
+
+.cz-datepicker-errormsg {
+    color: #dd4b39;
+}
