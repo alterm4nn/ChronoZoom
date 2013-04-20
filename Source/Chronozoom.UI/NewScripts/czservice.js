@@ -32,7 +32,9 @@ var CZ;
                     title: ci.contentItem ? ci.contentItem.title : ci.title,
                     description: ci.contentItem ? ci.contentItem.description : ci.description,
                     uri: ci.contentItem ? ci.contentItem.uri : ci.uri,
-                    mediaType: ci.contentItem ? ci.contentItem.mediaType : ci.mediaType
+                    mediaType: ci.contentItem ? ci.contentItem.mediaType : ci.mediaType,
+                    attribution: ci.contentItem ? ci.contentItem.attribution : ci.attribution,
+                    mediaSource: ci.contentItem ? ci.contentItem.mediaSource : ci.mediaSource
                 };
             }
             Map.contentItem = contentItem;

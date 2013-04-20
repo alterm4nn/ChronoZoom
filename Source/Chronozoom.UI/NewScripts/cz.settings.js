@@ -1,7 +1,7 @@
 var CZ;
 (function (CZ) {
     (function (Settings) {
-        Settings.czDataSource = 'dump';
+        Settings.czDataSource = 'db';
         Settings.czVersion = "main";
         Settings.ellipticalZoomZoomoutFactor = 0.5;
         Settings.ellipticalZoomDuration = 9000;
