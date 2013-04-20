@@ -41,7 +41,7 @@ var CZ;
                 case "rectangle":
                 case "infodot":
                 case "circle":
-                    return (tp.x < obj.x && tp.y < obj.y && tp.x + tp.width > obj.x + obj.width && tp.y + tp.height > obj.y + obj.height);
+                    return (tp.x <= obj.x && tp.y <= obj.y && tp.x + tp.width >= obj.x + obj.width && tp.y + tp.height >= obj.y + obj.height);
                 default:
                     return true;
             }
@@ -306,13 +306,14 @@ var CZ;
             var temp = {
                 x: Number(prop.start),
                 y: t.y,
-                width: Number(prop.end - prop.start),
+                width: Number(CZ.Dates.getCoordinateFromDecimalYear(prop.end) - prop.start),
                 height: t.height,
                 type: "rectangle"
             };
             if(checkTimelineIntersections(t.parent, temp, true)) {
                 t.x = temp.x;
                 t.width = temp.width;
+                t.endDate = prop.end;
             }
             t.title = prop.title;
             updateTimelineTitle(t);

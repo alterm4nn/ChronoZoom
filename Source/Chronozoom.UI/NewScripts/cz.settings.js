@@ -97,34 +97,6 @@ var CZ;
         Settings.maxTickArrangeIterations = 3;
         Settings.spaceBetweenLabels = 15;
         Settings.spaceBetweenSmallTicks = 10;
-        Settings.months = [
-            'January', 
-            'February', 
-            'March', 
-            'April', 
-            'May', 
-            'June', 
-            'July', 
-            'August', 
-            'September', 
-            'October', 
-            'November', 
-            'December'
-        ];
-        Settings.daysInMonth = [
-            31, 
-            28, 
-            31, 
-            30, 
-            31, 
-            30, 
-            31, 
-            31, 
-            30, 
-            31, 
-            30, 
-            31
-        ];
         Settings.tickLength = 14;
         Settings.smallTickLength = 7;
         Settings.strokeWidth = 3;
