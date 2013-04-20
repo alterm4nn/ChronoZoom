@@ -1,7 +1,7 @@
 ﻿/// <reference path='authoring.ts'/>
 /// <reference path='cz.settings.ts'/>
 /// <reference path='layout.ts'/>
-/// <reference path='cz.ui.ts'/>
+/// <reference path='controls/cz.datepicker.ts'/>
 
 /// <reference path='typings/jqueryui/jqueryui.d.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
