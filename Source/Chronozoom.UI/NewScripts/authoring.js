@@ -420,14 +420,7 @@ var CZ;
         }
         Authoring.IsNotEmpty = IsNotEmpty;
         function isNonegHeight(start, end) {
-            if(start > 0 && end > 0) {
-                return (start < end);
-            }
-            if(start < 0 && end < 0) {
-                return (start > end);
-            }
-            return (start < 0 && end > 0);
-            return false;
+            return true;
         }
         Authoring.isNonegHeight = isNonegHeight;
         function ValidateContentItems(contentItems) {

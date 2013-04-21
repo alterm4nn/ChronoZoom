@@ -677,10 +677,12 @@ module CZ {
          * Validates,if timeline size is not negative
         */
         export function isNonegHeight(start, end) {
-            if (start > 0 && end > 0) return (start < end);
+            //code is correct for previous AT version
+            /*if (start > 0 && end > 0) return (start < end);
             if (start < 0 && end < 0) return (start > end);
             return (start < 0 && end > 0);
-            return false;
+            return false;*/
+            return true;
         }
 
         /**
