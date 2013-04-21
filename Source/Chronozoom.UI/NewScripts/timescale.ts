@@ -1,6 +1,6 @@
 ﻿/// <reference path='cz.settings.ts'/>
 /// <reference path='common.ts'/>
-
+/// <reference path='viewportController.ts'/>
 
 module CZ {
 
@@ -25,7 +25,6 @@ module CZ {
 
         //    var self = this;
         container.mousemove(function (e) { mouseMove(e) });
-
 
         // TODO:
         // Visual color: #0388E5
@@ -71,7 +70,14 @@ module CZ {
         var leftDatePanel = $("<div class='cz-timescale-panel cz-timescale-left'></div>");
         var leftDate = $("<p id='timescale_left_border'></p>");
         var rightDatePanel = $("<div class='cz-timescale-panel cz-timescale-right'></div>");
-        var rightDate = $("<p id='timescale_right_border'></p>");
+        var rightDate = $("<p id='timescale_right_border' style='display: block'></p>");
+        var rightDateInput = $("<input class='timescale_right_border_input' style='display: none' type='text'/>");
+        var leftDateInput = $("<input class='timescale_left_border_input' style='display: none' type='text'/>");
+        var RightInputShown = false;
+        var old_right_val;
+        var LeftInputShown = false;
+        var old_left_val;
+
 
         // TODO: Consider to rename.
         var canvasSize = CZ.Settings.tickLength + CZ.Settings.timescaleThickness;
@@ -140,6 +146,66 @@ module CZ {
             },
         });
 
+        rightDatePanel.dblclick(function (e) {
+            if (!RightInputShown) {
+                rightDateInput.val(document.getElementById('timescale_right_border').innerHTML);
+                old_right_val = rightDateInput.val();
+                rightDateInput.css("display", "block");
+                rightDate.css("display", "none");
+                //console.log(_range);
+                RightInputShown = true;
+            } else {
+                var left_pan_val = document.getElementById('timescale_left_border').innerHTML;
+                var right_pan_val = rightDateInput.val();
+                var timerange;
+                 timerange = _tickSources[_mode].getRightPanelVirtualCoord(left_pan_val, right_pan_val, old_right_val, _range);
+                 if (timerange != null) {
+                     rightDateInput.css("display", "none");
+                     rightDate.css("display", "block");
+                     RightInputShown = false;
+                     var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                     var latestVisible = vp.visible;
+                     var width1 = timerange.right - timerange.left;
+                     var newVis = _tickSources[_mode].getVisibleForElement({ x: timerange.left, y: latestVisible.centerY - vp.height / 2, width: width1, height: vp.height }, 1.0, vp, false);
+                     CZ.Common.vc.virtualCanvas("setVisible", newVis);
+                     vp = CZ.Common.vc.virtualCanvas("getViewport");
+                     var lt = vp.pointScreenToVirtual(0, 0);
+                     var rb = vp.pointScreenToVirtual(vp.width, vp.height);
+                     var newrange = { min: lt.x, max: rb.x };
+                     that.update(newrange);
+                 }
+            }
+        });
+
+       leftDatePanel.dblclick(function (e) {
+            if (!LeftInputShown) {
+                leftDateInput.val(document.getElementById('timescale_left_border').innerHTML);
+                old_left_val = leftDateInput.val();
+                leftDateInput.css("display", "block");
+                leftDate.css("display", "none");
+                LeftInputShown = true;
+            } else {
+                var right_pan_val = document.getElementById('timescale_right_border').innerHTML;
+                var left_pan_val = leftDateInput.val();
+                var timerange;
+                timerange = _tickSources[_mode].getLeftPanelVirtualCoord(left_pan_val, right_pan_val, old_left_val, _range);
+
+                leftDateInput.css("display", "none");
+                leftDate.css("display", "block");
+                LeftInputShown = false;
+                var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                var latestVisible = vp.visible;
+                var newVis = _tickSources[_mode].getVisibleForElement({ x: timerange.left, y: latestVisible.centerY - vp.height / 2, width: (timerange.right - timerange.left), height: vp.height }, 1.0, vp, false);
+                CZ.Common.vc.virtualCanvas("setVisible",newVis);
+                vp = CZ.Common.vc.virtualCanvas("getViewport");
+                var lt = vp.pointScreenToVirtual(0, 0);
+                var rb = vp.pointScreenToVirtual(vp.width, vp.height);
+                var newrange = { min: lt.x, max: rb.x };
+                that.update(newrange);
+            }
+        });
+
+
         /**
          * Initializes timescale.
          */
@@ -156,7 +222,9 @@ module CZ {
 
             marker[0].appendChild(markerText[0]);
             leftDatePanel[0].appendChild(leftDate[0]);
+            leftDatePanel[0].appendChild(leftDateInput[0]);
             rightDatePanel[0].appendChild(rightDate[0]);
+            rightDatePanel[0].appendChild(rightDateInput[0]);
             _container[0].appendChild(labelsDiv[0]);
             _container[0].appendChild(canvas[0]);
             _container[0].appendChild(marker[0]);
@@ -843,6 +911,13 @@ module CZ {
         this.getMarkerLabel = function (range, time) {
             return time;
         };
+        // returns coordinate of  str
+        this.getRightPanelVirtualCoord = function (leftstr, rightstr, old_right_val,range) {
+            return rightstr;
+        }
+        this.getLeftPanelVirtualCoord = function (leftstr, rightstr, old_left_val, range) {
+            return leftstr;
+        }
     };
 
     export function CosmosTickSource() {
@@ -990,6 +1065,77 @@ module CZ {
             text += " " + this.regime;
             return text;
         };
+
+        this.getRightPanelVirtualCoord = function (leftstr, rightstr, old_rightstr, range) {
+            var left_val = parseFloat(leftstr);
+            var left_reg = leftstr.split(/\W+/g);
+
+            var right_val = parseFloat(rightstr);
+            var right_reg = rightstr.split(/\W+/g);
+
+            var old_right_val = parseFloat(old_rightstr);
+            var old_right_reg = old_rightstr.split(/\W+/g);
+
+            var left_regime = left_reg[left_reg.length - 1];
+            var right_regime = right_reg[right_reg.length - 1];
+            var old_right_regime = old_right_reg[old_right_reg.length - 1];
+
+            var k = (right_val - left_val)/(old_right_val - left_val);
+            if (range.min < this.range.min) range.min = this.range.min;
+            if (range.max > this.range.max) range.max = this.range.max;
+
+            var val = range.min + k * (range.max - range.min);
+
+            if (val < range.min) return null; 
+            if ((right_regime != "Ga") && (right_regime != "Ma") && (right_regime != "ka")) return null; 
+            if (isNaN(Number(right_val))) return null; 
+
+            return {left: range.min, right: val};
+        };
+        this.getLeftPanelVirtualCoord = function (leftstr, rightstr, old_leftstr, range) {
+            var left_val = parseFloat(leftstr);
+            var left_reg = leftstr.split(/\W+/g);
+
+            var right_val = parseFloat(rightstr);
+            var right_reg = rightstr.split(/\W+/g);
+
+            var old_left_val = parseFloat(old_leftstr);
+            var old_left_reg = old_leftstr.split(/\W+/g);
+
+            var left_regime = left_reg[left_reg.length - 1];
+            var right_regime = right_reg[right_reg.length - 1];
+            var old_left_regime = old_left_reg[old_left_reg.length - 1];
+
+            var k = (right_val - left_val) / (right_val - old_left_val);
+            if (range.min < this.range.min) range.min = this.range.min;
+            if (range.max > this.range.max) range.max = this.range.max;
+
+
+            var val = range.max - k * (range.max - range.min);
+            if (val > range.max)  return null; 
+            if ((left_regime != "Ga") && (left_regime != "Ma") && (left_regime != "ka"))  return null; 
+            if (isNaN(Number(right_val))) return null;
+
+            return { left: val, right: range.max };
+        };
+        this.getVisibleForElement = function (element, scale, viewport, use_margin) {
+            var margin = 2 * (CZ.Settings.contentScaleMargin && use_margin ? CZ.Settings.contentScaleMargin : 0);
+            var width = viewport.width - margin;
+            if (width < 0)
+                width = viewport.width;
+            var scaleX = scale * element.width / width;
+
+            var height = viewport.height - margin;
+            if (height < 0)
+                height = viewport.height;
+            var scaleY = scale * element.height / height;
+            var vs = {
+                centerX: element.x + element.width / 2.0,
+                centerY: element.y + element.height / 2.0,
+                scale: Math.max(scaleX, scaleY)
+            };
+            return vs;
+        };
     };
     CZ.CosmosTickSource.prototype = new CZ.TickSource;
 
@@ -997,16 +1143,10 @@ module CZ {
         this.base = CZ.TickSource;
         this.base();
 
-        /*    this.getTicks = function (range) {
-                this.getRegime(range.min, range.max);
-                return this.createTicks(range);
-            };*/
-
-
         this.getLabel = function (x) {
             var text;
             if (x <= 0) text = -x + 1 + " BCE";//text = x - 1;
-            else text = x + " AD";
+            else text = x + " CE";
             return text;
         };
 
@@ -1136,8 +1276,81 @@ module CZ {
             if (text < 0) text = -text;
             else if (text == 0) text = 1;
             if (time < this.firstYear + 1) text += " " + "BCE";
-            else text += " " + "AD";
+            else text += " " + "CE";
             return text;
+        };
+
+        this.getRightPanelVirtualCoord = function (leftstr, rightstr, old_rightstr, range) {
+            var left_val = parseFloat(leftstr);
+            var left_reg = leftstr.split(/\W+/g);
+
+            var right_val = parseFloat(rightstr);
+            var right_reg = rightstr.split(/\W+/g);
+
+            var old_right_val = parseFloat(old_rightstr);
+            var old_right_reg = old_rightstr.split(/\W+/g);
+
+            var left_regime = left_reg[left_reg.length - 1];
+            var right_regime = right_reg[right_reg.length - 1];
+            var old_right_regime = old_right_reg[old_right_reg.length - 1];
+            if ((old_right_regime === "CE") && (left_regime === "BCE")) {
+                 left_val = -left_val;
+            }
+
+            var k = (right_val - left_val) / (old_right_val - left_val);
+            if (range.min < this.range.min) range.min = this.range.min;
+            if (range.max > this.range.max) range.max = this.range.max;
+            var val = range.min + k * (range.max - range.min);
+            if (val < range.min) return null;
+            if ((right_regime != "BCE") && (right_regime != "CE")) return null;
+            if (isNaN(Number(right_val))) return null;
+            return { left: range.min, right: val };
+        };
+        this.getLeftPanelVirtualCoord = function (leftstr, rightstr, old_leftstr, range) {
+            var left_val = parseFloat(leftstr);
+            var left_reg = leftstr.split(/\W+/g);
+
+            var right_val = parseFloat(rightstr);
+            var right_reg = rightstr.split(/\W+/g);
+
+            var old_left_val = parseFloat(old_leftstr);
+            var old_left_reg = old_leftstr.split(/\W+/g);
+
+            var left_regime = left_reg[left_reg.length - 1];
+            var right_regime = right_reg[right_reg.length - 1];
+            var old_left_regime = old_left_reg[old_left_reg.length - 1];
+            if ((old_left_regime === "BCE") && (right_regime === "CE")) {
+                right_val = -right_val;
+            }
+
+            var k = (right_val - left_val) / (right_val - old_left_val);
+            if (range.min < this.range.min) range.min = this.range.min;
+            if (range.max > this.range.max) range.max = this.range.max;
+
+            var val = range.max - k * (range.max - range.min);
+            if (val > range.max) return null;
+            if ((left_regime != "BCE") && (left_regime != "CE")) return null;
+            if (isNaN(Number(right_val))) return null;
+
+            return { left: val, right: range.max };
+        };
+        this.getVisibleForElement = function (element, scale, viewport, use_margin) {
+            var margin = 2 * (CZ.Settings.contentScaleMargin && use_margin ? CZ.Settings.contentScaleMargin : 0);
+            var width = viewport.width - margin;
+            if (width < 0)
+                width = viewport.width;
+            var scaleX = scale * element.width / width;
+
+            var height = viewport.height - margin;
+            if (height < 0)
+                height = viewport.height;
+            var scaleY = scale * element.height / height;
+            var vs = {
+                centerX: element.x + element.width / 2.0,
+                centerY: element.y + element.height / 2.0,
+                scale: scaleX//Math.min(scaleX, scaleY)
+            };
+            return vs;
         };
     };
     CZ.CalendarTickSource.prototype = new CZ.TickSource;
@@ -1294,7 +1507,7 @@ module CZ {
 
             var step;
 
-            var n;//Math.floor(daysInMonth[date.month] / step);
+            var n;       //Math.floor(daysInMonth[date.month] / step);
             var tick = ticks[0].position;
             var date = CZ.Common.getDMYFromCoordinate(tick);
 
@@ -1379,9 +1592,97 @@ module CZ {
         this.getMarkerLabel = function (range, time) {
             this.getRegime(range.min, range.max);
             var date = CZ.Common.getDMYFromCoordinate(time);
-            var text = (this.beta > -3 ? date.month + 1 + "." : "") + date.day;
+            //var text = (this.beta > -3 ? date.month + 1 + "." : "") + date.day;
+            var text = date.day + "." + (date.month + 1) + "." + date.year ;
             return text;
         };
-    };
+
+       this.getRightPanelVirtualCoord = function (leftstr, rightstr, old_rightstr, range) {
+           var left_year_val = this.parseYear(leftstr);
+           var left_month_val = this.parseMonth(leftstr) - 1;
+           var left_date_val = this.parseDate(leftstr);
+
+           var right_year_val = this.parseYear(rightstr);
+           var right_month_val = this.parseMonth(rightstr) - 1;
+           var right_date_val = this.parseDate(rightstr);
+
+           var old_right_year_val = this.parseYear(old_rightstr);
+           var old_right_month_val = this.parseMonth(old_rightstr) - 1;
+           var old_right_date_val = this.parseDate(old_rightstr);
+
+           var right_val = CZ.Common.getCoordinateFromDMY(right_year_val , right_month_val, right_date_val );
+           var left_val = CZ.Common.getCoordinateFromDMY(left_year_val, left_month_val, left_date_val);
+           var old_right_val = CZ.Common.getCoordinateFromDMY(old_right_year_val, old_right_month_val, old_right_date_val);
+
+           if (range.min < this.range.min) range.min = this.range.min;
+           if (range.max > this.range.max) range.max = this.range.max;
+
+            if (right_val < range.min) return null;
+            if (isNaN(Number(right_val))) return null;
+
+            return { left: range.min, right: right_val };
+       };
+
+        this.getLeftPanelVirtualCoord = function (leftstr, rightstr, old_leftstr, range) {
+            var left_year_val = this.parseYear(leftstr);
+            var left_month_val = this.parseMonth(leftstr) - 1;
+            var left_date_val = this.parseDate(leftstr);
+
+            var right_year_val = this.parseYear(rightstr);
+            var right_month_val = this.parseMonth(rightstr) - 1;
+            var right_date_val = this.parseDate(rightstr);
+ 
+            var old_left_year_val = this.parseYear(old_leftstr);
+            var old_left_month_val = this.parseMonth(old_leftstr) - 1;
+            var old_left_date_val = this.parseDate(old_leftstr);
+            
+            var right_val = CZ.Common.getCoordinateFromDMY(right_year_val, right_month_val, right_date_val);
+            var left_val = CZ.Common.getCoordinateFromDMY(left_year_val, left_month_val, left_date_val);
+            var old_left_val = CZ.Common.getCoordinateFromDMY(old_left_year_val, old_left_month_val, old_left_date_val);
+
+            if (range.min < this.range.min) range.min = this.range.min;
+            if (range.max > this.range.max) range.max = this.range.max;
+
+            if (left_val > range.max) { console.log(left_val,range.max); return null; }
+            if (isNaN(Number(left_val))) return null;
+           
+            return { left: left_val, right: range.max };
+        };
+
+        this.parseDate = function (str) {
+            return parseFloat(str.split(/([_\W])/)[0]);
+        };
+
+        this.parseMonth = function (str) {
+            return parseFloat(str.split(/([_\W])/)[2]);
+        };
+
+        this.parseYear = function (str) {
+            var temp = str.split(/([_\W])/);
+            if (temp.length === 7) return (-parseFloat(temp[6]));
+            if (temp.length === 5) return (parseFloat(temp[4]));
+            return null;
+        };
+
+
+        this.getVisibleForElement = function (element, scale, viewport, use_margin) {
+            var margin = 2 * (CZ.Settings.contentScaleMargin && use_margin ? CZ.Settings.contentScaleMargin : 0);
+            var width = viewport.width - margin;
+            if (width < 0)
+                width = viewport.width;
+            var scaleX = scale * element.width / width;
+
+            var height = viewport.height - margin;
+            if (height < 0)
+                height = viewport.height;
+            var scaleY = scale * element.height / height;
+            var vs = {
+                centerX: element.x + element.width / 2.0,
+                centerY: element.y + element.height / 2.0,
+                scale: Math.min(scaleX,scaleY)
+            };
+            return vs;
+        };
+};
     CZ.DateTickSource.prototype = new CZ.TickSource;
 }

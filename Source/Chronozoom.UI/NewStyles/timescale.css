@@ -42,6 +42,29 @@
         margin:0px;
     }
 
+.timescale_right_border_input {
+    color: white;
+    background-color: #0388E5;
+    width: 185px;  
+    font-family: sans-serif;
+    font-size: 25px;
+    text-align: center;
+    vertical-align: middle;
+    margin:0px;
+}
+
+.timescale_left_border_input {
+    color: white;
+    background-color: #0388E5;
+    width: 185px;  
+    font-family: sans-serif;
+    font-size: 25px;
+    text-align: center;
+    vertical-align: middle;
+    margin:0px;
+}
+    
+
 .cz-timescale-right {
     right: 0px;
     border-left: 5px solid #58B7F9;
