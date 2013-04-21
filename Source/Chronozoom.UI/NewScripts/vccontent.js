@@ -484,6 +484,7 @@ var CZ;
             this.currentlyObservedTimelineEvent = vc.currentlyObservedTimelineEvent;
             this.settings.outline = true;
             this.type = 'timeline';
+            this.endDate = timelineinfo.endDate;
             var width = timelineinfo.timeEnd - timelineinfo.timeStart;
             var headerSize = timelineinfo.titleRect ? timelineinfo.titleRect.height : CZ.Settings.timelineHeaderSize * timelineinfo.height;
             var marginLeft = timelineinfo.titleRect ? timelineinfo.titleRect.marginLeft : CZ.Settings.timelineHeaderMargin * timelineinfo.height;
@@ -1285,11 +1286,11 @@ var CZ;
                                 opacity: 1,
                                 adjustWidth: true
                             }, sw);
-                            if(this.contentItem.mediaSource) {
+                            if(contentItem.mediaSource) {
                                 sourceItem.reactsOnMouse = true;
                                 sourceItem.onmouseclick = function (e) {
                                     vc.element.css('cursor', 'default');
-                                    window.open(this.contentItem.mediaSource);
+                                    window.open(contentItem.mediaSource);
                                     return true;
                                 };
                                 sourceItem.onmouseenter = function (pv, e) {
@@ -1304,17 +1305,7 @@ var CZ;
                                 };
                             }
                         };
-                        if(imageElem) {
-                            imageElem.onLoad = function () {
-                                var sx = this.x;
-                                var sw = this.width;
-                                var sy = this.y + this.height + sourceVertMargin;
-                                addSourceText(sx, sw, sy);
-                                this.onLoad = null;
-                            };
-                        } else {
-                            addSourceText(vx + leftOffset, contentWidth, sourceTop);
-                        }
+                        addSourceText(vx + leftOffset, contentWidth, sourceTop);
                     }
                     var descrTop = titleTop + titleHeight + verticalMargin;
                     addScrollText(container, layerid, id + "__description__", vx + leftOffset, descrTop, contentWidth, descrHeight, this.contentItem.description, 30, {

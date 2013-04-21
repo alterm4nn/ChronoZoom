@@ -8,7 +8,7 @@ var CZ;
                     id: t.guid,
                     ParentTimelineId: t.parent.guid,
                     FromYear: t.x,
-                    ToYear: t.x + t.width,
+                    ToYear: typeof t.endDate !== 'undefined' ? t.endDate : (t.x + t.width),
                     title: t.title,
                     Regime: t.regime
                 };
@@ -32,7 +32,9 @@ var CZ;
                     title: ci.contentItem ? ci.contentItem.title : ci.title,
                     description: ci.contentItem ? ci.contentItem.description : ci.description,
                     uri: ci.contentItem ? ci.contentItem.uri : ci.uri,
-                    mediaType: ci.contentItem ? ci.contentItem.mediaType : ci.mediaType
+                    mediaType: ci.contentItem ? ci.contentItem.mediaType : ci.mediaType,
+                    attribution: ci.contentItem ? ci.contentItem.attribution : ci.attribution,
+                    mediaSource: ci.contentItem ? ci.contentItem.mediaSource : ci.mediaSource
                 };
             }
             Map.contentItem = contentItem;

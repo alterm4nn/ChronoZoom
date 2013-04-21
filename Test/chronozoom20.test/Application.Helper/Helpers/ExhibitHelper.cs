@@ -67,10 +67,10 @@ namespace Application.Helper.Helpers
             {
                 string title =
                     GetJavaScriptExecutionResult(
-                        string.Format("vc.data('ui-virtualCanvas')._layersContent.children[0].children[{0}].title", i));
+                        string.Format("{0}.children[{1}].title",Javascripts.Cosmos, i));
                 if (title == exhibit.Title)
                 {
-                    ExecuteJavaScript(string.Format("CZ.Service.deleteExhibit(vc.data('ui-virtualCanvas')._layersContent.children[0].children[{0}])",i));
+                    ExecuteJavaScript(string.Format("CZ.Service.deleteExhibit({0}.children[{1}])",Javascripts.Cosmos,i));
                 }
             }
         }

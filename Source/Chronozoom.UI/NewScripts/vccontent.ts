@@ -758,6 +758,8 @@ module CZ {
             this.settings.outline = true;
             this.type = 'timeline';
 
+            this.endDate = timelineinfo.endDate;
+
             var width = timelineinfo.timeEnd - timelineinfo.timeStart;
 
             var headerSize = timelineinfo.titleRect ? timelineinfo.titleRect.height : CZ.Settings.timelineHeaderSize * timelineinfo.height;
@@ -1879,11 +1881,11 @@ module CZ {
                                 adjustWidth: true
                             }, sw);
 
-                            if (this.contentItem.mediaSource) { // we've got a URL here
+                            if (contentItem.mediaSource) { // we've got a URL here
                                 sourceItem.reactsOnMouse = true;
                                 sourceItem.onmouseclick = function (e) {
                                     vc.element.css('cursor', 'default');
-                                    window.open(this.contentItem.mediaSource);
+                                    window.open(contentItem.mediaSource);
                                     return true;
                                 };
                                 sourceItem.onmouseenter = function (pv, e) {
@@ -1899,18 +1901,7 @@ module CZ {
                             }
                         }
 
-
-                        if (imageElem) {
-                            imageElem.onLoad = function () {
-                                var sx = this.x;
-                                var sw = this.width;
-                                var sy = this.y + this.height + sourceVertMargin;
-                                addSourceText(sx, sw, sy);
-                                this.onLoad = null;
-                            }
-                        } else {
-                            addSourceText(vx + leftOffset, contentWidth, sourceTop);
-                        }
+                        addSourceText(vx + leftOffset, contentWidth, sourceTop);
                     }
 
 

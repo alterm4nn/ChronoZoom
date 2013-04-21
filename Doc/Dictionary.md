@@ -14,7 +14,7 @@ Contains a set of Content Items, and is contained by Timeline or a Collection. T
 
 ### Timeline ###
 
-A visual representation of a time period that contains a set of Exhibits, child Timelines, and Time Series Data, and is contained by a Timeline or a Collection. The Timeline entity has a Title, Date Range, and Tags. It is externally searchable & linkable.
+A visual representation of a time period that contains a set of Exhibits, child Timelines, and Time Series Data, and is contained by a Timeline or a Collection. The Timeline entity has a Title, Date Range, and Tags. It is externally searchable & linkable. 
 
 ### Tour ###
 

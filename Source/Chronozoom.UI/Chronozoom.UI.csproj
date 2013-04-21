@@ -162,6 +162,14 @@
     <Content Include="NewScripts\bibliography.ts" />
     <Content Include="NewScripts\breadCrumbs.ts" />
     <Content Include="NewScripts\common.ts" />
+    <Content Include="NewScripts\cz.dates.ts" />
+    <Content Include="NewScripts\controls\cz.datepicker.ts" />
+    <Content Include="NewScripts\controls\cz.datepicker.js">
+      <DependentUpon>cz.datepicker.ts</DependentUpon>
+    </Content>
+    <Content Include="NewScripts\cz.dates.js">
+      <DependentUpon>cz.dates.ts</DependentUpon>
+    </Content>
     <Content Include="NewScripts\cz.js">
       <DependentUpon>cz.ts</DependentUpon>
     </Content>
@@ -203,6 +211,7 @@
     <Compile Include="ACS\Util\NameValueCollectionExtensions.cs" />
     <Compile Include="ACS\Util\RequireAuthenticationAttribute.cs" />
     <Content Include="ACS\FederationMetadata\2007-06\FederationMetadata.xml" />
+    <Content Include="samples\cz.datepicker.html" />
     <Content Include="Views\Account\_IdentityProvidersWithClientSideCode.aspx" />
     <Content Include="favicon.ico" />
     <Content Include="Images\A.png" />
@@ -490,6 +499,7 @@
   <ItemGroup>
     <Content Include="Web.Sandbox.config">
       <DependentUpon>Web.config</DependentUpon>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>
@@ -514,6 +524,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Dumps\cern-get.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="NewStyles\cz.datepicker.css" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
