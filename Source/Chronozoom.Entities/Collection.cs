@@ -22,7 +22,11 @@ namespace Chronozoom.Entities
         [DataMember]
         public string Title { get; set; }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1041:ProvideObsoleteAttributeMessage"), Obsolete]
         [DataMember]
         public string UserId { get; set; }
+
+        [DataMember]
+        public User User { get; set; }
     }
 }

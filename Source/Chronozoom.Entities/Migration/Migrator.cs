@@ -102,13 +102,13 @@ namespace Chronozoom.Entities.Migration
             Collection collection = new Collection();
             collection.Title = collectionName;
             collection.Id = CollectionIdFromSuperCollection(superCollectionName, collectionName);
-            collection.UserId = userId;
+            collection.User.NameIdentifier = userId;
 
             // Load SuperCollection
             SuperCollection superCollection = new SuperCollection();
             superCollection.Title = superCollectionName;
             superCollection.Id = CollectionIdFromText(superCollectionName);
-            superCollection.UserId = userId;
+            superCollection.User.NameIdentifier = userId;
 
             superCollection.Collections = new System.Collections.ObjectModel.Collection<Collection>();
             superCollection.Collections.Add(collection);

@@ -228,11 +228,11 @@ namespace UI
         /// <returns>The URL for the new user collection.</returns>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/user", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        public String PutUser(User user)
+        public String PutUser(User userRequest)
         {
-            return AuthenticatedOperation<String>(delegate(string userId)
+            return AuthenticatedOperation<String>(delegate(User user)
             {
-                Uri collectionUri = UpdatePersonalCollection(userId, user);
+                Uri collectionUri = UpdatePersonalCollection(user.NameIdentifier, userRequest);
 
                 // TODO: Persist user changes, validation, etc. Initial check-in provides API stub.
 
@@ -243,21 +243,21 @@ namespace UI
 
         private Uri UpdatePersonalCollection(string userId, User user)
         {
-            SuperCollection superCollection = _storage.SuperCollections.Where(candidate => candidate.UserId == userId).FirstOrDefault();
+            SuperCollection superCollection = _storage.SuperCollections.Where(candidate => candidate.User.NameIdentifier == userId).FirstOrDefault();
             if (superCollection == null)
             {
                 // Create the personal supercollection
                 superCollection = new SuperCollection();
                 superCollection.Title = user.DisplayName;
                 superCollection.Id = CollectionIdFromText(user.DisplayName);
-                superCollection.UserId = userId;
+                superCollection.User.NameIdentifier = userId;
                 superCollection.Collections = new Collection<Collection>();
 
                 // Create the personal collection
                 Collection personalCollection = new Collection();
                 personalCollection.Title = _defaultUserCollectionName;
                 personalCollection.Id = CollectionIdFromSuperCollection(user.DisplayName, _defaultUserCollectionName);
-                personalCollection.UserId = userId;
+                personalCollection.User.NameIdentifier = userId;
 
                 superCollection.Collections.Add(personalCollection);
 
@@ -373,7 +373,7 @@ namespace UI
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public Guid PutCollectionName(string superCollectionName, string collectionName, Collection collectionRequest)
         {
-            return AuthenticatedOperation(user =>
+            return AuthenticatedOperation(delegate(User user)
                 {
                     Trace.TraceInformation("Put Collection {0} from user {1} in supercollection {2}", collectionName, user, superCollectionName);
 
@@ -389,13 +389,14 @@ namespace UI
                     Collection collection = _storage.Collections.Find(collectionGuid);
                     if (collection == null)
                     {
-                        collection = new Collection { Id = collectionGuid, Title = collectionName, UserId = user };
+                        collection = new Collection { Id = collectionGuid, Title = collectionName, User = user };
+                        //collection.User = new User {}
                         _storage.Collections.Add(collection);
                         returnValue = collectionGuid;
                     }
                     else
                     {
-                        if (collection.UserId != user)
+                        if (collection.User != user)
                         {
                             SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                             return Guid.Empty;
@@ -412,7 +413,7 @@ namespace UI
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public void DeleteCollection(string superCollectionName, string collectionName)
         {
-            AuthenticatedOperation(user =>
+            AuthenticatedOperation(delegate(User user)
                 {
                     Trace.TraceInformation("Delete Collection {0} from user {1} in supercollection {2}", collectionName, user, superCollectionName);
 
@@ -424,7 +425,7 @@ namespace UI
                         return;
                     }
 
-                    if (collection.UserId != user)
+                    if (collection.User.NameIdentifier != user.NameIdentifier)
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                         return;
@@ -449,7 +450,7 @@ namespace UI
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/timeline", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public Guid PutTimeline(string superCollectionName, string collectionName, TimelineRaw timelineRequest)
         {
-            return AuthenticatedOperation(user =>
+            return AuthenticatedOperation(delegate(User user)
                 {
                     Trace.TraceInformation("Put Timeline");
                     Guid returnValue;
@@ -470,7 +471,7 @@ namespace UI
                     }
 
                     // Validate user for timelines that require validation
-                    if (collection.UserId != user && collection.UserId != null)
+                    if (collection.User.NameIdentifier != user.NameIdentifier && collection.User.NameIdentifier != null)
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                         return Guid.Empty;
@@ -535,7 +536,7 @@ namespace UI
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/timeline", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public void DeleteTimeline(string superCollectionName, string collectionName, Timeline timelineRequest)
         {
-            AuthenticatedOperation(user =>
+            AuthenticatedOperation(delegate(User user)
                 {
                     Trace.TraceInformation("Delete Timeline");
 
@@ -553,7 +554,7 @@ namespace UI
                         return;
                     }
 
-                    if (collection.UserId != user && collection.UserId != null)
+                    if (collection.User.NameIdentifier != user.NameIdentifier && collection.User.NameIdentifier != null)
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                         return;
@@ -605,7 +606,7 @@ namespace UI
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/exhibit", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public PutExhibitResult PutExhibit(string superCollectionName, string collectionName, ExhibitRaw exhibitRequest)
         {
-            return AuthenticatedOperation(user =>
+            return AuthenticatedOperation(delegate(User user)
                 {
                     Trace.TraceInformation("Put Exhibit");
                     var returnValue = new PutExhibitResult();
@@ -626,7 +627,7 @@ namespace UI
                     }
 
                     // Validate user, if required.
-                    if (collection.UserId != user && collection.UserId != null)
+                    if (collection.User.NameIdentifier != user.NameIdentifier && collection.User.NameIdentifier != null)
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                         return returnValue;
@@ -791,7 +792,7 @@ namespace UI
                         return;
                     }
 
-                    if (collection.UserId != user && collection.UserId != null)
+                    if (collection.User.NameIdentifier != user.NameIdentifier && collection.User.NameIdentifier != null)
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                         return;
@@ -859,7 +860,7 @@ namespace UI
                     }
 
                     // Validate user, if required.
-                    if (collection.UserId != user && collection.UserId != null)
+                    if (collection.User.NameIdentifier != user.NameIdentifier && collection.User.NameIdentifier != null)
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                         return Guid.Empty;
@@ -910,7 +911,7 @@ namespace UI
                         return;
                     }
 
-                    if (collection.UserId != user && collection.UserId != null)
+                    if (collection.User.NameIdentifier != user.NameIdentifier && collection.User.NameIdentifier != null)
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                         return;
@@ -991,8 +992,9 @@ namespace UI
         /// <summary>
         /// Performs an operation udner an authenticated user.
         /// </summary>
-        private delegate T AuthenticatedOperationDelegate<T>(string user);
-        private static T AuthenticatedOperation<T>(AuthenticatedOperationDelegate<T> operation)
+       // private delegate T AuthenticatedOperationDelegate<T>(string user);
+        //private static T AuthenticatedOperation<T>(AuthenticatedOperationDelegate<T> operation)
+        private static T AuthenticatedOperation<T>(Func<User, T> operation)
         {
             Microsoft.IdentityModel.Claims.ClaimsIdentity claimsIdentity = HttpContext.Current.User.Identity as Microsoft.IdentityModel.Claims.ClaimsIdentity;
 
@@ -1001,20 +1003,23 @@ namespace UI
                 return operation(null);
             }
 
+            User user = new User();
             Microsoft.IdentityModel.Claims.Claim nameIdentifierClaim = claimsIdentity.Claims.Where(candidate => candidate.ClaimType.EndsWith("nameidentifier")).FirstOrDefault();
             if (nameIdentifierClaim == null)
             {
                 return operation(null);
             }
+            user.NameIdentifier = nameIdentifierClaim.Value;
 
-            return operation(nameIdentifierClaim.Value);
+           // return operation(nameIdentifierClaim.Value);
+            return operation(user);
         }
 
         /// <summary>
         /// Helper to AuthenticatedOperation to handle void.
         /// </summary>
         private delegate void AuthenticatedOperationVoidDelegate(string user);
-        private static void AuthenticatedOperation(AuthenticatedOperationVoidDelegate operation)
+        private static void AuthenticatedOperation(Action<User> operation)
         {
             AuthenticatedOperation<bool>(user =>
                 {
