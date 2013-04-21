@@ -414,6 +414,37 @@ var CZ;
             while(contentItems[i] != null) {
                 var CI = contentItems[i];
                 isValid = isValid && CZ.Authoring.IsNotEmpty(CI.title) && CZ.Authoring.IsNotEmpty(CI.uri) && CZ.Authoring.IsNotEmpty(CI.mediaType);
+                if(CI.mediaType == "Image") {
+                    var imageReg = /\.(jpg|jpeg|png)$/i;
+                    if(!imageReg.test(CI.uri)) {
+                        alert("Sorry, only JPG/PNG images are supported");
+                        isValid = false;
+                    }
+                } else if(CI.mediaType == "Video") {
+                    var youtube = /www\.youtube\.com\/watch\?v=([a-z0-9\-]+)/i;
+                    var youtube2 = /www.\youtube\.com\/embed\/([a-z0-9\-]+)/i;
+                    var vimeo = /vimeo\.com\/([0-9]+)/i;
+                    var vimeo2 = /player.vimeo.com\/video\/([0-9]+)/i;
+                    if(youtube.test(CI.uri)) {
+                        var youtubeResult = CI.uri.match(youtube);
+                        CI.uri = "http://www.youtube.com/embed/" + youtubeResult[1];
+                    } else if(vimeo.test(CI.uri)) {
+                        var vimeoResult = CI.uri.match(vimeo);
+                        CI.uri = "http://player.vimeo.com/video/" + vimeoResult[1];
+                    } else if(youtube2.test(CI.uri) || vimeo2.test(CI.uri)) {
+                    } else {
+                        alert("Sorry, only YouTube or Vimeo videos are supported");
+                        isValid = false;
+                    }
+                } else if(CI.mediaType == "PDF") {
+                    var pdf = /\.(pdf)$/i;
+                    if(pdf.test(CI.uri)) {
+                        CI.uri = "http://docs.google.com/viewer?url=" + encodeURI(CI.uri) + "&embedded=true";
+                    } else {
+                        alert("Sorry, only PDF is supported");
+                        isValid = false;
+                    }
+                }
                 if(!isValid) {
                     return false;
                 }
