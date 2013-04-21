@@ -68,6 +68,7 @@ module CZ {
 
         var marker = $("<div id='timescale_marker' class='cz-timescale-marker'></div>");
         var markerText = $("<p id='marker-text'></p>");
+        var markertriangle = $("<div id='marker-triangle'></div>");
         var leftDatePanel = $("<div class='cz-timescale-panel cz-timescale-left'></div>");
         var leftDate = $("<p id='timescale_left_border'></p>");
         var rightDatePanel = $("<div class='cz-timescale-panel cz-timescale-right'></div>");
@@ -148,63 +149,28 @@ module CZ {
         });
 
         rightDatePanel.dblclick(function (e) {
-            if (!RightInputShown) {
-                rightDateInput.val(document.getElementById('timescale_right_border').innerHTML);
-                old_right_val = rightDateInput.val();
-                rightDateInput.css("display", "block");
-                rightDate.css("display", "none");
-                //console.log(_range);
-                RightInputShown = true;
-            } else {
-                var left_pan_val = document.getElementById('timescale_left_border').innerHTML;
-                var right_pan_val = rightDateInput.val();
-                var timerange;
-                 timerange = _tickSources[_mode].getRightPanelVirtualCoord(left_pan_val, right_pan_val, old_right_val, _range);
-                 if (timerange != null) {
-                     rightDateInput.css("display", "none");
-                     rightDate.css("display", "block");
-                     RightInputShown = false;
-                     var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                     var latestVisible = vp.visible;
-                     var width1 = timerange.right - timerange.left;
-                     var newVis = _tickSources[_mode].getVisibleForElement({ x: timerange.left, y: latestVisible.centerY - vp.height / 2, width: width1, height: vp.height }, 1.0, vp, false);
-                     CZ.Common.vc.virtualCanvas("setVisible", newVis);
-                     vp = CZ.Common.vc.virtualCanvas("getViewport");
-                     var lt = vp.pointScreenToVirtual(0, 0);
-                     var rb = vp.pointScreenToVirtual(vp.width, vp.height);
-                     var newrange = { min: lt.x, max: rb.x };
-                     that.update(newrange);
-                 }
-            }
+            RightPanInput();
         });
 
-       leftDatePanel.dblclick(function (e) {
-            if (!LeftInputShown) {
-                leftDateInput.val(document.getElementById('timescale_left_border').innerHTML);
-                old_left_val = leftDateInput.val();
-                leftDateInput.css("display", "block");
-                leftDate.css("display", "none");
-                LeftInputShown = true;
-            } else {
-                var right_pan_val = document.getElementById('timescale_right_border').innerHTML;
-                var left_pan_val = leftDateInput.val();
-                var timerange;
-                timerange = _tickSources[_mode].getLeftPanelVirtualCoord(left_pan_val, right_pan_val, old_left_val, _range);
+        leftDatePanel.dblclick(function (e) {
+            LeftPanInput();
+       });
 
-                leftDateInput.css("display", "none");
-                leftDate.css("display", "block");
-                LeftInputShown = false;
-                var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                var latestVisible = vp.visible;
-                var newVis = _tickSources[_mode].getVisibleForElement({ x: timerange.left, y: latestVisible.centerY - vp.height / 2, width: (timerange.right - timerange.left), height: vp.height }, 1.0, vp, false);
-                CZ.Common.vc.virtualCanvas("setVisible",newVis);
-                vp = CZ.Common.vc.virtualCanvas("getViewport");
-                var lt = vp.pointScreenToVirtual(0, 0);
-                var rb = vp.pointScreenToVirtual(vp.width, vp.height);
-                var newrange = { min: lt.x, max: rb.x };
-                that.update(newrange);
-            }
-        });
+        marker.dblclick(function (e) {
+           var point = CZ.Common.getXBrowserMouseOrigin(container, e);
+           var k = (_range.max - _range.min) / _width;
+           var time = _range.max - k * (_width - point.x);
+
+           if (time <= _range.min + CZ.Settings.panelWidth * k) {
+               marker.css("display", "none");
+               LeftPanInput();
+           }
+
+           if  (time >= _range.max - CZ.Settings.panelWidth*k) {
+               marker.css("display", "none");
+               RightPanInput();
+             }
+       });
 
 
         /**
@@ -222,6 +188,8 @@ module CZ {
             labelsDiv.addClass("cz-timescale-labels-container");
 
             marker[0].appendChild(markerText[0]);
+            marker[0].appendChild(markertriangle[0]);
+
             leftDatePanel[0].appendChild(leftDate[0]);
             leftDatePanel[0].appendChild(leftDateInput[0]);
             rightDatePanel[0].appendChild(rightDate[0]);
@@ -638,14 +606,14 @@ module CZ {
         this.setTimeBorders = function () {
             var k = (_range.max - _range.min) / _width;
 
-            var left_time = _range.min;
-            var right_time = _range.max;
+            var left_time = _range.min + CZ.Settings.panelWidth * k;
+            var right_time = _range.max - CZ.Settings.panelWidth * k;
 
             if (right_time > CZ.Settings.maxPermitedTimeRange.right) {
                 right_time = CZ.Settings.maxPermitedTimeRange.right;
                 var right_pos = (right_time - _range.max) / k + _width;
             } else {
-                var right_pos = (right_time - _range.max) / k + _width - 73;
+                var right_pos = (right_time - _range.max) / k + _width;//- 73;
             }
             if (left_time < CZ.Settings.maxPermitedTimeRange.left) {
                 left_time = CZ.Settings.maxPermitedTimeRange.left;
@@ -653,9 +621,6 @@ module CZ {
             } else {
                 var left_pos = (left_time - _range.max) / k + _width;
             }
-
-            //$('#timescale_left_border').css("left", left_pos);
-            //$('#timescale_right_border').css("left", right_pos);
 
             var left_text = _tickSources[_mode].getMarkerLabel(_range, left_time);
             var right_text = _tickSources[_mode].getMarkerLabel(_range, right_time);
@@ -698,6 +663,67 @@ module CZ {
             renderMajorTicks();
             renderSmallTicks();
         }
+
+        function LeftPanInput() {
+            if (!LeftInputShown) {
+                leftDateInput.val(document.getElementById('timescale_left_border').innerHTML);
+                old_left_val = leftDateInput.val();
+                leftDateInput.css("display", "block");
+                leftDate.css("display", "none");
+                LeftInputShown = true;
+            } else {
+                var right_pan_val = document.getElementById('timescale_right_border').innerHTML;
+                var left_pan_val = leftDateInput.val();
+                var timerange;
+                timerange = _tickSources[_mode].getLeftPanelVirtualCoord(left_pan_val, right_pan_val, old_left_val, _range);
+
+                leftDateInput.css("display", "none");
+                leftDate.css("display", "block");
+                LeftInputShown = false;
+                var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                var latestVisible = vp.visible;
+                var newVis = _tickSources[_mode].getVisibleForElement({ x: timerange.left, y: latestVisible.centerY - vp.height / 2, width: (timerange.right - timerange.left), height: vp.height }, 1.0, vp, false);
+                CZ.Common.vc.virtualCanvas("setVisible", newVis);
+                vp = CZ.Common.vc.virtualCanvas("getViewport");
+                var lt = vp.pointScreenToVirtual(0, 0);
+                var rb = vp.pointScreenToVirtual(vp.width, vp.height);
+                var newrange = { min: lt.x, max: rb.x };
+                that.update(newrange);
+                marker.css("display", "block");
+            }
+        }
+
+        function RightPanInput() {
+            if (!RightInputShown) {
+                rightDateInput.val(document.getElementById('timescale_right_border').innerHTML);
+                old_right_val = rightDateInput.val();
+                rightDateInput.css("display", "block");
+                rightDate.css("display", "none");
+                 RightInputShown = true;
+            } else {
+                var left_pan_val = document.getElementById('timescale_left_border').innerHTML;
+                var right_pan_val = rightDateInput.val();
+                var timerange;
+                timerange = _tickSources[_mode].getRightPanelVirtualCoord(left_pan_val, right_pan_val, old_right_val, _range);
+                if (timerange != null) {
+                    rightDateInput.css("display", "none");
+                    rightDate.css("display", "block");
+                    RightInputShown = false;
+                    var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                    var latestVisible = vp.visible;
+                    var width1 = timerange.right - timerange.left;
+                    var newVis = _tickSources[_mode].getVisibleForElement({ x: timerange.left, y: latestVisible.centerY - vp.height / 2, width: width1, height: vp.height }, 1.0, vp, false);
+                    CZ.Common.vc.virtualCanvas("setVisible", newVis);
+                    vp = CZ.Common.vc.virtualCanvas("getViewport");
+                    var lt = vp.pointScreenToVirtual(0, 0);
+                    var rb = vp.pointScreenToVirtual(vp.width, vp.height);
+                    var newrange = { min: lt.x, max: rb.x };
+                    that.update(newrange);
+                    marker.css("display", "block");
+                }
+            }
+        }
+
 
         /**
          * Get screen coordinates of tick.
@@ -1610,9 +1636,9 @@ module CZ {
            var old_right_month_val = this.parseMonth(old_rightstr) - 1;
            var old_right_date_val = this.parseDate(old_rightstr);
 
-           var right_val = CZ.Common.getCoordinateFromDMY(right_year_val , right_month_val, right_date_val );
-           var left_val = CZ.Common.getCoordinateFromDMY(left_year_val, left_month_val, left_date_val);
-           var old_right_val = CZ.Common.getCoordinateFromDMY(old_right_year_val, old_right_month_val, old_right_date_val);
+           var right_val = CZ.Dates.getCoordinateFromDMY(right_year_val , right_month_val, right_date_val );
+           var left_val = CZ.Dates.getCoordinateFromDMY(left_year_val, left_month_val, left_date_val);
+           var old_right_val = CZ.Dates.getCoordinateFromDMY(old_right_year_val, old_right_month_val, old_right_date_val);
 
            if (range.min < this.range.min) range.min = this.range.min;
            if (range.max > this.range.max) range.max = this.range.max;
@@ -1636,14 +1662,14 @@ module CZ {
             var old_left_month_val = this.parseMonth(old_leftstr) - 1;
             var old_left_date_val = this.parseDate(old_leftstr);
             
-            var right_val = CZ.Common.getCoordinateFromDMY(right_year_val, right_month_val, right_date_val);
-            var left_val = CZ.Common.getCoordinateFromDMY(left_year_val, left_month_val, left_date_val);
-            var old_left_val = CZ.Common.getCoordinateFromDMY(old_left_year_val, old_left_month_val, old_left_date_val);
+            var right_val = CZ.Dates.getCoordinateFromDMY(right_year_val, right_month_val, right_date_val);
+            var left_val = CZ.Dates.getCoordinateFromDMY(left_year_val, left_month_val, left_date_val);
+            var old_left_val = CZ.Dates.getCoordinateFromDMY(old_left_year_val, old_left_month_val, old_left_date_val);
 
             if (range.min < this.range.min) range.min = this.range.min;
             if (range.max > this.range.max) range.max = this.range.max;
 
-            if (left_val > range.max) { console.log(left_val,range.max); return null; }
+            if (left_val > range.max) { return null; }
             if (isNaN(Number(left_val))) return null;
            
             return { left: left_val, right: range.max };
