@@ -34,6 +34,7 @@ If you are new to GitHub, we recommend reading [Learning to use GitHub for Chron
 - [Visual Studio Tools for Git](http://visualstudiogallery.msdn.microsoft.com/abafc7d6-dcaa-40f4-8a5e-d6724bdb980c)
 - [Git for Windows](http://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git)
  - Be sure to select 'Run Git from the Windows Command Prompt' during installation.
+- Install Windows Identity Foundation (Control Panel, Programs and Features, Turn Windows Feature on or off, Turn on Windows Identity Foundation 3.5)
 - [Stylecop](http://stylecop.codeplex.com/)
 
 ### Recommended ###

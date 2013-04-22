@@ -5,12 +5,12 @@
 /// <reference path='gestures.ts'/>
 /// <reference path='tours.ts'/>
 /// <reference path='virtualCanvas.ts'/>
+/// <reference path='controls/cz.datepicker.ts'/>
 
 /// <reference path='typings/jquery/jquery.d.ts'/>
 
 module CZ {
     module HomePageViewModel {
-
         $(document).ready(function () {
 
             $('.bubbleInfo').hide();
@@ -82,7 +82,7 @@ module CZ {
             $('#biblCloseButton')
                 .mouseout(() => { CZ.Common.toggleOffImage('biblCloseButton', 'png'); })
                 .mouseover(() => { CZ.Common.toggleOnImage('biblCloseButton', 'png'); })
-
+            
             // TODO: remove splash screen totaly and replace it with new UX.
             //$('#welcomeScreenCloseButton')
             //    .mouseover(() => { CZ.Common.toggleOnImage('welcomeScreenCloseButton', 'png'); })

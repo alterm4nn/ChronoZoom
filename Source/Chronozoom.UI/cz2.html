@@ -19,7 +19,8 @@
 
     <!--TODO: Download custom version of jQuery UI-->
 
-    <link rel="stylesheet" type="text/css" href="/NewStyles/cz.css" />
+    <link rel="stylesheet" type="text/css" href="/NewStyles/cz.css" />    
+    <link rel="stylesheet" type="text/css" href="/NewStyles/cz.datepicker.css" />
     <link rel="stylesheet" type="text/css" href="/NewStyles/timescale.css" />
     
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
@@ -51,6 +52,9 @@
     <script type="text/javascript" src="/NewScripts/authoring.ui.js"></script>
     <script type="text/javascript" src="/NewScripts/czservice.js"></script>
     <script type="text/javascript" src="/NewScripts/timescale.js"></script>
+
+    <script type="text/javascript" src="/NewScripts/controls/cz.datepicker.js"></script>
+    <script type="text/javascript" src="/NewScripts/cz.dates.js"></script>
 
     <!--[if IE]>
     <script type="text/javascript" src="/NewScripts/regimesIE.js"></script>
@@ -126,20 +130,18 @@
 
             <!--Create Timeline popup dialog-->
             <div id="createTimelineForm" style="background-color: rgb(60, 95, 150); display: none; color: white;">
-                <p>
-                    <label style="display: block">title</label>
-                    <input id="timelineTitleInput" style="display: block" type="text" />
-                </p>
+                <label style="display: block">title</label>
+                <input id="timelineTitleInput" style="display: block" type="text" />
+                
+                <br />
+                <label style="display: block">start</label>
+                <div id="timelineStartInput" style="display: block" ></div>
 
-                <p style="display: inline-block">
-                    <label style="display: block">start</label>
-                    <input id="timelineStartInput" style="display: block" />
-                </p>
+                <br />
+                <label style="display: block">end</label>
+                <div id="timelineEndInput" style="display: block"></div>
 
-                <p style="display: inline-block">
-                    <label style="display: block">end</label>
-                    <input id="timelineEndInput" style="display: block" />
-                </p>
+                <br />
                 <span id ="TimelineErrorSpan" style="color:red; display:none"> 
                     Input error
                 </span>
@@ -147,43 +149,37 @@
 
             <!--Create Exhibit popup dialog-->
             <div id="createExhibitForm" style="background-color: rgb(60, 95, 150); display: none; color: white;">
-                <p>
-                    <label style="display: block">Exhibit's title</label>
-                    <input id="exhibitTitleInput" style="display: block" />
-                </p>
-
-                <p style="display: inline-block">
-                    <label style="display: block">Exhibit's date</label>
-                    <input id="exhibitDateInput" style="display: block" />
-                </p>
-                 <span id ="ExhibitErrorSpan" style="color:red; display:none"> 
+                <label style="display: block">Exhibit's title</label>
+                <input id="exhibitTitleInput" style="display: block" />
+                                
+                <br />
+                <label style="display: block">Exhibit's date</label>
+                <div id="exhibitDateInput" style="display: block"></div>
+                
+                <br />
+                <span id ="ExhibitErrorSpan" style="color:red; display:none"> 
                     Input error
                 </span>
-
 
                 <hr />
 
                 <p>Content items:</p>
             </div>
 
-
             <!--Edit Content Item popup dialog-->
             <div id="editContentItemForm" style="background-color: rgb(60, 95, 150); display: none; color: white;">
-                <p>
-                    <label style="display: block">title</label>
-                    <input id="contentItemTitleInput" style="display: block" type="text" />
-                </p>
+                <label style="display: block">title</label>
+                <input id="contentItemTitleInput" style="display: block" type="text" />
 
-                <p style="display: block">
-                    <label style="display: block">description</label>
-                    <textarea id="contentItemDescriptionInput" style="display: block"></textarea>
-                </p>
+                <br />
+                <label style="display: block">description</label>
+                <textarea id="contentItemDescriptionInput" style="display: block"></textarea>
 
-                <p style="display: block">
-                    <label style="display: block">media source</label>
-                    <input type="url" id="contentItemMediaSourceInput" style="display: block" />
-                </p>
+                <br />
+                <label style="display: block">media source</label>
+                <input type="url" id="contentItemMediaSourceInput" style="display: block" />
 
+                <br />
                 <p style="display: block">
                     <label style="display: block">media type</label>
                     <select id="contentItemMediaTypeInput" style="display: block">
@@ -238,7 +234,7 @@
         </div>
 
         <div id="search" class="czWindow" style="z-index: 2010;max-height:250px; display: none">
-            <div class="header" onselectstart="return false;">
+            <div class="header unselectable" onselectstart="return false;">
                 Search
             </div>
             <div>
@@ -253,10 +249,10 @@
         </div>
 
         <div id="tours" class="czWindow" onselectstart="return false;" style="display: none">
-            <div class="header">
+            <div class="header unselectable">
                 Tours
             </div>
-            <div id="tours-narration" class="narration">
+            <div id="tours-narration" class="narration unselectable">
                 Narration: <span id="tours-narration-on" class="narration-selected">ON</span> |
                 <span id="tours-narration-off">OFF</span>
             </div>
@@ -264,7 +260,7 @@
             </div>
         </div>
 
-        <div id="bookmarks" class="bookmarksWindow" onselectstart="return false;" style="display: none">
+        <div id="bookmarks" class="bookmarksWindow unselectable" onselectstart="return false;" style="display: none">
             <img id="bookmarksCollapse" src="/Images/collapse-left.png" class="headerButton" />
             <div class="header">
             </div>
@@ -276,10 +272,10 @@
             </div>
         </div>
 
-        <div id="bibliographyBack" class="biblBack" style="display: none">
+        <div id="bibliographyBack" class="biblBack">
             <div id="bibliographyOut" class="biblOuterWindow">
                 <div id="bibliography" class="biblWindow">
-                    <img class="closeButton" id="biblCloseButton" src="/Images/close_off.png" alt="Close" onselectstart="return false;" />
+                    <img class="closeButton unselectable" id="biblCloseButton" src="/Images/close_off.png" alt="Close" onselectstart="return false;" />
                     <div class="title" onselectstart="return false;">
                         <span>Infodot name</span> &gt; Bibliography
                     </div>
@@ -327,7 +323,7 @@
         <div id="welcomeScreenOut" class="welcomeScreenOuterWindow">
             <div id="welcomeScreen" class="welcomeScreen">
                 <div class="titleArea">
-                    <img class="closeButton" id="welcomeScreenCloseButton" src="/Images/wlcmScreen_close_off.png"
+                    <img class="closeButton unselectable" id="welcomeScreenCloseButton" src="/Images/wlcmScreen_close_off.png"
                         alt="Close" onselectstart="return false;" />
                     <div class="title" onselectstart="return false;">
                         <span>Welcome to ChronoZoom beta!</span>
