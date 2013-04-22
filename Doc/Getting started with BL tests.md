@@ -15,17 +15,17 @@ BLTs are implemented using JavaScript and the Jasmine framework, and are used to
 
 You can use [MsBuild.exe](http://msdn.microsoft.com/en-us/library/vstudio/ms164311.aspx) for building the project
 
-*Example:* 
-`[pathToMsBuild]\MsBuild.exe [Chronozoom solution dir]\Test\chronozoom20.test\Tests.BL\Tests.BL.csproj`
+    *Example:* 
+    `[pathToMsBuild]\MsBuild.exe [Chronozoom solution dir]\Test\chronozoom20.test\Tests.BL\Tests.BL.csproj`
 
 5. Run Chutzpah  for **Test\chronozoom20.test\Tests.BL\Scripts\Specs\** from command line (cmd.exe)
 	
-*Example:*
-`[Path to unpackaged chutzpah]\chutzpah.console.exe  [Chronozoom solution dir]\Test\chronozoom20.test\Tests.BL\Scripts\Specs\`
+    *Example:*
+    `[Path to unpackaged chutzpah]\chutzpah.console.exe  [Chronozoom solution dir]\Test\chronozoom20.test\Tests.BL\Scripts\Specs\`
 
 If you want open results in browser you could use key "/openInBrowser"
 
-*Example:*
-`[Path to extracted chutzpah]\chutzpah.console.exe  [solution dir]\Test\chronozoom20.test\Tests.BL\Scripts\Specs\ /openInBrowser`
+    *Example:*
+    `[Path to extracted chutzpah]\chutzpah.console.exe  [solution dir]\Test\chronozoom20.test\Tests.BL\Scripts\Specs\ /openInBrowser`
 	
 [All chutzpah Command Line Options](http://chutzpah.codeplex.com/wikipage?title=Command%20Line%20Options&referringTitle=Documentation)
