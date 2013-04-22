@@ -19,17 +19,17 @@
 
     <!--TODO: Download custom version of jQuery UI-->
 
-    <link rel="stylesheet" type="text/css" href="/NewStyles/cz.css" />    
+    <link rel="stylesheet" type="text/css" href="/NewStyles/cz.css" />
     <link rel="stylesheet" type="text/css" href="/NewStyles/cz.datepicker.css" />
     <link rel="stylesheet" type="text/css" href="/NewStyles/timescale.css" />
-    
+
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
 
     <script type="text/javascript" src="/NewScripts/external/jquery-1.7.2.min.js"></script>
     <script type="text/javascript" src="/NewScripts/external/jquery.cookie.js"></script>
     <script type="text/javascript" src="/NewScripts/external/rx.js"></script>
     <script type="text/javascript" src="/NewScripts/external/rx.jQuery.js"></script>
-    <script type="text/javascript" src="http://seadragon.com/ajax/0.8/seadragon-min.js"></script>    
+    <script type="text/javascript" src="http://seadragon.com/ajax/0.8/seadragon-min.js"></script>
     <script type="text/javascript" src="/NewScripts/external/mouseWheelPlugin.js"></script>
     <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
@@ -56,6 +56,8 @@
     <script type="text/javascript" src="/NewScripts/controls/cz.datepicker.js"></script>
     <script type="text/javascript" src="/NewScripts/cz.dates.js"></script>
 
+    <script type="text/javascript" src="/NewScripts/external/ACS.js"></script>
+    
     <!--[if IE]>
     <script type="text/javascript" src="/NewScripts/regimesIE.js"></script>
     <![endif]-->
@@ -88,9 +90,13 @@
             </ul>
         </div>
         <div class="fright">
-            <ul>                
+            <ul>
                 <li class="fleft">
-                    <div id="login-panel" />
+                    <div id="login-panel" >
+                        <a onclick="CZ.Authoring.UI.login();return false;" id="loginButton" style="margin-right: 10px; cursor: pointer;color:#E9E9E9;display:none;">login</a>
+                        <a onclick="CZ.Authoring.UI.editProfile();" id="editButton" style="color:#E9E9E9;display:none;">edit</a>
+                        <a href="/account/logout" style="color:#E9E9E9;display:none;" id="logoutButton">logout</a>
+                    </div>
                 </li>
                 <li class="fleft">
                     <img id="search_button" title="Search ChronoZoom" alt="Search ChronoZoom" src="/Images/search_off.jpg" />
@@ -101,49 +107,50 @@
             </ul>
         </div>
 
-        <script language="javascript">
-            $.ajax({
-                url: "/account/isauth"
-            }).done(function (data) {
-                if (data != "True") {
-                    $("#login-panel").html('<a href="/account/login" style="color:#E9E9E9">login</a>');
-                } else {
-                    $("#login-panel").html('<a href="/account/logout" style="color:#E9E9E9">logout</a>');
-                }
+        <script>
+            $(document).ready(function () {
+                $.ajax({
+                    url: "/account/isauth"
+                }).done(function (data) {
+                    if (data != "True") {
+                        //$("#login-panel").html('<a href="/account/login" style="color:#E9E9E9">login</a>');
+                        $("#loginButton").show();
+                    } else {
+                        $("#logoutButton").show();
+                        $("#editButton").show();
+                    }
+                });
             });
-        </script>        
+
+
+        </script>
 
         <div id="footer-authoring">
 
-            <a onclick="CZ.Authoring.UI.createTimeline()" class="footer-authoring-link">
-                create timeline
+            <a onclick="CZ.Authoring.UI.createTimeline()" class="footer-authoring-link">create timeline
             </a>
-            <a onclick="CZ.Authoring.UI.editTimeline()" class="footer-authoring-link">
-                edit timeline
+            <a onclick="CZ.Authoring.UI.editTimeline()" class="footer-authoring-link">edit timeline
             </a>
-            <a onclick="CZ.Authoring.UI.createExhibit()" class="footer-authoring-link">
-                create exhibit
+            <a onclick="CZ.Authoring.UI.createExhibit()" class="footer-authoring-link">create exhibit
             </a>
-            <a onclick="CZ.Authoring.UI.editExhibit()" class="footer-authoring-link">
-                edit exhibit
+            <a onclick="CZ.Authoring.UI.editExhibit()" class="footer-authoring-link">edit exhibit
             </a>
 
             <!--Create Timeline popup dialog-->
             <div id="createTimelineForm" style="background-color: rgb(60, 95, 150); display: none; color: white;">
                 <label style="display: block">title</label>
                 <input id="timelineTitleInput" style="display: block" type="text" />
-                
+
                 <br />
                 <label style="display: block">start</label>
-                <div id="timelineStartInput" style="display: block" ></div>
+                <div id="timelineStartInput" style="display: block"></div>
 
                 <br />
                 <label style="display: block">end</label>
                 <div id="timelineEndInput" style="display: block"></div>
 
                 <br />
-                <span id ="TimelineErrorSpan" style="color:red; display:none"> 
-                    Input error
+                <span id="TimelineErrorSpan" style="color: red; display: none">Input error
                 </span>
             </div>
 
@@ -151,14 +158,13 @@
             <div id="createExhibitForm" style="background-color: rgb(60, 95, 150); display: none; color: white;">
                 <label style="display: block">Exhibit's title</label>
                 <input id="exhibitTitleInput" style="display: block" />
-                                
+
                 <br />
                 <label style="display: block">Exhibit's date</label>
                 <div id="exhibitDateInput" style="display: block"></div>
-                
+
                 <br />
-                <span id ="ExhibitErrorSpan" style="color:red; display:none"> 
-                    Input error
+                <span id="ExhibitErrorSpan" style="color: red; display: none">Input error
                 </span>
 
                 <hr />
@@ -190,7 +196,7 @@
                     </select>
                 </p>
 
-                 <p>
+                <p>
                     <label>Attribution</label>
                     <input type='text' id='cz-authoring-ci-attribution' style='display: block;' />
                 </p>
@@ -200,14 +206,60 @@
                     <input type='text' id='cz-authoring-ci-media-source' style='display: block;' />
                 </p>
             </div>
+
+
+            <div id="editProfileForm" style="background-color: rgb(60, 95, 150); display: none; color: white;">
+                <p>
+                    <label for="username" style="display: block">Username</label>
+                    <input type="text" name="username" id="profile_username" />
+                </p>
+                <p>
+                    <label for="username" style="display: block">e-mail</label>
+                    <input type="text" name="email" id="profile_email" />
+                </p>
+                <p>
+                    <label for="username" style="display: block">Display Name</label>
+                    <input type="text" name="display_name" id="profile_display_name" /><br />
+                </p>
+                <p>
+                    <label for="username">by providing my email I understand that Chronozoom may contact me about my account</label>
+                    <input type="checkbox" name="agreement" id="profile_agreement" /><br />
+                </p>
+            </div>
+
+            <div id="loginForm" style="background-color: rgb(60, 95, 150); display: none; color: white;">
+                <div id="Main">
+                    <div id="SignInContent" class="SignInContent">
+                        <div id="LeftArea" class="LeftArea" style="display: none;">
+                            <div class="Header">Sign in using your account on:</div>
+                            <div id="IdentityProvidersList"></div>
+                            <br />
+                            <div id="MoreOptions" style="display: none;"><a href="" onclick="ShowDefaultSigninPage(); return false;">Show more options</a></div>
+                        </div>
+                        <div id="Divider" class="Divider" style="display: none;">
+                            <div class="DividerLine"></div>
+                            <div>Or</div>
+                            <div class="DividerLine"></div>
+                        </div>
+                        <div id="RightArea" class="RightArea" style="display: none;">
+                            <div class="Header">Sign in using your e-mail address:</div>
+                            <form onsubmit="EmailAddressEntered(); return false;">
+                                <input type="text" id="EmailAddressTextBox" />
+                                <input type="submit" id="EmailAddressSubmitButton" value="Submit" /><br />
+                                <br />
+                                <label id="EmailAddressError"></label>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div id="tour_control" class="tour_control" style="display: none; top: 14px; position: relative; margin: auto">
             <img id="tour_prev" src="/Images/tour_prev_off.jpg" alt="previous" />
             <img style="margin: 0 0 0 16px"
                 id="tour_playpause" src="/Images/tour_pause_off.jpg" alt="play/pause" />
             <img
-                style="margin: 0 0 0 16px" id="tour_next" src="/Images/tour_next_off.jpg" alt="next"
-                    />
+                style="margin: 0 0 0 16px" id="tour_next" src="/Images/tour_next_off.jpg" alt="next" />
             <img style="margin: 0 0 0 10px" id="tour_exit" src="/Images/tour_exit_off.jpg"
                 alt="exit" />
         </div>
@@ -233,7 +285,7 @@
             </div>
         </div>
 
-        <div id="search" class="czWindow" style="z-index: 2010;max-height:250px; display: none">
+        <div id="search" class="czWindow" style="z-index: 2010; max-height: 250px; display: none">
             <div class="header" onselectstart="return false;">
                 Search
             </div>
@@ -287,17 +339,17 @@
     </div>
 
     <div id="footer">
-            <div class="breadcrumbs-nav fleft">
-                <div id="breadcrumbs-nav-left">&#171;</div>
-            </div>
-            <div class="breadcrumbs-container fleft">
-                <table id="breadcrumbs-table">
-                    <tr />
-                </table>
-            </div>
-            <div class="breadcrumbs-nav fleft">
-                <div id="breadcrumbs-nav-right" class="">&#187;</div>
-            </div>
+        <div class="breadcrumbs-nav fleft">
+            <div id="breadcrumbs-nav-left">&#171;</div>
+        </div>
+        <div class="breadcrumbs-container fleft">
+            <table id="breadcrumbs-table">
+                <tr />
+            </table>
+        </div>
+        <div class="breadcrumbs-nav fleft">
+            <div id="breadcrumbs-nav-right" class="">&#187;</div>
+        </div>
 
         <div class="fright">
             <ul>
@@ -315,10 +367,10 @@
                 </li>
             </ul>
         </div>
-                
+
         <div class="clearer" />
     </div>
-
+    <script src="https://cz-nodelete-chronozoom-test.accesscontrol.windows.net/v2/metadata/IdentityProviders.js?protocol=wsfederation&amp;realm=http%3a%2f%2ftest.chronozoomproject.org%2f&amp;reply_to=&amp;context=&amp;request_id=&amp;version=1.0&amp;callback=ShowSigninPage" type="text/javascript"></script>
     <!--<div id="welcomeScreenBack" class="welcomeScreenBack">
         <div id="welcomeScreenOut" class="welcomeScreenOuterWindow">
             <div id="welcomeScreen" class="welcomeScreen">

@@ -151,6 +151,10 @@
     <Content Include="BehindTheScenes.htm" />
     <Content Include="cz.aspx" />
     <Content Include="cz2.html" />
+    <Content Include="NewScripts\external\ACS.js" />
+    <Content Include="NewScripts\authoring.min.js">
+      <DependentUpon>authoring.ts</DependentUpon>
+    </Content>
     <Content Include="NewScripts\authoring.ts" />
     <Content Include="NewScripts\authoring.js">
       <DependentUpon>authoring.ts</DependentUpon>
@@ -158,9 +162,15 @@
     <Content Include="NewScripts\authoring.ui.js">
       <DependentUpon>authoring.ui.ts</DependentUpon>
     </Content>
+    <Content Include="NewScripts\authoring.ui.min.js">
+      <DependentUpon>authoring.ui.ts</DependentUpon>
+    </Content>
     <Content Include="NewScripts\authoring.ui.ts" />
     <Content Include="NewScripts\bibliography.ts" />
     <Content Include="NewScripts\breadCrumbs.ts" />
+    <Content Include="NewScripts\common.min.js">
+      <DependentUpon>common.ts</DependentUpon>
+    </Content>
     <Content Include="NewScripts\common.ts" />
     <Content Include="NewScripts\cz.dates.ts" />
     <Content Include="NewScripts\controls\cz.datepicker.ts" />
@@ -175,6 +185,9 @@
     </Content>
     <Content Include="NewScripts\cz.settings.ts" />
     <Content Include="NewScripts\cz.ts" />
+    <Content Include="NewScripts\czservice.min.js">
+      <DependentUpon>czservice.ts</DependentUpon>
+    </Content>
     <Content Include="NewScripts\czservice.ts" />
     <Content Include="NewScripts\external\flash_detect.js" />
     <Content Include="NewScripts\external\jquery-1.7.2.min.js" />
@@ -527,6 +540,16 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="NewStyles\cz.datepicker.css" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="NewScripts\authoring.min.js.map">
+      <DependentUpon>authoring.js</DependentUpon>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="NewScripts\authoring.ui.min.js.map">
+      <DependentUpon>authoring.ui.js</DependentUpon>
+    </Content>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

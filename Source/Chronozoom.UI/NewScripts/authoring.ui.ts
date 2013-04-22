@@ -1,7 +1,7 @@
 ﻿/// <reference path='authoring.ts'/>
 /// <reference path='cz.settings.ts'/>
 /// <reference path='layout.ts'/>
-/// <reference path='cz.ui.ts'/>
+/// <reference path='controls/cz.datepicker.ts'/>
 
 /// <reference path='typings/jqueryui/jqueryui.d.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
@@ -461,6 +461,38 @@ module CZ {
                 });
             }
 
+            export function showEditProfileForm() {
+                var username = $("#profile_username");
+                var email = $("#profile_email");
+                var display_name = $("profile_display_name");
+                var agreement = $("profile_agreement");
+
+
+                $("#editProfileForm").dialog({
+                    title: "edit profile",
+                    modal: true,
+                    height: 600,
+                    width: 600,
+                    buttons: {
+                        "save and close": function ()
+                        {
+                            CZ.Service.putProfile(username,display_name,email);
+                        }
+                    },
+                    close: function () {CZ.Authoring._isActive = false;}
+                });
+            }
+
+            export function showLoginForm() {
+                $("#loginForm").dialog({
+                    title: "login",
+                    modal: true,
+                    height: 600,
+                    width: 600,
+                    close: function () { CZ.Authoring._isActive = false; }
+                });
+            }
+
             // Mouseup handlers.
 
             export function createTimeline () {
@@ -533,6 +565,28 @@ module CZ {
                 } else {
                     $("a:contains('edit exhibit')").removeClass("active");
                 }
+            }
+
+            export function editProfile() {
+                // skip authoring during ongoing dynamic layout animation
+                if (CZ.Layout.animatingElements.length != 0) {
+                    return;
+                }
+
+                CZ.Authoring._isActive = (CZ.Authoring.mode !== "editProfile") || !CZ.Authoring._isActive;
+                CZ.Authoring.mode = "editProfile";
+                CZ.Authoring.showEditProfileForm();
+            }
+
+            export function login() {
+                // skip authoring during ongoing dynamic layout animation
+                if (CZ.Layout.animatingElements.length != 0) {
+                    return;
+                }
+
+                CZ.Authoring._isActive = (CZ.Authoring.mode !== "login") || !CZ.Authoring._isActive;
+                CZ.Authoring.mode = "login";
+                CZ.Authoring.showLoginForm();
             }
         }
     }

@@ -360,6 +360,39 @@ var CZ;
                 });
             }
             UI.showEditContentItemForm = showEditContentItemForm;
+            function showEditProfileForm() {
+                var username = $("#profile_username");
+                var email = $("#profile_email");
+                var display_name = $("profile_display_name");
+                var agreement = $("profile_agreement");
+                $("#editProfileForm").dialog({
+                    title: "edit profile",
+                    modal: true,
+                    height: 600,
+                    width: 600,
+                    buttons: {
+                        "save and close": function () {
+                            CZ.Service.putProfile(username, display_name, email);
+                        }
+                    },
+                    close: function () {
+                        CZ.Authoring._isActive = false;
+                    }
+                });
+            }
+            UI.showEditProfileForm = showEditProfileForm;
+            function showLoginForm() {
+                $("#loginForm").dialog({
+                    title: "login",
+                    modal: true,
+                    height: 600,
+                    width: 600,
+                    close: function () {
+                        CZ.Authoring._isActive = false;
+                    }
+                });
+            }
+            UI.showLoginForm = showLoginForm;
             function createTimeline() {
                 if(CZ.Layout.animatingElements.length != 0) {
                     return;
@@ -416,6 +449,24 @@ var CZ;
                 }
             }
             UI.editExhibit = editExhibit;
+            function editProfile() {
+                if(CZ.Layout.animatingElements.length != 0) {
+                    return;
+                }
+                CZ.Authoring._isActive = (CZ.Authoring.mode !== "editProfile") || !CZ.Authoring._isActive;
+                CZ.Authoring.mode = "editProfile";
+                CZ.Authoring.showEditProfileForm();
+            }
+            UI.editProfile = editProfile;
+            function login() {
+                if(CZ.Layout.animatingElements.length != 0) {
+                    return;
+                }
+                CZ.Authoring._isActive = (CZ.Authoring.mode !== "login") || !CZ.Authoring._isActive;
+                CZ.Authoring.mode = "login";
+                CZ.Authoring.showLoginForm();
+            }
+            UI.login = login;
         })(Authoring.UI || (Authoring.UI = {}));
         var UI = Authoring.UI;
     })(CZ.Authoring || (CZ.Authoring = {}));

@@ -182,6 +182,8 @@ var CZ;
         Authoring.showCreateExhibitForm = null;
         Authoring.showEditExhibitForm = null;
         Authoring.showEditContentItemForm = null;
+        Authoring.showEditProfileForm = null;
+        Authoring.showLoginForm = null;
         Authoring.modeMouseHandlers = {
             createTimeline: {
                 mousemove: function () {
@@ -250,6 +252,20 @@ var CZ;
                         Authoring.showEditContentItemForm(_hovered, _selectedExhibit);
                     }
                 }
+            },
+            editProfile: {
+                mousemove: function () {
+                },
+                mouseup: function () {
+                    Authoring.showEditProfileForm();
+                }
+            },
+            login: {
+                mousemove: function () {
+                },
+                mouseup: function () {
+                    Authoring.showLoginForm();
+                }
             }
         };
         function initialize(vc, formHandlers) {
@@ -299,6 +315,10 @@ var CZ;
             Authoring.showEditExhibitForm = formHandlers && formHandlers.showEditExhibitForm || function () {
             };
             Authoring.showEditContentItemForm = formHandlers && formHandlers.showEditContentItemForm || function () {
+            };
+            Authoring.showEditProfileForm = formHandlers && formHandlers.showEditProfileForm || function () {
+            };
+            Authoring.showLoginForm = formHandlers && formHandlers.showLoginForm || function () {
             };
         }
         Authoring.initialize = initialize;
@@ -422,16 +442,16 @@ var CZ;
                     }
                 } else if(CI.mediaType == "Video") {
                     var youtube = /www\.youtube\.com\/watch\?v=([a-z0-9\-]+)/i;
-                    var youtube2 = /www.\youtube\.com\/embed\/([a-z0-9\-]+)/i;
+                    var youtubeEmbed = /www.\youtube\.com\/embed\/([a-z0-9\-]+)/i;
                     var vimeo = /vimeo\.com\/([0-9]+)/i;
-                    var vimeo2 = /player.vimeo.com\/video\/([0-9]+)/i;
+                    var vimeoEmbed = /player.vimeo.com\/video\/([0-9]+)/i;
                     if(youtube.test(CI.uri)) {
                         var youtubeResult = CI.uri.match(youtube);
                         CI.uri = "http://www.youtube.com/embed/" + youtubeResult[1];
                     } else if(vimeo.test(CI.uri)) {
                         var vimeoResult = CI.uri.match(vimeo);
                         CI.uri = "http://player.vimeo.com/video/" + vimeoResult[1];
-                    } else if(youtube2.test(CI.uri) || vimeo2.test(CI.uri)) {
+                    } else if(youtubeEmbed.test(CI.uri) || vimeoEmbed.test(CI.uri)) {
                     } else {
                         alert("Sorry, only YouTube or Vimeo videos are supported");
                         isValid = false;
@@ -441,7 +461,7 @@ var CZ;
                     if(pdf.test(CI.uri)) {
                         CI.uri = "http://docs.google.com/viewer?url=" + encodeURI(CI.uri) + "&embedded=true";
                     } else {
-                        alert("Sorry, only PDF is supported");
+                        alert("Sorry, only PDF extension is supported");
                         isValid = false;
                     }
                 }

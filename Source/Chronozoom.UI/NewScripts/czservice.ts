@@ -40,6 +40,8 @@ module CZ {
                     mediaSource: ci.contentItem ? ci.contentItem.mediaSource : ci.mediaSource
                 };
             }
+
+
         }
 
         var _serviceUrl = CZ.Settings.serverUrlHost + "/chronozoom.svc/";
@@ -348,6 +350,42 @@ module CZ {
              );
 
             return $.when.apply($, promises);
+        }
+
+        /**
+        * Update user profile.
+        * @param  {Object} username .
+        * @param  {Object} display_name .
+        * @param  {Object} email .
+        */
+        export function putProfile(username, display_name, email) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("profile");
+
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify({})
+            });
+        }
+
+        /**
+        * Delete user profile.
+        * @param  {Object} username .
+        */
+        export function deleteProfile(username) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("profile");
+
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify({})
+            });
         }
     }
 }

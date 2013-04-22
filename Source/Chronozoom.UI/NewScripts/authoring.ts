@@ -333,7 +333,10 @@ module CZ {
         export var showEditTimelineForm : any = null;
         export var showCreateExhibitForm : any = null;
         export var showEditExhibitForm : any = null;
-        export var showEditContentItemForm : any = null;
+        export var showEditContentItemForm: any = null;
+
+        export var showEditProfileForm: any = null;
+        export var showLoginForm: any = null;
 
         /**
          * Represents a collection of mouse events' handlers for each mode.
@@ -415,6 +418,16 @@ module CZ {
                         showEditContentItemForm(_hovered, _selectedExhibit);
                     }
                 }
+            },
+
+            editProfile: {
+                mousemove: function () { },
+                mouseup: function () { showEditProfileForm();}
+            },
+
+            login: {
+                mousemove: function () { },
+                mouseup: function () { showLoginForm(); }
             }
         };
 
@@ -477,7 +490,10 @@ module CZ {
             showEditTimelineForm = formHandlers && formHandlers.showEditTimelineForm || function () {};
             showCreateExhibitForm = formHandlers && formHandlers.showCreateExhibitForm || function () {};
             showEditExhibitForm = formHandlers && formHandlers.showEditExhibitForm || function () {};
-            showEditContentItemForm = formHandlers && formHandlers.showEditContentItemForm || function () {};
+            showEditContentItemForm = formHandlers && formHandlers.showEditContentItemForm || function () { };
+
+            showEditProfileForm = formHandlers && formHandlers.showEditProfileForm || function () { };
+            showLoginForm = formHandlers && formHandlers.showLoginForm || function () { };
         }
 
         /**
@@ -654,6 +670,8 @@ module CZ {
             return (obj !== '' && obj !== null);
         }
 
+
+
         /**
          * Validates,if content item data is correct.
         */
@@ -676,13 +694,13 @@ module CZ {
                     //Input: https://www.youtube.com/watch?v=j5-yKhDd64s
                     //Output: http://www.youtube.com/embed/j5-yKhDd64s
                     var youtube = /www\.youtube\.com\/watch\?v=([a-z0-9\-]+)/i;
-                    var youtube2 = /www.\youtube\.com\/embed\/([a-z0-9\-]+)/i;
+                    var youtubeEmbed = /www.\youtube\.com\/embed\/([a-z0-9\-]+)/i;
 
                     //Vimeo
                     //Input: http://vimeo.com/28095551
                     //Output: http://player.vimeo.com/video/28095551
                     var vimeo = /vimeo\.com\/([0-9]+)/i
-                    var vimeo2 = /player.vimeo.com\/video\/([0-9]+)/i
+                    var vimeoEmbed = /player.vimeo.com\/video\/([0-9]+)/i
 
                     if (youtube.test(CI.uri)) {
                         var youtubeResult = CI.uri.match(youtube);
@@ -690,7 +708,7 @@ module CZ {
                     } else if (vimeo.test(CI.uri)) {
                         var vimeoResult = CI.uri.match(vimeo);
                         CI.uri = "http://player.vimeo.com/video/" + vimeoResult[1];
-                    } else if (youtube2.test(CI.uri) || vimeo2.test(CI.uri)) {
+                    } else if (youtubeEmbed.test(CI.uri) || vimeoEmbed.test(CI.uri)) {
                         //Embedded link provided
                     } else {
                         alert("Sorry, only YouTube or Vimeo videos are supported");
@@ -705,7 +723,7 @@ module CZ {
                     if (pdf.test(CI.uri)) {
                         CI.uri = "http://docs.google.com/viewer?url=" + encodeURI(CI.uri) + "&embedded=true";
                     } else {
-                        alert("Sorry, only PDF is supported");
+                        alert("Sorry, only PDF extension is supported");
                         isValid = false;
                     }
                 }
