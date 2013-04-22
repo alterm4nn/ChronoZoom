@@ -16,7 +16,7 @@ BLTs are implemented using JavaScript and the Jasmine framework, and are used to
 You can use [MsBuild.exe](http://msdn.microsoft.com/en-us/library/vstudio/ms164311.aspx) for building the project
 
 *Example:* 
-`pathToMsBuild\MsBuild.exe [Chronozoom solution dir]\Test\chronozoom20.test\Tests.BL\Tests.BL.csproj`
+`[pathToMsBuild]\MsBuild.exe [Chronozoom solution dir]\Test\chronozoom20.test\Tests.BL\Tests.BL.csproj`
 
 5. Run Chutzpah  for **Test\chronozoom20.test\Tests.BL\Scripts\Specs\** from command line (cmd.exe)
 	
