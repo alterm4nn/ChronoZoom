@@ -58,6 +58,18 @@ describe("Given:  'edit timeline' form is opened: ", function () {
             });
         });
     });
+
+    describe("When user set text instead year", function () {
+        it("should display error message", function () {
+            $('#timelineTitleInput').val('Title');
+            $('.cz-datepicker-year:first').val('some text');
+            $('.cz-datepicker-year:last').val('some text');
+            $('.cz-datepicker-year').trigger('blur');
+
+            expect($('.cz-datepicker-errormsg:first').text()).toEqual("Year should be a number.");
+            expect($('.cz-datepicker-errormsg:last').text()).toEqual("Year should be a number.");
+        });
+    });
 });
 
 function using(name, values, func) {
