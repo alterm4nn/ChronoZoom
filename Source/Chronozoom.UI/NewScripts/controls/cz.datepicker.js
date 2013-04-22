@@ -186,7 +186,7 @@ var CZ;
                 return CZ.Dates.getCoordinateFromDMY(year, month, day);
             };
             DatePicker.prototype.validateNumber = function (year) {
-                return !isNaN(Number(year)) && Number(year) !== Infinity && !isNaN(parseFloat(year));
+                return !isNaN(Number(year)) && isFinite(Number(year)) && !isNaN(parseFloat(year));
             };
             return DatePicker;
         })();

@@ -300,7 +300,7 @@ module CZ {
             * Validates that given string is a non infinite number, returns false if not
             */
             private validateNumber(year: string) {
-                return !isNaN(Number(year)) && Number(year) !== Infinity && !isNaN(parseFloat(year));
+                return !isNaN(Number(year)) && isFinite(Number(year)) && !isNaN(parseFloat(year));
             }
         }
     }
