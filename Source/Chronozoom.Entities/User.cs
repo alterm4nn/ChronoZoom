@@ -12,22 +12,17 @@ namespace Chronozoom.Entities
     [DataContract]
     public class User
     {
+        [Key]
         [DataMember]
         public Guid Id { get; set; }
 
- //[Key]
         [DataMember]
         public string DisplayName { get; set; }
 
         [DataMember]
         public string Email { get; set; }
 
-        [DataMember]
-        [NotMapped]
         public string NameIdentifier { get; set; }
-
-        [DataMember]
-        [NotMapped]
         public string IdentityProvider { get; set; }
     }
 }

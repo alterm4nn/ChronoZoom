@@ -98,17 +98,35 @@ namespace Chronozoom.Entities.Migration
 
         private Collection LoadCollections(string superCollectionName, string collectionName, string userId)
         {
+            User user;
+            if (userId == null)
+            {
+                user = _storage.Users.Where(candidate => candidate.NameIdentifier == null).FirstOrDefault();
+            }
+            else
+            {
+                user = _storage.Users.Where(candidate => candidate.NameIdentifier == userId).FirstOrDefault();
+            }
+
+            if (user == null)
+            {
+                user = new User { Id = Guid.NewGuid(), NameIdentifier = userId };
+            }
             // Load Collection
             Collection collection = new Collection();
             collection.Title = collectionName;
             collection.Id = CollectionIdFromSuperCollection(superCollectionName, collectionName);
-            collection.User.NameIdentifier = userId;
+            //TODO update User
+            collection.User = user;
+           // collection.User.NameIdentifier = userId;
 
             // Load SuperCollection
             SuperCollection superCollection = new SuperCollection();
             superCollection.Title = superCollectionName;
             superCollection.Id = CollectionIdFromText(superCollectionName);
-            superCollection.User.NameIdentifier = userId;
+            //TOD update User
+            superCollection.User = user;
+            //superCollection.User.NameIdentifier = userId;
 
             superCollection.Collections = new System.Collections.ObjectModel.Collection<Collection>();
             superCollection.Collections.Add(collection);
