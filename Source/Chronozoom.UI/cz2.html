@@ -241,7 +241,7 @@
         </div>
 
         <div id="search" class="czWindow" style="z-index: 2010;max-height:250px; display: none">
-            <div class="header" onselectstart="return false;">
+            <div class="header unselectable" onselectstart="return false;">
                 Search
             </div>
             <div>
@@ -256,10 +256,10 @@
         </div>
 
         <div id="tours" class="czWindow" onselectstart="return false;" style="display: none">
-            <div class="header">
+            <div class="header unselectable">
                 Tours
             </div>
-            <div id="tours-narration" class="narration">
+            <div id="tours-narration" class="narration unselectable">
                 Narration: <span id="tours-narration-on" class="narration-selected">ON</span> |
                 <span id="tours-narration-off">OFF</span>
             </div>
@@ -267,7 +267,7 @@
             </div>
         </div>
 
-        <div id="bookmarks" class="bookmarksWindow" onselectstart="return false;" style="display: none">
+        <div id="bookmarks" class="bookmarksWindow unselectable" onselectstart="return false;" style="display: none">
             <img id="bookmarksCollapse" src="/Images/collapse-left.png" class="headerButton" />
             <div class="header">
             </div>
@@ -279,10 +279,10 @@
             </div>
         </div>
 
-        <div id="bibliographyBack" class="biblBack" style="display: none">
+        <div id="bibliographyBack" class="biblBack">
             <div id="bibliographyOut" class="biblOuterWindow">
                 <div id="bibliography" class="biblWindow">
-                    <img class="closeButton" id="biblCloseButton" src="/Images/close_off.png" alt="Close" onselectstart="return false;" />
+                    <img class="closeButton unselectable" id="biblCloseButton" src="/Images/close_off.png" alt="Close" onselectstart="return false;" />
                     <div class="title" onselectstart="return false;">
                         <span>Infodot name</span> &gt; Bibliography
                     </div>
@@ -334,7 +334,7 @@
         <div id="welcomeScreenOut" class="welcomeScreenOuterWindow">
             <div id="welcomeScreen" class="welcomeScreen">
                 <div class="titleArea">
-                    <img class="closeButton" id="welcomeScreenCloseButton" src="/Images/wlcmScreen_close_off.png"
+                    <img class="closeButton unselectable" id="welcomeScreenCloseButton" src="/Images/wlcmScreen_close_off.png"
                         alt="Close" onselectstart="return false;" />
                     <div class="title" onselectstart="return false;">
                         <span>Welcome to ChronoZoom beta!</span>

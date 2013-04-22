@@ -7,6 +7,7 @@
 /// <reference path='virtualCanvas.ts'/>
 /// <reference path='uiloader.ts'/>
 /// <reference path='controls/formbase.ts'/>
+/// <reference path='controls/cz.datepicker.ts'/>
 
 /// <reference path='typings/jquery/jquery.d.ts'/>
 
