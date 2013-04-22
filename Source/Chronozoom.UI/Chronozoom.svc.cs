@@ -43,8 +43,15 @@ namespace UI
         private static MD5 _md5Hasher = MD5.Create();
         private const decimal _minYear = -13700000000;
         private const decimal _maxYear = 9999;
-        private const int _maxElements = 500;
         private const string _defaultUserCollectionName = "default";
+        
+        // The default number of max elements returned by the API
+        private static Lazy<int> _maxElements = new Lazy<int>(() =>
+        {
+            string maxElements = ConfigurationManager.AppSettings["MaxElementsDefault"];
+
+            return string.IsNullOrEmpty(maxElements) ? 2000 : int.Parse(maxElements);
+        });
 
         // error code descriptions
         private static class ErrorDescription
@@ -66,61 +73,42 @@ namespace UI
         }
 
         [OperationContract]
-        [Obsolete]
-        [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public BaseJsonResult<IEnumerable<Timeline>> Get(string supercollection, string collection)
-        {
-            Trace.TraceInformation("Get Timelines");
-
-            Guid collectionId = CollectionIdOrDefault(supercollection, collection);
-
-            string timelineCacheKey = string.Format(CultureInfo.InvariantCulture, "Timeline {0}", collectionId);
-            lock (Cache)
-            {
-                if (Cache.Contains(timelineCacheKey))
-                {
-                    return new BaseJsonResult<IEnumerable<Timeline>>((IEnumerable<Timeline>)Cache[timelineCacheKey]);
-                }
-
-                Collection<Timeline> timelines = _storage.TimelinesQuery(collectionId, _minYear, _maxYear, 0, null, _maxElements);
-
-                // Remove Guid.Empty assignment once client supports multiple timelines
-                if (timelines.Any())
-                    timelines.FirstOrDefault().Id = Guid.Empty;
-
-                Trace.TraceInformation("Add Timelines to cache");
-                Cache.Add(timelineCacheKey,
-                    timelines,
-                    DateTime.Now.AddMinutes(
-                        int.Parse(ConfigurationManager.AppSettings["CacheDuration"],
-                        CultureInfo.InvariantCulture)));
-
-                return new BaseJsonResult<IEnumerable<Timeline>>(timelines);
-            }
-         }
-
-        [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
         public Timeline GetTimelines(string supercollection, string collection, string start, string end, string minspan, string lca, string maxElements)
         {
-            Trace.TraceInformation("Get Filtered Timelines");
+            return AuthenticatedOperation(userId =>
+            {
+                Trace.TraceInformation("Get Filtered Timelines");
 
-            Guid collectionId = CollectionIdOrDefault(supercollection, collection);
+                Guid collectionId = CollectionIdOrDefault(supercollection, collection);
 
-            // initialize filters
-            decimal startTime = string.IsNullOrWhiteSpace(start) ? _minYear : decimal.Parse(start, CultureInfo.InvariantCulture);
-            decimal endTime = string.IsNullOrWhiteSpace(end) ? _maxYear : decimal.Parse(end, CultureInfo.InvariantCulture);
-            decimal span = string.IsNullOrWhiteSpace(minspan) ? 0 : decimal.Parse(minspan, CultureInfo.InvariantCulture);
-            Guid? lcaParsed = string.IsNullOrWhiteSpace(lca) ? (Guid?)null : Guid.Parse(lca);
-            int maxElementsParsed = string.IsNullOrWhiteSpace(maxElements) ? _maxElements : int.Parse(maxElements);
+                // If available, retrieve from cache.
+                if (CanCacheGetTimelines(userId, collectionId))
+                {
+                    Timeline cachedTimeline = GetCachedGetTimelines(collectionId, start, end, minspan, lca, maxElements);
+                    if (cachedTimeline != null)
+                    {
+                        return cachedTimeline;
+                    }
+                }
 
-            Collection<Timeline> timelines = _storage.TimelinesQuery(collectionId, startTime, endTime, span, lcaParsed, maxElementsParsed);
-            Timeline timeline = timelines.Where(candidate => candidate.Id == lcaParsed).FirstOrDefault();
+                // initialize filters
+                decimal startTime = string.IsNullOrWhiteSpace(start) ? _minYear : decimal.Parse(start, CultureInfo.InvariantCulture);
+                decimal endTime = string.IsNullOrWhiteSpace(end) ? _maxYear : decimal.Parse(end, CultureInfo.InvariantCulture);
+                decimal span = string.IsNullOrWhiteSpace(minspan) ? 0 : decimal.Parse(minspan, CultureInfo.InvariantCulture);
+                Guid? lcaParsed = string.IsNullOrWhiteSpace(lca) ? (Guid?)null : Guid.Parse(lca);
+                int maxElementsParsed = string.IsNullOrWhiteSpace(maxElements) ? _maxElements.Value : int.Parse(maxElements);
 
-            if (timeline == null)
-                timeline = timelines.FirstOrDefault();
+                Collection<Timeline> timelines = _storage.TimelinesQuery(collectionId, startTime, endTime, span, lcaParsed, maxElementsParsed);
+                Timeline timeline = timelines.Where(candidate => candidate.Id == lcaParsed).FirstOrDefault();
 
-            return timeline;
+                if (timeline == null)
+                    timeline = timelines.FirstOrDefault();
+
+                CacheGetTimelines(timeline, collectionId, start, end, minspan, lca, maxElements);
+
+                return timeline;
+            });
         }
 
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
@@ -1021,6 +1009,52 @@ namespace UI
                     operation(user);
                     return true;
                 });
+        }
+
+        /// <summary>
+        /// Can a given GetTimelines request be cached?
+        /// </summary>
+        private bool CanCacheGetTimelines(string userId, Guid collectionId)
+        {
+            string cacheKey = string.Format(CultureInfo.InvariantCulture, "Collection-To-Owner {0}", collectionId);
+            if (!Cache.Contains(cacheKey))
+            {
+                string ownerId = _storage.Collections.Find(collectionId).UserId;
+                if (ownerId != null)
+                {
+                    Cache.Add(cacheKey, ownerId, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
+                }
+            }
+
+            // Can cache as long as the user does not own the collection.
+            return (string)Cache[cacheKey] != userId;
+        }
+
+        /// <summary>
+        /// Retrieves the cached timeline.
+        /// </summary>
+        /// <returns>Null if not cached.</returns>
+        private Timeline GetCachedGetTimelines(Guid collectionId, string start, string end, string minspan, string lca, string maxElements)
+        {
+            string cacheKey = string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}", start, end, minspan, lca, maxElements);
+            if (Cache.Contains(cacheKey))
+            {
+                return (Timeline)Cache[cacheKey];
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Caches the given timeline for the given GetTimelines request.
+        /// </summary>
+        private void CacheGetTimelines(Timeline timeline, Guid collectionId, string start, string end, string minspan, string lca, string maxElements)
+        {
+            string cacheKey = string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}", start, end, minspan, lca, maxElements);
+            if (!Cache.Contains(cacheKey))
+            {
+                Cache.Add(cacheKey, timeline, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
+            }
         }
     }
 }

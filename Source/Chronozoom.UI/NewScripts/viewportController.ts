@@ -269,7 +269,7 @@ module CZ {
             };
 
             function getMissingTimelines(vbox, lca) {
-                CZ.Service.getTimelines({
+                CZ.Data.getTimelines({
                     lca: lca.guid,
                     start: vbox.left,
                     end: vbox.right,

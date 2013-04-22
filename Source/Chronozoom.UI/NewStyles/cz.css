@@ -814,8 +814,10 @@ border-top: 1px solid #BFBFBF;
 	position: relative;
 	border-radius: 8px;
 	cursor: default;
-    min-height: 443px;
-    height: 443px;
+    	min-height: 443px;
+   	height: 443px;
+	top: 50%;
+   	margin-top: -220px;
 }
 
 .welcomeScreen

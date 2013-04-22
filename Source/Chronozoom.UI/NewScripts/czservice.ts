@@ -79,9 +79,9 @@ module CZ {
         };
 
         
-        // NOTE: Set to sandbox for debug purposes.
-        export var collectionName = "sandbox";
-        export var superCollectionName = "sandbox";
+        // NOTE: Clear collections to let the server decide what to load.
+        export var collectionName = "";
+        export var superCollectionName = "";
 
         /**
         * Chronozoom.svc Requests.
