@@ -57,7 +57,7 @@ var CZ;
                 if(!this.validateNumber(coordinate)) {
                     return false;
                 }
-                coordinate = parseFloat(coordinate);
+                coordinate = Number(coordinate);
                 this.coordinate = coordinate;
                 var mode = this.modeSelector.find(":selected").val();
                 switch(mode) {
@@ -143,6 +143,7 @@ var CZ;
             DatePicker.prototype.setDate_YearMode = function (coordinate) {
                 var date = CZ.Dates.convertCoordinateToYear(coordinate);
                 this.yearSelector.val(date.year);
+                this.regimeSelector.find(":selected").attr("selected", "false");
                 this.regimeSelector.find("option").each(function () {
                     if(this.value === date.regime.toLowerCase()) {
                         $(this).attr("selected", "selected");
@@ -185,7 +186,10 @@ var CZ;
                 return CZ.Dates.getCoordinateFromDMY(year, month, day);
             };
             DatePicker.prototype.validateNumber = function (year) {
-                var parsed = parseFloat(year);
+                if(year === '') {
+                    return false;
+                }
+                var parsed = Number(year);
                 return !isNaN(parsed) && parsed !== Infinity;
             };
             return DatePicker;

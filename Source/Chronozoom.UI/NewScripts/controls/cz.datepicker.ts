@@ -102,7 +102,7 @@ module CZ {
                 if (!this.validateNumber(coordinate))
                     return false;
 
-                coordinate = parseFloat(coordinate);
+                coordinate = Number(coordinate);
 
                 this.coordinate = coordinate;
                 var mode = this.modeSelector.find(":selected").val();
@@ -228,8 +228,12 @@ module CZ {
             */
             private setDate_YearMode(coordinate: number): void {
                 var date = CZ.Dates.convertCoordinateToYear(coordinate);
-
+                
                 this.yearSelector.val(date.year);
+                // reset selected regime
+                this.regimeSelector.find(":selected").attr("selected", "false");
+
+                // select appropriate regime
                 this.regimeSelector.find("option").each(function () {
                     if (this.value === date.regime.toLowerCase()) {
                         $(this).attr("selected", "selected");
@@ -296,7 +300,9 @@ module CZ {
             * Validates that given string is a non infinite number, returns false if not
             */
             private validateNumber(year: string) {
-                var parsed = parseFloat(year);
+                if (year === '')
+                    return false;
+                var parsed = Number(year);
                 return !isNaN(parsed) && parsed !== Infinity;
             }
         }
