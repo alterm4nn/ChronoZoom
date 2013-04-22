@@ -5,6 +5,12 @@ var CZ;
         $(document).ready(function () {
             $('.bubbleInfo').hide();
             CZ.Common.initialize();
+            CZ.UILoader.loadAll().done(function () {
+                var form = new CZ.UI.FormBase(arguments[0], undefined);
+                $("#authoring").click(function (e) {
+                    form.show();
+                });
+            });
             $('#search_button').mouseup(CZ.Search.onSearchClicked).mouseover(function () {
                 CZ.Search.searchHighlight(true);
             }).mouseout(function () {

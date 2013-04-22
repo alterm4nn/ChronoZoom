@@ -5,7 +5,8 @@
 /// <reference path='gestures.ts'/>
 /// <reference path='tours.ts'/>
 /// <reference path='virtualCanvas.ts'/>
-/// <reference path='cz.ui.ts'/>
+/// <reference path='uiloader.ts'/>
+/// <reference path='controls/formbase.ts'/>
 
 /// <reference path='typings/jquery/jquery.d.ts'/>
 
@@ -16,6 +17,13 @@ module CZ {
             $('.bubbleInfo').hide();
 
             CZ.Common.initialize();
+            CZ.UILoader.loadAll().done(function () {
+                // Example.
+                var form = new CZ.UI.FormBase(arguments[0], undefined);
+                $("#authoring").click(function (e) {
+                    form.show();
+                })
+            });
 
             //CZ.Common.ax.showThresholds = true;
 

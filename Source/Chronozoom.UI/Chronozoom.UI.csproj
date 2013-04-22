@@ -162,6 +162,10 @@
     <Content Include="NewScripts\bibliography.ts" />
     <Content Include="NewScripts\breadCrumbs.ts" />
     <Content Include="NewScripts\common.ts" />
+    <Content Include="NewScripts\controls\formbase.js">
+      <DependentUpon>formbase.ts</DependentUpon>
+    </Content>
+    <Content Include="NewScripts\controls\formbase.ts" />
     <Content Include="NewScripts\cz.dates.ts" />
     <Content Include="NewScripts\controls\cz.datepicker.ts" />
     <Content Include="NewScripts\controls\cz.datepicker.js">
@@ -212,6 +216,7 @@
     <Compile Include="ACS\Util\RequireAuthenticationAttribute.cs" />
     <Content Include="ACS\FederationMetadata\2007-06\FederationMetadata.xml" />
     <Content Include="samples\cz.datepicker.html" />
+    <Content Include="ui\auth-event-form.html" />
     <Content Include="Views\Account\_IdentityProvidersWithClientSideCode.aspx" />
     <Content Include="favicon.ico" />
     <Content Include="Images\A.png" />
