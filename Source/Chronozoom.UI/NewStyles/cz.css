@@ -45,25 +45,25 @@ a:visited {
     height: 36px;
 }
 
-    #header ul {
-        overflow: hidden;
-        margin: 0;
-        padding: 0;
-        list-style: none;
-    }
+#header ul {
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
 
-        #header ul li {
-            height: 100%;
-        }
+#header ul li {
+    height: 100%;
+}
 
-            #header ul li img {
-                margin-right: 5px;
-                margin-left: 5px;
-            }
+#header ul li img {
+    margin-right: 5px;
+    margin-left: 5px;
+}
 
-    #header ul:after {
-        clear: both;
-    }
+#header ul:after {
+    clear: both;
+}
 
 .regime-link {
     margin-right: 15px;
@@ -73,9 +73,9 @@ a:visited {
     line-height: 36px;
 }
 
-    .regime-link:hover {
-        cursor: pointer;
-    }
+.regime-link:hover {
+    cursor: pointer;
+}
 
 #regime-link-cosmos {
     color: #FF5BEE;
@@ -253,24 +253,24 @@ a:visited {
     background-image: url('/Images/close.png');
 }
 
-    .biblWindow .title {
-        overflow: hidden;
-        margin-right: 60px;
-        margin-left: 32px;
-        padding-top: 22px;
-        padding-bottom: 7px;
-        border-bottom: 1px solid #DBDBDB;
-        color: #fff;
+.biblWindow .title {
+    overflow: hidden;
+    margin-right: 60px;
+    margin-left: 32px;
+    padding-top: 22px;
+    padding-bottom: 7px;
+    border-bottom: 1px solid #DBDBDB;
+    color: #fff;
 
-        -ms-text-overflow: ellipsis;
-         -o-text-overflow: ellipsis;
-            text-overflow: ellipsis;
-        white-space: nowrap;
-        font-weight: bold;
-        font-size: 18px;
-        font-family: Arial;
-        cursor: default;
-    }
+    -ms-text-overflow: ellipsis;
+        -o-text-overflow: ellipsis;
+        text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: bold;
+    font-size: 18px;
+    font-family: Arial;
+    cursor: default;
+}
 
 .biblWindow .sources {
     position: absolute;
@@ -336,8 +336,6 @@ a:visited {
     font-size: 15px;
     cursor: auto;
 }
-
-
 
 .czWindow {
     position: absolute;
@@ -822,26 +820,26 @@ a:visited {
 
 ***********************************************************/
 img.fallbackBackground {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: auto;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
             
-        /* Set up positioning */
-        min-width: 1024px;
+    /* Set up positioning */
+    min-width: 1024px;
             
-        /* Set up proportionate scaling */
-        /* Set rules to fill background */
-        min-height: 100%;
-    }
+    /* Set up proportionate scaling */
+    /* Set rules to fill background */
+    min-height: 100%;
+}
         
-        @media screen and (max-width: 1024px){
-            img.fallbackBackground {
-                left: 50%;
-                margin-left: -512px;
-            }
+    @media screen and (max-width: 1024px){
+        img.fallbackBackground {
+            left: 50%;
+            margin-left: -512px;
         }
+    }
 
 .fallbackOuterContent  {
     
@@ -977,16 +975,16 @@ img.fallbackBackground {
     height: 25px;
 }    
 
-    #footer ul {
-            overflow: hidden;
-            margin: 0;
-            padding: 0;
-            list-style: none;
-        }
+#footer ul {
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
 
-            #footer ul li {
-                height: 100%;
-            }
+#footer ul li {
+    height: 100%;
+}
 
 .footer-link {
     margin-right: 20px;
@@ -998,9 +996,9 @@ img.fallbackBackground {
     line-height: 25px;
 }
 
-    .footer-link:hover {
-        cursor: pointer;
-    }
+.footer-link:hover {
+    cursor: pointer;
+}
 
         
 /***********************************************************
@@ -1018,9 +1016,9 @@ img.fallbackBackground {
     line-height: 100%;
 }
 
-    .breadcrumbs-nav:hover {
-        color: #fff;
-    }
+.breadcrumbs-nav:hover {
+    color: #fff;
+}
 
 #breadcrumbs-nav-left {
     display: none;    
@@ -1032,8 +1030,7 @@ img.fallbackBackground {
     cursor: pointer;
 }
 
-.breadcrumbs-container {
-    
+.breadcrumbs-container {    
     overflow: hidden;
     width: 50%;
     height: 100%;
@@ -1052,19 +1049,19 @@ img.fallbackBackground {
     border-spacing: 0px;
 }
     
-    #breadcrumbs-table tr {
-        position: absolute;
-        height: 100%;
-        white-space: nowrap;
-    }
+#breadcrumbs-table tr {
+    position: absolute;
+    height: 100%;
+    white-space: nowrap;
+}
 
-        #breadcrumbs-table tr td {
-            margin: 0;
-            padding: 0;
-            height: 25px;
-            white-space: nowrap;
-            line-height: 100%;
-        }
+#breadcrumbs-table tr td {
+    margin: 0;
+    padding: 0;
+    height: 25px;
+    white-space: nowrap;
+    line-height: 100%;
+}
 
 .breadcrumb-separator 
 {
@@ -1078,8 +1075,7 @@ img.fallbackBackground {
     cursor: default;
 }
   
-.breadcrumb-link 
-{
+.breadcrumb-link {
     position: relative;
     display: inline-block;
     height: 25px;
@@ -1149,19 +1145,19 @@ img.fallbackBackground {
     font:                   11.5px Arial;
 }
 
-    .footer-authoring-link:hover {
-        background-color:   #BFBFBF;
-        color:              #000;
-        text-decoration:    none;
-        cursor: default;
-    }
+.footer-authoring-link:hover {
+    background-color:   #BFBFBF;
+    color:              #000;
+    text-decoration:    none;
+    cursor: default;
+}
 
-    .footer-authoring-link:active {
-        background-color:   #7B7B7B;
-        color:              #000;
-        text-decoration:    none;
-        cursor: default;
-    }
+.footer-authoring-link:active {
+    background-color:   #7B7B7B;
+    color:              #000;
+    text-decoration:    none;
+    cursor: default;
+}
 
 .footer-authoring-link.active {
     background-color:   #BFBFBF;
@@ -1169,12 +1165,13 @@ img.fallbackBackground {
     text-decoration:    none;
     cursor: default;
 }
-    .footer-authoring-link.active:active {
-        background-color:   #7B7B7B;
-        color:              #000;
-        text-decoration:    none;
-        cursor: default;
-    }
+
+.footer-authoring-link.active:active {
+    background-color:   #7B7B7B;
+    color:              #000;
+    text-decoration:    none;
+    cursor: default;
+}
 
 /***********************************************************
 

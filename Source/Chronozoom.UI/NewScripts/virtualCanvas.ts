@@ -58,8 +58,7 @@ module CZ {
                     var layerDivs = self.element.children("div");
                     layerDivs.each(function (index) { // for each internal (div)
                         // make a layer from (div)
-                        $(this).addClass("virtualCanvasLayerDiv")
-                                .addClass("unselectable")
+                        $(this).addClass("virtualCanvasLayerDiv unselectable")
                                 .zIndex(index * 3);
 
                         // creating canvas element
