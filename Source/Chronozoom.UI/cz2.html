@@ -107,24 +107,6 @@
             </ul>
         </div>
 
-        <script>
-            $(document).ready(function () {
-                $.ajax({
-                    url: "/account/isauth"
-                }).done(function (data) {
-                    if (data != "True") {
-                        //$("#login-panel").html('<a href="/account/login" style="color:#E9E9E9">login</a>');
-                        $("#loginButton").show();
-                    } else {
-                        $("#logoutButton").show();
-                        $("#editButton").show();
-                    }
-                });
-            });
-
-
-        </script>
-
         <div id="footer-authoring">
 
             <a onclick="CZ.Authoring.UI.createTimeline()" class="footer-authoring-link">create timeline

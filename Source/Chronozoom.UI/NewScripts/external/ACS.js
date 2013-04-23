@@ -1,4 +1,8 @@
-﻿
+﻿/*
+    Microsoft Azure ACS generated code
+*/
+
+
 var identityProviders = [];
 var cookieName = "ACSChosenIdentityProvider-20036976";
 var cookieExpiration = 30; // days

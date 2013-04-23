@@ -83,6 +83,18 @@ module CZ {
                 .mouseout(() => { CZ.Common.toggleOffImage('biblCloseButton', 'png'); })
                 .mouseover(() => { CZ.Common.toggleOnImage('biblCloseButton', 'png'); })
             
+            //Login/Logout button
+            $.ajax({
+                url: "/account/isauth"
+            }).done(function (data) {
+                if (data != "True") {
+                    $("#loginButton").show();
+                } else {
+                    $("#logoutButton").show();
+                    $("#editButton").show();
+                }
+            });
+
             // TODO: remove splash screen totaly and replace it with new UX.
             //$('#welcomeScreenCloseButton')
             //    .mouseover(() => { CZ.Common.toggleOnImage('welcomeScreenCloseButton', 'png'); })

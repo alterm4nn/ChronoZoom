@@ -74,6 +74,16 @@ var CZ;
             }).mouseover(function () {
                 CZ.Common.toggleOnImage('biblCloseButton', 'png');
             });
+            $.ajax({
+                url: "/account/isauth"
+            }).done(function (data) {
+                if(data != "True") {
+                    $("#loginButton").show();
+                } else {
+                    $("#logoutButton").show();
+                    $("#editButton").show();
+                }
+            });
             if(navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
                 if(/Chrome[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
                     var oprversion = new Number(RegExp.$1);
