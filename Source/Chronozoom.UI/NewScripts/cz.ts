@@ -5,19 +5,27 @@
 /// <reference path='gestures.ts'/>
 /// <reference path='tours.ts'/>
 /// <reference path='virtualCanvas.ts'/>
+/// <reference path='uiloader.ts'/>
+/// <reference path='controls/formbase.ts'/>
 /// <reference path='controls/cz.datepicker.ts'/>
 
 /// <reference path='typings/jquery/jquery.d.ts'/>
 
 module CZ {
     module HomePageViewModel {
+        // Contains mapping: CSS selector -> html file.
+        var _uiMap = {
+            "#auth-event-form": "/ui/auth-event-form.html"
+        };
+
         $(document).ready(function () {
 
             $('.bubbleInfo').hide();
 
             CZ.Common.initialize();
-
-            //CZ.Common.ax.showThresholds = true;
+            CZ.UILoader.loadAll(_uiMap).done(function () {
+                // TODO: Get UI components.
+            });
 
             $('#search_button')
                 .mouseup(CZ.Search.onSearchClicked)
@@ -321,7 +329,7 @@ module CZ {
             });
 
             var vp = CZ.Common.vc.virtualCanvas("getViewport");
-            CZ.Common.vc.virtualCanvas("setVisible", CZ.VCContent.getVisibleForElement({ x: -13700000000, y: 0, width: 13700000000, height: 5535444444.444445 }, 1.0, vp));
+            CZ.Common.vc.virtualCanvas("setVisible", CZ.VCContent.getVisibleForElement({ x: -13700000000, y: 0, width: 13700000000, height: 5535444444.444445 }, 1.0, vp),true);
             CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
 
             var bid = window.location.hash.match("b=([a-z0-9_]+)");

@@ -9,9 +9,8 @@ module CZ {
     export module VCContent {
         var elementclick = (<any>$).Event("elementclick");
 
-        export function getVisibleForElement(element, scale, viewport) {
-            var margin = 2 * (CZ.Settings.contentScaleMargin ? CZ.Settings.contentScaleMargin : 0);
-
+        export function getVisibleForElement(element, scale, viewport, use_margin) {
+            var margin = 2 * (CZ.Settings.contentScaleMargin && use_margin ? CZ.Settings.contentScaleMargin : 0);
             var width = viewport.width - margin;
             if (width < 0)
                 width = viewport.width;
@@ -21,18 +20,16 @@ module CZ {
             if (height < 0)
                 height = viewport.height;
             var scaleY = scale * element.height / height;
-
             var vs = { centerX: element.x + element.width / 2.0,
                 centerY: element.y + element.height / 2.0,
                 scale: Math.max(scaleX, scaleY)
             };
-
             return vs;
         }
 
         var zoomToElementHandler = function (sender, e, scale /* n [time units] / m [pixels] */) {
             var vp = sender.vc.getViewport();
-            var visible = getVisibleForElement(sender, scale, vp);
+            var visible = getVisibleForElement(sender, scale, vp,true);
             elementclick.newvisible = visible;
             elementclick.element = sender;
             sender.vc.element.trigger(elementclick);
@@ -295,8 +292,8 @@ module CZ {
                            (element.x >= parent.x && element.x + element.width <= parent.x + parent.width) &&
                            (element.y >= parent.y && element.y + element.height <= parent.y + parent.height);
 
-            if (!isWithin)
-                console.log("Child element does not belong to the parent element " + parent.id + " " + element.ID);
+            // if (!isWithin)
+            //     console.log("Child element does not belong to the parent element " + parent.id + " " + element.ID);
 
             //if (!suppresCheck && !isWithin) throw "Child element does not belong to the parent element";
             parent.children.push(element);

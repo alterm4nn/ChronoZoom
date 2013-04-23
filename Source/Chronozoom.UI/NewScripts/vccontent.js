@@ -2,8 +2,8 @@ var CZ;
 (function (CZ) {
     (function (VCContent) {
         var elementclick = ($).Event("elementclick");
-        function getVisibleForElement(element, scale, viewport) {
-            var margin = 2 * (CZ.Settings.contentScaleMargin ? CZ.Settings.contentScaleMargin : 0);
+        function getVisibleForElement(element, scale, viewport, use_margin) {
+            var margin = 2 * (CZ.Settings.contentScaleMargin && use_margin ? CZ.Settings.contentScaleMargin : 0);
             var width = viewport.width - margin;
             if(width < 0) {
                 width = viewport.width;
@@ -24,7 +24,7 @@ var CZ;
         VCContent.getVisibleForElement = getVisibleForElement;
         var zoomToElementHandler = function (sender, e, scale) {
             var vp = sender.vc.getViewport();
-            var visible = getVisibleForElement(sender, scale, vp);
+            var visible = getVisibleForElement(sender, scale, vp, true);
             elementclick.newvisible = visible;
             elementclick.element = sender;
             sender.vc.element.trigger(elementclick);
@@ -147,9 +147,6 @@ var CZ;
         };
         VCContent.addChild = function (parent, element, suppresCheck) {
             var isWithin = parent.width == Infinity || (element.x >= parent.x && element.x + element.width <= parent.x + parent.width) && (element.y >= parent.y && element.y + element.height <= parent.y + parent.height);
-            if(!isWithin) {
-                console.log("Child element does not belong to the parent element " + parent.id + " " + element.ID);
-            }
             parent.children.push(element);
             element.parent = parent;
             return element;

@@ -2,9 +2,14 @@ var CZ;
 (function (CZ) {
     var HomePageViewModel;
     (function (HomePageViewModel) {
+        var _uiMap = {
+            "#auth-event-form": "/ui/auth-event-form.html"
+        };
         $(document).ready(function () {
             $('.bubbleInfo').hide();
             CZ.Common.initialize();
+            CZ.UILoader.loadAll(_uiMap).done(function () {
+            });
             $('#search_button').mouseup(CZ.Search.onSearchClicked).mouseover(function () {
                 CZ.Search.searchHighlight(true);
             }).mouseout(function () {
@@ -250,7 +255,7 @@ var CZ;
                 y: 0,
                 width: 13700000000,
                 height: 5535444444.444445
-            }, 1.0, vp));
+            }, 1.0, vp), true);
             CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
             var bid = window.location.hash.match("b=([a-z0-9_]+)");
             if(bid) {
