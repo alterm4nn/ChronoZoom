@@ -10,10 +10,10 @@ var CZ;
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
             });
-            
             var url = CZ.UrlNav.getURL();
             var rootCollection = url.superCollectionName === undefined;
-            
+            CZ.Service.superCollectionName = url.superCollectionName;
+            CZ.Service.collectionName = url.collectionName;
             $('#search_button').mouseup(CZ.Search.onSearchClicked).mouseover(function () {
                 CZ.Search.searchHighlight(true);
             }).mouseout(function () {
