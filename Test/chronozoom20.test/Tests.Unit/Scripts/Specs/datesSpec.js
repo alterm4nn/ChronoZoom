@@ -8,68 +8,48 @@ describe("convertCoordinateToYear method", function () {
     beforeEach(function () {
         dates = CZ.Dates;
     });
-    describe("should return", function () {
-        it("regime GA, if coordinate is -1000000001", function () {
-            var coordinate = -1000000001;
+
+    using("coordinate =", [153.56, 0], function (value) {
+        it("regime CE ", function () {
+            var coordinate = value;
+            var result = convertCoordinateToYear(coordinate);
+            expect(result.year).toEqual(Math.floor(coordinate));
+            expect(result.regime).toEqual('CE');
+        });
+    });
+
+    using("coordinate =", [-1, -999], function (value) {
+        it("regime BCE ", function () {
+            var coordinate = value;
+            var result = convertCoordinateToYear(coordinate);
+            expect(result.year).toEqual(coordinate / -1);
+            expect(result.regime).toEqual('BCE');
+        });
+    });
+
+    using("coordinate =", [-1999, -999999], function (value) {
+        it("regime KA ", function () {
+            var coordinate = value;
+            var result = convertCoordinateToYear(coordinate);
+            expect(result.year).toEqual(coordinate / -1000);
+            expect(result.regime).toEqual('KA');
+        });
+    });
+    using("coordinate =", [-999999999, -1999999], function (value) {
+        it("regime MA ", function () {
+            var coordinate = value;
+            var result = convertCoordinateToYear(coordinate);
+            expect(result.year).toEqual(coordinate / -1000000);
+            expect(result.regime).toEqual('MA');
+        });
+    });
+
+    using("coordinate =", [-1000000001], function (value) {
+        it("regime GA ", function () {
+            var coordinate = value;
             var result = convertCoordinateToYear(coordinate);
             expect(result.year).toEqual(coordinate / -1000000000);
             expect(result.regime).toEqual('GA');
-        });
-
-        it("regime MA, if coordinate is -1999999", function () {
-            var coordinate = -1999999;
-            var result = convertCoordinateToYear(coordinate);
-            expect(result.year).toEqual(coordinate / -1000000);
-            expect(result.regime).toEqual('MA');
-        });
-
-        it("regime MA, if coordinate is -999999999 ", function () {
-            var coordinate = -999999999;
-            var result = convertCoordinateToYear(coordinate);
-            expect(result.year).toEqual(coordinate / -1000000);
-            expect(result.regime).toEqual('MA');
-        });
-
-        it("regime KA, if coordinate is -999999", function () {
-            var coordinate = -999999;
-            var result = convertCoordinateToYear(coordinate);
-            expect(result.year).toEqual(coordinate / -1000);
-            expect(result.regime).toEqual('KA');
-        });
-
-        it("regime KA, if coordinate is -1999", function () {
-            var coordinate = -1999;
-            var result = convertCoordinateToYear(coordinate);
-            expect(result.year).toEqual(coordinate / -1000);
-            expect(result.regime).toEqual('KA');
-        });
-
-        it("regime BCE, if coordinate is -999", function () {
-            var coordinate = -999;
-            var result = convertCoordinateToYear(coordinate);
-            expect(result.year).toEqual(coordinate / -1);
-            expect(result.regime).toEqual('BCE');
-        });
-
-        it("regime BCE, if coordinate is -1", function () {
-            var coordinate = -1;
-            var result = convertCoordinateToYear(coordinate);
-            expect(result.year).toEqual(coordinate / -1);
-            expect(result.regime).toEqual('BCE');
-        });
-
-        it("regime CE, if coordinate is 0", function () {
-            var coordinate = 0;
-            var result = convertCoordinateToYear(coordinate);
-            expect(result.year).toEqual(Math.floor(coordinate));
-            expect(result.regime).toEqual('CE');
-        });
-
-        it("regime CE, if coordinate is 153.56", function () {
-            var coordinate = 153.56;
-            var result = convertCoordinateToYear(coordinate);
-            expect(result.year).toEqual(Math.floor(coordinate));
-            expect(result.regime).toEqual('CE');
         });
     });
 });
@@ -78,6 +58,15 @@ function convertCoordinateToYear(coordinate) {
     return CZ.Dates.convertCoordinateToYear(coordinate);
 }
 
+function using(name, values, func) {
+    for (var i = 0, count = values.length; i < count; i++) {
+        if (Object.prototype.toString.call(values[i]) !== '[object Array]') {
+            values[i] = [values[i]];
+        }
+        func.apply(this, values[i]);
+        jasmine.currentEnv_.currentSpec.description += ' (with ' + name + ' ' + values[i].join(', ') + ')';
+    }
+}
 
 
 //describe("isLeapYear() method", function () {
