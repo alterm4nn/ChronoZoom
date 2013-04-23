@@ -255,7 +255,7 @@ var CZ;
                 y: 0,
                 width: 13700000000,
                 height: 5535444444.444445
-            }, 1.0, vp));
+            }, 1.0, vp), true);
             CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
             var bid = window.location.hash.match("b=([a-z0-9_]+)");
             if(bid) {
