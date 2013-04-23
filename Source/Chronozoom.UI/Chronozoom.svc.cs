@@ -261,7 +261,19 @@ namespace UI
 
                 if (user == null)
                 {
-                    return HandleAnonymousUser(user, userRequest);
+                    // No ACS so treat as an anonymous user who can access the sandbox collection.
+                    // If anonymous user does not already exist create the user.
+                    user = _storage.Users.Where(candidate => candidate.NameIdentifier == null).FirstOrDefault();
+                    if (user == null)
+                    {
+                        user = new User { Id = Guid.NewGuid(), DisplayName = _defaultUserName };
+                        _storage.Users.Add(user);
+                        _storage.SaveChanges();
+                    }
+
+                    collectionUri = UpdatePersonalCollection(user.NameIdentifier, userRequest);
+                    uriRequest = System.ServiceModel.OperationContext.Current.RequestContext.RequestMessage.Headers.To;
+                    return new Uri(new Uri(uriRequest.GetLeftPart(UriPartial.Authority)), collectionUri.ToString()).ToString();
                 }
 
                 User updateUser = _storage.Users.Where(candidate => candidate.DisplayName == userRequest.DisplayName).FirstOrDefault();
@@ -346,23 +358,6 @@ namespace UI
                 @"{0}\{1}\",
                 FriendlyUrlReplacements(superCollection.Title),
                 FriendlyUrlReplacements(superCollection.Title)), UriKind.Relative);
-        }
-
-        private String HandleAnonymousUser(User user, User userRequest)
-        {
-            // No ACS so treat as an anonymous user who can access the sandbox collection.
-            // If anonymous user does not already exist create the user.
-            user = _storage.Users.Where(candidate => candidate.NameIdentifier == null).FirstOrDefault();
-            if (user == null)
-            {
-                user = new User { Id = Guid.NewGuid(), DisplayName = _defaultUserName };
-                _storage.Users.Add(user);
-                _storage.SaveChanges();
-            }
- 
-            Uri collectionUri = UpdatePersonalCollection(user.NameIdentifier, userRequest);
-            Uri uriRequest = System.ServiceModel.OperationContext.Current.RequestContext.RequestMessage.Headers.To;
-            return new Uri(new Uri(uriRequest.GetLeftPart(UriPartial.Authority)), collectionUri.ToString()).ToString();
         }
 
         public void Dispose()
