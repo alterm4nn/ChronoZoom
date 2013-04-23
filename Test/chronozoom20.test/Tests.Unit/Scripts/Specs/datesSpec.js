@@ -11,40 +11,72 @@ describe("convertCoordinateToYear method", function () {
     describe("should return", function () {
         it("regime GA, if coordinate is -1000000001", function () {
             var coordinate = -1000000001;
-            var result = CZ.Dates.convertCoordinateToYear(coordinate);
+            var result = convertCoordinateToYear(coordinate);
             expect(result.year).toEqual(coordinate / -1000000000);
             expect(result.regime).toEqual('GA');
         });
 
         it("regime MA, if coordinate is -1999999", function () {
             var coordinate = -1999999;
-            var result = CZ.Dates.convertCoordinateToYear(coordinate);
+            var result = convertCoordinateToYear(coordinate);
             expect(result.year).toEqual(coordinate / -1000000);
             expect(result.regime).toEqual('MA');
         });
 
-        it("regime KA, if coordinate is -1999", function () {
-            var coordinate = -1999;
-            var result = CZ.Dates.convertCoordinateToYear(coordinate);
+        it("regime MA, if coordinate is -999999999 ", function () {
+            var coordinate = -999999999;
+            var result = convertCoordinateToYear(coordinate);
+            expect(result.year).toEqual(coordinate / -1000000);
+            expect(result.regime).toEqual('MA');
+        });
+
+        it("regime KA, if coordinate is -999999", function () {
+            var coordinate = -999999;
+            var result = convertCoordinateToYear(coordinate);
             expect(result.year).toEqual(coordinate / -1000);
             expect(result.regime).toEqual('KA');
         });
 
-        it("regime BCE, if coordinate is -1", function () {
-            var coordinate = -1;
-            var result = CZ.Dates.convertCoordinateToYear(coordinate);
+        it("regime KA, if coordinate is -1999", function () {
+            var coordinate = -1999;
+            var result = convertCoordinateToYear(coordinate);
+            expect(result.year).toEqual(coordinate / -1000);
+            expect(result.regime).toEqual('KA');
+        });
+
+        it("regime BCE, if coordinate is -999", function () {
+            var coordinate = -999;
+            var result = convertCoordinateToYear(coordinate);
             expect(result.year).toEqual(coordinate / -1);
             expect(result.regime).toEqual('BCE');
         });
 
+        it("regime BCE, if coordinate is -1", function () {
+            var coordinate = -1;
+            var result = convertCoordinateToYear(coordinate);
+            expect(result.year).toEqual(coordinate / -1);
+            expect(result.regime).toEqual('BCE');
+        });
+
+        it("regime CE, if coordinate is 0", function () {
+            var coordinate = 0;
+            var result = convertCoordinateToYear(coordinate);
+            expect(result.year).toEqual(Math.floor(coordinate));
+            expect(result.regime).toEqual('CE');
+        });
+
         it("regime CE, if coordinate is 153.56", function () {
             var coordinate = 153.56;
-            var result = CZ.Dates.convertCoordinateToYear(coordinate);
+            var result = convertCoordinateToYear(coordinate);
             expect(result.year).toEqual(Math.floor(coordinate));
             expect(result.regime).toEqual('CE');
         });
     });
 });
+
+function convertCoordinateToYear(coordinate) {
+    return CZ.Dates.convertCoordinateToYear(coordinate);
+}
 
 
 
