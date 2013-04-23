@@ -190,7 +190,6 @@ module CZ {
 
         export function setVisible(visible) {
             if (visible) {
-                //ax.axis("enableThresholds", false);
                 return controller.moveToVisible(visible);
             }
         }

@@ -438,9 +438,10 @@ module CZ {
                     delete this.viewport; // invalidating old viewport
                     this.options.visible = newVisible; // setting new visible region
                     this.isInAnimation = isInAnimation && isInAnimation.isActive;
-
+                    //console.log("newvs",newVisible);
                     // rendering canvas (we should update the image because of new visible region)
                     var viewbox_v = this._visibleToViewBox(newVisible); // visible region in appropriate format
+                    //console.log(viewbox_v);
                     var viewport = this.getViewport();
                     this._renderCanvas(this._layersContent, viewbox_v, viewport);
                 },

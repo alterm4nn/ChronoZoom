@@ -397,18 +397,37 @@ var CZ;
             renewExhibit(e);
         }
         Authoring.removeContentItem = removeContentItem;
+        function ValidateTimelineData(start, end, title) {
+            var isValid = CZ.Authoring.ValidateNumber(start) && CZ.Authoring.ValidateNumber(end);
+            isValid = isValid && CZ.Authoring.IsNotEmpty(title) && CZ.Authoring.IsNotEmpty(start) && CZ.Authoring.IsNotEmpty(end);
+            console.log(start, end);
+            isValid = isValid && CZ.Authoring.isNonegHeight(start, end);
+            return isValid;
+        }
+        Authoring.ValidateTimelineData = ValidateTimelineData;
+        function ValidateExhibitData(date, title, contentItems) {
+            var isValid = CZ.Authoring.ValidateNumber(date);
+            isValid = isValid && CZ.Authoring.IsNotEmpty(title) && CZ.Authoring.IsNotEmpty(date) && CZ.Authoring.IsNotEmpty(date);
+            isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
+            return isValid;
+        }
+        Authoring.ValidateExhibitData = ValidateExhibitData;
         function ValidateNumber(number) {
-            return !isNaN(Number(number));
+            return !isNaN(Number(number) && parseFloat(number));
         }
         Authoring.ValidateNumber = ValidateNumber;
         function IsNotEmpty(obj) {
             return (obj !== '' && obj !== null);
         }
         Authoring.IsNotEmpty = IsNotEmpty;
+        function isNonegHeight(start, end) {
+            return (start < end);
+        }
+        Authoring.isNonegHeight = isNonegHeight;
         function ValidateContentItems(contentItems) {
             var isValid = true;
-            if(contentItems == "[]") {
-                return true;
+            if(contentItems.length == 0) {
+                return false;
             }
             var i = 0;
             while(contentItems[i] != null) {

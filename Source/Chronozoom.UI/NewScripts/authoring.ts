@@ -641,10 +641,31 @@ module CZ {
         }
 
         /**
+         * Validates possible input errors for timelines.
+        */
+        export function ValidateTimelineData(start,end,title) {
+            var isValid = CZ.Authoring.ValidateNumber(start) && CZ.Authoring.ValidateNumber(end);
+            isValid = isValid && CZ.Authoring.IsNotEmpty(title) && CZ.Authoring.IsNotEmpty(start) && CZ.Authoring.IsNotEmpty(end);
+            console.log(start, end);
+            isValid = isValid && CZ.Authoring.isNonegHeight(start, end);
+            return isValid;
+        }
+
+        /**
+         * Validates possible input errors for exhibits.
+        */
+        export function ValidateExhibitData(date,title,contentItems) {
+            var isValid = CZ.Authoring.ValidateNumber(date);
+            isValid = isValid && CZ.Authoring.IsNotEmpty(title) && CZ.Authoring.IsNotEmpty(date) && CZ.Authoring.IsNotEmpty(date);
+            isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
+            return isValid;
+        }
+
+        /**
          * Validates,if number is valid.
         */
         export function ValidateNumber(number) {
-            return !isNaN(Number(number));
+            return !isNaN(Number(number) && parseFloat(number));
         }
 
         /**
@@ -653,13 +674,19 @@ module CZ {
         export function IsNotEmpty(obj) {
             return (obj !== '' && obj !== null);
         }
+        /**
+         * Validates,if timeline size is not negative
+        */
+        export function isNonegHeight(start, end) {
+            return (start < end);
+        }
 
         /**
          * Validates,if content item data is correct.
         */
         export function ValidateContentItems(contentItems) {
             var isValid = true;
-            if (contentItems == "[]") return true;
+            if (contentItems.length == 0) { return false; }
             var i = 0;
             while (contentItems[i] != null) {
                 var CI = contentItems[i];

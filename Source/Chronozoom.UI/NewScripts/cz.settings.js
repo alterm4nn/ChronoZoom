@@ -137,6 +137,8 @@ var CZ;
         Settings.minTickSpace = 8;
         Settings.minSmallTickSpace = 8;
         Settings.timescaleThickness = 2;
+        Settings.markerWidth = 85;
+        Settings.panelWidth = 185;
         Settings.cosmosTimelineID = "00000000-0000-0000-0000-000000000000";
         Settings.earthTimelineID = "8c8f294e-b09e-4506-94a3-5a51f0fb7a0b";
         Settings.lifeTimelineID = "06541ae4-1095-4658-a8eb-e2cbc1371d82";
