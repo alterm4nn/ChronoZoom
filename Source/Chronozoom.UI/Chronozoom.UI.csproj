@@ -215,6 +215,10 @@
     <Compile Include="ACS\Util\NameValueCollectionExtensions.cs" />
     <Compile Include="ACS\Util\RequireAuthenticationAttribute.cs" />
     <Content Include="ACS\FederationMetadata\2007-06\FederationMetadata.xml" />
+    <Content Include="samples\custom-form\form-example.html" />
+    <Content Include="samples\custom-form\form-example.js" />
+    <Content Include="samples\custom-form\form-example.ts" />
+    <Content Include="samples\custom-form\main.html" />
     <Content Include="samples\cz.datepicker.html" />
     <Content Include="ui\auth-event-form.html" />
     <Content Include="Views\Account\_IdentityProvidersWithClientSideCode.aspx" />

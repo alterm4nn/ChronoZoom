@@ -2,32 +2,35 @@
 
 module CZ {
     export module UI {
+
+        export interface FormBaseInfo {
+            activationSource: JQuery;
+            navButton: string;
+            closeButton: string;
+            titleTextblock: string;
+        }
         
         export class FormBase {
-            private navButton: JQuery;
-            private closeButton: JQuery;
-            private titleTextblock: JQuery;
+            public activationSource: JQuery;
+            public navButton: JQuery;
+            public closeButton: JQuery;
+            public titleTextblock: JQuery;
 
             public container: JQuery;
-            public activationSource: JQuery;
             public navPath: FormBase [];
 
-            constructor(container: JQuery, activationSource: JQuery) {
+            constructor(container: JQuery, formInfo: FormBaseInfo) {
                 if (!(container instanceof jQuery && container.is("div"))) {
                     throw "Container parameter is invalid! It should be jQuery instance of DIV.";
                 }
 
                 this.container = container;
-                this.activationSource = activationSource;
                 this.navPath = [];
 
-                this.initialize();
-            }
-
-            private initialize(): void {
-                this.navButton = this.container.find(".cz-form-nav");
-                this.closeButton = this.container.find(".cz-form-close-btn > .cz-form-btn");
-                this.titleTextblock = this.container.find(".cz-form-title");
+                this.activationSource = formInfo.activationSource;
+                this.navButton = this.container.find(formInfo.navButton);
+                this.closeButton = this.container.find(formInfo.closeButton);
+                this.titleTextblock = this.container.find(formInfo.titleTextblock);
 
                 this.closeButton.click(event => {
                     this.close();

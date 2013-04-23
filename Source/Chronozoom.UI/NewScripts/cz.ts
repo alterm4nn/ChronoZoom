@@ -13,20 +13,19 @@
 
 module CZ {
     module HomePageViewModel {
+        // Contains mapping: CSS selector -> html file.
+        var _uiMap = {
+            "#auth-event-form": "/ui/auth-event-form.html"
+        };
+
         $(document).ready(function () {
 
             $('.bubbleInfo').hide();
 
             CZ.Common.initialize();
-            CZ.UILoader.loadAll().done(function () {
-                // Example.
-                var form = new CZ.UI.FormBase(arguments[0], undefined);
-                $("#authoring").click(function (e) {
-                    form.show();
-                })
+            CZ.UILoader.loadAll(_uiMap).done(function () {
+                // TODO: Get UI components.
             });
-
-            //CZ.Common.ax.showThresholds = true;
 
             $('#search_button')
                 .mouseup(CZ.Search.onSearchClicked)

@@ -147,9 +147,6 @@ var CZ;
         };
         VCContent.addChild = function (parent, element, suppresCheck) {
             var isWithin = parent.width == Infinity || (element.x >= parent.x && element.x + element.width <= parent.x + parent.width) && (element.y >= parent.y && element.y + element.height <= parent.y + parent.height);
-            if(!isWithin) {
-                console.log("Child element does not belong to the parent element " + parent.id + " " + element.ID);
-            }
             parent.children.push(element);
             element.parent = parent;
             return element;

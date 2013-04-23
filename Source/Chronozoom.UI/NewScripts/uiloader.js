@@ -1,9 +1,6 @@
 var CZ;
 (function (CZ) {
     (function (UILoader) {
-        var _loadMap = {
-            "#auth-event-form": "/ui/auth-event-form.html"
-        };
         function loadHtml(selector, filepath) {
             var container = $(selector);
             var promise = new $.Deferred();
@@ -15,11 +12,12 @@ var CZ;
             });
             return promise;
         }
-        function loadAll() {
+        UILoader.loadHtml = loadHtml;
+        function loadAll(uiMap) {
             var promises = [];
-            for(var selector in _loadMap) {
-                if(_loadMap.hasOwnProperty(selector)) {
-                    promises.push(loadHtml(selector, _loadMap[selector]));
+            for(var selector in uiMap) {
+                if(uiMap.hasOwnProperty(selector)) {
+                    promises.push(loadHtml(selector, uiMap[selector]));
                 }
             }
             return $.when.apply($, promises);

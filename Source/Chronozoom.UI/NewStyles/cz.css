@@ -1479,7 +1479,6 @@ img.fallbackBackground {
     left: 0;
     z-index: 100000001;
     display: none;
-    float: left;
     width: 30.2734375%; /* 310 / 1024 */
     height: 92.05729166666667%; /* (768 - 36 - 25) / 768 */
     cursor: default;

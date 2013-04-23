@@ -2,12 +2,8 @@
 
 module CZ {
     export module UILoader {
-        // Contains mapping: CSS selector -> html file.
-        var _loadMap = {
-            "#auth-event-form": "/ui/auth-event-form.html"
-        };
-
-        function loadHtml(selector, filepath) {
+        
+        export function loadHtml(selector, filepath) {
             var container = $(selector);
             var promise = new $.Deferred();
 
@@ -22,12 +18,12 @@ module CZ {
             return promise;
         }
 
-        export function loadAll() {
+        export function loadAll(uiMap: Object) {
             var promises = [];
 
-            for (var selector in _loadMap) {
-                if (_loadMap.hasOwnProperty(selector)) {
-                    promises.push(loadHtml(selector, _loadMap[selector]));
+            for (var selector in uiMap) {
+                if (uiMap.hasOwnProperty(selector)) {
+                    promises.push(loadHtml(selector, uiMap[selector]));
                 }
             }
 
