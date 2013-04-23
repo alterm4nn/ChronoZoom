@@ -3,6 +3,7 @@
 
 .cz-datepicker-mode {
     display: inline-block;
+    width: 100px;
     margin-right: 30px;
 }
 
