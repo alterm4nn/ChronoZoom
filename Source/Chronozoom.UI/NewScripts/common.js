@@ -164,7 +164,7 @@ var CZ;
                 ProcessContent(response);
                 Common.vc.virtualCanvas("updateViewport");
             }, function (error) {
-                alert("Error connecting to service:\n" + error.responseText);
+                console.log("Error connecting to service:\n" + error.responseText);
             });
         }
         Common.loadData = loadData;
