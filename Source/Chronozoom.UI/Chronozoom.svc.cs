@@ -84,14 +84,14 @@ namespace UI
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
         public Timeline GetTimelines(string supercollection, string collection, string start, string end, string minspan, string lca, string maxElements)
         {
-            return AuthenticatedOperation(userId =>
+            return AuthenticatedOperation(delegate(User user)
             {
                 Trace.TraceInformation("Get Filtered Timelines");
 
                 Guid collectionId = CollectionIdOrDefault(supercollection, collection);
 
                 // If available, retrieve from cache.
-                if (CanCacheGetTimelines(userId, collectionId))
+                if (CanCacheGetTimelines(user.NameIdentifier, collectionId))
                 {
                     Timeline cachedTimeline = GetCachedGetTimelines(collectionId, start, end, minspan, lca, maxElements);
                     if (cachedTimeline != null)
@@ -1179,7 +1179,7 @@ namespace UI
             string cacheKey = string.Format(CultureInfo.InvariantCulture, "Collection-To-Owner {0}", collectionId);
             if (!Cache.Contains(cacheKey))
             {
-                string ownerId = _storage.Collections.Find(collectionId).UserId;
+                string ownerId = _storage.Collections.Find(collectionId).User.NameIdentifier;
                 if (ownerId != null)
                 {
                     Cache.Add(cacheKey, ownerId, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
