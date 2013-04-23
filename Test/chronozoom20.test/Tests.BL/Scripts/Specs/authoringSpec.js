@@ -140,6 +140,7 @@ describe("CZ.Authoring", function () {
         });
         describe("And: title is empty", function () {
             it("Then: error should be thrown", function () {
+                //Bug: https://github.com/alterm4nn/ChronoZoom/issues/259
                 var propFake = { title: "", start: "-5", end: "-4" };                
                 expect(function () { authoring.updateTimeline(newTimeline, propFake); }).toThrow(new Error("Title is empty"));
             });
