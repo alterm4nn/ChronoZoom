@@ -198,6 +198,10 @@
     <Content Include="NewScripts\typings\jqueryui\jqueryui.d.ts" />
     <Content Include="NewScripts\typings\jquery\jquery.d.ts" />
     <Content Include="NewScripts\typings\rx.js\rx.js.d.ts" />
+    <Content Include="NewScripts\uiloader.js">
+      <DependentUpon>uiloader.ts</DependentUpon>
+    </Content>
+    <Content Include="NewScripts\uiloader.ts" />
     <Content Include="NewScripts\urlnav.ts" />
     <Content Include="NewScripts\vccontent.ts" />
     <Content Include="NewScripts\viewport.ts" />
