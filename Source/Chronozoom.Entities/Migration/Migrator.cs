@@ -120,17 +120,13 @@ namespace Chronozoom.Entities.Migration
             Collection collection = new Collection();
             collection.Title = collectionName;
             collection.Id = CollectionIdFromSuperCollection(superCollectionName, collectionName);
-            //TODO update User
             collection.User = user;
-           // collection.User.NameIdentifier = userId;
 
             // Load SuperCollection
             SuperCollection superCollection = new SuperCollection();
             superCollection.Title = superCollectionName;
             superCollection.Id = CollectionIdFromText(superCollectionName);
-            //TOD update User
             superCollection.User = user;
-            //superCollection.User.NameIdentifier = userId;
 
             superCollection.Collections = new System.Collections.ObjectModel.Collection<Collection>();
             superCollection.Collections.Add(collection);

@@ -148,7 +148,6 @@
     <Content Include="ACS\FederationMetadata\2007-06\FederationMetadata.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="T.cs" />
     <Content Include="BehindTheScenes.htm" />
     <Content Include="cz.aspx" />
     <Content Include="cz2.html" />

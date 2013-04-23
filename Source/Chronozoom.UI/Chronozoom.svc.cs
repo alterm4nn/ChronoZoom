@@ -68,7 +68,7 @@ namespace UI
             public const string CollectionIdMismatch = "Collection id mismatch";
             public const string UserNotFound = "User not found";
             public const string SandboxSuperCollectionNotFound = "Default sandbox supercollection not found";
-            public const string DefaultUserNotFound = "Default anonymous mouse not found";
+            public const string DefaultUserNotFound = "Default anonymous user not found";
         }
 
         [OperationContract]
@@ -228,38 +228,18 @@ namespace UI
         }
 
         /// <summary>
-        /// Updates user information and associated personal collection.
-        /// </summary>
-        /// <param name="user">User information to update</param>
-        /// <returns>The URL for the new user collection.</returns>
-        //[OperationContract]
-        //[WebInvoke(Method = "PUT", UriTemplate = "/user", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        //public String PutUser(User userRequest)
-        //{
-        //    return AuthenticatedOperation<String>(delegate(User user)
-        //    {
-        //        Uri collectionUri = UpdatePersonalCollection(user.NameIdentifier, userRequest);
-
-        //        // TODO: Persist user changes, validation, etc. Initial check-in provides API stub.
-
-        //        Uri uriRequest = System.ServiceModel.OperationContext.Current.RequestContext.RequestMessage.Headers.To;
-        //        return new Uri(new Uri(uriRequest.GetLeftPart(UriPartial.Authority)), collectionUri.ToString()).ToString();
-        //    });
-        //}
-
-        /// <summary>
         /// Creates or updates user information and the user's associated personal collection.
         ///
         /// If the user id is not specified, then this is a new user. For a new user
         /// the following will be done:
         /// - if there is no ACS treat as an anonymous user who can access the Sandbox collection.
-        /// - if the anonymous user does not exist in the db then it is an error.
+        /// - if the anonymous user does not exist in the db then it is should either be created or is an error. (TODO: decide which is appropriate)
         /// - add a new supercollection with the user's display name
-        /// - add a new default collection to this supercollection
-        /// - create a new user with the with the specified attributes
+        /// - add a new default collection to this supercollection with user's display name
+        /// - create a new user  with the specified attributes
         ///
-        /// If the user id is specified and it does not exisit it is considered an error.
-        /// If the user id is specified and it exists then the user's attributes are updated.
+        /// If the user display name is specified and it does not exisit it is considered an error.
+        /// If the user display name is specified and it exists then the user's attributes are updated.
         ///
         /// </summary>
         /// <returns>The URL for the new user collection.</returns>
@@ -277,26 +257,11 @@ namespace UI
                     return string.Empty;
                 }
 
-                Uri collectionUri;
-                Uri uriRequest;
+                Uri collectionUri, uriRequest;
 
                 if (user == null)
                 {
-                    // No ACS so treat as an anonymous user who can access the
-                    // sandbox collection.
-                    // If anonymous user should already exist create the user.
-                    user = _storage.Users.Where(candidate => candidate.DisplayName == _defaultUserName).FirstOrDefault();
-                    if (user == null)
-                    {
-                        user = new User { Id = Guid.NewGuid(), DisplayName = "anonymous" };
-                        _storage.Users.Add(user);
-                        _storage.SaveChanges();
-                    }
-
-                    //TODO refactor 
-                    collectionUri = UpdatePersonalCollection(user.NameIdentifier, userRequest);
-                    uriRequest = System.ServiceModel.OperationContext.Current.RequestContext.RequestMessage.Headers.To;
-                    return new Uri(new Uri(uriRequest.GetLeftPart(UriPartial.Authority)), collectionUri.ToString()).ToString();
+                    return HandleAnonymousUser(user, userRequest);
                 }
 
                 User updateUser = _storage.Users.Where(candidate => candidate.DisplayName == userRequest.DisplayName).FirstOrDefault();
@@ -304,29 +269,33 @@ namespace UI
                 {
                     // Add new user
                     User newUser = new User { Id = Guid.NewGuid(), DisplayName = userRequest.DisplayName, Email = userRequest.Email };
-                    newUser.NameIdentifier = user.NameIdentifier; // TODO validate these values during testing
+                    newUser.NameIdentifier = user.NameIdentifier;
                     newUser.IdentityProvider = user.IdentityProvider;
                     collectionUri = UpdatePersonalCollection(userRequest.NameIdentifier, newUser);
                 }
                 else
                 {
-                   // User updateUser = _storage.Users.Where(candidate => candidate.DisplayName == user.DisplayName).FirstOrDefault();
-                   // User updateUser = _storage.Users.Find(userRequest.Id);
+                    if (userRequest.Id != Guid.Empty)
+                    {
+                        //TODO: check if this is an error or the user can specify the Id to be updated or only DisplayName needs to be specified for updated?
+                    }
+
                     if (updateUser == null)
                     {
                         SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.UserNotFound);
                         return String.Empty;
                     }
 
-                   // updateUser.DisplayName = userRequest.DisplayName; TODO: check if display name can be updated
+                    // TODO: check if display name can be updated -- probably not
+                   // updateUser.DisplayName = userRequest.DisplayName; 
                     updateUser.Email = userRequest.Email;
-                    //updateUser.NameIdentifier = // can these two be changed for an existing user?
+                    // TODO: check if these two values can be updated for an existing user?
+                    //updateUser.NameIdentifier = 
                     //updateUser.IdentityProvider = 
                     collectionUri = UpdatePersonalCollection(updateUser.NameIdentifier, updateUser);
                     _storage.SaveChanges();
                 }
 
-                //collectionUri = UpdatePersonalCollection(user.NameIdentifier, userRequest);
                 uriRequest = System.ServiceModel.OperationContext.Current.RequestContext.RequestMessage.Headers.To;
                 return new Uri(new Uri(uriRequest.GetLeftPart(UriPartial.Authority)), collectionUri.ToString()).ToString();
             });
@@ -334,7 +303,7 @@ namespace UI
 
         private Uri UpdatePersonalCollection(string userId, User user)
         {
-            if (userId == null)
+            if (userId == String.Empty)
             {
                 // Anonymous user so use the sandbox supercollection and collection
                 SuperCollection sandboxSuperCollection = _storage.SuperCollections.Where(candidate => candidate.Title == _sandboxSuperCollectionName).FirstOrDefault();
@@ -370,7 +339,7 @@ namespace UI
                 // Create the personal collection
                 Collection personalCollection = new Collection();
                 personalCollection.Title = user.DisplayName;
-                personalCollection.Id = CollectionIdFromSuperCollection(user.DisplayName, user.DisplayName);
+                personalCollection.Id = CollectionIdFromSuperCollection(superCollection.Title, personalCollection.Title);
                 personalCollection.User = user;
 
                 superCollection.Collections.Add(personalCollection);
@@ -387,6 +356,25 @@ namespace UI
                 @"{0}\{1}\",
                 FriendlyUrlReplacements(superCollection.Title),
                 FriendlyUrlReplacements(superCollection.Title)), UriKind.Relative);
+        }
+
+        private String HandleAnonymousUser(User user, User userRequest)
+        {
+            // No ACS so treat as an anonymous user who can access the sandbox collection.
+            // If anonymous user does not already exist create the user.
+            // TODO: check should anonymous user always exist and it is an error if it does not exist
+            // or it is ok to create the anonymous user if it does not exist.
+            user = _storage.Users.Where(candidate => candidate.DisplayName == _defaultUserName).FirstOrDefault();
+            if (user == null)
+            {
+                user = new User { Id = Guid.NewGuid(), DisplayName = "anonymous" };
+                _storage.Users.Add(user);
+                _storage.SaveChanges();
+            }
+ 
+            Uri collectionUri = UpdatePersonalCollection(user.NameIdentifier, userRequest);
+            Uri uriRequest = System.ServiceModel.OperationContext.Current.RequestContext.RequestMessage.Headers.To;
+            return new Uri(new Uri(uriRequest.GetLeftPart(UriPartial.Authority)), collectionUri.ToString()).ToString();
         }
 
         public void Dispose()
@@ -503,8 +491,7 @@ namespace UI
                     Collection collection = _storage.Collections.Find(collectionGuid);
                     if (collection == null)
                     {
-                        collection = new Collection { Id = collectionGuid, Title = collectionName, User = user };
-                        //collection.User = new User {}
+                        collection = new Collection { Id = collectionGuid, Title = collectionName, User = user }; //TODO: test User here
                         _storage.Collections.Add(collection);
                         returnValue = collectionGuid;
                     }
@@ -1106,8 +1093,6 @@ namespace UI
         /// <summary>
         /// Performs an operation under an authenticated user.
         /// </summary>
-       // private delegate T AuthenticatedOperationDelegate<T>(string user);
-        //private static T AuthenticatedOperation<T>(AuthenticatedOperationDelegate<T> operation)
         private static T AuthenticatedOperation<T>(Func<User, T> operation)
         {
             Microsoft.IdentityModel.Claims.ClaimsIdentity claimsIdentity = HttpContext.Current.User.Identity as Microsoft.IdentityModel.Claims.ClaimsIdentity;
@@ -1139,7 +1124,6 @@ namespace UI
         /// <summary>
         /// Helper to AuthenticatedOperation to handle void.
         /// </summary>
-        private delegate void AuthenticatedOperationVoidDelegate(string user);
         private static void AuthenticatedOperation(Action<User> operation)
         {
             AuthenticatedOperation<bool>(user =>
