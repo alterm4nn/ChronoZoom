@@ -211,29 +211,37 @@ var CZ;
                 setVisible(visible);
             });
             var earthTimeline = CZ.Layout.FindChildTimeline(cosmosTimeline, CZ.Settings.earthTimelineID, true);
-            Common.earthVisible = f(earthTimeline);
-            $("#regime-link-earth").click(function () {
-                var visible = CZ.UrlNav.navStringToVisible(Common.earthVisible, Common.vc);
-                setVisible(visible);
-            });
-            var lifeTimeline = CZ.Layout.FindChildTimeline(earthTimeline, CZ.Settings.lifeTimelineID);
-            Common.lifeVisible = f(lifeTimeline);
-            $("#regime-link-life").click(function () {
-                var visible = CZ.UrlNav.navStringToVisible(Common.lifeVisible, Common.vc);
-                setVisible(visible);
-            });
-            var prehistoryTimeline = CZ.Layout.FindChildTimeline(lifeTimeline, CZ.Settings.prehistoryTimelineID);
-            Common.prehistoryVisible = f(prehistoryTimeline);
-            $("#regime-link-prehistory").click(function () {
-                var visible = CZ.UrlNav.navStringToVisible(Common.prehistoryVisible, Common.vc);
-                setVisible(visible);
-            });
-            var humanityTimeline = CZ.Layout.FindChildTimeline(prehistoryTimeline, CZ.Settings.humanityTimelineID, true);
-            Common.humanityVisible = f(humanityTimeline);
-            $("#regime-link-humanity").click(function () {
-                var visible = CZ.UrlNav.navStringToVisible(Common.humanityVisible, Common.vc);
-                setVisible(visible);
-            });
+            if(typeof earthTimeline !== "undefined") {
+                Common.earthVisible = f(earthTimeline);
+                $("#regime-link-earth").click(function () {
+                    var visible = CZ.UrlNav.navStringToVisible(Common.earthVisible, Common.vc);
+                    setVisible(visible);
+                });
+                var lifeTimeline = CZ.Layout.FindChildTimeline(earthTimeline, CZ.Settings.lifeTimelineID);
+                if(typeof lifeTimeline !== "undefined") {
+                    Common.lifeVisible = f(lifeTimeline);
+                    $("#regime-link-life").click(function () {
+                        var visible = CZ.UrlNav.navStringToVisible(Common.lifeVisible, Common.vc);
+                        setVisible(visible);
+                    });
+                    var prehistoryTimeline = CZ.Layout.FindChildTimeline(lifeTimeline, CZ.Settings.prehistoryTimelineID);
+                    if(typeof prehistoryTimeline !== "undefined") {
+                        Common.prehistoryVisible = f(prehistoryTimeline);
+                        $("#regime-link-prehistory").click(function () {
+                            var visible = CZ.UrlNav.navStringToVisible(Common.prehistoryVisible, Common.vc);
+                            setVisible(visible);
+                        });
+                        var humanityTimeline = CZ.Layout.FindChildTimeline(prehistoryTimeline, CZ.Settings.humanityTimelineID, true);
+                        if(typeof humanityTimeline !== "undefined") {
+                            Common.humanityVisible = f(humanityTimeline);
+                            $("#regime-link-humanity").click(function () {
+                                var visible = CZ.UrlNav.navStringToVisible(Common.humanityVisible, Common.vc);
+                                setVisible(visible);
+                            });
+                        }
+                    }
+                }
+            }
             Common.maxPermitedVerticalRange = {
                 top: cosmosTimeline.y,
                 bottom: cosmosTimeline.y + cosmosTimeline.height
