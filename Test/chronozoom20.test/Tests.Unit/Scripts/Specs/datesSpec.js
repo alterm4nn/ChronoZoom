@@ -3,12 +3,51 @@
 /// <reference path="../Js/cz.settings.js" />
 
 
-describe("convertCoordinateToYear method", function () {
-    var dates;
-    beforeEach(function () {
-        dates = CZ.Dates;
+
+describe("convertYearToCoordinate method should return", function () {
+    
+    using("regime =", ["Ga"], function (value) {
+        it("year * -1000000000", function () {
+            var year = 100;
+            var coordinate = convertYearToCoordinate(year, value);
+            expect(coordinate).toEqual(year * -1000000000);
+        });
     });
 
+    using("regime =", ["ma"], function (value) {
+        it("year * -1000000", function () {
+            var year = -5;
+            var coordinate = convertYearToCoordinate(year, value);
+            expect(coordinate).toEqual(year * -1000000);
+        });
+    });
+
+    using("regime =", ["KA"], function (value) {
+        it("year * -1000", function () {
+            var year = .13568;
+            var coordinate = convertYearToCoordinate(year, value);
+            expect(coordinate).toEqual(year * -1000);
+        });
+    });
+
+    using("regime =", ["bCe"], function (value) {
+        it("year * -1", function () {
+            var year = 45.50;
+            var coordinate = convertYearToCoordinate(year, value);
+            expect(coordinate).toEqual(year * -1);
+        });
+    });
+
+    using("regime =", ["cE"], function (value) {
+        it("year", function () {
+            var year = 0.11;
+            var coordinate = convertYearToCoordinate(year, value);
+            expect(coordinate).toEqual(year);
+        });
+    });
+});
+
+describe("convertCoordinateToYear method should return", function () {
     using("coordinate =", [153.56, 0], function (value) {
         it("regime CE ", function () {
             var coordinate = value;
@@ -54,8 +93,13 @@ describe("convertCoordinateToYear method", function () {
     });
 });
 
+
+
 function convertCoordinateToYear(coordinate) {
     return CZ.Dates.convertCoordinateToYear(coordinate);
+}
+function convertYearToCoordinate(year, regime) {
+    return CZ.Dates.convertYearToCoordinate(year, regime);
 }
 
 function using(name, values, func) {
