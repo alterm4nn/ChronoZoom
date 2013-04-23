@@ -26,6 +26,10 @@ module CZ {
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 // TODO: Get UI components.
             });
+            var rootCollection: bool = url.superCollectionName === undefined;
+            CZ.Service.superCollectionName = url.superCollectionName;
+            CZ.Service.collectionName = url.collectionName;
+
 
             $('#search_button')
                 .mouseup(CZ.Search.onSearchClicked)
@@ -91,28 +95,35 @@ module CZ {
                 .mouseout(() => { CZ.Common.toggleOffImage('biblCloseButton', 'png'); })
                 .mouseover(() => { CZ.Common.toggleOnImage('biblCloseButton', 'png'); })
             
-            // TODO: remove splash screen totaly and replace it with new UX.
-            //$('#welcomeScreenCloseButton')
-            //    .mouseover(() => { CZ.Common.toggleOnImage('welcomeScreenCloseButton', 'png'); })
-            //    .mouseout(() => { CZ.Common.toggleOffImage('welcomeScreenCloseButton', 'png'); })
-            //    .click(CZ.Common.hideWelcomeScreen);
-            //$('#closeWelcomeScreenButton')
-            //    .click(CZ.Common.closeWelcomeScreen);
+            
+            $('#welcomeScreenCloseButton')
+                .mouseover(() => { CZ.Common.toggleOnImage('welcomeScreenCloseButton', 'png'); })
+                .mouseout(() => { CZ.Common.toggleOffImage('welcomeScreenCloseButton', 'png'); })
+                .click(CZ.Common.hideWelcomeScreen);
+            $('#closeWelcomeScreenButton')
+                .click(CZ.Common.closeWelcomeScreen);
 
-            //var wlcmScrnCookie = CZ.Common.getCookie("welcomeScreenDisallowed");
-            //if (wlcmScrnCookie != null) {
-            //    CZ.Common.hideWelcomeScreen();
-            //}
-            //else {
-            //    // click on gray area hides welcome screen
-            //    $("#welcomeScreenOut").click(function (e) {
-            //        e.stopPropagation();
-            //    });
+            var wlcmScrnCookie = CZ.Common.getCookie("welcomeScreenDisallowed");
+            if (wlcmScrnCookie != null) {
+                CZ.Common.hideWelcomeScreen();
+            }
+            else {
+                // click on gray area hides welcome screen
+                $("#welcomeScreenOut").click(function (e) {
+                    e.stopPropagation();
+                });
 
-            //    $("#welcomeScreenBack").click(function () {
-            //        CZ.Common.closeWelcomeScreen();
-            //    });
-            //}
+                $("#welcomeScreenBack").click(function () {
+                    CZ.Common.closeWelcomeScreen();
+                });
+            }
+
+            if (rootCollection) {
+                $(".footer-authoring-link").css("display", "none");
+            } else {
+                $("#welcomeScreenBack").css("display", "none");
+                $(".regime-link").css("display", "none");
+            }
 
             if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
                 if (/Chrome[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {

@@ -34,7 +34,11 @@ namespace Chronozoom.Entities.Test
             int timelineCount = 0;
             foreach (Timeline timeline in timelines)
             {
-                timeline.Traverse(childTimeline => timelineCount++);
+                timeline.Traverse(childTimeline => 
+                {
+                    timelineCount++;
+                    timelineCount += childTimeline.Exhibits.Count();
+                });
             }
 
             Assert.IsTrue(timelineCount <= maxElements, "Timelines maxElements query returned incorrect number of timelines");

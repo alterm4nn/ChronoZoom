@@ -218,6 +218,8 @@ module CZ {
                 path?: string[];
                 params?: any[];
                 hash?: { path: string; params?: any[]; };
+                superCollectionName?: string;
+                collectionName?: string;
             }
 
             var loc = document.location.toString().split("#");
@@ -237,10 +239,10 @@ module CZ {
                     url.path = result[4].split("/");
 
                     if (url.path.length > 1) {
-                        CZ.Service.superCollectionName = url.path[0];
+                        url.superCollectionName = url.path[0];
                     }
                     if (url.path.length > 2) {
-                        CZ.Service.collectionName = url.path[1];
+                        url.collectionName = url.path[1];
                     }
                 }
 
