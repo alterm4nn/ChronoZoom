@@ -299,20 +299,19 @@ namespace UI
                     return new Uri(new Uri(uriRequest.GetLeftPart(UriPartial.Authority)), collectionUri.ToString()).ToString();
                 }
 
-//                collectionUri = UpdatePersonalCollection(user.NameIdentifier, userRequest);
-
-                if (userRequest.Id == Guid.Empty)
+                User updateUser = _storage.Users.Where(candidate => candidate.DisplayName == userRequest.DisplayName).FirstOrDefault();
+                if (userRequest.Id == Guid.Empty && updateUser == null)
                 {
                     // Add new user
                     User newUser = new User { Id = Guid.NewGuid(), DisplayName = userRequest.DisplayName, Email = userRequest.Email };
                     newUser.NameIdentifier = user.NameIdentifier; // TODO validate these values during testing
                     newUser.IdentityProvider = user.IdentityProvider;
-                    _storage.Users.Add(newUser);
+                    collectionUri = UpdatePersonalCollection(userRequest.NameIdentifier, newUser);
                 }
                 else
                 {
-                    // Update existing user
-                    User updateUser = _storage.Users.Find(userRequest.Id);
+                   // User updateUser = _storage.Users.Where(candidate => candidate.DisplayName == user.DisplayName).FirstOrDefault();
+                   // User updateUser = _storage.Users.Find(userRequest.Id);
                     if (updateUser == null)
                     {
                         SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.UserNotFound);
@@ -323,10 +322,11 @@ namespace UI
                     updateUser.Email = userRequest.Email;
                     //updateUser.NameIdentifier = // can these two be changed for an existing user?
                     //updateUser.IdentityProvider = 
+                    collectionUri = UpdatePersonalCollection(updateUser.NameIdentifier, updateUser);
+                    _storage.SaveChanges();
                 }
-                _storage.SaveChanges();
 
-                collectionUri = UpdatePersonalCollection(user.NameIdentifier, userRequest);
+                //collectionUri = UpdatePersonalCollection(user.NameIdentifier, userRequest);
                 uriRequest = System.ServiceModel.OperationContext.Current.RequestContext.RequestMessage.Headers.To;
                 return new Uri(new Uri(uriRequest.GetLeftPart(UriPartial.Authority)), collectionUri.ToString()).ToString();
             });
@@ -386,7 +386,7 @@ namespace UI
                 CultureInfo.InvariantCulture,
                 @"{0}\{1}\",
                 FriendlyUrlReplacements(superCollection.Title),
-                _defaultUserCollectionName), UriKind.Relative);
+                FriendlyUrlReplacements(superCollection.Title)), UriKind.Relative);
         }
 
         public void Dispose()
