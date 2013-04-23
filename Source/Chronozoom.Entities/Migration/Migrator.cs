@@ -24,6 +24,7 @@ namespace Chronozoom.Entities.Migration
     {
         private Storage _storage;
         private static MD5 _md5Hasher = MD5.Create();
+        private const string _defaultUserName = "anonymous";
 
         // The user that is able to modify the base collections (e.g. Beta Content, AIDS Quilt)
         private static Lazy<string> _baseContentAdmin = new Lazy<string>(() =>
@@ -101,16 +102,19 @@ namespace Chronozoom.Entities.Migration
             User user;
             if (userId == null)
             {
+                // Anonymous user - Sandbox collection etc.
                 user = _storage.Users.Where(candidate => candidate.NameIdentifier == null).FirstOrDefault();
             }
             else
             {
+                // Beta content
                 user = _storage.Users.Where(candidate => candidate.NameIdentifier == userId).FirstOrDefault();
             }
 
             if (user == null)
             {
                 user = new User { Id = Guid.NewGuid(), NameIdentifier = userId };
+                user.DisplayName = userId == null ? _defaultUserName : userId; // TODO: check what to set this to
             }
             // Load Collection
             Collection collection = new Collection();

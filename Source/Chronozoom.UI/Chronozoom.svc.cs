@@ -68,6 +68,7 @@ namespace UI
             public const string CollectionIdMismatch = "Collection id mismatch";
             public const string UserNotFound = "User not found";
             public const string SandboxSuperCollectionNotFound = "Default sandbox supercollection not found";
+            public const string DefaultUserNotFound = "Default anonymous mouse not found";
         }
 
         [OperationContract]
@@ -251,8 +252,8 @@ namespace UI
         ///
         /// If the user id is not specified, then this is a new user. For a new user
         /// the following will be done:
-        /// - if there is no ACS treat as an anonymous user who can access the sandbox collection.
-        /// - if the anonymous user does not exist in the db then create it.
+        /// - if there is no ACS treat as an anonymous user who can access the Sandbox collection.
+        /// - if the anonymous user does not exist in the db then it is an error.
         /// - add a new supercollection with the user's display name
         /// - add a new default collection to this supercollection
         /// - create a new user with the with the specified attributes
@@ -283,7 +284,7 @@ namespace UI
                 {
                     // No ACS so treat as an anonymous user who can access the
                     // sandbox collection.
-                    // If anonymous user does not exist in the db then create it.
+                    // If anonymous user should already exist create the user.
                     user = _storage.Users.Where(candidate => candidate.DisplayName == _defaultUserName).FirstOrDefault();
                     if (user == null)
                     {
@@ -298,14 +299,14 @@ namespace UI
                     return new Uri(new Uri(uriRequest.GetLeftPart(UriPartial.Authority)), collectionUri.ToString()).ToString();
                 }
 
-                collectionUri = UpdatePersonalCollection(user.NameIdentifier, userRequest);
+//                collectionUri = UpdatePersonalCollection(user.NameIdentifier, userRequest);
 
                 if (userRequest.Id == Guid.Empty)
                 {
                     // Add new user
                     User newUser = new User { Id = Guid.NewGuid(), DisplayName = userRequest.DisplayName, Email = userRequest.Email };
                     newUser.NameIdentifier = user.NameIdentifier; // TODO validate these values during testing
-                    //newUser.IdentityProvider = 
+                    newUser.IdentityProvider = user.IdentityProvider;
                     _storage.Users.Add(newUser);
                 }
                 else
@@ -318,17 +319,19 @@ namespace UI
                         return String.Empty;
                     }
 
-                    updateUser.DisplayName = userRequest.DisplayName;
+                   // updateUser.DisplayName = userRequest.DisplayName; TODO: check if display name can be updated
                     updateUser.Email = userRequest.Email;
-                    //updateUser.NameIdentifier = // can this be changed?
+                    //updateUser.NameIdentifier = // can these two be changed for an existing user?
                     //updateUser.IdentityProvider = 
                 }
                 _storage.SaveChanges();
 
+                collectionUri = UpdatePersonalCollection(user.NameIdentifier, userRequest);
                 uriRequest = System.ServiceModel.OperationContext.Current.RequestContext.RequestMessage.Headers.To;
                 return new Uri(new Uri(uriRequest.GetLeftPart(UriPartial.Authority)), collectionUri.ToString()).ToString();
             });
         }
+
         private Uri UpdatePersonalCollection(string userId, User user)
         {
             if (userId == null)
@@ -354,22 +357,20 @@ namespace UI
                 }
             }
 
-            SuperCollection superCollection = _storage.SuperCollections.Where(candidate => candidate.User.NameIdentifier == userId).FirstOrDefault();
+            SuperCollection superCollection = _storage.SuperCollections.Where(candidate => candidate.User.NameIdentifier == user.NameIdentifier).FirstOrDefault();
             if (superCollection == null)
             {
                 // Create the personal supercollection
                 superCollection = new SuperCollection();
                 superCollection.Title = user.DisplayName;
                 superCollection.Id = CollectionIdFromText(user.DisplayName);
-                //superCollection.User.NameIdentifier = userId;
                 superCollection.User = user;
                 superCollection.Collections = new Collection<Collection>();
 
                 // Create the personal collection
                 Collection personalCollection = new Collection();
-                personalCollection.Title = _defaultUserCollectionName;
-                personalCollection.Id = CollectionIdFromSuperCollection(user.DisplayName, _defaultUserCollectionName);
-                //personalCollection.User.NameIdentifier = userId;
+                personalCollection.Title = user.DisplayName;
+                personalCollection.Id = CollectionIdFromSuperCollection(user.DisplayName, user.DisplayName);
                 personalCollection.User = user;
 
                 superCollection.Collections.Add(personalCollection);
@@ -1103,7 +1104,7 @@ namespace UI
         }
 
         /// <summary>
-        /// Performs an operation udner an authenticated user.
+        /// Performs an operation under an authenticated user.
         /// </summary>
        // private delegate T AuthenticatedOperationDelegate<T>(string user);
         //private static T AuthenticatedOperation<T>(AuthenticatedOperationDelegate<T> operation)
