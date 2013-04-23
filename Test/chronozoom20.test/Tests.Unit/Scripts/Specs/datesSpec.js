@@ -203,6 +203,29 @@ function using(name, values, func) {
 //    });
 //});
 
+describe("getDMYFromCoordinate() method", function () {
+    describe("should return", function () {
+        it("by 10 yeas above, if delta = 10 years", function () {
+            var coordinate = 10;
+            var result = CZ.Dates.getDMYFromCoordinate(coordinate);
+            expect({ year : 10, month : 0, day : 1}).toEqual(result);
+        });
+
+        it("by 10 yeas less, if delta = -10 years", function () {
+            var delta = -10;
+            var result = CZ.Dates.getDMYFromCoordinate(delta);
+            expect({ year: -10, month: 0, day: 1 }).toEqual(result);
+        });
+
+        it("1 year, if start year = -1 and delta = 1", function () {
+            var delta = 1;
+            var result = CZ.Dates.getDMYFromCoordinate(delta);
+            expect({ year: 1, month: 0, day: 1 }).toEqual(result);
+        });
+
+    });
+});
+
 //describe("getYearsBetweenDates() method", function () {
 //    var dates;
 //    beforeEach(function () {
