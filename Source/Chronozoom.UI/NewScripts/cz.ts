@@ -5,19 +5,27 @@
 /// <reference path='gestures.ts'/>
 /// <reference path='tours.ts'/>
 /// <reference path='virtualCanvas.ts'/>
+/// <reference path='uiloader.ts'/>
+/// <reference path='controls/formbase.ts'/>
 /// <reference path='controls/cz.datepicker.ts'/>
 
 /// <reference path='typings/jquery/jquery.d.ts'/>
 
 module CZ {
     module HomePageViewModel {
+        // Contains mapping: CSS selector -> html file.
+        var _uiMap = {
+            "#auth-event-form": "/ui/auth-event-form.html"
+        };
+
         $(document).ready(function () {
 
             $('.bubbleInfo').hide();
 
             CZ.Common.initialize();
-
-            //CZ.Common.ax.showThresholds = true;
+            CZ.UILoader.loadAll(_uiMap).done(function () {
+                // TODO: Get UI components.
+            });
 
             $('#search_button')
                 .mouseup(CZ.Search.onSearchClicked)
