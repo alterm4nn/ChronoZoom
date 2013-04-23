@@ -42,6 +42,29 @@
         margin:0px;
     }
 
+.timescale_right_border_input {
+    color: white;
+    background-color: #0388E5;
+    width: 185px;  
+    font-family: sans-serif;
+    font-size: 25px;
+    text-align: center;
+    vertical-align: middle;
+    margin:0px;
+}
+
+.timescale_left_border_input {
+    color: white;
+    background-color: #0388E5;
+    width: 185px;  
+    font-family: sans-serif;
+    font-size: 25px;
+    text-align: center;
+    vertical-align: middle;
+    margin:0px;
+}
+    
+
 .cz-timescale-right {
     right: 0px;
     border-left: 5px solid #58B7F9;
@@ -66,20 +89,30 @@
 }
 
 .cz-timescale-marker {
+    z-index: 150;
     position: absolute;
-    height: 100%;
-    width: 6.75em;
+    height: 80%;
+    width: 5.313em;
     background-color: #00538D;
     border: 2px solid green;
     top: -2px;
 }
-
     .cz-timescale-marker p {        
         vertical-align: middle;
         text-align: center;
         font-family: sans-serif;
-        font-size: 20px;
+        font-size: 15px;
         margin:0px;
+    }
+
+.cz-timescale-marker-triangle {
+        width: 0;
+        height: 0;
+        border-top: 17px solid #00538D;
+        border-left: 17px solid transparent;
+        border-right: 17px solid transparent;
+        vertical-align: middle;
+        margin-left: 1.68em;
     }
 
 .unselectable {

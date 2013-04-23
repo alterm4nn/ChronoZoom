@@ -269,7 +269,7 @@ module CZ {
             };
 
             function getMissingTimelines(vbox, lca) {
-                CZ.Service.getTimelines({
+                CZ.Data.getTimelines({
                     lca: lca.guid,
                     start: vbox.left,
                     end: vbox.right,
@@ -473,7 +473,6 @@ module CZ {
             this.moveToVisible = function (visible, noAnimation) {
                 var currentViewport = getViewport();
                 var targetViewport = new CZ.Viewport.Viewport2d(currentViewport.aspectRatio, currentViewport.width, currentViewport.height, visible);
-
                 var vbox = CZ.Common.viewportToViewBox(targetViewport);
                 var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
 

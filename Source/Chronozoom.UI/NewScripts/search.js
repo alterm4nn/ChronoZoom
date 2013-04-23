@@ -93,7 +93,7 @@ var CZ;
             if(!elem) {
                 alert('Element not found in the content.');
             } else {
-                var visible = CZ.VCContent.getVisibleForElement(elem, 1.0, CZ.Common.vc.virtualCanvas("getViewport"));
+                var visible = CZ.VCContent.getVisibleForElement(elem, 1.0, CZ.Common.vc.virtualCanvas("getViewport"), true);
                 navigateToElement({
                     element: elem,
                     newvisible: visible
@@ -229,7 +229,7 @@ var CZ;
                     }
                 },
                 error: function (xhr) {
-                    alert("Error connecting to service: " + xhr.responseText);
+                    console.log("Error connecting to service: " + xhr.responseText);
                 }
             });
         }

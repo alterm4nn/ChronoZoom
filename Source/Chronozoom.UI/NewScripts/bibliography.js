@@ -181,7 +181,7 @@ var CZ;
                     }
                 },
                 error: function (xhr) {
-                    alert("Error connecting to service: " + xhr.responseText);
+                    console.log("Error connecting to service: " + xhr.responseText);
                 }
             });
         }

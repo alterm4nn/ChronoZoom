@@ -162,6 +162,14 @@
     <Content Include="NewScripts\bibliography.ts" />
     <Content Include="NewScripts\breadCrumbs.ts" />
     <Content Include="NewScripts\common.ts" />
+    <Content Include="NewScripts\controls\formbase.js">
+      <DependentUpon>formbase.ts</DependentUpon>
+    </Content>
+    <Content Include="NewScripts\controls\formbase.ts" />
+    <TypeScriptCompile Include="NewScripts\cz.data.ts" />
+    <Content Include="NewScripts\cz.data.js">
+      <DependentUpon>cz.data.ts</DependentUpon>
+    </Content>
     <Content Include="NewScripts\cz.dates.ts" />
     <Content Include="NewScripts\controls\cz.datepicker.ts" />
     <Content Include="NewScripts\controls\cz.datepicker.js">
@@ -194,6 +202,10 @@
     <Content Include="NewScripts\typings\jqueryui\jqueryui.d.ts" />
     <Content Include="NewScripts\typings\jquery\jquery.d.ts" />
     <Content Include="NewScripts\typings\rx.js\rx.js.d.ts" />
+    <Content Include="NewScripts\uiloader.js">
+      <DependentUpon>uiloader.ts</DependentUpon>
+    </Content>
+    <Content Include="NewScripts\uiloader.ts" />
     <Content Include="NewScripts\urlnav.ts" />
     <Content Include="NewScripts\vccontent.ts" />
     <Content Include="NewScripts\viewport.ts" />
@@ -211,7 +223,12 @@
     <Compile Include="ACS\Util\NameValueCollectionExtensions.cs" />
     <Compile Include="ACS\Util\RequireAuthenticationAttribute.cs" />
     <Content Include="ACS\FederationMetadata\2007-06\FederationMetadata.xml" />
+    <Content Include="samples\custom-form\form-example.html" />
+    <Content Include="samples\custom-form\form-example.js" />
+    <Content Include="samples\custom-form\form-example.ts" />
+    <Content Include="samples\custom-form\main.html" />
     <Content Include="samples\cz.datepicker.html" />
+    <Content Include="ui\auth-event-form.html" />
     <Content Include="Views\Account\_IdentityProvidersWithClientSideCode.aspx" />
     <Content Include="favicon.ico" />
     <Content Include="Images\A.png" />
@@ -288,10 +305,6 @@
     <Content Include="oldResponseDump.txt" />
     <Content Include="Privacy.htm" />
     <Content Include="robots.txt" />
-    <Content Include="ScriptsMobile\axis.mobile.js" />
-    <Content Include="ScriptsMobile\cz.settings.mobile.js" />
-    <Content Include="ScriptsMobile\vccontent.mobile.js" />
-    <Content Include="ScriptsMobile\virtualCanvas.mobile.js" />
     <Content Include="NewScripts\breadCrumbs.js">
       <DependentUpon>breadCrumbs.ts</DependentUpon>
     </Content>

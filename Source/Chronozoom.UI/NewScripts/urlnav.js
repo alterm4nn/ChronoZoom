@@ -153,10 +153,10 @@ var CZ;
                 if(result[4] != "") {
                     url.path = result[4].split("/");
                     if(url.path.length > 1) {
-                        CZ.Service.superCollectionName = url.path[0];
+                        url.superCollectionName = url.path[0];
                     }
                     if(url.path.length > 2) {
-                        CZ.Service.collectionName = url.path[1];
+                        url.collectionName = url.path[1];
                     }
                 }
                 if(result[5] != "") {
