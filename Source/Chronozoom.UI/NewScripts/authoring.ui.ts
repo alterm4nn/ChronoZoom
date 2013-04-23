@@ -164,8 +164,8 @@ module CZ {
                     width: 600,
                     buttons: {
                         "save and close": function () {
-                            var isValid = CZ.Authoring.ValidateNumber(startInput.getDate()) && CZ.Authoring.ValidateNumber(endInput.getDate());
-                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(startInput.getDate()) && CZ.Authoring.IsNotEmpty(endInput.getDate());
+                            var isValid = startInput.getDate() !== false && endInput.getDate() !== false;
+                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val());
 
                             if (!isValid) {
                                 $("#TimelineErrorSpan").css("display", "block");
@@ -220,8 +220,8 @@ module CZ {
                     width: 600,
                     buttons: {
                         "save and close": function () {
-                            var isValid = CZ.Authoring.ValidateNumber(startInput.getDate()) && CZ.Authoring.ValidateNumber(endInput.getDate());
-                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(startInput.getDate()) && CZ.Authoring.IsNotEmpty(endInput.getDate());
+                            var isValid = startInput.getDate() !== false && endInput.getDate() !== false;
+                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val());
 
                             if (!isValid) {
                                 $("#TimelineErrorSpan").css("display", "block");
@@ -287,8 +287,8 @@ module CZ {
                         "save and close": function () {
                             var contentItems = _getContentItemsData();
 
-                            var isValid = CZ.Authoring.ValidateNumber(dateInput.getDate());
-                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(dateInput.getDate());
+                            var isValid = dateInput.getDate() !== false;
+                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val());
                             isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
 
                             if (!isValid) {
@@ -353,8 +353,8 @@ module CZ {
                         "save and close": function () {
                             contentItems = _getContentItemsData();
 
-                            var isValid = CZ.Authoring.ValidateNumber(dateInput.getDate());
-                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(dateInput.getDate());
+                            var isValid = dateInput.getDate() !== false;
+                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val());
                             isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
 
                             if (!isValid) {
