@@ -400,6 +400,7 @@ var CZ;
         function ValidateTimelineData(start, end, title) {
             var isValid = CZ.Authoring.ValidateNumber(start) && CZ.Authoring.ValidateNumber(end);
             isValid = isValid && CZ.Authoring.IsNotEmpty(title) && CZ.Authoring.IsNotEmpty(start) && CZ.Authoring.IsNotEmpty(end);
+            console.log(start, end);
             isValid = isValid && CZ.Authoring.isNonegHeight(start, end);
             return isValid;
         }
@@ -420,7 +421,7 @@ var CZ;
         }
         Authoring.IsNotEmpty = IsNotEmpty;
         function isNonegHeight(start, end) {
-            return true;
+            return (start < end);
         }
         Authoring.isNonegHeight = isNonegHeight;
         function ValidateContentItems(contentItems) {

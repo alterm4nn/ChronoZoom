@@ -97,7 +97,15 @@
     border: 2px solid green;
     top: -2px;
 }
-    .cz-timescale-marker div {
+    .cz-timescale-marker p {        
+        vertical-align: middle;
+        text-align: center;
+        font-family: sans-serif;
+        font-size: 15px;
+        margin:0px;
+    }
+
+.cz-timescale-marker-triangle {
         width: 0;
         height: 0;
         border-top: 17px solid #00538D;
@@ -105,14 +113,6 @@
         border-right: 17px solid transparent;
         vertical-align: middle;
         margin-left: 1.68em;
-    }
- 
-    .cz-timescale-marker p {        
-        vertical-align: middle;
-        text-align: center;
-        font-family: sans-serif;
-        font-size: 15px;
-        margin:0px;
     }
 
 .unselectable {

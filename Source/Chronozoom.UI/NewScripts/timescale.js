@@ -138,6 +138,7 @@ var CZ;
             leftDatePanel.addClass("cz-timescale-left");
             leftDatePanel.addClass("cz-timescale-panel");
             marker.addClass("cz-timescale-marker");
+            markertriangle.addClass("cz-timescale-marker-triangle");
             labelsDiv.addClass("cz-timescale-labels-container");
             marker[0].appendChild(markerText[0]);
             marker[0].appendChild(markertriangle[0]);

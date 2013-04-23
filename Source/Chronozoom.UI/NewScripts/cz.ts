@@ -5,7 +5,7 @@
 /// <reference path='gestures.ts'/>
 /// <reference path='tours.ts'/>
 /// <reference path='virtualCanvas.ts'/>
-/// <reference path='cz.ui.ts'/>
+/// <reference path='controls/cz.datepicker.ts'/>
 
 /// <reference path='typings/jquery/jquery.d.ts'/>
 

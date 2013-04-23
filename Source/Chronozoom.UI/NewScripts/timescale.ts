@@ -166,7 +166,7 @@ module CZ {
                LeftPanInput();
            }
 
-           if  (time >= _range.max - CZ.Settings.panelWidth*k) {
+           if  (time >= _range.max - CZ.Settings.panelWidth * k) {
                marker.css("display", "none");
                RightPanInput();
              }
@@ -185,6 +185,7 @@ module CZ {
             leftDatePanel.addClass("cz-timescale-left");
             leftDatePanel.addClass("cz-timescale-panel");
             marker.addClass("cz-timescale-marker");
+            markertriangle.addClass("cz-timescale-marker-triangle");
             labelsDiv.addClass("cz-timescale-labels-container");
 
             marker[0].appendChild(markerText[0]);

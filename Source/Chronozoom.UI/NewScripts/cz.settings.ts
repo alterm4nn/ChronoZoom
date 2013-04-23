@@ -120,7 +120,7 @@
         export var minSmallTickSpace = 8;
         export var timescaleThickness = 2; // thickness of timescale's baseline and ticks
         export var markerWidth = 85; //width of marker
-        export var panelWidth = 185; //width of marker
+        export var panelWidth = 185; //width of left-right panel
 
         // IDs of regime timelines
         export var cosmosTimelineID = "00000000-0000-0000-0000-000000000000";

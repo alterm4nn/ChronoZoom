@@ -646,6 +646,7 @@ module CZ {
         export function ValidateTimelineData(start,end,title) {
             var isValid = CZ.Authoring.ValidateNumber(start) && CZ.Authoring.ValidateNumber(end);
             isValid = isValid && CZ.Authoring.IsNotEmpty(title) && CZ.Authoring.IsNotEmpty(start) && CZ.Authoring.IsNotEmpty(end);
+            console.log(start, end);
             isValid = isValid && CZ.Authoring.isNonegHeight(start, end);
             return isValid;
         }
@@ -677,12 +678,7 @@ module CZ {
          * Validates,if timeline size is not negative
         */
         export function isNonegHeight(start, end) {
-            //code is correct for previous AT version
-            /*if (start > 0 && end > 0) return (start < end);
-            if (start < 0 && end < 0) return (start > end);
-            return (start < 0 && end > 0);
-            return false;*/
-            return true;
+            return (start < end);
         }
 
         /**

@@ -58,7 +58,8 @@ module CZ {
                     var layerDivs = self.element.children("div");
                     layerDivs.each(function (index) { // for each internal (div)
                         // make a layer from (div)
-                        $(this).addClass("virtualCanvasLayerDiv").zIndex(index * 3);
+                        $(this).addClass("virtualCanvasLayerDiv unselectable")
+                                .zIndex(index * 3);
 
                         // creating canvas element
                         var layerCanvasJq = $("<canvas></canvas>")
@@ -408,7 +409,8 @@ module CZ {
                 _destroy: function () {
                     this.element.removeClass("virtualCanvas");
                     this.element.children(".virtualCanvasLayerDiv").each(function (index) {
-                        $(this).removeClass("virtualCanvasLayerDiv");
+                        $(this).removeClass("virtualCanvasLayerDiv")
+                                .removeClass("unselectable");
                         $(this).remove(".virtualCanvasLayerCanvas");
                     });
                     this.element.unbind('.' + this.widgetName);
