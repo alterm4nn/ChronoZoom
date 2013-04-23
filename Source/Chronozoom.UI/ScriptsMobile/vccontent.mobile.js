@@ -1,6 +1,6 @@
 ﻿var elementclick = jQuery.Event("elementclick");
-var getVisibleForElement = function (element, scale, viewport) {
-    var margin = 2 * (contentScaleMargin ? contentScaleMargin : 0);
+var getVisibleForElement = function (element, scale, viewport,use_margin) {
+    var margin = 2 * (contentScaleMargin && use_margin ? contentScaleMargin : 0);
 
     var width = viewport.width - margin;
     if (width < 0)
@@ -22,7 +22,7 @@ var getVisibleForElement = function (element, scale, viewport) {
 
 var zoomToElementHandler = function (sender, e, scale /* n [time units] / m [pixels] */) {
     var vp = sender.vc.getViewport();
-    var visible = getVisibleForElement(sender, scale, vp);
+    var visible = getVisibleForElement(sender, scale, vp,true);
     elementclick.newvisible = visible;
     elementclick.element = sender;
     sender.vc.element.trigger(elementclick);
