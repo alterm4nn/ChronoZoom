@@ -228,7 +228,7 @@ module CZ {
                     vc.virtualCanvas("updateViewport");
                 },
                 function (error) {
-                    alert("Error connecting to service:\n" + error.responseText);
+                    console.log("Error connecting to service:\n" + error.responseText);
                 }
             );
         }
