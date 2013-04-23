@@ -152,16 +152,16 @@ namespace UI
             searchTerm = searchTerm.ToUpperInvariant();
 
             var timelines = _storage.Timelines.Where(_ => _.Title.ToUpper().Contains(searchTerm) && _.Collection.Id == collectionId).ToList();
-            var searchResults = timelines.Select(timeline => new SearchResult { Id = timeline.Id, Title = timeline.Title, ObjectType = ObjectType.Timeline, UniqueId = timeline.UniqueId }).ToList();
+            var searchResults = timelines.Select(timeline => new SearchResult { Id = timeline.Id, Title = timeline.Title, ObjectType = ObjectType.Timeline }).ToList();
 
             var exhibits = _storage.Exhibits.Where(_ => _.Title.ToUpper().Contains(searchTerm) && _.Collection.Id == collectionId).ToList();
-            searchResults.AddRange(exhibits.Select(exhibit => new SearchResult { Id = exhibit.Id, Title = exhibit.Title, ObjectType = ObjectType.Exhibit, UniqueId = exhibit.UniqueId }));
+            searchResults.AddRange(exhibits.Select(exhibit => new SearchResult { Id = exhibit.Id, Title = exhibit.Title, ObjectType = ObjectType.Exhibit }));
 
             var contentItems = _storage.ContentItems.Where(_ => 
                 (_.Title.ToUpper().Contains(searchTerm) || _.Caption.ToUpper().Contains(searchTerm))
                  && _.Collection.Id == collectionId
                 ).ToList();
-            searchResults.AddRange(contentItems.Select(contentItem => new SearchResult { Id = contentItem.Id, Title = contentItem.Title, ObjectType = ObjectType.ContentItem, UniqueId = contentItem.UniqueId }));
+            searchResults.AddRange(contentItems.Select(contentItem => new SearchResult { Id = contentItem.Id, Title = contentItem.Title, ObjectType = ObjectType.ContentItem }));
 
             Trace.TraceInformation("Search called for search term {0}", searchTerm);
             return new BaseJsonResult<IEnumerable<SearchResult>>(searchResults);
@@ -348,7 +348,7 @@ namespace UI
                     return;
                 }
 
-                if (superCollection.User.NameIdentifier != user.NameIdentifier)
+                if (user == null || superCollection.User.NameIdentifier != user.NameIdentifier)
                 {
                     SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                     return;
@@ -571,7 +571,7 @@ namespace UI
                         return;
                     }
 
-                    if (collection.User.NameIdentifier != user.NameIdentifier)
+                    if (user == null || collection.User.NameIdentifier != user.NameIdentifier)
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                         return;
@@ -617,7 +617,7 @@ namespace UI
                     }
 
                     // Validate user for timelines that require validation
-                    if (collection.User.NameIdentifier != user.NameIdentifier && collection.User.NameIdentifier != null)
+                    if (!UserCanModifyCollection(user, collection))
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                         return Guid.Empty;
@@ -700,7 +700,7 @@ namespace UI
                         return;
                     }
 
-                    if (collection.User.NameIdentifier != user.NameIdentifier && collection.User.NameIdentifier != null)
+                    if (!UserCanModifyCollection(user, collection))
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                         return;
@@ -773,7 +773,7 @@ namespace UI
                     }
 
                     // Validate user, if required.
-                    if (collection.User.NameIdentifier != user.NameIdentifier && collection.User.NameIdentifier != null)
+                    if (!UserCanModifyCollection(user, collection))
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                         return returnValue;
@@ -938,7 +938,7 @@ namespace UI
                         return;
                     }
 
-                    if (collection.User.NameIdentifier != user.NameIdentifier && collection.User.NameIdentifier != null)
+                    if (!UserCanModifyCollection(user, collection))
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                         return;
@@ -1006,7 +1006,7 @@ namespace UI
                     }
 
                     // Validate user, if required.
-                    if (collection.User.NameIdentifier != user.NameIdentifier && collection.User.NameIdentifier != null)
+                    if (!UserCanModifyCollection(user, collection))
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                         return Guid.Empty;
@@ -1057,7 +1057,7 @@ namespace UI
                         return;
                     }
 
-                    if (collection.User.NameIdentifier != user.NameIdentifier && collection.User.NameIdentifier != null)
+                    if (!UserCanModifyCollection(user, collection))
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                         return;
@@ -1208,7 +1208,7 @@ namespace UI
         /// <returns>Null if not cached.</returns>
         private Timeline GetCachedGetTimelines(Guid collectionId, string start, string end, string minspan, string lca, string maxElements)
         {
-            string cacheKey = string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}", collectionId, start, end, minspan, lca, maxElements);
+            string cacheKey = string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}|{5}", collectionId, start, end, minspan, lca, maxElements);
             if (Cache.Contains(cacheKey))
             {
                 return (Timeline)Cache[cacheKey];
@@ -1222,10 +1222,22 @@ namespace UI
         /// </summary>
         private void CacheGetTimelines(Timeline timeline, Guid collectionId, string start, string end, string minspan, string lca, string maxElements)
         {
-            string cacheKey = string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}", collectionId, start, end, minspan, lca, maxElements);
+            string cacheKey = string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}|{5}", collectionId, start, end, minspan, lca, maxElements);
             if (!Cache.Contains(cacheKey))
             {
                 Cache.Add(cacheKey, timeline, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
+            }
+        }
+
+        private static bool UserCanModifyCollection(User user, Collection collection)
+        {
+            if (user == null)
+            {
+                return collection.User == null || collection.User.NameIdentifier == null;
+            }
+            else
+            {
+                return collection.User.NameIdentifier == user.NameIdentifier;
             }
         }
     }

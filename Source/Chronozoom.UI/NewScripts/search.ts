@@ -2,6 +2,7 @@
 /// <reference path='cz.settings.ts'/>
 /// <reference path='common.ts'/>
 /// <reference path='vccontent.ts'/>
+/// <reference path='czservice.ts'/>
 
 /* This file contains code to perform search over the CZ database and show the results in UI.
 The page design must correspond to the schema and naming conventions presented here.
@@ -100,14 +101,12 @@ module CZ {
             }
         }
 
-        export function goToSearchResult(id) {
-            var elem = findVCElement(CZ.Common.vc.virtualCanvas("getLayerContent"), id);
-            if (!elem) {
-                alert('Element not found in the content.');
-            } else {
-                var visible = CZ.VCContent.getVisibleForElement(elem, 1.0, CZ.Common.vc.virtualCanvas("getViewport"),true);
-                navigateToElement({ element: elem, newvisible: visible });
-            }
+        export function goToSearchResult(resultId) {
+            var element = CZ.Common.vc.virtualCanvas("findElement", resultId);
+            var navStringElement = CZ.UrlNav.vcelementToNavString(element);
+
+            var visible = CZ.UrlNav.navStringToVisible(navStringElement, CZ.Common.vc);
+            CZ.Common.controller.moveToVisible(visible)
         }
 
         // Recursively finds and returns an element with given id.
@@ -156,12 +155,12 @@ module CZ {
                         var first = true;
                         for (var i = 0; i < results.length; i++) {
                             var item = results[i];
-                            if (item.ObjectType != objectType) continue;
+                            if (item.objectType != objectType) continue;
                             var resultId;
-                            switch (item.ObjectType) {
-                                case 0: resultId = 'e' + item.UniqueID; break; // exhibit
-                                case 1: resultId = 't' + item.UniqueID; break; // timeline
-                                case 2: resultId = 'c' + item.UniqueID; break; // content item
+                            switch (item.objectType) {
+                                case 0: resultId = 'e' + item.id; break; // exhibit
+                                case 1: resultId = 't' + item.id; break; // timeline
+                                case 2: resultId = item.id; break; // content item
                                 default: continue; // unknown type of result item
                             }
                             if (first) {
@@ -215,9 +214,9 @@ module CZ {
 
             var url;
             switch (CZ.Settings.czDataSource) {
-                case 'db': url = "/CZ.svc/Search";
+                case 'db': url = "/chronozoom.svc/Search";
                     break;
-                default: url = "/CZ.svc/SearchRelay";
+                default: url = "/chronozoom.svc/Search";
                     break;
             }
             $.ajax({
@@ -225,7 +224,7 @@ module CZ {
                 type: "GET",
                 async: true,
                 dataType: "json",
-                data: { searchTerm: searchString, supercollection: CZ.Common.supercollection, collection: CZ.Common.collection },
+                data: { searchTerm: searchString, supercollection: CZ.Service.superCollectionName, collection: CZ.Service.collectionName },
                 url: url,
                 success: function (result) {
                     if (CZ.Settings.czDataSource == 'db')
