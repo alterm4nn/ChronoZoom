@@ -26,10 +26,11 @@ module CZ {
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 // TODO: Get UI components.
             });
-            var rootCollection: bool = url.superCollectionName === undefined;
+
+            var url = CZ.UrlNav.getURL();
+            var rootCollection = url.superCollectionName === undefined;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
-
 
             $('#search_button')
                 .mouseup(CZ.Search.onSearchClicked)
