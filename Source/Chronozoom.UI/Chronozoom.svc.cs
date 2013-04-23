@@ -232,8 +232,8 @@ namespace UI
         ///
         /// If the user id is not specified, then this is a new user. For a new user
         /// the following will be done:
-        /// - if there is no ACS treat as an anonymous user who can access the Sandbox collection.
-        /// - if the anonymous user does not exist in the db then it is should either be created or is an error. (TODO: decide which is appropriate)
+        /// - if there is no ACS treat as an anonymous user who can access the Sandbox collection
+        /// - if the anonymous user does not exist in the db then it is created
         /// - add a new supercollection with the user's display name
         /// - add a new default collection to this supercollection with user's display name
         /// - create a new user  with the specified attributes
@@ -282,9 +282,6 @@ namespace UI
                     }
 
                     updateUser.Email = userRequest.Email;
-                    // TODO: check if these two values can be updated for an existing user?
-                    //updateUser.NameIdentifier = 
-                    //updateUser.IdentityProvider = 
                     collectionUri = UpdatePersonalCollection(updateUser.NameIdentifier, updateUser);
                     _storage.SaveChanges();
                 }
@@ -355,12 +352,10 @@ namespace UI
         {
             // No ACS so treat as an anonymous user who can access the sandbox collection.
             // If anonymous user does not already exist create the user.
-            // TODO: check should anonymous user always exist and it is an error if it does not exist
-            // or it is ok to create the anonymous user if it does not exist.
-            user = _storage.Users.Where(candidate => candidate.DisplayName == _defaultUserName).FirstOrDefault();
+            user = _storage.Users.Where(candidate => candidate.NameIdentifier == null).FirstOrDefault();
             if (user == null)
             {
-                user = new User { Id = Guid.NewGuid(), DisplayName = "anonymous" };
+                user = new User { Id = Guid.NewGuid(), DisplayName = _defaultUserName };
                 _storage.Users.Add(user);
                 _storage.SaveChanges();
             }

@@ -114,7 +114,7 @@ namespace Chronozoom.Entities.Migration
             if (user == null)
             {
                 user = new User { Id = Guid.NewGuid(), NameIdentifier = userId };
-                user.DisplayName = userId == null ? _defaultUserName : userId; // TODO: check what to set this to
+                user.DisplayName = (userId == null) ? _defaultUserName : userId;
             }
             // Load Collection
             Collection collection = new Collection();
