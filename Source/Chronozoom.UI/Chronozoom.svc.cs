@@ -334,7 +334,7 @@ namespace UI
             });
         }
 
-        public void DeleteSuperCollection(string superCollectionName)
+        private void DeleteSuperCollection(string superCollectionName)
         {
             AuthenticatedOperation(delegate(User user)
             {
