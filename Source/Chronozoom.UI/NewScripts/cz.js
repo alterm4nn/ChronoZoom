@@ -10,6 +10,10 @@ var CZ;
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
             });
+            
+            var url = CZ.UrlNav.getURL();
+            var rootCollection = url.superCollectionName === undefined;
+            
             $('#search_button').mouseup(CZ.Search.onSearchClicked).mouseover(function () {
                 CZ.Search.searchHighlight(true);
             }).mouseout(function () {
@@ -79,6 +83,29 @@ var CZ;
             }).mouseover(function () {
                 CZ.Common.toggleOnImage('biblCloseButton', 'png');
             });
+            $('#welcomeScreenCloseButton').mouseover(function () {
+                CZ.Common.toggleOnImage('welcomeScreenCloseButton', 'png');
+            }).mouseout(function () {
+                CZ.Common.toggleOffImage('welcomeScreenCloseButton', 'png');
+            }).click(CZ.Common.hideWelcomeScreen);
+            $('#closeWelcomeScreenButton').click(CZ.Common.closeWelcomeScreen);
+            var wlcmScrnCookie = CZ.Common.getCookie("welcomeScreenDisallowed");
+            if(wlcmScrnCookie != null) {
+                CZ.Common.hideWelcomeScreen();
+            } else {
+                $("#welcomeScreenOut").click(function (e) {
+                    e.stopPropagation();
+                });
+                $("#welcomeScreenBack").click(function () {
+                    CZ.Common.closeWelcomeScreen();
+                });
+            }
+            if(rootCollection) {
+                $(".footer-authoring-link").css("display", "none");
+            } else {
+                $("#welcomeScreenBack").css("display", "none");
+                $(".regime-link").css("display", "none");
+            }
             if(navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
                 if(/Chrome[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
                     var oprversion = new Number(RegExp.$1);

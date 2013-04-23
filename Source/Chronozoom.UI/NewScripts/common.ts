@@ -7,6 +7,7 @@
 /// <reference path='timescale.ts'/>
 /// <reference path='virtualcanvas.ts'/>
 /// <reference path='authoring.ui.ts'/>
+/// <reference path='cz.data.ts'/>
 
 // Obsolete functions not included in the typescript base library bindings
 declare var escape: any;
@@ -221,14 +222,7 @@ module CZ {
 
         //loading the data from the service
         export function loadData() {
-            //load URL state
-            CZ.UrlNav.getURL();
-
-            CZ.Service.getTimelines({
-                start: -50000000000,
-                end: 9999,
-                minspan: null // Can't specify minspan on first load since the timeline span will vary significantly.
-            }).then(
+            CZ.Data.getTimelines(null).then(
                 function (response) {
                     ProcessContent(response);
                     vc.virtualCanvas("updateViewport");

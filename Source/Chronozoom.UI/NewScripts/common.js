@@ -160,12 +160,7 @@ var CZ;
             }
         }
         function loadData() {
-            CZ.UrlNav.getURL();
-            CZ.Service.getTimelines({
-                start: -50000000000,
-                end: 9999,
-                minspan: null
-            }).then(function (response) {
+            CZ.Data.getTimelines(null).then(function (response) {
                 ProcessContent(response);
                 Common.vc.virtualCanvas("updateViewport");
             }, function (error) {
