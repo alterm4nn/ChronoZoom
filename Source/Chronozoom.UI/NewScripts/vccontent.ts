@@ -292,8 +292,8 @@ module CZ {
                            (element.x >= parent.x && element.x + element.width <= parent.x + parent.width) &&
                            (element.y >= parent.y && element.y + element.height <= parent.y + parent.height);
 
-            if (!isWithin)
-                console.log("Child element does not belong to the parent element " + parent.id + " " + element.ID);
+            // if (!isWithin)
+            //     console.log("Child element does not belong to the parent element " + parent.id + " " + element.ID);
 
             //if (!suppresCheck && !isWithin) throw "Child element does not belong to the parent element";
             parent.children.push(element);

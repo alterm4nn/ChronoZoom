@@ -2,9 +2,14 @@ var CZ;
 (function (CZ) {
     var HomePageViewModel;
     (function (HomePageViewModel) {
+        var _uiMap = {
+            "#auth-event-form": "/ui/auth-event-form.html"
+        };
         $(document).ready(function () {
             $('.bubbleInfo').hide();
             CZ.Common.initialize();
+            CZ.UILoader.loadAll(_uiMap).done(function () {
+            });
             $('#search_button').mouseup(CZ.Search.onSearchClicked).mouseover(function () {
                 CZ.Search.searchHighlight(true);
             }).mouseout(function () {
