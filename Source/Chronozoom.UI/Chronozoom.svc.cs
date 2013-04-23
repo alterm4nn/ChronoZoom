@@ -275,19 +275,12 @@ namespace UI
                 }
                 else
                 {
-                    if (userRequest.Id != Guid.Empty)
-                    {
-                        //TODO: check if this is an error or the user can specify the Id to be updated or only DisplayName needs to be specified for updated?
-                    }
-
                     if (updateUser == null)
                     {
                         SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.UserNotFound);
                         return String.Empty;
                     }
 
-                    // TODO: check if display name can be updated -- probably not
-                   // updateUser.DisplayName = userRequest.DisplayName; 
                     updateUser.Email = userRequest.Email;
                     // TODO: check if these two values can be updated for an existing user?
                     //updateUser.NameIdentifier = 
@@ -303,7 +296,7 @@ namespace UI
 
         private Uri UpdatePersonalCollection(string userId, User user)
         {
-            if (userId == String.Empty)
+            if (string.IsNullOrEmpty(userId))
             {
                 // Anonymous user so use the sandbox supercollection and collection
                 SuperCollection sandboxSuperCollection = _storage.SuperCollections.Where(candidate => candidate.Title == _sandboxSuperCollectionName).FirstOrDefault();
