@@ -49,7 +49,6 @@ describe("Given:  'edit timeline' form is opened: ", function () {
                 $('#timelineTitleInput').val(title);
                 $('.cz-datepicker-year:first').val(start);
                 $('.cz-datepicker-year:last').val(end);
-
                 $("span:contains('save and close')").click();
             });
 

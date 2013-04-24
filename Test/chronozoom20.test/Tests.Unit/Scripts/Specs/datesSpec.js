@@ -5,7 +5,7 @@
 
 
 describe("convertYearToCoordinate method should return", function () {
-    
+
     using("regime =", ["Ga"], function (value) {
         it("year * -1000000000", function () {
             var year = 100;
@@ -93,7 +93,35 @@ describe("convertCoordinateToYear method should return", function () {
     });
 });
 
+// var data1 = [coordinate, exoected year, expected month, expected day];
+var data1 = [-0.3488135039063145, -1, 7, 27];
+var data2 = [2013.0958904109589, 2013, 1, 5];
+var data3 = [1, 1, 0, 1];
+var data4 = [-2013.5, -2014, 6, 3];
+var data5 = [2012.161, 2012, 1, 29]; // - leap year
+var data6 = [2013.161, 2013, 2, 1];
+var data7 = [-1599.839, -1600, 1, 29]; // - leap year
+var data8 = [2000.161, 2000, 1, 29]; // - leap year
+var data9 = [2000.162, 2000, 2, 1];
 
+
+describe("getDMYFromCoordinate() method should return", function () {
+    usingDMY("", [data1, data2, data3, data4, data5, data6, data7, data8, data9], function (coordinate, year, month, day) {
+        it("{ year: " + year + ", month: " + month + ", day: " + day + " }  with coordinate: "+ coordinate , function () {
+            var result = CZ.Dates.getDMYFromCoordinate(coordinate);
+            expect({ year: year, month: month, day: day }).toEqual(result);
+        });
+    });
+});
+
+describe("getCoordinateFromDMY() method should return", function () {
+    usingDMY('', [data1, data2, data3, data4, data5, data6, data7, data8, data9], function (coordinate, year, month, day) {
+        it("coordinate: " + coordinate + " with { year: " + year + ", month: " + month + ", day: " + day + " } ", function () {
+            var result = CZ.Dates.getCoordinateFromDMY(year, month, day);
+            expect(1 * coordinate.toFixed(2)).toEqual(1 * result.toFixed(2));
+        });
+    });
+});
 
 function convertCoordinateToYear(coordinate) {
     return CZ.Dates.convertCoordinateToYear(coordinate);
@@ -112,160 +140,15 @@ function using(name, values, func) {
     }
 }
 
-
-//describe("isLeapYear() method", function () {
-//    describe("should return", function () {
-//        it("true, if year is leap and above zero (1600)", function () {
-//            var year = 1600;
-//            var result = isLeapYear(year);
-//            expect(true).toEqual(result);
-//        });
-
-//        it("false, if year is not leap and above zero (1990)", function () {
-//            var year = 1990;
-//            var result = isLeapYear(year);
-//            expect(false).toEqual(result);
-//        });
-
-//        it("true, if year is leap and less zero", function () {
-//            var year = -1600;
-//            var result = isLeapYear(year);
-//            expect(true).toEqual(result);
-//        });
-
-//        it("false, if year is 1700", function () {
-//            var year = 1700;
-//            var result = isLeapYear(year);
-//            expect(false).toEqual(result);
-//        });
-
-//        it("false, if year is not leap and less zero", function () {
-//            var year = -1990;
-//            var result = isLeapYear(year);
-//            expect(false).toEqual(result);
-//        });
-
-//        it("true, if year equal zero", function () {
-//            var year = 0;
-//            var result = isLeapYear(year);
-//            expect(true).toEqual(result);
-//        });
-
-//        it("false, if year = 1900)", function () {
-//            var year = 1900;
-//            var result = isLeapYear(year);
-//            expect(false).toEqual(result);
-//        });
-
-//        it("false, if year = 2000)", function () {
-//            var year = 2000;
-//            var result = isLeapYear(year);
-//            expect(true).toEqual(result);
-//        });
-
-//        it("false, if year less than zero)", function () {
-//            var year = -1600;
-//            var result = isLeapYear(year);
-//            expect(false).toEqual(result);
-//        });
-//    });
-//});
-
-//describe("getDateFrom() method", function () {
-//    describe("should return", function () {
-//        it("by 10 yeas above, if delta = 10 years", function () {
-//            var year = 2000;
-//            var month = 0;
-//            var day = 0;
-//            var delta = 10;
-//            var result = getDateFrom(year,month,day,delta);
-//            expect({ year : 2010, month : 0, day : 0}).toEqual(result);
-//        });
-
-//        it("by 10 yeas less, if delta = -10 years", function () {
-//            var year = 2000;
-//            var month = 0;
-//            var day = 0;
-//            var delta = -10;
-//            var result = getDateFrom(year, month, day, delta);
-//            expect({ year: 1990, month: 0, day: 0 }).toEqual(result);
-//        });
-
-//        it("1 year, if start year = -1 and delta = 1", function () {
-//            var year = -1;
-//            var month = 0;
-//            var day = 0;
-//            var delta = 1;
-//            var result = getDateFrom(year, month, day, delta);
-//            expect({ year: 1, month: 0, day: 0 }).toEqual(result);
-//        });
-
-//    });
-//});
-
-describe("getDMYFromCoordinate() method", function () {
-    describe("should return", function () {
-        it("by 10 yeas above, if delta = 10 years", function () {
-            var coordinate = 10;
-            var result = CZ.Dates.getDMYFromCoordinate(coordinate);
-            expect({ year : 10, month : 0, day : 1}).toEqual(result);
-        });
-
-        it("by 10 yeas less, if delta = -10 years", function () {
-            var delta = -10;
-            var result = CZ.Dates.getDMYFromCoordinate(delta);
-            expect({ year: -10, month: 0, day: 1 }).toEqual(result);
-        });
-
-        it("1 year, if start year = -1 and delta = 1", function () {
-            var delta = 1;
-            var result = CZ.Dates.getDMYFromCoordinate(delta);
-            expect({ year: 1, month: 0, day: 1 }).toEqual(result);
-        });
-
-    });
-});
-
-//describe("getYearsBetweenDates() method", function () {
-//    var dates;
-//    beforeEach(function () {
-//        dates = CZ.Dates;
-//    });
-//    describe("should return", function () {
-//        it("-1.0027397260273974, if start date = 1600-1-28 and end date = 1601-1-28", function () {
-//            var y1 = 1600;
-//            var m1 = 1;
-//            var d1 = 28;
-//            var y2 = 1601;
-//            var m2 = 1;
-//            var d2 = 28;
-//            var result = CZ.Dates.getYearsBetweenDates(y1, m1, d1, y2, m2, d2);
-//            expect(-1.0027397260273974).toEqual(result);
-//        });
-
-//        it("19, if start date = (10)-1-1 and end date = (-10)-1-1", function () {
-//            var y1 = 10;
-//            var m1 = 1;
-//            var d1 = 1;
-//            var y2 = -10;
-//            var m2 = 1;
-//            var d2 = 1;
-//            var result = dates.getYearsBetweenDates(y1, m1, d1, y2, m2, d2);
-//            expect(19).toEqual(result);
-//        });
-
-//        it("-19, if start date = (-10)-1-1 and end date = (10)-1-1", function () {
-//            var y1 = -10;
-//            var m1 = 1;
-//            var d1 = 1;
-//            var y2 = 10;
-//            var m2 = 1;
-//            var d2 = 1;
-//            var result = dates.getYearsBetweenDates(y1, m1, d1, y2, m2, d2);
-//            expect(-19).toEqual(result);
-//        });
-//    });
-//});
+function usingDMY(name, values, func) {
+    for (var i = 0, count = values.length; i < count; i++) {
+        if (Object.prototype.toString.call(values[i]) !== '[object Array]') {
+            values[i] = [values[i]];
+        }
+        func.apply(this, [values[i][0], values[i][1], values[i][2], values[i][3], values[i][4]]);
+        jasmine.currentEnv_.currentSpec.description += name;
+    }
+}
 
 //describe("loadDataUrl() method", function () {
 //    describe("should return", function () {
