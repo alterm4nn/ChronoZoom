@@ -5,7 +5,7 @@ var CZ;
             function DatePicker(datePicker) {
                 this.datePicker = datePicker;
                 this.Infinity = 9999;
-                this.WrongYearInput = "Year should be a number.";
+                this.WRONG_YEAR_INPUT = "Year should be a number.";
                 if(!(datePicker instanceof jQuery && datePicker.is("div"))) {
                     throw "DatePicker parameter is invalid! It should be jQuery instance of DIV.";
                 }
@@ -15,7 +15,7 @@ var CZ;
             DatePicker.prototype.initialize = function () {
                 var _this = this;
                 this.datePicker.addClass("cz-datepicker");
-                this.modeSelector = $("<select class='cz-datepicker-mode'></select>");
+                this.modeSelector = $("<select class='cz-datepicker-mode cz-input'></select>");
                 var optionYear = $("<option value='year'>Year</option>");
                 var optionDate = $("<option value='date'>Date</option>");
                 this.modeSelector.change(function (event) {
@@ -86,14 +86,14 @@ var CZ;
             DatePicker.prototype.editModeYear = function () {
                 var _this = this;
                 this.dateContainer.empty();
-                this.yearSelector = $("<input type='text' class='cz-datepicker-year'></input>");
-                this.regimeSelector = $("<select class='cz-datepicker-regime'></select>");
+                this.yearSelector = $("<input type='text' class='cz-datepicker-year-year cz-input'></input>");
+                this.regimeSelector = $("<select class='cz-datepicker-regime cz-input'></select>");
                 this.yearSelector.focus(function (event) {
                     _this.errorMsg.text("");
                 });
                 this.yearSelector.blur(function (event) {
                     if(!_this.validateNumber(_this.yearSelector.val())) {
-                        _this.errorMsg.text(_this.WrongYearInput);
+                        _this.errorMsg.text(_this.WRONG_YEAR_INPUT);
                     }
                 });
                 var optionGa = $("<option value='ga'>Ga</option>");
@@ -108,15 +108,15 @@ var CZ;
             DatePicker.prototype.editModeDate = function () {
                 var _this = this;
                 this.dateContainer.empty();
-                this.daySelector = $("<select class='cz-datepicker-day-selector'></select>");
-                this.monthSelector = $("<select class='cz-datepicker-month-selector'></select>");
-                this.yearSelector = $("<input type='text' class='cz-datepicker-year'></input>");
+                this.daySelector = $("<select class='cz-datepicker-day-selector cz-input'></select>");
+                this.monthSelector = $("<select class='cz-datepicker-month-selector cz-input'></select>");
+                this.yearSelector = $("<input type='text' class='cz-datepicker-year-date cz-input'></input>");
                 this.yearSelector.focus(function (event) {
                     _this.errorMsg.text("");
                 });
                 this.yearSelector.blur(function (event) {
                     if(!_this.validateNumber(_this.yearSelector.val())) {
-                        _this.errorMsg.text(_this.WrongYearInput);
+                        _this.errorMsg.text(_this.WRONG_YEAR_INPUT);
                     }
                 });
                 var self = this;
