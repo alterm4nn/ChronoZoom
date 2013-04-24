@@ -179,6 +179,7 @@ describe("getDMYFromCoordinate() method", function () {
         var data3 = [1, 1, 0, 1];
         var data4 = [-2013.5, -2014, 6, 3];
         var data5 = [2012.161, 2012, 1, 29]; // - leap year
+        var data6 = [2013.161, 2013, 2, 1]; 
 
         usingDMY("getDMYFromCoordinate() method", [data1, data2, data3, data4, data5], function (coordinate, year, month, day) {
             it("{ year: " + year + ", month: " + month + ", day: " + day + " }", function () {
