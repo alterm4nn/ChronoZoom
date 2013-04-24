@@ -348,7 +348,7 @@ module CZ {
             });
 
             var vp = CZ.Common.vc.virtualCanvas("getViewport");
-            CZ.Common.vc.virtualCanvas("setVisible", CZ.VCContent.getVisibleForElement({ x: -13700000000, y: 0, width: 13700000000, height: 5535444444.444445 }, 1.0, vp),true);
+            CZ.Common.vc.virtualCanvas("setVisible", CZ.VCContent.getVisibleForElement({ x: -13700000000, y: 0, width: 13700000000, height: 5535444444.444445 }, 1.0, vp, false), true);
             CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
 
             var bid = window.location.hash.match("b=([a-z0-9_]+)");

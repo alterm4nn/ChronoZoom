@@ -64,17 +64,19 @@ var CZ;
         }
         Search.initializeSearch = initializeSearch;
         function navigateToElement(e) {
-            var animId = CZ.Common.setVisibleByUserDirectly(e.newvisible);
-            if(animId) {
-                CZ.Common.setNavigationStringTo = {
-                    element: e.element,
-                    id: animId
-                };
+            if(!CZ.Authoring.isActive) {
+                var animId = CZ.Common.setVisibleByUserDirectly(e.newvisible);
+                if(animId) {
+                    CZ.Common.setNavigationStringTo = {
+                        element: e.element,
+                        id: animId
+                    };
+                }
             }
         }
         Search.navigateToElement = navigateToElement;
         function navigateToBookmark(bookmark) {
-            if(bookmark) {
+            if(bookmark && !CZ.Authoring.isActive) {
                 var visible = CZ.UrlNav.navStringToVisible(bookmark, CZ.Common.vc);
                 if(visible) {
                     var animId = CZ.Common.setVisibleByUserDirectly(visible);
