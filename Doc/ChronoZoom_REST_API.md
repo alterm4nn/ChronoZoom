@@ -88,6 +88,7 @@ Use the **GetThresholds** command to return the time thresholds that have been d
     http://chronozoomproject.org/chronozoom.svc/GetThresholds
 
 **Parameters**
+
 This command has no parameters.
 
 **Example Result Data**
@@ -260,6 +261,7 @@ Updates user information and associated personal collection.
     http://chronozoomproject.org/chronozoom.svc/PutUser?User=aUser
 
 **Parameters**
+
 |Parameter|Type|Value|Required|
 |:--------|:---|:----|:-------|
 |User|string|User information to update.|Yes|
@@ -326,6 +328,7 @@ If a timeline id is not specified, then a new timeline is added to the collectio
     http://chronozoomproject.org/chronozoom.svc/PutTimeline?collectionName=aCollection&timelineRequest=myTLdata
 
 **Parameters**
+
 |Parameter|Type|Value|Required|
 |:--------|:---|:----|:-------|
 |collectionName|The name of the collection to add or update a timeline.|string|Yes|
@@ -348,6 +351,7 @@ Deletes the timeline with the specified ID.
     http://chronozoomproject.org/chronozoom.svc/DeleteTimeline?collectionName=aCollection&timelineRequest=myTLdata
 
 **Parameters**
+
 |Parameter|Type|Value|Required|
 |:--------|:---|:----|:-------|
 |collectionName|The name of the collection containing the timeline to delete.|string|Yes|
@@ -373,6 +377,7 @@ Otherwise, the exhibit is added to the specified parent timeline. If an invalid 
     http://chronozoomproject.org/chronozoom.svc/PutExhibit?collectionName=myColl&exhibitRequest=myExhibitData
 
 **Parameters**
+
 |Parameter|Type|Value|Required|
 |:--------|:---|:----|:-------|
 |collectionName|The name of the collection that contains the exhibit to update, or to which a new exhibit should be added.|string|Yes|
@@ -395,6 +400,7 @@ Deletes the specified exhibit from the specified collection.
     http://chronozoomproject.org/chronozoom.svc/DeleteExhibit?collectionName=myColl&exhibitRequest=myExhibitData
 
 **Parameters**
+
 |Parameter|Type|Value|Required|
 |:--------|:---|:----|:-------|
 |collectionName|The name of the collection containing the exhibit to be deleted.|string|Yes|
@@ -424,6 +430,7 @@ If the parent exhibit ID is invalid then the request will fail. If the content i
     http://chronozoomproject.org/chronozoom.svc/PutContentItem?collectionName=myColl&exhibitRequest=myContentItem
 
 **Parameters**
+
 |Parameter|Type|Value|Required|
 |:--------|:---|:----|:-------|
 |collectionName|The name of the collection to which a content item will be added.|string|Yes|
@@ -446,6 +453,7 @@ Delete the specified content item from the specified collection.
     http://chronozoomproject.org/chronozoom.svc/DeleteContentItem?collectionName=myColl&exhibitRequest=myContentItem
 
 **Parameters**
+
 |Parameter|Type|Value|Required|
 |:--------|:---|:----|:-------|
 |collectionName|The name of the collection from which a content item will be deleted.|string|Yes|
