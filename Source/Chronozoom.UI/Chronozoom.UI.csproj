@@ -166,7 +166,7 @@
       <DependentUpon>formbase.ts</DependentUpon>
     </Content>
     <Content Include="NewScripts\controls\formbase.ts" />
-    <TypeScriptCompile Include="NewScripts\cz.data.ts" />
+    <Content Include="NewScripts\cz.data.ts" />
     <Content Include="NewScripts\cz.data.js">
       <DependentUpon>cz.data.ts</DependentUpon>
     </Content>
@@ -227,7 +227,12 @@
     <Content Include="samples\custom-form\form-example.ts" />
     <Content Include="samples\custom-form\main.html" />
     <Content Include="samples\cz.datepicker.html" />
+    <Content Include="ui\auth-edit-timeline.ts" />
+    <Content Include="ui\auth-edit-timeline.js">
+      <DependentUpon>auth-edit-timeline.ts</DependentUpon>
+    </Content>
     <Content Include="ui\auth-event-form.html" />
+    <Content Include="ui\auth-edit-timeline-form.html" />
     <Content Include="Views\Account\_IdentityProvidersWithClientSideCode.aspx" />
     <Content Include="favicon.ico" />
     <Content Include="Images\A.png" />

@@ -365,7 +365,8 @@ a:visited {
 
     font-size: 19px;
     cursor: default;
-    filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#FDFDFD', EndColorStr='#424242', GradientType=1); 
+    filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#FDFDFD', EndColorStr='#424242', GradientType=1); 
+
 /* MSIE */
 }
 
@@ -1220,19 +1221,16 @@ img.fallbackBackground {
 
 .cz-form {
     position: absolute;
-    top: 4.6875%; /* 36 / 768 */
-    left: 0;
+    top: 36px; /*4.6875%;*/ /* 36 / 768 */
     z-index: 100000001;
     display: none;
-    width: 30.2734375%; /* 310 / 1024 */
-    height: 92.05729166666667%; /* (768 - 36 - 25) / 768 */
     cursor: default;
 }
 
 .cz-form-header {
     position: relative;
     width: 100%;
-    height: 5.37482319660537%; /* 38 / (768 - 36 - 25) */
+    height: 36px; /*5.37482319660537%;*/ /* 38 / (768 - 36 - 25) */
     background-color: #0464A2;
 }
 
@@ -1246,7 +1244,7 @@ img.fallbackBackground {
 
 .cz-form-title {
     float: left;
-    margin-left: 4.19354838709677%; /* 13 / 310 */
+    margin-left: 15px;/*4.19354838709677%;*/ /* 13 / 310 */
     height: 100%;
     color: #fff;
     font-size: 1.5em;
@@ -1255,7 +1253,7 @@ img.fallbackBackground {
 
 .cz-form-close-btn {
     float: right;
-    margin-right: 4.19354838709677%; /* 13 / 310 */
+    margin-right: 15px;/*4.19354838709677%;*/ /* 13 / 310 */
     color: #fff;
     font-weight: bold;
     font-size: 1.5em;
@@ -1264,12 +1262,88 @@ img.fallbackBackground {
 
 .cz-form-btn {
     cursor: pointer;
+    border: none;
+    color: #fff;
+    height: 26px;
 }
 
 .cz-form-content {
-    padding: 1.94319880418535% 4.19354838709677%; /* 13 / 669; 13 / 310 */
-    height: 94.62517680339463%; /* ((768 - 36 - 25) - 38) / (768 - 36 - 25) */
+    position: absolute;
+    padding: 15px;/*1.94319880418535% 4.19354838709677%;*/ /* 13 / 669; 13 / 310 */
     background-color: #fff;
-    color: #aeaeae;
     text-align: justify;
+}
+
+
+
+.cz-lightgray {
+    color: #aeaeae;
+}
+
+.cz-input {
+    color: #232323;
+    background-color: #E9E9E9;
+    border: 1px solid #D5D5D5;
+    padding: 5px;
+    font-size: .75em;
+    height: 26px;
+    vertical-align: top;
+    
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
+}
+
+.cz-button {
+    cursor: pointer;
+    border: none;
+    color: #fff;
+    height: 26px;
+    width: 120px;
+
+    /* IE10 Consumer Preview */ 
+    background-image: -ms-linear-gradient(bottom, #0E4073 0%, #1B6AAB 100%);
+    /* Mozilla Firefox */ 
+    background-image: -moz-linear-gradient(bottom, #0E4073 0%, #1B6AAB 100%);
+    /* Opera */ 
+    background-image: -o-linear-gradient(bottom, #0E4073 0%, #1B6AAB 100%);
+    /* Webkit (Safari/Chrome 10) */ 
+    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #0E4073), color-stop(1, #1B6AAB));
+    /* Webkit (Chrome 11+) */ 
+    background-image: -webkit-linear-gradient(bottom, #0E4073 0%, #1B6AAB 100%);
+    /* W3C Markup, IE10 Release Preview */ 
+    background-image: linear-gradient(to top, #0E4073 0%, #1B6AAB 100%);
+}
+
+.cz-form-timeline {
+    min-width: 380px;
+    max-width: 450px;
+    width: 30.2734375%; /* 310 / 1024 */
+    bottom: 25px;
+    left: 0;
+}
+
+.cz-form-timeline > .cz-form-content {
+    position: absolute;
+    top: 36px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    overflow-y: auto;
+}
+
+.blocking-layer {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    z-index: -1;
+    background-color: rgba(0,0,0,0.2);
+}
+
+.errormsg {
+    color: #dd4b39;
+    display: none;
 }

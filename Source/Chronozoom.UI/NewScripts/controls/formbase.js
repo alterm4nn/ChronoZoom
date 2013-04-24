@@ -13,6 +13,8 @@ var CZ;
                 this.navButton = this.container.find(formInfo.navButton);
                 this.closeButton = this.container.find(formInfo.closeButton);
                 this.titleTextblock = this.container.find(formInfo.titleTextblock);
+                this.navButton.off();
+                this.closeButton.off();
                 this.closeButton.click(function (event) {
                     _this.close();
                 });
