@@ -44,6 +44,9 @@ namespace UI
         private const decimal _minYear = -13700000000;
         private const decimal _maxYear = 9999;
         private const string _defaultUserCollectionName = "default";
+        private const string _defaultUserName = "anonymous";
+        private const string _sandboxSuperCollectionName = "Sandbox";
+        private const string _sandboxCollectionName = "Sandbox";
         
         // The default number of max elements returned by the API
         private static Lazy<int> _maxElements = new Lazy<int>(() =>
@@ -52,6 +55,7 @@ namespace UI
 
             return string.IsNullOrEmpty(maxElements) ? 2000 : int.Parse(maxElements);
         });
+
 
         // error code descriptions
         private static class ErrorDescription
@@ -70,20 +74,24 @@ namespace UI
             public const string MissingClaim = "User missing expected claim";
             public const string ParentExhibitNonEmpty = "Parent exhibit should not be specified";
             public const string CollectionIdMismatch = "Collection id mismatch";
+            public const string UserNotFound = "User not found";
+            public const string SandboxSuperCollectionNotFound = "Default sandbox supercollection not found";
+            public const string DefaultUserNotFound = "Default anonymous user not found";
+            public const string SuperCollectionNotFound = "SuperCollection not found";
         }
 
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
         public Timeline GetTimelines(string supercollection, string collection, string start, string end, string minspan, string lca, string maxElements)
         {
-            return AuthenticatedOperation(userId =>
+            return AuthenticatedOperation(delegate(User user)
             {
                 Trace.TraceInformation("Get Filtered Timelines");
 
                 Guid collectionId = CollectionIdOrDefault(supercollection, collection);
 
                 // If available, retrieve from cache.
-                if (CanCacheGetTimelines(userId, collectionId))
+                if (CanCacheGetTimelines(user, collectionId))
                 {
                     Timeline cachedTimeline = GetCachedGetTimelines(collectionId, start, end, minspan, lca, maxElements);
                     if (cachedTimeline != null)
@@ -210,42 +218,186 @@ namespace UI
         }
 
         /// <summary>
-        /// Updates user information and associated personal collection.
+        /// Creates or updates user information and the user's associated personal collection.
+        ///
+        /// If the user id is not specified, then this is a new user. For a new user
+        /// the following will be done:
+        /// - if there is no ACS treat as an anonymous user who can access the Sandbox collection
+        /// - if the anonymous user does not exist in the db then it is created
+        /// - add a new supercollection with the user's display name
+        /// - add a new default collection to this supercollection with user's display name
+        /// - create a new user  with the specified attributes
+        ///
+        /// If the user display name is specified and it does not exisit it is considered an error.
+        /// If the user display name is specified and it exists then the user's attributes are updated.
+        ///
         /// </summary>
-        /// <param name="user">User information to update</param>
         /// <returns>The URL for the new user collection.</returns>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/user", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        public String PutUser(User user)
+        public String PutUser(User userRequest)
         {
-            return AuthenticatedOperation<String>(delegate(string userId)
+            return AuthenticatedOperation<String>(delegate(User user)
             {
-                Uri collectionUri = UpdatePersonalCollection(userId, user);
+                Trace.TraceInformation("Put User");
 
-                // TODO: Persist user changes, validation, etc. Initial check-in provides API stub.
+                if (userRequest == null)
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
+                    return string.Empty;
+                }
 
-                Uri uriRequest = System.ServiceModel.OperationContext.Current.RequestContext.RequestMessage.Headers.To;
+                Uri collectionUri, uriRequest;
+
+                if (user == null)
+                {
+                    // No ACS so treat as an anonymous user who can access the sandbox collection.
+                    // If anonymous user does not already exist create the user.
+                    user = _storage.Users.Where(candidate => candidate.NameIdentifier == null).FirstOrDefault();
+                    if (user == null)
+                    {
+                        user = new User { Id = Guid.NewGuid(), DisplayName = _defaultUserName };
+                        _storage.Users.Add(user);
+                        _storage.SaveChanges();
+                    }
+
+                    collectionUri = UpdatePersonalCollection(user.NameIdentifier, userRequest);
+                    uriRequest = System.ServiceModel.OperationContext.Current.RequestContext.RequestMessage.Headers.To;
+                    return new Uri(new Uri(uriRequest.GetLeftPart(UriPartial.Authority)), collectionUri.ToString()).ToString();
+                }
+
+                User updateUser = _storage.Users.Where(candidate => candidate.DisplayName == userRequest.DisplayName).FirstOrDefault();
+                if (userRequest.Id == Guid.Empty && updateUser == null)
+                {
+                    // Add new user
+                    User newUser = new User { Id = Guid.NewGuid(), DisplayName = userRequest.DisplayName, Email = userRequest.Email };
+                    newUser.NameIdentifier = user.NameIdentifier;
+                    newUser.IdentityProvider = user.IdentityProvider;
+                    collectionUri = UpdatePersonalCollection(userRequest.NameIdentifier, newUser);
+                }
+                else
+                {
+                    if (updateUser == null)
+                    {
+                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.UserNotFound);
+                        return String.Empty;
+                    }
+
+                    updateUser.Email = userRequest.Email;
+                    collectionUri = UpdatePersonalCollection(updateUser.NameIdentifier, updateUser);
+                    _storage.SaveChanges();
+                }
+
+                uriRequest = System.ServiceModel.OperationContext.Current.RequestContext.RequestMessage.Headers.To;
                 return new Uri(new Uri(uriRequest.GetLeftPart(UriPartial.Authority)), collectionUri.ToString()).ToString();
             });
         }
 
+        [OperationContract]
+        [WebInvoke(Method = "DELETE", UriTemplate = "/user", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        public void DeleteUser(User userRequest)
+        {
+            AuthenticatedOperation(delegate(User user)
+            {
+                Trace.TraceInformation("Delete User");
+                if (userRequest == null)
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
+                    return;
+                }
+
+                if (user == null)
+                {
+                    // No ACS so treat as an anonymous user who cannot delete anything.
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.UnauthorizedUser);
+                    return;
+                }
+
+                User deleteUser = _storage.Users.Where(candidate => candidate.DisplayName == userRequest.DisplayName).FirstOrDefault();
+                if (deleteUser == null)
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.UserNotFound);
+                    return;
+                }
+
+                if (user.NameIdentifier != deleteUser.NameIdentifier)
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.UnauthorizedUser);
+                    return;
+                }
+
+                DeleteCollection(userRequest.DisplayName, userRequest.DisplayName);
+                DeleteSuperCollection(userRequest.DisplayName);
+                _storage.Users.Remove(deleteUser);
+                _storage.SaveChanges();
+                return;
+            });
+        }
+
+        private void DeleteSuperCollection(string superCollectionName)
+        {
+            AuthenticatedOperation(delegate(User user)
+            {
+                Trace.TraceInformation("Delete SuperCollection {0} from user {1} ", superCollectionName, user);
+
+                Guid superCollectionId = CollectionIdFromText(superCollectionName);
+                SuperCollection superCollection = _storage.SuperCollections.Find(superCollectionId);
+                if (superCollection == null)
+                {
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.SuperCollectionNotFound);
+                    return;
+                }
+
+                if (superCollection.User.NameIdentifier != user.NameIdentifier)
+                {
+                    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                    return;
+                }
+
+                _storage.SuperCollections.Remove(superCollection);
+                _storage.SaveChanges();
+            });
+        }
         private Uri UpdatePersonalCollection(string userId, User user)
         {
-            SuperCollection superCollection = _storage.SuperCollections.Where(candidate => candidate.UserId == userId).FirstOrDefault();
+            if (string.IsNullOrEmpty(userId))
+            {
+                // Anonymous user so use the sandbox supercollection and collection
+                SuperCollection sandboxSuperCollection = _storage.SuperCollections.Where(candidate => candidate.Title == _sandboxSuperCollectionName).FirstOrDefault();
+                if (sandboxSuperCollection == null)
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.SandboxSuperCollectionNotFound);
+                    return new Uri(string.Format(
+                        CultureInfo.InvariantCulture,
+                        @"{0}\{1}\",
+                        String.Empty,
+                        String.Empty), UriKind.Relative);
+                }
+                else
+                {
+                    return new Uri(string.Format(
+                        CultureInfo.InvariantCulture,
+                        @"{0}\{1}\",
+                        FriendlyUrlReplacements(sandboxSuperCollection.Title),
+                        _sandboxCollectionName), UriKind.Relative);
+                }
+            }
+
+            SuperCollection superCollection = _storage.SuperCollections.Where(candidate => candidate.User.NameIdentifier == user.NameIdentifier).FirstOrDefault();
             if (superCollection == null)
             {
                 // Create the personal supercollection
                 superCollection = new SuperCollection();
                 superCollection.Title = user.DisplayName;
                 superCollection.Id = CollectionIdFromText(user.DisplayName);
-                superCollection.UserId = userId;
+                superCollection.User = user;
                 superCollection.Collections = new Collection<Collection>();
 
                 // Create the personal collection
                 Collection personalCollection = new Collection();
-                personalCollection.Title = _defaultUserCollectionName;
-                personalCollection.Id = CollectionIdFromSuperCollection(user.DisplayName, _defaultUserCollectionName);
-                personalCollection.UserId = userId;
+                personalCollection.Title = user.DisplayName;
+                personalCollection.Id = CollectionIdFromSuperCollection(superCollection.Title, personalCollection.Title);
+                personalCollection.User = user;
 
                 superCollection.Collections.Add(personalCollection);
 
@@ -260,7 +412,7 @@ namespace UI
                 CultureInfo.InvariantCulture,
                 @"{0}\{1}\",
                 FriendlyUrlReplacements(superCollection.Title),
-                _defaultUserCollectionName), UriKind.Relative);
+                FriendlyUrlReplacements(superCollection.Title)), UriKind.Relative);
         }
 
         public void Dispose()
@@ -361,7 +513,7 @@ namespace UI
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public Guid PutCollectionName(string superCollectionName, string collectionName, Collection collectionRequest)
         {
-            return AuthenticatedOperation(user =>
+            return AuthenticatedOperation(delegate(User user)
                 {
                     Trace.TraceInformation("Put Collection {0} from user {1} in supercollection {2}", collectionName, user, superCollectionName);
 
@@ -373,17 +525,24 @@ namespace UI
                         return Guid.Empty;
                     }
 
+                    if (user == null)
+                    {
+                        // No ACS so treat as an anonymous user who cannot add or modify a collection.
+                        SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                        return Guid.Empty;
+                    }
+
                     Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
                     Collection collection = _storage.Collections.Find(collectionGuid);
                     if (collection == null)
                     {
-                        collection = new Collection { Id = collectionGuid, Title = collectionName, UserId = user };
+                        collection = new Collection { Id = collectionGuid, Title = collectionName, User = user };
                         _storage.Collections.Add(collection);
                         returnValue = collectionGuid;
                     }
                     else
                     {
-                        if (collection.UserId != user)
+                        if (collection.User != user)
                         {
                             SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                             return Guid.Empty;
@@ -400,7 +559,7 @@ namespace UI
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public void DeleteCollection(string superCollectionName, string collectionName)
         {
-            AuthenticatedOperation(user =>
+            AuthenticatedOperation(delegate(User user)
                 {
                     Trace.TraceInformation("Delete Collection {0} from user {1} in supercollection {2}", collectionName, user, superCollectionName);
 
@@ -412,7 +571,7 @@ namespace UI
                         return;
                     }
 
-                    if (collection.UserId != user)
+                    if (collection.User.NameIdentifier != user.NameIdentifier)
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                         return;
@@ -437,7 +596,7 @@ namespace UI
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/timeline", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public Guid PutTimeline(string superCollectionName, string collectionName, TimelineRaw timelineRequest)
         {
-            return AuthenticatedOperation(user =>
+            return AuthenticatedOperation(delegate(User user)
                 {
                     Trace.TraceInformation("Put Timeline");
                     Guid returnValue;
@@ -458,7 +617,7 @@ namespace UI
                     }
 
                     // Validate user for timelines that require validation
-                    if (collection.UserId != user && collection.UserId != null)
+                    if (collection.User.NameIdentifier != user.NameIdentifier && collection.User.NameIdentifier != null)
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                         return Guid.Empty;
@@ -523,7 +682,7 @@ namespace UI
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/timeline", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public void DeleteTimeline(string superCollectionName, string collectionName, Timeline timelineRequest)
         {
-            AuthenticatedOperation(user =>
+            AuthenticatedOperation(delegate(User user)
                 {
                     Trace.TraceInformation("Delete Timeline");
 
@@ -541,7 +700,7 @@ namespace UI
                         return;
                     }
 
-                    if (collection.UserId != user && collection.UserId != null)
+                    if (collection.User.NameIdentifier != user.NameIdentifier && collection.User.NameIdentifier != null)
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                         return;
@@ -593,7 +752,7 @@ namespace UI
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/exhibit", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public PutExhibitResult PutExhibit(string superCollectionName, string collectionName, ExhibitRaw exhibitRequest)
         {
-            return AuthenticatedOperation(user =>
+            return AuthenticatedOperation(delegate(User user)
                 {
                     Trace.TraceInformation("Put Exhibit");
                     var returnValue = new PutExhibitResult();
@@ -614,7 +773,7 @@ namespace UI
                     }
 
                     // Validate user, if required.
-                    if (collection.UserId != user && collection.UserId != null)
+                    if (collection.User.NameIdentifier != user.NameIdentifier && collection.User.NameIdentifier != null)
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                         return returnValue;
@@ -779,7 +938,7 @@ namespace UI
                         return;
                     }
 
-                    if (collection.UserId != user && collection.UserId != null)
+                    if (collection.User.NameIdentifier != user.NameIdentifier && collection.User.NameIdentifier != null)
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                         return;
@@ -847,7 +1006,7 @@ namespace UI
                     }
 
                     // Validate user, if required.
-                    if (collection.UserId != user && collection.UserId != null)
+                    if (collection.User.NameIdentifier != user.NameIdentifier && collection.User.NameIdentifier != null)
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                         return Guid.Empty;
@@ -898,7 +1057,7 @@ namespace UI
                         return;
                     }
 
-                    if (collection.UserId != user && collection.UserId != null)
+                    if (collection.User.NameIdentifier != user.NameIdentifier && collection.User.NameIdentifier != null)
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                         return;
@@ -977,10 +1136,9 @@ namespace UI
         }
 
         /// <summary>
-        /// Performs an operation udner an authenticated user.
+        /// Performs an operation under an authenticated user.
         /// </summary>
-        private delegate T AuthenticatedOperationDelegate<T>(string user);
-        private static T AuthenticatedOperation<T>(AuthenticatedOperationDelegate<T> operation)
+        private static T AuthenticatedOperation<T>(Func<User, T> operation)
         {
             Microsoft.IdentityModel.Claims.ClaimsIdentity claimsIdentity = HttpContext.Current.User.Identity as Microsoft.IdentityModel.Claims.ClaimsIdentity;
 
@@ -995,14 +1153,23 @@ namespace UI
                 return operation(null);
             }
 
-            return operation(nameIdentifierClaim.Value);
+            Microsoft.IdentityModel.Claims.Claim identityProviderClaim = claimsIdentity.Claims.Where(candidate => candidate.ClaimType.EndsWith("identityprovider")).FirstOrDefault();
+            if (identityProviderClaim == null)
+            {
+                return operation(null);
+            }
+
+            User user = new User();
+            user.NameIdentifier = nameIdentifierClaim.Value;
+            user.IdentityProvider = identityProviderClaim.Value;
+
+            return operation(user);
         }
 
         /// <summary>
         /// Helper to AuthenticatedOperation to handle void.
         /// </summary>
-        private delegate void AuthenticatedOperationVoidDelegate(string user);
-        private static void AuthenticatedOperation(AuthenticatedOperationVoidDelegate operation)
+        private static void AuthenticatedOperation(Action<User> operation)
         {
             AuthenticatedOperation<bool>(user =>
                 {
@@ -1014,12 +1181,17 @@ namespace UI
         /// <summary>
         /// Can a given GetTimelines request be cached?
         /// </summary>
-        private bool CanCacheGetTimelines(string userId, Guid collectionId)
+        private bool CanCacheGetTimelines(User user, Guid collectionId)
         {
+            if (user == null)
+            {
+                // Anonymous user
+                return true;
+            }
             string cacheKey = string.Format(CultureInfo.InvariantCulture, "Collection-To-Owner {0}", collectionId);
             if (!Cache.Contains(cacheKey))
             {
-                string ownerId = _storage.Collections.Find(collectionId).UserId;
+                string ownerId = _storage.Collections.Find(collectionId).User.NameIdentifier;
                 if (ownerId != null)
                 {
                     Cache.Add(cacheKey, ownerId, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
@@ -1027,7 +1199,7 @@ namespace UI
             }
 
             // Can cache as long as the user does not own the collection.
-            return (string)Cache[cacheKey] != userId;
+            return (string)Cache[cacheKey] != user.NameIdentifier;
         }
 
         /// <summary>
