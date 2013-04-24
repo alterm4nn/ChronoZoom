@@ -23,16 +23,13 @@ namespace Chronozoom.Entities
     [DataContract]
     public class SearchResult
     {
-        [DataMember(Name="ID")]
+        [DataMember(Name = "id")]
         public Guid Id { get; set; }
 
-        [DataMember]
+        [DataMember(Name = "title")]
         public string Title { get; set; }
 
-        [DataMember]
+        [DataMember(Name = "objectType")]
         public ObjectType ObjectType { get; set; }
-
-        [DataMember(Name="UniqueID")]
-        public int UniqueId { get; set; }
     }
 }

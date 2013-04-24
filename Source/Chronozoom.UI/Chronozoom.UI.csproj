@@ -189,7 +189,6 @@
     <Content Include="NewScripts\external\jquery-ui-1.8.16.custom.min.js" />
     <Content Include="NewScripts\external\jquery.cookie.js" />
     <Content Include="NewScripts\external\jquery.signalR-1.0.0-rc2.js" />
-    <Content Include="NewScripts\external\jquery.signalR-1.0.0-rc2.min.js" />
     <Content Include="NewScripts\external\mouseWheelPlugin.js" />
     <Content Include="NewScripts\external\rx.jQuery.js" />
     <Content Include="NewScripts\external\rx.js" />
