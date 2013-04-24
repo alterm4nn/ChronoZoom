@@ -105,24 +105,20 @@ var data8 = [2000.161, 2000, 1, 29]; // - leap year
 var data9 = [2000.162, 2000, 2, 1];
 
 
-describe("getDMYFromCoordinate() method", function () {
-    describe("should return", function () {
-
-
-        usingDMY("getDMYFromCoordinate() method", [data1, data2, data3, data4, data5, data6, data7, data8, data9], function (coordinate, year, month, day) {
-            it("{ year: " + year + ", month: " + month + ", day: " + day + " }", function () {
-                var result = CZ.Dates.getDMYFromCoordinate(coordinate);
-                expect({ year: year, month: month, day: day }).toEqual(result);
-            });
+describe("getDMYFromCoordinate() method should return", function () {
+    usingDMY("", [data1, data2, data3, data4, data5, data6, data7, data8, data9], function (coordinate, year, month, day) {
+        it("{ year: " + year + ", month: " + month + ", day: " + day + " }  with coordinate: "+ coordinate , function () {
+            var result = CZ.Dates.getDMYFromCoordinate(coordinate);
+            expect({ year: year, month: month, day: day }).toEqual(result);
         });
     });
 });
 
-describe("getCoordinateFromDMY() method", function () {
-    usingDMY("getDMYFromCoordinate() method", [data1, data2, data3, data4, data5, data6, data7, data8, data9], function (coordinate, year, month, day) {
-        it("{ year: " + year + ", month: " + month + ", day: " + day + " }", function () {
+describe("getCoordinateFromDMY() method should return", function () {
+    usingDMY('', [data1, data2, data3, data4, data5, data6, data7, data8, data9], function (coordinate, year, month, day) {
+        it("coordinate: " + coordinate + " with { year: " + year + ", month: " + month + ", day: " + day + " } ", function () {
             var result = CZ.Dates.getCoordinateFromDMY(year, month, day);
-            expect(1*coordinate.toFixed(2)).toEqual(1*result.toFixed(2));
+            expect(1 * coordinate.toFixed(2)).toEqual(1 * result.toFixed(2));
         });
     });
 });
@@ -150,7 +146,7 @@ function usingDMY(name, values, func) {
             values[i] = [values[i]];
         }
         func.apply(this, [values[i][0], values[i][1], values[i][2], values[i][3], values[i][4]]);
-        jasmine.currentEnv_.currentSpec.description += ' with coordinate: ' + values[i][0];
+        jasmine.currentEnv_.currentSpec.description += name;
     }
 }
 
