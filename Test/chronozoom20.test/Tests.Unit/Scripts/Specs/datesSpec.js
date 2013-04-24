@@ -173,7 +173,7 @@ function using(name, values, func) {
 
 describe("getDMYFromCoordinate() method", function () {
     describe("should return", function () {
-
+        // var data1 = [coordinate, exoected year, expected month, expected day];
         var data1 = [-0.3488135039063145, -1, 7, 27];
         var data2 = [2013.0958904109589, 2013, 1, 5];
         var data3 = [1, 1, 0, 1];
