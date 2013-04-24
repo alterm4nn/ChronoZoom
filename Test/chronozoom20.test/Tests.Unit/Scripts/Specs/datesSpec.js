@@ -5,7 +5,7 @@
 
 
 describe("convertYearToCoordinate method should return", function () {
-    
+
     using("regime =", ["Ga"], function (value) {
         it("year * -1000000000", function () {
             var year = 100;
@@ -171,60 +171,33 @@ function using(name, values, func) {
 //    });
 //});
 
-//describe("getDateFrom() method", function () {
-//    describe("should return", function () {
-//        it("by 10 yeas above, if delta = 10 years", function () {
-//            var year = 2000;
-//            var month = 0;
-//            var day = 0;
-//            var delta = 10;
-//            var result = getDateFrom(year,month,day,delta);
-//            expect({ year : 2010, month : 0, day : 0}).toEqual(result);
-//        });
-
-//        it("by 10 yeas less, if delta = -10 years", function () {
-//            var year = 2000;
-//            var month = 0;
-//            var day = 0;
-//            var delta = -10;
-//            var result = getDateFrom(year, month, day, delta);
-//            expect({ year: 1990, month: 0, day: 0 }).toEqual(result);
-//        });
-
-//        it("1 year, if start year = -1 and delta = 1", function () {
-//            var year = -1;
-//            var month = 0;
-//            var day = 0;
-//            var delta = 1;
-//            var result = getDateFrom(year, month, day, delta);
-//            expect({ year: 1, month: 0, day: 0 }).toEqual(result);
-//        });
-
-//    });
-//});
-
 describe("getDMYFromCoordinate() method", function () {
     describe("should return", function () {
-        it("by 10 yeas above, if delta = 10 years", function () {
-            var coordinate = 10;
-            var result = CZ.Dates.getDMYFromCoordinate(coordinate);
-            expect({ year : 10, month : 0, day : 1}).toEqual(result);
-        });
 
-        it("by 10 yeas less, if delta = -10 years", function () {
-            var delta = -10;
-            var result = CZ.Dates.getDMYFromCoordinate(delta);
-            expect({ year: -10, month: 0, day: 1 }).toEqual(result);
-        });
+        var data1 = [-0.3488135039063145, -1, 7, 27];
+        var data2 = [2013.0958904109589, 2013, 1, 5];
+        var data3 = [1, 1, 0, 1];
+        var data4 = [-2013.5, -2014, 6, 3];
+        var data5 = [2012.161, 2012, 1, 29]; // - leap year
 
-        it("1 year, if start year = -1 and delta = 1", function () {
-            var delta = 1;
-            var result = CZ.Dates.getDMYFromCoordinate(delta);
-            expect({ year: 1, month: 0, day: 1 }).toEqual(result);
+        usingDMY("getDMYFromCoordinate() method", [data1, data2, data3, data4, data5], function (coordinate, year, month, day) {
+            it("{ year: " + year + ", month: " + month + ", day: " + day + " }", function () {
+                var result = CZ.Dates.getDMYFromCoordinate(coordinate);
+                expect({ year: year, month: month, day: day }).toEqual(result);
+            });
         });
-
     });
 });
+
+function usingDMY(name, values, func) {
+    for (var i = 0, count = values.length; i < count; i++) {
+        if (Object.prototype.toString.call(values[i]) !== '[object Array]') {
+            values[i] = [values[i]];
+        }
+        func.apply(this, [values[i][0], values[i][1], values[i][2], values[i][3], values[i][4]]);
+        jasmine.currentEnv_.currentSpec.description += ' with coordinate: ' + values[i][0];
+    }
+}
 
 //describe("getYearsBetweenDates() method", function () {
 //    var dates;
