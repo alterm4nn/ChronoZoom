@@ -356,7 +356,9 @@ module CZ {
                 //bid[0] - source string
                 //bid[1] - found match
                 $("#bibliography .sources").empty();
-                $("#bibliography .title").html("<span>Loading...</span>");
+                $("#bibliography .title").append($("<span></span>", {
+                    text: "Loading..."
+                }));
                 $("#bibliographyBack").css("display", "block");
             }
         });

@@ -534,7 +534,7 @@ module CZ {
             tourControlDiv.style.display = "none";
             if (tour) {
                 hideBookmarks();
-                $("#bookmarks .header").html("");
+                $("#bookmarks .header").text("");
 
                 // remove audio track
                 if (tour.audio)
@@ -654,38 +654,53 @@ module CZ {
 
                 // add new category to tours menu
                 if (tour.category !== category) {
-                    var cat = $('<div class="category">' + tour.category + '</div>').appendTo(toursUI);
+                    var cat = $("<div></div>", {
+                        class: "category",
+                        text: tour.category
+                    }).appendTo(toursUI);
 
                     // add category' UI
-                    var img = $('<img src="/Images/collapse-down.png" class="collapseButton" />').appendTo(cat);
+                    var img = $("<img></img", {
+                        class: "collapseButton",
+                        src: "/Images/collapse-down.png"
+                    }).appendTo(cat);
+
                     if (i == 0) {
                         cat.removeClass('category').addClass('categorySelected');
                         (<HTMLImageElement>img[0]).src = "/Images/collapse-up.png";
                     }
-                    categoryContent = $('<div class="itemContainer"></div>').appendTo(toursUI);
+
+                    categoryContent = $('<div></div>', {
+                        class: "itemContainer"
+                    }).appendTo(toursUI);
+
                     category = tour.category;
                 }
 
                 // add tour element into category
-                $('<div class="item" tour="' + i + '">' + tour.title + '</div>').appendTo(categoryContent)
-                            .click(function () { // click event handler for added tour element
-                                // close active tour                            
-                                removeActiveTour();
+                $("<div></div>", {
+                    class: "item",
+                    tour: i,
+                    text: tour.title,
+                    click: function () {
+                        // close active tour                            
+                        removeActiveTour();
 
-                                // hide tour UI
-                                $("#tours").hide('slide', {}, 'slow');
-                                CZ.Common.toggleOffImage('tours_index');
-                                isTourWindowVisible = false;
+                        // hide tour UI
+                        $("#tours").hide('slide', {}, 'slow');
+                        CZ.Common.toggleOffImage('tours_index');
+                        isTourWindowVisible = false;
 
-                                // activate selected tour  
-                                var mytour = tours[this.getAttribute("tour")];
-                                activateTour(mytour, isNarrationOn);
+                        // activate selected tour  
+                        var mytour = tours[this.getAttribute("tour")];
+                        activateTour(mytour, isNarrationOn);
 
-                                // deselect previously active tour in tours panel
-                                $(".touritem-selected").removeClass("touritem-selected", "slow");
-                                // mark this tour as selected in tours panel
-                                $(this).addClass("touritem-selected", "slow");
-                            });
+                        // deselect previously active tour in tours panel
+                        $(".touritem-selected").removeClass("touritem-selected", "slow");
+                        // mark this tour as selected in tours panel
+                        $(this).addClass("touritem-selected", "slow");
+                    }
+                }).appendTo(categoryContent);
             }
 
             // create jquery widget for category' content sliding
@@ -728,7 +743,7 @@ module CZ {
                     bookmarkAnimation = undefined;
                 });
 
-                $("#bookmarks .slideHeader").html("");
+                $("#bookmarks .slideHeader").text("");
                 isBookmarksTextShown = false;
             }
         }
@@ -740,16 +755,16 @@ module CZ {
             if (!isBookmarksWindowVisible) {
                 isBookmarksWindowVisible = true;
                 // todo: check whether the bookmarks are expanded
-                $("#bookmarks .slideText").html(bookmark.text);
+                $("#bookmarks .slideText").text(bookmark.text);
                 $("#bookmarks").show('slide', {}, 'slow');
             }
 
-            $("#bookmarks .header").html(tour.title);
-            $("#bookmarks .slideHeader").html(bookmark.caption);
-            $("#bookmarks .slideFooter").html(bookmark.number + '/' + tour.bookmarks.length);
+            $("#bookmarks .header").text(tour.title);
+            $("#bookmarks .slideHeader").text(bookmark.caption);
+            $("#bookmarks .slideFooter").text(bookmark.number + '/' + tour.bookmarks.length);
 
             if (isBookmarksWindowExpanded) {
-                $("#bookmarks .slideText").html(bookmark.text);
+                $("#bookmarks .slideText").text(bookmark.text);
                 if (!isBookmarksTextShown) {
 
                     // stop active sliding animation
@@ -763,7 +778,7 @@ module CZ {
                     isBookmarksTextShown = true;
                 }
             } else {
-                $("#bookmarks .slideText").html(bookmark.text);
+                $("#bookmarks .slideText").text(bookmark.text);
             }
         }
 

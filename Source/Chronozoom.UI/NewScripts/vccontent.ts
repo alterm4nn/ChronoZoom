@@ -1510,16 +1510,18 @@ module CZ {
             //But in vccontent we use position:absolute
             //So, we create "wrapping" div elemWrap, with position:absolute
             //Inside elemWrap, create child div with position:relative
-            var elem = $("<div id='citext_" + id + "' class='contentItemDescription'></div")
-                        .appendTo(vc);
+            var elem = $("<div></div>", {
+                id: "citext_" + id,
+                class: "contentItemDescription"
+            }).appendTo(vc);
+            
             elem[0].addEventListener("mousemove", CZ.Common.preventbubble, false);
             //elem[0].addEventListener("mouseup", CZ.Common.preventbubble, false);
             elem[0].addEventListener("mousedown", CZ.Common.preventbubble, false);
             elem[0].addEventListener("DOMMouseScroll", CZ.Common.preventbubble, false);
             elem[0].addEventListener("mousewheel", CZ.Common.preventbubble, false);
-            var textElem = $("<div style='position:relative' class='text'></div>")
-                        .html(text)
-                        .appendTo(elem);
+            var textElem = $("<div style='position:relative' class='text'></div>");
+            textElem.text(text).appendTo(elem);
 
             //Initialize content
             this.initializeContent(elem[0]);

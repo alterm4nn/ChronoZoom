@@ -294,7 +294,9 @@ var CZ;
             var bid = window.location.hash.match("b=([a-z0-9_]+)");
             if(bid) {
                 $("#bibliography .sources").empty();
-                $("#bibliography .title").html("<span>Loading...</span>");
+                $("#bibliography .title").append($("<span></span>", {
+                    text: "Loading..."
+                }));
                 $("#bibliographyBack").css("display", "block");
             }
         });
