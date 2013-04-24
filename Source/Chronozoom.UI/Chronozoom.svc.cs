@@ -1036,7 +1036,7 @@ namespace UI
         /// <returns>Null if not cached.</returns>
         private Timeline GetCachedGetTimelines(Guid collectionId, string start, string end, string minspan, string lca, string maxElements)
         {
-            string cacheKey = string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}", start, end, minspan, lca, maxElements);
+            string cacheKey = string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}", collectionId, start, end, minspan, lca, maxElements);
             if (Cache.Contains(cacheKey))
             {
                 return (Timeline)Cache[cacheKey];
@@ -1050,7 +1050,7 @@ namespace UI
         /// </summary>
         private void CacheGetTimelines(Timeline timeline, Guid collectionId, string start, string end, string minspan, string lca, string maxElements)
         {
-            string cacheKey = string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}", start, end, minspan, lca, maxElements);
+            string cacheKey = string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}", collectionId, start, end, minspan, lca, maxElements);
             if (!Cache.Contains(cacheKey))
             {
                 Cache.Add(cacheKey, timeline, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
