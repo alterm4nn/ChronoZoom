@@ -134,7 +134,7 @@ var CZ;
             };
             var requestTimer = null;
             this.getMissingData = function (vbox, lca) {
-                if(typeof CZ.Authoring === 'undefined' || CZ.Authoring._isActive === false) {
+                if(typeof CZ.Authoring === 'undefined' || CZ.Authoring.isActive === false) {
                     window.clearTimeout(requestTimer);
                     requestTimer = window.setTimeout(function () {
                         getMissingTimelines(vbox, lca);
@@ -192,7 +192,7 @@ var CZ;
                 });
             }
             gesturesSource.Subscribe(function (gesture) {
-                if(typeof gesture != "undefined" && !(CZ.Authoring._isActive)) {
+                if(typeof gesture != "undefined" && !CZ.Authoring.isActive) {
                     var isAnimationActive = self.activeAnimation;
                     var oldId = isAnimationActive ? self.activeAnimation.ID : undefined;
                     self.updateRecentViewport();
