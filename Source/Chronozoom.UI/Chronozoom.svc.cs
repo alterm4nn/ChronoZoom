@@ -91,7 +91,7 @@ namespace UI
                 Guid collectionId = CollectionIdOrDefault(supercollection, collection);
 
                 // If available, retrieve from cache.
-                if (CanCacheGetTimelines(user.NameIdentifier, collectionId))
+                if (CanCacheGetTimelines(user, collectionId))
                 {
                     Timeline cachedTimeline = GetCachedGetTimelines(collectionId, start, end, minspan, lca, maxElements);
                     if (cachedTimeline != null)
@@ -525,11 +525,18 @@ namespace UI
                         return Guid.Empty;
                     }
 
+                    if (user == null)
+                    {
+                        // No ACS so treat as an anonymous user who cannot add or modify a collection.
+                        SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                        return Guid.Empty;
+                    }
+
                     Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
                     Collection collection = _storage.Collections.Find(collectionGuid);
                     if (collection == null)
                     {
-                        collection = new Collection { Id = collectionGuid, Title = collectionName, User = user }; //TODO: test User here
+                        collection = new Collection { Id = collectionGuid, Title = collectionName, User = user };
                         _storage.Collections.Add(collection);
                         returnValue = collectionGuid;
                     }
@@ -1174,8 +1181,13 @@ namespace UI
         /// <summary>
         /// Can a given GetTimelines request be cached?
         /// </summary>
-        private bool CanCacheGetTimelines(string userId, Guid collectionId)
+        private bool CanCacheGetTimelines(User user, Guid collectionId)
         {
+            if (user == null)
+            {
+                // Anonymous user
+                return true;
+            }
             string cacheKey = string.Format(CultureInfo.InvariantCulture, "Collection-To-Owner {0}", collectionId);
             if (!Cache.Contains(cacheKey))
             {
@@ -1187,7 +1199,7 @@ namespace UI
             }
 
             // Can cache as long as the user does not own the collection.
-            return (string)Cache[cacheKey] != userId;
+            return (string)Cache[cacheKey] != user.NameIdentifier;
         }
 
         /// <summary>
