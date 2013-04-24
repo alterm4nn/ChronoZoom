@@ -61,6 +61,8 @@
     <script type="text/javascript" src="/NewScripts/controls/formbase.js"></script>
     <script type="text/javascript" src="/NewScripts/cz.dates.js"></script>
 
+    <script type="text/javascript" src="/ui/auth-edit-timeline.js"></script>
+
     <!--[if IE]>
     <script type="text/javascript" src="/NewScripts/regimesIE.js"></script>
     <![endif]-->
@@ -128,25 +130,6 @@
             </a>
             <a onclick="CZ.Authoring.UI.editExhibit()" class="footer-authoring-link">edit exhibit
             </a>
-
-            <!--Create Timeline popup dialog-->
-            <div id="createTimelineForm" style="background-color: rgb(60, 95, 150); display: none; color: white;">
-                <label style="display: block">title</label>
-                <input id="timelineTitleInput" style="display: block" type="text" />
-                
-                <br />
-                <label style="display: block">start</label>
-                <div id="timelineStartInput" style="display: block" ></div>
-
-                <br />
-                <label style="display: block">end</label>
-                <div id="timelineEndInput" style="display: block"></div>
-
-                <br />
-                <span id="TimelineErrorSpan" style="color: red; display: none">
-                    Input error
-                </span>
-            </div>
 
             <!--Create Exhibit popup dialog-->
             <div id="createExhibitForm" style="background-color: rgb(60, 95, 150); display: none; color: white;">
@@ -287,6 +270,9 @@
 
         <!--Create Event Form-->
         <div id="auth-event-form" class="cz-form unselectable">
+        </div>
+
+        <div id="auth-edit-timeline-form" class="cz-form cz-form-timeline unselectable">
         </div>
     </div>
 
