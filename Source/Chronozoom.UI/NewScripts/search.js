@@ -88,17 +88,11 @@ var CZ;
             }
         }
         Search.navigateToBookmark = navigateToBookmark;
-        function goToSearchResult(id) {
-            var elem = findVCElement(CZ.Common.vc.virtualCanvas("getLayerContent"), id);
-            if(!elem) {
-                alert('Element not found in the content.');
-            } else {
-                var visible = CZ.VCContent.getVisibleForElement(elem, 1.0, CZ.Common.vc.virtualCanvas("getViewport"), true);
-                navigateToElement({
-                    element: elem,
-                    newvisible: visible
-                });
-            }
+        function goToSearchResult(resultId) {
+            var element = CZ.Common.vc.virtualCanvas("findElement", resultId);
+            var navStringElement = CZ.UrlNav.vcelementToNavString(element);
+            var visible = CZ.UrlNav.navStringToVisible(navStringElement, CZ.Common.vc);
+            CZ.Common.controller.moveToVisible(visible);
         }
         Search.goToSearchResult = goToSearchResult;
         function findVCElement(root, id) {
@@ -146,19 +140,19 @@ var CZ;
                         var first = true;
                         for(var i = 0; i < results.length; i++) {
                             var item = results[i];
-                            if(item.ObjectType != objectType) {
+                            if(item.objectType != objectType) {
                                 continue;
                             }
                             var resultId;
-                            switch(item.ObjectType) {
+                            switch(item.objectType) {
                                 case 0:
-                                    resultId = 'e' + item.UniqueID;
+                                    resultId = 'e' + item.id;
                                     break;
                                 case 1:
-                                    resultId = 't' + item.UniqueID;
+                                    resultId = 't' + item.id;
                                     break;
                                 case 2:
-                                    resultId = 'c' + item.UniqueID;
+                                    resultId = item.id;
                                     break;
                                 default:
                                     continue;
@@ -204,10 +198,10 @@ var CZ;
             var url;
             switch(CZ.Settings.czDataSource) {
                 case 'db':
-                    url = "/CZ.svc/Search";
+                    url = "/chronozoom.svc/Search";
                     break;
                 default:
-                    url = "/CZ.svc/SearchRelay";
+                    url = "/chronozoom.svc/Search";
                     break;
             }
             $.ajax({
@@ -217,8 +211,8 @@ var CZ;
                 dataType: "json",
                 data: {
                     searchTerm: searchString,
-                    supercollection: CZ.Common.supercollection,
-                    collection: CZ.Common.collection
+                    supercollection: CZ.Service.superCollectionName,
+                    collection: CZ.Service.collectionName
                 },
                 url: url,
                 success: function (result) {
