@@ -122,7 +122,7 @@ var CZ;
                         if(isCancel) {
                             CZ.Authoring.removeTimeline(t);
                         }
-                        CZ.Authoring._isActive = false;
+                        CZ.Authoring.isActive = false;
                         startInput.remove();
                         endInput.remove();
                         $("#TimelineErrorSpan").css("display", "none");
@@ -172,7 +172,7 @@ var CZ;
                         }
                     },
                     close: function () {
-                        CZ.Authoring._isActive = false;
+                        CZ.Authoring.isActive = false;
                         startInput.remove();
                         endInput.remove();
                         $("a:contains('edit timeline')").removeClass("active");
@@ -225,7 +225,7 @@ var CZ;
                         if(isCancel) {
                             CZ.Authoring.removeExhibit(e);
                         }
-                        CZ.Authoring._isActive = false;
+                        CZ.Authoring.isActive = false;
                         dateInput.remove();
                         $("a:contains('create exhibit')").removeClass("active");
                         $("#ExhibitErrorSpan").css("display", "none");
@@ -284,7 +284,7 @@ var CZ;
                         }
                     },
                     close: function () {
-                        CZ.Authoring._isActive = false;
+                        CZ.Authoring.isActive = false;
                         dateInput.remove();
                         $("a:contains('edit exhibit')").removeClass("active");
                         $("#ExhibitErrorSpan").css("display", "none");
@@ -348,7 +348,7 @@ var CZ;
                         }
                     },
                     close: function () {
-                        CZ.Authoring._isActive = false;
+                        CZ.Authoring.isActive = false;
                         $("a:contains('edit exhibit')").removeClass("active");
                     }
                 });
@@ -358,10 +358,10 @@ var CZ;
                 if(CZ.Layout.animatingElements.length != 0) {
                     return;
                 }
-                CZ.Authoring._isActive = (CZ.Authoring.mode !== "createTimeline") || !CZ.Authoring._isActive;
+                CZ.Authoring.isActive = (CZ.Authoring.mode !== "createTimeline") || !CZ.Authoring.isActive;
                 CZ.Authoring.mode = "createTimeline";
                 $("div #footer-authoring > a").removeClass("active");
-                if(CZ.Authoring._isActive) {
+                if(CZ.Authoring.isActive) {
                     $("a:contains('create timeline')").addClass("active");
                 } else {
                     $("a:contains('create timeline')").removeClass("active");
@@ -372,10 +372,10 @@ var CZ;
                 if(CZ.Layout.animatingElements.length != 0) {
                     return;
                 }
-                CZ.Authoring._isActive = (CZ.Authoring.mode !== "editTimeline") || !CZ.Authoring._isActive;
+                CZ.Authoring.isActive = (CZ.Authoring.mode !== "editTimeline") || !CZ.Authoring.isActive;
                 CZ.Authoring.mode = "editTimeline";
                 $("div #footer-authoring > a").removeClass("active");
-                if(CZ.Authoring._isActive) {
+                if(CZ.Authoring.isActive) {
                     $("a:contains('edit timeline')").addClass("active");
                 } else {
                     $("a:contains('edit timeline')").removeClass("active");
@@ -386,10 +386,10 @@ var CZ;
                 if(CZ.Layout.animatingElements.length != 0) {
                     return;
                 }
-                CZ.Authoring._isActive = (CZ.Authoring.mode !== "createExhibit") || !CZ.Authoring._isActive;
+                CZ.Authoring.isActive = (CZ.Authoring.mode !== "createExhibit") || !CZ.Authoring.isActive;
                 CZ.Authoring.mode = "createExhibit";
                 $("div #footer-authoring > a").removeClass("active");
-                if(CZ.Authoring._isActive) {
+                if(CZ.Authoring.isActive) {
                     $("a:contains('create exhibit')").addClass("active");
                 } else {
                     $("a:contains('create exhibit')").removeClass("active");
@@ -400,10 +400,10 @@ var CZ;
                 if(CZ.Layout.animatingElements.length != 0) {
                     return;
                 }
-                CZ.Authoring._isActive = (CZ.Authoring.mode !== "editExhibit") || !CZ.Authoring._isActive;
+                CZ.Authoring.isActive = (CZ.Authoring.mode !== "editExhibit") || !CZ.Authoring.isActive;
                 CZ.Authoring.mode = "editExhibit";
                 $("div #footer-authoring > a").removeClass("active");
-                if(CZ.Authoring._isActive) {
+                if(CZ.Authoring.isActive) {
                     $("a:contains('edit exhibit')").addClass("active");
                 } else {
                     $("a:contains('edit exhibit')").removeClass("active");

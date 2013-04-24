@@ -174,8 +174,8 @@ var CZ;
                 opacity: 1
             });
         }
-        Authoring._isActive = false;
-        Authoring._isDragging = false;
+        Authoring.isActive = false;
+        Authoring.isDragging = false;
         Authoring.mode = null;
         Authoring.showCreateTimelineForm = null;
         Authoring.showEditTimelineForm = null;
@@ -185,7 +185,7 @@ var CZ;
         Authoring.modeMouseHandlers = {
             createTimeline: {
                 mousemove: function () {
-                    if(CZ.Authoring._isDragging && _hovered.type === "timeline") {
+                    if(CZ.Authoring.isDragging && _hovered.type === "timeline") {
                         updateNewRectangle();
                     }
                 },
@@ -194,6 +194,7 @@ var CZ;
                         return;
                     }
                     if(_hovered.type === "timeline") {
+                        updateNewRectangle();
                         _selectedTimeline = createNewTimeline();
                         Authoring.showCreateTimelineForm(_selectedTimeline);
                     }
@@ -219,17 +220,15 @@ var CZ;
             },
             createExhibit: {
                 mousemove: function () {
-                    if(CZ.Authoring._isDragging && _hovered.type === "timeline") {
+                    if(CZ.Authoring.isDragging && _hovered.type === "timeline") {
                         updateNewCircle();
                     }
                 },
                 mouseup: function () {
                     if(_hovered.type === "timeline") {
                         updateNewCircle();
-                        if(checkExhibitIntersections(_hovered, _circleCur, false)) {
-                            _selectedExhibit = createNewExhibit();
-                            Authoring.showCreateExhibitForm(_selectedExhibit);
-                        }
+                        _selectedExhibit = createNewExhibit();
+                        Authoring.showCreateExhibitForm(_selectedExhibit);
                     }
                 }
             },
@@ -255,11 +254,11 @@ var CZ;
         function initialize(vc, formHandlers) {
             _vcwidget = vc.data("ui-virtualCanvas");
             _vcwidget.element.on("mousedown", function (event) {
-                if(CZ.Authoring._isActive) {
+                if(CZ.Authoring.isActive) {
                     var viewport = _vcwidget.getViewport();
                     var origin = CZ.Common.getXBrowserMouseOrigin(_vcwidget.element, event);
                     var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
-                    CZ.Authoring._isDragging = true;
+                    CZ.Authoring.isDragging = true;
                     _dragStart = posv;
                     _dragPrev = {
                     };
@@ -269,11 +268,11 @@ var CZ;
                 }
             });
             _vcwidget.element.on("mouseup", function (event) {
-                if(CZ.Authoring._isActive) {
+                if(CZ.Authoring.isActive) {
                     var viewport = _vcwidget.getViewport();
                     var origin = CZ.Common.getXBrowserMouseOrigin(_vcwidget.element, event);
                     var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
-                    CZ.Authoring._isDragging = false;
+                    CZ.Authoring.isDragging = false;
                     _dragPrev = _dragCur;
                     _dragCur = posv;
                     CZ.Common.controller.stopAnimation();
@@ -281,7 +280,7 @@ var CZ;
                 }
             });
             _vcwidget.element.on("mousemove", function (event) {
-                if(CZ.Authoring._isActive) {
+                if(CZ.Authoring.isActive) {
                     var viewport = _vcwidget.getViewport();
                     var origin = CZ.Common.getXBrowserMouseOrigin(_vcwidget.element, event);
                     var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
