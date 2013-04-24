@@ -151,24 +151,7 @@ function using(name, values, func) {
 //            expect(true).toEqual(result);
 //        });
 
-//        it("false, if year = 1900)", function () {
-//            var year = 1900;
-//            var result = isLeapYear(year);
-//            expect(false).toEqual(result);
-//        });
 
-//        it("false, if year = 2000)", function () {
-//            var year = 2000;
-//            var result = isLeapYear(year);
-//            expect(true).toEqual(result);
-//        });
-
-//        it("false, if year less than zero)", function () {
-//            var year = -1600;
-//            var result = isLeapYear(year);
-//            expect(false).toEqual(result);
-//        });
-//    });
 //});
 
 describe("getDMYFromCoordinate() method", function () {
@@ -180,8 +163,11 @@ describe("getDMYFromCoordinate() method", function () {
         var data4 = [-2013.5, -2014, 6, 3];
         var data5 = [2012.161, 2012, 1, 29]; // - leap year
         var data6 = [2013.161, 2013, 2, 1]; 
+        var data7 = [-1599.839, -1600, 1, 29]; // - leap year
+        var data8 = [2000.161, 2000, 1, 29]; // - leap year
+        var data9 = [2000.162, 2000, 2, 1];
 
-        usingDMY("getDMYFromCoordinate() method", [data1, data2, data3, data4, data5], function (coordinate, year, month, day) {
+        usingDMY("getDMYFromCoordinate() method", [data1, data2, data3, data4, data5, data6, data7, data8, data9], function (coordinate, year, month, day) {
             it("{ year: " + year + ", month: " + month + ", day: " + day + " }", function () {
                 var result = CZ.Dates.getDMYFromCoordinate(coordinate);
                 expect({ year: year, month: month, day: day }).toEqual(result);
