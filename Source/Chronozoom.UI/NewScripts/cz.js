@@ -90,12 +90,16 @@ var CZ;
             }).mouseover(function () {
                 CZ.Common.toggleOnImage('biblCloseButton', 'png');
             });
-            $('#welcomeScreenCloseButton').mouseover(function () {
-                CZ.Common.toggleOnImage('welcomeScreenCloseButton', 'png');
-            }).mouseout(function () {
-                CZ.Common.toggleOffImage('welcomeScreenCloseButton', 'png');
-            }).click(CZ.Common.hideWelcomeScreen);
-            $('#closeWelcomeScreenButton').click(CZ.Common.closeWelcomeScreen);
+            $.ajax({
+                url: "/account/isauth"
+            }).done(function (data) {
+                if(data != "True") {
+                    $("#loginButton").show();
+                } else {
+                    $("#logoutButton").show();
+                    $("#editButton").show();
+                }
+            });
             var wlcmScrnCookie = CZ.Common.getCookie("welcomeScreenDisallowed");
             if(wlcmScrnCookie != null) {
                 CZ.Common.hideWelcomeScreen();

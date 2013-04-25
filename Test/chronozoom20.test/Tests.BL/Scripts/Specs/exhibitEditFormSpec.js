@@ -3,9 +3,6 @@
 /// <reference path="../Utils/jquery-ui.js" />
 /// <reference path="../Js/cz.settings.js" />
 /// <reference path="../Js/settings.js" />
-/// <reference path="../Js/cz.dates.js" />
-/// <reference path="../Js/common.js" />
-/// <reference path="../Js/cz.datepicker.js" />
 /// <reference path="../Js/vccontent.js" />
 /// <reference path="../Js/authoring.ui.js" />
 /// <reference path="../Js/authoring.js" />
@@ -46,9 +43,9 @@ describe("Given:  'edit exhibit' form is opened: ", function () {
         describe("When: User set: " + conditional + " and save changes", function () {
             beforeEach(function () {
                 $('#exhibitTitleInput').val(title);
-                $('.cz-datepicker-year').val(start);
+                $('#exhibitDateInput').val(start);
 
-                $("span:contains('save and close')").click();
+                $('.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only:first').click();
             });
 
             it("Then: Error message should be thrown.", function () {
@@ -71,6 +68,6 @@ function using(name, values, func) {
 function init() {
     $('#createExhibitForm').length == 0 ? $('body').prepend('<div id="createExhibitForm" >') : "";
     $('#exhibitTitleInput').length == 0 ? $('body').prepend('<span id="exhibitTitleInput"</span>') : "";
-    $('#exhibitDateInput').length == 0 ? $('body').prepend('<div id="exhibitDateInput"</div>') : "";
+    $('#exhibitDateInput').length == 0 ? $('body').prepend('<span id="exhibitDateInput"</span>') : "";
     $('#ExhibitErrorSpan').length == 0 ? $('body').prepend('<span id="ExhibitErrorSpan" style="color:red; display:none">Input error</span>') : "";
 }

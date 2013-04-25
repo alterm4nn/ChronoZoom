@@ -276,6 +276,32 @@ var CZ;
             return $.when.apply($, promises);
         }
         Service.putExhibitContent = putExhibitContent;
+        function putProfile(username, display_name, email) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("profile");
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify({
+                })
+            });
+        }
+        Service.putProfile = putProfile;
+        function deleteProfile(username) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("profile");
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify({
+                })
+            });
+        }
+        Service.deleteProfile = deleteProfile;
     })(CZ.Service || (CZ.Service = {}));
     var Service = CZ.Service;
 })(CZ || (CZ = {}));

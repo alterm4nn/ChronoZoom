@@ -26,7 +26,7 @@ var CZ;
                     self.cursorPosition = 0.0;
                     var layerDivs = self.element.children("div");
                     layerDivs.each(function (index) {
-                        $(this).addClass("virtualCanvasLayerDiv unselectable").zIndex(index * 3);
+                        $(this).addClass("virtualCanvasLayerDiv").zIndex(index * 3);
                         var layerCanvasJq = $("<canvas></canvas>").appendTo($(this)).addClass("virtualCanvasLayerCanvas").zIndex(index * 3 + 1);
                         self._layers.push($(this));
                     });
@@ -298,7 +298,7 @@ var CZ;
                 _destroy: function () {
                     this.element.removeClass("virtualCanvas");
                     this.element.children(".virtualCanvasLayerDiv").each(function (index) {
-                        $(this).removeClass("virtualCanvasLayerDiv").removeClass("unselectable");
+                        $(this).removeClass("virtualCanvasLayerDiv");
                         $(this).remove(".virtualCanvasLayerCanvas");
                     });
                     this.element.unbind('.' + this.widgetName);

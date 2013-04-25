@@ -7,8 +7,6 @@
 /// <reference path='virtualCanvas.ts'/>
 /// <reference path='uiloader.ts'/>
 /// <reference path='controls/formbase.ts'/>
-/// <reference path='controls/cz.datepicker.ts'/>
-
 /// <reference path='typings/jquery/jquery.d.ts'/>
 
 module CZ {
@@ -103,13 +101,17 @@ module CZ {
                 .mouseout(() => { CZ.Common.toggleOffImage('biblCloseButton', 'png'); })
                 .mouseover(() => { CZ.Common.toggleOnImage('biblCloseButton', 'png'); })
             
-            
-            $('#welcomeScreenCloseButton')
-                .mouseover(() => { CZ.Common.toggleOnImage('welcomeScreenCloseButton', 'png'); })
-                .mouseout(() => { CZ.Common.toggleOffImage('welcomeScreenCloseButton', 'png'); })
-                .click(CZ.Common.hideWelcomeScreen);
-            $('#closeWelcomeScreenButton')
-                .click(CZ.Common.closeWelcomeScreen);
+            //Login/Logout button
+            $.ajax({
+                url: "/account/isauth"
+            }).done(function (data) {
+                if (data != "True") {
+                    $("#loginButton").show();
+                } else {
+                    $("#logoutButton").show();
+                    $("#editButton").show();
+                }
+            });
 
             var wlcmScrnCookie = CZ.Common.getCookie("welcomeScreenDisallowed");
             if (wlcmScrnCookie != null) {

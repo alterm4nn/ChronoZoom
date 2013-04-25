@@ -365,7 +365,8 @@ a:visited {
 
     font-size: 19px;
     cursor: default;
-    filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#FDFDFD', EndColorStr='#424242', GradientType=1); 
+    filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#FDFDFD', EndColorStr='#424242', GradientType=1); 
+
 /* MSIE */
 }
 
