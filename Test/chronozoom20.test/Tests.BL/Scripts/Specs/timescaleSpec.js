@@ -1,6 +1,7 @@
 ﻿/// <reference path="../Utils/jquery-1.7.2.min.js" />
 /// <reference path="../Utils/jasmine-jquery.js" />
 /// <reference path="../Js/timescale.js" />
+/// <reference path="../Js/cz.dates.js" />
 /// <reference path="../Js/common.js" />
 /// <reference path="../Js/cz.settings.js" />
 /// <reference path="../Js/settings.js" />
@@ -44,30 +45,6 @@ describe("CZ.Timescale part", function () {
             tm.setTimeBorders();
             expect("4042.9 Ma").toEqual($('#timescale_left_border').text());
             expect("0.0 Ma").toEqual($('#timescale_right_border').text());
-        });
-    });
-
-    describe("When user set mouse to timescale point", function () {
-
-        beforeEach(function () {
-            //setFixtures('<body></body>');
-            $('body').prepend('<div id="axis" style="display:none;"></div>');
-            $('body').prepend('<p id="timescale_marker" style="display:none;"></p>');
-            _width = 1904;
-            _height = 75;
-            _mode = "calendar";
-            time = "2000";
-            CZ.Settings.maxPermitedTimeRange = {
-                left: -13700000000,
-                right: 2013.25
-            };
-            var range = { min: 1969.5394928592248, max: 2013.7481783736519 };
-            tm = new CZ.Timescale($('#axis'));
-            tm.update(range);
-        });
-        it("marker value should be corrected", function () {
-            tm.setTimeMarker(time);
-            expect("2000 AD").toEqual($('#marker-text').text());
         });
     });
 });
@@ -174,6 +151,125 @@ describe("CZ.CosmosTickSource", function () {
                 spyOn(cosmosTickSrc, 'createTicks');
                 cosmosTickSrc.createTicks();
                 expect(cosmosTickSrc.createTicks).toHaveBeenCalled();
+            });
+        });
+    });
+});
+
+describe("When user set mouse to timescale point", function () {
+
+    beforeEach(function () {
+        $('body').prepend('<div id="axis" style="display:none;"></div>');
+        $('body').prepend('<p id="timescale_marker" style="display:none;"></p>');
+        _width = 1904;
+        _height = 75;
+
+        CZ.Settings.maxPermitedTimeRange = {
+            left: -13700000000,
+            right: 2013.25
+        };
+        tm = new CZ.Timescale($('#axis'));
+    });
+    describe("in cosmos mode", function () {
+        describe("and Ma regime", function () {
+            beforeEach(function () {
+                time = -2252824056.1538224;
+                expectedResult = 2252.8 + " Ma";
+                var range = { min: -5226707537.317015, max: 656709550.6101665 };
+                tm.update(range);
+            });
+            it("Then: marker value should be corrected", function () {
+                tm.setTimeMarker(time);
+                expect(expectedResult).toEqual($('#marker-text').text());
+            });
+        });
+        describe("and Ga regime", function () {
+            beforeEach(function () {
+                time = -9722580060.656828;
+                expectedResult = 9.7 + " Ga";
+                var range = { min: -13920967774.407955, max: 220969787.70110416 };
+                tm.update(range);
+            });
+            it("Then: marker value should be corrected", function () {
+                tm.setTimeMarker(time);
+                expect(expectedResult).toEqual($('#marker-text').text());
+            });
+        });
+        describe("and ka regime", function () {
+            beforeEach(function () {
+                time = -5405.34945727703;
+                expectedResult = 5.4 + " ka";
+                var range = { min: -11613.371118660096, max: 23861.03837495743 };
+                tm.update(range);
+            });
+            it("Then: marker value should be corrected", function () {
+                tm.setTimeMarker(time);
+                expect(expectedResult).toEqual($('#marker-text').text());
+            });
+        });
+    });
+    describe("in calendar mode", function () {
+        describe("and BCE area", function () {
+            beforeEach(function () {
+                time = -3447.996412540633;
+                expectedResult = 3449 + " BCE";
+                var range = { min: -3447.996412540633, max: 2461.289563225633 };
+                tm.update(range);
+            });
+            it("Then: marker value should be corrected", function () {
+                tm.setTimeMarker(time);
+                expect(expectedResult).toEqual($('#marker-text').text());
+            });
+        });
+        describe("and CE area", function () {
+            beforeEach(function () {
+                time = 1000.996412540633;
+                expectedResult = 1000 + " CE";
+                var range = { min: -3447.996412540633, max: 2461.289563225633 };
+                tm.update(range);
+            });
+            it("Then: marker value should be corrected", function () {
+                tm.setTimeMarker(time);
+                expect(expectedResult).toEqual($('#marker-text').text());
+            });
+        });
+        describe("and time = 0", function () {
+            beforeEach(function () {
+                time = 0.5027397260273974;
+                expectedResult = 1 + " BCE";
+                var range = { min: -3447.996412540633, max: 2461.289563225633 };
+                tm.update(range);
+            });
+            it("Then: marker value should be corrected", function () {
+                tm.setTimeMarker(time);
+                expect(expectedResult).toEqual($('#marker-text').text());
+            });
+        });
+    });
+    describe("in date mode", function () {
+        describe("and one year area", function () {
+            beforeEach(function () {
+                time = 2012.1946866592516;
+                expectedResult = '3.12';
+                var range = { min: 2011.5541057045, max: 2012.5469000468117 };
+                tm.update(range);
+            });
+            it("Then: marker value should be corrected", function () {
+                tm.setTimeMarker(time);
+                expect(expectedResult).toEqual($('#marker-text').text());
+            });
+        });
+
+        describe("and one day area", function () {
+            beforeEach(function () {
+                time = 197.72385213591;
+                expectedResult = '21';
+                var range = { min: 198.16175542755357, max: 198.16255773500498 };
+                tm.update(range);
+            });
+            it("Then: marker value should be corrected", function () {
+                tm.setTimeMarker(time);
+                expect(expectedResult).toEqual($('#marker-text').text());
             });
         });
     });

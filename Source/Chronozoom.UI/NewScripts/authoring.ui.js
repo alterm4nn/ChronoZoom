@@ -3,19 +3,74 @@ var CZ;
     (function (Authoring) {
         (function (UI) {
             function _addContentItemForm(form, addSeparator) {
-                var container = $("<div class='cz-authoring-ci-container'></div>");
-                var title = $("<p>" + "<label>Title</label>" + "<input class='cz-authoring-ci-title' style='display: block' type='text'/>" + "</p>");
-                var description = $("<p>" + "<label style='display: block'>Description</label>" + "<textarea class='cz-authoring-ci-description' style='display: block' />" + "</p>");
-                var mediaSource = $("<p>" + "<label>Media source</label>" + "<input class='cz-authoring-ci-media-source' style='display: block' type='text'/>" + "</p>");
-                var mediaType = $("<p>" + "<label>Media type</label>" + "<select class='cz-authoring-ci-media-type' style='display: block'>" + "<option value='image'>Image</option>" + "<option value='pdf'>PDF</option> " + "<option value='video'>Video</option>" + "<option value='audio'>Audio</option>" + "</select>" + "</p>");
-                var removeBtn = $("<button>Remove content item</button>");
-                removeBtn[0].onclick = function () {
-                    container.remove();
-                };
+                var container = $("<div></div>", {
+                    class: "cz-authoring-ci-container"
+                });
+                var title = $("<p></p>").append($("<label></label>", {
+                    text: "Title"
+                })).append($("<input></input>", {
+                    class: "cz-authoring-ci-title",
+                    style: "display: block;",
+                    type: "text"
+                }));
+                var description = $("<p></p>").append($("<label></label>", {
+                    style: "display: block;",
+                    text: "Description"
+                })).append($("<textarea></textarea>", {
+                    class: "cz-authoring-ci-description",
+                    style: "display: block;"
+                }));
+                var mediaSource = $("<p></p>").append($("<label></label>", {
+                    text: "URL of image or video"
+                })).append($("<input></input>", {
+                    class: "cz-authoring-ci-uri",
+                    style: "display: block;",
+                    type: "text"
+                }));
+                var mediaType = $("<p></p>").append($("<label></label>", {
+                    text: "Media type"
+                })).append($("<select></select>", {
+                    class: "cz-authoring-ci-media-type",
+                    style: "display: block;"
+                }).append($("<option></option>", {
+                    value: "image",
+                    text: "Image"
+                }), $("<option></option>", {
+                    value: "pdf",
+                    text: "PDF"
+                }), $("<option></option>", {
+                    value: "video",
+                    text: "Video"
+                }), $("<option></option>", {
+                    value: "audio",
+                    text: "Audio"
+                })));
+                var attribution = $("<p></p>").append($("<label></label>", {
+                    text: "Attribution"
+                })).append($("<input></input>", {
+                    class: "cz-authoring-ci-attribution",
+                    style: "display: block;",
+                    type: "text"
+                }));
+                var mediaSourceURL = $("<p></p>").append($("<label></label>", {
+                    text: "Media Source"
+                })).append($("<input></input>", {
+                    class: "cz-authoring-ci-media-source",
+                    style: "display: block;",
+                    type: "text"
+                }));
+                var removeBtn = $("<button></button>", {
+                    text: "Remove content item",
+                    click: function () {
+                        container.remove();
+                    }
+                });
                 container.append(title);
                 container.append(description);
                 container.append(mediaSource);
                 container.append(mediaType);
+                container.append(attribution);
+                container.append(mediaSourceURL);
                 container.append(removeBtn);
                 if(addSeparator == true) {
                     var separator = $("<hr />");
@@ -28,11 +83,12 @@ var CZ;
                 var containers = $(".cz-authoring-ci-container");
                 $(".cz-authoring-ci-container").each(function () {
                     var CItitleInput = $(this).find(".cz-authoring-ci-title");
-                    ;
-                    var mediaInput = $(this).find(".cz-authoring-ci-media-source");
+                    var mediaInput = $(this).find(".cz-authoring-ci-uri");
                     var mediaTypeInput = ($)(this).find(".cz-authoring-ci-media-type option");
                     var descriptionInput = $(this).find(".cz-authoring-ci-description");
                     var guid = $(this).attr("cz-authoring-ci-guid") || undefined;
+                    var attributionInput = $(this).find(".cz-authoring-ci-attribution");
+                    var mediaSourceInput = $(this).find(".cz-authoring-ci-media-source");
                     var selected = ($)(mediaTypeInput)[0];
                     for(var i = 0; i < mediaTypeInput.length; i++) {
                         if(mediaTypeInput[i].selected) {
@@ -45,6 +101,8 @@ var CZ;
                         description: descriptionInput.val(),
                         uri: mediaInput.val(),
                         mediaType: selected.text,
+                        attribution: attributionInput.val(),
+                        mediaSource: mediaSourceInput.val(),
                         guid: guid,
                         parent: undefined
                     });
@@ -53,9 +111,11 @@ var CZ;
             }
             function _fillContentItemForm(form, contentItem) {
                 var titleInput = form.find(".cz-authoring-ci-title");
-                var mediaInput = form.find(".cz-authoring-ci-media-source");
+                var mediaInput = form.find(".cz-authoring-ci-uri");
                 var mediaTypeInput = form.find(".cz-authoring-ci-media-type option");
                 var descriptionInput = form.find(".cz-authoring-ci-description");
+                var attributionInput = form.find(".cz-authoring-ci-attribution");
+                var mediaSourceInput = form.find(".cz-authoring-ci-media-source");
                 var mediaType = contentItem.mediaType.toLowerCase();
                 if(mediaType === "picture") {
                     mediaType = "image";
@@ -64,6 +124,8 @@ var CZ;
                 titleInput.val(contentItem.title);
                 mediaInput.val(contentItem.uri);
                 descriptionInput.val(contentItem.description);
+                attributionInput.val(contentItem.attribution);
+                mediaSourceInput.val(contentItem.mediaSource);
                 mediaTypeInput.each(function (option) {
                     if(this.value === mediaType) {
                         $(this).attr("selected", "selected");
@@ -74,11 +136,12 @@ var CZ;
             function showCreateTimelineForm(t) {
                 var isCancel = true;
                 var titleInput = $("#timelineTitleInput");
-                var startInput = $("#timelineStartInput").spinner();
-                var endInput = $("#timelineEndInput").spinner();
+                var startInput = new CZ.UI.DatePicker($("#timelineStartInput"));
+                var endInput = new CZ.UI.DatePicker($("#timelineEndInput"));
+                endInput.addEditMode_Infinite();
                 titleInput.val(t.title);
-                startInput.val(t.x);
-                endInput.val(t.x + t.width);
+                startInput.setDate(t.x);
+                endInput.setDate(t.x + t.width);
                 $("#createTimelineForm").dialog({
                     title: "create timeline",
                     modal: true,
@@ -86,8 +149,7 @@ var CZ;
                     width: 600,
                     buttons: {
                         "save and close": function () {
-                            var isValid = CZ.Authoring.ValidateNumber(startInput.val()) && CZ.Authoring.ValidateNumber(endInput.val());
-                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(startInput.val()) && CZ.Authoring.IsNotEmpty(endInput.val());
+                            var isValid = CZ.Authoring.ValidateTimelineData(startInput.getDate(), endInput.getDate(), titleInput.val());
                             if(!isValid) {
                                 $("#TimelineErrorSpan").css("display", "block");
                             }
@@ -96,8 +158,8 @@ var CZ;
                                 isCancel = false;
                                 CZ.Authoring.updateTimeline(t, {
                                     title: titleInput.val(),
-                                    start: startInput.val(),
-                                    end: endInput.val()
+                                    start: startInput.getDate(),
+                                    end: endInput.getDate()
                                 }).then(function (success) {
                                     $(self).dialog("close");
                                 }, function (error) {
@@ -111,7 +173,9 @@ var CZ;
                         if(isCancel) {
                             CZ.Authoring.removeTimeline(t);
                         }
-                        CZ.Authoring._isActive = false;
+                        CZ.Authoring.isActive = false;
+                        startInput.remove();
+                        endInput.remove();
                         $("#TimelineErrorSpan").css("display", "none");
                         $("a:contains('create timeline')").removeClass("active");
                     }
@@ -119,12 +183,13 @@ var CZ;
             }
             UI.showCreateTimelineForm = showCreateTimelineForm;
             function showEditTimelineForm(t) {
-                var titleInput = $("#timelineTitleInput").spinner();
-                var startInput = $("#timelineStartInput").spinner();
-                var endInput = $("#timelineEndInput").spinner();
+                var titleInput = $("#timelineTitleInput");
+                var startInput = new CZ.UI.DatePicker($("#timelineStartInput"));
+                var endInput = new CZ.UI.DatePicker($("#timelineEndInput"));
+                endInput.addEditMode_Infinite();
                 titleInput.val(t.title);
-                startInput.val(t.x);
-                endInput.val(t.x + t.width);
+                startInput.setDate(t.x);
+                endInput.setDate(t.x + t.width);
                 $("#createTimelineForm").dialog({
                     title: "edit timeline",
                     modal: true,
@@ -132,8 +197,7 @@ var CZ;
                     width: 600,
                     buttons: {
                         "save and close": function () {
-                            var isValid = CZ.Authoring.ValidateNumber(startInput.val()) && CZ.Authoring.ValidateNumber(endInput.val());
-                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(startInput.val()) && CZ.Authoring.IsNotEmpty(endInput.val());
+                            var isValid = CZ.Authoring.ValidateTimelineData(startInput.getDate(), endInput.getDate(), titleInput.val());
                             if(!isValid) {
                                 $("#TimelineErrorSpan").css("display", "block");
                             }
@@ -141,8 +205,8 @@ var CZ;
                                 var self = this;
                                 CZ.Authoring.updateTimeline(t, {
                                     title: titleInput.val(),
-                                    start: startInput.val(),
-                                    end: endInput.val()
+                                    start: startInput.getDate(),
+                                    end: endInput.getDate()
                                 }).then(function (success) {
                                     $(self).dialog("close");
                                 }, function (error) {
@@ -159,7 +223,9 @@ var CZ;
                         }
                     },
                     close: function () {
-                        CZ.Authoring._isActive = false;
+                        CZ.Authoring.isActive = false;
+                        startInput.remove();
+                        endInput.remove();
                         $("a:contains('edit timeline')").removeClass("active");
                         $("#TimelineErrorSpan").css("display", "none");
                     }
@@ -169,9 +235,9 @@ var CZ;
             function showCreateExhibitForm(e) {
                 var isCancel = true;
                 var titleInput = $("#exhibitTitleInput");
-                var dateInput = $("#exhibitDateInput").spinner();
+                var dateInput = new CZ.UI.DatePicker($("#exhibitDateInput"));
                 titleInput.val(e.title);
-                dateInput.val(e.infodotDescription.date);
+                dateInput.setDate(e.infodotDescription.date);
                 var contentItems = e.contentItems;
                 for(var i = 0; i < contentItems.length; i++) {
                     _addContentItemForm($("#createExhibitForm"), true);
@@ -187,15 +253,13 @@ var CZ;
                     buttons: {
                         "save and close": function () {
                             var contentItems = _getContentItemsData();
-                            var isValid = CZ.Authoring.ValidateNumber(dateInput.val());
-                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(dateInput.val());
-                            isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
+                            var isValid = CZ.Authoring.ValidateExhibitData(dateInput.getDate(), titleInput.val(), contentItems);
                             if(!isValid) {
                                 $("#ExhibitErrorSpan").css("display", "block");
                             } else {
                                 CZ.Authoring.updateExhibit(e, {
                                     title: titleInput.val(),
-                                    date: dateInput.val(),
+                                    date: dateInput.getDate(),
                                     contentItems: contentItems
                                 });
                                 isCancel = false;
@@ -212,7 +276,8 @@ var CZ;
                         if(isCancel) {
                             CZ.Authoring.removeExhibit(e);
                         }
-                        CZ.Authoring._isActive = false;
+                        CZ.Authoring.isActive = false;
+                        dateInput.remove();
                         $("a:contains('create exhibit')").removeClass("active");
                         $("#ExhibitErrorSpan").css("display", "none");
                         $(this).find(".cz-authoring-ci-container").each(function () {
@@ -224,9 +289,9 @@ var CZ;
             UI.showCreateExhibitForm = showCreateExhibitForm;
             function showEditExhibitForm(e) {
                 var titleInput = $("#exhibitTitleInput");
-                var dateInput = $("#exhibitDateInput").spinner();
+                var dateInput = new CZ.UI.DatePicker($("#exhibitDateInput"));
                 titleInput.val(e.title);
-                dateInput.val(e.infodotDescription.date);
+                dateInput.setDate(e.infodotDescription.date);
                 var contentItems = e.contentItems;
                 for(var i = 0; i < contentItems.length; i++) {
                     _addContentItemForm($("#createExhibitForm"), true);
@@ -242,15 +307,13 @@ var CZ;
                     buttons: {
                         "save and close": function () {
                             contentItems = _getContentItemsData();
-                            var isValid = CZ.Authoring.ValidateNumber(dateInput.val());
-                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(dateInput.val());
-                            isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
+                            var isValid = CZ.Authoring.ValidateExhibitData(dateInput.getDate(), titleInput.val(), contentItems);
                             if(!isValid) {
                                 $("#ExhibitErrorSpan").css("display", "block");
                             } else {
                                 CZ.Authoring.updateExhibit(e, {
                                     title: titleInput.val(),
-                                    date: dateInput.val(),
+                                    date: dateInput.getDate(),
                                     contentItems: contentItems
                                 });
                                 $(this).dialog("close");
@@ -272,7 +335,8 @@ var CZ;
                         }
                     },
                     close: function () {
-                        CZ.Authoring._isActive = false;
+                        CZ.Authoring.isActive = false;
+                        dateInput.remove();
                         $("a:contains('edit exhibit')").removeClass("active");
                         $("#ExhibitErrorSpan").css("display", "none");
                         $(this).find(".cz-authoring-ci-container").each(function () {
@@ -287,6 +351,8 @@ var CZ;
                 var mediaInput = $("#contentItemMediaSourceInput");
                 var descriptionInput = $("#contentItemDescriptionInput");
                 var mediaTypeInput = ($)("#contentItemMediaTypeInput option");
+                var attributionInput = $("#cz-authoring-ci-attribution");
+                var mediaSourceInput = $("#cz-authoring-ci-media-source");
                 var mediaType = c.contentItem.mediaType.toLowerCase();
                 if(mediaType === "picture") {
                     mediaType = "image";
@@ -294,6 +360,8 @@ var CZ;
                 titleInput.val(c.contentItem.title);
                 mediaInput.val(c.contentItem.uri);
                 descriptionInput.val(c.contentItem.description);
+                attributionInput.val(c.contentItem.attribution);
+                mediaSourceInput.val(c.contentItem.mediaSource);
                 mediaTypeInput.each(function (option) {
                     if(this.value === mediaType) {
                         $(this).attr("selected", "selected");
@@ -317,7 +385,9 @@ var CZ;
                                 title: titleInput.val(),
                                 uri: mediaInput.val(),
                                 mediaType: selected.text,
-                                description: descriptionInput.val()
+                                description: descriptionInput.val(),
+                                attribution: attributionInput.val(),
+                                mediaSource: mediaSourceInput.val()
                             });
                             $(this).dialog("close");
                         },
@@ -329,7 +399,7 @@ var CZ;
                         }
                     },
                     close: function () {
-                        CZ.Authoring._isActive = false;
+                        CZ.Authoring.isActive = false;
                         $("a:contains('edit exhibit')").removeClass("active");
                     }
                 });
@@ -339,10 +409,10 @@ var CZ;
                 if(CZ.Layout.animatingElements.length != 0) {
                     return;
                 }
-                CZ.Authoring._isActive = (CZ.Authoring.mode !== "createTimeline") || !CZ.Authoring._isActive;
+                CZ.Authoring.isActive = (CZ.Authoring.mode !== "createTimeline") || !CZ.Authoring.isActive;
                 CZ.Authoring.mode = "createTimeline";
                 $("div #footer-authoring > a").removeClass("active");
-                if(CZ.Authoring._isActive) {
+                if(CZ.Authoring.isActive) {
                     $("a:contains('create timeline')").addClass("active");
                 } else {
                     $("a:contains('create timeline')").removeClass("active");
@@ -353,10 +423,10 @@ var CZ;
                 if(CZ.Layout.animatingElements.length != 0) {
                     return;
                 }
-                CZ.Authoring._isActive = (CZ.Authoring.mode !== "editTimeline") || !CZ.Authoring._isActive;
+                CZ.Authoring.isActive = (CZ.Authoring.mode !== "editTimeline") || !CZ.Authoring.isActive;
                 CZ.Authoring.mode = "editTimeline";
                 $("div #footer-authoring > a").removeClass("active");
-                if(CZ.Authoring._isActive) {
+                if(CZ.Authoring.isActive) {
                     $("a:contains('edit timeline')").addClass("active");
                 } else {
                     $("a:contains('edit timeline')").removeClass("active");
@@ -367,10 +437,10 @@ var CZ;
                 if(CZ.Layout.animatingElements.length != 0) {
                     return;
                 }
-                CZ.Authoring._isActive = (CZ.Authoring.mode !== "createExhibit") || !CZ.Authoring._isActive;
+                CZ.Authoring.isActive = (CZ.Authoring.mode !== "createExhibit") || !CZ.Authoring.isActive;
                 CZ.Authoring.mode = "createExhibit";
                 $("div #footer-authoring > a").removeClass("active");
-                if(CZ.Authoring._isActive) {
+                if(CZ.Authoring.isActive) {
                     $("a:contains('create exhibit')").addClass("active");
                 } else {
                     $("a:contains('create exhibit')").removeClass("active");
@@ -381,10 +451,10 @@ var CZ;
                 if(CZ.Layout.animatingElements.length != 0) {
                     return;
                 }
-                CZ.Authoring._isActive = (CZ.Authoring.mode !== "editExhibit") || !CZ.Authoring._isActive;
+                CZ.Authoring.isActive = (CZ.Authoring.mode !== "editExhibit") || !CZ.Authoring.isActive;
                 CZ.Authoring.mode = "editExhibit";
                 $("div #footer-authoring > a").removeClass("active");
-                if(CZ.Authoring._isActive) {
+                if(CZ.Authoring.isActive) {
                     $("a:contains('edit exhibit')").addClass("active");
                 } else {
                     $("a:contains('edit exhibit')").removeClass("active");

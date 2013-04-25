@@ -110,6 +110,7 @@ mkdir .\Scripts\Js
 mkdir .\Scripts\Utils
 
 copy "..\..\..\Source\Chronozoom.UI\NewScripts\*.js" "$(ProjectDir)Scripts\Js\" /y
+copy "..\..\..\Source\Chronozoom.UI\NewScripts\controls\*.js" "$(ProjectDir)Scripts\Js\" /y
 copy "..\..\..\Source\Chronozoom.UI\NewScripts\external\*.js" "$(ProjectDir)Scripts\Utils\" /y</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

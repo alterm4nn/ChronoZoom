@@ -58,7 +58,8 @@ module CZ {
                     var layerDivs = self.element.children("div");
                     layerDivs.each(function (index) { // for each internal (div)
                         // make a layer from (div)
-                        $(this).addClass("virtualCanvasLayerDiv").zIndex(index * 3);
+                        $(this).addClass("virtualCanvasLayerDiv unselectable")
+                                .zIndex(index * 3);
 
                         // creating canvas element
                         var layerCanvasJq = $("<canvas></canvas>")
@@ -408,7 +409,8 @@ module CZ {
                 _destroy: function () {
                     this.element.removeClass("virtualCanvas");
                     this.element.children(".virtualCanvasLayerDiv").each(function (index) {
-                        $(this).removeClass("virtualCanvasLayerDiv");
+                        $(this).removeClass("virtualCanvasLayerDiv")
+                                .removeClass("unselectable");
                         $(this).remove(".virtualCanvasLayerCanvas");
                     });
                     this.element.unbind('.' + this.widgetName);
@@ -436,9 +438,10 @@ module CZ {
                     delete this.viewport; // invalidating old viewport
                     this.options.visible = newVisible; // setting new visible region
                     this.isInAnimation = isInAnimation && isInAnimation.isActive;
-
+                    //console.log("newvs",newVisible);
                     // rendering canvas (we should update the image because of new visible region)
                     var viewbox_v = this._visibleToViewBox(newVisible); // visible region in appropriate format
+                    //console.log(viewbox_v);
                     var viewport = this.getViewport();
                     this._renderCanvas(this._layersContent, viewbox_v, viewport);
                 },

@@ -48,10 +48,14 @@ namespace Application.Helper.Helpers
                 Logger.Log("- contentItem.Title: " + contentItem.Title);
                 contentItem.Caption = GetJavaScriptExecutionResult(item + "description");
                 Logger.Log("- contentItem.Caption: " + contentItem.Caption);
-                contentItem.MediaSource = GetJavaScriptExecutionResult(item + "uri");
+                contentItem.Uri = GetJavaScriptExecutionResult(item + "uri");
                 Logger.Log("- contentItem.MediaSource: " + contentItem.MediaSource);
                 contentItem.MediaType = GetJavaScriptExecutionResult(item + "mediaType");
                 Logger.Log("- contentItem.MediaType: " + contentItem.MediaType);
+                contentItem.MediaSource = GetJavaScriptExecutionResult(item + "mediaSource");
+                Logger.Log("- contentItem.MediaSource: " + contentItem.MediaSource);
+                contentItem.Attribution = GetJavaScriptExecutionResult(item + "attribution");
+                Logger.Log("- contentItem.attribution: " + contentItem.Attribution);
                 exhibit.ContentItems.Add(contentItem);
             }
             exhibit.Id = new Guid(GetJavaScriptExecutionResult(script + ".guid"));
@@ -67,10 +71,10 @@ namespace Application.Helper.Helpers
             {
                 string title =
                     GetJavaScriptExecutionResult(
-                        string.Format("vc.data('ui-virtualCanvas')._layersContent.children[0].children[{0}].title", i));
+                        string.Format("{0}.children[{1}].title",Javascripts.Cosmos, i));
                 if (title == exhibit.Title)
                 {
-                    ExecuteJavaScript(string.Format("CZ.Service.deleteExhibit(vc.data('ui-virtualCanvas')._layersContent.children[0].children[{0}])",i));
+                    ExecuteJavaScript(string.Format("CZ.Service.deleteExhibit({0}.children[{1}])",Javascripts.Cosmos,i));
                 }
             }
         }
@@ -118,8 +122,20 @@ namespace Application.Helper.Helpers
         {
             SetTitle(contentItems[i].Title, i + 1);
             SetCaption(contentItems[i].Caption, i + 1);
-            SetMediaSourse(contentItems[i].MediaSource, i + 1);
+            SetUrl(contentItems[i].Uri, i + 1);
             SelectMediaType(contentItems[i].MediaType, i + 1);
+            SetAttribution(contentItems[i].Attribution, i + 1);
+            SetMediaSourse(contentItems[i].MediaSource, i + 1);
+        }
+
+        private void SetMediaSourse(string mediaSource, int i)
+        {
+            TypeText(By.XPath(string.Format("(//*[@class='cz-authoring-ci-media-source'])[{0}]", i)), mediaSource);
+        }
+
+        private void SetAttribution(string attribution, int i)
+        {
+            TypeText(By.XPath(string.Format("(//*[@class='cz-authoring-ci-attribution'])[{0}]", i)), attribution);
         }
 
         private void SelectMediaType(string mediaType, int index)
@@ -127,9 +143,9 @@ namespace Application.Helper.Helpers
             Select(By.XPath(string.Format("(//*[@class='cz-authoring-ci-media-type'])[{0}]", index)), mediaType);
         }
 
-        private void SetMediaSourse(string mediaSourse, int index)
+        private void SetUrl(string mediaSourse, int index)
         {
-            TypeText(By.XPath(string.Format("(//*[@class='cz-authoring-ci-media-source'])[{0}]", index)), mediaSourse);
+            TypeText(By.XPath(string.Format("(//*[@class='cz-authoring-ci-uri'])[{0}]", index)), mediaSourse);
         }
 
         private void SetCaption(string description, int index)

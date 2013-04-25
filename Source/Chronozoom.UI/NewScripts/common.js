@@ -64,106 +64,6 @@ var CZ;
             }
         }
         Common.preventbubble = preventbubble;
-        function getCoordinateFromDate(dateTime) {
-            return getYearsBetweenDates(dateTime.getFullYear(), dateTime.getMonth(), dateTime.getDay(), 0, 0, 0);
-        }
-        Common.getCoordinateFromDate = getCoordinateFromDate;
-        function getCoordinateFromDMY(year, month, day) {
-            return getYearsBetweenDates(year, month, day, 0, 0, 0);
-        }
-        Common.getCoordinateFromDMY = getCoordinateFromDMY;
-        function getDMYFromCoordinate(coord) {
-            return getDateFrom(0, 0, 0, coord);
-        }
-        Common.getDMYFromCoordinate = getDMYFromCoordinate;
-        function getCoordinateFromDecimalYear(decimalYear) {
-            var localPresent = getPresent();
-            var presentDate = getYearsBetweenDates(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay, 0, 0, 0);
-            return decimalYear === 9999 ? presentDate : decimalYear;
-        }
-        Common.getCoordinateFromDecimalYear = getCoordinateFromDecimalYear;
-        var present = undefined;
-        function getPresent() {
-            if(!present) {
-                present = new Date();
-                present.presentDay = present.getUTCDate();
-                present.presentMonth = present.getUTCMonth();
-                present.presentYear = present.getUTCFullYear();
-            }
-            return present;
-        }
-        Common.getPresent = getPresent;
-        function getYearsBetweenDates(y1, m1, d1, y2, m2, d2) {
-            var years = y2 - y1;
-            if(y2 > 0 && y1 < 0) {
-                years -= 1;
-            }
-            var months = m2 - m1;
-            if(m1 > m2 || (m1 == m2 && d1 > d2)) {
-                years--;
-                months += 12;
-            }
-            var month = m1;
-            var days = -d1;
-            for(var i = 0; i < months; i++) {
-                if(month == 12) {
-                    month = 0;
-                }
-                days += CZ.Settings.daysInMonth[month];
-                month++;
-            }
-            days += d2;
-            var res = years + days / 365;
-            return -res;
-        }
-        function getDateFrom(year, month, day, n) {
-            var endYear = year;
-            var endMonth = month;
-            var endDay = day;
-            endYear -= Math.floor(-n);
-            var nDays = (n + Math.floor(-n)) * 365;
-            while(nDays < 0) {
-                var tempMonth = endMonth > 0 ? endMonth - 1 : 11;
-                nDays += CZ.Settings.daysInMonth[tempMonth];
-                endMonth--;
-                if(endMonth < 0) {
-                    endYear--;
-                    endMonth = 11;
-                }
-            }
-            endDay += Math.round(nDays);
-            var tempDays = CZ.Settings.daysInMonth[endMonth];
-            if(isLeapYear(endYear)) {
-                tempDays++;
-            }
-            while(endDay > tempDays) {
-                endDay -= tempDays;
-                endMonth++;
-                if(endMonth > 11) {
-                    endMonth = 0;
-                    endYear++;
-                }
-                tempDays = CZ.Settings.daysInMonth[endMonth];
-                if(isLeapYear(endYear)) {
-                    tempDays++;
-                }
-            }
-            if(endYear < 0 && year > 0) {
-                endYear -= 1;
-            }
-            return {
-                year: endYear,
-                month: endMonth,
-                day: endDay
-            };
-        }
-        function isLeapYear(year) {
-            if(year % 400 == 0 || (year % 100 != 0 && year % 4 == 0)) {
-                return true;
-            } else {
-                return false;
-            }
-        }
         function toggleOffImage(elemId, ext) {
             if(!ext) {
                 ext = 'jpg';
@@ -260,16 +160,11 @@ var CZ;
             }
         }
         function loadData() {
-            CZ.UrlNav.getURL();
-            CZ.Service.getTimelines({
-                start: -50000000000,
-                end: 9999,
-                minspan: null
-            }).then(function (response) {
+            CZ.Data.getTimelines(null).then(function (response) {
                 ProcessContent(response);
                 Common.vc.virtualCanvas("updateViewport");
             }, function (error) {
-                alert("Error connecting to service:\n" + error.responseText);
+                console.log("Error connecting to service:\n" + error.responseText);
             });
         }
         Common.loadData = loadData;
@@ -316,29 +211,37 @@ var CZ;
                 setVisible(visible);
             });
             var earthTimeline = CZ.Layout.FindChildTimeline(cosmosTimeline, CZ.Settings.earthTimelineID, true);
-            Common.earthVisible = f(earthTimeline);
-            $("#regime-link-earth").click(function () {
-                var visible = CZ.UrlNav.navStringToVisible(Common.earthVisible, Common.vc);
-                setVisible(visible);
-            });
-            var lifeTimeline = CZ.Layout.FindChildTimeline(earthTimeline, CZ.Settings.lifeTimelineID);
-            Common.lifeVisible = f(lifeTimeline);
-            $("#regime-link-life").click(function () {
-                var visible = CZ.UrlNav.navStringToVisible(Common.lifeVisible, Common.vc);
-                setVisible(visible);
-            });
-            var prehistoryTimeline = CZ.Layout.FindChildTimeline(lifeTimeline, CZ.Settings.prehistoryTimelineID);
-            Common.prehistoryVisible = f(prehistoryTimeline);
-            $("#regime-link-prehistory").click(function () {
-                var visible = CZ.UrlNav.navStringToVisible(Common.prehistoryVisible, Common.vc);
-                setVisible(visible);
-            });
-            var humanityTimeline = CZ.Layout.FindChildTimeline(prehistoryTimeline, CZ.Settings.humanityTimelineID, true);
-            Common.humanityVisible = f(humanityTimeline);
-            $("#regime-link-humanity").click(function () {
-                var visible = CZ.UrlNav.navStringToVisible(Common.humanityVisible, Common.vc);
-                setVisible(visible);
-            });
+            if(typeof earthTimeline !== "undefined") {
+                Common.earthVisible = f(earthTimeline);
+                $("#regime-link-earth").click(function () {
+                    var visible = CZ.UrlNav.navStringToVisible(Common.earthVisible, Common.vc);
+                    setVisible(visible);
+                });
+                var lifeTimeline = CZ.Layout.FindChildTimeline(earthTimeline, CZ.Settings.lifeTimelineID);
+                if(typeof lifeTimeline !== "undefined") {
+                    Common.lifeVisible = f(lifeTimeline);
+                    $("#regime-link-life").click(function () {
+                        var visible = CZ.UrlNav.navStringToVisible(Common.lifeVisible, Common.vc);
+                        setVisible(visible);
+                    });
+                    var prehistoryTimeline = CZ.Layout.FindChildTimeline(lifeTimeline, CZ.Settings.prehistoryTimelineID);
+                    if(typeof prehistoryTimeline !== "undefined") {
+                        Common.prehistoryVisible = f(prehistoryTimeline);
+                        $("#regime-link-prehistory").click(function () {
+                            var visible = CZ.UrlNav.navStringToVisible(Common.prehistoryVisible, Common.vc);
+                            setVisible(visible);
+                        });
+                        var humanityTimeline = CZ.Layout.FindChildTimeline(prehistoryTimeline, CZ.Settings.humanityTimelineID, true);
+                        if(typeof humanityTimeline !== "undefined") {
+                            Common.humanityVisible = f(humanityTimeline);
+                            $("#regime-link-humanity").click(function () {
+                                var visible = CZ.UrlNav.navStringToVisible(Common.humanityVisible, Common.vc);
+                                setVisible(visible);
+                            });
+                        }
+                    }
+                }
+            }
             Common.maxPermitedVerticalRange = {
                 top: cosmosTimeline.y,
                 bottom: cosmosTimeline.y + cosmosTimeline.height

@@ -3,6 +3,7 @@
 /// <reference path="../Utils/jasmine-jquery.js" />
 /// <reference path="../Js/timescale.js" />
 /// <reference path="../Js/common.js" />
+/// <reference path="../Js/cz.dates.js" />
 /// <reference path="../Js/cz.settings.js" />
 /// <reference path="../Js/settings.js" />
 
@@ -13,7 +14,6 @@ var curM = currentDate.getMonth();
 var curD = currentDate.getDate();
 
 describe("CZ.Timescale part", function () {
-
     describe("constructor", function () {
         it("should throw exception if container undifined", function () {
             var container;
@@ -24,6 +24,36 @@ describe("CZ.Timescale part", function () {
             var container = document.createElement('table');
             expect(function () { new CZ.Timescale(container) }).toThrow(new Error("Container parameter is invalid! It should be DIV, or ID of DIV, or jQuery instance of DIV."));
         });
+
+        describe("setMode() method should set 'mode'", function () {
+            var range;
+            var timescale;
+            beforeEach(function () {
+                $('body').prepend('<div id="axis" style="display:none;"></div>');
+                $('body').prepend('<p id="timescale_left_border" style="display:none;"></p>');
+                $('body').prepend('<p id="timescale_right_border" style="display:none;"></p>');
+                timescale = new CZ.Timescale($('#axis'));
+            });
+
+            it("to 'cosmos' if range.min <= -10000", function () {
+                range = { min: -20000, max: 50 };
+                timescale.update(range);
+                expect(timescale.mode).toEqual("cosmos");
+            });
+
+            it("to 'calendar' if range.min > -10000 and beta >= 0", function () {
+                range = { min: 5, max: 10 };
+                timescale.update(range);
+                expect(timescale.mode).toEqual("calendar");
+            });
+
+            //it("to 'date' if range.min > -10000 and beta < 0", function () {
+            //    range = { min: 99.1, max: 100 };
+            //    timescale.update(range);
+            //    expect(timescale.mode).toEqual("date");
+            //});
+        });
+
     });
 });
 
@@ -133,11 +163,26 @@ describe("CZ.CosmosTickSource part", function () { //this is the class for creat
             expect("Ga").toEqual(cosmosTickSrc.regime);
         });
 
+        it("regime to 'Ga' if l <= -10000000000", function () {
+            var l = -10000000000;
+            var r = 0;
+            cosmosTickSrc.getRegime(l, r);
+            expect("Ga").toEqual(cosmosTickSrc.regime);
+        });
+
         it("regime to 'Ma' if l <= -10000000", function () {
             var l = -10000000;
             var r = 0;
             cosmosTickSrc.getRegime(l, r);
             expect("Ma").toEqual(cosmosTickSrc.regime);
+        });
+
+        it("regime to 'Ma' if range.min <= -10000000 and beta < 7", function () {
+            var l = -10000615221.34466;
+            var r = -9999780877.874556;
+            cosmosTickSrc.getRegime(l, r);
+            expect("Ma").toEqual(cosmosTickSrc.regime);
+            expect(1000000).toEqual(cosmosTickSrc.level);
         });
 
         it("regime to 'ka' if l <= -10000", function () {
@@ -147,14 +192,6 @@ describe("CZ.CosmosTickSource part", function () { //this is the class for creat
             expect("ka").toEqual(cosmosTickSrc.regime);
         });
 
-        it("range.min = l and range.max = r if l<r", function () {
-            var l = 10;
-            var r = 20;
-            cosmosTickSrc.getRegime(l, r);
-            expect(cosmosTickSrc.range.max).toEqual(CZ.Settings.maxPermitedTimeRange.right); //test bug, cosmosTickSrc.range.max not changed
-            expect(cosmosTickSrc.range.min).toEqual(CZ.Settings.maxPermitedTimeRange.left); //test bug, cosmosTickSrc.range.min not changed
-        });
-
         it("range.min and range.max to default value if l>r", function () {
             var l = 20;
             var r = 10;
@@ -162,6 +199,28 @@ describe("CZ.CosmosTickSource part", function () { //this is the class for creat
             cosmosTickSrc.getRegime(l, r);
             expect(0).toEqual(cosmosTickSrc.range.max);
             expect(defaultValue).toEqual(cosmosTickSrc.range.min);
+        });
+        
+        it("range.min and range.max to input values if l<r", function () {
+            var l = -20;
+            var r = -10;
+            cosmosTickSrc.getRegime(l, r);
+            expect(cosmosTickSrc.range.min).toEqual(l);
+            expect(cosmosTickSrc.range.max).toEqual(r);
+        });
+        
+        it("range.min to maxPermitedTimeRange.left, if range.min < maxPermitedTimeRange.left and l < r", function () {
+            var l = -13700000000;
+            var r = -10;
+            cosmosTickSrc.getRegime(l, r);
+            expect(cosmosTickSrc.range.min).toEqual(l);
+        });
+        
+        it("range.max to maxPermitedTimeRange.right, if range.max > maxPermitedTimeRange.right and l < r", function () {
+            var l = -13700000000;
+            var r = 10;
+            cosmosTickSrc.getRegime(l, r);
+            expect(cosmosTickSrc.range.max).toEqual(0);
         });
     });
 });
@@ -187,8 +246,41 @@ describe("CZ.CalendarTickSource part", function () { //this is the class for cre
 
     describe("getRegime() method should set", function () {
         var currentDate;
+        var firstYear;
         beforeEach(function () {
             currentDate = new Date();
+            firstYear = CZ.Dates.getCoordinateFromDMY(0, 0, 1);
+        });
+
+        it("range.min and range.max to input values if l<r", function () {
+            var l = -20;
+            var r = -10;
+            var firstYear = CZ.Dates.getCoordinateFromDMY(0, 0, 1);
+            calendarTickSrc.getRegime(l, r);
+            expect(calendarTickSrc.range.min).toEqual(l -= firstYear);
+            expect(calendarTickSrc.range.max).toEqual(r -= firstYear);
+        });
+        
+        it("range.min and range.max to maxPermitedTimeRange 'left' and 'right' values if l>r", function () {
+            var l = -10;
+            var r = -20;
+            calendarTickSrc.getRegime(l, r);
+            expect(calendarTickSrc.range.min).toEqual(CZ.Settings.maxPermitedTimeRange.left -= firstYear);
+            expect(calendarTickSrc.range.max).toEqual(CZ.Settings.maxPermitedTimeRange.right -= firstYear);
+        });
+
+        it("range.min to maxPermitedTimeRange.left, if range.min < maxPermitedTimeRange.left and l < r", function () {
+            var l = -13700000000;
+            var r = -10;
+            calendarTickSrc.getRegime(l, r);
+            expect(calendarTickSrc.range.min).toEqual(l -= firstYear);
+        });
+
+        it("range.max to maxPermitedTimeRange.right, if range.max > maxPermitedTimeRange.right and l < r", function () {
+            var l = -13700000000;
+            var r = 10;
+            calendarTickSrc.getRegime(l, r);
+            expect(calendarTickSrc.range.max).toEqual(0 - firstYear*2);
         });
 
         it("regime to 'BCE/CE' after call", function () {
@@ -198,85 +290,75 @@ describe("CZ.CalendarTickSource part", function () { //this is the class for cre
             expect("BCE/CE").toEqual(calendarTickSrc.regime);
         });
 
-        it("startDate value to current date if l<0 (-2000)", function () {
-            var l = -2000;
-            var r = 0;
+        it("startDate value to current date if l<r and l>0", function () {
+            var l = 2000;
+            var r = 4000;
             calendarTickSrc.getRegime(l, r);
             expect({ year: currentDate.getFullYear(), month: currentDate.getMonth(), day: currentDate.getDate() }).toEqual(calendarTickSrc.startDate);
         });
-
-        it("startDate value to current date if l=r and (-2000)", function () {  //inspect this behavior
-            var l = -2000;
-            var r = -2000;
-            calendarTickSrc.getRegime(l, r);
-            expect({ year: currentDate.getFullYear(), month: currentDate.getMonth(), day: currentDate.getDate() }).toEqual(calendarTickSrc.startDate);
-        });
-
-        it("endDate value to current date if r<0 (-2000)", function () {
-            var l = 0;
-            var r = -2000;
-            calendarTickSrc.getRegime(l, r);
-            expect({ year: currentDate.getFullYear(), month: currentDate.getMonth(), day: currentDate.getDate() }).toEqual(calendarTickSrc.endDate);
-        });
+        
     });
 });
 
-//describe("CZ.ClockTickSource part", function () {
-//    var clockTickSrc;
-//    beforeEach(function () {
-//        clockTickSrc = new CZ.ClockTickSource();
-//    });
+describe("CZ.DateTickSource part", function () {
+    var dateTickSrc;
+    beforeEach(function () {
+        dateTickSrc = new CZ.DateTickSource();
+        CZ.Settings.maxPermitedTimeRange.left = 0;
+        CZ.Settings.maxPermitedTimeRange.right = 5;
+    });
 
-//    describe("getRegime() method should set regime to", function () {
-//        it("'QuarterDays_Hours' if beta >= -2.2", function () {
-//            var l = 0.9;
-//            var r = 1;
-//            clockTickSrc.getRegime(l, r);
-//            expect("QuarterDays_Hours").toEqual(clockTickSrc.regime);
-//        });
+    describe("getRegime() method should set regime to", function () {
+        it("'Quarters_Month' if beta > -0.2", function () {
+            var l = 0.3;
+            var r = 1;
+            dateTickSrc.getRegime(l, r);
+            expect("Quarters_Month").toEqual(dateTickSrc.regime);
+        });
 
-//        it("'QuarterDays_Hours' if beta <= -2.2 && beta >= -2.7", function () {
-//            var l = 0.996;
-//            var r = 1;
-//            clockTickSrc.getRegime(l, r);
-//            expect("Hours_10mins").toEqual(clockTickSrc.regime);
-//        });
+        //it("'Quarters_Month' if beta = -0.2", function () {
+        //    var l = 0.3;
+        //    var r = 1;
+        //    dateTickSrc.getRegime(l, r);
+        //    expect("Quarters_Month").toEqual(dateTickSrc.regime);
+        //});
+        
+        it("'Month_Weeks' if beta < -0.2 and > -0.8", function () {
+            var l = 0.8;
+            var r = 1;
+            dateTickSrc.getRegime(l, r);
+            expect("Month_Weeks").toEqual(dateTickSrc.regime);
+        });
 
-//        it("'QuarterDays_Hours' if beta <= -2.7 && beta >= -3.4", function () {
-//            var l = 0.9991;
-//            var r = 1;
-//            clockTickSrc.getRegime(l, r);
-//            expect("10mins_mins").toEqual(clockTickSrc.regime);
-//        });
+        //it("'Month_Weeks' if beta = -0.8", function () {
+        //    var l = 0.8;
+        //    var r = 1;
+        //    dateTickSrc.getRegime(l, r);
+        //    expect("Month_Weeks").toEqual(dateTickSrc.regime);
+        //});
+        
+        it("'Weeks_Days' if beta < -0.8 and > -1.4", function () {
+            var l = 0.9;
+            var r = 1;
+            dateTickSrc.getRegime(l, r);
+            expect("Weeks_Days").toEqual(dateTickSrc.regime);
+        });
+        
+        //it("'Month_Weeks' if beta = -1.4", function () {
+        //    var l = 0.9601893;
+        //    var r = 1;
+        //    dateTickSrc.getRegime(l, r);
+        //    expect("Weeks_Days").toEqual(dateTickSrc.regime);
+        //});
+        
+        it("'Days_Quarters' if beta < -0.8 and > -1.4", function () {
+            var l = 0.99;
+            var r = 1;
+            dateTickSrc.getRegime(l, r);
+            expect("Days_Quarters").toEqual(dateTickSrc.regime);
+        });
 
-//        it("'QuarterDays_Hours' if beta <= -3.8 && beta >= -4.4", function () {
-//            var l = 0.99991;
-//            var r = 1;
-//            clockTickSrc.getRegime(l, r);
-//            expect("10mins_mins").toEqual(clockTickSrc.regime);
-//        });
 
-//        it("'10mins_mins' if beta = -3.6 ", function () {  //Hole in verification
-//            var l = 0.99975;
-//            var r = 1;
-//            clockTickSrc.getRegime(l, r);
-//            expect("10mins_mins").toEqual(clockTickSrc.regime);
-//        });
-
-//        it("'QuarterDays_Hours' if l > r ", function () {
-//            var l = 2;
-//            var r = 1;
-//            clockTickSrc.getRegime(l, r);
-//            expect("QuarterDays_Hours").toEqual(clockTickSrc.regime);
-//        });
-
-//        it("'QuarterDays_Hours' if l = r ", function () {
-//            var l = 1;
-//            var r = 1;
-//            clockTickSrc.getRegime(l, r);
-//            expect("QuarterDays_Hours").toEqual(clockTickSrc.regime);
-//        });
-
-//    });
-//});
+    });
+});
 

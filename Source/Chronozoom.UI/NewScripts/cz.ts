@@ -5,19 +5,39 @@
 /// <reference path='gestures.ts'/>
 /// <reference path='tours.ts'/>
 /// <reference path='virtualCanvas.ts'/>
+/// <reference path='uiloader.ts'/>
+/// <reference path='controls/formbase.ts'/>
+/// <reference path='controls/cz.datepicker.ts'/>
 
 /// <reference path='typings/jquery/jquery.d.ts'/>
 
 module CZ {
     module HomePageViewModel {
+        // Contains mapping: CSS selector -> html file.
+        var _uiMap = {
+            "#auth-event-form": "/ui/auth-event-form.html"
+        };
 
         $(document).ready(function () {
+            //Ensures there will be no 'console is undefined' errors
+            window.console = window.console || <any>(function () {
+                var c = <any>{};
+                c.log = c.warn = c.debug = c.info = c.log =
+                    c.error = c.time = c.dir = c.profile = c.clear = c.exception = c.trace = c.assert = function () { };
+                return c;
+            })();
 
             $('.bubbleInfo').hide();
 
             CZ.Common.initialize();
+            CZ.UILoader.loadAll(_uiMap).done(function () {
+                // TODO: Get UI components.
+            });
 
-            //CZ.Common.ax.showThresholds = true;
+            var url = CZ.UrlNav.getURL();
+            var rootCollection = url.superCollectionName === undefined;
+            CZ.Service.superCollectionName = url.superCollectionName;
+            CZ.Service.collectionName = url.collectionName;
 
             $('#search_button')
                 .mouseup(CZ.Search.onSearchClicked)
@@ -82,29 +102,36 @@ module CZ {
             $('#biblCloseButton')
                 .mouseout(() => { CZ.Common.toggleOffImage('biblCloseButton', 'png'); })
                 .mouseover(() => { CZ.Common.toggleOnImage('biblCloseButton', 'png'); })
+            
+            
+            $('#welcomeScreenCloseButton')
+                .mouseover(() => { CZ.Common.toggleOnImage('welcomeScreenCloseButton', 'png'); })
+                .mouseout(() => { CZ.Common.toggleOffImage('welcomeScreenCloseButton', 'png'); })
+                .click(CZ.Common.hideWelcomeScreen);
+            $('#closeWelcomeScreenButton')
+                .click(CZ.Common.closeWelcomeScreen);
 
-            // TODO: remove splash screen totaly and replace it with new UX.
-            //$('#welcomeScreenCloseButton')
-            //    .mouseover(() => { CZ.Common.toggleOnImage('welcomeScreenCloseButton', 'png'); })
-            //    .mouseout(() => { CZ.Common.toggleOffImage('welcomeScreenCloseButton', 'png'); })
-            //    .click(CZ.Common.hideWelcomeScreen);
-            //$('#closeWelcomeScreenButton')
-            //    .click(CZ.Common.closeWelcomeScreen);
+            var wlcmScrnCookie = CZ.Common.getCookie("welcomeScreenDisallowed");
+            if (wlcmScrnCookie != null) {
+                CZ.Common.hideWelcomeScreen();
+            }
+            else {
+                // click on gray area hides welcome screen
+                $("#welcomeScreenOut").click(function (e) {
+                    e.stopPropagation();
+                });
 
-            //var wlcmScrnCookie = CZ.Common.getCookie("welcomeScreenDisallowed");
-            //if (wlcmScrnCookie != null) {
-            //    CZ.Common.hideWelcomeScreen();
-            //}
-            //else {
-            //    // click on gray area hides welcome screen
-            //    $("#welcomeScreenOut").click(function (e) {
-            //        e.stopPropagation();
-            //    });
+                $("#welcomeScreenBack").click(function () {
+                    CZ.Common.closeWelcomeScreen();
+                });
+            }
 
-            //    $("#welcomeScreenBack").click(function () {
-            //        CZ.Common.closeWelcomeScreen();
-            //    });
-            //}
+            if (rootCollection) {
+                $(".footer-authoring-link").css("display", "none");
+            } else {
+                $("#welcomeScreenBack").css("display", "none");
+                $(".regime-link").css("display", "none");
+            }
 
             if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
                 if (/Chrome[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
@@ -321,7 +348,7 @@ module CZ {
             });
 
             var vp = CZ.Common.vc.virtualCanvas("getViewport");
-            CZ.Common.vc.virtualCanvas("setVisible", CZ.VCContent.getVisibleForElement({ x: -13700000000, y: 0, width: 13700000000, height: 5535444444.444445 }, 1.0, vp));
+            CZ.Common.vc.virtualCanvas("setVisible", CZ.VCContent.getVisibleForElement({ x: -13700000000, y: 0, width: 13700000000, height: 5535444444.444445 }, 1.0, vp, false), true);
             CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
 
             var bid = window.location.hash.match("b=([a-z0-9_]+)");
@@ -329,7 +356,9 @@ module CZ {
                 //bid[0] - source string
                 //bid[1] - found match
                 $("#bibliography .sources").empty();
-                $("#bibliography .title").html("<span>Loading...</span>");
+                $("#bibliography .title").append($("<span></span>", {
+                    text: "Loading..."
+                }));
                 $("#bibliographyBack").css("display", "block");
             }
         });

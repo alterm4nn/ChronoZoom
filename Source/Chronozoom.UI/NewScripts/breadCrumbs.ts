@@ -219,21 +219,23 @@ module CZ {
             var length = $("#breadcrumbs-table tr td").length;
 
             // add breadcrumb to table
-            var parent = $("#breadcrumbs-table tr");
-            var td = $("<td id='bc_" + length + "'></td>");
-
-            // Without title, it will be added after appending.
-            var div = $("<div class='breadcrumb-link' id='bc_link_" + element.id + "'></div>")
-                .click(function () {
-                    clickOverBreadCrumb(element.id, length);
-                });
-
-            var span = $("<span class='breadcrumb-separator' id='bc_'>&rsaquo;</span>");
-
-            td.append(div);
-            td.append(span);
-            parent.append(td);
-            div.text(element.title); // As text to avoid script execution.
+            $("#breadcrumbs-table tr")
+                .append($("<td></td>", {
+                    id: "bc_" + length
+                })
+                    .append($("<div></div>", {
+                        id: "bc_link_" + element.id,
+                        class: "breadcrumb-link",
+                        text: element.title,
+                        click: function () {
+                            clickOverBreadCrumb(element.id, length);
+                        }
+                    }))
+                    .append($("<span></span>", {
+                        id: "bc_",
+                        class: "breadcrumb-separator",
+                        text: "›"
+                    })));
 
             // select color of the text for this breadcrumb
             switch (element.regime) {

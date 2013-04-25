@@ -42,10 +42,17 @@ var CZ;
         var labelsDiv = $("<div></div>");
         var marker = $("<div id='timescale_marker' class='cz-timescale-marker'></div>");
         var markerText = $("<p id='marker-text'></p>");
+        var markertriangle = $("<div id='marker-triangle'></div>");
         var leftDatePanel = $("<div class='cz-timescale-panel cz-timescale-left'></div>");
         var leftDate = $("<p id='timescale_left_border'></p>");
         var rightDatePanel = $("<div class='cz-timescale-panel cz-timescale-right'></div>");
-        var rightDate = $("<p id='timescale_right_border'></p>");
+        var rightDate = $("<p id='timescale_right_border' style='display: block'></p>");
+        var rightDateInput = $("<input class='timescale_right_border_input' style='display: none' type='text'/>");
+        var leftDateInput = $("<input class='timescale_left_border_input' style='display: none' type='text'/>");
+        var RightInputShown = false;
+        var old_right_val;
+        var LeftInputShown = false;
+        var old_left_val;
         var canvasSize = CZ.Settings.tickLength + CZ.Settings.timescaleThickness;
         var text_size;
         var fontSize;
@@ -104,6 +111,25 @@ var CZ;
                 }
             }
         });
+        rightDatePanel.dblclick(function (e) {
+            RightPanInput();
+        });
+        leftDatePanel.dblclick(function (e) {
+            LeftPanInput();
+        });
+        marker.dblclick(function (e) {
+            var point = CZ.Common.getXBrowserMouseOrigin(container, e);
+            var k = (_range.max - _range.min) / _width;
+            var time = _range.max - k * (_width - point.x);
+            if(time <= _range.min + CZ.Settings.panelWidth * k) {
+                marker.css("display", "none");
+                LeftPanInput();
+            }
+            if(time >= _range.max - CZ.Settings.panelWidth * k) {
+                marker.css("display", "none");
+                RightPanInput();
+            }
+        });
         function init() {
             _container.addClass("cz-timescale");
             _container.addClass("unselectable");
@@ -112,10 +138,14 @@ var CZ;
             leftDatePanel.addClass("cz-timescale-left");
             leftDatePanel.addClass("cz-timescale-panel");
             marker.addClass("cz-timescale-marker");
+            markertriangle.addClass("cz-timescale-marker-triangle");
             labelsDiv.addClass("cz-timescale-labels-container");
             marker[0].appendChild(markerText[0]);
+            marker[0].appendChild(markertriangle[0]);
             leftDatePanel[0].appendChild(leftDate[0]);
+            leftDatePanel[0].appendChild(leftDateInput[0]);
             rightDatePanel[0].appendChild(rightDate[0]);
+            rightDatePanel[0].appendChild(rightDateInput[0]);
             _container[0].appendChild(labelsDiv[0]);
             _container[0].appendChild(canvas[0]);
             _container[0].appendChild(marker[0]);
@@ -428,19 +458,19 @@ var CZ;
             var k = (_range.max - _range.min) / _width;
             var point = (time - _range.max) / k + _width;
             this.markerPosition = point;
-            $('#timescale_marker').css("left", point - 47);
+            $('#timescale_marker').css("left", point - CZ.Settings.markerWidth / 2);
             var text = _tickSources[_mode].getMarkerLabel(_range, time);
             document.getElementById('marker-text').innerHTML = text;
         };
         this.setTimeBorders = function () {
             var k = (_range.max - _range.min) / _width;
-            var left_time = _range.min;
-            var right_time = _range.max;
+            var left_time = _range.min + CZ.Settings.panelWidth * k;
+            var right_time = _range.max - CZ.Settings.panelWidth * k;
             if(right_time > CZ.Settings.maxPermitedTimeRange.right) {
                 right_time = CZ.Settings.maxPermitedTimeRange.right;
                 var right_pos = (right_time - _range.max) / k + _width;
             } else {
-                var right_pos = (right_time - _range.max) / k + _width - 73;
+                var right_pos = (right_time - _range.max) / k + _width;
             }
             if(left_time < CZ.Settings.maxPermitedTimeRange.left) {
                 left_time = CZ.Settings.maxPermitedTimeRange.left;
@@ -472,6 +502,79 @@ var CZ;
             renderMajorTicks();
             renderSmallTicks();
         }
+        function LeftPanInput() {
+            if(!LeftInputShown) {
+                leftDateInput.val(document.getElementById('timescale_left_border').innerHTML);
+                old_left_val = leftDateInput.val();
+                leftDateInput.css("display", "block");
+                leftDate.css("display", "none");
+                LeftInputShown = true;
+            } else {
+                var right_pan_val = document.getElementById('timescale_right_border').innerHTML;
+                var left_pan_val = leftDateInput.val();
+                var timerange;
+                timerange = _tickSources[_mode].getLeftPanelVirtualCoord(left_pan_val, right_pan_val, old_left_val, _range);
+                leftDateInput.css("display", "none");
+                leftDate.css("display", "block");
+                LeftInputShown = false;
+                var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                var latestVisible = vp.visible;
+                var newVis = _tickSources[_mode].getVisibleForElement({
+                    x: timerange.left,
+                    y: latestVisible.centerY - vp.height / 2,
+                    width: (timerange.right - timerange.left),
+                    height: vp.height
+                }, 1.0, vp, false);
+                CZ.Common.vc.virtualCanvas("setVisible", newVis);
+                vp = CZ.Common.vc.virtualCanvas("getViewport");
+                var lt = vp.pointScreenToVirtual(0, 0);
+                var rb = vp.pointScreenToVirtual(vp.width, vp.height);
+                var newrange = {
+                    min: lt.x,
+                    max: rb.x
+                };
+                that.update(newrange);
+                marker.css("display", "block");
+            }
+        }
+        function RightPanInput() {
+            if(!RightInputShown) {
+                rightDateInput.val(document.getElementById('timescale_right_border').innerHTML);
+                old_right_val = rightDateInput.val();
+                rightDateInput.css("display", "block");
+                rightDate.css("display", "none");
+                RightInputShown = true;
+            } else {
+                var left_pan_val = document.getElementById('timescale_left_border').innerHTML;
+                var right_pan_val = rightDateInput.val();
+                var timerange;
+                timerange = _tickSources[_mode].getRightPanelVirtualCoord(left_pan_val, right_pan_val, old_right_val, _range);
+                if(timerange != null) {
+                    rightDateInput.css("display", "none");
+                    rightDate.css("display", "block");
+                    RightInputShown = false;
+                    var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                    var latestVisible = vp.visible;
+                    var width1 = timerange.right - timerange.left;
+                    var newVis = _tickSources[_mode].getVisibleForElement({
+                        x: timerange.left,
+                        y: latestVisible.centerY - vp.height / 2,
+                        width: width1,
+                        height: vp.height
+                    }, 1.0, vp, false);
+                    CZ.Common.vc.virtualCanvas("setVisible", newVis);
+                    vp = CZ.Common.vc.virtualCanvas("getViewport");
+                    var lt = vp.pointScreenToVirtual(0, 0);
+                    var rb = vp.pointScreenToVirtual(vp.width, vp.height);
+                    var newrange = {
+                        min: lt.x,
+                        max: rb.x
+                    };
+                    that.update(newrange);
+                    marker.css("display", "block");
+                }
+            }
+        }
         this.getCoordinateFromTick = function (x) {
             var delta = _deltaRange;
             var k = _size / (_range.max - _range.min);
@@ -481,7 +584,7 @@ var CZ;
             var firstYear;
             if(_range.min >= -10000) {
                 beta = Math.log(_range.max - _range.min) * log10;
-                firstYear = CZ.Common.getCoordinateFromDMY(0, 0, 1);
+                firstYear = CZ.Dates.getCoordinateFromDMY(0, 0, 1);
                 if(beta >= 0) {
                     x1 += k * firstYear;
                 }
@@ -637,6 +740,12 @@ var CZ;
         this.getMarkerLabel = function (range, time) {
             return time;
         };
+        this.getRightPanelVirtualCoord = function (leftstr, rightstr, old_right_val, range) {
+            return rightstr;
+        };
+        this.getLeftPanelVirtualCoord = function (leftstr, rightstr, old_left_val, range) {
+            return leftstr;
+        };
     }
     CZ.TickSource = TickSource;
     ;
@@ -668,13 +777,13 @@ var CZ;
             if(this.range.max > CZ.Settings.maxPermitedTimeRange.right) {
                 this.range.max = CZ.Settings.maxPermitedTimeRange.right;
             }
-            var localPresent = CZ.Common.getPresent();
+            var localPresent = CZ.Dates.getPresent();
             this.present = {
                 year: localPresent.getUTCFullYear(),
                 month: localPresent.getUTCMonth(),
                 day: localPresent.getUTCDate()
             };
-            this.firstYear = CZ.Common.getCoordinateFromDMY(0, 0, 1);
+            this.firstYear = CZ.Dates.getCoordinateFromDMY(0, 0, 1);
             this.delta = 1;
             this.beta = Math.floor(Math.log(this.range.max - this.range.min) * this.log10);
             if(this.range.min <= -10000000000) {
@@ -753,22 +862,102 @@ var CZ;
             return minors;
         };
         this.getMarkerLabel = function (range, time) {
-            var text;
+            var Labeltext;
             this.getRegime(range.min, range.max);
-            var n = Math.max(Math.floor(Math.log(this.delta * Math.pow(10, this.beta) / this.level) * this.log10), -4) - 1;
-            if(n > 20) {
-                n = 20;
+            var number_of_digits = Math.max(Math.floor(Math.log(this.delta * Math.pow(10, this.beta) / this.level) * this.log10), -4) - 1;
+            if(number_of_digits > 20) {
+                number_of_digits = 20;
             }
-            if(n < -20) {
-                n = -20;
-            }
-            if(n < 0) {
-                text = (new Number(-time / this.level)).toFixed(-n);
+            if(number_of_digits < 0) {
+                Labeltext = (new Number(-time / this.level)).toFixed(-number_of_digits);
             } else {
-                text = (new Number(-time / this.level)).toFixed(n);
+                Labeltext = (new Number(-time / this.level)).toFixed(number_of_digits);
             }
-            text += " " + this.regime;
-            return text;
+            Labeltext += " " + this.regime;
+            return Labeltext;
+        };
+        this.getRightPanelVirtualCoord = function (leftstr, rightstr, old_rightstr, range) {
+            var left_val = parseFloat(leftstr);
+            var left_reg = leftstr.split(/\W+/g);
+            var right_val = parseFloat(rightstr);
+            var right_reg = rightstr.split(/\W+/g);
+            var old_right_val = parseFloat(old_rightstr);
+            var old_right_reg = old_rightstr.split(/\W+/g);
+            var left_regime = left_reg[left_reg.length - 1];
+            var right_regime = right_reg[right_reg.length - 1];
+            var old_right_regime = old_right_reg[old_right_reg.length - 1];
+            var k = (right_val - left_val) / (old_right_val - left_val);
+            if(range.min < this.range.min) {
+                range.min = this.range.min;
+            }
+            if(range.max > this.range.max) {
+                range.max = this.range.max;
+            }
+            var val = range.min + k * (range.max - range.min);
+            if(val < range.min) {
+                return null;
+            }
+            if((right_regime != "Ga") && (right_regime != "Ma") && (right_regime != "ka")) {
+                return null;
+            }
+            if(isNaN(Number(right_val))) {
+                return null;
+            }
+            return {
+                left: range.min,
+                right: val
+            };
+        };
+        this.getLeftPanelVirtualCoord = function (leftstr, rightstr, old_leftstr, range) {
+            var left_val = parseFloat(leftstr);
+            var left_reg = leftstr.split(/\W+/g);
+            var right_val = parseFloat(rightstr);
+            var right_reg = rightstr.split(/\W+/g);
+            var old_left_val = parseFloat(old_leftstr);
+            var old_left_reg = old_leftstr.split(/\W+/g);
+            var left_regime = left_reg[left_reg.length - 1];
+            var right_regime = right_reg[right_reg.length - 1];
+            var old_left_regime = old_left_reg[old_left_reg.length - 1];
+            var k = (right_val - left_val) / (right_val - old_left_val);
+            if(range.min < this.range.min) {
+                range.min = this.range.min;
+            }
+            if(range.max > this.range.max) {
+                range.max = this.range.max;
+            }
+            var val = range.max - k * (range.max - range.min);
+            if(val > range.max) {
+                return null;
+            }
+            if((left_regime != "Ga") && (left_regime != "Ma") && (left_regime != "ka")) {
+                return null;
+            }
+            if(isNaN(Number(right_val))) {
+                return null;
+            }
+            return {
+                left: val,
+                right: range.max
+            };
+        };
+        this.getVisibleForElement = function (element, scale, viewport, use_margin) {
+            var margin = 2 * (CZ.Settings.contentScaleMargin && use_margin ? CZ.Settings.contentScaleMargin : 0);
+            var width = viewport.width - margin;
+            if(width < 0) {
+                width = viewport.width;
+            }
+            var scaleX = scale * element.width / width;
+            var height = viewport.height - margin;
+            if(height < 0) {
+                height = viewport.height;
+            }
+            var scaleY = scale * element.height / height;
+            var vs = {
+                centerX: element.x + element.width / 2.0,
+                centerY: element.y + element.height / 2.0,
+                scale: Math.max(scaleX, scaleY)
+            };
+            return vs;
         };
     }
     CZ.CosmosTickSource = CosmosTickSource;
@@ -782,7 +971,7 @@ var CZ;
             if(x <= 0) {
                 text = -x + 1 + " BCE";
             } else {
-                text = x + " AD";
+                text = x + " CE";
             }
             return text;
         };
@@ -800,22 +989,22 @@ var CZ;
             if(this.range.max > CZ.Settings.maxPermitedTimeRange.right) {
                 this.range.max = CZ.Settings.maxPermitedTimeRange.right;
             }
-            var localPresent = CZ.Common.getPresent();
+            var localPresent = CZ.Dates.getPresent();
             this.present = {
                 year: localPresent.getUTCFullYear(),
                 month: localPresent.getUTCMonth(),
                 day: localPresent.getUTCDate()
             };
-            this.firstYear = CZ.Common.getCoordinateFromDMY(0, 0, 1);
+            this.firstYear = CZ.Dates.getCoordinateFromDMY(0, 0, 1);
             this.range.max -= this.firstYear;
             this.range.min -= this.firstYear;
             this.startDate = this.present;
             this.endDate = this.present;
             if(this.range.min < 0) {
-                this.startDate = CZ.Common.getDMYFromCoordinate(this.range.min);
+                this.startDate = CZ.Dates.getDMYFromCoordinate(this.range.min);
             }
             if(this.range.max < 0) {
-                this.endDate = CZ.Common.getDMYFromCoordinate(this.range.max);
+                this.endDate = CZ.Dates.getDMYFromCoordinate(this.range.max);
             }
             this.delta = 1;
             this.beta = Math.floor(Math.log(this.range.max - this.range.min) * this.log10);
@@ -890,20 +1079,109 @@ var CZ;
         };
         this.getMarkerLabel = function (range, time) {
             this.getRegime(range.min, range.max);
-            var text = parseFloat(new Number(time - this.firstYear).toFixed(2));
-            text += (text > 0 ? -0.5 : -1.5);
-            text = Math.round(text);
-            if(text < 0) {
-                text = -text;
-            } else if(text == 0) {
-                text = 1;
+            var Labeltext = parseFloat(new Number(time - this.firstYear).toFixed(2));
+            Labeltext += (Labeltext > 0 ? -0.5 : -1.5);
+            Labeltext = Math.round(Labeltext);
+            if(Labeltext < 0) {
+                Labeltext = -Labeltext;
+            } else if(Labeltext == 0) {
+                Labeltext = 1;
             }
             if(time < this.firstYear + 1) {
-                text += " " + "BCE";
+                Labeltext += " " + "BCE";
             } else {
-                text += " " + "AD";
+                Labeltext += " " + "CE";
             }
-            return text;
+            return Labeltext;
+        };
+        this.getRightPanelVirtualCoord = function (leftstr, rightstr, old_rightstr, range) {
+            var left_val = parseFloat(leftstr);
+            var left_reg = leftstr.split(/\W+/g);
+            var right_val = parseFloat(rightstr);
+            var right_reg = rightstr.split(/\W+/g);
+            var old_right_val = parseFloat(old_rightstr);
+            var old_right_reg = old_rightstr.split(/\W+/g);
+            var left_regime = left_reg[left_reg.length - 1];
+            var right_regime = right_reg[right_reg.length - 1];
+            var old_right_regime = old_right_reg[old_right_reg.length - 1];
+            if((old_right_regime === "CE") && (left_regime === "BCE")) {
+                left_val = -left_val;
+            }
+            var k = (right_val - left_val) / (old_right_val - left_val);
+            if(range.min < this.range.min) {
+                range.min = this.range.min;
+            }
+            if(range.max > this.range.max) {
+                range.max = this.range.max;
+            }
+            var val = range.min + k * (range.max - range.min);
+            if(val < range.min) {
+                return null;
+            }
+            if((right_regime != "BCE") && (right_regime != "CE")) {
+                return null;
+            }
+            if(isNaN(Number(right_val))) {
+                return null;
+            }
+            return {
+                left: range.min,
+                right: val
+            };
+        };
+        this.getLeftPanelVirtualCoord = function (leftstr, rightstr, old_leftstr, range) {
+            var left_val = parseFloat(leftstr);
+            var left_reg = leftstr.split(/\W+/g);
+            var right_val = parseFloat(rightstr);
+            var right_reg = rightstr.split(/\W+/g);
+            var old_left_val = parseFloat(old_leftstr);
+            var old_left_reg = old_leftstr.split(/\W+/g);
+            var left_regime = left_reg[left_reg.length - 1];
+            var right_regime = right_reg[right_reg.length - 1];
+            var old_left_regime = old_left_reg[old_left_reg.length - 1];
+            if((old_left_regime === "BCE") && (right_regime === "CE")) {
+                right_val = -right_val;
+            }
+            var k = (right_val - left_val) / (right_val - old_left_val);
+            if(range.min < this.range.min) {
+                range.min = this.range.min;
+            }
+            if(range.max > this.range.max) {
+                range.max = this.range.max;
+            }
+            var val = range.max - k * (range.max - range.min);
+            if(val > range.max) {
+                return null;
+            }
+            if((left_regime != "BCE") && (left_regime != "CE")) {
+                return null;
+            }
+            if(isNaN(Number(right_val))) {
+                return null;
+            }
+            return {
+                left: val,
+                right: range.max
+            };
+        };
+        this.getVisibleForElement = function (element, scale, viewport, use_margin) {
+            var margin = 2 * (CZ.Settings.contentScaleMargin && use_margin ? CZ.Settings.contentScaleMargin : 0);
+            var width = viewport.width - margin;
+            if(width < 0) {
+                width = viewport.width;
+            }
+            var scaleX = scale * element.width / width;
+            var height = viewport.height - margin;
+            if(height < 0) {
+                height = viewport.height;
+            }
+            var scaleY = scale * element.height / height;
+            var vs = {
+                centerX: element.x + element.width / 2.0,
+                centerY: element.y + element.height / 2.0,
+                scale: scaleX
+            };
+            return vs;
         };
     }
     CZ.CalendarTickSource = CalendarTickSource;
@@ -928,17 +1206,17 @@ var CZ;
             if(this.range.max > CZ.Settings.maxPermitedTimeRange.right) {
                 this.range.max = CZ.Settings.maxPermitedTimeRange.right;
             }
-            var localPresent = CZ.Common.getPresent();
+            var localPresent = CZ.Dates.getPresent();
             this.present = {
                 year: localPresent.getUTCFullYear(),
                 month: localPresent.getUTCMonth(),
                 day: localPresent.getUTCDate()
             };
-            this.firstYear = CZ.Common.getCoordinateFromDMY(0, 0, 1);
+            this.firstYear = CZ.Dates.getCoordinateFromDMY(0, 0, 1);
             this.startDate = this.present;
             this.endDate = this.present;
-            this.startDate = CZ.Common.getDMYFromCoordinate(this.range.min);
-            this.endDate = CZ.Common.getDMYFromCoordinate(this.range.max);
+            this.startDate = CZ.Dates.getDMYFromCoordinate(this.range.min);
+            this.endDate = CZ.Dates.getDMYFromCoordinate(this.range.max);
             this.delta = 1;
             this.beta = Math.log(this.range.max - this.range.min) * this.log10;
             if(this.beta >= -0.2) {
@@ -956,7 +1234,7 @@ var CZ;
             this.level = 1;
         };
         this.getLabel = function (x) {
-            var text = CZ.Settings.months[month];
+            var text = CZ.Dates.months[month];
             var year_temp = year;
             if(year == 0) {
                 year_temp--;
@@ -965,7 +1243,7 @@ var CZ;
                 text += " " + year_temp;
             }
             if(tempDays == 1) {
-                text = day + " " + CZ.Settings.months[month];
+                text = day + " " + CZ.Dates.months[month];
             }
             if((this.regime == "Weeks_Days") && (day == 3)) {
                 text += ", " + year_temp;
@@ -1006,7 +1284,7 @@ var CZ;
                     year++;
                 }
                 if((this.regime == "Quarters_Month") || (this.regime == "Month_Weeks")) {
-                    var tick = CZ.Common.getCoordinateFromDMY(year, month, 1);
+                    var tick = CZ.Dates.getCoordinateFromDMY(year, month, 1);
                     if(tick >= this.range.min && tick <= this.range.max) {
                         if(tempDays != 1) {
                             if((month % 3 == 0) || (this.regime == "Month_Weeks")) {
@@ -1020,11 +1298,11 @@ var CZ;
                     }
                 }
                 if((this.regime == "Weeks_Days") || (this.regime == "Days_Quarters")) {
-                    countDays = Math.floor(CZ.Settings.daysInMonth[month]);
+                    countDays = Math.floor(CZ.Dates.daysInMonth[month]);
                     tempDays = 1;
                     for(var k = 1; k <= countDays; k += date_step) {
                         day = k;
-                        tick = CZ.Common.getCoordinateFromDMY(year, month, day);
+                        tick = CZ.Dates.getCoordinateFromDMY(year, month, day);
                         if(tick >= this.range.min && tick <= this.range.max) {
                             if(this.regime == "Weeks_Days") {
                                 if((k == 3) || (k == 10) || (k == 17) || (k == 24) || (k == 28)) {
@@ -1055,18 +1333,18 @@ var CZ;
             var step;
             var n;
             var tick = ticks[0].position;
-            var date = CZ.Common.getDMYFromCoordinate(tick);
+            var date = CZ.Dates.getDMYFromCoordinate(tick);
             if(this.regime == "Quarters_Month") {
                 n = 2;
             } else if(this.regime == "Month_Weeks") {
-                n = CZ.Settings.daysInMonth[date.month];
+                n = CZ.Dates.daysInMonth[date.month];
             } else if(this.regime == "Weeks_Days") {
                 n = 7;
             } else if(this.regime == "Days_Quarters") {
                 n = 4;
             }
             if(this.regime == "Quarters_Month") {
-                step = Math.floor(2 * CZ.Settings.daysInMonth[date.month] / n);
+                step = Math.floor(2 * CZ.Dates.daysInMonth[date.month] / n);
             } else if(this.regime == "Month_Weeks") {
                 step = 1;
             } else if(this.regime == "Weeks_Days") {
@@ -1078,31 +1356,31 @@ var CZ;
                 return null;
             }
             date.day -= step;
-            tick = CZ.Common.getCoordinateFromDMY(date.year, date.month, date.day);
+            tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
             if(this.regime != "Month_Weeks") {
                 while(tick > this.range.min) {
                     minors.push(tick);
                     date.day -= step;
-                    tick = CZ.Common.getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
                 }
             } else {
-                var j = CZ.Settings.daysInMonth[date.month];
+                var j = CZ.Dates.daysInMonth[date.month];
                 while(tick > this.range.min) {
                     if((j == 2) || (j == 9) || (j == 16) || (j == 23) || (j == 27)) {
                         minors.push(tick);
                     }
                     date.day -= step;
-                    tick = CZ.Common.getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
                     j--;
                 }
             }
             for(var i = 0; i < ticks.length - 1; i++) {
                 var tick = ticks[i].position;
-                var date = CZ.Common.getDMYFromCoordinate(tick);
+                var date = CZ.Dates.getDMYFromCoordinate(tick);
                 var j_step = 1;
                 for(var j = 1; j <= n; j += j_step) {
                     date.day += step;
-                    tick = CZ.Common.getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
                     if(this.regime != "Month_Weeks") {
                         if(minors.length == 0 || k * (ticks[i + 1].position - tick) > CZ.Settings.minSmallTickSpace) {
                             minors.push(tick);
@@ -1117,14 +1395,14 @@ var CZ;
                 }
             }
             var tick = ticks[ticks.length - 1].position;
-            var date = CZ.Common.getDMYFromCoordinate(tick);
+            var date = CZ.Dates.getDMYFromCoordinate(tick);
             date.day += step;
-            tick = CZ.Common.getCoordinateFromDMY(date.year, date.month, date.day);
+            tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
             if(this.regime != "Month_Weeks") {
                 while(tick < this.range.max) {
                     minors.push(tick);
                     date.day += step;
-                    tick = CZ.Common.getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
                 }
             } else {
                 var j = 0;
@@ -1133,7 +1411,7 @@ var CZ;
                         minors.push(tick);
                     }
                     date.day += step;
-                    tick = CZ.Common.getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
                     j++;
                 }
             }
@@ -1141,9 +1419,104 @@ var CZ;
         };
         this.getMarkerLabel = function (range, time) {
             this.getRegime(range.min, range.max);
-            var date = CZ.Common.getDMYFromCoordinate(time);
-            var text = (this.beta > -3 ? date.month + 1 + "." : "") + date.day;
-            return text;
+            var date = CZ.Dates.getDMYFromCoordinate(time);
+            var Labeltext = date.day + "." + (date.month + 1) + "." + date.year;
+            return Labeltext;
+        };
+        this.getRightPanelVirtualCoord = function (leftstr, rightstr, old_rightstr, range) {
+            var left_year_val = this.parseYear(leftstr);
+            var left_month_val = this.parseMonth(leftstr) - 1;
+            var left_date_val = this.parseDate(leftstr);
+            var right_year_val = this.parseYear(rightstr);
+            var right_month_val = this.parseMonth(rightstr) - 1;
+            var right_date_val = this.parseDate(rightstr);
+            var old_right_year_val = this.parseYear(old_rightstr);
+            var old_right_month_val = this.parseMonth(old_rightstr) - 1;
+            var old_right_date_val = this.parseDate(old_rightstr);
+            var right_val = CZ.Dates.getCoordinateFromDMY(right_year_val, right_month_val, right_date_val);
+            var left_val = CZ.Dates.getCoordinateFromDMY(left_year_val, left_month_val, left_date_val);
+            var old_right_val = CZ.Dates.getCoordinateFromDMY(old_right_year_val, old_right_month_val, old_right_date_val);
+            if(range.min < this.range.min) {
+                range.min = this.range.min;
+            }
+            if(range.max > this.range.max) {
+                range.max = this.range.max;
+            }
+            if(right_val < range.min) {
+                return null;
+            }
+            if(isNaN(Number(right_val))) {
+                return null;
+            }
+            return {
+                left: range.min,
+                right: right_val
+            };
+        };
+        this.getLeftPanelVirtualCoord = function (leftstr, rightstr, old_leftstr, range) {
+            var left_year_val = this.parseYear(leftstr);
+            var left_month_val = this.parseMonth(leftstr) - 1;
+            var left_date_val = this.parseDate(leftstr);
+            var right_year_val = this.parseYear(rightstr);
+            var right_month_val = this.parseMonth(rightstr) - 1;
+            var right_date_val = this.parseDate(rightstr);
+            var old_left_year_val = this.parseYear(old_leftstr);
+            var old_left_month_val = this.parseMonth(old_leftstr) - 1;
+            var old_left_date_val = this.parseDate(old_leftstr);
+            var right_val = CZ.Dates.getCoordinateFromDMY(right_year_val, right_month_val, right_date_val);
+            var left_val = CZ.Dates.getCoordinateFromDMY(left_year_val, left_month_val, left_date_val);
+            var old_left_val = CZ.Dates.getCoordinateFromDMY(old_left_year_val, old_left_month_val, old_left_date_val);
+            if(range.min < this.range.min) {
+                range.min = this.range.min;
+            }
+            if(range.max > this.range.max) {
+                range.max = this.range.max;
+            }
+            if(left_val > range.max) {
+                return null;
+            }
+            if(isNaN(Number(left_val))) {
+                return null;
+            }
+            return {
+                left: left_val,
+                right: range.max
+            };
+        };
+        this.parseDate = function (str) {
+            return parseFloat(str.split(/([_\W])/)[0]);
+        };
+        this.parseMonth = function (str) {
+            return parseFloat(str.split(/([_\W])/)[2]);
+        };
+        this.parseYear = function (str) {
+            var temp = str.split(/([_\W])/);
+            if(temp.length === 7) {
+                return (-parseFloat(temp[6]));
+            }
+            if(temp.length === 5) {
+                return (parseFloat(temp[4]));
+            }
+            return null;
+        };
+        this.getVisibleForElement = function (element, scale, viewport, use_margin) {
+            var margin = 2 * (CZ.Settings.contentScaleMargin && use_margin ? CZ.Settings.contentScaleMargin : 0);
+            var width = viewport.width - margin;
+            if(width < 0) {
+                width = viewport.width;
+            }
+            var scaleX = scale * element.width / width;
+            var height = viewport.height - margin;
+            if(height < 0) {
+                height = viewport.height;
+            }
+            var scaleY = scale * element.height / height;
+            var vs = {
+                centerX: element.x + element.width / 2.0,
+                centerY: element.y + element.height / 2.0,
+                scale: Math.min(scaleX, scaleY)
+            };
+            return vs;
         };
     }
     CZ.DateTickSource = DateTickSource;

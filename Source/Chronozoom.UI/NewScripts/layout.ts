@@ -31,12 +31,15 @@ module CZ {
         }
 
         function Prepare(timeline) {
-            timeline.left = CZ.Common.getCoordinateFromDecimalYear(timeline.start);
-            timeline.right = CZ.Common.getCoordinateFromDecimalYear(timeline.end);
+            timeline.left = CZ.Dates.getCoordinateFromDecimalYear(timeline.start);
+            timeline.right = CZ.Dates.getCoordinateFromDecimalYear(timeline.end);
+
+            // save timeline end date in case if it is '9999'
+            timeline.endDate = timeline.end;
 
             if (timeline.exhibits instanceof Array) {
                 timeline.exhibits.forEach(function (exhibit) {
-                    exhibit.x = CZ.Common.getCoordinateFromDecimalYear(exhibit.time);
+                    exhibit.x = CZ.Dates.getCoordinateFromDecimalYear(exhibit.time);
                 });
             }
 
@@ -144,7 +147,7 @@ module CZ {
                 }
 
                 if ((res.max - res.min) > (timeline.height - titleObject.bboxHeight)) {
-                    console.log("Warning: Child timelines and exhibits doesn't fit into parent. Timeline name: " + timeline.title);
+                    //console.log("Warning: Child timelines and exhibits doesn't fit into parent. Timeline name: " + timeline.title);
                     var contentHeight = res.max - res.min;
                     var fullHeight = contentHeight / (1 - headerPercent);
                     var titleObject = GenerateTitleObject(fullHeight, timeline, measureContext);
@@ -428,6 +431,7 @@ module CZ {
                 titleRect: timeline.titleRect,
                 strokeStyle: tlColor,
                 regime: timeline.Regime,
+                endDate: timeline.endDate,
                 opacity: 0
             });
 
@@ -874,7 +878,7 @@ module CZ {
 
         export function Merge(src, dest) {
             // skip dynamic layout during active authoring session
-            if (typeof CZ.Authoring !== 'undefined' && CZ.Authoring._isActive)
+            if (typeof CZ.Authoring !== 'undefined' && CZ.Authoring.isActive)
                 return;
 
             if (src && dest) {

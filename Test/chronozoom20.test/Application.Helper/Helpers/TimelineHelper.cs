@@ -54,15 +54,15 @@ namespace Application.Helper.Helpers
             Logger.Log("<- timeline: " + newTimeline);
             try
             {
-                string id = GetJavaScriptExecutionResult(string.Format("findVCElement(vc.data('ui-virtualCanvas')._layersContent.children[0],'{0}').id",newTimeline.TimelineId));
-                Logger.Log("- id: " + id);
-                bool result = !String.IsNullOrEmpty(id);
-                Logger.Log("-> result: " + result);
-                return result;
+                ExecuteJavaScript(string.Format("CZ.Search.goToSearchResult('{0}')", newTimeline.TimelineId));
+                Logger.Log("-> true");
+                return true;
             }
-            catch (Exception)
+            catch (UnhandledAlertException e)
             {
-                Logger.Log("-> result false");
+
+                AcceptAlert();
+                Logger.Log("-> false");
                 return false;
             }
         }
@@ -90,7 +90,7 @@ namespace Application.Helper.Helpers
         private void NavigateToTimeLine(Timeline timeline)
         {
             Logger.Log("<-");
-            ExecuteJavaScript(string.Format("goToSearchResult('{0}')", timeline.TimelineId));
+            ExecuteJavaScript(string.Format("CZ.Search.goToSearchResult('{0}')", timeline.TimelineId));
             Logger.Log("->");
         }
 

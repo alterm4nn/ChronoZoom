@@ -43,11 +43,11 @@ namespace Chronozoom.Entities
         [DataMember(Name="uri")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification="Uri not supported in entity framework.")]
         public string Uri { get; set; }
-        
-        [DataMember]
+
+        [DataMember(Name = "mediaSource")]
         public string MediaSource { get; set; }
-        
-        [DataMember]
+
+        [DataMember(Name = "attribution")]
         public string Attribution { get; set; }
 
         [DataMember(Name="UniqueID")]

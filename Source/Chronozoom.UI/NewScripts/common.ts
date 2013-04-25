@@ -7,6 +7,7 @@
 /// <reference path='timescale.ts'/>
 /// <reference path='virtualcanvas.ts'/>
 /// <reference path='authoring.ui.ts'/>
+/// <reference path='cz.data.ts'/>
 
 // Obsolete functions not included in the typescript base library bindings
 declare var escape: any;
@@ -109,125 +110,6 @@ module CZ {
                 e.cancelBubble = true;
         }
 
-        export function getCoordinateFromDate(dateTime) {
-            return getYearsBetweenDates(dateTime.getFullYear(), dateTime.getMonth(), dateTime.getDay(), 0, 0, 0);
-        }
-
-        export function getCoordinateFromDMY(year, month, day) {
-            return getYearsBetweenDates(year, month, day, 0, 0, 0);
-        }
-
-        export function getDMYFromCoordinate(coord) {
-            return getDateFrom(0, 0, 0, coord);
-        }
-
-        // convert date to virtual coordinate
-        // 9999 -> present day
-        export function getCoordinateFromDecimalYear(decimalYear) {
-            // get virtual coordinate of present day
-            var localPresent = getPresent();
-            var presentDate = getYearsBetweenDates(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay, 0, 0, 0);
-
-            return decimalYear === 9999 ? presentDate : decimalYear;
-        }
-
-        var present = undefined;
-        export function getPresent() {
-            if (!present) {
-                present = new Date();
-
-                present.presentDay = present.getUTCDate();
-                present.presentMonth = present.getUTCMonth();
-                present.presentYear = present.getUTCFullYear();
-            }
-            return present;
-        }
-
-        // gets the gap between two dates
-        // y1, m1, d1 is first date (year, month, day)
-        // y2, m2, d2 is second date (year, month, day)
-        // returns count of years between given dates
-        function getYearsBetweenDates(y1, m1, d1, y2, m2, d2) {
-            // get full years and month passed
-            var years = y2 - y1;
-
-            if (y2 > 0 && y1 < 0)
-                years -= 1;
-
-            var months = m2 - m1;
-
-            if (m1 > m2 || (m1 == m2 && d1 > d2)) {
-                years--;
-                months += 12;
-            }
-
-            var month = m1;
-            var days = -d1;
-
-            // calculate count of passed days 
-            for (var i = 0; i < months; i++) {
-                if (month == 12) {
-                    month = 0;
-                }
-                days += CZ.Settings.daysInMonth[month];
-                month++;
-            }
-            days += d2;
-            var res = years + days / 365;
-            return -res;
-        }
-
-        // gets the end date by given start date and gap between them
-        // year, month, day is known date
-        // n is count of years between known and result dates; n is negative, so result date in earlier then given
-        function getDateFrom(year, month, day, n) {
-            var endYear = year;
-            var endMonth = month;
-            var endDay = day;
-
-            // get full year of result date
-            endYear -= Math.floor(-n);
-
-            // get count of days in a gap
-            var nDays = (n + Math.floor(-n)) * 365;
-
-            // calculate how many full months have passed
-            while (nDays < 0) {
-                var tempMonth = endMonth > 0 ? endMonth - 1 : 11;
-                nDays += CZ.Settings.daysInMonth[tempMonth];
-                endMonth--;
-                if (endMonth < 0) {
-                    endYear--;
-                    endMonth = 11;
-                }
-            }
-
-            endDay += Math.round(nDays);
-            // get count of days in current month
-            var tempDays = CZ.Settings.daysInMonth[endMonth];
-            if (isLeapYear(endYear)) tempDays++;
-            // if result day is bigger than count of days then one more month has passed too            
-            while (endDay > tempDays) {
-                endDay -= tempDays;
-                endMonth++;
-                if (endMonth > 11) {
-                    endMonth = 0;
-                    endYear++;
-                }
-                tempDays = CZ.Settings.daysInMonth[endMonth];
-                if (isLeapYear(endYear)) tempDays++;
-            }
-            if (endYear < 0 && year > 0)
-                endYear -= 1;
-
-            return { year: endYear, month: endMonth, day: endDay };
-        }
-
-        function isLeapYear(year) {
-            if (year % 400 == 0 || (year % 100 != 0 && year % 4 == 0)) return true;
-            else return false;
-        }
-
         export function toggleOffImage(elemId, ext?) {
             if (!ext) ext = 'jpg';
             var imageSrc = $("#" + elemId).attr("src");
@@ -309,7 +191,6 @@ module CZ {
 
         export function setVisible(visible) {
             if (visible) {
-                //ax.axis("enableThresholds", false);
                 return controller.moveToVisible(visible);
             }
         }
@@ -341,20 +222,13 @@ module CZ {
 
         //loading the data from the service
         export function loadData() {
-            //load URL state
-            CZ.UrlNav.getURL();
-
-            CZ.Service.getTimelines({
-                start: -50000000000,
-                end: 9999,
-                minspan: null // Can't specify minspan on first load since the timeline span will vary significantly.
-            }).then(
+            CZ.Data.getTimelines(null).then(
                 function (response) {
                     ProcessContent(response);
                     vc.virtualCanvas("updateViewport");
                 },
                 function (error) {
-                    alert("Error connecting to service:\n" + error.responseText);
+                    console.log("Error connecting to service:\n" + error.responseText);
                 }
             );
         }
@@ -406,32 +280,40 @@ module CZ {
             });
 
             var earthTimeline = CZ.Layout.FindChildTimeline(cosmosTimeline, CZ.Settings.earthTimelineID, true);
-            earthVisible = f(earthTimeline);
-            $("#regime-link-earth").click(function () {
-                var visible = CZ.UrlNav.navStringToVisible(earthVisible, vc);
-                setVisible(visible);
-            });
-            
-            var lifeTimeline = CZ.Layout.FindChildTimeline(earthTimeline, CZ.Settings.lifeTimelineID);
-            lifeVisible = f(lifeTimeline);
-            $("#regime-link-life").click(function () {
-                var visible = CZ.UrlNav.navStringToVisible(lifeVisible, vc);
-                setVisible(visible);
-            });
+            if (typeof earthTimeline !== "undefined") {
+                earthVisible = f(earthTimeline);
+                $("#regime-link-earth").click(function () {
+                    var visible = CZ.UrlNav.navStringToVisible(earthVisible, vc);
+                    setVisible(visible);
+                });
 
-            var prehistoryTimeline = CZ.Layout.FindChildTimeline(lifeTimeline, CZ.Settings.prehistoryTimelineID);
-            prehistoryVisible = f(prehistoryTimeline);
-            $("#regime-link-prehistory").click(function () {
-                var visible = CZ.UrlNav.navStringToVisible(prehistoryVisible, vc);
-                setVisible(visible);
-            });
+                var lifeTimeline = CZ.Layout.FindChildTimeline(earthTimeline, CZ.Settings.lifeTimelineID);
+                if (typeof lifeTimeline !== "undefined") {
+                    lifeVisible = f(lifeTimeline);
+                    $("#regime-link-life").click(function () {
+                        var visible = CZ.UrlNav.navStringToVisible(lifeVisible, vc);
+                        setVisible(visible);
+                    });
 
-            var humanityTimeline = CZ.Layout.FindChildTimeline(prehistoryTimeline, CZ.Settings.humanityTimelineID, true);
-            humanityVisible = f(humanityTimeline);
-            $("#regime-link-humanity").click(function () {
-                var visible = CZ.UrlNav.navStringToVisible(humanityVisible, vc);
-                setVisible(visible);
-            });
+                    var prehistoryTimeline = CZ.Layout.FindChildTimeline(lifeTimeline, CZ.Settings.prehistoryTimelineID);
+                    if (typeof prehistoryTimeline !== "undefined") {
+                        prehistoryVisible = f(prehistoryTimeline);
+                        $("#regime-link-prehistory").click(function () {
+                            var visible = CZ.UrlNav.navStringToVisible(prehistoryVisible, vc);
+                            setVisible(visible);
+                        });
+
+                        var humanityTimeline = CZ.Layout.FindChildTimeline(prehistoryTimeline, CZ.Settings.humanityTimelineID, true);
+                        if (typeof humanityTimeline !== "undefined") {
+                            humanityVisible = f(humanityTimeline);
+                            $("#regime-link-humanity").click(function () {
+                                var visible = CZ.UrlNav.navStringToVisible(humanityVisible, vc);
+                                setVisible(visible);
+                            });
+                        }
+                    }
+                }
+            }
 
             maxPermitedVerticalRange = {    //setting top and bottom observation constraints according to cosmos timeline
                 top: cosmosTimeline.y,

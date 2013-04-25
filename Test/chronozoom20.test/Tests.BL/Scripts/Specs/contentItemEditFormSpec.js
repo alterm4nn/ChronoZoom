@@ -3,13 +3,15 @@
 /// <reference path="../Utils/jquery-ui.js" />
 /// <reference path="../Js/cz.settings.js" />
 /// <reference path="../Js/settings.js" />
+/// <reference path="../Js/cz.dates.js" />
+/// <reference path="../Js/common.js" />
 /// <reference path="../Js/vccontent.js" />
 /// <reference path="../Js/authoring.ui.js" />
 /// <reference path="../Js/authoring.js" />
 /// <reference path="../Js/czservice.js"/>
 /// <reference path="js-ignore.js"/>
 
-describe("Given:  'edit exhibit' form is opened: ", function () {
+describe("Given:  'edit content item' form is opened: ", function () {
     var parentTimeline = {};
     parentTimeline.guid = "00000000-0000-0000-0000-000000000000";
     parentTimeline.id = "t55";

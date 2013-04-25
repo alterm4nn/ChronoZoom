@@ -17,7 +17,6 @@ namespace Chronozoom.Entities
 
         [DataMember]
         public long B3 { get; set; }
-
     }
 
 }
