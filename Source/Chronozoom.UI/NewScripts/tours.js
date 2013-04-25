@@ -391,7 +391,7 @@ var CZ;
             tourControlDiv.style.display = "none";
             if(Tours.tour) {
                 hideBookmarks();
-                $("#bookmarks .header").html("");
+                $("#bookmarks .header").text("");
                 if(Tours.tour.audio) {
                     Tours.tour.audio = undefined;
                 }
@@ -465,26 +465,39 @@ var CZ;
                     hideBookmark(t);
                 });
                 if(tour.category !== category) {
-                    var cat = $('<div class="category">' + tour.category + '</div>').appendTo(toursUI);
-                    var img = $('<img src="/Images/collapse-down.png" class="collapseButton" />').appendTo(cat);
+                    var cat = $("<div></div>", {
+                        class: "category",
+                        text: tour.category
+                    }).appendTo(toursUI);
+                    var img = $("<img></img", {
+                        class: "collapseButton",
+                        src: "/Images/collapse-down.png"
+                    }).appendTo(cat);
                     if(i == 0) {
                         cat.removeClass('category').addClass('categorySelected');
                         (img[0]).src = "/Images/collapse-up.png";
                     }
-                    categoryContent = $('<div class="itemContainer"></div>').appendTo(toursUI);
+                    categoryContent = $('<div></div>', {
+                        class: "itemContainer"
+                    }).appendTo(toursUI);
                     category = tour.category;
                 }
-                $('<div class="item" tour="' + i + '">' + tour.title + '</div>').appendTo(categoryContent).click(function () {
-                    removeActiveTour();
-                    $("#tours").hide('slide', {
-                    }, 'slow');
-                    CZ.Common.toggleOffImage('tours_index');
-                    Tours.isTourWindowVisible = false;
-                    var mytour = Tours.tours[this.getAttribute("tour")];
-                    activateTour(mytour, Tours.isNarrationOn);
-                    $(".touritem-selected").removeClass("touritem-selected", "slow");
-                    $(this).addClass("touritem-selected", "slow");
-                });
+                $("<div></div>", {
+                    class: "item",
+                    tour: i,
+                    text: tour.title,
+                    click: function () {
+                        removeActiveTour();
+                        $("#tours").hide('slide', {
+                        }, 'slow');
+                        CZ.Common.toggleOffImage('tours_index');
+                        Tours.isTourWindowVisible = false;
+                        var mytour = Tours.tours[this.getAttribute("tour")];
+                        activateTour(mytour, Tours.isNarrationOn);
+                        $(".touritem-selected").removeClass("touritem-selected", "slow");
+                        $(this).addClass("touritem-selected", "slow");
+                    }
+                }).appendTo(categoryContent);
             }
             ($)("#tours-content").accordion({
                 fillSpace: false,
@@ -520,22 +533,22 @@ var CZ;
                 }, 'slow', function () {
                     Tours.bookmarkAnimation = undefined;
                 });
-                $("#bookmarks .slideHeader").html("");
+                $("#bookmarks .slideHeader").text("");
                 Tours.isBookmarksTextShown = false;
             }
         }
         function showBookmark(tour, bookmark) {
             if(!Tours.isBookmarksWindowVisible) {
                 Tours.isBookmarksWindowVisible = true;
-                $("#bookmarks .slideText").html(bookmark.text);
+                $("#bookmarks .slideText").text(bookmark.text);
                 $("#bookmarks").show('slide', {
                 }, 'slow');
             }
-            $("#bookmarks .header").html(tour.title);
-            $("#bookmarks .slideHeader").html(bookmark.caption);
-            $("#bookmarks .slideFooter").html(bookmark.number + '/' + tour.bookmarks.length);
+            $("#bookmarks .header").text(tour.title);
+            $("#bookmarks .slideHeader").text(bookmark.caption);
+            $("#bookmarks .slideFooter").text(bookmark.number + '/' + tour.bookmarks.length);
             if(Tours.isBookmarksWindowExpanded) {
-                $("#bookmarks .slideText").html(bookmark.text);
+                $("#bookmarks .slideText").text(bookmark.text);
                 if(!Tours.isBookmarksTextShown) {
                     if(Tours.bookmarkAnimation) {
                         Tours.bookmarkAnimation.stop(true, true);
@@ -547,7 +560,7 @@ var CZ;
                     Tours.isBookmarksTextShown = true;
                 }
             } else {
-                $("#bookmarks .slideText").html(bookmark.text);
+                $("#bookmarks .slideText").text(bookmark.text);
             }
         }
         function hideBookmarks() {
