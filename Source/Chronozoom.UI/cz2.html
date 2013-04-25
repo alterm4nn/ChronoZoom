@@ -22,14 +22,14 @@
     <link rel="stylesheet" type="text/css" href="/NewStyles/cz.css" />    
     <link rel="stylesheet" type="text/css" href="/NewStyles/cz.datepicker.css" />
     <link rel="stylesheet" type="text/css" href="/NewStyles/timescale.css" />
-    
+
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
 
     <script type="text/javascript" src="/NewScripts/external/jquery-1.7.2.min.js"></script>
     <script type="text/javascript" src="/NewScripts/external/jquery.cookie.js"></script>
     <script type="text/javascript" src="/NewScripts/external/rx.js"></script>
     <script type="text/javascript" src="/NewScripts/external/rx.jQuery.js"></script>
-    <script type="text/javascript" src="http://seadragon.com/ajax/0.8/seadragon-min.js"></script>    
+    <script type="text/javascript" src="http://seadragon.com/ajax/0.8/seadragon-min.js"></script>
     <script type="text/javascript" src="/NewScripts/external/mouseWheelPlugin.js"></script>
     <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
@@ -51,9 +51,12 @@
     <script type="text/javascript" src="/NewScripts/authoring.js"></script>
     <script type="text/javascript" src="/NewScripts/authoring.ui.js"></script>
     <script type="text/javascript" src="/NewScripts/czservice.js"></script>
+    <script type="text/javascript" src="/NewScripts/cz.data.js"></script>
     <script type="text/javascript" src="/NewScripts/timescale.js"></script>
 
+    <script type="text/javascript" src="/NewScripts/uiloader.js"></script>
     <script type="text/javascript" src="/NewScripts/controls/cz.datepicker.js"></script>
+    <script type="text/javascript" src="/NewScripts/controls/formbase.js"></script>
     <script type="text/javascript" src="/NewScripts/cz.dates.js"></script>
 
     <!--[if IE]>
@@ -88,7 +91,7 @@
             </ul>
         </div>
         <div class="fright">
-            <ul>                
+            <ul>
                 <li class="fleft">
                     <div id="login-panel" />
                 </li>
@@ -111,21 +114,17 @@
                     $("#login-panel").html('<a href="/account/logout" style="color:#E9E9E9">logout</a>');
                 }
             });
-        </script>        
+        </script>
 
         <div id="footer-authoring">
 
-            <a onclick="CZ.Authoring.UI.createTimeline()" class="footer-authoring-link">
-                create timeline
+            <a onclick="CZ.Authoring.UI.createTimeline()" class="footer-authoring-link">create timeline
             </a>
-            <a onclick="CZ.Authoring.UI.editTimeline()" class="footer-authoring-link">
-                edit timeline
+            <a onclick="CZ.Authoring.UI.editTimeline()" class="footer-authoring-link">edit timeline
             </a>
-            <a onclick="CZ.Authoring.UI.createExhibit()" class="footer-authoring-link">
-                create exhibit
+            <a onclick="CZ.Authoring.UI.createExhibit()" class="footer-authoring-link">create exhibit
             </a>
-            <a onclick="CZ.Authoring.UI.editExhibit()" class="footer-authoring-link">
-                edit exhibit
+            <a onclick="CZ.Authoring.UI.editExhibit()" class="footer-authoring-link">edit exhibit
             </a>
 
             <!--Create Timeline popup dialog-->
@@ -142,7 +141,7 @@
                 <div id="timelineEndInput" style="display: block"></div>
 
                 <br />
-                <span id ="TimelineErrorSpan" style="color:red; display:none"> 
+                <span id="TimelineErrorSpan" style="color: red; display: none">
                     Input error
                 </span>
             </div>
@@ -206,8 +205,7 @@
             <img style="margin: 0 0 0 16px"
                 id="tour_playpause" src="/Images/tour_pause_off.jpg" alt="play/pause" />
             <img
-                style="margin: 0 0 0 16px" id="tour_next" src="/Images/tour_next_off.jpg" alt="next"
-                    />
+                style="margin: 0 0 0 16px" id="tour_next" src="/Images/tour_next_off.jpg" alt="next" />
             <img style="margin: 0 0 0 10px" id="tour_exit" src="/Images/tour_exit_off.jpg"
                 alt="exit" />
         </div>
@@ -233,7 +231,7 @@
             </div>
         </div>
 
-        <div id="search" class="czWindow" style="z-index: 2010;max-height:250px; display: none">
+        <div id="search" class="czWindow" style="z-index: 2010; max-height: 250px; display: none">
             <div class="header unselectable" onselectstart="return false;">
                 Search
             </div>
@@ -284,46 +282,17 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <div id="footer">
-            <div class="breadcrumbs-nav fleft">
-                <div id="breadcrumbs-nav-left">&#171;</div>
-            </div>
-            <div class="breadcrumbs-container fleft">
-                <table id="breadcrumbs-table">
-                    <tr />
-                </table>
-            </div>
-            <div class="breadcrumbs-nav fleft">
-                <div id="breadcrumbs-nav-right" class="">&#187;</div>
-            </div>
-
-        <div class="fright">
-            <ul>
-                <li class="fright">
-                    <div class="footer-link">about</div>
-                </li>
-                <li class="fright">
-                    <div class="footer-link">feedback</div>
-                </li>
-                <li class="fright">
-                    <div class="footer-link">privacy</div>
-                </li>
-                <li class="fright">
-                    <div class="footer-link">help</div>
-                </li>
-            </ul>
+        <!--Create Event Form-->
+        <div id="auth-event-form" class="cz-form unselectable">
         </div>
-                
-        <div class="clearer" />
     </div>
 
-    <!--<div id="welcomeScreenBack" class="welcomeScreenBack">
+        <div id="welcomeScreenBack" class="welcomeScreenBack">
         <div id="welcomeScreenOut" class="welcomeScreenOuterWindow">
             <div id="welcomeScreen" class="welcomeScreen">
                 <div class="titleArea">
-                    <img class="closeButton unselectable" id="welcomeScreenCloseButton" src="/Images/wlcmScreen_close_off.png"
+                    <img class="closeButton" id="welcomeScreenCloseButton" src="/Images/wlcmScreen_close_off.png"
                         alt="Close" onselectstart="return false;" />
                     <div class="title" onselectstart="return false;">
                         <span>Welcome to ChronoZoom beta!</span>
@@ -349,6 +318,37 @@
                 </div>
             </div>
         </div>
-    </div>-->
+    </div>
+
+    <div id="footer">
+        <div class="breadcrumbs-nav fleft">
+            <div id="breadcrumbs-nav-left">&#171;</div>
+        </div>
+        <div class="breadcrumbs-container fleft">
+            <table id="breadcrumbs-table">
+                <tr />
+            </table>
+        </div>
+        <div class="breadcrumbs-nav fleft">
+            <div id="breadcrumbs-nav-right" class="">&#187;</div>
+        </div>
+        <div class="fright">
+            <ul>
+                <li class="fright">
+                    <div class="footer-link">about</div>
+                </li>
+                <li class="fright">
+                    <div class="footer-link">feedback</div>
+                </li>
+                <li class="fright">
+                    <div class="footer-link">privacy</div>
+                </li>
+                <li class="fright">
+                    <div class="footer-link">help</div>
+                </li>
+            </ul>
+        </div>
+        <div class="clearer" />
+    </div>
 </body>
 </html>

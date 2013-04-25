@@ -22,8 +22,13 @@ namespace Chronozoom.Entities
         [DataMember]
         public string Title { get; set; }
 
+        [Obsolete("UserId is being replaced with User")]
         [DataMember]
         public string UserId { get; set; }
+
+
+        [DataMember]
+        public User User { get; set; }
 
         [DataMember]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification="Need to be able to assemble this objects collection.")]

@@ -48,7 +48,7 @@ module CZ {
                 $("#bibliographyBack").show('clip', {}, 'slow', function () {
                     // After bibliography window was fully opened, reset 'onmouseclick' handler for sender of bibliography link.
                     sender.onmouseclick = function (e) {
-                        CZ.Common.vc.element.css('cursor', 'default');
+                        CZ.Common.vc.css('cursor', 'default');
                         showBibliography({ infodot: descr.infodot, contentItems: descr.contentItems }, element, id);
 
                         return true;
@@ -58,7 +58,7 @@ module CZ {
                 // After bibliography window was fully opened, reset 'onmouseclick' handler for sender of bibliography link.
                 sender.onmouseclick = function (e) {
 
-                    CZ.Common.vc.element.css('cursor', 'default');
+                    CZ.Common.vc.css('cursor', 'default');
                     showBibliography({ infodot: descr.infodot, contentItems: descr.contentItems }, element, id);
 
                     return true;
@@ -68,15 +68,14 @@ module CZ {
 
             // clearing all fields
             $("#bibliography .sources").empty();
-            $("#bibliography .title").html("<span></span> &gt; Bibliography");
             // Filling with new information
             if (descr) {
                 if (descr.infodot) {
-                    $("#bibliography .title span").html(descr.infodot.title);
+                    $("#bibliography .title").text(descr.infodot.title + " > Bibliography");
                     getBibliography(descr.infodot.guid, descr.contentItems);
                 }
                 else {
-                    $("#bibliography .title span").html('');
+                    $("#bibliography .title").text("> Bibliography");
                 }
             }
         }
@@ -102,12 +101,27 @@ module CZ {
                 });
 
                 if (response.length != 0) {
-                    $('<div class="sectionTitle" id="biblAdditionalResources">Additional Resources</div>').
-                        appendTo(sources);
+                    $("<div></div>", {
+                        id: "biblAdditionalResources",
+                        class: "sectionTitle",
+                        text: "Additional Resources"
+                    }).appendTo(sources);
+                    
                     for (var i = 0; i < response.length; i++) {
                         var r = response[i];
-                        var source = $('<div class="source"></div>').appendTo(sources);
-                        $('<div class="sourceName"><a href="' + r.Source + '" target="_blank">' + r.Source + '<a/></div>').appendTo(source);
+                        var source = $("<div></div>", {
+                            class: "source"
+                        }).appendTo(sources);
+
+                        $("<div></div>", {
+                            class: "sourceName"
+                        })
+                        .append($("<a></a>", {
+                            href: r.Source,
+                            target: "_blank",
+                            text: r.Source
+                        }))
+                        .appendTo(source);
 
                         // http://www.chicagomanualofstyle.org/tools_citationguide.html
                         var descr = r.Authors ? r.Authors : '';
@@ -128,17 +142,33 @@ module CZ {
                             descr += r.PageNumbers;
                         }
 
-                        $('<div class="sourceDescr">' + descr + '</div>').appendTo(source);
+                        $("<div></div>", {
+                            class: "sourceDescr",
+                            text: descr
+                        }).appendTo(source);
                     }
                 }
                 if (contentItems.length != 0) {
-                    $('<div class="sectionTitle" id="biblAdditionalResources">Current Resources</div>').
-                        appendTo(sources);
+                    $("<div></div>", {
+                        id: "biblAdditionalResources",
+                        class: "sectionTitle",
+                        text: "Current Resources"
+                    }).appendTo(sources);
+
                     for (var i = 0; i < contentItems.length; i++) {
                         var r = contentItems[i];
-                        var source = $('<div class="source"></div>').appendTo(sources);
+                        var source = $("<div></div>", {
+                            class: "source"
+                        }).appendTo(sources);
+                        
                         if (r.mediaSource) {
-                            $('<div class="sourceName"><a href="' + r.mediaSource + '" target="_blank">' + r.mediaSource + '<a/></div>').appendTo(source);
+                            $("<div></div>", {
+                                class: "sourceName"
+                            }).append($("<a></a>", {
+                                href: r.mediaSource,
+                                target: "_blank",
+                                text: r.mediaSource
+                            })).appendTo(source);
                         } else {
                             $('<br/>').appendTo(source);
                         }
@@ -152,7 +182,10 @@ module CZ {
                             descr += r.attribution;
                         }
 
-                        $('<div class="sourceDescr">' + descr + '</div>').appendTo(source);
+                        $("<div></div>", {
+                            class: "sourceDescr",
+                            text: descr
+                        }).appendTo(source);
                     }
                 }
             };
@@ -178,7 +211,7 @@ module CZ {
                         onBiblReceived(eval(result.d));
                 },
                 error: function (xhr) {
-                    alert("Error connecting to service: " + xhr.responseText);
+                    console.log("Error connecting to service: " + xhr.responseText);
                 }
             });
         }

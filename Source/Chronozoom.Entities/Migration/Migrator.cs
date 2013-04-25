@@ -24,6 +24,7 @@ namespace Chronozoom.Entities.Migration
     {
         private Storage _storage;
         private static MD5 _md5Hasher = MD5.Create();
+        private const string _defaultUserName = "anonymous";
 
         // The user that is able to modify the base collections (e.g. Beta Content, AIDS Quilt)
         private static Lazy<string> _baseContentAdmin = new Lazy<string>(() =>
@@ -98,17 +99,34 @@ namespace Chronozoom.Entities.Migration
 
         private Collection LoadCollections(string superCollectionName, string collectionName, string userId)
         {
+            User user;
+            if (userId == null)
+            {
+                // Anonymous user - Sandbox collection etc.
+                user = _storage.Users.Where(candidate => candidate.NameIdentifier == null).FirstOrDefault();
+            }
+            else
+            {
+                // Beta content
+                user = _storage.Users.Where(candidate => candidate.NameIdentifier == userId).FirstOrDefault();
+            }
+
+            if (user == null)
+            {
+                user = new User { Id = Guid.NewGuid(), NameIdentifier = userId };
+                user.DisplayName = (userId == null) ? _defaultUserName : userId;
+            }
             // Load Collection
             Collection collection = new Collection();
             collection.Title = collectionName;
             collection.Id = CollectionIdFromSuperCollection(superCollectionName, collectionName);
-            collection.UserId = userId;
+            collection.User = user;
 
             // Load SuperCollection
             SuperCollection superCollection = new SuperCollection();
             superCollection.Title = superCollectionName;
             superCollection.Id = CollectionIdFromText(superCollectionName);
-            superCollection.UserId = userId;
+            superCollection.User = user;
 
             superCollection.Collections = new System.Collections.ObjectModel.Collection<Collection>();
             superCollection.Collections.Add(collection);

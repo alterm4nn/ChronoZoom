@@ -35,7 +35,7 @@ var CZ;
                 $("#bibliographyBack").show('clip', {
                 }, 'slow', function () {
                     sender.onmouseclick = function (e) {
-                        CZ.Common.vc.element.css('cursor', 'default');
+                        CZ.Common.vc.css('cursor', 'default');
                         showBibliography({
                             infodot: descr.infodot,
                             contentItems: descr.contentItems
@@ -45,7 +45,7 @@ var CZ;
                 });
             } else {
                 sender.onmouseclick = function (e) {
-                    CZ.Common.vc.element.css('cursor', 'default');
+                    CZ.Common.vc.css('cursor', 'default');
                     showBibliography({
                         infodot: descr.infodot,
                         contentItems: descr.contentItems
@@ -54,13 +54,12 @@ var CZ;
                 };
             }
             $("#bibliography .sources").empty();
-            $("#bibliography .title").html("<span></span> &gt; Bibliography");
             if(descr) {
                 if(descr.infodot) {
-                    $("#bibliography .title span").html(descr.infodot.title);
+                    $("#bibliography .title").text(descr.infodot.title + " > Bibliography");
                     getBibliography(descr.infodot.guid, descr.contentItems);
                 } else {
-                    $("#bibliography .title span").html('');
+                    $("#bibliography .title").text("> Bibliography");
                 }
             }
         }
@@ -98,11 +97,23 @@ var CZ;
                     return 0;
                 });
                 if(response.length != 0) {
-                    $('<div class="sectionTitle" id="biblAdditionalResources">Additional Resources</div>').appendTo(sources);
+                    $("<div></div>", {
+                        id: "biblAdditionalResources",
+                        class: "sectionTitle",
+                        text: "Additional Resources"
+                    }).appendTo(sources);
                     for(var i = 0; i < response.length; i++) {
                         var r = response[i];
-                        var source = $('<div class="source"></div>').appendTo(sources);
-                        $('<div class="sourceName"><a href="' + r.Source + '" target="_blank">' + r.Source + '<a/></div>').appendTo(source);
+                        var source = $("<div></div>", {
+                            class: "source"
+                        }).appendTo(sources);
+                        $("<div></div>", {
+                            class: "sourceName"
+                        }).append($("<a></a>", {
+                            href: r.Source,
+                            target: "_blank",
+                            text: r.Source
+                        })).appendTo(source);
                         var descr = r.Authors ? r.Authors : '';
                         if(r.Title) {
                             if(descr != '') {
@@ -128,16 +139,31 @@ var CZ;
                             }
                             descr += r.PageNumbers;
                         }
-                        $('<div class="sourceDescr">' + descr + '</div>').appendTo(source);
+                        $("<div></div>", {
+                            class: "sourceDescr",
+                            text: descr
+                        }).appendTo(source);
                     }
                 }
                 if(contentItems.length != 0) {
-                    $('<div class="sectionTitle" id="biblAdditionalResources">Current Resources</div>').appendTo(sources);
+                    $("<div></div>", {
+                        id: "biblAdditionalResources",
+                        class: "sectionTitle",
+                        text: "Current Resources"
+                    }).appendTo(sources);
                     for(var i = 0; i < contentItems.length; i++) {
                         var r = contentItems[i];
-                        var source = $('<div class="source"></div>').appendTo(sources);
+                        var source = $("<div></div>", {
+                            class: "source"
+                        }).appendTo(sources);
                         if(r.mediaSource) {
-                            $('<div class="sourceName"><a href="' + r.mediaSource + '" target="_blank">' + r.mediaSource + '<a/></div>').appendTo(source);
+                            $("<div></div>", {
+                                class: "sourceName"
+                            }).append($("<a></a>", {
+                                href: r.mediaSource,
+                                target: "_blank",
+                                text: r.mediaSource
+                            })).appendTo(source);
                         } else {
                             $('<br/>').appendTo(source);
                         }
@@ -151,7 +177,10 @@ var CZ;
                             }
                             descr += r.attribution;
                         }
-                        $('<div class="sourceDescr">' + descr + '</div>').appendTo(source);
+                        $("<div></div>", {
+                            class: "sourceDescr",
+                            text: descr
+                        }).appendTo(source);
                     }
                 }
             };
@@ -181,7 +210,7 @@ var CZ;
                     }
                 },
                 error: function (xhr) {
-                    alert("Error connecting to service: " + xhr.responseText);
+                    console.log("Error connecting to service: " + xhr.responseText);
                 }
             });
         }

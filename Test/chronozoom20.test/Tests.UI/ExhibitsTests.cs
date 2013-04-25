@@ -16,7 +16,10 @@ namespace Tests
             Title = "contentItem",
             Caption = "This is a test item",
             MediaSource = "https://www.youtube.com/watch?v=eVpXkyN0zOE",
-            MediaType = "Video"
+            MediaType = "Video",
+            Attribution = "Tests Attribution",
+            Uri = "https://www.youtube.com/"
+            
         };
 
         readonly Exhibit _exhibit = new Exhibit
@@ -74,8 +77,10 @@ namespace Tests
             {
                 Assert.AreEqual(_exhibit.ContentItems[i].Title, newExhibit.ContentItems[i].Title, "Content items titles are not equal");
                 Assert.AreEqual(_exhibit.ContentItems[i].Caption, newExhibit.ContentItems[i].Caption, "Content items descriptions are not equal");
-                Assert.AreEqual(_exhibit.ContentItems[i].MediaSource, newExhibit.ContentItems[i].MediaSource, "Content items mediaSourses are not equal");
+                Assert.AreEqual(_exhibit.ContentItems[i].Uri, newExhibit.ContentItems[i].Uri, "Content items Urls are not equal");
                 Assert.AreEqual(_exhibit.ContentItems[i].MediaType, newExhibit.ContentItems[i].MediaType, "Content items mediaTypes are not equal");
+                Assert.AreEqual(_exhibit.ContentItems[i].MediaSource, newExhibit.ContentItems[i].MediaSource, "Content items mediaSourses are not equal");
+                Assert.AreEqual(_exhibit.ContentItems[i].Attribution, newExhibit.ContentItems[i].Attribution, "Content items attributions are not equal");
             }
         }
     }
