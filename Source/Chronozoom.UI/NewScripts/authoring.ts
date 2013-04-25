@@ -326,7 +326,8 @@ module CZ {
         // Authoring Tool state.
         export var isActive : any = false;
         export var isDragging : any = false;
-        export var mode : any = null;
+        export var mode: any = null
+        export var CImode: any = null;
 
         // Forms' handlers.
         export var showCreateTimelineForm : any = null;
@@ -412,6 +413,7 @@ module CZ {
                         showEditExhibitForm(_selectedExhibit);                        
                     } else if (_hovered.type === "contentItem") {
                         _selectedExhibit = _hovered.parent.parent.parent;
+                        CZ.Authoring.CImode = "editCI";
                         showEditContentItemForm(_hovered, _selectedExhibit);
                     }
                 }

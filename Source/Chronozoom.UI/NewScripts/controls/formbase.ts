@@ -26,7 +26,6 @@ module CZ {
 
                 this.container = container;
                 this.navPath = [];
-
                 this.activationSource = formInfo.activationSource;
                 this.navButton = this.container.find(formInfo.navButton);
                 this.closeButton = this.container.find(formInfo.closeButton);

@@ -10,7 +10,7 @@
 /// <reference path='controls/cz.datepicker.ts'/>
 /// <reference path='../ui/auth-edit-timeline.ts'/>
 /// <reference path='../ui/auth-edit-exhibit.ts'/>
-
+/// <reference path='../ui/auth-edit-ci-form.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
 
 module CZ {
@@ -19,7 +19,8 @@ module CZ {
         var _uiMap = {
             "#auth-event-form": "/ui/auth-event-form.html",
             "#auth-edit-timeline-form": "/ui/auth-edit-timeline-form.html",
-            "#auth-edit-exhibit-form": "/ui/auth-edit-exhibit-form.html"
+            "#auth-edit-exhibit-form": "/ui/auth-edit-exhibit-form.html",
+            "#auth-edit-ci-form": "/ui/auth-edit-ci-form.html"
         };
 
         enum FeatureActivation {
@@ -27,7 +28,7 @@ module CZ {
             Disabled,
             RootCollection,
             NotRootCollection,
-            }
+        }
 
         // Basic Flight-Control (Tracks the features that are enabled)
         //
@@ -101,17 +102,17 @@ module CZ {
                     },
                     showEditTimelineForm: function (timeline) {
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
-                        activationSource: $("#showButton"),
-                        navButton: ".cz-form-nav",
-                        closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        titleTextblock: ".cz-form-title",
-                        startDate: ".cz-form-time-start",
-                        endDate: ".cz-form-time-end",
-                        saveButton: ".cz-form-save",
-                        deleteButton: ".cz-form-delete",
-                        titleInput: ".cz-form-item-title",
-                        context: timeline
-                    });
+                        	activationSource: $("#showButton"),
+                        	navButton: ".cz-form-nav",
+                        	closeButton: ".cz-form-close-btn > .cz-form-btn",
+                        	titleTextblock: ".cz-form-title",
+                        	startDate: ".cz-form-time-start",
+                        	endDate: ".cz-form-time-end",
+                        	saveButton: ".cz-form-save",
+                        	deleteButton: ".cz-form-delete",
+                        	titleInput: ".cz-form-item-title",
+                        	context: timeline
+						});
                         form.show();
                     },
                     showCreateExhibitForm: function (exhibit) {
@@ -143,12 +144,27 @@ module CZ {
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             context: exhibit
-                        });
+						});
                         form.show();
                     },
-                    showEditContentItemForm: CZ.Authoring.UI.showEditContentItemForm
+                    showEditContentItemForm: function (ci, e) {
+                        var form = new CZ.UI.FormEditCI(forms[3], {
+                        	activationSource: $("#showButton"),
+                        	navButton: ".cz-form-nav",
+                        	closeButton: ".cz-form-close-btn > .cz-form-btn",
+                        	titleTextblock: ".cz-form-title",
+                        	saveButton: ".cz-form-save",
+                        	titleInput: ".cz-form-item-title",
+                        	mediaSourceInput: ".cz-form-item-mediasource",
+                        	mediaInput: ".cz-form-item-mediaurl",
+                        	descriptionInput: ".cz-form-item-descr",
+                       		attributionInput: ".cz-form-item-attribution",
+                        	mediaTypeInput: ".cz-form-item-media-type",
+                        	context: ci
+                        });
+                        form.show();
+                    }
                 });
-                // TODO: Get UI components.
             });
 
             CZ.Service.getServiceInformation().then(
