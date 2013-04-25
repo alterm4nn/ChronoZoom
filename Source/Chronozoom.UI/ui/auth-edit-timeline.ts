@@ -44,12 +44,12 @@ module CZ {
 
             private initialize(): void {
                 if (CZ.Authoring.mode === "createTimeline") {
-                    this.deleteButton.css("display", "none");
+                    this.deleteButton.hide();
                     this.titleTextblock.text("Create Timeline");
                     this.saveButton.text("create timeline");
                 }
                 else if (CZ.Authoring.mode === "editTimeline") {
-                    this.deleteButton.css("display", "inline-block");
+                    this.deleteButton.show();
                     this.titleTextblock.text("Edit Timeline");
                     this.saveButton.text("update timeline");
                 }
@@ -68,7 +68,7 @@ module CZ {
                 this.saveButton.click(event => {
                     var isValid = CZ.Authoring.ValidateTimelineData(this.startDate.getDate(), this.endDate.getDate(), this.titleInput.val());
                     if (!isValid) {
-                        this.container.find("#error-edit-timeline").css("display", "block");
+                        this.container.find("#error-edit-timeline").show();
                     }
                     if (isValid) {
                         var self = this;
@@ -118,6 +118,7 @@ module CZ {
                 CZ.Authoring.isActive = false;
 
                 this.activationSource.removeClass("activeButton");
+                this.container.find("#error-edit-timeline").hide();
             }
         }
     }

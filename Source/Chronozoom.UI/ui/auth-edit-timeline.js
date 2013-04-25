@@ -23,11 +23,11 @@ var CZ;
             FormEditTimeline.prototype.initialize = function () {
                 var _this = this;
                 if(CZ.Authoring.mode === "createTimeline") {
-                    this.deleteButton.css("display", "none");
+                    this.deleteButton.hide();
                     this.titleTextblock.text("Create Timeline");
                     this.saveButton.text("create timeline");
                 } else if(CZ.Authoring.mode === "editTimeline") {
-                    this.deleteButton.css("display", "inline-block");
+                    this.deleteButton.show();
                     this.titleTextblock.text("Edit Timeline");
                     this.saveButton.text("update timeline");
                 } else {
@@ -42,7 +42,7 @@ var CZ;
                 this.saveButton.click(function (event) {
                     var isValid = CZ.Authoring.ValidateTimelineData(_this.startDate.getDate(), _this.endDate.getDate(), _this.titleInput.val());
                     if(!isValid) {
-                        _this.container.find("#error-edit-timeline").css("display", "block");
+                        _this.container.find("#error-edit-timeline").show();
                     }
                     if(isValid) {
                         var self = _this;
@@ -81,6 +81,7 @@ var CZ;
                 });
                 CZ.Authoring.isActive = false;
                 this.activationSource.removeClass("activeButton");
+                this.container.find("#error-edit-timeline").hide();
             };
             return FormEditTimeline;
         })(CZ.UI.FormBase);

@@ -1345,5 +1345,5 @@ img.fallbackBackground {
 
 .errormsg {
     color: #dd4b39;
-    display: none;
+    display: block;
 }

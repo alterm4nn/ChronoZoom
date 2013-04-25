@@ -8,7 +8,6 @@
 /// <reference path='uiloader.ts'/>
 /// <reference path='controls/formbase.ts'/>
 /// <reference path='controls/cz.datepicker.ts'/>
-/// <reference path='../ui/auth-create-timeline.ts'/>
 /// <reference path='../ui/auth-edit-timeline.ts'/>
 
 /// <reference path='typings/jquery/jquery.d.ts'/>
@@ -388,7 +387,12 @@ module CZ {
             });
 
             var vp = CZ.Common.vc.virtualCanvas("getViewport");
-            CZ.Common.vc.virtualCanvas("setVisible", CZ.VCContent.getVisibleForElement({ x: -13700000000, y: 0, width: 13700000000, height: 5535444444.444445 }, 1.0, vp, false), true);
+            CZ.Common.vc.virtualCanvas("setVisible", CZ.VCContent.getVisibleForElement({
+                x: -13700000000,
+                y: 0,
+                width: 13700000000,
+                height: 5535444444.444445
+            }, 1.0, vp, false), true);
             CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
 
             var bid = window.location.hash.match("b=([a-z0-9_]+)");
