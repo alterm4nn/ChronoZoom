@@ -39,7 +39,7 @@ describe("Given:  'edit timeline' form is opened: ", function () {
     dataEnd = ["title", "45", "", "empty 'end'"];
     dataStartNotNumber = ["title", "45", "abc", "'end' is not number"];
     dataNotNumber = ["title", "!@#", "789", "'start' is not number"];
-    dataEndLessStart = ["title", "5", "2", "start is less than end"];
+    dataEndLessStart = ["title", "-5", "-2", "start is less than end"];
 
     using("Data set: ", [dataEndLessStart, dataTitle, dataStart, dataEnd, dataStartNotNumber, dataNotNumber], function (title, start, end, conditional) {
 
@@ -49,7 +49,6 @@ describe("Given:  'edit timeline' form is opened: ", function () {
                 $('#timelineTitleInput').val(title);
                 $('.cz-datepicker-year:first').val(start);
                 $('.cz-datepicker-year:last').val(end);
-
                 $("span:contains('save and close')").click();
             });
 
@@ -60,7 +59,7 @@ describe("Given:  'edit timeline' form is opened: ", function () {
     });
 
     describe("When user set text instead year", function () {
-        it("should display error message", function () {
+        it("should display error message 'Year should be a number'", function () {
             $('#timelineTitleInput').val('Title');
             $('.cz-datepicker-year:first').val('some text');
             $('.cz-datepicker-year:last').val('some text');
@@ -85,7 +84,7 @@ function using(name, values, func) {
 function init() {
     $('#createTimelineForm').length == 0 ? $('body').prepend('<div id="createTimelineForm" >') : "";
     $('#TimelineErrorSpan').length == 0 ? $('body').prepend('<span id="TimelineErrorSpan" style="color:red; display:none">Input error</span>') : "";
-    $('#timelineStartInput').length == 0 ? $('body').prepend('<div id="timelineStartInput"</div>') : "";
     $('#timelineEndInput').length == 0 ? $('body').prepend('<div id="timelineEndInput"</div>') : "";
+    $('#timelineStartInput').length == 0 ? $('body').prepend('<div id="timelineStartInput"</div>') : "";
     $('#timelineTitleInput').length == 0 ? $('body').prepend('<span id="timelineTitleInput"</span>') : "";
 }

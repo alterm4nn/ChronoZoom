@@ -104,7 +104,6 @@ var CZ;
                     }
                 }
                 if((res.max - res.min) > (timeline.height - titleObject.bboxHeight)) {
-                    console.log("Warning: Child timelines and exhibits doesn't fit into parent. Timeline name: " + timeline.title);
                     var contentHeight = res.max - res.min;
                     var fullHeight = contentHeight / (1 - headerPercent);
                     var titleObject = GenerateTitleObject(fullHeight, timeline, measureContext);
@@ -721,7 +720,7 @@ var CZ;
             }
         }
         function Merge(src, dest) {
-            if(typeof CZ.Authoring !== 'undefined' && CZ.Authoring._isActive) {
+            if(typeof CZ.Authoring !== 'undefined' && CZ.Authoring.isActive) {
                 return;
             }
             if(src && dest) {

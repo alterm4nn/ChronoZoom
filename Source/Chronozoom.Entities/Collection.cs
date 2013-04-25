@@ -22,7 +22,11 @@ namespace Chronozoom.Entities
         [DataMember]
         public string Title { get; set; }
 
+        [Obsolete("UserId is being replaced with User")]
         [DataMember]
         public string UserId { get; set; }
+
+        [DataMember]
+        public User User { get; set; }
     }
 }

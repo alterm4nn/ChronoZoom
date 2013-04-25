@@ -262,14 +262,14 @@ module CZ {
             var requestTimer = null;
             this.getMissingData = function (vbox, lca) {
                 // request new data only in case if authoring is not active
-                if (typeof CZ.Authoring === 'undefined' || CZ.Authoring._isActive === false) {
+                if (typeof CZ.Authoring === 'undefined' || CZ.Authoring.isActive === false) {
                     window.clearTimeout(requestTimer);
                     requestTimer = window.setTimeout(function () { getMissingTimelines(vbox, lca); }, 1000);
                 }
             };
 
             function getMissingTimelines(vbox, lca) {
-                CZ.Service.getTimelines({
+                CZ.Data.getTimelines({
                     lca: lca.guid,
                     start: vbox.left,
                     end: vbox.right,
@@ -333,7 +333,7 @@ module CZ {
             }
 
             gesturesSource.Subscribe(function (gesture) {
-                if (typeof gesture != "undefined" && !(CZ.Authoring._isActive)) {
+                if (typeof gesture != "undefined" && !CZ.Authoring.isActive) {
                     var isAnimationActive = self.activeAnimation;
                     var oldId = isAnimationActive ? self.activeAnimation.ID : undefined;
 
@@ -473,7 +473,6 @@ module CZ {
             this.moveToVisible = function (visible, noAnimation) {
                 var currentViewport = getViewport();
                 var targetViewport = new CZ.Viewport.Viewport2d(currentViewport.aspectRatio, currentViewport.width, currentViewport.height, visible);
-
                 var vbox = CZ.Common.viewportToViewBox(targetViewport);
                 var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
 
