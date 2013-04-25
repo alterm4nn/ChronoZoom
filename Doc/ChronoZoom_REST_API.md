@@ -27,19 +27,16 @@ The ChronoZoom Representational State Transfer (REST) API makes it possible to p
 ## Request URL Syntax ##
 All requests utilize the **GET**, **PUT** and **DELETE** HTTP verbs, and must be structured using the following URL syntax:
 
-    http://[site URL]/chronozoom.svc/[command]?[parameters]
+    `http://[site URL]/chronozoom.svc/[command]?[parameter]=[value]&[parameter]=[value]`
 
 For example:
 
-    http://chronozoomproject.org/chronozoom.svc/Get?start=-1&end=2013.0&timespan=10
+    `http://chronozoomproject.org/chronozoom.svc/Get?start=-1&end=2013.0&timespan=10`
 
 ## ChronoZoom REST Commands ##
 
 ### Get ###
 Use the **Get** command to return data within a specified range of years from a collection or a supercollection.
-
-**Syntax**
-    Get(string supercollection, string collection, string start, string end, string timespan)
 
 **Parameters**
 
@@ -55,11 +52,8 @@ Use the **Get** command to return data within a specified range of years from a 
 ----------
 ### GetTimelines ###
 
-**Syntax**
-    GetTimelines(string supercollection, string collection, string start, string end, string minspan, string lca, string maxElements)
-
 **HTTP**
-    http://chronozoomproject.org/chronozoom.svc/GetTimelines?collection=myCollection&start=1974&end=2013
+    `http://chronozoomproject.org/chronozoom.svc/GetTimelines?collection=myCollection&start=1974&end=2013`
 
 **Parameters**
 
@@ -70,7 +64,7 @@ Use the **Get** command to return data within a specified range of years from a 
 |start|float|Year at which to begin the search, between -20000000000 and 9999.|Yes|
 |end|float|Year at which to end the search, between -20000000000 and 9999.|Yes|
 |minspan|string|Filters the search results to a particular time scale.|Yes|
-|lca|string|???|???|
+|lca|string|Least Common Ancestor, a timeline identifier used to hint the server to retrieve timelines close to this location.|No|
 |maxElements|int|The maximum number of elements to return|Yes|
 
 **Example Result Data**
@@ -81,11 +75,8 @@ Use the **Get** command to return data within a specified range of years from a 
 ### GetThresholds ###
 Use the **GetThresholds** command to return the time thresholds that have been defined for a ChronoZoom instance.
 
-**Syntax**
-    GetThresholds()
-
 **HTTP**
-    http://chronozoomproject.org/chronozoom.svc/GetThresholds
+    `http://chronozoomproject.org/chronozoom.svc/GetThresholds`
 
 **Parameters**
 
@@ -185,11 +176,8 @@ This command has no parameters.
 ### Search ###
 Use the **Search** command to search for a specific term within a collection or a supercollection.
 
-**Syntax**
-    Search(string supercollection, string collection, string searchTerm)
-
 **HTTP**
-    http://chronozoomproject.org/chronozoom.svc/Search?searchTerm=Pluto
+    `http://chronozoomproject.org/chronozoom.svc/Search?searchTerm=Pluto`
 
 **Parameters**
 
@@ -209,11 +197,8 @@ Use the **Search** command to search for a specific term within a collection or 
 ### GetBibliography ###
 Use the **GetBibliography** command to return the bibliography for a given exhibit.
 
-**Syntax**
-    GetBibliography(string exhibitId)
-
 **HTTP**
-    http://chronozoomproject.org/chronozoom.svc/GetBibliography?exhibitId=[id]
+    `http://chronozoomproject.org/chronozoom.svc/GetBibliography?exhibitId=[id]`
 
 **Parameters**
 
@@ -232,11 +217,8 @@ Use the **GetBibliography** command to return the bibliography for a given exhib
 Use the **GetTours** command to return a list of tours for a given collection or supercollection.
 !!! Todo: The parameter doesn't seem to have an effect on this command. Why? !!!
 
-**Syntax**
-    GetTours(string supercollection, string collection)
-
 **HTTP**
-    http://chronozoomproject.org/chronozoom.svc/GetTours?collection=Chronozoom.Entities
+    `http://chronozoomproject.org/chronozoom.svc/GetTours?collection=Chronozoom.Entities`
 
 **Parameters**
 
@@ -254,11 +236,8 @@ Use the **GetTours** command to return a list of tours for a given collection or
 ### PutUser ###
 Updates user information and associated personal collection.
 
-**Syntax**
-    PutUser(string User)
-
 **HTTP**
-    http://chronozoomproject.org/chronozoom.svc/PutUser?User=aUser
+    `http://chronozoomproject.org/chronozoom.svc/PutUser?User=aUser`
 
 **Parameters**
 
@@ -277,8 +256,8 @@ Creates a new collection on behalf of the authenticated user.
 
 If a collection of the specified name does not exist then a new collection is created. If the collection exists and the authenticated user is the author then the collection is modified. If no author is registered then the authenticated user is set as the author. The title field can't be modified because it is part of the URL (the URL can be indexed).
 
-**Syntax**
-    http://chronozoomproject.org/chronozoom.svc/PutCollectionName?collectionName=myCollection
+**HTTP**
+    `http://chronozoomproject.org/chronozoom.svc/PutCollectionName?collectionName=myCollection`
 
 **Parameters**
 
@@ -286,7 +265,7 @@ If a collection of the specified name does not exist then a new collection is cr
 |:--------|:---|:----|:-------|
 |collectionName|The markup for the collection to create, in JSON format.|string|Yes|
 |superCollectionName|Name of the supercollection beneath which to create the specified collection.|string|Yes|
-|collectionRequest|???|string|???|
+|collectionRequest|The changes that will be applied to the specified collection.|string|Yes|
 
 **Returns**
 A GUID representing the ID for the newly created collection.
@@ -300,8 +279,8 @@ A GUID representing the ID for the newly created collection.
 ### DeleteCollection ###
 Deletes the specified collection.
 
-**Syntax**
-    http://chronozoomproject.org/chronozoom.svc/DeleteCollection?collectionName=myOldCollection
+**HTTP**
+    `http://chronozoomproject.org/chronozoom.svc/DeleteCollection?collectionName=myOldCollection`
 
 **Parameters**
 
@@ -324,8 +303,8 @@ Creates or updates the timeline in a given collection. If the collection does no
 
 If a timeline id is not specified, then a new timeline is added to the collection. For a new timeline, if the parent is not defined it will be set to the root timeline. If the specified timeline identifier does not exist a "not found" status is returned. If the timeline with the specified identifier exists, then the existing timeline is updated.
 
-**Syntax**
-    http://chronozoomproject.org/chronozoom.svc/PutTimeline?collectionName=aCollection&timelineRequest=myTLdata
+**HTTP**
+    `http://chronozoomproject.org/chronozoom.svc/PutTimeline?collectionName=aCollection&timelineRequest=myTLdata`
 
 **Parameters**
 
@@ -347,8 +326,8 @@ A GUID representing the ID for the timeline that was updated/created.
 ### DeleteTimeline ###
 Deletes the timeline with the specified ID.
 
-**Syntax**
-    http://chronozoomproject.org/chronozoom.svc/DeleteTimeline?collectionName=aCollection&timelineRequest=myTLdata
+**HTTP**
+    `http://chronozoomproject.org/chronozoom.svc/DeleteTimeline?collectionName=aCollection&timelineRequest=myTLdata`
 
 **Parameters**
 
@@ -373,8 +352,8 @@ Creates or updates the exhibit and its content items in a given collection. If t
 If an exhibit id is not specified, a new exhibit is added to the collection. If the ID for an existing exhibit is specified then the exhibit will be updated. If the exhibit ID to be updated does not exist a "not found" status is returned. If the parent timeline is not specified the exhibit is added to the root timeline.
 Otherwise, the exhibit is added to the specified parent timeline. If an invalid parent timeline is specified then the request will fail. 
 
-**Syntax**
-    http://chronozoomproject.org/chronozoom.svc/PutExhibit?collectionName=myColl&exhibitRequest=myExhibitData
+**HTTP**
+    `http://chronozoomproject.org/chronozoom.svc/PutExhibit?collectionName=myColl&exhibitRequest=myExhibitData`
 
 **Parameters**
 
@@ -385,7 +364,7 @@ Otherwise, the exhibit is added to the specified parent timeline. If an invalid 
 |exhibitRequest|Raw exhibit data in JSON format.|string|Yes|
 
 **Returns**
-Request result data. <!-- ???What does this look like? -->
+The exhibit object resulting from the requested modification.
 
 **Example Result Data**
 !!! Todo: Add examples. !!!
@@ -396,8 +375,8 @@ Request result data. <!-- ???What does this look like? -->
 ### DeleteExhibit ###
 Deletes the specified exhibit from the specified collection.
 
-**Syntax**
-    http://chronozoomproject.org/chronozoom.svc/DeleteExhibit?collectionName=myColl&exhibitRequest=myExhibitData
+**HTTP**
+    `http://chronozoomproject.org/chronozoom.svc/DeleteExhibit?collectionName=myColl&exhibitRequest=myExhibitData`
 
 **Parameters**
 
@@ -408,10 +387,7 @@ Deletes the specified exhibit from the specified collection.
 |exhibitRequest|Raw exhibit data in JSON format.|string|Yes|
 
 **Returns**
-Request result data. <!-- ???What does this look like? -->
-
-**Example Result Data**
-!!! Todo: Add examples. !!!
+None.
 
 [top](#chronozoom-rest-api-reference)
 
@@ -421,13 +397,12 @@ Creates or updates the content item in a given collection. If the collection doe
 
 If a content item ID is not specified then a new content item is added to the parent exhibit. 
 If a valid ID is specified and the content item exists, then the existing content item is updated. 
-For a new content item, if the parent exhibit is not specified then the request will fail. 
-If a parent exhibit is specified then the new content item is added to it. 
+For a new content item, if the parent exhibit is not specified then the request will fail.  
 If the parent exhibit ID is invalid then the request will fail. If the content item ID does not exist a "not found" status is returned.
 <!-- Todo: Perhaps instead of explaining this logic for each request type we can summarize it neatly at the top. -->
 
-**Syntax**
-    http://chronozoomproject.org/chronozoom.svc/PutContentItem?collectionName=myColl&exhibitRequest=myContentItem
+**HTTP**
+    `http://chronozoomproject.org/chronozoom.svc/PutContentItem?collectionName=myColl&exhibitRequest=myContentItem`
 
 **Parameters**
 
@@ -438,10 +413,7 @@ If the parent exhibit ID is invalid then the request will fail. If the content i
 |exhibitRequest|Request body.|string|Yes|
 
 **Returns**
-Request result data. <!-- ???What does this look like? -->
-
-**Example Result Data**
-!!! Todo: Add examples. !!!
+The GUID of the modified content item.
 
 [top](#chronozoom-rest-api-reference)
 
@@ -449,8 +421,8 @@ Request result data. <!-- ???What does this look like? -->
 ### DeleteContentItem ###
 Delete the specified content item from the specified collection.
 
-**Syntax**
-    http://chronozoomproject.org/chronozoom.svc/DeleteContentItem?collectionName=myColl&exhibitRequest=myContentItem
+**HTTP**
+    `http://chronozoomproject.org/chronozoom.svc/DeleteContentItem?collectionName=myColl&exhibitRequest=myContentItem`
 
 **Parameters**
 
@@ -461,10 +433,7 @@ Delete the specified content item from the specified collection.
 |exhibitRequest|Request body.|string|Yes|
 
 **Returns**
-Request result data. <!-- ???What does this look like? -->
-
-**Example Result Data**
-!!! Todo: Add examples. !!!
+None.
 
 [top](#chronozoom-rest-api-reference)
 
