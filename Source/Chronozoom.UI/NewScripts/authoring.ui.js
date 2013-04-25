@@ -3,17 +3,68 @@ var CZ;
     (function (Authoring) {
         (function (UI) {
             function _addContentItemForm(form, addSeparator) {
-                var container = $("<div class='cz-authoring-ci-container'></div>");
-                var title = $("<p>" + "<label>Title</label>" + "<input class='cz-authoring-ci-title' style='display: block' type='text'/>" + "</p>");
-                var description = $("<p>" + "<label style='display: block'>Description</label>" + "<textarea class='cz-authoring-ci-description' style='display: block' />" + "</p>");
-                var mediaSource = $("<p>" + "<label>URL of image or video</label>" + "<input class='cz-authoring-ci-uri' style='display: block' type='text'/>" + "</p>");
-                var mediaType = $("<p>" + "<label>Media type</label>" + "<select class='cz-authoring-ci-media-type' style='display: block'>" + "<option value='image'>Image</option>" + "<option value='pdf'>PDF</option> " + "<option value='video'>Video</option>" + "<option value='audio'>Audio</option>" + "</select>" + "</p>");
-                var attribution = $("<p>" + "<label>Attribution</label>" + "<input type='text' class='cz-authoring-ci-attribution' style='display: block;' />" + "</p>");
-                var mediaSourceURL = $("<p>" + "<label>Media Source</label>" + "<input type='text' class='cz-authoring-ci-media-source' style='display: block;' />" + "</p>");
-                var removeBtn = $("<button>Remove content item</button>");
-                removeBtn[0].onclick = function () {
-                    container.remove();
-                };
+                var container = $("<div></div>", {
+                    class: "cz-authoring-ci-container"
+                });
+                var title = $("<p></p>").append($("<label></label>", {
+                    text: "Title"
+                })).append($("<input></input>", {
+                    class: "cz-authoring-ci-title",
+                    style: "display: block;",
+                    type: "text"
+                }));
+                var description = $("<p></p>").append($("<label></label>", {
+                    style: "display: block;",
+                    text: "Description"
+                })).append($("<textarea></textarea>", {
+                    class: "cz-authoring-ci-description",
+                    style: "display: block;"
+                }));
+                var mediaSource = $("<p></p>").append($("<label></label>", {
+                    text: "URL of image or video"
+                })).append($("<input></input>", {
+                    class: "cz-authoring-ci-uri",
+                    style: "display: block;",
+                    type: "text"
+                }));
+                var mediaType = $("<p></p>").append($("<label></label>", {
+                    text: "Media type"
+                })).append($("<select></select>", {
+                    class: "cz-authoring-ci-media-type",
+                    style: "display: block;"
+                }).append($("<option></option>", {
+                    value: "image",
+                    text: "Image"
+                }), $("<option></option>", {
+                    value: "pdf",
+                    text: "PDF"
+                }), $("<option></option>", {
+                    value: "video",
+                    text: "Video"
+                }), $("<option></option>", {
+                    value: "audio",
+                    text: "Audio"
+                })));
+                var attribution = $("<p></p>").append($("<label></label>", {
+                    text: "Attribution"
+                })).append($("<input></input>", {
+                    class: "cz-authoring-ci-attribution",
+                    style: "display: block;",
+                    type: "text"
+                }));
+                var mediaSourceURL = $("<p></p>").append($("<label></label>", {
+                    text: "Media Source"
+                })).append($("<input></input>", {
+                    class: "cz-authoring-ci-media-source",
+                    style: "display: block;",
+                    type: "text"
+                }));
+                var removeBtn = $("<button></button>", {
+                    text: "Remove content item",
+                    click: function () {
+                        container.remove();
+                    }
+                });
                 container.append(title);
                 container.append(description);
                 container.append(mediaSource);
