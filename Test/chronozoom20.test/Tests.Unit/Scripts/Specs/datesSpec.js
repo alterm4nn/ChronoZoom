@@ -124,7 +124,6 @@ describe("getCoordinateFromDMY() method should return", function () {
 });
 
 describe("getPresent() method should return", function () {
-
     it("current date", function () {
         var expectedDate = new Date();
         var result = CZ.Dates.getPresent();
@@ -134,7 +133,37 @@ describe("getPresent() method should return", function () {
     });
 });
 
+describe("getCoordinateFromDecimalYear() method should return", function () {
+    it("decimalYear date if year != 9999", function () {
+        var decimal = 2012.654794520548;
+        var result = CZ.Dates.getCoordinateFromDecimalYear(decimal);
+        expect(result).toEqual(decimal);
+    });
 
+    it("decimalYear date if year = '9999'", function () {
+        var decimal = '9999';
+        var result = CZ.Dates.getCoordinateFromDecimalYear(decimal);
+        expect(result).toEqual(decimal);
+    });
+
+    it("decimalYear date if year = -9999", function () {
+        var decimal = -9999;
+        var result = CZ.Dates.getCoordinateFromDecimalYear(decimal);
+        expect(result).toEqual(decimal);
+    });
+
+    it("not decimalYear if year = 9999.00", function () {
+        var decimal = 9999.00;
+        var result = CZ.Dates.getCoordinateFromDecimalYear(decimal);
+        expect(result).not.toEqual(decimal);
+    });
+    
+    it("not decimalYear if year === 9999", function () {
+        var decimal = 9999;
+        var result = CZ.Dates.getCoordinateFromDecimalYear(decimal);
+        expect(result).not.toEqual(decimal);
+    });
+});
 
 function convertCoordinateToYear(coordinate) {
     return CZ.Dates.convertCoordinateToYear(coordinate);
