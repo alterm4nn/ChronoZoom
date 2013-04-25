@@ -46,10 +46,12 @@ module CZ {
                 if (CZ.Authoring.mode === "createTimeline") {
                     this.deleteButton.css("display", "none");
                     this.titleTextblock.text("Create Timeline");
+                    this.saveButton.text("create timeline");
                 }
                 else if (CZ.Authoring.mode === "editTimeline") {
                     this.deleteButton.css("display", "inline-block");
                     this.titleTextblock.text("Edit Timeline");
+                    this.saveButton.text("update timeline");
                 }
                 else {
                     console.log("Unexpected authoring mode in timeline form.");
