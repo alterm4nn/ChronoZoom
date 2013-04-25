@@ -15,7 +15,7 @@ module CZ {
                 * @param {Object}   form          Target DOM element found with jQuery.
                 * @param {Boolean}  addSeparator  Indicates whether separator is required.
                 */
-            function _addContentItemForm(form, addSeparator) {
+ /*           function _addContentItemForm(form, addSeparator) {
                 var container = $("<div></div>", {
                     class: "cz-authoring-ci-container"
                 });
@@ -119,12 +119,12 @@ module CZ {
 
                 form.append(container);
             }
-
+*/
             /**
                 * Returns an array of contentItems filled with user data.
                 * @return {Array}  An array of contentItems.
                 */
-            function _getContentItemsData() {
+ /*           function _getContentItemsData() {
                 var contentItems = [];
 
                 var containers = $(".cz-authoring-ci-container");
@@ -159,13 +159,13 @@ module CZ {
 
                 return contentItems;
             }
-
+*/
             /**
                 * Fills contentItem form with data taken from given contentItem.
                 * @param {Object}  form         Target DOM element found with jQuery.
                 * @param {Object}  contentItem  ContentItem which data is taken.
                 */
-            function _fillContentItemForm(form, contentItem) {
+  /*          function _fillContentItemForm(form, contentItem) {
                 var titleInput = form.find(".cz-authoring-ci-title");
                 var mediaInput = form.find(".cz-authoring-ci-uri");
                 var mediaTypeInput = form.find(".cz-authoring-ci-media-type option");
@@ -191,7 +191,7 @@ module CZ {
                     }
                 });
             }
-
+*/
             export function showCreateExhibitForm (e) {
                 var isCancel = true;
                 var titleInput = $("#exhibitTitleInput");
@@ -326,8 +326,8 @@ module CZ {
                     }
                 });
             }
-
-            export function showEditContentItemForm (c, e) {
+    
+  /*          export function showEditContentItemForm (c, e) {
                 var titleInput = $("#contentItemTitleInput");
                 var mediaInput = $("#contentItemMediaSourceInput");
                 var descriptionInput = $("#contentItemDescriptionInput");
@@ -387,7 +387,7 @@ module CZ {
                     }
                 });
             }
-
+    */
             // Mouseup handlers.
 
             export function createTimeline () {

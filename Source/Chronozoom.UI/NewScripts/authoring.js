@@ -177,6 +177,7 @@ var CZ;
         Authoring.isActive = false;
         Authoring.isDragging = false;
         Authoring.mode = null;
+        Authoring.CImode = null;
         Authoring.showCreateTimelineForm = null;
         Authoring.showEditTimelineForm = null;
         Authoring.showCreateExhibitForm = null;
@@ -246,6 +247,7 @@ var CZ;
                         Authoring.showEditExhibitForm(_selectedExhibit);
                     } else if(_hovered.type === "contentItem") {
                         _selectedExhibit = _hovered.parent.parent.parent;
+                        CZ.Authoring.CImode = "editCI";
                         Authoring.showEditContentItemForm(_hovered, _selectedExhibit);
                     }
                 }

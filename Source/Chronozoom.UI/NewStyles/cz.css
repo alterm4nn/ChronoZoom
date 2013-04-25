@@ -190,8 +190,6 @@ a:visited {
     cursor: pointer;
 }
 
-
-
 /***********************************************************
 
                         Bibliography
@@ -367,7 +365,7 @@ a:visited {
 
     font-size: 19px;
     cursor: default;
-    filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#FDFDFD', EndColorStr='#424242', GradientType=1); 
+    filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#FDFDFD', EndColorStr='#424242', GradientType=1);
 /* MSIE */
 }
 
@@ -1337,6 +1335,24 @@ img.fallbackBackground {
 }
 
 .cz-form-exhibit > .cz-form-content {
+    position: absolute;
+    top: 36px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    overflow-y: auto;
+}
+
+.cz-form-ci {
+    min-width: 380px;
+    max-width: 450px;
+    width: 30.2734375%; /* 310 / 1024 */
+    bottom: 25px;
+    left: 0;
+}
+
+.cz-form-ci > .cz-form-content {
     position: absolute;
     top: 36px;
     right: 0;

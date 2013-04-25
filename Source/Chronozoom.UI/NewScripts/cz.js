@@ -5,7 +5,8 @@ var CZ;
         var _uiMap = {
             "#auth-event-form": "/ui/auth-event-form.html",
             "#auth-edit-timeline-form": "/ui/auth-edit-timeline-form.html",
-            "#auth-edit-exhibit-form": "/ui/auth-edit-exhibit-form.html"
+            "#auth-edit-exhibit-form": "/ui/auth-edit-exhibit-form.html",
+            "#auth-edit-ci-form": "/ui/auth-edit-ci-form.html"
         };
         var FeatureActivation;
         (function (FeatureActivation) {
@@ -127,7 +128,23 @@ var CZ;
                         });
                         form.show();
                     },
-                    showEditContentItemForm: CZ.Authoring.UI.showEditContentItemForm
+                    showEditContentItemForm: function (ci, e) {
+                        var form = new CZ.UI.FormEditCI(forms[3], {
+                            activationSource: $("#showButton"),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            saveButton: ".cz-form-save",
+                            titleInput: ".cz-form-item-title",
+                            mediaSourceInput: ".cz-form-item-mediasource",
+                            mediaInput: ".cz-form-item-mediaurl",
+                            descriptionInput: ".cz-form-item-descr",
+                            attributionInput: ".cz-form-item-attribution",
+                            mediaTypeInput: ".cz-form-item-media-type",
+                            context: ci
+                        });
+                        form.show();
+                    }
                 });
             });
             var url = CZ.UrlNav.getURL();
