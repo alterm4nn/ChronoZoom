@@ -107,7 +107,7 @@ var data9 = [2000.162, 2000, 2, 1];
 
 describe("getDMYFromCoordinate() method should return", function () {
     usingDMY("", [data1, data2, data3, data4, data5, data6, data7, data8, data9], function (coordinate, year, month, day) {
-        it("{ year: " + year + ", month: " + month + ", day: " + day + " }  with coordinate: "+ coordinate , function () {
+        it("{ year: " + year + ", month: " + month + ", day: " + day + " }  with coordinate: " + coordinate, function () {
             var result = CZ.Dates.getDMYFromCoordinate(coordinate);
             expect({ year: year, month: month, day: day }).toEqual(result);
         });
@@ -122,6 +122,19 @@ describe("getCoordinateFromDMY() method should return", function () {
         });
     });
 });
+
+describe("getPresent() method should return", function () {
+
+    it("current date", function () {
+        var expectedDate = new Date();
+        var result = CZ.Dates.getPresent();
+        expect(expectedDate.getUTCDate()).toEqual(result.presentDay);
+        expect(expectedDate.getUTCMonth()).toEqual(result.presentMonth);
+        expect(expectedDate.getUTCFullYear()).toEqual(result.presentYear);
+    });
+});
+
+
 
 function convertCoordinateToYear(coordinate) {
     return CZ.Dates.convertCoordinateToYear(coordinate);
