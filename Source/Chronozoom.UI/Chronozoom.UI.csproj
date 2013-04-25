@@ -176,6 +176,7 @@
     <Content Include="Images\search-icon.png" />
     <Content Include="Images\tour-icon.png" />
     <Content Include="Images\view-icon.png" />
+    <Content Include="Images\edit.svg" />
     <Content Include="NewScripts\authoring.ts" />
     <Content Include="NewScripts\authoring.js">
       <DependentUpon>authoring.ts</DependentUpon>

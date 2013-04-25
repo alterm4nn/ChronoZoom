@@ -96,9 +96,7 @@ module CZ {
                         closeButton: ".cz-form-close-btn > .cz-form-btn",
                         titleTextblock: ".cz-form-title",
                         createTimeline: ".cz-form-create-timeline",
-                        createExhibit: ".cz-form-create-exhibit",
-                        editTimeline: ".cz-form-edit-timeline",
-                        editExhibit: ".cz-form-edit-exhibit"
+                        createExhibit: ".cz-form-create-exhibit"
                     });
                     form.show();
                 });
@@ -303,6 +301,9 @@ module CZ {
                     $(feature.JQueryReference).css("display", "none");
                 }
             });
+
+            if (!rootCollection)
+                CZ.Authoring.isEnabled = true;
 
             if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
                 if (/Chrome[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {

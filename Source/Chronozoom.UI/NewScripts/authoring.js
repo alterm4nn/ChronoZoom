@@ -22,10 +22,20 @@ var CZ;
         var _circleCur = {
             type: "circle"
         };
-        var _selectedTimeline = {
+        Authoring.selectedTimeline = {
         };
-        var _selectedExhibit = {
+        Authoring.selectedExhibit = {
         };
+        Authoring.isActive = false;
+        Authoring.isEnabled = false;
+        Authoring.isDragging = false;
+        Authoring.mode = null;
+        Authoring.CImode = null;
+        Authoring.showCreateTimelineForm = null;
+        Authoring.showEditTimelineForm = null;
+        Authoring.showCreateExhibitForm = null;
+        Authoring.showEditExhibitForm = null;
+        Authoring.showEditContentItemForm = null;
         function isIntersecting(te, obj) {
             switch(obj.type) {
                 case "timeline":
@@ -54,14 +64,14 @@ var CZ;
                 return false;
             }
             for(i = 0 , len = tp.children.length; i < len; ++i) {
-                selfIntersection = editmode ? (tp.children[i] === _selectedTimeline) : (tp.children[i] === tc);
+                selfIntersection = editmode ? (tp.children[i] === Authoring.selectedTimeline) : (tp.children[i] === tc);
                 if(!selfIntersection && isIntersecting(tc, tp.children[i])) {
                     return false;
                 }
             }
-            if(editmode && _selectedTimeline.children && _selectedTimeline.children.length > 0) {
-                for(i = 0 , len = _selectedTimeline.children.length; i < len; ++i) {
-                    if(!isIncluded(tc, _selectedTimeline.children[i])) {
+            if(editmode && Authoring.selectedTimeline.children && Authoring.selectedTimeline.children.length > 0) {
+                for(i = 0 , len = Authoring.selectedTimeline.children.length; i < len; ++i) {
+                    if(!isIncluded(tc, Authoring.selectedTimeline.children[i])) {
                         return false;
                     }
                 }
@@ -76,7 +86,7 @@ var CZ;
                 return false;
             }
             for(i = 0 , len = tp.children.length; i < len; ++i) {
-                selfIntersection = editmode ? (tp.children[i] === _selectedExhibit) : (tp.children[i] === ec);
+                selfIntersection = editmode ? (tp.children[i] === Authoring.selectedExhibit) : (tp.children[i] === ec);
                 if(!selfIntersection && isIntersecting(ec, tp.children[i])) {
                     return false;
                 }
@@ -167,6 +177,12 @@ var CZ;
             var marginTop = (1 - CZ.Settings.timelineHeaderMargin) * t.height - headerSize;
             var baseline = t.y + marginTop + headerSize / 2.0;
             CZ.VCContent.removeChild(t, t.id + "__header__");
+            if(CZ.Authoring.isEnabled && typeof t.editButton !== "undefined") {
+                t.editButton.x = t.x + t.width - 1.15 * t.titleObject.height;
+                t.editButton.y = t.titleObject.y;
+                t.editButton.width = t.titleObject.height;
+                t.editButton.height = t.titleObject.height;
+            }
             t.titleObject = CZ.VCContent.addText(t, t.layerid, t.id + "__header__", t.x + marginLeft, t.y + marginTop, baseline, headerSize, t.title, {
                 fontName: CZ.Settings.timelineHeaderFontName,
                 fillStyle: CZ.Settings.timelineHeaderFontColor,
@@ -174,15 +190,6 @@ var CZ;
                 opacity: 1
             });
         }
-        Authoring.isActive = false;
-        Authoring.isDragging = false;
-        Authoring.mode = null;
-        Authoring.CImode = null;
-        Authoring.showCreateTimelineForm = null;
-        Authoring.showEditTimelineForm = null;
-        Authoring.showCreateExhibitForm = null;
-        Authoring.showEditExhibitForm = null;
-        Authoring.showEditContentItemForm = null;
         Authoring.modeMouseHandlers = {
             createTimeline: {
                 mousemove: function () {
@@ -196,8 +203,8 @@ var CZ;
                     }
                     if(_hovered.type === "timeline") {
                         updateNewRectangle();
-                        _selectedTimeline = createNewTimeline();
-                        Authoring.showCreateTimelineForm(_selectedTimeline);
+                        Authoring.selectedTimeline = createNewTimeline();
+                        Authoring.showCreateTimelineForm(Authoring.selectedTimeline);
                     }
                 }
             },
@@ -211,11 +218,13 @@ var CZ;
                 },
                 mouseup: function () {
                     if(_hovered.type === "timeline") {
-                        _selectedTimeline = _hovered;
-                        Authoring.showEditTimelineForm(_selectedTimeline);
+                        Authoring.selectedTimeline = _hovered;
+                        Authoring.showEditTimelineForm(Authoring.selectedTimeline);
                     } else if(_hovered.type === "infodot" || _hovered.type === "contentItem") {
-                        _selectedTimeline = _hovered.parent;
-                        Authoring.showEditTimelineForm(_selectedTimeline);
+                        Authoring.selectedTimeline = _hovered.parent;
+                        Authoring.showEditTimelineForm(Authoring.selectedTimeline);
+                    } else {
+                        Authoring.showEditTimelineForm(Authoring.selectedTimeline);
                     }
                 }
             },
@@ -228,8 +237,8 @@ var CZ;
                 mouseup: function () {
                     if(_hovered.type === "timeline") {
                         updateNewCircle();
-                        _selectedExhibit = createNewExhibit();
-                        Authoring.showCreateExhibitForm(_selectedExhibit);
+                        Authoring.selectedExhibit = createNewExhibit();
+                        Authoring.showCreateExhibitForm(Authoring.selectedExhibit);
                     }
                 }
             },
@@ -243,12 +252,12 @@ var CZ;
                 },
                 mouseup: function () {
                     if(_hovered.type === "infodot") {
-                        _selectedExhibit = _hovered;
-                        Authoring.showEditExhibitForm(_selectedExhibit);
+                        Authoring.selectedExhibit = _hovered;
+                        Authoring.showEditExhibitForm(Authoring.selectedExhibit);
                     } else if(_hovered.type === "contentItem") {
-                        _selectedExhibit = _hovered.parent.parent.parent;
+                        Authoring.selectedExhibit = _hovered.parent.parent.parent;
                         CZ.Authoring.CImode = "editCI";
-                        Authoring.showEditContentItemForm(_hovered, _selectedExhibit);
+                        Authoring.showEditContentItemForm(_hovered, Authoring.selectedExhibit);
                     }
                 }
             }

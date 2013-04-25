@@ -2,6 +2,7 @@
 /// <reference path='common.ts'/>
 /// <reference path='bibliography.ts'/>
 /// <reference path='urlnav.ts'/>
+/// <reference path='cz.ts'/>
 
 declare var Seadragon: any;
 
@@ -763,12 +764,17 @@ module CZ {
             var width = timelineinfo.timeEnd - timelineinfo.timeStart;
 
             var headerSize = timelineinfo.titleRect ? timelineinfo.titleRect.height : CZ.Settings.timelineHeaderSize * timelineinfo.height;
+            var headerWidth = timelineinfo.titleRect && CZ.Authoring.isEnabled ? timelineinfo.titleRect.width : 0;
             var marginLeft = timelineinfo.titleRect ? timelineinfo.titleRect.marginLeft : CZ.Settings.timelineHeaderMargin * timelineinfo.height; // size of left and top margins (e.g. if timeline is for 100 years, relative margin timelineHeaderMargin=0.05, then absolute margin is 5 years).
             var marginTop = timelineinfo.titleRect ? timelineinfo.titleRect.marginTop : (1 - CZ.Settings.timelineHeaderMargin) * timelineinfo.height - headerSize;
             var baseline = timelineinfo.top + marginTop + headerSize / 2.0;
 
             this.titleObject = addText(this, layerid, id + "__header__", timelineinfo.timeStart + marginLeft, timelineinfo.top + marginTop, baseline, headerSize,
-                timelineinfo.header, { fontName: CZ.Settings.timelineHeaderFontName, fillStyle: CZ.Settings.timelineHeaderFontColor, textBaseline: 'middle' });
+                timelineinfo.header, {
+                    fontName: CZ.Settings.timelineHeaderFontName,
+                    fillStyle: CZ.Settings.timelineHeaderFontColor,
+                    textBaseline: 'middle'
+                }, headerWidth);
 
             this.title = this.titleObject.text;
             this.regime = timelineinfo.regime;
@@ -895,6 +901,29 @@ module CZ {
 
                 //rendering itself
                 this.base_render(ctx, visibleBox, viewport2d, size_p, opacity);
+
+                //initialize edit button if it isn't root collection and titleObject was already initialized
+                if (CZ.Authoring.isEnabled && typeof this.editButton === "undefined" && this.titleObject.width !== 0) {
+                    this.editButton = addImage(this, layerid, id + "__edit", this.x + this.width - 1.15 * this.titleObject.height, this.titleObject.y,
+                        this.titleObject.height, this.titleObject.height, "/Images/edit.svg");
+                    this.editButton.reactsOnMouse = true;
+
+                    this.editButton.onmouseclick = function () {
+                        CZ.Authoring.isActive = true;
+                        CZ.Authoring.mode = "editTimeline";
+                        CZ.Authoring.selectedTimeline = this.parent;
+
+                        return true;
+                    }
+
+                    this.editButton.onmousehover = function () {
+                        this.parent.settings.strokeStyle = "yellow";
+                    }
+
+                    this.editButton.onmouseunhover = function () {
+                        this.parent.settings.strokeStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
+                    }
+                }
 
                 if (this.settings.hoverAnimationDelta) {
                     if (this.settings.gradientOpacity == 0 || this.settings.gradientOpacity == 1)
@@ -1910,11 +1939,37 @@ module CZ {
 
                     // Description
                     var descrTop = titleTop + titleHeight + verticalMargin;
-                    addScrollText(container, layerid, id + "__description__", vx + leftOffset, descrTop,
+                    var descr = addScrollText(container, layerid, id + "__description__", vx + leftOffset, descrTop,
                                     contentWidth,
                                     descrHeight,
                                     this.contentItem.description, 30,
                                     {});
+                    
+                    //adding edit button
+                    if (CZ.Authoring.isEnabled) {
+                        var imageSize = (container.y + container.height - descr.y - descr.height) * 0.75;
+                        var editButton = addImage(container, layerid, id + "__edit", container.x + container.width - 1.25 * imageSize, descrTop + descrHeight,
+                            imageSize, imageSize,
+                            "/Images/edit.svg");
+
+                        editButton.reactsOnMouse = true;
+                        editButton.onmouseclick = function () {
+                            CZ.Authoring.isActive = true;
+                            CZ.Authoring.mode = "editExhibit";
+                            CZ.Authoring.selectedExhibit = self.parent.parent.parent;
+                            CZ.Authoring.showEditContentItemForm(self, self.parent.parent.parent);
+
+                            return true;
+                        }
+
+                        editButton.onmouseenter = function () {
+                            rect.settings.strokeStyle = "yellow";                            
+                        }
+
+                        editButton.onmouseleave = function () {
+                            rect.settings.strokeStyle = CZ.Settings.contentItemBoundingHoveredBoxBorderColor;
+                        }
+                    }
 
                     return {
                         zoomLevel: CZ.Settings.contentItemShowContentZoomLevel,
@@ -2092,9 +2147,6 @@ module CZ {
                 }
                 // Showing all content items, bibliography link and title of the infodot
                 else if (newZl >= CZ.Settings.infodotShowContentZoomLevel) {
-
-
-
                     if (curZl >= CZ.Settings.infodotShowContentZoomLevel)
                         return null;
 
@@ -2139,6 +2191,32 @@ module CZ {
                             wrapText: true,
                             numberOfLines: 2
                         }, titleWidth);
+
+                    //adding edit button
+                    if (CZ.Authoring.isEnabled) {
+                        var imageSize = (titleTop - infodot.y) * 0.75;
+                        var editButton = addImage(infodot, layerid, id + "__edit", time - imageSize / 2, infodot.y + imageSize * 0.2,
+                            imageSize, imageSize, "/Images/edit.svg");
+
+                        editButton.reactsOnMouse = true;
+                        editButton.onmouseclick = function () {
+                            CZ.Authoring.isActive = true;
+                            CZ.Authoring.mode = "editExhibit";
+                            CZ.Authoring.selectedExhibit = infodot;
+                            CZ.Authoring.showEditExhibitForm(infodot);
+
+                            return true;
+                        }
+
+                        editButton.onmouseenter = function () {
+                            infodot.settings.strokeStyle = "yellow";
+                        }
+
+                        editButton.onmouseleave = function () {
+                            infodot.settings.strokeStyle = CZ.Settings.infoDotBorderColor;
+                        }
+                    }
+
 
                     var biblBottom = vyc + centralSquareSize + 63.0 / 450 * 2 * radv;
                     var biblHeight = CZ.Settings.infodotBibliographyHeight * radv * 2;

@@ -31,8 +31,25 @@ module CZ {
         var _circleCur : any = { type: "circle" };
 
         // Selected objects for editing.
-        var _selectedTimeline : any = {};
-        var _selectedExhibit : any = {};
+        export var selectedTimeline : any = {};
+        export var selectedExhibit : any = {};
+
+
+        // Authoring Tool state.
+        export var isActive: bool = false;
+        export var isEnabled: bool = false;
+        export var isDragging: bool = false;
+
+        //TODO: use enum for authoring modes when new authoring forms will be completly integrated
+        export var mode: any = null;
+		export var CImode: any = null;
+
+        // Forms' handlers.
+        export var showCreateTimelineForm: (...args: any[]) => any = null;
+        export var showEditTimelineForm: (...args: any[]) => any = null;
+        export var showCreateExhibitForm: (...args: any[]) => any = null;
+        export var showEditExhibitForm: (...args: any[]) => any = null;
+        export var showEditContentItemForm: (...args: any[]) => any = null;
 
         /**
          * Tests a timeline/exhibit on intersection with another virtual canvas object.
@@ -96,16 +113,16 @@ module CZ {
 
             // Test on intersections with parent's children.
             for (i = 0, len = tp.children.length; i < len; ++i) {
-                selfIntersection = editmode ? (tp.children[i] === _selectedTimeline) : (tp.children[i] === tc);
+                selfIntersection = editmode ? (tp.children[i] === selectedTimeline) : (tp.children[i] === tc);
                 if (!selfIntersection && isIntersecting(tc, tp.children[i])) {
                     return false;
                 }
             }
 
             // Test on children's inclusion (only possible in editmode).
-            if (editmode && _selectedTimeline.children && _selectedTimeline.children.length > 0) {
-                for (i = 0, len = _selectedTimeline.children.length; i < len; ++i) {
-                    if (!isIncluded(tc, _selectedTimeline.children[i])) {
+            if (editmode && selectedTimeline.children && selectedTimeline.children.length > 0) {
+                for (i = 0, len = selectedTimeline.children.length; i < len; ++i) {
+                    if (!isIncluded(tc, selectedTimeline.children[i])) {
                         return false;
                     }
                 }
@@ -135,7 +152,7 @@ module CZ {
 
             // Test on intersections with parent's children.
             for (i = 0, len = tp.children.length; i < len; ++i) {
-                selfIntersection = editmode ? (tp.children[i] === _selectedExhibit) : (tp.children[i] === ec);
+                selfIntersection = editmode ? (tp.children[i] === selectedExhibit) : (tp.children[i] === ec);
                 if (!selfIntersection && isIntersecting(ec, tp.children[i])) {
                     return false;
                 }
@@ -305,6 +322,24 @@ module CZ {
             var baseline = t.y + marginTop + headerSize / 2.0;
 
             CZ.VCContent.removeChild(t, t.id + "__header__");
+
+            //remove edit button to reinitialize it
+            if (CZ.Authoring.isEnabled && typeof t.editButton !== "undefined") {
+                t.editButton.x = t.x + t.width - 1.15 * t.titleObject.height;
+                t.editButton.y = t.titleObject.y;
+                t.editButton.width = t.titleObject.height;
+                t.editButton.height = t.titleObject.height;
+                //this.editButton = addImage(this, layerid, id + "__edit", this.x + this.width - 1.15 * this.titleObject.height, this.titleObject.y,
+                  //      this.titleObject.height, this.titleObject.height, "/Images/edit.svg");
+            //    // remove event handlers to prevent eventhanlders stacking
+            //    t.editButton.onmouseclick = undefined;
+            //    t.editButton.onmousehover = undefined;
+            //    t.editButton.onmouseunhover = undefined;
+
+            //    CZ.VCContent.removeChild(t, t.id + "__edit");
+            }
+            //t.editButton = undefined;
+
             t.titleObject = CZ.VCContent.addText(
                 t,
                 t.layerid,
@@ -322,19 +357,6 @@ module CZ {
                 }
             );
         }
-
-        // Authoring Tool state.
-        export var isActive : any = false;
-        export var isDragging : any = false;
-        export var mode: any = null;
-        export var CImode: any = null;
-
-        // Forms' handlers.
-        export var showCreateTimelineForm : any = null;
-        export var showEditTimelineForm : any = null;
-        export var showCreateExhibitForm : any = null;
-        export var showEditExhibitForm : any = null;
-        export var showEditContentItemForm : any = null;
 
         /**
          * Represents a collection of mouse events' handlers for each mode.
@@ -357,8 +379,8 @@ module CZ {
                     if (_hovered.type === "timeline") {
                         updateNewRectangle();
 
-                        _selectedTimeline = createNewTimeline();
-                        showCreateTimelineForm(_selectedTimeline);
+                        selectedTimeline = createNewTimeline();
+                        showCreateTimelineForm(selectedTimeline);
                     }
                 }
             },
@@ -373,11 +395,14 @@ module CZ {
 
                 mouseup: function () {
                     if (_hovered.type === "timeline") {
-                        _selectedTimeline = _hovered;
-                        showEditTimelineForm(_selectedTimeline);
+                        selectedTimeline = _hovered;
+                        showEditTimelineForm(selectedTimeline);
                     } else if (_hovered.type === "infodot" || _hovered.type === "contentItem") {
-                        _selectedTimeline = _hovered.parent;
-                        showEditTimelineForm(_selectedTimeline);
+                        selectedTimeline = _hovered.parent;
+                        showEditTimelineForm(selectedTimeline);
+                    }
+                    else {
+                        showEditTimelineForm(selectedTimeline);
                     }
                 }
             },
@@ -393,8 +418,8 @@ module CZ {
                     if (_hovered.type === "timeline") {
                         updateNewCircle();
 
-                        _selectedExhibit = createNewExhibit();
-                        showCreateExhibitForm(_selectedExhibit);
+                        selectedExhibit = createNewExhibit();
+                        showCreateExhibitForm(selectedExhibit);
                     }
                 }
             },
@@ -409,12 +434,12 @@ module CZ {
 
                 mouseup: function () {
                     if (_hovered.type === "infodot") {
-                        _selectedExhibit = _hovered;
-                        showEditExhibitForm(_selectedExhibit);                        
+                        selectedExhibit = _hovered;
+                        showEditExhibitForm(selectedExhibit);                        
                     } else if (_hovered.type === "contentItem") {
-                        _selectedExhibit = _hovered.parent.parent.parent;
+                        selectedExhibit = _hovered.parent.parent.parent;
                         CZ.Authoring.CImode = "editCI";
-                        showEditContentItemForm(_hovered, _selectedExhibit);
+                        showEditContentItemForm(_hovered, selectedExhibit);
                     }
                 }
             }
