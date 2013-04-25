@@ -16,47 +16,93 @@ module CZ {
                 * @param {Boolean}  addSeparator  Indicates whether separator is required.
                 */
             function _addContentItemForm(form, addSeparator) {
-                var container = $("<div class='cz-authoring-ci-container'></div>");
+                var container = $("<div></div>", {
+                    class: "cz-authoring-ci-container"
+                });
 
-                var title = $("<p>" +
-                        "<label>Title</label>" +
-                        "<input class='cz-authoring-ci-title' style='display: block' type='text'/>" +
-                    "</p>");
+                var title = $("<p></p>")
+                    .append($("<label></label>", {
+                        text: "Title"
+                    }))
+                    .append($("<input></input>", {
+                        class: "cz-authoring-ci-title",
+                        style: "display: block;",
+                        type: "text"
+                    }));
 
-                var description = $("<p>" +
-                        "<label style='display: block'>Description</label>" +
-                        "<textarea class='cz-authoring-ci-description' style='display: block' />" +
-                    "</p>");
+                var description = $("<p></p>")
+                    .append($("<label></label>", {
+                        style: "display: block;",
+                        text: "Description"
+                    }))
+                    .append($("<textarea></textarea>", {
+                        class: "cz-authoring-ci-description",
+                        style: "display: block;"
+                    }));
 
-                var mediaSource = $("<p>" +
-                        "<label>URL of image or video</label>" +
-                        "<input class='cz-authoring-ci-uri' style='display: block' type='text'/>" +
-                    "</p>");
+                var mediaSource = $("<p></p>")
+                    .append($("<label></label>", {
+                        text: "URL of image or video"
+                    }))
+                    .append($("<input></input>", {
+                        class: "cz-authoring-ci-uri",
+                        style: "display: block;",
+                        type: "text"
+                    }));
 
-                var mediaType = $("<p>" +
-                    "<label>Media type</label>" +
-                        "<select class='cz-authoring-ci-media-type' style='display: block'>" +
-                            "<option value='image'>Image</option>" +
-                            "<option value='pdf'>PDF</option> " +
-                            "<option value='video'>Video</option>" +
-                            "<option value='audio'>Audio</option>" +
-                        "</select>" +
-                    "</p>");
+                var mediaType = $("<p></p>")
+                    .append($("<label></label>", {
+                        text: "Media type"
+                    }))
+                    .append($("<select></select>", {
+                        class: "cz-authoring-ci-media-type",
+                        style: "display: block;"
+                    })
+                        .append(
+                            $("<option></option>", {
+                                value: "image",
+                                text: "Image"
+                            }),
+                            $("<option></option>", {
+                                value: "pdf",
+                                text: "PDF"
+                            }),
+                            $("<option></option>", {
+                                value: "video",
+                                text: "Video"
+                            }),
+                            $("<option></option>", {
+                                value: "audio",
+                                text: "Audio"
+                            })
+                        ));
 
-                var attribution = $("<p>" +
-                        "<label>Attribution</label>" +
-                        "<input type='text' class='cz-authoring-ci-attribution' style='display: block;' />" +
-                    "</p>");
+                var attribution = $("<p></p>")
+                    .append($("<label></label>", {
+                        text: "Attribution"
+                    }))
+                    .append($("<input></input>", {
+                        class: "cz-authoring-ci-attribution",
+                        style: "display: block;",
+                        type: "text"
+                    }));
 
-                var mediaSourceURL = $("<p>" +
-                        "<label>Media Source</label>" +
-                        "<input type='text' class='cz-authoring-ci-media-source' style='display: block;' />" +
-                    "</p>");
+                var mediaSourceURL = $("<p></p>")
+                    .append($("<label></label>", {
+                        text: "Media Source"
+                    }))
+                    .append($("<input></input>", {
+                        class: "cz-authoring-ci-media-source",
+                        style: "display: block;",
+                        type: "text"
+                    }));
 
-                var removeBtn = $("<button>Remove content item</button>");
-                removeBtn[0].onclick = function () {
-                    container.remove();
-                };
+                var removeBtn = $("<button></button>", {
+                    text: "Remove content item",
+                    click: function () {
+                        container.remove()
+                    }
+                });
 
                 container.append(title);
                 container.append(description);
@@ -164,9 +210,7 @@ module CZ {
                     width: 600,
                     buttons: {
                         "save and close": function () {
-                            var isValid = CZ.Authoring.ValidateNumber(startInput.getDate()) && CZ.Authoring.ValidateNumber(endInput.getDate());
-                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(startInput.getDate()) && CZ.Authoring.IsNotEmpty(endInput.getDate());
-
+                            var isValid = CZ.Authoring.ValidateTimelineData(startInput.getDate(), endInput.getDate(), titleInput.val());
                             if (!isValid) {
                                 $("#TimelineErrorSpan").css("display", "block");
                             }
@@ -193,7 +237,7 @@ module CZ {
                         if (isCancel) {
                             CZ.Authoring.removeTimeline(t);
                         }
-                        CZ.Authoring._isActive = false;
+                        CZ.Authoring.isActive = false;
 
                         startInput.remove();
                         endInput.remove();
@@ -220,9 +264,7 @@ module CZ {
                     width: 600,
                     buttons: {
                         "save and close": function () {
-                            var isValid = CZ.Authoring.ValidateNumber(startInput.getDate()) && CZ.Authoring.ValidateNumber(endInput.getDate());
-                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(startInput.getDate()) && CZ.Authoring.IsNotEmpty(endInput.getDate());
-
+                            var isValid = CZ.Authoring.ValidateTimelineData(startInput.getDate(), endInput.getDate(), titleInput.val());
                             if (!isValid) {
                                 $("#TimelineErrorSpan").css("display", "block");
                             }
@@ -250,7 +292,7 @@ module CZ {
                         }
                     },
                     close: function () {
-                        CZ.Authoring._isActive = false;
+                        CZ.Authoring.isActive = false;
 
                         startInput.remove();
                         endInput.remove();
@@ -286,10 +328,7 @@ module CZ {
                     buttons: {
                         "save and close": function () {
                             var contentItems = _getContentItemsData();
-
-                            var isValid = CZ.Authoring.ValidateNumber(dateInput.getDate());
-                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(dateInput.getDate());
-                            isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
+                            var isValid = CZ.Authoring.ValidateExhibitData(dateInput.getDate(), titleInput.val(), contentItems);
 
                             if (!isValid) {
                                 $("#ExhibitErrorSpan").css("display", "block");
@@ -313,7 +352,7 @@ module CZ {
                         if (isCancel) {
                             CZ.Authoring.removeExhibit(e);
                         }
-                        CZ.Authoring._isActive = false;
+                        CZ.Authoring.isActive = false;
 
                         dateInput.remove();
                         $("a:contains('create exhibit')").removeClass("active");
@@ -353,9 +392,7 @@ module CZ {
                         "save and close": function () {
                             contentItems = _getContentItemsData();
 
-                            var isValid = CZ.Authoring.ValidateNumber(dateInput.getDate());
-                            isValid = isValid && CZ.Authoring.IsNotEmpty(titleInput.val()) && CZ.Authoring.IsNotEmpty(dateInput.getDate());
-                            isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
+                            var isValid = CZ.Authoring.ValidateExhibitData(dateInput.getDate(), titleInput.val(), contentItems);
 
                             if (!isValid) {
                                 $("#ExhibitErrorSpan").css("display", "block");
@@ -386,7 +423,7 @@ module CZ {
                         }
                     },
                     close: function () {
-                        CZ.Authoring._isActive = false;
+                        CZ.Authoring.isActive = false;
 
                         dateInput.remove();
                         $("a:contains('edit exhibit')").removeClass("active");
@@ -455,7 +492,7 @@ module CZ {
                         }
                     },
                     close: function () {
-                        CZ.Authoring._isActive = false;
+                        CZ.Authoring.isActive = false;
                         $("a:contains('edit exhibit')").removeClass("active");
                     }
                 });
@@ -479,7 +516,7 @@ module CZ {
                             CZ.Service.putProfile(username,display_name,email);
                         }
                     },
-                    close: function () {CZ.Authoring._isActive = false;}
+                    close: function () {CZ.Authoring.isActive = false;}
                 });
             }
 
@@ -489,7 +526,7 @@ module CZ {
                     modal: true,
                     height: 600,
                     width: 600,
-                    close: function () { CZ.Authoring._isActive = false; }
+                    close: function () { CZ.Authoring.isActive = false; }
                 });
             }
 
@@ -501,12 +538,12 @@ module CZ {
                     return;
                 }
 
-                CZ.Authoring._isActive = (CZ.Authoring.mode !== "createTimeline") || !CZ.Authoring._isActive;
+                CZ.Authoring.isActive = (CZ.Authoring.mode !== "createTimeline") || !CZ.Authoring.isActive;
                 CZ.Authoring.mode = "createTimeline";
 
                 $("div #footer-authoring > a").removeClass("active");
 
-                if (CZ.Authoring._isActive) {
+                if (CZ.Authoring.isActive) {
                     $("a:contains('create timeline')").addClass("active");
                 } else {
                     $("a:contains('create timeline')").removeClass("active");
@@ -519,12 +556,12 @@ module CZ {
                     return;
                 }
 
-                CZ.Authoring._isActive = (CZ.Authoring.mode !== "editTimeline") || !CZ.Authoring._isActive;
+                CZ.Authoring.isActive = (CZ.Authoring.mode !== "editTimeline") || !CZ.Authoring.isActive;
                 CZ.Authoring.mode = "editTimeline";
 
                 $("div #footer-authoring > a").removeClass("active");
 
-                if (CZ.Authoring._isActive) {
+                if (CZ.Authoring.isActive) {
                     $("a:contains('edit timeline')").addClass("active");
                 } else {
                     $("a:contains('edit timeline')").removeClass("active");
@@ -537,12 +574,12 @@ module CZ {
                     return;
                 }
 
-                CZ.Authoring._isActive = (CZ.Authoring.mode !== "createExhibit") || !CZ.Authoring._isActive;
+                CZ.Authoring.isActive = (CZ.Authoring.mode !== "createExhibit") || !CZ.Authoring.isActive;
                 CZ.Authoring.mode = "createExhibit";
 
                 $("div #footer-authoring > a").removeClass("active");
 
-                if (CZ.Authoring._isActive) {
+                if (CZ.Authoring.isActive) {
                     $("a:contains('create exhibit')").addClass("active");
                 } else {
                     $("a:contains('create exhibit')").removeClass("active");
@@ -555,12 +592,12 @@ module CZ {
                     return;
                 }
 
-                CZ.Authoring._isActive = (CZ.Authoring.mode !== "editExhibit") || !CZ.Authoring._isActive;
+                CZ.Authoring.isActive = (CZ.Authoring.mode !== "editExhibit") || !CZ.Authoring.isActive;
                 CZ.Authoring.mode = "editExhibit";
 
                 $("div #footer-authoring > a").removeClass("active");
 
-                if (CZ.Authoring._isActive) {
+                if (CZ.Authoring.isActive) {
                     $("a:contains('edit exhibit')").addClass("active");
                 } else {
                     $("a:contains('edit exhibit')").removeClass("active");
@@ -573,7 +610,7 @@ module CZ {
                     return;
                 }
 
-                CZ.Authoring._isActive = (CZ.Authoring.mode !== "editProfile") || !CZ.Authoring._isActive;
+                CZ.Authoring.isActive = (CZ.Authoring.mode !== "editProfile") || !CZ.Authoring.isActive;
                 CZ.Authoring.mode = "editProfile";
                 CZ.Authoring.showEditProfileForm();
             }
@@ -584,7 +621,7 @@ module CZ {
                     return;
                 }
 
-                CZ.Authoring._isActive = (CZ.Authoring.mode !== "login") || !CZ.Authoring._isActive;
+                CZ.Authoring.isActive = (CZ.Authoring.mode !== "login") || !CZ.Authoring.isActive;
                 CZ.Authoring.mode = "login";
                 CZ.Authoring.showLoginForm();
             }

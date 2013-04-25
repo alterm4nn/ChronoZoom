@@ -51,13 +51,16 @@
     <script type="text/javascript" src="/NewScripts/authoring.js"></script>
     <script type="text/javascript" src="/NewScripts/authoring.ui.js"></script>
     <script type="text/javascript" src="/NewScripts/czservice.js"></script>
+    <script type="text/javascript" src="/NewScripts/cz.data.js"></script>
     <script type="text/javascript" src="/NewScripts/timescale.js"></script>
 
+    <script type="text/javascript" src="/NewScripts/uiloader.js"></script>
     <script type="text/javascript" src="/NewScripts/controls/cz.datepicker.js"></script>
+    <script type="text/javascript" src="/NewScripts/controls/formbase.js"></script>
     <script type="text/javascript" src="/NewScripts/cz.dates.js"></script>
 
     <script type="text/javascript" src="/NewScripts/external/ACS.js"></script>
-    
+
     <!--[if IE]>
     <script type="text/javascript" src="/NewScripts/regimesIE.js"></script>
     <![endif]-->
@@ -92,10 +95,10 @@
         <div class="fright">
             <ul>
                 <li class="fleft">
-                    <div id="login-panel" >
-                        <a onclick="CZ.Authoring.UI.login();return false;" id="loginButton" style="margin-right: 10px; cursor: pointer;color:#E9E9E9;display:none;">login</a>
-                        <a onclick="CZ.Authoring.UI.editProfile();" id="editButton" style="color:#E9E9E9;display:none;">edit</a>
-                        <a href="/account/logout" style="color:#E9E9E9;display:none;" id="logoutButton">logout</a>
+                    <div id="login-panel">
+                        <a onclick="CZ.Authoring.UI.login();return false;" id="loginButton" style="margin-right: 10px; cursor: pointer; color: #E9E9E9; display: none;">login</a>
+                        <a onclick="CZ.Authoring.UI.editProfile();" id="editButton" style="color: #E9E9E9; display: none;">edit</a>
+                        <a href="/account/logout" style="color: #E9E9E9; display: none;" id="logoutButton">logout</a>
                     </div>
                 </li>
                 <li class="fleft">
@@ -132,8 +135,7 @@
                 <div id="timelineEndInput" style="display: block"></div>
 
                 <br />
-                <span id="TimelineErrorSpan" style="color: red; display: none">Input error
-                </span>
+                Input error                </span>
             </div>
 
             <!--Create Exhibit popup dialog-->
@@ -266,9 +268,8 @@
                 </div>
             </div>
         </div>
-
         <div id="search" class="czWindow" style="z-index: 2010; max-height: 250px; display: none">
-            <div class="header" onselectstart="return false;">
+            <div class="header unselectable" onselectstart="return false;">
                 Search
             </div>
             <div>
@@ -318,56 +319,56 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <div id="footer">
-        <div class="breadcrumbs-nav fleft">
-            <div id="breadcrumbs-nav-left">&#171;</div>
-        </div>
-        <div class="breadcrumbs-container fleft">
-            <table id="breadcrumbs-table">
-                <tr />
-            </table>
-        </div>
-        <div class="breadcrumbs-nav fleft">
-            <div id="breadcrumbs-nav-right" class="">&#187;</div>
-        </div>
+        <div id="footer">
+            <div class="breadcrumbs-nav fleft">
+                <div id="breadcrumbs-nav-left">&#171;</div>
+            </div>
+            <div class="breadcrumbs-container fleft">
+                <table id="breadcrumbs-table">
+                    <tr />
+                </table>
+            </div>
+            <div class="breadcrumbs-nav fleft">
+                <div id="breadcrumbs-nav-right" class="">&#187;</div>
+            </div>
 
-        <div class="fright">
-            <ul>
-                <li class="fright">
-                    <div class="footer-link">about</div>
-                </li>
-                <li class="fright">
-                    <div class="footer-link">feedback</div>
-                </li>
-                <li class="fright">
-                    <div class="footer-link">privacy</div>
-                </li>
-                <li class="fright">
-                    <div class="footer-link">help</div>
-                </li>
-            </ul>
+            <div class="fright">
+                <ul>
+                    <li class="fright">
+                        <div class="footer-link">about</div>
+                    </li>
+                    <li class="fright">
+                        <div class="footer-link">feedback</div>
+                    </li>
+                    <li class="fright">
+                        <div class="footer-link">privacy</div>
+                    </li>
+                    <li class="fright">
+                        <div class="footer-link">help</div>
+                    </li>
+                </ul>
+            </div>
+            <!--Create Event Form-->
+            <div id="auth-event-form" class="cz-form unselectable">
+            </div>
         </div>
-
-        <div class="clearer" />
-    </div>
-    <script src="https://cz-nodelete-chronozoom-test.accesscontrol.windows.net/v2/metadata/IdentityProviders.js?protocol=wsfederation&amp;realm=http%3a%2f%2ftest.chronozoomproject.org%2f&amp;reply_to=&amp;context=&amp;request_id=&amp;version=1.0&amp;callback=ShowSigninPage" type="text/javascript"></script>
-    <!--<div id="welcomeScreenBack" class="welcomeScreenBack">
-        <div id="welcomeScreenOut" class="welcomeScreenOuterWindow">
-            <div id="welcomeScreen" class="welcomeScreen">
-                <div class="titleArea">
-                    <img class="closeButton" id="welcomeScreenCloseButton" src="/Images/wlcmScreen_close_off.png"
-                        alt="Close" onselectstart="return false;" />
-                    <div class="title" onselectstart="return false;">
-                        <span>Welcome to ChronoZoom beta!</span>
+        <script src="https://cz-nodelete-chronozoom-test.accesscontrol.windows.net/v2/metadata/IdentityProviders.js?protocol=wsfederation&amp;realm=http%3a%2f%2ftest.chronozoomproject.org%2f&amp;reply_to=&amp;context=&amp;request_id=&amp;version=1.0&amp;callback=ShowSigninPage" type="text/javascript"></script>
+        <div id="welcomeScreenBack" class="welcomeScreenBack">
+            <div id="welcomeScreenOut" class="welcomeScreenOuterWindow">
+                <div id="welcomeScreen" class="welcomeScreen">
+                    <div class="titleArea">
+                        <img class="closeButton" id="welcomeScreenCloseButton" src="/Images/wlcmScreen_close_off.png"
+                            alt="Close" onselectstart="return false;" />
+                        <div class="title" onselectstart="return false;">
+                            <span>Welcome to ChronoZoom beta!</span>
+                        </div>
                     </div>
-                </div>
-                <div class="content">
-                    <div class="description">
-                        ChronoZoom is an interactive timeline for all of history.
+                    <div class="content">
+                        <div class="description">
+                            ChronoZoom is an interactive timeline for all of history.
                         <p>Explore all of the past - from the Big Bang, to the dinosours, to ancient and modern history.</p>
-                        Click or scroll to navigate through events and timelines. Watch our introduction video for a quick overview of this project.
+                            Click or scroll to navigate through events and timelines. Watch our introduction video for a quick overview of this project.
 
                         <div style="position: absolute; bottom: 0px;">
                             <button class="button">Start Exploring!</button>
@@ -376,13 +377,44 @@
                                 <label for="welcomeScreenCheckbox" unselectable="on" style="font-family: Arial; font-size: 16px;">Don't Show Again</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="media" id="welcomeScreenMedia">
-                        <iframe class="player" id="welcomeVideo" src="http://www.youtube.com/embed/3jvJD8Qv5ec" frameborder="0"></iframe>
+                        </div>
+                        <div class="media" id="welcomeScreenMedia">
+                            <iframe class="player" id="welcomeVideo" src="http://www.youtube.com/embed/3jvJD8Qv5ec" frameborder="0"></iframe>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>-->
+
+        <div id="footer">
+            <div class="breadcrumbs-nav fleft">
+                <div id="breadcrumbs-nav-left">&#171;</div>
+            </div>
+            <div class="breadcrumbs-container fleft">
+                <table id="breadcrumbs-table">
+                    <tr />
+                </table>
+            </div>
+            <div class="breadcrumbs-nav fleft">
+                <div id="breadcrumbs-nav-right" class="">&#187;</div>
+            </div>
+            <div class="fright">
+                <ul>
+                    <li class="fright">
+                        <div class="footer-link">about</div>
+                    </li>
+                    <li class="fright">
+                        <div class="footer-link">feedback</div>
+                    </li>
+                    <li class="fright">
+                        <div class="footer-link">privacy</div>
+                    </li>
+                    <li class="fright">
+                        <div class="footer-link">help</div>
+                    </li>
+                </ul>
+            </div>
+            <div class="clearer" />
+        </div>
 </body>
 </html>

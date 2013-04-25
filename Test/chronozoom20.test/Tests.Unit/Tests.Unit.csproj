@@ -66,6 +66,7 @@
     <Content Include="Scripts\Js\timescale.js" />
     <Content Include="Scripts\Specs\CommonSpec.js" />
     <Content Include="Scripts\Specs\CsvParseSpec.js" />
+    <Content Include="Scripts\Specs\datesSpec.js" />
     <Content Include="Scripts\Specs\TimeScaleSpec.js" />
     <Content Include="Scripts\Utils\jasmine-jquery.js" />
     <Content Include="Scripts\Utils\jquery-1.8.0.min.js" />

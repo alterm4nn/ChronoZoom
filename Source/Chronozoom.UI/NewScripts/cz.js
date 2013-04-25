@@ -2,9 +2,25 @@ var CZ;
 (function (CZ) {
     var HomePageViewModel;
     (function (HomePageViewModel) {
+        var _uiMap = {
+            "#auth-event-form": "/ui/auth-event-form.html"
+        };
         $(document).ready(function () {
+            window.console = window.console || (function () {
+                var c = {
+                };
+                c.log = c.warn = c.debug = c.info = c.log = c.error = c.time = c.dir = c.profile = c.clear = c.exception = c.trace = c.assert = function () {
+                };
+                return c;
+            })();
             $('.bubbleInfo').hide();
             CZ.Common.initialize();
+            CZ.UILoader.loadAll(_uiMap).done(function () {
+            });
+            var url = CZ.UrlNav.getURL();
+            var rootCollection = url.superCollectionName === undefined;
+            CZ.Service.superCollectionName = url.superCollectionName;
+            CZ.Service.collectionName = url.collectionName;
             $('#search_button').mouseup(CZ.Search.onSearchClicked).mouseover(function () {
                 CZ.Search.searchHighlight(true);
             }).mouseout(function () {
@@ -84,6 +100,23 @@ var CZ;
                     $("#editButton").show();
                 }
             });
+            var wlcmScrnCookie = CZ.Common.getCookie("welcomeScreenDisallowed");
+            if(wlcmScrnCookie != null) {
+                CZ.Common.hideWelcomeScreen();
+            } else {
+                $("#welcomeScreenOut").click(function (e) {
+                    e.stopPropagation();
+                });
+                $("#welcomeScreenBack").click(function () {
+                    CZ.Common.closeWelcomeScreen();
+                });
+            }
+            if(rootCollection) {
+                $(".footer-authoring-link").css("display", "none");
+            } else {
+                $("#welcomeScreenBack").css("display", "none");
+                $(".regime-link").css("display", "none");
+            }
             if(navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
                 if(/Chrome[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
                     var oprversion = new Number(RegExp.$1);
@@ -260,12 +293,14 @@ var CZ;
                 y: 0,
                 width: 13700000000,
                 height: 5535444444.444445
-            }, 1.0, vp));
+            }, 1.0, vp, false), true);
             CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
             var bid = window.location.hash.match("b=([a-z0-9_]+)");
             if(bid) {
                 $("#bibliography .sources").empty();
-                $("#bibliography .title").html("<span>Loading...</span>");
+                $("#bibliography .title").append($("<span></span>", {
+                    text: "Loading..."
+                }));
                 $("#bibliographyBack").css("display", "block");
             }
         });

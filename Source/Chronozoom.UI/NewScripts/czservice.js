@@ -71,8 +71,8 @@ var CZ;
         }
         Service.Request = Request;
         ;
-        Service.collectionName = "sandbox";
-        Service.superCollectionName = "sandbox";
+        Service.collectionName = "";
+        Service.superCollectionName = "";
         function get() {
             var request = new Service.Request(_serviceUrl);
             request.addToPath("get");

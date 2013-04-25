@@ -3,6 +3,9 @@
 /// <reference path="../Utils/jquery-ui.js" />
 /// <reference path="../Js/cz.settings.js" />
 /// <reference path="../Js/settings.js" />
+/// <reference path="../Js/cz.dates.js" />
+/// <reference path="../Js/common.js" />
+/// <reference path="../Js/cz.datepicker.js" />
 /// <reference path="../Js/vccontent.js" />
 /// <reference path="../Js/authoring.ui.js" />
 /// <reference path="../Js/authoring.js" />
@@ -36,7 +39,7 @@ describe("Given:  'edit timeline' form is opened: ", function () {
     dataEnd = ["title", "45", "", "empty 'end'"];
     dataStartNotNumber = ["title", "45", "abc", "'end' is not number"];
     dataNotNumber = ["title", "!@#", "789", "'start' is not number"];
-    dataEndLessStart = ["title", "5", "2", "start is less than end"];
+    dataEndLessStart = ["title", "-5", "-2", "start is less than end"];
 
     using("Data set: ", [dataEndLessStart, dataTitle, dataStart, dataEnd, dataStartNotNumber, dataNotNumber], function (title, start, end, conditional) {
 
@@ -44,15 +47,26 @@ describe("Given:  'edit timeline' form is opened: ", function () {
             beforeEach(function () {
 
                 $('#timelineTitleInput').val(title);
-                $('#timelineStartInput').val(start);
-                $('#timelineEndInput').val(end);
-
-                $('.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only:first').click();
+                $('.cz-datepicker-year:first').val(start);
+                $('.cz-datepicker-year:last').val(end);
+                $("span:contains('save and close')").click();
             });
 
             it("Then: Error message should be thrown.", function () {
                 expect('block').toEqual($('#TimelineErrorSpan').css('display'));
             });
+        });
+    });
+
+    describe("When user set text instead year", function () {
+        it("should display error message 'Year should be a number'", function () {
+            $('#timelineTitleInput').val('Title');
+            $('.cz-datepicker-year:first').val('some text');
+            $('.cz-datepicker-year:last').val('some text');
+            $('.cz-datepicker-year').trigger('blur');
+
+            expect($('.cz-datepicker-errormsg:first').text()).toEqual("Year should be a number.");
+            expect($('.cz-datepicker-errormsg:last').text()).toEqual("Year should be a number.");
         });
     });
 });
@@ -70,8 +84,7 @@ function using(name, values, func) {
 function init() {
     $('#createTimelineForm').length == 0 ? $('body').prepend('<div id="createTimelineForm" >') : "";
     $('#TimelineErrorSpan').length == 0 ? $('body').prepend('<span id="TimelineErrorSpan" style="color:red; display:none">Input error</span>') : "";
-    $('#timelineStartInput').length == 0 ? $('body').prepend('<span id="timelineStartInput"</span>') : "";
-    $('#timelineEndInput').length == 0 ? $('body').prepend('<span id="timelineEndInput"</span>') : "";
+    $('#timelineEndInput').length == 0 ? $('body').prepend('<div id="timelineEndInput"</div>') : "";
+    $('#timelineStartInput').length == 0 ? $('body').prepend('<div id="timelineStartInput"</div>') : "";
     $('#timelineTitleInput').length == 0 ? $('body').prepend('<span id="timelineTitleInput"</span>') : "";
-
 }

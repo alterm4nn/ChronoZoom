@@ -64,17 +64,19 @@ var CZ;
         }
         Search.initializeSearch = initializeSearch;
         function navigateToElement(e) {
-            var animId = CZ.Common.setVisibleByUserDirectly(e.newvisible);
-            if(animId) {
-                CZ.Common.setNavigationStringTo = {
-                    element: e.element,
-                    id: animId
-                };
+            if(!CZ.Authoring.isActive) {
+                var animId = CZ.Common.setVisibleByUserDirectly(e.newvisible);
+                if(animId) {
+                    CZ.Common.setNavigationStringTo = {
+                        element: e.element,
+                        id: animId
+                    };
+                }
             }
         }
         Search.navigateToElement = navigateToElement;
         function navigateToBookmark(bookmark) {
-            if(bookmark) {
+            if(bookmark && !CZ.Authoring.isActive) {
                 var visible = CZ.UrlNav.navStringToVisible(bookmark, CZ.Common.vc);
                 if(visible) {
                     var animId = CZ.Common.setVisibleByUserDirectly(visible);
@@ -88,17 +90,11 @@ var CZ;
             }
         }
         Search.navigateToBookmark = navigateToBookmark;
-        function goToSearchResult(id) {
-            var elem = findVCElement(CZ.Common.vc.virtualCanvas("getLayerContent"), id);
-            if(!elem) {
-                alert('Element not found in the content.');
-            } else {
-                var visible = CZ.VCContent.getVisibleForElement(elem, 1.0, CZ.Common.vc.virtualCanvas("getViewport"));
-                navigateToElement({
-                    element: elem,
-                    newvisible: visible
-                });
-            }
+        function goToSearchResult(resultId) {
+            var element = CZ.Common.vc.virtualCanvas("findElement", resultId);
+            var navStringElement = CZ.UrlNav.vcelementToNavString(element);
+            var visible = CZ.UrlNav.navStringToVisible(navStringElement, CZ.Common.vc);
+            CZ.Common.controller.moveToVisible(visible);
         }
         Search.goToSearchResult = goToSearchResult;
         function findVCElement(root, id) {
@@ -140,36 +136,47 @@ var CZ;
                 var output = $("#search .searchResults").empty();
                 if(results == null) {
                 } else if(results.length == 0) {
-                    $("<div class='searchNoResult'>No results</div>").appendTo(output);
+                    $("<div></div>", {
+                        class: "searchNoResult",
+                        text: "No results"
+                    }).appendTo(output);
                 } else {
                     var addResults = function (objectType, sectionTitle) {
                         var first = true;
                         for(var i = 0; i < results.length; i++) {
                             var item = results[i];
-                            if(item.ObjectType != objectType) {
+                            if(item.objectType != objectType) {
                                 continue;
                             }
                             var resultId;
-                            switch(item.ObjectType) {
+                            switch(item.objectType) {
                                 case 0:
-                                    resultId = 'e' + item.UniqueID;
+                                    resultId = 'e' + item.id;
                                     break;
                                 case 1:
-                                    resultId = 't' + item.UniqueID;
+                                    resultId = 't' + item.id;
                                     break;
                                 case 2:
-                                    resultId = 'c' + item.UniqueID;
+                                    resultId = item.id;
                                     break;
                                 default:
                                     continue;
                             }
                             if(first) {
-                                $("<div class='searchResultSection'>" + sectionTitle + "</div>").appendTo(output);
+                                $("<div></div>", {
+                                    class: "searchResultSection",
+                                    text: sectionTitle
+                                }).appendTo(output);
                                 first = false;
                             }
-                            $("<div class='searchResult' resultId='" + resultId + "'>" + results[i].title + "</div>").appendTo(output).click(function () {
-                                goToSearchResult(this.getAttribute('resultId'));
-                            });
+                            $("<div></div>", {
+                                class: "searchResult",
+                                resultId: resultId,
+                                text: results[i].title,
+                                click: function () {
+                                    goToSearchResult(this.getAttribute("resultId"));
+                                }
+                            }).appendTo(output);
                         }
                     };
                     addResults(1, "Timelines");
@@ -204,10 +211,10 @@ var CZ;
             var url;
             switch(CZ.Settings.czDataSource) {
                 case 'db':
-                    url = "/CZ.svc/Search";
+                    url = "/chronozoom.svc/Search";
                     break;
                 default:
-                    url = "/CZ.svc/SearchRelay";
+                    url = "/chronozoom.svc/Search";
                     break;
             }
             $.ajax({
@@ -217,8 +224,8 @@ var CZ;
                 dataType: "json",
                 data: {
                     searchTerm: searchString,
-                    supercollection: CZ.Common.supercollection,
-                    collection: CZ.Common.collection
+                    supercollection: CZ.Service.superCollectionName,
+                    collection: CZ.Service.collectionName
                 },
                 url: url,
                 success: function (result) {
@@ -229,7 +236,7 @@ var CZ;
                     }
                 },
                 error: function (xhr) {
-                    alert("Error connecting to service: " + xhr.responseText);
+                    console.log("Error connecting to service: " + xhr.responseText);
                 }
             });
         }
