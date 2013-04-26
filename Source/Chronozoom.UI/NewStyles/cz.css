@@ -57,8 +57,7 @@ a:visited {
 }
 
 #header ul li img {
-    margin-right: 5px;
-    margin-left: 5px;
+    margin: 5px;
 }
 
 #header ul:after {
@@ -185,9 +184,12 @@ a:visited {
 }
 
 .tour_control {
+    display: none;
+    margin: 5px;
     width: 190px;
     cursor: pointer;
 }
+
 
 
 /***********************************************************
@@ -456,7 +458,6 @@ a:visited {
     margin-left: 5px;
     padding-bottom: 10px;
     width: 181px;
-    height: auto !important;
     border-bottom: none; /*1px solid #424242;*/
 }
 
