@@ -63,7 +63,7 @@ module CZ {
 
             private isAudioLoaded = false; //is set automaticly after the audio track is loaded
             private isAudioEnabled = false; //to be changed by toggleAudio function
-            private audio; // audio element of this tour
+            private audioElement; // audio element of this tour
 
             private timerOnBookmarkIsOver;  // timer id which is set for bookmark complete event (stored to be able to cancel it if paused)
 
@@ -97,7 +97,7 @@ module CZ {
             @callback tour_TourFinished     Array of (func(tour)) The function is called when the tour is finished
             @callback tour_TourStarted      Array of (func(tour)) The function is called when the tour is finished
             */
-            constructor(public title, public bookmarks, public zoomTo, public vc, public category, public audioBlobUrl, public sequenceNum) {
+            constructor(public title, public bookmarks, public zoomTo, public vc, public category, public audio, public sequenceNum) {
 
                 if (!bookmarks || bookmarks.length == 0) {
                     throw "Tour has no bookmarks";
@@ -130,48 +130,49 @@ module CZ {
 
                 self.ReinitializeAudio = function ReinitializeAudio() {
                     // stop audio playback and clear audio element
-                    if (self.audio) {
-                        self.audio.pause();
+                    if (self.audioElement) {
+                        self.audioElement.pause();
                     }
 
-                    self.audio = undefined;
+                    self.audioElement = undefined;
 
                     self.isAudioLoaded = false;
-                    // reinitialize audio element
-                    self.audio = document.createElement('audio');
 
-                    self.audio.addEventListener("loadedmetadata", function () {
-                        if (self.audio.duration != Infinity)
-                            self.bookmarks[self.bookmarks.length - 1].duration = self.audio.duration - self.bookmarks[self.bookmarks.length - 1].lapseTime; //overriding the last bookmark duration
+                    // reinitialize audio element
+                    self.audioElement = document.createElement('audio');
+
+                    self.audioElement.addEventListener("loadedmetadata", function () {
+                        if (self.audioElement.duration != Infinity)
+                            self.bookmarks[self.bookmarks.length - 1].duration = self.audioElement.duration - self.bookmarks[self.bookmarks.length - 1].lapseTime; //overriding the last bookmark duration
                         if (isToursDebugEnabled && window.console && console.log("Tour " + self.title + " metadata loaded (readystate 1)"));
                     });
-                    self.audio.addEventListener("canplaythrough", function () {
+                    self.audioElement.addEventListener("canplaythrough", function () {
                         // audio track is fully loaded
                         self.isAudioLoaded = true;
 
                         if (isToursDebugEnabled && window.console && console.log("Tour " + self.title + " readystate 4"));
                     });
-                    self.audio.addEventListener("progress", function () {
-                        if (self.audio && self.audio.buffered.length > 0)
+                    self.audioElement.addEventListener("progress", function () {
+                        if (self.audioElement && self.audioElement.buffered.length > 0)
                             if (isToursDebugEnabled && window.console && console.log("Tour " + self.title + " downloaded " + (self.audio.buffered.end(self.audio.buffered.length - 1) / self.audio.duration)));
                     });
 
-                    self.audio.controls = false;
-                    self.audio.autoplay = false;
-                    self.audio.loop = false;
-                    self.audio.volume = 1;
+                    self.audioElement.controls = false;
+                    self.audioElement.autoplay = false;
+                    self.audioElement.loop = false;
+                    self.audioElement.volume = 1;
 
-                    self.audio.preload = "none";
+                    self.audioElement.preload = "none";
 
                     // add audio sources of different audio file extensions for audio element
-                    var blobPrefix = self.audioBlobUrl.substring(0, self.audioBlobUrl.length - 3);
+                    var blobPrefix = self.audio.substring(0, self.audio.length - 3);
                     for (var i = 0; i < CZ.Settings.toursAudioFormats.length; i++) {
                         var audioSource = document.createElement("Source");
                         audioSource.setAttribute("src", blobPrefix + CZ.Settings.toursAudioFormats[i].ext);
-                        self.audio.appendChild(audioSource);
+                        self.audioElement.appendChild(audioSource);
                     }
 
-                    self.audio.load();
+                    self.audioElement.load();
                     if (isToursDebugEnabled && window.console && console.log("Loading of tour " + self.title + " is queued"));
                 }
 
@@ -246,11 +247,11 @@ module CZ {
                 self.startBookmarkAudio = function startBookmarkAudio(bookmark) {
                     if (isToursDebugEnabled && window.console && console.log("playing source: " + self.audio.currentSrc));
 
-                    self.audio.pause();
+                    self.audioElement.pause();
 
                     // set audio track's time to time when this bookmark was paused (beginning of bookmark if it wasn't paused)
                     try {
-                        self.audio.currentTime = bookmark.lapseTime + bookmark.elapsed;
+                        self.audioElement.currentTime = bookmark.lapseTime + bookmark.elapsed;
                         if (isToursDebugEnabled && window.console && console.log("audio currentTime is set to " + (bookmark.lapseTime + bookmark.elapsed)));
                     }
                     catch (ex) {
@@ -259,7 +260,7 @@ module CZ {
 
                     if (isToursDebugEnabled && window.console && console.log("audio element is forced to play"));
 
-                    self.audio.play();
+                    self.audioElement.play();
                 }
 
                 /*
@@ -410,7 +411,7 @@ module CZ {
 
                     self.state = 'pause';
                     if (self.isAudioEnabled) {
-                        self.audio.pause();
+                        self.audioElement.pause();
                         if (isToursDebugEnabled && window.console && console.log("audio element is forced to pause"));
                     }
 
@@ -537,8 +538,8 @@ module CZ {
                 $("#bookmarks .header").text("");
 
                 // remove audio track
-                if (tour.audio)
-                    tour.audio = undefined;
+                if (tour.audioElement)
+                    tour.audioElement = undefined;
             }
 
             // reset active tour
@@ -660,7 +661,7 @@ module CZ {
                     }).appendTo(toursUI);
 
                     // add category' UI
-                    var img = $("<img></img", {
+                    var img = $("<img></img>", {
                         class: "collapseButton",
                         src: "/Images/collapse-down.png"
                     }).appendTo(cat);
@@ -705,28 +706,34 @@ module CZ {
 
             // create jquery widget for category' content sliding
             (<any>$)("#tours-content").accordion({
-                fillSpace: false,
                 collapsible: true,
-                autoHeight: false
-            });
+                heightStyle: "content",
+                beforeActivate: function (event, ui) {
+                    if (ui.newHeader) {
+                        ui.newHeader.removeClass('category');
+                        ui.newHeader.addClass('categorySelected');
 
-            // binding click at the tour category' expand button
-            $("#tours-content").bind("accordionchangestart", function (event, ui) {
-                if (ui.newHeader) {
-                    ui.newHeader.removeClass('category');
-                    ui.newHeader.addClass('categorySelected');
+                        var img = (<HTMLImageElement>$(".collapseButton", ui.newHeader)[0]);
+                        if (img) img.src = "/Images/collapse-up.png";
+                    }
+                    if (ui.oldHeader) {
+                        ui.oldHeader.removeClass('categorySelected');
+                        ui.oldHeader.addClass('category');
 
-                    var img = (<HTMLImageElement>$(".collapseButton", ui.newHeader)[0]);
-                    if (img) img.src = "/Images/collapse-up.png";
-                }
-                if (ui.oldHeader) {
-                    ui.oldHeader.removeClass('categorySelected');
-                    ui.oldHeader.addClass('category');
-
-                    var img = (<HTMLImageElement>$(".collapseButton", ui.oldHeader)[0]);
-                    if (img) img.src = "/Images/collapse-down.png";
+                        var img = (<HTMLImageElement>$(".collapseButton", ui.oldHeader)[0]);
+                        if (img) img.src = "/Images/collapse-down.png";
+                    }
                 }
             });
+
+            // TODO: Temp fix of accordion style. Delete this and jquery-ui.css when the new UI will be implemented.
+            $("#tours-content").removeClass("ui-accordion ui-widget ui-helper-reset ui-accordion-icons");
+            $("#tours-content .categorySelected > span").removeClass("ui-accordion-header-icon ui-icon ui-icon-triangle-1-s");
+            $("#tours-content .itemContainer").removeClass("ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom ui-accordion-content-active");
+            $("#tours-content .categorySelected")
+                .removeClass("ui-accordion-header-active ui-state-active ui-state-hover ui-corner-top ui-accordion-header ui-helper-reset ui-state-default ui-accordion-icons ui-state-focus ui-corner-all")
+                .on("blur change click dblclick error focus focusin focusout hover keydown keypress keyup load mousedown mouseenter mouseleave mousemove mouseout mouseover mouseup resize scroll select submit",
+                    function () { $(this).removeClass("ui-accordion-header-active ui-state-active ui-state-hover ui-corner-top ui-accordion-header ui-helper-reset ui-state-default ui-accordion-icons ui-state-focus ui-corner-all"); });
         }
 
         /*
@@ -890,12 +897,12 @@ module CZ {
 
                 // skip tours with invalid parameters
                 if ((typeof tourString.bookmarks == 'undefined') ||
-                            (typeof tourString.AudioBlobUrl == 'undefined') ||
-                            (tourString.AudioBlobUrl == undefined) ||
-                            (tourString.AudioBlobUrl == null) ||
-                            (typeof tourString.Category == 'undefined') ||
-                            (typeof tourString.Name == 'undefined') ||
-                            (typeof tourString.Sequence == 'undefined'))
+                            (typeof tourString.audio == 'undefined') ||
+                            (tourString.audio == undefined) ||
+                            (tourString.audio == null) ||
+                            (typeof tourString.category == 'undefined') ||
+                            (typeof tourString.name == 'undefined') ||
+                            (typeof tourString.sequence== 'undefined'))
                     continue;
 
                 // build array of bookmarks of current tour
@@ -905,20 +912,24 @@ module CZ {
                     var bmString = tourString.bookmarks[j];
 
                     // break if at least one bookmarks has invalid parameters
-                    if ((typeof bmString.Description == 'undefined') ||
-                            (typeof bmString.LapseTime == 'undefined') ||
-                            (typeof bmString.Name == 'undefined') ||
-                            (typeof bmString.URL == 'undefined')) {
+                    if ((typeof bmString.description == 'undefined') ||
+                            (typeof bmString.lapseTime == 'undefined') ||
+                            (typeof bmString.name == 'undefined')) {
                         areBookmarksValid = false;
                         break;
                     }
 
-                    // cut unnecessary part of bookmark's URL
-                    var bmURL = bmString.URL;
-                    if (bmURL.indexOf("#") != -1) {
-                        bmURL = bmURL.substring(bmURL.indexOf("#") + 1);
+                    // Create tour URL
+                    var resultId : string;
+                    switch (bmString.referenceType) {
+                        case 0: resultId = 't' + bmString.referenceId; break; // timeline
+                        case 1: resultId = 'e' + bmString.referenceId; break; // exhibit
+                        case 2: resultId = bmString.referenceId; break; // content item
                     }
-                    tourBookmarks.push(new TourBookmark(bmURL, bmString.Name, bmString.LapseTime, bmString.Description));
+                    var bookmarkElement = CZ.Common.vc.virtualCanvas("findElement", resultId);
+                    var navStringBookmarkElement = CZ.UrlNav.vcelementToNavString(bookmarkElement);
+
+                    tourBookmarks.push(new TourBookmark(navStringBookmarkElement, bmString.name, bmString.lapseTime, bmString.description));
                 }
 
                 // skip tour with broken bookmarks
@@ -926,7 +937,7 @@ module CZ {
                     continue;
 
                 // tour is correct and can be played
-                tours.push(new Tour(tourString.Name, tourBookmarks, bookmarkTransition, CZ.Common.vc, tourString.Category, tourString.AudioBlobUrl, tourString.Sequence));
+                tours.push(new Tour(tourString.name, tourBookmarks, bookmarkTransition, CZ.Common.vc, tourString.category, tourString.audio, tourString.sequence));
             }
         }
 
@@ -954,8 +965,7 @@ module CZ {
                 return;
 
             if (typeof curURL.hash.params !== 'undefined' && typeof curURL.hash.params["tour"] !== 'undefined') {
-                //if (tours.tours == null)
-			    if (tours == null)
+                if (tours == null)
                     initializeToursContent();
 
                 if (isTourWindowVisible) {
