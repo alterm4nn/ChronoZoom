@@ -190,9 +190,15 @@ namespace UI
             return new BaseJsonResult<IEnumerable<Reference>>(exhibit.References.ToList());
         }
 
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/tours")]
+        public BaseJsonResult<IEnumerable<Tour>> GetDefaultTours()
+        {
+            return GetTours("", "");
+        }
+
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
         [OperationContract]
-        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/{collection}/tours")]
         public BaseJsonResult<IEnumerable<Tour>> GetTours(string supercollection, string collection)
         {
             Trace.TraceInformation("Get Tours");

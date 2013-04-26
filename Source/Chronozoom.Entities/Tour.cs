@@ -19,24 +19,22 @@ namespace Chronozoom.Entities
         [DataMember(Name="id")]
         public Guid Id { get; set; }
 
-        [DataMember]
+        [DataMember(Name = "name")]
         public string Name { get; set; }
 
-        [DataMember(Name="UniqueID")]
         public int UniqueId { get; set; }
 
-        // TODO: Fix up this string Uri
         [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "To be fixed when entities are revisited")]
-        [DataMember]
+        [DataMember(Name = "audio")]
         public string AudioBlobUrl { get; set; }
 
-        [DataMember]
+        [DataMember(Name = "category")]
         public string Category { get; set; }
 
-        [DataMember]
+        [DataMember(Name = "sequence")]
         public int? Sequence { get; set; }
 
-        [DataMember(Name="bookmarks")]
+        [DataMember(Name = "bookmarks")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification="Automatically implemented properties must define both get and set accessors.")]
         public virtual Collection<Bookmark> Bookmarks { get; private set; }
 
