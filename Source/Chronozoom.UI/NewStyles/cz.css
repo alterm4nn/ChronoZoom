@@ -1,1381 +1,1123 @@
 ﻿html, body {
-    height: 100%;
     margin: 0;
     padding: 0;
+    height: 100%;
 }
 
 body {
-    -ms-touch-action: none;
     overflow: hidden;
-    font-family: 'Segoe UI', Helvetica, Arial, 'Trebuchet MS', San Serif;
-    background-color: #232323;
 
     min-width: 950px;
     min-height: 250px;
+    background-color: #232323;
+    font-family: 'Segoe UI', Helvetica, Arial, 'Trebuchet MS', San Serif;
+    -ms-touch-action: none;
 }
 
 a {
+    color: #fff;
     text-decoration: none;
 }
 
 a:hover {
-    text-decoration: none;
+    color: #fff;
+}
+
+a:active {
+    color: #fff;
 }
 
 a:visited {
+    color: #fff;
     text-decoration: none;
 }
 
-/************************************
-*               Header              *
-************************************/
+/***********************************************************
 
-#header {
-    height: 36px;
-    padding-left: 20px;
-    padding-right: 20px;
+                            Header            
+      
+***********************************************************/
+
+#header {    
     position: relative;
+    padding-right: 20px;
+    padding-left: 20px;
+    height: 36px;
 }
 
-    #header ul {
-        list-style: none;
-	    margin: 0;
-	    padding: 0;
-        overflow: hidden;
-    }
+#header ul {
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
 
-        #header ul li {
-            height: 100%;
-        }
+#header ul li {
+    height: 100%;
+}
 
-            #header ul li img {
-                margin-left: 5px;
-                margin-right: 5px;
-            }
+#header ul li img {
+    margin-right: 5px;
+    margin-left: 5px;
+}
 
-    #header ul:after {
-        clear: both;
-    }
+#header ul:after {
+    clear: both;
+}
 
 .regime-link {
-    line-height: 36px;
+    margin-right: 15px;
+    margin-left: 15px;
     height: 100%;
     font-size: medium 14px;
-    margin-left: 15px;
-    margin-right: 15px;
+    line-height: 36px;
 }
 
-    .regime-link:hover {
-        cursor: pointer;
-    }
+.regime-link:hover {
+    cursor: pointer;
+}
 
 #regime-link-cosmos {
-    color: #986C9D;
+    color: #FF5BEE;
 }
 
 #regime-link-earth {
-    color: #517F95;
+    color: #C874F4;
 }
 
 #regime-link-life {
-    color: #499649;
+    color: #A8B3FE;
 }
 
 #regime-link-prehistory {
-    color: #ED9132;
+    color: #83BAFF;
 }
 
 #regime-link-humanity {
-    color: #D45C46;
+    color: #66D5BF;
 }
 
 #login-panel {
-    line-height: 36px;
     height: 100%;
-    font-size: medium 14px;
     color: #E9E9E9 !important;
+    font-size: medium 14px;
+    line-height: 36px;
 }
 
-/****************************************
-*               Content                 *
-****************************************/
+/***********************************************************
+
+                            Content
+
+***********************************************************/
 
 #content {    
-    min-height: 100%;
-    height: 100%;
-    margin-top: -36px;
-    padding-top: 36px;
-    margin-bottom: -25px;
-    padding-bottom: 25px;    
             
     -webkit-box-sizing: border-box;
        -moz-box-sizing: border-box;
             box-sizing: border-box;
+    margin-top: -36px;
+    margin-bottom: -25px;
+    padding-top: 36px;
+    padding-bottom: 25px;
+    height: 100%;    
+    min-height: 100%;
 }
 
-#vc-container {
-    min-height: 100%;
-    height: 100%;
-    margin-top: -38px;
-    padding-top: 38px;
-    
+#vc-container {    
             
     -webkit-box-sizing: border-box;
        -moz-box-sizing: border-box;
             box-sizing: border-box;
+    margin-top: -38px;
+    padding-top: 38px;
+    height: 100%;
+    min-height: 100%;
 }
 
 #vc {
-    height: 100%;    
-    width: 100%;
     overflow: hidden;
+    width: 100%;
+    height: 100%;
     background-image: url('/Images/background.jpg');
+    background-position: center center;   
+    -webkit-background-size: cover; 
+       -moz-background-size: cover;
+         -o-background-size: cover;
+            background-size: cover;  
     background-repeat: no-repeat;
     background-attachment: fixed;
-    background-position: center center;
-    background-size: cover;
 }
 
 .virtualCanvas {
     position: relative;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
+
 .virtualCanvasLayerDiv {
-overflow: hidden;
-position: absolute;
-z-index: 0;
--webkit-user-select: none;
--khtml-user-select: none;
--moz-user-select: none;
--ms-user-select: none;
--o-user-select: none;
-user-select: none;
+    position: absolute;
+    z-index: 0;
+    overflow: hidden;
 }
 
-.virtualCanvasLayerCanvas
-{
-position: absolute;
-z-index: 0;
-left: 0px;
+.virtualCanvasLayerCanvas {
+    position: absolute;
+    left: 0;
+    z-index: 0;
 }
 
-.contentItemDescription
-{
-font-family: Arial;
-font-size: 10px;
-color: rgb(232,232,232);
-background-color: transparent;
-position: absolute;
-left: 0px;
-top: 0px;
+.contentItemDescription {
+    position: absolute;
+    top: 0;
+    left: 0;
+    
+    background-color: transparent;
+    color: rgb(232,232,232);
+    font-size: 10px;
+    font-family: Arial;
 }
 
-.contentItemDescription .text
-{
-height: inherit;
-overflow: auto;
-overflow-x: hidden;
-overflow-y: auto;
-position: relative;
+.contentItemDescription .text {    
+    position: relative;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: inherit;
+}
+
+.tour_control {
+    width: 190px;
+    cursor: pointer;
 }
 
 
-.textDivElement
-{
-color: white;
--ms-transform: scale(1,1);
+/***********************************************************
+
+                        Bibliography
+                   
+***********************************************************/
+
+.biblBack {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 5000;
+
+    width: 100%;
+    height: 100%;
+
+    background-color: rgba(255,255,255,0.2);
 }
 
-.tour_control
-{
-width: 190px;
-cursor: pointer;
+.biblOuterWindow {
+    position: absolute;
+    top: 10%;
+    bottom: 10%;
+    left: 25%;
+    right: 25%;
+    
+    min-width: 300px;
+    border-radius: 8px;
+    background-color: rgba(0,0,0,0.6);
+    cursor: default;
 }
 
+.biblWindow {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    bottom: 25px;
+    left: 25px;
+    overflow: hidden;
+    
+    border-radius: 8px;
+    background-color: #434343;
+    color: #fff;
 
-/********************************************
-*               bibliography                *
-********************************************/
+    vertical-align: middle;
+    font-size: 18.5px;
 
-.biblBack
-{
-width: 100%;
-height: 100%;
-z-index: 5000;
-background-color: rgba(255,255,255,0.2);
-position: absolute;
-left: 0;
-top: 0;
+    font-family: Arial;
+    cursor: default;
 }
 
-.biblOuterWindow
-{
-background-color: rgba(0,0,0,0.6);
-width: 788px;
-margin-left: auto;
-margin-right: auto;
-position: relative;
-border-radius: 8px;
-cursor: default;
+.biblWindow .closeButton {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 5005;
+    
+    width: 30px;
+    height: 30px;
+
+    background-image: url('/Images/close.png');
 }
 
-.biblWindow
-{
-font-family: Arial;
-font-size: 18.5px;
-color: White;
-background-color: #434343;
+.biblWindow .title {
+    overflow: hidden;
+    margin-right: 60px;
+    margin-left: 32px;
+    padding-top: 22px;
+    padding-bottom: 7px;
+    border-bottom: 1px solid #DBDBDB;
+    color: #fff;
 
-vertical-align: middle;
-position: absolute;
-border-radius: 8px;
-cursor: default;
-overflow: hidden;
-bottom: 25px;
-top: 25px;
-left: 25px;
-right: 25px;
+    -ms-text-overflow: ellipsis;
+        -o-text-overflow: ellipsis;
+        text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: bold;
+    font-size: 18px;
+    font-family: Arial;
+    cursor: default;
 }
 
-.biblWindow .closeButton
-{
-background-image: "/Images/close.png";
-position: absolute;
-right: 12px;
-top: 12px;
-width: 30px;
-height: 30px;
-z-index: 5005;
--webkit-user-select: none;
--khtml-user-select: none;
--moz-user-select: none;
--ms-user-select: none;
--o-user-select: none;
-user-select: none;
+.biblWindow .sources {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+    margin: 55px 20px 13px 32px;
+    padding-right: 23px;
+    height: auto;
 }
 
-.biblWindow .title
-{
-font-family: Arial;
-font-size: 18px;
-font-weight: bold;
-color: White;
-padding-top: 22px;
-padding-bottom: 7px;
-margin-right: 60px;
-margin-left: 32px;
-white-space: nowrap;
-overflow: hidden;
-text-overflow: ellipsis;
-border-bottom: 1px solid #DBDBDB;
-cursor: default;
--webkit-user-select: none;
--khtml-user-select: none;
--moz-user-select: none;
--ms-user-select: none;
--o-user-select: none;
-user-select: none;
+.biblWindow .sources .source {
+    margin: 0;
+    padding: 0 5px 0 5px;
+    border-bottom: 1px solid #DBDBDB;
 }
 
-.biblWindow .sources
-{
-display: block;
-position: absolute;
-height: auto;
-bottom: 0;
-top: 0;
-left: 0;
-right: 0;
-margin-left: 32px;
-margin-right: 20px;
-margin-top: 55px;
-margin-bottom: 13px;
-padding-right: 23px;
-height: auto;
-overflow: auto; /* scroll bars */
-overflow-x: hidden;
-}
+.biblWindow .sources .sectionTitle {
+    overflow: hidden;
+    margin: 0;
+    padding-top: 20px;
+    border-bottom: 1px solid #DBDBDB;
+    color: #fff;
+    text-align: left;
+    -ms-text-overflow: ellipsis;
+     -o-text-overflow: ellipsis;
+        text-overflow: ellipsis;  
+    white-space: nowrap;
+    font-size: 18px;
 
-.biblWindow .sources .source
-{
-padding-left: 4px;
-padding-right: 5px;
-padding-bottom: 0px;
-padding-top: 0px;
-margin-left: 0px;
-margin-right: 0px;
-margin-bottom: 0px;
-margin-top: 0px;
-border-bottom: 1px solid #DBDBDB;
-}
-
-.biblWindow .sources .sectionTitle
-{
-color: White;
-font-size: 18px;
-text-align: left;
-margin-left: 0px;
-margin-right: 0px;
-margin-top: 0px;
-padding-left: 0px;
-padding-bottom: 0px;
-padding-top: 20px;
-cursor: default;
-white-space: nowrap;
-overflow: hidden;
-text-overflow: ellipsis;
-border-bottom: 1px solid #DBDBDB;
+    cursor: default;
 }
 
 
-.biblWindow .sources .source .sourceName
-{
-color: #DBDBDB;
-font-size: 18px;
-text-align: left;
-margin-left: 0px;
-margin-right: 50px;
-margin-top: 0px;
-padding-left: 0px;
-padding-bottom: 12px;
-padding-top: 20px;
-cursor: pointer;
-white-space: nowrap;
-overflow: hidden;
-text-overflow: ellipsis;
+.biblWindow .sources .source .sourceName {
+    overflow: hidden;
+    margin-right: 50px;
+    padding-top: 20px;    
+    padding-bottom: 12px;
+
+    color: #DBDBDB;
+    text-align: left;
+    -ms-text-overflow: ellipsis;
+     -o-text-overflow: ellipsis;
+        text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 18px;
+    cursor: pointer;
 }
 
-.biblWindow .sources .source .sourceDescr
-{
-background-color: #DBDBDB;
-color: #424242;
-font-size: 15px;
-text-align: left;
-padding: 12px;
-margin-left: 12px;
-margin-right: 50px;
-margin-bottom: 25px;
-cursor: auto;
-border-radius: 8px;
+.biblWindow .sources .source .sourceDescr {
+    margin: 0 50px 25px 12px;
+    padding: 12px;
+    border-radius: 8px;
+
+    background-color: #DBDBDB;
+    color: #424242;
+    text-align: left;
+    font-size: 15px;
+    cursor: auto;
 }
 
+.czWindow {
+    position: absolute;
+    top: 144px;
+    left: 0;
+    z-index: 2000;
+    margin-bottom: 0;
+    margin-left: 0;
 
+    width: 220px;
+    border-bottom-right-radius: 8px;
+    background-color: #424242;
+    color: #BFBFBF;
+    font-size: 14.5px;
 
-.czWindow
-{
-font-family: Arial;
-font-size: 14.5px;
-color: #BFBFBF;
-background-color: #424242;
-z-index: 2000;
-position: absolute;
-left: 0px;
-top: 144px;
-width: 220px;
-margin-left: 0px;
-margin-bottom: 0px;
-border-bottom-right-radius: 8px;
+    font-family: Arial;
 }
 
-.czWindow .header
-{
-font-size: 19px;
-color: #424242;
-background: #515151; /* for non-css3 browsers */
-background: -moz-linear-gradient(left, #FDFDFD, #515151); /* Mozilla: */
-background: -webkit-gradient(linear, left top, right top, from(#FDFDFD), to(#424242)); /* Chrome, Safari:*/
-filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#FDFDFD', EndColorStr='#424242', GradientType=1); /* MSIE */
-width: 167px;
-vertical-align: middle;
-padding-top: 4px;
-padding-bottom: 2px;
-padding-left: 14px;
-cursor: default;
--webkit-user-select: none;
--khtml-user-select: none;
--moz-user-select: none;
--ms-user-select: none;
--o-user-select: none;
-user-select: none;
+.czWindow .header {
+    padding: 4px 0 2px 14px;
+    width: 167px;
+    background: #515151; /* for non-css3 browsers */
+    background: -moz-linear-gradient(left, #FDFDFD, #515151); /* Mozilla: */
+    background: -webkit-gradient(linear, left top, right top, from(#FDFDFD), to(#424242)); /* Chrome, Safari:*/
+    color: #424242;
+    vertical-align: middle;
+
+    font-size: 19px;
+    cursor: default;
+    filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#FDFDFD', EndColorStr='#424242', GradientType=1); 
+/* MSIE */
 }
 
-.czWindow .czTextBox
-{
-font-family: Arial;
-font-size: 12px;
-color: White;
-background-color: #424242;
-height: 20px;
-margin: 3px 5px 3px 5px;
-border: 1px solid #BFBFBF;
+.czWindow .czTextBox {
+    margin: 3px 5px 3px 5px;
+    height: 20px;
+    border: 1px solid #BFBFBF;
+    background-color: #424242;
+    color: #fff;
+    font-size: 12px;
+
+    font-family: Arial;
 }
 
-.czWindow .czTextBox:focus
-{
-border: 1px solid White;
+.czWindow .czTextBox:focus {
+    border: 1px solid #fff;
 }
 
-.czWindow .emptyTextBox
-{
-font-family: Arial;
-font-size: 12px;
-font-style: italic;
-color: #BFBFBF;
+.czWindow .emptyTextBox {
+    color: #BFBFBF;
+    font-style: italic;
+    font-size: 12px;
+    font-family: Arial;
 }
 
-.czWindow .narration
-{
-font-size: 13px;
-text-align: center;
-margin-left: 5px;
-margin-right: 15px;
-padding-bottom: 0px;
-padding-top: 10px;
-border-bottom: none; /*1px solid #424242;*/
-width: 181px;
-cursor: pointer;
--webkit-user-select: none;
--khtml-user-select: none;
--moz-user-select: none;
--ms-user-select: none;
--o-user-select: none;
-user-select: none;
+.czWindow .narration {
+    margin-right: 15px;
+    margin-left: 5px;
+    padding-top: 10px;
+    width: 181px;
+    border-bottom: none; /*1px solid #424242;*/
+    text-align: center;
+
+    font-size: 13px;
+    cursor: pointer;
 }
 
-.czWindow .narration-selected
-{
-color: White;
+.czWindow .narration-selected {
+    color: #fff;
 }
 
 
-.czWindow .content
-{
-margin-top: 10px;
-margin-left: 10px;
-margin-right: 13px;
-margin-bottom: 0px;
-width: 196px;
-border-bottom: 1px solid #424242;
--webkit-user-select: none;
--khtml-user-select: none;
--moz-user-select: none;
--ms-user-select: none;
--o-user-select: none;
-user-select: none;
+.czWindow .content {
+    margin: 10px 13px 0 10px;
+    width: 196px;
+    border-bottom: 1px solid #424242;
 }
 
-.czWindow .content .category
-{
-vertical-align: middle;
-margin-left: 0px;
-margin-right: 13px;
-margin-bottom: 10px;
-width: 196px;
-cursor: pointer;
-border-bottom: 2px solid #BFBFBF;
+.czWindow .content .category {
+    margin-right: 13px;
+    margin-bottom: 10px;
+    width: 196px;
+    border-bottom: 2px solid #BFBFBF;
+
+    vertical-align: middle;
+    cursor: pointer;
 }
 
-.czWindow .content .category:hover
-{
-color: White;
+.czWindow .content .category:hover {
+    color: #fff;
 }
 
 
-.czWindow .content .collapseButton
-{
-left: 194px;
-position: absolute;
+.czWindow .content .collapseButton {
+    position: absolute;
+    left: 194px;
 }
 
 
 
-.czWindow .content .categorySelected
-{
-vertical-align: middle;
-margin-left: 0px;
-margin-right: 13px;
-margin-bottom: 10px;
-width: 196px;
-cursor: pointer;
-border-bottom: none;
+.czWindow .content .categorySelected {
+    margin-right: 13px;
+    margin-bottom: 10px;
+    width: 196px;
+    border-bottom: none;
+
+    vertical-align: middle;
+    cursor: pointer;
 }
 
-.czWindow .content .categorySelected:hover
-{
-color: White;
+.czWindow .content .categorySelected:hover {
+    color: #fff;
 }
 
-.czWindow .content .itemContainer
-{
-margin-left: 5px;
-margin-right: 15px;
-padding-bottom: 10px;
-border-bottom: none; /*1px solid #424242;*/
-width: 181px;
+.czWindow .content .itemContainer {
+    margin-right: 15px;
+    margin-left: 5px;
+    padding-bottom: 10px;
+    width: 181px;
+    border-bottom: none; /*1px solid #424242;*/
 }
 
 
-.czWindow .content .itemContainer .item
-{
-cursor: pointer;
-white-space: nowrap;
-overflow: hidden;
-text-overflow: ellipsis;
+.czWindow .content .itemContainer .item {
+    overflow: hidden;
+    -ms-text-overflow: ellipsis;
+     -o-text-overflow: ellipsis;
+        text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
 }
 
-.czWindow .content .itemContainer .item:hover
-{
-color: White;
+.czWindow .content .itemContainer .item:hover {
+    color: #fff;
 }
 
-.czWindow .content .itemContainer .touritem-selected
-{
-color: White;
+.czWindow .content .itemContainer .touritem-selected {
+    color: #fff;
 }
 
-.czWindow .searchResults
-{
-margin-left: 10px;
-margin-right: 15px;
-margin-bottom: 10px;
-border-bottom: none; /*1px solid #424242;*/
-overflow: auto; /* scroll bars */
-overflow-x: hidden;
+.czWindow .searchResults {
+
+    overflow-x: hidden;
+    overflow-y: auto;
+    margin: 0 15px 10px 10px;
+    border-bottom: none; /*1px solid #424242;*/
 }
 
-/*
-.czWindow .searchResults
-{
-margin-left: 10px;
-margin-right: 15px;
-padding-bottom: 10px;
-border-bottom: none;
-overflow: auto;
-height: 104px;
-overflow-x: hidden;
-}
-*/
-.czWindow .searchResults .searchResultSection
-{
-font-size: 13px;
-text-align: left;
-margin-left: 0px;
-margin-right: 10px;
-margin-bottom: 5px;
-margin-top: 5px;
-padding-bottom: 0px;
-padding-top: 0px;
-cursor: default;
-white-space: nowrap;
-overflow: hidden;
-text-overflow: ellipsis;
--webkit-user-select: none;
--khtml-user-select: none;
--moz-user-select: none;
--ms-user-select: none;
--o-user-select: none;
-user-select: none;
-border-bottom: 1px solid #BFBFBF;
+.czWindow .searchResults .searchResultSection {
+    overflow: hidden;
+    margin: 5px 10px 5px 0;
+    padding: 0;
+    border-bottom: 1px solid #BFBFBF;
+    text-align: left;
+    -ms-text-overflow: ellipsis;
+     -o-text-overflow: ellipsis;
+        text-overflow: ellipsis;
+    white-space: nowrap;
+
+    font-size: 13px;
+    cursor: default;
 }
 
-.czWindow .searchResults .searchResult
-{
-font-size: 13px;
-text-align: left;
-margin-left: 7px;
-margin-right: 10px;
-padding-bottom: 0px;
-padding-top: 0px;
-border-bottom: none; /*1px solid #424242;*/
-cursor: pointer;
-white-space: nowrap;
-overflow: hidden;
-text-overflow: ellipsis;
--webkit-user-select: none;
--khtml-user-select: none;
--moz-user-select: none;
--ms-user-select: none;
--o-user-select: none;
-user-select: none;
+.czWindow .searchResults .searchResult {
+    overflow: hidden;
+    margin-right: 10px;
+   	margin-left: 7px;
+    padding: 0;
+    border-bottom: none; /*1px solid #424242;*/
+    text-align: left;
+    -ms-text-overflow: ellipsis;
+     -o-text-overflow: ellipsis;
+        text-overflow: ellipsis;
+    white-space: nowrap;
+
+    font-size: 13px;
+    cursor: pointer;
 }
 
-.czWindow .searchResults .searchResult:hover
-{
-color: White;
+.czWindow .searchResults .searchResult:hover {
+    color: #fff;
 }
 
-.czWindow .searchResults .searchNoResult
-{
-font-style:italic;
-font-size: 13px;
-text-align: left;
-margin-left: 0px;
-margin-right: 10px;
-padding-bottom: 0px;
-padding-top: 0px;
-border-bottom: none; /*1px solid #424242;*/
-cursor: default;
-white-space: nowrap;
-overflow: hidden;
-text-overflow: ellipsis;
--webkit-user-select: none;
--khtml-user-select: none;
--moz-user-select: none;
--ms-user-select: none;
--o-user-select: none;
-user-select: none;
+.czWindow .searchResults .searchNoResult {
+    overflow: hidden;
+    margin-right: 10px;
+    padding: 0;
+    border-bottom: none; /*1px solid #424242;*/
+    text-align: left;
+    -ms-text-overflow: ellipsis;
+     -o-text-overflow: ellipsis;
+        text-overflow: ellipsis;
+    white-space: nowrap;
+
+    font-style:italic;
+    font-size: 13px;
+    cursor: default;
 }
 
 
-.bookmarksWindow
-{
-font-family: Arial;
-font-size: 14.5px;
-color: #BFBFBF;
-background-color: #424242;
-z-index: 1999;
-position: absolute;
-left: 0px;
-bottom: 44px;
-width: 200px;
-max-height: 409px;
-margin-left: 0px;
-border-top-right-radius: 8px;
--webkit-user-select: none;
--khtml-user-select: none;
--moz-user-select: none;
--ms-user-select: none;
--o-user-select: none;
-user-select: none;
+.bookmarksWindow {
+    position: absolute;
+    bottom: 44px;
+    left: 0;
+    z-index: 1999;
+    margin-left: 0;
+    
+    width: 200px;
+    max-height: 409px;
+    border-top-right-radius: 8px;
+    background-color: #424242;
+    color: #BFBFBF;
+    font-size: 14.5px;
+
+    font-family: Arial;
 }
 
-.bookmarksWindow .header
-{
-font-size: 14.5px;
-color: White;
-padding-top: 10px;
-padding-bottom: 9px;
-padding-left: 5px;
-padding-right: 6px;
-margin-left: 10px;
-margin-right: 23px;
-cursor: default;
-border-bottom: 2px solid #BFBFBF;
+.bookmarksWindow .header {
+    padding: 10px 6px 9px 5px;
+    padding-right: 6px;
+    padding-left: 5px;
+    border-bottom: 2px solid #BFBFBF;
+    color: #fff;
+
+    font-size: 14.5px;
+    cursor: default;
 }
 
-.bookmarksWindow .headerButton
-{
-position: absolute;
-right: 12px;
-top: 9px;
+.bookmarksWindow .headerButton {
+    position: absolute;
+    top: 9px;
+    right: 12px;
 }
 
-.bookmarksWindow .slideHeader
-{
-font-size: 14.5px;
-color: White;
-padding-top: 5px;
-padding-bottom: 10px;
-padding-left: 4px;
-padding-right: 6px;
-margin-left: 10px;
-margin-right: 19px;
-cursor: default;
+.bookmarksWindow .slideHeader {
+    margin-right: 19px;
+    margin-left: 10px;
+    padding: 5px 6px 10px 4px;
+    color: White;
+
+    font-size: 14.5px;
+    cursor: default;
 }
 
-.bookmarksWindow .slideText
-{
-font-size: 13px;
-color: #BFBFBF;
-padding-top: 5px;
-padding-bottom: 5px;
-padding-left: 3px;
-padding-right: 3px;
-margin-left: 15px;
-margin-right: 19px;
-max-height: 250px;
-overflow: auto;
-overflow-x: hidden;
+.bookmarksWindow .slideText {
+
+    overflow-x: hidden;
+    overflow-y: auto;
+    margin-right: 19px;
+    margin-left: 15px;
+    padding: 5px 3px 5px 3px;    
+    max-height: 250px;
+    color: #BFBFBF;
+
+    font-size: 13px;
 }
 
-.bookmarksWindow .slideFooter
-{
-font-size: 12px;
-color: White;
-text-align: right;
-padding-top: 5px;
-padding-bottom: 13px;
-padding-left: 4px;
-padding-right: 0px;
-margin-top: 20px;
-margin-left: 10px;
-margin-right: 19px;
-cursor: default;
-height: 15px;
-border-top: 1px solid #BFBFBF;
+.bookmarksWindow .slideFooter {
+    margin: 20px 19px 0 10px;
+    padding: 5px 0 13px 4px;
+    height: 15px;
+    border-top: 1px solid #BFBFBF;
+    color: #fff;
+    text-align: right;
+
+    font-size: 12px;
+    cursor: default;
 }
 
 
-/****************************************
-*               tooltip                 *    
-****************************************/
+/***********************************************************
 
-.bubbleInfo 
-{
-	position:absolute;
-	float:left;
-	white-space:nowrap;
-	
-	filter:alpha(opacity=90); 
-	-moz-opacity: 0.9; 
-	opacity: 0.9; 
-	
-	clear:both;
-	padding:10px;
-	
-	background-position: center;
-	
-	-webkit-border-radius: 8px;
-	-moz-border-radius: 8px;
-	border-radius: 8px;
-	
-	display: block;
+                        Tooltip
+
+***********************************************************/
+
+.bubbleInfo {
+    position: absolute;
+    float: left;
+    clear: both;
+    display: block;
+    padding: 10px;
+    -webkit-border-radius: 8px;
+       -moz-border-radius: 8px;
+            border-radius: 8px;
+    background-position: center;
+    white-space: nowrap;
+    filter: alpha(opacity=90);
+    -moz-opacity: 0.9;
+    opacity: 0.9;
 }
 
-#defaultBox
-{
-	background-image: url("../Images/defaultGradientBox.jpg") ;
+#defaultBox {
+    background-image: url('../Images/defaultGradientBox.jpg') ;
 }
 
-#cosmosRegimeBox
-{
-	background-image: url("../Images/cosmosRegimeBox.jpg") ;
+#cosmosRegimeBox {
+    background-image: url('../Images/cosmosRegimeBox.jpg') ;
 }
 
-#earthRegimeBox
-{
-	background-image: url("../Images/earthRegimeBox.jpg") ;
+#earthRegimeBox {
+    background-image: url('../Images/earthRegimeBox.jpg') ;
 }
 
-#humanityRegimeBox
-{
-	background-image: url("../Images/humanityRegimeBox.jpg") ;
+#humanityRegimeBox {
+    background-image: url('../Images/humanityRegimeBox.jpg') ;
 }
 
-#lifeRegimeBox
-{
-	background-image: url("../Images/lifeRegimeBox.jpg") ;
+#lifeRegimeBox {
+    background-image: url('../Images/lifeRegimeBox.jpg') ;
 }
 
 
-#prehistoryRegimeBox
-{
-	background-image: url("../Images/prehistoryRegimeBox.jpg") ;
-	background-position: center;
+#prehistoryRegimeBox {
+    background-image: url('../Images/prehistoryRegimeBox.jpg') ;
+    background-position: center;
 }
 
-.bubbleInfo span
-{
-	color: white;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 14px;
+.bubbleInfo span {
+    color: #fff;
+    font-size: 14px;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
 }
 
 .block {
-		   position: relative;
-		   background-color: #abc;
-		   white-space: nowrap;
-		   display: block;
-		}		
-		
+    position: relative;
+    display: block;
+    background-color: #abc;
+    white-space: nowrap;
+}       
+        
 
 
 
-/***********************************
-*          Welcome Screen          *   
-************************************/
-.welcomeScreenBack
-{   
-	width: 100%;
-	height: 100%;
-	z-index: 5000;
-	background-color: rgba(255,255,255,0.2);
-	position: absolute;
-	left: 0;
-	top: 0;
+/***********************************************************
+
+                        Welcome Screen
+       
+***********************************************************/
+.welcomeScreenBack {   
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 5000;
+
+    width: 100%;
+    height: 100%;
+
+    background-color: rgba(255,255,255,0.2);
 }
 
-.welcomeScreenOuterWindow
-{
-	background-color: rgba(0,0,0,0.6);
-	width: 900px;
-	margin-left: auto;
-	margin-right: auto;
-	position: relative;
-	border-radius: 8px;
-	cursor: default;
-    min-height: 443px;
+.welcomeScreenOuterWindow {
+    position: relative;
+    margin-right: auto;
+    margin-left: auto;
+    width: 900px;
     height: 443px;
+
+    min-height: 443px;       
+    border-radius: 8px;
+
+    background-color: rgba(0,0,0,0.6);
+    cursor: default;
+	top: 50%;
+   	margin-top: -220px;
 }
 
-.welcomeScreen
-{
-	font-family: Arial;
-	font-size: 18.5px;
-	color: White;
-	background-color: #3C5F96;
-	width: 864px;    
-	margin-left: auto;
-	margin-right: auto;
-	vertical-align: middle;
-	position: relative;
+.welcomeScreen {
+    position: relative;
     top: 16px;
-    right: 0px;
+    right: 0;
     bottom: 16px;
-    left: 0px;
+    left: 0;
+    overflow: hidden;
+    margin-right: auto;
+
+    
+    margin-left: auto;
+    width: 864px;
     height: auto;
-	border-radius: 8px;
-	cursor: default;
-	overflow: hidden;
     min-height: 411px;
+    border-radius: 8px;
+    background-color: #3C5F96;
+    color: #fff;   
+    vertical-align: middle;
+    font-size: 18.5px; 
+
+    font-family: Arial;
+    cursor: default;
 }
 
-.welcomeScreen .titleArea
-{
-	margin-right: 22px;
-	margin-left: 32px;
-	border-bottom: 1px solid #DBDBDB;
+.welcomeScreen .titleArea {
+    margin-right: 22px;
+    margin-left: 32px;
+    border-bottom: 1px solid #DBDBDB;
 }
 
-.welcomeScreen .titleArea .closeButton
-{
-	background-image: "/Images/close.png";
-	position: absolute;
-	top: 12px;
-	right: 22px;
-	width: 30px;
-	height: 30px;
-	z-index: 5005;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	-o-user-select: none;
-	user-select: none;
+.welcomeScreen .titleArea .closeButton {
+    position: absolute;
+    top: 12px;
+    right: 22px;
+    z-index: 5005;
+    
+    width: 30px;
+    height: 30px;
+
+    background-image: url('/Images/close.png');
 }
 
-.welcomeScreen .titleArea .title
-{
-	font-family: Arial;
-	font-size: 18px;
-	font-weight: bold;
-	color: White;
-	padding-top: 22px;
-	padding-bottom: 7px;
-	margin-right: 60px;   
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	cursor: default;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	-o-user-select: none;
-	user-select: none;
+.welcomeScreen .titleArea .title {
+    overflow: hidden;
+    margin-right: 60px;
+    padding-top: 22px;
+    padding-bottom: 7px;
+    color: #fff;
+    -ms-text-overflow: ellipsis;
+     -o-text-overflow: ellipsis;
+        text-overflow: ellipsis; 
+    white-space: nowrap;
+    font-weight: bold;
+    font-size: 18px; 
+
+    font-family: Arial;
+    cursor: default;
 }
 
-.welcomeScreen .content
-{
-	width: 810px;
-	display: block;
-	position: absolute;
-	height: auto;
-	bottom: 0;
-	top: 0;
-	left: 0;
-	right: 0;
-	margin-left: 32px;
-	margin-right: 32px;
-	margin-top: 75px;
-	margin-bottom: 13px;
-	height: auto;
-	overflow: hidden;
-	font-family: Arial;
-	font-size: 16px;
+.welcomeScreen .content {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: block;
+
+    overflow: hidden;
+    margin: 75px 32px 13px 32px;
+
+    width: 810px;
+    height: auto;
+    font-size: 16px;
+    font-family: Arial;
 }
 
-.welcomeScreen .content .description
-{
-	display: inline-block;
-	position: absolute;
-	height: 315px;
-	width: 220px;
-	margin-right: 20px;
+.welcomeScreen .content .description {
+    position: absolute;
+
+    display: inline-block;
+    margin-right: 20px;
+    width: 220px;
+    height: 315px;
 }
 
-.welcomeScreen .content .description .button
-{
-	margin-bottom: 10px;
-	border: 1px solid #EF4136; 
-	background: #EA7134; 
-	width: 220px; 
-	height: 36px;
-	font-family: Arial;
-	font-size: 18px;
-	font-weight: bold;
-	color: White;
+.welcomeScreen .content .description .button {
+    margin-bottom: 10px;
+    width: 220px; 
+    height: 36px;
+    border: 1px solid #EF4136;
+     
+    background: #EA7134;
+    color: #fff;
+    font-weight: bold;
+    font-size: 18px; 
+    font-family: Arial;
 }
 
-.welcomeScreen .content .media
-{    
-	display: inline-block;
-	position: absolute;
-	width: 560px;
-	height: 315px;
-	right: 0px;
+.welcomeScreen .content .media {   
+    position: absolute; 
+    right: 0px;
+
+    display: inline-block;
+    width: 560px;
+    height: 315px;
 }
 
-.welcomeScreen .content .media .player
-{
-	position: absolute; 
-	right: 0px; 
-	width: 100%; 
-	height: 100%;
+.welcomeScreen .content .media .player {
+    position: absolute; 
+    right: 0px; 
+    width: 100%; 
+    height: 100%;
 }
 
-/**********************************
-*	FallbackPage
-**********************************/
-/*
-.fallbackScreenBack
-{   
-	width: 100%;
-	height: 100%;
-	z-index: 5000;
-	position: absolute;
-	left: 0;
-	top: 0;
-}
+/***********************************************************
 
-.fallbackScreenOuterWindow
-{
-	background-image: url('../Images/fallbackOuterBackground.jpg');
-	background-position: top center;
-	width: 900px;
-	margin-left: auto;
-	margin-right: auto;
-	position: relative;
-	cursor: default;
-}
+                        Fallbackpage
 
-.fallbackScreen
-{
-	font-family: Arial;
-	font-size: 18.5px;
-	color: White;
-	background-color: #3C5F96;
-	width: 864px;    
-	margin-left: auto;
-	margin-right: auto;
-	vertical-align: middle;
-	position: relative;
-	cursor: default;
-	overflow: hidden;
-}
-
-.fallbackScreen .titleArea
-{
-	margin-right: 22px;
-	margin-left: 32px;
-	border-bottom: 1px solid #DBDBDB;
-}
-
-.fallbackScreen .titleArea .title
-{
-	font-family: Arial;
-	font-size: 18px;
-	font-weight: bold;
-	color: White;
-	padding-top: 22px;
-	padding-bottom: 7px;
-	margin-right: 60px;   
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	cursor: default;
-}
-
-.fallbackScreen .content
-{
-	width: 810px;
-	display: block;
-	position: absolute;
-	height: auto;
-	bottom: 0;
-	top: 0;
-	left: 0;
-	right: 0;
-	margin-left: 32px;
-	margin-right: 32px;
-	margin-top: 75px;
-	margin-bottom: 13px;
-	height: auto;
-	overflow: hidden;
-	font-family: Arial;
-	font-size: 16px;
-}
-
-.fallbackScreen .content .description
-{
-	display: inline-block;
-	position: absolute;
-	height: 315px;
-	width: 220px;
-	margin-right: 20px;
-}
-
-.fallbackScreen .content .description a
-{
-   font-family: Arial;
-   font-size: 16px;
-   color:White;
-   text-decoration: underline;
-}
-
-.fallbackScreen .content .description .button
-{
-	margin-bottom: 10px;
-	border: 1px solid #EF4136; 
-	background: #EA7134; 
-	width: 220px; 
-	height: 36px;
-	font-family: Arial;
-	font-size: 18px;
-	font-weight: bold;
-	color: White;
-}
-
-.fallbackScreen .content .media
-{    
-	display: inline-block;
-	position: absolute;
-	width: 560px;
-	height: 315px;
-	right: 0px;
-}
-
-.fallbackScreen .content .media .player
-{
-	position: absolute; 
-	right: 0px; 
-	width: 100%; 
-	height: 100%;
-}*/
-
+***********************************************************/
 img.fallbackBackground {
-			/* Set rules to fill background */
-			min-height: 100%;
-			min-width: 1024px;
-			
-			/* Set up proportionate scaling */
-			width: 100%;
-			height: auto;
-			
-			/* Set up positioning */
-			position: fixed;
-			top: 0;
-			left: 0;
-		}
-		
-		@media screen and (max-width: 1024px){
-			img.fallbackBackground {
-				left: 50%;
-				margin-left: -512px; }
-		}
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+            
+    /* Set up positioning */
+    min-width: 1024px;
+            
+    /* Set up proportionate scaling */
+    /* Set rules to fill background */
+    min-height: 100%;
+}
+        
+    @media screen and (max-width: 1024px){
+        img.fallbackBackground {
+            left: 50%;
+            margin-left: -512px;
+        }
+    }
 
-.fallbackOuterContent 
-{	
-	background-image: url('../Images/fallbackOuterBackground.jpg');
-	background-position: top center;
-	
-	position:absolute; 
-	
-	top:50%;
-	left: 50%;
-	
-	width: 900px;
-	height:482px; 
+.fallbackOuterContent  {
+    
+    position:absolute; 
+    
+    top:50%;
+    left: 50%; 
 
-	margin-top:-241px;
-	margin-left: -450px;
-	
-	cursor: default;
+    margin-top:-241px;
+    margin-left: -450px;
+    
+    width: 900px;
+    height:482px;   
+    background-image: url('../Images/fallbackOuterBackground.jpg');
+    background-position: top center;
+    
+    cursor: default;
 }
 
-.fallbackContent 
-{
-	position: relative;
-	
-	width: 864px;
-	height:432px; 
+.fallbackContent  {
+    position: relative;
+    overflow: hidden; 
 
-	margin-top:25px; 
-	margin-left:auto; 
-	margin-right:auto;
-	
-	background-color: #3C5F96;
+    margin: 25px auto 0 auto;
+    
+    width: 864px;
+    height:432px;
+    
+    background-color: #3C5F96;
+    color: White;
+    
+    vertical-align: middle;
+    font-size: 18.5px;
 
-	font-family: Arial;
-	font-size: 18.5px;
-	color: White;
-	
-	vertical-align: middle;
-	cursor: default;
-	overflow: hidden;
+    font-family: Arial;
+    cursor: default;
 }
 
 
-.fallbackContent .titleArea
-{
-	margin-right: 22px;
-	margin-left: 32px;
-	border-bottom: 1px solid #DBDBDB;
+.fallbackContent .titleArea {
+    margin-right: 22px;
+    margin-left: 32px;
+    border-bottom: 1px solid #DBDBDB;
 }
 
-.fallbackContent .titleArea .title
-{
-	font-family: Arial;
-	font-size: 18px;
-	font-weight: bold;
-	color: White;
-	padding-top: 22px;
-	padding-bottom: 7px;
-	margin-right: 60px;   
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	cursor: default;
+.fallbackContent .titleArea .title {
+    overflow: hidden;
+    margin-right: 60px;
+    padding-top: 22px;
+    padding-bottom: 7px;
+    color: #fff;
+    -ms-text-overflow: ellipsis;
+     -o-text-overflow: ellipsis;
+        text-overflow: ellipsis;  
+    white-space: nowrap;
+    font-weight: bold;
+    font-size: 18px;
+     
+    font-family: Arial;
+    cursor: default;
 }
 
-.fallbackContent .content
-{
-	width: 810px;
-	display: block;
-	position: absolute;
-	height: auto;
-	bottom: 0;
-	top: 0;
-	left: 0;
-	right: 0;
-	margin-left: 32px;
-	margin-right: 32px;
-	margin-top: 75px;
-	margin-bottom: 13px;
-	height: auto;
-	overflow: hidden;
-	font-family: Arial;
-	font-size: 16px;
+.fallbackContent .content {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: block;
+
+    overflow: hidden;
+    margin: 75px 32px 13px 32px;
+
+    width: 810px;
+    height: auto;
+    font-size: 16px;
+    font-family: Arial;
 }
 
-.fallbackContent .content .description
-{
-	display: inline-block;
-	position: absolute;
-	height: 315px;
-	width: 220px;
-	margin-right: 20px;
+.fallbackContent .content .description {
+    position: absolute;
+    display: inline-block;
+    margin-right: 20px;
+    width: 220px;
+    height: 315px;
 }
 
-.fallbackContent .content .description a
-{
-   font-family: Arial;
-   font-size: 16px;
-   color:White;
+.fallbackContent .content .description a {
+   color: #fff;
    text-decoration: underline;
+   font-size: 16px;
+   font-family: Arial;
 }
 
-.fallbackContent .content .description .button
-{
-	border: 1px solid #EF4136; 
-	background: #EA7134; 
-	width: 220px; 
-	height: 36px;
-	font-family: Arial;
-	font-size: 18px;
-	font-weight: bold;
-	color: White;
+.fallbackContent .content .description .button { 
+    width: 220px; 
+    height: 36px;
+    border: 1px solid #EF4136; 
+    background: #EA7134;
+    color: White;
+    vertical-align:middle;
 
-	text-align: center;
-	vertical-align:middle;
-	
+    text-align: center;
+    font-weight: bold;
+    font-size: 18px;
+    font-family: Arial; 
 }
 
-.fallbackContent .content .media
-{    
-	display: inline-block;
-	position: absolute;
-	width: 560px;
-	height: 315px;
-	right: 0px;
+.fallbackContent .content .media {
+    position: absolute;
+    right: 0;    
+    display: inline-block;
+    width: 560px;
+    height: 315px;
 }
 
-.fallbackContent .content .media .player
-{
-	position: absolute; 
-	right: 0px; 
-	width: 100%; 
-	height: 100%;
+.fallbackContent .content .media .player {
+    position: absolute; 
+    right: 0px; 
+    width: 100%; 
+    height: 100%;
 }
 
 
-/*********************************************************
-*                       footer                           *
-**********************************************************/
+/***********************************************************
+
+                            Footer
+
+***********************************************************/
 
 #footer {
-    height: 25px;
     position: relative;
+    height: 25px;
 }    
 
-    #footer ul {
-            list-style: none;
-	        margin: 0;
-	        padding: 0;
-            overflow: hidden;
-        }
+#footer ul {
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
 
-            #footer ul li {
-                height: 100%;
-            }
+#footer ul li {
+    height: 100%;
+}
 
 .footer-link {
     margin-right: 20px;
     margin-left: 20px;
-    line-height: 25px;
     height: 100%; 
     
     color:  #FFF;
     white-space: nowrap;
+    line-height: 25px;
 }
 
-    .footer-link:hover {
-        cursor: pointer;
-    }
+.footer-link:hover {
+    cursor: pointer;
+}
 
-		
-/********************************************
-*               breadcrumbs                 *
-********************************************/
+        
+/***********************************************************
+
+                        Breadcrumbs
+
+***********************************************************/
 
 .breadcrumbs-nav {
     width: 25px;
     height: 25px;
-    text-align: center;
-    line-height: 100%;
-    font-size: 20px;
     color: #BFBFBF;
+    text-align: center;
+    font-size: 20px;
+    line-height: 100%;
 }
 
-    .breadcrumbs-nav:hover {
-        color: white;
-    }
-
-#breadcrumbs-nav-left {    
-	cursor: pointer;
-    display: none;
+.breadcrumbs-nav:hover {
+    color: #fff;
 }
 
-#breadcrumbs-nav-right {    
-	cursor: pointer;
-    display: none;
+#breadcrumbs-nav-left {
+    display: none;    
+    cursor: pointer;
 }
 
-.breadcrumbs-container {
+#breadcrumbs-nav-right {
+    display: none;    
+    cursor: pointer;
+}
+
+.breadcrumbs-container {    
+    overflow: hidden;
     width: 50%;
     height: 100%;
-    
-    overflow: hidden;
     line-height: 100%;
 }
 
 #breadcrumbs-table {
-	position: relative; 
-	cellspacing: 0px;
-	cellpadding: 0px;
-	border-collapse: collapse;	
-    border-spacing: 0px;	
-	margin: 0px;
-	padding: 0px;	
+    position: relative; 
+    margin: 0;
+    padding: 0;
+    width: auto;    
     height: 100%;
-    width: auto;
+    border-collapse: collapse; 
+    cellspacing: 0;
+    cellpadding: 0;   
+    border-spacing: 0;
 }
-	
-    #breadcrumbs-table tr {
-        position: absolute;
-        white-space: nowrap;
-        height: 100%;
-    }
+    
+#breadcrumbs-table tr {
+    position: absolute;
+    height: 100%;
+    white-space: nowrap;
+}
 
-        #breadcrumbs-table tr td {
-            height: 25px;
-            padding: 0;
-            margin: 0;
-            line-height: 100%;
-	        white-space: nowrap;
-        }
+#breadcrumbs-table tr td {
+    margin: 0;
+    padding: 0;
+    height: 25px;
+    white-space: nowrap;
+    line-height: 100%;
+}
 
 .breadcrumb-separator 
 {
-	margin-left: 3px;
-	margin-right: 3px;
-	color: #bfbfbf; 
+    margin-right: 3px;
+    margin-left: 3px; 
     height: 100%;
+    color: #bfbfbf;
+    font-size: 12.5px;
+    font-family: verdana;
     line-height: 100%;
-	font-size: 12.5px;
-	font-family: verdana;
-	cursor: default;
+    cursor: default;
 }
   
-.breadcrumb-link 
-{
-	display: inline-block;
-	position: relative;
-	line-height: 25px;
+.breadcrumb-link {
+    position: relative;
+    display: inline-block;
     height: 25px;
-	font-size: 12.5px;
-	font-family: verdana;
-	cursor: pointer;
+    font-size: 12.5px;
+    font-family: verdana;
+    line-height: 25px;
+    cursor: pointer;
 }
 
-.breadcrumb-cosmos {	   
-	color: #986C9D;
+.breadcrumb-cosmos {       
+    color: #986C9D;
 }
 
-.breadcrumb-earth {	   
-	color: #517F95;
+.breadcrumb-earth {    
+    color: #517F95;
 }
 
-.breadcrumb-life {	   
-	color: #499649;
+.breadcrumb-life {     
+    color: #499649;
 }
 
-.breadcrumb-prehistory {	   
-	color: #ED9132;
+.breadcrumb-prehistory {       
+    color: #ED9132;
 }
 
-.breadcrumb-humanity {	   
-	color: #D45C46;
+.breadcrumb-humanity {     
+    color: #D45C46;
 }
 
 .breadcrumb-hover {
-	color: white;
+    color: #fff;
 }
 
 
-/************************************
-*              Authoring            *
-************************************/
+/***********************************************************
+
+                            Authoring
+
+***********************************************************/
 
 #footer-authoring {
     display:            inline-block;
@@ -1384,58 +1126,61 @@ img.fallbackBackground {
 
 .footer-authoring-text {
     margin-right:       5px;
-    vertical-align:     middle;
     
     color:              #BFBFBF;
-    font:               11.5px Arial;
+    vertical-align:     middle;
     white-space:        nowrap;
+    font:               11.5px Arial;
 }
 
 .footer-authoring-link {
     margin-right:           3px;
     margin-left:            3px;
     padding:                4px 2px 3px 3px;
-    vertical-align:         middle;   
-    
-    color:                  #BFBFBF;
-    font:                   11.5px Arial;
-    white-space:            nowrap;
 
     -webkit-border-radius:  1px;
-	-moz-border-radius:     1px;
-	border-radius:          1px;
+    -moz-border-radius:     1px;
+    border-radius:          1px;   
+    
+    color:                  #BFBFBF;
+    vertical-align:         middle;
+    white-space:            nowrap;
+    font:                   11.5px Arial;
 }
 
-    .footer-authoring-link:hover {
-        color:              black;
-        background-color:   #BFBFBF;
-        text-decoration:    none;
-        cursor: default;
-    }
-
-    .footer-authoring-link:active {
-    	color:              black;
-        background-color:   #7B7B7B;
-        text-decoration:    none;
-        cursor: default;
-    }
-
-.footer-authoring-link.active {
-	color:              black;
+.footer-authoring-link:hover {
     background-color:   #BFBFBF;
+    color:              #000;
     text-decoration:    none;
     cursor: default;
 }
-	.footer-authoring-link.active:active {
-    	color:              black;
-        background-color:   #7B7B7B;
-        text-decoration:    none;
-        cursor: default;
-    }
 
-/************************************
-*               Auxilary            *
-************************************/
+.footer-authoring-link:active {
+    background-color:   #7B7B7B;
+    color:              #000;
+    text-decoration:    none;
+    cursor: default;
+}
+
+.footer-authoring-link.active {
+    background-color:   #BFBFBF;
+    color:              #000;
+    text-decoration:    none;
+    cursor: default;
+}
+
+.footer-authoring-link.active:active {
+    background-color:   #7B7B7B;
+    color:              #000;
+    text-decoration:    none;
+    cursor: default;
+}
+
+/***********************************************************
+
+                            Auxiliary
+
+***********************************************************/
 
 .fleft {
     float: left;

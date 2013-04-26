@@ -1510,16 +1510,18 @@ module CZ {
             //But in vccontent we use position:absolute
             //So, we create "wrapping" div elemWrap, with position:absolute
             //Inside elemWrap, create child div with position:relative
-            var elem = $("<div id='citext_" + id + "' class='contentItemDescription'></div")
-                        .appendTo(vc);
+            var elem = $("<div></div>", {
+                id: "citext_" + id,
+                class: "contentItemDescription"
+            }).appendTo(vc);
+            
             elem[0].addEventListener("mousemove", CZ.Common.preventbubble, false);
             //elem[0].addEventListener("mouseup", CZ.Common.preventbubble, false);
             elem[0].addEventListener("mousedown", CZ.Common.preventbubble, false);
             elem[0].addEventListener("DOMMouseScroll", CZ.Common.preventbubble, false);
             elem[0].addEventListener("mousewheel", CZ.Common.preventbubble, false);
-            var textElem = $("<div style='position:relative' class='text'></div>")
-                        .html(text)
-                        .appendTo(elem);
+            var textElem = $("<div style='position:relative' class='text'></div>");
+            textElem.text(text).appendTo(elem);
 
             //Initialize content
             this.initializeContent(elem[0]);
@@ -1869,6 +1871,7 @@ module CZ {
 
                     // Source
                     var sourceText = this.contentItem.attribution;
+                    var mediaSource = this.contentItem.mediaSource;
                     if (sourceText) {
                         var addSourceText = function (sx, sw, sy) {
                             var sourceItem = addText(container, layerid, id + "__source__", sx, sy, sy + sourceHeight / 2.0,
@@ -1881,11 +1884,11 @@ module CZ {
                                 adjustWidth: true
                             }, sw);
 
-                            if (contentItem.mediaSource) { // we've got a URL here
+                            if (mediaSource) { // we've got a URL here
                                 sourceItem.reactsOnMouse = true;
                                 sourceItem.onmouseclick = function (e) {
                                     vc.element.css('cursor', 'default');
-                                    window.open(contentItem.mediaSource);
+                                    window.open(mediaSource);
                                     return true;
                                 };
                                 sourceItem.onmouseenter = function (pv, e) {
@@ -1930,8 +1933,7 @@ module CZ {
                     }
                     var sz = 1 << zl;
                     var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x' + sz + '/' + contentItem.guid + '.png';
-                    // NOTE: Temporary fix until new thumbnails will be implemented!
-                    return null;
+
                     return {
                         zoomLevel: newZl,
                         content: new CanvasImage(vc, layerid, id + "@" + 1, thumbnailUri, vx, vy, vw, vh)

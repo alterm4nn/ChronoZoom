@@ -19,6 +19,13 @@ module CZ {
         };
 
         $(document).ready(function () {
+            //Ensures there will be no 'console is undefined' errors
+            window.console = window.console || <any>(function () {
+                var c = <any>{};
+                c.log = c.warn = c.debug = c.info = c.log =
+                    c.error = c.time = c.dir = c.profile = c.clear = c.exception = c.trace = c.assert = function () { };
+                return c;
+            })();
 
             $('.bubbleInfo').hide();
 
@@ -26,6 +33,11 @@ module CZ {
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 // TODO: Get UI components.
             });
+
+            var url = CZ.UrlNav.getURL();
+            var rootCollection = url.superCollectionName === undefined;
+            CZ.Service.superCollectionName = url.superCollectionName;
+            CZ.Service.collectionName = url.collectionName;
 
             $('#search_button')
                 .mouseup(CZ.Search.onSearchClicked)
@@ -91,28 +103,35 @@ module CZ {
                 .mouseout(() => { CZ.Common.toggleOffImage('biblCloseButton', 'png'); })
                 .mouseover(() => { CZ.Common.toggleOnImage('biblCloseButton', 'png'); })
             
-            // TODO: remove splash screen totaly and replace it with new UX.
-            //$('#welcomeScreenCloseButton')
-            //    .mouseover(() => { CZ.Common.toggleOnImage('welcomeScreenCloseButton', 'png'); })
-            //    .mouseout(() => { CZ.Common.toggleOffImage('welcomeScreenCloseButton', 'png'); })
-            //    .click(CZ.Common.hideWelcomeScreen);
-            //$('#closeWelcomeScreenButton')
-            //    .click(CZ.Common.closeWelcomeScreen);
+            
+            $('#welcomeScreenCloseButton')
+                .mouseover(() => { CZ.Common.toggleOnImage('welcomeScreenCloseButton', 'png'); })
+                .mouseout(() => { CZ.Common.toggleOffImage('welcomeScreenCloseButton', 'png'); })
+                .click(CZ.Common.hideWelcomeScreen);
+            $('#closeWelcomeScreenButton')
+                .click(CZ.Common.closeWelcomeScreen);
 
-            //var wlcmScrnCookie = CZ.Common.getCookie("welcomeScreenDisallowed");
-            //if (wlcmScrnCookie != null) {
-            //    CZ.Common.hideWelcomeScreen();
-            //}
-            //else {
-            //    // click on gray area hides welcome screen
-            //    $("#welcomeScreenOut").click(function (e) {
-            //        e.stopPropagation();
-            //    });
+            var wlcmScrnCookie = CZ.Common.getCookie("welcomeScreenDisallowed");
+            if (wlcmScrnCookie != null) {
+                CZ.Common.hideWelcomeScreen();
+            }
+            else {
+                // click on gray area hides welcome screen
+                $("#welcomeScreenOut").click(function (e) {
+                    e.stopPropagation();
+                });
 
-            //    $("#welcomeScreenBack").click(function () {
-            //        CZ.Common.closeWelcomeScreen();
-            //    });
-            //}
+                $("#welcomeScreenBack").click(function () {
+                    CZ.Common.closeWelcomeScreen();
+                });
+            }
+
+            if (rootCollection) {
+                $(".footer-authoring-link").css("display", "none");
+            } else {
+                $("#welcomeScreenBack").css("display", "none");
+                $(".regime-link").css("display", "none");
+            }
 
             if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
                 if (/Chrome[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
@@ -329,7 +348,7 @@ module CZ {
             });
 
             var vp = CZ.Common.vc.virtualCanvas("getViewport");
-            CZ.Common.vc.virtualCanvas("setVisible", CZ.VCContent.getVisibleForElement({ x: -13700000000, y: 0, width: 13700000000, height: 5535444444.444445 }, 1.0, vp),true);
+            CZ.Common.vc.virtualCanvas("setVisible", CZ.VCContent.getVisibleForElement({ x: -13700000000, y: 0, width: 13700000000, height: 5535444444.444445 }, 1.0, vp, false), true);
             CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
 
             var bid = window.location.hash.match("b=([a-z0-9_]+)");
@@ -337,7 +356,9 @@ module CZ {
                 //bid[0] - source string
                 //bid[1] - found match
                 $("#bibliography .sources").empty();
-                $("#bibliography .title").html("<span>Loading...</span>");
+                $("#bibliography .title").append($("<span></span>", {
+                    text: "Loading..."
+                }));
                 $("#bibliographyBack").css("display", "block");
             }
         });

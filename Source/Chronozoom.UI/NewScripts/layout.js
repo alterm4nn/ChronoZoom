@@ -720,7 +720,7 @@ var CZ;
             }
         }
         function Merge(src, dest) {
-            if(typeof CZ.Authoring !== 'undefined' && CZ.Authoring._isActive) {
+            if(typeof CZ.Authoring !== 'undefined' && CZ.Authoring.isActive) {
                 return;
             }
             if(src && dest) {

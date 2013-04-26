@@ -1031,12 +1031,16 @@ var CZ;
         function CanvasScrollTextItem(vc, layerid, id, vx, vy, vw, vh, text, z) {
             this.base = CanvasDomItem;
             this.base(vc, layerid, id, vx, vy, vw, vh, z);
-            var elem = $("<div id='citext_" + id + "' class='contentItemDescription'></div").appendTo(vc);
+            var elem = $("<div></div>", {
+                id: "citext_" + id,
+                class: "contentItemDescription"
+            }).appendTo(vc);
             elem[0].addEventListener("mousemove", CZ.Common.preventbubble, false);
             elem[0].addEventListener("mousedown", CZ.Common.preventbubble, false);
             elem[0].addEventListener("DOMMouseScroll", CZ.Common.preventbubble, false);
             elem[0].addEventListener("mousewheel", CZ.Common.preventbubble, false);
-            var textElem = $("<div style='position:relative' class='text'></div>").html(text).appendTo(elem);
+            var textElem = $("<div style='position:relative' class='text'></div>");
+            textElem.text(text).appendTo(elem);
             this.initializeContent(elem[0]);
             this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
                 var fontSize = size_p.y / CZ.Settings.contentItemDescriptionNumberOfLines;
@@ -1273,6 +1277,7 @@ var CZ;
                         numberOfLines: 1
                     }, contentWidth);
                     var sourceText = this.contentItem.attribution;
+                    var mediaSource = this.contentItem.mediaSource;
                     if(sourceText) {
                         var addSourceText = function (sx, sw, sy) {
                             var sourceItem = addText(container, layerid, id + "__source__", sx, sy, sy + sourceHeight / 2.0, 0.9 * sourceHeight, sourceText, {
@@ -1283,11 +1288,11 @@ var CZ;
                                 opacity: 1,
                                 adjustWidth: true
                             }, sw);
-                            if(contentItem.mediaSource) {
+                            if(mediaSource) {
                                 sourceItem.reactsOnMouse = true;
                                 sourceItem.onmouseclick = function (e) {
                                     vc.element.css('cursor', 'default');
-                                    window.open(contentItem.mediaSource);
+                                    window.open(mediaSource);
                                     return true;
                                 };
                                 sourceItem.onmouseenter = function (pv, e) {
@@ -1326,7 +1331,6 @@ var CZ;
                     }
                     var sz = 1 << zl;
                     var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x' + sz + '/' + contentItem.guid + '.png';
-                    return null;
                     return {
                         zoomLevel: newZl,
                         content: new CanvasImage(vc, layerid, id + "@" + 1, thumbnailUri, vx, vy, vw, vh)

@@ -64,6 +64,8 @@ namespace Chronozoom.Entities
 
         public DbSet<Tour> Tours { get; set; }
 
+        public DbSet<User> Users { get; set; }
+
         public DbSet<Entities.Collection> Collections { get; set; }
 
         public DbSet<SuperCollection> SuperCollections { get; set; }
@@ -76,14 +78,17 @@ namespace Chronozoom.Entities
             if (_useRiTreeQuery.Value)
             {
                 Trace.TraceInformation("Using RI-Tree Query");
-                timelines = FillTimelinesRiTreeQuery(collectionId, timelinesMap, startTime, endTime, span, commonAncestor, maxElements);
+                timelines = FillTimelinesRiTreeQuery(collectionId, timelinesMap, startTime, endTime, span, commonAncestor, ref maxElements);
             }
             else
             {
-                timelines = FillTimelinesRangeQuery(collectionId, timelinesMap, startTime, endTime, span, commonAncestor, maxElements);
+                timelines = FillTimelinesRangeQuery(collectionId, timelinesMap, startTime, endTime, span, commonAncestor, ref maxElements);
             }
 
-            FillTimelineRelations(timelinesMap);
+            if (maxElements > 0)
+            {
+                FillTimelineRelations(timelinesMap, maxElements);
+            }
 
             return new Collection<Timeline>(timelines);
         }
@@ -104,7 +109,7 @@ namespace Chronozoom.Entities
             return node;
         }
 
-        private void FillTimelineRelations(Dictionary<Guid, Timeline> timelinesMap)
+        private void FillTimelineRelations(Dictionary<Guid, Timeline> timelinesMap, int maxElements)
         {
             if (!timelinesMap.Keys.Any())
                 return;
@@ -112,7 +117,8 @@ namespace Chronozoom.Entities
             // Populate Exhibits
             string exhibitsQuery = string.Format(
                 CultureInfo.InvariantCulture,
-                "SELECT *, Year as [Time] FROM Exhibits WHERE Timeline_Id IN ('{0}')",
+                "SELECT TOP({0}) *, Year as [Time] FROM Exhibits WHERE Timeline_Id IN ('{1}')",
+                maxElements,
                 string.Join("', '", timelinesMap.Keys.ToArray()));
 
             var exhibitsRaw = Database.SqlQuery<ExhibitRaw>(exhibitsQuery);
@@ -167,14 +173,32 @@ namespace Chronozoom.Entities
         /// Keeping this commented until RI-Tree performance is validated.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        private List<Timeline> FillTimelinesRangeQuery(Guid collectionId, Dictionary<Guid, Timeline> timelinesMap, decimal startTime, decimal endTime, decimal span, Guid? commonAncestor, int maxElements)
+        private List<Timeline> FillTimelinesRangeQuery(Guid collectionId, Dictionary<Guid, Timeline> timelinesMap, decimal startTime, decimal endTime, decimal span, Guid? commonAncestor, ref int maxElements)
         {
-            string timelinesQuery = "SELECT TOP({0}) *, FromYear as [Start], ToYear as [End] FROM Timelines WHERE FromYear >= {1} AND ToYear <= {2} AND ToYear-FromYear >= {3} AND Collection_Id = {4} OR Id = {5} ORDER BY ToYear-FromYear DESC";
+            string timelinesQuery = @"
+                SELECT 
+                    TOP({0}) *,
+                    FromYear as [Start],
+                    ToYear as [End]
+                FROM Timelines
+                WHERE
+                    Collection_Id = {4} AND
+                    (
+                        FromYear >= {1} AND 
+                        ToYear <= {2} AND 
+                        ToYear-FromYear >= {3} OR
+                        Id = {5}
+                    )
+                ORDER BY
+                    CASE WHEN Id = {5} THEN 1 ELSE 0 END DESC,
+                    CASE WHEN Timeline_Id = {5} THEN 1 ELSE 0 END DESC,
+                    ToYear-FromYear DESC";
 
             return FillTimelinesFromFlatList(
                 Database.SqlQuery<TimelineRaw>(timelinesQuery, maxElements, startTime, endTime, span, collectionId, commonAncestor),
                 timelinesMap,
-                commonAncestor);
+                commonAncestor,
+                ref maxElements);
         }
 
         /// <summary>
@@ -184,23 +208,23 @@ namespace Chronozoom.Entities
         ///     3) Add references to understanding RI-Trees here.
         ///     4) Send code review and approve.
         /// </summary>
-        private List<Timeline> FillTimelinesRiTreeQuery(Guid collectionId, Dictionary<Guid, Timeline> timelinesMap, decimal startTime, decimal endTime, decimal span, Guid? commonAncestor, int maxElements)
+        private List<Timeline> FillTimelinesRiTreeQuery(Guid collectionId, Dictionary<Guid, Timeline> timelinesMap, decimal startTime, decimal endTime, decimal span, Guid? commonAncestor, ref int maxElements)
         {
             /* There are 4 cases of a given timeline intersecting the current canvas: [<]>, <[>], [<>], and <[]> (<> denotes the timeline, and [] denotes the canvas) */
 
             string timelinesQuery = @"SELECT TOP({0}) * FROM (
                 SELECT DISTINCT [Timelines].*, [Timelines].[FromYear] as [Start], [Timelines].[ToYear] as [End], [Timelines].[ToYear] - [Timelines].[FromYear] AS [TimeSpan] FROM [Timelines] JOIN
-	            (
+                (
                     SELECT ([b1] & CAST(({1} + 13700000001) AS BIGINT)) AS [node] FROM [Bitmasks] WHERE (CAST(({1} + 13700000001) AS BIGINT) & [b2]) <> 0
-	            ) AS [left_nodes] ON [Timelines].[ForkNode] = [left_nodes].[node] AND [Timelines].[ToYear] >= {1} AND [Timelines].[ToYear] - [Timelines].[FromYear] >= {3} AND [Timelines].[Collection_Id] = {4} OR [Timelines].[Id] = {5}
+                ) AS [left_nodes] ON [Timelines].[ForkNode] = [left_nodes].[node] AND [Timelines].[ToYear] >= {1} AND [Timelines].[ToYear] - [Timelines].[FromYear] >= {3} AND [Timelines].[Collection_Id] = {4} OR [Timelines].[Id] = {5}
                 UNION ALL
-	            SELECT DISTINCT [Timelines].*, [Timelines].[FromYear] as [Start], [Timelines].[ToYear] as [End], [Timelines].[ToYear] - [Timelines].[FromYear] AS [TimeSpan] FROM [Timelines] JOIN
-	            (
+                SELECT DISTINCT [Timelines].*, [Timelines].[FromYear] as [Start], [Timelines].[ToYear] as [End], [Timelines].[ToYear] - [Timelines].[FromYear] AS [TimeSpan] FROM [Timelines] JOIN
+                (
                     SELECT (([b1] & CAST(({2} + 13700000001) AS BIGINT)) | [b3]) AS [node] FROM [bitmasks] WHERE (CAST (({2} + 13700000001) AS BIGINT) & [b3]) = 0
-	            )
-	            AS [right_nodes] ON [Timelines].[ForkNode] = [right_nodes].[node] AND [Timelines].[FromYear] <= {2} AND [Timelines].[ToYear] - [Timelines].[FromYear] >= {3} AND [Timelines].[Collection_Id] = {4} OR [Timelines].[Id] = {5}
+                )
+                AS [right_nodes] ON [Timelines].[ForkNode] = [right_nodes].[node] AND [Timelines].[FromYear] <= {2} AND [Timelines].[ToYear] - [Timelines].[FromYear] >= {3} AND [Timelines].[Collection_Id] = {4} OR [Timelines].[Id] = {5}
                 UNION ALL
-	            SELECT DISTINCT [Timelines].*, [Timelines].[FromYear] as [Start], [Timelines].[ToYear] as [End], [Timelines].[ToYear] - [Timelines].[FromYear] AS [TimeSpan] FROM [Timelines] WHERE [Timelines].[ForkNode] BETWEEN ({1} + 13700000001) AND ({2} + 13700000001) AND [Timelines].[ToYear] - [Timelines].[FromYear] >= {3} AND [Timelines].[Collection_Id] = {4} OR [Timelines].[Id] = {5}
+                SELECT DISTINCT [Timelines].*, [Timelines].[FromYear] as [Start], [Timelines].[ToYear] as [End], [Timelines].[ToYear] - [Timelines].[FromYear] AS [TimeSpan] FROM [Timelines] WHERE [Timelines].[ForkNode] BETWEEN ({1} + 13700000001) AND ({2} + 13700000001) AND [Timelines].[ToYear] - [Timelines].[FromYear] >= {3} AND [Timelines].[Collection_Id] = {4} OR [Timelines].[Id] = {5}
             )
             AS [CanvasTimelines] ORDER BY [CanvasTimelines].[TimeSpan] DESC 
             ";
@@ -208,10 +232,11 @@ namespace Chronozoom.Entities
             return FillTimelinesFromFlatList(
                 Database.SqlQuery<TimelineRaw>(timelinesQuery, maxElements, startTime, endTime, span, collectionId, commonAncestor),
                 timelinesMap,
-                commonAncestor);
+                commonAncestor,
+                ref maxElements);
         }
 
-        private static List<Timeline> FillTimelinesFromFlatList(IEnumerable<TimelineRaw> timelinesRaw, Dictionary<Guid, Timeline> timelinesMap, Guid? commonAncestor)
+        private static List<Timeline> FillTimelinesFromFlatList(IEnumerable<TimelineRaw> timelinesRaw, Dictionary<Guid, Timeline> timelinesMap, Guid? commonAncestor, ref int maxElements)
         {
             List<Timeline> timelines = new List<Timeline>();
             Dictionary<Guid, Guid?> timelinesParents = new Dictionary<Guid, Guid?>();
@@ -223,6 +248,8 @@ namespace Chronozoom.Entities
 
                 timelinesParents[timelineRaw.Id] = timelineRaw.Timeline_ID;
                 timelinesMap[timelineRaw.Id] = timelineRaw;
+
+                maxElements--;
             }
 
             // Build the timelines tree by assigning each timeline to its parent

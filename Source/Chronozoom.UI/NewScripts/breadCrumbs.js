@@ -1,4 +1,4 @@
-var CZ;
+﻿var CZ;
 (function (CZ) {
     (function (BreadCrumbs) {
         var hiddenFromLeft = [];
@@ -168,16 +168,20 @@ var CZ;
         }
         function addBreadCrumb(element) {
             var length = $("#breadcrumbs-table tr td").length;
-            var parent = $("#breadcrumbs-table tr");
-            var td = $("<td id='bc_" + length + "'></td>");
-            var div = $("<div class='breadcrumb-link' id='bc_link_" + element.id + "'></div>").click(function () {
-                clickOverBreadCrumb(element.id, length);
-            });
-            var span = $("<span class='breadcrumb-separator' id='bc_'>&rsaquo;</span>");
-            td.append(div);
-            td.append(span);
-            parent.append(td);
-            div.text(element.title);
+            $("#breadcrumbs-table tr").append($("<td></td>", {
+                id: "bc_" + length
+            }).append($("<div></div>", {
+                id: "bc_link_" + element.id,
+                class: "breadcrumb-link",
+                text: element.title,
+                click: function () {
+                    clickOverBreadCrumb(element.id, length);
+                }
+            })).append($("<span></span>", {
+                id: "bc_",
+                class: "breadcrumb-separator",
+                text: "›"
+            })));
             switch(element.regime) {
                 case "Cosmos":
                     $("#bc_link_" + element.id).addClass("breadcrumb-cosmos");
