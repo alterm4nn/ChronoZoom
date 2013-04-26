@@ -1335,6 +1335,24 @@ img.fallbackBackground {
     overflow-y: auto;
 }
 
+.cz-form-exhibit {
+    min-width: 380px;
+    max-width: 450px;
+    width: 30.2734375%; /* 310 / 1024 */
+    bottom: 25px;
+    left: 0;
+}
+
+.cz-form-exhibit > .cz-form-content {
+    position: absolute;
+    top: 36px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    overflow-y: auto;
+}
+
 .blocking-layer {
     position: fixed;
     left: 0;

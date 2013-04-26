@@ -4,7 +4,8 @@ var CZ;
     (function (HomePageViewModel) {
         var _uiMap = {
             "#auth-event-form": "/ui/auth-event-form.html",
-            "#auth-edit-timeline-form": "/ui/auth-edit-timeline-form.html"
+            "#auth-edit-timeline-form": "/ui/auth-edit-timeline-form.html",
+            "#auth-edit-exhibit-form": "/ui/auth-edit-exhibit-form.html"
         };
         var FeatureActivation;
         (function (FeatureActivation) {
@@ -94,8 +95,38 @@ var CZ;
                         });
                         form.show();
                     },
-                    showCreateExhibitForm: CZ.Authoring.UI.showCreateExhibitForm,
-                    showEditExhibitForm: CZ.Authoring.UI.showEditExhibitForm,
+                    showCreateExhibitForm: function (exhibit) {
+                        var form = new CZ.UI.FormEditExhibit(forms[2], {
+                            activationSource: $("a:contains('create exhibit')"),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            titleInput: ".cz-form-item-title",
+                            datePicker: ".cz-form-time",
+                            createArtifactButton: ".cz-form-create-artifact",
+                            contentItemsListBox: ".cz-form-contentitems",
+                            saveButton: ".cz-form-save",
+                            deleteButton: ".cz-form-delete",
+                            context: exhibit
+                        });
+                        form.show();
+                    },
+                    showEditExhibitForm: function (exhibit) {
+                        var form = new CZ.UI.FormEditExhibit(forms[2], {
+                            activationSource: $("#showButton"),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            titleInput: ".cz-form-item-title",
+                            datePicker: ".cz-form-time",
+                            createArtifactButton: ".cz-form-create-artifact",
+                            contentItemsListBox: ".cz-form-contentitems",
+                            saveButton: ".cz-form-save",
+                            deleteButton: ".cz-form-delete",
+                            context: exhibit
+                        });
+                        form.show();
+                    },
                     showEditContentItemForm: CZ.Authoring.UI.showEditContentItemForm
                 });
             });
