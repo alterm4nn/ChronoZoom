@@ -80,6 +80,11 @@ namespace UI
             public const string SuperCollectionNotFound = "SuperCollection not found";
         }
 
+        /// <summary>
+        ///	Returns data within a specified range of years from a collection or a supercollection.
+        /// </summary>
+        /// <param name="collection">Name of the collection to query.</param>
+        /// <param name="supercollection">Name of the supercollection to query.</param>
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
         public Timeline GetTimelines(string supercollection, string collection, string start, string end, string minspan, string lca, string maxElements)
@@ -115,9 +120,48 @@ namespace UI
 
                 CacheGetTimelines(timeline, collectionId, start, end, minspan, lca, maxElements);
 
+<<<<<<< HEAD
+        /// <summary>
+        ///	Returns the timelines for the specified collection or supercollection.
+        /// </summary>
+        /// <param name="collection">Name of the collection to query.</param>
+        /// <param name="end">Year at which to end the search, between -20000000000 and 9999.</param>
+        /// <param name="lca">???</param>
+        /// <param name="maxElements">The maximum number of elements to return.</param>
+        /// <param name="minspan">Filters the search results to a particular time scale.</param>
+        /// <param name="start">Year at which to begin the search, -20000000000 and 9999.</param>
+        /// <param name="supercollection">Name of the supercollection to query.</param>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        public Timeline GetTimelines(string supercollection, string collection, string start, string end, string minspan, string lca, string maxElements)
+        {
+            Trace.TraceInformation("Get Filtered Timelines");
+
+            Guid collectionId = CollectionIdOrDefault(supercollection, collection);
+
+            // initialize filters
+            decimal startTime = string.IsNullOrWhiteSpace(start) ? _minYear : decimal.Parse(start, CultureInfo.InvariantCulture);
+            decimal endTime = string.IsNullOrWhiteSpace(end) ? _maxYear : decimal.Parse(end, CultureInfo.InvariantCulture);
+            decimal span = string.IsNullOrWhiteSpace(minspan) ? 0 : decimal.Parse(minspan, CultureInfo.InvariantCulture);
+            Guid? lcaParsed = string.IsNullOrWhiteSpace(lca) ? (Guid?)null : Guid.Parse(lca);
+            int maxElementsParsed = string.IsNullOrWhiteSpace(maxElements) ? _maxElements : int.Parse(maxElements);
+
+            Collection<Timeline> timelines = _storage.TimelinesQuery(collectionId, startTime, endTime, span, lcaParsed, maxElementsParsed);
+            Timeline timeline = timelines.Where(candidate => candidate.Id == lcaParsed).FirstOrDefault();
+
+            if (timeline == null)
+                timeline = timelines.FirstOrDefault();
+
+            return timeline;
+=======
                 return timeline;
             });
+>>>>>>> f9d1b527d666398044550aaabdbd171da53ba7b7
         }
+
+        /// <summary>
+        ///	 Returns the time thresholds that have been defined for a ChronoZoom instance.
+        /// </summary>
 
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
         [OperationContract]
@@ -138,6 +182,12 @@ namespace UI
             }
         }
 
+        /// <summary>
+        ///	Performs a search for a specific term within a collection or a supercollection.
+        /// </summary>
+        /// <param name="collection">Name of the collection to query.</param>
+        /// <param name="searchTerm">The term to search for.</param>
+        /// <param name="supercollection">Name of the supercollection to query.</param>
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
         public BaseJsonResult<IEnumerable<SearchResult>> Search(string supercollection, string collection, string searchTerm)
@@ -167,6 +217,10 @@ namespace UI
             return new BaseJsonResult<IEnumerable<SearchResult>>(searchResults);
         }
 
+        /// <summary>
+        ///	Returns the bibliography for a given exhibit.
+        /// </summary>
+        /// <param name="exhibitId">The ID of the exhibit.</param>
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
         public BaseJsonResult<IEnumerable<Reference>> GetBibliography(string exhibitId)
@@ -190,6 +244,11 @@ namespace UI
             return new BaseJsonResult<IEnumerable<Reference>>(exhibit.References.ToList());
         }
 
+        /// <summary>
+        ///	Returns a list of tours for a given collection or supercollection.
+        /// </summary>
+        /// <param name="collection">The name of the collection.</param>
+        /// <param name="supercollection">The name of the supercollection to which the specified collection belongs.</param>
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
@@ -232,6 +291,10 @@ namespace UI
         /// If the user display name is specified and it exists then the user's attributes are updated.
         ///
         /// </summary>
+<<<<<<< HEAD
+        /// <param name="user">User information to update.</param>
+=======
+>>>>>>> f9d1b527d666398044550aaabdbd171da53ba7b7
         /// <returns>The URL for the new user collection.</returns>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/user", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
@@ -501,13 +564,15 @@ namespace UI
 
 
         /// <summary>
-        /// If collection does not exist then a new collection is created the
-        /// authenticated user is set as the author if no author is already registered.
-        ///
-        /// If the collection exists and the authenticated user is its author then
-        /// the collection is modified.
+        /// Creates a new collection on behalf of the authenticated user.
+        /// <para>If a collection of the specified name does not exist then a new collection is created. If the collection exists and the authenticated user is the author then the collection is modified.</para>
+        /// <para>If no author is registered then the authenticated user is set as the author.</para>
         /// 
-        /// The title field can't be modified since it's part of the URL and the URL is indexable by 3rd parties.
+        /// <para>The title field can't be modified because it is part of the URL (the URL can be indexed).</para>
+        /// <param name="collectionName">The markup for the collection to create, in JSON format.</param>
+        /// <param name="collectionRequest">???</param>
+        /// <param name="superCollectionName">Name of the supercollection beneath which to create the specified collection.</param>
+        /// <returns>A GUID representing the ID for the newly created collection.</returns>
         /// </summary>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
@@ -555,6 +620,11 @@ namespace UI
                 });
         }
 
+        /// <summary>
+        /// Deletes the specified collection.
+        /// </summary>
+        /// <param name="superCollectionName">The name of the supercollection to which the specified collection belongs.</param>
+        /// <param name="collectionName">The name of the collection to delete.</param>
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public void DeleteCollection(string superCollectionName, string collectionName)
@@ -583,15 +653,14 @@ namespace UI
         }
 
         /// <summary>
-        /// Creates or updates the timeline in a given collection.
-        /// If the collection does not exist, then fail.
-        ///
-        /// If timeline id is not specified, then add a new timeline to the collection.
-        /// For a new timeline, if the parent is not defined, set this to the root timeline.
+        /// Creates or updates the timeline in a given collection. If the collection does not exist, the request will silently fail.
+        /// <para>If a timeline ID is not specified, then a new timeline is added to the collection. For a new timeline, if the parent is not defined it will be set to the root timeline.</para>
+        /// <para>If the specified timeline ID does not exist a "not found" status is returned. If the timeline with the specified ID exists, then the existing timeline is updated.</para>
+        /// <param name="collectionName">Name of the collection to add the timeline.</param>
+        /// <param name="superCollectionName">Name of the supercollection for the specified collection.</param>
+        /// <param name="timelineRequest">Raw timeline data in JSON format.</param>
+        /// <returns>A GUID representing the ID for the timeline that was updated/created.</returns>
         /// </summary>
-        // If timeline id to be updated does not exist return a not found status.
-        // If id is specified and the timeline exists, then the existing timeline is updated.
-        //
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/timeline", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public Guid PutTimeline(string superCollectionName, string collectionName, TimelineRaw timelineRequest)
@@ -678,6 +747,12 @@ namespace UI
                 });
         }
 
+        /// <summary>
+        /// Deletes the timeline with the specified ID.
+        /// </summary>
+        /// <param name="superCollectionName">The name of the supercollection for the specified collection</param>
+        /// <param name="collectionName">The name of the collection containing the timeline to delete.</param>
+        /// <param name="timelineRequest">Raw timeline data in JSON format.</param>
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/timeline", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public void DeleteTimeline(string superCollectionName, string collectionName, Timeline timelineRequest)
@@ -737,17 +812,18 @@ namespace UI
         }
 
         /// <summary>
-        /// Creates or updates the exhibit and its content items in a given collection.
-        /// If the collection does not exist, then fail.
+        /// Creates or updates the exhibit and its content items in a given collection. If the collection does not exist, then the request will silently fail.
         ///
-        /// If exhibit id is not specified, then add a new exhibit to the collection.
-        /// For a new exhibit, if the parent timeline is not specified it is added to the root timeline.
-        /// Otherwise if a valid parent timeline is specifed the new exhibit is added to it.
-        /// If an invalid parent timeline is specifed then it is considered a bad request.
-        ///
-        /// If exhibit id to be updated does not exist return a not found status.
-        /// If id is specified and the exhibit exists, then the existing exhibit is updated.
+        /// <para>If an exhibit id is not specified, a new exhibit is added to the collection.
+        /// If the ID for an existing exhibit is specified then the exhibit will be updated.
+        /// If the exhibit id to be updated does not exist a "not found" status is returned.
+        /// If the parent timeline is not specified the exhibit is added to the root timeline.
+        /// Otherwise, the exhibit is added to the specified parent timeline.
+        /// If an invalid parent timeline is specified then the request will fail.</para>
         /// </summary>
+        /// <param name="collectionName">The name of the collection to add or update an exhibit.</param>
+        /// <param name="exhibitRequest">The name of the supercollection to which the specified collection belongs.</param>
+        /// <param name="superCollectionName">Raw exhibit data in JSON format.</param>        
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/exhibit", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public PutExhibitResult PutExhibit(string superCollectionName, string collectionName, ExhibitRaw exhibitRequest)
@@ -916,6 +992,12 @@ namespace UI
             return newContentItemGuid;
         }
 
+        /// <summary>
+        /// Deletes the specified exhibit from the specified collection.
+        /// </summary>
+        /// <param name="superCollectionName">The name of the supercollection to which the specified collection belongs.</param>
+        /// <param name="collectionName">The name of the collection from which to delete an exhibit.</param>
+        /// <param name="exhibitRequest">Request body.</param>
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/exhibit", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public void DeleteExhibit(string superCollectionName, string collectionName, Exhibit exhibitRequest)
@@ -968,17 +1050,16 @@ namespace UI
         }
 
         /// <summary>
-        /// Creates or updates the content item in a given collection.
-        /// If the collection does not exist, then fail.
-        ///
-        /// If the content item id is not specified, then add a new content item is added to the parent exhibit.
-        /// For a new content item, if the parent exhibit is not specified then fail.
-        /// Otherwise if a valid parent exhibit is specifed the new content item is added to it.
-        /// If an invalid parent exhibit is specifed then it is considered a bad request.
-        ///
-        /// If the content item id to be updated does not exist return a not found status.
-        /// If id is specified and the content item exists, then the existing content item is updated.
+        /// Creates or updates the content item in a given collection. If the collection does not exist the request will silently fail.
+        /// <para>If a content item ID is not specified then a new content item is added to the parent exhibit.
+        /// If a valid ID is specified and the content item exists, then the existing content item is updated.
+        /// For a new content item, if the parent exhibit is not specified then the request will fail.
+        /// If a parent exhibit is specified then the new content item is added to it. If the parent exhibit ID is invalid then the request will fail.
+        /// If the content item ID does not exist a "not found" status is returned.</para>
         /// </summary>
+        /// <param name="collectionName">The name of the collection to which a content item will be added.</param>
+        /// <param name="contentItemRequest">The request body.</param>
+        /// <param name="superCollectionName">The name of the supercollection to which the specified collection belongs.</param>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/contentitem", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public Guid PutContentItem(string superCollectionName, string collectionName, ContentItemRaw contentItemRequest)
@@ -1035,6 +1116,12 @@ namespace UI
                 });
         }
 
+        /// <summary>
+        /// Delete the specified content item from the specified collection.
+        /// </summary>
+        /// <param name="superCollectionName">The name of the supercollection to which the specified collection belongs.</param>
+        /// <param name="collectionName">The name of the collection from which a content item will be deleted.</param>
+        /// <param name="contentItemRequest">Request body.</param>
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/contentitem", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public void DeleteContentItem(string superCollectionName, string collectionName, ContentItem contentItemRequest)

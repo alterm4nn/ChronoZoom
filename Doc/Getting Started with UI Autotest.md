@@ -18,7 +18,7 @@ This document shows you how to use [Selenium WebDriver](http://docs.seleniumhq.o
 
 **How to run UI tests on your local computer**
 
-1. Get the source code from github (fork https://github.com/alterm4nn/ChronoZoom).
+1. Get the source code from github (fork https://github.com/alterm4nn/ChronoZoom). For more information see [Clone the ChronoZoom GitHub Repository](https://github.com/willum070/ChronoZoom/blob/docs/Doc/ChronoZoom_Developer_Guide.md#clone-the-chronozoom-github-repository).
 2. Open **Source\Chronozoom.sln**
 3. Build the **Source\Chronozoom.Entities\Chronozoom.Entities.csproj** project.
 4. Open **Test\chronozoom20.test\ChronoZoom.Testing.sln**.
