@@ -163,6 +163,12 @@ var CZ;
             CZ.Data.getTimelines(null).then(function (response) {
                 ProcessContent(response);
                 Common.vc.virtualCanvas("updateViewport");
+                CZ.Service.getTours().then(function (response) {
+                    CZ.Tours.parseTours(response);
+                    CZ.Tours.initializeToursContent();
+                }, function (error) {
+                    console.log("Error connecting to service:\n" + error.responseText);
+                });
             }, function (error) {
                 console.log("Error connecting to service:\n" + error.responseText);
             });

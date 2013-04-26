@@ -200,7 +200,7 @@ var CZ;
             if(url == null) {
                 window.location.href = "testFallBackPage.htm";
             }
-            var path = url.protocol + "://" + url.host + ((url.port != "") ? (":" + url.port) : ("")) + "/" + url.path.join('/');
+            var path = url.protocol + "://" + url.host + ((url.port != "") ? (":" + url.port) : ("")) + "/" + (url.path === undefined ? "" : url.path.join('/'));
             var params = new Array();
             for(var key in url.params) {
                 params.push(key + "=" + url.params[key]);
