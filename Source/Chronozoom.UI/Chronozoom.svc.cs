@@ -556,9 +556,7 @@ namespace UI
                 collection.ToLower()));
         }
 
-        /// <summary>
-        /// Replace with URL friendly representations. For instance, converts space to '-'.
-        /// </summary>
+        // Replace with URL friendly representations. For instance, converts space to '-'.
         private static string FriendlyUrlReplacements(string value)
         {
             return Uri.EscapeDataString(value.Replace(' ', '-'));
@@ -1274,9 +1272,8 @@ namespace UI
             public T d { get; set; }
         }
 
-        /// <summary>
-        /// Performs an operation under an authenticated user.
-        /// </summary>
+
+        // Performs an operation under an authenticated user.
         private static T AuthenticatedOperation<T>(Func<User, T> operation)
         {
             Microsoft.IdentityModel.Claims.ClaimsIdentity claimsIdentity = HttpContext.Current.User.Identity as Microsoft.IdentityModel.Claims.ClaimsIdentity;
@@ -1305,9 +1302,7 @@ namespace UI
             return operation(user);
         }
 
-        /// <summary>
-        /// Helper to AuthenticatedOperation to handle void.
-        /// </summary>
+        // Helper to AuthenticatedOperation to handle void.
         private static void AuthenticatedOperation(Action<User> operation)
         {
             AuthenticatedOperation<bool>(user =>
@@ -1317,9 +1312,7 @@ namespace UI
             });
         }
 
-        /// <summary>
-        /// Can a given GetTimelines request be cached?
-        /// </summary>
+        // Can a given GetTimelines request be cached?
         private bool CanCacheGetTimelines(User user, Guid collectionId)
         {
             string cacheKey = string.Format(CultureInfo.InvariantCulture, "Collection-To-Owner {0}", collectionId);
@@ -1337,10 +1330,8 @@ namespace UI
             return (string)Cache[cacheKey] != userNameIdentifier;
         }
 
-        /// <summary>
-        /// Retrieves the cached timeline.
-        /// </summary>
-        /// <returns>Null if not cached.</returns>
+        // Retrieves the cached timeline.
+        // Null if not cached.
         private Timeline GetCachedGetTimelines(Guid collectionId, string start, string end, string minspan, string lca, string maxElements)
         {
             string cacheKey = string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}|{5}", collectionId, start, end, minspan, lca, maxElements);
@@ -1352,9 +1343,7 @@ namespace UI
             return null;
         }
 
-        /// <summary>
-        /// Caches the given timeline for the given GetTimelines request.
-        /// </summary>
+        // Caches the given timeline for the given GetTimelines request.
         private void CacheGetTimelines(Timeline timeline, Guid collectionId, string start, string end, string minspan, string lca, string maxElements)
         {
             string cacheKey = string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}|{5}", collectionId, start, end, minspan, lca, maxElements);
