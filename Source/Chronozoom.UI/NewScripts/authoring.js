@@ -347,7 +347,7 @@ var CZ;
             e.infodotDescription.title = temp.title;
             e.contentItems = prop.contentItems;
             e = renewExhibit(e);
-            CZ.Service.putExhibit(e).then(function (response) {
+            return CZ.Service.putExhibit(e).then(function (response) {
                 var contentItems = e.contentItems;
                 var len = contentItems.length;
                 var i = 0;

@@ -557,7 +557,7 @@ module CZ {
 
             e = renewExhibit(e);
             
-            CZ.Service.putExhibit(e).then(
+            return CZ.Service.putExhibit(e).then(
                 function (response) {
                     var contentItems = e.contentItems;
                     var len = contentItems.length;

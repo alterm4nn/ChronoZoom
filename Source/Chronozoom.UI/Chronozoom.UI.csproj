@@ -250,6 +250,11 @@
     <Content Include="samples\custom-form\form-example.ts" />
     <Content Include="samples\custom-form\main.html" />
     <Content Include="samples\cz.datepicker.html" />
+    <Content Include="ui\auth-edit-exhibit-form.html" />
+    <TypeScriptCompile Include="ui\auth-edit-exhibit.ts" />
+    <Content Include="ui\auth-edit-exhibit.js">
+      <DependentUpon>auth-edit-exhibit.ts</DependentUpon>
+    </Content>
     <Content Include="ui\auth-edit-timeline.ts" />
     <Content Include="ui\auth-edit-timeline.js">
       <DependentUpon>auth-edit-timeline.ts</DependentUpon>
