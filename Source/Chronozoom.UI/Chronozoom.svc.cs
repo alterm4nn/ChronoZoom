@@ -85,14 +85,15 @@ namespace UI
         /// </summary>
         /// <param name="supercollection">Name of the supercollection to query.</param>
         /// <param name="collection">Name of the collection to query.</param>
-        /// <param name="start">Year at which to begin the search, between -20000000000 and 9999</param>
-        /// <param name="end">Year at which to end the search, between -20000000000 and 9999</param>
-        /// <param name="minspan">Filters the search results to a particular time scale. </param>
+        /// <param name="start">Year at which to begin the search, between -20000000000 and 9999.</param>
+        /// <param name="end">Year at which to end the search, between -20000000000 and 9999.</param>
+        /// <param name="minspan">Filters the search results to a particular time scale.</param>
         /// <param name="lca">Least Common Ancestor, a timeline identifier used to hint the server to retrieve timelines close to this location.</param>
         /// <param name="maxElements">The maximum number of elements to return.</param>
         /// <returns>Timeline data in JSON format.</returns>
-        /// <example>
+        /// <example><![CDATA[ 
         /// http://chronozoomproject.org/chronozoom.svc/GetTimelines?collection=myCollection&start=1974&end=2013
+        /// ]]>
         /// </example>
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
@@ -137,8 +138,9 @@ namespace UI
         /// Returns the time thresholds that have been defined for a ChronoZoom instance.
         /// </summary>
         /// <returns></returns>
-        /// <example>
+        /// <example><![CDATA[ 
         /// http://chronozoomproject.org/chronozoom.svc/GetThresholds
+        /// ]]>
         /// </example>
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
         [OperationContract]
@@ -166,8 +168,9 @@ namespace UI
         /// <param name="collection">Name of the collection to query.</param>
         /// <param name="searchTerm">The term to search for.</param>
         /// <returns></returns>
-        /// <example>
+        /// <example><![CDATA[ 
         /// http://chronozoomproject.org/chronozoom.svc/Search?collection=myColl&searchTerm=Pluto
+        /// ]]>
         /// </example>
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
@@ -203,8 +206,9 @@ namespace UI
         /// </summary>
         /// <param name="exhibitId">ID of the exhibit.</param>
         /// <returns></returns>
-        /// <example>
+        /// <example><![CDATA[ 
         /// http://chronozoomproject.org/chronozoom.svc/GetBibliography?exhibitId=[id]
+        /// ]]>
         /// </example>
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
@@ -235,8 +239,9 @@ namespace UI
         /// <param name="supercollection">Name of the supercollection to query.</param>
         /// <param name="collection">Name of the collection to query.</param>
         /// <returns>A list of tours in JSON format.</returns>
-        /// <example>
+        /// <example><![CDATA[ 
         /// http://chronozoomproject.org/chronozoom.svc/GetTours?collection=Chronozoom.Entities
+        /// ]]>
         /// </example>
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
         [OperationContract]
@@ -281,7 +286,7 @@ namespace UI
         /// </remarks>
         /// <param name="userRequest">JSON containing the request details.</param>
         /// <returns>The URL for the new user collection.</returns>
-        /// <example>
+        /// <example><![CDATA[ 
         /// URL:
         /// http://chronozoomproject.org/chronozoom.svc/PutUser?User=aUser
         /// 
@@ -291,6 +296,7 @@ namespace UI
         ///     displayName: "name",
         ///     email: "email@email.com"
         /// }
+        /// ]]>
         /// </example>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/user", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
@@ -356,7 +362,7 @@ namespace UI
         /// Deletes the user with the specified user ID.
         /// </summary>
         /// <param name="userRequest">JSON containing the request details.</param>
-        /// <example>
+        /// <example><![CDATA[ 
         /// URL:
         /// http://chronozoomproject.org/chronozoom.svc/DeleteUser?userRequest={id:"0123456789"}
         /// 
@@ -364,6 +370,7 @@ namespace UI
         /// {
         ///     id: "0123456789"
         /// }
+        /// ]]>
         /// </example>
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/user", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
@@ -584,8 +591,9 @@ namespace UI
         /// <param name="collectionName">The name of the collection to create.</param>
         /// <param name="collectionRequest">The markup for the collection to create in JSON format.</param>
         /// <returns></returns>
-        /// <example>
+        /// <example><![CDATA[ 
         /// http://chronozoomproject.org/chronozoom.svc/PutCollectionName?collectionName=myCollection
+        /// ]]>
         /// </example>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
@@ -638,8 +646,9 @@ namespace UI
         /// </summary>
         /// <param name="superCollectionName">The name of the parent collection.</param>
         /// <param name="collectionName">The name of the collection to delete.</param>
-        /// <example>
+        /// <example><![CDATA[ 
         /// http://chronozoomproject.org/chronozoom.svc/DeleteCollection?collectionName=myOldCollection
+        /// ]]>
         /// </example>
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
@@ -682,8 +691,9 @@ namespace UI
         /// <param name="collectionName">The name of the collection to update.</param>
         /// <param name="timelineRequest">Timeline data in JSON format.</param>
         /// <returns></returns>
-        /// <example>
+        /// <example><![CDATA[ 
         /// http://chronozoomproject.org/chronozoom.svc/PutTimeline?collectionName=aCollection&timelineRequest=myTLdata
+        /// ]]>
         /// </example>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/timeline", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
@@ -777,8 +787,9 @@ namespace UI
         /// <param name="superCollectionName">The name of the parent collection.</param>
         /// <param name="collectionName">The name of the collection from which the timeline should be deleted.</param>
         /// <param name="timelineRequest">The request in JSON format.</param>
-        /// <example>
+        /// <example><![CDATA[ 
         /// http://chronozoomproject.org/chronozoom.svc/DeleteTimeline?collectionName=aCollection&timelineRequest={id:"0123456789"} 
+        /// ]]>
         /// </example>
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/timeline", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
@@ -853,8 +864,9 @@ namespace UI
         /// <param name="collectionName">The name of the collection to modify.</param>
         /// <param name="exhibitRequest">The exhibit data in JSON format.</param>
         /// <returns></returns>
-        /// <example>
+        /// <example><![CDATA[ 
         /// http://chronozoomproject.org/chronozoom.svc/PutExhibit?collectionName=myColl&exhibitRequest=myExhibitData
+        /// ]]>
         /// </example>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/exhibit", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
@@ -1030,8 +1042,9 @@ namespace UI
         /// <param name="superCollectionName">The name of the parent collection.</param>
         /// <param name="collectionName">The name of the collection to modify.</param>
         /// <param name="exhibitRequest">The exhibit ID in JSON format.</param>
-        /// <example>
+        /// <example><![CDATA[ 
         /// http://chronozoomproject.org/chronozoom.svc/DeleteExhibit?collectionName=myColl&exhibitRequest={id:"0123456789"}
+        /// ]]>
         /// </example>
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/exhibit", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
@@ -1091,8 +1104,9 @@ namespace UI
         /// <param name="collectionName">The name of the collection to modify.</param>
         /// <param name="contentItemRequest">The content item data in JSON format.</param>
         /// <returns></returns>
-        /// <example>
+        /// <example><![CDATA[ 
         /// http://chronozoomproject.org/chronozoom.svc/PutContentItem?collectionName=myColl&exhibitRequest=myContentItem
+        /// ]]>
         /// </example>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/contentitem", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
@@ -1156,8 +1170,9 @@ namespace UI
         /// <param name="superCollectionName">The name of the parent collection.</param>
         /// <param name="collectionName">The name of the collection to modify.</param>
         /// <param name="contentItemRequest">The request in JSON format.</param>
-        /// <example>
+        /// <example><![CDATA[ 
         /// http://chronozoomproject.org/chronozoom.svc/DeleteContentItem?collectionName=myColl&exhibitRequest={id:"0123456789"}
+        /// ]]>
         /// </example>
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/contentitem", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
