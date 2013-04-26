@@ -706,28 +706,34 @@ module CZ {
 
             // create jquery widget for category' content sliding
             (<any>$)("#tours-content").accordion({
-                fillSpace: false,
                 collapsible: true,
-                autoHeight: false
-            });
+                heightStyle: "content",
+                beforeActivate: function (event, ui) {
+                    if (ui.newHeader) {
+                        ui.newHeader.removeClass('category');
+                        ui.newHeader.addClass('categorySelected');
 
-            // binding click at the tour category' expand button
-            $("#tours-content").bind("accordionchangestart", function (event, ui) {
-                if (ui.newHeader) {
-                    ui.newHeader.removeClass('category');
-                    ui.newHeader.addClass('categorySelected');
+                        var img = (<HTMLImageElement>$(".collapseButton", ui.newHeader)[0]);
+                        if (img) img.src = "/Images/collapse-up.png";
+                    }
+                    if (ui.oldHeader) {
+                        ui.oldHeader.removeClass('categorySelected');
+                        ui.oldHeader.addClass('category');
 
-                    var img = (<HTMLImageElement>$(".collapseButton", ui.newHeader)[0]);
-                    if (img) img.src = "/Images/collapse-up.png";
-                }
-                if (ui.oldHeader) {
-                    ui.oldHeader.removeClass('categorySelected');
-                    ui.oldHeader.addClass('category');
-
-                    var img = (<HTMLImageElement>$(".collapseButton", ui.oldHeader)[0]);
-                    if (img) img.src = "/Images/collapse-down.png";
+                        var img = (<HTMLImageElement>$(".collapseButton", ui.oldHeader)[0]);
+                        if (img) img.src = "/Images/collapse-down.png";
+                    }
                 }
             });
+
+            // TODO: Temp fix of accordion style. Delete this and jquery-ui.css when the new UI will be implemented.
+            $("#tours-content").removeClass("ui-accordion ui-widget ui-helper-reset ui-accordion-icons");
+            $("#tours-content .categorySelected > span").removeClass("ui-accordion-header-icon ui-icon ui-icon-triangle-1-s");
+            $("#tours-content .itemContainer").removeClass("ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom ui-accordion-content-active");
+            $("#tours-content .categorySelected")
+                .removeClass("ui-accordion-header-active ui-state-active ui-state-hover ui-corner-top ui-accordion-header ui-helper-reset ui-state-default ui-accordion-icons ui-state-focus ui-corner-all")
+                .on("blur change click dblclick error focus focusin focusout hover keydown keypress keyup load mousedown mouseenter mouseleave mousemove mouseout mouseover mouseup resize scroll select submit",
+                    function () { $(this).removeClass("ui-accordion-header-active ui-state-active ui-state-hover ui-corner-top ui-accordion-header ui-helper-reset ui-state-default ui-accordion-icons ui-state-focus ui-corner-all"); });
         }
 
         /*
