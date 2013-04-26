@@ -368,7 +368,6 @@ a:visited {
     font-size: 19px;
     cursor: default;
     filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#FDFDFD', EndColorStr='#424242', GradientType=1); 
-
 /* MSIE */
 }
 
@@ -1276,12 +1275,6 @@ img.fallbackBackground {
     text-align: justify;
 }
 
-
-
-.cz-lightgray {
-    color: #aeaeae;
-}
-
 .cz-input {
     color: #232323;
     background-color: #E9E9E9;
@@ -1367,3 +1360,103 @@ img.fallbackBackground {
     color: #dd4b39;
     display: block;
 }
+
+.cz-lightgray {
+    color: #aeaeae;
+}
+
+/***********************************************************
+
+                    ListBox Base
+
+***********************************************************/
+
+.cz-listbox {
+    margin: 10px;
+    padding: 10px;
+    background-color: #e9e9e9;
+    list-style-type: none;
+    border: solid 2px #c7c7c7;
+}
+
+.cz-listbox-placeholder {
+    margin: 5px 10px;
+    padding: 10px;
+    border: solid 2px #0464a2;
+    background-color: #e9e9e9;
+}
+
+.cz-listitem {
+    clear: both;
+    margin: 5px 10px;
+    padding: 10px;
+    height: auto;
+    background-color: #fff;
+    border: solid 2px #c7c7c7;
+    ​/* IE10 Consumer Preview */
+    background-image: -ms-linear-gradient(bottom, #e9e9e9 0%, #fff 100%);
+    /* Mozilla Firefox */
+    background-image: -moz-linear-gradient(bottom, #e9e9e9 0%, #fff 100%);
+    /* Opera */
+    background-image: -o-linear-gradient(bottom, #e9e9e9 0%, #fff 100%);
+    /* Webkit (Safari/Chrome 10) */
+    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #e9e9e9), color-stop(1, #fff));
+    /* Webkit (Chrome 11+) */
+    background-image: -webkit-linear-gradient(bottom, #e9e9e9 0%, #fff 100%);
+    /* W3C Markup, IE10 Release Preview */
+    background-image: linear-gradient(to top, #e9e9e9 0%, #fff 100%);
+}
+
+.cz-listitem-close-btn {
+    float: right;
+    cursor: pointer;
+}
+
+/***********************************************************
+
+                ContentItem ListBox
+
+***********************************************************/
+
+.cz-ci-listitem-icon {
+    display: inline-block;
+    width: 15%;
+}
+
+.cz-ci-listitem-icon > img {
+    max-width: 100%;
+}
+
+.cz-ci-listitem-content {
+    display: inline-block;
+    margin: 0px 5px;
+    vertical-align: top;
+    width: 80%;
+}
+
+.cz-ci-listitem-title {
+    margin: 5px 0;
+    color: #232323;
+    font-size: 1.1em;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.cz-ci-listitem-descr {
+    color: #aeaeae;
+    font-size: 0.9em;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+/* DEBUG */
+/** { outline: 2px dotted red; }
+* * { outline: 2px dotted green; }
+* * * { outline: 2px dotted orange; }
+* * * * { outline: 2px dotted blue; }
+* * * * * { outline: 1px solid red; }
+* * * * * * { outline: 1px solid green; }
+* * * * * * * { outline: 1px solid orange; }
+* * * * * * * * { outline: 1px solid blue; }*/

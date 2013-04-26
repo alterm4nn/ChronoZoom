@@ -169,6 +169,11 @@
     </Content>
     <Content Include="NewScripts\controls\formbase.ts" />
     <Content Include="NewScripts\cz.data.ts" />
+    <TypeScriptCompile Include="NewScripts\cz.data.ts" />
+    <Content Include="NewScripts\controls\listboxbase.js">
+      <DependentUpon>listboxbase.ts</DependentUpon>
+    </Content>
+    <Content Include="NewScripts\controls\listboxbase.ts" />
     <Content Include="NewScripts\cz.data.js">
       <DependentUpon>cz.data.ts</DependentUpon>
     </Content>
@@ -231,6 +236,10 @@
     <Content Include="samples\custom-form\form-example.js" />
     <Content Include="samples\custom-form\form-example.ts" />
     <Content Include="samples\custom-form\main.html" />
+    <Content Include="samples\custom-listbox\listbox-example.html" />
+    <Content Include="samples\custom-listbox\listbox-example.js" />
+    <Content Include="samples\custom-listbox\listbox-example.ts" />
+    <Content Include="samples\custom-listbox\main.html" />
     <Content Include="samples\cz.datepicker.html" />
     <Content Include="ui\auth-edit-exhibit-form.html" />
     <TypeScriptCompile Include="ui\auth-edit-exhibit.ts" />
@@ -243,6 +252,13 @@
     </Content>
     <Content Include="ui\auth-event-form.html" />
     <Content Include="ui\auth-edit-timeline-form.html" />
+    <Content Include="ui\ci-listbox.html">
+      <DependentUpon>ci-listbox.ts</DependentUpon>
+    </Content>
+    <Content Include="ui\ci-listbox.js">
+      <DependentUpon>ci-listbox.ts</DependentUpon>
+    </Content>
+    <Content Include="ui\ci-listbox.ts" />
     <Content Include="Views\Account\_IdentityProvidersWithClientSideCode.aspx" />
     <Content Include="favicon.ico" />
     <Content Include="Images\A.png" />

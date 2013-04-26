@@ -1,0 +1,201 @@
+<html>
+<head>
+    <title>Custom Listbox Example</title>
+    
+    <meta http-equiv="Pragma" content="no-cache" />
+
+    <link rel="stylesheet" type="text/css" href="/NewStyles/cz.css"/>
+
+    <script type="text/javascript" src="/NewScripts/external/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+    <script type="text/javascript" src="/NewScripts/uiloader.js"></script>
+    <script type="text/javascript" src="/NewScripts/controls/listboxbase.js"></script>
+    <script type="text/javascript" src="/ui/ci-listbox.js"></script>
+    <script type="text/javascript" src="listbox-example.js"></script>
+
+    <style>
+        body {
+            overflow: auto;
+        }
+
+        body > div {
+            padding: 40px;
+            background-color: #fff;
+            width: 40%;
+            border: solid 8px #232323;
+            display: inline-block;
+            vertical-align: top;
+        }
+
+        .placeholder-example {
+            margin: 5px 10px;
+            padding: 10px;
+            border: solid 2px #0464a2;
+            background-color: #e9e9e9;
+        }
+
+        .listitem-example {
+            clear: both;
+            margin: 5px 10px;
+            padding: 10px;
+            height: 50px;
+            border: solid 2px #c7c7c7;
+        }
+
+        .red-item {
+            background-color: #884444;
+            width: 75%;
+        }
+
+        .green-item {
+            background-color: #448844;
+            width: 90%;
+            height: 75px;
+        }
+
+        .default-item {
+            background-color: #fff;
+        }
+    </style>
+
+    <script>
+        var contentItems = [
+            {
+                icon: "https://czbeta.blob.core.windows.net/images/x128/2148972d-359a-427e-b329-2050090ad7e2.png",
+                title: "Very long title of the item, even infinite and there is no hope that it will end haha!",
+                description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+            },
+            {
+                icon: "https://czbeta.blob.core.windows.net/images/x128/2148972d-359a-427e-b329-2050090ad7e2.png",
+                title: "Short title of the item.",
+                description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+            }
+        ];
+
+        var redGreens = [
+            { text: "Red Hello!" },
+            { text: "Green Hello!" },
+            { text: "Middle Red Middle" },
+            { text: "Middle Green Middle" }
+        ]
+
+        var listbox1;
+        var listbox2;
+
+        $(document).ready(function () {
+            CZ.UILoader.loadAll({
+                "$('<div id='listbox1'></div>')": "/ui/ci-listbox.html",
+                "$('<div id='listbox2'></div>')": "listbox-example.html"
+            }).done(function (c1, c2) {
+                listbox1 = new CZ.UI.ContentItemListBox(
+                    // NOTE: More sortable settings:
+                    //       http://api.jqueryui.com/sortable/
+                    c1.find(".cz-listbox"),
+                    {
+                        context: contentItems,
+                        sortableSettings: {
+                            forcePlaceholderSize: true,
+                            cursor: "move",
+                            placeholder: "cz-listbox-placeholder",
+                            revert: 100,
+                            opacity: 0.75,
+                            tolerance: "pointer",
+                            scroll: false,
+
+                            create: function() {
+                                // NOTE: In case of scrollbar shifting,
+                                //       control height manually.
+                                //$(this).height($(this).height());
+                            }
+                        }
+                    },
+                    {
+                        default: {
+                            container: c1.find(".cz-listitem"),
+                            uiMap: {
+                                closeButton: ".cz-listitem-close-btn",
+                                iconImg: ".cz-ci-listitem-icon > img",
+                                titleTextblock: ".cz-ci-listitem-title",
+                                descrTextblock: ".cz-ci-listitem-descr"
+                            }
+                        }
+                    }
+                );
+
+                listbox2 = new RedGreenListBox(
+                    // NOTE: More sortable settings:
+                    //       http://api.jqueryui.com/sortable/
+                    c2.find(".cz-listbox"),
+                    {
+                        context: redGreens,
+                        sortableSettings: {
+                            forcePlaceholderSize: true,
+                            cursor: "move",
+                            placeholder: "placeholder-example",
+                            revert: 100,
+                            opacity: 0.75,
+                            tolerance: "pointer",
+                            scroll: false,
+
+                            create: function() {
+                                // NOTE: In case of scrollbar shifting,
+                                //       control height manually.
+                                //$(this).height($(this).height());
+                            }
+                        }
+                    },
+                    {
+                        default: {
+                            container: c2.find(".default-item"),
+                            uiMap: {
+                                closeButton: ".cz-listitem-close-btn"
+                            }
+                        },
+                        red: {
+                            container: c2.find(".red-item"),
+                            uiMap: {
+                                closeButton: ".cz-listitem-close-btn",
+                                textblock: "span"
+                            }
+                        },
+                        green: {
+                            container: c2.find(".green-item"),
+                            uiMap: {
+                                closeButton: ".cz-listitem-close-btn",
+                                textblock: "span"
+                            }
+                        }
+                    }
+                );
+
+                var i = 3;
+                listbox1.container.appendTo("body > div:nth-child(1)");
+                $("body > div:nth-child(1) > button").click(function () {
+                    listbox1.add({
+                        icon: "https://czbeta.blob.core.windows.net/images/x128/2148972d-359a-427e-b329-2050090ad7e2.png",
+                        title: "Title " + i,
+                        description: "Description " + i++
+                    });
+                });
+
+                listbox2.container.appendTo("body > div:nth-child(2)");
+                $("body > div:nth-child(2) > button").click(function () {
+                    listbox2.add({
+                        text: $("input").val()
+                    });
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <div>
+        <button>Add Item</button>
+    </div>
+    <div>
+        <p>Enter the text which contains "red" or "green" words:</p>
+        <input></input>
+        <button>Add Item</button>
+    </div>
+</body>
+</html>
