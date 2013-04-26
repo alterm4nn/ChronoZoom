@@ -226,6 +226,16 @@ module CZ {
                 function (response) {
                     ProcessContent(response);
                     vc.virtualCanvas("updateViewport");
+
+                    CZ.Service.getTours().then(
+                        function (response) {
+                            CZ.Tours.parseTours(response);
+                            CZ.Tours.initializeToursContent();
+                        },
+                        function (error) {
+                            console.log("Error connecting to service:\n" + error.responseText);
+                        }
+                    );
                 },
                 function (error) {
                     console.log("Error connecting to service:\n" + error.responseText);

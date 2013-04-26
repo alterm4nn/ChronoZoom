@@ -135,6 +135,7 @@ namespace Chronozoom.Entities.Migration
             return collection;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Incremental change, will refactor later if the import process is kept")]
         private void LoadData(Stream dataTimelines, Stream dataTours, Stream dataThresholds, Collection collection, bool replaceGuids)
         {
@@ -142,18 +143,26 @@ namespace Chronozoom.Entities.Migration
 
             _storage.Collections.Add(collection);
 
+            // UniqueIds Map
+            Dictionary<int, Tuple<Guid, BookmarkType>> bookmarksMap = new Dictionary<int, Tuple<Guid, BookmarkType>>();
+
             // Associate each timeline with the root collection
             TraverseTimelines(bjrTimelines.d, timeline =>
             {
                 timeline.Collection = collection;
+                bookmarksMap[timeline.UniqueId] = new Tuple<Guid, BookmarkType>(timeline.Id, BookmarkType.Timeline);
+
                 foreach (Exhibit exhibit in timeline.Exhibits)
                 {
                     exhibit.Collection = collection;
+                    bookmarksMap[exhibit.UniqueId] = new Tuple<Guid, BookmarkType>(exhibit.Id, BookmarkType.Exhibit);
+
                     if (exhibit.ContentItems != null)
                     {
                         foreach (ContentItem contentItem in exhibit.ContentItems)
                         {
                             contentItem.Collection = collection;
+                            bookmarksMap[contentItem.UniqueId] = new Tuple<Guid, BookmarkType>(contentItem.Id, BookmarkType.ContentItem);
                         }
                     }
                 }
@@ -216,6 +225,35 @@ namespace Chronozoom.Entities.Migration
                         foreach (var bookmark in tour.Bookmarks)
                         {
                             bookmark.Id = Guid.NewGuid();
+
+                            // Split URL into reference/location parts
+                            string[] urlParts = bookmark.Url.Split('@');
+
+                            // Split references into its components
+                            string[] urlComponents = urlParts[0].Split('/');
+
+                            if (urlComponents.Length > 0)
+                            {
+                                switch (urlComponents[urlComponents.Length - 1].Substring(0, 1))
+                                {
+                                case "c":
+                                    bookmark.ReferenceType = BookmarkType.ContentItem;
+                                    break;
+                                case "e":
+                                    bookmark.ReferenceType = BookmarkType.Exhibit;
+                                    break;
+                                case "t":
+                                    bookmark.ReferenceType = BookmarkType.Timeline;
+                                    break;
+                                }
+
+                                int uniqueId = int.Parse(urlComponents[urlComponents.Length - 1].Substring(1), CultureInfo.InvariantCulture);
+                                if (bookmarksMap.Keys.Contains(uniqueId))
+                                {
+                                    bookmark.ReferenceId = bookmarksMap[uniqueId].Item1;
+                                    bookmark.ReferenceType = bookmarksMap[uniqueId].Item2;
+                                }
+                            }
                         }
                     }
 

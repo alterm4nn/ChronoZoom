@@ -300,7 +300,7 @@ module CZ {
 
             var path = url.protocol + "://" + url.host
                 + ((url.port != "") ? (":" + url.port) : ("")) + "/"
-                + url.path.join('/');
+                + (url.path === undefined ? "" : url.path.join('/'));
 
             var params = new Array();
             for (var key in url.params) {
