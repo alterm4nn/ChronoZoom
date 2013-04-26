@@ -33,21 +33,6 @@ For example:
 
 ## ChronoZoom REST Commands ##
 
-### Get ###
-Use the **Get** command to return data within a specified range of years from a collection or a supercollection.
-
-**Parameters**
-
-|Parameter|Type|Value|Required|
-|:--------|:---|:----|:-------|
-|supercollection|string|Name of the supercollection to query.|No|
-|collection|string|Name of the collection to query.|No|
-
-**Example Result Data**
-!!! Todo: Add examples. !!!
-
-[top](#chronozoom-rest-api-reference)
-----------
 ### GetTimelines ###
 
 **HTTP**
