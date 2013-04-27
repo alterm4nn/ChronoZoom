@@ -24,18 +24,18 @@ The ChronoZoom Representational State Transfer (REST) API makes it possible to p
 ## Request URL Syntax ##
 All requests utilize the **GET**, **PUT** and **DELETE** HTTP verbs, and must be structured using the following URL syntax:
 
-    `http://[site URL]/chronozoom.svc/[command]?[parameter]=[value]&[parameter]=[value]`
+    http://[site URL]/chronozoom.svc/[command]?[parameter]=[value]&[parameter]=[value]
 
 For example:
 
-    `http://chronozoomproject.org/chronozoom.svc/Get?start=-1&end=2013.0&timespan=10`
+    http://chronozoomproject.org/chronozoom.svc/Get?start=-1&end=2013.0&timespan=10
 
 ## ChronoZoom REST Commands ##
 
 ### GetTimelines ###
 
 **HTTP**
-    `http://chronozoomproject.org/chronozoom.svc/GetTimelines?collection=myCollection&start=1974&end=2013`
+    http://chronozoomproject.org/chronozoom.svc/GetTimelines?collection=myCollection&start=1974&end=2013
 
 **Parameters**
 
@@ -58,7 +58,7 @@ For example:
 Use the **GetThresholds** command to return the time thresholds that have been defined for a ChronoZoom instance.
 
 **HTTP**
-    `http://chronozoomproject.org/chronozoom.svc/GetThresholds`
+    http://chronozoomproject.org/chronozoom.svc/GetThresholds
 
 **Parameters**
 
@@ -159,7 +159,7 @@ This command has no parameters.
 Use the **Search** command to search for a specific term within a collection or a supercollection.
 
 **HTTP**
-    `http://chronozoomproject.org/chronozoom.svc/Search?searchTerm=Pluto`
+    http://chronozoomproject.org/chronozoom.svc/Search?searchTerm=Pluto
 
 **Parameters**
 
@@ -180,7 +180,7 @@ Use the **Search** command to search for a specific term within a collection or 
 Use the **GetBibliography** command to return the bibliography for a given exhibit.
 
 **HTTP**
-    `http://chronozoomproject.org/chronozoom.svc/GetBibliography?exhibitId=[id]`
+    http://chronozoomproject.org/chronozoom.svc/GetBibliography?exhibitId=[id]
 
 **Parameters**
 
@@ -200,7 +200,7 @@ Use the **GetTours** command to return a list of tours for a given collection or
 !!! Todo: The parameter doesn't seem to have an effect on this command. Why? !!!
 
 **HTTP**
-    `http://chronozoomproject.org/chronozoom.svc/GetTours?collection=Chronozoom.Entities`
+    http://chronozoomproject.org/chronozoom.svc/GetTours?collection=Chronozoom.Entities
 
 **Parameters**
 
@@ -219,7 +219,7 @@ Use the **GetTours** command to return a list of tours for a given collection or
 Updates user information and associated personal collection.
 
 **HTTP**
-    `http://chronozoomproject.org/chronozoom.svc/PutUser?User=aUser`
+    http://chronozoomproject.org/chronozoom.svc/PutUser?User=aUser
 
 **Parameters**
 
@@ -239,7 +239,7 @@ Creates a new collection on behalf of the authenticated user.
 If a collection of the specified name does not exist then a new collection is created. If the collection exists and the authenticated user is the author then the collection is modified. If no author is registered then the authenticated user is set as the author. The title field can't be modified because it is part of the URL (the URL can be indexed).
 
 **HTTP**
-    `http://chronozoomproject.org/chronozoom.svc/PutCollectionName?collectionName=myCollection`
+    http://chronozoomproject.org/chronozoom.svc/PutCollectionName?collectionName=myCollection
 
 **Parameters**
 
@@ -262,7 +262,7 @@ A GUID representing the ID for the newly created collection.
 Deletes the specified collection.
 
 **HTTP**
-    `http://chronozoomproject.org/chronozoom.svc/DeleteCollection?collectionName=myOldCollection`
+    http://chronozoomproject.org/chronozoom.svc/DeleteCollection?collectionName=myOldCollection
 
 **Parameters**
 
@@ -286,7 +286,7 @@ Creates or updates the timeline in a given collection. If the collection does no
 If a timeline id is not specified, then a new timeline is added to the collection. For a new timeline, if the parent is not defined it will be set to the root timeline. If the specified timeline identifier does not exist a "not found" status is returned. If the timeline with the specified identifier exists, then the existing timeline is updated.
 
 **HTTP**
-    `http://chronozoomproject.org/chronozoom.svc/PutTimeline?collectionName=aCollection&timelineRequest=myTLdata`
+    http://chronozoomproject.org/chronozoom.svc/PutTimeline?collectionName=aCollection&timelineRequest=myTLdata
 
 **Parameters**
 
@@ -309,7 +309,7 @@ A GUID representing the ID for the timeline that was updated/created.
 Deletes the timeline with the specified ID.
 
 **HTTP**
-    `http://chronozoomproject.org/chronozoom.svc/DeleteTimeline?collectionName=aCollection&timelineRequest=myTLdata`
+    http://chronozoomproject.org/chronozoom.svc/DeleteTimeline?collectionName=aCollection&timelineRequest=myTLdata
 
 **Parameters**
 
@@ -335,7 +335,7 @@ If an exhibit id is not specified, a new exhibit is added to the collection. If 
 Otherwise, the exhibit is added to the specified parent timeline. If an invalid parent timeline is specified then the request will fail. 
 
 **HTTP**
-    `http://chronozoomproject.org/chronozoom.svc/PutExhibit?collectionName=myColl&exhibitRequest=myExhibitData`
+    http://chronozoomproject.org/chronozoom.svc/PutExhibit?collectionName=myColl&exhibitRequest=myExhibitData
 
 **Parameters**
 
@@ -358,7 +358,7 @@ The exhibit object resulting from the requested modification.
 Deletes the specified exhibit from the specified collection.
 
 **HTTP**
-    `http://chronozoomproject.org/chronozoom.svc/DeleteExhibit?collectionName=myColl&exhibitRequest=myExhibitData`
+    http://chronozoomproject.org/chronozoom.svc/DeleteExhibit?collectionName=myColl&exhibitRequest=myExhibitData
 
 **Parameters**
 
@@ -384,7 +384,7 @@ If the parent exhibit ID is invalid then the request will fail. If the content i
 <!-- Todo: Perhaps instead of explaining this logic for each request type we can summarize it neatly at the top. -->
 
 **HTTP**
-    `http://chronozoomproject.org/chronozoom.svc/PutContentItem?collectionName=myColl&exhibitRequest=myContentItem`
+    http://chronozoomproject.org/chronozoom.svc/PutContentItem?collectionName=myColl&exhibitRequest=myContentItem
 
 **Parameters**
 
@@ -404,7 +404,7 @@ The GUID of the modified content item.
 Delete the specified content item from the specified collection.
 
 **HTTP**
-    `http://chronozoomproject.org/chronozoom.svc/DeleteContentItem?collectionName=myColl&exhibitRequest=myContentItem`
+    http://chronozoomproject.org/chronozoom.svc/DeleteContentItem?collectionName=myColl&exhibitRequest=myContentItem
 
 **Parameters**
 
