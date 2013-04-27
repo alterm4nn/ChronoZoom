@@ -203,11 +203,7 @@ var CZ;
                 },
                 url: url,
                 success: function (result) {
-                    if(CZ.Settings.czDataSource == 'db') {
-                        onBiblReceived(result.d);
-                    } else {
-                        onBiblReceived(eval(result.d));
-                    }
+                    onBiblReceived(result.d);
                 },
                 error: function (xhr) {
                     console.log("Error connecting to service: " + xhr.responseText);
