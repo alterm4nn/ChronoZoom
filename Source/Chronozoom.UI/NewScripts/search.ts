@@ -238,10 +238,7 @@ module CZ {
                 data: { searchTerm: searchString, supercollection: CZ.Service.superCollectionName, collection: CZ.Service.collectionName },
                 url: url,
                 success: function (result) {
-                    if (CZ.Settings.czDataSource == 'db')
-                        onSearchResults(searchString, result.d);
-                    else
-                        onSearchResults(searchString, eval(result.d));
+                    onSearchResults(searchString, result.d);
                 },
                 error: function (xhr) {
                     console.log("Error connecting to service: " + xhr.responseText);
