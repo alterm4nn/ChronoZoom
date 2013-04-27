@@ -5,7 +5,6 @@ The ChronoZoom Representational State Transfer (REST) API makes it possible to p
 ## Contents ##
 - [Request URL Syntax](#request-url-syntax)
 - ChronoZoom REST Commands
-    - [Get](#get)
     - [GetTimelines](#gettimelines)
     - [GetThresholds](#getthresholds)
     - [Search](#search)
