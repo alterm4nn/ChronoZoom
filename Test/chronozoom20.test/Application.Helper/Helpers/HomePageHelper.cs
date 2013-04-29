@@ -84,27 +84,6 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
-        public void OpenMrcLink()
-        {
-            Logger.Log("<-");
-            Click(By.XPath("//*[@title='Microsoft Research']"));
-            Logger.Log("->");
-        }
-
-        public void OpenUcBerkelyLink()
-        {
-            Logger.Log("<-");
-            Click(By.XPath("//*[@title='University of California Berkeley Department of Earth and Planetary Science']"));
-            Logger.Log("->");
-        }
-
-        public void OpenMsuLink()
-        {
-            Logger.Log("<-");
-            Click(By.XPath("//*[@title='Moscow State University']"));
-            Logger.Log("->");
-        }
-
         public string GetTitle()
         {
             Logger.Log("<-");
@@ -114,45 +93,32 @@ namespace Application.Helper.Helpers
         }
 
 
-        public void OpenTakeOurSurveyLink()
+        public void OpenHelpLink()
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@id='footer-right']/a[1]"));
+            Click(By.XPath("(//*[@class='footer-link'])[4]"));
             Logger.Log("->");
         }
 
-        public void OpenReportAProblemLink()
+        public void OpenFeedbackLink()
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@id='footer-right']/a[2]"));
+            Click(By.XPath("(//*[@class='footer-link'])[2]"));
             Logger.Log("->");
         }
 
-        public void OpenBehindTheScenesLink()
+        public void OpenAboutLink()
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@id='footer-right']/a[3]"));
+            Click(By.XPath("(//*[@class='footer-link'])[1]"));
             Logger.Log("->");
         }
 
-        public void OpenTermsOfUseLink()
-        {
-            Logger.Log("<-");
-            Click(By.XPath("//*[@id='footer-right']/a[4]"));
-            Logger.Log("->");
-        }
 
         public void OpenPrivacyLink()
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@id='footer-right']/a[5]"));
-            Logger.Log("->");
-        }
-
-        public void OpenTrademarkLink()
-        {
-            Logger.Log("<-");
-            Click(By.XPath("//*[@id='footer-right']/a[6]"));
+            Click(By.XPath("(//*[@class='footer-link'])[3]"));
             Logger.Log("->");
         }
 
