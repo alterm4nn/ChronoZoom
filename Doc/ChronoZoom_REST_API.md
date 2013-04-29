@@ -2,11 +2,37 @@
 
 The ChronoZoom Representational State Transfer (REST) API makes it possible to programmatically access content within a given ChronoZoom deployment. Content is made available on a read-only basis, and is returned in JavaScript Object Notation (JSON) format. This document describes how to make REST **GET** requests against ChronoZoom.
 
+<<<<<<< HEAD
 ## Request URL Syntax ##
 All requests utilize the **GET**, **PUT** and **DELETE** HTTP verbs, and must be structured as follows:
 
     **URL**
     http://{site URL}/chronozoom.svc/{superCollectionName}/{collectionName}/{item}
+=======
+## Contents ##
+- [Request URL Syntax](#request-url-syntax)
+- ChronoZoom REST Commands
+    - [GetTimelines](#gettimelines)
+    - [GetThresholds](#getthresholds)
+    - [Search](#search)
+    - [GetBibliography](#getbibliography)
+    - [GetTours](#gettours)
+    - [PutUser](#putuser)
+    - [PutCollectionName](#putcollectionname)
+    - [DeleteCollection](#deletecollection)
+    - [PutTimeline](#puttimeline)
+    - [DeleteTimeline](#deletetimeline)
+    - [PutExhibit](#putexhibit)
+    - [DeleteExhibit](#deleteexhibit)
+    - [PutContentItem](#putcontentitem)
+    - [DeleteContentItem](#deletecontentitem)
+
+
+## Request URL Syntax ##
+All requests utilize the **GET**, **PUT** and **DELETE** HTTP verbs, and must be structured using the following URL syntax:
+
+    http://[site URL]/chronozoom.svc/[command]?[parameter]=[value]&[parameter]=[value]
+>>>>>>> 7ab330d92a507b48153a51d1b83a4253b7ad6003
 
 ## ChronoZoom Resources ##
 
@@ -30,6 +56,11 @@ All requests utilize the **GET**, **PUT** and **DELETE** HTTP verbs, and must be
 ### GetTimelines ###
 Returns timeline data within a specified range of years from a collection or a supercollection.
 
+<<<<<<< HEAD
+=======
+### GetTimelines ###
+
+>>>>>>> 7ab330d92a507b48153a51d1b83a4253b7ad6003
 **HTTP**
     http://chronozoomproject.org/chronozoom.svc/GetTimelines?collection=myCollection&start=1974&end=2013
 
@@ -213,6 +244,7 @@ Use the **GetTours** command to return a list of tours for a given collection or
 ----------
 ### PutUser ###
 Updates user information and associated personal collection.
+<<<<<<< HEAD
 
 **HTTP**
     http://chronozoomproject.org/chronozoom.svc/PutUser?User=aUser
@@ -232,6 +264,27 @@ The URL for the new user collection.
 ### PutCollectionName ###
 Creates a new collection on behalf of the authenticated user.
 
+=======
+
+**HTTP**
+    http://chronozoomproject.org/chronozoom.svc/PutUser?User=aUser
+
+**Parameters**
+
+|Parameter|Type|Value|Required|
+|:--------|:---|:----|:-------|
+|User|string|User information to update.|Yes|
+
+**Returns**
+The URL for the new user collection.
+
+[top](#chronozoom-rest-api-reference)
+
+----------
+### PutCollectionName ###
+Creates a new collection on behalf of the authenticated user.
+
+>>>>>>> 7ab330d92a507b48153a51d1b83a4253b7ad6003
 If a collection of the specified name does not exist then a new collection is created. If the collection exists and the authenticated user is the author then the collection is modified. If no author is registered then the authenticated user is set as the author. The title field can't be modified because it is part of the URL (the URL can be indexed).
 
 **HTTP**
@@ -297,6 +350,7 @@ A GUID representing the ID for the timeline that was updated/created.
 
 **Example Result Data**
 !!! Todo: Add examples. !!!
+<<<<<<< HEAD
 
 [top](#chronozoom-rest-api-reference)
 
@@ -307,6 +361,18 @@ Deletes the timeline with the specified ID.
 **HTTP**
     http://chronozoomproject.org/chronozoom.svc/DeleteTimeline?collectionName=aCollection&timelineRequest=myTLdata
 
+=======
+
+[top](#chronozoom-rest-api-reference)
+
+----------
+### DeleteTimeline ###
+Deletes the timeline with the specified ID.
+
+**HTTP**
+    http://chronozoomproject.org/chronozoom.svc/DeleteTimeline?collectionName=aCollection&timelineRequest=myTLdata
+
+>>>>>>> 7ab330d92a507b48153a51d1b83a4253b7ad6003
 **Parameters**
 
 |Parameter|Type|Value|Required|
