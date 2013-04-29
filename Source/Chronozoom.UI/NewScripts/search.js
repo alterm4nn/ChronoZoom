@@ -8,11 +8,11 @@ var CZ;
                 CZ.Tours.onTourClicked();
             }
             if(Search.isSearchWindowVisible) {
-                CZ.Common.toggleOffImage('search_button');
+                $(".header-icon.active").removeClass("active");
                 $("#search").hide('slide', {
                 }, 'slow');
             } else {
-                CZ.Common.toggleOnImage('search_button');
+                $(".search-icon").addClass("active");
                 $("#search").show('slide', {
                 }, 'slow', function () {
                     $("#searchTextBox").focus();
@@ -21,16 +21,6 @@ var CZ;
             Search.isSearchWindowVisible = !Search.isSearchWindowVisible;
         }
         Search.onSearchClicked = onSearchClicked;
-        function searchHighlight(isOn) {
-            if(isOn) {
-                CZ.Common.toggleOnImage('search_button');
-            } else {
-                if(!Search.isSearchWindowVisible) {
-                    CZ.Common.toggleOffImage('search_button');
-                }
-            }
-        }
-        Search.searchHighlight = searchHighlight;
         function initializeSearch() {
             $("#searchTextBox").focus(function () {
                 if($(this).hasClass('emptyTextBox')) {

@@ -171,6 +171,11 @@
     <Content Include="BehindTheScenes.htm" />
     <Content Include="cz.aspx" />
     <Content Include="cz2.html" />
+    <Content Include="Images\edit-icon.png" />
+    <Content Include="Images\profile-icon.png" />
+    <Content Include="Images\search-icon.png" />
+    <Content Include="Images\tour-icon.png" />
+    <Content Include="Images\view-icon.png" />
     <Content Include="NewScripts\authoring.ts" />
     <Content Include="NewScripts\authoring.js">
       <DependentUpon>authoring.ts</DependentUpon>
@@ -187,7 +192,6 @@
     </Content>
     <Content Include="NewScripts\controls\formbase.ts" />
     <Content Include="NewScripts\cz.data.ts" />
-    <TypeScriptCompile Include="NewScripts\cz.data.ts" />
     <Content Include="NewScripts\controls\listboxbase.js">
       <DependentUpon>listboxbase.ts</DependentUpon>
     </Content>
@@ -260,12 +264,12 @@
     <Content Include="samples\custom-listbox\main.html" />
     <Content Include="samples\cz.datepicker.html" />
     <Content Include="ui\auth-edit-exhibit-form.html" />
-    <TypeScriptCompile Include="ui\auth-edit-exhibit.ts" />
+    <Content Include="ui\auth-edit-exhibit.ts" />
     <Content Include="ui\auth-edit-exhibit.js">
       <DependentUpon>auth-edit-exhibit.ts</DependentUpon>
     </Content>
     <Content Include="ui\auth-edit-ci-form.html" />
-    <TypeScriptCompile Include="ui\auth-edit-ci-form.ts" />
+    <Content Include="ui\auth-edit-ci-form.ts" />
     <Content Include="ui\auth-add-ci-form.js">
       <DependentUpon>auth-edit-ci-form.ts</DependentUpon>
     </Content>
@@ -285,6 +289,11 @@
       <DependentUpon>ci-listbox.ts</DependentUpon>
     </Content>
     <Content Include="ui\ci-listbox.ts" />
+    <Content Include="ui\header-edit-form.html" />
+    <Content Include="ui\header-edit.ts" />
+    <Content Include="ui\header-edit.js">
+      <DependentUpon>header-edit.ts</DependentUpon>
+    </Content>
     <Content Include="Views\Account\_IdentityProvidersWithClientSideCode.aspx" />
     <Content Include="favicon.ico" />
     <Content Include="Images\A.png" />

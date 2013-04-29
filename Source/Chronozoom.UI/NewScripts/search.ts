@@ -21,26 +21,16 @@ module CZ {
                 CZ.Tours.onTourClicked();
 
             if (isSearchWindowVisible) {
-                CZ.Common.toggleOffImage('search_button');
+                $(".header-icon.active").removeClass("active");
                 $("#search").hide('slide', {}, 'slow');
             } else {
-                CZ.Common.toggleOnImage('search_button');
+                $(".search-icon").addClass("active");
                 $("#search").show('slide', {}, 'slow',
                     function () {
                         $("#searchTextBox").focus();
                     });
             }
             isSearchWindowVisible = !isSearchWindowVisible;
-        }
-
-        export function searchHighlight(isOn) {
-            if (isOn) {
-                CZ.Common.toggleOnImage('search_button');
-            }
-            else {
-                if (!isSearchWindowVisible)
-                    CZ.Common.toggleOffImage('search_button');
-            }
         }
 
         export function initializeSearch() {

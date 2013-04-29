@@ -66,6 +66,7 @@
     <script type="text/javascript" src="/ui/auth-edit-timeline.js"></script>
     <script type="text/javascript" src="/ui/auth-edit-exhibit.js"></script>
     <script type="text/javascript" src="/ui/auth-edit-ci-form.js"></script>
+    <script type="text/javascript" src="/ui/header-edit.js"></script>
 
     <!--[if IE]>
     <script type="text/javascript" src="/NewScripts/regimesIE.js"></script>
@@ -79,7 +80,7 @@
         <div class="fleft">
             <ul>
                 <li class="fleft">
-                    <img style="margin-top: 3px; margin-right: 40px;" title="ChronoZoom" src="/Images/chronzoom-200px-white.png" />
+                    <div class="header-logo" />
                 </li>
                 <li class="fleft">
                     <div id="regime-link-cosmos" class="regime-link">cosmos</div>
@@ -101,13 +102,19 @@
         <div class="fright">
             <ul>
                 <li class="fleft">
-                    <div id="login-panel" />
+                    <div title="Take a guided tour" id="tours_index" class="header-icon tour-icon" data-enabled="true" />
                 </li>
                 <li class="fleft">
-                    <img id="search_button" title="Search ChronoZoom" alt="Search ChronoZoom" src="/Images/search_off.jpg" />
+                    <div id="search_button" title="Search ChronoZoom" class="header-icon search-icon" data-enabled="true" />
                 </li>
                 <li class="fleft">
-                    <img title="Take a guided tour" id="tours_index" alt="Take a guided tour" src="/Images/tour_off.jpg" />
+                    <div class="header-icon view-icon" data-enabled="false" />
+                </li>
+                <li class="fleft">
+                    <div class="header-icon edit-icon" data-enabled="true" />
+                </li>
+                <li class="fleft">
+                    <div id="login-panel" class="header-icon profile-icon" data-enabled="true" />
                 </li>
             </ul>
         </div>
@@ -124,8 +131,7 @@
             });
         </script>
 
-        <div id="footer-authoring">
-
+     <!--   <div id="footer-authoring">
             <a onclick="CZ.Authoring.UI.createTimeline()" class="footer-authoring-link">create timeline
             </a>
             <a onclick="CZ.Authoring.UI.editTimeline()" class="footer-authoring-link">edit timeline
@@ -134,61 +140,8 @@
             </a>
             <a onclick="CZ.Authoring.UI.editExhibit()" class="footer-authoring-link">edit exhibit
             </a>
-
-            <!--Create Exhibit popup dialog-->
-            <div id="createExhibitForm" style="background-color: rgb(60, 95, 150); display: none; color: white;">
-                <label style="display: block">Exhibit's title</label>
-                <input id="exhibitTitleInput" style="display: block" />
-                                
-                <br />
-                <label style="display: block">Exhibit's date</label>
-                <div id="exhibitDateInput" style="display: block"></div>
-                
-                <br />
-                <span id ="ExhibitErrorSpan" style="color:red; display:none"> 
-                    Input error
-                </span>
-
-                <hr />
-
-                <p>Content items:</p>
-            </div>
-
-            <!--Edit Content Item popup dialog-->
-            <div id="editContentItemForm" style="background-color: rgb(60, 95, 150); display: none; color: white;">
-                <label style="display: block">title</label>
-                <input id="contentItemTitleInput" style="display: block" type="text" />
-
-                <br />
-                <label style="display: block">description</label>
-                <textarea id="contentItemDescriptionInput" style="display: block"></textarea>
-
-                <br />
-                <label style="display: block">media source</label>
-                <input type="url" id="contentItemMediaSourceInput" style="display: block" />
-
-                <br />
-                <p style="display: block">
-                    <label style="display: block">media type</label>
-                    <select id="contentItemMediaTypeInput" style="display: block">
-                        <option value="pdf">PDF</option>
-                        <option value="image">Image</option>
-                        <option value="video">Video</option>
-                        <option value="audio">Audio</option>
-                    </select>
-                </p>
-
-                 <p>
-                    <label>Attribution</label>
-                    <input type='text' id='cz-authoring-ci-attribution' style='display: block;' />
-                </p>
-
-                <p>
-                    <label>Media Source</label>
-                    <input type='text' id='cz-authoring-ci-media-source' style='display: block;' />
-                </p>
-            </div>
-        </div>
+        </div>-->
+            
         <div id="tour_control" class="tour_control fleft">
             <img id="tour_prev" src="/Images/tour_prev_off.jpg" alt="previous" />
             <img style="margin: 0 0 0 16px"
@@ -276,9 +229,11 @@
         <div id="auth-event-form" class="cz-form unselectable">
         </div>
 
-        <div id="auth-edit-timeline-form" class="cz-form cz-form-timeline unselectable">
+        <div id="header-edit-form" class="cz-form cz-header-edit-form unselectable">
         </div>
 
+        <div id="auth-edit-timeline-form" class="cz-form cz-form-timeline unselectable">
+        </div>
         <div id="auth-edit-exhibit-form" class="cz-form cz-form-exhibit unselectable">
 		</div>
         <div id="auth-edit-ci-form" class="cz-form cz-form-ci unselectable">

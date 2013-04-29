@@ -11,13 +11,15 @@
 /// <reference path='../ui/auth-edit-timeline.ts'/>
 /// <reference path='../ui/auth-edit-exhibit.ts'/>
 /// <reference path='../ui/auth-edit-ci-form.ts'/>
+/// <reference path='../ui/header-edit.ts' />
+
 /// <reference path='typings/jquery/jquery.d.ts'/>
 
 module CZ {
     export module HomePageViewModel {
         // Contains mapping: CSS selector -> html file.
         var _uiMap = {
-            "#auth-event-form": "/ui/auth-event-form.html",
+            "#header-edit-form": "/ui/header-edit-form.html",
             "#auth-edit-timeline-form": "/ui/auth-edit-timeline-form.html",
             "#auth-edit-exhibit-form": "/ui/auth-edit-exhibit-form.html",
             "#auth-edit-ci-form": "/ui/auth-edit-ci-form.html"
@@ -55,7 +57,7 @@ module CZ {
             {
                 Name: "Authoring",
                 Activation: FeatureActivation.NotRootCollection,
-                JQueryReference: ".footer-authoring-link"
+                JQueryReference: ".header-icon.edit-icon"
             },
             {
                 Name: "WelcomeScreen",
@@ -83,6 +85,23 @@ module CZ {
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
+
+                $(".header-icon.edit-icon").click(function () {
+                    $(".header-icon.active").removeClass("active");
+                    $(this).addClass("active");
+
+                    var form = new CZ.UI.FormHeaderEdit(forms[0], {
+                        activationSource: $(this),
+                        navButton: ".cz-form-nav",
+                        closeButton: ".cz-form-close-btn > .cz-form-btn",
+                        titleTextblock: ".cz-form-title",
+                        createTimeline: ".cz-form-create-timeline",
+                        createExhibit: ".cz-form-create-exhibit",
+                        editTimeline: ".cz-form-edit-timeline",
+                        editExhibit: ".cz-form-edit-exhibit"
+                    });
+                    form.show();
+                });
 
                 CZ.Authoring.initialize(CZ.Common.vc, {
                     showCreateTimelineForm: function (timeline) {
@@ -181,14 +200,10 @@ module CZ {
             CZ.Service.collectionName = url.collectionName;
 
             $('#search_button')
-                .mouseup(CZ.Search.onSearchClicked)
-                .mouseover(() => { CZ.Search.searchHighlight(true); })
-                .mouseout(() => { CZ.Search.searchHighlight(false); });
+                .mouseup(CZ.Search.onSearchClicked);
 
             $('#tours_index')
-                .mouseup(CZ.Tours.onTourClicked)
-                .mouseover(() => { CZ.Tours.tourButtonHighlight(true); })
-                .mouseout(() => { CZ.Tours.tourButtonHighlight(false); });
+                .mouseup(CZ.Tours.onTourClicked);
 
             $('#human_rect')
                 .click(() => { CZ.Search.navigateToBookmark(CZ.Common.humanityVisible); });
