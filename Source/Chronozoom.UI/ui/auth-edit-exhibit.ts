@@ -1,7 +1,8 @@
-/// <reference path='../NewScripts/controls/formbase.ts'/>
+/// <reference path='ci-listbox.ts' />
+/// <reference path='../NewScripts/controls/formbase.ts' />
 /// <reference path='../NewScripts/authoring.ts'/>
-
 /// <reference path='../NewScripts/typings/jquery/jquery.d.ts'/>
+
 
 module CZ {
     export module UI {
@@ -21,7 +22,7 @@ module CZ {
             private titleInput: JQuery;
             private datePicker: CZ.UI.DatePicker;
             private createArtifactButton: JQuery;
-            private contentItemsListBox: JQuery;
+            private contentItemsListBox: CZ.UI.ContentItemListBox;
             private saveButton: JQuery;
             private deleteButton: JQuery;
 
@@ -35,7 +36,7 @@ module CZ {
                 this.titleInput = container.find(formInfo.titleInput);
                 this.datePicker = new CZ.UI.DatePicker(container.find(formInfo.datePicker));
                 this.createArtifactButton = container.find(formInfo.createArtifactButton);
-                this.contentItemsListBox = container.find(formInfo.contentItemsListBox);
+                this.contentItemsListBox = new CZ.UI.ContentItemListBox(container.find(formInfo.contentItemsListBox), (<any>formInfo.context).contentItems);
                 this.saveButton = container.find(formInfo.saveButton);
                 this.deleteButton = container.find(formInfo.deleteButton);
                 this.exhibit = formInfo.context;
@@ -107,36 +108,6 @@ module CZ {
             // todo: update to match new ui
             private getContentItemsData(): any[] {
                 var contentItems = [];
-
-                $(".cz-authoring-ci-container").each(function () {
-                    var CItitleInput = $(this).find(".cz-authoring-ci-title");
-                    var mediaInput = $(this).find(".cz-authoring-ci-uri");
-                    var mediaTypeInput = (<any>$)(this).find(".cz-authoring-ci-media-type option");
-                    var descriptionInput = $(this).find(".cz-authoring-ci-description");
-                    var guid = $(this).attr("cz-authoring-ci-guid") || undefined;
-                    var attributionInput = $(this).find(".cz-authoring-ci-attribution");
-                    var mediaSourceInput = $(this).find(".cz-authoring-ci-media-source");
-
-                    var selected = (<any>$)(mediaTypeInput)[0];
-
-                    for (var i = 0; i < mediaTypeInput.length; i++)
-                        if (mediaTypeInput[i].selected) {
-                            selected = mediaTypeInput[i];
-                            break;
-                        }
-
-                    contentItems.push({
-                        title: CItitleInput.val(),
-                        description: descriptionInput.val(),
-                        uri: mediaInput.val(),
-                        mediaType: selected.text,
-                        attribution: attributionInput.val(),
-                        mediaSource: mediaSourceInput.val(),
-                        guid: guid,
-                        parent: undefined
-                    });
-                });
-
                 return contentItems;
             }
 

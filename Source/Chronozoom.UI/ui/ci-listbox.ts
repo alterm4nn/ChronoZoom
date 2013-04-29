@@ -23,11 +23,64 @@ module CZ {
                     => ContentItemListItem;
             };
         }
-
+        
+        /*
         export class ContentItemListBox extends ListBoxBase {
             constructor(container: JQuery,
                         listBoxInfo: IListBoxBaseInfo,
                         listItemsInfo: IContentItemListItemInfo) {
+
+                listItemsInfo.default.ctor = ContentItemListItem;
+                super(container, listBoxInfo, listItemsInfo);
+            }
+        }
+        */
+
+        export class ContentItemListBox extends ListBoxBase {
+            constructor(container: JQuery, contentItems: any) {
+                var listBoxInfo: IListBoxBaseInfo = {
+                    context: contentItems,
+                    sortableSettings: {
+                        forcePlaceholderSize: true,
+                        cursor: "move",
+                        placeholder: "placeholder-example",
+                        revert: 100,
+                        opacity: 0.75,
+                        tolerance: "pointer",
+                        scroll: false,
+
+                        create: function () {
+                            // NOTE: In case of scrollbar shifting,
+                            //       control height manually.
+                            //$(this).height($(this).height());
+                        }
+                    }
+                };
+
+                var listItemsInfo: IContentItemListItemInfo = {
+                    default: {
+                        container: $('<li class="cz-listitem">' +
+                                        '<div class="cz-ci-listitem-icon">' +
+                                            '<img src="placeholder" alt="" />' +
+                                        '</div>' +
+
+                                        '<div class="cz-ci-listitem-content">' +
+                                            '<h4 class="cz-ci-listitem-title">Content Item Title</h4>' +
+                                            '<p class="cz-ci-listitem-descr">Content Item Description</p>' +
+                                        '</div>' +
+
+                                        '<div class="cz-listitem-close-btn">' +
+                                            'X' +
+                                        '</div>' +
+                                    '</li>'),
+                        uiMap: {
+                            closeButton: ".cz-listitem-close-btn",
+                            iconImg: ".cz-ci-listitem-icon > img",
+                            titleTextblock: ".cz-ci-listitem-title",
+                            descrTextblock: ".cz-ci-listitem-descr"
+                        }
+                    }
+                };
 
                 listItemsInfo.default.ctor = ContentItemListItem;
                 super(container, listBoxInfo, listItemsInfo);
@@ -50,7 +103,7 @@ module CZ {
                 this.titleTextblock = this.container.find(uiMap.titleTextblock);
                 this.descrTextblock = this.container.find(uiMap.descrTextblock);
 
-                this.iconImg.attr("src", this.data.icon);
+                this.iconImg.attr("src", this.data.icon || "/Images/Temp-Thumbnail2.png");
                 this.titleTextblock.text(this.data.title);
                 this.descrTextblock.text(this.data.description);
             }

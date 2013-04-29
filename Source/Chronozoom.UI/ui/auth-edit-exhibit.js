@@ -14,7 +14,7 @@ var CZ;
                 this.titleInput = container.find(formInfo.titleInput);
                 this.datePicker = new CZ.UI.DatePicker(container.find(formInfo.datePicker));
                 this.createArtifactButton = container.find(formInfo.createArtifactButton);
-                this.contentItemsListBox = container.find(formInfo.contentItemsListBox);
+                this.contentItemsListBox = new CZ.UI.ContentItemListBox(container.find(formInfo.contentItemsListBox), (formInfo.context).contentItems);
                 this.saveButton = container.find(formInfo.saveButton);
                 this.deleteButton = container.find(formInfo.deleteButton);
                 this.exhibit = formInfo.context;
@@ -66,32 +66,6 @@ var CZ;
             };
             FormEditExhibit.prototype.getContentItemsData = function () {
                 var contentItems = [];
-                $(".cz-authoring-ci-container").each(function () {
-                    var CItitleInput = $(this).find(".cz-authoring-ci-title");
-                    var mediaInput = $(this).find(".cz-authoring-ci-uri");
-                    var mediaTypeInput = ($)(this).find(".cz-authoring-ci-media-type option");
-                    var descriptionInput = $(this).find(".cz-authoring-ci-description");
-                    var guid = $(this).attr("cz-authoring-ci-guid") || undefined;
-                    var attributionInput = $(this).find(".cz-authoring-ci-attribution");
-                    var mediaSourceInput = $(this).find(".cz-authoring-ci-media-source");
-                    var selected = ($)(mediaTypeInput)[0];
-                    for(var i = 0; i < mediaTypeInput.length; i++) {
-                        if(mediaTypeInput[i].selected) {
-                            selected = mediaTypeInput[i];
-                            break;
-                        }
-                    }
-                    contentItems.push({
-                        title: CItitleInput.val(),
-                        description: descriptionInput.val(),
-                        uri: mediaInput.val(),
-                        mediaType: selected.text,
-                        attribution: attributionInput.val(),
-                        mediaSource: mediaSourceInput.val(),
-                        guid: guid,
-                        parent: undefined
-                    });
-                });
                 return contentItems;
             };
             FormEditExhibit.prototype.show = function () {
