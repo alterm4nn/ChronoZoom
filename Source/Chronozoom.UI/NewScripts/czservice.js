@@ -73,19 +73,6 @@ var CZ;
         ;
         Service.collectionName = "";
         Service.superCollectionName = "";
-        function get() {
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("get");
-            request.addParameter("supercollection", CZ.Service.superCollectionName);
-            request.addParameter("collection", CZ.Service.collectionName);
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                dataType: "json",
-                url: request.url
-            });
-        }
-        Service.get = get;
         function getTimelines(r) {
             var request = new Request(_serviceUrl);
             request.addToPath("gettimelines");
@@ -262,6 +249,19 @@ var CZ;
             });
         }
         Service.deleteContentItem = deleteContentItem;
+        function getTours() {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("tours");
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getTours = getTours;
         function putExhibitContent(e, oldContentItems) {
             var newGuids = e.contentItems.map(function (ci) {
                 return ci.guid;
