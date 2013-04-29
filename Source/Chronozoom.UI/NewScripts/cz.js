@@ -5,6 +5,51 @@ var CZ;
         var _uiMap = {
             "#auth-event-form": "/ui/auth-event-form.html"
         };
+        var FeatureActivation;
+        (function (FeatureActivation) {
+            FeatureActivation._map = [];
+            FeatureActivation._map[0] = "Enabled";
+            FeatureActivation.Enabled = 0;
+            FeatureActivation._map[1] = "Disabled";
+            FeatureActivation.Disabled = 1;
+            FeatureActivation._map[2] = "RootCollection";
+            FeatureActivation.RootCollection = 2;
+            FeatureActivation._map[3] = "NotRootCollection";
+            FeatureActivation.NotRootCollection = 3;
+        })(FeatureActivation || (FeatureActivation = {}));
+        var _featureMap = [
+            {
+                Name: "Login",
+                Activation: FeatureActivation.NotRootCollection,
+                JQueryReference: "#login-panel"
+            }, 
+            {
+                Name: "Search",
+                Activation: FeatureActivation.Enabled,
+                JQueryReference: "#search-button"
+            }, 
+            {
+                Name: "Tours",
+                Activation: FeatureActivation.Enabled,
+                JQueryReference: "#tours-index"
+            }, 
+            {
+                Name: "Authoring",
+                Activation: FeatureActivation.NotRootCollection,
+                JQueryReference: ".footer-authoring-link"
+            }, 
+            {
+                Name: "WelcomeScreen",
+                Activation: FeatureActivation.RootCollection,
+                JQueryReference: "#welcomeScreenBack"
+            }, 
+            {
+                Name: "Regimes",
+                Activation: FeatureActivation.RootCollection,
+                JQueryReference: ".regime-link"
+            }, 
+            
+        ];
         $(document).ready(function () {
             window.console = window.console || (function () {
                 var c = {
@@ -107,12 +152,21 @@ var CZ;
                     CZ.Common.closeWelcomeScreen();
                 });
             }
-            if(rootCollection) {
-                $(".footer-authoring-link").css("display", "none");
-            } else {
-                $("#welcomeScreenBack").css("display", "none");
-                $(".regime-link").css("display", "none");
-            }
+            _featureMap.forEach(function (feature) {
+                var enabled = true;
+                if(feature.Activation === FeatureActivation.Disabled) {
+                    enabled = false;
+                }
+                if(feature.Activation === FeatureActivation.NotRootCollection && rootCollection) {
+                    enabled = false;
+                }
+                if(feature.Activation === FeatureActivation.RootCollection && !rootCollection) {
+                    enabled = false;
+                }
+                if(!enabled) {
+                    $(feature.JQueryReference).css("display", "none");
+                }
+            });
             if(navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
                 if(/Chrome[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
                     var oprversion = new Number(RegExp.$1);
@@ -294,7 +348,9 @@ var CZ;
             var bid = window.location.hash.match("b=([a-z0-9_]+)");
             if(bid) {
                 $("#bibliography .sources").empty();
-                $("#bibliography .title").html("<span>Loading...</span>");
+                $("#bibliography .title").append($("<span></span>", {
+                    text: "Loading..."
+                }));
                 $("#bibliographyBack").css("display", "block");
             }
         });

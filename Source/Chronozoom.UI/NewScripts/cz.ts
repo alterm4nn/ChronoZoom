@@ -18,6 +18,52 @@ module CZ {
             "#auth-event-form": "/ui/auth-event-form.html"
         };
 
+        enum FeatureActivation {
+            Enabled,
+            Disabled,
+            RootCollection,
+            NotRootCollection,
+            }
+
+        // Basic Flight-Control (Tracks the features that are enabled)
+        //
+        // FEATURES CAN ONLY BE ACTIVATED IN ROOTCOLLECTION AFTER HITTING ZERO ACTIVE BUGS.
+        //
+        // REMOVING THIS COMMENT OR BYPASSING THIS CHECK MAYBE BRING YOU BAD KARMA, ITS TRUE.
+        //
+        var _featureMap = [
+            {
+                Name: "Login",
+                Activation: FeatureActivation.NotRootCollection,
+                JQueryReference: "#login-panel"
+            },
+            {
+                Name: "Search",
+                Activation: FeatureActivation.Enabled,
+                JQueryReference: "#search-button"
+            },
+            {
+                Name: "Tours",
+                Activation: FeatureActivation.Enabled,
+                JQueryReference: "#tours-index"
+            },
+            {
+                Name: "Authoring",
+                Activation: FeatureActivation.NotRootCollection,
+                JQueryReference: ".footer-authoring-link"
+            },
+            {
+                Name: "WelcomeScreen",
+                Activation: FeatureActivation.RootCollection,
+                JQueryReference: "#welcomeScreenBack"
+            },
+            {
+                Name: "Regimes",
+                Activation: FeatureActivation.RootCollection,
+                JQueryReference: ".regime-link"
+            },
+        ];
+
         $(document).ready(function () {
             //Ensures there will be no 'console is undefined' errors
             window.console = window.console || <any>(function () {
@@ -126,12 +172,26 @@ module CZ {
                 });
             }
 
-            if (rootCollection) {
-                $(".footer-authoring-link").css("display", "none");
-            } else {
-                $("#welcomeScreenBack").css("display", "none");
-                $(".regime-link").css("display", "none");
-            }
+            // Feature activation control
+            _featureMap.forEach(function (feature) {
+                var enabled : bool = true;
+
+                if (feature.Activation === FeatureActivation.Disabled) {
+                    enabled = false;
+                }
+
+                if (feature.Activation === FeatureActivation.NotRootCollection && rootCollection) {
+                    enabled = false;
+                }
+
+                if (feature.Activation === FeatureActivation.RootCollection && !rootCollection) {
+                    enabled = false;
+                }
+
+                if (!enabled) {
+                    $(feature.JQueryReference).css("display", "none");
+                }
+            });
 
             if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
                 if (/Chrome[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
@@ -356,7 +416,9 @@ module CZ {
                 //bid[0] - source string
                 //bid[1] - found match
                 $("#bibliography .sources").empty();
-                $("#bibliography .title").html("<span>Loading...</span>");
+                $("#bibliography .title").append($("<span></span>", {
+                    text: "Loading..."
+                }));
                 $("#bibliographyBack").css("display", "block");
             }
         });

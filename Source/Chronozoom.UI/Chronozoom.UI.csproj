@@ -205,6 +205,9 @@
       <DependentUpon>uiloader.ts</DependentUpon>
     </Content>
     <Content Include="NewScripts\uiloader.ts" />
+    <Content Include="NewScripts\urlnav.min.js">
+      <DependentUpon>urlnav.ts</DependentUpon>
+    </Content>
     <Content Include="NewScripts\urlnav.ts" />
     <Content Include="NewScripts\vccontent.ts" />
     <Content Include="NewScripts\viewport.ts" />

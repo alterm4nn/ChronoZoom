@@ -30,13 +30,13 @@ var CZ;
         }
         Tours.getBookmarkVisible = getBookmarkVisible;
         var Tour = (function () {
-            function Tour(title, bookmarks, zoomTo, vc, category, audioBlobUrl, sequenceNum) {
+            function Tour(title, bookmarks, zoomTo, vc, category, audio, sequenceNum) {
                 this.title = title;
                 this.bookmarks = bookmarks;
                 this.zoomTo = zoomTo;
                 this.vc = vc;
                 this.category = category;
-                this.audioBlobUrl = audioBlobUrl;
+                this.audio = audio;
                 this.sequenceNum = sequenceNum;
                 this.tour_BookmarkStarted = [];
                 this.tour_BookmarkFinished = [];
@@ -73,45 +73,45 @@ var CZ;
                     }
                 };
                 self.ReinitializeAudio = function ReinitializeAudio() {
-                    if(self.audio) {
-                        self.audio.pause();
+                    if(self.audioElement) {
+                        self.audioElement.pause();
                     }
-                    self.audio = undefined;
+                    self.audioElement = undefined;
                     self.isAudioLoaded = false;
-                    self.audio = document.createElement('audio');
-                    self.audio.addEventListener("loadedmetadata", function () {
-                        if(self.audio.duration != Infinity) {
-                            self.bookmarks[self.bookmarks.length - 1].duration = self.audio.duration - self.bookmarks[self.bookmarks.length - 1].lapseTime;
+                    self.audioElement = document.createElement('audio');
+                    self.audioElement.addEventListener("loadedmetadata", function () {
+                        if(self.audioElement.duration != Infinity) {
+                            self.bookmarks[self.bookmarks.length - 1].duration = self.audioElement.duration - self.bookmarks[self.bookmarks.length - 1].lapseTime;
                         }
                         if(isToursDebugEnabled && window.console && console.log("Tour " + self.title + " metadata loaded (readystate 1)")) {
                             ;
                         }
                     });
-                    self.audio.addEventListener("canplaythrough", function () {
+                    self.audioElement.addEventListener("canplaythrough", function () {
                         self.isAudioLoaded = true;
                         if(isToursDebugEnabled && window.console && console.log("Tour " + self.title + " readystate 4")) {
                             ;
                         }
                     });
-                    self.audio.addEventListener("progress", function () {
-                        if(self.audio && self.audio.buffered.length > 0) {
+                    self.audioElement.addEventListener("progress", function () {
+                        if(self.audioElement && self.audioElement.buffered.length > 0) {
                             if(isToursDebugEnabled && window.console && console.log("Tour " + self.title + " downloaded " + (self.audio.buffered.end(self.audio.buffered.length - 1) / self.audio.duration))) {
                                 ;
                             }
                         }
                     });
-                    self.audio.controls = false;
-                    self.audio.autoplay = false;
-                    self.audio.loop = false;
-                    self.audio.volume = 1;
-                    self.audio.preload = "none";
-                    var blobPrefix = self.audioBlobUrl.substring(0, self.audioBlobUrl.length - 3);
+                    self.audioElement.controls = false;
+                    self.audioElement.autoplay = false;
+                    self.audioElement.loop = false;
+                    self.audioElement.volume = 1;
+                    self.audioElement.preload = "none";
+                    var blobPrefix = self.audio.substring(0, self.audio.length - 3);
                     for(var i = 0; i < CZ.Settings.toursAudioFormats.length; i++) {
                         var audioSource = document.createElement("Source");
                         audioSource.setAttribute("src", blobPrefix + CZ.Settings.toursAudioFormats[i].ext);
-                        self.audio.appendChild(audioSource);
+                        self.audioElement.appendChild(audioSource);
                     }
-                    self.audio.load();
+                    self.audioElement.load();
                     if(isToursDebugEnabled && window.console && console.log("Loading of tour " + self.title + " is queued")) {
                         ;
                     }
@@ -161,9 +161,9 @@ var CZ;
                     if(isToursDebugEnabled && window.console && console.log("playing source: " + self.audio.currentSrc)) {
                         ;
                     }
-                    self.audio.pause();
+                    self.audioElement.pause();
                     try  {
-                        self.audio.currentTime = bookmark.lapseTime + bookmark.elapsed;
+                        self.audioElement.currentTime = bookmark.lapseTime + bookmark.elapsed;
                         if(isToursDebugEnabled && window.console && console.log("audio currentTime is set to " + (bookmark.lapseTime + bookmark.elapsed))) {
                             ;
                         }
@@ -175,7 +175,7 @@ var CZ;
                     if(isToursDebugEnabled && window.console && console.log("audio element is forced to play")) {
                         ;
                     }
-                    self.audio.play();
+                    self.audioElement.play();
                 };
                 self.setTimer = function setTimer(bookmark) {
                     if(self.timerOnBookmarkIsOver) {
@@ -294,7 +294,7 @@ var CZ;
                     }
                     self.state = 'pause';
                     if(self.isAudioEnabled) {
-                        self.audio.pause();
+                        self.audioElement.pause();
                         if(isToursDebugEnabled && window.console && console.log("audio element is forced to pause")) {
                             ;
                         }
@@ -391,9 +391,9 @@ var CZ;
             tourControlDiv.style.display = "none";
             if(Tours.tour) {
                 hideBookmarks();
-                $("#bookmarks .header").html("");
-                if(Tours.tour.audio) {
-                    Tours.tour.audio = undefined;
+                $("#bookmarks .header").text("");
+                if(Tours.tour.audioElement) {
+                    Tours.tour.audioElement = undefined;
                 }
             }
             Tours.tour = undefined;
@@ -465,49 +465,67 @@ var CZ;
                     hideBookmark(t);
                 });
                 if(tour.category !== category) {
-                    var cat = $('<div class="category">' + tour.category + '</div>').appendTo(toursUI);
-                    var img = $('<img src="/Images/collapse-down.png" class="collapseButton" />').appendTo(cat);
+                    var cat = $("<div></div>", {
+                        class: "category",
+                        text: tour.category
+                    }).appendTo(toursUI);
+                    var img = $("<img></img>", {
+                        class: "collapseButton",
+                        src: "/Images/collapse-down.png"
+                    }).appendTo(cat);
                     if(i == 0) {
                         cat.removeClass('category').addClass('categorySelected');
                         (img[0]).src = "/Images/collapse-up.png";
                     }
-                    categoryContent = $('<div class="itemContainer"></div>').appendTo(toursUI);
+                    categoryContent = $('<div></div>', {
+                        class: "itemContainer"
+                    }).appendTo(toursUI);
                     category = tour.category;
                 }
-                $('<div class="item" tour="' + i + '">' + tour.title + '</div>').appendTo(categoryContent).click(function () {
-                    removeActiveTour();
-                    $("#tours").hide('slide', {
-                    }, 'slow');
-                    CZ.Common.toggleOffImage('tours_index');
-                    Tours.isTourWindowVisible = false;
-                    var mytour = Tours.tours[this.getAttribute("tour")];
-                    activateTour(mytour, Tours.isNarrationOn);
-                    $(".touritem-selected").removeClass("touritem-selected", "slow");
-                    $(this).addClass("touritem-selected", "slow");
-                });
+                $("<div></div>", {
+                    class: "item",
+                    tour: i,
+                    text: tour.title,
+                    click: function () {
+                        removeActiveTour();
+                        $("#tours").hide('slide', {
+                        }, 'slow');
+                        CZ.Common.toggleOffImage('tours_index');
+                        Tours.isTourWindowVisible = false;
+                        var mytour = Tours.tours[this.getAttribute("tour")];
+                        activateTour(mytour, Tours.isNarrationOn);
+                        $(".touritem-selected").removeClass("touritem-selected", "slow");
+                        $(this).addClass("touritem-selected", "slow");
+                    }
+                }).appendTo(categoryContent);
             }
             ($)("#tours-content").accordion({
-                fillSpace: false,
                 collapsible: true,
-                autoHeight: false
+                heightStyle: "content",
+                beforeActivate: function (event, ui) {
+                    if(ui.newHeader) {
+                        ui.newHeader.removeClass('category');
+                        ui.newHeader.addClass('categorySelected');
+                        var img = ($(".collapseButton", ui.newHeader)[0]);
+                        if(img) {
+                            img.src = "/Images/collapse-up.png";
+                        }
+                    }
+                    if(ui.oldHeader) {
+                        ui.oldHeader.removeClass('categorySelected');
+                        ui.oldHeader.addClass('category');
+                        var img = ($(".collapseButton", ui.oldHeader)[0]);
+                        if(img) {
+                            img.src = "/Images/collapse-down.png";
+                        }
+                    }
+                }
             });
-            $("#tours-content").bind("accordionchangestart", function (event, ui) {
-                if(ui.newHeader) {
-                    ui.newHeader.removeClass('category');
-                    ui.newHeader.addClass('categorySelected');
-                    var img = ($(".collapseButton", ui.newHeader)[0]);
-                    if(img) {
-                        img.src = "/Images/collapse-up.png";
-                    }
-                }
-                if(ui.oldHeader) {
-                    ui.oldHeader.removeClass('categorySelected');
-                    ui.oldHeader.addClass('category');
-                    var img = ($(".collapseButton", ui.oldHeader)[0]);
-                    if(img) {
-                        img.src = "/Images/collapse-down.png";
-                    }
-                }
+            $("#tours-content").removeClass("ui-accordion ui-widget ui-helper-reset ui-accordion-icons");
+            $("#tours-content .categorySelected > span").removeClass("ui-accordion-header-icon ui-icon ui-icon-triangle-1-s");
+            $("#tours-content .itemContainer").removeClass("ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom ui-accordion-content-active");
+            $("#tours-content .categorySelected").removeClass("ui-accordion-header-active ui-state-active ui-state-hover ui-corner-top ui-accordion-header ui-helper-reset ui-state-default ui-accordion-icons ui-state-focus ui-corner-all").on("blur change click dblclick error focus focusin focusout hover keydown keypress keyup load mousedown mouseenter mouseleave mousemove mouseout mouseover mouseup resize scroll select submit", function () {
+                $(this).removeClass("ui-accordion-header-active ui-state-active ui-state-hover ui-corner-top ui-accordion-header ui-helper-reset ui-state-default ui-accordion-icons ui-state-focus ui-corner-all");
             });
         }
         Tours.initializeToursContent = initializeToursContent;
@@ -520,22 +538,22 @@ var CZ;
                 }, 'slow', function () {
                     Tours.bookmarkAnimation = undefined;
                 });
-                $("#bookmarks .slideHeader").html("");
+                $("#bookmarks .slideHeader").text("");
                 Tours.isBookmarksTextShown = false;
             }
         }
         function showBookmark(tour, bookmark) {
             if(!Tours.isBookmarksWindowVisible) {
                 Tours.isBookmarksWindowVisible = true;
-                $("#bookmarks .slideText").html(bookmark.text);
+                $("#bookmarks .slideText").text(bookmark.text);
                 $("#bookmarks").show('slide', {
                 }, 'slow');
             }
-            $("#bookmarks .header").html(tour.title);
-            $("#bookmarks .slideHeader").html(bookmark.caption);
-            $("#bookmarks .slideFooter").html(bookmark.number + '/' + tour.bookmarks.length);
+            $("#bookmarks .header").text(tour.title);
+            $("#bookmarks .slideHeader").text(bookmark.caption);
+            $("#bookmarks .slideFooter").text(bookmark.number + '/' + tour.bookmarks.length);
             if(Tours.isBookmarksWindowExpanded) {
-                $("#bookmarks .slideText").html(bookmark.text);
+                $("#bookmarks .slideText").text(bookmark.text);
                 if(!Tours.isBookmarksTextShown) {
                     if(Tours.bookmarkAnimation) {
                         Tours.bookmarkAnimation.stop(true, true);
@@ -547,7 +565,7 @@ var CZ;
                     Tours.isBookmarksTextShown = true;
                 }
             } else {
-                $("#bookmarks .slideText").html(bookmark.text);
+                $("#bookmarks .slideText").text(bookmark.text);
             }
         }
         function hideBookmarks() {
@@ -647,26 +665,36 @@ var CZ;
             for(var i = 0; i < content.d.length; i++) {
                 var areBookmarksValid = true;
                 var tourString = content.d[i];
-                if((typeof tourString.bookmarks == 'undefined') || (typeof tourString.AudioBlobUrl == 'undefined') || (tourString.AudioBlobUrl == undefined) || (tourString.AudioBlobUrl == null) || (typeof tourString.Category == 'undefined') || (typeof tourString.Name == 'undefined') || (typeof tourString.Sequence == 'undefined')) {
+                if((typeof tourString.bookmarks == 'undefined') || (typeof tourString.audio == 'undefined') || (tourString.audio == undefined) || (tourString.audio == null) || (typeof tourString.category == 'undefined') || (typeof tourString.name == 'undefined') || (typeof tourString.sequence == 'undefined')) {
                     continue;
                 }
                 var tourBookmarks = new Array();
                 for(var j = 0; j < tourString.bookmarks.length; j++) {
                     var bmString = tourString.bookmarks[j];
-                    if((typeof bmString.Description == 'undefined') || (typeof bmString.LapseTime == 'undefined') || (typeof bmString.Name == 'undefined') || (typeof bmString.URL == 'undefined')) {
+                    if((typeof bmString.description == 'undefined') || (typeof bmString.lapseTime == 'undefined') || (typeof bmString.name == 'undefined')) {
                         areBookmarksValid = false;
                         break;
                     }
-                    var bmURL = bmString.URL;
-                    if(bmURL.indexOf("#") != -1) {
-                        bmURL = bmURL.substring(bmURL.indexOf("#") + 1);
+                    var resultId;
+                    switch(bmString.referenceType) {
+                        case 0:
+                            resultId = 't' + bmString.referenceId;
+                            break;
+                        case 1:
+                            resultId = 'e' + bmString.referenceId;
+                            break;
+                        case 2:
+                            resultId = bmString.referenceId;
+                            break;
                     }
-                    tourBookmarks.push(new TourBookmark(bmURL, bmString.Name, bmString.LapseTime, bmString.Description));
+                    var bookmarkElement = CZ.Common.vc.virtualCanvas("findElement", resultId);
+                    var navStringBookmarkElement = CZ.UrlNav.vcelementToNavString(bookmarkElement);
+                    tourBookmarks.push(new TourBookmark(navStringBookmarkElement, bmString.name, bmString.lapseTime, bmString.description));
                 }
                 if(!areBookmarksValid) {
                     continue;
                 }
-                Tours.tours.push(new Tour(tourString.Name, tourBookmarks, bookmarkTransition, CZ.Common.vc, tourString.Category, tourString.AudioBlobUrl, tourString.Sequence));
+                Tours.tours.push(new Tour(tourString.name, tourBookmarks, bookmarkTransition, CZ.Common.vc, tourString.category, tourString.audio, tourString.sequence));
             }
         }
         Tours.parseTours = parseTours;

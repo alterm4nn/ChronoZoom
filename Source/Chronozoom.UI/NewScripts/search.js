@@ -136,7 +136,10 @@ var CZ;
                 var output = $("#search .searchResults").empty();
                 if(results == null) {
                 } else if(results.length == 0) {
-                    $("<div class='searchNoResult'>No results</div>").appendTo(output);
+                    $("<div></div>", {
+                        class: "searchNoResult",
+                        text: "No results"
+                    }).appendTo(output);
                 } else {
                     var addResults = function (objectType, sectionTitle) {
                         var first = true;
@@ -160,12 +163,20 @@ var CZ;
                                     continue;
                             }
                             if(first) {
-                                $("<div class='searchResultSection'>" + sectionTitle + "</div>").appendTo(output);
+                                $("<div></div>", {
+                                    class: "searchResultSection",
+                                    text: sectionTitle
+                                }).appendTo(output);
                                 first = false;
                             }
-                            $("<div class='searchResult' resultId='" + resultId + "'>" + results[i].title + "</div>").appendTo(output).click(function () {
-                                goToSearchResult(this.getAttribute('resultId'));
-                            });
+                            $("<div></div>", {
+                                class: "searchResult",
+                                resultId: resultId,
+                                text: results[i].title,
+                                click: function () {
+                                    goToSearchResult(this.getAttribute("resultId"));
+                                }
+                            }).appendTo(output);
                         }
                     };
                     addResults(1, "Timelines");
@@ -218,11 +229,7 @@ var CZ;
                 },
                 url: url,
                 success: function (result) {
-                    if(CZ.Settings.czDataSource == 'db') {
-                        onSearchResults(searchString, result.d);
-                    } else {
-                        onSearchResults(searchString, eval(result.d));
-                    }
+                    onSearchResults(searchString, result.d);
                 },
                 error: function (xhr) {
                     console.log("Error connecting to service: " + xhr.responseText);

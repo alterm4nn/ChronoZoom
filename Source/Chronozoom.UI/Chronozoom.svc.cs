@@ -190,9 +190,15 @@ namespace UI
             return new BaseJsonResult<IEnumerable<Reference>>(exhibit.References.ToList());
         }
 
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/tours")]
+        public BaseJsonResult<IEnumerable<Tour>> GetDefaultTours()
+        {
+            return GetTours("", "");
+        }
+
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
         [OperationContract]
-        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/{collection}/tours")]
         public BaseJsonResult<IEnumerable<Tour>> GetTours(string supercollection, string collection)
         {
             Trace.TraceInformation("Get Tours");
@@ -341,7 +347,7 @@ namespace UI
                 Trace.TraceInformation("Delete SuperCollection {0} from user {1} ", superCollectionName, user);
 
                 Guid superCollectionId = CollectionIdFromText(superCollectionName);
-                SuperCollection superCollection = _storage.SuperCollections.Find(superCollectionId);
+                SuperCollection superCollection = RetrieveSuperCollection(superCollectionId);
                 if (superCollection == null)
                 {
                     SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.SuperCollectionNotFound);
@@ -533,7 +539,7 @@ namespace UI
                     }
 
                     Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
-                    Collection collection = _storage.Collections.Find(collectionGuid);
+                    Collection collection = RetrieveCollection(collectionGuid);
                     if (collection == null)
                     {
                         collection = new Collection { Id = collectionGuid, Title = collectionName, User = user };
@@ -564,7 +570,7 @@ namespace UI
                     Trace.TraceInformation("Delete Collection {0} from user {1} in supercollection {2}", collectionName, user, superCollectionName);
 
                     Guid collectionId = CollectionIdFromSuperCollection(superCollectionName, collectionName);
-                    Collection collection = _storage.Collections.Find(collectionId);
+                    Collection collection = RetrieveCollection(collectionId);
                     if (collection == null)
                     {
                         SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
@@ -1183,23 +1189,19 @@ namespace UI
         /// </summary>
         private bool CanCacheGetTimelines(User user, Guid collectionId)
         {
-            if (user == null)
-            {
-                // Anonymous user
-                return true;
-            }
             string cacheKey = string.Format(CultureInfo.InvariantCulture, "Collection-To-Owner {0}", collectionId);
             if (!Cache.Contains(cacheKey))
             {
-                string ownerId = _storage.Collections.Find(collectionId).User.NameIdentifier;
-                if (ownerId != null)
-                {
-                    Cache.Add(cacheKey, ownerId, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
-                }
+                Collection collection = RetrieveCollection(collectionId);
+
+                string ownerNameIdentifier = collection == null || collection.User == null || collection.User.NameIdentifier == null ? "" : collection.User.NameIdentifier;
+                Cache.Add(cacheKey, ownerNameIdentifier, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
             }
 
+            string userNameIdentifier = user == null || user.NameIdentifier == null ? "" : user.NameIdentifier;
+
             // Can cache as long as the user does not own the collection.
-            return (string)Cache[cacheKey] != user.NameIdentifier;
+            return (string)Cache[cacheKey] != userNameIdentifier;
         }
 
         /// <summary>
@@ -1239,6 +1241,20 @@ namespace UI
             {
                 return collection.User.NameIdentifier == user.NameIdentifier;
             }
+        }
+
+        private Collection RetrieveCollection(Guid collectionId)
+        {
+            Collection collection = _storage.Collections.Find(collectionId);
+            _storage.Entry(collection).Reference("User").Load();
+            return collection;
+        }
+
+        private SuperCollection RetrieveSuperCollection(Guid superCollectionId)
+        {
+            SuperCollection superCollection = _storage.SuperCollections.Find(superCollectionId);
+            _storage.Entry(superCollection).Reference("User").Load();
+            return superCollection;
         }
     }
 }
