@@ -17,7 +17,8 @@ var CZ;
                 this.descriptionInput = container.find(formInfo.descriptionInput);
                 this.attributionInput = container.find(formInfo.attributionInput);
                 this.mediaTypeInput = container.find(formInfo.mediaTypeInput);
-                this.contentItem = formInfo.context;
+                this.contentItem = formInfo.context.contentItem;
+                this.exhibit = formInfo.context.exhibit;
                 this.saveButton.off();
                 this.initialize();
             }
@@ -59,14 +60,29 @@ var CZ;
                             break;
                         }
                     }
-                    CZ.Authoring.updateContentItem(_this.contentItem, {
-                        title: _this.titleInput.val(),
-                        uri: _this.mediaInput.val(),
-                        mediaType: selected.text,
-                        description: _this.descriptionInput.val(),
-                        attribution: _this.attributionInput.val(),
-                        mediaSource: _this.mediaSourceInput.val()
-                    });
+                    if(CZ.Authoring.CImode == "editCI") {
+                        CZ.Authoring.updateContentItem(_this.contentItem, {
+                            title: _this.titleInput.val(),
+                            uri: _this.mediaInput.val(),
+                            mediaType: selected.text,
+                            description: _this.descriptionInput.val(),
+                            attribution: _this.attributionInput.val(),
+                            mediaSource: _this.mediaSourceInput.val()
+                        });
+                    }
+                    if(CZ.Authoring.CImode == "createCI") {
+                        _this.exhibit.contentItems.push({
+                            title: _this.titleInput.val(),
+                            uri: _this.mediaInput.val(),
+                            mediaType: selected.text,
+                            description: _this.descriptionInput.val(),
+                            attribution: _this.attributionInput.val(),
+                            mediaSource: _this.mediaSourceInput.val(),
+                            guid: undefined,
+                            parent: undefined
+                        });
+                        _this.close();
+                    }
                     _this.close();
                 });
             };
@@ -81,7 +97,7 @@ var CZ;
                 });
                 CZ.Authoring.isActive = false;
                 this.activationSource.removeClass("activeButton");
-                this.container.find("#error-edit-ci").hide();
+                this.container.find("#error-edit-CI").hide();
             };
             return FormEditCI;
         })(CZ.UI.FormBase);

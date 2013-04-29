@@ -68,17 +68,17 @@ module CZ {
                 this.datePicker.setDate(this.exhibit.x);
 
                 this.saveButton.click(event => {
-                    var contentItems = this.getContentItemsData();
-                    var isValid = CZ.Authoring.ValidateExhibitData(this.datePicker.getDate(), this.titleInput.val(), contentItems);
+                   // var contentItems = this.getContentItemsData();
+                   /* var isValid = CZ.Authoring.ValidateExhibitData(this.datePicker.getDate(), this.titleInput.val(), contentItems);
                     if (!isValid) {
                         this.container.find("#error-edit-exhibit").show();
-                    }
-                    if (isValid) {
-                        var self = this;
-                        CZ.Authoring.updateExhibit(this.exhibit, {
+                    }*/
+                    //if (isValid) {
+                    var self = this;
+                         CZ.Authoring.updateExhibit(this.exhibit, {
                             title: this.titleInput.val(),
                             date: this.datePicker.getDate(),
-                            contentItems: contentItems
+                            contentItems: this.exhibit.contentItems //contentItems
                         }).then(
                             function (success) {
                                 self.isCancel = false;
@@ -88,7 +88,7 @@ module CZ {
                                 alert("Unable to save changes. Please try again later.");
                                 console.log(error);
                             });
-                    }
+                  //  }
                 });
 
                 this.deleteButton.click(event => {
@@ -96,6 +96,11 @@ module CZ {
                         CZ.Authoring.removeExhibit(this.exhibit);
                         this.close();
                     }
+                });
+
+                this.createArtifactButton.click(event => {
+                    CZ.Authoring.CImode = "createCI";
+                    CZ.Authoring.showEditContentItemForm(null, this.exhibit);
                 });
             }
 

@@ -40,31 +40,28 @@ var CZ;
                 this.titleInput.val(this.exhibit.title);
                 this.datePicker.setDate(this.exhibit.x);
                 this.saveButton.click(function (event) {
-                    var contentItems = _this.getContentItemsData();
-                    var isValid = CZ.Authoring.ValidateExhibitData(_this.datePicker.getDate(), _this.titleInput.val(), contentItems);
-                    if(!isValid) {
-                        _this.container.find("#error-edit-exhibit").show();
-                    }
-                    if(isValid) {
-                        var self = _this;
-                        CZ.Authoring.updateExhibit(_this.exhibit, {
-                            title: _this.titleInput.val(),
-                            date: _this.datePicker.getDate(),
-                            contentItems: contentItems
-                        }).then(function (success) {
-                            self.isCancel = false;
-                            self.close();
-                        }, function (error) {
-                            alert("Unable to save changes. Please try again later.");
-                            console.log(error);
-                        });
-                    }
+                    var self = _this;
+                    CZ.Authoring.updateExhibit(_this.exhibit, {
+                        title: _this.titleInput.val(),
+                        date: _this.datePicker.getDate(),
+                        contentItems: _this.exhibit.contentItems
+                    }).then(function (success) {
+                        self.isCancel = false;
+                        self.close();
+                    }, function (error) {
+                        alert("Unable to save changes. Please try again later.");
+                        console.log(error);
+                    });
                 });
                 this.deleteButton.click(function (event) {
                     if(confirm("Are you sure want to delete the exhibit and all of its contentitems? Delete can't be undone!")) {
                         CZ.Authoring.removeExhibit(_this.exhibit);
                         _this.close();
                     }
+                });
+                this.createArtifactButton.click(function (event) {
+                    CZ.Authoring.CImode = "createCI";
+                    CZ.Authoring.showEditContentItemForm(null, _this.exhibit);
                 });
             };
             FormEditExhibit.prototype.getContentItemsData = function () {

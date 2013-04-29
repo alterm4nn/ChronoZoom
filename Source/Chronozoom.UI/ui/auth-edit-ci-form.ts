@@ -13,7 +13,10 @@ module CZ {
             descriptionInput: string;
             attributionInput: string;
             mediaTypeInput: string;
-            context: Object;
+            context: {
+                exhibit: Object;
+                contentItem: Object;
+            };
         }
 
         export class FormEditCI extends CZ.UI.FormBase {
@@ -24,8 +27,9 @@ module CZ {
             private mediaInput: JQuery;
             private descriptionInput: JQuery;
             private attributionInput: JQuery;
-            private mediaTypeInput: JQuery;   //?
+            private mediaTypeInput: JQuery;   
             private contentItem: any;
+            private exhibit: any;
             private isCancel: bool;
 
             // We only need to add additional initialization in constructor.
@@ -39,9 +43,9 @@ module CZ {
                 this.attributionInput = container.find(formInfo.attributionInput);
                 this.mediaTypeInput = container.find(formInfo.mediaTypeInput);
  
-                this.contentItem = formInfo.context;
-
-                this.saveButton.off();
+                this.contentItem = formInfo.context.contentItem;
+                this.exhibit = formInfo.context.exhibit; 
+                 this.saveButton.off();
                 this.initialize();
             }
 
@@ -54,7 +58,6 @@ module CZ {
                     console.log("Unexpected authoring mode in CI form.");
                     this.close();
                 }
-
                 this.isCancel = true;
                 if (CZ.Authoring.CImode == "editCI") {
                     var c = this.contentItem;
@@ -68,16 +71,15 @@ module CZ {
                         mediaType = "image";
                     }
                     var med_opt = (<any>$)(this.mediaTypeInput[0]).find(".option");
-
+                    
                     var selected = med_opt.context[0].selected;
                     for (var i = 0; i < med_opt.context.length; i++) {
                          if (med_opt.context[i].text === mediaType) {
                             med_opt.context[i].selected = true;
                         }
                     }
-                 }
+                }
                    //something with media type
-
                 this.saveButton.click(event => {
                     var med_opt = (<any>$)(this.mediaTypeInput[0]).find(".option");
                     var selected = med_opt.context[0].selected;
@@ -86,15 +88,31 @@ module CZ {
                             selected = med_opt.context[i];
                             break;
                         }
-                            CZ.Authoring.updateContentItem(this.contentItem, {
+                    if (CZ.Authoring.CImode == "editCI") {
+                        CZ.Authoring.updateContentItem(this.contentItem, {
                             title: this.titleInput.val(),
-                            uri:   this.mediaInput.val(),
+                            uri: this.mediaInput.val(),
                             mediaType: selected.text,
                             description: this.descriptionInput.val(),
                             attribution: this.attributionInput.val(),
                             mediaSource: this.mediaSourceInput.val(),
                         });
-                        this.close();
+                     }
+
+                    if (CZ.Authoring.CImode == "createCI") {
+                        this.exhibit.contentItems.push({
+                            title: this.titleInput.val(),
+                            uri: this.mediaInput.val(),
+                            mediaType: selected.text,
+                            description: this.descriptionInput.val(),
+                            attribution: this.attributionInput.val(),
+                            mediaSource: this.mediaSourceInput.val(),
+                            guid: undefined,//guid,
+                            parent: undefined
+                        });
+                         this.close();
+                    }
+                    this.close();
                 });
             }
 
@@ -120,7 +138,7 @@ module CZ {
                 CZ.Authoring.isActive = false;
 
                 this.activationSource.removeClass("activeButton");
-                this.container.find("#error-edit-ci").hide();
+                this.container.find("#error-edit-CI").hide();
             }
         }
     }
