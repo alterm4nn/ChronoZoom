@@ -326,7 +326,7 @@ module CZ {
         // Authoring Tool state.
         export var isActive : any = false;
         export var isDragging : any = false;
-        export var mode: any = null
+        export var mode: any = null;
         export var CImode: any = null;
 
         // Forms' handlers.

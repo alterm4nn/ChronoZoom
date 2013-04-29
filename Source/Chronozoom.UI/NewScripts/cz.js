@@ -1,6 +1,5 @@
 var CZ;
 (function (CZ) {
-    var HomePageViewModel;
     (function (HomePageViewModel) {
         var _uiMap = {
             "#auth-event-form": "/ui/auth-event-form.html",
@@ -129,6 +128,7 @@ var CZ;
                         form.show();
                     },
                     showEditContentItemForm: function (ci, e) {
+                        console.log(e);
                         var form = new CZ.UI.FormEditCI(forms[3], {
                             activationSource: $("#showButton"),
                             navButton: ".cz-form-nav",
@@ -141,7 +141,10 @@ var CZ;
                             descriptionInput: ".cz-form-item-descr",
                             attributionInput: ".cz-form-item-attribution",
                             mediaTypeInput: ".cz-form-item-media-type",
-                            context: ci
+                            context: {
+                                exhibit: e,
+                                contentItem: ci
+                            }
                         });
                         form.show();
                     }
@@ -442,5 +445,6 @@ var CZ;
                 $("#bibliographyBack").css("display", "block");
             }
         });
-    })(HomePageViewModel || (HomePageViewModel = {}));
+    })(CZ.HomePageViewModel || (CZ.HomePageViewModel = {}));
+    var HomePageViewModel = CZ.HomePageViewModel;
 })(CZ || (CZ = {}));

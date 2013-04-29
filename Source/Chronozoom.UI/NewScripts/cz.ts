@@ -14,7 +14,7 @@
 /// <reference path='typings/jquery/jquery.d.ts'/>
 
 module CZ {
-    module HomePageViewModel {
+    export module HomePageViewModel {
         // Contains mapping: CSS selector -> html file.
         var _uiMap = {
             "#auth-event-form": "/ui/auth-event-form.html",
@@ -160,8 +160,11 @@ module CZ {
                         	descriptionInput: ".cz-form-item-descr",
                        		attributionInput: ".cz-form-item-attribution",
                         	mediaTypeInput: ".cz-form-item-media-type",
-                        	context: ci
-                        });
+                        	context: {
+                        	    exhibit: e,
+                        	    contentItem: ci
+                        	}
+                         });
                         form.show();
                     }
                 });

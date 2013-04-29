@@ -192,140 +192,140 @@ module CZ {
                 });
             }
 */
-            export function showCreateExhibitForm (e) {
-                var isCancel = true;
-                var titleInput = $("#exhibitTitleInput");
-                var dateInput = new CZ.UI.DatePicker($("#exhibitDateInput"));
+            //export function showCreateExhibitForm (e) {
+            //    var isCancel = true;
+            //    var titleInput = $("#exhibitTitleInput");
+            //    var dateInput = new CZ.UI.DatePicker($("#exhibitDateInput"));
 
-                titleInput.val(e.title);
-                dateInput.setDate(e.infodotDescription.date);
+            //    titleInput.val(e.title);
+            //    dateInput.setDate(e.infodotDescription.date);
 
-                var contentItems = e.contentItems;
+            //    var contentItems = e.contentItems;
 
-                for (var i = 0; i < contentItems.length; i++) {
-                    _addContentItemForm($("#createExhibitForm"), true);
-                }
+            //    for (var i = 0; i < contentItems.length; i++) {
+            //        _addContentItemForm($("#createExhibitForm"), true);
+            //    }
 
-                $(".cz-authoring-ci-container").each(function (index) {
-                    _fillContentItemForm($(this), contentItems[index]);
-                });
+            //    $(".cz-authoring-ci-container").each(function (index) {
+            //        _fillContentItemForm($(this), contentItems[index]);
+            //    });
 
-                $("#createExhibitForm").dialog({
-                    title: "create exhibit",
-                    modal: true,
-                    height: 600,
-                    width: 600,
-                    buttons: {
-                        "save and close": function () {
-                            var contentItems = _getContentItemsData();
-                            var isValid = CZ.Authoring.ValidateExhibitData(dateInput.getDate(), titleInput.val(), contentItems);
+            //    $("#createExhibitForm").dialog({
+            //        title: "create exhibit",
+            //        modal: true,
+            //        height: 600,
+            //        width: 600,
+            //        buttons: {
+            //            "save and close": function () {
+            //                var contentItems = _getContentItemsData();
+            //                var isValid = CZ.Authoring.ValidateExhibitData(dateInput.getDate(), titleInput.val(), contentItems);
 
-                            if (!isValid) {
-                                $("#ExhibitErrorSpan").css("display", "block");
-                            }
-                            else {
-                                CZ.Authoring.updateExhibit(e, {
-                                    title: titleInput.val(),
-                                    date: dateInput.getDate(),
-                                    contentItems: contentItems
-                                });
-                                isCancel = false;
-                                $(this).dialog("close");
-                            }
-                        },
-                        "add content item": function () {
-                            if ($(this).find(".cz-authoring-ci-container").length < CZ.Settings.infodotMaxContentItemsCount)
-                                _addContentItemForm($(this), true);
-                        }
-                    },
-                    close: function () {
-                        if (isCancel) {
-                            CZ.Authoring.removeExhibit(e);
-                        }
-                        CZ.Authoring.isActive = false;
+            //                if (!isValid) {
+            //                    $("#ExhibitErrorSpan").css("display", "block");
+            //                }
+            //                else {
+            //                    CZ.Authoring.updateExhibit(e, {
+            //                        title: titleInput.val(),
+            //                        date: dateInput.getDate(),
+            //                        contentItems: contentItems
+            //                    });
+            //                    isCancel = false;
+            //                    $(this).dialog("close");
+            //                }
+            //            },
+            //            "add content item": function () {
+            //                if ($(this).find(".cz-authoring-ci-container").length < CZ.Settings.infodotMaxContentItemsCount)
+            //                    _addContentItemForm($(this), true);
+            //            }
+            //        },
+            //        close: function () {
+            //            if (isCancel) {
+            //                CZ.Authoring.removeExhibit(e);
+            //            }
+            //            CZ.Authoring.isActive = false;
 
-                        dateInput.remove();
-                        $("a:contains('create exhibit')").removeClass("active");
-                        $("#ExhibitErrorSpan").css("display", "none");
+            //            dateInput.remove();
+            //            $("a:contains('create exhibit')").removeClass("active");
+            //            $("#ExhibitErrorSpan").css("display", "none");
 
-                        $(this).find(".cz-authoring-ci-container")
-                                .each(function () {
-                                    $(this).remove();
-                                });
-                    }
-                });
-            }
+            //            $(this).find(".cz-authoring-ci-container")
+            //                    .each(function () {
+            //                        $(this).remove();
+            //                    });
+            //        }
+            //    });
+            //}
 
-            export function showEditExhibitForm (e) {
-                var titleInput = $("#exhibitTitleInput");
-                var dateInput = new CZ.UI.DatePicker($("#exhibitDateInput"));
+            //export function showEditExhibitForm (e) {
+            //    var titleInput = $("#exhibitTitleInput");
+            //    var dateInput = new CZ.UI.DatePicker($("#exhibitDateInput"));
 
-                titleInput.val(e.title);
-                dateInput.setDate(e.infodotDescription.date);
+            //    titleInput.val(e.title);
+            //    dateInput.setDate(e.infodotDescription.date);
 
-                var contentItems = e.contentItems;
+            //    var contentItems = e.contentItems;
 
-                for (var i = 0; i < contentItems.length; i++) {
-                    _addContentItemForm($("#createExhibitForm"), true);
-                }
+            //    for (var i = 0; i < contentItems.length; i++) {
+            //        _addContentItemForm($("#createExhibitForm"), true);
+            //    }
 
-                $(".cz-authoring-ci-container").each(function (index) {
-                    _fillContentItemForm($(this), contentItems[index]);
-                });
+            //    $(".cz-authoring-ci-container").each(function (index) {
+            //        _fillContentItemForm($(this), contentItems[index]);
+            //    });
 
-                $("#createExhibitForm").dialog({
-                    title: "edit exhibit",
-                    modal: true,
-                    height: 600,
-                    width: 600,
-                    buttons: {
-                        "save and close": function () {
-                            contentItems = _getContentItemsData();
+            //    $("#createExhibitForm").dialog({
+            //        title: "edit exhibit",
+            //        modal: true,
+            //        height: 600,
+            //        width: 600,
+            //        buttons: {
+            //            "save and close": function () {
+            //                contentItems = _getContentItemsData();
 
-                            var isValid = CZ.Authoring.ValidateExhibitData(dateInput.getDate(), titleInput.val(), contentItems);
+            //                var isValid = CZ.Authoring.ValidateExhibitData(dateInput.getDate(), titleInput.val(), contentItems);
 
-                            if (!isValid) {
-                                $("#ExhibitErrorSpan").css("display", "block");
-                            }
-                            else {
-                                CZ.Authoring.updateExhibit(e, {
-                                    title: titleInput.val(),
-                                    date: dateInput.getDate(),
-                                    contentItems: contentItems
-                                });
-                                $(this).dialog("close");
+            //                if (!isValid) {
+            //                    $("#ExhibitErrorSpan").css("display", "block");
+            //                }
+            //                else {
+            //                    CZ.Authoring.updateExhibit(e, {
+            //                        title: titleInput.val(),
+            //                        date: dateInput.getDate(),
+            //                        contentItems: contentItems
+            //                    });
+            //                    $(this).dialog("close");
 
-                                $(this).find(".cz-authoring-ci-container")
-                                    .each(function () {
-                                        $(this).remove();
-                                    });
-                            }
-                        },
-                        "delete": function () {
-                            if (confirm("Are you sure want to delete exhibit and all of its content items? Delete can't be undone!")) {
-                                CZ.Authoring.removeExhibit(e);
-                                $(this).dialog("close");
-                            }
-                        },
-                        "add content item": function () {
-                            if ($(this).find(".cz-authoring-ci-container").length < CZ.Settings.infodotMaxContentItemsCount)
-                                _addContentItemForm($("#createExhibitForm"), true);
-                        }
-                    },
-                    close: function () {
-                        CZ.Authoring.isActive = false;
+            //                    $(this).find(".cz-authoring-ci-container")
+            //                        .each(function () {
+            //                            $(this).remove();
+            //                        });
+            //                }
+            //            },
+            //            "delete": function () {
+            //                if (confirm("Are you sure want to delete exhibit and all of its content items? Delete can't be undone!")) {
+            //                    CZ.Authoring.removeExhibit(e);
+            //                    $(this).dialog("close");
+            //                }
+            //            },
+            //            "add content item": function () {
+            //                if ($(this).find(".cz-authoring-ci-container").length < CZ.Settings.infodotMaxContentItemsCount)
+            //                    _addContentItemForm($("#createExhibitForm"), true);
+            //            }
+            //        },
+            //        close: function () {
+            //            CZ.Authoring.isActive = false;
 
-                        dateInput.remove();
-                        $("a:contains('edit exhibit')").removeClass("active");
-                        $("#ExhibitErrorSpan").css("display", "none");
+            //            dateInput.remove();
+            //            $("a:contains('edit exhibit')").removeClass("active");
+            //            $("#ExhibitErrorSpan").css("display", "none");
 
-                        $(this).find(".cz-authoring-ci-container")
-                                .each(function () {
-                                    $(this).remove();
-                                });
-                    }
-                });
-            }
+            //            $(this).find(".cz-authoring-ci-container")
+            //                    .each(function () {
+            //                        $(this).remove();
+            //                    });
+            //        }
+            //    });
+            //}
     
   /*          export function showEditContentItemForm (c, e) {
                 var titleInput = $("#contentItemTitleInput");
