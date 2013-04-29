@@ -33,15 +33,16 @@ describe("Given:  'edit timeline' form is opened: ", function () {
         $('.ui-button-icon-primary.ui-icon.ui-icon-closethick').click();
     });
 
-    //"data = ['timeline title', 'start value', 'end value', 'description']"
-    dataTitle = ["", "5", "10", "empty 'title'"];
-    dataStart = ["titlename", "", "5", "empty 'start'"];
-    dataEnd = ["title", "45", "", "empty 'end'"];
-    dataStartNotNumber = ["title", "45", "abc", "'end' is not number"];
-    dataNotNumber = ["title", "!@#", "789", "'start' is not number"];
-    dataEndLessStart = ["title", "-5", "-2", "start is less than end"];
+    //"data = ['timeline title', 'start value', 'end value', 'regime', 'description']"
+    dataTitle = ["", "5", "10", "ce","empty 'title'"];
+    dataStart = ["titlename", "", "5", "ce", "empty 'start'"];
+    dataEnd = ["title", "45", "", "ce", "empty 'end'"];
+    dataStartNotNumber = ["title", "45", "abc", "ce", "'end' is not number"];
+    dataNotNumber = ["title", "!@#", "789", "ce", "'start' is not number"];
+    dataEndLessStart = ["title", "5", "2", "ce", "start is less than end"];
+    dataEndLessStartBce = ["title", "2", "5", "bce", "start is less than end"];
 
-    using("Data set: ", [dataEndLessStart, dataTitle, dataStart, dataEnd, dataStartNotNumber, dataNotNumber], function (title, start, end, conditional) {
+    using("Data set: ", [dataEndLessStart, dataEndLessStartBce, dataTitle, dataStart, dataEnd, dataStartNotNumber, dataNotNumber], function (title, start, end, regime, conditional) {
 
         describe("When: User set: " + conditional + " and save changes", function () {
             beforeEach(function () {
@@ -49,6 +50,8 @@ describe("Given:  'edit timeline' form is opened: ", function () {
                 $('#timelineTitleInput').val(title);
                 $('.cz-datepicker-year:first').val(start);
                 $('.cz-datepicker-year:last').val(end);
+                ($)(".cz-datepicker-regime:first").val(regime).attr("selected", "selected");
+                ($)(".cz-datepicker-regime:last").val(regime).attr("selected", "selected");
                 $("span:contains('save and close')").click();
             });
 
@@ -77,7 +80,7 @@ function using(name, values, func) {
             values[i] = [values[i]];
         }
         func.apply(this, [values[i][0], values[i][1], values[i][2], values[i][3]]);
-        jasmine.currentEnv_.currentSpec.description += ' ' + name + '[' + "title: " + values[i][0] + ", start: " + values[i][1] + ", end: " + values[i][2] + " , description: " + values[i][3].concat(']');
+        jasmine.currentEnv_.currentSpec.description += ' ' + name + '[' + "title: " + values[i][0] + ", start: " + values[i][1] + ", end: " + values[i][2] + ", regime: " + values[i][3] + ", description: " + values[i][4].concat(']');
     }
 }
 
@@ -87,4 +90,15 @@ function init() {
     $('#timelineEndInput').length == 0 ? $('body').prepend('<div id="timelineEndInput"</div>') : "";
     $('#timelineStartInput').length == 0 ? $('body').prepend('<div id="timelineStartInput"</div>') : "";
     $('#timelineTitleInput').length == 0 ? $('body').prepend('<span id="timelineTitleInput"</span>') : "";
+    $('.cz-datepicker-regime:first').append($("<option></option>").attr("value", "ga").text("Ga")).attr("selected", "");
+    $('.cz-datepicker-regime:first').append($("<option></option>").attr("value", "ma").text("Ma"));
+    $('.cz-datepicker-regime:first').append($("<option></option>").attr("value", "ka").text("Ka"));
+    $('.cz-datepicker-regime:first').append($("<option></option>").attr("value", "bce").text("BCE")).attr("selected", "");
+    $('.cz-datepicker-regime:first').append($("<option></option>").attr("value", "ce").text("CE"));
+
+    $('.cz-datepicker-regime:last').append($("<option></option>").attr("value", "ga").text("Ga")).attr("selected", "");
+    $('.cz-datepicker-regime:last').append($("<option></option>").attr("value", "ma").text("Ma"));
+    $('.cz-datepicker-regime:last').append($("<option></option>").attr("value", "ka").text("Ka"));
+    $('.cz-datepicker-regime:last').append($("<option></option>").attr("value", "bce").text("BCE")).attr("selected", "");
+    $('.cz-datepicker-regime:last').append($("<option></option>").attr("value", "ce").text("CE"));
 }
