@@ -9,11 +9,11 @@ namespace Tests
     {
         const string Label2000Bce = "2000 BCE";
         const string Label2001Bce = "2001 BCE";
-        const string Label2000Ce = "2000 AD";
+        const string Label2000Ce = "2000 CE";
         const string Label4000Ma = "4000 Ma";
         const string Label500Ma = "500 Ma";
         const string Label1Bce = "1 BCE";
-        const string Label1Ce = "1 AD";
+        const string Label1Ce = "1 CE";
 
        
 
@@ -70,7 +70,7 @@ namespace Tests
         [TestMethod]
         public void Transition_BCE_to_CE_should_contain_1BCE_and_1CE_ticks()
         {
-            Logger.Log("Bug: https://github.com/alterm4nn/ChronoZoom/issues/87",LogType.Debug);
+            Logger.Log("Bug: @https://github.com/alterm4nn/ChronoZoom/issues/87", LogType.Debug);
             HomePageHelper.OpenBceCeArea();
             List<string> labels = TimescaleHelper.GetLabels();
             CollectionAssert.Contains(labels, Label1Bce, Label1Bce + " is not presented");
@@ -82,7 +82,7 @@ namespace Tests
         {
             HomePageHelper.OpenHumanityTimeline();
             HomePageHelper.OpenRomanHistoryTimeline();
-            const double expected = 943;
+            const double expected = 942;
             double leftBorder = TimescaleHelper.GetLeftBorderDate();
             double rightBorder = TimescaleHelper.GetRightBorderDate();
             Assert.AreEqual(expected, rightBorder - leftBorder);
@@ -94,7 +94,7 @@ namespace Tests
             HomePageHelper.OpenHumanityTimeline();
             HomePageHelper.OpenRomanHistoryTimeline();
             const string leftBorderAge = "BCE";
-            const string righBorderAge = "AD";
+            const string righBorderAge = "CE";
             string leftBorder = TimescaleHelper.GetLeftBorderDateAge();
             string rightBorder = TimescaleHelper.GetRightBorderDateAge();
             Assert.AreEqual(leftBorderAge, leftBorder);

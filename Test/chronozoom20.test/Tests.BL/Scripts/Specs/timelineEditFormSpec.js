@@ -48,10 +48,10 @@ describe("Given:  'edit timeline' form is opened: ", function () {
             beforeEach(function () {
 
                 $('#timelineTitleInput').val(title);
-                $('.cz-datepicker-year:first').val(start);
-                $('.cz-datepicker-year:last').val(end);
-                ($)(".cz-datepicker-regime:first").val(regime).attr("selected", "selected");
-                ($)(".cz-datepicker-regime:last").val(regime).attr("selected", "selected");
+                $('#timelineStartInput .cz-datepicker-year').val(start);
+                $('#timelineEndInput .cz-datepicker-year').val(end);
+                ($)("#timelineStartInput .cz-datepicker-regime").val(regime).attr("selected", "selected");
+                ($)("#timelineEndInput .cz-datepicker-regime").val(regime).attr("selected", "selected");
                 $("span:contains('save and close')").click();
             });
 
@@ -79,7 +79,7 @@ function using(name, values, func) {
         if (Object.prototype.toString.call(values[i]) !== '[object Array]') {
             values[i] = [values[i]];
         }
-        func.apply(this, [values[i][0], values[i][1], values[i][2], values[i][3]]);
+        func.apply(this, [values[i][0], values[i][1], values[i][2], values[i][3],values[i][4]]);
         jasmine.currentEnv_.currentSpec.description += ' ' + name + '[' + "title: " + values[i][0] + ", start: " + values[i][1] + ", end: " + values[i][2] + ", regime: " + values[i][3] + ", description: " + values[i][4].concat(']');
     }
 }
@@ -87,18 +87,18 @@ function using(name, values, func) {
 function init() {
     $('#createTimelineForm').length == 0 ? $('body').prepend('<div id="createTimelineForm" >') : "";
     $('#TimelineErrorSpan').length == 0 ? $('body').prepend('<span id="TimelineErrorSpan" style="color:red; display:none">Input error</span>') : "";
-    $('#timelineEndInput').length == 0 ? $('body').prepend('<div id="timelineEndInput"</div>') : "";
     $('#timelineStartInput').length == 0 ? $('body').prepend('<div id="timelineStartInput"</div>') : "";
+    $('#timelineEndInput').length == 0 ? $('body').prepend('<div id="timelineEndInput"</div>') : "";
     $('#timelineTitleInput').length == 0 ? $('body').prepend('<span id="timelineTitleInput"</span>') : "";
-    $('.cz-datepicker-regime:first').append($("<option></option>").attr("value", "ga").text("Ga")).attr("selected", "");
-    $('.cz-datepicker-regime:first').append($("<option></option>").attr("value", "ma").text("Ma"));
-    $('.cz-datepicker-regime:first').append($("<option></option>").attr("value", "ka").text("Ka"));
-    $('.cz-datepicker-regime:first').append($("<option></option>").attr("value", "bce").text("BCE")).attr("selected", "");
-    $('.cz-datepicker-regime:first').append($("<option></option>").attr("value", "ce").text("CE"));
+    $('#timelineStartInput .cz-datepicker-regime').append($("<option></option>").attr("value", "ga").text("Ga")).attr("selected", "");
+    $('#timelineStartInput .cz-datepicker-regime').append($("<option></option>").attr("value", "ma").text("Ma"));
+    $('#timelineStartInput .cz-datepicker-regime').append($("<option></option>").attr("value", "ka").text("Ka"));
+    $('#timelineStartInput .cz-datepicker-regime').append($("<option></option>").attr("value", "bce").text("BCE")).attr("selected", "");
+    $('#timelineStartInput .cz-datepicker-regime').append($("<option></option>").attr("value", "ce").text("CE"));
 
-    $('.cz-datepicker-regime:last').append($("<option></option>").attr("value", "ga").text("Ga")).attr("selected", "");
-    $('.cz-datepicker-regime:last').append($("<option></option>").attr("value", "ma").text("Ma"));
-    $('.cz-datepicker-regime:last').append($("<option></option>").attr("value", "ka").text("Ka"));
-    $('.cz-datepicker-regime:last').append($("<option></option>").attr("value", "bce").text("BCE")).attr("selected", "");
-    $('.cz-datepicker-regime:last').append($("<option></option>").attr("value", "ce").text("CE"));
+    $('#timelineEndInput .cz-datepicker-regime').append($("<option></option>").attr("value", "ga").text("Ga")).attr("selected", "");
+    $('#timelineEndInput .cz-datepicker-regime').append($("<option></option>").attr("value", "ma").text("Ma"));
+    $('#timelineEndInput .cz-datepicker-regime').append($("<option></option>").attr("value", "ka").text("Ka"));
+    $('#timelineEndInput .cz-datepicker-regime').append($("<option></option>").attr("value", "bce").text("BCE")).attr("selected", "");
+    $('#timelineEndInput .cz-datepicker-regime').append($("<option></option>").attr("value", "ce").text("CE"));
 }
