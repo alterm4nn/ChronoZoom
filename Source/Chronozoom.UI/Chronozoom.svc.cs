@@ -92,7 +92,19 @@ namespace UI
         /// <param name="maxElements">The maximum number of elements to return.</param>
         /// <returns>Timeline data in JSON format.</returns>
         /// <example><![CDATA[ 
-        /// http://chronozoomproject.org/chronozoom.svc/GetTimelines?collection=myCollection&start=1974&end=2013
+        /// HTTP verb: GET
+        ///
+        /// URL:
+        /// http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/timelines
+        ///
+        /// Request body (JSON):
+        /// {
+        ///    start: 1800
+        ///    end: 1920
+        ///    minspan: 
+        ///    lca: 
+        ///    maxElements: 25
+        /// }
         /// ]]>
         /// </example>
         [OperationContract]
@@ -137,9 +149,12 @@ namespace UI
         /// <summary>
         /// Returns the time thresholds that have been defined for a ChronoZoom instance.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Time threshold data in JSON format.</returns>
         /// <example><![CDATA[ 
-        /// http://chronozoomproject.org/chronozoom.svc/GetThresholds
+        /// HTTP verb: GET
+        ///
+        /// URL:
+        /// http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/thresholds
         /// ]]>
         /// </example>
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
@@ -167,9 +182,17 @@ namespace UI
         /// <param name="supercollection">Name of the supercollection to query.</param>
         /// <param name="collection">Name of the collection to query.</param>
         /// <param name="searchTerm">The term to search for.</param>
-        /// <returns></returns>
+        /// <returns>Search results in JSON format.</returns>
         /// <example><![CDATA[ 
-        /// http://chronozoomproject.org/chronozoom.svc/Search?collection=myColl&searchTerm=Pluto
+        /// HTTP verb: GET
+        ///
+        /// URL:
+        /// http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/search
+        ///
+        /// Request body (JSON):
+        /// {
+        ///    searchTerm: "Pluto"
+        /// }
         /// ]]>
         /// </example>
         [OperationContract]
@@ -205,9 +228,17 @@ namespace UI
         /// Returns the bibliography for a given exhibit.
         /// </summary>
         /// <param name="exhibitId">ID of the exhibit.</param>
-        /// <returns></returns>
+        /// <returns>The bibliography data in JSON format.</returns>
         /// <example><![CDATA[ 
-        /// http://chronozoomproject.org/chronozoom.svc/GetBibliography?exhibitId=[id]
+        /// HTTP verb: GET
+        ///
+        /// URL:
+        /// http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/bibliography
+        ///
+        /// Request body (JSON):
+        /// {
+        ///     exhibitId: "0123456789"
+        /// }
         /// ]]>
         /// </example>
         [OperationContract]
@@ -240,7 +271,10 @@ namespace UI
         /// <param name="collection">Name of the collection to query.</param>
         /// <returns>A list of tours in JSON format.</returns>
         /// <example><![CDATA[ 
-        /// http://chronozoomproject.org/chronozoom.svc/GetTours?collection=Chronozoom.Entities
+        /// HTTP verb: GET
+        ///
+        /// URL: 
+        /// http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/tours
         /// ]]>
         /// </example>
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
@@ -287,13 +321,15 @@ namespace UI
         /// <param name="userRequest">JSON containing the request details.</param>
         /// <returns>The URL for the new user collection.</returns>
         /// <example><![CDATA[ 
+        /// HTTP verb: PUT
+        ///
         /// URL:
-        /// http://chronozoomproject.org/chronozoom.svc/PutUser?User=aUser
+        /// http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/user
         /// 
-        /// Request body:
+        /// Request body (JSON):
         /// {
         ///     id: "0123456789",
-        ///     displayName: "name",
+        ///     displayName: "Joe",
         ///     email: "email@email.com"
         /// }
         /// ]]>
@@ -362,12 +398,13 @@ namespace UI
         /// Deletes the user with the specified user ID.
         /// </summary>
         /// <param name="userRequest">JSON containing the request details.</param>
+        /// <returns>HTTP response code.</returns>
         /// <example><![CDATA[ 
         /// HTTP verb: DELETE
         /// URL:
-        /// http://chronozoomproject.org/chronozoom.svc/{supercollection}/{collection}/user
+        /// http://{site URL}/chronozoom.svc/{supercollection}/{collection}/user
         /// 
-        /// Request body:
+        /// Request body (JSON):
         /// {
         ///     id: "0123456789"
         /// }
@@ -591,7 +628,15 @@ namespace UI
         /// <param name="collectionRequest">The markup for the collection to create in JSON format.</param>
         /// <returns></returns>
         /// <example><![CDATA[ 
-        /// http://chronozoomproject.org/chronozoom.svc/PutCollectionName?collectionName=myCollection
+        /// HTTP verb: PUT
+        ///
+        /// URL:
+        /// http://{site URL}/chronozoom.svc/{superCollectionName}/{collectionName}
+        ///
+        /// Request body (JSON):
+        /// {
+        ///      name: "My Collection"
+        /// }
         /// ]]>
         /// </example>
         [OperationContract]
@@ -645,8 +690,12 @@ namespace UI
         /// </summary>
         /// <param name="superCollectionName">The name of the parent collection.</param>
         /// <param name="collectionName">The name of the collection to delete.</param>
+        /// <returns>HTTP response code.</returns>
         /// <example><![CDATA[ 
-        /// http://chronozoomproject.org/chronozoom.svc/DeleteCollection?collectionName=myOldCollection
+        /// HTTP verb: DELETE
+        ///
+        /// URL:
+        /// http://{site URL}/chronozoom.svc/{superCollectionName}/{collectionName}
         /// ]]>
         /// </example>
         [OperationContract]
@@ -678,20 +727,28 @@ namespace UI
 
         /// <summary>
         /// Creates or updates the timeline in a given collection. 
-        /// If the collection does not exist, the request will fail.
         /// </summary>
         /// <remarks>
-        /// If a timeline id is not specified, then a new timeline is added to the collection. 
-        /// For a new timeline, if the parent is not defined it will be set to the root timeline. 
-        /// If the specified timeline identifier does not exist a "not found" status is returned. 
+        /// If an ID is specified but the collection does not exist, the request will fail ("not found" status).
+        /// If an ID is not specified, a new timeline will be added to the collection. 
+        /// For a new timeline, if the parent is not defined the root timeline will be set as the parent.
         /// If the timeline with the specified identifier exists, then the existing timeline is updated.
         /// </remarks>
         /// <param name="superCollectionName">The parent collection.</param>
         /// <param name="collectionName">The name of the collection to update.</param>
         /// <param name="timelineRequest">Timeline data in JSON format.</param>
-        /// <returns></returns>
+        /// <returns>HTTP status code.</returns>
         /// <example><![CDATA[ 
-        /// http://chronozoomproject.org/chronozoom.svc/PutTimeline?collectionName=aCollection&timelineRequest=myTLdata
+        /// HTTP verb: PUT
+        ///
+        /// URL:
+        /// http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/timeline
+        ///
+        /// Request body (JSON):
+        /// {
+        ///      id: "0123456789"
+        ///      title: "A New Title"
+        /// }
         /// ]]>
         /// </example>
         [OperationContract]
@@ -787,7 +844,15 @@ namespace UI
         /// <param name="collectionName">The name of the collection from which the timeline should be deleted.</param>
         /// <param name="timelineRequest">The request in JSON format.</param>
         /// <example><![CDATA[ 
-        /// http://chronozoomproject.org/chronozoom.svc/DeleteTimeline?collectionName=aCollection&timelineRequest={id:"0123456789"} 
+        /// HTTP verb: DELETE
+        ///
+        /// URL:
+        /// http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/timeline
+        ///
+        /// Request body (JSON):
+        /// {
+        ///      timelineRequest: Need request body format.
+        /// }
         /// ]]>
         /// </example>
         [OperationContract]
@@ -862,9 +927,17 @@ namespace UI
         /// <param name="superCollectionName">The name of the parent collection.</param>
         /// <param name="collectionName">The name of the collection to modify.</param>
         /// <param name="exhibitRequest">The exhibit data in JSON format.</param>
-        /// <returns></returns>
+        /// <returns>An exhibit in JSON format.</returns>
         /// <example><![CDATA[ 
-        /// http://chronozoomproject.org/chronozoom.svc/PutExhibit?collectionName=myColl&exhibitRequest=myExhibitData
+        /// **HTTP verb:** PUT
+        ///
+        /// **URL:**
+        ///     http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/exhibit
+        ///
+        /// **Request body:**
+        ///     {
+        ///          
+        ///     }
         /// ]]>
         /// </example>
         [OperationContract]
@@ -1042,9 +1115,16 @@ namespace UI
         /// <param name="collectionName">The name of the collection to modify.</param>
         /// <param name="exhibitRequest">The exhibit ID in JSON format.</param>
         /// <example><![CDATA[ 
-        /// http://chronozoomproject.org/chronozoom.svc/DeleteExhibit?collectionName=myColl&exhibitRequest={id:"0123456789"}
-        /// ]]>
-        /// </example>
+        /// **HTTP verb:** DELETE
+        ///
+        /// **URL:**
+        ///     http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/exhibit
+        ///
+        /// **Request body:**
+        ///     {
+        ///          id: "0123456789"
+        ///     }
+        /// ]]></example>
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/exhibit", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public void DeleteExhibit(string superCollectionName, string collectionName, Exhibit exhibitRequest)
@@ -1104,9 +1184,16 @@ namespace UI
         /// <param name="contentItemRequest">The content item data in JSON format.</param>
         /// <returns></returns>
         /// <example><![CDATA[ 
-        /// http://chronozoomproject.org/chronozoom.svc/PutContentItem?collectionName=myColl&exhibitRequest=myContentItem
-        /// ]]>
-        /// </example>
+        /// **HTTP verb:** PUT
+        ///
+        /// **URL:**
+        ///     http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/contentitem
+        ///
+        /// **Request body:**
+        ///     {
+        ///          
+        ///     }
+        /// ]]></example>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/contentitem", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public Guid PutContentItem(string superCollectionName, string collectionName, ContentItemRaw contentItemRequest)
@@ -1170,7 +1257,15 @@ namespace UI
         /// <param name="collectionName">The name of the collection to modify.</param>
         /// <param name="contentItemRequest">The request in JSON format.</param>
         /// <example><![CDATA[ 
-        /// http://chronozoomproject.org/chronozoom.svc/DeleteContentItem?collectionName=myColl&exhibitRequest={id:"0123456789"}
+        /// **HTTP verb:** DELETE
+        ///
+        /// **URL:**
+        ///     http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/contentitem
+        ///
+        /// **Request body:**
+        ///     {
+        ///          id: "0123456789"
+        ///     }
         /// ]]>
         /// </example>
         [OperationContract]
