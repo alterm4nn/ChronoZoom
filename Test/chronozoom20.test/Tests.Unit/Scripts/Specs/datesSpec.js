@@ -107,7 +107,7 @@ var data9 = [2000.162, 2000, 2, 1];
 
 describe("getDMYFromCoordinate() method should return", function () {
     usingDMY("", [data1, data2, data3, data4, data5, data6, data7, data8, data9], function (coordinate, year, month, day) {
-        it("{ year: " + year + ", month: " + month + ", day: " + day + " }  with coordinate: "+ coordinate , function () {
+        it("{ year: " + year + ", month: " + month + ", day: " + day + " }  with coordinate: " + coordinate, function () {
             var result = CZ.Dates.getDMYFromCoordinate(coordinate);
             expect({ year: year, month: month, day: day }).toEqual(result);
         });
@@ -120,6 +120,48 @@ describe("getCoordinateFromDMY() method should return", function () {
             var result = CZ.Dates.getCoordinateFromDMY(year, month, day);
             expect(1 * coordinate.toFixed(2)).toEqual(1 * result.toFixed(2));
         });
+    });
+});
+
+describe("getPresent() method should return", function () {
+    it("current date", function () {
+        var expectedDate = new Date();
+        var result = CZ.Dates.getPresent();
+        expect(expectedDate.getUTCDate()).toEqual(result.presentDay);
+        expect(expectedDate.getUTCMonth()).toEqual(result.presentMonth);
+        expect(expectedDate.getUTCFullYear()).toEqual(result.presentYear);
+    });
+});
+
+describe("getCoordinateFromDecimalYear() method should return", function () {
+    it("decimalYear date if year != 9999", function () {
+        var decimal = 2012.654794520548;
+        var result = CZ.Dates.getCoordinateFromDecimalYear(decimal);
+        expect(result).toEqual(decimal);
+    });
+
+    it("decimalYear date if year = '9999'", function () {
+        var decimal = '9999';
+        var result = CZ.Dates.getCoordinateFromDecimalYear(decimal);
+        expect(result).toEqual(decimal);
+    });
+
+    it("decimalYear date if year = -9999", function () {
+        var decimal = -9999;
+        var result = CZ.Dates.getCoordinateFromDecimalYear(decimal);
+        expect(result).toEqual(decimal);
+    });
+
+    it("not decimalYear if year = 9999.00", function () {
+        var decimal = 9999.00;
+        var result = CZ.Dates.getCoordinateFromDecimalYear(decimal);
+        expect(result).not.toEqual(decimal);
+    });
+    
+    it("not decimalYear if year === 9999", function () {
+        var decimal = 9999;
+        var result = CZ.Dates.getCoordinateFromDecimalYear(decimal);
+        expect(result).not.toEqual(decimal);
     });
 });
 

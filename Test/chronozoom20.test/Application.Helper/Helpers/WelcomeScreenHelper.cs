@@ -10,10 +10,17 @@ namespace Application.Helper.Helpers
         public void CloseWelcomePopup()
         {
             Logger.Log("<-");
-           // ClickCloseButton();
+            ClickCloseButton();
             WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("CZ.Common.cosmosVisible != undefined")), 60);
             Sleep(2);
             WaitAjaxComplete(10);
+            Logger.Log("->");
+        } 
+        
+        public void CloseWelcomePopupWithOutWaiting()
+        {
+            Logger.Log("<-");
+            ClickCloseButton();
             Logger.Log("->");
         }
 
