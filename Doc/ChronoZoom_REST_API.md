@@ -62,13 +62,13 @@ Timeline data in JSON format.
  
 |Parameter|Value|
 |:--------|:----|
-|param|Name of the supercollection to query.|
-|param|Name of the collection to query.|
-|param|Year at which to begin the search, between -20000000000 and 9999.|
-|param|Year at which to end the search, between -20000000000 and 9999.|
-|param|Filters the search results to a particular time scale.|
-|param|Least Common Ancestor, a timeline identifier used to hint the server to retrieve timelines close to this location.|
-|param|The maximum number of elements to return.|
+|supercollection|Name of the supercollection to query.|
+|collection|Name of the collection to query.|
+|start|Year at which to begin the search, between -20000000000 and 9999.|
+|end|Year at which to end the search, between -20000000000 and 9999.|
+|minspan|Filters the search results to a particular time scale.|
+|lca|Least Common Ancestor, a timeline identifier used to hint the server to retrieve timelines close to this location.|
+|maxElements|The maximum number of elements to return.|
  
 [top](#chronozoom-rest-api-reference)
  
@@ -122,9 +122,9 @@ Search results in JSON format.
  
 |Parameter|Value|
 |:--------|:----|
-|param|Name of the supercollection to query.|
-|param|Name of the collection to query.|
-|param|The term to search for.|
+|supercollection|Name of the supercollection to query.|
+|collection|Name of the collection to query.|
+|searchTerm|The term to search for.|
  
 [top](#chronozoom-rest-api-reference)
  
@@ -155,7 +155,7 @@ The bibliography data in JSON format.
  
 |Parameter|Value|
 |:--------|:----|
-|param|ID of the exhibit.|
+|exhibitId|ID of the exhibit.|
  
 [top](#chronozoom-rest-api-reference)
  
@@ -181,8 +181,8 @@ A list of tours in JSON format.
  
 |Parameter|Value|
 |:--------|:----|
-|param|Name of the supercollection to query.|
-|param|Name of the collection to query.|
+|supercollection|Name of the supercollection to query.|
+|collection|Name of the collection to query.|
  
 [top](#chronozoom-rest-api-reference)
  
@@ -215,7 +215,7 @@ The URL for the new user collection.
  
 |Parameter|Value|
 |:--------|:----|
-|param|JSON containing the request details.|
+|userRequest|JSON containing the request details.|
  
 [top](#chronozoom-rest-api-reference)
  
@@ -245,7 +245,7 @@ HTTP response code.
  
 |Parameter|Value|
 |:--------|:----|
-|param|JSON containing the request details.|
+|userRequest|JSON containing the request details.|
  
 [top](#chronozoom-rest-api-reference)
  
@@ -276,9 +276,9 @@ Creates a new collection using the specified name.
  
 |Parameter|Value|
 |:--------|:----|
-|param|The name of the parent supercollection for the collection.|
-|param|The name of the collection to create.|
-|param|The markup for the collection to create in JSON format.|
+|superCollectionName|The name of the parent supercollection for the collection.|
+|collectionName|The name of the collection to create.|
+|collectionRequest|The markup for the collection to create in JSON format.|
  
 [top](#chronozoom-rest-api-reference)
  
@@ -304,8 +304,8 @@ HTTP response code.
  
 |Parameter|Value|
 |:--------|:----|
-|param|The name of the parent collection.|
-|param|The name of the collection to delete.|
+|superCollectionName|The name of the parent collection.|
+|collectionName|The name of the collection to delete.|
  
 [top](#chronozoom-rest-api-reference)
  
@@ -337,9 +337,9 @@ HTTP status code.
  
 |Parameter|Value|
 |:--------|:----|
-|param|The parent collection.|
-|param|The name of the collection to update.|
-|param|Timeline data in JSON format.|
+|superCollectionName|The parent collection.|
+|collectionName|The name of the collection to update.|
+|timelineRequest|Timeline data in JSON format.|
  
 [top](#chronozoom-rest-api-reference)
  
@@ -367,9 +367,9 @@ Deletes the timeline with the specified ID.
  
 |Parameter|Value|
 |:--------|:----|
-|param|The name of the parent collection.|
-|param|The name of the collection from which the timeline should be deleted.|
-|param|The request in JSON format.|
+|superCollectionName|The name of the parent collection.|
+|collectionName|The name of the collection from which the timeline should be deleted.|
+|timelineRequest|The request in JSON format.|
  
 [top](#chronozoom-rest-api-reference)
  
@@ -400,9 +400,9 @@ An exhibit in JSON format.
  
 |Parameter|Value|
 |:--------|:----|
-|param|The name of the parent collection.|
-|param|The name of the collection to modify.|
-|param|The exhibit data in JSON format.|
+|superCollectionName|The name of the parent collection.|
+|collectionName|The name of the collection to modify.|
+|exhibitRequest|The exhibit data in JSON format.|
  
 [top](#chronozoom-rest-api-reference)
  
@@ -430,9 +430,9 @@ Deletes the specified exhibit from the specified collection.
  
 |Parameter|Value|
 |:--------|:----|
-|param|The name of the parent collection.|
-|param|The name of the collection to modify.|
-|param|The exhibit ID in JSON format.|
+|superCollectionName|The name of the parent collection.|
+|collectionName|The name of the collection to modify.|
+|exhibitRequest|The exhibit ID in JSON format.|
  
 [top](#chronozoom-rest-api-reference)
  
@@ -463,9 +463,9 @@ Creates or updates the content item in a given collection. If the collection doe
  
 |Parameter|Value|
 |:--------|:----|
-|param|The name of the parent collection.|
-|param|The name of the collection to modify.|
-|param|The content item data in JSON format.|
+|superCollectionName|The name of the parent collection.|
+|collectionName|The name of the collection to modify.|
+|contentItemRequest|The content item data in JSON format.|
  
 [top](#chronozoom-rest-api-reference)
  
@@ -493,9 +493,9 @@ Delete the specified content item from the specified collection.
  
 |Parameter|Value|
 |:--------|:----|
-|param|The name of the parent collection.|
-|param|The name of the collection to modify.|
-|param|The request in JSON format.|
+|superCollectionName|The name of the parent collection.|
+|collectionName|The name of the collection to modify.|
+|contentItemRequest|The request in JSON format.|
  
 [top](#chronozoom-rest-api-reference)
  
