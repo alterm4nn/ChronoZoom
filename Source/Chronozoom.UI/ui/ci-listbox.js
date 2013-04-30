@@ -14,12 +14,13 @@ var CZ;
                     sortableSettings: {
                         forcePlaceholderSize: true,
                         cursor: "move",
-                        placeholder: "placeholder-example",
+                        placeholder: "cz-listbox-placeholder",
                         revert: 100,
                         opacity: 0.75,
                         tolerance: "pointer",
                         scroll: false,
-                        create: function () {
+                        start: function (event, ui) {
+                            ui.placeholder.height(ui.item.height());
                         }
                     }
                 };

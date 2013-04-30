@@ -86,23 +86,27 @@ var CZ;
                     _this.close();
                 });
             };
-            FormEditCI.prototype.show = function () {
-                _super.prototype.show.call(this, {
+            FormEditCI.prototype.show = function (noAnimation) {
+                _super.prototype.show.call(this, noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",
                     duration: 500
                 });
-                this.activationSource.addClass("activeButton");
+                this.activationSource.addClass("active");
             };
-            FormEditCI.prototype.close = function () {
-                _super.prototype.close.call(this, {
+            FormEditCI.prototype.close = function (noAnimation) {
+                _super.prototype.close.call(this, noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",
                     duration: 500
                 });
                 CZ.Authoring.isActive = false;
-                this.activationSource.removeClass("activeButton");
+                this.activationSource.removeClass("active");
                 this.container.find("#error-edit-CI").hide();
+            };
+            FormEditCI.prototype.back = function () {
+                this.close(true);
+                this.prevForm.show(true);
             };
             return FormEditCI;
         })(CZ.UI.FormBase);

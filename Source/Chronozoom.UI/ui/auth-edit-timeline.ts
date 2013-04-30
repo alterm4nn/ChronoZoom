@@ -103,7 +103,7 @@ module CZ {
                     duration: 500
                 });
 
-                this.activationSource.addClass("activeButton");
+                this.activationSource.addClass("active");
             }
 
             public close() {
@@ -123,7 +123,7 @@ module CZ {
 
                 CZ.Authoring.isActive = false;
 
-                this.activationSource.removeClass("activeButton");
+                this.activationSource.removeClass("active");
                 this.container.find("#error-edit-timeline").hide();
             }
         }

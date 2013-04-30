@@ -101,8 +101,9 @@ module CZ {
                 });
 
                 this.createArtifactButton.click(event => {
+                    this.close(true);
                     CZ.Authoring.CImode = "createCI";
-                    CZ.Authoring.showEditContentItemForm(null, this.exhibit, this);
+                    CZ.Authoring.showEditContentItemForm(null, this.exhibit, this, true);
                 });
             }
 
@@ -112,18 +113,18 @@ module CZ {
                 return contentItems;
             }
 
-            public show(): void {
-                super.show({
+            public show(noAnimation?: bool): void {
+                super.show(noAnimation ? undefined : {
                     effect: "slide", 
                     direction: "left",
                     duration: 500
                 });
 
-                this.activationSource.addClass("activeButton");
+                this.activationSource.addClass("active");
             }
 
-            public close() {
-                super.close({
+            public close(noAnimation?: bool) {
+                super.close(noAnimation ? undefined : {
                     effect: "slide", 
                     direction: "left",
                     duration: 500,
@@ -138,7 +139,7 @@ module CZ {
                 
                 CZ.Authoring.isActive = false;
 
-                this.activationSource.removeClass("activeButton");
+                this.activationSource.removeClass("active");
                 this.container.find("#error-edit-exhibit").hide();
             }
         }

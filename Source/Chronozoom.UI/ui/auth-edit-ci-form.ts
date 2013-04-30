@@ -116,18 +116,18 @@ module CZ {
                 });
             }
 
-            public show(): void {
-                super.show({
+            public show(noAnimation?: bool): void {
+                super.show(noAnimation ? undefined : {
                     effect: "slide", 
                     direction: "left",
                     duration: 500
                 });
 
-                this.activationSource.addClass("activeButton");
+                this.activationSource.addClass("active");
             }
 
-            public close() {
-                super.close({
+            public close(noAnimation?: bool) {
+                super.close(noAnimation ? undefined : {
                     effect: "slide", 
                     direction: "left",
                     duration: 500
@@ -135,8 +135,13 @@ module CZ {
 
                 CZ.Authoring.isActive = false;
 
-                this.activationSource.removeClass("activeButton");
+                this.activationSource.removeClass("active");
                 this.container.find("#error-edit-CI").hide();
+            }
+
+            public back() {
+                this.close(true);
+                this.prevForm.show(true);
             }
         }
     }

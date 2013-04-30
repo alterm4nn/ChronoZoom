@@ -23,18 +23,6 @@ module CZ {
                     => ContentItemListItem;
             };
         }
-        
-        /*
-        export class ContentItemListBox extends ListBoxBase {
-            constructor(container: JQuery,
-                        listBoxInfo: IListBoxBaseInfo,
-                        listItemsInfo: IContentItemListItemInfo) {
-
-                listItemsInfo.default.ctor = ContentItemListItem;
-                super(container, listBoxInfo, listItemsInfo);
-            }
-        }
-        */
 
         export class ContentItemListBox extends ListBoxBase {
             constructor(container: JQuery, contentItems: any) {
@@ -43,16 +31,14 @@ module CZ {
                     sortableSettings: {
                         forcePlaceholderSize: true,
                         cursor: "move",
-                        placeholder: "placeholder-example",
+                        placeholder: "cz-listbox-placeholder",
                         revert: 100,
                         opacity: 0.75,
                         tolerance: "pointer",
                         scroll: false,
 
-                        create: function () {
-                            // NOTE: In case of scrollbar shifting,
-                            //       control height manually.
-                            //$(this).height($(this).height());
+                        start: function (event, ui) {
+                            ui.placeholder.height(ui.item.height());   
                         }
                     }
                 };

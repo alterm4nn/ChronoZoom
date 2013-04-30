@@ -87,40 +87,7 @@
                 "$('<div id='listbox1'></div>')": "/ui/ci-listbox.html",
                 "$('<div id='listbox2'></div>')": "listbox-example.html"
             }).done(function (c1, c2) {
-                listbox1 = new CZ.UI.ContentItemListBox(
-                    // NOTE: More sortable settings:
-                    //       http://api.jqueryui.com/sortable/
-                    c1.find(".cz-listbox"),
-                    {
-                        context: contentItems,
-                        sortableSettings: {
-                            forcePlaceholderSize: true,
-                            cursor: "move",
-                            placeholder: "cz-listbox-placeholder",
-                            revert: 100,
-                            opacity: 0.75,
-                            tolerance: "pointer",
-                            scroll: false,
-
-                            create: function() {
-                                // NOTE: In case of scrollbar shifting,
-                                //       control height manually.
-                                //$(this).height($(this).height());
-                            }
-                        }
-                    },
-                    {
-                        default: {
-                            container: c1.find(".cz-listitem"),
-                            uiMap: {
-                                closeButton: ".cz-listitem-close-btn",
-                                iconImg: ".cz-ci-listitem-icon > img",
-                                titleTextblock: ".cz-ci-listitem-title",
-                                descrTextblock: ".cz-ci-listitem-descr"
-                            }
-                        }
-                    }
-                );
+                listbox1 = new CZ.UI.ContentItemListBox(c1.find(".cz-listbox"), contentItems);
 
                 listbox2 = new RedGreenListBox(
                     // NOTE: More sortable settings:
@@ -141,6 +108,10 @@
                                 // NOTE: In case of scrollbar shifting,
                                 //       control height manually.
                                 //$(this).height($(this).height());
+                            },
+
+                            start: function (event, ui) {
+                                ui.placeholder.height(ui.item.height());   
                             }
                         }
                     },

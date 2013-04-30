@@ -60,25 +60,26 @@ var CZ;
                     }
                 });
                 this.createArtifactButton.click(function (event) {
+                    _this.close(true);
                     CZ.Authoring.CImode = "createCI";
-                    CZ.Authoring.showEditContentItemForm(null, _this.exhibit, _this);
+                    CZ.Authoring.showEditContentItemForm(null, _this.exhibit, _this, true);
                 });
             };
             FormEditExhibit.prototype.getContentItemsData = function () {
                 var contentItems = [];
                 return contentItems;
             };
-            FormEditExhibit.prototype.show = function () {
-                _super.prototype.show.call(this, {
+            FormEditExhibit.prototype.show = function (noAnimation) {
+                _super.prototype.show.call(this, noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",
                     duration: 500
                 });
-                this.activationSource.addClass("activeButton");
+                this.activationSource.addClass("active");
             };
-            FormEditExhibit.prototype.close = function () {
+            FormEditExhibit.prototype.close = function (noAnimation) {
                 var _this = this;
-                _super.prototype.close.call(this, {
+                _super.prototype.close.call(this, noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",
                     duration: 500,
@@ -90,7 +91,7 @@ var CZ;
                     CZ.Authoring.removeExhibit(this.exhibit);
                 }
                 CZ.Authoring.isActive = false;
-                this.activationSource.removeClass("activeButton");
+                this.activationSource.removeClass("active");
                 this.container.find("#error-edit-exhibit").hide();
             };
             return FormEditExhibit;

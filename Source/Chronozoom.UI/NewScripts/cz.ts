@@ -106,7 +106,7 @@ module CZ {
                 CZ.Authoring.initialize(CZ.Common.vc, {
                     showCreateTimelineForm: function (timeline) {
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
-                            activationSource: $("a:contains('create timeline')"),
+                            activationSource: $(".header-icon.edit-icon"),
                             navButton: ".cz-form-nav",
                             closeButton: ".cz-form-close-btn > .cz-form-btn",
                             titleTextblock: ".cz-form-title",
@@ -121,7 +121,7 @@ module CZ {
                     },
                     showEditTimelineForm: function (timeline) {
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
-                        	activationSource: $("#showButton"),
+                        	activationSource: $(".header-icon.edit-icon"),
                         	navButton: ".cz-form-nav",
                         	closeButton: ".cz-form-close-btn > .cz-form-btn",
                         	titleTextblock: ".cz-form-title",
@@ -136,14 +136,14 @@ module CZ {
                     },
                     showCreateExhibitForm: function (exhibit) {
                         var form = new CZ.UI.FormEditExhibit(forms[2], {
-                            activationSource: $("a:contains('create exhibit')"),
+                            activationSource: $(".header-icon.edit-icon"),
                             navButton: ".cz-form-nav",
                             closeButton: ".cz-form-close-btn > .cz-form-btn",
                             titleTextblock: ".cz-form-title",
                             titleInput: ".cz-form-item-title",
                             datePicker: ".cz-form-time",
                             createArtifactButton: ".cz-form-create-artifact",
-                            contentItemsListBox: ".cz-form-contentitems",
+                            contentItemsListBox: ".cz-listbox",
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             context: exhibit
@@ -152,23 +152,23 @@ module CZ {
                     },
                     showEditExhibitForm: function (exhibit) {
                         var form = new CZ.UI.FormEditExhibit(forms[2], {
-                            activationSource: $("#showButton"),
+                            activationSource: $(".header-icon.edit-icon"),
                             navButton: ".cz-form-nav",
                             closeButton: ".cz-form-close-btn > .cz-form-btn",
                             titleTextblock: ".cz-form-title",
                             titleInput: ".cz-form-item-title",
                             datePicker: ".cz-form-time",
                             createArtifactButton: ".cz-form-create-artifact",
-                            contentItemsListBox: ".cz-form-contentitems",
+                            contentItemsListBox: ".cz-listbox",
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             context: exhibit
 						});
                         form.show();
                     },
-                    showEditContentItemForm: function (ci, e, prevForm) {
+                    showEditContentItemForm: function (ci, e, prevForm, noAnimation) {
                         var form = new CZ.UI.FormEditCI(forms[3], {
-                        	activationSource: $("#showButton"),
+                        	activationSource: $(".header-icon.edit-icon"),
                             prevForm: prevForm,
                         	navButton: ".cz-form-nav",
                         	closeButton: ".cz-form-close-btn > .cz-form-btn",
@@ -185,7 +185,7 @@ module CZ {
                         	    contentItem: ci
                         	}
                          });
-                        form.show();
+                        form.show(noAnimation);
                     }
                 });
             });

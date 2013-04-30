@@ -72,7 +72,7 @@ var CZ;
                     direction: "left",
                     duration: 500
                 });
-                this.activationSource.addClass("activeButton");
+                this.activationSource.addClass("active");
             };
             FormEditTimeline.prototype.close = function () {
                 var _this = this;
@@ -89,7 +89,7 @@ var CZ;
                     CZ.Authoring.removeTimeline(this.timeline);
                 }
                 CZ.Authoring.isActive = false;
-                this.activationSource.removeClass("activeButton");
+                this.activationSource.removeClass("active");
                 this.container.find("#error-edit-timeline").hide();
             };
             return FormEditTimeline;
