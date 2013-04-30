@@ -67,18 +67,27 @@ var CZ;
                 });
             };
             FormEditTimeline.prototype.show = function () {
-                _super.prototype.show.call(this);
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
                 this.activationSource.addClass("activeButton");
             };
             FormEditTimeline.prototype.close = function () {
                 var _this = this;
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500,
+                    complete: function () {
+                        _this.endDate.remove();
+                        _this.startDate.remove();
+                    }
+                });
                 if(this.isCancel && CZ.Authoring.mode === "createTimeline") {
                     CZ.Authoring.removeTimeline(this.timeline);
                 }
-                this.container.hide("slow", function (event) {
-                    _this.endDate.remove();
-                    _this.startDate.remove();
-                });
                 CZ.Authoring.isActive = false;
                 this.activationSource.removeClass("activeButton");
                 this.container.find("#error-edit-timeline").hide();

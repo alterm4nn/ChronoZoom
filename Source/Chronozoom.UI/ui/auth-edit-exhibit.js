@@ -61,7 +61,7 @@ var CZ;
                 });
                 this.createArtifactButton.click(function (event) {
                     CZ.Authoring.CImode = "createCI";
-                    CZ.Authoring.showEditContentItemForm(null, _this.exhibit);
+                    CZ.Authoring.showEditContentItemForm(null, _this.exhibit, _this);
                 });
             };
             FormEditExhibit.prototype.getContentItemsData = function () {
@@ -69,17 +69,26 @@ var CZ;
                 return contentItems;
             };
             FormEditExhibit.prototype.show = function () {
-                _super.prototype.show.call(this);
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
                 this.activationSource.addClass("activeButton");
             };
             FormEditExhibit.prototype.close = function () {
                 var _this = this;
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500,
+                    complete: function () {
+                        _this.datePicker.remove();
+                    }
+                });
                 if(this.isCancel && CZ.Authoring.mode === "createExhibit") {
                     CZ.Authoring.removeExhibit(this.exhibit);
                 }
-                this.container.hide("slow", function (event) {
-                    _this.datePicker.remove();
-                });
                 CZ.Authoring.isActive = false;
                 this.activationSource.removeClass("activeButton");
                 this.container.find("#error-edit-exhibit").hide();

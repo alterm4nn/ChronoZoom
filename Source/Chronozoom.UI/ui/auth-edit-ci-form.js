@@ -87,13 +87,18 @@ var CZ;
                 });
             };
             FormEditCI.prototype.show = function () {
-                _super.prototype.show.call(this);
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
                 this.activationSource.addClass("activeButton");
             };
             FormEditCI.prototype.close = function () {
-                if(this.isCancel) {
-                }
-                this.container.hide("slow", function (event) {
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
                 });
                 CZ.Authoring.isActive = false;
                 this.activationSource.removeClass("activeButton");

@@ -97,23 +97,29 @@ module CZ {
             }
 
             public show(): void {
-                super.show();
+                super.show({
+                    effect: "slide", 
+                    direction: "left",
+                    duration: 500
+                });
 
-                // Just an example how to highligh pressed "Show Form" button.
-                // Ideally, it would be better to not place UI selectors in form code,
-                // but pass them through parameters.
                 this.activationSource.addClass("activeButton");
             }
 
             public close() {
+                super.close({
+                    effect: "slide", 
+                    direction: "left",
+                    duration: 500,
+                    complete: () => {
+                        this.endDate.remove();
+                        this.startDate.remove();
+                    }
+                });
+
                 if (this.isCancel && CZ.Authoring.mode === "createTimeline") {
                     CZ.Authoring.removeTimeline(this.timeline);
                 }
-
-                this.container.hide("slow", event => {
-                    this.endDate.remove();
-                    this.startDate.remove();
-                });
 
                 CZ.Authoring.isActive = false;
 

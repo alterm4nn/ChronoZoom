@@ -1299,6 +1299,15 @@ img.fallbackBackground {
     list-style: none;
 }
 
+.cz-form-nav {
+    float: left;
+    margin-left: 15px;/*4.19354838709677%;*/ /* 13 / 310 */
+    height: 100%;
+    color: #fff;
+    font-size: 1.5em;
+    line-height: 1.5em;
+}
+
 .cz-form-title {
     float: left;
     margin-left: 15px;/*4.19354838709677%;*/ /* 13 / 310 */

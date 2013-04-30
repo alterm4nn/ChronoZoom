@@ -142,10 +142,10 @@ var CZ;
                         });
                         form.show();
                     },
-                    showEditContentItemForm: function (ci, e) {
-                        console.log(e);
+                    showEditContentItemForm: function (ci, e, prevForm) {
                         var form = new CZ.UI.FormEditCI(forms[3], {
                             activationSource: $("#showButton"),
+                            prevForm: prevForm,
                             navButton: ".cz-form-nav",
                             closeButton: ".cz-form-close-btn > .cz-form-btn",
                             titleTextblock: ".cz-form-title",

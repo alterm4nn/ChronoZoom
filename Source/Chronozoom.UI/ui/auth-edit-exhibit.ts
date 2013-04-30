@@ -88,7 +88,8 @@ module CZ {
                             function (error) {
                                 alert("Unable to save changes. Please try again later.");
                                 console.log(error);
-                            });
+                            }
+                        );
                   //  }
                 });
 
@@ -101,7 +102,7 @@ module CZ {
 
                 this.createArtifactButton.click(event => {
                     CZ.Authoring.CImode = "createCI";
-                    CZ.Authoring.showEditContentItemForm(null, this.exhibit);
+                    CZ.Authoring.showEditContentItemForm(null, this.exhibit, this);
                 });
             }
 
@@ -112,23 +113,29 @@ module CZ {
             }
 
             public show(): void {
-                super.show();
+                super.show({
+                    effect: "slide", 
+                    direction: "left",
+                    duration: 500
+                });
 
-                // Just an example how to highligh pressed "Show Form" button.
-                // Ideally, it would be better to not place UI selectors in form code,
-                // but pass them through parameters.
                 this.activationSource.addClass("activeButton");
             }
 
             public close() {
+                super.close({
+                    effect: "slide", 
+                    direction: "left",
+                    duration: 500,
+                    complete: () => {
+                        this.datePicker.remove();
+                    }
+                });
+
                 if (this.isCancel && CZ.Authoring.mode === "createExhibit") {
                     CZ.Authoring.removeExhibit(this.exhibit);
                 }
-
-                this.container.hide("slow", event => {
-                    this.datePicker.remove();
-                });
-
+                
                 CZ.Authoring.isActive = false;
 
                 this.activationSource.removeClass("activeButton");
