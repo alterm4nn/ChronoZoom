@@ -280,9 +280,7 @@
     </Content>
     <Content Include="ui\auth-event-form.html" />
     <Content Include="ui\auth-edit-timeline-form.html" />
-    <Content Include="ui\ci-listbox.html">
-      <DependentUpon>ci-listbox.ts</DependentUpon>
-    </Content>
+    <Content Include="ui\ci-listbox.html" />
     <Content Include="ui\ci-listbox.js">
       <DependentUpon>ci-listbox.ts</DependentUpon>
     </Content>

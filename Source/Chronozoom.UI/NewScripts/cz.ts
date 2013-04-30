@@ -22,7 +22,8 @@ module CZ {
             "#header-edit-form": "/ui/header-edit-form.html",
             "#auth-edit-timeline-form": "/ui/auth-edit-timeline-form.html",
             "#auth-edit-exhibit-form": "/ui/auth-edit-exhibit-form.html",
-            "#auth-edit-ci-form": "/ui/auth-edit-ci-form.html"
+            "#auth-edit-ci-form": "/ui/auth-edit-ci-form.html",
+            "$('<div></div>')": "/ui/ci-listbox.html"
         };
 
         enum FeatureActivation {
@@ -144,6 +145,7 @@ module CZ {
                             contentItemsListBox: ".cz-listbox",
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
+                            contentItemsTemplate: forms[4],
                             context: exhibit
                         });
                         form.show();
@@ -160,6 +162,7 @@ module CZ {
                             contentItemsListBox: ".cz-listbox",
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
+                            contentItemsTemplate: forms[4],
                             context: exhibit
 						});
                         form.show();

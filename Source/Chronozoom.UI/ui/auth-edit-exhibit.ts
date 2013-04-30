@@ -14,6 +14,7 @@ module CZ {
             contentItemsListBox: string;
             saveButton: string;
             deleteButton: string;
+            contentItemsTemplate: JQuery;
             context: Object;
         }
 
@@ -25,6 +26,7 @@ module CZ {
             private contentItemsListBox: CZ.UI.ContentItemListBox;
             private saveButton: JQuery;
             private deleteButton: JQuery;
+            private contentItemsTemplate: JQuery;
 
             private exhibit: any;
             private isCancel: bool;
@@ -36,9 +38,10 @@ module CZ {
                 this.titleInput = container.find(formInfo.titleInput);
                 this.datePicker = new CZ.UI.DatePicker(container.find(formInfo.datePicker));
                 this.createArtifactButton = container.find(formInfo.createArtifactButton);
-                this.contentItemsListBox = new CZ.UI.ContentItemListBox(container.find(formInfo.contentItemsListBox), (<any>formInfo.context).contentItems);
+                this.contentItemsListBox = new CZ.UI.ContentItemListBox(container.find(formInfo.contentItemsListBox), formInfo.contentItemsTemplate, (<any>formInfo.context).contentItems);
                 this.saveButton = container.find(formInfo.saveButton);
                 this.deleteButton = container.find(formInfo.deleteButton);
+                this.contentItemsTemplate = formInfo.contentItemsTemplate;
                 this.exhibit = formInfo.context;
 
                 this.saveButton.off();

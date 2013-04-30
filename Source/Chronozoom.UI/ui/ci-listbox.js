@@ -8,7 +8,7 @@ var CZ;
     (function (UI) {
         var ContentItemListBox = (function (_super) {
             __extends(ContentItemListBox, _super);
-            function ContentItemListBox(container, contentItems) {
+            function ContentItemListBox(container, listItemContainer, contentItems) {
                 var listBoxInfo = {
                     context: contentItems,
                     sortableSettings: {
@@ -26,7 +26,7 @@ var CZ;
                 };
                 var listItemsInfo = {
                     default: {
-                        container: $('<li class="cz-listitem">' + '<div class="cz-ci-listitem-icon">' + '<img src="placeholder" alt="" />' + '</div>' + '<div class="cz-ci-listitem-content">' + '<h4 class="cz-ci-listitem-title">Content Item Title</h4>' + '<p class="cz-ci-listitem-descr">Content Item Description</p>' + '</div>' + '<div class="cz-listitem-close-btn">' + 'X' + '</div>' + '</li>'),
+                        container: listItemContainer,
                         uiMap: {
                             closeButton: ".cz-listitem-close-btn",
                             iconImg: ".cz-ci-listitem-icon > img",
