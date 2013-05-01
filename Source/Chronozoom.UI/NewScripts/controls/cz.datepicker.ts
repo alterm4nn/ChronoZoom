@@ -10,7 +10,7 @@ module CZ {
             private Infinity = 9999;
 
             // Error messages
-            private WrongYearInput = "Year should be a number.";
+            private WRONG_YEAR_INPUT = "Year should be a number.";
 
             private modeSelector: JQuery;
             private dateContainer: JQuery;
@@ -38,7 +38,7 @@ module CZ {
             private initialize(): void {
                 this.datePicker.addClass("cz-datepicker");
 
-                this.modeSelector = $("<select class='cz-datepicker-mode'></select>");
+                this.modeSelector = $("<select class='cz-datepicker-mode cz-input'></select>");
                 
                 var optionYear: JQuery = $("<option value='year'>Year</option>");
                 var optionDate: JQuery = $("<option value='date'>Date</option>");
@@ -143,8 +143,8 @@ module CZ {
             private editModeYear(): void {
                 this.dateContainer.empty();
 
-                this.yearSelector = $("<input type='text' class='cz-datepicker-year'></input>");
-                this.regimeSelector = $("<select class='cz-datepicker-regime'></select>");
+                this.yearSelector = $("<input type='text' class='cz-datepicker-year-year cz-input'></input>");
+                this.regimeSelector = $("<select class='cz-datepicker-regime cz-input'></select>");
 
                 this.yearSelector.focus(event => {
                     this.errorMsg.text("");
@@ -152,7 +152,7 @@ module CZ {
 
                 this.yearSelector.blur(event => {
                     if (!this.validateNumber(this.yearSelector.val())) {
-                        this.errorMsg.text(this.WrongYearInput);
+                        this.errorMsg.text(this.WRONG_YEAR_INPUT);
                     }
                 });
 
@@ -178,9 +178,9 @@ module CZ {
             private editModeDate(): void {
                 this.dateContainer.empty();
 
-                this.daySelector = $("<select class='cz-datepicker-day-selector'></select>");
-                this.monthSelector = $("<select class='cz-datepicker-month-selector'></select>");
-                this.yearSelector = $("<input type='text' class='cz-datepicker-year'></input>");
+                this.daySelector = $("<select class='cz-datepicker-day-selector cz-input'></select>");
+                this.monthSelector = $("<select class='cz-datepicker-month-selector cz-input'></select>");
+                this.yearSelector = $("<input type='text' class='cz-datepicker-year-date cz-input'></input>");
 
                 this.yearSelector.focus(event => {
                     this.errorMsg.text("");
@@ -188,7 +188,7 @@ module CZ {
 
                 this.yearSelector.blur(event => {
                     if (!this.validateNumber(this.yearSelector.val()))
-                        this.errorMsg.text(this.WrongYearInput);
+                        this.errorMsg.text(this.WRONG_YEAR_INPUT);
                 });
 
                 var self = this;

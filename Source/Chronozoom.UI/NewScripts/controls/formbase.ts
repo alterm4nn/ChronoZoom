@@ -32,6 +32,9 @@ module CZ {
                 this.closeButton = this.container.find(formInfo.closeButton);
                 this.titleTextblock = this.container.find(formInfo.titleTextblock);
 
+                this.navButton.off();
+                this.closeButton.off();
+
                 this.closeButton.click(event => {
                     this.close();
                 });
