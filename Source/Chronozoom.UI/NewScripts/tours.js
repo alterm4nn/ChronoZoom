@@ -493,7 +493,7 @@ var CZ;
                         removeActiveTour();
                         $("#tours").hide('slide', {
                         }, 'slow');
-                        CZ.Common.toggleOffImage('tours_index');
+                        $(".tour-icon").removeClass("active");
                         Tours.isTourWindowVisible = false;
                         var mytour = Tours.tours[this.getAttribute("tour")];
                         activateTour(mytour, Tours.isNarrationOn);
@@ -580,7 +580,7 @@ var CZ;
                 CZ.Search.onSearchClicked();
             }
             if(Tours.isTourWindowVisible) {
-                $(".header-icon.active").removeClass("active");
+                $(".tour-icon").removeClass("active");
                 $("#tours").hide('slide', {
                 }, 'slow');
             } else {

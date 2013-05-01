@@ -66,7 +66,7 @@ module CZ {
                 this.isCancel = true;
 
                 this.titleInput.val(this.exhibit.title);
-                this.datePicker.setDate(this.exhibit.x);
+                this.datePicker.setDate(this.exhibit.infodotDescription.date);
 
                 this.saveButton.click(event => {
                    // var contentItems = this.getContentItemsData();

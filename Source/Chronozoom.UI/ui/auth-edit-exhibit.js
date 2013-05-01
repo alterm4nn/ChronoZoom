@@ -38,7 +38,7 @@ var CZ;
                 }
                 this.isCancel = true;
                 this.titleInput.val(this.exhibit.title);
-                this.datePicker.setDate(this.exhibit.x);
+                this.datePicker.setDate(this.exhibit.infodotDescription.date);
                 this.saveButton.click(function (event) {
                     var self = _this;
                     CZ.Authoring.updateExhibit(_this.exhibit, {

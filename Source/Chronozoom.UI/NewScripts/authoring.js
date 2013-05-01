@@ -209,23 +209,9 @@ var CZ;
                 }
             },
             editTimeline: {
-                mousemove: function () {
-                    _hovered = _vcwidget.hovered || {
-                    };
-                    if(_hovered.type === "timeline") {
-                        _hovered.settings.strokeStyle = "red";
-                    }
-                },
                 mouseup: function () {
-                    if(_hovered.type === "timeline") {
-                        Authoring.selectedTimeline = _hovered;
-                        Authoring.showEditTimelineForm(Authoring.selectedTimeline);
-                    } else if(_hovered.type === "infodot" || _hovered.type === "contentItem") {
-                        Authoring.selectedTimeline = _hovered.parent;
-                        Authoring.showEditTimelineForm(Authoring.selectedTimeline);
-                    } else {
-                        Authoring.showEditTimelineForm(Authoring.selectedTimeline);
-                    }
+                    _hovered = Authoring.selectedTimeline;
+                    Authoring.showEditTimelineForm(Authoring.selectedTimeline);
                 }
             },
             createExhibit: {
@@ -243,22 +229,19 @@ var CZ;
                 }
             },
             editExhibit: {
-                mousemove: function () {
-                    _hovered = _vcwidget.hovered || {
-                    };
-                    if(_hovered.type === "infodot") {
-                        _hovered.settings.strokeStyle = "red";
-                    }
-                },
                 mouseup: function () {
                     if(_hovered.type === "infodot") {
                         Authoring.selectedExhibit = _hovered;
                         Authoring.showEditExhibitForm(Authoring.selectedExhibit);
-                    } else if(_hovered.type === "contentItem") {
-                        Authoring.selectedExhibit = _hovered.parent.parent.parent;
-                        CZ.Authoring.CImode = "editCI";
-                        Authoring.showEditContentItemForm(_hovered, Authoring.selectedExhibit);
                     }
+                }
+            },
+            editContentItem: {
+                mouseup: function () {
+                    _hovered = Authoring.selectedExhibit;
+                    CZ.Authoring.CImode = "editCI";
+                    Authoring.selectedExhibit = _hovered.parent.parent.parent;
+                    Authoring.showEditContentItemForm(_hovered, Authoring.selectedExhibit);
                 }
             }
         };

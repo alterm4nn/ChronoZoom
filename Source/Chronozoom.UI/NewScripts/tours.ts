@@ -693,7 +693,7 @@ module CZ {
 
                         // hide tour UI
                         $("#tours").hide('slide', {}, 'slow');
-                        CZ.Common.toggleOffImage('tours_index');
+                        $(".tour-icon").removeClass("active");
                         isTourWindowVisible = false;
 
                         // activate selected tour  
@@ -809,7 +809,7 @@ module CZ {
                 CZ.Search.onSearchClicked();
 
             if (isTourWindowVisible) {
-                $(".header-icon.active").removeClass("active");
+                $(".tour-icon").removeClass("active");
                 $("#tours").hide('slide', {}, 'slow');
             } else {
                 $(".tour-icon").addClass("active");

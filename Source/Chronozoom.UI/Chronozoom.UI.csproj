@@ -271,9 +271,6 @@
     </Content>
     <Content Include="ui\auth-edit-ci-form.html" />
     <Content Include="ui\auth-edit-ci-form.ts" />
-    <Content Include="ui\auth-add-ci-form.js">
-      <DependentUpon>auth-edit-ci-form.ts</DependentUpon>
-    </Content>
     <Content Include="ui\auth-edit-ci-form.js">
       <DependentUpon>auth-edit-ci-form.ts</DependentUpon>
     </Content>

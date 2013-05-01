@@ -329,16 +329,7 @@ module CZ {
                 t.editButton.y = t.titleObject.y;
                 t.editButton.width = t.titleObject.height;
                 t.editButton.height = t.titleObject.height;
-                //this.editButton = addImage(this, layerid, id + "__edit", this.x + this.width - 1.15 * this.titleObject.height, this.titleObject.y,
-                  //      this.titleObject.height, this.titleObject.height, "/Images/edit.svg");
-            //    // remove event handlers to prevent eventhanlders stacking
-            //    t.editButton.onmouseclick = undefined;
-            //    t.editButton.onmousehover = undefined;
-            //    t.editButton.onmouseunhover = undefined;
-
-            //    CZ.VCContent.removeChild(t, t.id + "__edit");
             }
-            //t.editButton = undefined;
 
             t.titleObject = CZ.VCContent.addText(
                 t,
@@ -386,24 +377,30 @@ module CZ {
             },
 
             editTimeline: {
-                mousemove: function () {
-                    _hovered = _vcwidget.hovered || {};
-                    if (_hovered.type === "timeline") {
-                        _hovered.settings.strokeStyle = "red";
-                    }
-                },
+                // TODO: remove obsolete mouse handlers for edit timeline, edit exhibit
+                //mousemove: function () {
+                //    _hovered = _vcwidget.hovered || {};
+                //    if (_hovered.type === "timeline") {
+                //        _hovered.settings.strokeStyle = "red";
+                //    }
+                //},
 
                 mouseup: function () {
-                    if (_hovered.type === "timeline") {
-                        selectedTimeline = _hovered;
-                        showEditTimelineForm(selectedTimeline);
-                    } else if (_hovered.type === "infodot" || _hovered.type === "contentItem") {
-                        selectedTimeline = _hovered.parent;
-                        showEditTimelineForm(selectedTimeline);
-                    }
-                    else {
-                        showEditTimelineForm(selectedTimeline);
-                    }
+                    // TODO: Remove Obsolete code for edit timeline, edit exhibit
+                    //if (_hovered.type === "timeline") {
+                    //    selectedTimeline = _hovered;
+                    //    showEditTimelineForm(selectedTimeline);
+                    //} else if (_hovered.type === "infodot" || _hovered.type === "contentItem") {
+                    //    selectedTimeline = _hovered.parent;
+                    //    showEditTimelineForm(selectedTimeline);
+                    //}
+                    //else {
+                    //selectedTimeline = _hovered.parent;
+
+                    //_hovered is private, so in vccontent selectedTimeline set as current _hovered
+                    _hovered = selectedTimeline;
+                    showEditTimelineForm(selectedTimeline);
+                    //}
                 }
             },
 
@@ -425,22 +422,35 @@ module CZ {
             },
 
             editExhibit: {
-                mousemove: function () {
-                    _hovered = _vcwidget.hovered || {};
-                    if (_hovered.type === "infodot") {
-                        _hovered.settings.strokeStyle = "red";
-                    }
-                },
+                // TODO: Remove Obsolete code for edit timeline, edit exhibit
+                //mousemove: function () {
+                //    _hovered = _vcwidget.hovered || {};
+                //    if (_hovered.type === "infodot") {
+                //        _hovered.settings.strokeStyle = "red";
+                //    }
+                //},
 
                 mouseup: function () {
                     if (_hovered.type === "infodot") {
                         selectedExhibit = _hovered;
-                        showEditExhibitForm(selectedExhibit);                        
-                    } else if (_hovered.type === "contentItem") {
-                        selectedExhibit = _hovered.parent.parent.parent;
-                        CZ.Authoring.CImode = "editCI";
-                        showEditContentItemForm(_hovered, selectedExhibit);
+                        showEditExhibitForm(selectedExhibit);
                     }
+                    //} else if (_hovered.type === "contentItem") {
+                    //    _hovered = selectedExhibit;
+                    //    selectedExhibit = _hovered.parent.parent.parent;
+                    //    CZ.Authoring.CImode = "editCI";
+                    //    showEditContentItemForm(_hovered, selectedExhibit);
+                    //}
+                }
+            },
+
+            editContentItem: {
+                mouseup: function () {
+                    //_hovered is private, so in vccontent selectedTimeline set as current _hovered
+                    _hovered = selectedExhibit;
+                    CZ.Authoring.CImode = "editCI";
+                    selectedExhibit = _hovered.parent.parent.parent;
+                    showEditContentItemForm(_hovered, selectedExhibit);
                 }
             }
         };

@@ -598,6 +598,11 @@ var CZ;
                     this.editButton.onmouseunhover = function () {
                         this.parent.settings.strokeStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
                     };
+                    this.editButton.onRemove = function () {
+                        this.onmousehover = undefined;
+                        this.onmouseunhover = undefined;
+                        this.onmouseclick = undefined;
+                    };
                 }
                 if(this.settings.hoverAnimationDelta) {
                     if(this.settings.gradientOpacity == 0 || this.settings.gradientOpacity == 1) {
@@ -1335,9 +1340,8 @@ var CZ;
                         editButton.reactsOnMouse = true;
                         editButton.onmouseclick = function () {
                             CZ.Authoring.isActive = true;
-                            CZ.Authoring.mode = "editExhibit";
-                            CZ.Authoring.selectedExhibit = self.parent.parent.parent;
-                            CZ.Authoring.showEditContentItemForm(self, self.parent.parent.parent);
+                            CZ.Authoring.mode = "editContentItem";
+                            CZ.Authoring.selectedExhibit = self;
                             return true;
                         };
                         editButton.onmouseenter = function () {
@@ -1512,7 +1516,8 @@ var CZ;
                     var titleTop = vyc - centralSquareSize - titleHeight;
                     var title = '';
                     if(infodotDescription && infodotDescription.title && infodotDescription.date) {
-                        title = infodotDescription.title + '\n(' + infodotDescription.date + ')';
+                        var exhibitDate = CZ.Dates.convertCoordinateToYear(infodotDescription.date);
+                        title = infodotDescription.title + '\n(' + exhibitDate.year + ' ' + exhibitDate.regime + ')';
                     }
                     var infodotTitle = addText(contentItem, layerid, id + "__title", time - titleWidth / 2, titleTop, titleTop, titleHeight, title, {
                         fontName: CZ.Settings.contentItemHeaderFontName,

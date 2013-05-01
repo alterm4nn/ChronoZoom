@@ -50,7 +50,7 @@ module CZ {
             }
 
             private initialize(): void {
-                if ((CZ.Authoring.mode === "editExhibit") || (CZ.Authoring.mode === "createExhibit")) {
+                if (CZ.Authoring.mode === "editExhibit" || CZ.Authoring.mode === "createExhibit" || CZ.Authoring.mode === "editContentItem") {
                     this.titleTextblock.text("Edit Artifact");
                     this.saveButton.text("edit artifact");
                 }

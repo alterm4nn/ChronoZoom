@@ -1170,70 +1170,6 @@ img.fallbackBackground {
     color: #fff;
 }
 
-
-/***********************************************************
-
-                            Authoring
-
-***********************************************************/
-
-#footer-authoring {
-    display:            inline-block;
-    background-color:   #212121;
-}
-
-.footer-authoring-text {
-    margin-right:       5px;
-    
-    color:              #BFBFBF;
-    vertical-align:     middle;
-    white-space:        nowrap;
-    font:               11.5px Arial;
-}
-
-.footer-authoring-link {
-    margin-right:           3px;
-    margin-left:            3px;
-    padding:                4px 2px 3px 3px;
-
-    -webkit-border-radius:  1px;
-    -moz-border-radius:     1px;
-    border-radius:          1px;   
-    
-    color:                  #BFBFBF;
-    vertical-align:         middle;
-    white-space:            nowrap;
-    font:                   11.5px Arial;
-}
-
-.footer-authoring-link:hover {
-    background-color:   #BFBFBF;
-    color:              #000;
-    text-decoration:    none;
-    cursor: default;
-}
-
-.footer-authoring-link:active {
-    background-color:   #7B7B7B;
-    color:              #000;
-    text-decoration:    none;
-    cursor: default;
-}
-
-.footer-authoring-link.active {
-    background-color:   #BFBFBF;
-    color:              #000;
-    text-decoration:    none;
-    cursor: default;
-}
-
-.footer-authoring-link.active:active {
-    background-color:   #7B7B7B;
-    color:              #000;
-    text-decoration:    none;
-    cursor: default;
-}
-
 /***********************************************************
 
                             Auxiliary
@@ -1359,7 +1295,7 @@ img.fallbackBackground {
     cursor: pointer;
     border: none;
     color: #fff;
-    width: 150px;
+    min-width: 150px;
     font-size: 12px;
     line-height: 36px;
     padding: 0 5px;

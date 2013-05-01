@@ -42,16 +42,21 @@ module CZ {
             }
 
             public show(): void {
-                super.show();
+                super.show({
+                    effect: "slide",
+                    direction: "right",
+                    duration: 500
+                });
 
-                // Just an example how to highligh pressed "Show Form" button.
-                // Ideally, it would be better to not place UI selectors in form code,
-                // but pass them through parameters.
                 this.activationSource.addClass("active");
             }
 
             public close() {
-                super.close();
+                super.close({
+                    effect: "slide",
+                    direction: "right",
+                    duration: 500
+                });
 
                 this.activationSource.removeClass("active");
             }

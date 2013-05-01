@@ -28,11 +28,19 @@ var CZ;
                 });
             };
             FormHeaderEdit.prototype.show = function () {
-                _super.prototype.show.call(this);
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "right",
+                    duration: 500
+                });
                 this.activationSource.addClass("active");
             };
             FormHeaderEdit.prototype.close = function () {
-                _super.prototype.close.call(this);
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "right",
+                    duration: 500
+                });
                 this.activationSource.removeClass("active");
             };
             return FormHeaderEdit;

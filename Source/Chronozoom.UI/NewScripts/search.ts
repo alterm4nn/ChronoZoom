@@ -21,7 +21,7 @@ module CZ {
                 CZ.Tours.onTourClicked();
 
             if (isSearchWindowVisible) {
-                $(".header-icon.active").removeClass("active");
+                $(".search-icon").removeClass("active");
                 $("#search").hide('slide', {}, 'slow');
             } else {
                 $(".search-icon").addClass("active");

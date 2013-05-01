@@ -8,7 +8,7 @@ var CZ;
                 CZ.Tours.onTourClicked();
             }
             if(Search.isSearchWindowVisible) {
-                $(".header-icon.active").removeClass("active");
+                $(".search-icon").removeClass("active");
                 $("#search").hide('slide', {
                 }, 'slow');
             } else {
