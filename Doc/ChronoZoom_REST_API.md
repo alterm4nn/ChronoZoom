@@ -1,255 +1,503 @@
 # ChronoZoom REST API Reference #
 
-The ChronoZoom Representational State Transfer (REST) API makes it possible to programmatically access content within a given ChronoZoom deployment. Content is made available on a read-only basis, and is returned in JavaScript Object Notation (JSON) format. This document describes how to make REST **GET** requests against ChronoZoom.
+The ChronoZoom Representational State Transfer (REST) API makes it possible to programmatically access content within a given ChronoZoom deployment. All request data is in JavaScript Object Notation (JSON) format. This document describes how to make REST requests against ChronoZoom.
 
-!!! Todo: Are there defaults if collection/supercollection are not specified? !!!
+## Request Syntax ##
+ChronoZoom REST requests use standard HTTP verbs (GET, PUT, DELETE). Request URLs point to **chronozoom.svc** for the deployment, followed by the supercollection and collection names, and finally the resource type:
 
-## Contents ##
-- [Request URL Syntax](#request-url-syntax)
-- ChronoZoom REST Commands
-    - [Get](#get)
-    - [GetThresholds](#getthresholds)
-    - [Search](#search)
-    - [GetBibliography](#getbibliography)
-    - [GetTours](#gettours)
-    - [GetSuperCollection](#getsupercollection)
+    http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/[resource]
 
+The request body is in JSON format:
+    
+    {
+        id: "0123456789"
+    }
 
-## Request URL Syntax ##
-All requests utilize the **GET** HTTP verb, and must be structured using the following URL syntax:
-
-    http://[site URL]/chronozoom.svc/[command]?[parameters]
-
-For example:
-
-    http://chronozoomproject.org/chronozoom.svc/Get?start=-1&end=2013.0&timespan=10
+## ChronoZoom Resources ##
+TBD
 
 ## ChronoZoom REST Commands ##
+- [GetTimelines](#gettimelines)
+- [GetThresholds](#getthresholds)
+- [Search](#search)
+- [GetBibliography](#getbibliography)
+- [GetTours](#gettours)
+- [PutUser](#putuser)
+- [DeleteUser](#deleteuser)
+- [PutCollectionName](#putcollectionname)
+- [DeleteCollection](#deletecollection)
+- [PutTimeline](#puttimeline)
+- [DeleteTimeline](#deletetimeline)
+- [PutExhibit](#putexhibit)
+- [DeleteExhibit](#deleteexhibit)
+- [PutContentItem](#putcontentitem)
+- [DeleteContentItem](#deletecontentitem)
 
-### Get ###
-Use the **Get** command to return data within a specified range of years from a collection or a supercollection.
-
-    Get(string supercollection, string collection, string start, string end, string timespan)
-
-**Parameters**
-
-|Parameter|Type|Value|Required|
-|:--------|:---|:----|:-------|
-|supercollection|string|Name of the supercollection to query.|No|
-|collection|string|Name of the collection to query.|No|
-|start|float|Year at which to begin the search, between -20000000000 and 9999.|Yes|
-|end|float|Year at which to end the search, between -20000000000 and 9999.|Yes|
-|timespan|int|Filters the search results to a particular length of time.|Yes|
-
-**Example Result Data**
-!!! Todo: Add examples. !!!
-
-[top](#chronozoom-rest-api-reference)
-
-----------
-### GetThresholds ###
-Use the **GetThresholds** command to return the time thresholds that have been defined for a ChronoZoom instance.
-
-**Syntax**
-    GetThresholds()
-
-**HTTP**
-    http://chronozoomproject.org/chronozoom.svc/GetThresholds
-
-**Parameters**
-This command has no parameters.
-
-**Example Result Data**
-
+## GetTimelines ##
+ 
+Returns timeline data within a specified range of years from a collection or a supercollection.
+ 
+**Returns**
+Timeline data in JSON format.
+ 
+**Example**
+ 
+    HTTP verb: GET
+            
+    URL:
+    http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/timelines
+            
+    Request body (JSON):
     {
-       "d":[
-          {
-             "__type":"Threshold:#Chronozoom.Entities",
-             "BookmarkRelativePath":"\/t55\/e33@x=0&y=0&w=1.6270949720670398&h=1.0558659217877098",
-             "Description":"The beginning of everything: What happened during the Big Bang and the early stages of the Universe. ",
-             "ThresholdDay":0,
-             "ThresholdMonth":0,
-             "ThresholdTimeUnit":"Ga",
-             "ThresholdYear":13.7000,
-             "Title":"1. Origins of the Universe"
-          },
-          {
-             "__type":"Threshold:#Chronozoom.Entities",
-             "BookmarkRelativePath":"\/t55\/e118@x=0&y=-4.3507039982036953e-16&w=1.6270949720670396&h=1.0558659217877095",
-             "Description":"Threshold 2: The Stars Light Up: Stars became the first stable, complex entities to exist in the Universe. This threshold examines the conditions that led up to the first stars lighting up.",
-             "ThresholdDay":0,
-             "ThresholdMonth":0,
-             "ThresholdTimeUnit":"Ga",
-             "ThresholdYear":13.5000,
-             "Title":"2. Origins of the First Stars"
-          },
-          {
-             "__type":"Threshold:#Chronozoom.Entities",
-             "BookmarkRelativePath":"\/t55\/e134@x=3.828619518419252e-14&y=0&w=1.627094972067061&h=1.0558659217877238",
-             "Description":"Threshold 3: Dying stars generate temperatures high enough to create entirely new elements. Only very big stars create temperatures high enough to create the rest of the elements.",
-             "ThresholdDay":0,
-             "ThresholdMonth":0,
-             "ThresholdTimeUnit":"Ga",
-             "ThresholdYear":12.0000,
-             "Title":"3. Origins of Chemical Complexity"
-          },
-          {
-             "__type":"Threshold:#Chronozoom.Entities",
-             "BookmarkRelativePath":"\/t55\/t174\/e135@x=-3.7948725260060514e-11&y=-6.713022027547824e-12&w=1.6270949720655796&h=1.0558659217867623",
-             "Description":"Threshold 4: Elements link up to form more complex molecules. These new materials were necessary for creating our solar system.  ",
-             "ThresholdDay":0,
-             "ThresholdMonth":0,
-             "ThresholdTimeUnit":"Ga",
-             "ThresholdYear":4.5600,
-             "Title":"4. Origins of the Earth and Solar System"
-          },
-          {
-             "__type":"Threshold:#Chronozoom.Entities",
-             "BookmarkRelativePath":"\/t55\/t174\/t66\/e136@x=2.1278858184814453e-12&y=-3.324449062347412e-12&w=1.627094972067812&h=1.055865921788211",
-             "Description":"Threshold 5 introduces DNA and Charles Darwin's work on the theory of evolution, as well as the Goldilocks Conditions necessary for life to form and prosper.",
-             "ThresholdDay":0,
-             "ThresholdMonth":0,
-             "ThresholdTimeUnit":"Ga",
-             "ThresholdYear":3.8000,
-             "Title":"5. Origins of life"
-          },
-          {
-             "__type":"Threshold:#Chronozoom.Entities",
-             "BookmarkRelativePath":"\/t55\/t174\/t66\/t46\/e137@x=2.8049244600183825e-12&y=-7.012311150045956e-13&w=1.370418848167538&h=1.0523560209424072",
-             "Description":"Threshold 6: A mass extinction 65 million years ago was followed by an increase in biodiversity. Mammals flourished, including our ancestors. ",
-             "ThresholdDay":0,
-             "ThresholdMonth":0,
-             "ThresholdTimeUnit":"Ma",
-             "ThresholdYear":7.0000,
-             "Title":"6. Origins of human beings"
-          },
-          {
-             "__type":"Threshold:#Chronozoom.Entities",
-             "BookmarkRelativePath":"\/t55\/t174\/t66\/t46\/e138@x=5.609848920036765e-12&y=-2.1036933450137866e-12&w=1.3704188481675372&h=1.0523560209424068",
-             "Description":"Threshold 7: Agriculture, the cultivation of animals, plants for products used to sustain life is a key component in the rise of sedentary human civilization. ",
-             "ThresholdDay":0,
-             "ThresholdMonth":0,
-             "ThresholdTimeUnit":"ka",
-             "ThresholdYear":11.0000,
-             "Title":"7. Origins of agriculture"
-          },
-          {
-             "__type":"Threshold:#Chronozoom.Entities",
-             "BookmarkRelativePath":"\/t55\/t174\/t66\/t46\/t361\/t364\/t377\/t161\/e139",
-             "Description":"Threshold 8: The birth of global exchange networks, competitive markets, and increasing use of energy have accelerated the pace of change.",
-             "ThresholdDay":0,
-             "ThresholdMonth":0,
-             "ThresholdTimeUnit":"CE",
-             "ThresholdYear":1000.0000,
-             "Title":"8. Origins of modern world"
-          }
-       ]
+       start: 1800
+       end: 1920
+       minspan: 
+       lca: 
+       maxElements: 25
     }
+    
 
-
-[top](#chronozoom-rest-api-reference)
-
-----------
-### Search ###
-Use the **Search** command to search for a specific term within a collection or a supercollection.
-
-**Syntax**
-    Search(string supercollection, string collection, string searchTerm)
-
-**HTTP**
-    http://chronozoomproject.org/chronozoom.svc/Search?searchTerm=Pluto
-
+ 
 **Parameters**
-
-|Parameter|Type|Value|Required|
-|:--------|:---|:----|:-------|
-|supercollection|string|Name of the supercollection to query.|No|
-|collection|string|Name of the collection to query.|No|
-|searchTerm|string|The term to search for.|Yes|
-
-**Example Result Data**
-
-!!! Todo: Need example data. !!!
-
+ 
+|Parameter|Value|
+|:--------|:----|
+|supercollection|Name of the supercollection to query.|
+|collection|Name of the collection to query.|
+|start|Year at which to begin the search, between -20000000000 and 9999.|
+|end|Year at which to end the search, between -20000000000 and 9999.|
+|minspan|Filters the search results to a particular time scale.|
+|lca|Least Common Ancestor, a timeline identifier used to hint the server to retrieve timelines close to this location.|
+|maxElements|The maximum number of elements to return.|
+ 
 [top](#chronozoom-rest-api-reference)
-
+ 
 ----------
-### GetBibliography ###
-Use the **GetBibliography** command to return the bibliography for a given exhibit.
+ 
+## GetThresholds ##
+ 
+Returns the time thresholds that have been defined for a ChronoZoom instance.
+ 
+**Returns**
+Time threshold data in JSON format.
+ 
+**Example**
+ 
+    HTTP verb: GET
+            
+    URL:
+    http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/thresholds
+    
 
-**Syntax**
-    GetBibliography(string exhibitId)
-
-**HTTP**
-    http://chronozoomproject.org/chronozoom.svc/GetBibliography?exhibitId=[id]
-
+ 
 **Parameters**
-
-|Parameter|Type|Value|Required|
-|:--------|:---|:----|:-------|
-|exhibitId|string|ID of the exhibit.|Yes|
-
-**Example Result Data**
-
-!!! Todo: Need example data. !!!
-
+None.
+ 
 [top](#chronozoom-rest-api-reference)
-
+ 
 ----------
-### GetTours ###
-Use the **GetTours** command to return a list of tours for a given collection or supercollection.
-!!! Todo: The parameter doesn't seem to have an effect on this command. Why? !!!
-
-**Syntax**
-    GetTours(string supercollection, string collection)
-
-**HTTP**
-    http://chronozoomproject.org/chronozoom.svc/GetTours?collection=Chronozoom.Entities
-
-**Parameters**
-
-|Parameter|Type|Value|Required|
-|:--------|:---|:----|:-------|
-|supercollection|string|Name of the supercollection to query.|No|
-|collection|string|Name of the collection to query.|No|
-
-**Example Result Data**
-!!! Todo: Add examples. !!!
-
-[top](#chronozoom-rest-api-reference)
-
-----------
-### GetSuperCollection ###
-Use the **GetSuperCollection** command to return the top supercollection for a given ChronoZoom deployment.
-!!! Todo: I am just guessing here, what does this really do? !!!
-
-**Syntax**
-    GetSuperCollection()
-
-**HTTP**
-    http://chronozoomproject.org/chronozoom.svc/GetSuperCollection
-
-**Parameters**
-This command has no parameters.
-
-**Example Result Data**
-
+ 
+## Search ##
+ 
+Performs a search for a specific term within a collection or a supercollection.
+ 
+**Returns**
+Search results in JSON format.
+ 
+**Example**
+ 
+    HTTP verb: GET
+            
+    URL:
+    http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/search
+            
+    Request body (JSON):
     {
-       "d":{
-          "__type":"SuperCollection:#Chronozoom.Entities",
-          "Collections":[
-             {
-                "__type":"Collection:#Chronozoom.Entities",
-                "Id":"33ab754a-8252-4b98-82c8-bda86c14ac1a",
-                "Title":"TestUser",
-                "UserId":"TestUser"
-             }
-          ],
-          "Id":"c6689c5d-0ec5-d0d3-2a2f-cf54f63993b6",
-          "Title":"TestUser",
-          "UserId":"TestUser"
-       }
+       searchTerm: "Pluto"
     }
+    
 
-
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|supercollection|Name of the supercollection to query.|
+|collection|Name of the collection to query.|
+|searchTerm|The term to search for.|
+ 
 [top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+## GetBibliography ##
+ 
+Returns the bibliography for a given exhibit.
+ 
+**Returns**
+The bibliography data in JSON format.
+ 
+**Example**
+ 
+    HTTP verb: GET
+            
+    URL:
+    http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/bibliography
+            
+    Request body (JSON):
+    {
+        exhibitId: "0123456789"
+    }
+    
+
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|exhibitId|ID of the exhibit.|
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+## GetTours ##
+ 
+Returns a list of tours for a given collection or supercollection.
+ 
+**Returns**
+A list of tours in JSON format.
+ 
+**Example**
+ 
+    HTTP verb: GET
+            
+    URL: 
+    http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/tours
+    
+
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|supercollection|Name of the supercollection to query.|
+|collection|Name of the collection to query.|
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+## PutUser ##
+ 
+Creates a new user, or updates an existing user's information and associated personal collection.
+ 
+**Returns**
+The URL for the new user collection.
+ 
+**Example**
+ 
+    HTTP verb: PUT
+            
+    URL:
+    http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/user
+    
+    Request body (JSON):
+    {
+        id: "0123456789",
+        displayName: "Joe",
+        email: "email@email.com"
+    }
+    
+
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|userRequest|JSON containing the request details.|
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+## DeleteUser ##
+ 
+Deletes the user with the specified user ID.
+ 
+**Returns**
+HTTP response code.
+ 
+**Example**
+ 
+            HTTP verb: DELETE
+            URL:
+            http://{site URL}/chronozoom.svc/{supercollection}/{collection}/user
+            
+            Request body (JSON):
+            {
+       id: "0123456789"
+            }
+            
+
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|userRequest|JSON containing the request details.|
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+## PutCollectionName ##
+ 
+Creates a new collection using the specified name.
+ 
+**Returns**
+
+ 
+**Example**
+ 
+    HTTP verb: PUT
+            
+    URL:
+    http://{site URL}/chronozoom.svc/{superCollectionName}/{collectionName}
+            
+    Request body (JSON):
+    {
+         name: "My Collection"
+    }
+    
+
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|superCollectionName|The name of the parent supercollection for the collection.|
+|collectionName|The name of the collection to create.|
+|collectionRequest|The markup for the collection to create in JSON format.|
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+## DeleteCollection ##
+ 
+Deletes the specified collection.
+ 
+**Returns**
+HTTP response code.
+ 
+**Example**
+ 
+    HTTP verb: DELETE
+            
+    URL:
+    http://{site URL}/chronozoom.svc/{superCollectionName}/{collectionName}
+    
+
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|superCollectionName|The name of the parent collection.|
+|collectionName|The name of the collection to delete.|
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+## PutTimeline ##
+ 
+Creates or updates the timeline in a given collection.
+ 
+**Returns**
+HTTP status code.
+ 
+**Example**
+ 
+    HTTP verb: PUT
+            
+    URL:
+    http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/timeline
+            
+    Request body (JSON):
+    {
+         id: "0123456789"
+         title: "A New Title"
+    }
+    
+
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|superCollectionName|The parent collection.|
+|collectionName|The name of the collection to update.|
+|timelineRequest|Timeline data in JSON format.|
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+## DeleteTimeline ##
+ 
+Deletes the timeline with the specified ID.
+ 
+**Example**
+ 
+    HTTP verb: DELETE
+            
+    URL:
+    http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/timelines
+            
+    Request body (JSON):
+    {
+         timelineRequest: Need request body format.
+    }
+    
+
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|superCollectionName|The name of the parent collection.|
+|collectionName|The name of the collection from which the timeline should be deleted.|
+|timelineRequest|The request in JSON format.|
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+## PutExhibit ##
+ 
+Creates or updates the exhibit and its content items in a given collection. If the collection does not exist, then the command will silently fail.
+ 
+**Returns**
+An exhibit in JSON format.
+ 
+**Example**
+ 
+    **HTTP verb:** PUT
+            
+    **URL:**
+        http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/exhibit
+            
+    **Request body:**
+        {
+             
+        }
+    
+
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|superCollectionName|The name of the parent collection.|
+|collectionName|The name of the collection to modify.|
+|exhibitRequest|The exhibit data in JSON format.|
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+## DeleteExhibit ##
+ 
+Deletes the specified exhibit from the specified collection.
+ 
+**Example**
+ 
+    **HTTP verb:** DELETE
+            
+    **URL:**
+        http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/exhibit
+            
+    **Request body:**
+        {
+             id: "0123456789"
+        }
+    
+
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|superCollectionName|The name of the parent collection.|
+|collectionName|The name of the collection to modify.|
+|exhibitRequest|The exhibit ID in JSON format.|
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+## PutContentItem ##
+ 
+Creates or updates the content item in a given collection. If the collection does not exist the request will fail.
+ 
+**Returns**
+
+ 
+**Example**
+ 
+    **HTTP verb:** PUT
+            
+    **URL:**
+        http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/contentitem
+            
+    **Request body:**
+        {
+             
+        }
+    
+
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|superCollectionName|The name of the parent collection.|
+|collectionName|The name of the collection to modify.|
+|contentItemRequest|The content item data in JSON format.|
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+## DeleteContentItem ##
+ 
+Delete the specified content item from the specified collection.
+ 
+**Example**
+ 
+    **HTTP verb:** DELETE
+            
+    **URL:**
+        http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/contentitem
+            
+    **Request body:**
+        {
+             id: "0123456789"
+        }
+    
+
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|superCollectionName|The name of the parent collection.|
+|collectionName|The name of the collection to modify.|
+|contentItemRequest|The request in JSON format.|
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
