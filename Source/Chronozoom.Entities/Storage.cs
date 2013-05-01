@@ -189,9 +189,21 @@ namespace Chronozoom.Entities
                         ToYear-FromYear >= {3} OR
                         Id = {5}
                     )
-                ORDER BY
-                    CASE WHEN Id = {5} THEN 1 ELSE 0 END DESC,
-                    CASE WHEN Timeline_Id = {5} THEN 1 ELSE 0 END DESC,
+                 ORDER BY
+                    CASE WHEN Id = {5} THEN 1 ELSE 0 END DESC, 
+                    CASE WHEN Timeline_Id = {5} THEN 1 ELSE 0 END DESC, 
+                    CASE WHEN Id = 
+                    (SELECT id 
+                        FROM Timelines 
+                        WHERE Timeline_Id Is NULL 
+                        AND Collection_Id = {4}
+                    ) THEN 1 ELSE 0 END DESC, 
+                    CASE WHEN Timeline_Id = 
+                    (SELECT id 
+                        FROM Timelines 
+                        WHERE Timeline_Id Is NULL 
+                        AND Collection_Id = {4}
+                    ) THEN 1 ELSE 0 END DESC,
                     ToYear-FromYear DESC";
 
             return FillTimelinesFromFlatList(

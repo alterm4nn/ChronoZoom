@@ -11,20 +11,20 @@ namespace Application.Helper.BrowserImpl
     {
         public virtual void ClickCloseButton()
         {
+            Logger.Log("<-");
             MoveToElementAndClick(By.Id("welcomeScreenCloseButton"));
+            Logger.Log("->");
         }
 
         public virtual void NavigateBceToCeEra()
         {
+            Logger.Log("<-");
             string targetDate = "0";
             Logger.Log("- targetDate: " + targetDate);
             string script = String.Format("CZ.Common.controller.moveToVisible(new CZ.Viewport.VisibleRegion2d(-{0},224031781.9944986,0.0009286813988062588),false)", targetDate);
             Logger.Log("- script: " + script);
             ExecuteJavaScript(script);
-            //Wait For Humanity in bread crumbs
-            WaitForElementIsDisplayed(By.Id("bc_link_t161"));
-            Sleep(2);
-            WaitAnimation();
+            Logger.Log("->");
         }
     }
 }

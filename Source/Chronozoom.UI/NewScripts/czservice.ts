@@ -87,21 +87,6 @@ module CZ {
         * Chronozoom.svc Requests.
         */
 
-        // .../get?supercollection=&collection=
-        export function get () {
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("get");
-            request.addParameter("supercollection", CZ.Service.superCollectionName);
-            request.addParameter("collection", CZ.Service.collectionName);
-
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                dataType: "json",
-                url: request.url
-            });
-        }
-
         // .../gettimelines?supercollection=&collection=&start=&end=&minspan=&lca=
         export function getTimelines (r) {
             var request = new Request(_serviceUrl);
@@ -317,6 +302,21 @@ module CZ {
                 contentType: "application/json",
                 url: request.url,
                 data: JSON.stringify(Map.contentItem(ci))
+            });
+        }
+
+        // .../{supercollection}/{collection}/tours
+        export function getTours () {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath(superCollectionName);
+            request.addToPath(collectionName);
+            request.addToPath("tours");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
             });
         }
 

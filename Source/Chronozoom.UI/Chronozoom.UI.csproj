@@ -47,6 +47,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <DocumentationFile>bin\UI.XML</DocumentationFile>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
@@ -205,6 +207,9 @@
       <DependentUpon>uiloader.ts</DependentUpon>
     </Content>
     <Content Include="NewScripts\uiloader.ts" />
+    <Content Include="NewScripts\urlnav.min.js">
+      <DependentUpon>urlnav.ts</DependentUpon>
+    </Content>
     <Content Include="NewScripts\urlnav.ts" />
     <Content Include="NewScripts\vccontent.ts" />
     <Content Include="NewScripts\viewport.ts" />
