@@ -32,7 +32,8 @@ module CZ {
 
         // Selected objects for editing.
         export var selectedTimeline : any = {};
-        export var selectedExhibit : any = {};
+        export var selectedExhibit: any = {};
+        export var selectedContentItem: any = {};
 
 
         // Authoring Tool state.
@@ -377,30 +378,8 @@ module CZ {
             },
 
             editTimeline: {
-                // TODO: remove obsolete mouse handlers for edit timeline, edit exhibit
-                //mousemove: function () {
-                //    _hovered = _vcwidget.hovered || {};
-                //    if (_hovered.type === "timeline") {
-                //        _hovered.settings.strokeStyle = "red";
-                //    }
-                //},
-
                 mouseup: function () {
-                    // TODO: Remove Obsolete code for edit timeline, edit exhibit
-                    //if (_hovered.type === "timeline") {
-                    //    selectedTimeline = _hovered;
-                    //    showEditTimelineForm(selectedTimeline);
-                    //} else if (_hovered.type === "infodot" || _hovered.type === "contentItem") {
-                    //    selectedTimeline = _hovered.parent;
-                    //    showEditTimelineForm(selectedTimeline);
-                    //}
-                    //else {
-                    //selectedTimeline = _hovered.parent;
-
-                    //_hovered is private, so in vccontent selectedTimeline set as current _hovered
-                    _hovered = selectedTimeline;
                     showEditTimelineForm(selectedTimeline);
-                    //}
                 }
             },
 
@@ -422,35 +401,14 @@ module CZ {
             },
 
             editExhibit: {
-                // TODO: Remove Obsolete code for edit timeline, edit exhibit
-                //mousemove: function () {
-                //    _hovered = _vcwidget.hovered || {};
-                //    if (_hovered.type === "infodot") {
-                //        _hovered.settings.strokeStyle = "red";
-                //    }
-                //},
-
                 mouseup: function () {
-                    if (_hovered.type === "infodot") {
-                        selectedExhibit = _hovered;
-                        showEditExhibitForm(selectedExhibit);
-                    }
-                    //} else if (_hovered.type === "contentItem") {
-                    //    _hovered = selectedExhibit;
-                    //    selectedExhibit = _hovered.parent.parent.parent;
-                    //    CZ.Authoring.CImode = "editCI";
-                    //    showEditContentItemForm(_hovered, selectedExhibit);
-                    //}
+                    showEditExhibitForm(selectedExhibit);
                 }
             },
 
             editContentItem: {
                 mouseup: function () {
-                    //_hovered is private, so in vccontent selectedTimeline set as current _hovered
-                    _hovered = selectedExhibit;
-                    CZ.Authoring.CImode = "editCI";
-                    selectedExhibit = _hovered.parent.parent.parent;
-                    showEditContentItemForm(_hovered, selectedExhibit);
+                    showEditContentItemForm(selectedContentItem, selectedExhibit);
                 }
             }
         };

@@ -26,6 +26,8 @@ var CZ;
         };
         Authoring.selectedExhibit = {
         };
+        Authoring.selectedContentItem = {
+        };
         Authoring.isActive = false;
         Authoring.isEnabled = false;
         Authoring.isDragging = false;
@@ -210,7 +212,6 @@ var CZ;
             },
             editTimeline: {
                 mouseup: function () {
-                    _hovered = Authoring.selectedTimeline;
                     Authoring.showEditTimelineForm(Authoring.selectedTimeline);
                 }
             },
@@ -230,18 +231,12 @@ var CZ;
             },
             editExhibit: {
                 mouseup: function () {
-                    if(_hovered.type === "infodot") {
-                        Authoring.selectedExhibit = _hovered;
-                        Authoring.showEditExhibitForm(Authoring.selectedExhibit);
-                    }
+                    Authoring.showEditExhibitForm(Authoring.selectedExhibit);
                 }
             },
             editContentItem: {
                 mouseup: function () {
-                    _hovered = Authoring.selectedExhibit;
-                    CZ.Authoring.CImode = "editCI";
-                    Authoring.selectedExhibit = _hovered.parent.parent.parent;
-                    Authoring.showEditContentItemForm(_hovered, Authoring.selectedExhibit);
+                    Authoring.showEditContentItemForm(Authoring.selectedContentItem, Authoring.selectedExhibit);
                 }
             }
         };

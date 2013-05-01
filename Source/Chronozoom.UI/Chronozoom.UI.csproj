@@ -278,7 +278,6 @@
     <Content Include="ui\auth-edit-timeline.js">
       <DependentUpon>auth-edit-timeline.ts</DependentUpon>
     </Content>
-    <Content Include="ui\auth-event-form.html" />
     <Content Include="ui\auth-edit-timeline-form.html" />
     <Content Include="ui\ci-listbox.html" />
     <Content Include="ui\ci-listbox.js">
