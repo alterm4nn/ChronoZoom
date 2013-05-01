@@ -144,25 +144,25 @@ namespace Chronozoom.Entities.Migration
             _storage.Collections.Add(collection);
 
             // UniqueIds Map
-            Dictionary<int, Tuple<Guid, BookmarkType>> bookmarksMap = new Dictionary<int, Tuple<Guid, BookmarkType>>();
+            Dictionary<int, List<Tuple<Guid, BookmarkType>>> bookmarksMap = new Dictionary<int, List<Tuple<Guid, BookmarkType>>>();
 
             // Associate each timeline with the root collection
             TraverseTimelines(bjrTimelines.d, timeline =>
             {
                 timeline.Collection = collection;
-                bookmarksMap[timeline.UniqueId] = new Tuple<Guid, BookmarkType>(timeline.Id, BookmarkType.Timeline);
+                AddBookmarkToBookmarkMap(bookmarksMap, timeline.UniqueId, timeline.Id, BookmarkType.Timeline);
 
                 foreach (Exhibit exhibit in timeline.Exhibits)
                 {
                     exhibit.Collection = collection;
-                    bookmarksMap[exhibit.UniqueId] = new Tuple<Guid, BookmarkType>(exhibit.Id, BookmarkType.Exhibit);
+                    AddBookmarkToBookmarkMap(bookmarksMap, exhibit.UniqueId, exhibit.Id, BookmarkType.Exhibit);
 
                     if (exhibit.ContentItems != null)
                     {
                         foreach (ContentItem contentItem in exhibit.ContentItems)
                         {
                             contentItem.Collection = collection;
-                            bookmarksMap[contentItem.UniqueId] = new Tuple<Guid, BookmarkType>(contentItem.Id, BookmarkType.ContentItem);
+                            AddBookmarkToBookmarkMap(bookmarksMap, contentItem.UniqueId, contentItem.Id, BookmarkType.ContentItem);
                         }
                     }
                 }
@@ -232,28 +232,42 @@ namespace Chronozoom.Entities.Migration
                             // Split references into its components
                             string[] urlComponents = urlParts[0].Split('/');
 
-                            if (urlComponents.Length > 0)
-                            {
-                                switch (urlComponents[urlComponents.Length - 1].Substring(0, 1))
-                                {
-                                case "c":
-                                    bookmark.ReferenceType = BookmarkType.ContentItem;
-                                    break;
-                                case "e":
-                                    bookmark.ReferenceType = BookmarkType.Exhibit;
-                                    break;
-                                case "t":
-                                    bookmark.ReferenceType = BookmarkType.Timeline;
-                                    break;
-                                }
+                            int uniqueId;
+                            BookmarkType bookmarkType;
 
-                                int uniqueId = int.Parse(urlComponents[urlComponents.Length - 1].Substring(1), CultureInfo.InvariantCulture);
+                            string newUrlComponents = "";
+                            for (int idxComponent = 0; idxComponent < urlComponents.Length; idxComponent++)
+                            {
+                                BookmarkFromBookmarkUrl(urlComponents[idxComponent], out uniqueId, out bookmarkType);
                                 if (bookmarksMap.Keys.Contains(uniqueId))
                                 {
-                                    bookmark.ReferenceId = bookmarksMap[uniqueId].Item1;
-                                    bookmark.ReferenceType = bookmarksMap[uniqueId].Item2;
+                                    List<Tuple<Guid, BookmarkType>> matchedBookmarks = bookmarksMap[uniqueId];
+                                    Tuple<Guid, BookmarkType> matchedBookmark = matchedBookmarks.Where(candidate => candidate.Item2 == bookmarkType).FirstOrDefault();
+                                    if (matchedBookmark != null)
+                                    {
+                                        newUrlComponents += "/";
+                                        switch (matchedBookmark.Item2)
+                                        {
+                                            case BookmarkType.Timeline:
+                                                newUrlComponents += "t";
+                                                break;
+                                            case BookmarkType.Exhibit:
+                                                newUrlComponents += "e";
+                                                break;
+                                        }
+                                        newUrlComponents += matchedBookmark.Item1.ToString();
+
+                                        // Last item? Record as target bookmark for the tour stop.
+                                        if (idxComponent + 1 == urlComponents.Length)
+                                        {
+                                            bookmark.ReferenceId = matchedBookmark.Item1;
+                                            bookmark.ReferenceType = matchedBookmark.Item2;
+                                        }
+                                    }
                                 }
                             }
+
+                            bookmark.Url = newUrlComponents;
                         }
                     }
 
@@ -271,6 +285,42 @@ namespace Chronozoom.Entities.Migration
                     _storage.Thresholds.Add(threshold);
                 }
             }
+        }
+
+        private static void AddBookmarkToBookmarkMap(Dictionary<int, List<Tuple<Guid, BookmarkType>>> bookmarksMap, int uniqueId, Guid id, BookmarkType bookmarkType)
+        {
+            if (!bookmarksMap.Keys.Contains(uniqueId))
+            {
+                bookmarksMap.Add(uniqueId, new List<Tuple<Guid, BookmarkType>>());
+            }
+
+            bookmarksMap[uniqueId].Add(new Tuple<Guid, BookmarkType>(id, bookmarkType));
+        }
+
+        private static void BookmarkFromBookmarkUrl(string urlPart, out int uniqueId, out BookmarkType bookmarkType)
+        {
+            uniqueId = -1;
+            bookmarkType = BookmarkType.Timeline;
+
+            if (string.IsNullOrEmpty(urlPart))
+            {
+                return;
+            }
+
+            switch (urlPart.Substring(0, 1))
+            {
+                case "c":
+                    bookmarkType = BookmarkType.ContentItem;
+                    break;
+                case "e":
+                    bookmarkType = BookmarkType.Exhibit;
+                    break;
+                case "t":
+                    bookmarkType = BookmarkType.Timeline;
+                    break;
+            }
+
+            uniqueId = int.Parse(urlPart.Substring(1), CultureInfo.InvariantCulture);
         }
 
         private void MigrateInPlace(Timeline timeline)

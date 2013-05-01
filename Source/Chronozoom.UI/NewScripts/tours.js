@@ -613,9 +613,11 @@ var CZ;
             }, 'fast');
             $("#bookmarks").effect('size', {
                 to: {
-                    width: 30
+                    width: '30px'
                 }
-            }, 'fast');
+            }, 'fast', function () {
+                $("#bookmarks").css('width', '30px');
+            });
             $("#bookmarksCollapse").attr("src", "/Images/expand-right.png");
         }
         function expandBookmarks() {
@@ -629,6 +631,7 @@ var CZ;
                     height: 'auto'
                 }
             }, 'slow', function () {
+                $("#bookmarks").css('width', '200px');
                 $("#bookmarks").css('height', 'auto');
                 $("#bookmarks .header").show('slide', {
                 }, 'fast');
@@ -671,25 +674,11 @@ var CZ;
                 var tourBookmarks = new Array();
                 for(var j = 0; j < tourString.bookmarks.length; j++) {
                     var bmString = tourString.bookmarks[j];
-                    if((typeof bmString.description == 'undefined') || (typeof bmString.lapseTime == 'undefined') || (typeof bmString.name == 'undefined')) {
+                    if((typeof bmString.description == 'undefined') || (typeof bmString.lapseTime == 'undefined') || (typeof bmString.name == 'undefined') || (typeof bmString.url == 'undefined')) {
                         areBookmarksValid = false;
                         break;
                     }
-                    var resultId;
-                    switch(bmString.referenceType) {
-                        case 0:
-                            resultId = 't' + bmString.referenceId;
-                            break;
-                        case 1:
-                            resultId = 'e' + bmString.referenceId;
-                            break;
-                        case 2:
-                            resultId = bmString.referenceId;
-                            break;
-                    }
-                    var bookmarkElement = CZ.Common.vc.virtualCanvas("findElement", resultId);
-                    var navStringBookmarkElement = CZ.UrlNav.vcelementToNavString(bookmarkElement);
-                    tourBookmarks.push(new TourBookmark(navStringBookmarkElement, bmString.name, bmString.lapseTime, bmString.description));
+                    tourBookmarks.push(new TourBookmark(bmString.url, bmString.name, bmString.lapseTime, bmString.description));
                 }
                 if(!areBookmarksValid) {
                     continue;

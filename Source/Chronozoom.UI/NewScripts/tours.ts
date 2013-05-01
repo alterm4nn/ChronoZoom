@@ -835,7 +835,10 @@ module CZ {
             $("#bookmarks .slideHeader").hide('slide', {}, 'fast');
             $("#bookmarks .slideText").hide('slide', {}, 'fast');
             $("#bookmarks .slideFooter").hide('slide', {}, 'fast');
-            $("#bookmarks").effect('size', { to: { width: 30 } }, 'fast');
+            $("#bookmarks").effect('size', { to: { width: '30px' } }, 'fast',
+                function () {
+                    $("#bookmarks").css('width', '30px');
+                });
             $("#bookmarksCollapse").attr("src", "/Images/expand-right.png");
         }
 
@@ -848,6 +851,7 @@ module CZ {
             //$("#bookmarks").switchClass('bookmarksWindow', 'bookmarksWindowCollapsed', 'slow',
             $("#bookmarks").effect('size', { to: { width: '200px', height: 'auto' } }, 'slow',
                         function () {
+                            $("#bookmarks").css('width', '200px');
                             $("#bookmarks").css('height', 'auto');
                             $("#bookmarks .header").show('slide', {}, 'fast');
                             $("#bookmarks .slideHeader").show('slide', {}, 'fast');
@@ -914,22 +918,13 @@ module CZ {
                     // break if at least one bookmarks has invalid parameters
                     if ((typeof bmString.description == 'undefined') ||
                             (typeof bmString.lapseTime == 'undefined') ||
-                            (typeof bmString.name == 'undefined')) {
+                            (typeof bmString.name == 'undefined') ||
+                            (typeof bmString.url == 'undefined')) {
                         areBookmarksValid = false;
                         break;
                     }
 
-                    // Create tour URL
-                    var resultId : string;
-                    switch (bmString.referenceType) {
-                        case 0: resultId = 't' + bmString.referenceId; break; // timeline
-                        case 1: resultId = 'e' + bmString.referenceId; break; // exhibit
-                        case 2: resultId = bmString.referenceId; break; // content item
-                    }
-                    var bookmarkElement = CZ.Common.vc.virtualCanvas("findElement", resultId);
-                    var navStringBookmarkElement = CZ.UrlNav.vcelementToNavString(bookmarkElement);
-
-                    tourBookmarks.push(new TourBookmark(navStringBookmarkElement, bmString.name, bmString.lapseTime, bmString.description));
+                    tourBookmarks.push(new TourBookmark(bmString.url, bmString.name, bmString.lapseTime, bmString.description));
                 }
 
                 // skip tour with broken bookmarks
