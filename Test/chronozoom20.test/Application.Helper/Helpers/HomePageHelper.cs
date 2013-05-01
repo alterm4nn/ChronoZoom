@@ -29,7 +29,7 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<-");
             _manager.GetNavigationHelper().OpenLifePage();
-            WaitForElementIsDisplayed(By.Id("bc_link_t66"));
+            WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='Life']"));
             WaitAnimation();
             Logger.Log("->");
         }
@@ -38,7 +38,7 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<-");
             _manager.GetNavigationHelper().OpenHumanityPage();
-            WaitForElementIsDisplayed(By.Id("bc_link_t161"));
+            WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='Humanity']"));
             WaitAnimation();
             Logger.Log("->");
         }
@@ -47,6 +47,8 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<-");
             NavigateBceToCeEra();
+            WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='Geologic Time Scale']"));
+            WaitForElementIsDisplayed(By.XPath("//*[@class='cz-timescale-label' and contains(@style,'display: block;') and text()='1 BCE']"));
             Logger.Log("->");
         }
 
@@ -54,7 +56,7 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<-");
             _manager.GetNavigationHelper().NavigateToRomanHistoryTimeline();
-            WaitForElementIsDisplayed(By.Id("bc_link_t44"));
+            WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='Roman History']"));
             WaitAnimation();
             Logger.Log("->");
         }
@@ -91,7 +93,6 @@ namespace Application.Helper.Helpers
             Logger.Log("-> title: " + title);
             return title;
         }
-
 
         public void OpenHelpLink()
         {

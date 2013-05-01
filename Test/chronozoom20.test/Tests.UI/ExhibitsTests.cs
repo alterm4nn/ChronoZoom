@@ -67,7 +67,6 @@ namespace Tests
         [TestMethod]
         public void Create_exibit_with_one_content_item()
         {
-           
             ExhibitHelper.AddExhibitWithContentItem(_exhibit);
             Exhibit newExhibit = ExhibitHelper.GetNewExhibit();
             Assert.AreEqual(_exhibit.Title,newExhibit.Title, "Titles are not equal");
