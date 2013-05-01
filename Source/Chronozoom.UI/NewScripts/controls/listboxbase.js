@@ -36,6 +36,7 @@ var CZ;
                 if(i !== -1) {
                     item.container.remove();
                     this.items.splice(i, 1);
+                    this.onListItemRemoved(item, i);
                 }
             };
             ListBoxBase.prototype.clear = function () {
@@ -44,6 +45,12 @@ var CZ;
                     item.container.remove();
                 }
                 this.items.length = 0;
+            };
+            ListBoxBase.prototype.selectItem = function (item) {
+                var i = this.items.indexOf(item);
+                if(i !== -1) {
+                    this.onListItemClicked(item, i);
+                }
             };
             return ListBoxBase;
         })();
@@ -57,6 +64,9 @@ var CZ;
                 this.parent = parent;
                 this.container = container;
                 this.data = context;
+                this.container.click(function (_) {
+                    return _this.parent.selectItem(_this);
+                });
                 this.closeButton = this.container.find(uiMap.closeButton);
                 if(!this.closeButton.length) {
                     throw "Close button is not found in a given UI map.";

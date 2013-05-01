@@ -42,7 +42,7 @@ var CZ;
                 this.saveButton.click(function (event) {
                     var isValid = CZ.Authoring.ValidateTimelineData(_this.startDate.getDate(), _this.endDate.getDate(), _this.titleInput.val());
                     if(!isValid) {
-                        _this.container.find("#error-edit-timeline").show();
+                        _this.container.find("#error-edit-timeline").show().delay(7000).fadeOut();
                     }
                     if(isValid) {
                         var self = _this;

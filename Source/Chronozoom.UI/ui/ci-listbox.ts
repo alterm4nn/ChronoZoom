@@ -58,6 +58,16 @@ module CZ {
                 listItemsInfo.default.ctor = ContentItemListItem;
                 super(container, listBoxInfo, listItemsInfo);
             }
+
+            /**
+             * Removes listitem from a listbox.
+             */
+            public remove(item: ListItemBase): void {
+                // every exhibit must have a min of 1 content items to be valid
+                if (this.items.length > 1) {
+                    super.remove(item);
+                }
+            }
         }
 
         export class ContentItemListItem extends ListItemBase {

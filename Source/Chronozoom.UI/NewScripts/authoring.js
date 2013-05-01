@@ -157,17 +157,7 @@ var CZ;
         }
         function createNewExhibit() {
             CZ.VCContent.removeChild(_hovered, "newExhibitCircle");
-            return CZ.VCContent.addInfodot(_hovered, "layerInfodots", undefined, _circleCur.x + _circleCur.r, _circleCur.y + _circleCur.r, _circleCur.r, [
-                {
-                    id: undefined,
-                    guid: undefined,
-                    title: "Content Item Title",
-                    description: "Content Item Description",
-                    uri: "",
-                    mediaType: "image",
-                    parent: _hovered.guid
-                }
-            ], {
+            return CZ.VCContent.addInfodot(_hovered, "layerInfodots", undefined, _circleCur.x + _circleCur.r, _circleCur.y + _circleCur.r, _circleCur.r, [], {
                 title: "Exhibit Title",
                 date: _circleCur.x + _circleCur.r,
                 guid: undefined
@@ -395,7 +385,7 @@ var CZ;
         Authoring.ValidateTimelineData = ValidateTimelineData;
         function ValidateExhibitData(date, title, contentItems) {
             var isValid = CZ.Authoring.ValidateNumber(date);
-            isValid = isValid && CZ.Authoring.IsNotEmpty(title) && CZ.Authoring.IsNotEmpty(date) && CZ.Authoring.IsNotEmpty(date);
+            isValid = isValid && CZ.Authoring.IsNotEmpty(title) && CZ.Authoring.IsNotEmpty(date);
             isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
             return isValid;
         }

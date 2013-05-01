@@ -10,13 +10,15 @@ var CZ;
             __extends(FormEditCI, _super);
             function FormEditCI(container, formInfo) {
                         _super.call(this, container, formInfo);
-                this.saveButton = container.find(formInfo.saveButton);
+                this.titleTextblock = container.find(formInfo.titleTextblock);
                 this.titleInput = container.find(formInfo.titleInput);
-                this.mediaSourceInput = container.find(formInfo.mediaSourceInput);
                 this.mediaInput = container.find(formInfo.mediaInput);
-                this.descriptionInput = container.find(formInfo.descriptionInput);
-                this.attributionInput = container.find(formInfo.attributionInput);
+                this.mediaSourceInput = container.find(formInfo.mediaSourceInput);
                 this.mediaTypeInput = container.find(formInfo.mediaTypeInput);
+                this.attributionInput = container.find(formInfo.attributionInput);
+                this.descriptionInput = container.find(formInfo.descriptionInput);
+                this.saveButton = container.find(formInfo.saveButton);
+                this.prevForm = formInfo.prevForm;
                 this.contentItem = formInfo.context.contentItem;
                 this.exhibit = formInfo.context.exhibit;
                 this.saveButton.off();
@@ -24,66 +26,72 @@ var CZ;
             }
             FormEditCI.prototype.initialize = function () {
                 var _this = this;
-                if(CZ.Authoring.mode === "editExhibit" || CZ.Authoring.mode === "createExhibit" || CZ.Authoring.mode === "editContentItem") {
-                    this.titleTextblock.text("Edit Artifact");
-                    this.saveButton.text("edit artifact");
+                if(!this.exhibit || !this.contentItem) {
+                    alert("Invalid binding. No contentItem to bind against.");
+                    this.close();
+                }
+                if(CZ.Authoring.mode === "createExhibit" || CZ.Authoring.mode === "editExhibit" || CZ.Authoring.mode === "editContentItem") {
+                    if(CZ.Authoring.CImode == "createCI") {
+                        this.titleTextblock.text("Create New");
+                        this.saveButton.text("create artifiact");
+                        this.closeButton.hide();
+                    } else if(CZ.Authoring.CImode == "editCI") {
+                        this.titleTextblock.text("Edit");
+                        this.saveButton.text("update artifact");
+                        if(this.prevForm) {
+                            this.closeButton.hide();
+                        }
+                    } else {
+                        console.log("Unexpected authoring mode in content item form.");
+                        this.close();
+                    }
                 } else {
-                    console.log("Unexpected authoring mode in CI form.");
+                    console.log("Unexpected authoring mode in content item form.");
                     this.close();
                 }
                 this.isCancel = true;
-                if(CZ.Authoring.CImode == "editCI") {
-                    var c = this.contentItem;
-                    this.titleInput.val(c.contentItem.title);
-                    this.descriptionInput.val(c.contentItem.description);
-                    this.attributionInput.val(c.attribution);
-                    this.mediaSourceInput.val(c.contentItem.mediaSource);
-                    this.mediaInput.val(c.contentItem.uri);
-                    var mediaType = c.contentItem.mediaType;
-                    if(mediaType === "Picture") {
-                        mediaType = "image";
-                    }
-                    var med_opt = ($)(this.mediaTypeInput[0]).find(".option");
-                    var selected = med_opt.context[0].selected;
-                    for(var i = 0; i < med_opt.context.length; i++) {
-                        if(med_opt.context[i].text === mediaType) {
-                            med_opt.context[i].selected = true;
-                        }
-                    }
-                }
+                this.titleInput.val(this.contentItem.title || "");
+                this.mediaInput.val(this.contentItem.uri || "");
+                this.mediaSourceInput.val(this.contentItem.mediaSource || "");
+                this.mediaTypeInput.val(this.contentItem.mediaType || "");
+                this.attributionInput.val(this.contentItem.attribution || "");
+                this.descriptionInput.val(this.contentItem.description || "");
                 this.saveButton.click(function (event) {
-                    var med_opt = ($)(_this.mediaTypeInput[0]).find(".option");
-                    var selected = med_opt.context[0].selected;
-                    for(var i = 0; i < med_opt.context.length; i++) {
-                        if(med_opt.context[i].selected) {
-                            selected = med_opt.context[i];
-                            break;
+                    var newContentItem = {
+                        title: _this.titleInput.val() || null,
+                        uri: _this.mediaInput.val() || null,
+                        mediaSource: _this.mediaSourceInput.val() || null,
+                        mediaType: _this.mediaTypeInput.val() || null,
+                        attribution: _this.attributionInput.val() || null,
+                        description: _this.descriptionInput.val() || null
+                    };
+                    if(CZ.Authoring.ValidateContentItems([
+                        newContentItem
+                    ])) {
+                        _this.isCancel = false;
+                        _this.contentItem.title = newContentItem.title;
+                        _this.contentItem.uri = newContentItem.uri;
+                        _this.contentItem.mediaSource = newContentItem.mediaSource;
+                        _this.contentItem.mediaType = newContentItem.mediaType;
+                        _this.contentItem.attribution = newContentItem.attribution;
+                        _this.contentItem.description = newContentItem.description;
+                        if(CZ.Authoring.CImode == "createCI") {
+                            (_this.prevForm).contentItemsListBox.add(newContentItem);
+                        } else if(CZ.Authoring.CImode == "editCI") {
+                            var listBoxItems = (_this.prevForm).contentItemsListBox.items;
+                            for(var i = 0; i < listBoxItems.length; i++) {
+                                var item = listBoxItems[i];
+                                if(_this.contentItem.title === item.data.title && _this.contentItem.uri === item.data.uri) {
+                                    $(item.container).find(".cz-ci-listitem-title").text(newContentItem.title);
+                                    $(item.container).find(".cz-ci-listitem-descr").text(newContentItem.description);
+                                    break;
+                                }
+                            }
                         }
+                        _this.back();
+                    } else {
+                        _this.container.find("#error-edit-ci").show().delay(7000).fadeOut();
                     }
-                    if(CZ.Authoring.CImode == "editCI") {
-                        CZ.Authoring.updateContentItem(_this.contentItem, {
-                            title: _this.titleInput.val(),
-                            uri: _this.mediaInput.val(),
-                            mediaType: selected.text,
-                            description: _this.descriptionInput.val(),
-                            attribution: _this.attributionInput.val(),
-                            mediaSource: _this.mediaSourceInput.val()
-                        });
-                    }
-                    if(CZ.Authoring.CImode == "createCI") {
-                        _this.exhibit.contentItems.push({
-                            title: _this.titleInput.val(),
-                            uri: _this.mediaInput.val(),
-                            mediaType: selected.text,
-                            description: _this.descriptionInput.val(),
-                            attribution: _this.attributionInput.val(),
-                            mediaSource: _this.mediaSourceInput.val(),
-                            guid: undefined,
-                            parent: undefined
-                        });
-                        _this.close();
-                    }
-                    _this.close();
                 });
             };
             FormEditCI.prototype.show = function (noAnimation) {
@@ -95,18 +103,23 @@ var CZ;
                 this.activationSource.addClass("active");
             };
             FormEditCI.prototype.close = function (noAnimation) {
+                this.container.find("#error-edit-ci").hide();
                 _super.prototype.close.call(this, noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",
                     duration: 500
                 });
+                if(this.isCancel && CZ.Authoring.CImode == "createCI") {
+                    this.exhibit.contentItems.pop();
+                }
                 CZ.Authoring.isActive = false;
                 this.activationSource.removeClass("active");
-                this.container.find("#error-edit-CI").hide();
             };
             FormEditCI.prototype.back = function () {
                 this.close(true);
-                this.prevForm.show(true);
+                if(this.prevForm) {
+                    this.prevForm.show(true);
+                }
             };
             return FormEditCI;
         })(CZ.UI.FormBase);

@@ -1964,9 +1964,13 @@ module CZ {
                             CZ.Authoring.isActive = true;
                             CZ.Authoring.mode = "editContentItem";
                             CZ.Authoring.CImode = "editCI";
-                            CZ.Authoring.selectedContentItem = self;
                             CZ.Authoring.selectedExhibit = self.parent.parent.parent;
-
+                            for (var i = 0; i < CZ.Authoring.selectedExhibit.contentItems.length; i++) {
+                                if (CZ.Authoring.selectedExhibit.contentItems[i].guid === self.guid) {
+                                    CZ.Authoring.selectedContentItem = CZ.Authoring.selectedExhibit.contentItems[i];
+                                    break;
+                                }
+                            }
                             return true;
                         }
 
@@ -2215,7 +2219,6 @@ module CZ {
                             CZ.Authoring.isActive = true;
                             CZ.Authoring.mode = "editExhibit";
                             CZ.Authoring.selectedExhibit = infodot;
-                            CZ.Authoring.showEditExhibitForm(infodot);
 
                             return true;
                         }

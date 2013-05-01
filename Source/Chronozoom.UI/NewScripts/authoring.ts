@@ -293,7 +293,7 @@ module CZ {
                 _circleCur.x + _circleCur.r,
                 _circleCur.y + _circleCur.r,
                 _circleCur.r,
-                [{
+                [/*{
                     id: undefined,
                     guid: undefined,
                     title: "Content Item Title",
@@ -301,7 +301,7 @@ module CZ {
                     uri: "",
                     mediaType: "image",
                     parent: _hovered.guid
-                }],
+                }*/],
                 {
                     title: "Exhibit Title",
                     date: _circleCur.x + _circleCur.r,
@@ -651,7 +651,7 @@ module CZ {
         */
         export function ValidateExhibitData(date,title,contentItems) {
             var isValid = CZ.Authoring.ValidateNumber(date);
-            isValid = isValid && CZ.Authoring.IsNotEmpty(title) && CZ.Authoring.IsNotEmpty(date) && CZ.Authoring.IsNotEmpty(date);
+            isValid = isValid && CZ.Authoring.IsNotEmpty(title) && CZ.Authoring.IsNotEmpty(date);
             isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
             return isValid;
         }

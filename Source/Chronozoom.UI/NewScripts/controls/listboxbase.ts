@@ -52,6 +52,8 @@ module CZ {
             public listItemsInfo: IListItemBaseInfo;
             public items: ListItemBase[];
             public getType: (context: any) => string;
+            public onListItemClicked: (item: ListItemBase, index: number) => any;
+            public onListItemRemoved: (item: ListItemBase, index: number) => any;
 
             constructor(container: JQuery,
                         listBoxInfo: IListBoxBaseInfo,
@@ -108,6 +110,7 @@ module CZ {
                 if (i !== -1) {
                     item.container.remove();
                     this.items.splice(i, 1);
+                    this.onListItemRemoved(item, i);
                 }
             }
 
@@ -120,6 +123,17 @@ module CZ {
                     item.container.remove();
                 }
                 this.items.length = 0;
+            }
+
+            /**
+            * Selects an element of the listbox
+            */
+            public selectItem(item: ListItemBase): void {
+                var i = this.items.indexOf(item);
+
+                if (i !== -1) {
+                    this.onListItemClicked(item, i);
+                }
             }
         }
 
@@ -149,6 +163,9 @@ module CZ {
                 this.parent = parent;
                 this.container = container;
                 this.data = context;
+
+                // Setup click on a listitem
+                this.container.click(_ => this.parent.selectItem(this));
 
                 // Setup close button of a listitem.
                 this.closeButton = this.container.find(uiMap.closeButton);

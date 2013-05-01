@@ -38,6 +38,11 @@ var CZ;
                 listItemsInfo.default.ctor = ContentItemListItem;
                         _super.call(this, container, listBoxInfo, listItemsInfo);
             }
+            ContentItemListBox.prototype.remove = function (item) {
+                if(this.items.length > 1) {
+                    _super.prototype.remove.call(this, item);
+                }
+            };
             return ContentItemListBox;
         })(UI.ListBoxBase);
         UI.ContentItemListBox = ContentItemListBox;        

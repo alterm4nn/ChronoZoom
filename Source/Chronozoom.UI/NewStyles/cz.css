@@ -1411,6 +1411,8 @@ img.fallbackBackground {
     background-color: #e9e9e9;
     list-style-type: none;
     border: solid 2px #c7c7c7;
+    height: 200px;
+    overflow:auto;
 }
 
 .cz-listbox-placeholder {

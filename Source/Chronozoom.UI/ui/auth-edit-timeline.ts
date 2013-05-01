@@ -68,7 +68,7 @@ module CZ {
                 this.saveButton.click(event => {
                     var isValid = CZ.Authoring.ValidateTimelineData(this.startDate.getDate(), this.endDate.getDate(), this.titleInput.val());
                     if (!isValid) {
-                        this.container.find("#error-edit-timeline").show();
+                        this.container.find("#error-edit-timeline").show().delay(7000).fadeOut();
                     }
                     if (isValid) {
                         var self = this;
