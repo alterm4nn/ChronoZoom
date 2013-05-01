@@ -13,8 +13,174 @@ The request body is in JSON format:
         id: "0123456789"
     }
 
-## ChronoZoom Resources ##
-TBD
+## ChronoZoom Entities ##
+- [BookmarkType](#bookmarktype)
+- [Bookmark](#bookmark)
+- [Collection](#collection)
+- [ContentItem](#contentitem)
+- [Exhibit](#exhibit)
+- [Reference](#reference)
+- [ObjectType](#objecttype)
+- [SearchResult](#searchresult)
+- [Storage](#storage)
+- [StorageMigrationsConfiguration](#storagemigrationsconfiguration)
+- [SuperCollection](#supercollection)
+- [Threshold](#threshold)
+- [User](#user)
+
+## BookmarkType ##
+ 
+Specifies the type of bookmark.
+ 
+|Enum|Value|
+|:--------|:----|
+|Timeline|0|
+|Exhibit|1|
+|ContentItem|2|
+ 
+## Bookmark ##
+ 
+Specifies a tour stop (can be either a timeline, an exhibit, or a content item).
+ 
+|Property|Value|
+|:-------|:----|
+|Id|The ID of the bookmark.|
+|Name|The name of the bookmark.|
+|Url|The URL of the bookmark.|
+|ReferenceType|The type of reference for the bookmark.|
+|ReferenceId|The ID of the reference that is associated with the bookmark.|
+|LapseTime|The lapse time value for the bookmark.|
+|Description|A text description of the bookmark.|
+ 
+## Collection ##
+ 
+Represents a collection of timelines.
+ 
+|Property|Value|
+|:-------|:----|
+|Id|The ID of the collection.|
+|Title|The title of the collection.|
+|User|The user ID for the collection owner.|
+ 
+## ContentItem ##
+ 
+A pointer to a piece of content in ChronoZoom. The Content Item entity is contained by an Exhibit, and is only viewable as part of an Exhibit.
+ 
+|Property|Value|
+|:-------|:----|
+|Id|The ID of the content item.|
+|Title|The title of the content item.|
+|Caption|The description of the content item.|
+|Threshold|The threshold for the content item.|
+|Regime|The regime in which the content item appears.|
+|TimeUnit|The time unit for the content item.|
+|Year|The year in which the content item appears.|
+|MediaType|Specifies which type of media the content type is.|
+|Uri|The URL for the content item.|
+|MediaSource|Identifies the source of the content item.|
+|Attribution|The attribution for the content item.|
+|UniqueId|The unique ID for the content item.|
+|Order|Specifies the order in which the content item should appear.|
+|HasBibliography|Indicates whether the content item has a bibliography (true or false).|
+|Collection|The collection that the content item is associated with.|
+ 
+## Exhibit ##
+ 
+Contains a set of content items, and is contained by a timeline or a collection.
+ 
+|Property|Value|
+|:-------|:----|
+|Id|The ID of the exhibit.|
+|Title|The title of the exhibit.|
+|Threshold|The threshold for the exhibit.|
+|Regime|The regime in which the threshold should appear.|
+|Day||
+|Year|The year in which the exhibit appears.|
+|UniqueId|The unique ID of the exhibit.|
+|Sequence|Specifies the point of the exhibit within the sequence.|
+|ContentItems|Specifies the collection of content items that is associated with the exhibit.|
+|References|Specifies the collection of references for the exhibit.|
+|Collection|Specifies the collection that is associated with the exhibit.|
+ 
+## Reference ##
+ 
+Specifies a bibliographical reference.
+ 
+|Property|Value|
+|:-------|:----|
+|Id|The ID of the reference.|
+|Title|The title of the reference.|
+|Authors|Lists the authors associated with the reference.|
+|BookChapters|Specifies the book chapters for the reference.|
+|CitationType|Indicates the citation type for the reference.|
+|PageNumbers|Lists the page numbers for the reference.|
+|Publication|The publication that the reference refers to.|
+|PublicationDates|The publication dates for the associated publication.|
+|Source|The source of the reference.|
+ 
+## ObjectType ##
+ 
+Specifies the type of object contained by the search result.
+ 
+|Enum|Value|
+|:--------|:----|
+|Exhibit|0|
+|Timeline|1|
+|ContentItem|2|
+ 
+## SearchResult ##
+ 
+Contains a search result.
+ 
+|Property|Value|
+|:-------|:----|
+|Id|The ID of the search result.|
+|Title|The title of the search result.|
+|ObjectType|The type of object contained by the search result.|
+ 
+## Storage ##
+ 
+Storage implementation for ChronoZoom based on Entity Framework.
+ 
+ 
+## StorageMigrationsConfiguration ##
+ 
+Describes storage migration options. Used when a schema upgrade is required.
+ 
+ 
+## SuperCollection ##
+ 
+Represents a set of collections.
+ 
+|Property|Value|
+|:-------|:----|
+|Id|The ID of the supercollection.|
+|Title|The title of the supercollection.|
+|User|The user who owns the supercollection.|
+|Collections|A collection of collections that belong to the supercollection.|
+ 
+## Threshold ##
+ 
+Specifies a point in time.
+ 
+|Property|Value|
+|:-------|:----|
+|Id|The ID of the threshold.|
+|Title|The title of the threshold.|
+|ThresholdYear|The year in which the threshold should occur.|
+|Description|The description of the threshold.|
+|BookmarkRelativePath|A relative path for the bookmark that is associated with the threshold.|
+ 
+## User ##
+ 
+A registered user.
+ 
+|Property|Value|
+|:-------|:----|
+|Id|The ID of the user.|
+|DisplayName|The display name of the user.|
+|Email|The email address of the user.|
+ 
 
 ## ChronoZoom REST Commands ##
 - [GetTimelines](#gettimelines)
@@ -354,7 +520,7 @@ Deletes the timeline with the specified ID.
     HTTP verb: DELETE
             
     URL:
-    http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/timelines
+    http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/timeline
             
     Request body (JSON):
     {
@@ -501,3 +667,4 @@ Delete the specified content item from the specified collection.
  
 ----------
  
+

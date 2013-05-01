@@ -11,34 +11,64 @@ using System.Runtime.Serialization;
 
 namespace Chronozoom.Entities
 {
+    /// <summary>
+    /// Specifies a bibliographical reference.
+    /// </summary>
     [DataContract]
     public class Reference
     {
+        /// <summary>
+        /// The ID of the reference.
+        /// </summary>
         [Key]
         [DataMember(Name="ID")]
         public Guid Id { get; set; }
 
+        /// <summary>
+        /// The title of the reference.
+        /// </summary>
         [DataMember]
         public string Title { get; set; }
 
+        /// <summary>
+        /// Lists the authors associated with the reference.
+        /// </summary>
         [DataMember]
         public string Authors { get; set; }
 
+        /// <summary>
+        /// Specifies the book chapters for the reference.
+        /// </summary>
         [DataMember]
         public string BookChapters { get; set; }
 
+        /// <summary>
+        /// Indicates the citation type for the reference.
+        /// </summary>
         [DataMember]
         public string CitationType { get; set; }
         
+        /// <summary>
+        /// Lists the page numbers for the reference.
+        /// </summary>
         [DataMember]
         public string PageNumbers { get; set; }
 
+        /// <summary>
+        /// The publication that the reference refers to.
+        /// </summary>
         [DataMember]
         public string Publication { get; set; }
 
+        /// <summary>
+        /// The publication dates for the associated publication.
+        /// </summary>
         [DataMember]
         public string PublicationDates { get; set; }
 
+        /// <summary>
+        /// The source of the reference.
+        /// </summary>
         [DataMember]
         public string Source { get; set; }
     }
