@@ -5,29 +5,25 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Runtime.Caching;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Json;
 using System.Security.Cryptography;
 using System.ServiceModel;
 using System.ServiceModel.Activation;
 using System.ServiceModel.Web;
 using System.Text;
 using System.Web;
-using System.Web.Script.Services;
 using Chronozoom.Entities;
-using Newtonsoft.Json;
+
+using UI.Utils;
 
 namespace UI
 {
@@ -56,6 +52,31 @@ namespace UI
             return string.IsNullOrEmpty(maxElements) ? 2000 : int.Parse(maxElements);
         });
 
+        // Points to the absolute path where thumbnails are stored
+        private static Lazy<Uri> _thumbnailsPath = new Lazy<Uri>(() =>
+        {
+            if (ConfigurationManager.AppSettings["ThumbnailsPath"] == null)
+                return null;
+
+            return new Uri(ConfigurationManager.AppSettings["ThumbnailsPath"]);
+        });
+
+        private static Lazy<ThumbnailGenerator> _thumbnailGenerator = new Lazy<ThumbnailGenerator>(() =>
+        {
+            string thumbnailStorage = null;
+            if (ConfigurationManager.AppSettings["ThumbnailStorage"] != null)
+            {
+                thumbnailStorage = ConfigurationManager.AppSettings["ThumbnailStorage"];
+            }
+
+            return new ThumbnailGenerator(thumbnailStorage);
+        });
+
+        // The connection string to thumbnails storage
+        private static Lazy<string> _thumbnailsStorage = new Lazy<string>(() =>
+        {
+            return ConfigurationManager.AppSettings["ThumbnailStorage"];
+        });
 
         // error code descriptions
         private static class ErrorDescription
@@ -409,6 +430,35 @@ namespace UI
                 uriRequest = System.ServiceModel.OperationContext.Current.RequestContext.RequestMessage.Headers.To;
                 return new Uri(new Uri(uriRequest.GetLeftPart(UriPartial.Authority)), collectionUri.ToString()).ToString();
             });
+        }
+
+        /// <summary>
+        /// Provides a structure to retrieve information about this service.
+        /// </summary>
+        [DataContract]
+        public class ServiceInformation
+        {
+            /// <summary>
+            /// The path to download thumbanils from.
+            /// </summary>
+            [DataMember]
+            public Uri ThumbnailsPath { get; set; }
+        }
+
+        /// <summary>
+        /// Provides information about the ChronoZoom service to the clients. Used internally by the ChronoZoom client.
+        /// </summary>
+        /// <returns>A ServiceInformation object describing parameter from the running service</returns>
+        [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/info", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        public ServiceInformation GetServiceInformation()
+        {
+            Trace.TraceInformation("Get Service Information");
+
+            ServiceInformation serviceInformation = new ServiceInformation();
+            serviceInformation.ThumbnailsPath = _thumbnailsPath.Value;
+
+            return serviceInformation;
         }
 
         /// <summary>
@@ -1070,6 +1120,15 @@ namespace UI
                     }
                 }
                 _storage.SaveChanges();
+
+                if (exhibitRequest.ContentItems != null)
+                {
+                    foreach (ContentItem contentItem in exhibitRequest.ContentItems)
+                    {
+                        _thumbnailGenerator.Value.CreateThumbnails(contentItem);
+                    }
+                }
+
                 return returnValue;
             });
         }
@@ -1262,7 +1321,10 @@ namespace UI
                     Guid updateContentItemGuid = UpdateContentItem(collectionGuid, contentItemRequest);
                     returnValue = updateContentItemGuid;
                 }
+                
                 _storage.SaveChanges();
+                _thumbnailGenerator.Value.CreateThumbnails(contentItemRequest);
+
                 return returnValue;
             });
         }
