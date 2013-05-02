@@ -22,6 +22,9 @@ var CZ;
                 this.duration = undefined;
                 this.number = 0;
                 this.elapsed = 0;
+                if(this.text === null) {
+                    this.text = "";
+                }
             }
             return TourBookmark;
         })();        
