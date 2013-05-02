@@ -262,6 +262,17 @@ var CZ;
             });
         }
         Service.getTours = getTours;
+        function getServiceInformation() {
+            var request = new Request(_serviceUrl);
+            request.addToPath("info");
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getServiceInformation = getServiceInformation;
         function putExhibitContent(e, oldContentItems) {
             var newGuids = e.contentItems.map(function (ci) {
                 return ci.guid;

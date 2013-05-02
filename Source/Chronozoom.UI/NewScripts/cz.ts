@@ -80,6 +80,11 @@ module CZ {
                 // TODO: Get UI components.
             });
 
+            CZ.Service.getServiceInformation().then(
+                function (response) {
+                    CZ.Settings.contentItemThumbnailBaseUri = response.ThumbnailsPath;
+                });
+
             var url = CZ.UrlNav.getURL();
             var rootCollection = url.superCollectionName === undefined;
             CZ.Service.superCollectionName = url.superCollectionName;
