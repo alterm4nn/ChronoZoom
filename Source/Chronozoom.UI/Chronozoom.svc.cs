@@ -265,6 +265,23 @@ namespace UI
         }
 
         /// <summary>
+        /// Returns a list of tours for the default collection and default supercollection.
+        /// </summary>
+        /// <returns>A list of tours in JSON format.</returns>
+        /// <example><![CDATA[ 
+        /// HTTP verb: GET
+        ///
+        /// URL: 
+        /// http://[site URL]/chronozoom.svc/tours
+        /// ]]>
+        /// </example>
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/tours")]
+        public BaseJsonResult<IEnumerable<Tour>> GetDefaultTours()
+        {
+            return GetTours("", "");
+        }
+
+        /// <summary>
         /// Returns a list of tours for a given collection or supercollection.
         /// </summary>
         /// <param name="supercollection">Name of the supercollection to query.</param>
@@ -279,7 +296,7 @@ namespace UI
         /// </example>
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
         [OperationContract]
-        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/{collection}/tours")]
         public BaseJsonResult<IEnumerable<Tour>> GetTours(string supercollection, string collection)
         {
             Trace.TraceInformation("Get Tours");
