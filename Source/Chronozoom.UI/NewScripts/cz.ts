@@ -10,7 +10,7 @@
 /// <reference path='controls/cz.datepicker.ts'/>
 /// <reference path='../ui/auth-edit-timeline.ts'/>
 /// <reference path='../ui/auth-edit-exhibit.ts'/>
-/// <reference path='../ui/auth-edit-ci-form.ts'/>
+/// <reference path='../ui/auth-edit-contentitem-form.ts'/>
 /// <reference path='../ui/header-edit.ts' />
 
 /// <reference path='typings/jquery/jquery.d.ts'/>
@@ -22,8 +22,8 @@ module CZ {
             "#header-edit-form": "/ui/header-edit-form.html",
             "#auth-edit-timeline-form": "/ui/auth-edit-timeline-form.html",
             "#auth-edit-exhibit-form": "/ui/auth-edit-exhibit-form.html",
-            "#auth-edit-ci-form": "/ui/auth-edit-ci-form.html",
-            "$('<div></div>')": "/ui/ci-listbox.html"
+            "#auth-edit-contentitem-form": "/ui/auth-edit-contentitem-form.html",
+            "$('<div></div>')": "/ui/contentitem-listbox.html"
         };
 
         enum FeatureActivation {

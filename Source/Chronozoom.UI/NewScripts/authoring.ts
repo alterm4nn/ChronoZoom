@@ -43,7 +43,7 @@ module CZ {
 
         //TODO: use enum for authoring modes when new authoring forms will be completly integrated
         export var mode: any = null;
-		export var CImode: any = null;
+		export var contentItemMode: any = null;
 
         // Forms' handlers.
         export var showCreateTimelineForm: (...args: any[]) => any = null;
@@ -238,7 +238,7 @@ module CZ {
          * Use it in when you need to update exhibit's or some of its content item's info.
          * @param  {Object} e    An exhibit to renew.
          */
-        function renewExhibit(e) {
+        export function renewExhibit(e) {
             var vyc = e.y + e.height / 2;
             var time = e.x + e.width / 2;
             var id = e.id;
@@ -684,8 +684,8 @@ module CZ {
             if (contentItems.length == 0) { return false; }
             var i = 0;
             while (contentItems[i] != null) {
-                var CI = contentItems[i];
-                isValid = isValid && CZ.Authoring.IsNotEmpty(CI.title) && CZ.Authoring.IsNotEmpty(CI.uri) && CZ.Authoring.IsNotEmpty(CI.mediaType);
+                var ci = contentItems[i];
+                isValid = isValid && CZ.Authoring.IsNotEmpty(ci.title) && CZ.Authoring.IsNotEmpty(ci.uri) && CZ.Authoring.IsNotEmpty(ci.mediaType);
                 if (!isValid) return false;
                 i++;
             }

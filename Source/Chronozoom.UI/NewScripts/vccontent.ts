@@ -1963,7 +1963,7 @@ module CZ {
                         editButton.onmouseclick = function () {
                             CZ.Authoring.isActive = true;
                             CZ.Authoring.mode = "editContentItem";
-                            CZ.Authoring.CImode = "editCI";
+                            CZ.Authoring.contentItemMode = "editContentItem";
                             CZ.Authoring.selectedExhibit = self.parent.parent.parent;
                             for (var i = 0; i < CZ.Authoring.selectedExhibit.contentItems.length; i++) {
                                 if (CZ.Authoring.selectedExhibit.contentItems[i].guid === self.guid) {

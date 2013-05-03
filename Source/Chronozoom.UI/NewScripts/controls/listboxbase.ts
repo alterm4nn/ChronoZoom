@@ -165,7 +165,7 @@ module CZ {
                 this.data = context;
 
                 // Setup click on a listitem
-                this.container.click(_ => this.parent.selectItem(this));
+                this.container.dblclick(_ => this.parent.selectItem(this));
 
                 // Setup close button of a listitem.
                 this.closeButton = this.container.find(uiMap.closeButton);

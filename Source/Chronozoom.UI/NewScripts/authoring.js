@@ -32,7 +32,7 @@ var CZ;
         Authoring.isEnabled = false;
         Authoring.isDragging = false;
         Authoring.mode = null;
-        Authoring.CImode = null;
+        Authoring.contentItemMode = null;
         Authoring.showCreateTimelineForm = null;
         Authoring.showEditTimelineForm = null;
         Authoring.showCreateExhibitForm = null;
@@ -140,6 +140,7 @@ var CZ;
             CZ.VCContent.removeChild(parent, id);
             return CZ.VCContent.addInfodot(parent, "layerInfodots", id, time, vyc, radv, cis, descr);
         }
+        Authoring.renewExhibit = renewExhibit;
         function createNewTimeline() {
             CZ.VCContent.removeChild(_hovered, "newTimelineRectangle");
             return CZ.VCContent.addTimeline(_hovered, _hovered.layerid, undefined, {
@@ -409,8 +410,8 @@ var CZ;
             }
             var i = 0;
             while(contentItems[i] != null) {
-                var CI = contentItems[i];
-                isValid = isValid && CZ.Authoring.IsNotEmpty(CI.title) && CZ.Authoring.IsNotEmpty(CI.uri) && CZ.Authoring.IsNotEmpty(CI.mediaType);
+                var ci = contentItems[i];
+                isValid = isValid && CZ.Authoring.IsNotEmpty(ci.title) && CZ.Authoring.IsNotEmpty(ci.uri) && CZ.Authoring.IsNotEmpty(ci.mediaType);
                 if(!isValid) {
                     return false;
                 }

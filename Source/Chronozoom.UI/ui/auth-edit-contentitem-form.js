@@ -31,11 +31,11 @@ var CZ;
                     this.close();
                 }
                 if(CZ.Authoring.mode === "createExhibit" || CZ.Authoring.mode === "editExhibit" || CZ.Authoring.mode === "editContentItem") {
-                    if(CZ.Authoring.CImode == "createCI") {
+                    if(CZ.Authoring.contentItemMode == "createContentItem") {
                         this.titleTextblock.text("Create New");
                         this.saveButton.text("create artifiact");
                         this.closeButton.hide();
-                    } else if(CZ.Authoring.CImode == "editCI") {
+                    } else if(CZ.Authoring.contentItemMode == "editContentItem") {
                         this.titleTextblock.text("Edit");
                         this.saveButton.text("update artifact");
                         if(this.prevForm) {
@@ -75,22 +75,25 @@ var CZ;
                         _this.contentItem.mediaType = newContentItem.mediaType;
                         _this.contentItem.attribution = newContentItem.attribution;
                         _this.contentItem.description = newContentItem.description;
-                        if(CZ.Authoring.CImode == "createCI") {
-                            (_this.prevForm).contentItemsListBox.add(newContentItem);
-                        } else if(CZ.Authoring.CImode == "editCI") {
-                            var listBoxItems = (_this.prevForm).contentItemsListBox.items;
-                            for(var i = 0; i < listBoxItems.length; i++) {
-                                var item = listBoxItems[i];
-                                if(_this.contentItem.title === item.data.title && _this.contentItem.uri === item.data.uri) {
-                                    $(item.container).find(".cz-ci-listitem-title").text(newContentItem.title);
-                                    $(item.container).find(".cz-ci-listitem-descr").text(newContentItem.description);
-                                    break;
+                        if(_this.prevForm) {
+                            if(CZ.Authoring.contentItemMode == "createContentItem") {
+                                (_this.prevForm).contentItemsListBox.add(newContentItem);
+                            } else if(CZ.Authoring.contentItemMode == "editContentItem") {
+                                var listBoxItems = (_this.prevForm).contentItemsListBox.items;
+                                for(var i = 0; i < listBoxItems.length; i++) {
+                                    var item = listBoxItems[i];
+                                    if(_this.contentItem.title === item.data.title && _this.contentItem.uri === item.data.uri) {
+                                        $(item.container).find(".cz-contentitem-listitem-title").text(newContentItem.title);
+                                        $(item.container).find(".cz-contentitem-listitem-descr").text(newContentItem.description);
+                                        break;
+                                    }
                                 }
                             }
                         }
+                        CZ.Authoring.renewExhibit(_this.exhibit);
                         _this.back();
                     } else {
-                        _this.container.find("#error-edit-ci").show().delay(7000).fadeOut();
+                        _this.container.find("#error-edit-contentitem").show().delay(7000).fadeOut();
                     }
                 });
             };
@@ -103,13 +106,13 @@ var CZ;
                 this.activationSource.addClass("active");
             };
             FormEditCI.prototype.close = function (noAnimation) {
-                this.container.find("#error-edit-ci").hide();
+                this.container.find("#error-edit-contentitem").hide();
                 _super.prototype.close.call(this, noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",
                     duration: 500
                 });
-                if(this.isCancel && CZ.Authoring.CImode == "createCI") {
+                if(this.isCancel && CZ.Authoring.contentItemMode == "createContentItem") {
                     this.exhibit.contentItems.pop();
                 }
                 CZ.Authoring.isActive = false;

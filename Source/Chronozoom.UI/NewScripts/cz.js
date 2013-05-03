@@ -5,8 +5,8 @@ var CZ;
             "#header-edit-form": "/ui/header-edit-form.html",
             "#auth-edit-timeline-form": "/ui/auth-edit-timeline-form.html",
             "#auth-edit-exhibit-form": "/ui/auth-edit-exhibit-form.html",
-            "#auth-edit-ci-form": "/ui/auth-edit-ci-form.html",
-            "$('<div></div>')": "/ui/ci-listbox.html"
+            "#auth-edit-contentitem-form": "/ui/auth-edit-contentitem-form.html",
+            "$('<div></div>')": "/ui/contentitem-listbox.html"
         };
         var FeatureActivation;
         (function (FeatureActivation) {

@@ -10,7 +10,7 @@
     <script type="text/javascript" src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
     <script type="text/javascript" src="/NewScripts/uiloader.js"></script>
     <script type="text/javascript" src="/NewScripts/controls/listboxbase.js"></script>
-    <script type="text/javascript" src="/ui/ci-listbox.js"></script>
+    <script type="text/javascript" src="/ui/contentitem-listbox.js"></script>
     <script type="text/javascript" src="listbox-example.js"></script>
 
     <style>
@@ -84,7 +84,7 @@
 
         $(document).ready(function () {
             CZ.UILoader.loadAll({
-                "$('<div id='listbox1'></div>')": "/ui/ci-listbox.html",
+                "$('<div id='listbox1'></div>')": "/ui/contentitem-listbox.html",
                 "$('<div id='listbox2'></div>')": "listbox-example.html"
             }).done(function (c1, c2) {
                 listbox1 = new CZ.UI.ContentItemListBox(c1.find(".cz-listbox"), contentItems);

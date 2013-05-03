@@ -86,7 +86,7 @@ var CZ;
                             description: ""
                         };
                         _this.exhibit.contentItems.push(newContentItem);
-                        CZ.Authoring.CImode = "createCI";
+                        CZ.Authoring.contentItemMode = "createContentItem";
                         CZ.Authoring.showEditContentItemForm(newContentItem, _this.exhibit, _this, true);
                     }
                 });
@@ -94,7 +94,7 @@ var CZ;
                     for(var i = 0; i < _this.exhibit.contentItems.length; i++) {
                         if(_this.exhibit.contentItems[i].title === item.data.title && _this.exhibit.contentItems[i].uri === item.data.uri) {
                             _this.close(true, false);
-                            CZ.Authoring.CImode = "editCI";
+                            CZ.Authoring.contentItemMode = "editContentItem";
                             CZ.Authoring.showEditContentItemForm(_this.exhibit.contentItems[i], _this.exhibit, _this, true);
                             break;
                         }

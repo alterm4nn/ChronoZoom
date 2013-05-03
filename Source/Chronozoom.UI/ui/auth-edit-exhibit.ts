@@ -1,4 +1,4 @@
-/// <reference path='ci-listbox.ts' />
+/// <reference path='contentitem-listbox.ts' />
 /// <reference path='../NewScripts/controls/formbase.ts' />
 /// <reference path='../NewScripts/authoring.ts'/>
 /// <reference path='../NewScripts/typings/jquery/jquery.d.ts'/>
@@ -126,7 +126,7 @@ module CZ {
                             description: ""
                         };
                         this.exhibit.contentItems.push(newContentItem);
-                        CZ.Authoring.CImode = "createCI";
+                        CZ.Authoring.contentItemMode = "createContentItem";
                         CZ.Authoring.showEditContentItemForm(newContentItem, this.exhibit, this, true);
                     }
                 });
@@ -137,7 +137,7 @@ module CZ {
                             this.exhibit.contentItems[i].uri === item.data.uri) {
 
                             this.close(true, false);
-                            CZ.Authoring.CImode = "editCI";
+                            CZ.Authoring.contentItemMode = "editContentItem";
                             CZ.Authoring.showEditContentItemForm(this.exhibit.contentItems[i], this.exhibit, this, true);
                             break;
                         }

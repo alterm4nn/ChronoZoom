@@ -64,7 +64,7 @@ var CZ;
                 this.parent = parent;
                 this.container = container;
                 this.data = context;
-                this.container.click(function (_) {
+                this.container.dblclick(function (_) {
                     return _this.parent.selectItem(_this);
                 });
                 this.closeButton = this.container.find(uiMap.closeButton);

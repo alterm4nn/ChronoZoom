@@ -29,9 +29,9 @@ var CZ;
                         container: listItemContainer,
                         uiMap: {
                             closeButton: ".cz-listitem-close-btn",
-                            iconImg: ".cz-ci-listitem-icon > img",
-                            titleTextblock: ".cz-ci-listitem-title",
-                            descrTextblock: ".cz-ci-listitem-descr"
+                            iconImg: ".cz-contentitem-listitem-icon > img",
+                            titleTextblock: ".cz-contentitem-listitem-title",
+                            descrTextblock: ".cz-contentitem-listitem-descr"
                         }
                     }
                 };

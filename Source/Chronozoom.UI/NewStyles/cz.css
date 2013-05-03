@@ -1355,7 +1355,7 @@ img.fallbackBackground {
     overflow-y: auto;
 }
 
-.cz-form-ci {
+.cz-form-contentitem {
     min-width: 380px;
     max-width: 450px;
     width: 30.2734375%; /* 310 / 1024 */
@@ -1363,7 +1363,7 @@ img.fallbackBackground {
     left: 0;
 }
 
-.cz-form-ci > .cz-form-content {
+.cz-form-contentitem > .cz-form-content {
     position: absolute;
     top: 36px;
     right: 0;
@@ -1456,23 +1456,23 @@ img.fallbackBackground {
 
 ***********************************************************/
 
-.cz-ci-listitem-icon {
+.cz-contentitem-listitem-icon {
     display: inline-block;
     width: 15%;
 }
 
-.cz-ci-listitem-icon > img {
+.cz-contentitem-listitem-icon > img {
     max-width: 100%;
 }
 
-.cz-ci-listitem-content {
+.cz-contentitem-listitem-content {
     display: inline-block;
     margin: 0px 5px;
     vertical-align: top;
     width: 75%;
 }
 
-.cz-ci-listitem-title {
+.cz-contentitem-listitem-title {
     margin: 0 0 10px 0;
     color: #232323;
     font-size: 12px;
@@ -1481,7 +1481,7 @@ img.fallbackBackground {
     overflow: hidden;
 }
 
-.cz-ci-listitem-descr {
+.cz-contentitem-listitem-descr {
     margin: 0;
     color: #aeaeae;
     font-size: 12px;
