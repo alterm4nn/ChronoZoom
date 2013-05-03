@@ -153,7 +153,7 @@ var CZ;
             }
         ];
         Settings.seadragonServiceURL = "http://api.zoom.it/v1/content/?url=";
-        Settings.seadragonImagePath = "../Images/";
+        Settings.seadragonImagePath = "/Images/";
         Settings.seadragonMaxConnectionAttempts = 3;
         Settings.seadragonRetryInterval = 2000;
         Settings.navigateNextMaxCount = 2;

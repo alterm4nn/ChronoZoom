@@ -138,7 +138,7 @@
 
         // seadragon
         export var seadragonServiceURL = "http://api.zoom.it/v1/content/?url=";
-        export var seadragonImagePath = "../Images/";
+        export var seadragonImagePath = "/Images/";
         export var seadragonMaxConnectionAttempts = 3;
         export var seadragonRetryInterval = 2000; // ms
 

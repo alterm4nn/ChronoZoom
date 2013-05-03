@@ -320,6 +320,19 @@ module CZ {
             });
         }
 
+        // .../{supercollection}/{collection}/structure?start=&end=&minspan=&lca=
+        export function getServiceInformation() {
+            var request = new Request(_serviceUrl);
+            request.addToPath("info");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+
         /**
         * Auxiliary Methods.
         */

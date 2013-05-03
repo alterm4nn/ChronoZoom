@@ -62,6 +62,9 @@ var CZ;
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
             });
+            CZ.Service.getServiceInformation().then(function (response) {
+                CZ.Settings.contentItemThumbnailBaseUri = response.ThumbnailsPath;
+            });
             var url = CZ.UrlNav.getURL();
             var rootCollection = url.superCollectionName === undefined;
             CZ.Service.superCollectionName = url.superCollectionName;

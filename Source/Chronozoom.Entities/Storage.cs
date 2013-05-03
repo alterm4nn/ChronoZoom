@@ -180,7 +180,17 @@ namespace Chronozoom.Entities
                     TOP({0}) *,
                     FromYear as [Start],
                     ToYear as [End]
-                FROM Timelines
+                FROM Timelines,
+                    (
+                        SELECT TOP(1) Id as AncestorId
+                        FROM Timelines 
+                        WHERE 
+                            (Timeline_Id Is NULL OR Id = {5})
+                            AND Collection_Id = {4}
+                        ORDER BY 
+                            CASE WHEN Id = {5} THEN 1 ELSE 0 END DESC, 
+                            CASE WHEN Id Is NULL THEN 1 ELSE 0 END DESC
+                    ) as AncestorTimeline
                 WHERE
                     Collection_Id = {4} AND
                     (
@@ -189,9 +199,9 @@ namespace Chronozoom.Entities
                         ToYear-FromYear >= {3} OR
                         Id = {5}
                     )
-                ORDER BY
-                    CASE WHEN Id = {5} THEN 1 ELSE 0 END DESC,
-                    CASE WHEN Timeline_Id = {5} THEN 1 ELSE 0 END DESC,
+                 ORDER BY
+                    CASE WHEN Timelines.Id = AncestorId THEN 1 ELSE 0 END DESC, 
+                    CASE WHEN Timeline_Id = AncestorId THEN 1 ELSE 0 END DESC, 
                     ToYear-FromYear DESC";
 
             return FillTimelinesFromFlatList(
