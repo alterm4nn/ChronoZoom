@@ -1514,7 +1514,7 @@ var CZ;
                         this.vc.requestInvalidate();
                         this.vc.element.css('cursor', 'default');
                     };
-                    var bid = window.location.hash.match("b=([a-z0-9_]+)");
+                    var bid = window.location.hash.match("b=([a-z0-9_\-]+)");
                     if(bid && bibliographyFlag) {
                         CZ.Bibliography.showBibliography({
                             infodot: infodotDescription,

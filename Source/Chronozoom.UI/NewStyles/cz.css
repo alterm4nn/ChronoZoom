@@ -1277,3 +1277,8 @@ img.fallbackBackground {
     color: #aeaeae;
     text-align: justify;
 }
+
+.truncateText {
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
