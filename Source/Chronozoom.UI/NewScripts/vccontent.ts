@@ -2169,7 +2169,7 @@ module CZ {
                     };
 
                     //Parse url for parameter b (bibliography).
-                    var bid = window.location.hash.match("b=([a-z0-9_]+)");
+                    var bid = window.location.hash.match("b=([a-z0-9_\-]+)");
                     if (bid && bibliographyFlag) {
                         //bid[0] - source string
                         //bid[1] - found match
