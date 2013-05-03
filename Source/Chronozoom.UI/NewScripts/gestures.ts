@@ -220,7 +220,7 @@ module CZ {
             var zoomController;
             var pinController;
 
-            if (window.navigator.msPointerEnabled) {
+            if (window.navigator.msPointerEnabled && (<any>window).MSGesture) {
                 vcGestureObject = new MSGesture();
                 vcGestureObject.target = CZ.Common.vc[0];
                 CZ.Common.vc[0].addEventListener("MSPointerMove", addPointerToGesture, false);
