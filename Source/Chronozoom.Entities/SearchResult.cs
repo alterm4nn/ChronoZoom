@@ -12,6 +12,9 @@ namespace Chronozoom.Entities
     /// <summary>
     /// Specifies the type of object contained by the search result.
     /// </summary>
+    /// <param name="Exhibit">0</param>
+    /// <param name="Timeline">1</param>
+    /// <param name="ContentItem">2</param>
     [DataContract(Name = "ObjectType")]
     public enum ObjectType
     {

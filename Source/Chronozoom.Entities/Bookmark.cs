@@ -14,6 +14,9 @@ namespace Chronozoom.Entities
     /// <summary>
     /// Specifies the type of bookmark.
     /// </summary>
+    /// <param name="Timeline">0</param>
+    /// <param name="Exhibit">1</param>
+    /// <param name="ContentItem">2</param>
     public enum BookmarkType
     {
         Timeline = 0,

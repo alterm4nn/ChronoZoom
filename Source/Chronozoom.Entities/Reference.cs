@@ -12,7 +12,7 @@ using System.Runtime.Serialization;
 namespace Chronozoom.Entities
 {
     /// <summary>
-    /// Specifies a bibliography reference.
+    /// Specifies a bibliographical reference.
     /// </summary>
     [DataContract]
     public class Reference
