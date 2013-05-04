@@ -19,6 +19,10 @@ var CZ;
                 for(var i = 0, context = listBoxInfo.context, len = context.length; i < len; ++i) {
                     this.add(context[i]);
                 }
+                this.itemDblClickHandler = function (item, idx) {
+                };
+                this.itemRemoveHandler = function (item, idx) {
+                };
                 this.container.sortable(listBoxInfo.sortableSettings);
             }
             ListBoxBase.prototype.add = function (context) {
@@ -36,7 +40,7 @@ var CZ;
                 if(i !== -1) {
                     item.container.remove();
                     this.items.splice(i, 1);
-                    this.onListItemRemoved(item, i);
+                    this.itemRemoveHandler(item, i);
                 }
             };
             ListBoxBase.prototype.clear = function () {
@@ -49,8 +53,14 @@ var CZ;
             ListBoxBase.prototype.selectItem = function (item) {
                 var i = this.items.indexOf(item);
                 if(i !== -1) {
-                    this.onListItemClicked(item, i);
+                    this.itemDblClickHandler(item, i);
                 }
+            };
+            ListBoxBase.prototype.itemDblClick = function (handler) {
+                this.itemDblClickHandler = handler;
+            };
+            ListBoxBase.prototype.itemRemove = function (handler) {
+                this.itemRemoveHandler = handler;
             };
             return ListBoxBase;
         })();

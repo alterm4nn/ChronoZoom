@@ -1283,6 +1283,7 @@ img.fallbackBackground {
     border: 1px solid #D5D5D5;
     padding: 5px;
     font-size: 12px;
+    font-family: 'Segoe UI', Helvetica, Arial, 'Trebuchet MS', 'San Serif';
     vertical-align: top;
     
     -webkit-box-sizing: border-box;
@@ -1383,14 +1384,12 @@ img.fallbackBackground {
     background-color: rgba(0,0,0,0.2);
 }
 
-}
-
 .truncateText {
     text-overflow: ellipsis;
     overflow: hidden;
 }
 
-.errormsg {
+.cz-form-errormsg {
     color: #dd4b39;
     display: block;
 }

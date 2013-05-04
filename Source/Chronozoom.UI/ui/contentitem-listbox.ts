@@ -1,5 +1,5 @@
+/// <reference path="../NewScripts/authoring.ts" />
 /// <reference path='../NewScripts/typings/jquery/jquery.d.ts'/>
-
 /// <reference path='../NewScripts/controls/listboxbase.ts'/>
 
 module CZ {
@@ -58,16 +58,6 @@ module CZ {
                 listItemsInfo.default.ctor = ContentItemListItem;
                 super(container, listBoxInfo, listItemsInfo);
             }
-
-            /**
-             * Removes listitem from a listbox.
-             */
-            public remove(item: ListItemBase): void {
-                // every exhibit must have a min of 1 content items to be valid
-                if (this.items.length > 1) {
-                    super.remove(item);
-                }
-            }
         }
 
         export class ContentItemListItem extends ListItemBase {
@@ -89,6 +79,17 @@ module CZ {
                 this.iconImg.attr("src", this.data.icon || "/Images/Temp-Thumbnail2.png");
                 this.titleTextblock.text(this.data.title);
                 this.descrTextblock.text(this.data.description);
+
+                this.closeButton.off();
+                this.closeButton.click(() => {
+                    if (CZ.Authoring.mode === "createExhibit") {
+                        super.close();
+                    } else if (CZ.Authoring.mode === "editExhibit") {
+                        if (this.parent.items.length > 1) {
+                            super.close();
+                        }
+                    }
+                });
             }
         }
     }

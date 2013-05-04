@@ -3,191 +3,226 @@
 /// <reference path='../NewScripts/authoring.ts'/>
 /// <reference path='../NewScripts/typings/jquery/jquery.d.ts'/>
 
-
 module CZ {
     export module UI {
-        export interface FormEditExhibitInfo extends CZ.UI.FormBaseInfo {
+        export interface FormEditExhibitInfo extends FormBaseInfo {
             titleTextblock: string;
             titleInput: string;
             datePicker: string;
             createArtifactButton: string;
             contentItemsListBox: string;
+            errorMessage: string;
             saveButton: string;
             deleteButton: string;
             contentItemsTemplate: JQuery;
             context: Object;
         }
 
-        export class FormEditExhibit extends CZ.UI.FormBase {
-            private container: JQuery;
-            private formInfo: FormEditExhibitInfo;
-
+        export class FormEditExhibit extends FormBase {
             private titleTextblock: JQuery;
             private titleInput: JQuery;
-            private datePicker: CZ.UI.DatePicker;
+            private datePicker: DatePicker;
             private createArtifactButton: JQuery;
-            private contentItemsListBox: CZ.UI.ContentItemListBox;
+            public  contentItemsListBox: ContentItemListBox;
+            private errorMessage: JQuery;
             private saveButton: JQuery;
             private deleteButton: JQuery;
+
             private contentItemsTemplate: JQuery;
 
-            private oldContentItems: any;
-            private exhibit: any;
-            private isCancel: bool; // form is closed without saving changes
+            public  exhibit: any; // CanvasInfodot
+            private exhibitCopy: any;
+
+            private mode; // create | edit
+            private isCancel: bool; // is form closed without saving changes
+
+            public clickedListItem: ContentItemListItem; // the contentitem on which the user dbl clicked
 
             constructor(container: JQuery, formInfo: FormEditExhibitInfo) {
                 super(container, formInfo);
-                this.container = container;
-                this.formInfo = formInfo;
 
                 this.titleTextblock = container.find(formInfo.titleTextblock);
                 this.titleInput = container.find(formInfo.titleInput);
                 this.datePicker = new CZ.UI.DatePicker(container.find(formInfo.datePicker));
                 this.createArtifactButton = container.find(formInfo.createArtifactButton);
                 this.contentItemsListBox = new CZ.UI.ContentItemListBox(container.find(formInfo.contentItemsListBox), formInfo.contentItemsTemplate, (<any>formInfo.context).contentItems);
+                this.errorMessage = container.find(formInfo.errorMessage);
                 this.saveButton = container.find(formInfo.saveButton);
                 this.deleteButton = container.find(formInfo.deleteButton);
+
                 this.contentItemsTemplate = formInfo.contentItemsTemplate;
-                this.oldContentItems = $.map((<any>formInfo.context).contentItems, function (obj) { return $.extend(true, {}, obj); });
+
                 this.exhibit = formInfo.context;
-
-                this.createArtifactButton.off();
-                this.saveButton.off();
-                this.deleteButton.off();
-
-                this.initialize();
-            }
-
-            private initialize(): void {
-                if (CZ.Authoring.mode === "createExhibit") {
-                    this.deleteButton.hide();
-                    this.titleTextblock.text("Create Exhibit");
-                    this.saveButton.text("create exhibit");
-                }
-                else if (CZ.Authoring.mode === "editExhibit") {
-                    this.deleteButton.show();
-                    this.titleTextblock.text("Edit Exhibit");
-                    this.saveButton.text("update exhibit");
-                }
-                else {
-                    console.log("Unexpected authoring mode in exhibit form.");
-                    this.close();
-                }
-
+                this.exhibitCopy = $.extend({}, formInfo.context, { children: null }); // shallow copy of exhibit (without children)
+                this.exhibitCopy = $.extend(true, {}, this.exhibitCopy); // deep copy of exhibit
+                delete this.exhibitCopy.children;
+                
+                this.mode = CZ.Authoring.mode; // deep copy mode. it never changes throughout the lifecycle of the form.
                 this.isCancel = true;
 
-                this.titleInput.val(this.exhibit.title);
-                this.datePicker.setDate(this.exhibit.infodotDescription.date);
+                this.initUI();
+            }
 
-                this.saveButton.click(event => {
-                    if (CZ.Authoring.ValidateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) &&
-                        this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= 10) { // num of content items in an exhibit [1, 10]
+            private initUI() {
+                if (this.mode === "createExhibit") {
+                    this.titleTextblock.text("Create Exhibit");
+                    this.saveButton.text("create exhibit");
 
-                        var newContentItems = this.exhibit.contentItems;
-                        this.exhibit.contentItems = this.oldContentItems;
-                        CZ.Authoring.updateExhibit(this.exhibit, {
-                            title: this.titleInput.val(),
-                            date: this.datePicker.getDate(),
-                            contentItems: newContentItems
-                        }).then(
-                            success => {
-                               this.isCancel = false;
-                               this.close();
-                           },
-                           error => {
-                               this.exhibit.contentItems = newContentItems;
-                               alert("Unable to save changes. Please try again later.");
-                               console.log(error);
-                           }
-                       );
-                    } else {
-                        this.container.find("#error-edit-exhibit").show().delay(7000).fadeOut();
-                    }
-                });
+                    this.titleInput.val(this.exhibit.title);
+                    this.datePicker.setDate(this.exhibit.infodotDescription.date);
 
-                // deleteButton is only visible when CZ.Authoring.mode === "editExhibit"
-                this.deleteButton.click(event => {
-                    if (confirm("Are you sure want to delete the exhibit and all of its content items? Delete can't be undone!")) {
-                        CZ.Authoring.removeExhibit(this.exhibit);
-                        this.isCancel = false;
-                        this.close();
-                    }
-                });
+                    this.closeButton.show();
+                    this.createArtifactButton.show();
+                    this.saveButton.show();
+                    this.deleteButton.hide();
 
-                this.createArtifactButton.click(event => {
-                    if (this.exhibit.contentItems.length < 10) {
-                        this.close(true, false);
-                        var newContentItem = {
-                            title: "",
-                            uri: "",
-                            mediaSource: "",
-                            mediaType: "",
-                            attribution: "",
-                            description: ""
-                        };
-                        this.exhibit.contentItems.push(newContentItem);
-                        CZ.Authoring.contentItemMode = "createContentItem";
-                        CZ.Authoring.showEditContentItemForm(newContentItem, this.exhibit, this, true);
-                    }
-                });
+                    // this.closeButton.click() is handled by base
+                    this.createArtifactButton.off();
+                    this.createArtifactButton.click(() => this.onCreateArtifact());
+                    this.saveButton.off();
+                    this.saveButton.click(() => this.onSave());
 
-                this.contentItemsListBox.onListItemClicked = (item, idx) => {
-                    for (var i = 0; i < this.exhibit.contentItems.length; i++) {
-                        if (this.exhibit.contentItems[i].title === item.data.title &&
-                            this.exhibit.contentItems[i].uri === item.data.uri) {
+                    this.contentItemsListBox.itemDblClick((item, index) => this.onContentItemDblClick(item, index));
+                    this.contentItemsListBox.itemRemove((item, index) => this.onContentItemRemoved(item, index));
 
-                            this.close(true, false);
-                            CZ.Authoring.contentItemMode = "editContentItem";
-                            CZ.Authoring.showEditContentItemForm(this.exhibit.contentItems[i], this.exhibit, this, true);
-                            break;
-                        }
-                    }
-                }
+                } else if (this.mode === "editExhibit") {
+                    this.titleTextblock.text("Edit Exhibit");
+                    this.saveButton.text("update exhibit");
 
-                this.contentItemsListBox.onListItemRemoved = (item, idx) => {
-                    for (var i = 0; i < this.exhibit.contentItems.length; i++) {
-                        if (this.exhibit.contentItems[i].title === item.data.title &&
-                            this.exhibit.contentItems[i].uri === item.data.uri) {
+                    this.titleInput.val(this.exhibit.title);
+                    this.datePicker.setDate(this.exhibit.infodotDescription.date);
 
-                            this.exhibit.contentItems.splice(i, 1);
-                            break;
-                        }
-                    }
+                    this.closeButton.show();
+                    this.createArtifactButton.show();
+                    this.saveButton.show();
+                    this.deleteButton.show();
+
+                    // this.closeButton.click() is handled by base
+                    this.createArtifactButton.off();
+                    this.createArtifactButton.click(() => this.onCreateArtifact());
+                    this.saveButton.off();
+                    this.saveButton.click(() => this.onSave());
+                    this.deleteButton.off();
+                    this.deleteButton.click(() => this.onDelete());
+
+                    this.contentItemsListBox.itemDblClick((item, index) => this.onContentItemDblClick(item, index));
+                    this.contentItemsListBox.itemRemove((item, index) => this.onContentItemRemoved(item, index));
+
+                } else {
+                    console.log("Unexpected authoring mode in exhibit form.");
                 }
             }
 
-            public show(noAnimation?: bool): void {
+            private onCreateArtifact() {
+                if (this.exhibit.contentItems.length < CZ.Settings.infodotMaxContentItemsCount) {
+                    var newContentItem = {
+                        title: "",
+                        uri: "",
+                        mediaSource: "",
+                        mediaType: "",
+                        attribution: "",
+                        description: "",
+                        index: this.exhibit.contentItems.length
+                    };
+                    this.exhibit.contentItems.push(newContentItem);
+                    this.hide(true);
+                    CZ.Authoring.contentItemMode = "createContentItem";
+                    CZ.Authoring.showEditContentItemForm(newContentItem, this.exhibit, this, true);
+                }
+            }
+
+            private onSave() {
+                var newExhibit = {
+                    title: this.titleInput.val(),
+                    date: this.datePicker.getDate(),
+                    contentItems: this.exhibit.contentItems
+                };
+
+                if (CZ.Authoring.ValidateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) &&
+                    this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {                    
+                    CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(
+                        success => {
+                            this.isCancel = false;
+                            this.close();
+                        },
+                        error => {
+                           alert("Unable to save changes. Please try again later.");
+                       }
+                    );
+                    
+                } else {
+                    this.errorMessage.show().delay(7000).fadeOut();
+                }
+            }
+
+            private onDelete() {
+                if (confirm("Are you sure want to delete the exhibit and all of its content items? Delete can't be undone!")) {
+                    CZ.Authoring.removeExhibit(this.exhibit);
+                    this.isCancel = false;
+                    this.close();
+                }
+            }
+
+            private onContentItemDblClick(item: ListItemBase, _: number) {
+                if (item.data.index >= 0) {
+                    this.clickedListItem = <ContentItemListItem>item;
+                    this.hide(true);
+                    CZ.Authoring.contentItemMode = "editContentItem";
+                    CZ.Authoring.showEditContentItemForm(this.exhibit.contentItems[item.data.index], this.exhibit, this, true);
+                }
+            }
+
+            private onContentItemRemoved(item: ListItemBase, _: number) {
+                if (item.data.index >= 0) {
+                    this.exhibit.contentItems.splice(item.data.index, 1);
+                    this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
+                    CZ.Common.vc.virtualCanvas("requestInvalidate");
+                }
+            }
+
+            public show(noAnimation?: bool = false) {
+                CZ.Authoring.isActive = true;
+                this.activationSource.addClass("active");
+                this.errorMessage.hide();
                 super.show(noAnimation ? undefined : {
-                    effect: "slide", 
+                    effect: "slide",
                     direction: "left",
                     duration: 500
                 });
-
-                this.activationSource.addClass("active");
-                this.isCancel = true;
             }
 
-            public close(noAnimation?: bool, destroy?: bool = true) {
-                this.container.find("#error-edit-exhibit").hide();
-
+            public hide(noAnimation?: bool = false) {
                 super.close(noAnimation ? undefined : {
-                    effect: "slide", 
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
+                this.activationSource.removeClass("active");
+            }
+
+            public close(noAnimation?: bool = false) {
+                super.close(noAnimation ? undefined : {
+                    effect: "slide",
                     direction: "left",
                     duration: 500,
                     complete: () => {
-                        if (destroy) {
-                            this.datePicker.remove();
-                            this.contentItemsListBox.clear();
-                        }
+                        this.datePicker.remove();
+                        this.contentItemsListBox.clear();
                     }
                 });
-
-                if (this.isCancel && destroy && CZ.Authoring.mode === "createExhibit") {
-                    CZ.Authoring.removeExhibit(this.exhibit);
+                if (this.isCancel) {
+                    if (this.mode === "createExhibit") {
+                        CZ.VCContent.removeChild(this.exhibit.parent, this.exhibit.id);
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    } else if (this.mode === "editExhibit") {
+                        delete this.exhibit.contentItems;
+                        $.extend(this.exhibit, this.exhibitCopy);
+                        this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    }
                 }
-
-                CZ.Authoring.isActive = false;
                 this.activationSource.removeClass("active");
+                CZ.Authoring.isActive = false;
             }
         }
     }

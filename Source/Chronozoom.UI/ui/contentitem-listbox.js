@@ -38,17 +38,13 @@ var CZ;
                 listItemsInfo.default.ctor = ContentItemListItem;
                         _super.call(this, container, listBoxInfo, listItemsInfo);
             }
-            ContentItemListBox.prototype.remove = function (item) {
-                if(this.items.length > 1) {
-                    _super.prototype.remove.call(this, item);
-                }
-            };
             return ContentItemListBox;
         })(UI.ListBoxBase);
         UI.ContentItemListBox = ContentItemListBox;        
         var ContentItemListItem = (function (_super) {
             __extends(ContentItemListItem, _super);
             function ContentItemListItem(parent, container, uiMap, context) {
+                var _this = this;
                         _super.call(this, parent, container, uiMap, context);
                 this.iconImg = this.container.find(uiMap.iconImg);
                 this.titleTextblock = this.container.find(uiMap.titleTextblock);
@@ -56,6 +52,16 @@ var CZ;
                 this.iconImg.attr("src", this.data.icon || "/Images/Temp-Thumbnail2.png");
                 this.titleTextblock.text(this.data.title);
                 this.descrTextblock.text(this.data.description);
+                this.closeButton.off();
+                this.closeButton.click(function () {
+                    if(CZ.Authoring.mode === "createExhibit") {
+                        _super.prototype.close.call(_this);
+                    } else if(CZ.Authoring.mode === "editExhibit") {
+                        if(_this.parent.items.length > 1) {
+                            _super.prototype.close.call(_this);
+                        }
+                    }
+                });
             }
             return ContentItemListItem;
         })(UI.ListItemBase);

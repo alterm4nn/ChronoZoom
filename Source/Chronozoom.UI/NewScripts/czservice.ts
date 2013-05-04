@@ -31,7 +31,7 @@ module CZ {
             export function contentItem(ci) {
                 return {
                     id: ci.guid,
-                    ParentExhibitId: ci.contentItem ? ci.contentItem.ParentExhibitId : ci.parent,
+                    ParentExhibitId: ci.contentItem ? ci.contentItem.ParentExhibitId : ci.ParentExhibitId,
                     title: ci.contentItem ? ci.contentItem.title : ci.title,
                     description: ci.contentItem ? ci.contentItem.description : ci.description,
                     uri: ci.contentItem ? ci.contentItem.uri : ci.uri,
@@ -337,7 +337,7 @@ module CZ {
         * Auxiliary Methods.
         */
 
-        export function putExhibitContent (e, oldContentItems) {
+        export function putExhibitContent (e, oldContentItems) : JQueryPromise {
             var newGuids = e.contentItems.map(function (ci) {
                 return ci.guid;
             });
@@ -345,7 +345,9 @@ module CZ {
             // Send PUT request for all exhibit's content items.
             var promises = e.contentItems.map(
                 function (ci) {
-                    return putContentItem(ci);
+                    return putContentItem(ci).then(response => {
+                        ci.id = ci.guid = response;
+                    });
                 }
             ).concat(
                 // Filter deleted content items and send DELETE request for them.

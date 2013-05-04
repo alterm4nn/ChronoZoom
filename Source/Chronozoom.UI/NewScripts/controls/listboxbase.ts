@@ -52,8 +52,8 @@ module CZ {
             public listItemsInfo: IListItemBaseInfo;
             public items: ListItemBase[];
             public getType: (context: any) => string;
-            public onListItemClicked: (item: ListItemBase, index: number) => any;
-            public onListItemRemoved: (item: ListItemBase, index: number) => any;
+            private itemDblClickHandler: (item: ListItemBase, index: number) => void;
+            private itemRemoveHandler: (item: ListItemBase, index: number) => void;
 
             constructor(container: JQuery,
                         listBoxInfo: IListBoxBaseInfo,
@@ -78,6 +78,10 @@ module CZ {
                 for (var i = 0, context = listBoxInfo.context, len = context.length; i < len; ++i) {
                     this.add(context[i]);
                 }
+
+                // Setup default handlers
+                this.itemDblClickHandler = (item, idx) => { };
+                this.itemRemoveHandler = (item, idx) => { };
 
                 // Apply jQueryUI sortable widget.
                 this.container.sortable(listBoxInfo.sortableSettings);
@@ -110,7 +114,7 @@ module CZ {
                 if (i !== -1) {
                     item.container.remove();
                     this.items.splice(i, 1);
-                    this.onListItemRemoved(item, i);
+                    this.itemRemoveHandler(item, i);
                 }
             }
 
@@ -132,8 +136,22 @@ module CZ {
                 var i = this.items.indexOf(item);
 
                 if (i !== -1) {
-                    this.onListItemClicked(item, i);
+                    this.itemDblClickHandler(item, i);
                 }
+            }
+
+            /**
+            * Setup listitem clicked handler
+            */
+            public itemDblClick(handler: (item: ListItemBase, index: number) => void ) {
+                this.itemDblClickHandler = handler;
+            }
+
+            /**
+            * Setup listitem removed handler
+            */
+            public itemRemove(handler: (item: ListItemBase, index: number) => void ) {
+                this.itemRemoveHandler = handler;
             }
         }
 

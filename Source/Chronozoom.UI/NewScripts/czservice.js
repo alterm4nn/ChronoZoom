@@ -28,7 +28,7 @@ var CZ;
             function contentItem(ci) {
                 return {
                     id: ci.guid,
-                    ParentExhibitId: ci.contentItem ? ci.contentItem.ParentExhibitId : ci.parent,
+                    ParentExhibitId: ci.contentItem ? ci.contentItem.ParentExhibitId : ci.ParentExhibitId,
                     title: ci.contentItem ? ci.contentItem.title : ci.title,
                     description: ci.contentItem ? ci.contentItem.description : ci.description,
                     uri: ci.contentItem ? ci.contentItem.uri : ci.uri,
@@ -278,7 +278,9 @@ var CZ;
                 return ci.guid;
             });
             var promises = e.contentItems.map(function (ci) {
-                return putContentItem(ci);
+                return putContentItem(ci).then(function (response) {
+                    ci.id = ci.guid = response;
+                });
             }).concat(oldContentItems.filter(function (ci) {
                 return (ci.guid && newGuids.indexOf(ci.guid) === -1);
             }).map(function (ci) {

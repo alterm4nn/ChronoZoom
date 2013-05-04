@@ -309,71 +309,127 @@ var CZ;
             CZ.VCContent.removeChild(t.parent, t.id);
         }
         Authoring.removeTimeline = removeTimeline;
-        function updateExhibit(e, prop) {
-            var temp = {
-                title: prop.title,
-                x: Number(prop.date) - e.outerRad,
-                y: e.y,
-                width: e.width,
-                height: e.height,
-                type: "circle"
-            };
-            var oldContentItems = e.contentItems;
-            if(checkExhibitIntersections(e.parent, temp, true)) {
-                e.x = temp.x;
-                e.infodotDescription.date = temp.x + e.outerRad;
-            }
-            e.title = temp.title;
-            e.infodotDescription.title = temp.title;
-            e.contentItems = prop.contentItems;
-            e = renewExhibit(e);
-            return CZ.Service.putExhibit(e).then(function (response) {
-                var contentItems = e.contentItems;
-                var len = contentItems.length;
-                var i = 0;
-                e.guid = response.ExhibitId;
-                e.id = "e" + response.ExhibitId;
-                for(i = 0; i < len; ++i) {
-                    contentItems[i].parent = e.guid;
-                }
-                CZ.Service.putExhibitContent(e, oldContentItems).then(function () {
-                    for(i = 0; i < len; ++i) {
-                        contentItems[i].guid = arguments[i];
-                    }
-                }, function () {
-                    console.log("Error connecting to service: update content item.\n");
+        function updateExhibit(e, args) {
+            var deferred = $.Deferred();
+            if(e && e.contentItems && args) {
+                var clone = $.extend({
+                }, e, {
+                    children: null
                 });
-            }, function (error) {
-                console.log("Error connecting to service: update exhibit.\n");
-            });
+                clone = $.extend(true, {
+                }, clone);
+                delete clone.children;
+                delete clone.contentItems;
+                $.extend(true, clone, args);
+                var oldContentItems = $.extend(true, [], e.contentItems);
+                if(e.id && e.guid) {
+                    for(var i = 0; i < e.contentItems.length; i++) {
+                        e.contentItems[i].ParentExhibitId = e.guid;
+                    }
+                    for(var i = 0; i < clone.contentItems.length; i++) {
+                        clone.contentItems[i].ParentExhibitId = e.guid;
+                    }
+                    CZ.Service.putExhibitContent(clone, oldContentItems).then(function (response) {
+                        $.extend(e, clone);
+                        e = renewExhibit(e);
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                        deferred.resolve();
+                    }, function (error) {
+                        console.log("Error connecting to service: update exhibit (put exhibit content).\n" + error.responseText);
+                        deferred.reject();
+                    });
+                } else {
+                    CZ.Service.putExhibit(clone).then(function (response) {
+                        e.id = clone.id = "e" + response.ExhibitId;
+                        e.guid = clone.guid = response.ExhibitId;
+                        for(var i = 0; i < e.contentItems.length; i++) {
+                            e.contentItems[i].ParentExhibitId = e.guid;
+                        }
+                        for(var i = 0; i < clone.contentItems.length; i++) {
+                            clone.contentItems[i].ParentExhibitId = clone.guid;
+                        }
+                        CZ.Service.putExhibitContent(clone, oldContentItems).then(function (response) {
+                            $.extend(e, clone);
+                            e = renewExhibit(e);
+                            CZ.Common.vc.virtualCanvas("requestInvalidate");
+                            deferred.resolve();
+                        }, function (error) {
+                            console.log("Error connecting to service: update exhibit (put exhibit content).\n" + error.responseText);
+                            deferred.reject();
+                        });
+                    }, function (error) {
+                        console.log("Error connecting to service: update exhibit.\n" + error.responseText);
+                        deferred.reject();
+                    });
+                }
+            } else {
+                deferred.reject();
+            }
+            return deferred.promise();
         }
         Authoring.updateExhibit = updateExhibit;
         function removeExhibit(e) {
-            CZ.Service.deleteExhibit(e);
-            CZ.VCContent.removeChild(e.parent, e.id);
+            var deferred = $.Deferred();
+            if(e && e.id && e.parent) {
+                var clone = $.extend({
+                }, e, {
+                    children: null
+                });
+                clone = $.extend(true, {
+                }, clone);
+                CZ.Service.deleteExhibit(clone).then(function (response) {
+                    CZ.VCContent.removeChild(e.parent, e.id);
+                    CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    deferred.resolve();
+                }, function (error) {
+                    console.log("Error connecting to service: remove exhibit.\n" + error.responseText);
+                    deferred.reject();
+                });
+            } else {
+                deferred.reject();
+            }
+            return deferred.promise();
         }
         Authoring.removeExhibit = removeExhibit;
-        function updateContentItem(c, args) {
-            var e = c.parent.parent.parent;
-            for(var prop in args) {
-                if(c.contentItem.hasOwnProperty(prop)) {
-                    c.contentItem[prop] = args[prop];
-                }
+        function updateContentItem(e, c, args) {
+            var deferred = $.Deferred();
+            if(e && e.contentItems && e.contentItems.length && c && args) {
+                var clone = $.extend(true, {
+                }, c, args);
+                CZ.Service.putContentItem(clone).then(function (response) {
+                    $.extend(c, clone);
+                    c.id = c.guid = response;
+                    e = renewExhibit(e);
+                    CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    deferred.resolve();
+                }, function (error) {
+                    console.log("Error connecting to service: update content item.\n" + error.responseText);
+                    deferred.reject();
+                });
+            } else {
+                deferred.reject();
             }
-            renewExhibit(e);
-            CZ.Service.putContentItem(c).then(function (response) {
-                c.guid = response;
-            }, function (error) {
-                console.log("Error connecting to service: update content item.\n" + error.responseText);
-            });
+            return deferred.promise();
         }
         Authoring.updateContentItem = updateContentItem;
-        function removeContentItem(c) {
-            var e = c.parent.parent.parent;
-            CZ.Service.deleteContentItem(c);
-            c.parent.parent.parent.contentItems.splice(c.contentItem.index, 1);
-            delete c.contentItem;
-            renewExhibit(e);
+        function removeContentItem(e, c) {
+            var deferred = $.Deferred();
+            if(e && e.contentItems && e.contentItems.length && c && c.index) {
+                var clone = $.extend(true, {
+                }, c);
+                CZ.Service.deleteContentItem(clone).then(function (response) {
+                    e.contentItems.splice(c.index, 1);
+                    e = renewExhibit(e);
+                    CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    deferred.resolve();
+                }, function (error) {
+                    console.log("Error connecting to service: remove content item.\n" + error.responseText);
+                    deferred.reject();
+                });
+            } else {
+                deferred.reject();
+            }
+            return deferred.promise();
         }
         Authoring.removeContentItem = removeContentItem;
         function ValidateTimelineData(start, end, title) {
