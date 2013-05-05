@@ -99,6 +99,7 @@ namespace UI
             public const string SandboxSuperCollectionNotFound = "Default sandbox supercollection not found";
             public const string DefaultUserNotFound = "Default anonymous user not found";
             public const string SuperCollectionNotFound = "SuperCollection not found";
+            public const string TimelineRangeInvalid = "Timeline lies outside of bounds of it's parent timeline";
         }
 
         /// <summary>
@@ -851,10 +852,16 @@ namespace UI
 
                 if (timelineRequest.Id == Guid.Empty)
                 {
-                    Timeline parentTimeline = FindParentTimeline(timelineRequest.Timeline_ID);
-                    if (parentTimeline == null)
+                    Timeline parentTimeline;
+                    if (!FindParentTimeline(timelineRequest.Timeline_ID, out parentTimeline))
                     {
                         SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
+                        return Guid.Empty;
+                    }
+
+                    if (!ValidateTimelineRange(parentTimeline, timelineRequest.FromYear, timelineRequest.ToYear))
+                    {
+                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineRangeInvalid);
                         return Guid.Empty;
                     }
 
@@ -866,12 +873,15 @@ namespace UI
                     newTimeline.Collection = collection;
 
                     // Update parent timeline.
-                    _storage.Entry(parentTimeline).Collection(_ => _.ChildTimelines).Load();
-                    if (parentTimeline.ChildTimelines == null)
+                    if (parentTimeline != null)
                     {
-                        parentTimeline.ChildTimelines = new System.Collections.ObjectModel.Collection<Timeline>();
+                        _storage.Entry(parentTimeline).Collection(_ => _.ChildTimelines).Load();
+                        if (parentTimeline.ChildTimelines == null)
+                        {
+                            parentTimeline.ChildTimelines = new System.Collections.ObjectModel.Collection<Timeline>();
+                        }
+                        parentTimeline.ChildTimelines.Add(newTimeline);
                     }
-                    parentTimeline.ChildTimelines.Add(newTimeline);
 
                     _storage.Timelines.Add(newTimeline);
                     returnValue = newTimelineGuid;
@@ -889,6 +899,14 @@ namespace UI
                     if (updateTimeline.Collection.Id != collectionGuid)
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                        return Guid.Empty;
+                    }
+
+                    TimelineRaw parentTimelineRaw = _storage.GetParentTimelineRaw(updateTimeline.Id);
+
+                    if (!ValidateTimelineRange(parentTimelineRaw, timelineRequest.FromYear, timelineRequest.ToYear))
+                    {
+                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineRangeInvalid);
                         return Guid.Empty;
                     }
 
@@ -974,6 +992,21 @@ namespace UI
             });
         }
 
+        bool ValidateTimelineRange(Timeline parentTimeline, decimal FromYear, decimal ToYear)
+        {
+            if (parentTimeline == null)
+            {
+                return true;
+            }
+
+            if (FromYear >= parentTimeline.FromYear && ToYear <= parentTimeline.ToYear && FromYear <= ToYear)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         public class PutExhibitResult
         {
             public Guid ExhibitId { get; set; }
@@ -1040,8 +1073,8 @@ namespace UI
 
                 if (exhibitRequest.Id == Guid.Empty)
                 {
-                    Timeline parentTimeline = FindParentTimeline(exhibitRequest.Timeline_ID);
-                    if (parentTimeline == null)
+                    Timeline parentTimeline;
+                    if (!FindParentTimeline(exhibitRequest.Timeline_ID, out parentTimeline) || parentTimeline == null)
                     {
                         SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
                         return returnValue;
@@ -1399,20 +1432,24 @@ namespace UI
             });
         }
 
-        private Timeline FindParentTimeline(Guid? parentTimelineGuid)
+        private bool FindParentTimeline(Guid? parentTimelineGuid, out Timeline parentTimeline)
         {
-            // Validate parent timeline
+            parentTimeline = null;
+
+            // If parent timeline is not specified it will default to null
             if (parentTimelineGuid == null)
             {
-                parentTimelineGuid = Guid.Empty;
+                return true;
             }
-            Timeline parentTimeline = _storage.Timelines.Find(parentTimelineGuid);
+
+            parentTimeline = _storage.Timelines.Find(parentTimelineGuid);
             if (parentTimeline == null)
             {
                 // Parent id is not found so no timeline will be added
                 SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
+                return false;
             }
-            return parentTimeline;
+            return true;
         }
 
         private Exhibit FindParentExhibit(Guid parentExhibitGuid)
