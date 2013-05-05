@@ -345,7 +345,7 @@ namespace Chronozoom.Entities
                 "SELECT * FROM Timelines WHERE Timeline_Id IN ('{0}')",
                 string.Join("', '", id));
             var timelinesRaw = Database.SqlQuery<TimelineRaw>(timelinesQuery);
-           
+
             foreach (TimelineRaw timelineRaw in timelinesRaw)
                 timelines.Add(timelineRaw.Id);
 
@@ -382,7 +382,7 @@ namespace Chronozoom.Entities
             var contentItemsRaw = Database.SqlQuery<ContentItemRaw>(contentItemsQuery);
 
             foreach (ContentItemRaw contentItemRaw in contentItemsRaw)
-                contentItems.Add(contentItemRaw.Id);      
+                contentItems.Add(contentItemRaw.Id);
             return contentItems;
         }
 
@@ -402,5 +402,13 @@ namespace Chronozoom.Entities
 
             return references;
         }
+
+        public TimelineRaw GetParentTimelineRaw(Guid timelineId)
+        {
+            var parentTimelinesRaw = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Id in (SELECT Timeline_Id FROM Timelines WHERE Id = {0})", timelineId);
+
+            return parentTimelinesRaw.FirstOrDefault();
+        }
+
     }
 }
