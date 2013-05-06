@@ -144,6 +144,7 @@ a:visited {
 
 .profile-icon {
     background-image: url('../Images/profile-icon.png');
+    display: inline-block;
 }
 
 .header__edit-button:hover {

@@ -197,7 +197,7 @@ module CZ {
                     }
                 });
                 var profileForm = new CZ.UI.FormEditProfile(forms[5], {
-                    activationSource: $("#showButton"),
+                    activationSource: $(".header-icon.profile-icon"),
                     navButton: ".cz-form-nav",
                     closeButton: ".cz-form-close-btn > .cz-form-btn",
                     titleTextblock: ".cz-form-title",
@@ -236,7 +236,7 @@ module CZ {
                 });
 
                 var loginForm = new CZ.UI.FormLogin(forms[6], {
-                    activationSource: $("#showButton"),
+                    activationSource: $(".header-icon.profile-icon"),
                     navButton: ".cz-form-nav",
                     closeButton: ".cz-form-close-btn > .cz-form-btn",
                     titleTextblock: ".cz-form-title",
