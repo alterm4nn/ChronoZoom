@@ -62,18 +62,12 @@ describe("Given:  'edit timeline' form is opened: ", function () {
             ["title", "2", "5e+3", "ga", "ma", "start is less than end"],
             ["title", "2", "5e+6", "ga", "ka", "start is less than end"],
             ["title", "2", "5e+9", "ga", "bce", "start is less than end"],
-            ["title", "2", "-5e+9", "ga", "ce", "start is less than end"],
+            ["title", "2", "-5e+9", "ga", "ce", "start is less than end"]
     ], function (title, start, end, regimeStart, regimeEnd, conditional) {
 
         describe("When: User set: " + conditional + " and save changes", function () {
             beforeEach(function () {
-
-                $('#timelineTitleInput').val(title);
-                $('#timelineStartInput .cz-datepicker-year').val(start);
-                $('#timelineEndInput .cz-datepicker-year').val(end);
-                ($)("#timelineStartInput .cz-datepicker-regime").val(regimeStart).attr("selected", "selected");
-                ($)("#timelineEndInput .cz-datepicker-regime").val(regimeEnd).attr("selected", "selected");
-                $("span:contains('save and close')").click();
+                setValues(title, start, end, regimeStart, regimeEnd);
             });
 
             it("Then: Error message should be thrown.", function () {
@@ -83,7 +77,7 @@ describe("Given:  'edit timeline' form is opened: ", function () {
     });
 
     var regimes = ["ce", "bce", "ma", "ga", "ka"];
-
+    //bug https://github.com/alterm4nn/ChronoZoom/issues/93
     describe("When: User set start as empty", function () {
         using1("Data set: ", regimes, function (regime) {
             describe("And: regime: " + regime + " and save changes", function () {
