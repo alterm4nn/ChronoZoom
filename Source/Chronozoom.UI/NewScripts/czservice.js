@@ -289,6 +289,45 @@ var CZ;
             return $.when.apply($, promises);
         }
         Service.putExhibitContent = putExhibitContent;
+        function putProfile(displayName, email) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("user");
+            var user = {
+                "DisplayName": displayName,
+                "Email": email
+            };
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                data: JSON.stringify(user)
+            });
+        }
+        Service.putProfile = putProfile;
+        function deleteProfile(displayName) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("user");
+            var user = {
+                "DisplayName": displayName
+            };
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                data: JSON.stringify(user)
+            });
+        }
+        Service.deleteProfile = deleteProfile;
+        function getProfile() {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("profile");
+            return $.ajax({
+                url: "/chronozoom.svc/user"
+            });
+        }
+        Service.getProfile = getProfile;
     })(CZ.Service || (CZ.Service = {}));
     var Service = CZ.Service;
 })(CZ || (CZ = {}));

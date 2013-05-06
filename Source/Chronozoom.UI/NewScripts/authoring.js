@@ -454,6 +454,37 @@ var CZ;
             while(contentItems[i] != null) {
                 var ci = contentItems[i];
                 isValid = isValid && CZ.Authoring.IsNotEmpty(ci.title) && CZ.Authoring.IsNotEmpty(ci.uri) && CZ.Authoring.IsNotEmpty(ci.mediaType);
+                if(ci.mediaType == "Image") {
+                    var imageReg = /\.(jpg|jpeg|png)$/i;
+                    if(!imageReg.test(ci.uri)) {
+                        alert("Sorry, only JPG/PNG images are supported");
+                        isValid = false;
+                    }
+                } else if(ci.mediaType == "Video") {
+                    var youtube = /www\.youtube\.com\/watch\?v=([a-z0-9\-]+)/i;
+                    var youtubeEmbed = /www.\youtube\.com\/embed\/([a-z0-9\-]+)/i;
+                    var vimeo = /vimeo\.com\/([0-9]+)/i;
+                    var vimeoEmbed = /player.vimeo.com\/video\/([0-9]+)/i;
+                    if(youtube.test(ci.uri)) {
+                        var youtubeResult = ci.uri.match(youtube);
+                        ci.uri = "http://www.youtube.com/embed/" + youtubeResult[1];
+                    } else if(vimeo.test(ci.uri)) {
+                        var vimeoResult = ci.uri.match(vimeo);
+                        ci.uri = "http://player.vimeo.com/video/" + vimeoResult[1];
+                    } else if(youtubeEmbed.test(ci.uri) || vimeoEmbed.test(ci.uri)) {
+                    } else {
+                        alert("Sorry, only YouTube or Vimeo videos are supported");
+                        isValid = false;
+                    }
+                } else if(ci.mediaType == "PDF") {
+                    var pdf = /\.(pdf)$/i;
+                    if(pdf.test(ci.uri)) {
+                        ci.uri = "http://docs.google.com/viewer?url=" + encodeURI(ci.uri) + "&embedded=true";
+                    } else {
+                        alert("Sorry, only PDF extension is supported");
+                        isValid = false;
+                    }
+                }
                 if(!isValid) {
                     return false;
                 }

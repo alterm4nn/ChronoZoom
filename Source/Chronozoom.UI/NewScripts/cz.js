@@ -6,7 +6,9 @@ var CZ;
             "#auth-edit-timeline-form": "/ui/auth-edit-timeline-form.html",
             "#auth-edit-exhibit-form": "/ui/auth-edit-exhibit-form.html",
             "#auth-edit-contentitem-form": "/ui/auth-edit-contentitem-form.html",
-            "$('<div></div>')": "/ui/contentitem-listbox.html"
+            "$('<div></div>')": "/ui/contentitem-listbox.html",
+            "#profile-form": "/ui/profile-form.html",
+            "#login-form": "/ui/login-form.html"
         };
         var FeatureActivation;
         (function (FeatureActivation) {
@@ -167,6 +169,50 @@ var CZ;
                         });
                         form.show(noAnimation);
                     }
+                });
+                var profileForm = new CZ.UI.FormEditProfile(forms[5], {
+                    activationSource: $("#showButton"),
+                    navButton: ".cz-form-nav",
+                    closeButton: ".cz-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-form-title",
+                    saveButton: "#cz-form-save",
+                    logoutButton: "#cz-form-logout",
+                    titleInput: ".cz-form-item-title",
+                    usernameInput: ".cz-form-username",
+                    emailInput: ".cz-form-email",
+                    agreeInput: ".cz-form-agree",
+                    loginPanel: "#login-panel",
+                    profilePanel: "#profile-panel",
+                    loginPanelLogin: "#profile-panel span.auth-panel-login",
+                    context: ""
+                });
+                $("#edit_profile_button").click(function () {
+                    profileForm.show();
+                });
+                CZ.Service.getProfile().done(function (data) {
+                    if(data == "") {
+                        $("#login-panel").show();
+                    } else if(data != "" && data.DisplayName == null) {
+                        $("#profile-panel").show();
+                        $("#profile-panel input#username").focus();
+                        profileForm.show();
+                    } else {
+                        $("#profile-panel").show();
+                        $("#profile-panel span.auth-panel-login").html(data.DisplayName);
+                    }
+                }).fail(function (error) {
+                    $("#login-panel").show();
+                });
+                var loginForm = new CZ.UI.FormLogin(forms[6], {
+                    activationSource: $("#showButton"),
+                    navButton: ".cz-form-nav",
+                    closeButton: ".cz-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-form-title",
+                    titleInput: ".cz-form-item-title",
+                    context: ""
+                });
+                $("#login-button").click(function () {
+                    loginForm.show();
                 });
             });
             CZ.Service.getServiceInformation().then(function (response) {

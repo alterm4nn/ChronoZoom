@@ -364,5 +364,52 @@ module CZ {
 
             return $.when.apply($, promises);
         }
+        /**
+        * Update user profile.
+        * @param  {Object} username .
+        * @param  {Object} email .
+        */
+        export function putProfile(displayName, email) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("user");
+            var user = {
+                "DisplayName": displayName,
+                "Email": email
+            };
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                data: JSON.stringify(user)
+            });
+        }
+
+        /**
+        * Delete user profile.
+        * @param  {Object} username .
+        */
+        export function deleteProfile(displayName) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("user");
+            var user = {
+                "DisplayName": displayName
+            };
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                data: JSON.stringify(user)
+            });
+        }
+
+        export function getProfile() {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("profile");
+            return $.ajax({
+                url: "/chronozoom.svc/user"
+            });
+        }
     }
 }

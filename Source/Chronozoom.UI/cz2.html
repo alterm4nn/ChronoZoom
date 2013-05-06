@@ -62,6 +62,7 @@
     <script type="text/javascript" src="/NewScripts/controls/formbase.js"></script>
     <script type="text/javascript" src="/NewScripts/cz.dates.js"></script>
 
+    <script type="text/javascript" src="/NewScripts/external/ACS.js"></script>
     <script type="text/javascript" src="/ui/contentitem-listbox.js"></script>
     <script type="text/javascript" src="/ui/auth-edit-timeline.js"></script>
     <script type="text/javascript" src="/ui/auth-edit-exhibit.js"></script>
@@ -73,6 +74,8 @@
     <![endif]-->
 
     <script type="text/javascript" src="/NewScripts/cz.js"></script>
+    <script type="text/javascript" src="/ui/profile-edit.js"></script>
+    <script type="text/javascript" src="/ui/login-form.js"></script>
     <title>ChronoZoom</title>
 </head>
 <body>
@@ -114,26 +117,21 @@
                     <div class="header-icon edit-icon" title="Create your events" data-enabled="true"></div>
                 </li>
                 <li class="fleft">
-                    <div id="login-panel" class="header-icon profile-icon" title="Sign in to ChronoZoom" data-enabled="true"></div>
+                    <!--<div id="login-panel" class="header-icon profile-icon" title="Sign in to ChronoZoom" data-enabled="true"></div>-->
+                    <div style="display: none" id="login-panel">
+                        <span class="auth-panel-login">Sign in</span>
+                        <img src="/Images/profile.png" id="login-button" />
+                    </div>
+                </li>
+                <li class="fleft">
+                    <div style="display: none" id="profile-panel">
+                        <span class="auth-panel-login"></span>
+                        <img src="/Images/profile.png" id="edit_profile_button" />
+                    </div>
                 </li>
             </ul>
         </div>
 
-        <script language="javascript">
-            $.ajax({
-                url: "/account/isauth"
-            }).done(function (data) {
-                if (data != "True") {
-                    $("#login-panel").text("?").css("cursor", "default").click(function () {
-                        window.location = "/account/login";
-                    });
-                } else {
-                    $("#login-panel").text("").css("cursor", "default").click(function () {
-                        window.location = "/account/logout";
-                    });
-                }
-            });
-        </script>
             
         <div id="tour_control" class="tour_control fleft">
             <img id="tour_prev" src="/Images/tour_prev_off.jpg" alt="previous" />
@@ -218,6 +216,8 @@
             </div>
         </div>
 
+        <div id="profile-form" class="cz-form unselectable"></div>
+        <div id="login-form" class="cz-form unselectable"></div>
         <div id="header-edit-form" class="cz-form cz-header-edit-form unselectable">
         </div>
 
@@ -230,7 +230,9 @@
 
     </div>
 
-        <div id="welcomeScreenBack" class="welcomeScreenBack">
+
+    <script src="https://cz-nodelete-chronozoom-test.accesscontrol.windows.net/v2/metadata/IdentityProviders.js?protocol=wsfederation&amp;realm=http%3a%2f%2ftest.chronozoomproject.org%2f&amp;reply_to=&amp;context=&amp;request_id=&amp;version=1.0&amp;callback=ShowSigninPage" type="text/javascript"></script>
+    <div id="welcomeScreenBack" class="welcomeScreenBack">
         <div id="welcomeScreenOut" class="welcomeScreenOuterWindow">
             <div id="welcomeScreen" class="welcomeScreen">
                 <div class="titleArea">
