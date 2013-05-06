@@ -20,6 +20,7 @@ namespace Tests
         public static ExhibitHelper ExhibitHelper { get; set; }
         public static AuthorizationHelper AuthorizationHelper { get; set; }
         public static HomePageHelper HomePageHelper { get; set; }
+        public static SearchHelper SearchHelper { get; set; }
 
         [AssemblyInitialize]
         public static void AssemblyInit(TestContext testContext)

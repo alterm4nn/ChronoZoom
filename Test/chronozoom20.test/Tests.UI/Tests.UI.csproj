@@ -59,6 +59,7 @@
     <Compile Include="FooterTests.cs" />
     <Compile Include="PhanerozoicAgeTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SearchTests.cs" />
     <Compile Include="TestBase.cs" />
     <Compile Include="TimelineTests.cs" />
     <Compile Include="TimescaleTests.cs" />
