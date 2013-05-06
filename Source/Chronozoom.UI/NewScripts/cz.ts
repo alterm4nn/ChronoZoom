@@ -37,13 +37,20 @@ module CZ {
             NotRootCollection,
         }
 
+        interface FeatureInfo {
+            Name: string;
+            Activation: FeatureActivation;
+            JQueryReference: string;
+            IsEnabled: bool;
+        }
+
         // Basic Flight-Control (Tracks the features that are enabled)
         //
         // FEATURES CAN ONLY BE ACTIVATED IN ROOTCOLLECTION AFTER HITTING ZERO ACTIVE BUGS.
         //
         // REMOVING THIS COMMENT OR BYPASSING THIS CHECK MAYBE BRING YOU BAD KARMA, ITS TRUE.
         //
-        var _featureMap = [
+        var _featureMap: FeatureInfo[] = [
             {
                 Name: "Login",
                 Activation: FeatureActivation.NotRootCollection,
@@ -217,23 +224,25 @@ module CZ {
                     profileForm.show();
                 });
 
-                CZ.Service.getProfile().done(data => {
-                    //Not authorized
-                    if (data == "") {
+                if (IsFeatureEnabled("Login")) {
+                    CZ.Service.getProfile().done(data => {
+                        //Not authorized
+                        if (data == "") {
+                            $("#login-panel").show();
+                        }
+                            //Authorized for a first time
+                        else if (data != "" && data.DisplayName == null) {
+                            $("#profile-panel").show();
+                            $("#profile-panel input#username").focus();
+                            profileForm.show();
+                        } else {
+                            $("#profile-panel").show();
+                            $("#profile-panel span.auth-panel-login").html(data.DisplayName);
+                        }
+                    }).fail((error) => {
                         $("#login-panel").show();
-                    }
-                        //Authorized for a first time
-                    else if (data != "" && data.DisplayName == null) {
-                        $("#profile-panel").show();
-                        $("#profile-panel input#username").focus();
-                        profileForm.show();
-                    } else {
-                        $("#profile-panel").show();
-                        $("#profile-panel span.auth-panel-login").html(data.DisplayName);
-                    }
-                }).fail((error) => {
-                    $("#login-panel").show();
-                });
+                    });
+                }
 
                 var loginForm = new CZ.UI.FormLogin(forms[6], {
                     activationSource: $(".header-icon.profile-icon"),
@@ -343,8 +352,9 @@ module CZ {
             }
 
             // Feature activation control
-            _featureMap.forEach(function (feature) {
+            for (var idxFeature = 0; idxFeature < _featureMap.length; idxFeature++) {
                 var enabled : bool = true;
+                var feature = _featureMap[idxFeature];
 
                 if (feature.Activation === FeatureActivation.Disabled) {
                     enabled = false;
@@ -358,10 +368,11 @@ module CZ {
                     enabled = false;
                 }
 
+                _featureMap[idxFeature].IsEnabled = enabled;
                 if (!enabled) {
                     $(feature.JQueryReference).css("display", "none");
                 }
-            });
+            }
 
             if (!rootCollection)
                 CZ.Authoring.isEnabled = true;
@@ -600,5 +611,10 @@ module CZ {
                 $("#bibliographyBack").css("display", "block");
             }
         });
+
+        function IsFeatureEnabled(featureName) {
+            var feature: FeatureInfo[] = $.grep(_featureMap, function (e) { return e.Name === featureName; });
+            return feature[0].IsEnabled;
+        }
     }
 }

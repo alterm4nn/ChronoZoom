@@ -91,12 +91,8 @@ module CZ {
 
                     CZ.Service.putProfile(this.usernameInput.val(), this.emailInput.val()).then(
                         success => {
-                            this.usernameInput.prop('disabled', true);
-                            CZ.Service.getProfile().done(data => {
-                                this.loginPanelLogin.html(data.DisplayName);
-                            });
-
-                            super.close();
+                            // Redirect to personal collection.
+                            window.location.assign("\\" + success);
                         },
                         function (error) {
                             alert("Unable to save changes. Please try again later.");
