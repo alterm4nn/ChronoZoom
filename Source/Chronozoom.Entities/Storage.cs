@@ -143,7 +143,12 @@ namespace Chronozoom.Entities
                 // Populate Content Items
                 string contentItemsQuery = string.Format(
                     CultureInfo.InvariantCulture,
-                    "SELECT * FROM ContentItems WHERE Exhibit_Id IN ('{0}')",
+                    @"
+                        SELECT * 
+                        FROM ContentItems 
+                        WHERE Exhibit_Id IN ('{0}')
+                        ORDER BY [Order] ASC
+                    ",
                     string.Join("', '", exhibits.Keys.ToArray()));
                 var contentItemsRaw = Database.SqlQuery<ContentItemRaw>(contentItemsQuery);
                 foreach (ContentItemRaw contentItemRaw in contentItemsRaw)
