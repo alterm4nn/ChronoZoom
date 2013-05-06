@@ -1,5 +1,4 @@
-﻿using System;
-using Application.Helper.Entities;
+﻿using Application.Helper.Entities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.ObjectModel;
 

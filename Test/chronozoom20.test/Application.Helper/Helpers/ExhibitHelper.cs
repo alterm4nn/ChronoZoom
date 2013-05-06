@@ -107,17 +107,6 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
-        private void AddContentItems(Collection<Chronozoom.Entities.ContentItem> contentItems)
-        {
-            Logger.Log("<- name: " + contentItems);
-            for (int i = 0; i <= contentItems.Count - 1; i++)
-            {
-                ClickAddContentItem();
-                FillContentItems(contentItems, i);
-            }
-            Logger.Log("->");
-        }
-
         private void FillContentItems(Collection<Chronozoom.Entities.ContentItem> contentItems, int i)
         {
             SetTitle(contentItems[i].Title, i + 1);
@@ -156,13 +145,6 @@ namespace Application.Helper.Helpers
         private void SetTitle(string title, int index)
         {
             TypeText(By.XPath(string.Format("(//*[@class='cz-authoring-ci-title'])[{0}]", index)), title);
-        }
-
-        private void ClickAddContentItem()
-        {
-            Logger.Log("<-");
-            Click(By.XPath("//*[@class='ui-dialog-buttonset']/*[2]"));
-            Logger.Log("->");
         }
     }
 }

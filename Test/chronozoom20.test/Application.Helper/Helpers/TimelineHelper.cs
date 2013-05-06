@@ -1,5 +1,4 @@
-﻿using System;
-using Application.Driver;
+﻿using Application.Driver;
 using Application.Helper.Constants;
 using Application.Helper.Entities;
 using Application.Helper.UserActions;
@@ -58,7 +57,7 @@ namespace Application.Helper.Helpers
                 Logger.Log("-> true");
                 return true;
             }
-            catch (UnhandledAlertException e)
+            catch (UnhandledAlertException)
             {
 
                 AcceptAlert();
