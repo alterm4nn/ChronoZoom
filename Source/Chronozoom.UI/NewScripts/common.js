@@ -32,13 +32,6 @@ var CZ;
             CZ.VirtualCanvas.initialize();
             Common.vc = ($)('#vc');
             Common.vc.virtualCanvas();
-            CZ.Authoring.initialize(Common.vc, {
-                showCreateTimelineForm: CZ.Authoring.UI.showCreateTimelineForm,
-                showEditTimelineForm: CZ.Authoring.UI.showEditTimelineForm,
-                showCreateExhibitForm: CZ.Authoring.UI.showCreateExhibitForm,
-                showEditExhibitForm: CZ.Authoring.UI.showEditExhibitForm,
-                showEditContentItemForm: CZ.Authoring.UI.showEditContentItemForm
-            });
         }
         Common.initialize = initialize;
         function getXBrowserMouseOrigin(jqelement, event) {

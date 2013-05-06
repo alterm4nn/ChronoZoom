@@ -406,11 +406,11 @@ module CZ {
 
 
             return {
-                width: width,
+                width: width - 1.25 * height, // decrease text width for saving place for edit icon
                 height: height,
                 marginTop: tlHeight - height - margin,
                 marginLeft: margin,
-                bboxWidth: width + 2 * margin,
+                bboxWidth: width + 2 * margin - 1.25 * height, // decrease bbox width for saving place for edit icon
                 bboxHeight: height + 2 * margin
             };
         }
