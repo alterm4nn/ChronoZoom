@@ -36,6 +36,7 @@ namespace Tests
             WelcomeScreenHelper = HelperManager.GetWelcomeScreenHelper();
             TimelineHelper = HelperManager.GetTimelineHelper();
             ExhibitHelper = HelperManager.GetExhibitHelper();
+            SearchHelper = HelperManager.GetSearchHelper();
             AuthorizationHelper = HelperManager.GetAuthorizationHelper();
         }
 

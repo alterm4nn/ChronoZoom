@@ -35,5 +35,15 @@ namespace Tests
         }
 
         #endregion
+
+        [TestMethod]
+        public void Search_Timeline()
+        {
+            SearchHelper.TypeSearchString("Mayan");
+            SearchHelper.WaitSearchProcess();
+            SearchHelper.NavigateToSearchResult("Mayan History");
+            SearchHelper.WaitNavigationToMayan();
+            Assert.AreEqual("Mayan History",SearchHelper.GetLastBreadcrumbsText());
+        }
     }
 }

@@ -129,6 +129,11 @@ namespace Application.Driver.UserActions
         protected void WaitForElementIsDisplayed(By by)
         {
             _wait.Until(w => IsElementDisplayed(by));
+        } 
+        
+        protected void WaitForElementIsNotDisplayed(By by)
+        {
+            _wait.Until(w => !IsElementDisplayed(by));
         }
 
         protected void WaitForElementEnabled(By by)
