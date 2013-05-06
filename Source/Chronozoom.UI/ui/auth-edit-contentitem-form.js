@@ -66,13 +66,13 @@ var CZ;
             FormEditCI.prototype.onSave = function () {
                 var _this = this;
                 var newContentItem = {
-                    title: this.titleInput.val() || null,
-                    uri: this.mediaInput.val() || null,
-                    mediaSource: this.mediaSourceInput.val() || null,
-                    mediaType: this.mediaTypeInput.val() || null,
-                    attribution: this.attributionInput.val() || null,
-                    description: this.descriptionInput.val() || null,
-                    index: this.contentItem.index || null
+                    title: this.titleInput.val() || "",
+                    uri: this.mediaInput.val() || "",
+                    mediaSource: this.mediaSourceInput.val() || "",
+                    mediaType: this.mediaTypeInput.val() || "",
+                    attribution: this.attributionInput.val() || "",
+                    description: this.descriptionInput.val() || "",
+                    index: this.contentItem.index
                 };
                 if(CZ.Authoring.ValidateContentItems([
                     newContentItem

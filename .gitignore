@@ -32,6 +32,7 @@ obj/
 Ankh.NoLoad
 UpgradeLog*
 _UpgradeReport_Files/
+PublishProfiles/
 
 #MonoDevelop
 *.pidb

@@ -322,46 +322,32 @@ var CZ;
                 delete clone.contentItems;
                 $.extend(true, clone, args);
                 var oldContentItems = $.extend(true, [], e.contentItems);
-                if(e.id && e.guid) {
+                CZ.Service.putExhibit(clone).then(function (response) {
+                    var old_id = e.id;
+                    e.id = clone.id = "e" + response.ExhibitId;
+                    var new_id = e.id;
+                    e.guid = clone.guid = response.ExhibitId;
                     for(var i = 0; i < e.contentItems.length; i++) {
                         e.contentItems[i].ParentExhibitId = e.guid;
                     }
                     for(var i = 0; i < clone.contentItems.length; i++) {
-                        clone.contentItems[i].ParentExhibitId = e.guid;
+                        clone.contentItems[i].ParentExhibitId = clone.guid;
                     }
                     CZ.Service.putExhibitContent(clone, oldContentItems).then(function (response) {
                         $.extend(e, clone);
+                        e.id = old_id;
                         e = renewExhibit(e);
+                        e.id = new_id;
                         CZ.Common.vc.virtualCanvas("requestInvalidate");
                         deferred.resolve();
                     }, function (error) {
                         console.log("Error connecting to service: update exhibit (put exhibit content).\n" + error.responseText);
                         deferred.reject();
                     });
-                } else {
-                    CZ.Service.putExhibit(clone).then(function (response) {
-                        e.id = clone.id = "e" + response.ExhibitId;
-                        e.guid = clone.guid = response.ExhibitId;
-                        for(var i = 0; i < e.contentItems.length; i++) {
-                            e.contentItems[i].ParentExhibitId = e.guid;
-                        }
-                        for(var i = 0; i < clone.contentItems.length; i++) {
-                            clone.contentItems[i].ParentExhibitId = clone.guid;
-                        }
-                        CZ.Service.putExhibitContent(clone, oldContentItems).then(function (response) {
-                            $.extend(e, clone);
-                            e = renewExhibit(e);
-                            CZ.Common.vc.virtualCanvas("requestInvalidate");
-                            deferred.resolve();
-                        }, function (error) {
-                            console.log("Error connecting to service: update exhibit (put exhibit content).\n" + error.responseText);
-                            deferred.reject();
-                        });
-                    }, function (error) {
-                        console.log("Error connecting to service: update exhibit.\n" + error.responseText);
-                        deferred.reject();
-                    });
-                }
+                }, function (error) {
+                    console.log("Error connecting to service: update exhibit.\n" + error.responseText);
+                    deferred.reject();
+                });
             } else {
                 deferred.reject();
             }

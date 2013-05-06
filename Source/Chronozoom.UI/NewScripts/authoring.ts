@@ -535,55 +535,38 @@ module CZ {
                 var oldContentItems = $.extend(true, [], e.contentItems);
 
                 // pass cloned objects to CZ.Service calls to avoid any side effects
-                if (e.id && e.guid) {
-                    for (var i = 0; i < e.contentItems.length; i++) {
-                        e.contentItems[i].ParentExhibitId = e.guid;
-                    }
-                    for (var i = 0; i < clone.contentItems.length; i++) {
-                        clone.contentItems[i].ParentExhibitId = e.guid;
-                    }
-                    CZ.Service.putExhibitContent(clone, oldContentItems).then(
-                        response => {
-                            $.extend(e, clone);
-                            e = renewExhibit(e);
-                            CZ.Common.vc.virtualCanvas("requestInvalidate");
-                            deferred.resolve();
-                        },
-                        error => {
-                            console.log("Error connecting to service: update exhibit (put exhibit content).\n" + error.responseText);
-                            deferred.reject();
+                CZ.Service.putExhibit(clone).then(
+                    response => {
+                        var old_id = e.id;
+                        e.id = clone.id = "e" + response.ExhibitId;
+                        var new_id = e.id;
+                        e.guid = clone.guid = response.ExhibitId;
+                        for (var i = 0; i < e.contentItems.length; i++) {
+                            e.contentItems[i].ParentExhibitId = e.guid;
                         }
-                    );
-                } else {
-                    CZ.Service.putExhibit(clone).then(
-                        response => {
-                            e.id = clone.id = "e" + response.ExhibitId;
-                            e.guid = clone.guid = response.ExhibitId;
-                            for (var i = 0; i < e.contentItems.length; i++) {
-                                e.contentItems[i].ParentExhibitId = e.guid;
-                            }
-                            for (var i = 0; i < clone.contentItems.length; i++) {
-                                clone.contentItems[i].ParentExhibitId = clone.guid;
-                            }
-                            CZ.Service.putExhibitContent(clone, oldContentItems).then(
-                                response => {
-                                    $.extend(e, clone);
-                                    e = renewExhibit(e);
-                                    CZ.Common.vc.virtualCanvas("requestInvalidate");
-                                    deferred.resolve();
-                                },
-                                error => {
-                                    console.log("Error connecting to service: update exhibit (put exhibit content).\n" + error.responseText);
-                                    deferred.reject();
-                                }
-                            );
-                        },
-                        error => {
-                            console.log("Error connecting to service: update exhibit.\n" + error.responseText);
-                            deferred.reject();
+                        for (var i = 0; i < clone.contentItems.length; i++) {
+                            clone.contentItems[i].ParentExhibitId = clone.guid;
                         }
-                    );
-                }
+                        CZ.Service.putExhibitContent(clone, oldContentItems).then(
+                            response => {
+                                $.extend(e, clone);
+                                e.id = old_id;
+                                e = renewExhibit(e);
+                                e.id = new_id;
+                                CZ.Common.vc.virtualCanvas("requestInvalidate");
+                                deferred.resolve();
+                            },
+                            error => {
+                                console.log("Error connecting to service: update exhibit (put exhibit content).\n" + error.responseText);
+                                deferred.reject();
+                            }
+                        );
+                    },
+                    error => {
+                        console.log("Error connecting to service: update exhibit.\n" + error.responseText);
+                        deferred.reject();
+                    }
+                );
 
             } else {
                 deferred.reject();

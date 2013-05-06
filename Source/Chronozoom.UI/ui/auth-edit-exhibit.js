@@ -36,8 +36,8 @@ var CZ;
                 if(this.mode === "createExhibit") {
                     this.titleTextblock.text("Create Exhibit");
                     this.saveButton.text("create exhibit");
-                    this.titleInput.val(this.exhibit.title);
-                    this.datePicker.setDate(this.exhibit.infodotDescription.date);
+                    this.titleInput.val(this.exhibit.title || "");
+                    this.datePicker.setDate(this.exhibit.infodotDescription.date || "");
                     this.closeButton.show();
                     this.createArtifactButton.show();
                     this.saveButton.show();
@@ -59,8 +59,8 @@ var CZ;
                 } else if(this.mode === "editExhibit") {
                     this.titleTextblock.text("Edit Exhibit");
                     this.saveButton.text("update exhibit");
-                    this.titleInput.val(this.exhibit.title);
-                    this.datePicker.setDate(this.exhibit.infodotDescription.date);
+                    this.titleInput.val(this.exhibit.title || "");
+                    this.datePicker.setDate(this.exhibit.infodotDescription.date || "");
                     this.closeButton.show();
                     this.createArtifactButton.show();
                     this.saveButton.show();
@@ -89,6 +89,11 @@ var CZ;
             };
             FormEditExhibit.prototype.onCreateArtifact = function () {
                 if(this.exhibit.contentItems.length < CZ.Settings.infodotMaxContentItemsCount) {
+                    this.exhibit.title = this.titleInput.val() || "";
+                    this.exhibit.x = this.datePicker.getDate() - this.exhibit.width / 2;
+                    this.exhibit.infodotDescription = {
+                        date: this.datePicker.getDate()
+                    };
                     var newContentItem = {
                         title: "",
                         uri: "",
@@ -107,9 +112,12 @@ var CZ;
             FormEditExhibit.prototype.onSave = function () {
                 var _this = this;
                 var newExhibit = {
-                    title: this.titleInput.val(),
-                    date: this.datePicker.getDate(),
-                    contentItems: this.exhibit.contentItems
+                    title: this.titleInput.val() || "",
+                    x: this.datePicker.getDate() - this.exhibit.width / 2,
+                    infodotDescription: {
+                        date: this.datePicker.getDate()
+                    },
+                    contentItems: this.exhibit.contentItems || []
                 };
                 if(CZ.Authoring.ValidateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) && this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {
                     CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(function (success) {
@@ -132,6 +140,11 @@ var CZ;
             FormEditExhibit.prototype.onContentItemDblClick = function (item, _) {
                 if(item.data.index >= 0) {
                     this.clickedListItem = item;
+                    this.exhibit.title = this.titleInput.val() || "";
+                    this.exhibit.x = this.datePicker.getDate() - this.exhibit.width / 2;
+                    this.exhibit.infodotDescription = {
+                        date: this.datePicker.getDate()
+                    };
                     this.hide(true);
                     CZ.Authoring.contentItemMode = "editContentItem";
                     CZ.Authoring.showEditContentItemForm(this.exhibit.contentItems[item.data.index], this.exhibit, this, true);
