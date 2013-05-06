@@ -23,7 +23,7 @@ module CZ {
             Disabled,
             RootCollection,
             NotRootCollection,
-            }
+        }
 
         // Basic Flight-Control (Tracks the features that are enabled)
         //
@@ -153,14 +153,14 @@ module CZ {
             $('#biblCloseButton')
                 .mouseout(() => { CZ.Common.toggleOffImage('biblCloseButton', 'png'); })
                 .mouseover(() => { CZ.Common.toggleOnImage('biblCloseButton', 'png'); })
-            
-            
+
+
             $('#welcomeScreenCloseButton')
                 .mouseover(() => { CZ.Common.toggleOnImage('welcomeScreenCloseButton', 'png'); })
                 .mouseout(() => { CZ.Common.toggleOffImage('welcomeScreenCloseButton', 'png'); })
                 .click(CZ.Common.hideWelcomeScreen);
-            $('#closeWelcomeScreenButton')
-                .click(CZ.Common.closeWelcomeScreen);
+            $('#startExploringButton')
+                .click(CZ.Common.startExploring);
 
             var wlcmScrnCookie = CZ.Common.getCookie("welcomeScreenDisallowed");
             if (wlcmScrnCookie != null) {
@@ -173,13 +173,13 @@ module CZ {
                 });
 
                 $("#welcomeScreenBack").click(function () {
-                    CZ.Common.closeWelcomeScreen();
+                    CZ.Common.hideWelcomeScreen();
                 });
             }
 
             // Feature activation control
             _featureMap.forEach(function (feature) {
-                var enabled : bool = true;
+                var enabled: bool = true;
 
                 if (feature.Activation === FeatureActivation.Disabled) {
                     enabled = false;
