@@ -103,8 +103,8 @@ module CZ {
             }
         }
 
-        export function goToSearchResult(resultId) {
-            var element = CZ.Common.vc.virtualCanvas("findElement", resultId);
+        export function goToSearchResult(resultId, elementType?) {
+            var element = findVCElement(CZ.Common.vc.virtualCanvas("getLayerContent"), resultId, elementType);
             var navStringElement = CZ.UrlNav.vcelementToNavString(element);
 
             var visible = CZ.UrlNav.navStringToVisible(navStringElement, CZ.Common.vc);
@@ -113,8 +113,9 @@ module CZ {
 
         // Recursively finds and returns an element with given id.
         // If not found, returns null.
-        function findVCElement(root, id) {
-            var lookingForCI = id.charAt(0) === 'c';
+        function findVCElement(root, id, elementType?) {
+            var lookingForCI = elementType === "contentItem";
+
             var rfind = function (el, id) {
                 if (el.id === id) return el;
                 if (!el.children) return null;
@@ -161,10 +162,21 @@ module CZ {
                             var item = results[i];
                             if (item.objectType != objectType) continue;
                             var resultId;
+                            var elementType;
+
                             switch (item.objectType) {
-                                case 0: resultId = 'e' + item.id; break; // exhibit
-                                case 1: resultId = 't' + item.id; break; // timeline
-                                case 2: resultId = item.id; break; // content item
+                                case 0:  // exhibit
+                                    resultId = 'e' + item.id;
+                                    elementType = "exhibit";
+                                    break;
+                                case 1: // timeline
+                                    resultId = 't' + item.id;
+                                    elementType = "timeline";
+                                    break; 
+                                case 2: // content item
+                                    resultId = item.id;
+                                    elementType = "contentItem";
+                                    break; 
                                 default: continue; // unknown type of result item
                             }
                             if (first) {
@@ -180,9 +192,11 @@ module CZ {
                                 resultId: resultId,
                                 text: results[i].title,
                                 click: function () {
-                                    goToSearchResult(this.getAttribute("resultId"));
+                                    goToSearchResult(this.getAttribute("resultId"), this.getAttribute("data-element-type"));
                                 }
-                            }).appendTo(output)
+                            })
+                            .attr("data-element-type", elementType)
+                            .appendTo(output)
                         }
                     }
                     addResults(1, "Timelines");
