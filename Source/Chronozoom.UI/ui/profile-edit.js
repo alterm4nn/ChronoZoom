@@ -48,12 +48,12 @@ var CZ;
                         alert("Provided incorrect username, \n'a-z', '0-9', '-', '_' - characters allowed only. ");
                         return;
                     }
-                    var isValid = _this.validEmail(_this.emailInput.val());
+                    isValid = _this.validEmail(_this.emailInput.val());
                     if(!isValid) {
                         alert("Provided incorrect email address");
                         return;
                     }
-                    var isValid = _this.agreeInput.prop("checked");
+                    isValid = _this.agreeInput.prop("checked");
                     if(!isValid) {
                         alert("Please agree with provided terms");
                         return;
@@ -80,13 +80,19 @@ var CZ;
                 });
             };
             FormEditProfile.prototype.show = function () {
-                _super.prototype.show.call(this);
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "right",
+                    duration: 500
+                });
                 this.activationSource.addClass("active");
             };
             FormEditProfile.prototype.close = function () {
-                this.container.hide("slow", function (event) {
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "right",
+                    duration: 500
                 });
-                CZ.Authoring.isActive = false;
                 this.activationSource.removeClass("active");
             };
             return FormEditProfile;

@@ -10,21 +10,14 @@ var CZ;
             __extends(FormLogoutProfile, _super);
             function FormLogoutProfile(container, formInfo) {
                         _super.call(this, container, formInfo);
-                this.initialize();
             }
-            FormLogoutProfile.prototype.initialize = function () {
-            };
             FormLogoutProfile.prototype.show = function () {
                 _super.prototype.show.call(this);
-                this.activationSource.addClass("activeButton");
+                this.activationSource.addClass("active");
             };
             FormLogoutProfile.prototype.close = function () {
-                if(this.isCancel && CZ.Authoring.mode === "profile") {
-                }
-                this.container.hide("slow", function (event) {
-                });
-                CZ.Authoring.isActive = false;
-                this.activationSource.removeClass("activeButton");
+                _super.prototype.close.call(this);
+                this.activationSource.removeClass("active");
             };
             return FormLogoutProfile;
         })(CZ.UI.FormBase);

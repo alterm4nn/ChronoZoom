@@ -30,7 +30,7 @@ module CZ {
             private loginPanel: JQuery;
             private profilePanel: JQuery;
             private loginPanelLogin: JQuery;
-            // We only need to add additional initialization in constructor.
+
             constructor(container: JQuery, formInfo: FormEditProfileInfo) {
                 super(container, formInfo);
 
@@ -42,6 +42,7 @@ module CZ {
                 this.loginPanel = $(document.body).find(formInfo.loginPanel);
                 this.profilePanel = $(document.body).find(formInfo.profilePanel);
                 this.loginPanelLogin = $(document.body).find(formInfo.loginPanelLogin);
+                
                 this.initialize();
             }
 
@@ -66,10 +67,8 @@ module CZ {
                             this.agreeInput.prop('disabled', true);
                         }
                         this.emailInput.val(data.Email);
-
                     }
                 });
-
 
                 this.saveButton.click(event => {
                     var isValid = this.validUsername(this.usernameInput.val());
@@ -78,12 +77,13 @@ module CZ {
                         return;
                     }
 
-                    var isValid = this.validEmail(this.emailInput.val());
+                    isValid = this.validEmail(this.emailInput.val());
                     if (!isValid) {
                         alert("Provided incorrect email address");
                         return;
                     }
-                    var isValid = this.agreeInput.prop("checked");
+
+                    isValid = this.agreeInput.prop("checked");
                     if (!isValid) {
                         alert("Please agree with provided terms");
                         return;
@@ -105,30 +105,35 @@ module CZ {
                     );
 
                 });
+
                 this.logoutButton.click(event =>
                 {
-                    return $.ajax({ url: "/account/logout" }).done(data =>
-                    {
+                    return $.ajax({
+                        url: "/account/logout"
+                    }).done(data => {
                         this.profilePanel.hide();
                         this.loginPanel.show();
                         super.close();
                     });
                 });
-
             }
 
             public show(): void {
-                super.show();
+                super.show({
+                    effect: "slide",
+                    direction: "right",
+                    duration: 500
+                });
 
-                // Ideally, it would be better to not place UI selectors in form code,
-                // but pass them through parameters.
                 this.activationSource.addClass("active");
             }
 
             public close() {
-                this.container.hide("slow", event => { });
-
-                CZ.Authoring.isActive = false;
+                super.close({
+                    effect: "slide",
+                    direction: "right",
+                    duration: 500
+                });
 
                 this.activationSource.removeClass("active");
             }

@@ -178,8 +178,8 @@
     <Content Include="Images\tour-icon.png" />
     <Content Include="Images\view-icon.png" />
     <Content Include="Images\edit.svg" />
-   
     <Content Include="NewScripts\external\ACS.js" />
+    <Content Include="NewScripts\authoring.ts" />
     <Content Include="NewScripts\authoring.js">
       <DependentUpon>authoring.ts</DependentUpon>
     </Content>
@@ -224,17 +224,11 @@
     <Content Include="NewScripts\external\mouseWheelPlugin.js" />
     <Content Include="NewScripts\external\rx.jQuery.js" />
     <Content Include="NewScripts\external\rx.js" />
-
     <Content Include="NewScripts\gestures.ts" />
-
     <Content Include="NewScripts\layout.ts" />
-
     <Content Include="NewScripts\regimesIE.ts" />
-
     <Content Include="NewScripts\search.ts" />
-
     <Content Include="NewScripts\timescale.ts" />
-
     <Content Include="NewScripts\tours.ts" />
     <Content Include="NewScripts\typings\jqueryui\jqueryui.d.ts" />
     <Content Include="NewScripts\typings\jquery\jquery.d.ts" />
@@ -242,19 +236,12 @@
     <Content Include="NewScripts\uiloader.js">
       <DependentUpon>uiloader.ts</DependentUpon>
     </Content>
-
     <Content Include="NewScripts\uiloader.ts" />
-
     <Content Include="NewScripts\urlnav.ts" />
- 
     <Content Include="NewScripts\vccontent.ts" />
-
     <Content Include="NewScripts\viewport.ts" />
-
     <Content Include="NewScripts\viewportAnimation.ts" />
-
     <Content Include="NewScripts\viewportController.ts" />
-
     <Content Include="NewScripts\virtualCanvas.ts" />
     <Content Include="Dumps\wahib-responsedumprest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -269,7 +256,6 @@
     <Content Include="ACS\FederationMetadata\2007-06\FederationMetadata.xml" />
     <Content Include="samples\custom-form\form-example.html" />
     <Content Include="samples\custom-form\form-example.js" />
-
     <Content Include="samples\custom-form\form-example.ts" />
     <Content Include="samples\custom-form\main.html" />
     <Content Include="samples\custom-listbox\listbox-example.html" />
@@ -277,9 +263,7 @@
     <Content Include="samples\custom-listbox\listbox-example.ts" />
     <Content Include="samples\custom-listbox\main.html" />
     <Content Include="samples\cz.datepicker.html" />
-
     <Content Include="ui\auth-edit-exhibit-form.html" />
-
     <Content Include="ui\auth-edit-exhibit.ts" />
     <Content Include="ui\auth-edit-exhibit.js">
       <DependentUpon>auth-edit-exhibit.ts</DependentUpon>
@@ -289,7 +273,6 @@
     <Content Include="ui\auth-edit-contentitem-form.js">
       <DependentUpon>auth-edit-contentitem-form.ts</DependentUpon>
     </Content>
-
     <Content Include="ui\auth-edit-timeline.ts" />
     <Content Include="ui\auth-edit-timeline.js">
       <DependentUpon>auth-edit-timeline.ts</DependentUpon>
@@ -299,10 +282,8 @@
     <Content Include="ui\contentitem-listbox.js">
       <DependentUpon>contentitem-listbox.ts</DependentUpon>
     </Content>
-
     <Content Include="ui\contentitem-listbox.ts" />
     <Content Include="ui\header-edit-form.html" />
-
     <Content Include="ui\header-edit.ts" />
     <Content Include="ui\header-edit.js">
       <DependentUpon>header-edit.ts</DependentUpon>
@@ -311,15 +292,12 @@
     <Content Include="ui\login-form.js">
       <DependentUpon>login-form.ts</DependentUpon>
     </Content>
-
     <Content Include="ui\login-form.ts" />
     <Content Include="ui\logout-form.html" />
     <Content Include="ui\logout-form.js">
       <DependentUpon>logout-form.ts</DependentUpon>
     </Content>
-
     <Content Include="ui\logout-form.ts" />
-
     <Content Include="ui\profile-form.html" />
     <Content Include="ui\profile-edit.js">
       <DependentUpon>profile-edit.ts</DependentUpon>

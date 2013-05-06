@@ -134,7 +134,7 @@ module CZ {
                         	deleteButton: ".cz-form-delete",
                         	titleInput: ".cz-form-item-title",
                         	context: timeline
-			});
+                        });
                         form.show();
                     },
                     showCreateExhibitForm: function (exhibit) {
@@ -231,7 +231,9 @@ module CZ {
                         $("#profile-panel").show();
                         $("#profile-panel span.auth-panel-login").html(data.DisplayName);
                     }
-                }).fail((error) => { $("#login-panel").show(); });
+                }).fail((error) => {
+                    $("#login-panel").show();
+                });
 
                 var loginForm = new CZ.UI.FormLogin(forms[6], {
                     activationSource: $("#showButton"),

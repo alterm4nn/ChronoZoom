@@ -1300,6 +1300,8 @@ img.fallbackBackground {
     line-height: 36px;
     padding: 0 5px;
 
+    /* IE9 */
+    filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#1B6AAB', EndColorStr='#0E4073', GradientType=0);
     /* IE10 Consumer Preview */ 
     background-image: -ms-linear-gradient(bottom, #0E4073 0%, #1B6AAB 100%);
     /* Mozilla Firefox */ 
@@ -1488,97 +1490,88 @@ img.fallbackBackground {
     overflow: hidden;
 }
 
+/***********************************************************
+
+                Registration Forms
+
+***********************************************************/
+
+/* Profile Form */
 #profile-form {
-    right:0px;
-    width:304px;
-    /*color:#b1b1b1;*/
-	background-color:#f5f5f5;
-    font-size:14px;
+    right: 0;
+    width: 304px;
+    background-color: #f5f5f5;
+    font-size: 14px;
 }
 
-#profile-form div.czform_cb_div label{
-	margin-left:2em;
-}
-	
-#profile-form a:link{color:#25a1ea;}
-
-#profile-form a:visited {color:#25a1ea;}
-	
-#profile-form div.czform_text{
-	color:black;
+#profile-form div.czform_cb_div label {
+    margin-left: 2em;
 }
 
-#profile-form label{
-	display:block;
-	/*color: #b1b1b1;*/
-	margin-left: 2px;
+#profile-form a:link {
+    color: #25a1ea;
 }
 
-
-#profile-form input[type=text]{
-	min-width:270px;
+#profile-form a:visited {
+    color: #25a1ea;
 }
 
-#profile-form input[type=checkbox]{
-	float:left;
-	padding:6px;
-	/*background-color:#E9E9E9;*/
-	/*border: 1px solid #d5d5d5;*/
-	color:#fff;
+#profile-form div.czform_text {
+    color: black;
+}
+
+#profile-form label {
+    display: block;
+    margin-left: 2px;
+}
+
+#profile-form input[type=text] {
+    min-width: 270px;
+}
+
+#profile-form input[type=checkbox] {
+    float: left;
+    margin-left: 0px;
+    padding: 6px;
+    color: #fff;
+}
+
+#profile-form div.cz-form-content div {
+    clear: both;
+    margin-bottom: 14px;
     margin-left: 0px;
 }
-
-#profile-form div.cz-form-content div{
-	clear:both;
-	margin-bottom:14px;
-    margin-left: 0px;
-}
-
 
 #profile-form button.cz-form-save {
-    width:134px;
-    color:#fff;
+    width: 134px;
+    color: #fff;
 }
 
-.profile-form-button{
-    width: 120px;
-    min-width: 120px;
-    height: 26px;
-    line-height: 0px;
-
-}
-
-.auth-panel-login{
-    color:#E9E9E9;
-    display:inline-block; 
-    vertical-align:top;
-    margin-top:8px;
-    margin-left:10px;
+.auth-panel-login {
+    display: inline-block;
+    margin-top: 8px;
+    margin-left: 10px;
+    color: #E9E9E9;
+    vertical-align: top;
 }
 
 /* Login Form */
-#login-form{
-    right:0px;
-    width:304px;
-    font-size:14px;
+#login-form {
+    right: 0px;
+    width: 304px;
+    font-size: 14px;
 }
 
-#login-form div.cz-form-content div{
-	clear:both;
-	margin-bottom:14px;
-    margin-left: 0px;
+#login-form div.cz-form-content div {
+    clear: both;
+    margin-bottom: 14px;
+    margin-left: 0;
 }
 
-#login-form div.cz-form-content{
-	width:304px;
+#login-form div.cz-form-content {
+    width: 304px;
 }
 
-#cz-form-logout, #cz-form-save {
-    width:134px;
-}
-
-.login-form-button{
-    width: 140px;
-    height: 26px;
-    line-height: 0px;
+#cz-form-logout,#cz-form-save {
+    width: 134px;
 }

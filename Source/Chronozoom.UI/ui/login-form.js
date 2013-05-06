@@ -10,19 +10,22 @@ var CZ;
             __extends(FormLogin, _super);
             function FormLogin(container, formInfo) {
                         _super.call(this, container, formInfo);
-                this.initialize();
             }
-            FormLogin.prototype.initialize = function () {
-            };
             FormLogin.prototype.show = function () {
-                _super.prototype.show.call(this);
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "right",
+                    duration: 500
+                });
+                this.activationSource.addClass("active");
             };
             FormLogin.prototype.close = function () {
-                this.container.hide("slow", function (event) {
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "right",
+                    duration: 500
                 });
-                CZ.Authoring.isActive = false;
-                this.activationSource.removeClass("activeButton");
-                this.container.find("#error-edit-timeline").hide();
+                this.activationSource.removeClass("active");
             };
             return FormLogin;
         })(CZ.UI.FormBase);
