@@ -322,9 +322,12 @@ var CZ;
         Service.deleteProfile = deleteProfile;
         function getProfile() {
             var request = new Service.Request(_serviceUrl);
-            request.addToPath("profile");
+            request.addToPath("user");
             return $.ajax({
-                url: "/chronozoom.svc/user"
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
             });
         }
         Service.getProfile = getProfile;
