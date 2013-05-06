@@ -33,9 +33,6 @@ describe("Given:  'edit timeline' form is opened: ", function () {
         $('.ui-button-icon-primary.ui-icon.ui-icon-closethick').click();
     });
 
-
-
-
     using("Data set: ", [
             //"data = ['timeline title', 'start value', 'end value', 'regime', 'description']"
             ["title", "5", "2", "ce", "ce", "start is less than end"],
