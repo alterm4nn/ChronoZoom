@@ -6,7 +6,11 @@ namespace Application.Helper.Helpers
 {
     public class WelcomeScreenHelper : DependentActions
     {
-   
+
+        public void CloseWelcomePopup()
+        {
+            Click(By.Id("welcomeScreenCloseButton"));
+        }
 
         public void StartExploring()
         {

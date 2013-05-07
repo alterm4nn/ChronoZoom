@@ -3,8 +3,6 @@
 namespace Tests
 {
     [TestClass]
-    [Ignore]
-    //https://github.com/alterm4nn/ChronoZoom/issues/317
     public class WelcomeScreenTests : TestBase
     {
         #region Initialize and Cleanup

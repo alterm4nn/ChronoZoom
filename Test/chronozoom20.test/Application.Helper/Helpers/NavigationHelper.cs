@@ -14,7 +14,7 @@ namespace Application.Helper.Helpers
         
         public void OpenSandboxPage()
         {
-            OpenUrl(Configuration.BaseUrl + "/sandbox/sandbox/");
+            OpenUrl(Configuration.BaseUrl + "/test/test");
         }
 
         public void OpenExhibitEukaryoticCells()
