@@ -1,5 +1,4 @@
-﻿using System;
-using Application.Driver;
+﻿using Application.Driver;
 using Application.Helper.UserActions;
 using OpenQA.Selenium;
 
