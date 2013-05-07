@@ -38,7 +38,6 @@ namespace Tests
         {
             BrowserStateManager.RefreshState();
             NavigationHelper.OpenHomePage();
-            WelcomeScreenHelper.CloseWelcomePopup();
             HomePageHelper.DeleteAllElementsLocally();
         }
 

@@ -1,4 +1,5 @@
-﻿using Application.Driver;
+﻿using System;
+using Application.Driver;
 using Application.Helper.UserActions;
 using OpenQA.Selenium;
 
@@ -6,9 +7,16 @@ namespace Application.Helper.Helpers
 {
     public class NavigationHelper : DependentActions
     {
-        public void OpenHomePage(bool wait = true)
+        public void OpenHomePage()
         {
             OpenUrl(Configuration.BaseUrl);
+            WaitPageLoading();
+        }  
+        
+        public void OpenSandboxPage()
+        {
+            OpenUrl(Configuration.BaseUrl + "/sandbox/sandbox/");
+            WaitPageLoading();
         }
 
         public void OpenExhibitEukaryoticCells()
@@ -61,6 +69,13 @@ namespace Application.Helper.Helpers
         {
             WaitForElementEnabled(by);
             Click(by);
+        }
+
+        private void WaitPageLoading()
+        {
+            WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("CZ.Common.cosmosVisible != undefined")), 60);
+            Sleep(2);
+            WaitAjaxComplete(10);
         }
 
 

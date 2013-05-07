@@ -20,7 +20,6 @@ namespace Tests
         {
             BrowserStateManager.RefreshState();
             NavigationHelper.OpenHomePage();
-            WelcomeScreenHelper.CloseWelcomePopup();
         }
 
         [ClassCleanup]
@@ -32,10 +31,8 @@ namespace Tests
         public void TestCleanup()
         {
             HomePageHelper.WaitWhileHomePageIsLoaded();
-            WelcomeScreenHelper.CloseWelcomePopup();
             AuthorizationHelper.Logout();
             HomePageHelper.WaitWhileHomePageIsLoaded();
-            WelcomeScreenHelper.CloseWelcomePopup();
             CreateScreenshotsIfTestFail(TestContext);
         }
 
