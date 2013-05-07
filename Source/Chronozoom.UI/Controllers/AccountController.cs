@@ -41,7 +41,7 @@ namespace Chronozoom.Api.Controllers
 
         public ActionResult Login()
         {
-            return Redirect("/cz2.html");
+            return Redirect("/sandbox/sandbox/");
         }
 
         public ActionResult Success(FormCollection forms)
@@ -74,6 +74,7 @@ namespace Chronozoom.Api.Controllers
                 //}
             }
 
+            // Temporary redirect to sandbox
             return Redirect("/cz2.html");
         }
 

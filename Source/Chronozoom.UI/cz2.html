@@ -67,14 +67,24 @@
 
     <script type="text/javascript" src="/NewScripts/uiloader.js"></script>
     <script type="text/javascript" src="/NewScripts/controls/cz.datepicker.js"></script>
+    <script type="text/javascript" src="/NewScripts/controls/listboxbase.js"></script>
     <script type="text/javascript" src="/NewScripts/controls/formbase.js"></script>
     <script type="text/javascript" src="/NewScripts/cz.dates.js"></script>
+
+    <script type="text/javascript" src="/NewScripts/external/ACS.js"></script>
+    <script type="text/javascript" src="/ui/contentitem-listbox.js"></script>
+    <script type="text/javascript" src="/ui/auth-edit-timeline.js"></script>
+    <script type="text/javascript" src="/ui/auth-edit-exhibit.js"></script>
+    <script type="text/javascript" src="/ui/auth-edit-contentitem-form.js"></script>
+    <script type="text/javascript" src="/ui/header-edit.js"></script>
 
     <!--[if IE]>
     <script type="text/javascript" src="/NewScripts/regimesIE.js"></script>
     <![endif]-->
 
     <script type="text/javascript" src="/NewScripts/cz.js"></script>
+    <script type="text/javascript" src="/ui/profile-edit.js"></script>
+    <script type="text/javascript" src="/ui/login-form.js"></script>
     <title>ChronoZoom</title>
 </head>
 <body>
@@ -82,135 +92,55 @@
         <div class="fleft">
             <ul>
                 <li class="fleft">
-                    <img style="margin-top: 3px; margin-right: 40px;" title="ChronoZoom" src="/Images/chronzoom-200px-white.png" />
+                    <div class="header-logo"></div>
                 </li>
                 <li class="fleft">
-                    <div id="regime-link-cosmos" class="regime-link">cosmos</div>
+                    <div id="regime-link-cosmos" class="regime-link">Cosmos</div>
                 </li>
                 <li class="fleft">
-                    <div id="regime-link-earth" class="regime-link">earth</div>
+                    <div id="regime-link-earth" class="regime-link">Earth</div>
                 </li>
                 <li class="fleft">
-                    <div id="regime-link-life" class="regime-link">life</div>
+                    <div id="regime-link-life" class="regime-link">Life</div>
                 </li>
                 <li class="fleft">
-                    <div id="regime-link-prehistory" class="regime-link">prehistory</div>
+                    <div id="regime-link-prehistory" class="regime-link">Prehistory</div>
                 </li>
                 <li class="fleft">
-                    <div id="regime-link-humanity" class="regime-link">humanity</div>
+                    <div id="regime-link-humanity" class="regime-link">Humanity</div>
                 </li>
             </ul>
         </div>
         <div class="fright">
             <ul>
                 <li class="fleft">
-                    <div id="login-panel" />
+                    <div id="tours_index" class="header-icon tour-icon" title="Take a guided tour" data-enabled="true"></div>
                 </li>
                 <li class="fleft">
-                    <img id="search_button" title="Search ChronoZoom" alt="Search ChronoZoom" src="/Images/search_off.jpg" />
+                    <div id="search_button" class="header-icon search-icon" title="Search ChronoZoom" data-enabled="true"></div>
                 </li>
                 <li class="fleft">
-                    <img title="Take a guided tour" id="tours_index" alt="Take a guided tour" src="/Images/tour_off.jpg" />
+                    <div class="header-icon view-icon" title="View Collections" data-enabled="false"></div>
+                </li>
+                <li class="fleft">
+                    <div class="header-icon edit-icon" title="Create your events" data-enabled="true"></div>
+                </li>
+                <li class="fleft">
+                    <div style="display: none" id="login-panel">
+                        <label for="login-button" class="auth-panel-login">Sign in</label
+                        ><div id="login-button" class="header-icon profile-icon" title="Sign in to ChronoZoom" data-enabled="true"></div>
+                    </div>
+                </li>
+                <li class="fleft">
+                    <div style="display: none" id="profile-panel">
+                        <label for="edit_profile_button" class="auth-panel-login"></label
+                        ><div id="edit_profile_button" class="header-icon profile-icon" title="Sign in to ChronoZoom" data-enabled="true"></div>
+                    </div>
                 </li>
             </ul>
         </div>
 
-        <script language="javascript">
-            $.ajax({
-                url: "/account/isauth"
-            }).done(function (data) {
-                if (data != "True") {
-                    $("#login-panel").html('<a href="/account/login" style="color:#E9E9E9">login</a>');
-                } else {
-                    $("#login-panel").html('<a href="/account/logout" style="color:#E9E9E9">logout</a>');
-                }
-            });
-        </script>
-
-        <div id="footer-authoring">
-
-            <a onclick="CZ.Authoring.UI.createTimeline()" class="footer-authoring-link">create timeline
-            </a>
-            <a onclick="CZ.Authoring.UI.editTimeline()" class="footer-authoring-link">edit timeline
-            </a>
-            <a onclick="CZ.Authoring.UI.createExhibit()" class="footer-authoring-link">create exhibit
-            </a>
-            <a onclick="CZ.Authoring.UI.editExhibit()" class="footer-authoring-link">edit exhibit
-            </a>
-
-            <!--Create Timeline popup dialog-->
-            <div id="createTimelineForm" style="background-color: rgb(60, 95, 150); display: none; color: white;">
-                <label style="display: block">title</label>
-                <input id="timelineTitleInput" style="display: block" type="text" />
-                
-                <br />
-                <label style="display: block">start</label>
-                <div id="timelineStartInput" style="display: block" ></div>
-
-                <br />
-                <label style="display: block">end</label>
-                <div id="timelineEndInput" style="display: block"></div>
-
-                <br />
-                <span id="TimelineErrorSpan" style="color: red; display: none">
-                    Input error
-                </span>
-            </div>
-
-            <!--Create Exhibit popup dialog-->
-            <div id="createExhibitForm" style="background-color: rgb(60, 95, 150); display: none; color: white;">
-                <label style="display: block">Exhibit's title</label>
-                <input id="exhibitTitleInput" style="display: block" />
-                                
-                <br />
-                <label style="display: block">Exhibit's date</label>
-                <div id="exhibitDateInput" style="display: block"></div>
-                
-                <br />
-                <span id ="ExhibitErrorSpan" style="color:red; display:none"> 
-                    Input error
-                </span>
-
-                <hr />
-
-                <p>Content items:</p>
-            </div>
-
-            <!--Edit Content Item popup dialog-->
-            <div id="editContentItemForm" style="background-color: rgb(60, 95, 150); display: none; color: white;">
-                <label style="display: block">title</label>
-                <input id="contentItemTitleInput" style="display: block" type="text" />
-
-                <br />
-                <label style="display: block">description</label>
-                <textarea id="contentItemDescriptionInput" style="display: block"></textarea>
-
-                <br />
-                <label style="display: block">media source</label>
-                <input type="url" id="contentItemMediaSourceInput" style="display: block" />
-
-                <br />
-                <p style="display: block">
-                    <label style="display: block">media type</label>
-                    <select id="contentItemMediaTypeInput" style="display: block">
-                        <option value="pdf">PDF</option>
-                        <option value="image">Image</option>
-                        <option value="video">Video</option>
-                        <option value="audio">Audio</option>
-                    </select>
-                </p>
-
-                 <p>
-                    <label>Attribution</label>
-                    <input type='text' id='cz-authoring-ci-attribution' style='display: block;' />
-                </p>
-
-                <p>
-                    <label>Media Source</label>
-                    <input type='text' id='cz-authoring-ci-media-source' style='display: block;' />
-                </p>
-            </div>
-        </div>
+            
         <div id="tour_control" class="tour_control fleft">
             <img id="tour_prev" src="/Images/tour_prev_off.jpg" alt="previous" />
             <img style="margin: 0 0 0 16px"
@@ -294,12 +224,23 @@
             </div>
         </div>
 
-        <!--Create Event Form-->
-        <div id="auth-event-form" class="cz-form unselectable">
+        <div id="profile-form" class="cz-form unselectable"></div>
+        <div id="login-form" class="cz-form unselectable"></div>
+        <div id="header-edit-form" class="cz-form cz-header-edit-form unselectable">
         </div>
+
+        <div id="auth-edit-timeline-form" class="cz-form cz-form-timeline unselectable">
+        </div>
+        <div id="auth-edit-exhibit-form" class="cz-form cz-form-exhibit unselectable">
+		</div>
+        <div id="auth-edit-contentitem-form" class="cz-form cz-form-contentitem unselectable">
+        </div>
+
     </div>
 
-        <div id="welcomeScreenBack" class="welcomeScreenBack">
+
+    <script src="https://cz-nodelete-chronozoom-test.accesscontrol.windows.net/v2/metadata/IdentityProviders.js?protocol=wsfederation&amp;realm=http%3a%2f%2ftest.chronozoomproject.org%2f&amp;reply_to=&amp;context=&amp;request_id=&amp;version=1.0&amp;callback=ShowSigninPage" type="text/javascript"></script>
+    <div id="welcomeScreenBack" class="welcomeScreenBack">
         <div id="welcomeScreenOut" class="welcomeScreenOuterWindow">
             <div id="welcomeScreen" class="welcomeScreen">
                 <div class="titleArea">
@@ -316,7 +257,7 @@
                         Click or scroll to navigate through events and timelines. Watch our introduction video for a quick overview of this project.
 
                         <div style="position: absolute; bottom: 0px;">
-                            <button class="button">Start Exploring!</button>
+                            <button class="button" id="welcomeScreenStartButton">Start Exploring!</button>
                             <div>
                                 <input type="checkbox" id="welcomeScreenCheckbox" name="welcomeScreenCheckbox" />
                                 <label for="welcomeScreenCheckbox" unselectable="on" style="font-family: Arial; font-size: 16px;">Don't Show Again</label>
@@ -337,12 +278,13 @@
         </div>
         <div class="breadcrumbs-container fleft">
             <table id="breadcrumbs-table">
-                <tr />
+                <tr></tr>
             </table>
         </div>
         <div class="breadcrumbs-nav fleft">
             <div id="breadcrumbs-nav-right" class="">&#187;</div>
         </div>
+
         <div class="fright">
             <ul>
                 <li class="fright">
@@ -359,7 +301,7 @@
                 </li>
             </ul>
         </div>
-        <div class="clearer" />
+        <div class="clearer"></div>
     </div>
 </body>
 </html>

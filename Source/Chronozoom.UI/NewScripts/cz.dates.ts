@@ -180,7 +180,7 @@ module CZ {
             endDay += Math.round(nDays);
             // get count of days in current month
             var tempDays = daysInMonth[endMonth];
-            if (isLeapYear(endYear)) tempDays++;
+            //if (isLeapYear(endYear)) tempDays++;
             // if result day is bigger than count of days then one more month has passed too            
             while (endDay > tempDays) {
                 endDay -= tempDays;
@@ -190,7 +190,7 @@ module CZ {
                     endYear++;
                 }
                 tempDays = daysInMonth[endMonth];
-                if (isLeapYear(endYear)) tempDays++;
+              //  if (isLeapYear(endYear)) tempDays++;
             }
             if (endYear < 0 && year > 0)
                 endYear -= 1;

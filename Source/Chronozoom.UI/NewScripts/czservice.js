@@ -28,7 +28,7 @@ var CZ;
             function contentItem(ci) {
                 return {
                     id: ci.guid,
-                    ParentExhibitId: ci.contentItem ? ci.contentItem.ParentExhibitId : ci.parent,
+                    ParentExhibitId: ci.contentItem ? ci.contentItem.ParentExhibitId : ci.ParentExhibitId,
                     title: ci.contentItem ? ci.contentItem.title : ci.title,
                     description: ci.contentItem ? ci.contentItem.description : ci.description,
                     uri: ci.contentItem ? ci.contentItem.uri : ci.uri,
@@ -278,7 +278,9 @@ var CZ;
                 return ci.guid;
             });
             var promises = e.contentItems.map(function (ci) {
-                return putContentItem(ci);
+                return putContentItem(ci).then(function (response) {
+                    ci.id = ci.guid = response;
+                });
             }).concat(oldContentItems.filter(function (ci) {
                 return (ci.guid && newGuids.indexOf(ci.guid) === -1);
             }).map(function (ci) {
@@ -287,6 +289,48 @@ var CZ;
             return $.when.apply($, promises);
         }
         Service.putExhibitContent = putExhibitContent;
+        function putProfile(displayName, email) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("user");
+            var user = {
+                "DisplayName": displayName,
+                "Email": email
+            };
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                data: JSON.stringify(user)
+            });
+        }
+        Service.putProfile = putProfile;
+        function deleteProfile(displayName) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("user");
+            var user = {
+                "DisplayName": displayName
+            };
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                data: JSON.stringify(user)
+            });
+        }
+        Service.deleteProfile = deleteProfile;
+        function getProfile() {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("user");
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+        Service.getProfile = getProfile;
     })(CZ.Service || (CZ.Service = {}));
     var Service = CZ.Service;
 })(CZ || (CZ = {}));

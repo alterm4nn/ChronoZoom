@@ -493,7 +493,7 @@ var CZ;
                         removeActiveTour();
                         $("#tours").hide('slide', {
                         }, 'slow');
-                        CZ.Common.toggleOffImage('tours_index');
+                        $(".tour-icon").removeClass("active");
                         Tours.isTourWindowVisible = false;
                         var mytour = Tours.tours[this.getAttribute("tour")];
                         activateTour(mytour, Tours.isNarrationOn);
@@ -580,27 +580,17 @@ var CZ;
                 CZ.Search.onSearchClicked();
             }
             if(Tours.isTourWindowVisible) {
-                CZ.Common.toggleOffImage('tours_index');
+                $(".tour-icon").removeClass("active");
                 $("#tours").hide('slide', {
                 }, 'slow');
             } else {
-                CZ.Common.toggleOnImage('tours_index');
+                $(".tour-icon").addClass("active");
                 $("#tours").show('slide', {
                 }, 'slow');
             }
             Tours.isTourWindowVisible = !Tours.isTourWindowVisible;
         }
         Tours.onTourClicked = onTourClicked;
-        function tourButtonHighlight(isOn) {
-            if(isOn) {
-                CZ.Common.toggleOnImage('tours_index');
-            } else {
-                if(!Tours.isTourWindowVisible) {
-                    CZ.Common.toggleOffImage('tours_index');
-                }
-            }
-        }
-        Tours.tourButtonHighlight = tourButtonHighlight;
         function collapseBookmarks() {
             if(!Tours.isBookmarksWindowExpanded) {
                 return;

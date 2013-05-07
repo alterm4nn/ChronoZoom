@@ -14,6 +14,7 @@
         #datepicker {
             margin-top: 50px;
             padding: 5px;
+            width: 350px;
         }
 
         .error {
@@ -26,6 +27,7 @@
         
         function pageOnLoad() {
             datepicker = new CZ.UI.DatePicker($("#datepicker"));
+            datepicker.addEditMode_Infinite();
 
             $("#input-date-btn").click(function () {
                 datepicker.setDate($("#input-date").val());

@@ -22,10 +22,22 @@ var CZ;
         var _circleCur = {
             type: "circle"
         };
-        var _selectedTimeline = {
+        Authoring.selectedTimeline = {
         };
-        var _selectedExhibit = {
+        Authoring.selectedExhibit = {
         };
+        Authoring.selectedContentItem = {
+        };
+        Authoring.isActive = false;
+        Authoring.isEnabled = false;
+        Authoring.isDragging = false;
+        Authoring.mode = null;
+        Authoring.contentItemMode = null;
+        Authoring.showCreateTimelineForm = null;
+        Authoring.showEditTimelineForm = null;
+        Authoring.showCreateExhibitForm = null;
+        Authoring.showEditExhibitForm = null;
+        Authoring.showEditContentItemForm = null;
         function isIntersecting(te, obj) {
             switch(obj.type) {
                 case "timeline":
@@ -50,18 +62,18 @@ var CZ;
             var i = 0;
             var len = 0;
             var selfIntersection = false;
-            if(!isIncluded(tp, tc)) {
+            if(!isIncluded(tp, tc) && tp.id !== "__root__") {
                 return false;
             }
             for(i = 0 , len = tp.children.length; i < len; ++i) {
-                selfIntersection = editmode ? (tp.children[i] === _selectedTimeline) : (tp.children[i] === tc);
+                selfIntersection = editmode ? (tp.children[i] === Authoring.selectedTimeline) : (tp.children[i] === tc);
                 if(!selfIntersection && isIntersecting(tc, tp.children[i])) {
                     return false;
                 }
             }
-            if(editmode && _selectedTimeline.children && _selectedTimeline.children.length > 0) {
-                for(i = 0 , len = _selectedTimeline.children.length; i < len; ++i) {
-                    if(!isIncluded(tc, _selectedTimeline.children[i])) {
+            if(editmode && Authoring.selectedTimeline.children && Authoring.selectedTimeline.children.length > 0) {
+                for(i = 0 , len = Authoring.selectedTimeline.children.length; i < len; ++i) {
+                    if(!isIncluded(tc, Authoring.selectedTimeline.children[i])) {
                         return false;
                     }
                 }
@@ -76,7 +88,7 @@ var CZ;
                 return false;
             }
             for(i = 0 , len = tp.children.length; i < len; ++i) {
-                selfIntersection = editmode ? (tp.children[i] === _selectedExhibit) : (tp.children[i] === ec);
+                selfIntersection = editmode ? (tp.children[i] === Authoring.selectedExhibit) : (tp.children[i] === ec);
                 if(!selfIntersection && isIntersecting(ec, tp.children[i])) {
                     return false;
                 }
@@ -128,6 +140,7 @@ var CZ;
             CZ.VCContent.removeChild(parent, id);
             return CZ.VCContent.addInfodot(parent, "layerInfodots", id, time, vyc, radv, cis, descr);
         }
+        Authoring.renewExhibit = renewExhibit;
         function createNewTimeline() {
             CZ.VCContent.removeChild(_hovered, "newTimelineRectangle");
             return CZ.VCContent.addTimeline(_hovered, _hovered.layerid, undefined, {
@@ -145,17 +158,7 @@ var CZ;
         }
         function createNewExhibit() {
             CZ.VCContent.removeChild(_hovered, "newExhibitCircle");
-            return CZ.VCContent.addInfodot(_hovered, "layerInfodots", undefined, _circleCur.x + _circleCur.r, _circleCur.y + _circleCur.r, _circleCur.r, [
-                {
-                    id: undefined,
-                    guid: undefined,
-                    title: "Content Item Title",
-                    description: "Content Item Description",
-                    uri: "",
-                    mediaType: "image",
-                    parent: _hovered.guid
-                }
-            ], {
+            return CZ.VCContent.addInfodot(_hovered, "layerInfodots", undefined, _circleCur.x + _circleCur.r, _circleCur.y + _circleCur.r, _circleCur.r, [], {
                 title: "Exhibit Title",
                 date: _circleCur.x + _circleCur.r,
                 guid: undefined
@@ -167,6 +170,12 @@ var CZ;
             var marginTop = (1 - CZ.Settings.timelineHeaderMargin) * t.height - headerSize;
             var baseline = t.y + marginTop + headerSize / 2.0;
             CZ.VCContent.removeChild(t, t.id + "__header__");
+            if(CZ.Authoring.isEnabled && typeof t.editButton !== "undefined") {
+                t.editButton.x = t.x + t.width - 1.15 * t.titleObject.height;
+                t.editButton.y = t.titleObject.y;
+                t.editButton.width = t.titleObject.height;
+                t.editButton.height = t.titleObject.height;
+            }
             t.titleObject = CZ.VCContent.addText(t, t.layerid, t.id + "__header__", t.x + marginLeft, t.y + marginTop, baseline, headerSize, t.title, {
                 fontName: CZ.Settings.timelineHeaderFontName,
                 fillStyle: CZ.Settings.timelineHeaderFontColor,
@@ -174,14 +183,6 @@ var CZ;
                 opacity: 1
             });
         }
-        Authoring.isActive = false;
-        Authoring.isDragging = false;
-        Authoring.mode = null;
-        Authoring.showCreateTimelineForm = null;
-        Authoring.showEditTimelineForm = null;
-        Authoring.showCreateExhibitForm = null;
-        Authoring.showEditExhibitForm = null;
-        Authoring.showEditContentItemForm = null;
         Authoring.modeMouseHandlers = {
             createTimeline: {
                 mousemove: function () {
@@ -195,27 +196,14 @@ var CZ;
                     }
                     if(_hovered.type === "timeline") {
                         updateNewRectangle();
-                        _selectedTimeline = createNewTimeline();
-                        Authoring.showCreateTimelineForm(_selectedTimeline);
+                        Authoring.selectedTimeline = createNewTimeline();
+                        Authoring.showCreateTimelineForm(Authoring.selectedTimeline);
                     }
                 }
             },
             editTimeline: {
-                mousemove: function () {
-                    _hovered = _vcwidget.hovered || {
-                    };
-                    if(_hovered.type === "timeline") {
-                        _hovered.settings.strokeStyle = "red";
-                    }
-                },
                 mouseup: function () {
-                    if(_hovered.type === "timeline") {
-                        _selectedTimeline = _hovered;
-                        Authoring.showEditTimelineForm(_selectedTimeline);
-                    } else if(_hovered.type === "infodot" || _hovered.type === "contentItem") {
-                        _selectedTimeline = _hovered.parent;
-                        Authoring.showEditTimelineForm(_selectedTimeline);
-                    }
+                    Authoring.showEditTimelineForm(Authoring.selectedTimeline);
                 }
             },
             createExhibit: {
@@ -227,27 +215,19 @@ var CZ;
                 mouseup: function () {
                     if(_hovered.type === "timeline") {
                         updateNewCircle();
-                        _selectedExhibit = createNewExhibit();
-                        Authoring.showCreateExhibitForm(_selectedExhibit);
+                        Authoring.selectedExhibit = createNewExhibit();
+                        Authoring.showCreateExhibitForm(Authoring.selectedExhibit);
                     }
                 }
             },
             editExhibit: {
-                mousemove: function () {
-                    _hovered = _vcwidget.hovered || {
-                    };
-                    if(_hovered.type === "infodot") {
-                        _hovered.settings.strokeStyle = "red";
-                    }
-                },
                 mouseup: function () {
-                    if(_hovered.type === "infodot") {
-                        _selectedExhibit = _hovered;
-                        Authoring.showEditExhibitForm(_selectedExhibit);
-                    } else if(_hovered.type === "contentItem") {
-                        _selectedExhibit = _hovered.parent.parent.parent;
-                        Authoring.showEditContentItemForm(_hovered, _selectedExhibit);
-                    }
+                    Authoring.showEditExhibitForm(Authoring.selectedExhibit);
+                }
+            },
+            editContentItem: {
+                mouseup: function () {
+                    Authoring.showEditContentItemForm(Authoring.selectedContentItem, Authoring.selectedExhibit);
                 }
             }
         };
@@ -329,71 +309,113 @@ var CZ;
             CZ.VCContent.removeChild(t.parent, t.id);
         }
         Authoring.removeTimeline = removeTimeline;
-        function updateExhibit(e, prop) {
-            var temp = {
-                title: prop.title,
-                x: Number(prop.date) - e.outerRad,
-                y: e.y,
-                width: e.width,
-                height: e.height,
-                type: "circle"
-            };
-            var oldContentItems = e.contentItems;
-            if(checkExhibitIntersections(e.parent, temp, true)) {
-                e.x = temp.x;
-                e.infodotDescription.date = temp.x + e.outerRad;
-            }
-            e.title = temp.title;
-            e.infodotDescription.title = temp.title;
-            e.contentItems = prop.contentItems;
-            e = renewExhibit(e);
-            CZ.Service.putExhibit(e).then(function (response) {
-                var contentItems = e.contentItems;
-                var len = contentItems.length;
-                var i = 0;
-                e.guid = response.ExhibitId;
-                e.id = "e" + response.ExhibitId;
-                for(i = 0; i < len; ++i) {
-                    contentItems[i].parent = e.guid;
-                }
-                CZ.Service.putExhibitContent(e, oldContentItems).then(function () {
-                    for(i = 0; i < len; ++i) {
-                        contentItems[i].guid = arguments[i];
-                    }
-                }, function () {
-                    console.log("Error connecting to service: update content item.\n");
+        function updateExhibit(e, args) {
+            var deferred = $.Deferred();
+            if(e && e.contentItems && args) {
+                var clone = $.extend({
+                }, e, {
+                    children: null
                 });
-            }, function (error) {
-                console.log("Error connecting to service: update exhibit.\n");
-            });
+                clone = $.extend(true, {
+                }, clone);
+                delete clone.children;
+                delete clone.contentItems;
+                $.extend(true, clone, args);
+                var oldContentItems = $.extend(true, [], e.contentItems);
+                CZ.Service.putExhibit(clone).then(function (response) {
+                    var old_id = e.id;
+                    e.id = clone.id = "e" + response.ExhibitId;
+                    var new_id = e.id;
+                    e.guid = clone.guid = response.ExhibitId;
+                    for(var i = 0; i < e.contentItems.length; i++) {
+                        e.contentItems[i].ParentExhibitId = e.guid;
+                    }
+                    for(var i = 0; i < clone.contentItems.length; i++) {
+                        clone.contentItems[i].ParentExhibitId = clone.guid;
+                    }
+                    CZ.Service.putExhibitContent(clone, oldContentItems).then(function (response) {
+                        $.extend(e, clone);
+                        e.id = old_id;
+                        e = renewExhibit(e);
+                        e.id = new_id;
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                        deferred.resolve();
+                    }, function (error) {
+                        console.log("Error connecting to service: update exhibit (put exhibit content).\n" + error.responseText);
+                        deferred.reject();
+                    });
+                }, function (error) {
+                    console.log("Error connecting to service: update exhibit.\n" + error.responseText);
+                    deferred.reject();
+                });
+            } else {
+                deferred.reject();
+            }
+            return deferred.promise();
         }
         Authoring.updateExhibit = updateExhibit;
         function removeExhibit(e) {
-            CZ.Service.deleteExhibit(e);
-            CZ.VCContent.removeChild(e.parent, e.id);
+            var deferred = $.Deferred();
+            if(e && e.id && e.parent) {
+                var clone = $.extend({
+                }, e, {
+                    children: null
+                });
+                clone = $.extend(true, {
+                }, clone);
+                CZ.Service.deleteExhibit(clone).then(function (response) {
+                    CZ.VCContent.removeChild(e.parent, e.id);
+                    CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    deferred.resolve();
+                }, function (error) {
+                    console.log("Error connecting to service: remove exhibit.\n" + error.responseText);
+                    deferred.reject();
+                });
+            } else {
+                deferred.reject();
+            }
+            return deferred.promise();
         }
         Authoring.removeExhibit = removeExhibit;
-        function updateContentItem(c, args) {
-            var e = c.parent.parent.parent;
-            for(var prop in args) {
-                if(c.contentItem.hasOwnProperty(prop)) {
-                    c.contentItem[prop] = args[prop];
-                }
+        function updateContentItem(e, c, args) {
+            var deferred = $.Deferred();
+            if(e && e.contentItems && e.contentItems.length && c && args) {
+                var clone = $.extend(true, {
+                }, c, args);
+                CZ.Service.putContentItem(clone).then(function (response) {
+                    $.extend(c, clone);
+                    c.id = c.guid = response;
+                    e = renewExhibit(e);
+                    CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    deferred.resolve();
+                }, function (error) {
+                    console.log("Error connecting to service: update content item.\n" + error.responseText);
+                    deferred.reject();
+                });
+            } else {
+                deferred.reject();
             }
-            renewExhibit(e);
-            CZ.Service.putContentItem(c).then(function (response) {
-                c.guid = response;
-            }, function (error) {
-                console.log("Error connecting to service: update content item.\n" + error.responseText);
-            });
+            return deferred.promise();
         }
         Authoring.updateContentItem = updateContentItem;
-        function removeContentItem(c) {
-            var e = c.parent.parent.parent;
-            CZ.Service.deleteContentItem(c);
-            c.parent.parent.parent.contentItems.splice(c.contentItem.index, 1);
-            delete c.contentItem;
-            renewExhibit(e);
+        function removeContentItem(e, c) {
+            var deferred = $.Deferred();
+            if(e && e.contentItems && e.contentItems.length && c && c.index) {
+                var clone = $.extend(true, {
+                }, c);
+                CZ.Service.deleteContentItem(clone).then(function (response) {
+                    e.contentItems.splice(c.index, 1);
+                    e = renewExhibit(e);
+                    CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    deferred.resolve();
+                }, function (error) {
+                    console.log("Error connecting to service: remove content item.\n" + error.responseText);
+                    deferred.reject();
+                });
+            } else {
+                deferred.reject();
+            }
+            return deferred.promise();
         }
         Authoring.removeContentItem = removeContentItem;
         function ValidateTimelineData(start, end, title) {
@@ -406,7 +428,7 @@ var CZ;
         Authoring.ValidateTimelineData = ValidateTimelineData;
         function ValidateExhibitData(date, title, contentItems) {
             var isValid = CZ.Authoring.ValidateNumber(date);
-            isValid = isValid && CZ.Authoring.IsNotEmpty(title) && CZ.Authoring.IsNotEmpty(date) && CZ.Authoring.IsNotEmpty(date);
+            isValid = isValid && CZ.Authoring.IsNotEmpty(title) && CZ.Authoring.IsNotEmpty(date);
             isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
             return isValid;
         }
@@ -430,8 +452,39 @@ var CZ;
             }
             var i = 0;
             while(contentItems[i] != null) {
-                var CI = contentItems[i];
-                isValid = isValid && CZ.Authoring.IsNotEmpty(CI.title) && CZ.Authoring.IsNotEmpty(CI.uri) && CZ.Authoring.IsNotEmpty(CI.mediaType);
+                var ci = contentItems[i];
+                isValid = isValid && CZ.Authoring.IsNotEmpty(ci.title) && CZ.Authoring.IsNotEmpty(ci.uri) && CZ.Authoring.IsNotEmpty(ci.mediaType);
+                if(ci.mediaType.toLowerCase() === "image") {
+                    var imageReg = /\.(jpg|jpeg|png)$/i;
+                    if(!imageReg.test(ci.uri)) {
+                        alert("Sorry, only JPG/PNG images are supported");
+                        isValid = false;
+                    }
+                } else if(ci.mediaType.toLowerCase() === "video") {
+                    var youtube = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                    var youtubeEmbed = /www.\youtube\.com\/embed\/([a-z0-9\-]+)/i;
+                    var vimeo = /vimeo\.com\/([0-9]+)/i;
+                    var vimeoEmbed = /player.vimeo.com\/video\/([0-9]+)/i;
+                    if(youtube.test(ci.uri)) {
+                        var youtubeResult = ci.uri.match(youtube);
+                        ci.uri = "http://www.youtube.com/embed/" + youtubeResult[1];
+                    } else if(vimeo.test(ci.uri)) {
+                        var vimeoResult = ci.uri.match(vimeo);
+                        ci.uri = "http://player.vimeo.com/video/" + vimeoResult[1];
+                    } else if(youtubeEmbed.test(ci.uri) || vimeoEmbed.test(ci.uri)) {
+                    } else {
+                        alert("Sorry, only YouTube or Vimeo videos are supported");
+                        isValid = false;
+                    }
+                } else if(ci.mediaType.toLowerCase() === "pdf") {
+                    var pdf = /\.(pdf)$/i;
+                    if(pdf.test(ci.uri)) {
+                        ci.uri = "http://docs.google.com/viewer?url=" + encodeURI(ci.uri) + "&embedded=true";
+                    } else {
+                        alert("Sorry, only PDF extension is supported");
+                        isValid = false;
+                    }
+                }
                 if(!isValid) {
                     return false;
                 }

@@ -693,7 +693,7 @@ module CZ {
 
                         // hide tour UI
                         $("#tours").hide('slide', {}, 'slow');
-                        CZ.Common.toggleOffImage('tours_index');
+                        $(".tour-icon").removeClass("active");
                         isTourWindowVisible = false;
 
                         // activate selected tour  
@@ -809,24 +809,13 @@ module CZ {
                 CZ.Search.onSearchClicked();
 
             if (isTourWindowVisible) {
-                CZ.Common.toggleOffImage('tours_index');
+                $(".tour-icon").removeClass("active");
                 $("#tours").hide('slide', {}, 'slow');
             } else {
-                CZ.Common.toggleOnImage('tours_index');
+                $(".tour-icon").addClass("active");
                 $("#tours").show('slide', {}, 'slow');
             }
             isTourWindowVisible = !isTourWindowVisible;
-        }
-
-        /* Highlights the tour button in the top menu */
-        export function tourButtonHighlight(isOn) {
-            if (isOn) {
-                CZ.Common.toggleOnImage('tours_index');
-            }
-            else {
-                if (!isTourWindowVisible)
-                    CZ.Common.toggleOffImage('tours_index');
-            }
         }
 
         /*

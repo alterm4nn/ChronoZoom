@@ -24,6 +24,7 @@
 *.sdf
 *.opensdf
 *.unsuccessfulbuild
+*.pubxml
 ipch/
 obj/
 [Bb]in
@@ -32,6 +33,7 @@ obj/
 Ankh.NoLoad
 UpgradeLog*
 _UpgradeReport_Files/
+PublishProfiles/
 
 #MonoDevelop
 *.pidb

@@ -18,6 +18,7 @@ namespace Application.Helper
         private static TimelineHelper _timelineHelper;
         private static ExhibitHelper _exhibitHelper;
         private static AuthorizationHelper _authorizationHelper;
+        private static SearchHelper _searchHelper;
 
         public static void Stop()
         {
@@ -91,6 +92,11 @@ namespace Application.Helper
         public AuthorizationHelper GetAuthorizationHelper()
         {
             return _authorizationHelper ?? (_authorizationHelper = new AuthorizationHelper());
+        }
+
+        public SearchHelper GetSearchHelper()
+        {
+            return _searchHelper ?? (_searchHelper = new SearchHelper());
         }
     }
 }

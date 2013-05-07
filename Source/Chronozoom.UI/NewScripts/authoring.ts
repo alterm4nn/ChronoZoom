@@ -12,27 +12,45 @@
 module CZ {
     export module Authoring {
         // Virtual canvas widget.
-        var _vcwidget : any;
+        var _vcwidget: any;
 
         // Mouse position.
-        var _dragStart : any = {};
-        var _dragPrev : any = {};
-        var _dragCur : any = {};
+        var _dragStart: any = {};
+        var _dragPrev: any = {};
+        var _dragCur: any = {};
 
         // Current hovered object in virtual canvas.
-        var _hovered : any = {};
+        var _hovered: any = {};
 
         // New timeline rectangle.
-        var _rectPrev : any = { type: "rectangle" };
-        var _rectCur : any = { type: "rectangle" };
+        var _rectPrev: any = { type: "rectangle" };
+        var _rectCur: any = { type: "rectangle" };
 
         // New exhibit circle.
-        var _circlePrev : any = { type: "circle" };
-        var _circleCur : any = { type: "circle" };
+        var _circlePrev: any = { type: "circle" };
+        var _circleCur: any = { type: "circle" };
 
         // Selected objects for editing.
-        var _selectedTimeline : any = {};
-        var _selectedExhibit : any = {};
+        export var selectedTimeline: any = {};
+        export var selectedExhibit: any = {};
+        export var selectedContentItem: any = {};
+
+
+        // Authoring Tool state.
+        export var isActive: bool = false;
+        export var isEnabled: bool = false;
+        export var isDragging: bool = false;
+
+        //TODO: use enum for authoring modes when new authoring forms will be completly integrated
+        export var mode: any = null;
+        export var contentItemMode: any = null;
+
+        // Forms' handlers.
+        export var showCreateTimelineForm: (...args: any[]) => any = null;
+        export var showEditTimelineForm: (...args: any[]) => any = null;
+        export var showCreateExhibitForm: (...args: any[]) => any = null;
+        export var showEditExhibitForm: (...args: any[]) => any = null;
+        export var showEditContentItemForm: (...args: any[]) => any = null;
 
         /**
          * Tests a timeline/exhibit on intersection with another virtual canvas object.
@@ -90,22 +108,22 @@ module CZ {
             var selfIntersection = false;
 
             // Test on inclusion in parent.
-            if (!isIncluded(tp, tc)) {
+            if (!isIncluded(tp, tc) && tp.id !== "__root__") {
                 return false;
             }
 
             // Test on intersections with parent's children.
             for (i = 0, len = tp.children.length; i < len; ++i) {
-                selfIntersection = editmode ? (tp.children[i] === _selectedTimeline) : (tp.children[i] === tc);
+                selfIntersection = editmode ? (tp.children[i] === selectedTimeline) : (tp.children[i] === tc);
                 if (!selfIntersection && isIntersecting(tc, tp.children[i])) {
                     return false;
                 }
             }
 
             // Test on children's inclusion (only possible in editmode).
-            if (editmode && _selectedTimeline.children && _selectedTimeline.children.length > 0) {
-                for (i = 0, len = _selectedTimeline.children.length; i < len; ++i) {
-                    if (!isIncluded(tc, _selectedTimeline.children[i])) {
+            if (editmode && selectedTimeline.children && selectedTimeline.children.length > 0) {
+                for (i = 0, len = selectedTimeline.children.length; i < len; ++i) {
+                    if (!isIncluded(tc, selectedTimeline.children[i])) {
                         return false;
                     }
                 }
@@ -135,7 +153,7 @@ module CZ {
 
             // Test on intersections with parent's children.
             for (i = 0, len = tp.children.length; i < len; ++i) {
-                selfIntersection = editmode ? (tp.children[i] === _selectedExhibit) : (tp.children[i] === ec);
+                selfIntersection = editmode ? (tp.children[i] === selectedExhibit) : (tp.children[i] === ec);
                 if (!selfIntersection && isIntersecting(ec, tp.children[i])) {
                     return false;
                 }
@@ -157,7 +175,7 @@ module CZ {
             // Test on intersections and update timeline's rectangle if it passes the test.
             if (checkTimelineIntersections(_hovered, _rectCur, false)) {
                 // Set border's color of timeline's rectangle.
-                var settings : any = $.extend({}, _hovered.settings);
+                var settings: any = $.extend({}, _hovered.settings);
                 settings.strokeStyle = "red";
 
                 $.extend(_rectPrev, _rectCur);
@@ -184,7 +202,7 @@ module CZ {
         function updateNewCircle() {
             // Update circle's position and radius.
             // NOTE: These values are heuristic.
-            _circleCur.r = (_hovered.width > _hovered.height) ? 
+            _circleCur.r = (_hovered.width > _hovered.height) ?
                             _hovered.height / 27.7 :
                             _hovered.width / 10.0;
 
@@ -195,7 +213,7 @@ module CZ {
             // Test on intersections and update exhibits's circle if it passes the test.
             if (checkExhibitIntersections(_hovered, _circleCur, false)) {
                 $.extend(_circlePrev, _circleCur);
-                
+
                 CZ.VCContent.removeChild(_hovered, "newExhibitCircle");
                 CZ.VCContent.addCircle(
                     _hovered,
@@ -220,7 +238,7 @@ module CZ {
          * Use it in when you need to update exhibit's or some of its content item's info.
          * @param  {Object} e    An exhibit to renew.
          */
-        function renewExhibit(e) {
+        export function renewExhibit(e) {
             var vyc = e.y + e.height / 2;
             var time = e.x + e.width / 2;
             var id = e.id;
@@ -275,15 +293,7 @@ module CZ {
                 _circleCur.x + _circleCur.r,
                 _circleCur.y + _circleCur.r,
                 _circleCur.r,
-                [{
-                    id: undefined,
-                    guid: undefined,
-                    title: "Content Item Title",
-                    description: "Content Item Description",
-                    uri: "",
-                    mediaType: "image",
-                    parent: _hovered.guid
-                }],
+                [],
                 {
                     title: "Exhibit Title",
                     date: _circleCur.x + _circleCur.r,
@@ -305,6 +315,15 @@ module CZ {
             var baseline = t.y + marginTop + headerSize / 2.0;
 
             CZ.VCContent.removeChild(t, t.id + "__header__");
+
+            //remove edit button to reinitialize it
+            if (CZ.Authoring.isEnabled && typeof t.editButton !== "undefined") {
+                t.editButton.x = t.x + t.width - 1.15 * t.titleObject.height;
+                t.editButton.y = t.titleObject.y;
+                t.editButton.width = t.titleObject.height;
+                t.editButton.height = t.titleObject.height;
+            }
+
             t.titleObject = CZ.VCContent.addText(
                 t,
                 t.layerid,
@@ -322,18 +341,6 @@ module CZ {
                 }
             );
         }
-
-        // Authoring Tool state.
-        export var isActive : any = false;
-        export var isDragging : any = false;
-        export var mode : any = null;
-
-        // Forms' handlers.
-        export var showCreateTimelineForm : any = null;
-        export var showEditTimelineForm : any = null;
-        export var showCreateExhibitForm : any = null;
-        export var showEditExhibitForm : any = null;
-        export var showEditContentItemForm : any = null;
 
         /**
          * Represents a collection of mouse events' handlers for each mode.
@@ -356,28 +363,15 @@ module CZ {
                     if (_hovered.type === "timeline") {
                         updateNewRectangle();
 
-                        _selectedTimeline = createNewTimeline();
-                        showCreateTimelineForm(_selectedTimeline);
+                        selectedTimeline = createNewTimeline();
+                        showCreateTimelineForm(selectedTimeline);
                     }
                 }
             },
 
             editTimeline: {
-                mousemove: function () {
-                    _hovered = _vcwidget.hovered || {};
-                    if (_hovered.type === "timeline") {
-                        _hovered.settings.strokeStyle = "red";
-                    }
-                },
-
                 mouseup: function () {
-                    if (_hovered.type === "timeline") {
-                        _selectedTimeline = _hovered;
-                        showEditTimelineForm(_selectedTimeline);
-                    } else if (_hovered.type === "infodot" || _hovered.type === "contentItem") {
-                        _selectedTimeline = _hovered.parent;
-                        showEditTimelineForm(_selectedTimeline);
-                    }
+                    showEditTimelineForm(selectedTimeline);
                 }
             },
 
@@ -392,28 +386,21 @@ module CZ {
                     if (_hovered.type === "timeline") {
                         updateNewCircle();
 
-                        _selectedExhibit = createNewExhibit();
-                        showCreateExhibitForm(_selectedExhibit);
+                        selectedExhibit = createNewExhibit();
+                        showCreateExhibitForm(selectedExhibit);
                     }
                 }
             },
 
             editExhibit: {
-                mousemove: function () {
-                    _hovered = _vcwidget.hovered || {};
-                    if (_hovered.type === "infodot") {
-                        _hovered.settings.strokeStyle = "red";
-                    }
-                },
-
                 mouseup: function () {
-                    if (_hovered.type === "infodot") {
-                        _selectedExhibit = _hovered;
-                        showEditExhibitForm(_selectedExhibit);                        
-                    } else if (_hovered.type === "contentItem") {
-                        _selectedExhibit = _hovered.parent.parent.parent;
-                        showEditContentItemForm(_hovered, _selectedExhibit);
-                    }
+                    showEditExhibitForm(selectedExhibit);
+                }
+            },
+
+            editContentItem: {
+                mouseup: function () {
+                    showEditContentItemForm(selectedContentItem, selectedExhibit);
                 }
             }
         };
@@ -473,11 +460,11 @@ module CZ {
             });
 
             // Assign forms' handlers.
-            showCreateTimelineForm = formHandlers && formHandlers.showCreateTimelineForm || function () {};
-            showEditTimelineForm = formHandlers && formHandlers.showEditTimelineForm || function () {};
-            showCreateExhibitForm = formHandlers && formHandlers.showCreateExhibitForm || function () {};
-            showEditExhibitForm = formHandlers && formHandlers.showEditExhibitForm || function () {};
-            showEditContentItemForm = formHandlers && formHandlers.showEditContentItemForm || function () {};
+            showCreateTimelineForm = formHandlers && formHandlers.showCreateTimelineForm || function () { };
+            showEditTimelineForm = formHandlers && formHandlers.showEditTimelineForm || function () { };
+            showCreateExhibitForm = formHandlers && formHandlers.showCreateExhibitForm || function () { };
+            showEditExhibitForm = formHandlers && formHandlers.showEditExhibitForm || function () { };
+            showEditContentItemForm = formHandlers && formHandlers.showEditContentItemForm || function () { };
         }
 
         /**
@@ -533,60 +520,59 @@ module CZ {
          * Updates exhibit's properties.
          * Use it externally from forms' handlers.
          * @param  {Object} e    An exhibit to update.
-         * @param  {Object} prop An object with properties' values.
+         * @param  {Object} args An object with properties' values.
          */
-        export function updateExhibit(e, prop) {
-            var temp = {
-                title: prop.title,
-                x: Number(prop.date) - e.outerRad,
-                y: e.y,
-                width: e.width,
-                height: e.height,
-                type: "circle"
-            };
-            var oldContentItems = e.contentItems;
+        export function updateExhibit(e, args) {
+            var deferred = $.Deferred();
 
-            if (checkExhibitIntersections(e.parent, temp, true)) {
-                e.x = temp.x;
-                e.infodotDescription.date = temp.x + e.outerRad;
+            if (e && e.contentItems && args) {
+                var clone: any = $.extend({}, e, { children: null }); // shallow copy of exhibit (without children)
+                clone = $.extend(true, {}, clone); // deep copy exhibit
+                delete clone.children;
+                delete clone.contentItems;
+                $.extend(true, clone, args); // overwrite and append properties
+
+                var oldContentItems = $.extend(true, [], e.contentItems);
+
+                // pass cloned objects to CZ.Service calls to avoid any side effects
+                CZ.Service.putExhibit(clone).then(
+                    response => {
+                        var old_id = e.id;
+                        e.id = clone.id = "e" + response.ExhibitId;
+                        var new_id = e.id;
+                        e.guid = clone.guid = response.ExhibitId;
+                        for (var i = 0; i < e.contentItems.length; i++) {
+                            e.contentItems[i].ParentExhibitId = e.guid;
+                        }
+                        for (var i = 0; i < clone.contentItems.length; i++) {
+                            clone.contentItems[i].ParentExhibitId = clone.guid;
+                        }
+                        CZ.Service.putExhibitContent(clone, oldContentItems).then(
+                            response => {
+                                $.extend(e, clone);
+                                e.id = old_id;
+                                e = renewExhibit(e);
+                                e.id = new_id;
+                                CZ.Common.vc.virtualCanvas("requestInvalidate");
+                                deferred.resolve();
+                            },
+                            error => {
+                                console.log("Error connecting to service: update exhibit (put exhibit content).\n" + error.responseText);
+                                deferred.reject();
+                            }
+                        );
+                    },
+                    error => {
+                        console.log("Error connecting to service: update exhibit.\n" + error.responseText);
+                        deferred.reject();
+                    }
+                );
+
+            } else {
+                deferred.reject();
             }
 
-            e.title = temp.title;
-            e.infodotDescription.title = temp.title;
-            e.contentItems = prop.contentItems;
-
-            e = renewExhibit(e);
-            
-            CZ.Service.putExhibit(e).then(
-                function (response) {
-                    var contentItems = e.contentItems;
-                    var len = contentItems.length;
-                    var i = 0;
-                    e.guid = response.ExhibitId;
-                    e.id = "e" + response.ExhibitId;
-                    
-                    // Set parent's guid for all content items.
-                    for (i = 0; i < len; ++i) {
-                        contentItems[i].parent = e.guid;
-                    }
-
-                    // Send PUT/DELETE requests for all content items and
-                    // set guids for them.
-                    CZ.Service.putExhibitContent(e, oldContentItems).then(
-                        function () {
-                            for (i = 0; i < len; ++i) {
-                                contentItems[i].guid = arguments[i];
-                            }
-                        },
-                        function () {
-                            console.log("Error connecting to service: update content item.\n");
-                        }
-                    );
-                },
-                function (error) {
-                    console.log("Error connecting to service: update exhibit.\n");
-                }
-            );
+            return deferred.promise();
         }
 
         /**
@@ -595,55 +581,98 @@ module CZ {
          * @param  {Object} e An exhibit to remove.
          */
         export function removeExhibit(e) {
-            CZ.Service.deleteExhibit(e);
-            CZ.VCContent.removeChild(e.parent, e.id);
+            var deferred = $.Deferred();
+
+            if (e && e.id && e.parent) {
+                var clone: any = $.extend({}, e, { children: null });
+                clone = $.extend(true, {}, clone);
+
+                CZ.Service.deleteExhibit(clone).then(
+                    response => {
+                        CZ.VCContent.removeChild(e.parent, e.id);
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                        deferred.resolve();
+                    },
+                    error => {
+                        console.log("Error connecting to service: remove exhibit.\n" + error.responseText);
+                        deferred.reject();
+                    }
+                );
+            } else {
+                deferred.reject();
+            }
+
+            return deferred.promise();
         }
 
         /**
          * Updates content item's properties in selected exhibit.
          * Use it externally from forms' handlers.
-         * @param  {Object} c    A content item in selected exhibit.
-         * @param  {Object} args An object with properties' values.
+         * @param  {CanvasInfodot} e A selected exhibit.
+         * @param  {ContentItemMetadata} c A content item in selected exhibit.
+         * @param  {Object} args An object with updated property values.
          */
-        export function updateContentItem(c, args) {
-            var e = c.parent.parent.parent;
+        export function updateContentItem(e, c, args) {
+            var deferred = $.Deferred();
 
-            for (var prop in args) {
-                if (c.contentItem.hasOwnProperty(prop)) {
-                    c.contentItem[prop] = args[prop];
-                }
+            if (e && e.contentItems && e.contentItems.length && c && args) {
+                var clone: any = $.extend(true, {}, c, args);
+
+                CZ.Service.putContentItem(clone).then(
+                    response => {
+                        $.extend(c, clone);
+                        c.id = c.guid = response;
+                        e = renewExhibit(e);
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                        deferred.resolve();
+                    },
+                    error => {
+                        console.log("Error connecting to service: update content item.\n" + error.responseText);
+                        deferred.reject();
+                    }
+                );
+            } else {
+                deferred.reject();
             }
-            
-            renewExhibit(e);
 
-            CZ.Service.putContentItem(c).then(
-                function (response) {
-                    c.guid = response;
-                },
-                function (error) {
-                    console.log("Error connecting to service: update content item.\n" + error.responseText);
-                }
-            );
+            return deferred.promise();
         }
 
         /**
          * Removes content item from selected exhibit.
          * Use it externally from form's handlers.
-         * @param  {Object} c A content item in selected exhibit.
+         * @param  {CanvasInfodot} e A selected exhibit.
+         * @param  {ContentItemMetadata} c A content item in selected exhibit.
          */
-        export function removeContentItem(c) {
-            var e = c.parent.parent.parent;
+        export function removeContentItem(e, c) {
+            var deferred = $.Deferred();
 
-            CZ.Service.deleteContentItem(c);
-            c.parent.parent.parent.contentItems.splice(c.contentItem.index, 1);
-            delete c.contentItem;
-            renewExhibit(e);
+            if (e && e.contentItems && e.contentItems.length && c && c.index) {
+                var clone = $.extend(true, {}, c);
+
+                CZ.Service.deleteContentItem(clone).then(
+                    response => {
+                        e.contentItems.splice(c.index, 1);
+                        e = renewExhibit(e);
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                        deferred.resolve();
+                    },
+                    error => {
+                        console.log("Error connecting to service: remove content item.\n" + error.responseText);
+                        deferred.reject();
+                    }
+                );
+            } else {
+                deferred.reject();
+            }
+
+            return deferred.promise();
         }
 
         /**
          * Validates possible input errors for timelines.
         */
-        export function ValidateTimelineData(start,end,title) {
+        export function ValidateTimelineData(start, end, title) {
             var isValid = CZ.Authoring.ValidateNumber(start) && CZ.Authoring.ValidateNumber(end);
             isValid = isValid && CZ.Authoring.IsNotEmpty(title) && CZ.Authoring.IsNotEmpty(start) && CZ.Authoring.IsNotEmpty(end);
             console.log(start, end);
@@ -654,9 +683,9 @@ module CZ {
         /**
          * Validates possible input errors for exhibits.
         */
-        export function ValidateExhibitData(date,title,contentItems) {
+        export function ValidateExhibitData(date, title, contentItems) {
             var isValid = CZ.Authoring.ValidateNumber(date);
-            isValid = isValid && CZ.Authoring.IsNotEmpty(title) && CZ.Authoring.IsNotEmpty(date) && CZ.Authoring.IsNotEmpty(date);
+            isValid = isValid && CZ.Authoring.IsNotEmpty(title) && CZ.Authoring.IsNotEmpty(date);
             isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
             return isValid;
         }
@@ -689,8 +718,49 @@ module CZ {
             if (contentItems.length == 0) { return false; }
             var i = 0;
             while (contentItems[i] != null) {
-                var CI = contentItems[i];
-                isValid = isValid && CZ.Authoring.IsNotEmpty(CI.title) && CZ.Authoring.IsNotEmpty(CI.uri) && CZ.Authoring.IsNotEmpty(CI.mediaType);
+                var ci = contentItems[i];
+                isValid = isValid && CZ.Authoring.IsNotEmpty(ci.title) && CZ.Authoring.IsNotEmpty(ci.uri) && CZ.Authoring.IsNotEmpty(ci.mediaType);
+                if (ci.mediaType.toLowerCase() === "image") {
+                    var imageReg = /\.(jpg|jpeg|png)$/i;
+                    if (!imageReg.test(ci.uri)) {
+                        alert("Sorry, only JPG/PNG images are supported");
+                        isValid = false;
+                    }
+                } else if (ci.mediaType.toLowerCase() === "video") {
+                    //YouTube
+                    // from http://stackoverflow.com/questions/3452546/javascript-regex-how-to-get-youtube-video-id-from-url
+                    var youtube = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                    var youtubeEmbed = /www.\youtube\.com\/embed\/([a-z0-9\-]+)/i;
+
+                    //Vimeo
+                    var vimeo = /vimeo\.com\/([0-9]+)/i
+                    var vimeoEmbed = /player.vimeo.com\/video\/([0-9]+)/i
+
+                    if (youtube.test(ci.uri)) {
+                        var youtubeResult = ci.uri.match(youtube);
+                        ci.uri = "http://www.youtube.com/embed/" + youtubeResult[1];
+                    } else if (vimeo.test(ci.uri)) {
+                        var vimeoResult = ci.uri.match(vimeo);
+                        ci.uri = "http://player.vimeo.com/video/" + vimeoResult[1];
+                    } else if (youtubeEmbed.test(ci.uri) || vimeoEmbed.test(ci.uri)) {
+                        //Embedded link provided
+                    } else {
+                        alert("Sorry, only YouTube or Vimeo videos are supported");
+                        isValid = false;
+                    }
+
+                } else if (ci.mediaType.toLowerCase() === "pdf") {
+                    //Google PDF viewer
+                    //Example: http://docs.google.com/viewer?url=http%3A%2F%2Fwww.selab.isti.cnr.it%2Fws-mate%2Fexample.pdf&embedded=true
+                    var pdf = /\.(pdf)$/i;
+
+                    if (pdf.test(ci.uri)) {
+                        ci.uri = "http://docs.google.com/viewer?url=" + encodeURI(ci.uri) + "&embedded=true";
+                    } else {
+                        alert("Sorry, only PDF extension is supported");
+                        isValid = false;
+                    }
+                }
                 if (!isValid) return false;
                 i++;
             }

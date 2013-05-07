@@ -32,13 +32,6 @@ var CZ;
             CZ.VirtualCanvas.initialize();
             Common.vc = ($)('#vc');
             Common.vc.virtualCanvas();
-            CZ.Authoring.initialize(Common.vc, {
-                showCreateTimelineForm: CZ.Authoring.UI.showCreateTimelineForm,
-                showEditTimelineForm: CZ.Authoring.UI.showEditTimelineForm,
-                showCreateExhibitForm: CZ.Authoring.UI.showCreateExhibitForm,
-                showEditExhibitForm: CZ.Authoring.UI.showEditExhibitForm,
-                showEditContentItemForm: CZ.Authoring.UI.showEditContentItemForm
-            });
         }
         Common.initialize = initialize;
         function getXBrowserMouseOrigin(jqelement, event) {
@@ -95,11 +88,13 @@ var CZ;
             }, 'slow');
         }
         Common.showFooter = showFooter;
-        function closeWelcomeScreen() {
-            setCookie("welcomeScreenDisallowed", "1", 365);
+        function startExploring() {
+            if($('#welcomeScreenCheckbox').is(':checked')) {
+                setCookie("welcomeScreenDisallowed", "1", 365);
+            }
             hideWelcomeScreen();
         }
-        Common.closeWelcomeScreen = closeWelcomeScreen;
+        Common.startExploring = startExploring;
         function hideWelcomeScreen() {
             ((document.createElement("welcomeVideo"))).src = "";
             $("#welcomeScreenBack").css("display", "none");

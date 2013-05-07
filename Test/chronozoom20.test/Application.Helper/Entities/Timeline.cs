@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Application.Helper.Entities
+﻿namespace Application.Helper.Entities
 {
     public class Timeline : Chronozoom.Entities.Timeline
     {
