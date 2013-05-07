@@ -7,7 +7,7 @@ module CZ {
 
         export class DatePicker {
             // Value that represents infinity date
-            private Infinity = 9999;
+            private INFINITY_VALUE = 9999;
 
             // Error messages
             private WRONG_YEAR_INPUT = "Year should be a number.";
@@ -107,12 +107,26 @@ module CZ {
                 this.coordinate = coordinate;
                 var mode = this.modeSelector.find(":selected").val();
 
+                // set edit mode to infinite in case if coordinate is infinity
+                if (this.coordinate === this.INFINITY_VALUE) {
+                    this.regimeSelector.find(":selected").attr("selected", "false");
+                    this.modeSelector.find("option").each(function () {
+                        if ($(this).val() === "infinite") {
+                            $(this).attr("selected", "selected");
+                            return;
+                        }
+                    });
+                    this.editModeInfinite();
+                }
+
                 switch (mode) {
                     case "year":
                         this.setDate_YearMode(coordinate);
                         break;
                     case "date":
                         this.setDate_DateMode(coordinate);
+                        break;
+                    case "infinite":
                         break;
                 }
             }
@@ -132,7 +146,7 @@ module CZ {
                         break;
                     // optional mode, it can be disabled
                     case "infinite":
-                        return this.Infinity;
+                        return this.INFINITY_VALUE;
                         break;
                 }
             }

@@ -108,7 +108,7 @@ module CZ {
             var selfIntersection = false;
 
             // Test on inclusion in parent.
-            if (!isIncluded(tp, tc)) {
+            if (!isIncluded(tp, tc) && tp.id !== "__root__") {
                 return false;
             }
 

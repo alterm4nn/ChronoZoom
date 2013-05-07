@@ -4,7 +4,7 @@ var CZ;
         var DatePicker = (function () {
             function DatePicker(datePicker) {
                 this.datePicker = datePicker;
-                this.Infinity = 9999;
+                this.INFINITY_VALUE = 9999;
                 this.WRONG_YEAR_INPUT = "Year should be a number.";
                 if(!(datePicker instanceof jQuery && datePicker.is("div"))) {
                     throw "DatePicker parameter is invalid! It should be jQuery instance of DIV.";
@@ -60,12 +60,24 @@ var CZ;
                 coordinate = Number(coordinate);
                 this.coordinate = coordinate;
                 var mode = this.modeSelector.find(":selected").val();
+                if(this.coordinate === this.INFINITY_VALUE) {
+                    this.regimeSelector.find(":selected").attr("selected", "false");
+                    this.modeSelector.find("option").each(function () {
+                        if($(this).val() === "infinite") {
+                            $(this).attr("selected", "selected");
+                            return;
+                        }
+                    });
+                    this.editModeInfinite();
+                }
                 switch(mode) {
                     case "year":
                         this.setDate_YearMode(coordinate);
                         break;
                     case "date":
                         this.setDate_DateMode(coordinate);
+                        break;
+                    case "infinite":
                         break;
                 }
             };
@@ -79,7 +91,7 @@ var CZ;
                         return this.getDate_DateMode();
                         break;
                     case "infinite":
-                        return this.Infinity;
+                        return this.INFINITY_VALUE;
                         break;
                 }
             };

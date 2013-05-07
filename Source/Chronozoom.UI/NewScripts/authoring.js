@@ -62,7 +62,7 @@ var CZ;
             var i = 0;
             var len = 0;
             var selfIntersection = false;
-            if(!isIncluded(tp, tc)) {
+            if(!isIncluded(tp, tc) && tp.id !== "__root__") {
                 return false;
             }
             for(i = 0 , len = tp.children.length; i < len; ++i) {

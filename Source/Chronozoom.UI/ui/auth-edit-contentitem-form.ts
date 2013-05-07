@@ -4,7 +4,7 @@
 
 module CZ {
     export module UI {
-        export interface FormEditCIInfo extends CZ.UI.FormBaseInfo {
+        export interface IFormEditCIInfo extends CZ.UI.IFormBaseInfo {
             titleInput: string;
             mediaInput: string;
             mediaSourceInput: string;
@@ -38,7 +38,7 @@ module CZ {
             private mode; // create | edit
             private isCancel: bool; // is form closed without saving changes
 
-            constructor(container: JQuery, formInfo: FormEditCIInfo) {
+            constructor(container: JQuery, formInfo: IFormEditCIInfo) {
                 super(container, formInfo);
 
                 this.titleTextblock = container.find(formInfo.titleTextblock);

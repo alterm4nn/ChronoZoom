@@ -5,7 +5,7 @@
 
 module CZ {
     export module UI {
-        export interface FormHeaderEditInfo extends CZ.UI.FormBaseInfo {
+        export interface IFormHeaderEditInfo extends CZ.UI.IFormBaseInfo {
             createTimeline: string;
             createExhibit: string;
             editTimeline: string;
@@ -17,7 +17,7 @@ module CZ {
             private createExhibitBtn: JQuery;
 
             // We only need to add additional initialization in constructor.
-            constructor(container: JQuery, formInfo: FormHeaderEditInfo) {
+            constructor(container: JQuery, formInfo: IFormHeaderEditInfo) {
                 super(container, formInfo);
 
                 this.createTimelineBtn = this.container.find(formInfo.createTimeline);

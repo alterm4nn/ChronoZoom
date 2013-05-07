@@ -38,7 +38,11 @@ var CZ;
                 this.endDate.addEditMode_Infinite();
                 this.titleInput.val(this.timeline.title);
                 this.startDate.setDate(this.timeline.x);
-                this.endDate.setDate(this.timeline.x + this.timeline.width);
+                if(this.timeline.endDate === 9999) {
+                    this.endDate.setDate(this.timeline.endDate);
+                } else {
+                    this.endDate.setDate(this.timeline.x + this.timeline.width);
+                }
                 this.saveButton.click(function (event) {
                     var isValid = CZ.Authoring.ValidateTimelineData(_this.startDate.getDate(), _this.endDate.getDate(), _this.titleInput.val());
                     if(!isValid) {

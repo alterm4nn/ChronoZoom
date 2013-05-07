@@ -7,7 +7,7 @@ module CZ {
     export module UI {
 
         export class FormLogoutProfile extends CZ.UI.FormBase {
-            constructor(container: JQuery, formInfo: CZ.UI.FormBaseInfo) {
+            constructor(container: JQuery, formInfo: CZ.UI.IFormBaseInfo) {
                 super(container, formInfo);
             }
 
