@@ -8,20 +8,42 @@ var CZ;
                     throw "Container parameter is invalid! It should be jQuery instance of DIV.";
                 }
                 this.container = container;
-                this.navPath = [];
+                this.prevForm = formInfo.prevForm;
                 this.activationSource = formInfo.activationSource;
                 this.navButton = this.container.find(formInfo.navButton);
                 this.closeButton = this.container.find(formInfo.closeButton);
                 this.titleTextblock = this.container.find(formInfo.titleTextblock);
+                if(this.prevForm) {
+                    this.navButton.show();
+                } else {
+                    this.navButton.hide();
+                }
+                this.navButton.off();
+                this.closeButton.off();
+                this.navButton.click(function (event) {
+                    _this.back();
+                });
                 this.closeButton.click(function (event) {
                     _this.close();
                 });
             }
             FormBase.prototype.show = function () {
-                this.container.show("slow");
+                var args = [];
+                for (var _i = 0; _i < (arguments.length - 0); _i++) {
+                    args[_i] = arguments[_i + 0];
+                }
+                this.container.show.apply(this.container, args);
             };
             FormBase.prototype.close = function () {
-                this.container.hide("slow");
+                var args = [];
+                for (var _i = 0; _i < (arguments.length - 0); _i++) {
+                    args[_i] = arguments[_i + 0];
+                }
+                this.container.hide.apply(this.container, args);
+            };
+            FormBase.prototype.back = function () {
+                this.close();
+                this.prevForm.show();
             };
             return FormBase;
         })();

@@ -41,12 +41,12 @@ var CZ;
         var canvas = $("<canvas></canvas>");
         var labelsDiv = $("<div></div>");
         var marker = $("<div id='timescale_marker' class='cz-timescale-marker'></div>");
-        var markerText = $("<p id='marker-text'></p>");
+        var markerText = $("<div id='marker-text'></div>");
         var markertriangle = $("<div id='marker-triangle'></div>");
         var leftDatePanel = $("<div class='cz-timescale-panel cz-timescale-left'></div>");
         var leftDate = $("<p id='timescale_left_border'></p>");
         var rightDatePanel = $("<div class='cz-timescale-panel cz-timescale-right'></div>");
-        var rightDate = $("<p id='timescale_right_border' style='display: block'></p>");
+        var rightDate = $("<p id='timescale_right_border'></p>");
         var rightDateInput = $("<input class='timescale_right_border_input' style='display: none' type='text'/>");
         var leftDateInput = $("<input class='timescale_left_border_input' style='display: none' type='text'/>");
         var RightInputShown = false;
@@ -458,7 +458,8 @@ var CZ;
             var k = (_range.max - _range.min) / _width;
             var point = (time - _range.max) / k + _width;
             this.markerPosition = point;
-            $('#timescale_marker').css("left", point - CZ.Settings.markerWidth / 2);
+            var markerWidth = parseFloat($('#timescale_marker').css("width"));
+            $('#timescale_marker').css("left", point - markerWidth / 2);
             var text = _tickSources[_mode].getMarkerLabel(_range, time);
             document.getElementById('marker-text').innerHTML = text;
         };
@@ -478,8 +479,8 @@ var CZ;
             } else {
                 var left_pos = (left_time - _range.max) / k + _width;
             }
-            var left_text = _tickSources[_mode].getMarkerLabel(_range, left_time);
-            var right_text = _tickSources[_mode].getMarkerLabel(_range, right_time);
+            var left_text = _tickSources[_mode].getPanelLabel(_range, left_time);
+            var right_text = _tickSources[_mode].getPanelLabel(_range, right_time);
             document.getElementById('timescale_left_border').innerHTML = left_text;
             document.getElementById('timescale_right_border').innerHTML = right_text;
         };
@@ -506,7 +507,7 @@ var CZ;
             if(!LeftInputShown) {
                 leftDateInput.val(document.getElementById('timescale_left_border').innerHTML);
                 old_left_val = leftDateInput.val();
-                leftDateInput.css("display", "block");
+                leftDateInput.css("display", "table-cell");
                 leftDate.css("display", "none");
                 LeftInputShown = true;
             } else {
@@ -515,7 +516,7 @@ var CZ;
                 var timerange;
                 timerange = _tickSources[_mode].getLeftPanelVirtualCoord(left_pan_val, right_pan_val, old_left_val, _range);
                 leftDateInput.css("display", "none");
-                leftDate.css("display", "block");
+                leftDate.css("display", "table-cell");
                 LeftInputShown = false;
                 var vp = CZ.Common.vc.virtualCanvas("getViewport");
                 var latestVisible = vp.visible;
@@ -534,14 +535,14 @@ var CZ;
                     max: rb.x
                 };
                 that.update(newrange);
-                marker.css("display", "block");
+                marker.css("display", "table");
             }
         }
         function RightPanInput() {
             if(!RightInputShown) {
                 rightDateInput.val(document.getElementById('timescale_right_border').innerHTML);
                 old_right_val = rightDateInput.val();
-                rightDateInput.css("display", "block");
+                rightDateInput.css("display", "table-cell");
                 rightDate.css("display", "none");
                 RightInputShown = true;
             } else {
@@ -551,7 +552,7 @@ var CZ;
                 timerange = _tickSources[_mode].getRightPanelVirtualCoord(left_pan_val, right_pan_val, old_right_val, _range);
                 if(timerange != null) {
                     rightDateInput.css("display", "none");
-                    rightDate.css("display", "block");
+                    rightDate.css("display", "table-cell");
                     RightInputShown = false;
                     var vp = CZ.Common.vc.virtualCanvas("getViewport");
                     var latestVisible = vp.visible;
@@ -571,7 +572,7 @@ var CZ;
                         max: rb.x
                     };
                     that.update(newrange);
-                    marker.css("display", "block");
+                    marker.css("display", "table");
                 }
             }
         }
@@ -692,7 +693,9 @@ var CZ;
         this.createTicks = function (range) {
         };
         this.getSmallTicks = function (ticks) {
-            return this.createSmallTicks(ticks);
+            if(ticks.length !== 0) {
+                return this.createSmallTicks(ticks);
+            }
         };
         this.createSmallTicks = function (ticks) {
         };
@@ -862,19 +865,20 @@ var CZ;
             return minors;
         };
         this.getMarkerLabel = function (range, time) {
-            var Labeltext;
+            var labelText;
             this.getRegime(range.min, range.max);
-            var number_of_digits = Math.max(Math.floor(Math.log(this.delta * Math.pow(10, this.beta) / this.level) * this.log10), -4) - 1;
-            if(number_of_digits > 20) {
-                number_of_digits = 20;
-            }
-            if(number_of_digits < 0) {
-                Labeltext = (new Number(-time / this.level)).toFixed(-number_of_digits);
-            } else {
-                Labeltext = (new Number(-time / this.level)).toFixed(number_of_digits);
-            }
-            Labeltext += " " + this.regime;
-            return Labeltext;
+            var numOfDigits = Math.max(Math.floor(Math.log(this.delta * Math.pow(10, this.beta) / this.level) * this.log10), -4) - 1;
+            labelText = (-time / this.level).toFixed(Math.abs(numOfDigits));
+            labelText += " " + this.regime;
+            return labelText;
+        };
+        this.getPanelLabel = function (range, time) {
+            var labelText;
+            this.getRegime(range.min, range.max);
+            var numOfDigits = Math.max(Math.floor(Math.log(this.delta * Math.pow(10, this.beta) / this.level) * this.log10), -4) - 1;
+            var labelText = (new Number(-time / this.level)).toFixed(Math.abs(numOfDigits));
+            labelText += " " + this.regime;
+            return labelText;
         };
         this.getRightPanelVirtualCoord = function (leftstr, rightstr, old_rightstr, range) {
             var left_val = parseFloat(leftstr);
@@ -1079,20 +1083,37 @@ var CZ;
         };
         this.getMarkerLabel = function (range, time) {
             this.getRegime(range.min, range.max);
-            var Labeltext = parseFloat(new Number(time - this.firstYear).toFixed(2));
-            Labeltext += (Labeltext > 0 ? -0.5 : -1.5);
-            Labeltext = Math.round(Labeltext);
-            if(Labeltext < 0) {
-                Labeltext = -Labeltext;
-            } else if(Labeltext == 0) {
-                Labeltext = 1;
+            var labelText = parseFloat(new Number(time - this.firstYear).toFixed(2));
+            labelText += (labelText > 0 ? -0.5 : -1.5);
+            labelText = Math.round(labelText);
+            if(labelText < 0) {
+                labelText = -labelText;
+            } else if(labelText == 0) {
+                labelText = 1;
             }
             if(time < this.firstYear + 1) {
-                Labeltext += " " + "BCE";
+                labelText += " " + "BCE";
             } else {
-                Labeltext += " " + "CE";
+                labelText += " " + "CE";
             }
-            return Labeltext;
+            return labelText;
+        };
+        this.getPanelLabel = function (range, time) {
+            this.getRegime(range.min, range.max);
+            var labelText = parseFloat(new Number(time - this.firstYear).toFixed(2));
+            labelText += (labelText > 0 ? -0.5 : -1.5);
+            labelText = Math.round(labelText);
+            if(labelText < 0) {
+                labelText = -labelText;
+            } else if(labelText == 0) {
+                labelText = 1;
+            }
+            if(time < this.firstYear + 1) {
+                labelText += " " + "BCE";
+            } else {
+                labelText += " " + "CE";
+            }
+            return labelText;
         };
         this.getRightPanelVirtualCoord = function (leftstr, rightstr, old_rightstr, range) {
             var left_val = parseFloat(leftstr);
@@ -1420,8 +1441,14 @@ var CZ;
         this.getMarkerLabel = function (range, time) {
             this.getRegime(range.min, range.max);
             var date = CZ.Dates.getDMYFromCoordinate(time);
-            var Labeltext = date.day + "." + (date.month + 1) + "." + date.year;
-            return Labeltext;
+            var labelText = date.day + "." + (date.month + 1) + "." + date.year;
+            return labelText;
+        };
+        this.getPanelLabel = function (range, time) {
+            this.getRegime(range.min, range.max);
+            var date = CZ.Dates.getDMYFromCoordinate(time);
+            var labelText = date.day + "." + (date.month + 1) + "." + date.year;
+            return labelText;
         };
         this.getRightPanelVirtualCoord = function (leftstr, rightstr, old_rightstr, range) {
             var left_year_val = this.parseYear(leftstr);

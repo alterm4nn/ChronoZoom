@@ -334,11 +334,11 @@ var CZ;
                 height = width * 100.0 / size.width;
             }
             return {
-                width: width,
+                width: width - 1.25 * height,
                 height: height,
                 marginTop: tlHeight - height - margin,
                 marginLeft: margin,
-                bboxWidth: width + 2 * margin,
+                bboxWidth: width + 2 * margin - 1.25 * height,
                 bboxHeight: height + 2 * margin
             };
         }
