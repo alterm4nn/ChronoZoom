@@ -454,14 +454,14 @@ var CZ;
             while(contentItems[i] != null) {
                 var ci = contentItems[i];
                 isValid = isValid && CZ.Authoring.IsNotEmpty(ci.title) && CZ.Authoring.IsNotEmpty(ci.uri) && CZ.Authoring.IsNotEmpty(ci.mediaType);
-                if(ci.mediaType == "Image") {
+                if(ci.mediaType.toLowerCase() === "image") {
                     var imageReg = /\.(jpg|jpeg|png)$/i;
                     if(!imageReg.test(ci.uri)) {
                         alert("Sorry, only JPG/PNG images are supported");
                         isValid = false;
                     }
-                } else if(ci.mediaType == "Video") {
-                    var youtube = /www\.youtube\.com\/watch\?v=([a-z0-9\-]+)/i;
+                } else if(ci.mediaType.toLowerCase() === "video") {
+                    var youtube = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
                     var youtubeEmbed = /www.\youtube\.com\/embed\/([a-z0-9\-]+)/i;
                     var vimeo = /vimeo\.com\/([0-9]+)/i;
                     var vimeoEmbed = /player.vimeo.com\/video\/([0-9]+)/i;
@@ -476,7 +476,7 @@ var CZ;
                         alert("Sorry, only YouTube or Vimeo videos are supported");
                         isValid = false;
                     }
-                } else if(ci.mediaType == "PDF") {
+                } else if(ci.mediaType.toLowerCase() === "pdf") {
                     var pdf = /\.(pdf)$/i;
                     if(pdf.test(ci.uri)) {
                         ci.uri = "http://docs.google.com/viewer?url=" + encodeURI(ci.uri) + "&embedded=true";
