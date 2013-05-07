@@ -519,6 +519,24 @@ namespace UI
             });
         }
 
+        [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/user", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        public User GetUser()
+        {
+            return AuthenticatedOperation(delegate(User user)
+            {
+                Trace.TraceInformation("Get User");
+                if (user == null)
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
+                    return null;
+                }
+                var u = _storage.Users.Where(candidate => candidate.NameIdentifier == user.NameIdentifier).FirstOrDefault();
+                if (u != null) return u;
+                return user;
+            });
+        }
+
         private void DeleteSuperCollection(string superCollectionName)
         {
             AuthenticatedOperation(delegate(User user)
