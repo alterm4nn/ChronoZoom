@@ -7,9 +7,14 @@ namespace Application.Helper.Helpers
 {
     public class NavigationHelper : DependentActions
     {
-        public void OpenHomePage(bool wait = true)
+        public void OpenHomePage()
         {
             OpenUrl(Configuration.BaseUrl);
+        }  
+        
+        public void OpenSandboxPage()
+        {
+            OpenUrl(Configuration.BaseUrl + "/test/test");
         }
 
         public void OpenExhibitEukaryoticCells()
@@ -63,7 +68,5 @@ namespace Application.Helper.Helpers
             WaitForElementEnabled(by);
             Click(by);
         }
-
-
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using Application.Helper.Entities;
+﻿using Application.Helper.Entities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Tests
@@ -16,9 +15,8 @@ namespace Tests
         public static void ClassInitialize(TestContext testContext)
         {
             BrowserStateManager.RefreshState();
-            NavigationHelper.OpenHomePage();
-            WelcomeScreenHelper.CloseWelcomePopup();
-
+            HomePageHelper.OpenSandboxPage();
+            
             _timeline = new Timeline { Title = "WebdriverTitle" };
             HomePageHelper.DeleteAllElementsLocally();
             TimelineHelper.AddTimeline(_timeline);

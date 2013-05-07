@@ -1,5 +1,4 @@
-﻿using System;
-using Application.Helper.Entities;
+﻿using Application.Helper.Entities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.ObjectModel;
 
@@ -38,8 +37,7 @@ namespace Tests
         public void TestInitialize()
         {
             BrowserStateManager.RefreshState();
-            NavigationHelper.OpenHomePage();
-            WelcomeScreenHelper.CloseWelcomePopup();
+            HomePageHelper.OpenSandboxPage();
             HomePageHelper.DeleteAllElementsLocally();
         }
 
