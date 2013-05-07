@@ -41,7 +41,6 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
-
         public void DeleteTimelineByJavaScript(Timeline timeline)
         {
             Logger.Log("<-");
