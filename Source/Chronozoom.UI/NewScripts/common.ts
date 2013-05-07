@@ -128,9 +128,9 @@ module CZ {
             $("#footerBack").show('clip', {}, 'slow');
         }
 
-        export function closeWelcomeScreen() {
-            //if ($('input[name=welcomeScreenCheckbox]').is(':checked'))
-            setCookie("welcomeScreenDisallowed", "1", 365);
+        export function startExploring() {
+            if ($('#welcomeScreenCheckbox').is(':checked'))
+                setCookie("welcomeScreenDisallowed", "1", 365);
 
             hideWelcomeScreen();
         }

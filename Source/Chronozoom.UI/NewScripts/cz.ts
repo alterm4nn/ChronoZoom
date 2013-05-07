@@ -332,9 +332,9 @@ module CZ {
             $('#welcomeScreenCloseButton')
                 .mouseover(() => { CZ.Common.toggleOnImage('welcomeScreenCloseButton', 'png'); })
                 .mouseout(() => { CZ.Common.toggleOffImage('welcomeScreenCloseButton', 'png'); })
-                .click(CZ.Common.hideWelcomeScreen);
-            $('#closeWelcomeScreenButton')
-                .click(CZ.Common.closeWelcomeScreen);
+                .click(CZ.Common.startExploring);
+            $('#welcomeScreenStartButton')
+                .click(CZ.Common.startExploring);
 
             var wlcmScrnCookie = CZ.Common.getCookie("welcomeScreenDisallowed");
             if (wlcmScrnCookie != null) {
@@ -347,7 +347,7 @@ module CZ {
                 });
 
                 $("#welcomeScreenBack").click(function () {
-                    CZ.Common.closeWelcomeScreen();
+                    CZ.Common.startExploring();
                 });
             }
 

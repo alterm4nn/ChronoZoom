@@ -88,11 +88,13 @@ var CZ;
             }, 'slow');
         }
         Common.showFooter = showFooter;
-        function closeWelcomeScreen() {
-            setCookie("welcomeScreenDisallowed", "1", 365);
+        function startExploring() {
+            if($('#welcomeScreenCheckbox').is(':checked')) {
+                setCookie("welcomeScreenDisallowed", "1", 365);
+            }
             hideWelcomeScreen();
         }
-        Common.closeWelcomeScreen = closeWelcomeScreen;
+        Common.startExploring = startExploring;
         function hideWelcomeScreen() {
             ((document.createElement("welcomeVideo"))).src = "";
             $("#welcomeScreenBack").css("display", "none");
