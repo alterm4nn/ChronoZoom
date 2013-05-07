@@ -23,6 +23,16 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
+        public void SearchEvidenceEarliestStoneToolsExhibit()
+        {
+            Logger.Log("<-");
+            TypeSearchString("Stone Tools");
+            WaitSearchProcess();
+            NavigateToSearchResult("Evidence of Earliest Stone Tools");
+            WaitNavigationToGenusHome();
+            Logger.Log("->");
+        }
+
         private void TypeSearchString(string searchText)
         {
             Logger.Log("<- text: " + searchText);
@@ -51,8 +61,14 @@ namespace Application.Helper.Helpers
             WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='Mayan History']"));
             WaitAnimation();
             Logger.Log("->");
+        }        
+        
+        private void WaitNavigationToGenusHome()
+        {
+            Logger.Log("<-");
+            WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='Genus Homo']"));
+            WaitAnimation();
+            Logger.Log("->");
         }
-
-
     }
 }

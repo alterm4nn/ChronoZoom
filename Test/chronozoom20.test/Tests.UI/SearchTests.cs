@@ -37,10 +37,17 @@ namespace Tests
         #endregion
 
         [TestMethod]
-        public void Search_Timeline()
+        public void Search_Mayan_History_Timeline()
         {
             SearchHelper.SearchMayanHistoryTimeline();
             Assert.AreEqual("Mayan History", HomePageHelper.GetLastBreadcrumbs());
+        }  
+        
+        [TestMethod]
+        public void Search_Evidence_Earliest_Stone_Tools_Exhibit()
+        {
+            SearchHelper.SearchEvidenceEarliestStoneToolsExhibit();
+            Assert.AreEqual("Genus Homo", HomePageHelper.GetLastBreadcrumbs());
         }
     }
 }
