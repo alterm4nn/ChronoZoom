@@ -79,6 +79,14 @@ namespace Application.Helper.Helpers
             }
         }
 
+        public string GetContentItemDescription()
+        {
+            Logger.Log("<-");
+            string description = GetText(By.XPath("//*[@id='vc']/*[@class='contentItemDescription']/div"));
+            Logger.Log("-> description: " + description);
+            return description;
+        }
+
         private void SaveAndClose()
         {
             Logger.Log("<-");
@@ -104,17 +112,6 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<-");
             MoveToElementAndClick(By.ClassName("virtualCanvasLayerCanvas"));
-            Logger.Log("->");
-        }
-
-        private void AddContentItems(Collection<Chronozoom.Entities.ContentItem> contentItems)
-        {
-            Logger.Log("<- name: " + contentItems);
-            for (int i = 0; i <= contentItems.Count - 1; i++)
-            {
-                ClickAddContentItem();
-                FillContentItems(contentItems, i);
-            }
             Logger.Log("->");
         }
 
@@ -156,13 +153,6 @@ namespace Application.Helper.Helpers
         private void SetTitle(string title, int index)
         {
             TypeText(By.XPath(string.Format("(//*[@class='cz-authoring-ci-title'])[{0}]", index)), title);
-        }
-
-        private void ClickAddContentItem()
-        {
-            Logger.Log("<-");
-            Click(By.XPath("//*[@class='ui-dialog-buttonset']/*[2]"));
-            Logger.Log("->");
         }
     }
 }

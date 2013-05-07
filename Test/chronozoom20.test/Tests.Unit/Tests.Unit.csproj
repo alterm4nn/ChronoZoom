@@ -66,7 +66,7 @@
     <Content Include="Scripts\Js\timescale.js" />
     <Content Include="Scripts\Specs\authoringSpec.js" />
     <Content Include="Scripts\Specs\CommonSpec.js" />
-    <Content Include="Scripts\Specs\CsvParseSpec.js" />
+    <Content Include="Scripts\Specs\CsvParse.js" />
     <Content Include="Scripts\Specs\datesSpec.js" />
     <Content Include="Scripts\Specs\TimeScaleSpec.js" />
     <Content Include="Scripts\Utils\jasmine-jquery.js" />

@@ -15,12 +15,24 @@ namespace Application.Helper.Helpers
             _manager = new HelperManager();
         }
 
+        public void OpenPage()
+        {
+            _manager.GetNavigationHelper().OpenHomePage();
+            WaitWhileHomePageIsLoaded();
+        }
+        
+        public void OpenSandboxPage()
+        {
+            _manager.GetNavigationHelper().OpenSandboxPage();
+            WaitWhileHomePageIsLoaded();
+        }
+
         public string GetEukaryoticCellsDescription()
         {
             Logger.Log("<-");
             _manager.GetNavigationHelper().OpenExhibitEukaryoticCells();
             Logger.Log("ExhibitEukaryotic Cell is opened");
-            string description = GetText(By.XPath("//*[@id='vc']/*[@class='contentItemDescription']/div"));
+            string description = _manager.GetExhibitHelper().GetContentItemDescription();
             Logger.Log("-> description: " + description);
             return description;
         }
@@ -59,15 +71,6 @@ namespace Application.Helper.Helpers
             WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='Roman History']"));
             WaitAnimation();
             Logger.Log("->");
-        }
-
-        public string GetLastBreadcrumbs()
-        {
-            Logger.Log("<-");
-            WaitAnimation();
-            string result = GetText(By.XPath("//*[@id='breadCrumbsTable']/*/tr/td[last()]/div"));
-            Logger.Log("-> Last Breadcrumbs: " + result);
-            return result;
         }
 
         public void MoveMouseToCenter()
@@ -147,6 +150,17 @@ namespace Application.Helper.Helpers
         public void WaitWhileHomePageIsLoaded()
         {
             WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("CZ.Common.cosmosVisible != undefined")), 60);
+            Sleep(2);
+            WaitAjaxComplete(10);
+        }
+
+        public string GetLastBreadcrumbs()
+        {
+            Logger.Log("<-");
+            WaitAnimation();
+            string result = GetText(By.XPath("//*[@id='breadcrumbs-table']/*/tr/td[last()]/div"));
+            Logger.Log("-> Last Breadcrumbs: " + result);
+            return result;
         }
     }
 }

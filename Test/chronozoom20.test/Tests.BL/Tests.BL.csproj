@@ -65,9 +65,7 @@
     <Content Include="Scripts\Js\newauthoring.js" />
     <Content Include="Scripts\Js\settings.js" />
     <Content Include="Scripts\Specs\authoringSpec.js" />
-    <Content Include="Scripts\Specs\commonSpec.js" />
     <Content Include="Scripts\Specs\contentItemEditFormSpec.js" />
-    <Content Include="Scripts\Specs\csvParseSpec.js" />
     <Content Include="Scripts\Specs\exhibitEditFormSpec.js" />
     <Content Include="Scripts\Specs\timelineEditFormSpec.js" />
     <Content Include="Scripts\Specs\timescaleSpec.js" />

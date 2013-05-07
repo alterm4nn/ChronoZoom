@@ -19,7 +19,7 @@ namespace Tests
         {
             BrowserStateManager.RefreshState();
             NavigationHelper.OpenHomePage();
-            WelcomeScreenHelper.CloseWelcomePopupWithOutWaiting();
+            WelcomeScreenHelper.CloseWelcomePopup();
         }
 
         [ClassCleanup]

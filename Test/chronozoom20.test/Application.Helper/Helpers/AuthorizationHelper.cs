@@ -115,7 +115,7 @@ namespace Application.Helper.Helpers
         {
             var document = new XmlDocument();
             document.Load(GetValidAcountsXmlPath());
-
+            
             switch (user.Type)
             {
                 case UserType.Google:
