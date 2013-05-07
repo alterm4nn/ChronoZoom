@@ -34,7 +34,10 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<- timeline: " + timeline);
             NavigateToTimeLine(timeline);
-            DeleteTimelineByJavaScript(timeline);
+            InitTimelineEditMode();
+            InitEditForm();
+            ClickDelete();
+            ConfirmDeletion();
             Logger.Log("->");
         }
 
