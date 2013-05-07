@@ -33,6 +33,16 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
+        public void Search_Take_Our_Survey_Artifact()
+        {
+            Logger.Log("<-");
+            TypeSearchString("Take our survey");
+            WaitSearchProcess();
+            NavigateToSearchResult("Take our Survey");
+            WaitNavigationToChronozoomProject();
+            Logger.Log("->");
+        }
+
         private void TypeSearchString(string searchText)
         {
             Logger.Log("<- text: " + searchText);
@@ -67,6 +77,14 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<-");
             WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='Genus Homo']"));
+            WaitAnimation();
+            Logger.Log("->");
+        }    
+        
+        private void WaitNavigationToChronozoomProject()
+        {
+            Logger.Log("<-");
+            WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='ChronoZoom Project']"));
             WaitAnimation();
             Logger.Log("->");
         }

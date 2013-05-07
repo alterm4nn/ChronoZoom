@@ -79,6 +79,14 @@ namespace Application.Helper.Helpers
             }
         }
 
+        public string GetContentItemDescription()
+        {
+            Logger.Log("<-");
+            string description = GetText(By.XPath("//*[@id='vc']/*[@class='contentItemDescription']/div"));
+            Logger.Log("-> description: " + description);
+            return description;
+        }
+
         private void SaveAndClose()
         {
             Logger.Log("<-");

@@ -20,7 +20,7 @@ namespace Application.Helper.Helpers
             Logger.Log("<-");
             _manager.GetNavigationHelper().OpenExhibitEukaryoticCells();
             Logger.Log("ExhibitEukaryotic Cell is opened");
-            string description = GetText(By.XPath("//*[@id='vc']/*[@class='contentItemDescription']/div"));
+            string description = _manager.GetExhibitHelper().GetContentItemDescription();
             Logger.Log("-> description: " + description);
             return description;
         }
