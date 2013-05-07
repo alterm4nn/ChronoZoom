@@ -602,8 +602,15 @@ namespace UI
 
                 superCollection.Collections.Add(personalCollection);
 
+                // Add root timeline Cosmos to the personal collection
+                Timeline rootTimeline = new Timeline { Id = Guid.NewGuid(), Title = "Cosmos" , Regime = "Cosmos" };
+                rootTimeline.FromYear = -13700000000;
+                rootTimeline.ToYear = 9999;
+                rootTimeline.Collection = personalCollection;
+
                 _storage.SuperCollections.Add(superCollection);
                 _storage.Collections.Add(personalCollection);
+                _storage.Timelines.Add(rootTimeline);
                 _storage.SaveChanges();
 
                 Trace.TraceInformation("Personal collection saved.");
