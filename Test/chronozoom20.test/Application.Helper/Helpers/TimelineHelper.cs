@@ -15,6 +15,7 @@ namespace Application.Helper.Helpers
             DrawTimeline();
             SetTimelineName(timeline.Title);
             CreateTimeline();
+            WaitAjaxComplete(60);
             Logger.Log("->");
         }
 
@@ -33,10 +34,7 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<- timeline: " + timeline);
             NavigateToTimeLine(timeline);
-            InitTimelineEditMode();
-            InitEditForm();
-            ClickDelete();
-            ConfirmDeletion();
+            DeleteTimelineByJavaScript(timeline);
             Logger.Log("->");
         }
 
@@ -44,7 +42,7 @@ namespace Application.Helper.Helpers
         public void DeleteTimelineByJavaScript(Timeline timeline)
         {
             Logger.Log("<-");
-            ExecuteJavaScript(string.Format("CZ.Service.deleteTimeline({0})", Javascripts.LastCanvasElement));
+            ExecuteJavaScript(string.Format("CZ.Authoring.removeTimeline({0})", Javascripts.LastCanvasElement));
             Logger.Log("->");
         }
 
@@ -53,13 +51,12 @@ namespace Application.Helper.Helpers
             Logger.Log("<- timeline: " + newTimeline);
             try
             {
-                ExecuteJavaScript(string.Format("CZ.Search.goToSearchResult('{0}')", newTimeline.TimelineId));
+                ExecuteJavaScript(string.Format("CZ.Search.goToSearchResult('{0}', 'timeline')", newTimeline.TimelineId));
                 Logger.Log("-> true");
                 return true;
             }
             catch (UnhandledAlertException)
             {
-
                 AcceptAlert();
                 Logger.Log("-> false");
                 return false;
@@ -73,12 +70,12 @@ namespace Application.Helper.Helpers
 
         private void ClickDelete()
         {
-            Click(By.XPath("//*[text()='delete']"));
+            Click(By.XPath("//*[@id='auth-edit-timeline-form']//*[@class='cz-form-delete cz-button']"));
         }
 
         private void InitEditForm()
         {
-            MoveToElementAndClick(By.ClassName("virtualCanvasLayerCanvas"));
+            ExecuteJavaScript("CZ.Authoring.showEditTimelineForm(CZ.Authoring.selectedTimeline)");
         }
 
         private void InitTimelineEditMode()
@@ -90,6 +87,7 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<-");
             ExecuteJavaScript(string.Format("CZ.Search.goToSearchResult('{0}')", timeline.TimelineId));
+            MoveToElementAndClick(By.ClassName("virtualCanvasLayerCanvas"));
             Logger.Log("->");
         }
 
