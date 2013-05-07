@@ -14,7 +14,7 @@ namespace Application.Helper.Helpers
             InitTimelineCreationMode();
             DrawTimeline();
             SetTimelineName(timeline.Title);
-            SaveAndClose();
+            CreateTimeline();
             Logger.Log("->");
         }
 
@@ -93,15 +93,15 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
-        private void SaveAndClose()
+        private void CreateTimeline()
         {
-            Click(By.ClassName("ui-dialog-buttonset"));
+            Click(By.XPath("//*[@id='auth-edit-timeline-form']//*[@class='cz-form-save cz-button']"));
         }
 
         private void SetTimelineName(string timelineName)
         {
             Logger.Log("<- timeline: " + timelineName);
-            TypeText(By.Id("timelineTitleInput"), timelineName);
+            TypeText(By.XPath("//*[@id='auth-edit-timeline-form']//*[@class='cz-form-item-title cz-input']"), timelineName);
             Logger.Log("->");
         }
 
@@ -115,7 +115,8 @@ namespace Application.Helper.Helpers
         private void InitTimelineCreationMode()
         {
             Logger.Log("<-");
-            MoveToElementAndClick(By.XPath("//*[@id='footer-authoring']/a[1]"));
+            MoveToElementAndClick(By.XPath("//*[@title='Create your events']"));
+            MoveToElementAndClick(By.XPath("//button[text()='create timeline']"));
             Logger.Log("->");
         }
 
