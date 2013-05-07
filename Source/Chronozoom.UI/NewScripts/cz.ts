@@ -332,7 +332,7 @@ module CZ {
             $('#welcomeScreenCloseButton')
                 .mouseover(() => { CZ.Common.toggleOnImage('welcomeScreenCloseButton', 'png'); })
                 .mouseout(() => { CZ.Common.toggleOffImage('welcomeScreenCloseButton', 'png'); })
-                .click(CZ.Common.hideWelcomeScreen);
+                .click(CZ.Common.startExploring);
             $('#startExploringButton')
                 .click(CZ.Common.startExploring);
 
@@ -347,7 +347,7 @@ module CZ {
                 });
 
                 $("#welcomeScreenBack").click(function () {
-                    CZ.Common.hideWelcomeScreen();
+                    CZ.Common.startExploring();
                 });
             }
 
