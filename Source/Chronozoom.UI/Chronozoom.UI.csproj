@@ -615,10 +615,6 @@
   <ItemGroup>
     <Content Include="NewStyles\cz.datepicker.css" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Properties\PublishProfiles\cz-july2013-wahib-test - FTP.pubxml" />
-    <None Include="Properties\PublishProfiles\cz-july2013-wahib-test - Web Deploy.pubxml" />
-  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
