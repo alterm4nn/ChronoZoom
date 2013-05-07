@@ -3,7 +3,7 @@
 module CZ {
     export module UI {
 
-        export interface FormBaseInfo {
+        export interface IFormBaseInfo {
             activationSource: JQuery;
             prevForm?: FormBase;
             navButton: string;
@@ -20,7 +20,7 @@ module CZ {
             public container: JQuery;
             public prevForm: FormBase;
 
-            constructor(container: JQuery, formInfo: FormBaseInfo) {
+            constructor(container: JQuery, formInfo: IFormBaseInfo) {
                 if (!(container instanceof jQuery && container.is("div"))) {
                     throw "Container parameter is invalid! It should be jQuery instance of DIV.";
                 }

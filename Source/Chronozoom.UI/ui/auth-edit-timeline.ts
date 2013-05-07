@@ -5,7 +5,7 @@
 
 module CZ {
     export module UI {
-        export interface FormEditTimelineInfo extends CZ.UI.FormBaseInfo {
+        export interface IFormEditTimelineInfo extends CZ.UI.IFormBaseInfo {
             startDate: string;
             endDate: string;
             saveButton: string;
@@ -25,7 +25,7 @@ module CZ {
             private isCancel: bool;
 
             // We only need to add additional initialization in constructor.
-            constructor(container: JQuery, formInfo: FormEditTimelineInfo) {
+            constructor(container: JQuery, formInfo: IFormEditTimelineInfo) {
                 super(container, formInfo);
 
                 this.saveButton = container.find(formInfo.saveButton);
@@ -63,7 +63,13 @@ module CZ {
 
                 this.titleInput.val(this.timeline.title);
                 this.startDate.setDate(this.timeline.x);
-                this.endDate.setDate(this.timeline.x + this.timeline.width);
+
+                if (this.timeline.endDate === 9999) {
+                    this.endDate.setDate(this.timeline.endDate);
+                }
+                else {
+                    this.endDate.setDate(this.timeline.x + this.timeline.width);
+                }
 
                 this.saveButton.click(event => {
                     var isValid = CZ.Authoring.ValidateTimelineData(this.startDate.getDate(), this.endDate.getDate(), this.titleInput.val());
