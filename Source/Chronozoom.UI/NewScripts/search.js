@@ -80,15 +80,15 @@ var CZ;
             }
         }
         Search.navigateToBookmark = navigateToBookmark;
-        function goToSearchResult(resultId) {
-            var element = CZ.Common.vc.virtualCanvas("findElement", resultId);
+        function goToSearchResult(resultId, elementType) {
+            var element = findVCElement(CZ.Common.vc.virtualCanvas("getLayerContent"), resultId, elementType);
             var navStringElement = CZ.UrlNav.vcelementToNavString(element);
             var visible = CZ.UrlNav.navStringToVisible(navStringElement, CZ.Common.vc);
             CZ.Common.controller.moveToVisible(visible);
         }
         Search.goToSearchResult = goToSearchResult;
-        function findVCElement(root, id) {
-            var lookingForCI = id.charAt(0) === 'c';
+        function findVCElement(root, id, elementType) {
+            var lookingForCI = elementType === "contentItem";
             var rfind = function (el, id) {
                 if(el.id === id) {
                     return el;
@@ -139,15 +139,19 @@ var CZ;
                                 continue;
                             }
                             var resultId;
+                            var elementType;
                             switch(item.objectType) {
                                 case 0:
                                     resultId = 'e' + item.id;
+                                    elementType = "exhibit";
                                     break;
                                 case 1:
                                     resultId = 't' + item.id;
+                                    elementType = "timeline";
                                     break;
                                 case 2:
                                     resultId = item.id;
+                                    elementType = "contentItem";
                                     break;
                                 default:
                                     continue;
@@ -164,9 +168,9 @@ var CZ;
                                 resultId: resultId,
                                 text: results[i].title,
                                 click: function () {
-                                    goToSearchResult(this.getAttribute("resultId"));
+                                    goToSearchResult(this.getAttribute("resultId"), this.getAttribute("data-element-type"));
                                 }
-                            }).appendTo(output);
+                            }).attr("data-element-type", elementType).appendTo(output);
                         }
                     };
                     addResults(1, "Timelines");
