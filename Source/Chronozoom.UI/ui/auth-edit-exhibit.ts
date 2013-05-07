@@ -5,7 +5,7 @@
 
 module CZ {
     export module UI {
-        export interface FormEditExhibitInfo extends FormBaseInfo {
+        export interface IFormEditExhibitInfo extends IFormBaseInfo {
             titleTextblock: string;
             titleInput: string;
             datePicker: string;
@@ -38,7 +38,7 @@ module CZ {
 
             public clickedListItem: ContentItemListItem; // the contentitem on which the user dbl clicked
 
-            constructor(container: JQuery, formInfo: FormEditExhibitInfo) {
+            constructor(container: JQuery, formInfo: IFormEditExhibitInfo) {
                 super(container, formInfo);
 
                 this.titleTextblock = container.find(formInfo.titleTextblock);

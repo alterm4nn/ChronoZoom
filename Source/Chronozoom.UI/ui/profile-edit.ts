@@ -6,7 +6,7 @@
 module CZ {
     export module UI {
 
-        export interface FormEditProfileInfo extends CZ.UI.FormBaseInfo {
+        export interface FormEditProfileInfo extends CZ.UI.IFormBaseInfo {
             saveButton: string;
             logoutButton: string;
             usernameInput: string;
