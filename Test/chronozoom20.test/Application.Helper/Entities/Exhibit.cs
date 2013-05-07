@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-
-namespace Application.Helper.Entities
+﻿namespace Application.Helper.Entities
 {
     public class Exhibit : Chronozoom.Entities.Exhibit
     {
