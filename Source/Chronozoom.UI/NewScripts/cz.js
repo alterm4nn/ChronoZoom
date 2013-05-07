@@ -189,20 +189,22 @@ var CZ;
                 $("#edit_profile_button").click(function () {
                     profileForm.show();
                 });
-                CZ.Service.getProfile().done(function (data) {
-                    if(data == "") {
+                if(IsFeatureEnabled("Login")) {
+                    CZ.Service.getProfile().done(function (data) {
+                        if(data == "") {
+                            $("#login-panel").show();
+                        } else if(data != "" && data.DisplayName == null) {
+                            $("#profile-panel").show();
+                            $("#profile-panel input#username").focus();
+                            profileForm.show();
+                        } else {
+                            $("#profile-panel").show();
+                            $("#profile-panel span.auth-panel-login").html(data.DisplayName);
+                        }
+                    }).fail(function (error) {
                         $("#login-panel").show();
-                    } else if(data != "" && data.DisplayName == null) {
-                        $("#profile-panel").show();
-                        $("#profile-panel input#username").focus();
-                        profileForm.show();
-                    } else {
-                        $("#profile-panel").show();
-                        $("#profile-panel span.auth-panel-login").html(data.DisplayName);
-                    }
-                }).fail(function (error) {
-                    $("#login-panel").show();
-                });
+                    });
+                }
                 var loginForm = new CZ.UI.FormLogin(forms[6], {
                     activationSource: $(".header-icon.profile-icon"),
                     navButton: ".cz-form-nav",
@@ -300,8 +302,9 @@ var CZ;
                     CZ.Common.closeWelcomeScreen();
                 });
             }
-            _featureMap.forEach(function (feature) {
+            for(var idxFeature = 0; idxFeature < _featureMap.length; idxFeature++) {
                 var enabled = true;
+                var feature = _featureMap[idxFeature];
                 if(feature.Activation === FeatureActivation.Disabled) {
                     enabled = false;
                 }
@@ -311,10 +314,11 @@ var CZ;
                 if(feature.Activation === FeatureActivation.RootCollection && !rootCollection) {
                     enabled = false;
                 }
+                _featureMap[idxFeature].IsEnabled = enabled;
                 if(!enabled) {
                     $(feature.JQueryReference).css("display", "none");
                 }
-            });
+            }
             if(!rootCollection) {
                 CZ.Authoring.isEnabled = true;
             }
@@ -505,6 +509,12 @@ var CZ;
                 $("#bibliographyBack").css("display", "block");
             }
         });
+        function IsFeatureEnabled(featureName) {
+            var feature = $.grep(_featureMap, function (e) {
+                return e.Name === featureName;
+            });
+            return feature[0].IsEnabled;
+        }
     })(CZ.HomePageViewModel || (CZ.HomePageViewModel = {}));
     var HomePageViewModel = CZ.HomePageViewModel;
 })(CZ || (CZ = {}));
