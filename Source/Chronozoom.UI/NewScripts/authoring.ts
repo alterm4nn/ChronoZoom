@@ -720,22 +720,19 @@ module CZ {
             while (contentItems[i] != null) {
                 var ci = contentItems[i];
                 isValid = isValid && CZ.Authoring.IsNotEmpty(ci.title) && CZ.Authoring.IsNotEmpty(ci.uri) && CZ.Authoring.IsNotEmpty(ci.mediaType);
-                if (ci.mediaType == "Image") {
+                if (ci.mediaType.toLowerCase() === "image") {
                     var imageReg = /\.(jpg|jpeg|png)$/i;
                     if (!imageReg.test(ci.uri)) {
                         alert("Sorry, only JPG/PNG images are supported");
                         isValid = false;
                     }
-                } else if (ci.mediaType == "Video") {
+                } else if (ci.mediaType.toLowerCase() === "video") {
                     //YouTube
-                    //Input: https://www.youtube.com/watch?v=j5-yKhDd64s
-                    //Output: http://www.youtube.com/embed/j5-yKhDd64s
-                    var youtube = /www\.youtube\.com\/watch\?v=([a-z0-9\-]+)/i;
+                    // from http://stackoverflow.com/questions/3452546/javascript-regex-how-to-get-youtube-video-id-from-url
+                    var youtube = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
                     var youtubeEmbed = /www.\youtube\.com\/embed\/([a-z0-9\-]+)/i;
 
                     //Vimeo
-                    //Input: http://vimeo.com/28095551
-                    //Output: http://player.vimeo.com/video/28095551
                     var vimeo = /vimeo\.com\/([0-9]+)/i
                     var vimeoEmbed = /player.vimeo.com\/video\/([0-9]+)/i
 
@@ -752,7 +749,7 @@ module CZ {
                         isValid = false;
                     }
 
-                } else if (ci.mediaType == "PDF") {
+                } else if (ci.mediaType.toLowerCase() === "pdf") {
                     //Google PDF viewer
                     //Example: http://docs.google.com/viewer?url=http%3A%2F%2Fwww.selab.isti.cnr.it%2Fws-mate%2Fexample.pdf&embedded=true
                     var pdf = /\.(pdf)$/i;

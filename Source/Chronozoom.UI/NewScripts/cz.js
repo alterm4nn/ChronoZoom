@@ -289,8 +289,8 @@ var CZ;
                 CZ.Common.toggleOnImage('welcomeScreenCloseButton', 'png');
             }).mouseout(function () {
                 CZ.Common.toggleOffImage('welcomeScreenCloseButton', 'png');
-            }).click(CZ.Common.hideWelcomeScreen);
-            $('#closeWelcomeScreenButton').click(CZ.Common.closeWelcomeScreen);
+            }).click(CZ.Common.startExploring);
+            $('#welcomeScreenStartButton').click(CZ.Common.startExploring);
             var wlcmScrnCookie = CZ.Common.getCookie("welcomeScreenDisallowed");
             if(wlcmScrnCookie != null) {
                 CZ.Common.hideWelcomeScreen();
@@ -299,7 +299,7 @@ var CZ;
                     e.stopPropagation();
                 });
                 $("#welcomeScreenBack").click(function () {
-                    CZ.Common.closeWelcomeScreen();
+                    CZ.Common.startExploring();
                 });
             }
             for(var idxFeature = 0; idxFeature < _featureMap.length; idxFeature++) {
