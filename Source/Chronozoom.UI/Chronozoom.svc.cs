@@ -387,7 +387,7 @@ namespace UI
                     return string.Empty;
                 }
 
-                Uri collectionUri, uriRequest;
+                Uri collectionUri;
 
                 if (user == null)
                 {
@@ -402,8 +402,7 @@ namespace UI
                     }
 
                     collectionUri = UpdatePersonalCollection(user.NameIdentifier, userRequest);
-                    uriRequest = System.ServiceModel.OperationContext.Current.RequestContext.RequestMessage.Headers.To;
-                    return new Uri(new Uri(uriRequest.GetLeftPart(UriPartial.Authority)), collectionUri.ToString()).ToString();
+                    return collectionUri.ToString();
                 }
 
                 User updateUser = _storage.Users.Where(candidate => candidate.DisplayName == userRequest.DisplayName).FirstOrDefault();
@@ -413,7 +412,7 @@ namespace UI
                     User newUser = new User { Id = Guid.NewGuid(), DisplayName = userRequest.DisplayName, Email = userRequest.Email };
                     newUser.NameIdentifier = user.NameIdentifier;
                     newUser.IdentityProvider = user.IdentityProvider;
-                    collectionUri = UpdatePersonalCollection(userRequest.NameIdentifier, newUser);
+                    collectionUri = UpdatePersonalCollection(user.NameIdentifier, newUser);
                 }
                 else
                 {
@@ -424,12 +423,11 @@ namespace UI
                     }
 
                     updateUser.Email = userRequest.Email;
-                    collectionUri = UpdatePersonalCollection(updateUser.NameIdentifier, updateUser);
+                    collectionUri = UpdatePersonalCollection(user.NameIdentifier, updateUser);
                     _storage.SaveChanges();
                 }
 
-                uriRequest = System.ServiceModel.OperationContext.Current.RequestContext.RequestMessage.Headers.To;
-                return new Uri(new Uri(uriRequest.GetLeftPart(UriPartial.Authority)), collectionUri.ToString()).ToString();
+                return collectionUri.ToString();
             });
         }
 
@@ -516,6 +514,24 @@ namespace UI
                 _storage.Users.Remove(deleteUser);
                 _storage.SaveChanges();
                 return;
+            });
+        }
+
+        [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/user", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        public User GetUser()
+        {
+            return AuthenticatedOperation(delegate(User user)
+            {
+                Trace.TraceInformation("Get User");
+                if (user == null)
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
+                    return null;
+                }
+                var u = _storage.Users.Where(candidate => candidate.NameIdentifier == user.NameIdentifier).FirstOrDefault();
+                if (u != null) return u;
+                return user;
             });
         }
 
@@ -835,7 +851,7 @@ namespace UI
                 }
 
                 Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
-                Collection collection = _storage.Collections.Find(collectionGuid);
+                Collection collection = RetrieveCollection(collectionGuid);
                 if (collection == null)
                 {
                     // Collection does not exist
@@ -955,7 +971,7 @@ namespace UI
                 }
 
                 Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName); ;
-                Collection collection = _storage.Collections.Find(collectionGuid);
+                Collection collection = RetrieveCollection(collectionGuid);
                 if (collection == null)
                 {
                     SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
@@ -1056,7 +1072,7 @@ namespace UI
                 }
 
                 Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
-                Collection collection = _storage.Collections.Find(collectionGuid);
+                Collection collection = RetrieveCollection(collectionGuid);
                 if (collection == null)
                 {
                     // Collection does not exist
@@ -1249,7 +1265,7 @@ namespace UI
                 }
 
                 Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
-                Collection collection = _storage.Collections.Find(collectionGuid);
+                Collection collection = RetrieveCollection(collectionGuid);
                 if (collection == null)
                 {
                     SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
@@ -1320,7 +1336,7 @@ namespace UI
                 }
 
                 Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
-                Collection collection = _storage.Collections.Find(collectionGuid);
+                Collection collection = RetrieveCollection(collectionGuid);
 
                 if (collection == null)
                 {
@@ -1395,7 +1411,7 @@ namespace UI
                 }
 
                 Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
-                Collection collection = _storage.Collections.Find(collectionGuid);
+                Collection collection = RetrieveCollection(collectionGuid);
                 if (collection == null)
                 {
                     SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
@@ -1559,7 +1575,7 @@ namespace UI
         private void CacheGetTimelines(Timeline timeline, Guid collectionId, string start, string end, string minspan, string lca, string maxElements)
         {
             string cacheKey = string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}|{5}", collectionId, start, end, minspan, lca, maxElements);
-            if (!Cache.Contains(cacheKey))
+            if (!Cache.Contains(cacheKey) && timeline != null)
             {
                 Cache.Add(cacheKey, timeline, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
             }
