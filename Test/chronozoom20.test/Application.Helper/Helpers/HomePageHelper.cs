@@ -61,15 +61,6 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
-        public string GetLastBreadcrumbs()
-        {
-            Logger.Log("<-");
-            WaitAnimation();
-            string result = GetText(By.XPath("//*[@id='breadCrumbsTable']/*/tr/td[last()]/div"));
-            Logger.Log("-> Last Breadcrumbs: " + result);
-            return result;
-        }
-
         public void MoveMouseToCenter()
         {
             Logger.Log("<-");
@@ -147,6 +138,15 @@ namespace Application.Helper.Helpers
         public void WaitWhileHomePageIsLoaded()
         {
             WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("CZ.Common.cosmosVisible != undefined")), 60);
+        }
+
+        public string GetLastBreadcrumbs()
+        {
+            Logger.Log("<-");
+            WaitAnimation();
+            string result = GetText(By.XPath("//*[@id='breadcrumbs-table']/*/tr/td[last()]/div"));
+            Logger.Log("-> Last Breadcrumbs: " + result);
+            return result;
         }
     }
 }

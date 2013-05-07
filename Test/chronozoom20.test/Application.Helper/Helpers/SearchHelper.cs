@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+﻿using Application.Driver;
 using Application.Helper.UserActions;
 using OpenQA.Selenium;
 
@@ -10,35 +8,51 @@ namespace Application.Helper.Helpers
     {
         public void InitSearchWindow()
         {
+            Logger.Log("<-");
             Click(By.Id("search_button"));
+            Logger.Log("->");
         }
 
-        public void TypeSearchString(string searchText)
+        public void SearchMayanHistoryTimeline()
         {
+            Logger.Log("<-");
+            TypeSearchString("Mayan");
+            WaitSearchProcess();
+            NavigateToSearchResult("Mayan History");
+            WaitNavigationToMayan();
+            Logger.Log("->");
+        }
+
+        private void TypeSearchString(string searchText)
+        {
+            Logger.Log("<- text: " + searchText);
             TypeText(By.Id("searchTextBox"),searchText);
+            Logger.Log("->");
         }
 
-        public void WaitSearchProcess()
+        private void WaitSearchProcess()
         {
+            Logger.Log("<-");
             WaitForElementIsDisplayed(By.Id("loadingImage"));
             WaitForElementIsNotDisplayed(By.Id("loadingImage"));
+            Logger.Log("->");
         }
 
-        public void NavigateToSearchResult(string name)
+        private void NavigateToSearchResult(string name)
         {
+            Logger.Log("<- result: " + name);
             MoveToElementAndClick(By.XPath(string.Format("//*[@class='searchResult' and text()='{0}']",name)));
+            Logger.Log("->");
         }
 
-
-        public void WaitNavigationToMayan()
+        private void WaitNavigationToMayan()
         {
+            Logger.Log("<-");
             WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='Mayan History']"));
             WaitAnimation();
+            Logger.Log("->");
         }
 
-        public string GetLastBreadcrumbsText()
-        {
-            return GetText(By.XPath("//*[@id='breadcrumbs-table']/*/*/*[last()]/div"));
-        }
+
     }
 }
