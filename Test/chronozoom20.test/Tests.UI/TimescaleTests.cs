@@ -42,7 +42,7 @@ namespace Tests
         public void TestCleanup()
         {
             CreateScreenshotsIfTestFail(TestContext);
-            NavigationHelper.NavigateToCosmos();
+            HomePageHelper.OpenPage();
         }
 
         #endregion 

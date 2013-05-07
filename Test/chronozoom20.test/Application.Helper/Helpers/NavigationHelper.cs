@@ -10,13 +10,11 @@ namespace Application.Helper.Helpers
         public void OpenHomePage()
         {
             OpenUrl(Configuration.BaseUrl);
-            WaitPageLoading();
         }  
         
         public void OpenSandboxPage()
         {
             OpenUrl(Configuration.BaseUrl + "/sandbox/sandbox/");
-            WaitPageLoading();
         }
 
         public void OpenExhibitEukaryoticCells()
@@ -70,14 +68,5 @@ namespace Application.Helper.Helpers
             WaitForElementEnabled(by);
             Click(by);
         }
-
-        private void WaitPageLoading()
-        {
-            WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("CZ.Common.cosmosVisible != undefined")), 60);
-            Sleep(2);
-            WaitAjaxComplete(10);
-        }
-
-
     }
 }

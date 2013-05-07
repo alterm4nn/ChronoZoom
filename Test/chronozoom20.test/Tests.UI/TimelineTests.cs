@@ -15,7 +15,7 @@ namespace Tests
         public static void ClassInitialize(TestContext testContext)
         {
             BrowserStateManager.RefreshState();
-            NavigationHelper.OpenSandboxPage();
+            HomePageHelper.OpenSandboxPage();
             
             _timeline = new Timeline { Title = "WebdriverTitle" };
             HomePageHelper.DeleteAllElementsLocally();

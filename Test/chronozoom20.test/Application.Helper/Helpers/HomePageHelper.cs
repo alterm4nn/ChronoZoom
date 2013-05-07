@@ -15,6 +15,18 @@ namespace Application.Helper.Helpers
             _manager = new HelperManager();
         }
 
+        public void OpenPage()
+        {
+            _manager.GetNavigationHelper().OpenHomePage();
+            WaitWhileHomePageIsLoaded();
+        }
+        
+        public void OpenSandboxPage()
+        {
+            _manager.GetNavigationHelper().OpenSandboxPage();
+            WaitWhileHomePageIsLoaded();
+        }
+
         public string GetEukaryoticCellsDescription()
         {
             Logger.Log("<-");
@@ -138,6 +150,8 @@ namespace Application.Helper.Helpers
         public void WaitWhileHomePageIsLoaded()
         {
             WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("CZ.Common.cosmosVisible != undefined")), 60);
+            Sleep(2);
+            WaitAjaxComplete(10);
         }
 
         public string GetLastBreadcrumbs()

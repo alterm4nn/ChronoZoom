@@ -37,7 +37,7 @@ namespace Tests
         public void TestInitialize()
         {
             BrowserStateManager.RefreshState();
-            NavigationHelper.OpenHomePage();
+            HomePageHelper.OpenSandboxPage();
             HomePageHelper.DeleteAllElementsLocally();
         }
 
