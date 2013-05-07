@@ -117,8 +117,7 @@ namespace Application.Helper.Helpers
             Click(By.XPath("(//*[@class='footer-link'])[1]"));
             Logger.Log("->");
         }
-
-
+        
         public void OpenPrivacyLink()
         {
             Logger.Log("<-");
