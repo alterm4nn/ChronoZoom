@@ -59,11 +59,7 @@ var CZ;
                         return;
                     }
                     CZ.Service.putProfile(_this.usernameInput.val(), _this.emailInput.val()).then(function (success) {
-                        _this.usernameInput.prop('disabled', true);
-                        CZ.Service.getProfile().done(function (data) {
-                            _this.loginPanelLogin.html(data.DisplayName);
-                        });
-                        _super.prototype.close.call(_this);
+                        window.location.assign("\\" + success);
                     }, function (error) {
                         alert("Unable to save changes. Please try again later.");
                         console.log(error);
