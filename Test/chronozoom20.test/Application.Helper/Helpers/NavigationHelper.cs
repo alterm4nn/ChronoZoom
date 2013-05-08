@@ -13,7 +13,7 @@ namespace Application.Helper.Helpers
         
         public void OpenSandboxPage()
         {
-            OpenUrl(Configuration.BaseUrl + "/test/test");
+            OpenUrl(Configuration.BaseUrl + "/sandbox/sandbox/");
         }
 
         public void OpenExhibitEukaryoticCells()
