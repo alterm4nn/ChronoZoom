@@ -5,7 +5,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using Chronozoom.Api;
-using Chronozoom.Api.Models;
 using Chronozoom.Entities;
 using Newtonsoft.Json;
 using OuterCurve;
@@ -66,14 +65,7 @@ namespace UI
             Storage.Trace.Listeners.Add(SignalRTraceListener);
 
             RouteTable.Routes.MapHubs();
-            WebApiConfig.Register(GlobalConfiguration.Configuration);
             RegisterRoutes(RouteTable.Routes);
-
-            using (StreamReader file = File.OpenText(HostingEnvironment.ApplicationPhysicalPath + @"/Dumps/wahib-responsedumprest.json"))
-            {
-                JsonSerializer serializer = new JsonSerializer();
-                Globals.Root = (Chronozoom.Api.Models.Timeline)serializer.Deserialize(file, typeof(Chronozoom.Api.Models.Timeline));
-            }
 
             Trace.TraceInformation("Application Starting");
         }
