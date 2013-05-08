@@ -247,9 +247,6 @@
     <Content Include="scripts\viewport-animation.ts" />
     <Content Include="scripts\viewport-controller.ts" />
     <Content Include="scripts\virtual-canvas.ts" />
-    <Content Include="scripts\viewportAnimation.ts" />
-    <Content Include="scripts\viewportController.ts" />
-    <Content Include="scripts\virtualCanvas.ts" />
     <Compile Include="ACS\Hrd\HrdClient.cs" />
     <Compile Include="ACS\Hrd\HrdRequest.cs" />
     <Compile Include="ACS\Models\HrdIdentityProvider.cs" />
@@ -310,7 +307,6 @@
       <DependentUpon>header-edit-profile-form.ts</DependentUpon>
     </Content>
     <Content Include="ui\header-edit-profile-form.ts" />
-    <Content Include="ui\profile-edit.ts" />
     <Content Include="favicon.ico" />
     <Content Include="images\background.jpg" />
     <Content Include="images\backgroundWithBlur.jpg" />
