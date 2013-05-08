@@ -1,4 +1,5 @@
-﻿using Application.Driver;
+﻿using System;
+using Application.Driver;
 using Application.Helper.Constants;
 using Application.Helper.Entities;
 using Application.Helper.UserActions;
@@ -34,7 +35,7 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<- timeline: " + timeline);
             NavigateToTimeLine(timeline);
-            InitTimelineEditMode();
+            WaitAnimation();
             InitEditForm();
             ClickDelete();
             ConfirmDeletion();
@@ -57,9 +58,9 @@ namespace Application.Helper.Helpers
                 Logger.Log("-> true");
                 return true;
             }
-            catch (UnhandledAlertException)
+            catch (Exception)
             {
-                AcceptAlert();
+                //AcceptAlert();
                 Logger.Log("-> false");
                 return false;
             }
@@ -68,6 +69,7 @@ namespace Application.Helper.Helpers
         private void ConfirmDeletion()
         {
             AcceptAlert();
+            MoveToElementAndClick(By.ClassName("virtualCanvasLayerCanvas"));
         }
 
         private void ClickDelete()
@@ -77,19 +79,15 @@ namespace Application.Helper.Helpers
 
         private void InitEditForm()
         {
+            ExecuteJavaScript("CZ.Authoring.isActive = true");
+            ExecuteJavaScript("CZ.Authoring.mode = 'editTimeline'");
             ExecuteJavaScript("CZ.Authoring.showEditTimelineForm(CZ.Authoring.selectedTimeline)");
-        }
-
-        private void InitTimelineEditMode()
-        {
-            MoveToElementAndClick(By.XPath("//*[@id='footer-authoring']/a[2]"));
         }
 
         private void NavigateToTimeLine(Timeline timeline)
         {
             Logger.Log("<-");
             ExecuteJavaScript(string.Format("CZ.Search.goToSearchResult('{0}')", timeline.TimelineId));
-            MoveToElementAndClick(By.ClassName("virtualCanvasLayerCanvas"));
             Logger.Log("->");
         }
 
