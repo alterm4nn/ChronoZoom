@@ -1,6 +1,5 @@
-/// <reference path='../../NewScripts/controls/listboxbase.ts'/>
-
-/// <reference path='../../NewScripts/typings/jquery/jquery.d.ts'/>
+/// <reference path='../../ui/controls/listboxbase.ts'/>
+/// <reference path='../../scripts/typings/jquery/jquery.d.ts'/>
 
 interface IRedGreenListItemInfo extends CZ.UI.IListItemBaseInfo {
     red: {

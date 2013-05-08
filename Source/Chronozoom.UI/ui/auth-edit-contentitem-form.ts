@@ -1,6 +1,6 @@
-/// <reference path='../NewScripts/controls/formbase.ts'/>
-/// <reference path='../NewScripts/authoring.ts'/>
-/// <reference path='../NewScripts/typings/jquery/jquery.d.ts'/>
+/// <reference path='../ui/controls/formbase.ts'/>
+/// <reference path='../scripts/authoring.ts'/>
+/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
 
 module CZ {
     export module UI {
