@@ -75,7 +75,7 @@ namespace Chronozoom.Api.Controllers
             }
 
             // Temporary redirect to sandbox
-            return Redirect("/cz2.html");
+            return Redirect("/cz.html");
         }
 
         // GET: /Account/Logout
@@ -93,7 +93,7 @@ namespace Chronozoom.Api.Controllers
                 fam.SignOut(true);
             }
 
-            return Redirect("/cz2.html");
+            return Redirect("/cz.html");
         }
 
         //[ChildActionOnly]

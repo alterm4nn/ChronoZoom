@@ -52,7 +52,6 @@ namespace Chronozoom.Entities.Migration
             LoadDataFromDump("Sandbox", "beta-get.json", "beta-gettours.json", "beta-getthresholds.json", true, null);
             LoadDataFromDump("AIDS Timeline", "aidstimeline-get.json", "aidstimeline-gettours.json", null, true, _baseContentAdmin.Value);
             LoadDataFromDump("AIDS Standalone", "aidsstandalone-get.json", null, null, true, _baseContentAdmin.Value);
-            LoadDataFromDump("CERN", "cern-get.json", null, null, true, null);
         }
 
 
