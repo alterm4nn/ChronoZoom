@@ -26,6 +26,11 @@ namespace Chronozoom.Entities
         [Key]
         [DataMember(Name="id")]
         public Guid Id { get; set; }
+        
+        /// <summary>
+        /// The depth of the timeline in the timeline tree
+        /// </summary>
+        public int Depth { get; set; }
 
         /// <summary>
         /// The title of the timeline.

@@ -55,6 +55,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="DepthAttrTest.cs" />
     <Compile Include="RITreeTest.cs" />
     <Compile Include="StorageTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
