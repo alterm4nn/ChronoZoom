@@ -904,6 +904,11 @@ namespace UI
                             parentTimeline.ChildTimelines = new System.Collections.ObjectModel.Collection<Timeline>();
                         }
                         parentTimeline.ChildTimelines.Add(newTimeline);
+                        newTimeline.Depth = parentTimeline.Depth + 1;
+                    }
+                    else
+                    {
+                        newTimeline.Depth = 0;
                     }
 
                     _storage.Timelines.Add(newTimeline);
@@ -1109,6 +1114,7 @@ namespace UI
                     newExhibit.Title = exhibitRequest.Title;
                     newExhibit.Year = exhibitRequest.Year;
                     newExhibit.Collection = collection;
+                    newExhibit.Depth = parentTimeline.Depth + 1;
 
                     // Update parent timeline.
                     _storage.Entry(parentTimeline).Collection(_ => _.Exhibits).Load();
@@ -1225,7 +1231,8 @@ namespace UI
                 MediaType = contentItemRequest.MediaType,
                 Uri = contentItemRequest.Uri,
                 MediaSource = contentItemRequest.MediaSource,
-                Attribution = contentItemRequest.Attribution
+                Attribution = contentItemRequest.Attribution,
+                Depth = newExhibit.Depth + 1
             };
             newContentItem.Collection = collection;
 
