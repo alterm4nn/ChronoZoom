@@ -187,8 +187,10 @@ A registered user.
 - [GetThresholds](#getthresholds)
 - [Search](#search)
 - [GetBibliography](#getbibliography)
+- [GetDefaultTours](#getdefaulttours)
 - [GetTours](#gettours)
 - [PutUser](#putuser)
+- [GetServiceInformation](#getserviceinformation)
 - [DeleteUser](#deleteuser)
 - [PutCollectionName](#putcollectionname)
 - [DeleteCollection](#deletecollection)
@@ -327,6 +329,29 @@ The bibliography data in JSON format.
  
 ----------
  
+## GetDefaultTours ##
+ 
+Returns a list of tours for the default collection and default supercollection.
+ 
+**Returns**
+A list of tours in JSON format.
+ 
+**Example**
+ 
+    HTTP verb: GET
+            
+    URL: 
+    http://[site URL]/chronozoom.svc/tours
+    
+
+ 
+**Parameters**
+None.
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
 ## GetTours ##
  
 Returns a list of tours for a given collection or supercollection.
@@ -382,6 +407,20 @@ The URL for the new user collection.
 |Parameter|Value|
 |:--------|:----|
 |userRequest|JSON containing the request details.|
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+## GetServiceInformation ##
+ 
+Provides information about the ChronoZoom service to the clients. Used internally by the ChronoZoom client.
+ 
+**Returns**
+A ServiceInformation object describing parameter from the running service
+ 
+**Parameters**
+None.
  
 [top](#chronozoom-rest-api-reference)
  
