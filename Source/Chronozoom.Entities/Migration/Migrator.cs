@@ -198,6 +198,7 @@ namespace Chronozoom.Entities.Migration
             {
                 if (replaceGuids) timeline.Id = Guid.NewGuid();
                 timeline.Collection = collection;
+                timeline.Depth = 0;
                 MigrateInPlace(timeline);
                 timeline.ForkNode = Storage.ForkNode((long)timeline.FromYear, (long)timeline.ToYear);
                 _storage.Timelines.Add(timeline);
@@ -246,6 +247,14 @@ namespace Chronozoom.Entities.Migration
                 foreach (var exhibit in timeline.Exhibits)
                 {
                     exhibit.Year = ConvertToDecimalYear(exhibit.Day, exhibit.Month, exhibit.Year, exhibit.TimeUnit);
+                    exhibit.Depth = timeline.Depth + 1;
+                    if (exhibit.ContentItems != null)
+                    {
+                        foreach (ContentItem contentItem in exhibit.ContentItems)
+                        {
+                            contentItem.Depth = exhibit.Depth + 1;
+                        }
+                    }
                 }
             }
 
@@ -253,6 +262,7 @@ namespace Chronozoom.Entities.Migration
             {
                 foreach (var child in timeline.ChildTimelines)
                 {
+                    child.Depth = timeline.Depth + 1;
                     MigrateInPlace(child);
                 }
             }
