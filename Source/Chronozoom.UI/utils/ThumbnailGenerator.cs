@@ -13,7 +13,7 @@ using Microsoft.WindowsAzure.Storage.Blob;
 
 using Chronozoom.Entities;
 
-namespace UI.Utils
+namespace Chronozoom.UI.Utils
 {
     /// <summary>
     /// Helper class to generate content item thumbnails.
@@ -38,9 +38,9 @@ namespace UI.Utils
         /// Creates and uploades to storage thumbnails for the given content item.
         /// </summary>
         /// <param name="contentItem"></param>
-        public void CreateThumbnails(ContentItem contentItem)
+        internal void CreateThumbnails(ContentItem contentItem)
         {
-            if (_thumbnailsStorage == null || contentItem.Uri == null || string.Compare(contentItem.MediaType, "Image", true, CultureInfo.InvariantCulture) != 0)
+            if (contentItem == null || _thumbnailsStorage == null || contentItem.Uri == null || string.Compare(contentItem.MediaType, "Image", StringComparison.OrdinalIgnoreCase) != 0)
                 return;
 
             // Retrieve storage account information
@@ -65,45 +65,45 @@ namespace UI.Utils
             WebRequest request = WebRequest.Create(contentItem.Uri);
             using (WebResponse response = request.GetResponse())
             {
-                using (Stream responseStream = response.GetResponseStream())
+                Stream responseStream = response.GetResponseStream();
+                using (Bitmap bitmap = new Bitmap(responseStream))
                 {
-                    using (Bitmap bitmap = new Bitmap(responseStream))
+                    if (response.ContentLength > _maxSourceContentLength)
                     {
-                        if (response.ContentLength > _maxSourceContentLength)
-                        {
-                            throw new InvalidDataException("Source image is too big.");
-                        }
-
-                        SaveUploadThumbnail(imagesContainer, contentItem.Id.ToString(), bitmap, 8);
-                        SaveUploadThumbnail(imagesContainer, contentItem.Id.ToString(), bitmap, 16);
-                        SaveUploadThumbnail(imagesContainer, contentItem.Id.ToString(), bitmap, 32);
-                        SaveUploadThumbnail(imagesContainer, contentItem.Id.ToString(), bitmap, 64);
-                        SaveUploadThumbnail(imagesContainer, contentItem.Id.ToString(), bitmap, 128);
+                        throw new InvalidDataException("Source image is too big.");
                     }
+
+                    SaveUploadThumbnail(imagesContainer, contentItem.Id.ToString(), bitmap, 8);
+                    SaveUploadThumbnail(imagesContainer, contentItem.Id.ToString(), bitmap, 16);
+                    SaveUploadThumbnail(imagesContainer, contentItem.Id.ToString(), bitmap, 32);
+                    SaveUploadThumbnail(imagesContainer, contentItem.Id.ToString(), bitmap, 64);
+                    SaveUploadThumbnail(imagesContainer, contentItem.Id.ToString(), bitmap, 128);
                 }
             }
         }
 
-        private void SaveUploadThumbnail(CloudBlobContainer imagesContainer, string filename, Bitmap bitmap, int dimension)
+        private static void SaveUploadThumbnail(CloudBlobContainer imagesContainer, string filename, Bitmap bitmap, int dimension)
         {
             if (imagesContainer == null)
                 return;
 
-            Bitmap thumbnail = new Bitmap(dimension, dimension);
-
-            Graphics graphics = Graphics.FromImage(thumbnail);
-            graphics.InterpolationMode = InterpolationMode.High;
-            graphics.DrawImage(bitmap, 0, 0, dimension, dimension);
-
-            using (MemoryStream thumbnailStream = new MemoryStream())
+            using (Bitmap thumbnail = new Bitmap(dimension, dimension))
             {
-                thumbnail.Save(thumbnailStream, System.Drawing.Imaging.ImageFormat.Png);
 
-                // Upload thumbnail
-                CloudBlockBlob blockBlob = imagesContainer.GetBlockBlobReference(@"x" + dimension + @"\" + filename + ".png");
+                Graphics graphics = Graphics.FromImage(thumbnail);
+                graphics.InterpolationMode = InterpolationMode.High;
+                graphics.DrawImage(bitmap, 0, 0, dimension, dimension);
 
-                thumbnailStream.Seek(0, SeekOrigin.Begin);
-                blockBlob.UploadFromStream(thumbnailStream);
+                using (MemoryStream thumbnailStream = new MemoryStream())
+                {
+                    thumbnail.Save(thumbnailStream, System.Drawing.Imaging.ImageFormat.Png);
+
+                    // Upload thumbnail
+                    CloudBlockBlob blockBlob = imagesContainer.GetBlockBlobReference(@"x" + dimension + @"\" + filename + ".png");
+
+                    thumbnailStream.Seek(0, SeekOrigin.Begin);
+                    blockBlob.UploadFromStream(thumbnailStream);
+                }
             }
         }
     }

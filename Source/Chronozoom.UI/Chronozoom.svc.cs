@@ -23,10 +23,61 @@ using System.Text;
 using System.Web;
 using Chronozoom.Entities;
 
-using UI.Utils;
+using Chronozoom.UI.Utils;
 
-namespace UI
+namespace Chronozoom.UI
 {
+    [DataContract]
+    public class BaseJsonResult<T>
+    {
+        public BaseJsonResult(T data)
+        {
+            D = data;
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "D")]
+        [DataMember(Name = "d")]
+        public T D { get; set; }
+    }
+
+    /// <summary>
+    /// Provides a structure to retrieve information about this service.
+    /// </summary>
+    [DataContract]
+    public class ServiceInformation
+    {
+        /// <summary>
+        /// The path to download thumbanils from.
+        /// </summary>
+        [DataMember]
+        public Uri ThumbnailsPath { get; set; }
+    }
+
+    public class PutExhibitResult
+    {
+        private List<Guid> _contentItemId;
+
+        public Guid ExhibitId { get; set; }
+        public IEnumerable<Guid> ContentItemId
+        {
+            get
+            {
+                return _contentItemId.AsEnumerable();
+            }
+        }
+
+        internal PutExhibitResult()
+        {
+            _contentItemId = new List<Guid>();
+        }
+
+        internal void Add(Guid id)
+        {
+            _contentItemId.Add(id);
+        }
+    }
+
+    [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
     [SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly", Justification = "No unmanaged handles")]
     [ServiceContract(Namespace = "")]
     [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
@@ -49,7 +100,7 @@ namespace UI
         {
             string maxElements = ConfigurationManager.AppSettings["MaxElementsDefault"];
 
-            return string.IsNullOrEmpty(maxElements) ? 2000 : int.Parse(maxElements);
+            return string.IsNullOrEmpty(maxElements) ? 2000 : int.Parse(maxElements, CultureInfo.InvariantCulture);
         });
 
         // Points to the absolute path where thumbnails are stored
@@ -72,12 +123,6 @@ namespace UI
             return new ThumbnailGenerator(thumbnailStorage);
         });
 
-        // The connection string to thumbnails storage
-        private static Lazy<string> _thumbnailsStorage = new Lazy<string>(() =>
-        {
-            return ConfigurationManager.AppSettings["ThumbnailStorage"];
-        });
-
         // error code descriptions
         private static class ErrorDescription
         {
@@ -96,21 +141,21 @@ namespace UI
             public const string ParentExhibitNonEmpty = "Parent exhibit should not be specified";
             public const string CollectionIdMismatch = "Collection id mismatch";
             public const string UserNotFound = "User not found";
-            public const string SandboxSuperCollectionNotFound = "Default sandbox supercollection not found";
+            public const string SandboxSuperCollectionNotFound = "Default sandbox superCollection not found";
             public const string DefaultUserNotFound = "Default anonymous user not found";
             public const string SuperCollectionNotFound = "SuperCollection not found";
             public const string TimelineRangeInvalid = "Timeline lies outside of bounds of it's parent timeline";
         }
 
         /// <summary>
-        /// Returns timeline data within a specified range of years from a collection or a supercollection.
+        /// Returns timeline data within a specified range of years from a collection or a superCollection.
         /// </summary>
-        /// <param name="supercollection">Name of the supercollection to query.</param>
+        /// <param name="superCollection">Name of the superCollection to query.</param>
         /// <param name="collection">Name of the collection to query.</param>
         /// <param name="start">Year at which to begin the search, between -20000000000 and 9999.</param>
         /// <param name="end">Year at which to end the search, between -20000000000 and 9999.</param>
         /// <param name="minspan">Filters the search results to a particular time scale.</param>
-        /// <param name="lca">Least Common Ancestor, a timeline identifier used to hint the server to retrieve timelines close to this location.</param>
+        /// <param name="commonAncestor">Least Common Ancestor, a timeline identifier used to hint the server to retrieve timelines close to this location.</param>
         /// <param name="maxElements">The maximum number of elements to return.</param>
         /// <returns>Timeline data in JSON format.</returns>
         /// <example><![CDATA[ 
@@ -131,18 +176,19 @@ namespace UI
         /// </example>
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public Timeline GetTimelines(string supercollection, string collection, string start, string end, string minspan, string lca, string maxElements)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "minspan")]
+        public Timeline GetTimelines(string superCollection, string collection, string start, string end, string minspan, string commonAncestor, string maxElements)
         {
             return AuthenticatedOperation(delegate(User user)
             {
                 Trace.TraceInformation("Get Filtered Timelines");
 
-                Guid collectionId = CollectionIdOrDefault(supercollection, collection);
+                Guid collectionId = CollectionIdOrDefault(superCollection, collection);
 
                 // If available, retrieve from cache.
                 if (CanCacheGetTimelines(user, collectionId))
                 {
-                    Timeline cachedTimeline = GetCachedGetTimelines(collectionId, start, end, minspan, lca, maxElements);
+                    Timeline cachedTimeline = GetCachedGetTimelines(collectionId, start, end, minspan, commonAncestor, maxElements);
                     if (cachedTimeline != null)
                     {
                         return cachedTimeline;
@@ -153,8 +199,8 @@ namespace UI
                 decimal startTime = string.IsNullOrWhiteSpace(start) ? _minYear : decimal.Parse(start, CultureInfo.InvariantCulture);
                 decimal endTime = string.IsNullOrWhiteSpace(end) ? _maxYear : decimal.Parse(end, CultureInfo.InvariantCulture);
                 decimal span = string.IsNullOrWhiteSpace(minspan) ? 0 : decimal.Parse(minspan, CultureInfo.InvariantCulture);
-                Guid? lcaParsed = string.IsNullOrWhiteSpace(lca) ? (Guid?)null : Guid.Parse(lca);
-                int maxElementsParsed = string.IsNullOrWhiteSpace(maxElements) ? _maxElements.Value : int.Parse(maxElements);
+                Guid? lcaParsed = string.IsNullOrWhiteSpace(commonAncestor) ? (Guid?)null : Guid.Parse(commonAncestor);
+                int maxElementsParsed = string.IsNullOrWhiteSpace(maxElements) ? _maxElements.Value : int.Parse(maxElements, CultureInfo.InvariantCulture);
 
                 Collection<Timeline> timelines = _storage.TimelinesQuery(collectionId, startTime, endTime, span, lcaParsed, maxElementsParsed);
                 Timeline timeline = timelines.Where(candidate => candidate.Id == lcaParsed).FirstOrDefault();
@@ -162,7 +208,7 @@ namespace UI
                 if (timeline == null)
                     timeline = timelines.FirstOrDefault();
 
-                CacheGetTimelines(timeline, collectionId, start, end, minspan, lca, maxElements);
+                CacheGetTimelines(timeline, collectionId, start, end, minspan, commonAncestor, maxElements);
 
                 return timeline;
             });
@@ -179,6 +225,7 @@ namespace UI
         /// http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/thresholds
         /// ]]>
         /// </example>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
@@ -199,9 +246,9 @@ namespace UI
         }
 
         /// <summary>
-        /// Performs a search for a specific term within a collection or a supercollection.
+        /// Performs a search for a specific term within a collection or a superCollection.
         /// </summary>
-        /// <param name="supercollection">Name of the supercollection to query.</param>
+        /// <param name="superCollection">Name of the superCollection to query.</param>
         /// <param name="collection">Name of the collection to query.</param>
         /// <param name="searchTerm">The term to search for.</param>
         /// <returns>Search results in JSON format.</returns>
@@ -217,9 +264,10 @@ namespace UI
         /// }
         /// ]]>
         /// </example>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public BaseJsonResult<IEnumerable<SearchResult>> Search(string supercollection, string collection, string searchTerm)
+        public BaseJsonResult<IEnumerable<SearchResult>> Search(string superCollection, string collection, string searchTerm)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
             {
@@ -227,7 +275,7 @@ namespace UI
                 return null;
             }
 
-            Guid collectionId = CollectionIdOrDefault(supercollection, collection);
+            Guid collectionId = CollectionIdOrDefault(superCollection, collection);
             searchTerm = searchTerm.ToUpperInvariant();
 
             var timelines = _storage.Timelines.Where(_ => _.Title.ToUpper().Contains(searchTerm) && _.Collection.Id == collectionId).ToList();
@@ -263,6 +311,7 @@ namespace UI
         /// }
         /// ]]>
         /// </example>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
         public BaseJsonResult<IEnumerable<Reference>> GetBibliography(string exhibitId)
@@ -287,7 +336,7 @@ namespace UI
         }
 
         /// <summary>
-        /// Returns a list of tours for the default collection and default supercollection.
+        /// Returns a list of tours for the default collection and default superCollection.
         /// </summary>
         /// <returns>A list of tours in JSON format.</returns>
         /// <example><![CDATA[ 
@@ -297,6 +346,8 @@ namespace UI
         /// http://[site URL]/chronozoom.svc/tours
         /// ]]>
         /// </example>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/tours")]
         public BaseJsonResult<IEnumerable<Tour>> GetDefaultTours()
         {
@@ -304,9 +355,9 @@ namespace UI
         }
 
         /// <summary>
-        /// Returns a list of tours for a given collection or supercollection.
+        /// Returns a list of tours for a given collection or superCollection.
         /// </summary>
-        /// <param name="supercollection">Name of the supercollection to query.</param>
+        /// <param name="superCollection">Name of the superCollection to query.</param>
         /// <param name="collection">Name of the collection to query.</param>
         /// <returns>A list of tours in JSON format.</returns>
         /// <example><![CDATA[ 
@@ -316,14 +367,16 @@ namespace UI
         /// http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/tours
         /// ]]>
         /// </example>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/{collection}/tours")]
-        public BaseJsonResult<IEnumerable<Tour>> GetTours(string supercollection, string collection)
+        public BaseJsonResult<IEnumerable<Tour>> GetTours(string superCollection, string collection)
         {
             Trace.TraceInformation("Get Tours");
 
-            Guid collectionId = CollectionIdOrDefault(supercollection, collection);
+            Guid collectionId = CollectionIdOrDefault(superCollection, collection);
             lock (Cache)
             {
                 string toursCacheKey = string.Format(CultureInfo.InvariantCulture, "Tour {0}", collectionId);
@@ -350,8 +403,8 @@ namespace UI
         /// If the user ID is omitted then a new user is created.
         /// If there is no ACS the user is treated as anonymous and granted access to the sandbox collection.
         /// If the anonymous user does not exist in the database then it is created.
-        /// A new supercollection with the user's display name is added.
-        /// A new default collection with the user's display name is added to this supercollection.
+        /// A new superCollection with the user's display name is added.
+        /// A new default collection with the user's display name is added to this superCollection.
         /// A new user with the specified attributes is created.
         ///
         /// If the specified user display name does not exist it is considered an error.
@@ -432,25 +485,13 @@ namespace UI
         }
 
         /// <summary>
-        /// Provides a structure to retrieve information about this service.
-        /// </summary>
-        [DataContract]
-        public class ServiceInformation
-        {
-            /// <summary>
-            /// The path to download thumbanils from.
-            /// </summary>
-            [DataMember]
-            public Uri ThumbnailsPath { get; set; }
-        }
-
-        /// <summary>
         /// Provides information about the ChronoZoom service to the clients. Used internally by the ChronoZoom client.
         /// </summary>
         /// <returns>A ServiceInformation object describing parameter from the running service</returns>
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         [OperationContract]
         [WebInvoke(Method = "GET", UriTemplate = "/info", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        public ServiceInformation GetServiceInformation()
+        public static ServiceInformation GetServiceInformation()
         {
             Trace.TraceInformation("Get Service Information");
 
@@ -517,6 +558,7 @@ namespace UI
             });
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         [OperationContract]
         [WebInvoke(Method = "GET", UriTemplate = "/user", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public User GetUser()
@@ -563,7 +605,7 @@ namespace UI
         {
             if (string.IsNullOrEmpty(userId))
             {
-                // Anonymous user so use the sandbox supercollection and collection
+                // Anonymous user so use the sandbox superCollection and collection
                 SuperCollection sandboxSuperCollection = _storage.SuperCollections.Where(candidate => candidate.Title == _sandboxSuperCollectionName).FirstOrDefault();
                 if (sandboxSuperCollection == null)
                 {
@@ -587,7 +629,7 @@ namespace UI
             SuperCollection superCollection = _storage.SuperCollections.Where(candidate => candidate.User.NameIdentifier == user.NameIdentifier).FirstOrDefault();
             if (superCollection == null)
             {
-                // Create the personal supercollection
+                // Create the personal superCollection
                 superCollection = new SuperCollection();
                 superCollection.Title = user.DisplayName;
                 superCollection.Id = CollectionIdFromText(user.DisplayName);
@@ -647,9 +689,9 @@ namespace UI
             }
         }
 
-        private Guid CollectionIdOrDefault(string supercollection, string collection)
+        private Guid CollectionIdOrDefault(string superCollectionName, string collectionName)
         {
-            if (string.IsNullOrEmpty(supercollection))
+            if (string.IsNullOrEmpty(superCollectionName))
             {
                 lock (Cache)
                 {
@@ -672,17 +714,18 @@ namespace UI
             }
             else
             {
-                return CollectionIdFromSuperCollection(supercollection, collection);
+                return CollectionIdFromSuperCollection(superCollectionName, collectionName);
             }
         }
 
-        private static Guid CollectionIdFromSuperCollection(string supercollection, string collection)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase")]
+        private static Guid CollectionIdFromSuperCollection(string superCollection, string collection)
         {
             return CollectionIdFromText(string.Format(
                 CultureInfo.InvariantCulture,
                 "{0}|{1}",
-                supercollection.ToLower(),
-                collection.ToLower()));
+                superCollection.ToLower(CultureInfo.InvariantCulture),
+                collection.ToLower(CultureInfo.InvariantCulture)));
         }
 
         // Replace with URL friendly representations. For instance, converts space to '-'.
@@ -691,6 +734,7 @@ namespace UI
             return Uri.EscapeDataString(value.Replace(' ', '-'));
         }
 
+        [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase")]
         private static Guid CollectionIdFromText(string value)
         {
             // Replace with URL friendly representations
@@ -714,7 +758,7 @@ namespace UI
         /// If no author is registered then the authenticated user is set as the author. 
         /// The title field can't be modified because it is part of the URL (the URL can be indexed).
         /// </remarks>
-        /// <param name="superCollectionName">The name of the parent supercollection for the collection.</param>
+        /// <param name="superCollectionName">The name of the parent superCollection for the collection.</param>
         /// <param name="collectionName">The name of the collection to create.</param>
         /// <param name="collectionRequest">The markup for the collection to create in JSON format.</param>
         /// <returns></returns>
@@ -736,7 +780,7 @@ namespace UI
         {
             return AuthenticatedOperation(delegate(User user)
             {
-                Trace.TraceInformation("Put Collection {0} from user {1} in supercollection {2}", collectionName, user, superCollectionName);
+                Trace.TraceInformation("Put Collection {0} from user {1} in superCollection {2}", collectionName, user, superCollectionName);
 
                 Guid returnValue = Guid.Empty;
 
@@ -795,7 +839,7 @@ namespace UI
         {
             AuthenticatedOperation(delegate(User user)
             {
-                Trace.TraceInformation("Delete Collection {0} from user {1} in supercollection {2}", collectionName, user, superCollectionName);
+                Trace.TraceInformation("Delete Collection {0} from user {1} in superCollection {2}", collectionName, user, superCollectionName);
 
                 Guid collectionId = CollectionIdFromSuperCollection(superCollectionName, collectionName);
                 Collection collection = RetrieveCollection(collectionId);
@@ -1020,7 +1064,7 @@ namespace UI
             });
         }
 
-        bool ValidateTimelineRange(Timeline parentTimeline, decimal FromYear, decimal ToYear)
+        static bool ValidateTimelineRange(Timeline parentTimeline, decimal FromYear, decimal ToYear)
         {
             if (parentTimeline == null)
             {
@@ -1033,12 +1077,6 @@ namespace UI
             }
 
             return false;
-        }
-
-        public class PutExhibitResult
-        {
-            public Guid ExhibitId { get; set; }
-            public List<Guid> ContentItemId { get; set; }
         }
 
         /// <summary>
@@ -1068,6 +1106,7 @@ namespace UI
         ///     }
         /// ]]>
         /// </example>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/exhibit", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public PutExhibitResult PutExhibit(string superCollectionName, string collectionName, ExhibitRaw exhibitRequest)
@@ -1135,11 +1174,7 @@ namespace UI
                         {
                             // Parent exhibit item will be equal to the newly added exhibit
                             var newContentItemGuid = AddContentItem(collection, newExhibit, contentItemRequest);
-                            if (returnValue.ContentItemId == null)
-                            {
-                                returnValue.ContentItemId = new List<Guid>();
-                            }
-                            returnValue.ContentItemId.Add(newContentItemGuid);
+                            returnValue.Add(newContentItemGuid);
                         }
                     }
 
@@ -1172,11 +1207,7 @@ namespace UI
                             Guid updateContentItemGuid = UpdateContentItem(collectionGuid, contentItemRequest);
                             if (updateContentItemGuid != Guid.Empty)
                             {
-                                if (returnValue.ContentItemId == null)
-                                {
-                                    returnValue.ContentItemId = new List<Guid>();
-                                }
-                                returnValue.ContentItemId.Add(updateContentItemGuid);
+                                returnValue.Add(updateContentItemGuid);
                             }
                         }
                     }
@@ -1502,19 +1533,6 @@ namespace UI
             }
         }
 
-        [DataContract]
-        public class BaseJsonResult<T>
-        {
-            public BaseJsonResult(T data)
-            {
-                d = data;
-            }
-
-            [DataMember]
-            public T d { get; set; }
-        }
-
-
         // Performs an operation under an authenticated user.
         private static T AuthenticatedOperation<T>(Func<User, T> operation)
         {
@@ -1525,13 +1543,13 @@ namespace UI
                 return operation(null);
             }
 
-            Microsoft.IdentityModel.Claims.Claim nameIdentifierClaim = claimsIdentity.Claims.Where(candidate => candidate.ClaimType.EndsWith("nameidentifier")).FirstOrDefault();
+            Microsoft.IdentityModel.Claims.Claim nameIdentifierClaim = claimsIdentity.Claims.Where(candidate => candidate.ClaimType.EndsWith("nameidentifier", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
             if (nameIdentifierClaim == null)
             {
                 return operation(null);
             }
 
-            Microsoft.IdentityModel.Claims.Claim identityProviderClaim = claimsIdentity.Claims.Where(candidate => candidate.ClaimType.EndsWith("identityprovider")).FirstOrDefault();
+            Microsoft.IdentityModel.Claims.Claim identityProviderClaim = claimsIdentity.Claims.Where(candidate => candidate.ClaimType.EndsWith("identityprovider", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
             if (identityProviderClaim == null)
             {
                 return operation(null);
@@ -1574,7 +1592,7 @@ namespace UI
 
         // Retrieves the cached timeline.
         // Null if not cached.
-        private Timeline GetCachedGetTimelines(Guid collectionId, string start, string end, string minspan, string lca, string maxElements)
+        private static Timeline GetCachedGetTimelines(Guid collectionId, string start, string end, string minspan, string lca, string maxElements)
         {
             string cacheKey = string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}|{5}", collectionId, start, end, minspan, lca, maxElements);
             if (Cache.Contains(cacheKey))
@@ -1586,7 +1604,7 @@ namespace UI
         }
 
         // Caches the given timeline for the given GetTimelines request.
-        private void CacheGetTimelines(Timeline timeline, Guid collectionId, string start, string end, string minspan, string lca, string maxElements)
+        private static void CacheGetTimelines(Timeline timeline, Guid collectionId, string start, string end, string minspan, string lca, string maxElements)
         {
             string cacheKey = string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}|{5}", collectionId, start, end, minspan, lca, maxElements);
             if (!Cache.Contains(cacheKey) && timeline != null)

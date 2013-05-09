@@ -23,6 +23,7 @@ namespace ASC.Hrd
     /// <summary>
     /// Abstracts the acquisition of the HRD JSON Feed
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Hrd")]
     public class HrdClient
     {
         public HrdClient()
