@@ -54,13 +54,9 @@ namespace Chronozoom.Entities
 
         public DbSet<Timeline> Timelines { get; set; }
 
-        public DbSet<Threshold> Thresholds { get; set; }
-
         public DbSet<Exhibit> Exhibits { get; set; }
 
         public DbSet<ContentItem> ContentItems { get; set; }
-
-        public DbSet<Reference> References { get; set; }
 
         public DbSet<Tour> Tours { get; set; }
 
@@ -69,6 +65,77 @@ namespace Chronozoom.Entities
         public DbSet<Entities.Collection> Collections { get; set; }
 
         public DbSet<SuperCollection> SuperCollections { get; set; }
+        
+        public void CreatePostOrderIndex()
+        {
+            foreach (Timeline t in Timelines)
+            {
+                t.Successor = null;
+                t.Predecessor = null;
+                t.FirstNodeInSubtree = null;
+
+            }
+            foreach (Timeline t in Timelines)
+            {
+                if (t.Depth == 0)
+                {
+                    PostOrderTraversal(t);
+                }
+            }
+            SaveChanges();
+        }
+
+        public void CreatePostOrderIndex(IEnumerable<Timeline> timelines)
+        {
+            if (timelines == null) throw new ArgumentNullException("timelines");
+            foreach (Timeline t in timelines)
+            {
+                t.Successor = null;
+                t.Predecessor = null;
+                t.FirstNodeInSubtree = null;
+
+            }
+            foreach (Timeline t in timelines)
+            {
+                if (t.Depth == 0)
+                {
+                    PostOrderTraversal(t);
+                }
+            }
+            SaveChanges();
+        }
+
+        private Timeline PostOrderTraversal(Timeline root)
+        {
+            if (root.ChildTimelines != null)
+            {
+                int count = root.ChildTimelines.Count;
+                if (count > 0)
+                {
+                    Timeline rs = PostOrderTraversal(root.ChildTimelines[0]);
+                    root.FirstNodeInSubtree = rs;
+                    for (int i = 0; i < count - 1; ++i)
+                    {
+                        Timeline s = PostOrderTraversal(root.ChildTimelines[i + 1]);
+                        root.ChildTimelines[i].Successor = s;
+                        s.Predecessor = root.ChildTimelines[i];
+                    }
+                    root.ChildTimelines[count - 1].Successor = root;
+                    root.Predecessor = root.ChildTimelines[count - 1];
+                    return rs;
+                }
+                else
+                {
+                    root.FirstNodeInSubtree = root;
+                    return root;
+                }
+            }
+            else
+            {
+                root.FirstNodeInSubtree = root;
+                return root;
+            }
+        }
 
         public Collection<Timeline> TimelinesQuery(Guid collectionId, decimal startTime, decimal endTime, decimal span, Guid? commonAncestor, int maxElements)
         {
@@ -128,9 +195,6 @@ namespace Chronozoom.Entities
                 if (exhibitRaw.ContentItems == null)
                     exhibitRaw.ContentItems = new System.Collections.ObjectModel.Collection<ContentItem>();
 
-                if (exhibitRaw.References == null)
-                    exhibitRaw.References = new System.Collections.ObjectModel.Collection<Reference>();
-
                 if (timelinesMap.Keys.Contains(exhibitRaw.Timeline_ID))
                 {
                     timelinesMap[exhibitRaw.Timeline_ID].Exhibits.Add(exhibitRaw);
@@ -156,19 +220,6 @@ namespace Chronozoom.Entities
                     if (exhibits.Keys.Contains(contentItemRaw.Exhibit_ID))
                     {
                         exhibits[contentItemRaw.Exhibit_ID].ContentItems.Add(contentItemRaw);
-                    }
-                }
-
-                // Populate References
-                string referencesQuery = string.Format(CultureInfo.InvariantCulture,
-                    "SELECT * FROM [References] WHERE Exhibit_Id IN ('{0}')",
-                    string.Join("', '", exhibits.Keys.ToArray()));
-                var referencesRaw = Database.SqlQuery<ReferenceRaw>(referencesQuery);
-                foreach (ReferenceRaw referenceRaw in referencesRaw)
-                {
-                    if (exhibits.Keys.Contains(referenceRaw.Exhibit_ID))
-                    {
-                        exhibits[referenceRaw.Exhibit_ID].References.Add(referenceRaw);
                     }
                 }
             }
@@ -318,15 +369,6 @@ namespace Chronozoom.Entities
         public void DeleteExhibit(Guid id)
         {
             var exhibitsIDs = GetChildContentItemsIds(id); // list of ids of content items
-            var referencesIDs = GetChildReferencesIds(id); // list of ids of references
-
-            // delete references
-            while (referencesIDs.Count != 0)
-            {
-                var r = this.References.Find(referencesIDs.First());
-                this.References.Remove(r);
-                referencesIDs.RemoveAt(0);
-            }
 
             // delete content items
             while (exhibitsIDs.Count != 0)
@@ -389,23 +431,6 @@ namespace Chronozoom.Entities
             foreach (ContentItemRaw contentItemRaw in contentItemsRaw)
                 contentItems.Add(contentItemRaw.Id);
             return contentItems;
-        }
-
-        // Returns list of ids of child references of exhibit with given id.
-        private List<Guid> GetChildReferencesIds(Guid id)
-        {
-            var references = new List<Guid>();
-
-            // Find exhibit's references
-            string referencesQuery = string.Format(CultureInfo.InvariantCulture,
-                "SELECT * FROM [References] WHERE Exhibit_Id IN ('{0}')",
-                string.Join("', '", id));
-            var referencesRaw = Database.SqlQuery<ReferenceRaw>(referencesQuery);
-
-            foreach (ReferenceRaw referenceRaw in referencesRaw)
-                references.Add(referenceRaw.Id);
-
-            return references;
         }
 
         public TimelineRaw GetParentTimelineRaw(Guid timelineId)

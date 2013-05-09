@@ -136,8 +136,8 @@ module CZ {
         }
 
         export function hideWelcomeScreen() {
-            (<HTMLIFrameElement>(document.createElement("welcomeVideo"))).src = "";
-            $("#welcomeScreenBack").css("display", "none");
+            $('#welcomeScreen').remove();
+            $('#welcomeScreenBack').css("display", "none");
         }
 
         /*Animation tooltip parameter*/

@@ -16,7 +16,6 @@ namespace Chronozoom.Entities.Test
         public void Initialize()
         {
             _storage.Database.Delete();
-
             _betaCollection = _storage.Collections.Where(candidate => candidate.Title == "Beta Content").FirstOrDefault();
             Assert.IsNotNull(_betaCollection);
         }
@@ -48,7 +47,8 @@ namespace Chronozoom.Entities.Test
         [TestCategoryAttribute("Entities")]
         public void TestEntities_DeleteTimeline_DeletesTimeline()
         {
-            Guid timelineDeleteId = _storage.Timelines.First().Id;
+            Timeline unitedStateTimeline = _storage.Timelines.Where(candidate => candidate.Title == "United States").FirstOrDefault();
+            Guid timelineDeleteId = unitedStateTimeline.Id;
             _storage.DeleteTimeline(timelineDeleteId);
             _storage.SaveChanges();
 

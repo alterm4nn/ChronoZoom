@@ -19,9 +19,10 @@ using System.Web.Routing;
 using System.Web.UI;
 using System.Web.Mvc;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 
-namespace UI
+namespace Chronozoom.UI
 {
     public class Global : System.Web.HttpApplication
     {
@@ -29,7 +30,7 @@ namespace UI
 
         internal static TraceSource Trace { get; set; }
 
-        public class WebFormRouteHandler<T> : IRouteHandler where T : IHttpHandler, new()
+        internal class WebFormRouteHandler<T> : IRouteHandler where T : IHttpHandler, new()
         {
             public string VirtualPath { get; set; }
 
@@ -46,7 +47,7 @@ namespace UI
             }
         }
 
-        public static void RegisterRoutes(RouteCollection routes)
+        internal static void RegisterRoutes(RouteCollection routes)
         {
             var routeHandlerDetails = new WebFormRouteHandler<Page>("~/cz.aspx");
             routes.MapRoute(
@@ -78,21 +79,43 @@ namespace UI
         {
         }
 
-        void Application_BeginRequest(object sender, EventArgs e)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+        public void Application_BeginRequest(object sender, EventArgs e)
         {
-            Regex r = new Regex(@"^/[a-z\-_0-9]+/?$");
-
             var app = (HttpApplication)sender;
             if (app.Context.Request.Url.LocalPath == "/")
             {
-                app.Context.RewritePath(
-                         string.Concat(app.Context.Request.Url.LocalPath, "cz.aspx"));
-            }
-            else if (r.IsMatch(app.Context.Request.Url.LocalPath))
-            {
-                app.Context.RewritePath(string.Concat(app.Context.Request.Url.LocalPath, "cz.aspx?new=1"));
+                if (BrowserIsSupported())
+                {
+                    app.Context.RewritePath(string.Concat(app.Context.Request.Url.LocalPath, "cz.aspx"));
+                }
+                else
+                {
+                    app.Context.RewritePath(string.Concat(app.Context.Request.Url.LocalPath, "fallback.html"));
+                }
             }
         }
 
+        // Supported versions - Moved from JavaScript and added Opera
+        private static readonly Dictionary<string, int> _supportedMatrix = new Dictionary<string, int>()
+        {
+            { "IE", 9 },
+            { "Firefox", 7 },
+            { "Chrome", 14 },
+            { "Safari", 5 },
+            { "Opera", 10 },
+        };
+
+        private bool BrowserIsSupported()
+        {
+            System.Web.HttpBrowserCapabilities browser = Request.Browser;
+
+            if (_supportedMatrix.ContainsKey(browser.Browser))
+            {
+                return Double.Parse(browser.Version, System.Globalization.CultureInfo.InvariantCulture) >= _supportedMatrix[browser.Browser];
+            }
+
+            return true;
+        }
     }
 }

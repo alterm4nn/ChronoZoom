@@ -43,24 +43,6 @@ namespace Chronozoom.Entities
         public string Caption { get; set; }
 
         /// <summary>
-        /// The threshold for the content item.
-        /// </summary>
-        [Obsolete("Beta Only")]
-        public string Threshold { get; set; }
-
-        /// <summary>
-        /// The regime in which the content item appears.
-        /// </summary>
-        [Obsolete("Beta Only")]
-        public string Regime { get; set; }
-
-        /// <summary>
-        /// The time unit for the content item.
-        /// </summary>
-        [Obsolete("Beta Only")]
-        public string TimeUnit { get; set; }
-
-        /// <summary>
         /// The year in which the content item appears.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
@@ -92,22 +74,10 @@ namespace Chronozoom.Entities
         public string Attribution { get; set; }
 
         /// <summary>
-        /// The unique ID for the content item.
-        /// </summary>
-        [Obsolete("Beta Only")]
-        public int UniqueId { get; set; }
-
-        /// <summary>
         /// Specifies the order in which the content item should appear.
         /// </summary>
         [DataMember]
         public short? Order { get; set; }
-
-        /// <summary>
-        /// Indicates whether the content item has a bibliography (true or false).
-        /// </summary>
-        [Obsolete("Beta Only")]
-        public bool HasBibliography { get; set; }
 
         /// <summary>
         /// The collection that the content item is associated with.
@@ -121,7 +91,7 @@ namespace Chronozoom.Entities
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "Needs to match storage column name")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "ID", Justification = "Needs to match storage column name")]
-        [DataMember(Name = "parentExhibitId")]
+        [DataMember(Name = "ParentExhibitId")]
         public Guid Exhibit_ID { get; set; }
     }
 }

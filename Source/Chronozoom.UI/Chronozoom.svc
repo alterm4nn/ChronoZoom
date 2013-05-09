@@ -1,1 +1,1 @@
-﻿<%@ ServiceHost Language="C#" Debug="true" Service="UI.ChronozoomSVC" CodeBehind="Chronozoom.svc.cs" Factory="System.ServiceModel.Activation.WebScriptServiceHostFactory" %>
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="Chronozoom.UI.ChronozoomSVC" CodeBehind="Chronozoom.svc.cs" Factory="System.ServiceModel.Activation.WebScriptServiceHostFactory" %>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Application.Driver;
 using Application.Helper.Constants;
@@ -26,7 +27,7 @@ namespace Application.Helper.Helpers
             InitExhibitCreationMode();
             SetExhibitPoint();
             SetExhibitTitle(exhibit.Title);
-            FillContentItems(exhibit.ContentItems,0);
+            AddArtifacts(exhibit.ContentItems);
             SaveAndClose();
             Logger.Log("->");
         }
@@ -64,17 +65,17 @@ namespace Application.Helper.Helpers
             return exhibit;
         }
 
-        public void DeleteExhibit(Exhibit exhibit)
+        public void DeleteExhibitByJavascript(Exhibit exhibit)
         {
             int childrenCount = int.Parse(GetJavaScriptExecutionResult(Javascripts.CosmosChildrenCount));
             for (int i = 0; i < childrenCount; i++)
             {
                 string title =
                     GetJavaScriptExecutionResult(
-                        string.Format("{0}.children[{1}].title",Javascripts.Cosmos, i));
+                        string.Format("{0}.children[{1}].title", Javascripts.Cosmos, i));
                 if (title == exhibit.Title)
                 {
-                    ExecuteJavaScript(string.Format("CZ.Service.deleteExhibit({0}.children[{1}])",Javascripts.Cosmos,i));
+                    ExecuteJavaScript(string.Format("CZ.Service.deleteExhibit({0}.children[{1}])", Javascripts.Cosmos, i));
                 }
             }
         }
@@ -87,24 +88,83 @@ namespace Application.Helper.Helpers
             return description;
         }
 
-        private void SaveAndClose()
+        public void DeleteExhibit(Exhibit exhibit)
         {
-            Logger.Log("<-");
-            Click(By.XPath("//*[@class='ui-dialog-buttonset']/*[1]"));
+            Logger.Log("<- title: " + exhibit.Title);
+            NavigateToExhibit(exhibit);
+            InitEditExhibitForm();
+            ClickDeleteButton();
+            ConfirmDeletion();
             Logger.Log("->");
         }
 
-        private void SetExhibitTitle(string timelineName)
+
+        public bool IsExhibitFound(Exhibit exhibit)
         {
-            Logger.Log("<- name: " + timelineName);
-            TypeText(By.Id("exhibitTitleInput"), timelineName);
+            Logger.Log("<- timeline: " + exhibit);
+            try
+            {
+                ExecuteJavaScript(string.Format("CZ.Search.goToSearchResult('e{0}', 'timeline')", exhibit.Id));
+                Logger.Log("-> true");
+                return true;
+            }
+            catch (Exception)
+            {
+                //AcceptAlert();
+                Logger.Log("-> false");
+                return false;
+            }
+        }
+
+        private void ConfirmDeletion()
+        {
+            AcceptAlert();
+            MoveToElementAndClick(By.ClassName("virtualCanvasLayerCanvas"));
+        }
+
+        private void ClickDeleteButton()
+        {
+            Click(By.XPath("//*[@id='auth-edit-exhibit-form']//*[@class='cz-form-delete cz-button']"));
+        }
+
+        private void InitEditExhibitForm()
+        {
+            Logger.Log("<-");
+            ExecuteJavaScript("CZ.Authoring.isActive = true");
+            ExecuteJavaScript("CZ.Authoring.mode = 'editExhibit'");
+            ExecuteJavaScript("CZ.Authoring.selectedExhibit = " + Javascripts.LastCanvasElement);
+            ExecuteJavaScript("CZ.Authoring.showEditExhibitForm(CZ.Authoring.selectedExhibit)");
+            Logger.Log("->");
+        }
+
+        private void NavigateToExhibit(Exhibit exhibit)
+        {
+            Logger.Log("<- title: " + exhibit.Title);
+            ExecuteJavaScript(string.Format("CZ.Search.goToSearchResult('e{0}')",exhibit.Id));
+            WaitAnimation();
+            MoveToElementAndClick(By.ClassName("virtualCanvasLayerCanvas"));
+            Logger.Log("->");
+        }
+
+        private void SaveAndClose()
+        {
+            Logger.Log("<-");
+            Click(By.XPath("//*[@id='auth-edit-exhibit-form']//*[@class='cz-form-save cz-button']"));
+            Logger.Log("->");
+        }
+
+        private void SetExhibitTitle(string exhibitName)
+        {
+            Logger.Log("<- name: " + exhibitName);
+            TypeText(By.XPath("//*[@id='auth-edit-exhibit-form']//*[@class='cz-form-item-title cz-input']"), exhibitName);
             Logger.Log("->");
         }
 
         private void InitExhibitCreationMode()
         {
             Logger.Log("<-");
-            MoveToElementAndClick(By.XPath("//*[@id='footer-authoring']/a[3]"));
+            MoveToElementAndClick(By.XPath("//*[@title='Create your events']"));
+            MoveToElementAndClick(By.XPath("//button[text()='create exhibit']"));
             Logger.Log("->");
         }
 
@@ -115,44 +175,59 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
-        private void FillContentItems(Collection<Chronozoom.Entities.ContentItem> contentItems, int i)
+        private void FillArtifact(Chronozoom.Entities.ContentItem contentItem)
         {
-            SetTitle(contentItems[i].Title, i + 1);
-            SetCaption(contentItems[i].Caption, i + 1);
-            SetUrl(contentItems[i].Uri, i + 1);
-            SelectMediaType(contentItems[i].MediaType, i + 1);
-            SetAttribution(contentItems[i].Attribution, i + 1);
-            SetMediaSourse(contentItems[i].MediaSource, i + 1);
+            Logger.Log("<-");
+            SetTitle(contentItem.Title);
+            SetDescription(contentItem.Caption);
+            SetUrl(contentItem.Uri);
+            SelectMediaType(contentItem.MediaType);
+            SetAttribution(contentItem.Attribution);
+            SetMediaSourse(contentItem.MediaSource);
+            Logger.Log("->");
         }
 
-        private void SetMediaSourse(string mediaSource, int i)
+        private void SetMediaSourse(string mediaSource)
         {
-            TypeText(By.XPath(string.Format("(//*[@class='cz-authoring-ci-media-source'])[{0}]", i)), mediaSource);
+            TypeText(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-mediasource cz-input']"), mediaSource);
         }
 
-        private void SetAttribution(string attribution, int i)
+        private void SetAttribution(string attribution)
         {
-            TypeText(By.XPath(string.Format("(//*[@class='cz-authoring-ci-attribution'])[{0}]", i)), attribution);
+            TypeText(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-attribution cz-input']"), attribution);
         }
 
-        private void SelectMediaType(string mediaType, int index)
+        private void SelectMediaType(string mediaType)
         {
-            Select(By.XPath(string.Format("(//*[@class='cz-authoring-ci-media-type'])[{0}]", index)), mediaType);
+            Select(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-media-type cz-input']"), mediaType);
         }
 
-        private void SetUrl(string mediaSourse, int index)
+        private void SetUrl(string mediaSourse)
         {
-            TypeText(By.XPath(string.Format("(//*[@class='cz-authoring-ci-uri'])[{0}]", index)), mediaSourse);
+            TypeText(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-mediaurl cz-input']"), mediaSourse);
         }
 
-        private void SetCaption(string description, int index)
+        private void SetDescription(string description)
         {
-            TypeText(By.XPath(string.Format("(//*[@class='cz-authoring-ci-description'])[{0}]", index)), description);
+            TypeText(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-descr cz-input']"), description);
         }
 
-        private void SetTitle(string title, int index)
+        private void SetTitle(string title)
         {
-            TypeText(By.XPath(string.Format("(//*[@class='cz-authoring-ci-title'])[{0}]", index)), title);
+            TypeText(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-title cz-input']"), title);
         }
+
+
+        private void AddArtifacts(IEnumerable<Chronozoom.Entities.ContentItem> contentItems)
+        {
+            foreach (Chronozoom.Entities.ContentItem contentItem in contentItems)
+            {
+                Click(By.XPath("//*[@class='cz-form-create-artifact cz-button']"));
+                FillArtifact(contentItem);
+                Click(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-save cz-button']"));
+            }
+
+        }
+
     }
 }

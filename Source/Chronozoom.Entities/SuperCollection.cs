@@ -31,10 +31,6 @@ namespace Chronozoom.Entities
         [DataMember]
         public string Title { get; set; }
 
-        [Obsolete("UserId is being replaced with User")]
-        [DataMember]
-        public string UserId { get; set; }
-
         /// <summary>
         /// The user who owns the supercollection.
         /// </summary>

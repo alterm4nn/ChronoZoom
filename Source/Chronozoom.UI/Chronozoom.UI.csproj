@@ -11,8 +11,8 @@
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>UI</RootNamespace>
-    <AssemblyName>UI</AssemblyName>
+    <RootNamespace>Chronozoom.UI</RootNamespace>
+    <AssemblyName>Chronozoom.UI</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort />
@@ -47,7 +47,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>bin\UI.XML</DocumentationFile>
+    <DocumentationFile>bin\Chronozoom.UI.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
@@ -356,7 +356,6 @@
     <Content Include="dumps\aidstimeline-get.json" />
     <Content Include="dumps\aidstimeline-gettours.json" />
     <Content Include="dumps\beta-get.json" />
-    <Content Include="dumps\beta-getthresholds.json" />
     <Content Include="dumps\beta-gettours.json" />
     <Content Include="TraceLog.html" />
     <Content Include="images\close_off.png" />
@@ -422,13 +421,15 @@
       <DependentUpon>cz.less</DependentUpon>
     </Content>
     <Content Include="css\Site.css" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Chronozoom.svc.cs">
       <DependentUpon>Chronozoom.svc</DependentUpon>
     </Compile>
-    <Compile Include="controllers\AccountController.cs" />
+    <Compile Include="ACS\controllers\AccountController.cs" />
     <Compile Include="cz.aspx.cs">
       <DependentUpon>cz.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -463,27 +464,6 @@
       <Project>{e9c7a64b-d03b-47d7-89dd-48d046de564c}</Project>
       <Name>OuterCurve.SignalRTraceListener</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Web.Sandbox.config">
-      <DependentUpon>Web.config</DependentUpon>
-      <SubType>Designer</SubType>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Web.Staging.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Web.DevPreview.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Web.Production.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\Settings.StyleCop">
