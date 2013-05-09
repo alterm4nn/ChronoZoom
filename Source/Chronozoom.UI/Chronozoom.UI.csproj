@@ -353,7 +353,6 @@
     <Content Include="css\timescale.css">
       <DependentUpon>timescale.less</DependentUpon>
     </Content>
-    <Content Include="dumps\aidsstandalone-get.json" />
     <Content Include="dumps\aidstimeline-get.json" />
     <Content Include="dumps\aidstimeline-gettours.json" />
     <Content Include="dumps\beta-get.json" />

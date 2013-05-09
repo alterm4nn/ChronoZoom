@@ -1,4 +1,4 @@
-﻿﻿// ---------------------------------------​---------------------------------------​--------------------------------------
+﻿// ---------------------------------------​---------------------------------------​--------------------------------------
 // <copyright company="Outercurve Foundation">
 //   Copyright (c) 2013, The Outercurve Foundation
 // </copyright>
@@ -50,8 +50,7 @@ namespace Chronozoom.Entities.Migration
             MigrateRiTree();
             LoadDataFromDump("Beta Content", "beta-get.json", "beta-gettours.json", "beta-getthresholds.json", false, _baseContentAdmin.Value);
             LoadDataFromDump("Sandbox", "beta-get.json", "beta-gettours.json", "beta-getthresholds.json", true, null);
-            LoadDataFromDump("AIDS Timeline", "aidstimeline-get.json", "aidstimeline-gettours.json", null, true, _baseContentAdmin.Value);
-            LoadDataFromDump("AIDS Standalone", "aidsstandalone-get.json", null, null, true, _baseContentAdmin.Value);
+            LoadDataFromDump("AIDS Timeline", "aidstimeline-get.json", "aidstimeline-gettours.json", null, false, _baseContentAdmin.Value);
         }
 
 
@@ -138,30 +137,24 @@ namespace Chronozoom.Entities.Migration
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Incremental change, will refactor later if the import process is kept")]
         private void LoadData(Stream dataTimelines, Stream dataTours, Stream dataThresholds, Collection collection, bool replaceGuids)
         {
-            var bjrTimelines = new DataContractJsonSerializer(typeof(BaseJsonResult<IEnumerable<Timeline>>)).ReadObject(dataTimelines) as BaseJsonResult<IEnumerable<Timeline>>;
+            var timelines = new DataContractJsonSerializer(typeof(IEnumerable<Timeline>)).ReadObject(dataTimelines) as IEnumerable<Timeline>;
 
             _storage.Collections.Add(collection);
 
-            // UniqueIds Map
-            Dictionary<int, List<Tuple<Guid, BookmarkType>>> bookmarksMap = new Dictionary<int, List<Tuple<Guid, BookmarkType>>>();
-
             // Associate each timeline with the root collection
-            TraverseTimelines(bjrTimelines.d, timeline =>
+            TraverseTimelines(timelines, timeline =>
             {
                 timeline.Collection = collection;
-                AddBookmarkToBookmarkMap(bookmarksMap, timeline.UniqueId, timeline.Id, BookmarkType.Timeline);
 
                 foreach (Exhibit exhibit in timeline.Exhibits)
                 {
                     exhibit.Collection = collection;
-                    AddBookmarkToBookmarkMap(bookmarksMap, exhibit.UniqueId, exhibit.Id, BookmarkType.Exhibit);
 
                     if (exhibit.ContentItems != null)
                     {
                         foreach (ContentItem contentItem in exhibit.ContentItems)
                         {
                             contentItem.Collection = collection;
-                            AddBookmarkToBookmarkMap(bookmarksMap, contentItem.UniqueId, contentItem.Id, BookmarkType.ContentItem);
                         }
                     }
                 }
@@ -170,7 +163,7 @@ namespace Chronozoom.Entities.Migration
             if (replaceGuids)
             {
                 // Replace GUIDs to ensure multiple collections can be imported
-                TraverseTimelines(bjrTimelines.d, timeline =>
+                TraverseTimelines(timelines, timeline =>
                 {
                     timeline.Id = Guid.NewGuid();
 
@@ -201,7 +194,7 @@ namespace Chronozoom.Entities.Migration
                 );
             }
 
-            foreach (var timeline in bjrTimelines.d)
+            foreach (var timeline in timelines)
             {
                 if (replaceGuids) timeline.Id = Guid.NewGuid();
                 timeline.Collection = collection;
@@ -219,54 +212,11 @@ namespace Chronozoom.Entities.Migration
                     if (replaceGuids) tour.Id = Guid.NewGuid();
                     tour.Collection = collection;
 
-                    if (tour.Bookmarks != null)
+                    if (tour.Bookmarks != null && replaceGuids)
                     {
                         foreach (var bookmark in tour.Bookmarks)
                         {
                             bookmark.Id = Guid.NewGuid();
-
-                            // Split URL into reference/location parts
-                            string[] urlParts = bookmark.Url.Split('@');
-
-                            // Split references into its components
-                            string[] urlComponents = urlParts[0].Split('/');
-
-                            int uniqueId;
-                            BookmarkType bookmarkType;
-
-                            string newUrlComponents = "";
-                            for (int idxComponent = 0; idxComponent < urlComponents.Length; idxComponent++)
-                            {
-                                BookmarkFromBookmarkUrl(urlComponents[idxComponent], out uniqueId, out bookmarkType);
-                                if (bookmarksMap.Keys.Contains(uniqueId))
-                                {
-                                    List<Tuple<Guid, BookmarkType>> matchedBookmarks = bookmarksMap[uniqueId];
-                                    Tuple<Guid, BookmarkType> matchedBookmark = matchedBookmarks.Where(candidate => candidate.Item2 == bookmarkType).FirstOrDefault();
-                                    if (matchedBookmark != null)
-                                    {
-                                        newUrlComponents += "/";
-                                        switch (matchedBookmark.Item2)
-                                        {
-                                            case BookmarkType.Timeline:
-                                                newUrlComponents += "t";
-                                                break;
-                                            case BookmarkType.Exhibit:
-                                                newUrlComponents += "e";
-                                                break;
-                                        }
-                                        newUrlComponents += matchedBookmark.Item1.ToString();
-
-                                        // Last item? Record as target bookmark for the tour stop.
-                                        if (idxComponent + 1 == urlComponents.Length)
-                                        {
-                                            bookmark.ReferenceId = matchedBookmark.Item1;
-                                            bookmark.ReferenceType = matchedBookmark.Item2;
-                                        }
-                                    }
-                                }
-                            }
-
-                            bookmark.Url = newUrlComponents;
                         }
                     }
 
@@ -284,42 +234,6 @@ namespace Chronozoom.Entities.Migration
                     _storage.Thresholds.Add(threshold);
                 }
             }
-        }
-
-        private static void AddBookmarkToBookmarkMap(Dictionary<int, List<Tuple<Guid, BookmarkType>>> bookmarksMap, int uniqueId, Guid id, BookmarkType bookmarkType)
-        {
-            if (!bookmarksMap.Keys.Contains(uniqueId))
-            {
-                bookmarksMap.Add(uniqueId, new List<Tuple<Guid, BookmarkType>>());
-            }
-
-            bookmarksMap[uniqueId].Add(new Tuple<Guid, BookmarkType>(id, bookmarkType));
-        }
-
-        private static void BookmarkFromBookmarkUrl(string urlPart, out int uniqueId, out BookmarkType bookmarkType)
-        {
-            uniqueId = -1;
-            bookmarkType = BookmarkType.Timeline;
-
-            if (string.IsNullOrEmpty(urlPart))
-            {
-                return;
-            }
-
-            switch (urlPart.Substring(0, 1))
-            {
-                case "c":
-                    bookmarkType = BookmarkType.ContentItem;
-                    break;
-                case "e":
-                    bookmarkType = BookmarkType.Exhibit;
-                    break;
-                case "t":
-                    bookmarkType = BookmarkType.Timeline;
-                    break;
-            }
-
-            uniqueId = int.Parse(urlPart.Substring(1), CultureInfo.InvariantCulture);
         }
 
         private void MigrateInPlace(Timeline timeline)

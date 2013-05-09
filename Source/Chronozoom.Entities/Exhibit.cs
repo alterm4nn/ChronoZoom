@@ -36,50 +36,46 @@ namespace Chronozoom.Entities
         /// <summary>
         /// The threshold for the exhibit.
         /// </summary>
-        [DataMember]
+        [Obsolete("Beta Only")]
         public string Threshold { get; set; }
 
         /// <summary>
         /// The regime in which the threshold should appear.
         /// </summary>
-        [DataMember]
+        [Obsolete("Beta Only")]
         public string Regime { get; set; }
 
         [NotMapped]
-        [DataMember]
+        [Obsolete("Beta Only")]
         public string TimeUnit { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
         [NotMapped]
-        [DataMember]
+        [Obsolete("Beta Only")]
         public int? Day { get; set; }
 
         [NotMapped]
-        [DataMember]
+        [Obsolete("Beta Only")]
         public int? Month { get; set; }
 
         /// <summary>
         /// The year in which the exhibit appears.
-        /// </summary>
-        [DataMember]
-        public decimal Year { get; set; }
-
-        [NotMapped]
+        /// </summary
         [DataMember(Name = "time")]
-        public decimal Time { get; set; }
+        public decimal Year { get; set; }
 
         /// <summary>
         /// The unique ID of the exhibit.
         /// </summary>
-        [DataMember(Name = "UniqueID")]
+        [Obsolete("Beta Only")]
         public int UniqueId { get; set; }
 
         /// <summary>
         /// Specifies the point of the exhibit within the sequence.
         /// </summary>
-        [DataMember]
+        [Obsolete("Beta Only")]
         public int? Sequence { get; set; }
 
         /// <summary>
@@ -98,7 +94,6 @@ namespace Chronozoom.Entities
         /// <summary>
         /// Specifies the collection that is associated with the exhibit.
         /// </summary>
-        [DataMember(Name = "collection")]
         public virtual Entities.Collection Collection { get; set; }
     }
 
@@ -108,7 +103,7 @@ namespace Chronozoom.Entities
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "Needs to match storage column name")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "ID", Justification = "Needs to match storage column name")]
-        [DataMember(Name = "ParentTimelineId")]
+        [DataMember(Name = "parentTimelineId")]
         public Guid Timeline_ID { get; set; }
     }
 }
