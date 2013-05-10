@@ -1,1 +1,1 @@
-﻿<%@ Application Codebehind="Global.asax.cs" Inherits="UI.Global" Language="C#" %>
+﻿<%@ Application Codebehind="Global.asax.cs" Inherits="Chronozoom.UI.Global" Language="C#" %>

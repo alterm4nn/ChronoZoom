@@ -48,7 +48,8 @@ namespace Chronozoom.Entities.Test
         [TestCategoryAttribute("Entities")]
         public void TestEntities_DeleteTimeline_DeletesTimeline()
         {
-            Guid timelineDeleteId = _storage.Timelines.First().Id;
+            Timeline unitedStateTimeline = _storage.Timelines.Where(candidate => candidate.Title == "United States").FirstOrDefault();
+            Guid timelineDeleteId = unitedStateTimeline.Id;
             _storage.DeleteTimeline(timelineDeleteId);
             _storage.SaveChanges();
 

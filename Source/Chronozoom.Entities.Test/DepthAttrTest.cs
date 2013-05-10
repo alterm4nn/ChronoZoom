@@ -20,7 +20,7 @@ namespace Chronozoom.Entities.Test
         }
 
         [TestMethod]
-        public void TestDepthAttr()
+        public void TestEntities_DepthField_GeneratedCorrectly()
         {
             var timeline_random_samples = _storage.Timelines.SqlQuery(String.Format("SELECT TOP {0} * FROM Timelines ORDER BY NEWID()", NUM_TEST));
             foreach (Timeline t in timeline_random_samples)
