@@ -54,13 +54,9 @@ namespace Chronozoom.Entities
 
         public DbSet<Timeline> Timelines { get; set; }
 
-        public DbSet<Threshold> Thresholds { get; set; }
-
         public DbSet<Exhibit> Exhibits { get; set; }
 
         public DbSet<ContentItem> ContentItems { get; set; }
-
-        public DbSet<Reference> References { get; set; }
 
         public DbSet<Tour> Tours { get; set; }
 
@@ -128,9 +124,6 @@ namespace Chronozoom.Entities
                 if (exhibitRaw.ContentItems == null)
                     exhibitRaw.ContentItems = new System.Collections.ObjectModel.Collection<ContentItem>();
 
-                if (exhibitRaw.References == null)
-                    exhibitRaw.References = new System.Collections.ObjectModel.Collection<Reference>();
-
                 if (timelinesMap.Keys.Contains(exhibitRaw.Timeline_ID))
                 {
                     timelinesMap[exhibitRaw.Timeline_ID].Exhibits.Add(exhibitRaw);
@@ -156,19 +149,6 @@ namespace Chronozoom.Entities
                     if (exhibits.Keys.Contains(contentItemRaw.Exhibit_ID))
                     {
                         exhibits[contentItemRaw.Exhibit_ID].ContentItems.Add(contentItemRaw);
-                    }
-                }
-
-                // Populate References
-                string referencesQuery = string.Format(CultureInfo.InvariantCulture,
-                    "SELECT * FROM [References] WHERE Exhibit_Id IN ('{0}')",
-                    string.Join("', '", exhibits.Keys.ToArray()));
-                var referencesRaw = Database.SqlQuery<ReferenceRaw>(referencesQuery);
-                foreach (ReferenceRaw referenceRaw in referencesRaw)
-                {
-                    if (exhibits.Keys.Contains(referenceRaw.Exhibit_ID))
-                    {
-                        exhibits[referenceRaw.Exhibit_ID].References.Add(referenceRaw);
                     }
                 }
             }
@@ -318,15 +298,6 @@ namespace Chronozoom.Entities
         public void DeleteExhibit(Guid id)
         {
             var exhibitsIDs = GetChildContentItemsIds(id); // list of ids of content items
-            var referencesIDs = GetChildReferencesIds(id); // list of ids of references
-
-            // delete references
-            while (referencesIDs.Count != 0)
-            {
-                var r = this.References.Find(referencesIDs.First());
-                this.References.Remove(r);
-                referencesIDs.RemoveAt(0);
-            }
 
             // delete content items
             while (exhibitsIDs.Count != 0)
@@ -389,23 +360,6 @@ namespace Chronozoom.Entities
             foreach (ContentItemRaw contentItemRaw in contentItemsRaw)
                 contentItems.Add(contentItemRaw.Id);
             return contentItems;
-        }
-
-        // Returns list of ids of child references of exhibit with given id.
-        private List<Guid> GetChildReferencesIds(Guid id)
-        {
-            var references = new List<Guid>();
-
-            // Find exhibit's references
-            string referencesQuery = string.Format(CultureInfo.InvariantCulture,
-                "SELECT * FROM [References] WHERE Exhibit_Id IN ('{0}')",
-                string.Join("', '", id));
-            var referencesRaw = Database.SqlQuery<ReferenceRaw>(referencesQuery);
-
-            foreach (ReferenceRaw referenceRaw in referencesRaw)
-                references.Add(referenceRaw.Id);
-
-            return references;
         }
 
         public TimelineRaw GetParentTimelineRaw(Guid timelineId)

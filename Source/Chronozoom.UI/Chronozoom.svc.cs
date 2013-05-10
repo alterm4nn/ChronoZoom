@@ -215,37 +215,6 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
-        /// Returns the time thresholds that have been defined for a ChronoZoom instance.
-        /// </summary>
-        /// <returns>Time threshold data in JSON format.</returns>
-        /// <example><![CDATA[ 
-        /// HTTP verb: GET
-        ///
-        /// URL:
-        /// http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/thresholds
-        /// ]]>
-        /// </example>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
-        [OperationContract]
-        [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public BaseJsonResult<IEnumerable<Threshold>> GetThresholds()
-        {
-            Trace.TraceInformation("Get Thresholds");
-
-            lock (Cache)
-            {
-                if (!Cache.Contains("Thresholds"))
-                {
-                    Trace.TraceInformation("Get Thresholds Cache Miss");
-                    Cache.Add("Thresholds", _storage.Thresholds.ToList(), DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
-                }
-
-                return new BaseJsonResult<IEnumerable<Threshold>>((List<Threshold>)Cache["Thresholds"]);
-            }
-        }
-
-        /// <summary>
         /// Performs a search for a specific term within a collection or a superCollection.
         /// </summary>
         /// <param name="superCollection">Name of the superCollection to query.</param>
@@ -292,47 +261,6 @@ namespace Chronozoom.UI
 
             Trace.TraceInformation("Search called for search term {0}", searchTerm);
             return new BaseJsonResult<IEnumerable<SearchResult>>(searchResults);
-        }
-
-        /// <summary>
-        /// Returns the bibliography for a given exhibit.
-        /// </summary>
-        /// <param name="exhibitId">ID of the exhibit.</param>
-        /// <returns>The bibliography data in JSON format.</returns>
-        /// <example><![CDATA[ 
-        /// HTTP verb: GET
-        ///
-        /// URL:
-        /// http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/bibliography
-        ///
-        /// Request body (JSON):
-        /// {
-        ///     exhibitId: "0123456789"
-        /// }
-        /// ]]>
-        /// </example>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        [OperationContract]
-        [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        public BaseJsonResult<IEnumerable<Reference>> GetBibliography(string exhibitId)
-        {
-            Guid guid;
-            if (!Guid.TryParse(exhibitId, out guid))
-            {
-                Trace.TraceEvent(TraceEventType.Warning, 0, "GetBibliography called with invalid Id {0}", exhibitId);
-                return null;
-            }
-
-            var exhibit = _storage.Exhibits.Find(guid);
-            if (exhibit == null)
-            {
-                Trace.TraceEvent(TraceEventType.Warning, 0, "GetBibliography called, no matching exhibit found with Id {0}", exhibitId);
-                return null;
-            }
-
-            Trace.TraceInformation("GetBibliography called for Exhibit Id {0}", exhibitId);
-            _storage.Entry(exhibit).Collection(_ => _.References).Load();
-            return new BaseJsonResult<IEnumerable<Reference>>(exhibit.References.ToList());
         }
 
         /// <summary>
