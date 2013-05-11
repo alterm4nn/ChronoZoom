@@ -96,8 +96,8 @@ var CZ;
         }
         Common.startExploring = startExploring;
         function hideWelcomeScreen() {
-            ((document.createElement("welcomeVideo"))).src = "";
-            $("#welcomeScreenBack").css("display", "none");
+            $('#welcomeScreen').remove();
+            $('#welcomeScreenBack').css("display", "none");
         }
         Common.hideWelcomeScreen = hideWelcomeScreen;
         Common.animationTooltipRunning = null;
