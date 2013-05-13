@@ -322,46 +322,6 @@ var CZ;
             if(!rootCollection) {
                 CZ.Authoring.isEnabled = true;
             }
-            if(navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
-                if(/Chrome[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
-                    var oprversion = new Number(RegExp.$1);
-                    if(oprversion < 14.0) {
-                        var fallback_agreement = CZ.Common.getCookie("new_bad_browser_agreement");
-                        if((fallback_agreement == null) || (fallback_agreement == "")) {
-                            window.location.href = "fallback.html";
-                            return;
-                        }
-                    }
-                }
-            } else if(navigator.userAgent.toLowerCase().indexOf('version') > -1) {
-                if(/Version[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
-                    var oprversion = new Number(RegExp.$1);
-                    if(oprversion < 5.0) {
-                        var fallback_agreement = CZ.Common.getCookie("new_bad_browser_agreement");
-                        if((fallback_agreement == null) || (fallback_agreement == "")) {
-                            window.location.href = "fallback.html";
-                            return;
-                        }
-                    }
-                }
-            } else {
-                var br = ($).browser;
-                var isIe9 = br.msie && parseInt(br.version, 10) >= 9;
-                if(!isIe9) {
-                    var isFF9 = br.mozilla && parseInt(br.version, 10) >= 7;
-                    if(!isFF9) {
-                        var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
-                        if(!is_chrome) {
-                            var fallback_agreement = CZ.Common.getCookie("new_bad_browser_agreement");
-                            if((fallback_agreement == null) || (fallback_agreement == "")) {
-                                window.location.href = "fallback.html";
-                                return;
-                            }
-                        }
-                        return;
-                    }
-                }
-            }
             if(navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
                 document.addEventListener('touchmove', function (e) {
                     e.preventDefault();
