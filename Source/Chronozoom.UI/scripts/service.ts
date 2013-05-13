@@ -9,8 +9,8 @@ module CZ {
                 return {
                     id: t.guid,
                     ParentTimelineId: t.parent.guid,
-                    FromYear: t.x,
-                    ToYear: typeof t.endDate !== 'undefined' ? t.endDate : (t.x + t.width),
+                    start: t.x,
+                    end: typeof t.endDate !== 'undefined' ? t.endDate : (t.x + t.width),
                     title: t.title,
                     Regime: t.regime
                 };
@@ -20,7 +20,7 @@ module CZ {
                 return {
                     id: e.guid,
                     ParentTimelineId: e.parent.guid,
-                    Year: e.infodotDescription.date,
+                    time: e.infodotDescription.date,
                     title: e.title,
                     description: undefined,
                     contentItems: undefined
