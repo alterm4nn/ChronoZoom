@@ -16,7 +16,6 @@ namespace Chronozoom.Entities
     /// Contains a set of content items, and is contained by a timeline or a collection.
     /// </summary>
     [KnownType(typeof(ContentItemRaw))]
-    [KnownType(typeof(ReferenceRaw))]
     [DataContract]
     public class Exhibit
     {
@@ -39,49 +38,10 @@ namespace Chronozoom.Entities
         public string Title { get; set; }
 
         /// <summary>
-        /// The threshold for the exhibit.
-        /// </summary>
-        [Obsolete("Beta Only")]
-        public string Threshold { get; set; }
-
-        /// <summary>
-        /// The regime in which the threshold should appear.
-        /// </summary>
-        [Obsolete("Beta Only")]
-        public string Regime { get; set; }
-
-        [NotMapped]
-        [Obsolete("Beta Only")]
-        public string TimeUnit { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        [NotMapped]
-        [Obsolete("Beta Only")]
-        public int? Day { get; set; }
-
-        [NotMapped]
-        [Obsolete("Beta Only")]
-        public int? Month { get; set; }
-
-        /// <summary>
         /// The year in which the exhibit appears.
         /// </summary
         [DataMember(Name = "time")]
         public decimal Year { get; set; }
-
-        /// <summary>
-        /// The unique ID of the exhibit.
-        /// </summary>
-        [Obsolete("Beta Only")]
-        public int UniqueId { get; set; }
-
-        /// <summary>
-        /// Specifies the point of the exhibit within the sequence.
-        /// </summary>
-        [Obsolete("Beta Only")]
-        public int? Sequence { get; set; }
 
         /// <summary>
         /// Specifies the collection of content items that is associated with the exhibit.
@@ -89,12 +49,6 @@ namespace Chronozoom.Entities
         [DataMember(Name = "contentItems")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Object property needs to be initialized externally")]
         public virtual Collection<ContentItem> ContentItems { get; set; }
-
-        /// <summary>
-        /// Specifies the collection of references for the exhibit.
-        /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Object property needs to be initialized externally")]
-        public virtual Collection<Reference> References { get; set; }
 
         /// <summary>
         /// Specifies the collection that is associated with the exhibit.

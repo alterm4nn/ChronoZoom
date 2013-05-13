@@ -2,17 +2,8 @@
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="Chronozoom.Entities.Exhibit">
     <Position X="5.5" Y="4.5" Width="1.5" />
-    <Members>
-      <Property Name="Day" Hidden="true" />
-      <Property Name="Month" Hidden="true" />
-      <Property Name="Regime" Hidden="true" />
-      <Property Name="Sequence" Hidden="true" />
-      <Property Name="Threshold" Hidden="true" />
-      <Property Name="TimeUnit" Hidden="true" />
-      <Property Name="UniqueId" Hidden="true" />
-    </Members>
     <TypeIdentifier>
-      <HashCode>AAACAAAAJAAAQEAAAAAAAAAAAAAQAAAEAAAgAAEAQMA=</HashCode>
+      <HashCode>AAACAAAABAAAQEAAAAAAAAAAAAAAAAAkAAAAAAAAAAA=</HashCode>
       <FileName>Exhibit.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
@@ -22,28 +13,19 @@
   <Class Name="Chronozoom.Entities.Timeline">
     <Position X="3.25" Y="3" Width="1.5" />
     <Members>
-      <Property Name="FromDay" Hidden="true" />
-      <Property Name="FromMonth" Hidden="true" />
-      <Property Name="FromTimeUnit" Hidden="true" />
       <Property Name="Height" Hidden="true" />
       <Property Name="Regime" Hidden="true" />
-      <Property Name="Sequence" Hidden="true" />
-      <Property Name="Threshold" Hidden="true" />
-      <Property Name="ToDay" Hidden="true" />
-      <Property Name="ToMonth" Hidden="true" />
-      <Property Name="ToTimeUnit" Hidden="true" />
-      <Property Name="UniqueId" Hidden="true" />
     </Members>
     <AssociationLine Name="Exhibits" Type="Chronozoom.Entities.Exhibit" FixedFromPoint="true" FixedToPoint="true">
       <Path>
         <Point X="4.75" Y="3.657" />
         <Point X="5.125" Y="3.657" />
-        <Point X="5.125" Y="5.339" />
-        <Point X="5.5" Y="5.339" />
+        <Point X="5.125" Y="5.261" />
+        <Point X="5.5" Y="5.261" />
       </Path>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AAACAgCABgBAQGAIAAAAAAAEAAABAAAAAAQgAEEAQIE=</HashCode>
+      <HashCode>AAACAgCABAAAQGAIAAAAAAAAAAABAAAgAAAAAAAAAIA=</HashCode>
       <FileName>Timeline.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -57,36 +39,14 @@
   <Class Name="Chronozoom.Entities.ContentItem">
     <Position X="7.25" Y="6" Width="1.5" />
     <Members>
-      <Property Name="HasBibliography" Hidden="true" />
       <Property Name="MediaSource" Hidden="true" />
       <Property Name="MediaType" Hidden="true" />
       <Property Name="Order" Hidden="true" />
-      <Property Name="Regime" Hidden="true" />
-      <Property Name="Threshold" Hidden="true" />
-      <Property Name="TimeUnit" Hidden="true" />
-      <Property Name="UniqueId" Hidden="true" />
       <Property Name="Year" Hidden="true" />
     </Members>
     <TypeIdentifier>
-      <HashCode>AAECQAAARAAAQEgAAAQAAAAAAAAAAAAACAAgAAAAQMA=</HashCode>
+      <HashCode>AAECQAAARAAAQEgAAAAAAAAAAAAAAAAgCAAAAAAAAAA=</HashCode>
       <FileName>ContentItem.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Chronozoom.Entities.Reference">
-    <Position X="7.25" Y="8.25" Width="1.5" />
-    <Members>
-      <Property Name="Authors" Hidden="true" />
-      <Property Name="BookChapters" Hidden="true" />
-      <Property Name="CitationType" Hidden="true" />
-      <Property Name="PageNumbers" Hidden="true" />
-      <Property Name="Publication" Hidden="true" />
-      <Property Name="PublicationDates" Hidden="true" />
-      <Property Name="Source" Hidden="true" />
-      <Property Name="Title" Hidden="true" />
-    </Members>
-    <TypeIdentifier>
-      <HashCode>AAACgAAAAgAAAEAAAAEAAAAAAABAAAAAAAQAAECAAAA=</HashCode>
-      <FileName>Reference.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Chronozoom.Entities.Tour">
@@ -105,14 +65,14 @@
   <Class Name="Chronozoom.Entities.Collection">
     <Position X="0.5" Y="2.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAADAAAAAAAAAEAAAAAAAAgAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAADAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Collection.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Chronozoom.Entities.SuperCollection">
     <Position X="0.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAADAAAAAAAAAEAAAAAAAAgAAAAAAAAAAAAAAIAAAAA=</HashCode>
+      <HashCode>AAADAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAIAAAAA=</HashCode>
       <FileName>SuperCollection.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
