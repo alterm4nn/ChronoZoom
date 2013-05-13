@@ -357,8 +357,6 @@ describe("CZ.DateTickSource part", function () {
             dateTickSrc.getRegime(l, r);
             expect("Days_Quarters").toEqual(dateTickSrc.regime);
         });
-
-
     });
 });
 
