@@ -44,6 +44,7 @@ namespace Chronozoom.Api.Controllers
             return Redirect("/sandbox/sandbox/");
         }
 
+        [ValidateInput(false)]
         public ActionResult Success(FormCollection forms)
         {
             if (Request.IsAuthenticated)
