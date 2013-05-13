@@ -26,7 +26,8 @@ module CZ {
             "#auth-edit-contentitem-form": "/ui/auth-edit-contentitem-form.html",
             "$('<div></div>')": "/ui/contentitem-listbox.html",
             "#profile-form": "/ui/header-edit-profile-form.html",
-            "#login-form": "/ui/header-login-form.html"
+            "#login-form": "/ui/header-login-form.html",
+            "#timeseries-form": "/ui/timeseries-graph-form.html"
         };
 
         enum FeatureActivation {
