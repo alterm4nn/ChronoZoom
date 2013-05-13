@@ -356,7 +356,6 @@
     <Content Include="dumps\aidstimeline-get.json" />
     <Content Include="dumps\aidstimeline-gettours.json" />
     <Content Include="dumps\beta-get.json" />
-    <Content Include="dumps\beta-getthresholds.json" />
     <Content Include="dumps\beta-gettours.json" />
     <Content Include="TraceLog.html" />
     <Content Include="images\close_off.png" />
@@ -422,7 +421,9 @@
       <DependentUpon>cz.less</DependentUpon>
     </Content>
     <Content Include="css\Site.css" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Chronozoom.svc.cs">

@@ -39,47 +39,16 @@ namespace Chronozoom.Entities
         public string Title { get; set; }
 
         /// <summary>
-        /// The threshold that is associated with the timeline.
-        /// </summary>
-        [Obsolete("Beta Only")]
-        public string Threshold { get; set; }
-
-        /// <summary>
         /// The regime in which the timeline should occur.
         /// </summary>
         [DataMember]
         public string Regime { get; set; }
-
-        [NotMapped]
-        [Obsolete("Beta Only")]
-        public string FromTimeUnit { get; set; }
-
-        [NotMapped]
-        [Obsolete("Beta Only")]
-        public int? FromDay { get; set; }
-
-        [NotMapped]
-        [Obsolete("Beta Only")]
-        public int? FromMonth { get; set; }
 
         /// <summary>
         /// The year the timeline begins.
         /// </summary>
         [DataMember(Name = "start")]
         public decimal FromYear { get; set; }
-
-        [NotMapped]
-        [Obsolete("Beta Only")]
-        public string ToTimeUnit { get; set; }
-
-        [NotMapped]
-        [Obsolete("Beta Only")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ToDay", Justification = "This property will be removed soon")]
-        public int? ToDay { get; set; }
-
-        [NotMapped]
-        [Obsolete("Beta Only")]
-        public int? ToMonth { get; set; }
 
         /// <summary>
         /// The year the timeline ends.
@@ -91,18 +60,6 @@ namespace Chronozoom.Entities
         /// ???
         /// </summary>
         public decimal ForkNode { get; set; }
-
-        /// <summary>
-        /// The unique ID of the timeline.
-        /// </summary>
-        [Obsolete("Beta Only")]
-        public int UniqueId { get; set; }
-
-        /// <summary>
-        /// ???
-        /// </summary>
-        [Obsolete("Beta Only")]
-        public int? Sequence { get; set; }
 
         /// <summary>
         /// The height of the timeline.
