@@ -5,7 +5,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using Chronozoom.Api;
-using Chronozoom.Api.Models;
 using Chronozoom.Entities;
 using Newtonsoft.Json;
 using OuterCurve;
@@ -22,7 +21,7 @@ using System.Web.Mvc;
 using System.Text.RegularExpressions;
 
 
-namespace UI
+namespace Chronozoom.UI
 {
     public class Global : System.Web.HttpApplication
     {
@@ -30,7 +29,7 @@ namespace UI
 
         internal static TraceSource Trace { get; set; }
 
-        public class WebFormRouteHandler<T> : IRouteHandler where T : IHttpHandler, new()
+        internal class WebFormRouteHandler<T> : IRouteHandler where T : IHttpHandler, new()
         {
             public string VirtualPath { get; set; }
 
@@ -47,7 +46,7 @@ namespace UI
             }
         }
 
-        public static void RegisterRoutes(RouteCollection routes)
+        internal static void RegisterRoutes(RouteCollection routes)
         {
             var routeHandlerDetails = new WebFormRouteHandler<Page>("~/cz.aspx");
             routes.MapRoute(
@@ -66,14 +65,7 @@ namespace UI
             Storage.Trace.Listeners.Add(SignalRTraceListener);
 
             RouteTable.Routes.MapHubs();
-            WebApiConfig.Register(GlobalConfiguration.Configuration);
             RegisterRoutes(RouteTable.Routes);
-
-            using (StreamReader file = File.OpenText(HostingEnvironment.ApplicationPhysicalPath + @"/Dumps/wahib-responsedumprest.json"))
-            {
-                JsonSerializer serializer = new JsonSerializer();
-                Globals.Root = (Chronozoom.Api.Models.Timeline)serializer.Deserialize(file, typeof(Chronozoom.Api.Models.Timeline));
-            }
 
             Trace.TraceInformation("Application Starting");
         }
@@ -86,21 +78,14 @@ namespace UI
         {
         }
 
-        void Application_BeginRequest(object sender, EventArgs e)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+        public void Application_BeginRequest(object sender, EventArgs e)
         {
-            Regex r = new Regex(@"^/[a-z\-_0-9]+/?$");
-
             var app = (HttpApplication)sender;
             if (app.Context.Request.Url.LocalPath == "/")
             {
-                app.Context.RewritePath(
-                         string.Concat(app.Context.Request.Url.LocalPath, "cz.aspx"));
-            }
-            else if (r.IsMatch(app.Context.Request.Url.LocalPath))
-            {
-                app.Context.RewritePath(string.Concat(app.Context.Request.Url.LocalPath, "cz.aspx?new=1"));
+                app.Context.RewritePath(string.Concat(app.Context.Request.Url.LocalPath, "cz.aspx"));
             }
         }
-
     }
 }

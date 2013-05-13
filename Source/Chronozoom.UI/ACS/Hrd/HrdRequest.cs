@@ -44,6 +44,7 @@ namespace ASC.Hrd
         /// <param name="replyTo">Optional reply_to for the relying party</param>
         /// <param name="context">Optional context for the request</param>
         /// <param name="callback">Optional callback method. When specified the response will include java script to call this method.</param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2234:PassSystemUriObjectsInsteadOfStrings")]
         public HrdRequest(string issuer,
             string realm,
             Protocol protocol = Protocol.wsfederation,
@@ -74,6 +75,7 @@ namespace ASC.Hrd
         /// Gets the url with its query string representing this request
         /// </summary>
         /// <returns></returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1055:UriReturnValuesShouldNotBeStrings")]
         public string GetUrlWithQueryString()
         {
             uriBuilder.Path = HrdPath;

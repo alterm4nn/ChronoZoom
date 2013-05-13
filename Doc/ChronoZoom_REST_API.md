@@ -95,7 +95,6 @@ Contains a set of content items, and is contained by a timeline or a collection.
 |Threshold|The threshold for the exhibit.|
 |Regime|The regime in which the threshold should appear.|
 |Day||
-|Year|The year in which the exhibit appears.|
 |UniqueId|The unique ID of the exhibit.|
 |Sequence|Specifies the point of the exhibit within the sequence.|
 |ContentItems|Specifies the collection of content items that is associated with the exhibit.|
@@ -187,8 +186,10 @@ A registered user.
 - [GetThresholds](#getthresholds)
 - [Search](#search)
 - [GetBibliography](#getbibliography)
+- [GetDefaultTours](#getdefaulttours)
 - [GetTours](#gettours)
 - [PutUser](#putuser)
+- [GetServiceInformation](#getserviceinformation)
 - [DeleteUser](#deleteuser)
 - [PutCollectionName](#putcollectionname)
 - [DeleteCollection](#deletecollection)
@@ -236,6 +237,7 @@ Timeline data in JSON format.
 |lca|Least Common Ancestor, a timeline identifier used to hint the server to retrieve timelines close to this location.|
 |maxElements|The maximum number of elements to return.|
  
+ 
 [top](#chronozoom-rest-api-reference)
  
 ----------
@@ -258,6 +260,7 @@ Time threshold data in JSON format.
  
 **Parameters**
 None.
+ 
  
 [top](#chronozoom-rest-api-reference)
  
@@ -292,6 +295,7 @@ Search results in JSON format.
 |collection|Name of the collection to query.|
 |searchTerm|The term to search for.|
  
+ 
 [top](#chronozoom-rest-api-reference)
  
 ----------
@@ -323,6 +327,54 @@ The bibliography data in JSON format.
 |:--------|:----|
 |exhibitId|ID of the exhibit.|
  
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+## GetDefaultTours ##
+ 
+Returns a list of tours for the default collection and default supercollection.
+ 
+**Returns**
+A list of tours in JSON format.
+ 
+**Example**
+ 
+    HTTP verb: GET
+            
+    URL: 
+    http://[site URL]/chronozoom.svc/tours
+    
+
+ 
+**Parameters**
+None.
+ 
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+## GetDefaultTours ##
+ 
+Returns a list of tours for the default collection and default supercollection.
+ 
+**Returns**
+A list of tours in JSON format.
+ 
+**Example**
+ 
+    HTTP verb: GET
+            
+    URL: 
+    http://[site URL]/chronozoom.svc/tours
+    
+
+ 
+**Parameters**
+None.
+ 
 [top](#chronozoom-rest-api-reference)
  
 ----------
@@ -349,6 +401,7 @@ A list of tours in JSON format.
 |:--------|:----|
 |supercollection|Name of the supercollection to query.|
 |collection|Name of the collection to query.|
+ 
  
 [top](#chronozoom-rest-api-reference)
  
@@ -383,6 +436,47 @@ The URL for the new user collection.
 |:--------|:----|
 |userRequest|JSON containing the request details.|
  
+**Remarks**
+If the user ID is omitted then a new user is created.
+             If there is no ACS the user is treated as anonymous and granted access to the sandbox collection.
+             If the anonymous user does not exist in the database then it is created.
+             A new supercollection with the user's display name is added.
+             A new default collection with the user's display name is added to this supercollection.
+             A new user with the specified attributes is created.
+            
+             If the specified user display name does not exist it is considered an error.
+             If the user display name is specified and it exists then the user's attributes are updated.
+ 
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+## GetServiceInformation ##
+ 
+Provides information about the ChronoZoom service to the clients. Used internally by the ChronoZoom client.
+ 
+**Returns**
+A ServiceInformation object describing parameter from the running service
+ 
+**Parameters**
+None.
+ 
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+## GetServiceInformation ##
+ 
+Provides information about the ChronoZoom service to the clients. Used internally by the ChronoZoom client.
+ 
+**Returns**
+A ServiceInformation object describing parameter from the running service
+ 
+**Parameters**
+None.
+ 
 [top](#chronozoom-rest-api-reference)
  
 ----------
@@ -412,6 +506,7 @@ HTTP response code.
 |Parameter|Value|
 |:--------|:----|
 |userRequest|JSON containing the request details.|
+ 
  
 [top](#chronozoom-rest-api-reference)
  
@@ -446,6 +541,13 @@ Creates a new collection using the specified name.
 |collectionName|The name of the collection to create.|
 |collectionRequest|The markup for the collection to create in JSON format.|
  
+**Remarks**
+If a collection of the specified name does not exist then a new collection is created. 
+             If the collection exists and the authenticated user is the author then the collection is modified. 
+             If no author is registered then the authenticated user is set as the author. 
+             The title field can't be modified because it is part of the URL (the URL can be indexed).
+ 
+ 
 [top](#chronozoom-rest-api-reference)
  
 ----------
@@ -472,6 +574,7 @@ HTTP response code.
 |:--------|:----|
 |superCollectionName|The name of the parent collection.|
 |collectionName|The name of the collection to delete.|
+ 
  
 [top](#chronozoom-rest-api-reference)
  
@@ -507,6 +610,13 @@ HTTP status code.
 |collectionName|The name of the collection to update.|
 |timelineRequest|Timeline data in JSON format.|
  
+**Remarks**
+If an ID is specified but the collection does not exist, the request will fail ("not found" status).
+             If an ID is not specified, a new timeline will be added to the collection. 
+             For a new timeline, if the parent is not defined the root timeline will be set as the parent.
+             If the timeline with the specified identifier exists, then the existing timeline is updated.
+ 
+ 
 [top](#chronozoom-rest-api-reference)
  
 ----------
@@ -536,6 +646,7 @@ Deletes the timeline with the specified ID.
 |superCollectionName|The name of the parent collection.|
 |collectionName|The name of the collection from which the timeline should be deleted.|
 |timelineRequest|The request in JSON format.|
+ 
  
 [top](#chronozoom-rest-api-reference)
  
@@ -570,6 +681,15 @@ An exhibit in JSON format.
 |collectionName|The name of the collection to modify.|
 |exhibitRequest|The exhibit data in JSON format.|
  
+**Remarks**
+If an exhibit id is not specified, a new exhibit is added to the collection. 
+             If the ID for an existing exhibit is specified then the exhibit will be updated. 
+             If the exhibit ID to be updated does not exist a "not found" status is returned. 
+             If the parent timeline is not specified the exhibit is added to the root timeline. 
+             Otherwise, the exhibit is added to the specified parent timeline. 
+             If an invalid parent timeline is specified then the request will fail.
+ 
+ 
 [top](#chronozoom-rest-api-reference)
  
 ----------
@@ -599,6 +719,7 @@ Deletes the specified exhibit from the specified collection.
 |superCollectionName|The name of the parent collection.|
 |collectionName|The name of the collection to modify.|
 |exhibitRequest|The exhibit ID in JSON format.|
+ 
  
 [top](#chronozoom-rest-api-reference)
  
@@ -633,6 +754,7 @@ Creates or updates the content item in a given collection. If the collection doe
 |collectionName|The name of the collection to modify.|
 |contentItemRequest|The content item data in JSON format.|
  
+ 
 [top](#chronozoom-rest-api-reference)
  
 ----------
@@ -662,6 +784,7 @@ Delete the specified content item from the specified collection.
 |superCollectionName|The name of the parent collection.|
 |collectionName|The name of the collection to modify.|
 |contentItemRequest|The request in JSON format.|
+ 
  
 [top](#chronozoom-rest-api-reference)
  

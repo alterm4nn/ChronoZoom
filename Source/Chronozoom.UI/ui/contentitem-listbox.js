@@ -49,7 +49,7 @@ var CZ;
                 this.iconImg = this.container.find(uiMap.iconImg);
                 this.titleTextblock = this.container.find(uiMap.titleTextblock);
                 this.descrTextblock = this.container.find(uiMap.descrTextblock);
-                this.iconImg.attr("src", this.data.icon || "/Images/Temp-Thumbnail2.png");
+                this.iconImg.attr("src", this.data.icon || "/images/Temp-Thumbnail2.png");
                 this.titleTextblock.text(this.data.title);
                 this.descrTextblock.text(this.data.description);
                 this.closeButton.off();

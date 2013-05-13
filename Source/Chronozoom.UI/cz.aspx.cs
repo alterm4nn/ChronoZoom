@@ -6,7 +6,7 @@
 
 using System;
 
-namespace UI
+namespace Chronozoom.UI
 {
     public partial class EntryPage : System.Web.UI.Page
     {
@@ -14,11 +14,11 @@ namespace UI
         {
             if (Request.Browser["IsMobileDevice"] == "false" || Request.QueryString["full"] == "1")
             {
-                Server.Transfer(Page.ResolveUrl("~/") + "/cz2.html");
+                Server.Transfer(Page.ResolveUrl("~/") + "/cz.html");
             }
             else
             {
-                Server.Transfer(Page.ResolveUrl("~/") + "/cz2.html?experience=mobile");
+                Server.Transfer(Page.ResolveUrl("~/") + "/cz.html?experience=mobile");
             }
         }
     }
