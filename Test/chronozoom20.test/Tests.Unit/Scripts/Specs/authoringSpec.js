@@ -11,6 +11,11 @@ describe("CZ.Authoring part", function () {
     beforeEach(function () {
         authoring = CZ.Authoring;
         validateContentItems = authoring.ValidateContentItems;
+        validateTimelineData = authoring.ValidateTimelineData;
+        validateExhibitData = authoring.ValidateExhibitData;
+        validateNumber = authoring.ValidateNumber;
+        isNotEmpty = authoring.IsNotEmpty;
+        isNonegHeight = authoring.isNonegHeight;
         alertMessage = '';
     });
 
@@ -138,4 +143,120 @@ describe("CZ.Authoring part", function () {
 
         });
     });
+
+    //todo: Need to use 'using' function
+    describe("ValidateTimelineData() function", function() {
+        describe("should return", function() {
+            it("true, if start less than end", function() {
+                var start = 2; var end = 5; var title = 'test';
+                var isValid = validateTimelineData(start, end, title);
+                expect(isValid).toEqual(true);
+            });
+        });
+    });
+    
+    describe("ValidateNumber() function", function () {
+        describe("should return", function () {
+            it("true, if number not null ", function () {
+                var number = 0;
+                var result = validateNumber(number);
+                expect(true).toEqual(result);
+            });
+            
+            it("false, if number is empty ", function () {
+                var number = '';
+                var result = validateNumber(number);
+                expect(false).toEqual(result);
+            });
+            
+            it("false, if number equal any text ", function () {
+                var number = 'text';
+                var result = validateNumber(number);
+                expect(false).toEqual(result);
+            });
+            
+            it("false, if number equal NaN", function () {
+                var number = NaN;
+                var result = validateNumber(number);
+                expect(false).toEqual(result);
+            });
+            
+            it("false, if number start with point (.2)", function () {
+                var number = .2;
+                var result = validateNumber(number);
+                expect(false).toEqual(result);
+            });
+            
+            it("false, if number end with point (2.)", function () {
+                var number = 2.;
+                var result = validateNumber(number);
+                expect(false).toEqual(result);
+            });
+        });
+    });
+    
+    describe("IsNotEmpty() function", function () {
+        describe("should return", function () {
+            it("false, if object is empty ", function () {
+                var obj = '';
+                var result = isNotEmpty(obj);
+                expect(false).toEqual(result);
+            });
+            
+            it("false, if object is null ", function () {
+                var obj = null;
+                var result = isNotEmpty(obj);
+                expect(false).toEqual(result);
+            });
+            
+            it("true, if object is not null", function () {
+                var obj = 'text';
+                var result = isNotEmpty(obj);
+                expect(true).toEqual(result);
+            });
+        });
+    });
+    
+    describe("isNonegHeight() function", function () {
+        describe("should return", function () {
+            it("true, if start < end", function () {
+                var start = 2, end = 5;
+                var result = isNonegHeight(start, end);
+                expect(true).toEqual(result);
+            });
+
+            it("false, if start > end", function () {
+                var start = 5, end = 2;
+                var result = isNonegHeight(start, end);
+                expect(false).toEqual(result);
+            });
+            
+            it("false, if start = end", function () {
+                var start = 5, end = 5;
+                var result = isNonegHeight(start, end);
+                expect(false).toEqual(result);
+            });
+        });
+    });
+    
+    //todo: need to use using, table of data:
+    describe("ValidateExhibitData() function", function () {
+        describe("should return", function () {
+            it("true, if Date is number, title is not empty, contentItems is not empty", function () {
+                var date = 100, title = 'text', contentItems = [{ mediaType: 'image', uri: 'image.jpg', title: 'Title' }];
+                var result = validateExhibitData(date,title,contentItems);
+                expect(true).toEqual(result);
+            });
+        });
+    });
 });
+
+function using(name, values, func) {
+    for (var i = 0, count = values.length; i < count; i++) {
+        if (Object.prototype.toString.call(values[i]) !== '[object Array]') {
+            values[i] = [values[i]];
+        }
+        func.apply(this, [values[i][0], values[i][1], values[i][2], values[i][3], values[i][4], values[i][5]]);
+        jasmine.currentEnv_.currentSpec.description += ' ' + name + '[' + "title: " + values[i][0] + ", start: " + values[i][1] + ", end: " + values[i][2] + ", regimeStart: " + values[i][3] + ", regimeEnd: " + values[i][4];
+    }
+}
