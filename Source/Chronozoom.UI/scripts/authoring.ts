@@ -726,26 +726,24 @@ module CZ {
                         isValid = false;
                     }
                 } else if (ci.mediaType.toLowerCase() === "video") {
-                    //YouTube
-                    // from http://stackoverflow.com/questions/3452546/javascript-regex-how-to-get-youtube-video-id-from-url
-                    var youtube = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-                    var youtubeEmbed = /www.\youtube\.com\/embed\/([a-z0-9\-]+)/i;
-
-                    //Vimeo
+                    // Youtube
+                    var youtube = /(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/user\/\S+))([^\/&]{10,12})/
+                    // Vimeo
                     var vimeo = /vimeo\.com\/([0-9]+)/i
                     var vimeoEmbed = /player.vimeo.com\/video\/([0-9]+)/i
 
                     if (youtube.test(ci.uri)) {
-                        var youtubeResult = ci.uri.match(youtube);
-                        ci.uri = "http://www.youtube.com/embed/" + youtubeResult[1];
+                        var youtubeVideoId = ci.uri.match(youtube)[1];
+                        ci.uri = "http://www.youtube.com/embed/" + youtubeVideoId;
                     } else if (vimeo.test(ci.uri)) {
-                        var vimeoResult = ci.uri.match(vimeo);
-                        ci.uri = "http://player.vimeo.com/video/" + vimeoResult[1];
-                    } else if (youtubeEmbed.test(ci.uri) || vimeoEmbed.test(ci.uri)) {
+                        var vimeoVideoId = ci.uri.match(vimeo);
+                        ci.uri = "http://player.vimeo.com/video/" + vimeoVideoId[1];
+                    } else if (vimeoEmbed.test(ci.uri)) {
                         //Embedded link provided
                     } else {
                         alert("Sorry, only YouTube or Vimeo videos are supported");
                         isValid = false;
+
                     }
 
                 } else if (ci.mediaType.toLowerCase() === "pdf") {
