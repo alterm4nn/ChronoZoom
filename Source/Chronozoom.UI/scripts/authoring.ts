@@ -726,20 +726,18 @@ module CZ {
                         isValid = false;
                     }
                 } else if (ci.mediaType.toLowerCase() === "video") {
-                    var youtubeVideoId = ci.uri.split('v=')[1];
-                    var ampersandPosition = youtubeVideoId.indexOf('&');
-                    if (ampersandPosition != -1) {
-                        youtubeVideoId = youtubeVideoId.substring(0, ampersandPosition);
-                    }
-                    //Vimeo
+                    // Youtube
+                    var youtube = /(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/user\/\S+|\/ytscreeningroom\?v=|\/sandalsResorts#\w\/\w\/.*\/))([^\/&]{10,12})/
+                    // Vimeo
                     var vimeo = /vimeo\.com\/([0-9]+)/i
                     var vimeoEmbed = /player.vimeo.com\/video\/([0-9]+)/i
 
-                    if (youtubeVideoId !== null) {
+                    if (youtube.test(ci.uri)) {
+                        var youtubeVideoId = ci.uri.match(youtube)[1];
                         ci.uri = "http://www.youtube.com/embed/" + youtubeVideoId;
                     } else if (vimeo.test(ci.uri)) {
-                        var vimeoResult = ci.uri.match(vimeo);
-                        ci.uri = "http://player.vimeo.com/video/" + vimeoResult[1];
+                        var vimeoVideoId = ci.uri.match(vimeo);
+                        ci.uri = "http://player.vimeo.com/video/" + vimeoVideoId[1];
                     } else if (vimeoEmbed.test(ci.uri)) {
                         //Embedded link provided
                     } else {
