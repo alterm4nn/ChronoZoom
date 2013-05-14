@@ -727,7 +727,7 @@ module CZ {
                     }
                 } else if (ci.mediaType.toLowerCase() === "video") {
                     // Youtube
-                    var youtube = /(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/user\/\S+|\/ytscreeningroom\?v=|\/sandalsResorts#\w\/\w\/.*\/))([^\/&]{10,12})/
+                    var youtube = /(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/user\/\S+))([^\/&]{10,12})/
                     // Vimeo
                     var vimeo = /vimeo\.com\/([0-9]+)/i
                     var vimeoEmbed = /player.vimeo.com\/video\/([0-9]+)/i
