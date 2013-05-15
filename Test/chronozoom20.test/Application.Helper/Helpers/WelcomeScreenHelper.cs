@@ -22,7 +22,7 @@ namespace Application.Helper.Helpers
         public bool IsWelcomeScreenDispalyed()
         {
             Logger.Log("<-");
-            bool result = IsElementDisplayed(By.Id("welcomeScreen"));
+            bool result = IsElementExists(By.Id("welcomeScreen"));
             Logger.Log("-> result: " + result);
             return result;
         }
