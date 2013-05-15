@@ -20,7 +20,7 @@ namespace Application.Helper.Helpers
             _manager.GetNavigationHelper().OpenHomePage();
             WaitWhileHomePageIsLoaded();
         }
-        
+
         public void OpenSandboxPage()
         {
             _manager.GetNavigationHelper().OpenSandboxPage();
@@ -60,7 +60,7 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<-");
             _manager.GetNavigationHelper().NavigateToCosmos();
-            WaitCondition(()=>GetItemsCount(By.XPath("//*[@id='breadcrumbs-table']//td")) == 1,60);
+            WaitCondition(() => GetItemsCount(By.XPath("//*[@id='breadcrumbs-table']//td")) == 1, 60);
             Logger.Log("->");
         }
 
@@ -126,7 +126,7 @@ namespace Application.Helper.Helpers
             Click(By.XPath("(//*[@class='footer-link'])[1]"));
             Logger.Log("->");
         }
-        
+
         public void OpenPrivacyLink()
         {
             Logger.Log("<-");
