@@ -150,6 +150,7 @@
     <Reference Include="System.Web.Routing">
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Web.Services" />
     <Reference Include="System.Web.WebPages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
@@ -168,11 +169,13 @@
     <Content Include="ACS\FederationMetadata\2007-06\FederationMetadata.xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="default.ashx.cs">
+      <DependentUpon>default.ashx</DependentUpon>
+    </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="utils\ThumbnailGenerator.cs" />
-    <Content Include="cz.aspx" />
     <Content Include="cz.html" />
     <Content Include="fallback.html" />
     <Content Include="Global.asax" />
@@ -430,10 +433,6 @@
       <DependentUpon>Chronozoom.svc</DependentUpon>
     </Compile>
     <Compile Include="ACS\controllers\AccountController.cs" />
-    <Compile Include="cz.aspx.cs">
-      <DependentUpon>cz.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="utils\GlobalSuppressions.cs" />
     <!--<Compile Include="Models\Reference.cs" />-->
     <!--<Compile Include="Models\Utility.cs" />-->
@@ -479,6 +478,9 @@
     <Content Include="css\cz.less" />
     <Content Include="css\datepicker.less" />
     <Content Include="css\timescale.less" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="default.ashx" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
