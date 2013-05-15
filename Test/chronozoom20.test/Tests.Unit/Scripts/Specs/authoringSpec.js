@@ -184,11 +184,17 @@ describe("CZ.Authoring part", function () {
             it("false, if number start with point (.2)", function () {
                 var number = .2;
                 var result = validateNumber(number);
-                expect(false).toEqual(result);
+                expect(true).toEqual(result);
             });
 
             it("false, if number end with point (2.)", function () {
                 var number = 2.;
+                var result = validateNumber(number);
+                expect(true).toEqual(result);
+            });
+
+            it("false, if number contains both numeric and alphabet symbols (2f2)", function () {
+                var number = '2f2';
                 var result = validateNumber(number);
                 expect(false).toEqual(result);
             });
