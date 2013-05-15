@@ -1,5 +1,4 @@
-﻿using System;
-using Application.Helper.Entities;
+﻿using Application.Helper.Entities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.ObjectModel;
 
@@ -22,7 +21,7 @@ namespace Tests
 
         };
 
-        static readonly Exhibit _exhibit = new Exhibit
+        static readonly Exhibit Exhibit = new Exhibit
         {
             Title = "WebdriverExhibitWithContent",
             ContentItems = new Collection<Chronozoom.Entities.ContentItem> { ContentItem }
@@ -37,7 +36,7 @@ namespace Tests
             HomePageHelper.OpenSandboxPage();
             HomePageHelper.DeleteAllElementsLocally();
 
-            ExhibitHelper.AddExhibitWithContentItem(_exhibit);
+            ExhibitHelper.AddExhibitWithContentItem(Exhibit);
             _newExhibit = ExhibitHelper.GetNewExhibit();
 
         }
@@ -69,30 +68,30 @@ namespace Tests
         [TestMethod]
         public void new_exhibit_content_shoul_be_correctly()
         {
-            for (int i = 0; i < _exhibit.ContentItems.Count; i++)
+            for (int i = 0; i < Exhibit.ContentItems.Count; i++)
             {
-                Assert.AreEqual(_exhibit.ContentItems[i].Title, _newExhibit.ContentItems[i].Title, "Content items titles are not equal");
-                Assert.AreEqual(_exhibit.ContentItems[i].Caption, _newExhibit.ContentItems[i].Caption, "Content items descriptions are not equal");
+                Assert.AreEqual(Exhibit.ContentItems[i].Title, _newExhibit.ContentItems[i].Title, "Content items titles are not equal");
+                Assert.AreEqual(Exhibit.ContentItems[i].Caption, _newExhibit.ContentItems[i].Caption, "Content items descriptions are not equal");
 
-                Assert.AreEqual(_exhibit.ContentItems[i].MediaType, _newExhibit.ContentItems[i].MediaType, true, "Content items mediaTypes are not equal");
-                Assert.AreEqual(_exhibit.ContentItems[i].MediaSource, _newExhibit.ContentItems[i].MediaSource, "Content items mediaSourses are not equal");
-                Assert.AreEqual(_exhibit.ContentItems[i].Attribution, _newExhibit.ContentItems[i].Attribution, "Content items attributions are not equal");
+                Assert.AreEqual(Exhibit.ContentItems[i].MediaType, _newExhibit.ContentItems[i].MediaType, true, "Content items mediaTypes are not equal");
+                Assert.AreEqual(Exhibit.ContentItems[i].MediaSource, _newExhibit.ContentItems[i].MediaSource, "Content items mediaSourses are not equal");
+                Assert.AreEqual(Exhibit.ContentItems[i].Attribution, _newExhibit.ContentItems[i].Attribution, "Content items attributions are not equal");
             }
         }
 
         [TestMethod]
         public void new_exhibit_should_have_a_title()
         {
-            Assert.AreEqual(_exhibit.Title, _newExhibit.Title, "Titles are not equal");
+            Assert.AreEqual(Exhibit.Title, _newExhibit.Title, "Titles are not equal");
         }
 
         [TestMethod]
         public void new_exhibit_should_have_a_correct_url()
         {
             //Bug https://github.com/alterm4nn/ChronoZoom/issues/147
-            for (int i = 0; i < _exhibit.ContentItems.Count; i++)
+            for (int i = 0; i < Exhibit.ContentItems.Count; i++)
             {
-                Assert.AreEqual(_exhibit.ContentItems[i].Uri, _newExhibit.ContentItems[i].Uri,
+                Assert.AreEqual(Exhibit.ContentItems[i].Uri, _newExhibit.ContentItems[i].Uri,
                                 "Content items Urls are not equal");
             }
         }
@@ -101,7 +100,7 @@ namespace Tests
         [TestMethod]
         public void new_exhibit_should_have_a_content_items()
         {
-            Assert.AreEqual(_exhibit.ContentItems.Count, _newExhibit.ContentItems.Count, "Content items count are not equal");
+            Assert.AreEqual(Exhibit.ContentItems.Count, _newExhibit.ContentItems.Count, "Content items count are not equal");
         }
 
         [TestMethod]
