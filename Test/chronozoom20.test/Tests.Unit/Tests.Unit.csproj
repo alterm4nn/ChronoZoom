@@ -84,7 +84,6 @@
     <Content Include="Scripts\Js\service.js" />
     <Content Include="Scripts\Js\settings.js" />
     <Content Include="Scripts\Js\timescale.js" />
-    <Content Include="Scripts\Specs\authoringSpec-min.js" />
     <Content Include="Scripts\Specs\authoringSpec.js" />
     <Content Include="Scripts\Specs\CommonSpec.js" />
     <Content Include="Scripts\Specs\CsvParse.js" />
@@ -107,6 +106,8 @@ mkdir .\Scripts\Js
 mkdir .\Scripts\Utils
 
 copy "..\..\..\Source\Chronozoom.UI\Scripts\*.js" "$(ProjectDir)Scripts\Js\" /y
+copy "..\..\..\Source\Chronozoom.UI\ui\*.js" "$(ProjectDir)Scripts\Js\" /y
+copy "..\..\..\Source\Chronozoom.UI\ui\controls\*.js" "$(ProjectDir)Scripts\Js\" /y
 copy "..\..\..\Source\Chronozoom.UI\Scripts\external\*.js" "$(ProjectDir)Scripts\Utils\" /y</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
