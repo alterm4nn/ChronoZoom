@@ -41,8 +41,8 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<-");
             _manager.GetNavigationHelper().OpenLifePage();
-            WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='Life']"));
             WaitAnimation();
+            WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='Life']"));
             Logger.Log("->");
         }
 
@@ -52,6 +52,15 @@ namespace Application.Helper.Helpers
             _manager.GetNavigationHelper().OpenHumanityPage();
             WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='Humanity']"));
             WaitAnimation();
+            Logger.Log("->");
+        }
+
+
+        public void OpenCosmosTimeline()
+        {
+            Logger.Log("<-");
+            _manager.GetNavigationHelper().NavigateToCosmos();
+            WaitCondition(()=>GetItemsCount(By.XPath("//*[@id='breadcrumbs-table']//td")) == 1,60);
             Logger.Log("->");
         }
 
@@ -161,5 +170,6 @@ namespace Application.Helper.Helpers
             Logger.Log("-> Last Breadcrumbs: " + result);
             return result;
         }
+
     }
 }
