@@ -6,7 +6,7 @@
 describe("CZ.Authoring part", function () {
     var alertMessage;
     alert = function (message) { alertMessage = message; };
-    
+
     var authoring;
     beforeEach(function () {
         authoring = CZ.Authoring;
@@ -24,12 +24,12 @@ describe("CZ.Authoring part", function () {
         describe("should return", function () {
 
             //empty array
-            it("true, if 'contentItems' is empty array", function () {
+            it("false, if 'contentItems' is empty array", function () {
                 contentItems = [];
                 var isValid = validateContentItems(contentItems);
-                expect(true).toEqual(isValid);
+                expect(false).toEqual(isValid);
             });
-            
+
             //Empty fields
             it("false, if 'title' is empty", function () {
                 contentItems = [{ mediaType: 'Image', uri: 'Uri', title: '' }];
@@ -46,7 +46,7 @@ describe("CZ.Authoring part", function () {
                 var isValid = validateContentItems(contentItems);
                 expect(false).toEqual(isValid);
             });
-            
+
             //Image
             it("true, if 'mediaType' equal 'Image' and 'uri' end with 'jpg'", function () {
                 contentItems = [{ mediaType: 'Image', uri: 'www.example.com/image.jpg', title: 'Title' }];
@@ -69,7 +69,7 @@ describe("CZ.Authoring part", function () {
                 expect(false).toEqual(isValid);
                 expect('Sorry, only JPG/PNG images are supported').toEqual(alertMessage);
             });
-           
+
             //Video
             it("true, if 'mediaType' equal 'Video' and 'uri' equal 'http://www.youtube.com/watch?v=3jvJD8Qv5ec'", function () {
                 contentItems = [{ mediaType: 'Video', uri: 'http://www.youtube.com/watch?v=3jvJD8Qv5ec', title: 'Title' }];
@@ -138,23 +138,23 @@ describe("CZ.Authoring part", function () {
                 contentItems = [{ mediaType: 'PDF', uri: 'http://site.com/mypdffile', title: 'Title' }];
                 var isValid = validateContentItems(contentItems);
                 expect(false).toEqual(isValid);
-                expect('Sorry, only PDF is supported').toEqual(alertMessage);
+                expect('Sorry, only PDF extension is supported').toEqual(alertMessage);
             });
 
         });
     });
 
     //todo: Need to use 'using' function
-    describe("ValidateTimelineData() function", function() {
-        describe("should return", function() {
-            it("true, if start less than end", function() {
+    describe("ValidateTimelineData() function", function () {
+        describe("should return", function () {
+            it("true, if start less than end", function () {
                 var start = 2; var end = 5; var title = 'test';
                 var isValid = validateTimelineData(start, end, title);
                 expect(isValid).toEqual(true);
             });
         });
     });
-    
+
     describe("ValidateNumber() function", function () {
         describe("should return", function () {
             it("true, if number not null ", function () {
@@ -162,31 +162,31 @@ describe("CZ.Authoring part", function () {
                 var result = validateNumber(number);
                 expect(true).toEqual(result);
             });
-            
+
             it("false, if number is empty ", function () {
                 var number = '';
                 var result = validateNumber(number);
                 expect(false).toEqual(result);
             });
-            
+
             it("false, if number equal any text ", function () {
                 var number = 'text';
                 var result = validateNumber(number);
                 expect(false).toEqual(result);
             });
-            
+
             it("false, if number equal NaN", function () {
                 var number = NaN;
                 var result = validateNumber(number);
                 expect(false).toEqual(result);
             });
-            
+
             it("false, if number start with point (.2)", function () {
                 var number = .2;
                 var result = validateNumber(number);
                 expect(false).toEqual(result);
             });
-            
+
             it("false, if number end with point (2.)", function () {
                 var number = 2.;
                 var result = validateNumber(number);
@@ -194,7 +194,7 @@ describe("CZ.Authoring part", function () {
             });
         });
     });
-    
+
     describe("IsNotEmpty() function", function () {
         describe("should return", function () {
             it("false, if object is empty ", function () {
@@ -202,13 +202,13 @@ describe("CZ.Authoring part", function () {
                 var result = isNotEmpty(obj);
                 expect(false).toEqual(result);
             });
-            
+
             it("false, if object is null ", function () {
                 var obj = null;
                 var result = isNotEmpty(obj);
                 expect(false).toEqual(result);
             });
-            
+
             it("true, if object is not null", function () {
                 var obj = 'text';
                 var result = isNotEmpty(obj);
@@ -216,7 +216,7 @@ describe("CZ.Authoring part", function () {
             });
         });
     });
-    
+
     describe("isNonegHeight() function", function () {
         describe("should return", function () {
             it("true, if start < end", function () {
@@ -230,7 +230,7 @@ describe("CZ.Authoring part", function () {
                 var result = isNonegHeight(start, end);
                 expect(false).toEqual(result);
             });
-            
+
             it("false, if start = end", function () {
                 var start = 5, end = 5;
                 var result = isNonegHeight(start, end);
@@ -238,13 +238,13 @@ describe("CZ.Authoring part", function () {
             });
         });
     });
-    
+
     //todo: need to use using, table of data:
     describe("ValidateExhibitData() function", function () {
         describe("should return", function () {
             it("true, if Date is number, title is not empty, contentItems is not empty", function () {
                 var date = 100, title = 'text', contentItems = [{ mediaType: 'image', uri: 'image.jpg', title: 'Title' }];
-                var result = validateExhibitData(date,title,contentItems);
+                var result = validateExhibitData(date, title, contentItems);
                 expect(true).toEqual(result);
             });
         });
