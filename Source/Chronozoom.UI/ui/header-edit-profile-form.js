@@ -21,8 +21,8 @@ var CZ;
                 this.initialize();
             }
             FormEditProfile.prototype.validEmail = function (e) {
-                var filter = /^[a-zA-Z-_\.]+@(?:[a-zA-Z_\.])+?\.[a-zA-Z]{2,4}$/;
-                return String(e).search(filter) != -1;
+                var filter = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                return filter.test(String(e));
             };
             FormEditProfile.prototype.validUsername = function (e) {
                 var filter = /^[a-z0-9\-_]{4,20}$/i;
