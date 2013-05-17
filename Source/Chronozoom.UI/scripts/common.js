@@ -26,6 +26,7 @@ var CZ;
         var tourNotParsed = undefined;
         Common.supercollection = "";
         Common.collection = "";
+        Common.initialContent = null;
         function initialize() {
             Common.ax = ($)('#axis');
             Common.axis = new CZ.Timescale(Common.ax);
@@ -158,6 +159,13 @@ var CZ;
             CZ.Data.getTimelines(null).then(function (response) {
                 ProcessContent(response);
                 Common.vc.virtualCanvas("updateViewport");
+                if(CZ.Common.initialContent !== null) {
+                    CZ.Service.getContentPath(CZ.Common.initialContent).then(function (response) {
+                        window.location.hash = response;
+                    }, function (error) {
+                        console.log("Error connecting to service:\n" + error.responseText);
+                    });
+                }
                 CZ.Service.getTours().then(function (response) {
                     CZ.Tours.parseTours(response);
                     CZ.Tours.initializeToursContent();
