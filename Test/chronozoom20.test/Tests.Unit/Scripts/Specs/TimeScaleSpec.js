@@ -1,10 +1,8 @@
 ﻿/// <reference path="../Utils/jquery-1.7.2.min.js" />
-/// <reference path="../Utils/j" />
 /// <reference path="../Utils/jasmine-jquery.js" />
 /// <reference path="../Js/timescale.js" />
 /// <reference path="../Js/common.js" />
-/// <reference path="../Js/cz.dates.js" />
-/// <reference path="../Js/cz.settings.js" />
+/// <reference path="../Js/dates.js" />
 /// <reference path="../Js/settings.js" />
 
 var oneDay = 0.0027397260274;
