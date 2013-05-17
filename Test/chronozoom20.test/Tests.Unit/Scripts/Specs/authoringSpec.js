@@ -144,14 +144,39 @@ describe("CZ.Authoring part", function () {
         });
     });
 
-    //todo: Need to use 'using' function
+
     describe("ValidateTimelineData() function", function () {
         describe("should return", function () {
-            it("true, if start less than end", function () {
-                var start = 2; var end = 5; var title = 'test';
-                var isValid = validateTimelineData(start, end, title);
-                expect(isValid).toEqual(true);
+
+            var validInputData = [
+                [1, 2, 'text'],
+                [-1, 10, 'text'],
+                [-1, -10, 'text'],
+                [1, -10, 'text'],
+                [2, 1, 'text']
+            ];
+            var invalidInputData = [
+                [-2, false, 'text'],
+                [false, -2, 'text'],
+                [false, false, 'text'],
+                [-2, -2, 'text'],
+                [2, false, 'text']
+            ];
+
+            timelineDataUsing("true", validInputData, function (start, end, title) {
+                it("should return", function () {
+                    var isValid = validateTimelineData(start, end, title);
+                    expect(true).toEqual(isValid);
+                });
             });
+
+            timelineDataUsing("false", invalidInputData, function (start, end, title) {
+                it("should return", function () {
+                    var isValid = validateTimelineData(start, end, title);
+                    expect(false).toEqual(isValid);
+                });
+            });
+
         });
     });
 
@@ -264,5 +289,15 @@ function using(name, values, func) {
         }
         func.apply(this, [values[i][0], values[i][1], values[i][2], values[i][3], values[i][4], values[i][5]]);
         jasmine.currentEnv_.currentSpec.description += ' ' + name + '[' + "title: " + values[i][0] + ", start: " + values[i][1] + ", end: " + values[i][2] + ", regimeStart: " + values[i][3] + ", regimeEnd: " + values[i][4];
+    }
+}
+
+function timelineDataUsing(name, values, func) {
+    for (var i = 0, count = values.length; i < count; i++) {
+        if (Object.prototype.toString.call(values[i]) !== '[object Array]') {
+            values[i] = [values[i]];
+        }
+        func.apply(this, [values[i][0], values[i][1], values[i][2]]);
+        jasmine.currentEnv_.currentSpec.description += ' ' + name + ' if input data equal: start: ' + values[i][0] + ', end: ' + values[i][1] + ', title: ' + values[i][2];
     }
 }
