@@ -109,9 +109,12 @@
     <EmbeddedResource Include="Migrations\201305102117597_AddRITreeWithIndex.resx">
       <DependentUpon>201305102117597_AddRITreeWithIndex.cs</DependentUpon>
     </EmbeddedResource>
+<<<<<<< HEAD
     <EmbeddedResource Include="Migrations\201305141937202_PostOrderFields.resx">
       <DependentUpon>201305141937202_PostOrderFields.cs</DependentUpon>
     </EmbeddedResource>
+=======
+>>>>>>> upstream/master
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

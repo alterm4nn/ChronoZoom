@@ -63,6 +63,7 @@ namespace Chronozoom.Entities
 
         /// <summary>
         /// The height of the timeline.
+
         /// </summary>
         [DataMember]
         public decimal? Height { get; set; }
