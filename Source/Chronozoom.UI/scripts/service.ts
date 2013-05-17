@@ -332,6 +332,22 @@ module CZ {
             });
         }
 
+        // .../{supercollection}/{collection}/{reference}/contentpath
+        export function getContentPath(reference: string) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath(superCollectionName);
+            request.addToPath(collectionName);
+            request.addToPath(reference);
+            request.addToPath("contentpath");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        } getContentPath
+
         /**
         * Auxiliary Methods.
         */

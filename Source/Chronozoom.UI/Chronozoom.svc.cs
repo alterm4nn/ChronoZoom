@@ -416,10 +416,11 @@ namespace Chronozoom.UI
         /// Provides information about the ChronoZoom service to the clients. Used internally by the ChronoZoom client.
         /// </summary>
         /// <returns>A ServiceInformation object describing parameter from the running service</returns>
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         [OperationContract]
         [WebInvoke(Method = "GET", UriTemplate = "/info", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        public static ServiceInformation GetServiceInformation()
+        public ServiceInformation GetServiceInformation()
         {
             Trace.TraceInformation("Get Service Information");
 
@@ -642,6 +643,9 @@ namespace Chronozoom.UI
             }
             else
             {
+                if (string.IsNullOrEmpty(collectionName))
+                    collectionName = superCollectionName;
+
                 return CollectionIdFromSuperCollection(superCollectionName, collectionName);
             }
         }
@@ -660,6 +664,12 @@ namespace Chronozoom.UI
         private static string FriendlyUrlReplacements(string value)
         {
             return Uri.EscapeDataString(value.Replace(' ', '-'));
+        }
+
+        // Decodes from URL friendly representations. For instance, converts '-' to space.
+        private static string FriendlyUrlDecode(string value)
+        {
+            return Uri.UnescapeDataString(value.Replace('-', ' '));
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase")]
@@ -1419,6 +1429,42 @@ namespace Chronozoom.UI
                 _storage.ContentItems.Remove(deleteContentItem);
                 _storage.SaveChanges();
             });
+        }
+
+        /// <summary>
+        /// Retrieves a path to the given content id.
+        /// 
+        /// For t48fbb8a8-7c5d-49c3-83e1-98939ae2ae6, this API retrieves /t00000000-0000-0000-0000-000000000000/t48fbb8a8-7c5d-49c3-83e1-98939ae2ae67
+        /// </summary>
+        /// <returns>The full path to the content</returns>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "{supercollection}/{collection}/{reference}/contentpath")]
+        public string GetContentPath(string superCollection, string collection, string reference)
+        {
+            Trace.TraceInformation("Get Content Information");
+            
+            Guid idCandidate = Guid.Empty;
+            Guid? idParsed = null;
+            if (Guid.TryParse(reference, out idCandidate))
+            {
+                idParsed = idCandidate;
+                reference = null;
+            }
+            else
+            {
+                reference = FriendlyUrlDecode(reference);
+            }
+
+            Guid collectionId = CollectionIdOrDefault(superCollection, collection);
+
+            string cacheKey = string.Format(CultureInfo.InvariantCulture, "ContentPath {0} {1} {2}", collectionId, idParsed.ToString(), reference);
+            if (Cache.Contains(cacheKey))
+                return (string)Cache[cacheKey];
+
+            string value = _storage.GetContentPath(collectionId, idParsed, reference);
+            Cache.Add(cacheKey, value, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
+
+            return value;
         }
 
         private bool FindParentTimeline(Guid? parentTimelineGuid, out Timeline parentTimeline)

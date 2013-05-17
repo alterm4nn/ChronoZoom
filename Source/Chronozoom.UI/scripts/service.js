@@ -273,6 +273,21 @@ var CZ;
             });
         }
         Service.getServiceInformation = getServiceInformation;
+        function getContentPath(reference) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath(reference);
+            request.addToPath("contentpath");
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getContentPath = getContentPath;
+        getContentPath;
         function putExhibitContent(e, oldContentItems) {
             var newGuids = e.contentItems.map(function (ci) {
                 return ci.guid;

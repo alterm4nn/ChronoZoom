@@ -266,6 +266,7 @@ module CZ {
             var rootCollection = url.superCollectionName === undefined;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
+            CZ.Common.initialContent = url.content;
 
             $('#search_button')
                 .mouseup(CZ.Search.onSearchClicked);
