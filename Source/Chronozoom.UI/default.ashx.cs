@@ -11,7 +11,7 @@ namespace Chronozoom.UI
     /// </summary>
     public class DefaultHttpHandler : IHttpHandler
     {
-        private static const string _mainPageName = @"cz.html";
+        private const string _mainPageName = @"cz.html";
         private static readonly Lazy<string> _mainPage = new Lazy<string>(() =>
         {
             return File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + _mainPageName);
