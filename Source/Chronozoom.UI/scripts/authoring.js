@@ -428,13 +428,13 @@ var CZ;
         Authoring.ValidateTimelineData = ValidateTimelineData;
         function ValidateExhibitData(date, title, contentItems) {
             var isValid = CZ.Authoring.ValidateNumber(date);
-            isValid = isValid && CZ.Authoring.IsNotEmpty(title) && CZ.Authoring.IsNotEmpty(date);
+            isValid = isValid && CZ.Authoring.IsNotEmpty(title);
             isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
             return isValid;
         }
         Authoring.ValidateExhibitData = ValidateExhibitData;
         function ValidateNumber(number) {
-            return !isNaN(Number(number) && parseFloat(number));
+            return !isNaN(Number(number) && parseFloat(number)) && IsNotEmpty(number);
         }
         Authoring.ValidateNumber = ValidateNumber;
         function IsNotEmpty(obj) {
@@ -461,17 +461,16 @@ var CZ;
                         isValid = false;
                     }
                 } else if(ci.mediaType.toLowerCase() === "video") {
-                    var youtube = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-                    var youtubeEmbed = /www.\youtube\.com\/embed\/([a-z0-9\-]+)/i;
+                    var youtube = /(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|[\S\?\&]+&v=|\/user\/\S+))([^\/&#]{10,12})/;
                     var vimeo = /vimeo\.com\/([0-9]+)/i;
                     var vimeoEmbed = /player.vimeo.com\/video\/([0-9]+)/i;
                     if(youtube.test(ci.uri)) {
-                        var youtubeResult = ci.uri.match(youtube);
-                        ci.uri = "http://www.youtube.com/embed/" + youtubeResult[1];
+                        var youtubeVideoId = ci.uri.match(youtube)[1];
+                        ci.uri = "http://www.youtube.com/embed/" + youtubeVideoId;
                     } else if(vimeo.test(ci.uri)) {
-                        var vimeoResult = ci.uri.match(vimeo);
-                        ci.uri = "http://player.vimeo.com/video/" + vimeoResult[1];
-                    } else if(youtubeEmbed.test(ci.uri) || vimeoEmbed.test(ci.uri)) {
+                        var vimeoVideoId = ci.uri.match(vimeo)[1];
+                        ci.uri = "http://player.vimeo.com/video/" + vimeoVideoId;
+                    } else if(vimeoEmbed.test(ci.uri)) {
                     } else {
                         alert("Sorry, only YouTube or Vimeo videos are supported");
                         isValid = false;

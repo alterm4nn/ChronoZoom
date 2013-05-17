@@ -19,6 +19,7 @@ using System.Web.Routing;
 using System.Web.UI;
 using System.Web.Mvc;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 
 namespace Chronozoom.UI
@@ -84,8 +85,37 @@ namespace Chronozoom.UI
             var app = (HttpApplication)sender;
             if (app.Context.Request.Url.LocalPath == "/")
             {
-                app.Context.RewritePath(string.Concat(app.Context.Request.Url.LocalPath, "cz.aspx"));
+                if (BrowserIsSupported())
+                {
+                    app.Context.RewritePath(string.Concat(app.Context.Request.Url.LocalPath, "cz.aspx"));
+                }
+                else
+                {
+                    app.Context.RewritePath(string.Concat(app.Context.Request.Url.LocalPath, "fallback.html"));
+                }
             }
+        }
+
+        // Supported versions - Moved from JavaScript and added Opera
+        private static readonly Dictionary<string, int> _supportedMatrix = new Dictionary<string, int>()
+        {
+            { "IE", 9 },
+            { "Firefox", 7 },
+            { "Chrome", 14 },
+            { "Safari", 5 },
+            { "Opera", 10 },
+        };
+
+        private bool BrowserIsSupported()
+        {
+            System.Web.HttpBrowserCapabilities browser = Request.Browser;
+
+            if (_supportedMatrix.ContainsKey(browser.Browser))
+            {
+                return Double.Parse(browser.Version, System.Globalization.CultureInfo.InvariantCulture) >= _supportedMatrix[browser.Browser];
+            }
+
+            return true;
         }
     }
 }
