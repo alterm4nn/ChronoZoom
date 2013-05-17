@@ -24,7 +24,7 @@ A set of Timelines, Exhibits, and Tours. The Collection entity has a Title and T
 A pointer to a piece of content in ChronoZoom. The Content Item entity consists of a Url, Title, Caption, and Attribution. It is contained by an Exhibit, and is only viewable as part of an Exhibit.
 
 ### Exhibit ###
-Contains a set of Content Items, and is contained by Timeline or a Collection. The Exhibit entity consists of a Title, Date, and Tags. It is externally searchable & linkable.
+Consists of a set of content items (artifacts), and is contained by either a timeline or a collection.
 
 ### Giga-annum ###
 Abbreviated as **Ga**, Giga-annum is a unit of time equal to one billion years. It is commonly used in geology and paleontology to signify time in the past. For example, 4.55 Ga indicates 4.55 billion (or 4550 million) years ago.
@@ -50,7 +50,7 @@ A Threshold is a moment in time where the universe has experienced an exponentia
 - Origins of the Modern World
 
 ### Timeline ###
-A visual representation of a time period that contains a set of Exhibits, child Timelines, and Time Series Data, and is contained by a Timeline or a Collection. The Timeline entity has a Title, Date Range, and Tags. It is externally searchable & linkable. 
+a visual representation of a time period. Timelines can contain other (child) timelines, and exhibits. You can use timelines to depict a range of time such as the lifespan of a historical figure or period of a civilization.
 
 ### Tour ###
 A narrated tour with an audio track and media events that perform navigations to Timelines or Exhibits. The Tour entity has a Title and Tags.  It is contained by a Collection.  It is externally searchable & linkable.
