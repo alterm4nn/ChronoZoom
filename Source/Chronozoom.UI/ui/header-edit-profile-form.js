@@ -21,7 +21,7 @@ var CZ;
                 this.initialize();
             }
             FormEditProfile.prototype.validEmail = function (e) {
-                var filter = /^\w+@[a-zA-Z_\.]+?\.[a-zA-Z]{2,4}$/;
+                var filter = /^[a-zA-Z0-9][a-zA-Z0-9-._]+[a-zA-Z0-9]@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/i;
                 return String(e).search(filter) != -1;
             };
             FormEditProfile.prototype.validUsername = function (e) {

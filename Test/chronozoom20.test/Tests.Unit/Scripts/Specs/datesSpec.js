@@ -1,6 +1,6 @@
 ﻿/// <reference path="../Utils/jquery-1.7.2.min.js" />
-/// <reference path="../Js/cz.dates.js" />
-/// <reference path="../Js/cz.settings.js" />
+/// <reference path="../Js/dates.js" />
+/// <reference path="../Js/settings.js" />
 
 
 
