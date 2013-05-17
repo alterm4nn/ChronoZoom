@@ -55,6 +55,9 @@ module CZ {
         export var supercollection = ""; // the supercollection associated with this url
         export var collection = ""; // the collection associated with this url
 
+        // Initial Content contains the identifier (e.g. ID or Title) of the content that should be loaded initially.
+        export var initialContent = null;
+
         /* Initialize the JQuery UI Widgets
         */
         export function initialize() {
@@ -218,6 +221,17 @@ module CZ {
                 function (response) {
                     ProcessContent(response);
                     vc.virtualCanvas("updateViewport");
+
+                    if (CZ.Common.initialContent !== null) {
+                        CZ.Service.getContentPath(CZ.Common.initialContent).then(
+                            function (response) {
+                                window.location.hash = response;
+                            },
+                            function (error) {
+                                console.log("Error connecting to service:\n" + error.responseText);
+                            }
+                        );
+                    }
 
                     CZ.Service.getTours().then(
                         function (response) {

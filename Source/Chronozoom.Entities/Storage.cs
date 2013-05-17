@@ -382,6 +382,38 @@ namespace Chronozoom.Entities
             this.Exhibits.Remove(deleteExhibit);
         }
 
+        /// <summary>
+        /// Retrieves a path to an timeline, exhibit or content item.
+        /// </summary>
+        public string GetContentPath(Guid collectionId, Guid? contentId, string title)
+        {
+            string contentPath = string.Empty;
+
+            ContentItemRaw contentItem = Database.SqlQuery<ContentItemRaw>("SELECT * FROM ContentItems WHERE Collection_Id = {0} AND (Id = {1} OR Title = {2})", collectionId, contentId, title).FirstOrDefault();
+            if (contentItem != null)
+            {
+                contentPath = "/" + contentItem.Id;
+                contentId = contentItem.Exhibit_ID;
+            }
+
+            ExhibitRaw exhibit = Database.SqlQuery<ExhibitRaw>("SELECT * FROM Exhibits WHERE Collection_Id = {0} AND (Id = {1} OR Title = {2})", collectionId, contentId, title).FirstOrDefault();
+            if (exhibit != null)
+            {
+                contentPath = "/e" + exhibit.Id + contentPath;
+                contentId = exhibit.Timeline_ID;
+            }
+
+            TimelineRaw timeline = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Collection_Id = {0} AND (Id = {1} OR Title = {2})", collectionId, contentId, title).FirstOrDefault();
+
+            while (timeline != null)
+            {
+                contentPath = "/t" + timeline.Id + contentPath;
+                timeline = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Id = {0}", timeline.Timeline_ID).FirstOrDefault();
+            } 
+
+            return contentPath.ToString();
+        }
+
         // Returns list of ids of chilt timelines of timeline with given id.
         private List<Guid> GetChildTimelinesIds(Guid id)
         {

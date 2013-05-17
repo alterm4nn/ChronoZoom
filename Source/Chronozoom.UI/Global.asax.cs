@@ -49,14 +49,19 @@ namespace Chronozoom.UI
 
         internal static void RegisterRoutes(RouteCollection routes)
         {
-            var routeHandlerDetails = new WebFormRouteHandler<Page>("~/cz.aspx");
+            var routeHandlerDetails = new WebFormRouteHandler<DefaultHttpHandler>(null);
             routes.MapRoute(
                 "Account", // Route name
                 "account/{action}", // URL with parameters
                 new { controller = "Account" } // Parameter defaults
                 );
 
-            routes.Add(new Route("{supercollection}/{collection}/", routeHandlerDetails));
+            routes.Add(new Route("{supercollection}", routeHandlerDetails));
+            routes.Add(new Route("{supercollection}/{collection}", routeHandlerDetails));
+            routes.Add(new Route("{supercollection}/{collection}/{reference}", routeHandlerDetails));
+            routes.Add(new Route("{supercollection}/{collection}/{timelineTitle}/{reference}", routeHandlerDetails));
+            routes.Add(new Route("{supercollection}/{collection}/{timelineTitle}/{exhibitTitle}/{reference}", routeHandlerDetails));
+            routes.Add(new Route("{supercollection}/{collection}/{timelineTitle}/{exhibitTitle}/{contentItemTitle}/{reference}", routeHandlerDetails));
         }
 
         public void Application_Start(object sender, EventArgs e)
@@ -87,7 +92,7 @@ namespace Chronozoom.UI
             {
                 if (BrowserIsSupported())
                 {
-                    app.Context.RewritePath(string.Concat(app.Context.Request.Url.LocalPath, "cz.aspx"));
+                    app.Context.RewritePath(string.Concat(app.Context.Request.Url.LocalPath, "default.ashx"));
                 }
                 else
                 {
