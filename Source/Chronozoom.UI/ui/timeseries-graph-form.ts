@@ -4,7 +4,7 @@
 declare var Dygraph: any;
 
 module CZ {
-    export module UI {
+    export module UI { 
         export interface TimeSeriesFormInfo extends CZ.UI.IFormBaseInfo {
         }
 
@@ -22,7 +22,6 @@ module CZ {
                         "2008-05-08,70\n" +
                         "2008-05-09,80\n",
                         { drawXAxis: false });
-
             }
         }
     }

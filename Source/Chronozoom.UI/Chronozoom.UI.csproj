@@ -202,7 +202,7 @@
     <Content Include="scripts\external\dygraphs\dashed-canvas.js" />
     <Content Include="scripts\external\dygraphs\dygraph-canvas.js" />
     <Content Include="scripts\external\dygraphs\dygraph-combined.js" />
-    <None Include="scripts\external\dygraphs\dygraph-combined.ts" />
+    <Content Include="scripts\external\dygraphs\dygraph-combined.ts" />
     <Content Include="scripts\external\dygraphs\dygraph-dev.js" />
     <Content Include="scripts\external\dygraphs\dygraph-externs.js" />
     <Content Include="scripts\external\dygraphs\dygraph-gviz.js" />

@@ -1,8 +1,8 @@
-Date.ext = {
+(Date).ext = {
 };
-Date.ext.util = {
+(Date).ext.util = {
 };
-Date.ext.util.xPad = function (a, c, b) {
+(Date).ext.util.xPad = function (a, c, b) {
     if(typeof (b) == "undefined") {
         b = 10;
     }
@@ -11,13 +11,13 @@ Date.ext.util.xPad = function (a, c, b) {
     }
     return a.toString();
 };
-Date.prototype.locale = "en-GB";
-if(document.getElementsByTagName("html") && document.getElementsByTagName("html")[0].lang) {
-    Date.prototype.locale = document.getElementsByTagName("html")[0].lang;
+(Date).prototype.locale = "en-GB";
+if((document).getElementsByTagName("html") && (document).getElementsByTagName("html")[0].lang) {
+    (Date).prototype.locale = (document).getElementsByTagName("html")[0].lang;
 }
-Date.ext.locales = {
+(Date).ext.locales = {
 };
-Date.ext.locales.en = {
+(Date).ext.locales.en = {
     a: [
         "Sun", 
         "Mon", 
@@ -76,28 +76,28 @@ Date.ext.locales.en = {
     x: "%d/%m/%y",
     X: "%T"
 };
-Date.ext.locales["en-US"] = Date.ext.locales.en;
-Date.ext.locales["en-US"].c = "%a %d %b %Y %r %Z";
-Date.ext.locales["en-US"].x = "%D";
-Date.ext.locales["en-US"].X = "%r";
-Date.ext.locales["en-GB"] = Date.ext.locales.en;
-Date.ext.locales["en-AU"] = Date.ext.locales["en-GB"];
-Date.ext.formats = {
+(Date).ext.locales["en-US"] = (Date).ext.locales.en;
+(Date).ext.locales["en-US"].c = "%a %d %b %Y %r %Z";
+(Date).ext.locales["en-US"].x = "%D";
+(Date).ext.locales["en-US"].X = "%r";
+(Date).ext.locales["en-GB"] = (Date).ext.locales.en;
+(Date).ext.locales["en-AU"] = (Date).ext.locales["en-GB"];
+(Date).ext.formats = {
     a: function (a) {
-        return Date.ext.locales[a.locale].a[a.getDay()];
+        return (Date).ext.locales[a.locale].a[a.getDay()];
     },
     A: function (a) {
-        return Date.ext.locales[a.locale].A[a.getDay()];
+        return (Date).ext.locales[a.locale].A[a.getDay()];
     },
     b: function (a) {
-        return Date.ext.locales[a.locale].b[a.getMonth()];
+        return (Date).ext.locales[a.locale].b[a.getMonth()];
     },
     B: function (a) {
-        return Date.ext.locales[a.locale].B[a.getMonth()];
+        return (Date).ext.locales[a.locale].B[a.getMonth()];
     },
     c: "toLocaleString",
     C: function (a) {
-        return Date.ext.util.xPad(parseInt(a.getFullYear() / 100, 10), 0);
+        return (Date).ext.util.xPad(parseInt((a.getFullYear() / 100).toString(), 10), 0);
     },
     d: [
         "getDate", 
@@ -108,12 +108,12 @@ Date.ext.formats = {
         " "
     ],
     g: function (a) {
-        return Date.ext.util.xPad(parseInt(Date.ext.util.G(a) / 100, 10), 0);
+        return (Date).ext.util.xPad(parseInt(((Date).ext.util.G(a) / 100).toString(), 10), 0);
     },
     G: function (c) {
         var e = c.getFullYear();
-        var b = parseInt(Date.ext.formats.V(c), 10);
-        var a = parseInt(Date.ext.formats.W(c), 10);
+        var b = parseInt((Date).ext.formats.V(c), 10);
+        var a = parseInt((Date).ext.formats.W(c), 10);
         if(a > b) {
             e++;
         } else {
@@ -129,26 +129,26 @@ Date.ext.formats = {
     ],
     I: function (b) {
         var a = b.getHours() % 12;
-        return Date.ext.util.xPad(a === 0 ? 12 : a, 0);
+        return (Date).ext.util.xPad(a === 0 ? 12 : a, 0);
     },
     j: function (c) {
         var a = c - new Date("" + c.getFullYear() + "/1/1 GMT");
         a += c.getTimezoneOffset() * 60000;
-        var b = parseInt(a / 60000 / 60 / 24, 10) + 1;
-        return Date.ext.util.xPad(b, 0, 100);
+        var b = parseInt((a / 60000 / 60 / 24).toString(), 10) + 1;
+        return (Date).ext.util.xPad(b, 0, 100);
     },
     m: function (a) {
-        return Date.ext.util.xPad(a.getMonth() + 1, 0);
+        return (Date).ext.util.xPad(a.getMonth() + 1, 0);
     },
     M: [
         "getMinutes", 
         "0"
     ],
     p: function (a) {
-        return Date.ext.locales[a.locale].p[a.getHours() >= 12 ? 1 : 0];
+        return (Date).ext.locales[a.locale].p[a.getHours() >= 12 ? 1 : 0];
     },
     P: function (a) {
-        return Date.ext.locales[a.locale].P[a.getHours() >= 12 ? 1 : 0];
+        return (Date).ext.locales[a.locale].P[a.getHours() >= 12 ? 1 : 0];
     },
     S: [
         "getSeconds", 
@@ -159,39 +159,39 @@ Date.ext.formats = {
         return b === 0 ? 7 : b;
     },
     U: function (e) {
-        var a = parseInt(Date.ext.formats.j(e), 10);
+        var a = parseInt((Date).ext.formats.j(e), 10);
         var c = 6 - e.getDay();
-        var b = parseInt((a + c) / 7, 10);
-        return Date.ext.util.xPad(b, 0);
+        var b = parseInt(((a + c) / 7).toString(), 10);
+        return (Date).ext.util.xPad(b, 0);
     },
     V: function (e) {
-        var c = parseInt(Date.ext.formats.W(e), 10);
+        var c = parseInt((Date).ext.formats.W(e), 10);
         var a = (new Date("" + e.getFullYear() + "/1/1")).getDay();
         var b = c + (a > 4 || a <= 1 ? 0 : 1);
         if(b == 53 && (new Date("" + e.getFullYear() + "/12/31")).getDay() < 4) {
             b = 1;
         } else {
             if(b === 0) {
-                b = Date.ext.formats.V(new Date("" + (e.getFullYear() - 1) + "/12/31"));
+                b = (Date).ext.formats.V(new Date("" + (e.getFullYear() - 1) + "/12/31"));
             }
         }
-        return Date.ext.util.xPad(b, 0);
+        return (Date).ext.util.xPad(b, 0);
     },
     w: "getDay",
     W: function (e) {
-        var a = parseInt(Date.ext.formats.j(e), 10);
-        var c = 7 - Date.ext.formats.u(e);
-        var b = parseInt((a + c) / 7, 10);
-        return Date.ext.util.xPad(b, 0, 10);
+        var a = parseInt((Date).ext.formats.j(e), 10);
+        var c = 7 - (Date).ext.formats.u(e);
+        var b = parseInt(((a + c) / 7).toString(), 10);
+        return (Date).ext.util.xPad(b, 0, 10);
     },
     y: function (a) {
-        return Date.ext.util.xPad(a.getFullYear() % 100, 0);
+        return (Date).ext.util.xPad(a.getFullYear() % 100, 0);
     },
     Y: "getFullYear",
     z: function (c) {
         var b = c.getTimezoneOffset();
-        var a = Date.ext.util.xPad(parseInt(Math.abs(b / 60), 10), 0);
-        var e = Date.ext.util.xPad(b % 60, 0);
+        var a = (Date).ext.util.xPad(parseInt((Math.abs(b / 60)).toString(), 10), 0);
+        var e = (Date).ext.util.xPad(b % 60, 0);
         return (b > 0 ? "-" : "+") + a + e;
     },
     Z: function (a) {
@@ -201,7 +201,7 @@ Date.ext.formats = {
         return "%";
     }
 };
-Date.ext.aggregates = {
+(Date).ext.aggregates = {
     c: "locale",
     D: "%m/%d/%y",
     h: "%b",
@@ -213,13 +213,13 @@ Date.ext.aggregates = {
     x: "locale",
     X: "locale"
 };
-Date.ext.aggregates.z = Date.ext.formats.z(new Date());
-Date.ext.aggregates.Z = Date.ext.formats.Z(new Date());
-Date.ext.unsupported = {
+(Date).ext.aggregates.z = (Date).ext.formats.z(new Date());
+(Date).ext.aggregates.Z = (Date).ext.formats.Z(new Date());
+(Date).ext.unsupported = {
 };
-Date.prototype.strftime = function (a) {
-    if(!(this.locale in Date.ext.locales)) {
-        if(this.locale.replace(/-[a-zA-Z]+$/, "") in Date.ext.locales) {
+(Date).prototype.strftime = function (a) {
+    if(!(this.locale in (Date).ext.locales)) {
+        if(this.locale.replace(/-[a-zA-Z]+$/, "") in (Date).ext.locales) {
             this.locale = this.locale.replace(/-[a-zA-Z]+$/, "");
         } else {
             this.locale = "en-GB";
@@ -228,12 +228,12 @@ Date.prototype.strftime = function (a) {
     var c = this;
     while(a.match(/%[cDhnrRtTxXzZ]/)) {
         a = a.replace(/%([cDhnrRtTxXzZ])/g, function (e, d) {
-            var g = Date.ext.aggregates[d];
-            return (g == "locale" ? Date.ext.locales[c.locale][d] : g);
+            var g = (Date).ext.aggregates[d];
+            return (g == "locale" ? (Date).ext.locales[c.locale][d] : g);
         });
     }
     var b = a.replace(/%([aAbBCdegGHIjmMpPSuUVwWyY%])/g, function (e, d) {
-        var g = Date.ext.formats[d];
+        var g = (Date).ext.formats[d];
         if(typeof (g) == "string") {
             return c[g]();
         } else {
@@ -241,7 +241,7 @@ Date.prototype.strftime = function (a) {
                 return g.call(c, c);
             } else {
                 if(typeof (g) == "object" && typeof (g[0]) == "string") {
-                    return Date.ext.util.xPad(c[g[0]](), g[1]);
+                    return (Date).ext.util.xPad(c[g[0]](), g[1]);
                 } else {
                     return d;
                 }
@@ -487,6 +487,7 @@ function RGBColorParser(f) {
         return "#" + l + k + i;
     };
 }
+var printStackTrace;
 function printStackTrace(b) {
     b = b || {
         guess: true
@@ -518,7 +519,7 @@ printStackTrace.implementation.prototype = {
         if(a["arguments"] && a.stack) {
             return "chrome";
         } else {
-            if(typeof a.message === "string" && typeof window !== "undefined" && window.opera) {
+            if(typeof a.message === "string" && typeof window !== "undefined" && (window).opera) {
                 if(!a.stacktrace) {
                     return "opera9";
                 }
@@ -760,7 +761,7 @@ printStackTrace.implementation.prototype = {
         return "(?)";
     }
 };
-CanvasRenderingContext2D.prototype.installPattern = function (e) {
+(CanvasRenderingContext2D).prototype.installPattern = function (e) {
     if(typeof (this.isPatternInstalled) !== "undefined") {
         throw "Must un-install old line pattern before installing a new one.";
     }
@@ -856,7 +857,7 @@ CanvasRenderingContext2D.prototype.installPattern = function (e) {
         b = [];
     };
 };
-CanvasRenderingContext2D.prototype.uninstallPattern = function () {
+(CanvasRenderingContext2D).prototype.uninstallPattern = function () {
     throw "Must install a line pattern before uninstalling it.";
 };
 var DygraphOptions = (function () {
@@ -1454,7 +1455,7 @@ DygraphCanvasRenderer.isSupported = function (f) {
     var b = null;
     try  {
         if(typeof (f) == "undefined" || f === null) {
-            b = document.createElement("canvas");
+            b = (document).createElement("canvas");
         } else {
             b = f;
         }
@@ -1481,7 +1482,7 @@ DygraphCanvasRenderer.prototype._createIEClipArea = function () {
             f.removeChild(f.childNodes[e]);
         }
     }
-    var c = document.bgColor;
+    var c = (document).bgColor;
     var d = this.dygraph_.graphDiv;
     while(d != document) {
         var a = d.currentStyle.backgroundColor;
@@ -1495,7 +1496,7 @@ DygraphCanvasRenderer.prototype._createIEClipArea = function () {
         if(j.w === 0 || j.h === 0) {
             return;
         }
-        var i = document.createElement("div");
+        var i = (document).createElement("div");
         i.className = g;
         i.style.backgroundColor = c;
         i.style.position = "absolute";
@@ -2073,7 +2074,7 @@ Dygraph.dateAxisFormatter = function (b, c) {
         } else {
             var a = b.getHours() * 3600 + b.getMinutes() * 60 + b.getSeconds() + b.getMilliseconds();
             if(a === 0 || c >= Dygraph.DAILY) {
-                return new Date(b.getTime() + 3600 * 1000).strftime("%d%b");
+                return (new Date(b.getTime() + 3600 * 1000)).strftime("%d%b");
             } else {
                 return Dygraph.hmsString_(b.getTime());
             }
@@ -2189,7 +2190,7 @@ Dygraph.prototype.__old_init__ = function (f, d, e, b) {
     this.__init__(f, d, b);
 };
 Dygraph.prototype.__init__ = function (a, c, l) {
-    if(/MSIE/.test(navigator.userAgent) && !window.opera && typeof (G_vmlCanvasManager) != "undefined" && document.readyState != "complete") {
+    if(/MSIE/.test(navigator.userAgent) && !(window).opera && typeof (G_vmlCanvasManager) != "undefined" && (document).readyState != "complete") {
         var o = this;
         setTimeout(function () {
             o.__init__(a, c, l);
@@ -2202,7 +2203,7 @@ Dygraph.prototype.__init__ = function (a, c, l) {
     }
     l = Dygraph.mapLegacyOptions_(l);
     if(typeof (a) == "string") {
-        a = document.getElementById(a);
+        a = (document).getElementById(a);
     }
     if(!a) {
         Dygraph.error("Constructing dygraph with a non-existent div!");
@@ -2527,7 +2528,7 @@ Dygraph.prototype.getValue = function (b, a) {
 };
 Dygraph.prototype.createInterface_ = function () {
     var a = this.maindiv_;
-    this.graphDiv = document.createElement("div");
+    this.graphDiv = (document).createElement("div");
     this.graphDiv.style.width = this.width_ + "px";
     this.graphDiv.style.height = this.height_ + "px";
     this.graphDiv.style.textAlign = "left";
@@ -2609,7 +2610,7 @@ Dygraph.prototype.createPlotKitCanvas_ = function (a) {
 };
 Dygraph.prototype.createMouseEventElement_ = function () {
     if(this.isUsingExcanvas_) {
-        var a = document.createElement("div");
+        var a = (document).createElement("div");
         a.style.position = "absolute";
         a.style.backgroundColor = "white";
         a.style.filter = "alpha(opacity=0)";
@@ -2679,7 +2680,7 @@ Dygraph.prototype.getPropertiesForSeries = function (c) {
 };
 Dygraph.prototype.createRollInterface_ = function () {
     if(!this.roller_) {
-        this.roller_ = document.createElement("input");
+        this.roller_ = (document).createElement("input");
         this.roller_.type = "text";
         this.roller_.style.display = "none";
         this.graphDiv.appendChild(this.roller_);
@@ -4552,14 +4553,14 @@ Dygraph.addAnnotationRule = function () {
         return;
     }
     var f = "border: 1px solid black; background-color: white; text-align: center;";
-    var e = document.createElement("style");
+    var e = (document).createElement("style");
     e.type = "text/css";
-    document.getElementsByTagName("head")[0].appendChild(e);
-    for(var b = 0; b < document.styleSheets.length; b++) {
-        if(document.styleSheets[b].disabled) {
+    (document).getElementsByTagName("head")[0].appendChild(e);
+    for(var b = 0; b < (document).styleSheets.length; b++) {
+        if((document).styleSheets[b].disabled) {
             continue;
         }
-        var d = document.styleSheets[b];
+        var d = (document).styleSheets[b];
         try  {
             if(d.insertRule) {
                 var a = d.cssRules ? d.cssRules.length : 0;
@@ -4621,8 +4622,8 @@ Dygraph.log = function (c, g) {
         } catch (h) {
         }
     }
-    if(typeof (window.console) != "undefined") {
-        var a = window.console;
+    if(typeof ((window).console) != "undefined") {
+        var a = (window).console;
         var f = function (e, k, i) {
             if(k && typeof (k) == "function") {
                 k.call(e, i);
@@ -4646,7 +4647,7 @@ Dygraph.log = function (c, g) {
         }
     }
     if(Dygraph.LOG_STACK_TRACES) {
-        window.console.log(b.join("\n"));
+        (window).console.log(b.join("\n"));
     }
 };
 Dygraph.info = function (a) {
@@ -4669,7 +4670,7 @@ Dygraph.addEvent = function addEvent(c, b, a) {
         c.addEventListener(b, a, false);
     } else {
         c[b + a] = function () {
-            a(window.event);
+            a((window).event);
         };
         c.attachEvent("on" + b, c[b + a]);
     }
@@ -4694,7 +4695,7 @@ Dygraph.removeEvent = function (c, b, a) {
     }
 };
 Dygraph.cancelEvent = function (a) {
-    a = a ? a : window.event;
+    a = a ? a : (window).event;
     if(a.stopPropagation) {
         a.stopPropagation();
     }
@@ -4765,8 +4766,8 @@ Dygraph.findPosX = function (c) {
         var a = c;
         while(1) {
             var b = "0";
-            if(window.getComputedStyle) {
-                b = window.getComputedStyle(a, null).borderLeft || "0";
+            if((window).getComputedStyle) {
+                b = (window).getComputedStyle(a, null).borderLeft || "0";
             }
             d += parseInt(b, 10);
             d += a.offsetLeft;
@@ -4780,7 +4781,7 @@ Dygraph.findPosX = function (c) {
             d += c.x;
         }
     }
-    while(c && c != document.body) {
+    while(c && c != (document).body) {
         d -= c.scrollLeft;
         c = c.parentNode;
     }
@@ -4792,8 +4793,8 @@ Dygraph.findPosY = function (c) {
         var a = c;
         while(1) {
             var d = "0";
-            if(window.getComputedStyle) {
-                d = window.getComputedStyle(a, null).borderTop || "0";
+            if((window).getComputedStyle) {
+                d = (window).getComputedStyle(a, null).borderTop || "0";
             }
             b += parseInt(d, 10);
             b += a.offsetTop;
@@ -4807,7 +4808,7 @@ Dygraph.findPosY = function (c) {
             b += c.y;
         }
     }
-    while(c && c != document.body) {
+    while(c && c != (document).body) {
         b -= c.scrollTop;
         c = c.parentNode;
     }
@@ -4817,8 +4818,8 @@ Dygraph.pageX = function (c) {
     if(c.pageX) {
         return (!c.pageX || c.pageX < 0) ? 0 : c.pageX;
     } else {
-        var d = document.documentElement;
-        var a = document.body;
+        var d = (document).documentElement;
+        var a = (document).body;
         return c.clientX + (d.scrollLeft || a.scrollLeft) - (d.clientLeft || 0);
     }
 };
@@ -4826,8 +4827,8 @@ Dygraph.pageY = function (c) {
     if(c.pageY) {
         return (!c.pageY || c.pageY < 0) ? 0 : c.pageY;
     } else {
-        var d = document.documentElement;
-        var a = document.body;
+        var d = (document).documentElement;
+        var a = (document).body;
         return c.clientY + (d.scrollTop || a.scrollTop) - (d.clientTop || 0);
     }
 };
@@ -4890,7 +4891,7 @@ Dygraph.binarySearch = function (a, d, i, e, b) {
     var h = function (j) {
         return j >= 0 && j < d.length;
     };
-    var g = parseInt((e + b) / 2, 10);
+    var g = parseInt(((e + b) / 2).toString(), 10);
     var c = d[g];
     var f;
     if(c == a) {
@@ -5017,8 +5018,8 @@ Dygraph.clone = function (c) {
     return b;
 };
 Dygraph.createCanvas = function () {
-    var a = document.createElement("canvas");
-    var b = (/MSIE/.test(navigator.userAgent) && !window.opera);
+    var a = (document).createElement("canvas");
+    var b = (/MSIE/.test(navigator.userAgent) && !(window).opera);
     if(b && (typeof (G_vmlCanvasManager) != "undefined")) {
         a = G_vmlCanvasManager.initElement((a));
     }
@@ -5065,8 +5066,8 @@ Dygraph.createIterator = function (d, c, b, a) {
     return new Dygraph.Iterator(d, c, b, a);
 };
 Dygraph.requestAnimFrame = (function () {
-    return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function (a) {
-        window.setTimeout(a, 1000 / 60);
+    return (window).requestAnimationFrame || (window).webkitRequestAnimationFrame || (window).mozRequestAnimationFrame || (window).oRequestAnimationFrame || (window).msRequestAnimationFrame || function (a) {
+        (window).setTimeout(a, 1000 / 60);
     };
 })();
 Dygraph.repeatAndCleanup = function (h, g, f, a) {
@@ -5285,18 +5286,18 @@ Dygraph.IFrameTarp = function () {
     this.tarps = [];
 };
 Dygraph.IFrameTarp.prototype.cover = function () {
-    var f = document.getElementsByTagName("iframe");
+    var f = (document).getElementsByTagName("iframe");
     for(var c = 0; c < f.length; c++) {
         var e = f[c];
         var b = Dygraph.findPosX(e), h = Dygraph.findPosY(e), d = e.offsetWidth, a = e.offsetHeight;
-        var g = document.createElement("div");
+        var g = (document).createElement("div");
         g.style.position = "absolute";
         g.style.left = b + "px";
         g.style.top = h + "px";
         g.style.width = d + "px";
         g.style.height = a + "px";
         g.style.zIndex = 999;
-        document.body.appendChild(g);
+        (document).body.appendChild(g);
         this.tarps.push(g);
     }
 };
@@ -5341,10 +5342,10 @@ Dygraph.pow = function (a, b) {
     return Math.pow(a, b);
 };
 Dygraph.dateSetters = {
-    ms: Date.prototype.setMilliseconds,
-    s: Date.prototype.setSeconds,
-    m: Date.prototype.setMinutes,
-    h: Date.prototype.setHours
+    ms: (Date).prototype.setMilliseconds,
+    s: (Date).prototype.setSeconds,
+    m: (Date).prototype.setMinutes,
+    h: (Date).prototype.setHours
 };
 Dygraph.setDateSameTZ = function (c, b) {
     var f = c.getTimezoneOffset();
@@ -6252,7 +6253,7 @@ Dygraph.Plugins.Annotations = (function () {
             if(w.hasOwnProperty("tickHeight")) {
                 n = w.tickHeight;
             }
-            var j = document.createElement("div");
+            var j = (document).createElement("div");
             for(var A in x) {
                 if(x.hasOwnProperty(A)) {
                     j.style[A] = x[A];
@@ -6267,14 +6268,14 @@ Dygraph.Plugins.Annotations = (function () {
             var m = w.hasOwnProperty("width") ? w.width : 16;
             var k = w.hasOwnProperty("height") ? w.height : 16;
             if(w.hasOwnProperty("icon")) {
-                var z = document.createElement("img");
+                var z = (document).createElement("img");
                 z.src = w.icon;
                 z.width = m;
                 z.height = k;
                 j.appendChild(z);
             } else {
                 if(l.annotation.hasOwnProperty("shortText")) {
-                    j.appendChild(document.createTextNode(l.annotation.shortText));
+                    j.appendChild((document).createTextNode(l.annotation.shortText));
                 }
             }
             var c = l.canvasx - m / 2;
@@ -6418,14 +6419,14 @@ Dygraph.Plugins.Axes = (function () {
             y2: C("y2")
         };
         var m = function (g, x, y) {
-            var K = document.createElement("div");
+            var K = (document).createElement("div");
             var e = p[y == "y2" ? "y2" : x];
             for(var r in e) {
                 if(e.hasOwnProperty(r)) {
                     K.style[r] = e[r];
                 }
             }
-            var i = document.createElement("div");
+            var i = (document).createElement("div");
             i.className = "dygraph-axis-label dygraph-axis-label-" + x + (y ? " dygraph-axis-label-" + y : "");
             i.innerHTML = g;
             K.appendChild(i);
@@ -6572,7 +6573,7 @@ Dygraph.Plugins.ChartLabels = (function () {
         };
     };
     var b = function (d) {
-        var e = document.createElement("div");
+        var e = (document).createElement("div");
         e.style.position = "absolute";
         e.style.left = d.x + "px";
         e.style.top = d.y + "px";
@@ -6602,7 +6603,7 @@ Dygraph.Plugins.ChartLabels = (function () {
         this.y2label_div_ = null;
     };
     var a = function (l, i, f, h, j) {
-        var d = document.createElement("div");
+        var d = (document).createElement("div");
         d.style.position = "absolute";
         if(f == 1) {
             d.style.left = "0px";
@@ -6613,7 +6614,7 @@ Dygraph.Plugins.ChartLabels = (function () {
         d.style.width = i.w + "px";
         d.style.height = i.h + "px";
         d.style.fontSize = (l.getOption("yLabelWidth") - 2) + "px";
-        var m = document.createElement("div");
+        var m = (document).createElement("div");
         m.style.position = "absolute";
         m.style.width = i.h + "px";
         m.style.height = i.w + "px";
@@ -6626,12 +6627,12 @@ Dygraph.Plugins.ChartLabels = (function () {
         m.style.MozTransform = e;
         m.style.OTransform = e;
         m.style.msTransform = e;
-        if(typeof (document.documentMode) !== "undefined" && document.documentMode < 9) {
+        if(typeof ((document).documentMode) !== "undefined" && (document).documentMode < 9) {
             m.style.filter = "progid:DXImageTransform.Microsoft.BasicImage(rotation=" + (f == 1 ? "3" : "1") + ")";
             m.style.left = "0px";
             m.style.top = "0px";
         }
-        var k = document.createElement("div");
+        var k = (document).createElement("div");
         k.className = h;
         k.innerHTML = j;
         m.appendChild(k);
@@ -6649,7 +6650,7 @@ Dygraph.Plugins.ChartLabels = (function () {
             this.title_div_.style.fontSize = (i.getOption("titleHeight") - 8) + "px";
             this.title_div_.style.fontWeight = "bold";
             this.title_div_.style.zIndex = 10;
-            var f = document.createElement("div");
+            var f = (document).createElement("div");
             f.className = "dygraph-label dygraph-title";
             f.innerHTML = i.getOption("title");
             this.title_div_.appendChild(f);
@@ -6660,7 +6661,7 @@ Dygraph.Plugins.ChartLabels = (function () {
             this.xlabel_div_ = b(j);
             this.xlabel_div_.style.textAlign = "center";
             this.xlabel_div_.style.fontSize = (i.getOption("xLabelHeight") - 2) + "px";
-            var f = document.createElement("div");
+            var f = (document).createElement("div");
             f.className = "dygraph-label dygraph-xlabel";
             f.innerHTML = i.getOption("xlabel");
             this.xlabel_div_.appendChild(f);
@@ -6777,7 +6778,7 @@ Dygraph.Plugins.Legend = (function () {
         var l = j.getOption("labelsDiv");
         if(l && null !== l) {
             if(typeof (l) == "string" || l instanceof String) {
-                m = document.getElementById(l);
+                m = (document).getElementById(l);
             } else {
                 m = l;
             }
@@ -6795,7 +6796,7 @@ Dygraph.Plugins.Legend = (function () {
                 overflow: "hidden"
             };
             Dygraph.update(i, j.getOption("labelsDivStyles"));
-            m = document.createElement("div");
+            m = (document).createElement("div");
             m.className = "dygraph-legend";
             for(var h in i) {
                 if(!i.hasOwnProperty(h)) {
@@ -6820,7 +6821,7 @@ Dygraph.Plugins.Legend = (function () {
         };
     };
     var b = function (g) {
-        var f = document.createElement("span");
+        var f = (document).createElement("span");
         f.setAttribute("style", "margin: 0; padding: 0 0 0 1em; border: 0;");
         g.appendChild(f);
         var e = f.offsetWidth;
@@ -6917,7 +6918,7 @@ Dygraph.Plugins.Legend = (function () {
         return r;
     };
     d = function (s, h, r) {
-        var e = (/MSIE/.test(navigator.userAgent) && !window.opera);
+        var e = (/MSIE/.test(navigator.userAgent) && !(window).opera);
         if(e) {
             return "&mdash;";
         }
@@ -6962,7 +6963,7 @@ Dygraph.Plugins.Legend = (function () {
 })();
 Dygraph.Plugins.RangeSelector = (function () {
     var a = function () {
-        this.isIE_ = /MSIE/.test(navigator.userAgent) && !window.opera;
+        this.isIE_ = /MSIE/.test(navigator.userAgent) && !(window).opera;
         this.hasTouchInterface_ = typeof (TouchEvent) != "undefined";
         this.isMobileDevice_ = /mobile|android/gi.test(navigator.appVersion);
         this.interfaceCreated_ = false;
@@ -7104,7 +7105,7 @@ Dygraph.Plugins.RangeSelector = (function () {
         this.fgcanvas_ctx_ = Dygraph.getContext(this.fgcanvas_);
     };
     a.prototype.createIEPanOverlay_ = function () {
-        this.iePanOverlay_ = document.createElement("div");
+        this.iePanOverlay_ = (document).createElement("div");
         this.iePanOverlay_.style.position = "absolute";
         this.iePanOverlay_.style.backgroundColor = "white";
         this.iePanOverlay_.style.filter = "alpha(opacity=0)";
@@ -7138,7 +7139,7 @@ Dygraph.Plugins.RangeSelector = (function () {
     };
     a.prototype.initInteraction_ = function () {
         var o = this;
-        var i = this.isIE_ ? document : window;
+        var i = this.isIE_ ? (document) : (window);
         var u = 0;
         var v = null;
         var s = false;
@@ -7359,7 +7360,7 @@ Dygraph.Plugins.RangeSelector = (function () {
         };
         this.setDefaultOption_("interactionModel", Dygraph.Interaction.dragIsPanInteractionModel);
         this.setDefaultOption_("panEdgeFraction", 0.0001);
-        var b = window.opera ? "mousedown" : "dragstart";
+        var b = (window).opera ? "mousedown" : "dragstart";
         this.dygraph_.addEvent(this.leftZoomHandle_, b, f);
         this.dygraph_.addEvent(this.rightZoomHandle_, b, f);
         if(this.isUsingExcanvas_) {
