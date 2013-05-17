@@ -8,7 +8,8 @@ var CZ;
             "#auth-edit-contentitem-form": "/ui/auth-edit-contentitem-form.html",
             "$('<div></div>')": "/ui/contentitem-listbox.html",
             "#profile-form": "/ui/header-edit-profile-form.html",
-            "#login-form": "/ui/header-login-form.html"
+            "#login-form": "/ui/header-login-form.html",
+            "#timeSeriesContainer": "/ui/timeseries-graph-form.html"
         };
         var FeatureActivation;
         (function (FeatureActivation) {
@@ -67,6 +68,8 @@ var CZ;
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
+                var timeSeriesForm = new CZ.UI.TimeSeriesForm(forms[7], {
+                });
                 $(".header-icon.edit-icon").click(function () {
                     $(".header-icon.active").removeClass("active");
                     $(this).addClass("active");

@@ -14,7 +14,9 @@
 /// <reference path='../ui/header-edit-form.ts' />
 /// <reference path='../ui/header-edit-profile-form.ts'/>
 /// <reference path='../ui/header-login-form.ts'/>
+/// <reference path='../ui/timeseries-graph-form.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
+
 
 module CZ {
     export module HomePageViewModel {
@@ -27,7 +29,7 @@ module CZ {
             "$('<div></div>')": "/ui/contentitem-listbox.html",
             "#profile-form": "/ui/header-edit-profile-form.html",
             "#login-form": "/ui/header-login-form.html",
-            "#timeseries-form": "/ui/timeseries-graph-form.html"
+            "#timeSeriesContainer": "/ui/timeseries-graph-form.html" 
         };
 
         enum FeatureActivation {
@@ -97,6 +99,10 @@ module CZ {
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
+
+                var timeSeriesForm = new CZ.UI.TimeSeriesForm(forms[7], {});      
+
+                //$("#timeSeriesContainer")
 
                 $(".header-icon.edit-icon").click(function () {
                     $(".header-icon.active").removeClass("active");

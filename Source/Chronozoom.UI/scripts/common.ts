@@ -30,6 +30,8 @@ module CZ {
         Array for logging of inners messages and exceptions
         */
 
+        export var timeSeriesChart;
+
         var searchString;
         export var ax;
         export var axis;
