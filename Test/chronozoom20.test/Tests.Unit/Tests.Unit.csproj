@@ -87,6 +87,7 @@
     <Content Include="Scripts\Specs\authoringSpec.js" />
     <Content Include="Scripts\Specs\CommonSpec.js" />
     <Content Include="Scripts\Specs\CsvParse.js" />
+    <Content Include="Scripts\Specs\datepickerSpec.js" />
     <Content Include="Scripts\Specs\datesSpec.js" />
     <Content Include="Scripts\Specs\profileDataSpec.js" />
     <Content Include="Scripts\Specs\TimeScaleSpec.js" />
