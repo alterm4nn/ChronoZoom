@@ -20,6 +20,7 @@ using System.Web.UI;
 using System.Web.Mvc;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using System.ServiceModel.Activation;
 
 
 namespace Chronozoom.UI
@@ -55,6 +56,8 @@ namespace Chronozoom.UI
                 "account/{action}", // URL with parameters
                 new { controller = "Account" } // Parameter defaults
                 );
+
+            routes.Add(new ServiceRoute("api", new WebServiceHostFactory(), typeof(ChronozoomSVC)));
 
             routes.Add(new Route("{supercollection}", routeHandlerDetails));
             routes.Add(new Route("{supercollection}/{collection}", routeHandlerDetails));
