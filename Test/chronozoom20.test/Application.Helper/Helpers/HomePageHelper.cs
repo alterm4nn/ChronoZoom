@@ -109,28 +109,28 @@ namespace Application.Helper.Helpers
         public void OpenHelpLink()
         {
             Logger.Log("<-");
-            Click(By.XPath("(//*[@class='footer-link'])[4]"));
+            Click(By.XPath("//*[@id='footer']/*/*/*/a[text()='Help']"));
             Logger.Log("->");
         }
 
         public void OpenFeedbackLink()
         {
             Logger.Log("<-");
-            Click(By.XPath("(//*[@class='footer-link'])[2]"));
+            Click(By.XPath("//*[@id='footer']/*/*/*/a[text()='Feedback']"));
             Logger.Log("->");
         }
 
-        public void OpenAboutLink()
+        public void OpenNoticeLink()
         {
             Logger.Log("<-");
-            Click(By.XPath("(//*[@class='footer-link'])[1]"));
+            Click(By.XPath("//*[@id='footer']/*/*/*/a[text()='Notices']"));
             Logger.Log("->");
         }
 
-        public void OpenPrivacyLink()
+        public void OpenDevelopersLink()
         {
             Logger.Log("<-");
-            Click(By.XPath("(//*[@class='footer-link'])[3]"));
+            Click(By.XPath("//*[@id='footer']/*/*/*/a[text()='Developers']"));
             Logger.Log("->");
         }
 
