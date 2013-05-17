@@ -240,6 +240,10 @@ describe("CZ.Authoring part", function () {
             it("false, if start = end", function () {
                 var start = 5, end = 5;
                 var result = isNonegHeight(start, end);
+		expect(false).toEqual(result);
+	    });
+        });	
+    });
     //todo: need to use using, table of data:
     describe("ValidateExhibitData() function", function () {
         describe("should return", function () {
