@@ -28,7 +28,8 @@ module CZ {
             "$('<div></div>')": "/ui/contentitem-listbox.html",
             "#profile-form": "/ui/header-edit-profile-form.html",
             "#login-form": "/ui/header-login-form.html",
-            "#auth-edit-tours-form": "/ui/auth-edit-tour-form.html",
+            "#auth-edit-tours-form": "/ui/auth-edit-tour-form.html", // 7
+            "$('<div><!--Tours Authoring--></div>')": "/ui/tourstop-listbox.html" // 8
         };
 
         enum FeatureActivation {
@@ -124,7 +125,10 @@ module CZ {
                             titleTextblock: ".cz-form-title",
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
+                            addStopButton: ".cz-form-tour-addstop",
                             titleInput: ".cz-form-item-title",
+                            tourStopsListBox: ".cz-listbox",
+                            tourStopsTemplate: forms[8],
                             context: tour
                         });
                         form.show();

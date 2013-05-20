@@ -1,3 +1,4 @@
+/// <reference path='../ui/tourstop-listbox.ts' />
 /// <reference path='../ui/controls/formbase.ts'/>
 /// <reference path='../scripts/authoring.ts'/>
 /// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
@@ -7,25 +8,42 @@ module CZ {
         export interface IFormEditTourInfo extends CZ.UI.IFormBaseInfo {
             saveButton: string;
             deleteButton: string;
+            addStopButton: string;
             titleInput: string;
+            tourStopsListBox: string;
+            tourStopsTemplate: JQuery;
             context: Object;
+        }
+
+        export class TourStop
+        {
+            private targetElement: Object;
+
         }
 
         export class FormEditTour extends CZ.UI.FormBase {
             private saveButton: JQuery;
             private deleteButton: JQuery;
+            private addStopButton: JQuery;
             private titleInput: JQuery;
+            private stops: TourStop[];
             private tour: Object;
 
-            private isCancel: bool;
+            public tourStopsListBox: TourStopListBox;
+
 
             // We only need to add additional initialization in constructor.
             constructor(container: JQuery, formInfo: IFormEditTourInfo) {
                 super(container, formInfo);
 
+
                 this.saveButton = container.find(formInfo.saveButton);
                 this.deleteButton = container.find(formInfo.deleteButton);
+                this.addStopButton = container.find(formInfo.addStopButton);
                 this.titleInput = container.find(formInfo.titleInput);
+
+                this.stops = [];
+                this.tourStopsListBox = new CZ.UI.TourStopListBox(container.find(formInfo.tourStopsListBox), formInfo.tourStopsTemplate, this.stops);
 
                 this.saveButton.off();
                 this.deleteButton.off();
@@ -49,6 +67,15 @@ module CZ {
                     this.titleTextblock.text("Edit Tour");
                     this.saveButton.text("update tour");
                 }
+
+                var self = this;
+                this.addStopButton.click(event =>
+                {
+                    CZ.Authoring.isActive = true; // for now we do not watch for mouse moves
+                    CZ.Authoring.mode = "editTour-selectTarget";
+                    CZ.Authoring.callback = arg => self.onTargetElementSelected(arg);
+                    self.hide();
+                });
 
                 //this.isCancel = true;
                 //this.endDate.addEditMode_Infinite();
@@ -104,6 +131,17 @@ module CZ {
                 this.activationSource.addClass("active");
             }
 
+
+            public hide(noAnimation?: bool = false) {
+                super.close(noAnimation ? undefined : {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
+                this.activationSource.removeClass("active");
+            }
+
+
             public close() {
                 super.close({
                     effect: "slide",
@@ -123,6 +161,17 @@ module CZ {
 
                 this.activationSource.removeClass("active");
                 this.container.find("cz-form-errormsg").hide();
+            }
+
+            private onTargetElementSelected(targetElement: any)
+            {
+                alert(targetElement.type);
+
+                var stop: any = {};
+                stop.title = targetElement.title;
+                stop.description = targetElement.type;
+                this.tourStopsListBox.add(stop);
+                this.show();
             }
         }
     }

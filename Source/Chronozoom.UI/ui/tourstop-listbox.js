@@ -35,7 +35,7 @@ var CZ;
                         }
                     }
                 };
-                listItemsInfo.default.ctor = UI.ContentItemListItem;
+                listItemsInfo.default.ctor = TourStopListItem;
                         _super.call(this, container, listBoxInfo, listItemsInfo);
             }
             return TourStopListBox;
@@ -44,7 +44,6 @@ var CZ;
         var TourStopListItem = (function (_super) {
             __extends(TourStopListItem, _super);
             function TourStopListItem(parent, container, uiMap, context) {
-                var _this = this;
                         _super.call(this, parent, container, uiMap, context);
                 this.iconImg = this.container.find(uiMap.iconImg);
                 this.titleTextblock = this.container.find(uiMap.titleTextblock);
@@ -54,13 +53,6 @@ var CZ;
                 this.descrTextblock.text(this.data.description);
                 this.closeButton.off();
                 this.closeButton.click(function () {
-                    if(CZ.Authoring.mode === "createExhibit") {
-                        _super.prototype.close.call(_this);
-                    } else if(CZ.Authoring.mode === "editExhibit") {
-                        if(_this.parent.items.length > 1) {
-                            _super.prototype.close.call(_this);
-                        }
-                    }
                 });
             }
             return TourStopListItem;

@@ -9,7 +9,7 @@ var CZ;
         var FormEditTimeline = (function (_super) {
             __extends(FormEditTimeline, _super);
             function FormEditTimeline(container, formInfo) {
-                _super.call(this, container, formInfo);
+                        _super.call(this, container, formInfo);
                 this.saveButton = container.find(formInfo.saveButton);
                 this.deleteButton = container.find(formInfo.deleteButton);
                 this.startDate = new CZ.UI.DatePicker(container.find(formInfo.startDate));
