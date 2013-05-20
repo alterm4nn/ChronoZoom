@@ -41,7 +41,7 @@ module CZ {
             }
         }
 
-        var _serviceUrl = CZ.Settings.serverUrlHost + "/chronozoom.svc/";
+        var _serviceUrl = CZ.Settings.serverUrlHost + "/api/";
 
         export function Request (urlBase) {
             var _url = urlBase;

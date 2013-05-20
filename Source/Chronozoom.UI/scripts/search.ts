@@ -229,9 +229,9 @@ module CZ {
 
             var url;
             switch (CZ.Settings.czDataSource) {
-                case 'db': url = "/chronozoom.svc/Search";
+                case 'db': url = "/api/Search";
                     break;
-                default: url = "/chronozoom.svc/Search";
+                default: url = "/api/Search";
                     break;
             }
             $.ajax({
