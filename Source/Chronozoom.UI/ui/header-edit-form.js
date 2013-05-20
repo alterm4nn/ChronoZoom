@@ -12,18 +12,24 @@ var CZ;
                         _super.call(this, container, formInfo);
                 this.createTimelineBtn = this.container.find(formInfo.createTimeline);
                 this.createExhibitBtn = this.container.find(formInfo.createExhibit);
+                this.createTourBtn = this.container.find(formInfo.createTour);
                 this.initialize();
             }
             FormHeaderEdit.prototype.initialize = function () {
                 var _this = this;
                 this.createTimelineBtn.off();
                 this.createExhibitBtn.off();
+                this.createTourBtn.off();
                 this.createTimelineBtn.click(function (event) {
                     CZ.Authoring.UI.createTimeline();
                     _this.close();
                 });
                 this.createExhibitBtn.click(function (event) {
                     CZ.Authoring.UI.createExhibit();
+                    _this.close();
+                });
+                this.createTourBtn.click(function (event) {
+                    CZ.Authoring.UI.createTour();
                     _this.close();
                 });
             };

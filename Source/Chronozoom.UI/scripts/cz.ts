@@ -107,7 +107,8 @@ module CZ {
                         closeButton: ".cz-form-close-btn > .cz-form-btn",
                         titleTextblock: ".cz-form-title",
                         createTimeline: ".cz-form-create-timeline",
-                        createExhibit: ".cz-form-create-exhibit"
+                        createExhibit: ".cz-form-create-exhibit",
+                        createTour: ".cz-form-create-tour"
                     });
                     form.show();
                 });

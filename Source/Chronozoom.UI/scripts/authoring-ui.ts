@@ -31,6 +31,12 @@ module CZ {
                 CZ.Authoring.mode = "editTimeline";
             }
 
+            // Opens a window for creating new tour.
+            export function createTour()
+            {
+                alert("Creating a tour");
+            }
+
             export function createExhibit () {
                 // skip authoring during ongoing dynamic layout animation
                 if (CZ.Layout.animatingElements.length != 0) {

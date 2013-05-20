@@ -18,6 +18,10 @@ var CZ;
                 CZ.Authoring.mode = "editTimeline";
             }
             UI.editTimeline = editTimeline;
+            function createTour() {
+                alert("Creating a tour");
+            }
+            UI.createTour = createTour;
             function createExhibit() {
                 if(CZ.Layout.animatingElements.length != 0) {
                     return;
