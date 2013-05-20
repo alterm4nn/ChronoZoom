@@ -6,10 +6,10 @@ var CZ;
             "#auth-edit-timeline-form": "/ui/auth-edit-timeline-form.html",
             "#auth-edit-exhibit-form": "/ui/auth-edit-exhibit-form.html",
             "#auth-edit-contentitem-form": "/ui/auth-edit-contentitem-form.html",
+            "#auth-edit-tours-form": "/ui/auth-edit-tour-form.html",
             "$('<div></div>')": "/ui/contentitem-listbox.html",
             "#profile-form": "/ui/header-edit-profile-form.html",
-            "#login-form": "/ui/header-login-form.html",
-            "#auth-edit-tours-form": "/ui/auth-edit-tour-form.html"
+            "#login-form": "/ui/header-login-form.html"
         };
         var FeatureActivation;
         (function (FeatureActivation) {
@@ -83,19 +83,6 @@ var CZ;
                     form.show();
                 });
                 CZ.Authoring.initialize(CZ.Common.vc, {
-                    showEditTourForm: function (tour) {
-                        var form = new CZ.UI.FormEditTour(forms[7], {
-                            activationSource: $(".header-icon.edit-icon"),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            saveButton: ".cz-form-save",
-                            deleteButton: ".cz-form-delete",
-                            titleInput: ".cz-form-item-title",
-                            context: tour
-                        });
-                        form.show();
-                    },
                     showCreateTimelineForm: function (timeline) {
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
                             activationSource: $(".header-icon.edit-icon"),

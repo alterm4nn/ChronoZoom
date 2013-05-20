@@ -2,15 +2,6 @@ var CZ;
 (function (CZ) {
     (function (Authoring) {
         (function (UI) {
-            function createTour() {
-                if(CZ.Layout.animatingElements.length != 0) {
-                    return;
-                }
-                CZ.Authoring.isActive = false;
-                CZ.Authoring.mode = "editTour";
-                Authoring.showEditTourForm(null);
-            }
-            UI.createTour = createTour;
             function createTimeline() {
                 if(CZ.Layout.animatingElements.length != 0) {
                     return;
@@ -27,6 +18,10 @@ var CZ;
                 CZ.Authoring.mode = "editTimeline";
             }
             UI.editTimeline = editTimeline;
+            function createTour() {
+                alert("Creating a tour");
+            }
+            UI.createTour = createTour;
             function createExhibit() {
                 if(CZ.Layout.animatingElements.length != 0) {
                     return;
