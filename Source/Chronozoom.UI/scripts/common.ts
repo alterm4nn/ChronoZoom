@@ -8,6 +8,8 @@
 /// <reference path='virtual-canvas.ts'/>
 /// <reference path='authoring-ui.ts'/>
 /// <reference path='data.ts'/>
+/// <reference path='../ui/timeseries-graph-form.ts'/>
+
 
 // Obsolete functions not included in the typescript base library bindings
 declare var escape: any;
@@ -29,8 +31,6 @@ module CZ {
         /*
         Array for logging of inners messages and exceptions
         */
-
-        export var timeSeriesChart;
 
         var searchString;
         export var ax;
@@ -339,6 +339,13 @@ module CZ {
             vc.virtualCanvas("updateViewport");
             //ax.axis("updateWidth");
             updateAxis(vc, ax);
+
+            //updating timeSeries chart
+            //var vp = vc.virtualCanvas("getViewport");
+            //var lt = vp.pointScreenToVirtual(0, 0);
+            //var rb = vp.pointScreenToVirtual(vp.width, vp.height);
+            //timeSeriesChart.updateRange(lt.x, rb.x);
+
             CZ.BreadCrumbs.updateBreadCrumbsLabels();
         }
 

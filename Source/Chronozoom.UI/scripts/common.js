@@ -6,7 +6,6 @@ var CZ;
         Common.controller;
         Common.isAxisFreezed = true;
         Common.startHash;
-        Common.timeSeriesChart;
         var searchString;
         Common.ax;
         Common.axis;

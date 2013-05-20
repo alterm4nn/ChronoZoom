@@ -19,6 +19,8 @@
 
 
 module CZ {
+    export var timeSeriesChart: CZ.UI.LineChart;
+
     export module HomePageViewModel {
         // Contains mapping: CSS selector -> html file.
         var _uiMap = {
@@ -100,9 +102,8 @@ module CZ {
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
 
-                var timeSeriesForm = new CZ.UI.TimeSeriesForm(forms[7], {});      
-
-                //$("#timeSeriesContainer")
+                timeSeriesChart = new CZ.UI.LineChart(forms[7]);
+                //updateTimeSeriesChart(CZ.Common.vc.virtualCanvas("getViewport"));
 
                 $(".header-icon.edit-icon").click(function () {
                     $(".header-icon.active").removeClass("active");
@@ -432,6 +433,8 @@ module CZ {
                                     var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
                                     CZ.Common.updateMarker();
                                 }
+
+                                updateTimeSeriesChart(vp);
                             },
                             function () {
                                 return CZ.Common.vc.virtualCanvas("getViewport");
@@ -578,6 +581,23 @@ module CZ {
         function IsFeatureEnabled(featureName) {
             var feature: FeatureInfo[] = $.grep(_featureMap, function (e) { return e.Name === featureName; });
             return feature[0].IsEnabled;
+        }
+
+        function updateTimeSeriesChart(vp) {
+            var left = vp.pointScreenToVirtual(0, 0).x;
+            if (left < CZ.Settings.maxPermitedTimeRange.left) left = CZ.Settings.maxPermitedTimeRange.left;
+            var right = vp.pointScreenToVirtual(vp.width, vp.height).x;
+            if (right > CZ.Settings.maxPermitedTimeRange.right) right = CZ.Settings.maxPermitedTimeRange.right;
+
+            if (timeSeriesChart !== undefined) {
+                var leftCSS = vp.pointVirtualToScreen(left, 0).x;
+                var rightCSS = vp.pointVirtualToScreen(right, 0).x;
+                timeSeriesChart.updateRange(leftCSS, rightCSS);
+
+                var leftPlot = Dates.getDMYFromCoordinate(left).year;
+                var rightPlot = Dates.getDMYFromCoordinate(right).year;
+                timeSeriesChart.updateLayout(leftPlot, rightPlot);
+            }
         }
     }
 }
