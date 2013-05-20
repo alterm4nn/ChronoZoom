@@ -117,6 +117,7 @@
     <Reference Include="System.ServiceModel">
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.ServiceModel.Activation" />
     <Reference Include="System.ServiceModel.Web">
       <Private>True</Private>
     </Reference>
@@ -174,6 +175,7 @@
     <Compile Include="default.ashx.cs">
       <DependentUpon>default.ashx</DependentUpon>
     </Compile>
+    <Compile Include="api\ichronozoomsvc.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -391,7 +393,7 @@
     <Content Include="scripts\tours.js">
       <DependentUpon>tours.ts</DependentUpon>
     </Content>
-    <Content Include="Chronozoom.svc" />
+    <Content Include="api\chronozoom.svc" />
     <Content Include="scripts\urlnav.js">
       <DependentUpon>urlnav.ts</DependentUpon>
     </Content>
@@ -431,8 +433,8 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Chronozoom.svc.cs">
-      <DependentUpon>Chronozoom.svc</DependentUpon>
+    <Compile Include="api\chronozoom.svc.cs">
+      <DependentUpon>chronozoom.svc</DependentUpon>
     </Compile>
     <Compile Include="ACS\controllers\AccountController.cs" />
     <Compile Include="utils\GlobalSuppressions.cs" />
