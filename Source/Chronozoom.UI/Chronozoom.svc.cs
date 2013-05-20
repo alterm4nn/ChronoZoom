@@ -214,6 +214,40 @@ namespace Chronozoom.UI
             });
         }
 
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "minspan")]
+        public Collection<Timeline> GetTimelineSubtree(Guid collectionId, string start, string end, string minspan, string commonAncestor, string maxElements)
+        {
+            return AuthenticatedOperation(delegate(User user)
+            {
+                Trace.TraceInformation("Get Filtered Timelines");
+                /*
+                Guid collectionId = CollectionIdOrDefault(superCollection, collection);
+
+                // If available, retrieve from cache.
+                if (CanCacheGetTimelines(user, collectionId))
+                {
+                    Timeline cachedTimeline = GetCachedGetTimelines(collectionId, start, end, minspan, commonAncestor, maxElements);
+                    if (cachedTimeline != null)
+                    {
+                        return cachedTimeline;
+                    }
+                }
+                */
+                
+                // initialize filters
+                decimal startTime = string.IsNullOrWhiteSpace(start) ? _minYear : decimal.Parse(start, CultureInfo.InvariantCulture);
+                decimal endTime = string.IsNullOrWhiteSpace(end) ? _maxYear : decimal.Parse(end, CultureInfo.InvariantCulture);
+                decimal minSpanParsed = string.IsNullOrWhiteSpace(minspan) ? 0 : decimal.Parse(minspan, CultureInfo.InvariantCulture);
+                Guid? lcaParsed = string.IsNullOrWhiteSpace(commonAncestor) ? (Guid?)null : Guid.Parse(commonAncestor);
+                int maxElementsParsed = string.IsNullOrWhiteSpace(maxElements) ? _maxElements.Value : int.Parse(maxElements, CultureInfo.InvariantCulture);
+                return _storage.TimelineSubtreeQuery(collectionId, lcaParsed, startTime, endTime, minSpanParsed, maxElementsParsed);
+            });
+        }
+
+
+
         /// <summary>
         /// Performs a search for a specific term within a collection or a superCollection.
         /// </summary>

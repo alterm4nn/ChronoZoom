@@ -160,6 +160,50 @@ namespace Chronozoom.Entities
             return new Collection<Timeline>(timelines);
         }
 
+        public Collection<Timeline> TimelineSubtreeQuery(Guid collectionId, Guid? leastCommonAncestor, decimal startTime, decimal endTime, decimal minSpan, int maxElements)
+        {
+            Collection<Timeline> result = new Collection<Timeline>();
+            Queue<TimelineRaw> q = new Queue<TimelineRaw>();
+            var init_timelines = leastCommonAncestor == null ? Database.SqlQuery<TimelineRaw>("SELECT * FROM [Timelines] WHERE [Depth] = 0 AND CollectionID = {0}", collectionId) : Database.SqlQuery<TimelineRaw>("SELECT * FROM [Timelines] WHERE [Id] = {0}", leastCommonAncestor);   // select the root element
+            foreach (TimelineRaw t in init_timelines)   //under normal circumstances this result should only contain a single timeline
+            {
+                q.Enqueue(t);
+            }
+            while (q.Count > 0 && maxElements > 0)
+            {
+                bool childGreaterThanMinspan = false;
+                TimelineRaw t = q.Dequeue();
+                var childTimelines = Database.SqlQuery<TimelineRaw>("SELECT * FROM [Timelines] WHERE [Timeline_ID] = {0}", t.Id);
+                foreach (TimelineRaw c in childTimelines)
+                {
+                    if (c.ToYear - c.FromYear > minSpan)
+                    {
+                        childGreaterThanMinspan = true;
+                        break;
+                    }
+                }
+                if (childGreaterThanMinspan)
+                {
+                    result.Add(t);
+                    --maxElements;
+                    if (maxElements > 0)
+                    {
+                        foreach (TimelineRaw c in childTimelines)
+                        {
+                            result.Add(c);
+                            --maxElements;
+                            if ((c.FromYear >= startTime && c.FromYear <= endTime) || (c.ToYear >= startTime && c.ToYear <= endTime) || (c.FromYear <= startTime && c.ToYear >= endTime) || (c.FromYear >= startTime && c.ToYear <= endTime))
+                            {   //if c overlaps with current viewport, then c may be further expanded
+                                q.Enqueue(c);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            return result;
+        }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "FromYear+13700000001"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "ToYear+13700000001")]
         public static Int64 ForkNode(Int64 fromYear, Int64 toYear)
         {

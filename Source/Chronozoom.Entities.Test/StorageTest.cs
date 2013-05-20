@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Data.Entity;
-
+using Chronozoom.Entities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Chronozoom.Entities.Test
