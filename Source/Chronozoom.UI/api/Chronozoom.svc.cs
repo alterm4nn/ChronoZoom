@@ -89,6 +89,7 @@ namespace Chronozoom.UI
         private static MD5 _md5Hasher = MD5.Create();
         private const decimal _minYear = -13700000000;
         private const decimal _maxYear = 9999;
+        private const int _defaultDepth = 30;
         private const string _defaultUserCollectionName = "default";
         private const string _defaultUserName = "anonymous";
         private const string _sandboxSuperCollectionName = "Sandbox";
@@ -149,7 +150,7 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
-        public Timeline GetTimelines(string superCollection, string collection, string start, string end, string minspan, string commonAncestor, string maxElements)
+        public Timeline GetTimelines(string superCollection, string collection, string start, string end, string minspan, string commonAncestor, string maxElements, string depth)
         {
             return AuthenticatedOperation(delegate(User user)
             {
@@ -160,7 +161,7 @@ namespace Chronozoom.UI
                 // If available, retrieve from cache.
                 if (CanCacheGetTimelines(user, collectionId))
                 {
-                    Timeline cachedTimeline = GetCachedGetTimelines(collectionId, start, end, minspan, commonAncestor, maxElements);
+                    Timeline cachedTimeline = GetCachedGetTimelines(collectionId, start, end, minspan, commonAncestor, maxElements, depth);
                     if (cachedTimeline != null)
                     {
                         return cachedTimeline;
@@ -173,14 +174,15 @@ namespace Chronozoom.UI
                 decimal span = string.IsNullOrWhiteSpace(minspan) ? 0 : decimal.Parse(minspan, CultureInfo.InvariantCulture);
                 Guid? lcaParsed = string.IsNullOrWhiteSpace(commonAncestor) ? (Guid?)null : Guid.Parse(commonAncestor);
                 int maxElementsParsed = string.IsNullOrWhiteSpace(maxElements) ? _maxElements.Value : int.Parse(maxElements, CultureInfo.InvariantCulture);
+                int depthParsed = string.IsNullOrWhiteSpace(depth) ? _defaultDepth : int.Parse(depth, CultureInfo.InvariantCulture);
 
-                Collection<Timeline> timelines = _storage.TimelinesQuery(collectionId, startTime, endTime, span, lcaParsed, maxElementsParsed);
+                Collection<Timeline> timelines = _storage.TimelinesQuery(collectionId, startTime, endTime, span, lcaParsed, maxElementsParsed, depthParsed);
                 Timeline timeline = timelines.Where(candidate => candidate.Id == lcaParsed).FirstOrDefault();
 
                 if (timeline == null)
                     timeline = timelines.FirstOrDefault();
 
-                CacheGetTimelines(timeline, collectionId, start, end, minspan, commonAncestor, maxElements);
+                CacheGetTimelines(timeline, collectionId, start, end, minspan, commonAncestor, maxElements, depth);
 
                 return timeline;
             });
@@ -434,7 +436,7 @@ namespace Chronozoom.UI
                     return new Uri(string.Format(
                         CultureInfo.InvariantCulture,
                         @"{0}\{1}\",
-                        FriendlyUrlReplacements(sandboxSuperCollection.Title),
+                        FriendlyUrl.FriendlyUrlEncode(sandboxSuperCollection.Title),
                         _sandboxCollectionName), UriKind.Relative);
                 }
             }
@@ -474,8 +476,8 @@ namespace Chronozoom.UI
             return new Uri(string.Format(
                 CultureInfo.InvariantCulture,
                 @"{0}\{1}\",
-                FriendlyUrlReplacements(superCollection.Title),
-                FriendlyUrlReplacements(superCollection.Title)), UriKind.Relative);
+                FriendlyUrl.FriendlyUrlEncode(superCollection.Title),
+                FriendlyUrl.FriendlyUrlEncode(superCollection.Title)), UriKind.Relative);
         }
 
         public void Dispose()
@@ -542,18 +544,6 @@ namespace Chronozoom.UI
                 "{0}|{1}",
                 superCollection.ToLower(CultureInfo.InvariantCulture),
                 collection.ToLower(CultureInfo.InvariantCulture)));
-        }
-
-        // Replace with URL friendly representations. For instance, converts space to '-'.
-        private static string FriendlyUrlReplacements(string value)
-        {
-            return Uri.EscapeDataString(value.Replace(' ', '-'));
-        }
-
-        // Decodes from URL friendly representations. For instance, converts '-' to space.
-        private static string FriendlyUrlDecode(string value)
-        {
-            return Uri.UnescapeDataString(value.Replace('-', ' '));
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase")]
@@ -1177,7 +1167,7 @@ namespace Chronozoom.UI
             }
             else
             {
-                reference = FriendlyUrlDecode(reference);
+                reference = FriendlyUrl.FriendlyUrlDecode(reference);
             }
 
             Guid collectionId = CollectionIdOrDefault(superCollection, collection);
@@ -1190,6 +1180,21 @@ namespace Chronozoom.UI
             Cache.Add(cacheKey, value, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
 
             return value;
+        }
+
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        public IEnumerable<SuperCollection> GetCollections()
+        {
+            List<SuperCollection> superCollections = _storage.SuperCollections.ToList();
+
+            foreach (SuperCollection superCollection in superCollections)
+            {
+                _storage.Entry(superCollection).Collection(x => x.Collections).Load();
+            }
+
+            return superCollections;
         }
 
         private bool FindParentTimeline(Guid? parentTimelineGuid, out Timeline parentTimeline)
@@ -1291,9 +1296,9 @@ namespace Chronozoom.UI
 
         // Retrieves the cached timeline.
         // Null if not cached.
-        private static Timeline GetCachedGetTimelines(Guid collectionId, string start, string end, string minspan, string lca, string maxElements)
+        private static Timeline GetCachedGetTimelines(Guid collectionId, string start, string end, string minspan, string lca, string maxElements, string depth)
         {
-            string cacheKey = string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}|{5}", collectionId, start, end, minspan, lca, maxElements);
+            string cacheKey = string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}|{5}|{6}", collectionId, start, end, minspan, lca, maxElements, depth);
             if (Cache.Contains(cacheKey))
             {
                 return (Timeline)Cache[cacheKey];
@@ -1303,9 +1308,9 @@ namespace Chronozoom.UI
         }
 
         // Caches the given timeline for the given GetTimelines request.
-        private static void CacheGetTimelines(Timeline timeline, Guid collectionId, string start, string end, string minspan, string lca, string maxElements)
+        private static void CacheGetTimelines(Timeline timeline, Guid collectionId, string start, string end, string minspan, string lca, string maxElements, string depth)
         {
-            string cacheKey = string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}|{5}", collectionId, start, end, minspan, lca, maxElements);
+            string cacheKey = string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}|{5}|{6}", collectionId, start, end, minspan, lca, maxElements, depth);
             if (!Cache.Contains(cacheKey) && timeline != null)
             {
                 Cache.Add(cacheKey, timeline, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));

@@ -66,7 +66,7 @@ namespace Chronozoom.Entities
 
         public DbSet<SuperCollection> SuperCollections { get; set; }
 
-        public Collection<Timeline> TimelinesQuery(Guid collectionId, decimal startTime, decimal endTime, decimal span, Guid? commonAncestor, int maxElements)
+        public Collection<Timeline> TimelinesQuery(Guid collectionId, decimal startTime, decimal endTime, decimal span, Guid? commonAncestor, int maxElements, int depth)
         {
             Dictionary<Guid, Timeline> timelinesMap = new Dictionary<Guid, Timeline>();
 
@@ -78,7 +78,7 @@ namespace Chronozoom.Entities
             }
             else
             {
-                timelines = FillTimelinesRangeQuery(collectionId, timelinesMap, startTime, endTime, span, commonAncestor, ref maxElements);
+                timelines = FillTimelinesRangeQuery(collectionId, timelinesMap, startTime, endTime, span, commonAncestor, depth, ref maxElements);
             }
 
             if (maxElements > 0)
@@ -158,7 +158,7 @@ namespace Chronozoom.Entities
         /// Keeping this commented until RI-Tree performance is validated.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        private List<Timeline> FillTimelinesRangeQuery(Guid collectionId, Dictionary<Guid, Timeline> timelinesMap, decimal startTime, decimal endTime, decimal span, Guid? commonAncestor, ref int maxElements)
+        private List<Timeline> FillTimelinesRangeQuery(Guid collectionId, Dictionary<Guid, Timeline> timelinesMap, decimal startTime, decimal endTime, decimal span, Guid? commonAncestor, int depth, ref int maxElements)
         {
             string timelinesQuery = @"
                 SELECT 
@@ -167,7 +167,9 @@ namespace Chronozoom.Entities
                     ToYear as [End]
                 FROM Timelines,
                     (
-                        SELECT TOP(1) Id as AncestorId
+                        SELECT TOP(1)
+                            Id as AncestorId,
+                            Depth as AncestorDepth
                         FROM Timelines 
                         WHERE 
                             (Timeline_Id Is NULL OR Id = {5})
@@ -178,6 +180,7 @@ namespace Chronozoom.Entities
                     ) as AncestorTimeline
                 WHERE
                     Collection_Id = {4} AND
+                    Depth < AncestorDepth + {6} AND
                     (
                         FromYear >= {1} AND 
                         ToYear <= {2} AND 
@@ -190,7 +193,7 @@ namespace Chronozoom.Entities
                     ToYear-FromYear DESC";
 
             return FillTimelinesFromFlatList(
-                Database.SqlQuery<TimelineRaw>(timelinesQuery, maxElements, startTime, endTime, span, collectionId, commonAncestor),
+                Database.SqlQuery<TimelineRaw>(timelinesQuery, maxElements, startTime, endTime, span, collectionId, commonAncestor, depth),
                 timelinesMap,
                 commonAncestor,
                 ref maxElements);

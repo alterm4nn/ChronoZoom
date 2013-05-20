@@ -56,8 +56,10 @@ namespace Chronozoom.UI
                 "account/{action}", // URL with parameters
                 new { controller = "Account" } // Parameter defaults
                 );
-
+            
             routes.Add(new ServiceRoute("api", new WebServiceHostFactory(), typeof(ChronozoomSVC)));
+
+            routes.Add(new Route("sitemap.xml", new WebFormRouteHandler<Page>("/pages/sitemap.aspx")));
 
             routes.Add(new Route("{supercollection}", routeHandlerDetails));
             routes.Add(new Route("{supercollection}/{collection}", routeHandlerDetails));
@@ -91,6 +93,7 @@ namespace Chronozoom.UI
         public void Application_BeginRequest(object sender, EventArgs e)
         {
             var app = (HttpApplication)sender;
+
             if (app.Context.Request.Url.LocalPath == "/")
             {
                 if (BrowserIsSupported())
