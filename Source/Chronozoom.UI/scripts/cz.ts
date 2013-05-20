@@ -592,11 +592,15 @@ module CZ {
             if (timeSeriesChart !== undefined) {
                 var leftCSS = vp.pointVirtualToScreen(left, 0).x;
                 var rightCSS = vp.pointVirtualToScreen(right, 0).x;
-                timeSeriesChart.updateRange(leftCSS, rightCSS);
-
                 var leftPlot = Dates.getDMYFromCoordinate(left).year;
                 var rightPlot = Dates.getDMYFromCoordinate(right).year;
-                timeSeriesChart.updateLayout(leftPlot, rightPlot);
+
+                if (CZ.Data.sampleData === undefined) {
+                    CZ.Data.sampleData = CZ.Data.generateSampleData();
+                }
+
+                timeSeriesChart.clear(leftCSS, rightCSS);
+                timeSeriesChart.drawDataSet(CZ.Data.sampleData, leftCSS, rightCSS, leftPlot, rightPlot);  
             }
         }
     }

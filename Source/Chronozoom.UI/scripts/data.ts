@@ -25,5 +25,39 @@ module CZ {
                 });
         }
 
+        export class DataSet {
+            public time: number[];
+            public series: Series[];
+
+        }
+
+        export class Series {
+            public values: number[]; 
+            public appearanceSettings: any;
+
+            constructor() {
+                this.values = new Array();
+            }
+        }
+
+        export function generateSampleData() {
+            var n = 10;
+            var result = new DataSet();
+            result.time = new Array(n);
+            result.series = new Array(1);
+
+            var seria = new Series();
+            seria.values = new Array(n);
+            result.series.push(seria);
+
+            for (var i = 0; i < n; i++) {
+                result.time.push(i * 1000000000 - 1000000000 * 2);
+                seria.values.push(i);
+            }
+
+            return result;
+        }
+
+        export var sampleData = generateSampleData(); 
     }
 }

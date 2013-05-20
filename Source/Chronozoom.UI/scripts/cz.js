@@ -491,10 +491,13 @@ var CZ;
             if(CZ.timeSeriesChart !== undefined) {
                 var leftCSS = vp.pointVirtualToScreen(left, 0).x;
                 var rightCSS = vp.pointVirtualToScreen(right, 0).x;
-                CZ.timeSeriesChart.updateRange(leftCSS, rightCSS);
                 var leftPlot = CZ.Dates.getDMYFromCoordinate(left).year;
                 var rightPlot = CZ.Dates.getDMYFromCoordinate(right).year;
-                CZ.timeSeriesChart.updateLayout(leftPlot, rightPlot);
+                if(CZ.Data.sampleData === undefined) {
+                    CZ.Data.sampleData = CZ.Data.generateSampleData();
+                }
+                CZ.timeSeriesChart.clear(leftCSS, rightCSS);
+                CZ.timeSeriesChart.drawDataSet(CZ.Data.sampleData, leftCSS, rightCSS, leftPlot, rightPlot);
             }
         }
     })(CZ.HomePageViewModel || (CZ.HomePageViewModel = {}));
