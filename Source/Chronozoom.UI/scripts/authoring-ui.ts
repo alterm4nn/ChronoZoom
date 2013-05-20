@@ -11,6 +11,19 @@ module CZ {
         export module UI {
             // Mouseup handlers.
 
+            // Opens a window for creating new tour.
+            export function createTour() {
+                // skip authoring during ongoing dynamic layout animation
+                if (CZ.Layout.animatingElements.length != 0) {
+                    return;
+                }
+
+                CZ.Authoring.isActive = false; // for now we do not watch for mouse moves
+                CZ.Authoring.mode = "editTour";
+
+                showEditTourForm(null);
+            }
+
             export function createTimeline () {
                 // skip authoring during ongoing dynamic layout animation
                 if (CZ.Layout.animatingElements.length != 0) {
@@ -29,12 +42,6 @@ module CZ {
 
                 CZ.Authoring.isActive = (CZ.Authoring.mode !== "editTimeline") || !CZ.Authoring.isActive;
                 CZ.Authoring.mode = "editTimeline";
-            }
-
-            // Opens a window for creating new tour.
-            export function createTour()
-            {
-                alert("Creating a tour");
             }
 
             export function createExhibit () {

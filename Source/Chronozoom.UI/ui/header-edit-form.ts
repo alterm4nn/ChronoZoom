@@ -43,7 +43,6 @@ module CZ {
                     this.close();
                 });
 
-
                 this.createTourBtn.click(event => {
                     CZ.Authoring.UI.createTour();
                     this.close();

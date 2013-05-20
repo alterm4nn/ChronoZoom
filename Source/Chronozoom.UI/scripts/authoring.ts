@@ -50,6 +50,7 @@ module CZ {
         export var showCreateExhibitForm: (...args: any[]) => any = null;
         export var showEditExhibitForm: (...args: any[]) => any = null;
         export var showEditContentItemForm: (...args: any[]) => any = null;
+        export var showEditTourForm: (...args: any[]) => any = null;
 
         /**
          * Tests a timeline/exhibit on intersection with another virtual canvas object.
@@ -368,6 +369,9 @@ module CZ {
                 }
             },
 
+            editTour: {
+            },
+
             editTimeline: {
                 mouseup: function () {
                     showEditTimelineForm(selectedTimeline);
@@ -464,6 +468,7 @@ module CZ {
             showCreateExhibitForm = formHandlers && formHandlers.showCreateExhibitForm || function () { };
             showEditExhibitForm = formHandlers && formHandlers.showEditExhibitForm || function () { };
             showEditContentItemForm = formHandlers && formHandlers.showEditContentItemForm || function () { };
+            showEditTourForm = formHandlers && formHandlers.showEditTourForm || function () { };
         }
 
         /**

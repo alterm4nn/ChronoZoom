@@ -70,6 +70,7 @@
     <script type="text/javascript" src="/ui/auth-edit-timeline-form.js"></script>
     <script type="text/javascript" src="/ui/auth-edit-exhibit-form.js"></script>
     <script type="text/javascript" src="/ui/auth-edit-contentitem-form.js"></script>
+    <script type="text/javascript" src="/ui/auth-edit-tour-form.js"></script>
     <script type="text/javascript" src="/ui/header-edit-form.js"></script>
     <script type="text/javascript" src="/ui/header-edit-profile-form.js"></script>
     <script type="text/javascript" src="/ui/header-login-form.js"></script>
@@ -121,20 +122,19 @@
                 </li>
                 <li class="fleft">
                     <div style="display: none" id="login-panel">
-                        <label for="login-button" class="auth-panel-login">Sign in</label
-                        ><div id="login-button" class="header-icon profile-icon" title="Sign in to ChronoZoom" data-enabled="true"></div>
+                        <label for="login-button" class="auth-panel-login">Sign in</label><div id="login-button" class="header-icon profile-icon" title="Sign in to ChronoZoom" data-enabled="true"></div>
                     </div>
                 </li>
                 <li class="fleft">
                     <div style="display: none" id="profile-panel">
-                        <label for="edit_profile_button" class="auth-panel-login"></label
-                        ><div id="edit_profile_button" class="header-icon profile-icon" title="Sign in to ChronoZoom" data-enabled="true"></div>
+                        <label for="edit_profile_button" class="auth-panel-login"></label>
+                        <div id="edit_profile_button" class="header-icon profile-icon" title="Sign in to ChronoZoom" data-enabled="true"></div>
                     </div>
                 </li>
             </ul>
         </div>
 
-            
+
         <div id="tour_control" class="tour_control fleft">
             <img id="tour_prev" src="/images/tour_prev_off.jpg" alt="previous" />
             <img style="margin: 0 0 0 16px"
@@ -193,6 +193,10 @@
             </div>
         </div>
 
+
+        <div id="auth-edit-tours-form" class="cz-form cz-form-tour-edit unselectable" onselectstart="return false;">
+        </div>
+
         <div id="bookmarks" class="bookmarksWindow unselectable" onselectstart="return false;" style="display: none">
             <img id="bookmarksCollapse" src="/images/collapse-left.png" class="headerButton" />
             <div class="header">
@@ -226,7 +230,7 @@
         <div id="auth-edit-timeline-form" class="cz-form cz-form-timeline unselectable">
         </div>
         <div id="auth-edit-exhibit-form" class="cz-form cz-form-exhibit unselectable">
-		</div>
+        </div>
         <div id="auth-edit-contentitem-form" class="cz-form cz-form-contentitem unselectable">
         </div>
 

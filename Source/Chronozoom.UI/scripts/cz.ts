@@ -11,6 +11,7 @@
 /// <reference path='../ui/auth-edit-timeline-form.ts'/>
 /// <reference path='../ui/auth-edit-exhibit-form.ts'/>
 /// <reference path='../ui/auth-edit-contentitem-form.ts'/>
+/// <reference path='../ui/auth-edit-tour-form.ts'/>
 /// <reference path='../ui/header-edit-form.ts' />
 /// <reference path='../ui/header-edit-profile-form.ts'/>
 /// <reference path='../ui/header-login-form.ts'/>
@@ -26,7 +27,8 @@ module CZ {
             "#auth-edit-contentitem-form": "/ui/auth-edit-contentitem-form.html",
             "$('<div></div>')": "/ui/contentitem-listbox.html",
             "#profile-form": "/ui/header-edit-profile-form.html",
-            "#login-form": "/ui/header-login-form.html"
+            "#login-form": "/ui/header-login-form.html",
+            "#auth-edit-tours-form": "/ui/auth-edit-tour-form.html",
         };
 
         enum FeatureActivation {
@@ -114,6 +116,19 @@ module CZ {
                 });
 
                 CZ.Authoring.initialize(CZ.Common.vc, {
+                    showEditTourForm: function (tour) {
+                        var form = new CZ.UI.FormEditTour(forms[7], {
+                            activationSource: $(".header-icon.edit-icon"),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            saveButton: ".cz-form-save",
+                            deleteButton: ".cz-form-delete",
+                            titleInput: ".cz-form-item-title",
+                            context: tour
+                        });
+                        form.show();
+                    },
                     showCreateTimelineForm: function (timeline) {
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
                             activationSource: $(".header-icon.edit-icon"),
@@ -131,16 +146,16 @@ module CZ {
                     },
                     showEditTimelineForm: function (timeline) {
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
-                        	activationSource: $(".header-icon.edit-icon"),
-                        	navButton: ".cz-form-nav",
-                        	closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        	titleTextblock: ".cz-form-title",
-                        	startDate: ".cz-form-time-start",
-                        	endDate: ".cz-form-time-end",
-                        	saveButton: ".cz-form-save",
-                        	deleteButton: ".cz-form-delete",
-                        	titleInput: ".cz-form-item-title",
-                        	context: timeline
+                            activationSource: $(".header-icon.edit-icon"),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            startDate: ".cz-form-time-start",
+                            endDate: ".cz-form-time-end",
+                            saveButton: ".cz-form-save",
+                            deleteButton: ".cz-form-delete",
+                            titleInput: ".cz-form-item-title",
+                            context: timeline
                         });
                         form.show();
                     },
@@ -177,29 +192,29 @@ module CZ {
                             deleteButton: ".cz-form-delete",
                             contentItemsTemplate: forms[4],
                             context: exhibit
-						});
+                        });
                         form.show();
                     },
                     showEditContentItemForm: function (ci, e, prevForm, noAnimation) {
                         var form = new CZ.UI.FormEditCI(forms[3], {
                             activationSource: $(".header-icon.edit-icon"),
                             prevForm: prevForm,
-                        	navButton: ".cz-form-nav",
-                        	closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        	titleTextblock: ".cz-form-title",
-                        	errorMessage: ".cz-form-errormsg",
-                        	saveButton: ".cz-form-save",
-                        	titleInput: ".cz-form-item-title",
-                        	mediaSourceInput: ".cz-form-item-mediasource",
-                        	mediaInput: ".cz-form-item-mediaurl",
-                        	descriptionInput: ".cz-form-item-descr",
-                       		attributionInput: ".cz-form-item-attribution",
-                        	mediaTypeInput: ".cz-form-item-media-type",
-                        	context: {
-                        	    exhibit: e,
-                        	    contentItem: ci
-                        	}
-                         });
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            errorMessage: ".cz-form-errormsg",
+                            saveButton: ".cz-form-save",
+                            titleInput: ".cz-form-item-title",
+                            mediaSourceInput: ".cz-form-item-mediasource",
+                            mediaInput: ".cz-form-item-mediaurl",
+                            descriptionInput: ".cz-form-item-descr",
+                            attributionInput: ".cz-form-item-attribution",
+                            mediaTypeInput: ".cz-form-item-media-type",
+                            context: {
+                                exhibit: e,
+                                contentItem: ci
+                            }
+                        });
                         form.show(noAnimation);
                     }
                 });
@@ -327,8 +342,8 @@ module CZ {
             $('#biblCloseButton')
                 .mouseout(() => { CZ.Common.toggleOffImage('biblCloseButton', 'png'); })
                 .mouseover(() => { CZ.Common.toggleOnImage('biblCloseButton', 'png'); })
-            
-            
+
+
             $('#welcomeScreenCloseButton')
                 .mouseover(() => { CZ.Common.toggleOnImage('welcomeScreenCloseButton', 'png'); })
                 .mouseout(() => { CZ.Common.toggleOffImage('welcomeScreenCloseButton', 'png'); })
@@ -353,7 +368,7 @@ module CZ {
 
             // Feature activation control
             for (var idxFeature = 0; idxFeature < _featureMap.length; idxFeature++) {
-                var enabled : bool = true;
+                var enabled: bool = true;
                 var feature = _featureMap[idxFeature];
 
                 if (feature.Activation === FeatureActivation.Disabled) {
