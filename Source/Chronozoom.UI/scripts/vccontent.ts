@@ -1597,10 +1597,9 @@ module CZ {
 
             var elem = document.createElement('iframe');
             elem.setAttribute("id", id);
-            if (pdfSrc.indexOf('?') == -1)
-                pdfSrc += '?wmode=opaque';
-            else
-                pdfSrc += '&wmode=opaque';
+            pdfSrc = "http://docs.google.com/viewer?url="
+                + encodeURI(pdfSrc) + "&embedded=true&wmode=opaque";
+
             elem.setAttribute("src", pdfSrc);
             elem.setAttribute("visible", 'true');
             elem.setAttribute("controls", 'true');
@@ -1624,6 +1623,24 @@ module CZ {
 
             var elem = document.createElement('iframe');
             elem.setAttribute("id", id);
+
+            // Youtube
+            var youtube = /(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|[\S\?\&_]+&v=|\/user\/\S+))([^\/&#]{10,12})/
+            
+            // Vimeo
+            var vimeo = /vimeo\.com\/([0-9]+)/i
+            var vimeoEmbed = /player.vimeo.com\/video\/([0-9]+)/i
+
+            if (youtube.test(videoSrc)) {
+                var youtubeVideoId = videoSrc.match(youtube)[1];
+                videoSrc = "http://www.youtube.com/embed/" + youtubeVideoId;
+            } else if (vimeo.test(videoSrc)) {
+                var vimeoVideoId = videoSrc.match(vimeo)[1];
+                videoSrc = "http://player.vimeo.com/video/" + vimeoVideoId;
+            } else if (vimeoEmbed.test(videoSrc)) {
+                //Embedded link provided
+            }
+
             if (videoSrc.indexOf('?') == -1)
                 videoSrc += '?wmode=opaque';
             else

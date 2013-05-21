@@ -727,23 +727,14 @@ module CZ {
                     }
                 } else if (ci.mediaType.toLowerCase() === "video") {
                     // Youtube
-                    var youtube = /(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|[\S\?\&]+&v=|\/user\/\S+))([^\/&#]{10,12})/
+                    var youtube = /(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|[\S\?\&_]+&v=|\/user\/\S+))([^\/&#]{10,12})/
                     // Vimeo
                     var vimeo = /vimeo\.com\/([0-9]+)/i
                     var vimeoEmbed = /player.vimeo.com\/video\/([0-9]+)/i
 
-                    if (youtube.test(ci.uri)) {
-                        var youtubeVideoId = ci.uri.match(youtube)[1];
-                        ci.uri = "http://www.youtube.com/embed/" + youtubeVideoId;
-                    } else if (vimeo.test(ci.uri)) {
-                        var vimeoVideoId = ci.uri.match(vimeo)[1];
-                        ci.uri = "http://player.vimeo.com/video/" + vimeoVideoId;
-                    } else if (vimeoEmbed.test(ci.uri)) {
-                        //Embedded link provided
-                    } else {
+                    if (!youtube.test(ci.uri) && !vimeo.test(ci.uri) && !vimeoEmbed.test(ci.uri)) {
                         alert("Sorry, only YouTube or Vimeo videos are supported");
                         isValid = false;
-
                     }
 
                 } else if (ci.mediaType.toLowerCase() === "pdf") {
@@ -751,9 +742,7 @@ module CZ {
                     //Example: http://docs.google.com/viewer?url=http%3A%2F%2Fwww.selab.isti.cnr.it%2Fws-mate%2Fexample.pdf&embedded=true
                     var pdf = /\.(pdf)$/i;
 
-                    if (pdf.test(ci.uri)) {
-                        ci.uri = "http://docs.google.com/viewer?url=" + encodeURI(ci.uri) + "&embedded=true";
-                    } else {
+                    if (!pdf.test(ci.uri)) {
                         alert("Sorry, only PDF extension is supported");
                         isValid = false;
                     }
