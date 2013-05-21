@@ -498,6 +498,14 @@ var CZ;
                 }
                 CZ.timeSeriesChart.clear(leftCSS, rightCSS);
                 CZ.timeSeriesChart.drawDataSet(CZ.Data.sampleData, leftCSS, rightCSS, leftPlot, rightPlot);
+                CZ.timeSeriesChart.drawAxis(leftCSS, -5, 5, {
+                    labelCount: 4,
+                    tickLength: 10,
+                    majorTickThickness: 1,
+                    stroke: 'black',
+                    axisLocation: 'left',
+                    font: '16px Calibri'
+                });
             }
         }
     })(CZ.HomePageViewModel || (CZ.HomePageViewModel = {}));

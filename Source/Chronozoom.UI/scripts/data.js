@@ -35,6 +35,8 @@ var CZ;
             var seria = new Series();
             seria.values = new Array();
             seria.appearanceSettings = {
+                thickness: 1,
+                stroke: 'blue'
             };
             seria.appearanceSettings.yMin = -5;
             seria.appearanceSettings.yMax = 5;
