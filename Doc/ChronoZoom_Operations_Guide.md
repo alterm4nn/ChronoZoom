@@ -13,9 +13,47 @@ You can use the [Azure Management Portal](https://manage.windowsazure.com/) to c
 
 **To Add a Staged Deployment:** TBD.
 
-
-
 See the [Windows Azure Documentation](http://www.windowsazure.com/en-us/documentation/) for more detailed information.
+
+## Weekly Deployment to Production ##
+**Wednesday:** stabilization day. Only hot-fixes are accepted to alterm4nn.
+
+**Thursday:** ChronoZoom teams sign off on test.chronozoomproject.org build and proceeds with deployment to production.
+
+The process for deployment consists of the following steps:
+- Database Backup
+- Website Deployment
+
+The following rollback procedures are available for failed deployments:
+- Website Roll Back
+- Data Roll Back
+
+#### Database Backup ####
+To back up the database, call [CREATE DATABASE](http://msdn.microsoft.com/en-us/library/windowsazure/ee336274.aspx) using the following syntax:
+
+`CREATE DATABASE [cz-nodelete-chronozoom-prod-backup] AS COPY OF [cz-nodelete-chronozoom-prod]`
+
+If entity changes result in a breaking change:
+1. Launch Visual Studio.
+2. Click **Tools**, **Library Package Manager**, **Package Manager Console**.
+    `Update-Database -V -ProjectName Chronozoom.Entities -ConnectionString "<connection>" -ConnectionProviderName System.Data.SqlClient`    
+If data loss is expected, add the `-Force` parameter.
+
+
+#### Website Deployment ####
+
+Merge alterm4nn:main into alterm4nn:production. Windows Azure automatically picks the production branch and deploys the update.
+
+#### Website Roll Back ####
+1. From the Azure Management Console, click the **DEPLOYMENTS** tab.
+2. Select the previous deployment and redeploy.
+
+#### Data Roll Back ####
+1. Perform a website roll back.
+2. Swap with the backup database.
+    - In the Azure Management Console, click the **DEPLOYMENTS** tab.
+    - Point the **Storage** parameter to the backup database.
+3. After the site is up and running again, create a copy of backup as production and re-point the **Storage** parameter to the new production database.
 
 ## Azure Management Portal ##
 
