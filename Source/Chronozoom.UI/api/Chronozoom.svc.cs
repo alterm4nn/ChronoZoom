@@ -168,6 +168,11 @@ namespace Chronozoom.UI
             return new ThumbnailGenerator(thumbnailStorage);
         });
 
+        // The Maximum number of elements retured in a Search
+        private const int MaxSearchLimit = 50;
+      
+        
+
         // error code descriptions
         private static class ErrorDescription
         {
@@ -247,16 +252,16 @@ namespace Chronozoom.UI
             Guid collectionId = CollectionIdOrDefault(superCollection, collection);
             searchTerm = searchTerm.ToUpperInvariant();
 
-            var timelines = _storage.Timelines.Where(_ => _.Title.ToUpper().Contains(searchTerm) && _.Collection.Id == collectionId).ToList();
+            var timelines = _storage.Timelines.Where(_ => _.Title.ToUpper().Contains(searchTerm) && _.Collection.Id == collectionId).Take(MaxSearchLimit).ToList();
             var searchResults = timelines.Select(timeline => new SearchResult { Id = timeline.Id, Title = timeline.Title, ObjectType = ObjectType.Timeline }).ToList();
 
-            var exhibits = _storage.Exhibits.Where(_ => _.Title.ToUpper().Contains(searchTerm) && _.Collection.Id == collectionId).ToList();
+            var exhibits = _storage.Exhibits.Where(_ => _.Title.ToUpper().Contains(searchTerm) && _.Collection.Id == collectionId).Take(MaxSearchLimit).ToList();
             searchResults.AddRange(exhibits.Select(exhibit => new SearchResult { Id = exhibit.Id, Title = exhibit.Title, ObjectType = ObjectType.Exhibit }));
 
             var contentItems = _storage.ContentItems.Where(_ =>
                 (_.Title.ToUpper().Contains(searchTerm) || _.Caption.ToUpper().Contains(searchTerm))
                  && _.Collection.Id == collectionId
-                ).ToList();
+                ).Take(MaxSearchLimit).ToList();
             searchResults.AddRange(contentItems.Select(contentItem => new SearchResult { Id = contentItem.Id, Title = contentItem.Title, ObjectType = ObjectType.ContentItem }));
 
             Trace.TraceInformation("Search called for search term {0}", searchTerm);
