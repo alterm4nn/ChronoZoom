@@ -26,11 +26,21 @@ namespace Chronozoom.Entities
         [Key]
         [DataMember(Name = "id")]
         public Guid Id { get; set; }
-        
+
+        /// <summary>
+        /// The root id of the largest timeline tree containing current node
+        /// </summary>
+        public Guid RootId { get; set; }
+
         /// <summary>
         /// The depth of the timeline in the timeline tree
         /// </summary>
         public int Depth { get; set; }
+
+        /// <summary>
+        /// The number of content items contained in subtree under current timeline
+        /// </summary>
+        public int SubtreeSize { get; set; }
 
         /// <summary>
         /// The title of the timeline.

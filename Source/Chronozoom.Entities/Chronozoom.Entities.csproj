@@ -79,6 +79,10 @@
     <Compile Include="Migrations\201305141937202_PostOrderFields.Designer.cs">
       <DependentUpon>201305141937202_PostOrderFields.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201305210426510_TimelineAttrs.cs" />
+    <Compile Include="Migrations\201305210426510_TimelineAttrs.Designer.cs">
+      <DependentUpon>201305210426510_TimelineAttrs.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migration\Migrator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SearchResult.cs" />
@@ -109,8 +113,11 @@
     <EmbeddedResource Include="Migrations\201305102117597_AddRITreeWithIndex.resx">
       <DependentUpon>201305102117597_AddRITreeWithIndex.cs</DependentUpon>
     </EmbeddedResource>
-<EmbeddedResource Include="Migrations\201305141937202_PostOrderFields.resx">
+    <EmbeddedResource Include="Migrations\201305141937202_PostOrderFields.resx">
       <DependentUpon>201305141937202_PostOrderFields.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201305210426510_TimelineAttrs.resx">
+      <DependentUpon>201305210426510_TimelineAttrs.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
