@@ -1418,6 +1418,14 @@ img.fallbackBackground {
   text-overflow: ellipsis;
   overflow: hidden;
 }
+.cz-contentitem-listitem-highlighted {
+  margin: 0;
+  color: #3bb6f3;
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
 /***********************************************************
 
                 Registration Forms

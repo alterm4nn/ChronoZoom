@@ -15,9 +15,37 @@ module CZ {
             context: Object;
         }
 
-        export class TourStop
-        {
-            private targetElement: Object;
+        export class TourStop {
+            private targetElement: any;
+            private title: string;
+            private type: string;
+
+            constructor(target: any) {
+                if (target == undefined || target == null)
+                    throw "target element of a tour stop is null or undefined";
+                if (typeof target.type == "undefined")
+                    throw "type of the tour stop target element is undefined";
+                this.targetElement = target;
+                if (target.type === "contentItem") {
+                    this.type = "Content Item";
+                    this.title = target.contentItem.title;
+                } else {
+                    this.type = target.type === "timeline" ? "Timeline" : "Event";
+                    this.title = target.title;
+                }
+            }
+
+            public get Target(): string {
+                return this.targetElement;
+            }
+
+            public get Title(): string {
+                return this.title;
+            }
+
+            public get Type(): string {
+                return this.type;
+            }
 
         }
 
@@ -76,49 +104,6 @@ module CZ {
                     CZ.Authoring.callback = arg => self.onTargetElementSelected(arg);
                     self.hide();
                 });
-
-                //this.isCancel = true;
-                //this.endDate.addEditMode_Infinite();
-
-                //this.titleInput.val(this.timeline.title);
-                //this.startDate.setDate(this.timeline.x);
-
-                //if (this.timeline.endDate === 9999) {
-                //    this.endDate.setDate(this.timeline.endDate);
-                //}
-                //else {
-                //    this.endDate.setDate(this.timeline.x + this.timeline.width);
-                //}
-
-                //this.saveButton.click(event => {
-                //    var isValid = CZ.Authoring.ValidateTimelineData(this.startDate.getDate(), this.endDate.getDate(), this.titleInput.val());
-                //    if (!isValid) {
-                //        this.container.find("#error-edit-timeline").show().delay(7000).fadeOut();
-                //    }
-                //    if (isValid) {
-                //        var self = this;
-                //        CZ.Authoring.updateTimeline(this.timeline, {
-                //            title: this.titleInput.val(),
-                //            start: this.startDate.getDate(),
-                //            end: this.endDate.getDate(),
-                //        }).then(
-                //            function (success) {
-                //                self.isCancel = false;
-                //                self.close();
-                //            },
-                //            function (error) {
-                //                alert("Unable to save changes. Please try again later.");
-                //                console.log(error);
-                //            });
-                //    }
-                //});
-
-                //this.deleteButton.click(event => {
-                //    if (confirm("Are you sure want to delete timeline and all of its nested timelines and exhibits? Delete can't be undone!")) {
-                //        CZ.Authoring.removeTimeline(this.timeline);
-                //        this.close();
-                //    }
-                //});
             }
 
             public show(): void {
@@ -148,14 +133,8 @@ module CZ {
                     direction: "left",
                     duration: 500,
                     complete: () => {
-                        //this.endDate.remove();
-                        //this.startDate.remove();
                     }
                 });
-
-                //if (this.isCancel && CZ.Authoring.mode === "createTimeline") {
-                //    CZ.Authoring.removeTimeline(this.timeline);
-                //}
 
                 CZ.Authoring.isActive = false;
 
@@ -163,13 +142,12 @@ module CZ {
                 this.container.find("cz-form-errormsg").hide();
             }
 
-            private onTargetElementSelected(targetElement: any)
-            {
-                alert(targetElement.type);
+            private onTargetElementSelected(targetElement: any) {
+                CZ.Authoring.isActive = false;
+                CZ.Authoring.mode = "editTour";
+                CZ.Authoring.callback = null;
 
-                var stop: any = {};
-                stop.title = targetElement.title;
-                stop.description = targetElement.type;
+                var stop = new TourStop(targetElement);
                 this.tourStopsListBox.add(stop);
                 this.show();
             }

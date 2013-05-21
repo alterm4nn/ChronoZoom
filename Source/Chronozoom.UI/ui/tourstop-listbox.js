@@ -31,7 +31,7 @@ var CZ;
                             closeButton: ".cz-listitem-close-btn",
                             iconImg: ".cz-contentitem-listitem-icon > img",
                             titleTextblock: ".cz-contentitem-listitem-title",
-                            descrTextblock: ".cz-contentitem-listitem-descr"
+                            typeTextblock: ".cz-contentitem-listitem-highlighted"
                         }
                     }
                 };
@@ -47,12 +47,18 @@ var CZ;
                         _super.call(this, parent, container, uiMap, context);
                 this.iconImg = this.container.find(uiMap.iconImg);
                 this.titleTextblock = this.container.find(uiMap.titleTextblock);
-                this.descrTextblock = this.container.find(uiMap.descrTextblock);
-                this.iconImg.attr("src", this.data.icon || "/images/Temp-Thumbnail2.png");
-                this.titleTextblock.text(this.data.title);
-                this.descrTextblock.text(this.data.description);
-                this.closeButton.off();
-                this.closeButton.click(function () {
+                this.typeTextblock = this.container.find(uiMap.typeTextblock);
+                this.iconImg.attr("src", this.data.Icon || "/images/Temp-Thumbnail2.png");
+                this.titleTextblock.text(this.data.Title);
+                this.typeTextblock.text(this.data.Type);
+                this.container.dblclick(function (e) {
+                    var vp = context.Target.vc.getViewport();
+                    var visible = CZ.VCContent.getVisibleForElement(context.Target, 1.0, vp, true);
+                    var target = {
+                        newvisible: visible,
+                        element: context.Target
+                    };
+                    CZ.Search.navigateToElement(target);
                 });
             }
             return TourStopListItem;

@@ -7,7 +7,43 @@ var CZ;
 (function (CZ) {
     (function (UI) {
         var TourStop = (function () {
-            function TourStop() { }
+            function TourStop(target) {
+                if(target == undefined || target == null) {
+                    throw "target element of a tour stop is null or undefined";
+                }
+                if(typeof target.type == "undefined") {
+                    throw "type of the tour stop target element is undefined";
+                }
+                this.targetElement = target;
+                if(target.type === "contentItem") {
+                    this.type = "Content Item";
+                    this.title = target.contentItem.title;
+                } else {
+                    this.type = target.type === "timeline" ? "Timeline" : "Event";
+                    this.title = target.title;
+                }
+            }
+            Object.defineProperty(TourStop.prototype, "Target", {
+                get: function () {
+                    return this.targetElement;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(TourStop.prototype, "Title", {
+                get: function () {
+                    return this.title;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(TourStop.prototype, "Type", {
+                get: function () {
+                    return this.type;
+                },
+                enumerable: true,
+                configurable: true
+            });
             return TourStop;
         })();
         UI.TourStop = TourStop;        
@@ -76,11 +112,10 @@ var CZ;
                 this.container.find("cz-form-errormsg").hide();
             };
             FormEditTour.prototype.onTargetElementSelected = function (targetElement) {
-                alert(targetElement.type);
-                var stop = {
-                };
-                stop.title = targetElement.title;
-                stop.description = targetElement.type;
+                CZ.Authoring.isActive = false;
+                CZ.Authoring.mode = "editTour";
+                CZ.Authoring.callback = null;
+                var stop = new TourStop(targetElement);
                 this.tourStopsListBox.add(stop);
                 this.show();
             };
