@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # ChronoZoom Authoring Guide #
 This guide shows you all you need to know to make your own custom ChronoZoom timelines and exhibits.
 
@@ -15,9 +14,9 @@ Before you start, you will need to sign in using either a Windows Live&#8482;, G
 ![Login](images/auth_guide_sign-in.png)
 
 ## Research and Planning ##
-Doing a bit of research and planning will make creating content in ChronoZoom a more enjoyable experience. During this phase, you will get to spend some time learning about history! As your research progresses, you might find it helpful to create a spreadsheet to track the items you want to cover. The following example spreadsheet shows a list of exhibits for a proposed timeline documenting the UFO phenomenon beginning in 1947 with the famous sighting that gave us the term "Flying Saucer". Each sheet represents the exhibits that are associated with a particular timeline or collection.
+Doing a bit of research and planning will make creating content in ChronoZoom much more efficient. During this phase, you will get to spend some time learning about history! You might find it helpful to create a spreadsheet to track the items you want to cover. The following example spreadsheet shows a list of exhibits for a proposed timeline documenting the UFO phenomenon beginning in 1947 with the famous sighting that gave us the term "Flying Saucer". Each sheet represents the exhibits that are associated with a particular timeline or collection.
 
-[UFO_Phenomenon_Timeline_Priorities.xlsx](UFO_Phenomenon_Timeline_Priorities.xlsx)
+UFO_Phenomenon_Timeline_Priorities.xlsx
 
 ## Create a Timeline ##
 A timeline is a visual representation of a time period. Timelines can contain other (child) timelines, and exhibits. You can use timelines to depict a range of time such as the lifespan of a historical figure or period of a civilization.
@@ -45,6 +44,9 @@ A timeline is a visual representation of a time period. Timelines can contain ot
 8. Click **create timeline** to create the timeline.
 
 ## Create an Exhibit ##
+<<<<<<< HEAD
+>>>>>>> 9d728ff... Added more screen captures; text updates.
+=======
 An exhibit consists of a set of content items (artifacts), and is contained by either a timeline or a collection. Content items can be one of the following types:
 - Image
 - PDF
@@ -63,11 +65,4 @@ An exhibit consists of a set of content items (artifacts), and is contained by e
 6. Click **create artifact** to add the content item. The exhibit will list the artifacts that have been created:
 ![Create Exhibit with artifacts](images/auth_guide_create-exhibit-2.png)
 7. Click **create exhibit** to create the exhibit.
-=======
-# ChronoZoom Authoring Guide #
-Now you can create your own timelines and exhibits to take users on new historical journeys.
-
-## Create a Timeline ##
-
-## Create an Exhibit ##
->>>>>>> 9d728ff... Added more screen captures; text updates.
+>>>>>>> 334d5fe... this should be up to date now
