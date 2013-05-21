@@ -187,6 +187,7 @@
     <Content Include="images\tour-icon.png" />
     <Content Include="images\view-icon.png" />
     <Content Include="images\edit.svg" />
+    <Content Include="rolanddata.txt" />
     <Content Include="scripts\external\ACS.js" />
     <Content Include="scripts\authoring.ts" />
     <Content Include="scripts\authoring.js">
@@ -199,29 +200,6 @@
     <Content Include="scripts\bibliography.ts" />
     <Content Include="scripts\breadcrumbs.ts" />
     <Content Include="scripts\common.ts" />
-    <Content Include="scripts\external\dygraphs\dashed-canvas.js" />
-    <Content Include="scripts\external\dygraphs\dygraph-canvas.js" />
-    <Content Include="scripts\external\dygraphs\dygraph-combined.js" />
-    <Content Include="scripts\external\dygraphs\dygraph-combined.ts" />
-    <Content Include="scripts\external\dygraphs\dygraph-dev.js" />
-    <Content Include="scripts\external\dygraphs\dygraph-externs.js" />
-    <Content Include="scripts\external\dygraphs\dygraph-gviz.js" />
-    <Content Include="scripts\external\dygraphs\dygraph-interaction-model.js" />
-    <Content Include="scripts\external\dygraphs\dygraph-layout.js" />
-    <Content Include="scripts\external\dygraphs\dygraph-options-reference.js" />
-    <Content Include="scripts\external\dygraphs\dygraph-options.js" />
-    <Content Include="scripts\external\dygraphs\dygraph-plugin-base.js" />
-    <Content Include="scripts\external\dygraphs\dygraph-plugin-install.js" />
-    <Content Include="scripts\external\dygraphs\dygraph-tickers.js" />
-    <Content Include="scripts\external\dygraphs\dygraph-utils.js" />
-    <Content Include="scripts\external\dygraphs\dygraph.js" />
-    <Content Include="scripts\external\dygraphs\plugins\annotations.js" />
-    <Content Include="scripts\external\dygraphs\plugins\axes.js" />
-    <Content Include="scripts\external\dygraphs\plugins\chart-labels.js" />
-    <Content Include="scripts\external\dygraphs\plugins\grid.js" />
-    <Content Include="scripts\external\dygraphs\plugins\legend.js" />
-    <Content Include="scripts\external\dygraphs\plugins\range-selector.js" />
-    <Content Include="scripts\external\dygraphs\stacktrace.js" />
     <Content Include="ui\controls\formbase.js">
       <DependentUpon>formbase.ts</DependentUpon>
     </Content>

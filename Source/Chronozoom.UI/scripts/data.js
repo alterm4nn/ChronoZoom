@@ -28,7 +28,21 @@ var CZ;
         })();
         Data.Series = Series;        
         function generateSampleData() {
-            var n = 300;
+            var rolandData;
+            $.ajax({
+                cache: false,
+                type: "GET",
+                async: false,
+                dataType: "json",
+                url: 'rolanddata.txt',
+                success: function (result) {
+                    rolandData = result;
+                },
+                error: function (xhr) {
+                    alert("Error connecting to service: " + xhr.responseText);
+                }
+            });
+            var n = rolandData.length / 2;
             var result = new DataSet();
             result.time = new Array();
             result.series = new Array();
@@ -38,12 +52,19 @@ var CZ;
                 thickness: 1,
                 stroke: 'blue'
             };
-            seria.appearanceSettings.yMin = -5;
-            seria.appearanceSettings.yMax = 5;
+            seria.appearanceSettings.yMin = rolandData[1];
+            seria.appearanceSettings.yMax = rolandData[1];
             result.series.push(seria);
             for(var i = 0; i < n; i++) {
-                result.time.push(i * 13700000000 / n - 13700000000);
-                seria.values.push(Math.random() * 10 - 5);
+                result.time.push(rolandData[2 * i]);
+                var y = rolandData[2 * i + 1];
+                if(seria.appearanceSettings.yMin > y) {
+                    seria.appearanceSettings.yMin = y;
+                }
+                if(seria.appearanceSettings.yMax < y) {
+                    seria.appearanceSettings.yMax = y;
+                }
+                seria.values.push(y);
             }
             return result;
         }

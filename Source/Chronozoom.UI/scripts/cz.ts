@@ -601,7 +601,7 @@ module CZ {
 
                 timeSeriesChart.clear(leftCSS, rightCSS);
                 timeSeriesChart.drawDataSet(CZ.Data.sampleData, leftCSS, rightCSS, leftPlot, rightPlot);
-                timeSeriesChart.drawAxis(leftCSS, -5, 5, { labelCount: 4, tickLength: 10, majorTickThickness: 1, stroke: 'black', axisLocation: 'left', font: '16px Calibri' });
+                timeSeriesChart.drawAxis(leftCSS, CZ.Data.sampleData.series[0].appearanceSettings.yMin, CZ.Data.sampleData.series[0].appearanceSettings.yMax, { labelCount: 4, tickLength: 10, majorTickThickness: 1, stroke: 'black', axisLocation: 'left', font: '16px Calibri' });
             }
         }
     }

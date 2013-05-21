@@ -498,7 +498,7 @@ var CZ;
                 }
                 CZ.timeSeriesChart.clear(leftCSS, rightCSS);
                 CZ.timeSeriesChart.drawDataSet(CZ.Data.sampleData, leftCSS, rightCSS, leftPlot, rightPlot);
-                CZ.timeSeriesChart.drawAxis(leftCSS, -5, 5, {
+                CZ.timeSeriesChart.drawAxis(leftCSS, CZ.Data.sampleData.series[0].appearanceSettings.yMin, CZ.Data.sampleData.series[0].appearanceSettings.yMax, {
                     labelCount: 4,
                     tickLength: 10,
                     majorTickThickness: 1,
