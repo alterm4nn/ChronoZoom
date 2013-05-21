@@ -137,7 +137,7 @@ namespace Application.Helper.Helpers
         public void OpenLoginPage()
         {
             Logger.Log("<-");
-            Click(By.Id("login-panel"));
+            Click(By.Id("login-button"));
             Logger.Log("->");
         }
 
