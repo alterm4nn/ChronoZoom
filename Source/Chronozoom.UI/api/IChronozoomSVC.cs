@@ -30,6 +30,7 @@ namespace Chronozoom.UI
         /// <param name="minspan">Filters the search results to a particular time scale.</param>
         /// <param name="commonAncestor">Least Common Ancestor, a timeline identifier used to hint the server to retrieve timelines close to this location.</param>
         /// <param name="maxElements">The maximum number of elements to return.</param>
+        /// <param name="depth">The max depth for children timelines.</param>
         /// <returns>Timeline data in JSON format.</returns>
         /// <example><![CDATA[ 
         /// HTTP verb: GET
@@ -51,7 +52,7 @@ namespace Chronozoom.UI
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "minspan")]
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        Timeline GetTimelines(string superCollection, string collection, string start, string end, string minspan, string commonAncestor, string maxElements);
+        Timeline GetTimelines(string superCollection, string collection, string start, string end, string minspan, string commonAncestor, string maxElements, string depth);
 
         /// <summary>
         /// Performs a search for a specific term within a collection or a superCollection.
@@ -386,5 +387,28 @@ namespace Chronozoom.UI
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "{supercollection}/{collection}/{reference}/contentpath")]
         string GetContentPath(string superCollection, string collection, string reference);
+        
+        /// <summary>
+        /// Retrieve the list of all collections.
+        /// </summary>
+        /// <example><![CDATA[ 
+        /// **HTTP verb:** GET
+        ///
+        /// **URL:**
+        ///     http://[site URL]/api/collections
+        ///                                /// **Request body:**
+        ///     {
+        ///          name: "Super Collection",
+        ///          collection: [
+        ///             { name: "Collection 1" },
+        ///             { name: "Collection 2" },
+        ///          ]
+        ///     }
+        /// ]]>
+        /// </example>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        [OperationContract]
+        [WebGet(UriTemplate = "/collections", ResponseFormat = WebMessageFormat.Json)]
+        IEnumerable<SuperCollection> GetCollections();
     }
 }

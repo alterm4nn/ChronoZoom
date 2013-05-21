@@ -179,7 +179,16 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="pages\sitemap.aspx.cs">
+      <DependentUpon>sitemap.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="pages\sitemap.aspx.designer.cs">
+      <DependentUpon>sitemap.aspx</DependentUpon>
+    </Compile>
     <Compile Include="utils\ThumbnailGenerator.cs" />
+    <Compile Include="utils\UrlHelper.cs" />
     <Content Include="cz.html" />
     <Content Include="fallback.html" />
     <Content Include="Global.asax" />
@@ -189,6 +198,7 @@
     <Content Include="images\tour-icon.png" />
     <Content Include="images\view-icon.png" />
     <Content Include="images\edit.svg" />
+    <Content Include="pages\sitemap.aspx" />
     <Content Include="scripts\external\ACS.js" />
     <Content Include="scripts\authoring.ts" />
     <Content Include="scripts\authoring.js">

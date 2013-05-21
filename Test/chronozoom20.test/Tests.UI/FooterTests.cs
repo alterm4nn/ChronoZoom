@@ -39,6 +39,7 @@ namespace Tests
         {
             HomePageHelper.OpenHelpLink();
             Assert.AreEqual("User Guide – ChronoZoom Project", HomePageHelper.GetTitle());
+            Assert.AreEqual("http://join.chronozoomproject.org/user-guide/", HomePageHelper.GetUrl());
         }
 
         [TestMethod]
