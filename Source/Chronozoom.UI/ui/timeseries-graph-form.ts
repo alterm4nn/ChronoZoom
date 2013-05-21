@@ -45,8 +45,22 @@ module CZ {
             }
 
             public drawDataSet(dataSet: CZ.Data.DataSet, screenLeft: number, screenRight: number, plotLeft: number, plotRight: number): void {
-                var dataToScreenX = (x) => { return (x - plotLeft) / (plotRight - plotLeft) * this.canvas.width + screenLeft; };
-                var dataToScreenY = (y) => { return this.canvas.height / 2.0; };
+                //todo: determine y-range. It should be inside dataset
+                var plotBottom = 0;
+                var plotTop = 0;
+
+                dataSet.series.forEach(function (seria) {
+                    if (seria.appearanceSettings && seria.appearanceSettings.yMin && seria.appearanceSettings.yMin < plotBottom) {
+                        plotBottom = seria.appearanceSettings.yMin;
+                    }
+
+                    if (seria.appearanceSettings && seria.appearanceSettings.yMax && seria.appearanceSettings.yMax > plotTop) {
+                        plotTop = seria.appearanceSettings.yMax;
+                    }
+                });
+
+                var dataToScreenX = (x) => { return (x - plotLeft) / (plotRight - plotLeft) * (screenRight - screenLeft) + screenLeft; };
+                var dataToScreenY = (y) => { return (1 - (y - plotBottom) / (plotTop - plotBottom)) * this.canvas.height  };
 
                 var x = dataSet.time;
                 var n = x.length;
@@ -55,7 +69,9 @@ module CZ {
 
                 dataSet.series.forEach(function (seria) {
                     //setup appearance 
-                    ctx.fillStyle = "blue";
+                    ctx.strokeStyle = 'blue';
+                    ctx.fillStyle = 'blue'; 
+                    ctx.lineWidth = 2;
 
                     //drawing line
                     var y = seria.values;
@@ -70,8 +86,8 @@ module CZ {
                         else
                             ctx.lineTo(xi, yi); 
                     }
-
-                    ctx.closePath();
+                     
+                    ctx.stroke();
                 });
             }
         }

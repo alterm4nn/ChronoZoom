@@ -28,21 +28,25 @@ var CZ;
         })();
         Data.Series = Series;        
         function generateSampleData() {
-            var n = 10;
+            var n = 300;
             var result = new DataSet();
-            result.time = new Array(n);
-            result.series = new Array(1);
+            result.time = new Array();
+            result.series = new Array();
             var seria = new Series();
-            seria.values = new Array(n);
+            seria.values = new Array();
+            seria.appearanceSettings = {
+            };
+            seria.appearanceSettings.yMin = -5;
+            seria.appearanceSettings.yMax = 5;
             result.series.push(seria);
             for(var i = 0; i < n; i++) {
-                result.time.push(i * 1000000000 - 1000000000 * 2);
-                seria.values.push(i);
+                result.time.push(i * 13700000000 / n - 13700000000);
+                seria.values.push(Math.random() * 10 - 5);
             }
             return result;
         }
         Data.generateSampleData = generateSampleData;
-        Data.sampleData = generateSampleData();
+        Data.sampleData;
     })(CZ.Data || (CZ.Data = {}));
     var Data = CZ.Data;
 })(CZ || (CZ = {}));

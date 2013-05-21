@@ -31,17 +31,29 @@ var CZ;
             };
             LineChart.prototype.drawDataSet = function (dataSet, screenLeft, screenRight, plotLeft, plotRight) {
                 var _this = this;
+                var plotBottom = 0;
+                var plotTop = 0;
+                dataSet.series.forEach(function (seria) {
+                    if(seria.appearanceSettings && seria.appearanceSettings.yMin && seria.appearanceSettings.yMin < plotBottom) {
+                        plotBottom = seria.appearanceSettings.yMin;
+                    }
+                    if(seria.appearanceSettings && seria.appearanceSettings.yMax && seria.appearanceSettings.yMax > plotTop) {
+                        plotTop = seria.appearanceSettings.yMax;
+                    }
+                });
                 var dataToScreenX = function (x) {
-                    return (x - plotLeft) / (plotRight - plotLeft) * _this.canvas.width + screenLeft;
+                    return (x - plotLeft) / (plotRight - plotLeft) * (screenRight - screenLeft) + screenLeft;
                 };
                 var dataToScreenY = function (y) {
-                    return _this.canvas.height / 2.0;
+                    return (1 - (y - plotBottom) / (plotTop - plotBottom)) * _this.canvas.height;
                 };
                 var x = dataSet.time;
                 var n = x.length;
                 var ctx = this.context;
                 dataSet.series.forEach(function (seria) {
-                    ctx.fillStyle = "blue";
+                    ctx.strokeStyle = 'blue';
+                    ctx.fillStyle = 'blue';
+                    ctx.lineWidth = 2;
                     var y = seria.values;
                     ctx.beginPath();
                     for(var i = 0; i < n; i++) {
@@ -53,7 +65,7 @@ var CZ;
                             ctx.lineTo(xi, yi);
                         }
                     }
-                    ctx.closePath();
+                    ctx.stroke();
                 });
             };
             return LineChart;
