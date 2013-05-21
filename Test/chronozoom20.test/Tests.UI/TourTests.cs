@@ -19,7 +19,7 @@ namespace Tests
         public void TestInitialize()
         {
             BrowserStateManager.RefreshState();
-            NavigationHelper.OpenHomePage();
+            HomePageHelper.OpenPage();
             WelcomeScreenHelper.CloseWelcomePopup();
         }
 
@@ -38,7 +38,6 @@ namespace Tests
         #endregion 
 
         [TestMethod]
-        [Ignore]
         public void Test_Start_Pause_Tour()
         {
             TourHelper.OpenToursListWindow();
@@ -48,7 +47,6 @@ namespace Tests
         }  
         
         [TestMethod]
-        [Ignore]
         public void Test_Show_Hide_Bookmark_Tour()
         {
             TourHelper.OpenToursListWindow();

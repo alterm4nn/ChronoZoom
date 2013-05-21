@@ -15,7 +15,8 @@ namespace Application.Helper.Helpers
             InitTimelineCreationMode();
             DrawTimeline();
             SetTimelineName(timeline.Title);
-            SaveAndClose();
+            CreateTimeline();
+            WaitAjaxComplete(60);
             Logger.Log("->");
         }
 
@@ -34,18 +35,17 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<- timeline: " + timeline);
             NavigateToTimeLine(timeline);
-            InitTimelineEditMode();
+            WaitAnimation();
             InitEditForm();
             ClickDelete();
             ConfirmDeletion();
             Logger.Log("->");
         }
 
-
         public void DeleteTimelineByJavaScript(Timeline timeline)
         {
             Logger.Log("<-");
-            ExecuteJavaScript(string.Format("CZ.Service.deleteTimeline({0})", Javascripts.LastCanvasElement));
+            ExecuteJavaScript(string.Format("CZ.Authoring.removeTimeline({0})", Javascripts.LastCanvasElement));
             Logger.Log("->");
         }
 
@@ -54,14 +54,13 @@ namespace Application.Helper.Helpers
             Logger.Log("<- timeline: " + newTimeline);
             try
             {
-                ExecuteJavaScript(string.Format("CZ.Search.goToSearchResult('{0}')", newTimeline.TimelineId));
+                ExecuteJavaScript(string.Format("CZ.Search.goToSearchResult('{0}', 'timeline')", newTimeline.TimelineId));
                 Logger.Log("-> true");
                 return true;
             }
-            catch (UnhandledAlertException e)
+            catch (Exception)
             {
-
-                AcceptAlert();
+                //AcceptAlert();
                 Logger.Log("-> false");
                 return false;
             }
@@ -70,21 +69,19 @@ namespace Application.Helper.Helpers
         private void ConfirmDeletion()
         {
             AcceptAlert();
+            MoveToElementAndClick(By.ClassName("virtualCanvasLayerCanvas"));
         }
 
         private void ClickDelete()
         {
-            Click(By.XPath("//*[text()='delete']"));
+            Click(By.XPath("//*[@id='auth-edit-timeline-form']//*[@class='cz-form-delete cz-button']"));
         }
 
         private void InitEditForm()
         {
-            MoveToElementAndClick(By.ClassName("virtualCanvasLayerCanvas"));
-        }
-
-        private void InitTimelineEditMode()
-        {
-            MoveToElementAndClick(By.XPath("//*[@id='footer-authoring']/a[2]"));
+            ExecuteJavaScript("CZ.Authoring.isActive = true");
+            ExecuteJavaScript("CZ.Authoring.mode = 'editTimeline'");
+            ExecuteJavaScript("CZ.Authoring.showEditTimelineForm(CZ.Authoring.selectedTimeline)");
         }
 
         private void NavigateToTimeLine(Timeline timeline)
@@ -94,15 +91,15 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
-        private void SaveAndClose()
+        private void CreateTimeline()
         {
-            Click(By.ClassName("ui-dialog-buttonset"));
+            Click(By.XPath("//*[@id='auth-edit-timeline-form']//*[@class='cz-form-save cz-button']"));
         }
 
         private void SetTimelineName(string timelineName)
         {
             Logger.Log("<- timeline: " + timelineName);
-            TypeText(By.Id("timelineTitleInput"), timelineName);
+            TypeText(By.XPath("//*[@id='auth-edit-timeline-form']//*[@class='cz-form-item-title cz-input']"), timelineName);
             Logger.Log("->");
         }
 
@@ -116,7 +113,8 @@ namespace Application.Helper.Helpers
         private void InitTimelineCreationMode()
         {
             Logger.Log("<-");
-            MoveToElementAndClick(By.XPath("//*[@id='footer-authoring']/a[1]"));
+            MoveToElementAndClick(By.XPath("//*[@title='Create your events']"));
+            MoveToElementAndClick(By.XPath("//button[text()='create timeline']"));
             Logger.Log("->");
         }
 

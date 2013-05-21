@@ -18,7 +18,7 @@ namespace Tests
         public void TestInitialize()
         {
             BrowserStateManager.RefreshState();
-            NavigationHelper.OpenHomePage();
+            HomePageHelper.OpenPage();
         }
 
         [ClassCleanup]
@@ -35,7 +35,6 @@ namespace Tests
         #endregion
 
         [TestMethod]
-        [Ignore]
         public void When_user_clicks_start_exploring_welcome_popup_is_closed()
         {
             WelcomeScreenHelper.StartExploring();

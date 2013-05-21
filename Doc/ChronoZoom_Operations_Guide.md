@@ -23,7 +23,7 @@ When you first sign in to Azure, you are presented with a list of resources. The
 
 ![Azure Management Console: all items](images/ops_guide-1.png)
 
-Along the bottom of the page are several options: **New**, **Browse**, **Stop**, **Restart**, **Manage Domains**, **Delete**, and **Help**. Clicking the **Help** icon will display help content for whichever tab you are currently working in. The contents of the bottom bar will change depending on the tab you are in. 
+Along the bottom of the page are several options: **New**, **Browse**, **Stop**, **Restart**, **Manage Domains**, **Delete**, and **Help**. Clicking the **Help** icon will display help content for whichever tab you are currently working in. The contents of the bottom bar will change depending on the tab you are in.  
 
 ![Bottom bar](images/ops_guide-0.png)
  

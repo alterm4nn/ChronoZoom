@@ -3,6 +3,7 @@
 /// <reference path="../Utils/jasmine-jquery.js" />
 /// <reference path="../Js/timescale.js" />
 /// <reference path="../Js/common.js" />
+/// <reference path="../Js/dates.js" />
 /// <reference path="../Js/cz.settings.js" />
 /// <reference path="../Js/settings.js" />
 
@@ -248,13 +249,13 @@ describe("CZ.CalendarTickSource part", function () { //this is the class for cre
         var firstYear;
         beforeEach(function () {
             currentDate = new Date();
-            firstYear = CZ.Common.getCoordinateFromDMY(0, 0, 1);
+            firstYear = CZ.Dates.getCoordinateFromDMY(0, 0, 1);
         });
 
         it("range.min and range.max to input values if l<r", function () {
             var l = -20;
             var r = -10;
-            var firstYear = CZ.Common.getCoordinateFromDMY(0, 0, 1);
+            var firstYear = CZ.Dates.getCoordinateFromDMY(0, 0, 1);
             calendarTickSrc.getRegime(l, r);
             expect(calendarTickSrc.range.min).toEqual(l -= firstYear);
             expect(calendarTickSrc.range.max).toEqual(r -= firstYear);
@@ -356,8 +357,6 @@ describe("CZ.DateTickSource part", function () {
             dateTickSrc.getRegime(l, r);
             expect("Days_Quarters").toEqual(dateTickSrc.regime);
         });
-
-
     });
 });
 

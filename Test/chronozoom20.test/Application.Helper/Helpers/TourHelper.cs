@@ -20,7 +20,7 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<-");
             SelectTour(MayanHistoryTourName);
-            WaitForElementIsDisplayed(By.Id("bc_link_t554"));
+            WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='Mayan History']"));
             Logger.Log("->");
         }
 

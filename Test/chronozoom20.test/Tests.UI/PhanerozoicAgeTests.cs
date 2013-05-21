@@ -19,7 +19,7 @@ namespace Tests
         public void TestInitialize()
         {
             BrowserStateManager.RefreshState();
-            NavigationHelper.OpenHomePage();
+            HomePageHelper.OpenPage();
             WelcomeScreenHelper.CloseWelcomePopup();
         }
 
@@ -41,7 +41,7 @@ namespace Tests
         public void Test_Eukaryotic_Cells_Description()
         {
             string description = HomePageHelper.GetEukaryoticCellsDescription();
-            StringAssert.Contains(description, "eukaryotic cells");
+            StringAssert.Contains(description, "Eukaryote cells");
         }
 
         [TestMethod]

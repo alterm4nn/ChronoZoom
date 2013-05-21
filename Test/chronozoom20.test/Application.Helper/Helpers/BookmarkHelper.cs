@@ -18,7 +18,7 @@ namespace Application.Helper.Helpers
         public bool IsBookmarkExpanded()
         {
             Logger.Log("<-");
-            bool result = Convert.ToBoolean(GetJavaScriptExecutionResult("isBookmarksWindowExpanded"));
+            bool result = Convert.ToBoolean(GetJavaScriptExecutionResult("CZ.Tours.isBookmarksWindowExpanded"));
             Logger.Log("-> IsBookmarkExpanded: " + result);
             return result;
         }

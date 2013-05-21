@@ -12,53 +12,76 @@ using System.Runtime.Serialization;
 
 namespace Chronozoom.Entities
 {
+    /// <summary>
+    /// A pointer to a piece of content in ChronoZoom. The Content Item entity is contained by an Exhibit, and is only viewable as part of an Exhibit.
+    /// </summary>
     [DataContract]
     public class ContentItem
     {
+        /// <summary>
+        /// The ID of the content item.
+        /// </summary>
         [Key]
-        [DataMember(Name="id")]
+        [DataMember(Name = "id")]
         public Guid Id { get; set; }
 
+        /// <summary>
+        /// The depth of the content item in the timeline tree
+        /// </summary>
+        public int Depth { get; set; }
+
+        /// <summary>
+        /// The title of the content item.
+        /// </summary>
         [DataMember(Name = "title")]
         public string Title { get; set; }
 
+        /// <summary>
+        /// The description of the content item.
+        /// </summary>
         [DataMember(Name = "description")]
         public string Caption { get; set; }
-        
-        [DataMember]
-        public string Threshold { get; set; }
-        
-        [DataMember]
-        public string Regime { get; set; }
-        
-        [DataMember]
-        public string TimeUnit { get; set; }
-        
-        [DataMember]
+
+        /// <summary>
+        /// The year in which the content item appears.
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
         public decimal? Year { get; set; }
 
+        /// <summary>
+        /// Specifies which type of media the content type is.
+        /// </summary>
         [DataMember(Name = "mediaType")]
         public string MediaType { get; set; }
 
-        [DataMember(Name="uri")]
+        /// <summary>
+        /// The URL for the content item.
+        /// </summary>
+        [DataMember(Name = "uri")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification="Uri not supported in entity framework.")]
         public string Uri { get; set; }
 
-        [DataMember(Name = "mediaSource")]
+        /// <summary>
+        /// Identifies the source of the content item.
+        /// </summary>
+        [DataMember(Name = "mediaSource", EmitDefaultValue = false)]
         public string MediaSource { get; set; }
 
-        [DataMember(Name = "attribution")]
+        /// <summary>
+        /// The attribution for the content item.
+        /// </summary>
+        [DataMember(Name = "attribution", EmitDefaultValue = false)]
         public string Attribution { get; set; }
 
-        [DataMember(Name="UniqueID")]
-        public int UniqueId { get; set; }
-
+        /// <summary>
+        /// Specifies the order in which the content item should appear.
+        /// </summary>
         [DataMember]
         public short? Order { get; set; }
 
-        [DataMember]
-        public bool HasBibliography { get; set; }
-
+        /// <summary>
+        /// The collection that the content item is associated with.
+        /// </summary>
         public virtual Entities.Collection Collection { get; set; }
     }
 
@@ -68,7 +91,7 @@ namespace Chronozoom.Entities
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "Needs to match storage column name")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "ID", Justification = "Needs to match storage column name")]
-        [DataMember(Name="ParentExhibitId")]
+        [DataMember(Name = "ParentExhibitId")]
         public Guid Exhibit_ID { get; set; }
     }
 }

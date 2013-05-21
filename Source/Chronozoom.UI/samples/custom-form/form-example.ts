@@ -1,8 +1,7 @@
-/// <reference path='../../NewScripts/controls/formbase.ts'/>
+/// <reference path='../../ui/controls/formbase.ts'/>
+/// <reference path='../../scripts/typings/jquery/jquery.d.ts'/>
 
-/// <reference path='../../NewScripts/typings/jquery/jquery.d.ts'/>
-
-interface FormTestInfo extends CZ.UI.FormBaseInfo {
+interface FormTestInfo extends CZ.UI.IFormBaseInfo {
     testButton: string;
 }
 
