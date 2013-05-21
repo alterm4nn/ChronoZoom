@@ -105,6 +105,14 @@ namespace Application.Helper.Helpers
             Logger.Log("-> title: " + title);
             return title;
         }
+        
+        public string GetUrl()
+        {
+            Logger.Log("<-");
+            string url = GetCurrentUrl();
+            Logger.Log("-> title: " + url);
+            return url;
+        }
 
         public void OpenHelpLink()
         {
