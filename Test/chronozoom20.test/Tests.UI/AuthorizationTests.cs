@@ -19,8 +19,7 @@ namespace Tests
         public void TestInitialize()
         {
             BrowserStateManager.RefreshState();
-            HomePageHelper.OpenPage();
-            WelcomeScreenHelper.CloseWelcomePopup();
+            HomePageHelper.OpenSandboxPage();
         }
 
         [ClassCleanup]
@@ -31,9 +30,7 @@ namespace Tests
         [TestCleanup]
         public void TestCleanup()
         {
-            HomePageHelper.WaitWhileHomePageIsLoaded();
             AuthorizationHelper.Logout();
-            HomePageHelper.WaitWhileHomePageIsLoaded();
             CreateScreenshotsIfTestFail(TestContext);
         }
 

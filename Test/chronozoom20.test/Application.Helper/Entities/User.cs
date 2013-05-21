@@ -8,7 +8,7 @@
 
         public override string ToString()
         {
-            return string.Format("Login: {0}, Password: {1}, UserType: {2}", Login, Password, Type);
+            return string.Format("Login: {0}, UserType: {1}", Login, Type);
         }
     }
 
