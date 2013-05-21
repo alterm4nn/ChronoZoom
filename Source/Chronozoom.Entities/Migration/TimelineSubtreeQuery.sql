@@ -1,6 +1,6 @@
 CREATE PROCEDURE TimelineSubtreeQuery
-	@LCA Guid = NULL,
-	@CollectionId GUID,
+	@LCA UNIQUEIDENTIFIER = NULL,
+	@Collection_Id UNIQUEIDENTIFIER,
 	@min_span DECIMAL,
 	@startTime DECIMAL,
 	@endTime DECIMAL,
@@ -10,20 +10,20 @@ BEGIN
 	DECLARE @current_level_cnt INT
 	DECLARE @cnt INT
 	DECLARE @num_ge_min_span INT
-	DECLARE @current_id GUID
+	DECLARE @current_id UNIQUEIDENTIFIER
 	DECLARE @current_level TABLE (
-		Id GUID
+		Id UNIQUEIDENTIFIER
 	)
 	DECLARE @next_level TABLE (
-		Id GUID
+		Id UNIQUEIDENTIFIER
 	)
 	DECLARE @results TABLE (
-		Id GUID
+		Id UNIQUEIDENTIFIER
 	)
 	DECLARE cur CURSOR FOR SELECT Id FROM @current_level
 
 	IF @LCA = CAST(CAST(0 AS BINARY) AS UNIQUEIDENTIFIER)
-		INSERT INTO @current_level SELECT Id FROM Timelines WHERE Depth = 0 AND CollectionID =  @CollectionId
+		INSERT INTO @current_level SELECT Id FROM Timelines WHERE Depth = 0 AND Collection_ID =  @Collection_Id
 	ELSE
 		INSERT INTO @current_level VALUES (@LCA)
 	
