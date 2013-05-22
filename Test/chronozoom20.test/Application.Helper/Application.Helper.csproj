@@ -68,6 +68,7 @@
     <Compile Include="BrowserImpl\SafariControls.cs" />
     <Compile Include="Helpers\AuthorizationHelper.cs" />
     <Compile Include="Helpers\BookmarkHelper.cs" />
+    <Compile Include="Helpers\BreadcrumbsHelper.cs" />
     <Compile Include="Helpers\DateTimeHelper.cs" />
     <Compile Include="Helpers\ExhibitHelper.cs" />
     <Compile Include="Helpers\HomePageHelper.cs" />
