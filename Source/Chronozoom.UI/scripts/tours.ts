@@ -799,6 +799,9 @@ module CZ {
             if (CZ.Search.isSearchWindowVisible)
                 CZ.Search.onSearchClicked();
 
+
+            //var tourList = new Tours
+
             if (isTourWindowVisible) {
                 $(".tour-icon").removeClass("active");
                 $("#tours").hide('slide', {}, 'slow');

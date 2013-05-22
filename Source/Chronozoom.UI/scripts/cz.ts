@@ -29,6 +29,7 @@ module CZ {
             "#profile-form": "/ui/header-edit-profile-form.html",
             "#login-form": "/ui/header-login-form.html",
             "#auth-edit-tours-form": "/ui/auth-edit-tour-form.html",
+            "#cz-tourlist-form": "/ui/tourslist-form.html"
         };
 
         enum FeatureActivation {

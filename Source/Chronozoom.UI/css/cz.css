@@ -1273,6 +1273,14 @@ img.fallbackBackground {
   left: 0;
   overflow-y: auto;
 }
+.cz-tourlist-form {
+  min-width: 380px;
+  max-width: 450px;
+  width: 30.2734375%;
+  /* 310 / 1024 */
+
+  right: 0px;
+}
 .cz-form-timeline {
   min-width: 380px;
   max-width: 450px;
