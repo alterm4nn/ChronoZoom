@@ -227,6 +227,19 @@ var CZ;
             var rootCollection = url.superCollectionName === undefined;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
+            $('#timeSeries_button').mouseup(function () {
+                var h = $('#timeSeriesContainer').height();
+                if(h > 0) {
+                    $('#timeSeriesContainer').height(0);
+                    $('#timeSeriesContainer').hide();
+                    $('#vc').height('100%');
+                } else {
+                    $('#timeSeriesContainer').height('30%');
+                    $('#timeSeriesContainer').show();
+                    $('#vc').height('70%');
+                }
+                CZ.Common.updateLayout();
+            });
             $('#search_button').mouseup(CZ.Search.onSearchClicked);
             $('#tours_index').mouseup(CZ.Tours.onTourClicked);
             $('#human_rect').click(function () {

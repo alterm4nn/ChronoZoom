@@ -184,6 +184,7 @@
     <Content Include="images\edit-icon.png" />
     <Content Include="images\profile-icon.png" />
     <Content Include="images\search-icon.png" />
+    <Content Include="images\timseries-icon.png" />
     <Content Include="images\tour-icon.png" />
     <Content Include="images\view-icon.png" />
     <Content Include="images\edit.svg" />

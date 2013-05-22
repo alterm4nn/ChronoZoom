@@ -261,6 +261,9 @@ a:visited {
 .search-icon {
   background-image: url('../images/search-icon.png');
 }
+.timeSeries-icon {
+  background-image: url('../images/timseries-icon.png');
+}
 .view-icon {
   background-image: url('../images/view-icon.png');
   opacity: .5;
