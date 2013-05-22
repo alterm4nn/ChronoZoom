@@ -19,6 +19,7 @@ namespace Application.Helper
         private static ExhibitHelper _exhibitHelper;
         private static AuthorizationHelper _authorizationHelper;
         private static SearchHelper _searchHelper;
+        private static BreadcrumbsHelper _breadcrumbsHelper;
 
         public static void Stop()
         {
@@ -97,6 +98,11 @@ namespace Application.Helper
         public SearchHelper GetSearchHelper()
         {
             return _searchHelper ?? (_searchHelper = new SearchHelper());
+        }
+
+        public BreadcrumbsHelper GetBreadcrumbsHelper()
+        {
+            return _breadcrumbsHelper ?? (_breadcrumbsHelper = new BreadcrumbsHelper());
         }
     }
 }

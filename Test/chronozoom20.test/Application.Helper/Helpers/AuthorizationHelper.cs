@@ -10,6 +10,14 @@ namespace Application.Helper.Helpers
 {
     public class AuthorizationHelper : DependentActions
     {
+
+        public void OpenLoginPage()
+        {
+            Logger.Log("<-");
+            Click(By.Id("login-button"));
+            Logger.Log("->");
+        }
+
         public void AuthenticateAsGoogleUser()
         {
             Logger.Log("<-");
