@@ -684,7 +684,6 @@ module CZ {
         export function ValidateTimelineData(start, end, title) {
             var isValid = CZ.Authoring.ValidateNumber(start) && CZ.Authoring.ValidateNumber(end);
             isValid = isValid && CZ.Authoring.IsNotEmpty(title) && CZ.Authoring.IsNotEmpty(start) && CZ.Authoring.IsNotEmpty(end);
-            console.log(start, end);
             isValid = isValid && CZ.Authoring.isNonegHeight(start, end);
             return isValid;
         }
