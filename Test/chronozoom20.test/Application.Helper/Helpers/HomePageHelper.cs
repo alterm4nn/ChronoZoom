@@ -26,62 +26,7 @@ namespace Application.Helper.Helpers
             _manager.GetNavigationHelper().OpenSandboxPage();
             WaitWhileHomePageIsLoaded();
         }
-
-        public string GetEukaryoticCellsDescription()
-        {
-            Logger.Log("<-");
-            _manager.GetNavigationHelper().OpenExhibitEukaryoticCells();
-            Logger.Log("ExhibitEukaryotic Cell is opened");
-            string description = _manager.GetExhibitHelper().GetContentItemDescription();
-            Logger.Log("-> description: " + description);
-            return description;
-        }
-
-        public void OpenLifeTimeline()
-        {
-            Logger.Log("<-");
-            _manager.GetNavigationHelper().OpenLifePage();
-            WaitAnimation();
-            WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='Life']"));
-            Logger.Log("->");
-        }
-
-        public void OpenHumanityTimeline()
-        {
-            Logger.Log("<-");
-            _manager.GetNavigationHelper().OpenHumanityPage();
-            WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='Humanity']"));
-            WaitAnimation();
-            Logger.Log("->");
-        }
-
-
-        public void OpenCosmosTimeline()
-        {
-            Logger.Log("<-");
-            _manager.GetNavigationHelper().NavigateToCosmos();
-            WaitCondition(() => GetItemsCount(By.XPath("//*[@id='breadcrumbs-table']//td")) == 1, 60);
-            Logger.Log("->");
-        }
-
-        public void OpenBceCeArea()
-        {
-            Logger.Log("<-");
-            NavigateBceToCeEra();
-            WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='Geologic Time Scale']"));
-            WaitForElementIsDisplayed(By.XPath("//*[@class='cz-timescale-label' and contains(@style,'display: block;') and text()='1 BCE']"));
-            Logger.Log("->");
-        }
-
-        public void OpenRomanHistoryTimeline()
-        {
-            Logger.Log("<-");
-            _manager.GetNavigationHelper().NavigateToRomanHistoryTimeline();
-            WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='Roman History']"));
-            WaitAnimation();
-            Logger.Log("->");
-        }
-
+        
         public void MoveMouseToCenter()
         {
             Logger.Log("<-");
@@ -142,13 +87,6 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
-        public void OpenLoginPage()
-        {
-            Logger.Log("<-");
-            Click(By.Id("login-button"));
-            Logger.Log("->");
-        }
-
         public void DeleteLastElementLocally(string id)
         {
             Logger.Log("<- id: ");
@@ -169,15 +107,5 @@ namespace Application.Helper.Helpers
             Sleep(2);
             WaitAjaxComplete(10);
         }
-
-        public string GetLastBreadcrumbs()
-        {
-            Logger.Log("<-");
-            WaitAnimation();
-            string result = GetText(By.XPath("//*[@id='breadcrumbs-table']/*/tr/td[last()]/div"));
-            Logger.Log("-> Last Breadcrumbs: " + result);
-            return result;
-        }
-
     }
 }
