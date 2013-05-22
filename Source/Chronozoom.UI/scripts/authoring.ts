@@ -52,6 +52,10 @@ module CZ {
         export var showEditContentItemForm: (...args: any[]) => any = null;
         export var showEditTourForm: (...args: any[]) => any = null;
 
+        // Generic callback function set by the form when waits user's input (e.g. mouse click) to continue.
+        export var callback: (...args: any[]) => any = null;
+
+
         /**
          * Tests a timeline/exhibit on intersection with another virtual canvas object.
          * @param  {Object}  te   A timeline/exhibit to test.
@@ -370,6 +374,15 @@ module CZ {
             },
 
             editTour: {
+            },
+
+            "editTour-selectTarget": {
+                mouseup: function () {
+                    if (callback != null && _hovered != undefined && _hovered != null)
+                        callback(_hovered);
+                },
+                mousemove: function () {
+                }
             },
 
             editTimeline: {
