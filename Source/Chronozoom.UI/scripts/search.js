@@ -205,10 +205,10 @@ var CZ;
             var url;
             switch(CZ.Settings.czDataSource) {
                 case 'db':
-                    url = "/chronozoom.svc/Search";
+                    url = "/api/Search";
                     break;
                 default:
-                    url = "/chronozoom.svc/Search";
+                    url = "/api/Search";
                     break;
             }
             $.ajax({

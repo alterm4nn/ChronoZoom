@@ -145,7 +145,7 @@ var CZ;
             } else {
                 switch(CZ.Settings.czDataSource) {
                     case 'db':
-                        return "/Chronozoom.svc/get";
+                        return "/api/get";
                     case 'relay':
                         return "ChronozoomRelay";
                     case 'dump':
