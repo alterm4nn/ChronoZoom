@@ -1,6 +1,8 @@
 var CZ;
 (function (CZ) {
     CZ.timeSeriesChart;
+    CZ.leftDataSet;
+    CZ.rightDataSet;
     (function (HomePageViewModel) {
         var _uiMap = {
             "#header-edit-form": "/ui/header-edit-form.html",
@@ -54,6 +56,11 @@ var CZ;
                 Name: "Regimes",
                 Activation: FeatureActivation.RootCollection,
                 JQueryReference: ".regime-link"
+            }, 
+            {
+                Name: "TimeSeries",
+                Activation: FeatureActivation.NotRootCollection,
+                JQueryReference: "#timeSeriesContainer"
             }, 
             
         ];
@@ -227,19 +234,25 @@ var CZ;
             var rootCollection = url.superCollectionName === undefined;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
-            $('#timeSeries_button').mouseup(function () {
-                var h = $('#timeSeriesContainer').height();
-                if(h > 0) {
-                    $('#timeSeriesContainer').height(0);
-                    $('#timeSeriesContainer').hide();
-                    $('#vc').height('100%');
-                } else {
-                    $('#timeSeriesContainer').height('30%');
-                    $('#timeSeriesContainer').show();
-                    $('#vc').height('70%');
-                }
-                CZ.Common.updateLayout();
-            });
+            if(rootCollection) {
+                $('#timeSeries_button').hide();
+                $('#vc').height('100%');
+            } else {
+                $('#timeSeries_button').show();
+                $('#timeSeries_button').mouseup(function () {
+                    var h = $('#timeSeriesContainer').height();
+                    if(h > 0) {
+                        $('#timeSeriesContainer').height(0);
+                        $('#timeSeriesContainer').hide();
+                        $('#vc').height('100%');
+                    } else {
+                        $('#timeSeriesContainer').height('30%');
+                        $('#timeSeriesContainer').show();
+                        $('#vc').height('70%');
+                    }
+                    CZ.Common.updateLayout();
+                });
+            }
             $('#search_button').mouseup(CZ.Search.onSearchClicked);
             $('#tours_index').mouseup(CZ.Tours.onTourClicked);
             $('#human_rect').click(function () {
@@ -485,6 +498,7 @@ var CZ;
                 }));
                 $("#bibliographyBack").css("display", "block");
             }
+            CZ.rightDataSet = CZ.Data.generateSampleData();
         });
         function IsFeatureEnabled(featureName) {
             var feature = $.grep(_featureMap, function (e) {
@@ -506,19 +520,29 @@ var CZ;
                 var rightCSS = vp.pointVirtualToScreen(right, 0).x;
                 var leftPlot = CZ.Dates.getDMYFromCoordinate(left).year;
                 var rightPlot = CZ.Dates.getDMYFromCoordinate(right).year;
-                if(CZ.Data.sampleData === undefined) {
-                    CZ.Data.sampleData = CZ.Data.generateSampleData();
-                }
                 CZ.timeSeriesChart.clear(leftCSS, rightCSS);
-                CZ.timeSeriesChart.drawDataSet(CZ.Data.sampleData, leftCSS, rightCSS, leftPlot, rightPlot);
-                CZ.timeSeriesChart.drawAxis(leftCSS, CZ.Data.sampleData.series[0].appearanceSettings.yMin, CZ.Data.sampleData.series[0].appearanceSettings.yMax, {
-                    labelCount: 4,
-                    tickLength: 10,
-                    majorTickThickness: 1,
-                    stroke: 'black',
-                    axisLocation: 'left',
-                    font: '16px Calibri'
-                });
+                if(CZ.leftDataSet !== undefined) {
+                    CZ.timeSeriesChart.drawDataSet(CZ.leftDataSet, leftCSS, rightCSS, leftPlot, rightPlot);
+                    CZ.timeSeriesChart.drawAxis(leftCSS, CZ.leftDataSet.series[0].appearanceSettings.yMin, CZ.leftDataSet.series[0].appearanceSettings.yMax, {
+                        labelCount: 4,
+                        tickLength: 10,
+                        majorTickThickness: 1,
+                        stroke: 'black',
+                        axisLocation: 'left',
+                        font: '16px Calibri'
+                    });
+                }
+                if(CZ.rightDataSet !== undefined) {
+                    CZ.timeSeriesChart.drawDataSet(CZ.rightDataSet, leftCSS, rightCSS, leftPlot, rightPlot);
+                    CZ.timeSeriesChart.drawAxis(rightCSS, CZ.rightDataSet.series[0].appearanceSettings.yMin, CZ.rightDataSet.series[0].appearanceSettings.yMax, {
+                        labelCount: 4,
+                        tickLength: 10,
+                        majorTickThickness: 1,
+                        stroke: 'black',
+                        axisLocation: 'right',
+                        font: '16px Calibri'
+                    });
+                }
             }
         }
     })(CZ.HomePageViewModel || (CZ.HomePageViewModel = {}));

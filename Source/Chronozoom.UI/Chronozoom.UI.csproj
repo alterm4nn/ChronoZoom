@@ -188,7 +188,7 @@
     <Content Include="images\tour-icon.png" />
     <Content Include="images\view-icon.png" />
     <Content Include="images\edit.svg" />
-    <Content Include="rolanddata.txt" />
+    <None Include="dumps\beta-timeseries.json" />
     <Content Include="scripts\external\ACS.js" />
     <Content Include="scripts\authoring.ts" />
     <Content Include="scripts\authoring.js">

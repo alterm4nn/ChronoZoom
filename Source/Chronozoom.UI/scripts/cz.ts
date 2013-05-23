@@ -20,6 +20,8 @@
 
 module CZ {
     export var timeSeriesChart: CZ.UI.LineChart;
+    export var leftDataSet: CZ.Data.DataSet;
+    export var rightDataSet: CZ.Data.DataSet;
 
     export module HomePageViewModel {
         // Contains mapping: CSS selector -> html file.
@@ -84,6 +86,11 @@ module CZ {
                 Name: "Regimes",
                 Activation: FeatureActivation.RootCollection,
                 JQueryReference: ".regime-link"
+            },
+            {
+                Name: "TimeSeries",
+                Activation: FeatureActivation.NotRootCollection,
+                JQueryReference: "#timeSeriesContainer"
             },
         ];
 
@@ -275,7 +282,12 @@ module CZ {
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
 
-            $('#timeSeries_button')
+            if (rootCollection) {
+                $('#timeSeries_button').hide();
+                $('#vc').height('100%');
+            } else {
+                $('#timeSeries_button').show();
+                $('#timeSeries_button')
                 .mouseup(function () {
                     var h = $('#timeSeriesContainer').height();
                     if (h > 0) {
@@ -285,11 +297,12 @@ module CZ {
                     } else {
                         $('#timeSeriesContainer').height('30%');
                         $('#timeSeriesContainer').show();
-                        $('#vc').height('70%'); 
+                        $('#vc').height('70%');
                     }
 
                     CZ.Common.updateLayout();
                 });
+            }
 
             $('#search_button')
                 .mouseup(CZ.Search.onSearchClicked);
@@ -592,6 +605,8 @@ module CZ {
                 }));
                 $("#bibliographyBack").css("display", "block");
             }
+
+            rightDataSet = CZ.Data.generateSampleData();
         });
 
         function IsFeatureEnabled(featureName) {
@@ -611,13 +626,18 @@ module CZ {
                 var leftPlot = Dates.getDMYFromCoordinate(left).year;
                 var rightPlot = Dates.getDMYFromCoordinate(right).year;
 
-                if (CZ.Data.sampleData === undefined) {
-                    CZ.Data.sampleData = CZ.Data.generateSampleData();
-                }
 
                 timeSeriesChart.clear(leftCSS, rightCSS);
-                timeSeriesChart.drawDataSet(CZ.Data.sampleData, leftCSS, rightCSS, leftPlot, rightPlot);
-                timeSeriesChart.drawAxis(leftCSS, CZ.Data.sampleData.series[0].appearanceSettings.yMin, CZ.Data.sampleData.series[0].appearanceSettings.yMax, { labelCount: 4, tickLength: 10, majorTickThickness: 1, stroke: 'black', axisLocation: 'left', font: '16px Calibri' });
+
+                if (leftDataSet !== undefined) {
+                    timeSeriesChart.drawDataSet(leftDataSet, leftCSS, rightCSS, leftPlot, rightPlot);
+                    timeSeriesChart.drawAxis(leftCSS, leftDataSet.series[0].appearanceSettings.yMin, leftDataSet.series[0].appearanceSettings.yMax, { labelCount: 4, tickLength: 10, majorTickThickness: 1, stroke: 'black', axisLocation: 'left', font: '16px Calibri' });
+                }
+
+                if (rightDataSet !== undefined) {
+                    timeSeriesChart.drawDataSet(rightDataSet, leftCSS, rightCSS, leftPlot, rightPlot);
+                    timeSeriesChart.drawAxis(rightCSS, rightDataSet.series[0].appearanceSettings.yMin, rightDataSet.series[0].appearanceSettings.yMax, { labelCount: 4, tickLength: 10, majorTickThickness: 1, stroke: 'black', axisLocation: 'right', font: '16px Calibri' });
+                }
             }
         }
     }

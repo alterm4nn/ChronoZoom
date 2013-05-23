@@ -48,7 +48,7 @@ module CZ {
                 type: "GET",
                 async: false,
                 dataType: "json",
-                url: 'rolanddata.txt',
+                url: '/dumps/beta-timeseries.json',
                 success: function (result) {
                     rolandData = result;
                 },
@@ -79,7 +79,5 @@ module CZ {
 
             return result;
         }
-
-        export var sampleData: DataSet;
     }
 }

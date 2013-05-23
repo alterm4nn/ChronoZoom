@@ -177,10 +177,14 @@ module CZ {
                 ctx.fillStyle = appearence.stroke;
                 ctx.lineWidth = appearence.majorTickThickness;
                 var ticklength = appearence.tickLength;
+                var textOffset = 2;
 
                 if (appearence.axisLocation == "right") {
                     ticklength = -ticklength;
+                    textOffset = -textOffset;
                 }
+
+                ctx.textAlign = appearence.axisLocation;
 
                 ticks.forEach(function (tick) {
                     var y = dataToScreenY(tick);
@@ -189,9 +193,7 @@ module CZ {
                     ctx.lineTo(screenLeft + ticklength, y);
                     ctx.stroke();
 
-                    ctx.fillText(tick, screenLeft + ticklength + 2, y);
-
-                    
+                    ctx.fillText(tick, screenLeft + ticklength + textOffset, y);
                 });
 
             }

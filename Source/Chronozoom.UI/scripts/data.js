@@ -34,7 +34,7 @@ var CZ;
                 type: "GET",
                 async: false,
                 dataType: "json",
-                url: 'rolanddata.txt',
+                url: '/dumps/beta-timeseries.json',
                 success: function (result) {
                     rolandData = result;
                 },
@@ -69,7 +69,6 @@ var CZ;
             return result;
         }
         Data.generateSampleData = generateSampleData;
-        Data.sampleData;
     })(CZ.Data || (CZ.Data = {}));
     var Data = CZ.Data;
 })(CZ || (CZ = {}));
