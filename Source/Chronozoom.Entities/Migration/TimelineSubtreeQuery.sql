@@ -54,5 +54,5 @@ BEGIN
 		DELETE FROM @next_level 
 	END
 
-	SELECT * FROM Timeline WHERE Id IN (SELECT Id FROM @results) 
+	SELECT * FROM Timelines WHERE Id IN (SELECT Id FROM @results) 
 END
