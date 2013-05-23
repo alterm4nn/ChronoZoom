@@ -25,7 +25,7 @@ var CZ;
                 if(String(e).length > 254) {
                     return false;
                 }
-                var filter = /^([\w^_]+(?:([-_\.\+][\w^_]+)|)|(xn--[\w^_]+))@([\w^_]+(?:(-+[\w^_]+)|)|(xn--[\w^_]+))(?:\.([\w^_]+(?:([\w-_\.\+][\w^_]+)|)|(xn--[\w^_]+)))$/i;
+                var filter = /^(([\w^_]+((?:([-_\.\+][\w^_]+))|))|(xn--[\w^_]+))@(([\w^_]+((?:(-+[\w^_]+))|))|(xn--[\w^_]+))(?:\.(([\w^_]+((?:([\w-_\.\+][\w^_]+))|))|(xn--[\w^_]+)))$/i;
                 return String(e).search(filter) != -1;
             };
             FormEditProfile.prototype.validUsername = function (e) {
