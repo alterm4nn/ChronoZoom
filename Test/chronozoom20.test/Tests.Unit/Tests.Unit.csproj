@@ -58,16 +58,38 @@
     <Content Include="Content\jasmine\jasmine_favicon.png" />
     <Content Include="Scripts\jasmine\jasmine-html.js" />
     <Content Include="Scripts\jasmine\jasmine.js" />
+    <Content Include="Scripts\Js\auth-edit-contentitem-form.js" />
+    <Content Include="Scripts\Js\auth-edit-exhibit-form.js" />
+    <Content Include="Scripts\Js\auth-edit-exhibit.js" />
+    <Content Include="Scripts\Js\auth-edit-timeline-form.js" />
+    <Content Include="Scripts\Js\auth-edit-timeline.js" />
+    <Content Include="Scripts\Js\authoring.js" />
     <Content Include="Scripts\Js\common.js" />
+    <Content Include="Scripts\Js\contentitem-listbox.js" />
     <Content Include="Scripts\Js\csvUtils.js" />
+    <Content Include="Scripts\Js\cz.datepicker.js" />
     <Content Include="Scripts\Js\cz.html.js" />
     <Content Include="Scripts\Js\cz.settings.js" />
+    <Content Include="Scripts\Js\datepicker.js" />
+    <Content Include="Scripts\Js\formbase.js" />
+    <Content Include="Scripts\Js\header-edit-form.js" />
+    <Content Include="Scripts\Js\header-edit-profile-form.js" />
+    <Content Include="Scripts\Js\header-edit.js" />
+    <Content Include="Scripts\Js\header-login-form.js" />
+    <Content Include="Scripts\Js\header-logout-form.js" />
+    <Content Include="Scripts\Js\listboxbase.js" />
+    <Content Include="Scripts\Js\login-form.js" />
+    <Content Include="Scripts\Js\logout-form.js" />
+    <Content Include="Scripts\Js\profile-edit.js" />
+    <Content Include="Scripts\Js\service.js" />
     <Content Include="Scripts\Js\settings.js" />
     <Content Include="Scripts\Js\timescale.js" />
     <Content Include="Scripts\Specs\authoringSpec.js" />
     <Content Include="Scripts\Specs\CommonSpec.js" />
-    <Content Include="Scripts\Specs\CsvParseSpec.js" />
+    <Content Include="Scripts\Specs\CsvParse.js" />
+    <Content Include="Scripts\Specs\datepickerSpec.js" />
     <Content Include="Scripts\Specs\datesSpec.js" />
+    <Content Include="Scripts\Specs\profileDataSpec.js" />
     <Content Include="Scripts\Specs\TimeScaleSpec.js" />
     <Content Include="Scripts\Utils\jasmine-jquery.js" />
     <Content Include="Scripts\Utils\jquery-1.8.0.min.js" />
@@ -84,8 +106,10 @@
 mkdir .\Scripts\Js
 mkdir .\Scripts\Utils
 
-copy "..\..\..\Source\Chronozoom.UI\NewScripts\*.js" "$(ProjectDir)Scripts\Js\" /y
-copy "..\..\..\Source\Chronozoom.UI\NewScripts\external\*.js" "$(ProjectDir)Scripts\Utils\" /y</PreBuildEvent>
+copy "..\..\..\Source\Chronozoom.UI\Scripts\*.js" "$(ProjectDir)Scripts\Js\" /y
+copy "..\..\..\Source\Chronozoom.UI\ui\*.js" "$(ProjectDir)Scripts\Js\" /y
+copy "..\..\..\Source\Chronozoom.UI\ui\controls\*.js" "$(ProjectDir)Scripts\Js\" /y
+copy "..\..\..\Source\Chronozoom.UI\Scripts\external\*.js" "$(ProjectDir)Scripts\Utils\" /y</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

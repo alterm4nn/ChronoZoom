@@ -9,16 +9,28 @@ using System.Threading.Tasks;
 
 namespace Chronozoom.Entities
 {
+    /// <summary>
+    /// A registered user.
+    /// </summary>
     [DataContract]
     public class User
     {
+        /// <summary>
+        /// The ID of the user.
+        /// </summary>
         [Key]
         [DataMember]
         public Guid Id { get; set; }
 
+        /// <summary>
+        /// The display name of the user.
+        /// </summary>
         [DataMember]
         public string DisplayName { get; set; }
 
+        /// <summary>
+        /// The email address of the user.
+        /// </summary>
         [DataMember]
         public string Email { get; set; }
 

@@ -15,61 +15,18 @@ namespace Application.Helper.Helpers
             _manager = new HelperManager();
         }
 
-        public string GetEukaryoticCellsDescription()
+        public void OpenPage()
         {
-            Logger.Log("<-");
-            _manager.GetNavigationHelper().OpenExhibitEukaryoticCells();
-            Logger.Log("ExhibitEukaryotic Cell is opened");
-            string description = GetText(By.XPath("//*[@id='vc']/*[@class='contentItemDescription']/div"));
-            Logger.Log("-> description: " + description);
-            return description;
+            _manager.GetNavigationHelper().OpenHomePage();
+            WaitWhileHomePageIsLoaded();
         }
 
-        public void OpenLifeTimeline()
+        public void OpenSandboxPage()
         {
-            Logger.Log("<-");
-            _manager.GetNavigationHelper().OpenLifePage();
-            WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='Life']"));
-            WaitAnimation();
-            Logger.Log("->");
+            _manager.GetNavigationHelper().OpenSandboxPage();
+            WaitWhileHomePageIsLoaded();
         }
-
-        public void OpenHumanityTimeline()
-        {
-            Logger.Log("<-");
-            _manager.GetNavigationHelper().OpenHumanityPage();
-            WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='Humanity']"));
-            WaitAnimation();
-            Logger.Log("->");
-        }
-
-        public void OpenBceCeArea()
-        {
-            Logger.Log("<-");
-            NavigateBceToCeEra();
-            WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='Geologic Time Scale']"));
-            WaitForElementIsDisplayed(By.XPath("//*[@class='cz-timescale-label' and contains(@style,'display: block;') and text()='1 BCE']"));
-            Logger.Log("->");
-        }
-
-        public void OpenRomanHistoryTimeline()
-        {
-            Logger.Log("<-");
-            _manager.GetNavigationHelper().NavigateToRomanHistoryTimeline();
-            WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='Roman History']"));
-            WaitAnimation();
-            Logger.Log("->");
-        }
-
-        public string GetLastBreadcrumbs()
-        {
-            Logger.Log("<-");
-            WaitAnimation();
-            string result = GetText(By.XPath("//*[@id='breadCrumbsTable']/*/tr/td[last()]/div"));
-            Logger.Log("-> Last Breadcrumbs: " + result);
-            return result;
-        }
-
+        
         public void MoveMouseToCenter()
         {
             Logger.Log("<-");
@@ -93,40 +50,40 @@ namespace Application.Helper.Helpers
             Logger.Log("-> title: " + title);
             return title;
         }
+        
+        public string GetUrl()
+        {
+            Logger.Log("<-");
+            string url = GetCurrentUrl();
+            Logger.Log("-> title: " + url);
+            return url;
+        }
 
         public void OpenHelpLink()
         {
             Logger.Log("<-");
-            Click(By.XPath("(//*[@class='footer-link'])[4]"));
+            Click(By.XPath("//*[@id='footer']/*/*/*/a[text()='Help']"));
             Logger.Log("->");
         }
 
         public void OpenFeedbackLink()
         {
             Logger.Log("<-");
-            Click(By.XPath("(//*[@class='footer-link'])[2]"));
+            Click(By.XPath("//*[@id='footer']/*/*/*/a[text()='Feedback']"));
             Logger.Log("->");
         }
 
-        public void OpenAboutLink()
+        public void OpenNoticeLink()
         {
             Logger.Log("<-");
-            Click(By.XPath("(//*[@class='footer-link'])[1]"));
+            Click(By.XPath("//*[@id='footer']/*/*/*/a[text()='Notices']"));
             Logger.Log("->");
         }
 
-
-        public void OpenPrivacyLink()
+        public void OpenDevelopersLink()
         {
             Logger.Log("<-");
-            Click(By.XPath("(//*[@class='footer-link'])[3]"));
-            Logger.Log("->");
-        }
-
-        public void OpenLoginPage()
-        {
-            Logger.Log("<-");
-            Click(By.Id("login-panel"));
+            Click(By.XPath("//*[@id='footer']/*/*/*/a[text()='Developers']"));
             Logger.Log("->");
         }
 
@@ -147,6 +104,8 @@ namespace Application.Helper.Helpers
         public void WaitWhileHomePageIsLoaded()
         {
             WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("CZ.Common.cosmosVisible != undefined")), 60);
+            Sleep(2);
+            WaitAjaxComplete(10);
         }
     }
 }

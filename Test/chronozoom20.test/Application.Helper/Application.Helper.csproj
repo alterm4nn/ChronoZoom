@@ -36,12 +36,11 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Source\Chronozoom.Entities\bin\Chronozoom.Entities.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Practices.Unity, Version=3.0.1208.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Unity.3.0.1208-Preview\lib\Net45\Microsoft.Practices.Unity.dll</HintPath>
+    <Reference Include="Microsoft.Practices.Unity">
+      <HintPath>..\packages\Unity.3.0.1304.0\lib\Net45\Microsoft.Practices.Unity.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Practices.Unity.Configuration">
-      <HintPath>..\packages\Unity.3.0.1208-Preview\lib\Net45\Microsoft.Practices.Unity.Configuration.dll</HintPath>
+      <HintPath>..\packages\Unity.3.0.1304.0\lib\Net45\Microsoft.Practices.Unity.Configuration.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -52,7 +51,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="WebDriver">
-      <HintPath>..\packages\Selenium.WebDriver.2.31.2\lib\net40\WebDriver.dll</HintPath>
+      <HintPath>..\packages\Selenium.WebDriver.2.32.1\lib\net40\WebDriver.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -69,10 +68,12 @@
     <Compile Include="BrowserImpl\SafariControls.cs" />
     <Compile Include="Helpers\AuthorizationHelper.cs" />
     <Compile Include="Helpers\BookmarkHelper.cs" />
+    <Compile Include="Helpers\BreadcrumbsHelper.cs" />
     <Compile Include="Helpers\DateTimeHelper.cs" />
     <Compile Include="Helpers\ExhibitHelper.cs" />
     <Compile Include="Helpers\HomePageHelper.cs" />
     <Compile Include="Helpers\NavigationHelper.cs" />
+    <Compile Include="Helpers\SearchHelper.cs" />
     <Compile Include="Helpers\TimelineHelper.cs" />
     <Compile Include="Helpers\TimescaleHelper.cs" />
     <Compile Include="Helpers\TourHelper.cs" />

@@ -26,7 +26,7 @@ namespace ASC.Util
         /// </summary>
         /// <param name="collection"></param>
         /// <returns></returns>
-        public static string ToQueryString(this NameValueCollection collection)
+        internal static string ToQueryString(this NameValueCollection collection)
         {
             return string.Join("&",
                 from k in collection.AllKeys

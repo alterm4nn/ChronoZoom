@@ -54,13 +54,9 @@ namespace Chronozoom.Entities
 
         public DbSet<Timeline> Timelines { get; set; }
 
-        public DbSet<Threshold> Thresholds { get; set; }
-
         public DbSet<Exhibit> Exhibits { get; set; }
 
         public DbSet<ContentItem> ContentItems { get; set; }
-
-        public DbSet<Reference> References { get; set; }
 
         public DbSet<Tour> Tours { get; set; }
 
@@ -70,7 +66,7 @@ namespace Chronozoom.Entities
 
         public DbSet<SuperCollection> SuperCollections { get; set; }
 
-        public Collection<Timeline> TimelinesQuery(Guid collectionId, decimal startTime, decimal endTime, decimal span, Guid? commonAncestor, int maxElements)
+        public Collection<Timeline> TimelinesQuery(Guid collectionId, decimal startTime, decimal endTime, decimal span, Guid? commonAncestor, int maxElements, int depth)
         {
             Dictionary<Guid, Timeline> timelinesMap = new Dictionary<Guid, Timeline>();
 
@@ -82,7 +78,7 @@ namespace Chronozoom.Entities
             }
             else
             {
-                timelines = FillTimelinesRangeQuery(collectionId, timelinesMap, startTime, endTime, span, commonAncestor, ref maxElements);
+                timelines = FillTimelinesRangeQuery(collectionId, timelinesMap, startTime, endTime, span, commonAncestor, depth, ref maxElements);
             }
 
             if (maxElements > 0)
@@ -128,9 +124,6 @@ namespace Chronozoom.Entities
                 if (exhibitRaw.ContentItems == null)
                     exhibitRaw.ContentItems = new System.Collections.ObjectModel.Collection<ContentItem>();
 
-                if (exhibitRaw.References == null)
-                    exhibitRaw.References = new System.Collections.ObjectModel.Collection<Reference>();
-
                 if (timelinesMap.Keys.Contains(exhibitRaw.Timeline_ID))
                 {
                     timelinesMap[exhibitRaw.Timeline_ID].Exhibits.Add(exhibitRaw);
@@ -143,7 +136,12 @@ namespace Chronozoom.Entities
                 // Populate Content Items
                 string contentItemsQuery = string.Format(
                     CultureInfo.InvariantCulture,
-                    "SELECT * FROM ContentItems WHERE Exhibit_Id IN ('{0}')",
+                    @"
+                        SELECT * 
+                        FROM ContentItems 
+                        WHERE Exhibit_Id IN ('{0}')
+                        ORDER BY [Order] ASC
+                    ",
                     string.Join("', '", exhibits.Keys.ToArray()));
                 var contentItemsRaw = Database.SqlQuery<ContentItemRaw>(contentItemsQuery);
                 foreach (ContentItemRaw contentItemRaw in contentItemsRaw)
@@ -153,19 +151,6 @@ namespace Chronozoom.Entities
                         exhibits[contentItemRaw.Exhibit_ID].ContentItems.Add(contentItemRaw);
                     }
                 }
-
-                // Populate References
-                string referencesQuery = string.Format(CultureInfo.InvariantCulture,
-                    "SELECT * FROM [References] WHERE Exhibit_Id IN ('{0}')",
-                    string.Join("', '", exhibits.Keys.ToArray()));
-                var referencesRaw = Database.SqlQuery<ReferenceRaw>(referencesQuery);
-                foreach (ReferenceRaw referenceRaw in referencesRaw)
-                {
-                    if (exhibits.Keys.Contains(referenceRaw.Exhibit_ID))
-                    {
-                        exhibits[referenceRaw.Exhibit_ID].References.Add(referenceRaw);
-                    }
-                }
             }
         }
 
@@ -173,16 +158,29 @@ namespace Chronozoom.Entities
         /// Keeping this commented until RI-Tree performance is validated.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        private List<Timeline> FillTimelinesRangeQuery(Guid collectionId, Dictionary<Guid, Timeline> timelinesMap, decimal startTime, decimal endTime, decimal span, Guid? commonAncestor, ref int maxElements)
+        private List<Timeline> FillTimelinesRangeQuery(Guid collectionId, Dictionary<Guid, Timeline> timelinesMap, decimal startTime, decimal endTime, decimal span, Guid? commonAncestor, int depth, ref int maxElements)
         {
             string timelinesQuery = @"
                 SELECT 
                     TOP({0}) *,
                     FromYear as [Start],
                     ToYear as [End]
-                FROM Timelines
+                FROM Timelines,
+                    (
+                        SELECT TOP(1)
+                            Id as AncestorId,
+                            Depth as AncestorDepth
+                        FROM Timelines 
+                        WHERE 
+                            (Timeline_Id Is NULL OR Id = {5})
+                            AND Collection_Id = {4}
+                        ORDER BY 
+                            CASE WHEN Id = {5} THEN 1 ELSE 0 END DESC, 
+                            CASE WHEN Id Is NULL THEN 1 ELSE 0 END DESC
+                    ) as AncestorTimeline
                 WHERE
                     Collection_Id = {4} AND
+                    Depth < AncestorDepth + {6} AND
                     (
                         FromYear >= {1} AND 
                         ToYear <= {2} AND 
@@ -190,24 +188,12 @@ namespace Chronozoom.Entities
                         Id = {5}
                     )
                  ORDER BY
-                    CASE WHEN Id = {5} THEN 1 ELSE 0 END DESC, 
-                    CASE WHEN Timeline_Id = {5} THEN 1 ELSE 0 END DESC, 
-                    CASE WHEN Id = 
-                    (SELECT id 
-                        FROM Timelines 
-                        WHERE Timeline_Id Is NULL 
-                        AND Collection_Id = {4}
-                    ) THEN 1 ELSE 0 END DESC, 
-                    CASE WHEN Timeline_Id = 
-                    (SELECT id 
-                        FROM Timelines 
-                        WHERE Timeline_Id Is NULL 
-                        AND Collection_Id = {4}
-                    ) THEN 1 ELSE 0 END DESC,
+                    CASE WHEN Timelines.Id = AncestorId THEN 1 ELSE 0 END DESC, 
+                    CASE WHEN Timeline_Id = AncestorId THEN 1 ELSE 0 END DESC, 
                     ToYear-FromYear DESC";
 
             return FillTimelinesFromFlatList(
-                Database.SqlQuery<TimelineRaw>(timelinesQuery, maxElements, startTime, endTime, span, collectionId, commonAncestor),
+                Database.SqlQuery<TimelineRaw>(timelinesQuery, maxElements, startTime, endTime, span, collectionId, commonAncestor, depth),
                 timelinesMap,
                 commonAncestor,
                 ref maxElements);
@@ -315,15 +301,6 @@ namespace Chronozoom.Entities
         public void DeleteExhibit(Guid id)
         {
             var exhibitsIDs = GetChildContentItemsIds(id); // list of ids of content items
-            var referencesIDs = GetChildReferencesIds(id); // list of ids of references
-
-            // delete references
-            while (referencesIDs.Count != 0)
-            {
-                var r = this.References.Find(referencesIDs.First());
-                this.References.Remove(r);
-                referencesIDs.RemoveAt(0);
-            }
 
             // delete content items
             while (exhibitsIDs.Count != 0)
@@ -337,6 +314,38 @@ namespace Chronozoom.Entities
             this.Exhibits.Remove(deleteExhibit);
         }
 
+        /// <summary>
+        /// Retrieves a path to an timeline, exhibit or content item.
+        /// </summary>
+        public string GetContentPath(Guid collectionId, Guid? contentId, string title)
+        {
+            string contentPath = string.Empty;
+
+            ContentItemRaw contentItem = Database.SqlQuery<ContentItemRaw>("SELECT * FROM ContentItems WHERE Collection_Id = {0} AND (Id = {1} OR Title = {2})", collectionId, contentId, title).FirstOrDefault();
+            if (contentItem != null)
+            {
+                contentPath = "/" + contentItem.Id;
+                contentId = contentItem.Exhibit_ID;
+            }
+
+            ExhibitRaw exhibit = Database.SqlQuery<ExhibitRaw>("SELECT * FROM Exhibits WHERE Collection_Id = {0} AND (Id = {1} OR Title = {2})", collectionId, contentId, title).FirstOrDefault();
+            if (exhibit != null)
+            {
+                contentPath = "/e" + exhibit.Id + contentPath;
+                contentId = exhibit.Timeline_ID;
+            }
+
+            TimelineRaw timeline = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Collection_Id = {0} AND (Id = {1} OR Title = {2})", collectionId, contentId, title).FirstOrDefault();
+
+            while (timeline != null)
+            {
+                contentPath = "/t" + timeline.Id + contentPath;
+                timeline = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Id = {0}", timeline.Timeline_ID).FirstOrDefault();
+            } 
+
+            return contentPath.ToString();
+        }
+
         // Returns list of ids of chilt timelines of timeline with given id.
         private List<Guid> GetChildTimelinesIds(Guid id)
         {
@@ -347,7 +356,7 @@ namespace Chronozoom.Entities
                 "SELECT * FROM Timelines WHERE Timeline_Id IN ('{0}')",
                 string.Join("', '", id));
             var timelinesRaw = Database.SqlQuery<TimelineRaw>(timelinesQuery);
-           
+
             foreach (TimelineRaw timelineRaw in timelinesRaw)
                 timelines.Add(timelineRaw.Id);
 
@@ -384,25 +393,16 @@ namespace Chronozoom.Entities
             var contentItemsRaw = Database.SqlQuery<ContentItemRaw>(contentItemsQuery);
 
             foreach (ContentItemRaw contentItemRaw in contentItemsRaw)
-                contentItems.Add(contentItemRaw.Id);      
+                contentItems.Add(contentItemRaw.Id);
             return contentItems;
         }
 
-        // Returns list of ids of child references of exhibit with given id.
-        private List<Guid> GetChildReferencesIds(Guid id)
+        public TimelineRaw GetParentTimelineRaw(Guid timelineId)
         {
-            var references = new List<Guid>();
+            var parentTimelinesRaw = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Id in (SELECT Timeline_Id FROM Timelines WHERE Id = {0})", timelineId);
 
-            // Find exhibit's references
-            string referencesQuery = string.Format(CultureInfo.InvariantCulture,
-                "SELECT * FROM [References] WHERE Exhibit_Id IN ('{0}')",
-                string.Join("', '", id));
-            var referencesRaw = Database.SqlQuery<ReferenceRaw>(referencesQuery);
-
-            foreach (ReferenceRaw referenceRaw in referencesRaw)
-                references.Add(referenceRaw.Id);
-
-            return references;
+            return parentTimelinesRaw.FirstOrDefault();
         }
+
     }
 }

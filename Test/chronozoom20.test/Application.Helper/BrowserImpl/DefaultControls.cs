@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Globalization;
 using Application.Driver;
 using Application.Driver.UserActions;
-using Application.Helper.Helpers;
 using OpenQA.Selenium;
 
 namespace Application.Helper.BrowserImpl

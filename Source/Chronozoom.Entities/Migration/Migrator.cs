@@ -1,4 +1,4 @@
-﻿﻿// ---------------------------------------​---------------------------------------​--------------------------------------
+﻿// ---------------------------------------​---------------------------------------​--------------------------------------
 // <copyright company="Outercurve Foundation">
 //   Copyright (c) 2013, The Outercurve Foundation
 // </copyright>
@@ -48,13 +48,10 @@ namespace Chronozoom.Entities.Migration
         public void Migrate()
         {
             MigrateRiTree();
-            LoadDataFromDump("Beta Content", "beta-get.json", "beta-gettours.json", "beta-getthresholds.json", false, _baseContentAdmin.Value);
-            LoadDataFromDump("Sandbox", "beta-get.json", "beta-gettours.json", "beta-getthresholds.json", true, null);
-            LoadDataFromDump("AIDS Timeline", "aidstimeline-get.json", "aidstimeline-gettours.json", null, true, _baseContentAdmin.Value);
-            LoadDataFromDump("AIDS Standalone", "aidsstandalone-get.json", null, null, true, _baseContentAdmin.Value);
-            LoadDataFromDump("CERN", "cern-get.json", null, null, true, null);
+            LoadDataFromDump("Beta Content", "beta-get.json", "beta-gettours.json", false, _baseContentAdmin.Value);
+            LoadDataFromDump("Sandbox", "beta-get.json", "beta-gettours.json", true, null);
+            LoadDataFromDump("AIDS Timeline", "aidstimeline-get.json", "aidstimeline-gettours.json", false, _baseContentAdmin.Value);
         }
-
 
         private void MigrateRiTree()
         {
@@ -79,7 +76,7 @@ namespace Chronozoom.Entities.Migration
             }
         }
 
-        private void LoadDataFromDump(string superCollectionName, string getFileName, string getToursFileName, string getThresholdsFileName, bool replaceGuids, string contentAdminId)
+        private void LoadDataFromDump(string superCollectionName, string getFileName, string getToursFileName, bool replaceGuids, string contentAdminId)
         {
             if (_storage.SuperCollections.Find(CollectionIdFromText(superCollectionName)) == null)
             {
@@ -87,9 +84,8 @@ namespace Chronozoom.Entities.Migration
                 Collection collection = LoadCollections(superCollectionName, superCollectionName, contentAdminId);
                 using (Stream getData = File.OpenRead(_baseDirectory.Value + @"Dumps\" + getFileName))
                 using (Stream getToursData = getToursFileName == null ? null : File.OpenRead(_baseDirectory.Value + @"Dumps\" + getToursFileName))
-                using (Stream getThresholdsData = getThresholdsFileName == null ? null : File.OpenRead(_baseDirectory.Value + @"Dumps\" + getThresholdsFileName))
                 {
-                    LoadData(getData, getToursData, getThresholdsData, collection, replaceGuids);
+                    LoadData(getData, getToursData, collection, replaceGuids);
                 }
 
                 // Save changes to storage
@@ -137,32 +133,26 @@ namespace Chronozoom.Entities.Migration
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Incremental change, will refactor later if the import process is kept")]
-        private void LoadData(Stream dataTimelines, Stream dataTours, Stream dataThresholds, Collection collection, bool replaceGuids)
+        private void LoadData(Stream dataTimelines, Stream dataTours, Collection collection, bool replaceGuids)
         {
-            var bjrTimelines = new DataContractJsonSerializer(typeof(BaseJsonResult<IEnumerable<Timeline>>)).ReadObject(dataTimelines) as BaseJsonResult<IEnumerable<Timeline>>;
+            var timelines = new DataContractJsonSerializer(typeof(IEnumerable<Timeline>)).ReadObject(dataTimelines) as IEnumerable<Timeline>;
 
             _storage.Collections.Add(collection);
 
-            // UniqueIds Map
-            Dictionary<int, Tuple<Guid, BookmarkType>> bookmarksMap = new Dictionary<int, Tuple<Guid, BookmarkType>>();
-
             // Associate each timeline with the root collection
-            TraverseTimelines(bjrTimelines.d, timeline =>
+            TraverseTimelines(timelines, timeline =>
             {
                 timeline.Collection = collection;
-                bookmarksMap[timeline.UniqueId] = new Tuple<Guid, BookmarkType>(timeline.Id, BookmarkType.Timeline);
 
                 foreach (Exhibit exhibit in timeline.Exhibits)
                 {
                     exhibit.Collection = collection;
-                    bookmarksMap[exhibit.UniqueId] = new Tuple<Guid, BookmarkType>(exhibit.Id, BookmarkType.Exhibit);
 
                     if (exhibit.ContentItems != null)
                     {
                         foreach (ContentItem contentItem in exhibit.ContentItems)
                         {
                             contentItem.Collection = collection;
-                            bookmarksMap[contentItem.UniqueId] = new Tuple<Guid, BookmarkType>(contentItem.Id, BookmarkType.ContentItem);
                         }
                     }
                 }
@@ -171,7 +161,7 @@ namespace Chronozoom.Entities.Migration
             if (replaceGuids)
             {
                 // Replace GUIDs to ensure multiple collections can be imported
-                TraverseTimelines(bjrTimelines.d, timeline =>
+                TraverseTimelines(timelines, timeline =>
                 {
                     timeline.Id = Guid.NewGuid();
 
@@ -188,24 +178,17 @@ namespace Chronozoom.Entities.Migration
                                     contentItem.Id = Guid.NewGuid();
                                 }
                             }
-
-                            if (exhibit.References != null)
-                            {
-                                foreach (Reference reference in exhibit.References)
-                                {
-                                    reference.Id = Guid.NewGuid();
-                                }
-                            }
                         }
                     }
                 }
                 );
             }
 
-            foreach (var timeline in bjrTimelines.d)
+            foreach (var timeline in timelines)
             {
                 if (replaceGuids) timeline.Id = Guid.NewGuid();
                 timeline.Collection = collection;
+                timeline.Depth = 0;
                 MigrateInPlace(timeline);
                 timeline.ForkNode = Storage.ForkNode((long)timeline.FromYear, (long)timeline.ToYear);
                 _storage.Timelines.Add(timeline);
@@ -220,69 +203,33 @@ namespace Chronozoom.Entities.Migration
                     if (replaceGuids) tour.Id = Guid.NewGuid();
                     tour.Collection = collection;
 
-                    if (tour.Bookmarks != null)
+                    if (tour.Bookmarks != null && replaceGuids)
                     {
                         foreach (var bookmark in tour.Bookmarks)
                         {
                             bookmark.Id = Guid.NewGuid();
-
-                            // Split URL into reference/location parts
-                            string[] urlParts = bookmark.Url.Split('@');
-
-                            // Split references into its components
-                            string[] urlComponents = urlParts[0].Split('/');
-
-                            if (urlComponents.Length > 0)
-                            {
-                                switch (urlComponents[urlComponents.Length - 1].Substring(0, 1))
-                                {
-                                case "c":
-                                    bookmark.ReferenceType = BookmarkType.ContentItem;
-                                    break;
-                                case "e":
-                                    bookmark.ReferenceType = BookmarkType.Exhibit;
-                                    break;
-                                case "t":
-                                    bookmark.ReferenceType = BookmarkType.Timeline;
-                                    break;
-                                }
-
-                                int uniqueId = int.Parse(urlComponents[urlComponents.Length - 1].Substring(1), CultureInfo.InvariantCulture);
-                                if (bookmarksMap.Keys.Contains(uniqueId))
-                                {
-                                    bookmark.ReferenceId = bookmarksMap[uniqueId].Item1;
-                                    bookmark.ReferenceType = bookmarksMap[uniqueId].Item2;
-                                }
-                            }
                         }
                     }
 
                     _storage.Tours.Add(tour);
                 }
             }
-
-            if (dataThresholds != null)
-            {
-                var bjrThresholds = new DataContractJsonSerializer(typeof(BaseJsonResult<IEnumerable<Threshold>>)).ReadObject(dataThresholds) as BaseJsonResult<IEnumerable<Threshold>>;
-
-                foreach (var threshold in bjrThresholds.d)
-                {
-                    threshold.ThresholdYear = ConvertToDecimalYear(threshold.ThresholdDay, threshold.ThresholdMonth, threshold.ThresholdYear, threshold.ThresholdTimeUnit);
-                    _storage.Thresholds.Add(threshold);
-                }
-            }
         }
 
         private void MigrateInPlace(Timeline timeline)
         {
-            timeline.FromYear = ConvertToDecimalYear(timeline.FromDay, timeline.FromMonth, timeline.FromYear, timeline.FromTimeUnit);
-            timeline.ToYear = ConvertToDecimalYear(timeline.ToDay, timeline.ToMonth, timeline.ToYear, timeline.ToTimeUnit);
-
             if (timeline.Exhibits != null)
             {
                 foreach (var exhibit in timeline.Exhibits)
                 {
-                    exhibit.Year = ConvertToDecimalYear(exhibit.Day, exhibit.Month, exhibit.Year, exhibit.TimeUnit);
+                    exhibit.Depth = timeline.Depth + 1;
+                    if (exhibit.ContentItems != null)
+                    {
+                        foreach (ContentItem contentItem in exhibit.ContentItems)
+                        {
+                            contentItem.Depth = exhibit.Depth + 1;
+                        }
+                    }
                 }
             }
 
@@ -290,95 +237,10 @@ namespace Chronozoom.Entities.Migration
             {
                 foreach (var child in timeline.ChildTimelines)
                 {
+                    child.Depth = timeline.Depth + 1;
                     MigrateInPlace(child);
                 }
             }
-        }
-
-        // returns the decimal year equivalent of the incoming data
-        private static decimal ConvertToDecimalYear(int? day, int? month, decimal year, string timeUnit)
-        {
-            // Substitute 0.0 for year 9999.  Today the algorithm assumes year 0.0 means 'today' but in decimal years, 0.0 is a valid value.
-            if (year == 0)
-            {
-                return 9999;
-            }
-
-            decimal decimalyear = year;
-
-            // if the timeUnit is null - we still calculate decimalyear in the first if of the function and return that value
-            if (timeUnit != null)
-            {
-                // if the timeunit is CE
-                if (string.Compare(timeUnit, "ce", StringComparison.OrdinalIgnoreCase) == 0 && day != null && month != null)
-                {
-                    int tempmonth = 1;
-                    int tempday = 1;
-
-                    // if the month and day values are null, calculating decimalyear with the first day of the year
-                    if (month.HasValue && month > 0)
-                    {
-                        tempmonth = (int)month;
-                        if (day.HasValue && day > 0)
-                        {
-                            tempday = (int)day;
-                        }
-                    }
-
-                    var dt = new DateTime((int)decimalyear, tempmonth, tempday);
-                    decimalyear = ConvertToDecimalYear(dt);
-                }
-                else if (string.Compare(timeUnit, "ce", StringComparison.OrdinalIgnoreCase) == 0)
-                {
-                    // decimalyear is already in decimal year
-                }
-                else if (string.Compare(timeUnit, "bce", StringComparison.OrdinalIgnoreCase) == 0)
-                {
-                    // anything that is not CE is in the negative scale. 0 CE = O Decimal Year
-                    decimalyear *= -1;
-                }
-                else if (string.Compare(timeUnit, "ka", StringComparison.OrdinalIgnoreCase) == 0)
-                {
-                    decimalyear *= -1000;
-                }
-                else if (string.Compare(timeUnit, "ma", StringComparison.OrdinalIgnoreCase) == 0)
-                {
-                    decimalyear *= -1000000;
-                }
-                else if (string.Compare(timeUnit, "ga", StringComparison.OrdinalIgnoreCase) == 0)
-                {
-                    decimalyear *= -1000000000;
-                }
-                else if (string.Compare(timeUnit, "ta", StringComparison.OrdinalIgnoreCase) == 0)
-                {
-                    decimalyear *= -1000000000000;
-                }
-                else if (string.Compare(timeUnit, "pa", StringComparison.OrdinalIgnoreCase) == 0)
-                {
-                    decimalyear *= -1000000000000000;
-                }
-                else if (string.Compare(timeUnit, "ea", StringComparison.OrdinalIgnoreCase) == 0)
-                {
-                    decimalyear *= -1000000000000000000;
-                }
-                else
-                {
-                    throw new DataException(string.Format(CultureInfo.InvariantCulture, "Unable to parse timeUnit: {0}", timeUnit));
-                }
-            }
-
-            return decimalyear;
-        }
-
-        private static decimal ConvertToDecimalYear(DateTime dateTime)
-        {
-            decimal year = dateTime.Year;
-            decimal secondsInThisYear = DateTime.IsLeapYear(dateTime.Year) ? 366 * 24 * 60 * 60 : 365 * 24 * 60 * 60;
-            decimal secondsElapsedSinceYearStart = (dateTime.DayOfYear - 1) * 24 * 60 * 60 + dateTime.Hour * 60 * 60 + dateTime.Minute * 60 + dateTime.Second;
-
-            decimal fractionalYear = secondsElapsedSinceYearStart / secondsInThisYear;
-
-            return year + fractionalYear;
         }
 
         [DataContract]

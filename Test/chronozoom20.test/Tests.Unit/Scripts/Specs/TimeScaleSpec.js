@@ -3,7 +3,7 @@
 /// <reference path="../Utils/jasmine-jquery.js" />
 /// <reference path="../Js/timescale.js" />
 /// <reference path="../Js/common.js" />
-/// <reference path="../Js/cz.dates.js" />
+/// <reference path="../Js/dates.js" />
 /// <reference path="../Js/cz.settings.js" />
 /// <reference path="../Js/settings.js" />
 
@@ -357,8 +357,6 @@ describe("CZ.DateTickSource part", function () {
             dateTickSrc.getRegime(l, r);
             expect("Days_Quarters").toEqual(dateTickSrc.regime);
         });
-
-
     });
 });
 
