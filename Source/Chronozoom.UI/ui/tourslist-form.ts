@@ -30,9 +30,7 @@ module CZ {
                     tour => {
                         this.onTakeTour(tour);
                     },
-                    tour => {
-                        this.onEditTour(tour);
-                    });
+                    this.editTour ? tour => { this.onEditTour(tour); } : null);
 
                 this.initialize();
             }

@@ -57,9 +57,12 @@ var CZ;
                 this.container.find("#takeTour").click(function (e) {
                     parent.TakeTour(context);
                 });
-                this.container.find("#editTour").click(function (e) {
-                    parent.EditTour(context);
-                });
+                container.find(".cz-tourslist-editing").css("display", parent.EditTour ? "inline" : "none");
+                if(parent.EditTour) {
+                    this.container.find("#editTour").click(function (e) {
+                        parent.EditTour(context);
+                    });
+                }
             }
             return TourListItem;
         })(UI.ListItemBase);

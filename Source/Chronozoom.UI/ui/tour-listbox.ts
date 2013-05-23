@@ -86,10 +86,14 @@ module CZ {
                 {
                     parent.TakeTour(context);
                 });
-                this.container.find("#editTour").click(e =>
-                {
-                    parent.EditTour(context);
-                });
+
+                container.find(".cz-tourslist-editing").css("display", parent.EditTour ? "inline" : "none");
+                if (parent.EditTour) {
+                    this.container.find("#editTour").click(e =>
+                    {
+                        parent.EditTour(context);
+                    });
+                }
             }
         }
     }

@@ -59,6 +59,37 @@ var CZ;
             }, 
             
         ];
+        function InitializeToursUI(profile, forms) {
+            var allowEditing = IsFeatureEnabled("Authoring") && (profile && profile != "" && profile.DisplayName === CZ.Service.superCollectionName);
+            var onToursInitialized = function () {
+                CZ.Tours.initializeToursUI();
+                $("#tours_index").click(function () {
+                    var form = new CZ.UI.FormToursList(forms[9], {
+                        activationSource: $(this),
+                        navButton: ".cz-form-nav",
+                        closeButton: ".cz-form-close-btn > .cz-form-btn",
+                        titleTextblock: ".cz-form-title",
+                        tourTemplate: forms[10],
+                        tours: CZ.Tours.tours,
+                        takeTour: function (tour) {
+                            CZ.Tours.removeActiveTour();
+                            CZ.Tours.activateTour(tour, undefined);
+                        },
+                        editTour: allowEditing ? function (tour) {
+                            if(CZ.Authoring.showEditTourForm) {
+                                CZ.Authoring.showEditTourForm(tour);
+                            }
+                        } : null
+                    });
+                    form.show();
+                });
+            };
+            if(CZ.Tours.tours) {
+                onToursInitialized();
+            } else {
+                $("body").bind("toursInitialized", onToursInitialized);
+            }
+        }
         $(document).ready(function () {
             window.console = window.console || (function () {
                 var c = {
@@ -71,34 +102,11 @@ var CZ;
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
-                var onToursInitialized = function () {
-                    CZ.Tours.initializeToursUI();
-                    $("#tours_index").click(function () {
-                        var form = new CZ.UI.FormToursList(forms[9], {
-                            activationSource: $(this),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            tourTemplate: forms[10],
-                            tours: CZ.Tours.tours,
-                            takeTour: function (tour) {
-                                CZ.Tours.removeActiveTour();
-                                CZ.Tours.activateTour(tour, undefined);
-                            },
-                            editTour: function (tour) {
-                                if(CZ.Authoring.showEditTourForm) {
-                                    CZ.Authoring.showEditTourForm(tour);
-                                }
-                            }
-                        });
-                        form.show();
-                    });
-                };
-                if(CZ.Tours.tours) {
-                    onToursInitialized();
-                } else {
-                    $("body").bind("toursInitialized", onToursInitialized);
-                }
+                CZ.Service.getProfile().done(function (profile) {
+                    InitializeToursUI(profile, forms);
+                }).fail(function (err) {
+                    InitializeToursUI(null, forms);
+                });
                 $(".header-icon.edit-icon").click(function () {
                     $(".header-icon.active").removeClass("active");
                     $(this).addClass("active");

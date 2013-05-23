@@ -15,9 +15,9 @@ var CZ;
                 this.editTour = formInfo.editTour;
                 this.toursListBox = new CZ.UI.TourListBox(container.find("#tours"), formInfo.tourTemplate, formInfo.tours, function (tour) {
                     _this.onTakeTour(tour);
-                }, function (tour) {
+                }, this.editTour ? function (tour) {
                     _this.onEditTour(tour);
-                });
+                } : null);
                 this.initialize();
             }
             FormToursList.prototype.initialize = function () {
