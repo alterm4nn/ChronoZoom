@@ -1187,10 +1187,14 @@ namespace Chronozoom.UI
         /// </summary>
         public IEnumerable<SuperCollection> GetCollections()
         {
-            List<SuperCollection> superCollections = _storage.SuperCollections.ToList();
+            // Skip the sandbox collection since it's currently a test-only collection
+            List<SuperCollection> superCollections = _storage.SuperCollections.Where(candidate => candidate.Title != _sandboxSuperCollectionName).ToList();
 
             foreach (SuperCollection superCollection in superCollections)
             {
+                if (string.CompareOrdinal(superCollection.Title, _sandboxSuperCollectionName) == 0)
+                    continue;
+
                 _storage.Entry(superCollection).Collection(x => x.Collections).Load();
             }
 
