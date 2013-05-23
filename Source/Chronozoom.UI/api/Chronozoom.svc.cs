@@ -49,8 +49,26 @@ namespace Chronozoom.UI
         /// <summary>
         /// The path to download thumbanils from.
         /// </summary>
-        [DataMember]
+        [DataMember(Name = "thumbnailsPath")]
         public Uri ThumbnailsPath { get; set; }
+
+        /// <summary>
+        /// The URL to sign in with Microsoft account.
+        /// </summary>
+        [DataMember(Name = "signinUrlMicrosoft")]
+        public Uri SignInUrlMicrosoft { get; set; }
+
+        /// <summary>
+        /// The URL to sign in with Google account.
+        /// </summary>
+        [DataMember(Name = "signinUrlGoogle")]
+        public Uri SignInUrlGoogle { get; set; }
+
+        /// <summary>
+        /// The URL to sign in with Yahoo account.
+        /// </summary>
+        [DataMember(Name = "signinUrlYahoo")]
+        public Uri SignInUrlYahoo { get; set; }
     }
 
     public class PutExhibitResult
@@ -110,6 +128,33 @@ namespace Chronozoom.UI
                 return null;
 
             return new Uri(ConfigurationManager.AppSettings["ThumbnailsPath"]);
+        });
+
+        // The login URL to sign in with Microsoft account
+        private static Lazy<Uri> _signinUrlMicrosoft = new Lazy<Uri>(() =>
+        {
+            if (ConfigurationManager.AppSettings["SignInUrlMicrosoft"] == null)
+                return new Uri(@"https://login.live.com/login.srf?wa=wsignin1.0&wtrealm=https%3a%2f%2faccesscontrol.windows.net%2f&wreply=https%3a%2f%2fcz-nodelete-chronozoom-test.accesscontrol.windows.net%2fv2%2fwsfederation&wp=MBI_FED_SSL&wctx=cHI9d3NmZWRlcmF0aW9uJnJtPWh0dHAlM2ElMmYlMmZ0ZXN0LmNocm9ub3pvb21wcm9qZWN0Lm9yZyUyZiZjeD1ybSUzZDAlMjZpZCUzZHBhc3NpdmUlMjZydSUzZCUyNTJmYWNjb3VudCUyNTJmbG9naW41");
+
+            return new Uri(ConfigurationManager.AppSettings["SignInUrlMicrosoft"]);
+        });
+
+        // The login URL to sign in with Google account
+        private static Lazy<Uri> _signinUrlGoogle = new Lazy<Uri>(() =>
+        {
+            if (ConfigurationManager.AppSettings["SignInUrlGoogle"] == null)
+                return new Uri(@"https://www.google.com/accounts/o8/ud?openid.ns=http%3a%2f%2fspecs.openid.net%2fauth%2f2.0&openid.mode=checkid_setup&openid.claimed_id=http%3a%2f%2fspecs.openid.net%2fauth%2f2.0%2fidentifier_select&openid.identity=http%3a%2f%2fspecs.openid.net%2fauth%2f2.0%2fidentifier_select&openid.realm=https%3a%2f%2fcz-nodelete-chronozoom-test.accesscontrol.windows.net%3a443%2fv2%2fopenid&openid.return_to=https%3a%2f%2fcz-nodelete-chronozoom-test.accesscontrol.windows.net%3a443%2fv2%2fopenid%3fcontext%3dcHI9d3NmZWRlcmF0aW9uJnJtPWh0dHAlM2ElMmYlMmZ0ZXN0LmNocm9ub3pvb21wcm9qZWN0Lm9yZyUyZiZjeD1ybSUzZDAlMjZpZCUzZHBhc3NpdmUlMjZydSUzZCUyNTJmYWNjb3VudCUyNTJmbG9naW4mcHJvdmlkZXI9R29vZ2xl0&openid.ns.ax=http%3a%2f%2fopenid.net%2fsrv%2fax%2f1.0&openid.ax.mode=fetch_request&openid.ax.required=email%2cfullname%2cfirstname%2clastname&openid.ax.type.email=http%3a%2f%2faxschema.org%2fcontact%2femail&openid.ax.type.fullname=http%3a%2f%2faxschema.org%2fnamePerson&openid.ax.type.firstname=http%3a%2f%2faxschema.org%2fnamePerson%2ffirst&openid.ax.type.lastname=http%3a%2f%2faxschema.org%2fnamePerson%2flast");
+
+            return new Uri(ConfigurationManager.AppSettings["SignInUrlGoogle"]);
+        });
+
+        // The login URL to sign in with Yahoo account
+        private static Lazy<Uri> _signinUrlYahoo = new Lazy<Uri>(() =>
+        {
+            if (ConfigurationManager.AppSettings["SignInUrlYahoo"] == null)
+                return new Uri("https://open.login.yahooapis.com/openid/op/auth?openid.ns=http%3a%2f%2fspecs.openid.net%2fauth%2f2.0&openid.mode=checkid_setup&openid.claimed_id=http%3a%2f%2fspecs.openid.net%2fauth%2f2.0%2fidentifier_select&openid.identity=http%3a%2f%2fspecs.openid.net%2fauth%2f2.0%2fidentifier_select&openid.realm=https%3a%2f%2fcz-nodelete-chronozoom-test.accesscontrol.windows.net%3a443%2fv2%2fopenid&openid.return_to=https%3a%2f%2fcz-nodelete-chronozoom-test.accesscontrol.windows.net%3a443%2fv2%2fopenid%3fcontext%3dcHI9d3NmZWRlcmF0aW9uJnJtPWh0dHAlM2ElMmYlMmZ0ZXN0LmNocm9ub3pvb21wcm9qZWN0Lm9yZyUyZiZjeD1ybSUzZDAlMjZpZCUzZHBhc3NpdmUlMjZydSUzZCUyNTJmYWNjb3VudCUyNTJmbG9naW4mcHJvdmlkZXI9WWFob28h0&openid.ns.ax=http%3a%2f%2fopenid.net%2fsrv%2fax%2f1.0&openid.ax.mode=fetch_request&openid.ax.required=email%2cfullname%2cfirstname%2clastname&openid.ax.type.email=http%3a%2f%2faxschema.org%2fcontact%2femail&openid.ax.type.fullname=http%3a%2f%2faxschema.org%2fnamePerson&openid.ax.type.firstname=http%3a%2f%2faxschema.org%2fnamePerson%2ffirst&openid.ax.type.lastname=http%3a%2f%2faxschema.org%2fnamePerson%2flast");
+
+            return new Uri(ConfigurationManager.AppSettings["LoginUrlYahoo"]);
         });
 
         private static Lazy<ThumbnailGenerator> _thumbnailGenerator = new Lazy<ThumbnailGenerator>(() =>
@@ -326,6 +371,9 @@ namespace Chronozoom.UI
 
             ServiceInformation serviceInformation = new ServiceInformation();
             serviceInformation.ThumbnailsPath = _thumbnailsPath.Value;
+            serviceInformation.SignInUrlMicrosoft = _signinUrlMicrosoft.Value;
+            serviceInformation.SignInUrlGoogle = _signinUrlGoogle.Value;
+            serviceInformation.SignInUrlYahoo = _signinUrlYahoo.Value;
 
             return serviceInformation;
         }
@@ -458,16 +506,8 @@ namespace Chronozoom.UI
                 personalCollection.User = user;
 
                 superCollection.Collections.Add(personalCollection);
-
-                // Add root timeline Cosmos to the personal collection
-                Timeline rootTimeline = new Timeline { Id = Guid.NewGuid(), Title = "Cosmos" , Regime = "Cosmos" };
-                rootTimeline.FromYear = -13700000000;
-                rootTimeline.ToYear = 9999;
-                rootTimeline.Collection = personalCollection;
-
                 _storage.SuperCollections.Add(superCollection);
                 _storage.Collections.Add(personalCollection);
-                _storage.Timelines.Add(rootTimeline);
                 _storage.SaveChanges();
 
                 Trace.TraceInformation("Personal collection saved.");

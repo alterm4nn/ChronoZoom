@@ -149,5 +149,10 @@
         // progresive loading
         export var serverUrlHost = location.protocol + "//" + location.host;
         export var minTimelineWidth = 100; // px
+
+        // Login constants
+        export var signinUrlMicrosoft = "";
+        export var signinUrlGoogle = "";
+        export var signinUrlYahoo = "";
     }
 }

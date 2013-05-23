@@ -18,6 +18,7 @@ var CZ;
                 this.loginPanel = $(document.body).find(formInfo.loginPanel);
                 this.profilePanel = $(document.body).find(formInfo.profilePanel);
                 this.loginPanelLogin = $(document.body).find(formInfo.loginPanelLogin);
+                this.allowRedirect = formInfo.allowRedirect;
                 this.initialize();
             }
             FormEditProfile.prototype.validEmail = function (e) {
@@ -59,7 +60,11 @@ var CZ;
                         return;
                     }
                     CZ.Service.putProfile(_this.usernameInput.val(), _this.emailInput.val()).then(function (success) {
-                        window.location.assign("\\" + success);
+                        if(_this.allowRedirect) {
+                            window.location.assign("\\" + success);
+                        } else {
+                            _this.close();
+                        }
                     }, function (error) {
                         alert("Unable to save changes. Please try again later.");
                         console.log(error);
