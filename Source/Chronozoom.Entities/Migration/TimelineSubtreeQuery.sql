@@ -1,6 +1,6 @@
 CREATE PROCEDURE TimelineSubtreeQuery
-	@LCA UNIQUEIDENTIFIER = NULL,
 	@Collection_Id UNIQUEIDENTIFIER,
+	@LCA UNIQUEIDENTIFIER,
 	@min_span DECIMAL,
 	@startTime DECIMAL,
 	@endTime DECIMAL,

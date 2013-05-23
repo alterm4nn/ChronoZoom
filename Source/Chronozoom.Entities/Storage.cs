@@ -46,6 +46,7 @@ namespace Chronozoom.Entities
         {
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<Storage, StorageMigrationsConfiguration>());
             Configuration.ProxyCreationEnabled = false;
+            Trace.TraceInformation("providerName: " + System.Configuration.ConfigurationManager.ConnectionStrings[0].ProviderName);
         }
 
         public static TraceSource Trace { get; private set; }
@@ -160,8 +161,36 @@ namespace Chronozoom.Entities
             return new Collection<Timeline>(timelines);
         }
 
-        public Collection<Timeline> TimelineSubtreeQuery(Guid collectionId, Guid? leastCommonAncestor, decimal startTime, decimal endTime, decimal minSpan, int maxElements)
+        public IEnumerable<Timeline> TimelineSubtreeQuery(Guid collectionId, Guid? leastCommonAncestor, decimal startTime, decimal endTime, decimal minSpan, int maxElements)
         {
+            if (System.Configuration.ConfigurationManager.ConnectionStrings[0].ProviderName.Equals("System.Data.SqlClient")) {
+                SqlParameter paramCollectionId = new SqlParameter {
+                    ParameterName = "Collection_Id",
+                    Value = collectionId
+                };
+                SqlParameter paramLCA = new SqlParameter {
+                    ParameterName = "LCA",
+                    Value = leastCommonAncestor
+                };
+                SqlParameter paramMinSpan = new SqlParameter {
+                    ParameterName = "min_span",
+                    Value = minSpan
+                };
+                SqlParameter paramStartTime = new SqlParameter {
+                    ParameterName = "startTime",
+                    Value = startTime
+                };
+                SqlParameter paramEndTime = new SqlParameter {
+                    ParameterName = "endTime",
+                    Value = endTime
+                };
+                SqlParameter paramMaxElem = new SqlParameter {
+                    ParameterName = "max_elem",
+                    Value = maxElements
+                };
+                IEnumerable<Timeline> stored_proc_result = Database.SqlQuery<Timeline>("EXEC TimelineSubtreeQuery @Collection_Id, @LCA, @min_span, @startTime, @endTime, @max_elem", paramCollectionId, paramLCA, paramMinSpan, paramStartTime, paramEndTime, paramMaxElem);
+                return stored_proc_result;
+            }
             Collection<Timeline> result = new Collection<Timeline>();
             Queue<TimelineRaw> q = new Queue<TimelineRaw>();
             var init_timelines = leastCommonAncestor == null ? Database.SqlQuery<TimelineRaw>("SELECT * FROM [Timelines] WHERE [Depth] = 0 AND CollectionID = {0}", collectionId) : Database.SqlQuery<TimelineRaw>("SELECT * FROM [Timelines] WHERE [Id] = {0}", leastCommonAncestor);   // select the root element
@@ -200,7 +229,6 @@ namespace Chronozoom.Entities
                     }
                 }
             }
-            
             return result;
         }
 

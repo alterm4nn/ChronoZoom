@@ -217,7 +217,7 @@ namespace Chronozoom.UI
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "minspan")]
-        public Collection<Timeline> GetTimelineSubtree(Guid collectionId, string start, string end, string minspan, string commonAncestor, string maxElements)
+        public IEnumerable<Timeline> GetTimelineSubtree(Guid collectionId, string start, string end, string minspan, string commonAncestor, string maxElements)
         {
             return AuthenticatedOperation(delegate(User user)
             {
