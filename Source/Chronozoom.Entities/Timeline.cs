@@ -69,7 +69,7 @@ namespace Chronozoom.Entities
         /// <summary>
         /// ???
         /// </summary>
-        public decimal ForkNode { get; set; }
+        public Int64 ForkNode { get; set; }
 
         /// <summary>
         /// The height of the timeline.
@@ -81,17 +81,17 @@ namespace Chronozoom.Entities
         /// <summary>
         /// The number of timelines within subtree of this timeline
         /// </summary>
-        public Timeline FirstNodeInSubtree { get; set; }
+        public Guid FirstNodeInSubtree { get; set; }
         
         /// <summary>
         /// Reference to predecessor (when traversed in post-order) 
         /// </summary>
-        public Timeline Predecessor { get; set; }
+        public Guid Predecessor { get; set; }
         
         /// <summary>
         /// Reference to sucessor (when traversed in post-order) 
         /// </summary>
-        public Timeline Successor { get; set; }
+        public Guid Successor { get; set; }
 
         /// <summary>
         /// The collection of child timelines belonging to the timeline.

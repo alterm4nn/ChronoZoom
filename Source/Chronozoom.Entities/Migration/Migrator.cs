@@ -209,11 +209,11 @@ namespace Chronozoom.Entities.Migration
             {
                 Guid rootId = r.Id;
                 r.RootId = rootId;
-                Timeline t = r.FirstNodeInSubtree;
+                Timeline t = _storage.Timelines.Where(f => f.Id == r.FirstNodeInSubtree).FirstOrDefault();
                 while (t != r)
                 {
                     t.RootId = rootId;
-                    t = t.Successor;
+                    t = _storage.Timelines.Where(s => s.Id == t.Successor).FirstOrDefault();
                 }
             }
             _storage.SaveChanges();

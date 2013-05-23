@@ -32,7 +32,7 @@ namespace Chronozoom.Entities.Test
                     ++num_timeline_retrieved;
                     if (t.FirstNodeInSubtree != null)
                     {
-                        for (Timeline c = t.FirstNodeInSubtree; c != t; c = c.Successor){
+                        for (Timeline c = _storage.Timelines.Where(_c => _c.Id == t.FirstNodeInSubtree).FirstOrDefault(); c != t; c = _storage.Timelines.Where(_c => _c.Id == c.Successor).FirstOrDefault()){
                             ++num_timeline_retrieved;
                         }
                     }

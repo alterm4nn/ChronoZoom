@@ -71,9 +71,9 @@ namespace Chronozoom.Entities
         {
             foreach (Timeline t in Timelines)
             {
-                t.Successor = null;
-                t.Predecessor = null;
-                t.FirstNodeInSubtree = null;
+                t.Successor = Guid.Empty;
+                t.Predecessor = Guid.Empty;
+                t.FirstNodeInSubtree = Guid.Empty;
 
             }
             foreach (Timeline t in Timelines)
@@ -91,9 +91,9 @@ namespace Chronozoom.Entities
             if (timelines == null) throw new ArgumentNullException("timelines");
             foreach (Timeline t in timelines)
             {
-                t.Successor = null;
-                t.Predecessor = null;
-                t.FirstNodeInSubtree = null;
+                t.Successor = Guid.Empty;
+                t.Predecessor = Guid.Empty;
+                t.FirstNodeInSubtree = Guid.Empty;
 
             }
             foreach (Timeline t in timelines)
@@ -114,26 +114,26 @@ namespace Chronozoom.Entities
                 if (count > 0)
                 {
                     Timeline rs = PostOrderTraversal(root.ChildTimelines[0]);
-                    root.FirstNodeInSubtree = rs;
+                    root.FirstNodeInSubtree = rs.Id;
                     for (int i = 0; i < count - 1; ++i)
                     {
                         Timeline s = PostOrderTraversal(root.ChildTimelines[i + 1]);
-                        root.ChildTimelines[i].Successor = s;
-                        s.Predecessor = root.ChildTimelines[i];
+                        root.ChildTimelines[i].Successor = s.Id;
+                        s.Predecessor = root.ChildTimelines[i].Id;
                     }
-                    root.ChildTimelines[count - 1].Successor = root;
-                    root.Predecessor = root.ChildTimelines[count - 1];
+                    root.ChildTimelines[count - 1].Successor = root.Id;
+                    root.Predecessor = root.ChildTimelines[count - 1].Id;
                     return rs;
                 }
                 else
                 {
-                    root.FirstNodeInSubtree = root;
+                    root.FirstNodeInSubtree = root.Id;
                     return root;
                 }
             }
             else
             {
-                root.FirstNodeInSubtree = root;
+                root.FirstNodeInSubtree = root.Id;
                 return root;
             }
         }
