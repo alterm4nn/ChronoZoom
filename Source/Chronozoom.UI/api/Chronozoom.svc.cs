@@ -316,24 +316,13 @@ namespace Chronozoom.UI
                     return string.Empty;
                 }
 
-                Uri collectionUri;
-
-                if (user == null)
+                if (user == null || string.IsNullOrEmpty(user.NameIdentifier))
                 {
-                    // No ACS so treat as an anonymous user who can access the sandbox collection.
-                    // If anonymous user does not already exist create the user.
-                    user = _storage.Users.Where(candidate => candidate.NameIdentifier == null).FirstOrDefault();
-                    if (user == null)
-                    {
-                        user = new User { Id = Guid.NewGuid(), DisplayName = _defaultUserName };
-                        _storage.Users.Add(user);
-                        _storage.SaveChanges();
-                    }
-
-                    collectionUri = UpdatePersonalCollection(user.NameIdentifier, userRequest);
-                    return collectionUri.ToString();
+                    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                    return string.Empty; ;
                 }
 
+                Uri collectionUri;
                 User updateUser = _storage.Users.Where(candidate => candidate.DisplayName == userRequest.DisplayName).FirstOrDefault();
                 if (userRequest.Id == Guid.Empty && updateUser == null)
                 {
@@ -341,7 +330,7 @@ namespace Chronozoom.UI
                     User newUser = new User { Id = Guid.NewGuid(), DisplayName = userRequest.DisplayName, Email = userRequest.Email };
                     newUser.NameIdentifier = user.NameIdentifier;
                     newUser.IdentityProvider = user.IdentityProvider;
-                    collectionUri = UpdatePersonalCollection(user.NameIdentifier, newUser);
+                    collectionUri = EnsurePersonalCollection(newUser);
                 }
                 else
                 {
@@ -351,8 +340,14 @@ namespace Chronozoom.UI
                         return String.Empty;
                     }
 
+                    if (user == null || string.IsNullOrEmpty(user.NameIdentifier) || user.NameIdentifier != updateUser.NameIdentifier)
+                    {
+                        SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                        return string.Empty; ;
+                    }
+
                     updateUser.Email = userRequest.Email;
-                    collectionUri = UpdatePersonalCollection(user.NameIdentifier, updateUser);
+                    collectionUri = EnsurePersonalCollection(updateUser);
                     _storage.SaveChanges();
                 }
 
@@ -464,31 +459,8 @@ namespace Chronozoom.UI
                 _storage.SaveChanges();
             });
         }
-        private Uri UpdatePersonalCollection(string userId, User user)
+        private Uri EnsurePersonalCollection(User user)
         {
-            if (string.IsNullOrEmpty(userId))
-            {
-                // Anonymous user so use the sandbox superCollection and collection
-                SuperCollection sandboxSuperCollection = _storage.SuperCollections.Where(candidate => candidate.Title == _sandboxSuperCollectionName).FirstOrDefault();
-                if (sandboxSuperCollection == null)
-                {
-                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.SandboxSuperCollectionNotFound);
-                    return new Uri(string.Format(
-                        CultureInfo.InvariantCulture,
-                        @"{0}\{1}\",
-                        String.Empty,
-                        String.Empty), UriKind.Relative);
-                }
-                else
-                {
-                    return new Uri(string.Format(
-                        CultureInfo.InvariantCulture,
-                        @"{0}\{1}\",
-                        FriendlyUrl.FriendlyUrlEncode(sandboxSuperCollection.Title),
-                        _sandboxCollectionName), UriKind.Relative);
-                }
-            }
-
             SuperCollection superCollection = _storage.SuperCollections.Where(candidate => candidate.User.NameIdentifier == user.NameIdentifier).FirstOrDefault();
             if (superCollection == null)
             {
