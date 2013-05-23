@@ -5,7 +5,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
@@ -33,6 +33,7 @@ namespace Chronozoom.Entities
         /// <summary>
         /// The ID of the bookmark.
         /// </summary>
+        [Key]
         [DataMember(Name="id")]
         public Guid Id { get; set; }
 
@@ -62,6 +63,7 @@ namespace Chronozoom.Entities
         /// The ID of the reference that is associated with the bookmark.
         /// </summary>
         [DataMember(Name = "referenceId")]
+        [Obsolete("Duplicates ReferenceId")] 
         public Guid ReferenceId { get; set; }
 
         /// <summary>
@@ -75,5 +77,11 @@ namespace Chronozoom.Entities
         /// </summary>
         [DataMember(Name = "description")]
         public string Description { get; set; }
+
+        /// <summary>  
+        /// A sequence id to identify the ordering of bookmarks within a tour  
+        /// </summary>  
+        [DataMember(Name = "sequenceId")]  
+        public int SequenceId { get; set; }  
     }
 }
