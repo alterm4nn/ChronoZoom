@@ -22,7 +22,10 @@ var CZ;
                 this.initialize();
             }
             FormEditProfile.prototype.validEmail = function (e) {
-                var filter = /^[a-zA-Z0-9][a-zA-Z0-9-._]+[a-zA-Z0-9]@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/i;
+                if(String(e).length > 254) {
+                    return false;
+                }
+                var filter = /^(([\w^_]+((?:([-_\.\+][\w^_]+))|))|(xn--[\w^_]+))@(([\w^_]+((?:(-+[\w^_]+))|))|(xn--[\w^_]+))(?:\.(([\w^_]+((?:([\w-_\.\+][\w^_]+))|))|(xn--[\w^_]+)))$/i;
                 return String(e).search(filter) != -1;
             };
             FormEditProfile.prototype.validUsername = function (e) {

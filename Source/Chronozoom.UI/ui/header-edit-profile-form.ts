@@ -49,7 +49,10 @@ module CZ {
             }
 
             private validEmail(e) {
-                var filter = /^[a-zA-Z0-9][a-zA-Z0-9-._]+[a-zA-Z0-9]@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/i;
+                // Maximum length is 254: http://stackoverflow.com/questions/386294/what-is-the-maximum-length-of-a-valid-email-address
+                if (String(e).length > 254)
+                    return false;
+                var filter = /^(([\w^_]+((?:([-_\.\+][\w^_]+))|))|(xn--[\w^_]+))@(([\w^_]+((?:(-+[\w^_]+))|))|(xn--[\w^_]+))(?:\.(([\w^_]+((?:([\w-_\.\+][\w^_]+))|))|(xn--[\w^_]+)))$/i;
                 return String(e).search(filter) != -1;
             }
 
