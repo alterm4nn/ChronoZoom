@@ -362,7 +362,7 @@ var CZ;
                 if(!response) {
                     canvasIsEmpty = true;
                     if(CZ.Authoring.showCreateTimelineForm) {
-                        CZ.Authoring.showCreateTimelineForm(defaultRootTimelines);
+                        CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
                     }
                 }
             });
