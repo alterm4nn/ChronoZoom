@@ -106,6 +106,11 @@ module CZ {
             var len = 0;
             var selfIntersection = false;
 
+            // If creating root timeline, skip intersection validations
+            if (!tp) {
+                return true;
+            }
+
             // Test on inclusion in parent.
             if (!isIncluded(tp, tc) && tp.id !== "__root__") {
                 return false;
@@ -258,8 +263,8 @@ module CZ {
          * Creates new timeline and adds it to virtual canvas.
          * @return {Object} Created timeline.
          */
-        function createNewTimeline() {
-            CZ.VCContent.removeChild(_hovered, "newTimelineRectangle");
+        export function createNewTimeline() {
+
             return CZ.VCContent.addTimeline(
                 _hovered,
                 _hovered.layerid,
@@ -499,6 +504,11 @@ module CZ {
                     t.id = "t" + success;
                     t.guid = success;
                     t.titleObject.id = "t" + success + "__header__";
+
+                    if (!t.parent.guid) {
+                        // Root timeline, refresh page
+                        document.location.reload(true);
+                    }
                 },
                 function (error) {
                 }
