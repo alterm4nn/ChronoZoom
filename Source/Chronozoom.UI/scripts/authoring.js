@@ -62,6 +62,9 @@ var CZ;
             var i = 0;
             var len = 0;
             var selfIntersection = false;
+            if(!tp) {
+                return true;
+            }
             if(!isIncluded(tp, tc) && tp.id !== "__root__") {
                 return false;
             }
@@ -142,7 +145,6 @@ var CZ;
         }
         Authoring.renewExhibit = renewExhibit;
         function createNewTimeline() {
-            CZ.VCContent.removeChild(_hovered, "newTimelineRectangle");
             return CZ.VCContent.addTimeline(_hovered, _hovered.layerid, undefined, {
                 timeStart: _rectCur.x,
                 timeEnd: _rectCur.x + _rectCur.width,
@@ -156,6 +158,7 @@ var CZ;
                 strokeStyle: _hovered.settings.gradientFillStyle
             });
         }
+        Authoring.createNewTimeline = createNewTimeline;
         function createNewExhibit() {
             CZ.VCContent.removeChild(_hovered, "newExhibitCircle");
             return CZ.VCContent.addInfodot(_hovered, "layerInfodots", undefined, _circleCur.x + _circleCur.r, _circleCur.y + _circleCur.r, _circleCur.r, [], {
@@ -300,6 +303,9 @@ var CZ;
                 t.id = "t" + success;
                 t.guid = success;
                 t.titleObject.id = "t" + success + "__header__";
+                if(!t.parent.guid) {
+                    document.location.reload(true);
+                }
             }, function (error) {
             });
         }

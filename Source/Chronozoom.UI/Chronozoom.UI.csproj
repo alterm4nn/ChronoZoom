@@ -522,9 +522,6 @@
   <ItemGroup>
     <Content Include="default.ashx" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\External\sqlcecompact40\amd64\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest" />
-  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

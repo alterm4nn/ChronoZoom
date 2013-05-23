@@ -156,10 +156,13 @@ var CZ;
             }
         }
         function loadData() {
-            CZ.Data.getTimelines(null).then(function (response) {
+            return CZ.Data.getTimelines(null).then(function (response) {
+                if(!response) {
+                    return;
+                }
                 ProcessContent(response);
                 Common.vc.virtualCanvas("updateViewport");
-                if(CZ.Common.initialContent !== null) {
+                if(CZ.Common.initialContent) {
                     CZ.Service.getContentPath(CZ.Common.initialContent).then(function (response) {
                         window.location.hash = response;
                     }, function (error) {
