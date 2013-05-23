@@ -25,7 +25,7 @@ var CZ;
         var _featureMap = [
             {
                 Name: "Login",
-                Activation: FeatureActivation.NotRootCollection,
+                Activation: FeatureActivation.Enabled,
                 JQueryReference: "#login-panel"
             }, 
             {
@@ -55,6 +55,15 @@ var CZ;
             }, 
             
         ];
+        var defaultRootTimeline = {
+            title: "My Timeline",
+            x: 1950,
+            endDate: 9999,
+            children: [],
+            parent: {
+                guid: null
+            }
+        };
         $(document).ready(function () {
             window.console = window.console || (function () {
                 var c = {
@@ -64,6 +73,7 @@ var CZ;
                 return c;
             })();
             $('.bubbleInfo').hide();
+            var canvasIsEmpty;
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
@@ -82,6 +92,7 @@ var CZ;
                 });
                 CZ.Authoring.initialize(CZ.Common.vc, {
                     showCreateTimelineForm: function (timeline) {
+                        CZ.Authoring.mode = "createTimeline";
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
                             activationSource: $(".header-icon.edit-icon"),
                             navButton: ".cz-form-nav",
@@ -170,6 +181,9 @@ var CZ;
                         form.show(noAnimation);
                     }
                 });
+                if(canvasIsEmpty) {
+                    CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
+                }
                 var profileForm = new CZ.UI.FormEditProfile(forms[5], {
                     activationSource: $(".header-icon.profile-icon"),
                     navButton: ".cz-form-nav",
@@ -184,7 +198,8 @@ var CZ;
                     loginPanel: "#login-panel",
                     profilePanel: "#profile-panel",
                     loginPanelLogin: "#profile-panel span.auth-panel-login",
-                    context: ""
+                    context: "",
+                    allowRedirect: IsFeatureEnabled("Authoring")
                 });
                 $("#edit_profile_button").click(function () {
                     profileForm.show();
@@ -218,7 +233,10 @@ var CZ;
                 });
             });
             CZ.Service.getServiceInformation().then(function (response) {
-                CZ.Settings.contentItemThumbnailBaseUri = response.ThumbnailsPath;
+                CZ.Settings.contentItemThumbnailBaseUri = response.thumbnailsPath;
+                CZ.Settings.signinUrlMicrosoft = response.signinUrlMicrosoft;
+                CZ.Settings.signinUrlGoogle = response.signinUrlGoogle;
+                CZ.Settings.signinUrlYahoo = response.signinUrlYahoo;
             });
             var url = CZ.UrlNav.getURL();
             var rootCollection = url.superCollectionName === undefined;
@@ -340,7 +358,14 @@ var CZ;
             if(window.location.hash) {
                 CZ.Common.startHash = window.location.hash;
             }
-            CZ.Common.loadData();
+            CZ.Common.loadData().then(function (response) {
+                if(!response) {
+                    canvasIsEmpty = true;
+                    if(CZ.Authoring.showCreateTimelineForm) {
+                        CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
+                    }
+                }
+            });
             CZ.Search.initializeSearch();
             CZ.Bibliography.initializeBibliography();
             CZ.Tours.initializeToursUI();

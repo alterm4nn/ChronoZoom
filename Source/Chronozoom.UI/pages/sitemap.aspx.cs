@@ -42,7 +42,13 @@ namespace Chronozoom.UI
             if (superCollection == null || collection == null || string.IsNullOrEmpty(superCollection.Title) || string.IsNullOrEmpty(collection.Title))
                 return null;
 
-            return new Uri(_hostPath.Value + "/" + FriendlyUrl.FriendlyUrlEncode(superCollection.Title) + "/" + FriendlyUrl.FriendlyUrlEncode(collection.Title) + "/");
+            string path = _hostPath.Value + "/" + FriendlyUrl.FriendlyUrlEncode(superCollection.Title) + "/";
+            if (string.CompareOrdinal(superCollection.Title, collection.Title) != 0)
+            {
+                path += FriendlyUrl.FriendlyUrlEncode(collection.Title) + "/";
+            }
+
+            return new Uri(path);
         }
     }
 }
