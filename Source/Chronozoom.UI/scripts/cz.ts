@@ -15,6 +15,7 @@
 /// <reference path='../ui/header-edit-form.ts' />
 /// <reference path='../ui/header-edit-profile-form.ts'/>
 /// <reference path='../ui/header-login-form.ts'/>
+/// <reference path='../ui/tourslist-form.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
 
 module CZ {
@@ -30,7 +31,7 @@ module CZ {
             "#login-form": "/ui/header-login-form.html",
             "#auth-edit-tours-form": "/ui/auth-edit-tour-form.html", // 7
             "$('<div><!--Tours Authoring--></div>')": "/ui/tourstop-listbox.html", // 8
-            "#cz-tourlist-form": "/ui/tourslist-form.html"
+            "#toursList": "/ui/tourslist-form.html" // 9
         };
 
         enum FeatureActivation {
@@ -100,6 +101,17 @@ module CZ {
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
+                
+                CZ.Tours.initializeToursUI();
+                $("#tours_index").click(function () { // show form
+                    var form = new CZ.UI.FormToursList(forms[9], {
+                        activationSource: $(this),
+                        navButton: ".cz-form-nav",
+                        closeButton: ".cz-form-close-btn > .cz-form-btn",
+                        titleTextblock: ".cz-form-title"
+                    });
+                    form.show();
+                });
 
                 $(".header-icon.edit-icon").click(function () {
                     $(".header-icon.active").removeClass("active");
@@ -292,7 +304,10 @@ module CZ {
                 .mouseup(CZ.Search.onSearchClicked);
 
             $('#tours_index')
-                .mouseup(CZ.Tours.onTourClicked);
+                .mouseup(e =>
+                {
+                    CZ.Tours.onTourClicked();
+                });
 
             $('#human_rect')
                 .click(() => { CZ.Search.navigateToBookmark(CZ.Common.humanityVisible); });
@@ -462,7 +477,6 @@ module CZ {
 
             CZ.Search.initializeSearch();
             CZ.Bibliography.initializeBibliography();
-            CZ.Tours.initializeToursUI();
 
             var canvasGestures = CZ.Gestures.getGesturesStream(CZ.Common.vc); //gesture sequence of the virtual canvas
             var axisGestures = CZ.Gestures.applyAxisBehavior(CZ.Gestures.getGesturesStream(CZ.Common.ax)); //gesture sequence of axis (tranformed according to axis behavior logic)

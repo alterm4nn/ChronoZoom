@@ -1,5 +1,5 @@
 ﻿/// <reference path='typings/jqueryui/jqueryui.d.ts'/>
-
+/// <reference path='../ui/tourslist-form.ts' />
 /// <reference path='urlnav.ts'/>
 /// <reference path='common.ts'/>
 
@@ -631,7 +631,7 @@ module CZ {
         }
 
         export function initializeToursUI() {
-            $("#tours").hide();
+            $("#tours").hide();    
 
             // Bookmarks window
             hideBookmarks();
@@ -799,9 +799,6 @@ module CZ {
             if (CZ.Search.isSearchWindowVisible)
                 CZ.Search.onSearchClicked();
 
-
-            //var tourList = new Tours
-
             if (isTourWindowVisible) {
                 $(".tour-icon").removeClass("active");
                 $("#tours").hide('slide', {}, 'slow');
@@ -809,7 +806,7 @@ module CZ {
                 $(".tour-icon").addClass("active");
                 $("#tours").show('slide', {}, 'slow');
             }
-            isTourWindowVisible = !isTourWindowVisible;
+            isTourWindowVisible = !isTourWindowVisible;            
         }
 
         /*

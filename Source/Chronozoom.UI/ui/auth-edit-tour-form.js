@@ -50,7 +50,7 @@ var CZ;
         var FormEditTour = (function (_super) {
             __extends(FormEditTour, _super);
             function FormEditTour(container, formInfo) {
-                _super.call(this, container, formInfo);
+                        _super.call(this, container, formInfo);
                 this.saveButton = container.find(formInfo.saveButton);
                 this.deleteButton = container.find(formInfo.deleteButton);
                 this.addStopButton = container.find(formInfo.addStopButton);

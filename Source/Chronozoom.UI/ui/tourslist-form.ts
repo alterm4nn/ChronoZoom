@@ -4,6 +4,7 @@
 
 module CZ {
     export module UI {
+
         export interface IFormToursListInfo extends CZ.UI.IFormBaseInfo {
         }
 
@@ -12,7 +13,7 @@ module CZ {
             private isCancel: bool;
 
             // We only need to add additional initialization in constructor.
-            constructor(container: JQuery, formInfo: IFormEditTourInfo) {
+            constructor(container: JQuery, formInfo: IFormToursListInfo) {
                 super(container, formInfo);
 
                 this.initialize();
@@ -23,9 +24,13 @@ module CZ {
             }
 
             public show(): void {
+                var self = this;
+                $(window).resize(e => self.onWindowResize(e));
+                this.onWindowResize(null);
+
                 super.show({
                     effect: "slide",
-                    direction: "left",
+                    direction: "right",
                     duration: 500
                 });
 
@@ -33,9 +38,11 @@ module CZ {
             }
 
             public close() {
+                $(window).unbind("resize");
+
                 super.close({
                     effect: "slide",
-                    direction: "left",
+                    direction: "right",
                     duration: 500,
                     complete: () => {
                         //this.endDate.remove();
@@ -51,6 +58,13 @@ module CZ {
 
                 this.activationSource.removeClass("active");
                 this.container.find("cz-form-errormsg").hide();
+            }
+
+            private onWindowResize(e: JQueryEventObject)
+            {                
+                var height = $(window).height();
+                this.container.height(height - 70);
+                this.container.find("#tours").height(height - 200);
             }
         }
     }

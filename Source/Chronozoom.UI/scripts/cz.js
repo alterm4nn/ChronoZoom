@@ -10,7 +10,8 @@ var CZ;
             "#profile-form": "/ui/header-edit-profile-form.html",
             "#login-form": "/ui/header-login-form.html",
             "#auth-edit-tours-form": "/ui/auth-edit-tour-form.html",
-            "$('<div><!--Tours Authoring--></div>')": "/ui/tourstop-listbox.html"
+            "$('<div><!--Tours Authoring--></div>')": "/ui/tourstop-listbox.html",
+            "#toursList": "/ui/tourslist-form.html"
         };
         var FeatureActivation;
         (function (FeatureActivation) {
@@ -69,6 +70,16 @@ var CZ;
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
+                CZ.Tours.initializeToursUI();
+                $("#tours_index").click(function () {
+                    var form = new CZ.UI.FormToursList(forms[9], {
+                        activationSource: $(this),
+                        navButton: ".cz-form-nav",
+                        closeButton: ".cz-form-close-btn > .cz-form-btn",
+                        titleTextblock: ".cz-form-title"
+                    });
+                    form.show();
+                });
                 $(".header-icon.edit-icon").click(function () {
                     $(".header-icon.active").removeClass("active");
                     $(this).addClass("active");
@@ -244,7 +255,9 @@ var CZ;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             $('#search_button').mouseup(CZ.Search.onSearchClicked);
-            $('#tours_index').mouseup(CZ.Tours.onTourClicked);
+            $('#tours_index').mouseup(function (e) {
+                CZ.Tours.onTourClicked();
+            });
             $('#human_rect').click(function () {
                 CZ.Search.navigateToBookmark(CZ.Common.humanityVisible);
             });
@@ -401,7 +414,6 @@ var CZ;
             CZ.Common.loadData();
             CZ.Search.initializeSearch();
             CZ.Bibliography.initializeBibliography();
-            CZ.Tours.initializeToursUI();
             var canvasGestures = CZ.Gestures.getGesturesStream(CZ.Common.vc);
             var axisGestures = CZ.Gestures.applyAxisBehavior(CZ.Gestures.getGesturesStream(CZ.Common.ax));
             var jointGesturesStream = canvasGestures.Merge(axisGestures);

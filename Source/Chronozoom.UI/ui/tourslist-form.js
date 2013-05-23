@@ -15,17 +15,23 @@ var CZ;
             FormToursList.prototype.initialize = function () {
             };
             FormToursList.prototype.show = function () {
+                var self = this;
+                $(window).resize(function (e) {
+                    return self.onWindowResize(e);
+                });
+                this.onWindowResize(null);
                 _super.prototype.show.call(this, {
                     effect: "slide",
-                    direction: "left",
+                    direction: "right",
                     duration: 500
                 });
                 this.activationSource.addClass("active");
             };
             FormToursList.prototype.close = function () {
+                $(window).unbind("resize");
                 _super.prototype.close.call(this, {
                     effect: "slide",
-                    direction: "left",
+                    direction: "right",
                     duration: 500,
                     complete: function () {
                     }
@@ -33,6 +39,11 @@ var CZ;
                 CZ.Authoring.isActive = false;
                 this.activationSource.removeClass("active");
                 this.container.find("cz-form-errormsg").hide();
+            };
+            FormToursList.prototype.onWindowResize = function (e) {
+                var height = $(window).height();
+                this.container.height(height - 70);
+                this.container.find("#tours").height(height - 200);
             };
             return FormToursList;
         })(CZ.UI.FormBase);
