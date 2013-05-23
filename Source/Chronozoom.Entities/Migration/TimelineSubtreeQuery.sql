@@ -21,7 +21,6 @@ BEGIN
 		Id UNIQUEIDENTIFIER
 	)
 	DECLARE cur CURSOR FOR SELECT Id FROM @current_level
-
 	IF @LCA = CAST(CAST(0 AS BINARY) AS UNIQUEIDENTIFIER)
 		INSERT INTO @current_level SELECT Id FROM Timelines WHERE Depth = 0 AND Collection_ID =  @Collection_Id
 	ELSE
@@ -51,8 +50,9 @@ BEGIN
 		END
 		DELETE FROM @current_level
 		INSERT INTO @current_level SELECT Id FROM @next_level
-		DELETE FROM @next_level 
+		DELETE FROM @next_level
+		CLOSE cur 
 	END
-
+	DEALLOCATE cur
 	SELECT * FROM Timelines WHERE Id IN (SELECT Id FROM @results) 
 END
