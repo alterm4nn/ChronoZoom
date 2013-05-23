@@ -54,5 +54,5 @@ BEGIN
 		CLOSE cur 
 	END
 	DEALLOCATE cur
-	SELECT * FROM Timelines WHERE Id IN (SELECT Id FROM @results) 
+	SELECT * FROM Timelines WHERE Id IN (SELECT Id FROM @results) ORDER BY Depth 
 END
