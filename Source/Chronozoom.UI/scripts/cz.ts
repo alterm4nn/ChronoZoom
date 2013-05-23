@@ -31,7 +31,8 @@ module CZ {
             "#login-form": "/ui/header-login-form.html",
             "#auth-edit-tours-form": "/ui/auth-edit-tour-form.html", // 7
             "$('<div><!--Tours Authoring--></div>')": "/ui/tourstop-listbox.html", // 8
-            "#toursList": "/ui/tourslist-form.html" // 9
+            "#toursList": "/ui/tourslist-form.html", // 9
+            "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html", // 8
         };
 
         enum FeatureActivation {
@@ -101,17 +102,33 @@ module CZ {
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
-                
-                CZ.Tours.initializeToursUI();
-                $("#tours_index").click(function () { // show form
-                    var form = new CZ.UI.FormToursList(forms[9], {
-                        activationSource: $(this),
-                        navButton: ".cz-form-nav",
-                        closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        titleTextblock: ".cz-form-title"
+
+                var onToursInitialized = function () {
+                    CZ.Tours.initializeToursUI();
+                    $("#tours_index").click(function () { // show form
+                        var form = new CZ.UI.FormToursList(forms[9], {
+                            activationSource: $(this),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            tourTemplate: forms[10],
+                            tours: CZ.Tours.tours,
+                            takeTour: tour => {
+                                CZ.Tours.removeActiveTour();
+                                CZ.Tours.activateTour(tour, undefined);
+                            },
+                            editTour: tour => {
+                                if (CZ.Authoring.showEditTourForm)
+                                    CZ.Authoring.showEditTourForm(tour);
+                            }
+                        });
+                        form.show();
                     });
-                    form.show();
-                });
+                };
+                if (CZ.Tours.tours)
+                    onToursInitialized();
+                else
+                    $("body").bind("toursInitialized", onToursInitialized);
 
                 $(".header-icon.edit-icon").click(function () {
                     $(".header-icon.active").removeClass("active");
@@ -139,8 +156,8 @@ module CZ {
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             addStopButton: ".cz-form-tour-addstop",
-                            titleInput: ".cz-form-item-title",
-                            tourStopsListBox: ".cz-listbox",
+                            titleInput: ".cz-form-title",
+                            tourStopsListBox: "#stopsList",
                             tourStopsTemplate: forms[8],
                             context: tour
                         });
@@ -303,11 +320,12 @@ module CZ {
             $('#search_button')
                 .mouseup(CZ.Search.onSearchClicked);
 
-            $('#tours_index')
-                .mouseup(e =>
-                {
-                    CZ.Tours.onTourClicked();
-                });
+            // Commented by Dmitry Voytsekhovskiy: new tours window is now opened in a handler of UI map loading completion.
+            //$('#tours_index')
+            //    .mouseup(e =>
+            //    {
+            //        CZ.Tours.onTourClicked();
+            //    });
 
             $('#human_rect')
                 .click(() => { CZ.Search.navigateToBookmark(CZ.Common.humanityVisible); });

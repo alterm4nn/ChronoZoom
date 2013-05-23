@@ -1385,6 +1385,12 @@ img.fallbackBackground {
   height: 200px;
   overflow: auto;
 }
+.cz-listbox-nocontainer {
+  margin: 15px 0;
+  list-style-type: none;
+  height: 200px;
+  overflow: auto;
+}
 .cz-listbox-placeholder {
   margin: 5px 10px;
   padding: 10px;
@@ -1452,6 +1458,17 @@ img.fallbackBackground {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+}
+.cz-contentitem-listitem-button {
+  margin: 0;
+  color: #3bb6f3;
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  cursor: pointer;
+  width: auto;
+  display: inline;
 }
 /***********************************************************
 

@@ -11,7 +11,8 @@ var CZ;
             "#login-form": "/ui/header-login-form.html",
             "#auth-edit-tours-form": "/ui/auth-edit-tour-form.html",
             "$('<div><!--Tours Authoring--></div>')": "/ui/tourstop-listbox.html",
-            "#toursList": "/ui/tourslist-form.html"
+            "#toursList": "/ui/tourslist-form.html",
+            "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html"
         };
         var FeatureActivation;
         (function (FeatureActivation) {
@@ -70,16 +71,34 @@ var CZ;
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
-                CZ.Tours.initializeToursUI();
-                $("#tours_index").click(function () {
-                    var form = new CZ.UI.FormToursList(forms[9], {
-                        activationSource: $(this),
-                        navButton: ".cz-form-nav",
-                        closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        titleTextblock: ".cz-form-title"
+                var onToursInitialized = function () {
+                    CZ.Tours.initializeToursUI();
+                    $("#tours_index").click(function () {
+                        var form = new CZ.UI.FormToursList(forms[9], {
+                            activationSource: $(this),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            tourTemplate: forms[10],
+                            tours: CZ.Tours.tours,
+                            takeTour: function (tour) {
+                                CZ.Tours.removeActiveTour();
+                                CZ.Tours.activateTour(tour, undefined);
+                            },
+                            editTour: function (tour) {
+                                if(CZ.Authoring.showEditTourForm) {
+                                    CZ.Authoring.showEditTourForm(tour);
+                                }
+                            }
+                        });
+                        form.show();
                     });
-                    form.show();
-                });
+                };
+                if(CZ.Tours.tours) {
+                    onToursInitialized();
+                } else {
+                    $("body").bind("toursInitialized", onToursInitialized);
+                }
                 $(".header-icon.edit-icon").click(function () {
                     $(".header-icon.active").removeClass("active");
                     $(this).addClass("active");
@@ -104,8 +123,8 @@ var CZ;
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             addStopButton: ".cz-form-tour-addstop",
-                            titleInput: ".cz-form-item-title",
-                            tourStopsListBox: ".cz-listbox",
+                            titleInput: ".cz-form-title",
+                            tourStopsListBox: "#stopsList",
                             tourStopsTemplate: forms[8],
                             context: tour
                         });
@@ -255,9 +274,6 @@ var CZ;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             $('#search_button').mouseup(CZ.Search.onSearchClicked);
-            $('#tours_index').mouseup(function (e) {
-                CZ.Tours.onTourClicked();
-            });
             $('#human_rect').click(function () {
                 CZ.Search.navigateToBookmark(CZ.Common.humanityVisible);
             });

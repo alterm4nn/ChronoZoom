@@ -20,18 +20,21 @@ module CZ {
             private title: string;
             private type: string;
 
-            constructor(target: any) {
+            constructor(target: any, title?: string) {
                 if (target == undefined || target == null)
                     throw "target element of a tour stop is null or undefined";
                 if (typeof target.type == "undefined")
                     throw "type of the tour stop target element is undefined";
                 this.targetElement = target;
-                if (target.type === "contentItem") {
+                if (target.type === "Unknown") {
+                    this.type = target.type;
+                    this.title = title;
+                } else if (target.type === "contentItem") {
                     this.type = "Content Item";
-                    this.title = target.contentItem.title;
+                    this.title = title ? title : target.contentItem.title;
                 } else {
                     this.type = target.type === "timeline" ? "Timeline" : "Event";
-                    this.title = target.title;
+                    this.title = title ? title : target.title;
                 }
             }
 
@@ -55,7 +58,7 @@ module CZ {
             private addStopButton: JQuery;
             private titleInput: JQuery;
             private stops: TourStop[];
-            private tour: Object;
+            private tour: any;
 
             public tourStopsListBox: TourStopListBox;
 
@@ -70,13 +73,26 @@ module CZ {
                 this.addStopButton = container.find(formInfo.addStopButton);
                 this.titleInput = container.find(formInfo.titleInput);
 
-                this.stops = [];
-                this.tourStopsListBox = new CZ.UI.TourStopListBox(container.find(formInfo.tourStopsListBox), formInfo.tourStopsTemplate, this.stops);
-
                 this.saveButton.off();
                 this.deleteButton.off();
 
                 this.tour = formInfo.context;
+                this.stops = [];
+                if (this.tour) {
+                    this.container.find(".cz-form-tour-title").val(this.tour.title);
+                    for (var i = 0, len = this.tour.bookmarks.length; i < len; i++) {
+                        var bookmark = this.tour.bookmarks[i];
+                        var target = CZ.Tours.bookmarkUrlToElement(bookmark.url);
+                        if (target == null) {
+                            target = {
+                                type: "Unknown"
+                            };
+                        }
+                        var stop = new TourStop(target, (!bookmark.caption || $.trim(bookmark.caption) === "") ? this.tour.title : bookmark.caption);
+                        this.stops.push(stop);
+                    }
+                }
+                this.tourStopsListBox = new CZ.UI.TourStopListBox(container.find(formInfo.tourStopsListBox), formInfo.tourStopsTemplate, this.stops);
 
                 this.initialize();
             }
@@ -140,6 +156,7 @@ module CZ {
 
                 this.activationSource.removeClass("active");
                 this.container.find("cz-form-errormsg").hide();
+                this.tourStopsListBox.container.empty();
             }
 
             private onTargetElementSelected(targetElement: any) {

@@ -55,6 +55,17 @@ module CZ {
             animationId: number;
         }
 
+        export function hasActiveTour(): bool {
+            return tour != undefined;
+        }
+
+        export function bookmarkUrlToElement(bookmarkUrl: string): any
+        {
+            var element = CZ.UrlNav.navStringTovcElement(bookmarkUrl, CZ.Common.vc.virtualCanvas("getLayerContent"));
+            if (!element) return null;
+            return element;
+        }
+
         export class Tour {
             public tour_BookmarkStarted = [];
             public tour_BookmarkFinished = [];
@@ -493,6 +504,8 @@ module CZ {
         @param    isAudioEnabled (Boolean) Whether to play audio during the tour or not
         */
         export function activateTour(newTour, isAudioEnabled) {
+            if (isAudioEnabled == undefined) isAudioEnabled = isNarrationOn;
+
             if (newTour != undefined) {
                 var tourControlDiv = document.getElementById("tour_control");
                 tourControlDiv.style.display = "block";
@@ -525,9 +538,9 @@ module CZ {
         }
 
         /*
-        Diactivates a tour. Removes all tour controlls.
+        Deactivates a tour. Removes all tour controls.
         */
-        function removeActiveTour() {
+        export function removeActiveTour() {
             // stop active tour
             if (tour) {
                 tourPause();
@@ -918,6 +931,7 @@ module CZ {
                 // tour is correct and can be played
                 tours.push(new Tour(tourString.name, tourBookmarks, bookmarkTransition, CZ.Common.vc, tourString.category, tourString.audio, tourString.sequence));
             }
+            $("body").trigger("toursInitialized");
         }
 
         /*

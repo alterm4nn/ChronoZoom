@@ -32,6 +32,18 @@ var CZ;
             return CZ.UrlNav.navStringToVisible(bookmark.url, CZ.Common.vc);
         }
         Tours.getBookmarkVisible = getBookmarkVisible;
+        function hasActiveTour() {
+            return Tours.tour != undefined;
+        }
+        Tours.hasActiveTour = hasActiveTour;
+        function bookmarkUrlToElement(bookmarkUrl) {
+            var element = CZ.UrlNav.navStringTovcElement(bookmarkUrl, CZ.Common.vc.virtualCanvas("getLayerContent"));
+            if(!element) {
+                return null;
+            }
+            return element;
+        }
+        Tours.bookmarkUrlToElement = bookmarkUrlToElement;
         var Tour = (function () {
             function Tour(title, bookmarks, zoomTo, vc, category, audio, sequenceNum) {
                 this.title = title;
@@ -363,6 +375,9 @@ var CZ;
         })();
         Tours.Tour = Tour;        
         function activateTour(newTour, isAudioEnabled) {
+            if(isAudioEnabled == undefined) {
+                isAudioEnabled = Tours.isNarrationOn;
+            }
             if(newTour != undefined) {
                 var tourControlDiv = document.getElementById("tour_control");
                 tourControlDiv.style.display = "block";
@@ -401,6 +416,7 @@ var CZ;
             }
             Tours.tour = undefined;
         }
+        Tours.removeActiveTour = removeActiveTour;
         function tourPrev() {
             if(Tours.tour != undefined) {
                 Tours.tour.prev();
@@ -672,6 +688,7 @@ var CZ;
                 }
                 Tours.tours.push(new Tour(tourString.name, tourBookmarks, bookmarkTransition, CZ.Common.vc, tourString.category, tourString.audio, tourString.sequence));
             }
+            $("body").trigger("toursInitialized");
         }
         Tours.parseTours = parseTours;
         function bookmarkTransition(visible, onCompleted, onInterrupted, bookmark) {

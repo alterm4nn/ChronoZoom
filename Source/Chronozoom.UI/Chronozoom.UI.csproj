@@ -426,6 +426,11 @@
       <DependentUpon>cz.less</DependentUpon>
     </Content>
     <Content Include="css\Site.css" />
+    <Content Include="ui\tour-listbox.html" />
+    <TypeScriptCompile Include="ui\tour-listbox.ts" />
+    <Content Include="ui\tour-listbox.js">
+      <DependentUpon>tour-listbox.ts</DependentUpon>
+    </Content>
     <Content Include="ui\tourslist-form.html" />
     <Content Include="ui\tourslist-form.js">
       <DependentUpon>tourslist-form.ts</DependentUpon>

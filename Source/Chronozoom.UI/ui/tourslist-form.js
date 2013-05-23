@@ -9,7 +9,15 @@ var CZ;
         var FormToursList = (function (_super) {
             __extends(FormToursList, _super);
             function FormToursList(container, formInfo) {
+                var _this = this;
                         _super.call(this, container, formInfo);
+                this.takeTour = formInfo.takeTour;
+                this.editTour = formInfo.editTour;
+                this.toursListBox = new CZ.UI.TourListBox(container.find("#tours"), formInfo.tourTemplate, formInfo.tours, function (tour) {
+                    _this.onTakeTour(tour);
+                }, function (tour) {
+                    _this.onEditTour(tour);
+                });
                 this.initialize();
             }
             FormToursList.prototype.initialize = function () {
@@ -39,6 +47,15 @@ var CZ;
                 CZ.Authoring.isActive = false;
                 this.activationSource.removeClass("active");
                 this.container.find("cz-form-errormsg").hide();
+                this.container.find("#tours").empty();
+            };
+            FormToursList.prototype.onTakeTour = function (tour) {
+                this.close();
+                this.takeTour(tour);
+            };
+            FormToursList.prototype.onEditTour = function (tour) {
+                this.close();
+                this.editTour(tour);
             };
             FormToursList.prototype.onWindowResize = function (e) {
                 var height = $(window).height();
