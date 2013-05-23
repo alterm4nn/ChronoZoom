@@ -152,20 +152,21 @@ namespace Application.Helper.Helpers
 
         private string GetValidAcountsXmlPath()
         {
-            var lavidFilePath = string.Empty;
+            var validFilePath = string.Empty;
 
             const string accountsPathVsRun = @".\..\..\Constants\Accounts.xml";
-            const string accountsPathConsoleRun = @"..\..\..\Application.Helper\Constants\Accounts.xml";
+            const string accountsPathConsoleRun = @".\..\..\..\..\Application.Helper\Constants\Accounts.xml";
 
             if (File.Exists(accountsPathVsRun))
-                lavidFilePath = accountsPathVsRun;
+                validFilePath = accountsPathVsRun;
             if (File.Exists(accountsPathConsoleRun))
-                lavidFilePath = accountsPathConsoleRun;
-            if (string.IsNullOrEmpty(lavidFilePath))
+                validFilePath = accountsPathConsoleRun;
+            if (string.IsNullOrEmpty(validFilePath))
             {
                 throw new Exception("Cannot find Accounts.xml file");
             }
-            return lavidFilePath;
+
+            return validFilePath;
         }
     }
 }

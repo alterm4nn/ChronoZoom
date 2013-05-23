@@ -104,6 +104,11 @@ namespace Application.Driver.UserActions
             return WebDriver.Manage().Cookies.AllCookies;
         }
 
+        protected void DeleteCookieByName(string cookieName)
+        {
+            WebDriver.Manage().Cookies.DeleteCookieNamed(cookieName);
+        }
+
         protected int GetItemsCount(By by)
         {
             try
