@@ -84,7 +84,9 @@
     <Compile Include="UserActions\DependentActions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Constants\Accounts.xml" />
+    <Resource Include="Constants\Accounts.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Application.Driver\Application.Driver.csproj">

@@ -12,7 +12,8 @@ namespace Tests
         [ClassInitialize]
         public static void ClassInitialize(TestContext testContext)
         {
-
+            HomePageHelper.OpenPage();
+            WelcomeScreenHelper.CloseWelcomePopup();
         }
 
         [TestInitialize]
