@@ -47,11 +47,6 @@ namespace Chronozoom.Entities
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<Storage, StorageMigrationsConfiguration>());
             Configuration.ProxyCreationEnabled = false;
             Trace.TraceInformation("providerName: " + System.Configuration.ConfigurationManager.ConnectionStrings[0].ProviderName);
-            IEnumerable<Timeline> result = TimelineSubtreeQuery(new Guid("2b6cd8e0-5833-ceaf-117e-cf74db7fed1f"), new Guid("00000000-0000-0000-0000-000000000000"), -1123828290, -1423828290, 300000000, 2000);
-            foreach (Timeline t in result)
-            {
-               Trace.TraceInformation("" + t.Id);
-            }
         }
 
         public static TraceSource Trace { get; private set; }
