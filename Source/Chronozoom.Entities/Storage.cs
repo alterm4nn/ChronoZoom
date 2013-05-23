@@ -201,38 +201,54 @@ namespace Chronozoom.Entities
             }
             else
             {
+                bool return_entire_subtree = false;
                 result = new Collection<TimelineRaw>();
-                Queue<TimelineRaw> q = new Queue<TimelineRaw>();
-                var init_timelines = leastCommonAncestor == null ? Database.SqlQuery<TimelineRaw>("SELECT * FROM [Timelines] WHERE [Depth] = 0 AND CollectionID = {0}", collectionId) : Database.SqlQuery<TimelineRaw>("SELECT * FROM [Timelines] WHERE [Id] = {0}", leastCommonAncestor);   // select the root element
-                foreach (TimelineRaw t in init_timelines)   //under normal circumstances this result should only contain a single timeline
+                if (leastCommonAncestor != null)
                 {
-                    q.Enqueue(t);
-                }
-                while (q.Count > 0 && maxElements > 0)
-                {
-                    bool childGreaterThanMinspan = false;
-                    TimelineRaw t = q.Dequeue();
-                    var childTimelines = Database.SqlQuery<TimelineRaw>("SELECT * FROM [Timelines] WHERE [Timeline_ID] = {0}", t.Id);
-                    foreach (TimelineRaw c in childTimelines)
+                    Timeline root = Timelines.Where(r => r.Id == leastCommonAncestor).FirstOrDefault();
+                    if (root != null && root.SubtreeSize <= maxElements)
                     {
-                        if (c.ToYear - c.FromYear > minSpan)
+                        for (TimelineRaw c = (TimelineRaw)Timelines.Where(_c => _c.Id == root.FirstNodeInSubtree).FirstOrDefault(); c != root; c = Timelines.Where(_c => _c.Id == c.Successor).FirstOrDefault())
                         {
-                            childGreaterThanMinspan = true;
-                            break;
+                            ((Collection<TimelineRaw>)result).Add(c);
                         }
+                        return_entire_subtree = true;
                     }
-                    if (childGreaterThanMinspan)
+                }
+                if (!return_entire_subtree)
+                {
+                    Queue<TimelineRaw> q = new Queue<TimelineRaw>();
+                    var init_timelines = leastCommonAncestor == null ? Database.SqlQuery<TimelineRaw>("SELECT * FROM [Timelines] WHERE [Depth] = 0 AND CollectionID = {0}", collectionId) : Database.SqlQuery<TimelineRaw>("SELECT * FROM [Timelines] WHERE [Id] = {0}", leastCommonAncestor);   // select the root element
+                    foreach (TimelineRaw t in init_timelines)   //under normal circumstances this result should only contain a single timeline
                     {
-                        ((Collection<TimelineRaw>)result).Add(t);
-                        --maxElements;
-                        if (maxElements >= t.ChildTimelines.Count())
+                        q.Enqueue(t);
+                    }
+                    while (q.Count > 0 && maxElements > 0)
+                    {
+                        bool childGreaterThanMinspan = false;
+                        TimelineRaw t = q.Dequeue();
+                        var childTimelines = Database.SqlQuery<TimelineRaw>("SELECT * FROM [Timelines] WHERE [Timeline_ID] = {0}", t.Id);
+                        foreach (TimelineRaw c in childTimelines)
                         {
-                            foreach (TimelineRaw c in childTimelines)
+                            if (c.ToYear - c.FromYear > minSpan)
                             {
-                                --maxElements;
-                                if ((c.FromYear >= startTime && c.FromYear <= endTime) || (c.ToYear >= startTime && c.ToYear <= endTime) || (c.FromYear <= startTime && c.ToYear >= endTime) || (c.FromYear >= startTime && c.ToYear <= endTime))
-                                {   //if c overlaps with current viewport, then c may be further expanded
-                                    q.Enqueue(c);
+                                childGreaterThanMinspan = true;
+                                break;
+                            }
+                        }
+                        if (childGreaterThanMinspan)
+                        {
+                            ((Collection<TimelineRaw>)result).Add(t);
+                            --maxElements;
+                            if (maxElements >= t.ChildTimelines.Count())
+                            {
+                                foreach (TimelineRaw c in childTimelines)
+                                {
+                                    --maxElements;
+                                    if ((c.FromYear >= startTime && c.FromYear <= endTime) || (c.ToYear >= startTime && c.ToYear <= endTime) || (c.FromYear <= startTime && c.ToYear >= endTime) || (c.FromYear >= startTime && c.ToYear <= endTime))
+                                    {   //if c overlaps with current viewport, then c may be further expanded
+                                        q.Enqueue(c);
+                                    }
                                 }
                             }
                         }
