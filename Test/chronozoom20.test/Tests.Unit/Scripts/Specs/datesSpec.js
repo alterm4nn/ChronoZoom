@@ -67,19 +67,19 @@ describe("convertCoordinateToYear method should return", function () {
     });
 
     using("coordinate =", [-1999, -999999], function (value) {
-        it("regime KA ", function () {
+        it("regime Ka ", function () {
             var coordinate = value;
             var result = convertCoordinateToYear(coordinate);
             expect(result.year).toEqual(coordinate / -1000);
-            expect(result.regime).toEqual('KA');
+            expect(result.regime).toEqual('Ka');
         });
     });
     using("coordinate =", [-999999999, -1999999], function (value) {
-        it("regime MA ", function () {
+        it("regime Ma ", function () {
             var coordinate = value;
             var result = convertCoordinateToYear(coordinate);
             expect(result.year).toEqual(coordinate / -1000000);
-            expect(result.regime).toEqual('MA');
+            expect(result.regime).toEqual('Ma');
         });
     });
 
@@ -88,7 +88,7 @@ describe("convertCoordinateToYear method should return", function () {
             var coordinate = value;
             var result = convertCoordinateToYear(coordinate);
             expect(result.year).toEqual(coordinate / -1000000000);
-            expect(result.regime).toEqual('GA');
+            expect(result.regime).toEqual('Ga');
         });
     });
 });
