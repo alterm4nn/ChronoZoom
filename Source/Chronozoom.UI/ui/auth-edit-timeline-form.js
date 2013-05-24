@@ -97,7 +97,7 @@ var CZ;
                 this.container.find("#error-edit-timeline").hide();
             };
             return FormEditTimeline;
-        })(CZ.UI.FormBase);
+        })(CZ.UI.FormUpdateEntity);
         UI.FormEditTimeline = FormEditTimeline;        
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;

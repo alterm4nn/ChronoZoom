@@ -5,8 +5,7 @@
 module CZ {
     export module UI {
 
-        export interface FormEditProfileInfo extends CZ.UI.IFormBaseInfo {
-            saveButton: string;
+        export interface FormEditProfileInfo extends CZ.UI.IFormUpdateEntityInfo {
             logoutButton: string;
             usernameInput: string;
             emailInput: string;
@@ -18,7 +17,7 @@ module CZ {
             allowRedirect: bool;
         }
 
-        export class FormEditProfile extends CZ.UI.FormBase {
+        export class FormEditProfile extends CZ.UI.FormUpdateEntity {
             private saveButton: JQuery;
             private logoutButton: JQuery;
             private titleInput: JQuery;

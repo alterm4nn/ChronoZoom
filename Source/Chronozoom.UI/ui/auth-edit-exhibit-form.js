@@ -204,7 +204,7 @@ var CZ;
                 CZ.Authoring.isActive = false;
             };
             return FormEditExhibit;
-        })(UI.FormBase);
+        })(UI.FormUpdateEntity);
         UI.FormEditExhibit = FormEditExhibit;        
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
