@@ -154,7 +154,7 @@ namespace Application.Helper.Helpers
         {
             var validFilePath = string.Empty;
 
-            const string accountsPathVsRun = @".\..\..\Constants\Accounts.xml";
+            const string accountsPathVsRun = @".\..\..\..\Application.Helper\Constants\Accounts.xml";
             const string accountsPathConsoleRun = @".\..\..\..\..\Application.Helper\Constants\Accounts.xml";
 
             if (File.Exists(accountsPathVsRun))
