@@ -180,6 +180,8 @@ A registered user.
 - [DeleteExhibit](#deleteexhibit)
 - [PutContentItem](#putcontentitem)
 - [DeleteContentItem](#deletecontentitem)
+- [GetContentPath](#getcontentpath)
+- [GetCollections](#getcollections)
 
 ### GetTimelines ###
  
@@ -193,7 +195,7 @@ Timeline data in JSON format.
     HTTP verb: GET
             
     URL:
-    http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/timelines
+    http://[site URL]/api/[superCollectionName]/[collectionName]/timelines
             
     Request body (JSON):
     {
@@ -217,6 +219,7 @@ Timeline data in JSON format.
 |minspan|Filters the search results to a particular time scale.|
 |commonAncestor|Least Common Ancestor, a timeline identifier used to hint the server to retrieve timelines close to this location.|
 |maxElements|The maximum number of elements to return.|
+|depth|The max depth for children timelines.|
  
  
 [top](#chronozoom-rest-api-reference)
@@ -235,7 +238,7 @@ Search results in JSON format.
     HTTP verb: GET
             
     URL:
-    http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/search
+    http://[site URL]/api/[superCollectionName]/[collectionName]/search
             
     Request body (JSON):
     {
@@ -269,7 +272,7 @@ A list of tours in JSON format.
     HTTP verb: GET
             
     URL: 
-    http://[site URL]/chronozoom.svc/tours
+    http://[site URL]/api/tours
     
 
  
@@ -293,7 +296,7 @@ A list of tours in JSON format.
     HTTP verb: GET
             
     URL: 
-    http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/tours
+    http://[site URL]/api/[superCollectionName]/[collectionName]/tours
     
 
  
@@ -321,7 +324,7 @@ The URL for the new user collection.
     HTTP verb: PUT
             
     URL:
-    http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/user
+    http://[site URL]/api/[superCollectionName]/[collectionName]/user
     
     Request body (JSON):
     {
@@ -339,14 +342,15 @@ The URL for the new user collection.
 |userRequest|JSON containing the request details.|
  
 **Remarks**
-If no user ID is passed then a new user is created:
-    - A new superCollection with the user's display name is added.
-    - A new default collection with the user's display name is added to this superCollection.
-    - A new user with the specified attributes is created.
+If the user ID is omitted then a new user is created.
     If there is no ACS the user is treated as anonymous and granted access to the sandbox collection.
-    If the anonymous user does not exist in the database then one is created.
-    If the specified user display name does not exist an error results.
-    If the specified user display name exists then that user's attributes are updated.
+    If the anonymous user does not exist in the database then it is created.
+    A new superCollection with the user's display name is added.
+    A new default collection with the user's display name is added to this superCollection.
+    A new user with the specified attributes is created.
+            
+    If the specified user display name does not exist it is considered an error.
+    If the user display name is specified and it exists then the user's attributes are updated.
 
  
  
@@ -481,7 +485,7 @@ HTTP status code.
     HTTP verb: PUT
             
     URL:
-    http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/timeline
+    http://[site URL]/api/[superCollectionName]/[collectionName]/timeline
             
     Request body (JSON):
     {
@@ -520,7 +524,7 @@ Deletes the timeline with the specified ID.
     HTTP verb: DELETE
             
     URL:
-    http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/timeline
+    http://[site URL]/api/[superCollectionName]/[collectionName]/timeline
             
     Request body (JSON):
     {
@@ -554,7 +558,7 @@ An exhibit in JSON format.
     **HTTP verb:** PUT
             
     **URL:**
-        http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/exhibit
+        http://[site URL]/api/[superCollectionName]/[collectionName]/exhibit
             
     **Request body:**
         {
@@ -594,7 +598,7 @@ Deletes the specified exhibit from the specified collection.
     **HTTP verb:** DELETE
             
     **URL:**
-        http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/exhibit
+        http://[site URL]/api/[superCollectionName]/[collectionName]/exhibit
             
     **Request body:**
         {
@@ -628,7 +632,7 @@ Creates or updates the content item in a given collection. If the collection doe
     **HTTP verb:** PUT
             
     **URL:**
-        http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/contentitem
+        http://[site URL]/api/[superCollectionName]/[collectionName]/contentitem
             
     **Request body:**
         {
@@ -659,7 +663,7 @@ Delete the specified content item from the specified collection.
     **HTTP verb:** DELETE
             
     **URL:**
-        http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/contentitem
+        http://[site URL]/api/[superCollectionName]/[collectionName]/contentitem
             
     **Request body:**
         {
@@ -675,6 +679,52 @@ Delete the specified content item from the specified collection.
 |superCollectionName|The name of the parent collection.|
 |collectionName|The name of the collection to modify.|
 |contentItemRequest|The request in JSON format.|
+ 
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+### GetContentPath ###
+ 
+Retrieves a path to the given content id.
+            
+            For t48fbb8a8-7c5d-49c3-83e1-98939ae2ae6, this API retrieves /t00000000-0000-0000-0000-000000000000/t48fbb8a8-7c5d-49c3-83e1-98939ae2ae67
+ 
+**Returns**
+The full path to the content
+ 
+**Parameters**
+None.
+ 
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+### GetCollections ###
+ 
+Retrieve the list of all collections.
+ 
+**Example**
+ 
+    **HTTP verb:** GET
+            
+    **URL:**
+        http://[site URL]/api/collections
+                 /// **Request body:**
+        {
+             name: "Super Collection",
+             collection: [
+                { name: "Collection 1" },
+                { name: "Collection 2" },
+             ]
+        }
+    
+
+ 
+**Parameters**
+None.
  
  
 [top](#chronozoom-rest-api-reference)
