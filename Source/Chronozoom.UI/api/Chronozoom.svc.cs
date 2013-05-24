@@ -1099,8 +1099,8 @@ namespace Chronozoom.UI
                 }
                 else
                 {
-                    Guid updateContentItemGuid = UpdateContentItem(collectionGuid, contentItemRequest);
-                    returnValue = updateContentItemGuid;
+                    contentItemRequest.Id = UpdateContentItem(collectionGuid, contentItemRequest);
+                    returnValue = contentItemRequest.Id;
                 }
                 
                 _storage.SaveChanges();
