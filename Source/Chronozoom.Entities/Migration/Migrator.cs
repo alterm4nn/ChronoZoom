@@ -15,6 +15,7 @@ using System.Text;
 using System.IO;
 using System.Security.Cryptography;
 using System.Data;
+using System.Diagnostics;
 
 using Chronozoom.Entities;
 
@@ -51,7 +52,17 @@ namespace Chronozoom.Entities.Migration
             LoadDataFromDump("Beta Content", "beta-get.json", "beta-gettours.json", false, _baseContentAdmin.Value);
             LoadDataFromDump("Sandbox", "beta-get.json", "beta-gettours.json", true, null);
             LoadDataFromDump("AIDS Timeline", "aidstimeline-get.json", "aidstimeline-gettours.json", false, _baseContentAdmin.Value);
-        }
+            /*
+             // see whether non-empty result is returned
+            IEnumerable<TimelineRaw> result = _storage.TimelineSubtreeQuery(new Guid("2b6cd8e0-5833-ceaf-117e-cf74db7fed1f"), new Guid("00000000-0000-0000-0000-000000000000"), new decimal(-14042500050.334726), new decimal(-1123828290.16082), new decimal(0), 200);
+            TraceSource Trace = new TraceSource("Storage", SourceLevels.All);
+            Trace.TraceInformation("" + result.Count());
+            foreach (TimelineRaw t in result)
+            {
+                Trace.TraceInformation("" + t.Id);
+            }
+            */
+       }
 
         private void MigrateRiTree()
         {

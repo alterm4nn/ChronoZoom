@@ -114,6 +114,25 @@ namespace Chronozoom.Entities
     [NotMapped]
     public class TimelineRaw : Timeline
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "t")]
+        public TimelineRaw() { }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "t")]
+        public TimelineRaw(Timeline t)
+        {
+            Id = t.Id;
+            RootId = t.RootId;
+            Depth = t.Depth;
+            SubtreeSize = t.SubtreeSize;
+            Title = t.Title;
+            Regime = t.Regime;
+            FromYear = t.FromYear;
+            ToYear = t.ToYear;
+            ForkNode = t.ForkNode;
+            Height = t.Height;
+            FirstNodeInSubtree = t.FirstNodeInSubtree;
+            Predecessor = t.Predecessor;
+            Successor = t.Successor;
+        }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "Needs to match storage column name")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "ID", Justification = "Needs to match storage column name")]
         [DataMember(Name = "ParentTimelineId", EmitDefaultValue = false)]

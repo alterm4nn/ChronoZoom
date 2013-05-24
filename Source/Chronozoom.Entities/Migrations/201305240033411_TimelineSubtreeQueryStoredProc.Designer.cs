@@ -5,13 +5,13 @@ namespace Chronozoom.Entities
     using System.Data.Entity.Migrations.Infrastructure;
     using System.Resources;
     
-    public sealed partial class RemoveBetaFields : IMigrationMetadata
+    public sealed partial class TimelineSubtreeQueryStoredProc : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(RemoveBetaFields));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(TimelineSubtreeQueryStoredProc));
         
         string IMigrationMetadata.Id
         {
-            get { return "201305102053361_RemoveBetaFields"; }
+            get { return "201305240033411_TimelineSubtreeQueryStoredProc"; }
         }
         
         string IMigrationMetadata.Source

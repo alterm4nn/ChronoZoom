@@ -161,43 +161,14 @@ namespace Chronozoom.Entities
             return new Collection<Timeline>(timelines);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         public IEnumerable<TimelineRaw> TimelineSubtreeQuery(Guid collectionId, Guid? leastCommonAncestor, decimal startTime, decimal endTime, decimal minSpan, int maxElements)
         {
             IEnumerable<TimelineRaw> result;
             Dictionary<Guid?, TimelineRaw> map = new Dictionary<Guid?, TimelineRaw>();
             if (System.Configuration.ConfigurationManager.ConnectionStrings[0].ProviderName.Equals("System.Data.SqlClient"))
             {
-                SqlParameter paramCollectionId = new SqlParameter
-                {
-                    ParameterName = "Collection_Id",
-                    Value = collectionId
-                };
-                SqlParameter paramLCA = new SqlParameter
-                {
-                    ParameterName = "LCA",
-                    Value = leastCommonAncestor
-                };
-                SqlParameter paramMinSpan = new SqlParameter
-                {
-                    ParameterName = "min_span",
-                    Value = minSpan
-                };
-                SqlParameter paramStartTime = new SqlParameter
-                {
-                    ParameterName = "startTime",
-                    Value = startTime
-                };
-                SqlParameter paramEndTime = new SqlParameter
-                {
-                    ParameterName = "endTime",
-                    Value = endTime
-                };
-                SqlParameter paramMaxElem = new SqlParameter
-                {
-                    ParameterName = "max_elem",
-                    Value = maxElements
-                };
-                result = Database.SqlQuery<TimelineRaw>("EXEC TimelineSubtreeQuery @Collection_Id, @LCA, @min_span, @startTime, @endTime, @max_elem", paramCollectionId, paramLCA, paramMinSpan, paramStartTime, paramEndTime, paramMaxElem);
+                result = Database.SqlQuery<TimelineRaw>("EXEC TimelineSubtreeQuery {0}, {1}, {2}, {3}, {4}, {5}", collectionId, leastCommonAncestor, minSpan, startTime, endTime, maxElements);
             }
             else
             {
@@ -208,9 +179,9 @@ namespace Chronozoom.Entities
                     Timeline root = Timelines.Where(r => r.Id == leastCommonAncestor).FirstOrDefault();
                     if (root != null && root.SubtreeSize <= maxElements)
                     {
-                        for (TimelineRaw c = (TimelineRaw)Timelines.Where(_c => _c.Id == root.FirstNodeInSubtree).FirstOrDefault(); c != root; c = Timelines.Where(_c => _c.Id == c.Successor).FirstOrDefault())
+                        for (Timeline c = Timelines.Where(_c => _c.Id == root.FirstNodeInSubtree).FirstOrDefault(); c != root; c = Timelines.Where(_c => _c.Id == c.Successor).FirstOrDefault())
                         {
-                            ((Collection<TimelineRaw>)result).Add(c);
+                            ((Collection<TimelineRaw>)result).Add(new TimelineRaw(c));
                         }
                         return_entire_subtree = true;
                     }
@@ -258,8 +229,15 @@ namespace Chronozoom.Entities
             foreach (TimelineRaw t in result)   // note: results are ordered by depth in ascending order
             {
                 map.Add(t.Id, t);
-                if (map.ContainsKey(t.Timeline_ID))
+            }
+            foreach (TimelineRaw t in result)   // note: results are ordered by depth in ascending order
+            {
+                if (t.Timeline_ID != null && map.ContainsKey(t.Timeline_ID))
                 {
+                    if (map[t.Timeline_ID].ChildTimelines == null)
+                    {
+                        map[t.Timeline_ID].ChildTimelines = new Collection<Timeline>();
+                    }
                     map[t.Timeline_ID].ChildTimelines.Add(t);
                 }
             }

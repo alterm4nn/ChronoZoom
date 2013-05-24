@@ -25,8 +25,6 @@ BEGIN
 	DECLARE cur CURSOR FOR SELECT Id FROM @current_level
 	SET @return_entire_subtree = 0
 	SET @subtree_size = 0
-
-	
 	IF @LCA = CAST(CAST(0 AS BINARY) AS UNIQUEIDENTIFIER)
 		INSERT INTO @current_level SELECT Id FROM Timelines WHERE Depth = 0 AND Collection_ID =  @Collection_Id
 	ELSE
