@@ -60,6 +60,8 @@ namespace Chronozoom.Entities
 
         public DbSet<Tour> Tours { get; set; }
 
+        public DbSet<Bookmark> Bookmarks { get; set; } 
+
         public DbSet<User> Users { get; set; }
 
         public DbSet<Entities.Collection> Collections { get; set; }
@@ -404,5 +406,14 @@ namespace Chronozoom.Entities
             return parentTimelinesRaw.FirstOrDefault();
         }
 
+        // Returns the tour associated with a given bookmark id.
+        public Tour GetBookmarkTour(Bookmark bookmark)
+        {
+            if (bookmark == null)
+                return null;
+
+            var bookmarkTour = Database.SqlQuery<Tour>("SELECT * FROM Tours WHERE Id in (SELECT Tour_Id FROM Bookmarks WHERE Id = {0})", bookmark.Id);
+            return bookmarkTour.FirstOrDefault();
+        }
     }
 }
