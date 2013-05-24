@@ -88,10 +88,9 @@ namespace Tests
         [TestMethod]
         public void new_exhibit_should_have_a_correct_url()
         {
-            //Bug https://github.com/alterm4nn/ChronoZoom/issues/147
             for (int i = 0; i < Exhibit.ContentItems.Count; i++)
             {
-                Assert.AreEqual(Exhibit.ContentItems[i].Uri, _newExhibit.ContentItems[i].Uri,
+                Assert.AreEqual(ExhibitHelper.GetExpectedYouTubeUri(Exhibit.ContentItems[i].Uri), _newExhibit.ContentItems[i].Uri,
                                 "Content items Urls are not equal");
             }
         }
