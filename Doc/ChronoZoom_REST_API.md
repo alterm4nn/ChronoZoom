@@ -2,16 +2,19 @@
 
 The ChronoZoom Representational State Transfer (REST) API makes it possible to programmatically access content within a given ChronoZoom deployment. All request data is in JavaScript Object Notation (JSON) format. This document describes how to make REST requests against ChronoZoom.
 
-## Request Syntax ##
-ChronoZoom REST requests use standard HTTP verbs (GET, PUT, DELETE). Request URLs point to **chronozoom.svc** for the deployment, followed by the supercollection and collection names, and finally the resource type:
+## Using the REST API ##
+ChronoZoom REST requests use standard HTTP verbs (GET, PUT, DELETE). The request URL syntax is as follows:
 
-    http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/[resource]
+    http://{URL}/api/{supercollection}/{collection}/{resource}
 
-The request body is in JSON format:
+Use JSON for the request body:
     
     {
-        id: "0123456789"
+        id: "0123456789",
+        title: "Aboriginal Folklore"
     }
+
+
 
 ## Contents ##
 - [ChronoZoom Entities](#chronozoom-entities)
@@ -172,6 +175,7 @@ A registered user.
 - [PutUser](#putuser)
 - [GetServiceInformation](#getserviceinformation)
 - [DeleteUser](#deleteuser)
+- [GetUser](#getuser)
 - [PutCollectionName](#putcollectionname)
 - [DeleteCollection](#deletecollection)
 - [PutTimeline](#puttimeline)
@@ -195,16 +199,7 @@ Timeline data in JSON format.
     HTTP verb: GET
             
     URL:
-    http://[site URL]/api/[superCollectionName]/[collectionName]/timelines
-            
-    Request body (JSON):
-    {
-       start: 1800
-       end: 1920
-       minspan: 
-       lca: 
-       maxElements: 25
-    }
+    http://{URL}/api/{supercollection}/{collection}/timelines?start={year}&end={year}
     
 
  
@@ -238,12 +233,7 @@ Search results in JSON format.
     HTTP verb: GET
             
     URL:
-    http://[site URL]/api/[superCollectionName]/[collectionName]/search
-            
-    Request body (JSON):
-    {
-       searchTerm: "Pluto"
-    }
+    http://{URL}/api/search?searchTerm={term}&supercollection={supercollection}&collection={collection}
     
 
  
@@ -251,9 +241,13 @@ Search results in JSON format.
  
 |Parameter|Value|
 |:--------|:----|
-|superCollection|Name of the superCollection to query.|
+|superCollection|Name of the supercollection to query.|
 |collection|Name of the collection to query.|
 |searchTerm|The term to search for.|
+ 
+**Remarks**
+Note: The syntax for search is different from other requests. The values for supercollection and collection are specified as request parameters rather than as part of the URL.
+
  
  
 [top](#chronozoom-rest-api-reference)
@@ -272,7 +266,7 @@ A list of tours in JSON format.
     HTTP verb: GET
             
     URL: 
-    http://[site URL]/api/tours
+    http://{URL}/api/tours
     
 
  
@@ -296,7 +290,7 @@ A list of tours in JSON format.
     HTTP verb: GET
             
     URL: 
-    http://[site URL]/api/[superCollectionName]/[collectionName]/tours
+    http://{URL}/api//{supercollection}/{collection}/tours
     
 
  
@@ -324,7 +318,7 @@ The URL for the new user collection.
     HTTP verb: PUT
             
     URL:
-    http://[site URL]/api/[superCollectionName]/[collectionName]/user
+    http://{URL}/api//{supercollection}/{collection}/user
     
     Request body (JSON):
     {
@@ -360,7 +354,7 @@ If the user ID is omitted then a new user is created.
  
 ### GetServiceInformation ###
  
-Provides information about the ChronoZoom service to the clients. Used internally by the ChronoZoom client.
+Internal. Provides information about the ChronoZoom service to clients.
  
 **Returns**
 A ServiceInformation object describing parameter from the running service
@@ -383,12 +377,13 @@ HTTP response code.
 **Example**
  
             HTTP verb: DELETE
+            
             URL:
-            http://{site URL}/chronozoom.svc/{supercollection}/{collection}/user
+            http://{URL}/api//{supercollection}/{collection}/user
             
             Request body (JSON):
             {
-       id: "0123456789"
+       displayName: "Neil"
             }
             
 
@@ -398,6 +393,30 @@ HTTP response code.
 |Parameter|Value|
 |:--------|:----|
 |userRequest|JSON containing the request details.|
+ 
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+### GetUser ###
+ 
+Returns the current user.
+ 
+**Returns**
+JSON containing data for the current user.
+ 
+**Example**
+
+            HTTP verb: GET
+            
+            URL:
+            http://{URL}/api/user
+            
+
+ 
+**Parameters**
+None.
  
  
 [top](#chronozoom-rest-api-reference)
@@ -416,11 +435,12 @@ Creates a new collection using the specified name.
     HTTP verb: PUT
             
     URL:
-    http://{site URL}/chronozoom.svc/{superCollectionName}/{collectionName}
+    http://{URL}/api/{supercollection}/{collection}
             
     Request body (JSON):
     {
-         name: "My Collection"
+         id: "{id}",
+         title: "{title}"
     }
     
 
@@ -429,9 +449,9 @@ Creates a new collection using the specified name.
  
 |Parameter|Value|
 |:--------|:----|
-|superCollectionName|The name of the parent superCollection for the collection.|
+|superCollectionName|The name of the parent supercollection.|
 |collectionName|The name of the collection to create.|
-|collectionRequest|The markup for the collection to create in JSON format.|
+|collectionRequest|The markup for the collection to create in JSON format. For more information, see [Collection](#collection).|
  
 **Remarks**
 If a collection of the specified name does not exist then a new collection is created. 
@@ -457,7 +477,7 @@ HTTP response code.
     HTTP verb: DELETE
             
     URL:
-    http://{site URL}/chronozoom.svc/{superCollectionName}/{collectionName}
+    http://{URL}/api/{supercollection}/{collection}
     
 
  
@@ -485,7 +505,7 @@ HTTP status code.
     HTTP verb: PUT
             
     URL:
-    http://[site URL]/api/[superCollectionName]/[collectionName]/timeline
+    http://{URL}/api//{supercollection}/{collection}/timeline
             
     Request body (JSON):
     {
@@ -501,7 +521,7 @@ HTTP status code.
 |:--------|:----|
 |superCollectionName|The parent collection.|
 |collectionName|The name of the collection to update.|
-|timelineRequest|Timeline data in JSON format.|
+|timelineRequest|Timeline request data in JSON format.|
  
 **Remarks**
 If an ID is specified but the collection does not exist, the request will fail ("not found" status).
@@ -524,11 +544,11 @@ Deletes the timeline with the specified ID.
     HTTP verb: DELETE
             
     URL:
-    http://[site URL]/api/[superCollectionName]/[collectionName]/timeline
+    http://{URL}/api//{supercollection}/{collection}/timeline
             
     Request body (JSON):
     {
-         timelineRequest: Need request body format.
+         id: "0123456789"
     }
     
 
@@ -551,19 +571,23 @@ Deletes the timeline with the specified ID.
 Creates or updates the exhibit and its content items in a given collection. If the collection does not exist, then the command will silently fail.
  
 **Returns**
-An exhibit in JSON format.
+[Exhibit](#exhibit) markup in JSON format.
  
 **Example**
  
-    **HTTP verb:** PUT
+    HTTP verb: PUT
             
-    **URL:**
-        http://[site URL]/api/[superCollectionName]/[collectionName]/exhibit
+    URL:
+    http://{URL}/api//{supercollection}/{collection}/exhibit
             
-    **Request body:**
-        {
-             
-        }
+    Request body (JSON):
+    {
+         id: "0123456789",
+         title: "Mars Exploration",
+         threshold: "[threshold]",
+         regime: "[regime]",
+         contentItems: "[contentItems]" 
+    }
     
 
  
@@ -595,15 +619,15 @@ Deletes the specified exhibit from the specified collection.
  
 **Example**
  
-    **HTTP verb:** DELETE
+    HTTP verb: DELETE
             
-    **URL:**
-        http://[site URL]/api/[superCollectionName]/[collectionName]/exhibit
+    URL:
+    http://{URL}/api//{supercollection}/{collection}/exhibit
             
-    **Request body:**
-        {
-             id: "0123456789"
-        }
+    Request body:
+    {
+         id: "0123456789"
+    }
     
 
  
@@ -613,7 +637,7 @@ Deletes the specified exhibit from the specified collection.
 |:--------|:----|
 |superCollectionName|The name of the parent collection.|
 |collectionName|The name of the collection to modify.|
-|exhibitRequest|The exhibit ID in JSON format.|
+|exhibitRequest|The exhibit request in JSON format.|
  
  
 [top](#chronozoom-rest-api-reference)
@@ -629,15 +653,17 @@ Creates or updates the content item in a given collection. If the collection doe
  
 **Example**
  
-    **HTTP verb:** PUT
+    HTTP verb: PUT
             
-    **URL:**
-        http://[site URL]/api/[superCollectionName]/[collectionName]/contentitem
+    URL:
+    http://{URL}/api//{supercollection}/{collection}/contentitem
             
-    **Request body:**
-        {
-             
-        }
+    Request body:
+    {
+        id: "0123456789",
+        title: "The Outer Planets",
+        uri: "http://www.example.com/images/planets.png"
+    }
     
 
  
@@ -647,7 +673,7 @@ Creates or updates the content item in a given collection. If the collection doe
 |:--------|:----|
 |superCollectionName|The name of the parent collection.|
 |collectionName|The name of the collection to modify.|
-|contentItemRequest|The content item data in JSON format.|
+|contentItemRequest|The [ContentItem](#contentitem) data in JSON format.|
  
  
 [top](#chronozoom-rest-api-reference)
@@ -660,15 +686,15 @@ Delete the specified content item from the specified collection.
  
 **Example**
  
-    **HTTP verb:** DELETE
+    HTTP verb: DELETE
             
-    **URL:**
-        http://[site URL]/api/[superCollectionName]/[collectionName]/contentitem
+    URL:
+    http://{URL}/api/{supercollection}/{collection}/contentitem
             
-    **Request body:**
-        {
-             id: "0123456789"
-        }
+    Request body:
+    {
+         id: "0123456789"
+    }
     
 
  
@@ -692,7 +718,16 @@ Retrieves a path to the given content id.
             For t48fbb8a8-7c5d-49c3-83e1-98939ae2ae6, this API retrieves /t00000000-0000-0000-0000-000000000000/t48fbb8a8-7c5d-49c3-83e1-98939ae2ae67
  
 **Returns**
-The full path to the content
+The full path to the content.
+ 
+**Example**
+
+            HTTP verb: GET
+            
+            URL:
+            http://{URL}/api/{supercollection}/{collection}/{reference}/contentpath
+            
+
  
 **Parameters**
 None.
@@ -708,18 +743,10 @@ Retrieve the list of all collections.
  
 **Example**
  
-    **HTTP verb:** GET
+    HTTP verb: GET
             
-    **URL:**
-        http://[site URL]/api/collections
-                 /// **Request body:**
-        {
-             name: "Super Collection",
-             collection: [
-                { name: "Collection 1" },
-                { name: "Collection 2" },
-             ]
-        }
+    URL:
+    http://{URL}/api/collections
     
 
  
