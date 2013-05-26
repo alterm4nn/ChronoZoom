@@ -21,6 +21,7 @@ namespace Tests
         public static AuthorizationHelper AuthorizationHelper { get; set; }
         public static HomePageHelper HomePageHelper { get; set; }
         public static SearchHelper SearchHelper { get; set; }
+        public static BreadcrumbsHelper BreadcrumbsHelper { get; set; }
 
         [AssemblyInitialize]
         public static void AssemblyInit(TestContext testContext)
@@ -38,6 +39,7 @@ namespace Tests
             ExhibitHelper = HelperManager.GetExhibitHelper();
             SearchHelper = HelperManager.GetSearchHelper();
             AuthorizationHelper = HelperManager.GetAuthorizationHelper();
+            BreadcrumbsHelper = HelperManager.GetBreadcrumbsHelper();
         }
 
         

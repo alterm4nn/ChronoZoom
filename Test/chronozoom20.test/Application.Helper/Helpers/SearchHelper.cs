@@ -53,7 +53,6 @@ namespace Application.Helper.Helpers
         private void WaitSearchProcess()
         {
             Logger.Log("<-");
-            WaitForElementIsDisplayed(By.Id("loadingImage"));
             WaitForElementIsNotDisplayed(By.Id("loadingImage"));
             Logger.Log("->");
         }

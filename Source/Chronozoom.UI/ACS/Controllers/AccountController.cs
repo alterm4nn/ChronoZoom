@@ -41,9 +41,10 @@ namespace Chronozoom.Api.Controllers
 
         public ActionResult Login()
         {
-            return Redirect("/sandbox/sandbox/");
+            return Redirect("/");
         }
 
+        [ValidateInput(false)]
         public ActionResult Success(FormCollection forms)
         {
             if (Request.IsAuthenticated)

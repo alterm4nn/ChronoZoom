@@ -54,13 +54,13 @@ var CZ;
             };
             if(coordinate < -999999999) {
                 year.year /= -1000000000;
-                year.regime = 'GA';
+                year.regime = 'Ga';
             } else if(coordinate < -999999) {
                 year.year /= -1000000;
-                year.regime = 'MA';
+                year.regime = 'Ma';
             } else if(coordinate < -999) {
                 year.year /= -1000;
-                year.regime = 'KA';
+                year.regime = 'Ka';
             } else if(coordinate < 0) {
                 year.year /= -1;
                 year.year = Math.floor(year.year);

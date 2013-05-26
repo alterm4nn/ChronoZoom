@@ -10,16 +10,18 @@ namespace Application.Helper.Helpers
 {
     public class AuthorizationHelper : DependentActions
     {
+
+        public void OpenLoginPage()
+        {
+            Logger.Log("<-");
+            Click(By.Id("login-button"));
+            Logger.Log("->");
+        }
+
         public void AuthenticateAsGoogleUser()
         {
             Logger.Log("<-");
-
-            if (!IsElementExists(By.XPath("//*[@name='Google']")))
-            {
-                Click(By.XPath("//*[@id='MoreOptions']/a"));
-            }
             Click(By.XPath("//*[@name='Google']"));
-
             var user = new User { Type = UserType.Google };
             FillUserCredentials(user);
             Logger.Log(user.ToString());
@@ -31,13 +33,7 @@ namespace Application.Helper.Helpers
         public void AuthenticateAsYahooUser()
         {
             Logger.Log("<-");
-
-            if (!IsElementExists(By.XPath("//*[@name='Yahoo!']")))
-            {
-                Click(By.XPath("//*[@id='MoreOptions']/a"));
-            }
             Click(By.XPath("//*[@name='Yahoo!']"));
-
             var user = new User { Type = UserType.Yahoo };
             FillUserCredentials(user);
             Logger.Log(user.ToString());
@@ -48,13 +44,7 @@ namespace Application.Helper.Helpers
         public void AuthenticateAsMicrosoftUser()
         {
             Logger.Log("<-");
-
-            if (!IsElementExists(By.XPath("//*[@name='Windows Live™ ID']")))
-            {
-                Click(By.XPath("//*[@id='MoreOptions']/a"));
-            }
             Click(By.XPath("//*[@name='Windows Live™ ID']"));
-
             var user = new User { Type = UserType.Microsoft };
             FillUserCredentials(user);
             Logger.Log(user.ToString());
@@ -66,25 +56,23 @@ namespace Application.Helper.Helpers
         public void Logout()
         {
             Logger.Log("<-");
-            if (FindElement(By.XPath("//*[@id='LoginPanel']/a")).Text == "Logout")
+            if (!IsElementDisplayed(By.Id("profile-form")))
             {
-                Click(By.XPath("//*[@id='LoginPanel']/a"));
+                Click(By.Id("edit_profile_button"));
             }
+            Click(By.Id("cz-form-logout"));
             Logger.Log("->");
         }
 
         public bool IsUserAuthenticated()
         {
             Logger.Log("<-");
-
-            var isLogoutPresent = FindElement(By.XPath("//*[@id='LoginPanel']/a")).Text == "Logout";
+            if (!IsElementDisplayed(By.Id("profile-form")))
+            {
+                Click(By.Id("edit_profile_button"));
+            }
+            var isLogoutPresent = IsElementDisplayed(By.Id("cz-form-logout"));
             Logger.Log("isLogoutPresent: " + isLogoutPresent);
-
-            //WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("CZ.Common.cosmosVisible != undefined")), 60);
-            //OpenUrl(GetParentUriString(new Uri(Configuration.BaseUrl)) + "account/isauth");
-            //WaitForElementIsExisted(By.TagName("body"));
-            //var isApiAuth = bool.Parse(GetText(By.TagName("body")));
-            //Logger.Log("isApiAuth: " + isApiAuth);
 
             var isCookieExist = IsUserCookieExist();
             Logger.Log("isCookieExist: " + isCookieExist);
@@ -115,7 +103,7 @@ namespace Application.Helper.Helpers
         {
             var document = new XmlDocument();
             document.Load(GetValidAcountsXmlPath());
-            
+
             switch (user.Type)
             {
                 case UserType.Google:
@@ -123,8 +111,8 @@ namespace Application.Helper.Helpers
                     user.Password = document.SelectSingleNode("//Accounts/google/password").InnerText;
                     break;
                 case UserType.Microsoft:
-                    user.Login = document.SelectSingleNode("//Accounts/micorsoft/login").InnerText;
-                    user.Password = document.SelectSingleNode("//Accounts/micorsoft/password").InnerText;
+                    user.Login = document.SelectSingleNode("//Accounts/microsoft/login").InnerText;
+                    user.Password = document.SelectSingleNode("//Accounts/microsoft/password").InnerText;
                     break;
                 case UserType.Yahoo:
                     user.Login = document.SelectSingleNode("//Accounts/yahoo/login").InnerText;
@@ -152,7 +140,6 @@ namespace Application.Helper.Helpers
                     TypeText(By.Id("username"), user.Login);
                     TypeText(By.Id("passwd"), user.Password);
                     Click(By.Id(".save"));
-                    WaitForElementIsDisplayed(By.XPath("//*[@id='LoginPanel']/a"));
                     break;
                 case UserType.Microsoft:
                     ClickElementAndType(By.Id("idDiv_PWD_UsernameExample"), user.Login);
@@ -165,20 +152,21 @@ namespace Application.Helper.Helpers
 
         private string GetValidAcountsXmlPath()
         {
-            var lavidFilePath = string.Empty;
+            var validFilePath = string.Empty;
 
-            const string accountsPathVsRun = @".\..\..\Constants\Accounts.xml";
-            const string accountsPathConsoleRun = @"..\..\..\Application.Helper\Constants\Accounts.xml";
+            const string accountsPathVsRun = @".\..\..\..\Application.Helper\Constants\Accounts.xml";
+            const string accountsPathConsoleRun = @".\..\..\..\..\Application.Helper\Constants\Accounts.xml";
 
             if (File.Exists(accountsPathVsRun))
-                lavidFilePath = accountsPathVsRun;
+                validFilePath = accountsPathVsRun;
             if (File.Exists(accountsPathConsoleRun))
-                lavidFilePath = accountsPathConsoleRun;
-            if (string.IsNullOrEmpty(lavidFilePath))
+                validFilePath = accountsPathConsoleRun;
+            if (string.IsNullOrEmpty(validFilePath))
             {
                 throw new Exception("Cannot find Accounts.xml file");
             }
-            return lavidFilePath;
+
+            return validFilePath;
         }
     }
 }

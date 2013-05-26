@@ -7,8 +7,8 @@ var CZ;
                 return {
                     id: t.guid,
                     ParentTimelineId: t.parent.guid,
-                    FromYear: t.x,
-                    ToYear: typeof t.endDate !== 'undefined' ? t.endDate : (t.x + t.width),
+                    start: t.x,
+                    end: typeof t.endDate !== 'undefined' ? t.endDate : (t.x + t.width),
                     title: t.title,
                     Regime: t.regime
                 };
@@ -18,7 +18,7 @@ var CZ;
                 return {
                     id: e.guid,
                     ParentTimelineId: e.parent.guid,
-                    Year: e.infodotDescription.date,
+                    time: e.infodotDescription.date,
                     title: e.title,
                     description: undefined,
                     contentItems: undefined
@@ -39,7 +39,7 @@ var CZ;
             }
             Map.contentItem = contentItem;
         })(Map || (Map = {}));
-        var _serviceUrl = CZ.Settings.serverUrlHost + "/chronozoom.svc/";
+        var _serviceUrl = CZ.Settings.serverUrlHost + "/api/";
         function Request(urlBase) {
             var _url = urlBase;
             var _hasParameters = false;
@@ -273,6 +273,21 @@ var CZ;
             });
         }
         Service.getServiceInformation = getServiceInformation;
+        function getContentPath(reference) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath(reference);
+            request.addToPath("contentpath");
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getContentPath = getContentPath;
+        getContentPath;
         function putExhibitContent(e, oldContentItems) {
             var newGuids = e.contentItems.map(function (ci) {
                 return ci.guid;

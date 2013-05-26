@@ -6,10 +6,13 @@ namespace Application.Helper.Helpers
 {
     public class WelcomeScreenHelper : DependentActions
     {
-
         public void CloseWelcomePopup()
         {
-            Click(By.Id("welcomeScreenCloseButton"));
+            if (IsElementDisplayed(By.Id("welcomeScreenOut")))
+            {
+                Click(By.Id("welcomeScreenCheckbox"));
+                Click(By.Id("welcomeScreenCloseButton"));                
+            }
         }
 
         public void StartExploring()
@@ -22,9 +25,14 @@ namespace Application.Helper.Helpers
         public bool IsWelcomeScreenDispalyed()
         {
             Logger.Log("<-");
-            bool result = IsElementDisplayed(By.Id("welcomeScreen"));
+            bool result = IsElementExists(By.Id("welcomeScreen"));
             Logger.Log("-> result: " + result);
             return result;
+        }
+
+        public void ResetPopupState()
+        {
+            DeleteCookieByName("welcomeScreenDisallowed");
         }
     }
 }

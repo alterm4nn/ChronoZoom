@@ -9,8 +9,8 @@ module CZ {
                 return {
                     id: t.guid,
                     ParentTimelineId: t.parent.guid,
-                    FromYear: t.x,
-                    ToYear: typeof t.endDate !== 'undefined' ? t.endDate : (t.x + t.width),
+                    start: t.x,
+                    end: typeof t.endDate !== 'undefined' ? t.endDate : (t.x + t.width),
                     title: t.title,
                     Regime: t.regime
                 };
@@ -20,7 +20,7 @@ module CZ {
                 return {
                     id: e.guid,
                     ParentTimelineId: e.parent.guid,
-                    Year: e.infodotDescription.date,
+                    time: e.infodotDescription.date,
                     title: e.title,
                     description: undefined,
                     contentItems: undefined
@@ -41,7 +41,7 @@ module CZ {
             }
         }
 
-        var _serviceUrl = CZ.Settings.serverUrlHost + "/chronozoom.svc/";
+        var _serviceUrl = CZ.Settings.serverUrlHost + "/api/";
 
         export function Request (urlBase) {
             var _url = urlBase;
@@ -331,6 +331,22 @@ module CZ {
                 url: request.url
             });
         }
+
+        // .../{supercollection}/{collection}/{reference}/contentpath
+        export function getContentPath(reference: string) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath(superCollectionName);
+            request.addToPath(collectionName);
+            request.addToPath(reference);
+            request.addToPath("contentpath");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        } getContentPath
 
         /**
         * Auxiliary Methods.

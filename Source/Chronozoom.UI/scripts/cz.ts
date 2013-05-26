@@ -58,7 +58,7 @@ module CZ {
         var _featureMap: FeatureInfo[] = [
             {
                 Name: "Login",
-                Activation: FeatureActivation.NotRootCollection,
+                Activation: FeatureActivation.Enabled,
                 JQueryReference: "#login-panel"
             },
             {
@@ -119,6 +119,8 @@ module CZ {
                 $("body").bind("toursInitialized", onToursInitialized);
         }
 
+        var defaultRootTimeline = { title: "My Timeline", x: 1950, endDate: 9999, children: [], parent: { guid: null } };
+
         $(document).ready(function () {
             //Ensures there will be no 'console is undefined' errors
             window.console = window.console || <any>(function () {
@@ -129,6 +131,7 @@ module CZ {
             })();
 
             $('.bubbleInfo').hide();
+            var canvasIsEmpty;
 
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
@@ -172,6 +175,7 @@ module CZ {
                         form.show();
                     },
                     showCreateTimelineForm: function (timeline) {
+                        CZ.Authoring.mode = "createTimeline";
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
                             activationSource: $(".header-icon.edit-icon"),
                             navButton: ".cz-form-nav",
@@ -188,16 +192,16 @@ module CZ {
                     },
                     showEditTimelineForm: function (timeline) {
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
-                            activationSource: $(".header-icon.edit-icon"),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            startDate: ".cz-form-time-start",
-                            endDate: ".cz-form-time-end",
-                            saveButton: ".cz-form-save",
-                            deleteButton: ".cz-form-delete",
-                            titleInput: ".cz-form-item-title",
-                            context: timeline
+                        	activationSource: $(".header-icon.edit-icon"),
+                        	navButton: ".cz-form-nav",
+                        	closeButton: ".cz-form-close-btn > .cz-form-btn",
+                        	titleTextblock: ".cz-form-title",
+                        	startDate: ".cz-form-time-start",
+                        	endDate: ".cz-form-time-end",
+                        	saveButton: ".cz-form-save",
+                        	deleteButton: ".cz-form-delete",
+                        	titleInput: ".cz-form-item-title",
+                        	context: timeline
                         });
                         form.show();
                     },
@@ -234,32 +238,37 @@ module CZ {
                             deleteButton: ".cz-form-delete",
                             contentItemsTemplate: forms[4],
                             context: exhibit
-                        });
+						});
                         form.show();
                     },
                     showEditContentItemForm: function (ci, e, prevForm, noAnimation) {
                         var form = new CZ.UI.FormEditCI(forms[3], {
                             activationSource: $(".header-icon.edit-icon"),
                             prevForm: prevForm,
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            errorMessage: ".cz-form-errormsg",
-                            saveButton: ".cz-form-save",
-                            titleInput: ".cz-form-item-title",
-                            mediaSourceInput: ".cz-form-item-mediasource",
-                            mediaInput: ".cz-form-item-mediaurl",
-                            descriptionInput: ".cz-form-item-descr",
-                            attributionInput: ".cz-form-item-attribution",
-                            mediaTypeInput: ".cz-form-item-media-type",
-                            context: {
-                                exhibit: e,
-                                contentItem: ci
-                            }
-                        });
+                        	navButton: ".cz-form-nav",
+                        	closeButton: ".cz-form-close-btn > .cz-form-btn",
+                        	titleTextblock: ".cz-form-title",
+                        	errorMessage: ".cz-form-errormsg",
+                        	saveButton: ".cz-form-save",
+                        	titleInput: ".cz-form-item-title",
+                        	mediaSourceInput: ".cz-form-item-mediasource",
+                        	mediaInput: ".cz-form-item-mediaurl",
+                        	descriptionInput: ".cz-form-item-descr",
+                       		attributionInput: ".cz-form-item-attribution",
+                        	mediaTypeInput: ".cz-form-item-media-type",
+                        	context: {
+                        	    exhibit: e,
+                        	    contentItem: ci
+                        	}
+                         });
                         form.show(noAnimation);
                     }
                 });
+
+                if (canvasIsEmpty) {
+                    CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
+                }
+
                 var profileForm = new CZ.UI.FormEditProfile(forms[5], {
                     activationSource: $(".header-icon.profile-icon"),
                     navButton: ".cz-form-nav",
@@ -274,7 +283,8 @@ module CZ {
                     loginPanel: "#login-panel",
                     profilePanel: "#profile-panel",
                     loginPanelLogin: "#profile-panel span.auth-panel-login",
-                    context: ""
+                    context: "",
+                    allowRedirect: IsFeatureEnabled("Authoring")
                 });
 
                 $("#edit_profile_button").click(function () {
@@ -317,13 +327,17 @@ module CZ {
 
             CZ.Service.getServiceInformation().then(
                 function (response) {
-                    CZ.Settings.contentItemThumbnailBaseUri = response.ThumbnailsPath;
+                    CZ.Settings.contentItemThumbnailBaseUri = response.thumbnailsPath;
+                    CZ.Settings.signinUrlMicrosoft = response.signinUrlMicrosoft;
+                    CZ.Settings.signinUrlGoogle = response.signinUrlGoogle;
+                    CZ.Settings.signinUrlYahoo = response.signinUrlYahoo;
                 });
 
             var url = CZ.UrlNav.getURL();
             var rootCollection = url.superCollectionName === undefined;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
+            CZ.Common.initialContent = url.content;
 
             $('#search_button')
                 .mouseup(CZ.Search.onSearchClicked);
@@ -388,8 +402,8 @@ module CZ {
             $('#biblCloseButton')
                 .mouseout(() => { CZ.Common.toggleOffImage('biblCloseButton', 'png'); })
                 .mouseover(() => { CZ.Common.toggleOnImage('biblCloseButton', 'png'); })
-
-
+            
+            
             $('#welcomeScreenCloseButton')
                 .mouseover(() => { CZ.Common.toggleOnImage('welcomeScreenCloseButton', 'png'); })
                 .mouseout(() => { CZ.Common.toggleOffImage('welcomeScreenCloseButton', 'png'); })
@@ -438,49 +452,6 @@ module CZ {
             if (!rootCollection)
                 CZ.Authoring.isEnabled = true;
 
-            if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
-                if (/Chrome[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
-                    var oprversion = new Number(RegExp.$1) // capture x.x portion and store as a number
-                    if (oprversion < 14.0) {
-                        var fallback_agreement = CZ.Common.getCookie("new_bad_browser_agreement");
-                        if ((fallback_agreement == null) || (fallback_agreement == "")) {
-                            window.location.href = "fallback.html";
-                            return;
-                        }
-                    }
-                }
-            }
-            else if (navigator.userAgent.toLowerCase().indexOf('version') > -1) {
-                if (/Version[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
-                    var oprversion = new Number(RegExp.$1) // capture x.x portion and store as a number
-                    if (oprversion < 5.0) {
-                        var fallback_agreement = CZ.Common.getCookie("new_bad_browser_agreement");
-                        if ((fallback_agreement == null) || (fallback_agreement == "")) {
-                            window.location.href = "fallback.html";
-                            return;
-                        }
-                    }
-                }
-            }
-            else {
-                var br = (<any>$).browser;
-                var isIe9 = br.msie && parseInt(br.version, 10) >= 9;
-                if (!isIe9) {
-                    var isFF9 = br.mozilla && parseInt(br.version, 10) >= 7;
-                    if (!isFF9) {
-                        var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
-                        if (!is_chrome) {
-                            var fallback_agreement = CZ.Common.getCookie("new_bad_browser_agreement");
-                            if ((fallback_agreement == null) || (fallback_agreement == "")) {
-                                window.location.href = "fallback.html";
-                                return;
-                            }
-                        }
-                        return;
-                    }
-                }
-            }
-
             if (navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
                 // Suppress the default iOS elastic pan/zoom actions.
                 document.addEventListener('touchmove', function (e) { e.preventDefault(); });
@@ -499,7 +470,15 @@ module CZ {
 
             if (window.location.hash)
                 CZ.Common.startHash = window.location.hash; // to be processes after the data is loaded
-            CZ.Common.loadData(); //retrieving the data
+
+            CZ.Common.loadData().then(function (response) {
+                if (!response) {
+                    canvasIsEmpty = true;
+                    if (CZ.Authoring.showCreateTimelineForm) {
+                        CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
+                    }
+                }
+            }); //retrieving the data
 
             CZ.Search.initializeSearch();
             CZ.Bibliography.initializeBibliography();

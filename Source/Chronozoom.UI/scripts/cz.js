@@ -29,7 +29,7 @@ var CZ;
         var _featureMap = [
             {
                 Name: "Login",
-                Activation: FeatureActivation.NotRootCollection,
+                Activation: FeatureActivation.Enabled,
                 JQueryReference: "#login-panel"
             }, 
             {
@@ -99,6 +99,7 @@ var CZ;
                 return c;
             })();
             $('.bubbleInfo').hide();
+            var canvasIsEmpty;
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
@@ -139,6 +140,7 @@ var CZ;
                         form.show();
                     },
                     showCreateTimelineForm: function (timeline) {
+                        CZ.Authoring.mode = "createTimeline";
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
                             activationSource: $(".header-icon.edit-icon"),
                             navButton: ".cz-form-nav",
@@ -227,6 +229,9 @@ var CZ;
                         form.show(noAnimation);
                     }
                 });
+                if(canvasIsEmpty) {
+                    CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
+                }
                 var profileForm = new CZ.UI.FormEditProfile(forms[5], {
                     activationSource: $(".header-icon.profile-icon"),
                     navButton: ".cz-form-nav",
@@ -241,7 +246,8 @@ var CZ;
                     loginPanel: "#login-panel",
                     profilePanel: "#profile-panel",
                     loginPanelLogin: "#profile-panel span.auth-panel-login",
-                    context: ""
+                    context: "",
+                    allowRedirect: IsFeatureEnabled("Authoring")
                 });
                 $("#edit_profile_button").click(function () {
                     profileForm.show();
@@ -275,12 +281,16 @@ var CZ;
                 });
             });
             CZ.Service.getServiceInformation().then(function (response) {
-                CZ.Settings.contentItemThumbnailBaseUri = response.ThumbnailsPath;
+                CZ.Settings.contentItemThumbnailBaseUri = response.thumbnailsPath;
+                CZ.Settings.signinUrlMicrosoft = response.signinUrlMicrosoft;
+                CZ.Settings.signinUrlGoogle = response.signinUrlGoogle;
+                CZ.Settings.signinUrlYahoo = response.signinUrlYahoo;
             });
             var url = CZ.UrlNav.getURL();
             var rootCollection = url.superCollectionName === undefined;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
+            CZ.Common.initialContent = url.content;
             $('#search_button').mouseup(CZ.Search.onSearchClicked);
             $('#human_rect').click(function () {
                 CZ.Search.navigateToBookmark(CZ.Common.humanityVisible);
@@ -378,46 +388,6 @@ var CZ;
             if(!rootCollection) {
                 CZ.Authoring.isEnabled = true;
             }
-            if(navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
-                if(/Chrome[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
-                    var oprversion = new Number(RegExp.$1);
-                    if(oprversion < 14.0) {
-                        var fallback_agreement = CZ.Common.getCookie("new_bad_browser_agreement");
-                        if((fallback_agreement == null) || (fallback_agreement == "")) {
-                            window.location.href = "fallback.html";
-                            return;
-                        }
-                    }
-                }
-            } else if(navigator.userAgent.toLowerCase().indexOf('version') > -1) {
-                if(/Version[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
-                    var oprversion = new Number(RegExp.$1);
-                    if(oprversion < 5.0) {
-                        var fallback_agreement = CZ.Common.getCookie("new_bad_browser_agreement");
-                        if((fallback_agreement == null) || (fallback_agreement == "")) {
-                            window.location.href = "fallback.html";
-                            return;
-                        }
-                    }
-                }
-            } else {
-                var br = ($).browser;
-                var isIe9 = br.msie && parseInt(br.version, 10) >= 9;
-                if(!isIe9) {
-                    var isFF9 = br.mozilla && parseInt(br.version, 10) >= 7;
-                    if(!isFF9) {
-                        var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
-                        if(!is_chrome) {
-                            var fallback_agreement = CZ.Common.getCookie("new_bad_browser_agreement");
-                            if((fallback_agreement == null) || (fallback_agreement == "")) {
-                                window.location.href = "fallback.html";
-                                return;
-                            }
-                        }
-                        return;
-                    }
-                }
-            }
             if(navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
                 document.addEventListener('touchmove', function (e) {
                     e.preventDefault();
@@ -435,7 +405,14 @@ var CZ;
             if(window.location.hash) {
                 CZ.Common.startHash = window.location.hash;
             }
-            CZ.Common.loadData();
+            CZ.Common.loadData().then(function (response) {
+                if(!response) {
+                    canvasIsEmpty = true;
+                    if(CZ.Authoring.showCreateTimelineForm) {
+                        CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
+                    }
+                }
+            });
             CZ.Search.initializeSearch();
             CZ.Bibliography.initializeBibliography();
             var canvasGestures = CZ.Gestures.getGesturesStream(CZ.Common.vc);

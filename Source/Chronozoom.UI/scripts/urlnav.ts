@@ -220,12 +220,13 @@ module CZ {
                 hash?: { path: string; params?: any[]; };
                 superCollectionName?: string;
                 collectionName?: string;
+                content?: string;
             }
 
             var loc = document.location.toString().split("#");
             var path = loc[0];
             var hash = loc[1];
-            var expr = new RegExp("^(https|http):\/\/([a-z_0-9\-.]{4,})(?:\:([0-9]{1,5}))?(?:\/*)([a-z\-_0-9\/.]*)[?]?([a-z\-_0-9=&]*)$", "i");
+            var expr = new RegExp("^(https|http):\/\/([a-z_0-9\-.]{4,})(?:\:([0-9]{1,5}))?(?:\/*)([a-z\-_0-9\/.%]*)[?]?([a-z\-_0-9=&]*)$", "i");
             var result = path.match(expr);
             if (result != null) {
                 url = {
@@ -238,11 +239,14 @@ module CZ {
                 if (result[4] != "") {
                     url.path = result[4].split("/");
 
-                    if (url.path.length > 1) {
+                    if (url.path.length >= 1 && url.path[0].length > 0 && url.path[0] !== "cz.html") {
                         url.superCollectionName = url.path[0];
                     }
-                    if (url.path.length > 2) {
+                    if (url.path.length >= 2 && url.path[1].length > 0) {
                         url.collectionName = url.path[1];
+                    }
+                    if (url.path.length >= 3 && url.path[url.path.length - 1].length > 0) {
+                        url.content = url.path[url.path.length - 1];
                     }
                 }
 

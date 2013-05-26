@@ -40,15 +40,15 @@ namespace Tests
         [TestMethod]
         public void Test_Eukaryotic_Cells_Description()
         {
-            string description = HomePageHelper.GetEukaryoticCellsDescription();
-            StringAssert.Contains(description, "eukaryotic cells");
+            string description = ExhibitHelper.GetEukaryoticCellsDescription();
+            StringAssert.Contains(description, "Eukaryote cells");
         }
 
         [TestMethod]
         public void Test_Navigate_To_Life()
         {
-            HomePageHelper.OpenLifeTimeline();
-            string actual = HomePageHelper.GetLastBreadcrumbs();
+            TimelineHelper.OpenLifeTimeline();
+            string actual = BreadcrumbsHelper.GetLastBreadcrumbs();
             Assert.AreEqual("Life", actual);
         }
     }

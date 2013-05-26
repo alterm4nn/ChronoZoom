@@ -111,6 +111,11 @@ module CZ {
             var len = 0;
             var selfIntersection = false;
 
+            // If creating root timeline, skip intersection validations
+            if (!tp) {
+                return true;
+            }
+
             // Test on inclusion in parent.
             if (!isIncluded(tp, tc) && tp.id !== "__root__") {
                 return false;
@@ -263,8 +268,8 @@ module CZ {
          * Creates new timeline and adds it to virtual canvas.
          * @return {Object} Created timeline.
          */
-        function createNewTimeline() {
-            CZ.VCContent.removeChild(_hovered, "newTimelineRectangle");
+        export function createNewTimeline() {
+
             return CZ.VCContent.addTimeline(
                 _hovered,
                 _hovered.layerid,
@@ -517,6 +522,11 @@ module CZ {
                     t.id = "t" + success;
                     t.guid = success;
                     t.titleObject.id = "t" + success + "__header__";
+
+                    if (!t.parent.guid) {
+                        // Root timeline, refresh page
+                        document.location.reload(true);
+                    }
                 },
                 function (error) {
                 }
@@ -702,7 +712,7 @@ module CZ {
         */
         export function ValidateExhibitData(date, title, contentItems) {
             var isValid = CZ.Authoring.ValidateNumber(date);
-            isValid = isValid && CZ.Authoring.IsNotEmpty(title) && CZ.Authoring.IsNotEmpty(date);
+            isValid = isValid && CZ.Authoring.IsNotEmpty(title);
             isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
             return isValid;
         }
@@ -711,7 +721,7 @@ module CZ {
          * Validates,if number is valid.
         */
         export function ValidateNumber(number) {
-            return !isNaN(Number(number) && parseFloat(number));
+            return !isNaN(Number(number) && parseFloat(number)) && IsNotEmpty(number);
         }
 
         /**
@@ -744,26 +754,24 @@ module CZ {
                         isValid = false;
                     }
                 } else if (ci.mediaType.toLowerCase() === "video") {
-                    //YouTube
-                    // from http://stackoverflow.com/questions/3452546/javascript-regex-how-to-get-youtube-video-id-from-url
-                    var youtube = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-                    var youtubeEmbed = /www.\youtube\.com\/embed\/([a-z0-9\-]+)/i;
-
-                    //Vimeo
+                    // Youtube
+                    var youtube = /(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|[\S\?\&]+&v=|\/user\/\S+))([^\/&#]{10,12})/
+                    // Vimeo
                     var vimeo = /vimeo\.com\/([0-9]+)/i
                     var vimeoEmbed = /player.vimeo.com\/video\/([0-9]+)/i
 
                     if (youtube.test(ci.uri)) {
-                        var youtubeResult = ci.uri.match(youtube);
-                        ci.uri = "http://www.youtube.com/embed/" + youtubeResult[1];
+                        var youtubeVideoId = ci.uri.match(youtube)[1];
+                        ci.uri = "http://www.youtube.com/embed/" + youtubeVideoId;
                     } else if (vimeo.test(ci.uri)) {
-                        var vimeoResult = ci.uri.match(vimeo);
-                        ci.uri = "http://player.vimeo.com/video/" + vimeoResult[1];
-                    } else if (youtubeEmbed.test(ci.uri) || vimeoEmbed.test(ci.uri)) {
+                        var vimeoVideoId = ci.uri.match(vimeo)[1];
+                        ci.uri = "http://player.vimeo.com/video/" + vimeoVideoId;
+                    } else if (vimeoEmbed.test(ci.uri)) {
                         //Embedded link provided
                     } else {
                         alert("Sorry, only YouTube or Vimeo videos are supported");
                         isValid = false;
+
                     }
 
                 } else if (ci.mediaType.toLowerCase() === "pdf") {

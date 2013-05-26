@@ -38,6 +38,8 @@
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -51,6 +53,23 @@
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
+    <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
+    <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
+    <None Include="_bin_deployableAssemblies\x86\sqlceer40EN.dll" />
+    <None Include="_bin_deployableAssemblies\x86\sqlcecompact40.dll" />
+    <None Include="_bin_deployableAssemblies\x86\sqlceca40.dll" />
+    <None Include="_bin_deployableAssemblies\x86\Microsoft.VC90.CRT\README_ENU.txt" />
+    <None Include="_bin_deployableAssemblies\x86\Microsoft.VC90.CRT\msvcr90.dll" />
+    <None Include="_bin_deployableAssemblies\amd64\sqlcese40.dll" />
+    <None Include="_bin_deployableAssemblies\amd64\sqlceqp40.dll" />
+    <None Include="_bin_deployableAssemblies\amd64\sqlceme40.dll" />
+    <None Include="_bin_deployableAssemblies\amd64\sqlceer40EN.dll" />
+    <None Include="_bin_deployableAssemblies\amd64\sqlcecompact40.dll" />
+    <None Include="_bin_deployableAssemblies\amd64\sqlceca40.dll" />
+    <None Include="_bin_deployableAssemblies\amd64\Microsoft.VC90.CRT\README_ENU.txt" />
+    <None Include="_bin_deployableAssemblies\amd64\Microsoft.VC90.CRT\msvcr90.dll" />
+    <None Include="_bin_deployableAssemblies\x86\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest" />
     <Reference Include="EntityFramework, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
@@ -102,6 +121,14 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Data.Services.Client" />
+    <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.SqlServer.Compact.4.0.8876.1\lib\net40\System.Data.SqlServerCe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SqlServerCe.Entity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\EntityFramework.SqlServerCompact.4.3.6\lib\net40\System.Data.SqlServerCe.Entity.dll</HintPath>
+    </Reference>
     <Reference Include="System.IdentityModel" />
     <Reference Include="System.identitymodel.services" />
     <Reference Include="System.Net.Http" />
@@ -115,6 +142,7 @@
     <Reference Include="System.ServiceModel">
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.ServiceModel.Activation" />
     <Reference Include="System.ServiceModel.Web">
       <Private>True</Private>
     </Reference>
@@ -150,6 +178,7 @@
     <Reference Include="System.Web.Routing">
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Web.Services" />
     <Reference Include="System.Web.WebPages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
@@ -168,11 +197,24 @@
     <Content Include="ACS\FederationMetadata\2007-06\FederationMetadata.xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="api\errorhandler.cs" />
+    <Compile Include="default.ashx.cs">
+      <DependentUpon>default.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="api\ichronozoomsvc.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="pages\sitemap.aspx.cs">
+      <DependentUpon>sitemap.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="pages\sitemap.aspx.designer.cs">
+      <DependentUpon>sitemap.aspx</DependentUpon>
+    </Compile>
     <Compile Include="utils\ThumbnailGenerator.cs" />
-    <Content Include="cz.aspx" />
+    <Compile Include="utils\UrlHelper.cs" />
     <Content Include="cz.html" />
     <Content Include="fallback.html" />
     <Content Include="Global.asax" />
@@ -182,6 +224,7 @@
     <Content Include="images\tour-icon.png" />
     <Content Include="images\view-icon.png" />
     <Content Include="images\edit.svg" />
+    <Content Include="pages\sitemap.aspx" />
     <Content Include="scripts\external\ACS.js" />
     <Content Include="scripts\authoring.ts" />
     <Content Include="scripts\authoring.js">
@@ -391,7 +434,7 @@
     <Content Include="scripts\tours.js">
       <DependentUpon>tours.ts</DependentUpon>
     </Content>
-    <Content Include="Chronozoom.svc" />
+    <Content Include="api\chronozoom.svc" />
     <Content Include="scripts\urlnav.js">
       <DependentUpon>urlnav.ts</DependentUpon>
     </Content>
@@ -446,14 +489,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Chronozoom.svc.cs">
-      <DependentUpon>Chronozoom.svc</DependentUpon>
+    <Compile Include="api\chronozoom.svc.cs">
+      <DependentUpon>chronozoom.svc</DependentUpon>
     </Compile>
     <Compile Include="ACS\controllers\AccountController.cs" />
-    <Compile Include="cz.aspx.cs">
-      <DependentUpon>cz.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="utils\GlobalSuppressions.cs" />
     <!--<Compile Include="Models\Reference.cs" />-->
     <!--<Compile Include="Models\Utility.cs" />-->
@@ -486,27 +525,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Web.Sandbox.config">
-      <DependentUpon>Web.config</DependentUpon>
-      <SubType>Designer</SubType>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Web.Staging.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Web.DevPreview.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Web.Production.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="..\Settings.StyleCop">
       <Link>Settings.StyleCop</Link>
     </Content>
@@ -520,6 +538,9 @@
     <Content Include="css\cz.less" />
     <Content Include="css\datepicker.less" />
     <Content Include="css\timescale.less" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="default.ashx" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

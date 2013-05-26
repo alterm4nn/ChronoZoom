@@ -19,6 +19,8 @@ using System.Web.Routing;
 using System.Web.UI;
 using System.Web.Mvc;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.ServiceModel.Activation;
 
 
 namespace Chronozoom.UI
@@ -48,14 +50,23 @@ namespace Chronozoom.UI
 
         internal static void RegisterRoutes(RouteCollection routes)
         {
-            var routeHandlerDetails = new WebFormRouteHandler<Page>("~/cz.aspx");
+            var routeHandlerDetails = new WebFormRouteHandler<DefaultHttpHandler>(null);
             routes.MapRoute(
                 "Account", // Route name
                 "account/{action}", // URL with parameters
                 new { controller = "Account" } // Parameter defaults
                 );
+            
+            routes.Add(new ServiceRoute("api", new WebServiceHostFactory(), typeof(ChronozoomSVC)));
 
-            routes.Add(new Route("{supercollection}/{collection}/", routeHandlerDetails));
+            routes.Add(new Route("sitemap.xml", new WebFormRouteHandler<Page>("/pages/sitemap.aspx")));
+
+            routes.Add(new Route("{supercollection}", routeHandlerDetails));
+            routes.Add(new Route("{supercollection}/{collection}", routeHandlerDetails));
+            routes.Add(new Route("{supercollection}/{collection}/{reference}", routeHandlerDetails));
+            routes.Add(new Route("{supercollection}/{collection}/{timelineTitle}/{reference}", routeHandlerDetails));
+            routes.Add(new Route("{supercollection}/{collection}/{timelineTitle}/{exhibitTitle}/{reference}", routeHandlerDetails));
+            routes.Add(new Route("{supercollection}/{collection}/{timelineTitle}/{exhibitTitle}/{contentItemTitle}/{reference}", routeHandlerDetails));
         }
 
         public void Application_Start(object sender, EventArgs e)
@@ -82,10 +93,40 @@ namespace Chronozoom.UI
         public void Application_BeginRequest(object sender, EventArgs e)
         {
             var app = (HttpApplication)sender;
+
             if (app.Context.Request.Url.LocalPath == "/")
             {
-                app.Context.RewritePath(string.Concat(app.Context.Request.Url.LocalPath, "cz.aspx"));
+                if (BrowserIsSupported())
+                {
+                    app.Context.RewritePath(string.Concat(app.Context.Request.Url.LocalPath, "default.ashx"));
+                }
+                else
+                {
+                    app.Context.RewritePath(string.Concat(app.Context.Request.Url.LocalPath, "fallback.html"));
+                }
             }
+        }
+
+        // Supported versions - Moved from JavaScript and added Opera
+        private static readonly Dictionary<string, int> _supportedMatrix = new Dictionary<string, int>()
+        {
+            { "IE", 9 },
+            { "Firefox", 7 },
+            { "Chrome", 14 },
+            { "Safari", 5 },
+            { "Opera", 10 },
+        };
+
+        private bool BrowserIsSupported()
+        {
+            System.Web.HttpBrowserCapabilities browser = Request.Browser;
+
+            if (_supportedMatrix.ContainsKey(browser.Browser))
+            {
+                return Double.Parse(browser.Version, System.Globalization.CultureInfo.InvariantCulture) >= _supportedMatrix[browser.Browser];
+            }
+
+            return true;
         }
     }
 }

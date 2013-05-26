@@ -15,6 +15,7 @@ module CZ {
             profilePanel: string;
             loginPanelLogin: string;
             context: Object;
+            allowRedirect: bool;
         }
 
         export class FormEditProfile extends CZ.UI.FormBase {
@@ -29,6 +30,7 @@ module CZ {
             private loginPanel: JQuery;
             private profilePanel: JQuery;
             private loginPanelLogin: JQuery;
+            private allowRedirect: bool;
 
             constructor(container: JQuery, formInfo: FormEditProfileInfo) {
                 super(container, formInfo);
@@ -41,12 +43,16 @@ module CZ {
                 this.loginPanel = $(document.body).find(formInfo.loginPanel);
                 this.profilePanel = $(document.body).find(formInfo.profilePanel);
                 this.loginPanelLogin = $(document.body).find(formInfo.loginPanelLogin);
+                this.allowRedirect = formInfo.allowRedirect;
                 
                 this.initialize();
             }
 
             private validEmail(e) {
-                var filter = /^\w+@[a-zA-Z_\.]+?\.[a-zA-Z]{2,4}$/;
+                // Maximum length is 254: http://stackoverflow.com/questions/386294/what-is-the-maximum-length-of-a-valid-email-address
+                if (String(e).length > 254)
+                    return false;
+                var filter = /^([\w^_]+(?:([-_\.\+][\w^_]+)|)|(xn--[\w^_]+))@([\w^_]+(?:(-+[\w^_]+)|)|(xn--[\w^_]+))(?:\.([\w^_]+(?:([\w-_\.\+][\w^_]+)|)|(xn--[\w^_]+)))$/i;
                 return String(e).search(filter) != -1;
             }
 
@@ -91,7 +97,12 @@ module CZ {
                     CZ.Service.putProfile(this.usernameInput.val(), this.emailInput.val()).then(
                         success => {
                             // Redirect to personal collection.
-                            window.location.assign("\\" + success);
+                            if (this.allowRedirect) {
+                                window.location.assign("\\" + success);
+                            }
+                            else {
+                                this.close();
+                            }
                         },
                         function (error) {
                             alert("Unable to save changes. Please try again later.");
