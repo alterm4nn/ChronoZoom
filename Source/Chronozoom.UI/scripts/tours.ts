@@ -28,7 +28,7 @@ module CZ {
         @param caption (string) text describing the bookmark
         @param lapseTime (number) a position in the audiotreck of the bookmark in seconds
         */
-        class TourBookmark {
+        export class TourBookmark {
 
             public duration = undefined;
             public number = 0;
@@ -937,7 +937,7 @@ module CZ {
         /*
         Bookmark' transition handler function to be passed to tours.
         */
-        function bookmarkTransition(visible, onCompleted, onInterrupted, bookmark) {
+        export function bookmarkTransition(visible, onCompleted, onInterrupted, bookmark) {
             tourBookmarkTransitionCompleted = onCompleted; // reinitialize animation completed handler for bookmark' transition
             tourBookmarkTransitionInterrupted = onInterrupted; // reinitialize animation interrupted handler for bookmark' transition
 

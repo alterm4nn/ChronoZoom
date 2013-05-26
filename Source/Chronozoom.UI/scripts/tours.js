@@ -27,7 +27,8 @@ var CZ;
                 }
             }
             return TourBookmark;
-        })();        
+        })();
+        Tours.TourBookmark = TourBookmark;        
         function getBookmarkVisible(bookmark) {
             return CZ.UrlNav.navStringToVisible(bookmark.url, CZ.Common.vc);
         }
@@ -704,6 +705,7 @@ var CZ;
             }
             return animId;
         }
+        Tours.bookmarkTransition = bookmarkTransition;
         function loadTourFromURL() {
             var curURL = CZ.UrlNav.getURL();
             if((typeof curURL.hash.params !== 'undefined') && (curURL.hash.params["tour"] > Tours.tours.length)) {

@@ -58,12 +58,13 @@ var CZ;
                 this.deleteButton = container.find(formInfo.deleteButton);
                 this.addStopButton = container.find(formInfo.addStopButton);
                 this.titleInput = container.find(formInfo.titleInput);
+                this.tourTitleInput = this.container.find(".cz-form-tour-title");
                 this.saveButton.off();
                 this.deleteButton.off();
                 this.tour = formInfo.context;
                 this.stops = [];
                 if(this.tour) {
-                    this.container.find(".cz-form-tour-title").val(this.tour.title);
+                    this.tourTitleInput.val(this.tour.title);
                     for(var i = 0, len = this.tour.bookmarks.length; i < len; i++) {
                         var bookmark = this.tour.bookmarks[i];
                         var target = CZ.Tours.bookmarkUrlToElement(bookmark.url);
@@ -79,15 +80,19 @@ var CZ;
                 this.tourStopsListBox = new CZ.UI.TourStopListBox(container.find(formInfo.tourStopsListBox), formInfo.tourStopsTemplate, this.stops);
                 this.initialize();
             }
+            FormEditTour.prototype.initializeAsEdit = function () {
+                this.deleteButton.show();
+                this.titleTextblock.text("Edit Tour");
+                this.saveButton.text("update tour");
+            };
             FormEditTour.prototype.initialize = function () {
+                var _this = this;
                 if(this.tour == null) {
                     this.deleteButton.hide();
                     this.titleTextblock.text("Create Tour");
                     this.saveButton.text("create tour");
                 } else {
-                    this.deleteButton.show();
-                    this.titleTextblock.text("Edit Tour");
-                    this.saveButton.text("update tour");
+                    this.initializeAsEdit();
                 }
                 var self = this;
                 this.addStopButton.click(function (event) {
@@ -97,6 +102,25 @@ var CZ;
                         return self.onTargetElementSelected(arg);
                     };
                     self.hide();
+                });
+                this.saveButton.click(function (event) {
+                    if(_this.tour == null) {
+                        var name = _this.tourTitleInput.val();
+                        var tourBookmarks = new Array();
+                        var lapseTime = 0.0;
+                        for(var j = 0, n = _this.tourStopsListBox.items.length; j < n; j++) {
+                            var tourstopItem = _this.tourStopsListBox.items[j];
+                            var tourstop = tourstopItem.data;
+                            var url = CZ.UrlNav.vcelementToNavString(tourstop.Target);
+                            var title = tourstop.Title;
+                            var text = "";
+                            tourBookmarks.push(new CZ.Tours.TourBookmark(url, title, lapseTime, text));
+                            lapseTime += 10;
+                        }
+                        _this.tour = new CZ.Tours.Tour(name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, "my tours", "", CZ.Tours.tours.length);
+                        CZ.Tours.tours.push(_this.tour);
+                        _this.initializeAsEdit();
+                    }
                 });
             };
             FormEditTour.prototype.show = function () {

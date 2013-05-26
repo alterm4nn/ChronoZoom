@@ -57,6 +57,7 @@ module CZ {
             private deleteButton: JQuery;
             private addStopButton: JQuery;
             private titleInput: JQuery;
+            private tourTitleInput: JQuery;
             private stops: TourStop[];
             private tour: any;
 
@@ -73,13 +74,15 @@ module CZ {
                 this.addStopButton = container.find(formInfo.addStopButton);
                 this.titleInput = container.find(formInfo.titleInput);
 
+                this.tourTitleInput = this.container.find(".cz-form-tour-title");
+
                 this.saveButton.off();
                 this.deleteButton.off();
 
                 this.tour = formInfo.context;
                 this.stops = [];
                 if (this.tour) {
-                    this.container.find(".cz-form-tour-title").val(this.tour.title);
+                    this.tourTitleInput.val(this.tour.title);
                     for (var i = 0, len = this.tour.bookmarks.length; i < len; i++) {
                         var bookmark = this.tour.bookmarks[i];
                         var target = CZ.Tours.bookmarkUrlToElement(bookmark.url);
@@ -97,6 +100,12 @@ module CZ {
                 this.initialize();
             }
 
+            private initializeAsEdit(): void {
+                this.deleteButton.show();
+                this.titleTextblock.text("Edit Tour");
+                this.saveButton.text("update tour");
+            }
+
             private initialize(): void {
 
                 if (this.tour == null) // creating new tour
@@ -107,9 +116,7 @@ module CZ {
                 }
                 else // editing an existing tour
                 {
-                    this.deleteButton.show();
-                    this.titleTextblock.text("Edit Tour");
-                    this.saveButton.text("update tour");
+                    this.initializeAsEdit();
                 }
 
                 var self = this;
@@ -119,6 +126,39 @@ module CZ {
                     CZ.Authoring.mode = "editTour-selectTarget";
                     CZ.Authoring.callback = arg => self.onTargetElementSelected(arg);
                     self.hide();
+                });
+                this.saveButton.click(event =>
+                {
+                    if (this.tour == null) { // create new tour
+                        // Add the tour to the local tours collection
+                        var name = this.tourTitleInput.val();
+
+                        // build array of bookmarks of current tour
+                        var tourBookmarks = new Array();
+                        var lapseTime = 0.0;
+
+                        for (var j = 0, n = this.tourStopsListBox.items.length; j < n; j++) {
+                            var tourstopItem = <TourStopListItem> this.tourStopsListBox.items[j];
+                            var tourstop = <TourStop> tourstopItem.data;
+                                                      
+                            var url = UrlNav.vcelementToNavString(tourstop.Target);
+                            var title = tourstop.Title;
+                            var text = "";
+                            tourBookmarks.push(new CZ.Tours.TourBookmark(url, title, lapseTime, text));
+
+                            lapseTime += 10;
+                        }
+
+                        this.tour = new CZ.Tours.Tour(name,
+                            tourBookmarks,
+                            CZ.Tours.bookmarkTransition,
+                            CZ.Common.vc,
+                            "my tours", // catgory
+                            "", //audio
+                            CZ.Tours.tours.length)
+                        CZ.Tours.tours.push(this.tour);
+                        this.initializeAsEdit();
+                    }
                 });
             }
 
