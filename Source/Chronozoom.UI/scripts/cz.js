@@ -64,6 +64,7 @@ var CZ;
             var onToursInitialized = function () {
                 CZ.Tours.initializeToursUI();
                 $("#tours_index").click(function () {
+                    CZ.Tours.removeActiveTour();
                     var form = new CZ.UI.FormToursList(forms[9], {
                         activationSource: $(this),
                         navButton: ".cz-form-nav",
@@ -133,6 +134,7 @@ var CZ;
                 });
                 CZ.Authoring.initialize(CZ.Common.vc, {
                     showEditTourForm: function (tour) {
+                        CZ.Tours.removeActiveTour();
                         var form = new CZ.UI.FormEditTour(forms[7], {
                             activationSource: $(".header-icon.edit-icon"),
                             navButton: ".cz-form-nav",

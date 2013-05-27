@@ -82,13 +82,16 @@ var CZ;
                 bookmarks[bookmarks.length - 1].duration = 10;
                 bookmarks[bookmarks.length - 1].number = bookmarks.length;
                 self.toggleAudio = function toggleAudio(isOn) {
-                    if(isOn) {
+                    if(isOn && self.audio) {
                         self.isAudioEnabled = true;
                     } else {
                         self.isAudioEnabled = false;
                     }
                 };
                 self.ReinitializeAudio = function ReinitializeAudio() {
+                    if(!self.audio) {
+                        return;
+                    }
                     if(self.audioElement) {
                         self.audioElement.pause();
                     }
@@ -174,6 +177,9 @@ var CZ;
                     self.currentPlace.animationId = self.zoomTo(getBookmarkVisible(bookmark), self.onGoToSuccess, self.onGoToFailure, bookmark.url);
                 };
                 self.startBookmarkAudio = function startBookmarkAudio(bookmark) {
+                    if(!self.audio) {
+                        return;
+                    }
                     if(isToursDebugEnabled && window.console && console.log("playing source: " + self.audio.currentSrc)) {
                         ;
                     }
@@ -349,6 +355,7 @@ var CZ;
                             self.tour_BookmarkStarted[i](self, bookmark);
                         }
                     }
+                    showBookmark(this, bookmark);
                 };
                 self.RaiseBookmarkFinished = function RaiseBookmarkFinished(bookmark) {
                     if(self.tour_BookmarkFinished.length > 0) {
@@ -356,6 +363,7 @@ var CZ;
                             self.tour_BookmarkFinished[i](self, bookmark);
                         }
                     }
+                    hideBookmark(this);
                 };
                 self.RaiseTourStarted = function RaiseTourStarted() {
                     if(self.tour_TourStarted.length > 0) {
@@ -478,12 +486,6 @@ var CZ;
             var categoryContent;
             for(var i = 0; i < Tours.tours.length; i++) {
                 var tour = Tours.tours[i];
-                tour.tour_BookmarkStarted.push(function (t, bookmark) {
-                    showBookmark(t, bookmark);
-                });
-                tour.tour_BookmarkFinished.push(function (t, bookmark) {
-                    hideBookmark(t);
-                });
                 if(tour.category !== category) {
                     var cat = $("<div></div>", {
                         class: "category",

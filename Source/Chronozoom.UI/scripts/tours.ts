@@ -137,13 +137,15 @@ module CZ {
                 @param isOn (Boolean) whether the audio is enabled
                 */
                 self.toggleAudio = function toggleAudio(isOn) {
-                    if (isOn)
+                    if (isOn && self.audio)
                         self.isAudioEnabled = true;
                     else
                         self.isAudioEnabled = false;
                 }
 
                 self.ReinitializeAudio = function ReinitializeAudio() {
+                    if (!self.audio) return;
+
                     // stop audio playback and clear audio element
                     if (self.audioElement) {
                         self.audioElement.pause();
@@ -260,6 +262,7 @@ module CZ {
                 @param bookmark         (bookmark) bookmark which audio narration part should be played.
                 */
                 self.startBookmarkAudio = function startBookmarkAudio(bookmark) {
+                    if (!self.audio) return;
                     if (isToursDebugEnabled && window.console && console.log("playing source: " + self.audio.currentSrc));
 
                     self.audioElement.pause();
@@ -470,6 +473,7 @@ module CZ {
                         for (var i = 0; i < self.tour_BookmarkStarted.length; i++)
                             self.tour_BookmarkStarted[i](self, bookmark);
                     }
+                    showBookmark(this, bookmark);
                 }
 
                 // calls every bookmarkFinished callback function
@@ -478,6 +482,7 @@ module CZ {
                         for (var i = 0; i < self.tour_BookmarkFinished.length; i++)
                             self.tour_BookmarkFinished[i](self, bookmark);
                     }
+                    hideBookmark(this);
                 }
 
                 // calls every tourStarted callback function
@@ -661,14 +666,14 @@ module CZ {
                 var tour = tours[i];
 
                 // add new bookmarkStarted callback function
-                tour.tour_BookmarkStarted.push(function (t, bookmark) {
-                    showBookmark(t, bookmark);
-                });
+                //tour.tour_BookmarkStarted.push(function (t, bookmark) {
+                //    showBookmark(t, bookmark);
+                //});
 
-                // add new bookmarkFinished callback function
-                tour.tour_BookmarkFinished.push(function (t, bookmark) {
-                    hideBookmark(t);
-                });
+                //// add new bookmarkFinished callback function
+                //tour.tour_BookmarkFinished.push(function (t, bookmark) {
+                //    hideBookmark(t);
+                //});
 
                 // add new category to tours menu
                 if (tour.category !== category) {
