@@ -19,6 +19,7 @@ module CZ {
             private targetElement: any;
             private title: string;
             private type: string;
+            private lapseTime: number;
 
             constructor(target: any, title?: string) {
                 if (target == undefined || target == null)
@@ -44,6 +45,13 @@ module CZ {
 
             public get Title(): string {
                 return this.title;
+            }
+
+            public get LapseTime(): number {
+                return this.lapseTime;
+            }
+            public set LapseTime(value: number) {
+                this.lapseTime = value;
             }
 
             public get Type(): string {
@@ -85,19 +93,58 @@ module CZ {
                     this.tourTitleInput.val(this.tour.title);
                     for (var i = 0, len = this.tour.bookmarks.length; i < len; i++) {
                         var bookmark = this.tour.bookmarks[i];
-                        var target = CZ.Tours.bookmarkUrlToElement(bookmark.url);
-                        if (target == null) {
-                            target = {
-                                type: "Unknown"
-                            };
-                        }
-                        var stop = new TourStop(target, (!bookmark.caption || $.trim(bookmark.caption) === "") ? this.tour.title : bookmark.caption);
+                        var stop = FormEditTour.bookmarkToTourstop(bookmark);
                         this.stops.push(stop);
                     }
+                } else {
+                    this.tourTitleInput.val("");
                 }
                 this.tourStopsListBox = new CZ.UI.TourStopListBox(container.find(formInfo.tourStopsListBox), formInfo.tourStopsTemplate, this.stops);
-
                 this.initialize();
+            }
+
+            private static bookmarkToTourstop(bookmark: CZ.Tours.TourBookmark): TourStop {
+                var target = CZ.Tours.bookmarkUrlToElement(bookmark.url);
+                if (target == null) {
+                    target = {
+                        type: "Unknown"
+                    };
+                }
+                var stop = new TourStop(target, (!bookmark.caption || $.trim(bookmark.caption) === "") ? undefined : bookmark.caption);
+                stop.LapseTime = bookmark.lapseTime;
+                return stop;
+            }
+
+            private static tourstopToBookmark(tourstop: TourStop): CZ.Tours.TourBookmark {
+                var url = UrlNav.vcelementToNavString(tourstop.Target);
+                var title = tourstop.Title;
+                var text = "";
+                var bookmark = new CZ.Tours.TourBookmark(url, title, tourstop.LapseTime, text);
+                return bookmark;
+            }
+
+            // Creates new tour instance from the current state of the UI.
+            private createTour(): CZ.Tours.Tour {
+                // Add the tour to the local tours collection
+                var name = this.tourTitleInput.val();
+
+                // build array of bookmarks of current tour
+                var tourBookmarks = new Array();
+                for (var j = 0, n = this.tourStopsListBox.items.length; j < n; j++) {
+                    var tourstopItem = <TourStopListItem> this.tourStopsListBox.items[j];
+                    var tourstop = <TourStop> tourstopItem.data;
+                    var bookmark = FormEditTour.tourstopToBookmark(tourstop);
+                    tourBookmarks.push(bookmark);
+                }
+
+                var tour = new CZ.Tours.Tour(name,
+                    tourBookmarks,
+                    CZ.Tours.bookmarkTransition,
+                    CZ.Common.vc,
+                    "my tours", // category
+                    "", //audio
+                    CZ.Tours.tours.length)
+                return tour;
             }
 
             private initializeAsEdit(): void {
@@ -129,35 +176,22 @@ module CZ {
                 });
                 this.saveButton.click(event =>
                 {
-                    if (this.tour == null) { // create new tour
+                    // create new tour
+                    if (this.tour == null) {
                         // Add the tour to the local tours collection
-                        var name = this.tourTitleInput.val();
-
-                        // build array of bookmarks of current tour
-                        var tourBookmarks = new Array();
-                        var lapseTime = 0.0;
-
-                        for (var j = 0, n = this.tourStopsListBox.items.length; j < n; j++) {
-                            var tourstopItem = <TourStopListItem> this.tourStopsListBox.items[j];
-                            var tourstop = <TourStop> tourstopItem.data;
-                                                      
-                            var url = UrlNav.vcelementToNavString(tourstop.Target);
-                            var title = tourstop.Title;
-                            var text = "";
-                            tourBookmarks.push(new CZ.Tours.TourBookmark(url, title, lapseTime, text));
-
-                            lapseTime += 10;
-                        }
-
-                        this.tour = new CZ.Tours.Tour(name,
-                            tourBookmarks,
-                            CZ.Tours.bookmarkTransition,
-                            CZ.Common.vc,
-                            "my tours", // catgory
-                            "", //audio
-                            CZ.Tours.tours.length)
+                        this.tour = this.createTour();
                         CZ.Tours.tours.push(this.tour);
                         this.initializeAsEdit();
+                    } else {
+                        // Update existing tour
+                        for (var i = 0, n = CZ.Tours.tours.length; i < n; i++)
+                        {
+                            if (CZ.Tours.tours[i] === this.tour)
+                            {
+                                this.tour = CZ.Tours.tours[i] = this.createTour();
+                                break;
+                            }
+                        }
                     }
                 });
             }
@@ -205,6 +239,13 @@ module CZ {
                 CZ.Authoring.callback = null;
 
                 var stop = new TourStop(targetElement);
+                if (this.tourStopsListBox.items.length > 0) {
+                    stop.LapseTime = (<TourStop>(<TourStopListItem> this.tourStopsListBox.items[this.tourStopsListBox.items.length - 1]).data).LapseTime
+                        + Settings.tourDefaultTransitionTime;
+                }
+                else {
+                    stop.LapseTime = 0;
+                }
                 this.tourStopsListBox.add(stop);
                 this.show();
             }

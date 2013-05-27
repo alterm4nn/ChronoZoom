@@ -52,6 +52,9 @@ var CZ;
                 this.titleTextblock.text(this.data.Title);
                 this.typeTextblock.text(this.data.Type);
                 this.container.dblclick(function (e) {
+                    if(typeof context.Target.vc == "undefined") {
+                        return;
+                    }
                     var vp = context.Target.vc.getViewport();
                     var visible = CZ.VCContent.getVisibleForElement(context.Target, 1.0, vp, true);
                     var target = {

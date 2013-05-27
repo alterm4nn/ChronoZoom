@@ -40,6 +40,16 @@ var CZ;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(TourStop.prototype, "LapseTime", {
+                get: function () {
+                    return this.lapseTime;
+                },
+                set: function (value) {
+                    this.lapseTime = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(TourStop.prototype, "Type", {
                 get: function () {
                     return this.type;
@@ -67,19 +77,45 @@ var CZ;
                     this.tourTitleInput.val(this.tour.title);
                     for(var i = 0, len = this.tour.bookmarks.length; i < len; i++) {
                         var bookmark = this.tour.bookmarks[i];
-                        var target = CZ.Tours.bookmarkUrlToElement(bookmark.url);
-                        if(target == null) {
-                            target = {
-                                type: "Unknown"
-                            };
-                        }
-                        var stop = new TourStop(target, (!bookmark.caption || $.trim(bookmark.caption) === "") ? this.tour.title : bookmark.caption);
+                        var stop = FormEditTour.bookmarkToTourstop(bookmark);
                         this.stops.push(stop);
                     }
+                } else {
+                    this.tourTitleInput.val("");
                 }
                 this.tourStopsListBox = new CZ.UI.TourStopListBox(container.find(formInfo.tourStopsListBox), formInfo.tourStopsTemplate, this.stops);
                 this.initialize();
             }
+            FormEditTour.bookmarkToTourstop = function bookmarkToTourstop(bookmark) {
+                var target = CZ.Tours.bookmarkUrlToElement(bookmark.url);
+                if(target == null) {
+                    target = {
+                        type: "Unknown"
+                    };
+                }
+                var stop = new TourStop(target, (!bookmark.caption || $.trim(bookmark.caption) === "") ? undefined : bookmark.caption);
+                stop.LapseTime = bookmark.lapseTime;
+                return stop;
+            };
+            FormEditTour.tourstopToBookmark = function tourstopToBookmark(tourstop) {
+                var url = CZ.UrlNav.vcelementToNavString(tourstop.Target);
+                var title = tourstop.Title;
+                var text = "";
+                var bookmark = new CZ.Tours.TourBookmark(url, title, tourstop.LapseTime, text);
+                return bookmark;
+            };
+            FormEditTour.prototype.createTour = function () {
+                var name = this.tourTitleInput.val();
+                var tourBookmarks = new Array();
+                for(var j = 0, n = this.tourStopsListBox.items.length; j < n; j++) {
+                    var tourstopItem = this.tourStopsListBox.items[j];
+                    var tourstop = tourstopItem.data;
+                    var bookmark = FormEditTour.tourstopToBookmark(tourstop);
+                    tourBookmarks.push(bookmark);
+                }
+                var tour = new CZ.Tours.Tour(name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, "my tours", "", CZ.Tours.tours.length);
+                return tour;
+            };
             FormEditTour.prototype.initializeAsEdit = function () {
                 this.deleteButton.show();
                 this.titleTextblock.text("Edit Tour");
@@ -105,21 +141,16 @@ var CZ;
                 });
                 this.saveButton.click(function (event) {
                     if(_this.tour == null) {
-                        var name = _this.tourTitleInput.val();
-                        var tourBookmarks = new Array();
-                        var lapseTime = 0.0;
-                        for(var j = 0, n = _this.tourStopsListBox.items.length; j < n; j++) {
-                            var tourstopItem = _this.tourStopsListBox.items[j];
-                            var tourstop = tourstopItem.data;
-                            var url = CZ.UrlNav.vcelementToNavString(tourstop.Target);
-                            var title = tourstop.Title;
-                            var text = "";
-                            tourBookmarks.push(new CZ.Tours.TourBookmark(url, title, lapseTime, text));
-                            lapseTime += 10;
-                        }
-                        _this.tour = new CZ.Tours.Tour(name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, "my tours", "", CZ.Tours.tours.length);
+                        _this.tour = _this.createTour();
                         CZ.Tours.tours.push(_this.tour);
                         _this.initializeAsEdit();
+                    } else {
+                        for(var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
+                            if(CZ.Tours.tours[i] === _this.tour) {
+                                _this.tour = CZ.Tours.tours[i] = _this.createTour();
+                                break;
+                            }
+                        }
                     }
                 });
             };
@@ -158,6 +189,11 @@ var CZ;
                 CZ.Authoring.mode = "editTour";
                 CZ.Authoring.callback = null;
                 var stop = new TourStop(targetElement);
+                if(this.tourStopsListBox.items.length > 0) {
+                    stop.LapseTime = ((this.tourStopsListBox.items[this.tourStopsListBox.items.length - 1]).data).LapseTime + CZ.Settings.tourDefaultTransitionTime;
+                } else {
+                    stop.LapseTime = 0;
+                }
                 this.tourStopsListBox.add(stop);
                 this.show();
             };

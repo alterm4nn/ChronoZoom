@@ -48,6 +48,7 @@ var CZ;
                 this.activationSource.removeClass("active");
                 this.container.find("cz-form-errormsg").hide();
                 this.container.find("#tours").empty();
+                this.toursListBox.container.empty();
             };
             FormToursList.prototype.onTakeTour = function (tour) {
                 this.close();
