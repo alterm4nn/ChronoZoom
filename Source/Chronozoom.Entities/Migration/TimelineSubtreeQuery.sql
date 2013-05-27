@@ -56,11 +56,11 @@ BEGIN
 			FETCH NEXT FROM cur INTO @current_id
 			WHILE @@FETCH_STATUS = 0
 			BEGIN
+				INSERT INTO @results VALUES(@current_id)
+				SET @cnt = @cnt + 1
 				SELECT @num_ge_min_span=COUNT(Id) FROM (SELECT TOP(1) Id FROM Timelines WHERE Timeline_ID = @current_id AND ToYear - FromYear >= @min_span) AS ChildTimelines
 				IF @num_ge_min_span > 0
 				BEGIN
-					INSERT INTO @results VALUES(@current_id)
-					SET @cnt = @cnt + 1
 					IF @cnt < @max_elem
 						INSERT INTO @next_level SELECT Id FROM Timelines WHERE Timeline_ID = @current_id AND ToYear - FromYear >= @min_span AND ((FromYear >= @startTime AND FromYear <= @endTime) OR (ToYear >= @startTime AND ToYear <= @endTime) OR (FromYear <= @startTime AND ToYear >= @endTime) OR (FromYear >= @startTime AND ToYear <= @endTime))
 					ELSE

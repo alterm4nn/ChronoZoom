@@ -207,10 +207,10 @@ namespace Chronozoom.Entities
                                 break;
                             }
                         }
+                        ((Collection<TimelineRaw>)result).Add(t);
+                        --maxElements;
                         if (childGreaterThanMinspan)
                         {
-                            ((Collection<TimelineRaw>)result).Add(t);
-                            --maxElements;
                             if (maxElements >= t.ChildTimelines.Count())
                             {
                                 foreach (TimelineRaw c in childTimelines)
