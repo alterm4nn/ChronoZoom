@@ -201,6 +201,7 @@
     <Content Include="scripts\bibliography.ts" />
     <Content Include="scripts\breadcrumbs.ts" />
     <Content Include="scripts\common.ts" />
+    <Content Include="scripts\external\csvToArray.v2.1.js" />
     <Content Include="ui\controls\formbase.js">
       <DependentUpon>formbase.ts</DependentUpon>
     </Content>
@@ -436,6 +437,7 @@
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="dumps\beta-timeseries.csv" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Chronozoom.svc.cs">

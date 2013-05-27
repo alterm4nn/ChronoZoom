@@ -47,34 +47,53 @@ module CZ {
                 cache: false,
                 type: "GET",
                 async: false,
-                dataType: "json",
-                url: '/dumps/beta-timeseries.json',
+                dataType: "text",
+                url: '/dumps/beta-timeseries.csv', 
                 success: function (result) {
                     rolandData = result;
                 },
                 error: function (xhr) {
-                    alert("Error connecting to service: " + xhr.responseText);
+                    alert("Error fetching timeSeries Data: " + xhr.responseText);
                 }
             });
 
-            var n = rolandData.length / 2;
+            return csvToDataSet(rolandData);
+        }
+
+        export function csvToDataSet(csvText: any): DataSet {
+            var firstLineEnding = csvText.indexOf("\n");
+            var appearance = csvText.substr(0, firstLineEnding);
+            var dataText = csvText.substr(firstLineEnding, csvText.length);
+
+            var csvArr = dataText.csvToArray({ trim: true });
+            var dataLength = csvArr.length - 1;
+            var seriesLength = csvArr[0].length - 1;
+
             var result = new DataSet();
             result.time = new Array();
             result.series = new Array();
-            var seria = new Series();
-            seria.values = new Array();
-            seria.appearanceSettings = { thickness: 1, stroke: 'blue' };
-            seria.appearanceSettings.yMin = rolandData[1];
-            seria.appearanceSettings.yMax = rolandData[1];
-            result.series.push(seria);
-            for (var i = 0; i < n; i++) {
-                result.time.push(rolandData[2 * i]);
-                var y = rolandData[2 * i + 1];
-                if (seria.appearanceSettings.yMin > y)
-                    seria.appearanceSettings.yMin = y;
-                if (seria.appearanceSettings.yMax < y)
-                    seria.appearanceSettings.yMax = y;
-                seria.values.push(y);
+
+            for (var i = 1; i <= seriesLength; i++) {
+                var seria = new Series();
+                seria.values = new Array();
+                //TODO: add proper appearence settings
+                seria.appearanceSettings = { thickness: 1, stroke: 'blue' };
+                seria.appearanceSettings.yMin = parseFloat(csvArr[1][i]);
+                seria.appearanceSettings.yMax = parseFloat(csvArr[1][i]);
+                result.series.push(seria);
+            }
+
+            for (var i = 0; i < dataLength; i++) {
+                result.time.push(csvArr[i + 1][0]);
+                for (var j = 1; j <= seriesLength; j++) {
+                    var value = parseFloat(csvArr[i + 1][j]);
+                    var seria = result.series[j-1];
+                    if (seria.appearanceSettings.yMin > value)
+                        seria.appearanceSettings.yMin = value;
+                    if (seria.appearanceSettings.yMax < value)
+                        seria.appearanceSettings.yMax = value;
+                    seria.values.push(value);
+                }
             }
 
             return result;
