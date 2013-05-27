@@ -15,9 +15,9 @@ var CZ;
                 this.usernameInput = container.find(formInfo.usernameInput);
                 this.emailInput = container.find(formInfo.emailInput);
                 this.agreeInput = container.find(formInfo.agreeInput);
-                this.loginPanel = $(document.body).find(formInfo.loginPanel);
-                this.profilePanel = $(document.body).find(formInfo.profilePanel);
-                this.loginPanelLogin = $(document.body).find(formInfo.loginPanelLogin);
+                this.loginPanel = $(document.body).find(formInfo.loginPanel).first();
+                this.profilePanel = $(document.body).find(formInfo.profilePanel).first();
+                this.loginPanelLogin = $(document.body).find(formInfo.loginPanelLogin).first();
                 this.allowRedirect = formInfo.allowRedirect;
                 this.initialize();
             }
@@ -79,7 +79,7 @@ var CZ;
                     }).done(function (data) {
                         _this.profilePanel.hide();
                         _this.loginPanel.show();
-                        _super.prototype.close.call(_this);
+                        _this.close();
                     });
                 });
             };

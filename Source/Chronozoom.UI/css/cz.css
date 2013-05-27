@@ -233,6 +233,25 @@ a:visited {
   color: #E9E9E9 !important;
   font-size: medium 14px;
 }
+#login-panel label {
+  display: inline-block;
+  margin-top: 8px;
+  margin-left: 10px;
+  color: #E9E9E9;
+  vertical-align: top;
+}
+#login-panel[data-enabled~="true"]:hover {
+  background-color: #0464a2;
+}
+#login-panel.active {
+  background-color: #0464a2;
+}
+#profile-panel[data-enabled~="true"]:hover {
+  background-color: #0464a2;
+}
+#profile-panel.active {
+  background-color: #0464a2;
+}
 .header-logo {
   height: 36px;
   line-height: 36px;
@@ -1248,22 +1267,16 @@ img.fallbackBackground {
 
   filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#1B6AAB', EndColorStr='#0E4073', GradientType=0);
   /* IE10 Consumer Preview */
-
   background-image: -ms-linear-gradient(bottom, #0e4073 0%, #1b6aab 100%);
   /* Mozilla Firefox */
-
   background-image: -moz-linear-gradient(bottom, #0e4073 0%, #1b6aab 100%);
   /* Opera */
-
   background-image: -o-linear-gradient(bottom, #0e4073 0%, #1b6aab 100%);
   /* Webkit (Safari/Chrome 10) */
-
   background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #0e4073), color-stop(1, #1b6aab));
   /* Webkit (Chrome 11+) */
-
   background-image: -webkit-linear-gradient(bottom, #0e4073 0%, #1b6aab 100%);
   /* W3C Markup, IE10 Release Preview */
-
   background-image: linear-gradient(to top, #0e4073 0%, #1b6aab 100%);
 }
 .cz-header-edit-form {
