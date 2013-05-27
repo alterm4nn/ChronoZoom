@@ -112,7 +112,7 @@ module CZ {
                     description: this.descriptionInput.val() || "",
                     index: this.contentItem.index
                 };
-                if (CZ.Authoring.ValidateContentItems([newContentItem])) {
+                if (CZ.Authoring.validateContentItems([newContentItem])) {
                     if (CZ.Authoring.contentItemMode === "createContentItem") {
                         if (this.prevForm && this.prevForm instanceof FormEditExhibit) {
                             this.isCancel = false;

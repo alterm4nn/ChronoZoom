@@ -18,6 +18,7 @@ module CZ {
             private startDate: CZ.UI.DatePicker;
             private endDate: CZ.UI.DatePicker;
             private titleInput: JQuery;
+            private errorMessage: JQuery;
 
             private timeline: any;
             private isCancel: bool;
@@ -36,6 +37,8 @@ module CZ {
 
                 this.saveButton.off();
                 this.deleteButton.off();
+
+                this.errorMessage = this.container.find("#error-edit-timeline");
 
                 this.initialize();
             }
@@ -70,12 +73,24 @@ module CZ {
                 }
 
                 this.saveButton.click(event => {
-                    var isValid = CZ.Authoring.ValidateTimelineData(this.startDate.getDate(), this.endDate.getDate(), this.titleInput.val());
-                    if (!isValid) {
-                        this.container.find("#error-edit-timeline").show().delay(7000).fadeOut();
+                    this.errorMessage.empty();
+                    var isDataValid = false;
+                    isDataValid = CZ.Authoring.validateTimelineData(this.startDate.getDate(), this.endDate.getDate(), this.titleInput.val());
+                    // Other cases are covered by datepicker
+                    if (!CZ.Authoring.isNotEmpty(this.titleInput.val())) {
+                        this.errorMessage.text('Title is empty');
                     }
-                    if (isValid) {
+                    else if (!CZ.Authoring.isIntervalPositive(this.startDate.getDate(), this.endDate.getDate())) {
+                        this.errorMessage.text('Result interval is not positive');
+                    }      
+                    
+                    if (!isDataValid) {
+                        return;
+                    }
+                    else {
+                        this.errorMessage.empty();
                         var self = this;
+
                         CZ.Authoring.updateTimeline(this.timeline, {
                             title: this.titleInput.val(),
                             start: this.startDate.getDate(),
@@ -111,6 +126,8 @@ module CZ {
             }
 
             public close() {
+                this.errorMessage.empty();
+
                 super.close({
                     effect: "slide", 
                     direction: "left",
@@ -121,14 +138,15 @@ module CZ {
                     }
                 });
 
-                if (this.isCancel && CZ.Authoring.mode === "createTimeline") {
-                    CZ.Authoring.removeTimeline(this.timeline);
+                if (this.isCancel && CZ.Authoring.mode === "createTimeline") {                    
+                    CZ.VCContent.removeChild(this.timeline.parent, this.timeline.id);
+                    CZ.Common.vc.virtualCanvas("requestInvalidate");
                 }
 
                 CZ.Authoring.isActive = false;
 
                 this.activationSource.removeClass("active");
-                this.container.find("#error-edit-timeline").hide();
+                
             }
         }
     }

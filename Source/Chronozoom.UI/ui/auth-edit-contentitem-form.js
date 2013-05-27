@@ -74,7 +74,7 @@ var CZ;
                     description: this.descriptionInput.val() || "",
                     index: this.contentItem.index
                 };
-                if(CZ.Authoring.ValidateContentItems([
+                if(CZ.Authoring.validateContentItems([
                     newContentItem
                 ])) {
                     if(CZ.Authoring.contentItemMode === "createContentItem") {
