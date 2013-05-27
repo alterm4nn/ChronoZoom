@@ -100,7 +100,7 @@ var CZ;
                 this.activationSource.removeClass("active");
             };
             return FormEditProfile;
-        })(CZ.UI.FormBase);
+        })(CZ.UI.FormUpdateEntity);
         UI.FormEditProfile = FormEditProfile;        
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;

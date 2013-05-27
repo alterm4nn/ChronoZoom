@@ -63,5 +63,27 @@ module CZ {
                 this.prevForm.show();
             }
         }
+
+
+        export interface IFormUpdateEntityInfo extends IFormBaseInfo {
+            saveButton: string;
+        }
+
+        export class FormUpdateEntity extends FormBase {
+            public saveButton: JQuery;
+
+            constructor(container: JQuery, formInfo: IFormUpdateEntityInfo) {
+                super(container, formInfo);
+
+                this.saveButton = this.container.find(formInfo.saveButton);
+                
+                this.container.keypress(event => {
+                    // trigger click on save button if ENTER was pressed
+                    if (event.keyCode === 13) {
+                        this.saveButton.trigger("click");
+                    }
+                });
+            }
+        }
     }
 }

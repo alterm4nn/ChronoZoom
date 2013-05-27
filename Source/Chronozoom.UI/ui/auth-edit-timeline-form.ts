@@ -4,16 +4,15 @@
 
 module CZ {
     export module UI {
-        export interface IFormEditTimelineInfo extends CZ.UI.IFormBaseInfo {
+        export interface IFormEditTimelineInfo extends CZ.UI.IFormUpdateEntityInfo {
             startDate: string;
             endDate: string;
-            saveButton: string;
             deleteButton: string;
             titleInput: string;
             context: Object;
         }
 
-        export class FormEditTimeline extends CZ.UI.FormBase {
+        export class FormEditTimeline extends CZ.UI.FormUpdateEntity {
             private saveButton: JQuery;
             private deleteButton: JQuery;
             private startDate: CZ.UI.DatePicker;

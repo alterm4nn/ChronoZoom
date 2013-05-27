@@ -136,7 +136,7 @@ var CZ;
                 CZ.Authoring.isActive = false;
             };
             return FormEditCI;
-        })(CZ.UI.FormBase);
+        })(CZ.UI.FormUpdateEntity);
         UI.FormEditCI = FormEditCI;        
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
