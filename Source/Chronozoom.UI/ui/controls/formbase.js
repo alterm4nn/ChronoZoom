@@ -1,3 +1,8 @@
+var __extends = this.__extends || function (d, b) {
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var CZ;
 (function (CZ) {
     (function (UI) {
@@ -48,6 +53,21 @@ var CZ;
             return FormBase;
         })();
         UI.FormBase = FormBase;        
+        var FormUpdateEntity = (function (_super) {
+            __extends(FormUpdateEntity, _super);
+            function FormUpdateEntity(container, formInfo) {
+                var _this = this;
+                        _super.call(this, container, formInfo);
+                this.saveButton = this.container.find(formInfo.saveButton);
+                this.container.keypress(function (event) {
+                    if(event.keyCode === 13) {
+                        _this.saveButton.trigger("click");
+                    }
+                });
+            }
+            return FormUpdateEntity;
+        })(FormBase);
+        UI.FormUpdateEntity = FormUpdateEntity;        
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
