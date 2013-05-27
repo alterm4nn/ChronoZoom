@@ -4,6 +4,7 @@
 
 module CZ {
     export module UI {
+       
 
         export interface FormEditProfileInfo extends CZ.UI.IFormUpdateEntityInfo {
             logoutButton: string;
@@ -31,9 +32,9 @@ module CZ {
             private loginPanelLogin: JQuery;
             private allowRedirect: bool;
 
+
             constructor(container: JQuery, formInfo: FormEditProfileInfo) {
                 super(container, formInfo);
-
                 this.saveButton = container.find(formInfo.saveButton);
                 this.logoutButton = container.find(formInfo.logoutButton);
                 this.usernameInput = container.find(formInfo.usernameInput);

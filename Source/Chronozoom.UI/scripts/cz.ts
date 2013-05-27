@@ -98,21 +98,31 @@ module CZ {
 
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
+
                 var forms = arguments;
-
                 $(".header-icon.edit-icon").click(function () {
-                    $(".header-icon.active").removeClass("active");
-                    $(this).addClass("active");
-
-                    var form = new CZ.UI.FormHeaderEdit(forms[0], {
-                        activationSource: $(this),
-                        navButton: ".cz-form-nav",
-                        closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        titleTextblock: ".cz-form-title",
-                        createTimeline: ".cz-form-create-timeline",
-                        createExhibit: ".cz-form-create-exhibit"
-                    });
-                    form.show();
+                    var editForm = getFormById("#header-edit-form");
+                    if (editForm === false) {
+                        closeAllForms();
+                        var form = new CZ.UI.FormHeaderEdit(forms[0], {
+                            activationSource: $(this),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            createTimeline: ".cz-form-create-timeline",
+                            createExhibit: ".cz-form-create-exhibit"
+                        });
+                        form.show();
+                    }
+                    else {
+                        if (editForm.isFormVisible) {
+                            editForm.close();
+                        }
+                        else {
+                            closeAllForms();
+                            editForm.show();
+                        }
+                    }
                 });
 
                 CZ.Authoring.initialize(CZ.Common.vc, {
@@ -134,16 +144,16 @@ module CZ {
                     },
                     showEditTimelineForm: function (timeline) {
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
-                        	activationSource: $(".header-icon.edit-icon"),
-                        	navButton: ".cz-form-nav",
-                        	closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        	titleTextblock: ".cz-form-title",
-                        	startDate: ".cz-form-time-start",
-                        	endDate: ".cz-form-time-end",
-                        	saveButton: ".cz-form-save",
-                        	deleteButton: ".cz-form-delete",
-                        	titleInput: ".cz-form-item-title",
-                        	context: timeline
+                            activationSource: $(".header-icon.edit-icon"),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            startDate: ".cz-form-time-start",
+                            endDate: ".cz-form-time-end",
+                            saveButton: ".cz-form-save",
+                            deleteButton: ".cz-form-delete",
+                            titleInput: ".cz-form-item-title",
+                            context: timeline
                         });
                         form.show();
                     },
@@ -180,29 +190,29 @@ module CZ {
                             deleteButton: ".cz-form-delete",
                             contentItemsTemplate: forms[4],
                             context: exhibit
-						});
+                        });
                         form.show();
                     },
                     showEditContentItemForm: function (ci, e, prevForm, noAnimation) {
                         var form = new CZ.UI.FormEditCI(forms[3], {
                             activationSource: $(".header-icon.edit-icon"),
                             prevForm: prevForm,
-                        	navButton: ".cz-form-nav",
-                        	closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        	titleTextblock: ".cz-form-title",
-                        	errorMessage: ".cz-form-errormsg",
-                        	saveButton: ".cz-form-save",
-                        	titleInput: ".cz-form-item-title",
-                        	mediaSourceInput: ".cz-form-item-mediasource",
-                        	mediaInput: ".cz-form-item-mediaurl",
-                        	descriptionInput: ".cz-form-item-descr",
-                       		attributionInput: ".cz-form-item-attribution",
-                        	mediaTypeInput: ".cz-form-item-media-type",
-                        	context: {
-                        	    exhibit: e,
-                        	    contentItem: ci
-                        	}
-                         });
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            errorMessage: ".cz-form-errormsg",
+                            saveButton: ".cz-form-save",
+                            titleInput: ".cz-form-item-title",
+                            mediaSourceInput: ".cz-form-item-mediasource",
+                            mediaInput: ".cz-form-item-mediaurl",
+                            descriptionInput: ".cz-form-item-descr",
+                            attributionInput: ".cz-form-item-attribution",
+                            mediaTypeInput: ".cz-form-item-media-type",
+                            context: {
+                                exhibit: e,
+                                contentItem: ci
+                            }
+                        });
                         form.show(noAnimation);
                     }
                 });
@@ -212,7 +222,7 @@ module CZ {
                 }
 
                 var profileForm = new CZ.UI.FormEditProfile(forms[5], {
-                    activationSource: $(".header-icon.profile-icon"),
+                    activationSource: $("#login-panel"),
                     navButton: ".cz-form-nav",
                     closeButton: ".cz-form-close-btn > .cz-form-btn",
                     titleTextblock: ".cz-form-title",
@@ -224,37 +234,13 @@ module CZ {
                     agreeInput: ".cz-form-agree",
                     loginPanel: "#login-panel",
                     profilePanel: "#profile-panel",
-                    loginPanelLogin: "#profile-panel span.auth-panel-login",
+                    loginPanelLogin: "#profile-panel.auth-panel-login",
                     context: "",
                     allowRedirect: IsFeatureEnabled("Authoring")
                 });
 
-                $("#edit_profile_button").click(function () {
-                    profileForm.show();
-                });
-
-                if (IsFeatureEnabled("Login")) {
-                    CZ.Service.getProfile().done(data => {
-                        //Not authorized
-                        if (data == "") {
-                            $("#login-panel").show();
-                        }
-                            //Authorized for a first time
-                        else if (data != "" && data.DisplayName == null) {
-                            $("#profile-panel").show();
-                            $("#profile-panel input#username").focus();
-                            profileForm.show();
-                        } else {
-                            $("#profile-panel").show();
-                            $("#profile-panel span.auth-panel-login").html(data.DisplayName);
-                        }
-                    }).fail((error) => {
-                        $("#login-panel").show();
-                    });
-                }
-
                 var loginForm = new CZ.UI.FormLogin(forms[6], {
-                    activationSource: $(".header-icon.profile-icon"),
+                    activationSource: $("#login-panel"),
                     navButton: ".cz-form-nav",
                     closeButton: ".cz-form-close-btn > .cz-form-btn",
                     titleTextblock: ".cz-form-title",
@@ -262,8 +248,53 @@ module CZ {
                     context: ""
                 });
 
-                $("#login-button").click(function () {
-                    loginForm.show();
+                $("#edit_profile_button").click(function () {
+                    if (!profileForm.isFormVisible) {
+                        closeAllForms();
+                        profileForm.show();
+                    }
+                    else {
+                        profileForm.close();
+                    }
+
+                });
+
+                if (IsFeatureEnabled("Login")) {
+                    CZ.Service.getProfile().done(data => {
+                        //Not authorized
+                        if (data == "") {
+                            $("#profile-panel").show();
+                        }
+                            //Authorized for a first time
+                        else if (data != "" && data.DisplayName == null) {
+                            $("#profile-panel").show();
+                            $("#profile-panel input#username").focus();
+
+                            if (!profileForm.isFormVisible) {
+                                closeAllForms();
+                                profileForm.show();
+                            }
+                            else {
+                                profileForm.close();
+                            }
+                        }
+                        else {
+                            $("#profile-panel").show();
+                            $(".auth-panel-login").html(data.DisplayName);
+                        }
+                    }).fail((error) => {
+                        $("#login-panel").show();
+                    });
+                }
+
+                $("#login-panel").click(function () {
+                    if (!loginForm.isFormVisible) {
+                        closeAllForms();
+                        loginForm.show();
+                    }
+                    else {
+                        loginForm.close();
+                    }
                 });
             });
 
@@ -340,8 +371,8 @@ module CZ {
             $('#biblCloseButton')
                 .mouseout(() => { CZ.Common.toggleOffImage('biblCloseButton', 'png'); })
                 .mouseover(() => { CZ.Common.toggleOnImage('biblCloseButton', 'png'); })
-            
-            
+
+
             $('#welcomeScreenCloseButton')
                 .mouseover(() => { CZ.Common.toggleOnImage('welcomeScreenCloseButton', 'png'); })
                 .mouseout(() => { CZ.Common.toggleOffImage('welcomeScreenCloseButton', 'png'); })
@@ -366,7 +397,7 @@ module CZ {
 
             // Feature activation control
             for (var idxFeature = 0; idxFeature < _featureMap.length; idxFeature++) {
-                var enabled : bool = true;
+                var enabled: bool = true;
                 var feature = _featureMap[idxFeature];
 
                 if (feature.Activation === FeatureActivation.Disabled) {
@@ -593,6 +624,19 @@ module CZ {
         function IsFeatureEnabled(featureName) {
             var feature: FeatureInfo[] = $.grep(_featureMap, function (e) { return e.Name === featureName; });
             return feature[0].IsEnabled;
+        }
+
+        function closeAllForms() {
+            $('.cz-major-form').each((i, f) => { var form = $(f).data('form'); if (form) { form.close(); } });
+                     
+        }
+
+        function getFormById(name) {
+            var form = $(name).data("form");
+            if (form)
+                return form;
+            else
+                return false;
         }
     }
 }

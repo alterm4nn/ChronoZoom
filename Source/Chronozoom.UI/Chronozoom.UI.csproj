@@ -215,6 +215,9 @@
     </Compile>
     <Compile Include="utils\ThumbnailGenerator.cs" />
     <Compile Include="utils\UrlHelper.cs" />
+    <Content Include="css\cz.min.css">
+      <DependentUpon>cz.less</DependentUpon>
+    </Content>
     <Content Include="cz.html" />
     <Content Include="fallback.html" />
     <Content Include="Global.asax" />

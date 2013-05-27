@@ -430,8 +430,8 @@ var CZ;
         }
         Authoring.removeContentItem = removeContentItem;
         function validateTimelineData(start, end, title) {
-            var isValid = CZ.Authoring.validateNumber(start) && CZ.Authoring.validateNumber(end);
-            isValid = isValid && CZ.Authoring.isNotEmpty(title) && CZ.Authoring.isNotEmpty(start) && CZ.Authoring.isNotEmpty(end);
+            var isValid = (start !== false) && (end !== false);
+            isValid = isValid && CZ.Authoring.isNotEmpty(title);
             isValid = isValid && CZ.Authoring.isIntervalPositive(start, end);
             return isValid;
         }
