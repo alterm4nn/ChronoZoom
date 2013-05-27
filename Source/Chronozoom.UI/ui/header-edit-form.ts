@@ -7,8 +7,6 @@ module CZ {
         export interface IFormHeaderEditInfo extends CZ.UI.IFormBaseInfo {
             createTimeline: string;
             createExhibit: string;
-            editTimeline: string;
-            editExhibit: string;
         }
 
         export class FormHeaderEdit extends CZ.UI.FormBase {
