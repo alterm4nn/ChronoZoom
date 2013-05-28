@@ -33,7 +33,9 @@ namespace Application.Driver.UserActions
         private Actions _builder;
         protected Actions Builder
         {
-            get { _builder = new Actions(WebDriver);
+            get
+            {
+                _builder = new Actions(WebDriver);
                 return _builder;
             }
         }
@@ -134,8 +136,8 @@ namespace Application.Driver.UserActions
         protected void WaitForElementIsDisplayed(By by)
         {
             _wait.Until(w => IsElementDisplayed(by));
-        } 
-        
+        }
+
         protected void WaitForElementIsNotDisplayed(By by)
         {
             _wait.Until(w => !IsElementDisplayed(by));
@@ -149,6 +151,11 @@ namespace Application.Driver.UserActions
         protected void WaitForElementIsExisted(By by)
         {
             _wait.Until(w => IsElementExists(by));
+        }
+
+        protected void WaitForAlertIsDisplayed()
+        {
+            _wait.Until(w => IsAlertPresented());
         }
 
         protected void TypeText(By by, string text)
@@ -214,15 +221,7 @@ namespace Application.Driver.UserActions
         {
             chain.Invoke().Build().Perform();
         }
-
-        private bool AreEqualViewports()
-        {
-            string v1 = GetJavaScriptExecutionResult("$('#vc').virtualCanvas('getViewport')");
-            Sleep(2);
-            string v2 = GetJavaScriptExecutionResult("$('#vc').virtualCanvas('getViewport')");
-            return v1 == v2;
-        }
-
+        
         protected void ClickElementAndType(By by, string text)
         {
             IWebElement element = FindElement(by);
@@ -262,13 +261,13 @@ namespace Application.Driver.UserActions
             IWebElement element = FindElement(by);
             InvokeChain(() => Builder.MoveToElement(element).Click(element));
         }
-        
+
         protected void MoveToElementCoordinates(By by, int x, int y)
         {
             IWebElement element = FindElement(by);
-            InvokeChain(() => Builder.MoveToElement(element,x,y));
+            InvokeChain(() => Builder.MoveToElement(element, x, y));
         }
-        
+
         protected string GetAttributeValue(By by, string attributeName)
         {
             return FindElement(by).GetAttribute(attributeName);
@@ -351,11 +350,33 @@ namespace Application.Driver.UserActions
         {
             IWebElement element = FindElement(by);
             InvokeChain(() => Builder.MoveToElement(element).DragAndDropToOffset(element, 50, 50));
-        } 
-        
+        }
+
         protected void AcceptAlert()
         {
             WebDriver.SwitchTo().Alert().Accept();
         }
+
+        private bool IsAlertPresented()
+        {
+            try
+            {
+                WebDriver.SwitchTo().Alert();
+                return true;
+            }
+            catch (NoAlertPresentException)
+            {
+                return false;
+            }
+        }
+
+        private bool AreEqualViewports()
+        {
+            string v1 = GetJavaScriptExecutionResult("$('#vc').virtualCanvas('getViewport')");
+            Sleep(2);
+            string v2 = GetJavaScriptExecutionResult("$('#vc').virtualCanvas('getViewport')");
+            return v1 == v2;
+        }
+
     }
 }
