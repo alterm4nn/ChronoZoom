@@ -40,7 +40,7 @@ namespace Chronozoom.Entities
         [MaxLength(4000)]
         [Column(TypeName = "nvarchar")]
         public string Title { get; set; }
-        
+
         /// <summary>
         /// The regime in which the timeline should occur.
         /// </summary>

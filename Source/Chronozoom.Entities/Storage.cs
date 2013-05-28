@@ -28,6 +28,12 @@ namespace Chronozoom.Entities
     /// </summary>
     public class Storage : DbContext
     {
+        private static Lazy<int> _storageTimeout = new Lazy<int>(() =>
+        {
+            string storageTimeout = ConfigurationManager.AppSettings["StorageTimeout"];
+            return string.IsNullOrEmpty(storageTimeout) ? 30 : int.Parse(storageTimeout, CultureInfo.InvariantCulture);
+        });
+
         // Enables RI-Tree queries.
         private static Lazy<bool> _useRiTreeQuery = new Lazy<bool>(() =>
         {
@@ -44,6 +50,11 @@ namespace Chronozoom.Entities
 
         public Storage()
         {
+            if (System.Configuration.ConfigurationManager.ConnectionStrings[0].ProviderName.Equals("System.Data.​SqlClient"))
+            {
+                ((IObjectContextAdapter)this).ObjectContext.CommandTimeout = _storageTimeout.Value;
+            }
+
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<Storage, StorageMigrationsConfiguration>());
             Configuration.ProxyCreationEnabled = false;
         }
