@@ -388,6 +388,108 @@ namespace Chronozoom.UI
         void DeleteContentItem(string superCollectionName, string collectionName, ContentItem contentItemRequest);
 
         /// <summary>
+        /// Creates a new tour and it's supporting bookmarks
+        /// </summary>
+        /// <remarks>
+        /// All bookmarks in a tour must belong to the same collection and the user 
+        /// must have permission to modify that collection.
+        /// POST is used to create a new tour. The tour id should not be specified. 
+        /// </remarks>
+        /// <param name="superCollectionName">The name of the parent collection.</param>
+        /// <param name="collectionName">The name of the collection to modify.</param>
+        /// <param name="tourRequest">The tour data in JSON format.</param>
+        /// <returns>An exhibit in JSON format.</returns>
+        /// <example><![CDATA[ 
+        /// **HTTP verb:** POST
+        ///
+        /// **URL:**
+        ///     http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/tour
+        ///
+        /// **Request body:**
+        ///     {
+        ///          
+        ///     }
+        /// ]]>
+        /// </example>
+        [OperationContract]
+        [WebInvoke(Method = "POST", UriTemplate = "/{superCollectionName}/{collectionName}/tour", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        TourResult PostTour(string superCollectionName, string collectionName, Tour tourRequest);
+
+        /// <summary>
+        /// Creates or updates a tour and it's supporting bookmarks
+        /// </summary>
+        /// <remarks>
+        /// All bookmarks in a tour must belong to the same collection and the user 
+        /// must have permission to modify that collection.
+        /// If a tour ID is not specified, it is a bad update request.
+        /// If the ID for an existing tour is specified then the tour will be updated. 
+        /// If the tour ID to be updated does not exist a "not found" status is returned. 
+        /// If an invalid tour id or bookmark id (for updates) is specified then the request will fail. 
+        /// </remarks>
+        /// <param name="superCollectionName">The name of the parent collection.</param>
+        /// <param name="collectionName">The name of the collection to modify.</param>
+        /// <param name="tourRequest">The tour data in JSON format.</param>
+        /// <returns>An exhibit in JSON format.</returns>
+        /// <example><![CDATA[ 
+        /// **HTTP verb:** PUT
+        ///
+        /// **URL:**
+        ///     http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/tour
+        ///
+        /// **Request body:**
+        ///     {
+        ///          
+        ///     }
+        /// ]]>
+        /// </example>
+        [OperationContract]
+        [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/tour", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        TourResult PutTour(string superCollectionName, string collectionName, Tour tourRequest);
+
+        /// <summary>
+        /// Deletes the specified tour.
+        /// </summary>
+        /// <param name="superCollectionName">The name of the parent collection.</param>
+        /// <param name="collectionName">The name of the collection to modify.</param>
+        /// <param name="tourRequest">The tour ID in JSON format.</param>
+        /// <example><![CDATA[ 
+        /// **HTTP verb:** DELETE
+        ///
+        /// **URL:**
+        ///     http://[site URL]/[superCollectionName]/[collectionName]/tour
+        ///
+        /// **Request body:**
+        ///     {
+        ///          id: "5c07b2bf-65e1-45e1-a9cd-792a7767d685"
+        ///     }
+        /// ]]></example>
+        [OperationContract]
+        [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/tour", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        void DeleteTour(string superCollectionName, string collectionName, Tour tourRequest);
+
+        /// <summary>
+        /// Delete a list of bookmarks belonging to the same tour.
+        /// </summary>
+        /// <param name="superCollectionName">The name of the parent collection.</param>
+        /// <param name="collectionName">The name of the collection to modify.</param>
+        /// <param name="tourRequest">The request in JSON format.</param>
+        /// <example><![CDATA[ 
+        /// **HTTP verb:** DELETE
+        ///
+        /// **URL:**
+        ///     http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/bookmark
+        ///
+        /// **Request body:**
+        ///     {
+        ///          id: "0123456789"
+        ///     }
+        /// ]]>
+        /// </example>
+        [OperationContract]
+        [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/bookmark", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        void DeleteBookmarks(string superCollectionName, string collectionName, Tour tourRequest);
+
+        /// <summary>
         /// Retrieves a path to the given content id.
         /// 
         /// For t48fbb8a8-7c5d-49c3-83e1-98939ae2ae6, this API retrieves /t00000000-0000-0000-0000-000000000000/t48fbb8a8-7c5d-49c3-83e1-98939ae2ae67
