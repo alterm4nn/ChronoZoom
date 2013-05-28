@@ -153,6 +153,19 @@ var CZ;
                         }
                     }
                 });
+                this.deleteButton.click(function (event) {
+                    if(_this.tour == null) {
+                        return;
+                    }
+                    for(var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
+                        if(CZ.Tours.tours[i] === _this.tour) {
+                            _this.tour = null;
+                            CZ.Tours.tours.splice(i, 1);
+                            _this.close();
+                            break;
+                        }
+                    }
+                });
             };
             FormEditTour.prototype.show = function () {
                 _super.prototype.show.call(this, {

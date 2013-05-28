@@ -184,13 +184,23 @@ module CZ {
                         this.initializeAsEdit();
                     } else {
                         // Update existing tour
-                        for (var i = 0, n = CZ.Tours.tours.length; i < n; i++)
-                        {
-                            if (CZ.Tours.tours[i] === this.tour)
-                            {
+                        for (var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
+                            if (CZ.Tours.tours[i] === this.tour) {
                                 this.tour = CZ.Tours.tours[i] = this.createTour();
                                 break;
                             }
+                        }
+                    }
+                });
+                this.deleteButton.click(event =>
+                {
+                    if (this.tour == null) return;
+                    for (var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
+                        if (CZ.Tours.tours[i] === this.tour) {
+                            this.tour = null;
+                            CZ.Tours.tours.splice(i, 1);
+                            this.close();
+                            break;
                         }
                     }
                 });
