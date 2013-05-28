@@ -6,6 +6,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
@@ -41,6 +42,8 @@ namespace Chronozoom.Entities
         /// The name of the bookmark.
         /// </summary>
         [DataMember(Name="name")]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         public string Name { get; set; }
 
         /// <summary>
@@ -50,6 +53,8 @@ namespace Chronozoom.Entities
         /// 
         /// </example>
         [DataMember(Name="url")]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification="Uri not supported in entity framework.")]
         public string Url { get; set; }
 
@@ -76,6 +81,8 @@ namespace Chronozoom.Entities
         /// A text description of the bookmark.
         /// </summary>
         [DataMember(Name = "description")]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         public string Description { get; set; }
 
         /// <summary>  

@@ -7,8 +7,10 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
+using System.Data.SqlTypes;
 
 namespace Chronozoom.Entities
 {
@@ -29,6 +31,8 @@ namespace Chronozoom.Entities
         /// The name of the tour.
         /// </summary>
         [DataMember(Name = "name")]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         public string Name { get; set; }
 
         /// <summary>
@@ -47,6 +51,8 @@ namespace Chronozoom.Entities
         /// The category to which the tour belongs.
         /// </summary>
         [DataMember(Name = "category")]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         public string Category { get; set; }
 
         /// <summary>
