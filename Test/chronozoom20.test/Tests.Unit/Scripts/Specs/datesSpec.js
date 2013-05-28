@@ -22,7 +22,7 @@ describe("convertYearToCoordinate method should return", function () {
         });
     });
 
-    using("regime =", ["ka"], function (value) {
+    using("regime =", ["Ka"], function (value) {
         it("year * -1000", function () {
             var year = .13568;
             var coordinate = convertYearToCoordinate(year, value);
@@ -71,7 +71,7 @@ describe("convertCoordinateToYear method should return", function () {
             var coordinate = value;
             var result = convertCoordinateToYear(coordinate);
             expect(result.year).toEqual(coordinate / -1000);
-            expect(result.regime).toEqual('ka');
+            expect(result.regime).toEqual('Ka');
         });
     });
     using("coordinate =", [-999999999, -1999999], function (value) {
