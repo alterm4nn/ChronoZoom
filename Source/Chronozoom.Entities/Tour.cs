@@ -58,10 +58,9 @@ namespace Chronozoom.Entities
         /// <summary>
         /// The collection of bookmarks for the tour.
         /// </summary>
-        [DataMember(Name = "bookmarks")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification="Automatically implemented properties must define both get and set accessors.")]
-        public virtual Collection<Bookmark> Bookmarks { get; private set; }
-
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly"), DataMember(Name = "bookmarks")]
+        public virtual Collection<Bookmark> Bookmarks { get; set; }
+        
         public virtual Entities.Collection Collection { get; set; }
     }
 }
