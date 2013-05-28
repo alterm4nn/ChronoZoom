@@ -20,7 +20,7 @@ namespace Tests
         public void TestInitialize()
         {
             BrowserStateManager.RefreshState();
-            HomePageHelper.OpenSandboxPage();
+            HomePageHelper.OpenPage();
             AuthorizationHelper.OpenLoginPage();
         }
 
@@ -32,32 +32,40 @@ namespace Tests
         [TestCleanup]
         public void TestCleanup()
         {
-            AuthorizationHelper.Logout();
+            AuthorizationHelper.DeleteAuthenticatedCookies();
             CreateScreenshotsIfTestFail(TestContext);
         }
 
         #endregion
 
         [TestMethod]
-        public void Test_Login_as_Google_user()
+        public void Test_Login_as_new_Google_user()
         {
-
             AuthorizationHelper.AuthenticateAsGoogleUser();
-            Assert.IsTrue(AuthorizationHelper.IsUserAuthenticated());
+            Assert.IsTrue(AuthorizationHelper.IsNewUserAuthenticated());
+            AuthorizationHelper.Logout();
+            Assert.IsTrue(AuthorizationHelper.IsUserLogout());
+            Assert.IsFalse(AuthorizationHelper.IsUserCookieExist(), "Cookies are not deleted");
         }
 
         [TestMethod]
-        public void Test_Login_as_Yahoo_user()
+        public void Test_Login_as_new_Yahoo_user()
         {
             AuthorizationHelper.AuthenticateAsYahooUser();
-            Assert.IsTrue(AuthorizationHelper.IsUserAuthenticated());
+            Assert.IsTrue(AuthorizationHelper.IsNewUserAuthenticated());
+            AuthorizationHelper.Logout();
+            Assert.IsTrue(AuthorizationHelper.IsUserLogout());
+            Assert.IsFalse(AuthorizationHelper.IsUserCookieExist(), "Cookies are not deleted");
         }
 
         [TestMethod]
-        public void Test_Login_as_Ms_user()
+        public void Test_Login_as_existed_Ms_user()
         {
             AuthorizationHelper.AuthenticateAsMicrosoftUser();
-            Assert.IsTrue(AuthorizationHelper.IsUserAuthenticated());
+            Assert.IsTrue(AuthorizationHelper.IsExistedUserAuthenticated());
+            AuthorizationHelper.Logout();
+            Assert.IsTrue(AuthorizationHelper.IsUserLogout());
+            Assert.IsFalse(AuthorizationHelper.IsUserCookieExist(), "Cookies are not deleted");
         }
     }
 }

@@ -117,7 +117,6 @@ namespace Application.Helper.Helpers
             }
             catch (Exception)
             {
-                //AcceptAlert();
                 Logger.Log("-> false");
                 return false;
             }
