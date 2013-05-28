@@ -46,6 +46,10 @@ Specifies the type of bookmark.
 |Exhibit|1|
 |ContentItem|2|
  
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
 ### Bookmark ###
  
 Specifies a tour stop (can be either a timeline, an exhibit, or a content item).
@@ -60,6 +64,10 @@ Specifies a tour stop (can be either a timeline, an exhibit, or a content item).
 |LapseTime|The lapse time value for the bookmark.|
 |Description|A text description of the bookmark.|
  
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
 ### Collection ###
  
 Represents a collection of timelines.
@@ -69,6 +77,10 @@ Represents a collection of timelines.
 |Id|The ID of the collection.|
 |Title|The title of the collection.|
 |User|The user ID for the collection owner.|
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
  
 ### ContentItem ###
  
@@ -88,6 +100,10 @@ A pointer to a piece of content in ChronoZoom. The Content Item entity is contai
 |Order|Specifies the order in which the content item should appear.|
 |Collection|The collection that the content item is associated with.|
  
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
 ### Exhibit ###
  
 Contains a set of content items, and is contained by a timeline or a collection.
@@ -100,20 +116,36 @@ Contains a set of content items, and is contained by a timeline or a collection.
 |ContentItems|Specifies the collection of content items that is associated with the exhibit.|
 |Collection|Specifies the collection that is associated with the exhibit.|
  
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
 ### RemoveBetaFields ###
  
 Migration to remove beta fields.
  
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
  
 ### RemoveRITree ###
  
 Migration to remove the RI-Tree.
  
  
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
 ### AddRITreeWithIndex ###
  
 Migration to add RI-Tree with index field.
  
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
  
 ### ObjectType ###
  
@@ -125,6 +157,10 @@ Specifies the type of object contained by the search result.
 |Timeline|1|
 |ContentItem|2|
  
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
 ### SearchResult ###
  
 Contains a search result.
@@ -135,15 +171,27 @@ Contains a search result.
 |Title|The title of the search result.|
 |ObjectType|The type of object contained by the search result.|
  
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
 ### Storage ###
  
 Storage implementation for ChronoZoom based on Entity Framework.
  
  
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
 ### StorageMigrationsConfiguration ###
  
 Describes storage migration options. Used when a schema upgrade is required.
  
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
  
 ### SuperCollection ###
  
@@ -156,6 +204,10 @@ Represents a set of collections.
 |User|The user who owns the supercollection.|
 |Collections|A collection of collections that belong to the supercollection.|
  
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
 ### User ###
  
 A registered user.
@@ -165,6 +217,10 @@ A registered user.
 |Id|The ID of the user.|
 |DisplayName|The display name of the user.|
 |Email|The email address of the user.|
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
  
 
 ## ChronoZoom REST Commands ##
@@ -246,7 +302,7 @@ Search results in JSON format.
 |searchTerm|The term to search for.|
  
 **Remarks**
-Note: The syntax for search is different from other requests. The values for supercollection and collection are specified as request parameters rather than as part of the URL.
+The syntax for search is different from other requests. The values for supercollection and collection are specified as request parameters rather than as part of the URL.
 
  
  
@@ -451,7 +507,7 @@ Creates a new collection using the specified name.
 |:--------|:----|
 |superCollectionName|The name of the parent supercollection.|
 |collectionName|The name of the collection to create.|
-|collectionRequest|The markup for the collection to create in JSON format. For more information, see [Collection](#collection).|
+|collectionRequest|[Collection](#collection) markup in JSON format.|
  
 **Remarks**
 If a collection of the specified name does not exist then a new collection is created. 
@@ -521,7 +577,7 @@ HTTP status code.
 |:--------|:----|
 |superCollectionName|The parent collection.|
 |collectionName|The name of the collection to update.|
-|timelineRequest|Timeline request data in JSON format.|
+|timelineRequest|[Timeline](#timeline) markup in JSON format.|
  
 **Remarks**
 If an ID is specified but the collection does not exist, the request will fail ("not found" status).
@@ -571,7 +627,7 @@ Deletes the timeline with the specified ID.
 Creates or updates the exhibit and its content items in a given collection. If the collection does not exist, then the command will silently fail.
  
 **Returns**
-[Exhibit](#exhibit) markup in JSON format.
+Exhibit markup in JSON format.
  
 **Example**
  
@@ -597,7 +653,7 @@ Creates or updates the exhibit and its content items in a given collection. If t
 |:--------|:----|
 |superCollectionName|The name of the parent collection.|
 |collectionName|The name of the collection to modify.|
-|exhibitRequest|The exhibit data in JSON format.|
+|exhibitRequest|[Exhibit](#exhibit) markup in JSON format.|
  
 **Remarks**
 If an exhibit id is not specified, a new exhibit is added to the collection. 
@@ -637,7 +693,7 @@ Deletes the specified exhibit from the specified collection.
 |:--------|:----|
 |superCollectionName|The name of the parent collection.|
 |collectionName|The name of the collection to modify.|
-|exhibitRequest|The exhibit request in JSON format.|
+|exhibitRequest|The request in JSON format.|
  
  
 [top](#chronozoom-rest-api-reference)
@@ -646,7 +702,7 @@ Deletes the specified exhibit from the specified collection.
  
 ### PutContentItem ###
  
-Creates or updates the content item in a given collection. If the collection does not exist the request will fail.
+Creates or updates the content item in a given collection. If the specified collection does not exist the request will fail.
  
 **Returns**
 
@@ -673,7 +729,7 @@ Creates or updates the content item in a given collection. If the collection doe
 |:--------|:----|
 |superCollectionName|The name of the parent collection.|
 |collectionName|The name of the collection to modify.|
-|contentItemRequest|The [ContentItem](#contentitem) data in JSON format.|
+|contentItemRequest|[ContentItem](#contentitem) markup in JSON format.|
  
  
 [top](#chronozoom-rest-api-reference)
