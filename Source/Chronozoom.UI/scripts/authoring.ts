@@ -724,7 +724,8 @@ module CZ {
          * Validates,if timeline size is not negative or null
         */
         export function isIntervalPositive(start, end) {
-            return (start < end);
+            return (parseFloat(start) < parseFloat(end));
+                
         }
 
         /**

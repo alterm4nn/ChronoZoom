@@ -452,7 +452,7 @@ var CZ;
         }
         Authoring.isNotEmpty = isNotEmpty;
         function isIntervalPositive(start, end) {
-            return (start < end);
+            return (parseFloat(start) < parseFloat(end));
         }
         Authoring.isIntervalPositive = isIntervalPositive;
         function validateContentItems(contentItems) {
