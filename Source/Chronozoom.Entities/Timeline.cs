@@ -37,7 +37,7 @@ namespace Chronozoom.Entities
         /// The title of the timeline.
         /// </summary>
         [DataMember(Name = "title")]
-        [MaxLength(4000)]
+        [MaxLength(200)]
         [Column(TypeName = "nvarchar")]
         public string Title { get; set; }
 
