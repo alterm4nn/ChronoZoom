@@ -154,7 +154,7 @@ describe("CZ.Authoring part", function () {
                 [-10, -1, 'text']
             ];
             var invalidInputData = [
-                [-2, false, 'text'],
+                [-2, false, 'text'], //bug https://github.com/alterm4nn/ChronoZoom/issues/411
                 [false, -2, 'text'],
                 [false, false, 'text'],
                 [-2, -2, 'text'],
@@ -162,7 +162,7 @@ describe("CZ.Authoring part", function () {
                 [1, -10, 'text'],
                 [2, 1, 'text'],
                 [1, 50, ''],
-                [1, 50, ],
+                //[1, 50, ], according to https://github.com/alterm4nn/ChronoZoom/issues/259
                 [1, , 'text']
             ];
 
