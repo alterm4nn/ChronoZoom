@@ -83,6 +83,10 @@
     <Compile Include="Migrations\201305102117597_AddRITreeWithIndex.Designer.cs">
       <DependentUpon>201305102117597_AddRITreeWithIndex.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201305240425388_ChangeTours.cs" />
+    <Compile Include="Migrations\201305240425388_ChangeTours.Designer.cs">
+      <DependentUpon>201305240425388_ChangeTours.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migration\Migrator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SearchResult.cs" />
@@ -112,6 +116,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201305102117597_AddRITreeWithIndex.resx">
       <DependentUpon>201305102117597_AddRITreeWithIndex.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201305240425388_ChangeTours.resx">
+      <DependentUpon>201305240425388_ChangeTours.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
