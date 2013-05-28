@@ -10,12 +10,12 @@ describe("CZ.Authoring part", function () {
     var authoring;
     beforeEach(function () {
         authoring = CZ.Authoring;
-        validateContentItems = authoring.ValidateContentItems;
-        validateTimelineData = authoring.ValidateTimelineData;
-        validateExhibitData = authoring.ValidateExhibitData;
-        validateNumber = authoring.ValidateNumber;
-        isNotEmpty = authoring.IsNotEmpty;
-        isNonegHeight = authoring.isNonegHeight;
+        validateContentItems = authoring.validateContentItems;
+        validateTimelineData = authoring.validateTimelineData;
+        validateExhibitData = authoring.validateExhibitData;
+        validateNumber = authoring.validateNumber;
+        isNotEmpty = authoring.isNotEmpty;
+        isIntervalPositive = authoring.isIntervalPositive;
         alertMessage = '';
     });
 
@@ -145,7 +145,7 @@ describe("CZ.Authoring part", function () {
     });
 
 
-    describe("ValidateTimelineData() function", function () {
+    describe("validateTimelineData() function", function () {
         describe("should return", function () {
 
             var validInputData = [
@@ -180,7 +180,7 @@ describe("CZ.Authoring part", function () {
         });
     });
 
-    describe("ValidateNumber() function", function () {
+    describe("validateNumber() function", function () {
         describe("should return", function () {
             it("true, if number not null ", function () {
                 var number = 0;
@@ -226,7 +226,7 @@ describe("CZ.Authoring part", function () {
         });
     });
 
-    describe("IsNotEmpty() function", function () {
+    describe("isNotEmpty() function", function () {
         describe("should return", function () {
             it("false, if object is empty ", function () {
                 var obj = '';
@@ -248,23 +248,23 @@ describe("CZ.Authoring part", function () {
         });
     });
 
-    describe("isNonegHeight() function", function () {
+    describe("isIntervalPositive() function", function () {
         describe("should return", function () {
             it("true, if start < end", function () {
                 var start = 2, end = 5;
-                var result = isNonegHeight(start, end);
+                var result = isIntervalPositive(start, end);
                 expect(true).toEqual(result);
             });
 
             it("false, if start > end", function () {
                 var start = 5, end = 2;
-                var result = isNonegHeight(start, end);
+                var result = isIntervalPositive(start, end);
                 expect(false).toEqual(result);
             });
 
             it("false, if start = end", function () {
                 var start = 5, end = 5;
-                var result = isNonegHeight(start, end);
+                var result = isIntervalPositive(start, end);
                 expect(false).toEqual(result);
             });
         });

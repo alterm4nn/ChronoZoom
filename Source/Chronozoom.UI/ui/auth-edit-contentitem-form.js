@@ -74,7 +74,7 @@ var CZ;
                     description: this.descriptionInput.val() || "",
                     index: this.contentItem.index
                 };
-                if(CZ.Authoring.ValidateContentItems([
+                if(CZ.Authoring.validateContentItems([
                     newContentItem
                 ])) {
                     if(CZ.Authoring.contentItemMode === "createContentItem") {
@@ -136,7 +136,7 @@ var CZ;
                 CZ.Authoring.isActive = false;
             };
             return FormEditCI;
-        })(CZ.UI.FormBase);
+        })(CZ.UI.FormUpdateEntity);
         UI.FormEditCI = FormEditCI;        
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;

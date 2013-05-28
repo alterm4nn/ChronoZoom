@@ -66,10 +66,7 @@
     <Content Include="Scripts\Js\authoring.js" />
     <Content Include="Scripts\Js\common.js" />
     <Content Include="Scripts\Js\contentitem-listbox.js" />
-    <Content Include="Scripts\Js\csvUtils.js" />
     <Content Include="Scripts\Js\cz.datepicker.js" />
-    <Content Include="Scripts\Js\cz.html.js" />
-    <Content Include="Scripts\Js\cz.settings.js" />
     <Content Include="Scripts\Js\datepicker.js" />
     <Content Include="Scripts\Js\formbase.js" />
     <Content Include="Scripts\Js\header-edit-form.js" />

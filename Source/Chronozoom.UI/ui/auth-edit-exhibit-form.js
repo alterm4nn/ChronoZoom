@@ -119,7 +119,7 @@ var CZ;
                     },
                     contentItems: this.exhibit.contentItems || []
                 };
-                if(CZ.Authoring.ValidateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) && this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {
+                if(CZ.Authoring.validateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) && this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {
                     CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(function (success) {
                         _this.isCancel = false;
                         _this.close();
@@ -204,7 +204,7 @@ var CZ;
                 CZ.Authoring.isActive = false;
             };
             return FormEditExhibit;
-        })(UI.FormBase);
+        })(UI.FormUpdateEntity);
         UI.FormEditExhibit = FormEditExhibit;        
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;

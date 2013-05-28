@@ -152,22 +152,22 @@
 
         <div id="vc-container">
             <div id="vc">
-                <div id="layerTimelines" onselectstart="return false;">
+                <div id="layerTimelines" class="unselectable">
                 </div>
                 <!--for popup's-->
                 <p class="bubbleInfo" style="display: inline-block; z-index: 3000;" id="defaultBox">
                     <span></span>
                 </p>
                 <!--//////////-->
-                <div id="layerInfodots" onselectstart="return false;">
+                <div id="layerInfodots" class="unselectable">
                 </div>
-                <div id="iframe_layer" onselectstart="return false;">
+                <div id="iframe_layer" class="unselectable">
                 </div>
             </div>
         </div>
 
         <div id="search" class="czWindow" style="z-index: 2010; max-height: 250px; display: none">
-            <div class="header unselectable" onselectstart="return false;">
+            <div class="header unselectable" >
                 Search
             </div>
             <div>
@@ -181,7 +181,7 @@
             </div>
         </div>
 
-        <div id="tours" class="czWindow" onselectstart="return false;" style="display: none">
+        <div id="tours" class="czWindow unselectable" style="display: none">
             <div class="header unselectable">
                 Tours
             </div>
@@ -193,7 +193,7 @@
             </div>
         </div>
 
-        <div id="bookmarks" class="bookmarksWindow unselectable" onselectstart="return false;" style="display: none">
+        <div id="bookmarks" class="bookmarksWindow unselectable" style="display: none">
             <img id="bookmarksCollapse" src="/images/collapse-left.png" class="headerButton" />
             <div class="header">
             </div>
@@ -208,8 +208,8 @@
         <div id="bibliographyBack" class="biblBack">
             <div id="bibliographyOut" class="biblOuterWindow">
                 <div id="bibliography" class="biblWindow">
-                    <img class="closeButton unselectable" id="biblCloseButton" src="/images/close_off.png" alt="Close" onselectstart="return false;" />
-                    <div class="title" onselectstart="return false;">
+                    <img class="closeButton unselectable" id="biblCloseButton" src="/images/close_off.png" alt="Close" />
+                    <div class="title">
                         <span>Infodot name</span> &gt; Bibliography
                     </div>
                     <div class="sources">
@@ -239,8 +239,8 @@
             <div id="welcomeScreen" class="welcomeScreen">
                 <div class="titleArea">
                     <img class="closeButton" id="welcomeScreenCloseButton" src="/images/close_off.png"
-                        alt="Close" onselectstart="return false;" />
-                    <div class="title" onselectstart="return false;">
+                        alt="Close" class="unselectable" />
+                    <div class="title" class="unselectable" >
                         <span>Welcome to ChronoZoom beta!</span>
                     </div>
                 </div>

@@ -18,6 +18,7 @@ var CZ;
                 this.timeline = formInfo.context;
                 this.saveButton.off();
                 this.deleteButton.off();
+                this.errorMessage = this.container.find("#error-edit-timeline");
                 this.initialize();
             }
             FormEditTimeline.prototype.initialize = function () {
@@ -44,11 +45,18 @@ var CZ;
                     this.endDate.setDate(this.timeline.x + this.timeline.width);
                 }
                 this.saveButton.click(function (event) {
-                    var isValid = CZ.Authoring.ValidateTimelineData(_this.startDate.getDate(), _this.endDate.getDate(), _this.titleInput.val());
-                    if(!isValid) {
-                        _this.container.find("#error-edit-timeline").show().delay(7000).fadeOut();
+                    _this.errorMessage.empty();
+                    var isDataValid = false;
+                    isDataValid = CZ.Authoring.validateTimelineData(_this.startDate.getDate(), _this.endDate.getDate(), _this.titleInput.val());
+                    if(!CZ.Authoring.isNotEmpty(_this.titleInput.val())) {
+                        _this.errorMessage.text('Title is empty');
+                    } else if(!CZ.Authoring.isIntervalPositive(_this.startDate.getDate(), _this.endDate.getDate())) {
+                        _this.errorMessage.text('Result interval is not positive');
                     }
-                    if(isValid) {
+                    if(!isDataValid) {
+                        return;
+                    } else {
+                        _this.errorMessage.empty();
                         var self = _this;
                         CZ.Authoring.updateTimeline(_this.timeline, {
                             title: _this.titleInput.val(),
@@ -80,6 +88,7 @@ var CZ;
             };
             FormEditTimeline.prototype.close = function () {
                 var _this = this;
+                this.errorMessage.empty();
                 _super.prototype.close.call(this, {
                     effect: "slide",
                     direction: "left",
@@ -90,14 +99,14 @@ var CZ;
                     }
                 });
                 if(this.isCancel && CZ.Authoring.mode === "createTimeline") {
-                    CZ.Authoring.removeTimeline(this.timeline);
+                    CZ.VCContent.removeChild(this.timeline.parent, this.timeline.id);
+                    CZ.Common.vc.virtualCanvas("requestInvalidate");
                 }
                 CZ.Authoring.isActive = false;
                 this.activationSource.removeClass("active");
-                this.container.find("#error-edit-timeline").hide();
             };
             return FormEditTimeline;
-        })(CZ.UI.FormBase);
+        })(CZ.UI.FormUpdateEntity);
         UI.FormEditTimeline = FormEditTimeline;        
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
