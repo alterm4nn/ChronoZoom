@@ -35,6 +35,8 @@ namespace Chronozoom.Entities
         /// The title of the exhibit.
         /// </summary>
         [DataMember(Name = "title")]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         public string Title { get; set; }
 
         /// <summary>
