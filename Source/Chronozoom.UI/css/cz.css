@@ -314,7 +314,7 @@ a:visited {
 #vc {
   overflow: hidden;
   width: 100%;
-  height: 70%;
+  height: 100%;
   background-image: url('/images/background.jpg');
   background-position: center center;
   -webkit-background-size: cover;
@@ -325,7 +325,7 @@ a:visited {
   background-attachment: fixed;
 }
 #timeSeriesContainer {
-  height: 30%;
+  height: 0%;
   background-color: gray;
 }
 .virtualCanvas {
@@ -1478,4 +1478,22 @@ img.fallbackBackground {
 #cz-form-logout,
 #cz-form-save {
   width: 134px;
+}
+/* TimSeries Data Form */
+#timeSeriesDataForm {
+  right: 0px;
+  width: 300px;
+}
+#existingTimeSeries {
+  padding: 0;
+}
+.cz-preloaded-timeseries {
+  margin: 2px;
+  padding: 0px;
+  text-align: left;
+  width: 200px;
+  color: #0388E5;
+}
+.cz-preloaded-timeseries :hover {
+  color: #58B7F9;
 }

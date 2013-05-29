@@ -1,26 +1,17 @@
-var __extends = this.__extends || function (d, b) {
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
 var CZ;
 (function (CZ) {
     (function (UI) {
-        var TimeSeriesForm = (function (_super) {
-            __extends(TimeSeriesForm, _super);
-            function TimeSeriesForm(container, formInfo) {
-                        _super.call(this, container, formInfo);
-            }
-            return TimeSeriesForm;
-        })(CZ.UI.FormBase);
-        UI.TimeSeriesForm = TimeSeriesForm;        
         var LineChart = (function () {
             function LineChart(container) {
+                this.container = container;
                 this.canvas = document.createElement("canvas");
                 $(this.canvas).appendTo($("#timeSeries"));
                 this.canvas.width = container.width();
                 this.canvas.height = container.height();
                 this.context = this.canvas.getContext("2d");
+                $("#closeTimeChartBtn").click(function () {
+                    CZ.HomePageViewModel.hideTimeSeriesChart();
+                });
             }
             LineChart.prototype.calculateTicks = function (ymin, ymax, labelCount) {
                 var delta = (ymax - ymin) / labelCount;
@@ -166,6 +157,10 @@ var CZ;
                     ctx.stroke();
                     ctx.fillText(tick, screenLeft + ticklength + textOffset, y);
                 });
+            };
+            LineChart.prototype.updateCanvasHeight = function () {
+                this.canvas.height = $("#timeSeries").height() - 36;
+                this.canvas.width = $("#timeSeries").width();
             };
             return LineChart;
         })();

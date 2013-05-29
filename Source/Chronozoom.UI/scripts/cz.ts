@@ -15,6 +15,7 @@
 /// <reference path='../ui/header-edit-profile-form.ts'/>
 /// <reference path='../ui/header-login-form.ts'/>
 /// <reference path='../ui/timeseries-graph-form.ts'/>
+/// <reference path='../ui/timeseries-data-form.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
 
 
@@ -33,7 +34,8 @@ module CZ {
             "$('<div></div>')": "/ui/contentitem-listbox.html",
             "#profile-form": "/ui/header-edit-profile-form.html",
             "#login-form": "/ui/header-login-form.html",
-            "#timeSeriesContainer": "/ui/timeseries-graph-form.html"
+            "#timeSeriesContainer": "/ui/timeseries-graph-form.html",
+            "#timeSeriesDataForm": "/ui/timeseries-data-form.html"
         };
 
         enum FeatureActivation {
@@ -110,7 +112,15 @@ module CZ {
                 var forms = arguments;
 
                 timeSeriesChart = new CZ.UI.LineChart(forms[7]);
-                //updateTimeSeriesChart(CZ.Common.vc.virtualCanvas("getViewport"));
+
+                $('#timeSeries_button').click(function () {
+                    var timSeriesDataFormDiv = forms[8];
+                    var timSeriesDataForm = new CZ.UI.TimeSeriesDataForm(timSeriesDataFormDiv, {
+                        activationSource: $("#timeSeries_button"),
+                        closeButton: ".cz-form-close-btn > .cz-form-btn"
+                    });
+                    timSeriesDataForm.show();
+                });
 
                 $(".header-icon.edit-icon").click(function () {
                     $(".header-icon.active").removeClass("active");
@@ -284,24 +294,8 @@ module CZ {
 
             if (rootCollection) {
                 $('#timeSeries_button').hide();
-                $('#vc').height('100%');
             } else {
                 $('#timeSeries_button').show();
-                $('#timeSeries_button')
-                .mouseup(function () {
-                    var h = $('#timeSeriesContainer').height();
-                    if (h > 0) {
-                        $('#timeSeriesContainer').height(0);
-                        $('#timeSeriesContainer').hide();
-                        $('#vc').height('100%');
-                    } else {
-                        $('#timeSeriesContainer').height('30%');
-                        $('#timeSeriesContainer').show();
-                        $('#vc').height('70%');
-                    }
-
-                    CZ.Common.updateLayout();
-                });
             }
 
             $('#search_button')
@@ -605,8 +599,6 @@ module CZ {
                 }));
                 $("#bibliographyBack").css("display", "block");
             }
-
-            rightDataSet = CZ.Data.generateSampleData();
         });
 
         function IsFeatureEnabled(featureName) {
@@ -614,7 +606,24 @@ module CZ {
             return feature[0].IsEnabled;
         }
 
-        function updateTimeSeriesChart(vp) {
+        export function showTimeSeriesChart() {
+            $('#timeSeriesContainer').height('30%');
+            $('#timeSeriesContainer').show();
+            $('#vc').height('70%');
+            timeSeriesChart.updateCanvasHeight();
+            CZ.Common.updateLayout();
+        }
+
+        export function hideTimeSeriesChart() {
+            leftDataSet = undefined;
+            rightDataSet = undefined;
+            $('#timeSeriesContainer').height(0);
+            $('#timeSeriesContainer').hide();
+            $('#vc').height('100%');
+            CZ.Common.updateLayout();
+        }
+
+        export function updateTimeSeriesChart(vp) {
             var left = vp.pointScreenToVirtual(0, 0).x;
             if (left < CZ.Settings.maxPermitedTimeRange.left) left = CZ.Settings.maxPermitedTimeRange.left;
             var right = vp.pointScreenToVirtual(vp.width, vp.height).x;

@@ -1,10 +1,35 @@
-﻿<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title></title>
-</head>
-<body>
+﻿<div class="cz-form-header" style="width: 300px;">
+    <ul>
+        <li class="cz-form-nav"></li>
+        <li class="cz-form-title">Charts
+        </li>
+        <li class="cz-form-close-btn">
+            <a class="cz-form-btn">X
+            </a>
+        </li>
+    </ul>
+</div>
+<div class="cz-form-content" style="width: 300px;">
+    <div>View one of pre-loaded series</div>
+    <ul id="existingTimeSeries">
+    </ul>
+    <div id="uploaduserdatacontainer">
+        <div>Upload and view your own</div>
+        <input id="fileLoader" type="file" accept="text/csv" name="csvfile" />
+        <div>
+            <div style="margin-right: 4px; float: left">delimeter</div>
+            <input id="delim" type="text" name="delimiter" value="," style="width: 20px;" />
+        </div>
+        <button id="loaduserdatabtn">Load</button>
+    </div>
+</div>
 
-</body>
-</html>
+<style>
+    #loaduserdatabtn {
+        width: 70px;
+        height: 30px;
+        background-color: #0464a2;
+        display: block;
+        color: white;
+    }
+</style>

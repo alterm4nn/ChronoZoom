@@ -12,7 +12,8 @@ var CZ;
             "$('<div></div>')": "/ui/contentitem-listbox.html",
             "#profile-form": "/ui/header-edit-profile-form.html",
             "#login-form": "/ui/header-login-form.html",
-            "#timeSeriesContainer": "/ui/timeseries-graph-form.html"
+            "#timeSeriesContainer": "/ui/timeseries-graph-form.html",
+            "#timeSeriesDataForm": "/ui/timeseries-data-form.html"
         };
         var FeatureActivation;
         (function (FeatureActivation) {
@@ -77,6 +78,14 @@ var CZ;
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
                 CZ.timeSeriesChart = new CZ.UI.LineChart(forms[7]);
+                $('#timeSeries_button').click(function () {
+                    var timSeriesDataFormDiv = forms[8];
+                    var timSeriesDataForm = new CZ.UI.TimeSeriesDataForm(timSeriesDataFormDiv, {
+                        activationSource: $("#timeSeries_button"),
+                        closeButton: ".cz-form-close-btn > .cz-form-btn"
+                    });
+                    timSeriesDataForm.show();
+                });
                 $(".header-icon.edit-icon").click(function () {
                     $(".header-icon.active").removeClass("active");
                     $(this).addClass("active");
@@ -236,22 +245,8 @@ var CZ;
             CZ.Service.collectionName = url.collectionName;
             if(rootCollection) {
                 $('#timeSeries_button').hide();
-                $('#vc').height('100%');
             } else {
                 $('#timeSeries_button').show();
-                $('#timeSeries_button').mouseup(function () {
-                    var h = $('#timeSeriesContainer').height();
-                    if(h > 0) {
-                        $('#timeSeriesContainer').height(0);
-                        $('#timeSeriesContainer').hide();
-                        $('#vc').height('100%');
-                    } else {
-                        $('#timeSeriesContainer').height('30%');
-                        $('#timeSeriesContainer').show();
-                        $('#vc').height('70%');
-                    }
-                    CZ.Common.updateLayout();
-                });
             }
             $('#search_button').mouseup(CZ.Search.onSearchClicked);
             $('#tours_index').mouseup(CZ.Tours.onTourClicked);
@@ -498,7 +493,6 @@ var CZ;
                 }));
                 $("#bibliographyBack").css("display", "block");
             }
-            CZ.rightDataSet = CZ.Data.generateSampleData();
         });
         function IsFeatureEnabled(featureName) {
             var feature = $.grep(_featureMap, function (e) {
@@ -506,6 +500,23 @@ var CZ;
             });
             return feature[0].IsEnabled;
         }
+        function showTimeSeriesChart() {
+            $('#timeSeriesContainer').height('30%');
+            $('#timeSeriesContainer').show();
+            $('#vc').height('70%');
+            CZ.timeSeriesChart.updateCanvasHeight();
+            CZ.Common.updateLayout();
+        }
+        HomePageViewModel.showTimeSeriesChart = showTimeSeriesChart;
+        function hideTimeSeriesChart() {
+            CZ.leftDataSet = undefined;
+            CZ.rightDataSet = undefined;
+            $('#timeSeriesContainer').height(0);
+            $('#timeSeriesContainer').hide();
+            $('#vc').height('100%');
+            CZ.Common.updateLayout();
+        }
+        HomePageViewModel.hideTimeSeriesChart = hideTimeSeriesChart;
         function updateTimeSeriesChart(vp) {
             var left = vp.pointScreenToVirtual(0, 0).x;
             if(left < CZ.Settings.maxPermitedTimeRange.left) {
@@ -545,6 +556,7 @@ var CZ;
                 }
             }
         }
+        HomePageViewModel.updateTimeSeriesChart = updateTimeSeriesChart;
     })(CZ.HomePageViewModel || (CZ.HomePageViewModel = {}));
     var HomePageViewModel = CZ.HomePageViewModel;
 })(CZ || (CZ = {}));

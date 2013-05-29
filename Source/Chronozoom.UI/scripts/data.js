@@ -42,15 +42,14 @@ var CZ;
                     alert("Error fetching timeSeries Data: " + xhr.responseText);
                 }
             });
-            return csvToDataSet(rolandData);
+            return csvToDataSet(rolandData, ",");
         }
         Data.generateSampleData = generateSampleData;
-        function csvToDataSet(csvText) {
-            var firstLineEnding = csvText.indexOf("\n");
-            var appearance = csvText.substr(0, firstLineEnding);
-            var dataText = csvText.substr(firstLineEnding, csvText.length);
+        function csvToDataSet(csvText, delimiter) {
+            var dataText = csvText;
             var csvArr = dataText.csvToArray({
-                trim: true
+                trim: true,
+                fSep: delimiter
             });
             var dataLength = csvArr.length - 1;
             var seriesLength = csvArr[0].length - 1;

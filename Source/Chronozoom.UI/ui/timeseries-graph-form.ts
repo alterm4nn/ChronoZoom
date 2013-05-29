@@ -1,30 +1,20 @@
 ﻿/// <reference path='controls/formbase.ts'/>
 /// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
 /// <reference path='../scripts/data.ts'/>
-
-
-declare var Dygraph: any;
+/// <reference path='../scripts/cz.ts'/>
 
 module CZ {
     export module UI {
-        export interface TimeSeriesFormInfo extends CZ.UI.IFormBaseInfo {
-        }
-
-        export class TimeSeriesForm extends CZ.UI.FormBase {
-            private graph: any;
-
-            // We only need to add additional initialization in constructor.
-            constructor(container: JQuery, formInfo: any) {
-                super(container, formInfo);
-            }
-        }
 
         export class LineChart {
 
             private canvas: any;
             private context: any;
+            private container:any;
 
             constructor(container: JQuery) {
+                this.container = container;
+
                 this.canvas = <HTMLCanvasElement>document.createElement("canvas");
                 $(this.canvas).appendTo($("#timeSeries"));
 
@@ -32,6 +22,10 @@ module CZ {
                 this.canvas.height = container.height();
 
                 this.context = this.canvas.getContext("2d");
+
+                $("#closeTimeChartBtn").click(function () {
+                    CZ.HomePageViewModel.hideTimeSeriesChart();
+                });
             }
 
             private calculateTicks(ymin: number, ymax: number, labelCount: number): any {
@@ -196,6 +190,11 @@ module CZ {
                     ctx.fillText(tick, screenLeft + ticklength + textOffset, y);
                 });
 
+            }
+
+            public updateCanvasHeight(): void {
+                this.canvas.height = $("#timeSeries").height() - 36;
+                this.canvas.width = $("#timeSeries").width();
             }
         }
     }

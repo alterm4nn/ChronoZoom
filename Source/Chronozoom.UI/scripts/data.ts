@@ -57,15 +57,13 @@ module CZ {
                 }
             });
 
-            return csvToDataSet(rolandData);
+            return csvToDataSet(rolandData, ",");
         }
 
-        export function csvToDataSet(csvText: any): DataSet {
-            var firstLineEnding = csvText.indexOf("\n");
-            var appearance = csvText.substr(0, firstLineEnding);
-            var dataText = csvText.substr(firstLineEnding, csvText.length);
+        export function csvToDataSet(csvText: any, delimiter: any): DataSet {
+            var dataText = csvText;
 
-            var csvArr = dataText.csvToArray({ trim: true });
+            var csvArr = dataText.csvToArray({ trim: true, fSep : delimiter });
             var dataLength = csvArr.length - 1;
             var seriesLength = csvArr[0].length - 1;
 
