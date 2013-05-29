@@ -51,9 +51,11 @@ var CZ;
         }
         function isIncluded(tp, obj) {
             switch(obj.type) {
+                case "infodot":
+                    return (tp.x <= obj.infodotDescription.date && tp.y <= obj.y && tp.x + tp.width >= obj.infodotDescription.date && tp.y + tp.height >= obj.y + obj.height);
+                    break;
                 case "timeline":
                 case "rectangle":
-                case "infodot":
                 case "circle":
                     return (tp.x <= obj.x && tp.y <= obj.y && tp.x + tp.width >= obj.x + obj.width && tp.y + tp.height >= obj.y + obj.height);
                 default:
@@ -92,14 +94,9 @@ var CZ;
             if(!isIncluded(tp, ec)) {
                 return false;
             }
-            for(i = 0 , len = tp.children.length; i < len; ++i) {
-                selfIntersection = editmode ? (tp.children[i] === Authoring.selectedExhibit) : (tp.children[i] === ec);
-                if(!selfIntersection && isIntersecting(ec, tp.children[i])) {
-                    return false;
-                }
-            }
             return true;
         }
+        Authoring.checkExhibitIntersections = checkExhibitIntersections;
         function updateNewRectangle() {
             _rectCur.x = Math.min(_dragStart.x, _dragCur.x);
             _rectCur.y = Math.min(_dragStart.y, _dragCur.y);
@@ -452,7 +449,7 @@ var CZ;
         }
         Authoring.validateTimelineData = validateTimelineData;
         function validateExhibitData(date, title, contentItems) {
-            var isValid = CZ.Authoring.validateNumber(date);
+            var isValid = date !== false;
             isValid = isValid && CZ.Authoring.isNotEmpty(title);
             isValid = isValid && CZ.Authoring.validateContentItems(contentItems);
             return isValid;
