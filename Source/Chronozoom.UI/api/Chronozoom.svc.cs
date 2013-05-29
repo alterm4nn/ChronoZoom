@@ -24,6 +24,7 @@ using System.Web;
 using Chronozoom.Entities;
 
 using Chronozoom.UI.Utils;
+using System.ServiceModel.Description;
 
 namespace Chronozoom.UI
 {
@@ -148,7 +149,7 @@ namespace Chronozoom.UI
         // Points to the absolute path where thumbnails are stored
         private static Lazy<Uri> _thumbnailsPath = new Lazy<Uri>(() =>
         {
-            if (ConfigurationManager.AppSettings["ThumbnailsPath"] == null)
+            if (string.IsNullOrEmpty(ConfigurationManager.AppSettings["ThumbnailsPath"]))
                 return null;
 
             return new Uri(ConfigurationManager.AppSettings["ThumbnailsPath"]);
@@ -157,7 +158,7 @@ namespace Chronozoom.UI
         // The login URL to sign in with Microsoft account
         private static Lazy<Uri> _signinUrlMicrosoft = new Lazy<Uri>(() =>
         {
-            if (ConfigurationManager.AppSettings["SignInUrlMicrosoft"] == null)
+            if (string.IsNullOrEmpty(ConfigurationManager.AppSettings["SignInUrlMicrosoft"]))
                 return new Uri(@"https://login.live.com/login.srf?wa=wsignin1.0&wtrealm=https%3a%2f%2faccesscontrol.windows.net%2f&wreply=https%3a%2f%2fcz-nodelete-chronozoom-test.accesscontrol.windows.net%2fv2%2fwsfederation&wp=MBI_FED_SSL&wctx=cHI9d3NmZWRlcmF0aW9uJnJtPWh0dHAlM2ElMmYlMmZ0ZXN0LmNocm9ub3pvb21wcm9qZWN0Lm9yZyUyZiZjeD1ybSUzZDAlMjZpZCUzZHBhc3NpdmUlMjZydSUzZCUyNTJmYWNjb3VudCUyNTJmbG9naW41");
 
             return new Uri(ConfigurationManager.AppSettings["SignInUrlMicrosoft"]);
@@ -166,7 +167,7 @@ namespace Chronozoom.UI
         // The login URL to sign in with Google account
         private static Lazy<Uri> _signinUrlGoogle = new Lazy<Uri>(() =>
         {
-            if (ConfigurationManager.AppSettings["SignInUrlGoogle"] == null)
+            if (string.IsNullOrEmpty(ConfigurationManager.AppSettings["SignInUrlGoogle"]))
                 return new Uri(@"https://www.google.com/accounts/o8/ud?openid.ns=http%3a%2f%2fspecs.openid.net%2fauth%2f2.0&openid.mode=checkid_setup&openid.claimed_id=http%3a%2f%2fspecs.openid.net%2fauth%2f2.0%2fidentifier_select&openid.identity=http%3a%2f%2fspecs.openid.net%2fauth%2f2.0%2fidentifier_select&openid.realm=https%3a%2f%2fcz-nodelete-chronozoom-test.accesscontrol.windows.net%3a443%2fv2%2fopenid&openid.return_to=https%3a%2f%2fcz-nodelete-chronozoom-test.accesscontrol.windows.net%3a443%2fv2%2fopenid%3fcontext%3dcHI9d3NmZWRlcmF0aW9uJnJtPWh0dHAlM2ElMmYlMmZ0ZXN0LmNocm9ub3pvb21wcm9qZWN0Lm9yZyUyZiZjeD1ybSUzZDAlMjZpZCUzZHBhc3NpdmUlMjZydSUzZCUyNTJmYWNjb3VudCUyNTJmbG9naW4mcHJvdmlkZXI9R29vZ2xl0&openid.ns.ax=http%3a%2f%2fopenid.net%2fsrv%2fax%2f1.0&openid.ax.mode=fetch_request&openid.ax.required=email%2cfullname%2cfirstname%2clastname&openid.ax.type.email=http%3a%2f%2faxschema.org%2fcontact%2femail&openid.ax.type.fullname=http%3a%2f%2faxschema.org%2fnamePerson&openid.ax.type.firstname=http%3a%2f%2faxschema.org%2fnamePerson%2ffirst&openid.ax.type.lastname=http%3a%2f%2faxschema.org%2fnamePerson%2flast");
 
             return new Uri(ConfigurationManager.AppSettings["SignInUrlGoogle"]);
@@ -175,7 +176,7 @@ namespace Chronozoom.UI
         // The login URL to sign in with Yahoo account
         private static Lazy<Uri> _signinUrlYahoo = new Lazy<Uri>(() =>
         {
-            if (ConfigurationManager.AppSettings["SignInUrlYahoo"] == null)
+            if (string.IsNullOrEmpty(ConfigurationManager.AppSettings["SignInUrlYahoo"]))
                 return new Uri("https://open.login.yahooapis.com/openid/op/auth?openid.ns=http%3a%2f%2fspecs.openid.net%2fauth%2f2.0&openid.mode=checkid_setup&openid.claimed_id=http%3a%2f%2fspecs.openid.net%2fauth%2f2.0%2fidentifier_select&openid.identity=http%3a%2f%2fspecs.openid.net%2fauth%2f2.0%2fidentifier_select&openid.realm=https%3a%2f%2fcz-nodelete-chronozoom-test.accesscontrol.windows.net%3a443%2fv2%2fopenid&openid.return_to=https%3a%2f%2fcz-nodelete-chronozoom-test.accesscontrol.windows.net%3a443%2fv2%2fopenid%3fcontext%3dcHI9d3NmZWRlcmF0aW9uJnJtPWh0dHAlM2ElMmYlMmZ0ZXN0LmNocm9ub3pvb21wcm9qZWN0Lm9yZyUyZiZjeD1ybSUzZDAlMjZpZCUzZHBhc3NpdmUlMjZydSUzZCUyNTJmYWNjb3VudCUyNTJmbG9naW4mcHJvdmlkZXI9WWFob28h0&openid.ns.ax=http%3a%2f%2fopenid.net%2fsrv%2fax%2f1.0&openid.ax.mode=fetch_request&openid.ax.required=email%2cfullname%2cfirstname%2clastname&openid.ax.type.email=http%3a%2f%2faxschema.org%2fcontact%2femail&openid.ax.type.fullname=http%3a%2f%2faxschema.org%2fnamePerson&openid.ax.type.firstname=http%3a%2f%2faxschema.org%2fnamePerson%2ffirst&openid.ax.type.lastname=http%3a%2f%2faxschema.org%2fnamePerson%2flast");
 
             return new Uri(ConfigurationManager.AppSettings["SignInUrlYahoo"]);
@@ -184,7 +185,7 @@ namespace Chronozoom.UI
         private static Lazy<ThumbnailGenerator> _thumbnailGenerator = new Lazy<ThumbnailGenerator>(() =>
         {
             string thumbnailStorage = null;
-            if (ConfigurationManager.AppSettings["ThumbnailStorage"] != null)
+            if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["ThumbnailStorage"]))
             {
                 thumbnailStorage = ConfigurationManager.AppSettings["ThumbnailStorage"];
             }
@@ -226,6 +227,29 @@ namespace Chronozoom.UI
             public const string BookmarkNotFound = "Bookmark not found";
             public const string BookmarkSequenceIdDuplicate = "Bookmark sequence id already exisits";
             public const string BookmarkSequenceIdInvalid = "Bookmark sequence id is invalid";
+        }
+
+        private static Lazy<string> _hostPath = new Lazy<string>(() =>
+        {
+            Uri uri = HttpContext.Current.Request.Url;
+            return uri.Scheme + Uri.SchemeDelimiter + uri.Host + ":" + uri.Port;
+        });
+
+        private static Lazy<IChronozoomSVC> _chronozoomService = new Lazy<IChronozoomSVC>(() =>
+        {
+            WebHttpBinding myBinding = new WebHttpBinding();
+            myBinding.MaxReceivedMessageSize = 100000000;
+
+            EndpointAddress myEndpoint = new EndpointAddress(_hostPath.Value + "/api/chronozoom.svc");
+
+            ChannelFactory<IChronozoomSVC> factory = new ChannelFactory<IChronozoomSVC>(myBinding, myEndpoint);
+            factory.Endpoint.Behaviors.Add(new WebHttpBehavior());
+            return factory.CreateChannel();
+        });
+
+        internal static IChronozoomSVC Instance
+        {
+            get { return _chronozoomService.Value; }
         }
 
         /// <summary>
