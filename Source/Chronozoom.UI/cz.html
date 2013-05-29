@@ -43,13 +43,16 @@
     <script type="text/javascript" src="/scripts/external/ACS.js"></script>
     <script type="text/javascript" src="/scripts/external/seadragon-min.js"></script>
 
-    <script type="text/javascript">
-        if (Modernizr.canvas) {
-            $.getScript("/cz.js");
-        }
-        else {
-            window.location = "/fallback.html"
-        }
+        <script type="text/javascript">
+            if (Modernizr.canvas) {
+                var script = document.createElement("script");
+                script.type = "text/javascript";
+                script.src = "/cz.js";
+                document.getElementsByTagName("head")[0].appendChild(script);
+            }
+            else {
+                window.location = "/fallback.html"
+            }
     </script>
 
     <title>ChronoZoom</title>
