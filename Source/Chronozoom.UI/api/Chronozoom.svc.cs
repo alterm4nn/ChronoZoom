@@ -1760,7 +1760,8 @@ namespace Chronozoom.UI
         private Collection RetrieveCollection(Guid collectionId)
         {
             Collection collection = _storage.Collections.Find(collectionId);
-            _storage.Entry(collection).Reference("User").Load();
+            if (collection != null)
+                _storage.Entry(collection).Reference("User").Load();
             return collection;
         }
 
