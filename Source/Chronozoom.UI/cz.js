@@ -8175,9 +8175,10 @@ var CZ;
                 if(!this.validateNumber(year)) {
                     return false;
                 }
+                year = parseInt(year);
                 var month = this.monthSelector.find(":selected").val();
                 month = CZ.Dates.months.indexOf(month);
-                var day = this.daySelector.find(":selected").val();
+                var day = parseInt(this.daySelector.find(":selected").val());
                 return CZ.Dates.getCoordinateFromDMY(year, month, day);
             };
             DatePicker.prototype.validateNumber = function (year) {
