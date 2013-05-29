@@ -185,7 +185,7 @@
     <Content Include="dumps\5.4M-LR04stack.csv" />
     <Content Include="dumps\540M-Veizer1020.csv" />
     <Content Include="dumps\65M-zachos2001.csv" />
-    <Content Include="dumps\timeseries-preloaded.json" />
+    <Content Include="dumps\timeseries-preloaded.txt" />
     <Content Include="fallback.html" />
     <Content Include="Global.asax" />
     <Content Include="images\edit-icon.png" />

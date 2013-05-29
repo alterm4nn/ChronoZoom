@@ -18,7 +18,7 @@ var CZ;
                         type: "GET",
                         async: false,
                         dataType: "JSON",
-                        url: '/dumps/timeseries-preloaded.json',
+                        url: '/dumps/timeseries-preloaded.txt',
                         success: function (result) {
                             preloadedlist = result.d;
                         },
