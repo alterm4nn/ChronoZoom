@@ -1,7 +1,7 @@
 ﻿/// <reference path="../Utils/jquery-1.7.2.min.js" />
 /// <reference path="../Utils/jasmine-jquery.js" />
 /// <reference path="../Js/timescale.js" />
-/// <reference path="../Js/cz.dates.js" />
+/// <reference path="../Js/dates.js" />
 /// <reference path="../Js/common.js" />
 /// <reference path="../Js/cz.settings.js" />
 /// <reference path="../Js/settings.js" />
@@ -221,7 +221,7 @@ describe("When user set mouse to timescale point", function () {
         });
         describe("and CE area", function () {
             beforeEach(function () {
-                time = 1000.996412540633;
+                time = 1001;
                 expectedResult = "1001 CE";
                 var range = { min: -3447.996412540633, max: 2461.289563225633 };
                 tm.update(range);
