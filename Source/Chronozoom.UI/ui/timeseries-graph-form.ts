@@ -16,7 +16,7 @@ module CZ {
                 this.container = container;
 
                 this.canvas = <HTMLCanvasElement>document.createElement("canvas");
-                $(this.canvas).appendTo($("#timeSeries"));
+                $(this.canvas).prependTo($("#timeSeries"));
 
                 this.canvas.width = container.width();
                 this.canvas.height = container.height();
@@ -110,6 +110,11 @@ module CZ {
 
                 this.context.fillStyle = "white";
                 this.context.fillRect(screenLeft, 0, screenRight - screenLeft, this.canvas.height);
+
+                $("#rightLegend").css("right", $("#timeSeries").width() - screenRight + 30);
+                $("#leftLegend").css("left", screenLeft + 30);
+
+                $("#timeSeriesChartHeader").text("TimeSeries Chart");
             }
 
             public drawDataSet(dataSet: CZ.Data.DataSet, screenLeft: number, screenRight: number, plotLeft: number, plotRight: number): void {
@@ -196,6 +201,34 @@ module CZ {
                 this.canvas.height = $("#timeSeries").height() - 36;
                 this.canvas.width = $("#timeSeries").width();
             }
+
+            public clearLegend(location: string): void {
+                var legend = location === "left" ? $("#leftLegend") : $("#rightLegend");
+                legend.empty();
+                legend.hide();
+            }
+
+            public addLegendRecord(location: string, stroke: any, description: string): void {
+                var legend = location === "left" ? $("#leftLegend") : $("#rightLegend");
+                legend.show();
+                var cont = $('<div></div>');
+                var strokeIndicatior = $('<div></div>');
+                strokeIndicatior.width(16);
+                strokeIndicatior.height(16);
+                strokeIndicatior.css("background-color", stroke);
+                strokeIndicatior.css("margin", "4px");
+                strokeIndicatior.css("float", "left");
+
+                var descriptionDiv = $('<div></div>');
+                descriptionDiv.css("text-align", "center");
+
+                descriptionDiv.text(description);
+
+                strokeIndicatior.appendTo(cont);
+                descriptionDiv.appendTo(cont);
+
+                cont.appendTo(legend);
+            } 
         }
     }
 }

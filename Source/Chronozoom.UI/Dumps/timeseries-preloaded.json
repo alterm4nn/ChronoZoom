@@ -1,1 +1,9 @@
-﻿{ "d" : [{"name": "Chris's Data", "file":"/dumps/beta-timeseries.csv", "delimiter":","}, {"name": "250-be5yavg.csv", "file":"/dumps/250-be5yavg.csv", "delimiter":" "}, {"name": "2k-moberg2000.csv", "file":"/dumps/2k-moberg2000.csv", "delimiter":" "}]}
+﻿{ "d" : [
+{"name": "Chris's Data", "file":"/dumps/beta-timeseries.csv", "delimiter":","}, 
+{"name": "250-be5yavg.csv", "file":"/dumps/250-be5yavg.csv", "delimiter":" "}, 
+{"name": "2k-moberg2000.csv", "file":"/dumps/2k-moberg2000.csv", "delimiter":" "}, 
+{"name": "65M-zachos2001.csv", "file":"/dumps/65M-zachos2001.csv", "delimiter":" "}, 
+{"name": "420k-vostok.csv", "file":"/dumps/420k-vostok.csv", "delimiter":" "}, 
+{"name": "5.4M-LR04stack.csv", "file":"/dumps/5.4M-LR04stack.csv", "delimiter":" "}, 
+{"name": "540M-Veizer1020.csv", "file":"/dumps/540M-Veizer1020.csv", "delimiter":" "}
+]}

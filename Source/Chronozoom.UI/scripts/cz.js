@@ -532,6 +532,9 @@ var CZ;
                 var leftPlot = CZ.Dates.getDMYFromCoordinate(left).year;
                 var rightPlot = CZ.Dates.getDMYFromCoordinate(right).year;
                 CZ.timeSeriesChart.clear(leftCSS, rightCSS);
+                CZ.timeSeriesChart.clearLegend("left");
+                CZ.timeSeriesChart.clearLegend("right");
+                var chartHeader = "TimeSeries Chart";
                 if(CZ.leftDataSet !== undefined) {
                     CZ.timeSeriesChart.drawDataSet(CZ.leftDataSet, leftCSS, rightCSS, leftPlot, rightPlot);
                     CZ.timeSeriesChart.drawAxis(leftCSS, CZ.leftDataSet.series[0].appearanceSettings.yMin, CZ.leftDataSet.series[0].appearanceSettings.yMax, {
@@ -542,6 +545,10 @@ var CZ;
                         axisLocation: 'left',
                         font: '16px Calibri'
                     });
+                    for(var i = 0; i < CZ.leftDataSet.series.length; i++) {
+                        CZ.timeSeriesChart.addLegendRecord("left", CZ.leftDataSet.series[i].appearanceSettings.stroke, CZ.leftDataSet.series[i].appearanceSettings.name);
+                    }
+                    chartHeader += " (" + CZ.leftDataSet.name;
                 }
                 if(CZ.rightDataSet !== undefined) {
                     CZ.timeSeriesChart.drawDataSet(CZ.rightDataSet, leftCSS, rightCSS, leftPlot, rightPlot);
@@ -553,7 +560,15 @@ var CZ;
                         axisLocation: 'right',
                         font: '16px Calibri'
                     });
+                    for(var i = 0; i < CZ.rightDataSet.series.length; i++) {
+                        CZ.timeSeriesChart.addLegendRecord("right", CZ.rightDataSet.series[i].appearanceSettings.stroke, CZ.rightDataSet.series[i].appearanceSettings.name);
+                    }
+                    var str = chartHeader.indexOf("(") > 0 ? ", " : " (";
+                    chartHeader += str + CZ.rightDataSet.name + ")";
+                } else {
+                    chartHeader += ")";
                 }
+                $("#timeSeriesChartHeader").text(chartHeader);
             }
         }
         HomePageViewModel.updateTimeSeriesChart = updateTimeSeriesChart;

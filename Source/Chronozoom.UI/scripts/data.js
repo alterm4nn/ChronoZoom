@@ -42,10 +42,10 @@ var CZ;
                     alert("Error fetching timeSeries Data: " + xhr.responseText);
                 }
             });
-            return csvToDataSet(rolandData, ",");
+            return csvToDataSet(rolandData, ",", "sampleData");
         }
         Data.generateSampleData = generateSampleData;
-        function csvToDataSet(csvText, delimiter) {
+        function csvToDataSet(csvText, delimiter, name) {
             var dataText = csvText;
             var csvArr = dataText.csvToArray({
                 trim: true,
@@ -54,6 +54,7 @@ var CZ;
             var dataLength = csvArr.length - 1;
             var seriesLength = csvArr[0].length - 1;
             var result = new DataSet();
+            result.name = name;
             result.time = new Array();
             result.series = new Array();
             for(var i = 1; i <= seriesLength; i++) {
@@ -61,7 +62,8 @@ var CZ;
                 seria.values = new Array();
                 seria.appearanceSettings = {
                     thickness: 1,
-                    stroke: 'blue'
+                    stroke: 'blue',
+                    name: csvArr[0][i]
                 };
                 seria.appearanceSettings.yMin = parseFloat(csvArr[1][i]);
                 seria.appearanceSettings.yMax = parseFloat(csvArr[1][i]);

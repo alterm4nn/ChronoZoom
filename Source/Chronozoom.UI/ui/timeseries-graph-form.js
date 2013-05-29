@@ -5,7 +5,7 @@ var CZ;
             function LineChart(container) {
                 this.container = container;
                 this.canvas = document.createElement("canvas");
-                $(this.canvas).appendTo($("#timeSeries"));
+                $(this.canvas).prependTo($("#timeSeries"));
                 this.canvas.width = container.width();
                 this.canvas.height = container.height();
                 this.context = this.canvas.getContext("2d");
@@ -91,6 +91,9 @@ var CZ;
                 this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
                 this.context.fillStyle = "white";
                 this.context.fillRect(screenLeft, 0, screenRight - screenLeft, this.canvas.height);
+                $("#rightLegend").css("right", $("#timeSeries").width() - screenRight + 30);
+                $("#leftLegend").css("left", screenLeft + 30);
+                $("#timeSeriesChartHeader").text("TimeSeries Chart");
             };
             LineChart.prototype.drawDataSet = function (dataSet, screenLeft, screenRight, plotLeft, plotRight) {
                 var _this = this;
@@ -161,6 +164,28 @@ var CZ;
             LineChart.prototype.updateCanvasHeight = function () {
                 this.canvas.height = $("#timeSeries").height() - 36;
                 this.canvas.width = $("#timeSeries").width();
+            };
+            LineChart.prototype.clearLegend = function (location) {
+                var legend = location === "left" ? $("#leftLegend") : $("#rightLegend");
+                legend.empty();
+                legend.hide();
+            };
+            LineChart.prototype.addLegendRecord = function (location, stroke, description) {
+                var legend = location === "left" ? $("#leftLegend") : $("#rightLegend");
+                legend.show();
+                var cont = $('<div></div>');
+                var strokeIndicatior = $('<div></div>');
+                strokeIndicatior.width(16);
+                strokeIndicatior.height(16);
+                strokeIndicatior.css("background-color", stroke);
+                strokeIndicatior.css("margin", "4px");
+                strokeIndicatior.css("float", "left");
+                var descriptionDiv = $('<div></div>');
+                descriptionDiv.css("text-align", "center");
+                descriptionDiv.text(description);
+                strokeIndicatior.appendTo(cont);
+                descriptionDiv.appendTo(cont);
+                cont.appendTo(legend);
             };
             return LineChart;
         })();

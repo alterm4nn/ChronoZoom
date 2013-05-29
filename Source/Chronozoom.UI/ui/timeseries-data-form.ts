@@ -52,7 +52,7 @@ module CZ {
                             });
 
                             CZ.HomePageViewModel.showTimeSeriesChart();
-                            CZ.rightDataSet = CZ.Data.csvToDataSet(data, preloaded.delimiter);
+                            CZ.rightDataSet = CZ.Data.csvToDataSet(data, preloaded.delimiter, preloaded.name);
                             var vp = CZ.Common.vc.virtualCanvas("getViewport");
                             CZ.HomePageViewModel.updateTimeSeriesChart(vp);
                         });
@@ -117,7 +117,7 @@ module CZ {
 
             private updateUserData(csvString): void {
                 CZ.HomePageViewModel.showTimeSeriesChart();
-                CZ.leftDataSet = CZ.Data.csvToDataSet(csvString, $("#delim").prop("value"));
+                CZ.leftDataSet = CZ.Data.csvToDataSet(csvString, $("#delim").prop("value"), this.input[0].files[0].name);
                 CZ.leftDataSet.series[0].appearanceSettings.stroke = "red";
                 var vp = CZ.Common.vc.virtualCanvas("getViewport");
                 CZ.HomePageViewModel.updateTimeSeriesChart(vp);

@@ -26,6 +26,7 @@ module CZ {
         }
 
         export class DataSet {
+            public name: string;
             public time: number[];
             public series: Series[];
 
@@ -57,10 +58,10 @@ module CZ {
                 }
             });
 
-            return csvToDataSet(rolandData, ",");
+            return csvToDataSet(rolandData, ",", "sampleData");
         }
 
-        export function csvToDataSet(csvText: any, delimiter: any): DataSet {
+        export function csvToDataSet(csvText: any, delimiter: any, name: string): DataSet {
             var dataText = csvText;
 
             var csvArr = dataText.csvToArray({ trim: true, fSep : delimiter });
@@ -68,6 +69,7 @@ module CZ {
             var seriesLength = csvArr[0].length - 1;
 
             var result = new DataSet();
+            result.name = name;
             result.time = new Array();
             result.series = new Array();
 
@@ -75,7 +77,7 @@ module CZ {
                 var seria = new Series();
                 seria.values = new Array();
                 //TODO: add proper appearence settings
-                seria.appearanceSettings = { thickness: 1, stroke: 'blue' };
+                seria.appearanceSettings = { thickness: 1, stroke: 'blue', name: csvArr[0][i] };
                 seria.appearanceSettings.yMin = parseFloat(csvArr[1][i]);
                 seria.appearanceSettings.yMax = parseFloat(csvArr[1][i]);
                 result.series.push(seria);
