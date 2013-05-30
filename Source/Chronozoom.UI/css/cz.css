@@ -261,6 +261,9 @@ a:visited {
 .search-icon {
   background-image: url('../images/search-icon.png');
 }
+.timeSeries-icon {
+  background-image: url('../images/timseries-icon.png');
+}
 .view-icon {
   background-image: url('../images/view-icon.png');
   opacity: .5;
@@ -320,6 +323,10 @@ a:visited {
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
+}
+#timeSeriesContainer {
+  height: 0%;
+  background-color: gray;
 }
 .virtualCanvas {
   position: relative;
@@ -1541,4 +1548,22 @@ img.fallbackBackground {
 #cz-form-logout,
 #cz-form-save {
   width: 134px;
+}
+/* TimSeries Data Form */
+#timeSeriesDataForm {
+  right: 0px;
+  width: 500px;
+}
+#existingTimeSeries {
+  padding: 0;
+}
+.cz-preloaded-timeseries {
+  margin: 2px;
+  padding: 0px;
+  text-align: left;
+  width: 200px;
+  color: #0388E5;
+}
+.cz-preloaded-timeseries :hover {
+  color: #58B7F9;
 }

@@ -15,10 +15,17 @@
 /// <reference path='../ui/header-edit-form.ts' />
 /// <reference path='../ui/header-edit-profile-form.ts'/>
 /// <reference path='../ui/header-login-form.ts'/>
+/// <reference path='../ui/timeseries-graph-form.ts'/>
+/// <reference path='../ui/timeseries-data-form.ts'/>
 /// <reference path='../ui/tourslist-form.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
 
+
 module CZ {
+    export var timeSeriesChart: CZ.UI.LineChart;
+    export var leftDataSet: CZ.Data.DataSet;
+    export var rightDataSet: CZ.Data.DataSet; 
+
     export module HomePageViewModel {
         // Contains mapping: CSS selector -> html file.
         var _uiMap = {
@@ -32,7 +39,9 @@ module CZ {
             "#auth-edit-tours-form": "/ui/auth-edit-tour-form.html", // 7
             "$('<div><!--Tours Authoring--></div>')": "/ui/tourstop-listbox.html", // 8
             "#toursList": "/ui/tourslist-form.html", // 9
-            "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html", // 8
+            "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html", // 10
+            "#timeSeriesContainer": "/ui/timeseries-graph-form.html", //11
+            "#timeSeriesDataForm": "/ui/timeseries-data-form.html" //12
         };
 
         enum FeatureActivation {
@@ -86,6 +95,11 @@ module CZ {
                 Activation: FeatureActivation.RootCollection,
                 JQueryReference: ".regime-link"
             },
+            {
+                Name: "TimeSeries",
+                Activation: FeatureActivation.NotRootCollection,
+                JQueryReference: "#timeSeriesContainer"
+            },
         ];
 
         function InitializeToursUI(profile, forms) {
@@ -137,6 +151,17 @@ module CZ {
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
+
+                timeSeriesChart = new CZ.UI.LineChart(forms[11]);
+
+                $('#timeSeries_button').click(function () {
+                    var timSeriesDataFormDiv = forms[12];
+                    var timSeriesDataForm = new CZ.UI.TimeSeriesDataForm(timSeriesDataFormDiv, {
+                        activationSource: $("#timeSeries_button"),
+                        closeButton: ".cz-form-close-btn > .cz-form-btn"
+                    });
+                    timSeriesDataForm.show();
+                });
 
                 CZ.Service.getProfile()
                     .done(profile => { InitializeToursUI(profile, forms); })
@@ -341,6 +366,12 @@ module CZ {
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
 
+            if (rootCollection) {
+                $('#timeSeries_button').hide();
+            } else {
+                $('#timeSeries_button').show();
+            }
+
             $('#search_button')
                 .mouseup(CZ.Search.onSearchClicked);
 
@@ -510,6 +541,8 @@ module CZ {
                                     var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
                                     CZ.Common.updateMarker();
                                 }
+
+                                updateTimeSeriesChart(vp);
                             },
                             function () {
                                 return CZ.Common.vc.virtualCanvas("getViewport");
@@ -656,6 +689,71 @@ module CZ {
         function IsFeatureEnabled(featureName) {
             var feature: FeatureInfo[] = $.grep(_featureMap, function (e) { return e.Name === featureName; });
             return feature[0].IsEnabled;
+        }
+
+        export function showTimeSeriesChart() {
+            $('#timeSeriesContainer').height('30%');
+            $('#timeSeriesContainer').show();
+            $('#vc').height('70%');
+            timeSeriesChart.updateCanvasHeight();
+            CZ.Common.updateLayout();
+        }
+
+        export function hideTimeSeriesChart() {
+            leftDataSet = undefined;
+            rightDataSet = undefined;
+            $('#timeSeriesContainer').height(0);
+            $('#timeSeriesContainer').hide();
+            $('#vc').height('100%');
+            CZ.Common.updateLayout();
+        }
+
+        export function updateTimeSeriesChart(vp) {
+            var left = vp.pointScreenToVirtual(0, 0).x;
+            if (left < CZ.Settings.maxPermitedTimeRange.left) left = CZ.Settings.maxPermitedTimeRange.left;
+            var right = vp.pointScreenToVirtual(vp.width, vp.height).x;
+            if (right > CZ.Settings.maxPermitedTimeRange.right) right = CZ.Settings.maxPermitedTimeRange.right;
+
+            if (timeSeriesChart !== undefined) {
+                var leftCSS = vp.pointVirtualToScreen(left, 0).x;
+                var rightCSS = vp.pointVirtualToScreen(right, 0).x;
+                var leftPlot = Dates.getDMYFromCoordinate(left).year;
+                var rightPlot = Dates.getDMYFromCoordinate(right).year;
+
+
+                timeSeriesChart.clear(leftCSS, rightCSS);
+                timeSeriesChart.clearLegend("left");
+                timeSeriesChart.clearLegend("right");
+
+                var chartHeader = "TimeSeries Chart";
+
+                if (leftDataSet !== undefined) {
+                    timeSeriesChart.drawDataSet(leftDataSet, leftCSS, rightCSS, leftPlot, rightPlot);
+                    timeSeriesChart.drawAxis(leftCSS, leftDataSet.series[0].appearanceSettings.yMin, leftDataSet.series[0].appearanceSettings.yMax, { labelCount: 4, tickLength: 10, majorTickThickness: 1, stroke: 'black', axisLocation: 'left', font: '16px Calibri' });
+
+                    for (var i = 0; i < leftDataSet.series.length; i++) {
+                        timeSeriesChart.addLegendRecord("left", leftDataSet.series[i].appearanceSettings.stroke, leftDataSet.series[i].appearanceSettings.name);
+                    }
+
+                    chartHeader += " (" + leftDataSet.name;
+                }
+
+                if (rightDataSet !== undefined) {
+                    timeSeriesChart.drawDataSet(rightDataSet, leftCSS, rightCSS, leftPlot, rightPlot);
+                    timeSeriesChart.drawAxis(rightCSS, rightDataSet.series[0].appearanceSettings.yMin, rightDataSet.series[0].appearanceSettings.yMax, { labelCount: 4, tickLength: 10, majorTickThickness: 1, stroke: 'black', axisLocation: 'right', font: '16px Calibri' });
+
+                    for (var i = 0; i < rightDataSet.series.length; i++) {
+                        timeSeriesChart.addLegendRecord("right", rightDataSet.series[i].appearanceSettings.stroke, rightDataSet.series[i].appearanceSettings.name);
+                    }
+
+                    var str = chartHeader.indexOf("(") > 0 ? ", " : " (";
+                    chartHeader += str + rightDataSet.name + ")";
+                } else {
+                    chartHeader += ")";
+                }
+
+                $("#timeSeriesChartHeader").text(chartHeader);
+            }
         }
     }
 }

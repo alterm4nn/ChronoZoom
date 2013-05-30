@@ -213,6 +213,16 @@
       <DependentUpon>sitemap.aspx</DependentUpon>
     </Compile>
     <Compile Include="utils\ThumbnailGenerator.cs" />
+    <Content Include="css\cz.min.css">
+      <DependentUpon>cz.less</DependentUpon>
+    </Content>
+    <Content Include="dumps\250-be5yavg.csv" />
+    <Content Include="dumps\2k-moberg2000.csv" />
+    <Content Include="dumps\420k-vostok.csv" />
+    <Content Include="dumps\5.4M-LR04stack.csv" />
+    <Content Include="dumps\540M-Veizer1020.csv" />
+    <Content Include="dumps\65M-zachos2001.csv" />
+    <Content Include="dumps\timeseries-preloaded.txt" />
     <Compile Include="utils\UrlHelper.cs" />
     <Content Include="cz.html" />
     <Content Include="cz.js" />
@@ -221,6 +231,7 @@
     <Content Include="images\edit-icon.png" />
     <Content Include="images\profile-icon.png" />
     <Content Include="images\search-icon.png" />
+    <Content Include="images\timseries-icon.png" />
     <Content Include="images\tour-icon.png" />
     <Content Include="images\view-icon.png" />
     <Content Include="images\edit.svg" />
@@ -237,6 +248,7 @@
     <Content Include="scripts\bibliography.ts" />
     <Content Include="scripts\breadcrumbs.ts" />
     <Content Include="scripts\common.ts" />
+    <Content Include="scripts\external\csvToArray.v2.1.js" />
     <Content Include="ui\auth-edit-tour-form.html" />
     <Content Include="ui\auth-edit-tour-form.js">
       <DependentUpon>auth-edit-tour-form.ts</DependentUpon>
@@ -464,6 +476,16 @@
       <DependentUpon>cz.less</DependentUpon>
     </Content>
     <Content Include="css\Site.css" />
+    <Content Include="ui\timeseries-data-form.html" />
+    <TypeScriptCompile Include="ui\timeseries-data-form.ts" />
+    <Content Include="ui\timeseries-data-form.js">
+      <DependentUpon>timeseries-data-form.ts</DependentUpon>
+    </Content>
+    <Content Include="ui\timeseries-graph-form.html" />
+    <Content Include="ui\timeseries-graph-form.js">
+      <DependentUpon>timeseries-graph-form.ts</DependentUpon>
+    </Content>
+    <Content Include="ui\timeseries-graph-form.ts" />
     <Content Include="ui\tour-listbox.html" />
     <TypeScriptCompile Include="ui\tour-listbox.ts" />
     <Content Include="ui\tour-listbox.js">
@@ -482,6 +504,7 @@
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="dumps\beta-timeseries.csv" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="api\chronozoom.svc.cs">

@@ -61,12 +61,8 @@ var CZ;
             var sign = coord / Math.abs(coord);
             var day = 0, month = 0, year = 0;
             var idxYear, countLeapYears = 0;
-            for(idxYear = 0; idxYear < Math.abs(coord) - 1; idxYear++) {
-                year += sign;
-                if(isLeapYear(sign * idxYear)) {
-                    countLeapYears++;
-                }
-            }
+            year = (coord >= 0) ? Math.floor(coord) : Math.floor(coord) + 1;
+            countLeapYears = (sign > 0) ? numberofLeap(year) : 0;
             var day, month;
             var countDays;
             countDays = Math.abs(coord) - Math.abs(year);
@@ -174,6 +170,20 @@ var CZ;
             }
         }
         Dates.isLeapYear = isLeapYear;
+        function numberofLeap(year) {
+            var startLeap = 1582;
+            if(year < startLeap) {
+                return 0;
+            }
+            var years1 = Math.floor(year / 4) - Math.floor(startLeap / 4);
+            years1 -= Math.floor(year / 100) - Math.floor(startLeap / 100);
+            years1 += Math.floor(year / 400) - Math.floor(startLeap / 400);
+            if(isLeapYear(year)) {
+                years1--;
+            }
+            return years1;
+        }
+        Dates.numberofLeap = numberofLeap;
     })(CZ.Dates || (CZ.Dates = {}));
     var Dates = CZ.Dates;
 })(CZ || (CZ = {}));
