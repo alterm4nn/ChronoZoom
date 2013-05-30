@@ -137,11 +137,16 @@ module CZ {
                 var newExhibit = {
                     title: this.titleInput.val() || "",
                     x: this.datePicker.getDate() - this.exhibit.width / 2,
+                    y: this.exhibit.y,
+                    height: this.exhibit.height,
+                    width: this.exhibit.width,
                     infodotDescription: { date: this.datePicker.getDate() },
-                    contentItems: this.exhibit.contentItems || []
+                    contentItems: this.exhibit.contentItems || [],
+                    type: "infodot"
                 };
 
                 if (CZ.Authoring.validateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) &&
+                    CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true) &&
                     this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {                    
                     CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(
                         success => {
