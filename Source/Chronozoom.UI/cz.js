@@ -9581,7 +9581,8 @@ var CZ;
                 this.iconImg = this.container.find(uiMap.iconImg);
                 this.titleTextblock = this.container.find(uiMap.titleTextblock);
                 this.descrTextblock = this.container.find(uiMap.descrTextblock);
-                this.iconImg.attr("src", this.data.icon || "/images/Temp-Thumbnail2.png");
+                this.iconImg.attr("onerror", "this.src='/images/Temp-Thumbnail2.png';");
+                this.iconImg.attr("src", this.data.uri);
                 this.titleTextblock.text(this.data.title);
                 this.descrTextblock.text(this.data.description);
                 this.closeButton.off();
@@ -9918,6 +9919,7 @@ var CZ;
                         if(this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
                             this.isCancel = false;
                             var clickedListItem = (this.prevForm).clickedListItem;
+                            clickedListItem.iconImg.attr("src", newContentItem.uri);
                             clickedListItem.titleTextblock.text(newContentItem.title);
                             clickedListItem.descrTextblock.text(newContentItem.description);
                             $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);

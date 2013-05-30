@@ -90,6 +90,7 @@ var CZ;
                         if(this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
                             this.isCancel = false;
                             var clickedListItem = (this.prevForm).clickedListItem;
+                            clickedListItem.iconImg.attr("src", newContentItem.uri);
                             clickedListItem.titleTextblock.text(newContentItem.title);
                             clickedListItem.descrTextblock.text(newContentItem.description);
                             $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
