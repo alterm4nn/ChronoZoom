@@ -1270,7 +1270,6 @@ namespace Chronozoom.UI
                 newTour.Collection = collection;
 
                 _storage.Tours.Add(newTour);
-                _storage.SaveChanges();
                 returnValue.TourId = newTourGuid;
 
                 // Populate the bookmarks.
@@ -1281,10 +1280,6 @@ namespace Chronozoom.UI
                         var newBookmarkGuid = AddBookmark(newTour, bookmarkRequest);
                         if (newBookmarkGuid != Guid.Empty)
                         {
-                            //if (returnValue.BookmarkId == null)
-                            //{
-                            //    returnValue.BookmarkId = new List<Guid>();
-                            //}
                             returnValue.Add(newBookmarkGuid);
                         }
                     }
@@ -1359,10 +1354,6 @@ namespace Chronozoom.UI
                         Guid updateBookmarkGuid = UpdateBookmark(updateTour, bookmarkRequest);
                         if (updateBookmarkGuid != Guid.Empty)
                         {
-                            //if (returnValue.BookmarkId == null)
-                            //{
-                            //    returnValue.BookmarkId = new List<Guid>();
-                            //}
                             returnValue.Add(updateBookmarkGuid);
                         }
                     }
