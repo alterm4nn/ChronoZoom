@@ -40,14 +40,14 @@ namespace Tests
         public void Search_Mayan_History_Timeline()
         {
             SearchHelper.SearchMayanHistoryTimeline();
-            Assert.AreEqual("Mayan History", HomePageHelper.GetLastBreadcrumbs());
+            Assert.AreEqual("Mayan History", BreadcrumbsHelper.GetLastBreadcrumbs());
         }  
         
         [TestMethod]
         public void Search_Evidence_Earliest_Stone_Tools_Exhibit()
         {
             SearchHelper.SearchEvidenceEarliestStoneToolsExhibit();
-            Assert.AreEqual("Genus Homo", HomePageHelper.GetLastBreadcrumbs());
+            Assert.AreEqual("Genus Homo", BreadcrumbsHelper.GetLastBreadcrumbs());
         }  
         
         [TestMethod]

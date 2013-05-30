@@ -28,7 +28,7 @@ module CZ {
         export class DataSet {
             public name: string;
             public time: number[];
-            public series: Series[];
+            public series: Series[]; 
 
         }
 

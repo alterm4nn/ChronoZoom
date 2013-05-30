@@ -54,8 +54,8 @@ namespace Tests
         [TestMethod]
         public void Life_TimeLine_Contains_Data()
         {
-            HomePageHelper.OpenCosmosTimeline();   
-            HomePageHelper.OpenLifeTimeline();
+            TimelineHelper.OpenCosmosTimeline();
+            TimelineHelper.OpenLifeTimeline();
             List<string> labels = TimescaleHelper.GetLabels();
             CollectionAssert.Contains(labels, Label3500Ma, Label3500Ma + " is not presented");
             CollectionAssert.Contains(labels, Label500Ma, Label500Ma + "is not presented");
@@ -64,7 +64,7 @@ namespace Tests
         [TestMethod]
         public void Humanity_TimeLine_Contains_Data()
         {
-            HomePageHelper.OpenHumanityTimeline();
+            TimelineHelper.OpenHumanityTimeline();
             List<string> labels = TimescaleHelper.GetLabels();
             CollectionAssert.Contains(labels, Label2000Bce, Label2000Bce + " is not presented");
             CollectionAssert.Contains(labels, Label2000Ce, Label2000Ce + " is not presented");
@@ -76,7 +76,7 @@ namespace Tests
         public void Transition_BCE_to_CE_should_contain_1BCE_and_1CE_ticks()
         {
             Logger.Log("Bug: @https://github.com/alterm4nn/ChronoZoom/issues/87", LogType.Debug);
-            HomePageHelper.OpenBceCeArea();
+            TimelineHelper.OpenBceCeArea();
             List<string> labels = TimescaleHelper.GetLabels();
             CollectionAssert.Contains(labels, Label1Bce, Label1Bce + " is not presented");
             CollectionAssert.Contains(labels, Label1Ce, Label1Ce + " is not presented");
@@ -85,8 +85,8 @@ namespace Tests
         [TestMethod]
         public void Roman_History_TimeLine_Borders()
         {
-            HomePageHelper.OpenHumanityTimeline();
-            HomePageHelper.OpenRomanHistoryTimeline();
+            TimelineHelper.OpenHumanityTimeline();
+            TimelineHelper.OpenRomanHistoryTimeline();
             const double expected = 942;
             double leftBorder = TimescaleHelper.GetLeftBorderDate();
             double rightBorder = TimescaleHelper.GetRightBorderDate();
@@ -96,8 +96,8 @@ namespace Tests
         [TestMethod]
         public void Roman_History_TimeLine_Borders_Ages()
         {
-            HomePageHelper.OpenHumanityTimeline();
-            HomePageHelper.OpenRomanHistoryTimeline();
+            TimelineHelper.OpenHumanityTimeline();
+            TimelineHelper.OpenRomanHistoryTimeline();
             const string leftBorderAge = "BCE";
             const string righBorderAge = "CE";
             string leftBorder = TimescaleHelper.GetLeftBorderDateAge();
@@ -109,7 +109,7 @@ namespace Tests
         [TestMethod]
         public void Mouse_Marker()
         {
-            HomePageHelper.OpenHumanityTimeline();
+            TimelineHelper.OpenHumanityTimeline();
             string mouseMarkerText = TimescaleHelper.GetMouseMarkerText();
             HomePageHelper.MoveMouseToCenter();
             string mouseMarkerCenterText = TimescaleHelper.GetMouseMarkerText();

@@ -56,7 +56,7 @@ var CZ;
                                 }
                             });
                             CZ.HomePageViewModel.showTimeSeriesChart();
-                            CZ.rightDataSet = CZ.Data.csvToDataSet(data, preloaded.delimiter, preloaded.name);
+                            CZ.rightDataSet = CZ.Data.csvToDataSet(data, preloaded.delimiter, preloaded.source);
                             var vp = CZ.Common.vc.virtualCanvas("getViewport");
                             CZ.HomePageViewModel.updateTimeSeriesChart(vp);
                         });

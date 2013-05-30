@@ -41,7 +41,7 @@ module CZ {
             }
         }
 
-        var _serviceUrl = CZ.Settings.serverUrlHost + "/chronozoom.svc/";
+        var _serviceUrl = CZ.Settings.serverUrlHost + "/api/";
 
         export function Request (urlBase) {
             var _url = urlBase;
@@ -331,6 +331,22 @@ module CZ {
                 url: request.url
             });
         }
+
+        // .../{supercollection}/{collection}/{reference}/contentpath
+        export function getContentPath(reference: string) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath(superCollectionName);
+            request.addToPath(collectionName);
+            request.addToPath(reference);
+            request.addToPath("contentpath");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        } getContentPath
 
         /**
         * Auxiliary Methods.

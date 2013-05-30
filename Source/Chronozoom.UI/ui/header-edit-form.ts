@@ -7,13 +7,13 @@ module CZ {
         export interface IFormHeaderEditInfo extends CZ.UI.IFormBaseInfo {
             createTimeline: string;
             createExhibit: string;
-            editTimeline: string;
-            editExhibit: string;
+            createTour: string;
         }
 
         export class FormHeaderEdit extends CZ.UI.FormBase {
             private createTimelineBtn: JQuery;
             private createExhibitBtn: JQuery;
+            private createTourBtn: JQuery;
 
             // We only need to add additional initialization in constructor.
             constructor(container: JQuery, formInfo: IFormHeaderEditInfo) {
@@ -21,6 +21,7 @@ module CZ {
 
                 this.createTimelineBtn = this.container.find(formInfo.createTimeline);
                 this.createExhibitBtn = this.container.find(formInfo.createExhibit);
+                this.createTourBtn = this.container.find(formInfo.createTour);
 
                 this.initialize();
             }
@@ -28,6 +29,7 @@ module CZ {
             private initialize(): void {
                 this.createTimelineBtn.off();
                 this.createExhibitBtn.off();
+                this.createTourBtn.off();
 
                 this.createTimelineBtn.click(event => {
                     CZ.Authoring.UI.createTimeline();
@@ -36,6 +38,11 @@ module CZ {
 
                 this.createExhibitBtn.click(event => {
                     CZ.Authoring.UI.createExhibit();
+                    this.close();
+                });
+
+                this.createTourBtn.click(event => {
+                    CZ.Authoring.UI.createTour();
                     this.close();
                 });
             }

@@ -57,6 +57,9 @@ module CZ {
         export var supercollection = ""; // the supercollection associated with this url
         export var collection = ""; // the collection associated with this url
 
+        // Initial Content contains the identifier (e.g. ID or Title) of the content that should be loaded initially.
+        export var initialContent = null;
+
         /* Initialize the JQuery UI Widgets
         */
         export function initialize() {
@@ -203,7 +206,7 @@ module CZ {
             } else {
                 switch (CZ.Settings.czDataSource) {
                     case 'db':
-                        return "/Chronozoom.svc/get";
+                        return "/api/get";
                     case 'relay':
                         return "ChronozoomRelay";
                     case 'dump':
@@ -216,10 +219,25 @@ module CZ {
 
         //loading the data from the service
         export function loadData() {
-            CZ.Data.getTimelines(null).then(
+            return CZ.Data.getTimelines(null).then(
                 function (response) {
+                    if (!response) {
+                        return;
+                    }
+
                     ProcessContent(response);
                     vc.virtualCanvas("updateViewport");
+
+                    if (CZ.Common.initialContent) {
+                        CZ.Service.getContentPath(CZ.Common.initialContent).then(
+                            function (response) {
+                                window.location.hash = response;
+                            },
+                            function (error) {
+                                console.log("Error connecting to service:\n" + error.responseText);
+                            }
+                        );
+                    }
 
                     CZ.Service.getTours().then(
                         function (response) {

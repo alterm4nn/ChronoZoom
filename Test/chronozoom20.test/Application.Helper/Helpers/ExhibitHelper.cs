@@ -11,6 +11,13 @@ namespace Application.Helper.Helpers
 {
     public class ExhibitHelper : DependentActions
     {
+        private readonly HelperManager _manager;
+
+        public ExhibitHelper()
+        {
+            _manager = new HelperManager();
+        }
+        
         public void AddExhibit(Exhibit exhibit)
         {
             Logger.Log("<- " + exhibit);
@@ -110,10 +117,27 @@ namespace Application.Helper.Helpers
             }
             catch (Exception)
             {
-                //AcceptAlert();
                 Logger.Log("-> false");
                 return false;
             }
+        }
+
+        public string GetEukaryoticCellsDescription()
+        {
+            Logger.Log("<-");
+            _manager.GetNavigationHelper().OpenExhibitEukaryoticCells();
+            Logger.Log("ExhibitEukaryotic Cell is opened");
+            string description = GetContentItemDescription();
+            Logger.Log("-> description: " + description);
+            return description;
+        }
+
+        public string GetExpectedYouTubeUri(string uri)
+        {
+            Logger.Log("<- uri: " + uri, LogType.MessageWithoutScreenshot);
+            string expectedUri = "http://www.youtube.com/embed/" + (uri.Split('=')[1]);
+            Logger.Log("-> expected uri: " + expectedUri, LogType.MessageWithoutScreenshot);
+            return expectedUri;
         }
 
         private void ConfirmDeletion()

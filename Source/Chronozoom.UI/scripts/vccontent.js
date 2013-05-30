@@ -1677,11 +1677,14 @@ var CZ;
             for(var i = 0; i < citems.length; i++) {
                 if(citems[i].id == cid) {
                     return {
+                        id: cid,
                         x: citems[i].x,
                         y: citems[i].y,
                         width: citems[i].width,
                         height: citems[i].height,
-                        parent: infodot
+                        parent: infodot,
+                        type: "contentItem",
+                        vc: infodot.vc
                     };
                 }
             }

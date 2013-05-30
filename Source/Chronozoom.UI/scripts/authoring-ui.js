@@ -2,6 +2,15 @@ var CZ;
 (function (CZ) {
     (function (Authoring) {
         (function (UI) {
+            function createTour() {
+                if(CZ.Layout.animatingElements.length != 0) {
+                    return;
+                }
+                CZ.Authoring.isActive = false;
+                CZ.Authoring.mode = "editTour";
+                Authoring.showEditTourForm(null);
+            }
+            UI.createTour = createTour;
             function createTimeline() {
                 if(CZ.Layout.animatingElements.length != 0) {
                     return;

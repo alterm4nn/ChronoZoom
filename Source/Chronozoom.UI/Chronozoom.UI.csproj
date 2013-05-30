@@ -53,6 +53,23 @@
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
+    <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
+    <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
+    <None Include="_bin_deployableAssemblies\x86\sqlceer40EN.dll" />
+    <None Include="_bin_deployableAssemblies\x86\sqlcecompact40.dll" />
+    <None Include="_bin_deployableAssemblies\x86\sqlceca40.dll" />
+    <None Include="_bin_deployableAssemblies\x86\Microsoft.VC90.CRT\README_ENU.txt" />
+    <None Include="_bin_deployableAssemblies\x86\Microsoft.VC90.CRT\msvcr90.dll" />
+    <None Include="_bin_deployableAssemblies\amd64\sqlcese40.dll" />
+    <None Include="_bin_deployableAssemblies\amd64\sqlceqp40.dll" />
+    <None Include="_bin_deployableAssemblies\amd64\sqlceme40.dll" />
+    <None Include="_bin_deployableAssemblies\amd64\sqlceer40EN.dll" />
+    <None Include="_bin_deployableAssemblies\amd64\sqlcecompact40.dll" />
+    <None Include="_bin_deployableAssemblies\amd64\sqlceca40.dll" />
+    <None Include="_bin_deployableAssemblies\amd64\Microsoft.VC90.CRT\README_ENU.txt" />
+    <None Include="_bin_deployableAssemblies\amd64\Microsoft.VC90.CRT\msvcr90.dll" />
+    <None Include="_bin_deployableAssemblies\x86\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest" />
     <Reference Include="EntityFramework, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
@@ -104,6 +121,14 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Data.Services.Client" />
+    <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.SqlServer.Compact.4.0.8876.1\lib\net40\System.Data.SqlServerCe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SqlServerCe.Entity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\EntityFramework.SqlServerCompact.4.3.6\lib\net40\System.Data.SqlServerCe.Entity.dll</HintPath>
+    </Reference>
     <Reference Include="System.IdentityModel" />
     <Reference Include="System.identitymodel.services" />
     <Reference Include="System.Net.Http" />
@@ -117,6 +142,7 @@
     <Reference Include="System.ServiceModel">
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.ServiceModel.Activation" />
     <Reference Include="System.ServiceModel.Web">
       <Private>True</Private>
     </Reference>
@@ -152,6 +178,7 @@
     <Reference Include="System.Web.Routing">
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Web.Services" />
     <Reference Include="System.Web.WebPages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
@@ -170,15 +197,25 @@
     <Content Include="ACS\FederationMetadata\2007-06\FederationMetadata.xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="api\errorhandler.cs" />
+    <Compile Include="default.ashx.cs">
+      <DependentUpon>default.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="api\ichronozoomsvc.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="pages\sitemap.aspx.cs">
+      <DependentUpon>sitemap.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="pages\sitemap.aspx.designer.cs">
+      <DependentUpon>sitemap.aspx</DependentUpon>
     </Compile>
     <Compile Include="utils\ThumbnailGenerator.cs" />
     <Content Include="css\cz.min.css">
       <DependentUpon>cz.less</DependentUpon>
     </Content>
-    <Content Include="cz.aspx" />
-    <Content Include="cz.html" />
     <Content Include="dumps\250-be5yavg.csv" />
     <Content Include="dumps\2k-moberg2000.csv" />
     <Content Include="dumps\420k-vostok.csv" />
@@ -186,6 +223,9 @@
     <Content Include="dumps\540M-Veizer1020.csv" />
     <Content Include="dumps\65M-zachos2001.csv" />
     <Content Include="dumps\timeseries-preloaded.txt" />
+    <Compile Include="utils\UrlHelper.cs" />
+    <Content Include="cz.html" />
+    <Content Include="cz.js" />
     <Content Include="fallback.html" />
     <Content Include="Global.asax" />
     <Content Include="images\edit-icon.png" />
@@ -195,6 +235,7 @@
     <Content Include="images\tour-icon.png" />
     <Content Include="images\view-icon.png" />
     <Content Include="images\edit.svg" />
+    <Content Include="pages\sitemap.aspx" />
     <Content Include="scripts\external\ACS.js" />
     <Content Include="scripts\authoring.ts" />
     <Content Include="scripts\authoring.js">
@@ -208,6 +249,11 @@
     <Content Include="scripts\breadcrumbs.ts" />
     <Content Include="scripts\common.ts" />
     <Content Include="scripts\external\csvToArray.v2.1.js" />
+    <Content Include="ui\auth-edit-tour-form.html" />
+    <Content Include="ui\auth-edit-tour-form.js">
+      <DependentUpon>auth-edit-tour-form.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\external\seadragon-min.js" />
     <Content Include="ui\controls\formbase.js">
       <DependentUpon>formbase.ts</DependentUpon>
     </Content>
@@ -235,8 +281,6 @@
     <Content Include="scripts\cz.ts" />
     <Content Include="scripts\service.ts" />
     <Content Include="scripts\external\flash_detect.js" />
-    <Content Include="scripts\external\jquery-1.7.2.min.js" />
-    <Content Include="scripts\external\jquery-ui-1.8.16.custom.min.js" />
     <Content Include="scripts\external\jquery.cookie.js" />
     <Content Include="scripts\external\jquery.signalR-1.0.0-rc2.js" />
     <Content Include="scripts\external\mouseWheelPlugin.js" />
@@ -244,7 +288,6 @@
     <Content Include="scripts\external\rx.js" />
     <Content Include="scripts\gestures.ts" />
     <Content Include="scripts\layout.ts" />
-    <Content Include="scripts\regimesIE.ts" />
     <Content Include="scripts\search.ts" />
     <Content Include="scripts\timescale.ts" />
     <Content Include="scripts\tours.ts" />
@@ -301,6 +344,7 @@
       <DependentUpon>contentitem-listbox.ts</DependentUpon>
     </Content>
     <Content Include="ui\contentitem-listbox.ts" />
+    <Content Include="ui\auth-edit-tour-form.ts" />
     <Content Include="ui\header-edit-form.html" />
     <Content Include="ui\header-edit-form.ts" />
     <Content Include="ui\header-edit-form.js">
@@ -358,9 +402,6 @@
     <Content Include="scripts\breadcrumbs.js">
       <DependentUpon>breadcrumbs.ts</DependentUpon>
     </Content>
-    <Content Include="scripts\regimesIE.js">
-      <DependentUpon>regimesIE.ts</DependentUpon>
-    </Content>
     <Content Include="scripts\timescale.js">
       <DependentUpon>timescale.ts</DependentUpon>
     </Content>
@@ -400,7 +441,7 @@
     <Content Include="scripts\tours.js">
       <DependentUpon>tours.ts</DependentUpon>
     </Content>
-    <Content Include="Chronozoom.svc" />
+    <Content Include="api\chronozoom.svc" />
     <Content Include="scripts\urlnav.js">
       <DependentUpon>urlnav.ts</DependentUpon>
     </Content>
@@ -445,20 +486,31 @@
       <DependentUpon>timeseries-graph-form.ts</DependentUpon>
     </Content>
     <Content Include="ui\timeseries-graph-form.ts" />
+    <Content Include="ui\tour-listbox.html" />
+    <TypeScriptCompile Include="ui\tour-listbox.ts" />
+    <Content Include="ui\tour-listbox.js">
+      <DependentUpon>tour-listbox.ts</DependentUpon>
+    </Content>
+    <Content Include="ui\tourslist-form.html" />
+    <Content Include="ui\tourslist-form.js">
+      <DependentUpon>tourslist-form.ts</DependentUpon>
+    </Content>
+    <Content Include="ui\tourslist-form.ts" />
+    <Content Include="ui\tourstop-listbox.html" />
+    <Content Include="ui\tourstop-listbox.js">
+      <DependentUpon>tourstop-listbox.ts</DependentUpon>
+    </Content>
+    <Content Include="ui\tourstop-listbox.ts" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
     <Content Include="dumps\beta-timeseries.csv" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Chronozoom.svc.cs">
-      <DependentUpon>Chronozoom.svc</DependentUpon>
+    <Compile Include="api\chronozoom.svc.cs">
+      <DependentUpon>chronozoom.svc</DependentUpon>
     </Compile>
     <Compile Include="ACS\controllers\AccountController.cs" />
-    <Compile Include="cz.aspx.cs">
-      <DependentUpon>cz.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="utils\GlobalSuppressions.cs" />
     <!--<Compile Include="Models\Reference.cs" />-->
     <!--<Compile Include="Models\Utility.cs" />-->
@@ -505,6 +557,9 @@
     <Content Include="css\datepicker.less" />
     <Content Include="css\timescale.less" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="default.ashx" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
@@ -531,6 +586,10 @@
     </VisualStudio>
   </ProjectExtensions>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>tsc -target ES5 --out $(ProjectDir)cz.js $(ProjectDir)scripts\cz.ts
+      exit 0</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
