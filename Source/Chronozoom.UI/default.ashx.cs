@@ -20,11 +20,7 @@ namespace Chronozoom.UI
     /// </summary>
     public class DefaultHttpHandler : IHttpHandler
     {
-<<<<<<< HEAD
-        private const string _mainPageName = @"cz.html";  /* cannot be marked as static */
-=======
         private const string _mainPageName = @"cz.html";
->>>>>>> upstream/master
         private static readonly Lazy<string> _mainPage = new Lazy<string>(() =>
         {
             PageInformation pageInforamtion = new PageInformation();
@@ -61,10 +57,12 @@ namespace Chronozoom.UI
             context.Response.ContentType = "text/html";
 
             PageInformation pageInformation;
-            if (PageIsDynamic(HttpContext.Current.Request.Url, out pageInformation)) {
+            if (PageIsDynamic(HttpContext.Current.Request.Url, out pageInformation))
+            {
                 context.Response.Write(GenerateDefaultPage(pageInformation));
             }
-            else {
+            else
+            {
                 context.Response.Write(_mainPage.Value);
             }
         }
@@ -146,7 +144,7 @@ namespace Chronozoom.UI
                 XElement metaDescription = pageRoot.XPathSelectElement("/xhtml:html/xhtml:head/xhtml:meta[@name='Description']", xmlNamespaceManager);
                 XName contentAttribute = "content";
 
-                metaDescription.SetAttributeValue(contentAttribute,  pageInformation.Description);
+                metaDescription.SetAttributeValue(contentAttribute, pageInformation.Description);
             }
 
             XElement lastMetaTag = pageRoot.XPathSelectElement("/xhtml:html/xhtml:head/xhtml:meta[@name='viewport']", xmlNamespaceManager);
