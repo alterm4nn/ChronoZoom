@@ -119,8 +119,8 @@ module CZ {
 
             public drawDataSet(dataSet: CZ.Data.DataSet, screenLeft: number, screenRight: number, plotLeft: number, plotRight: number): void {
                 //todo: determine y-range. It should be inside dataset
-                var plotBottom = 0;
-                var plotTop = 0;
+                var plotBottom = Number.MAX_VALUE;
+                var plotTop = Number.MIN_VALUE;
 
                 dataSet.series.forEach(function (seria) {
                     if (seria.appearanceSettings && seria.appearanceSettings.yMin && seria.appearanceSettings.yMin < plotBottom) {

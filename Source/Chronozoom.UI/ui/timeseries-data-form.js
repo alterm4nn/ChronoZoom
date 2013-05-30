@@ -28,9 +28,18 @@ var CZ;
                     });
                     preloadedlist.forEach(function (preloaded) {
                         var li = $('<ul></ul>').appendTo(existingTimSeriesList);
+                        var par = $("<p></p>");
                         var link = $('<a></a>').addClass("cz-form-btn").appendTo(li);
                         link.css("color", "#25a1ea");
+                        link.css("float", "left");
                         link.text(preloaded.name);
+                        var div = $("<div>Source:</div>").appendTo(li);
+                        div.css("margin-left", "3px");
+                        div.css("margin-right", "3px");
+                        div.css("float", "left");
+                        var sourceDiv = $("<a></a>").appendTo(li);
+                        sourceDiv.css("color", "blue");
+                        sourceDiv.text(preloaded.source);
                         link.click(function (e) {
                             var data;
                             $.ajax({

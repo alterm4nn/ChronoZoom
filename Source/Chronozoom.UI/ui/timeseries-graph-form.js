@@ -97,8 +97,8 @@ var CZ;
             };
             LineChart.prototype.drawDataSet = function (dataSet, screenLeft, screenRight, plotLeft, plotRight) {
                 var _this = this;
-                var plotBottom = 0;
-                var plotTop = 0;
+                var plotBottom = Number.MAX_VALUE;
+                var plotTop = Number.MIN_VALUE;
                 dataSet.series.forEach(function (seria) {
                     if(seria.appearanceSettings && seria.appearanceSettings.yMin && seria.appearanceSettings.yMin < plotBottom) {
                         plotBottom = seria.appearanceSettings.yMin;

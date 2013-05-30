@@ -1482,7 +1482,7 @@ img.fallbackBackground {
 /* TimSeries Data Form */
 #timeSeriesDataForm {
   right: 0px;
-  width: 300px;
+  width: 500px;
 }
 #existingTimeSeries {
   padding: 0;
