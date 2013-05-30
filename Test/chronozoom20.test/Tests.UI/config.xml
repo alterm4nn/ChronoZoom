@@ -16,8 +16,8 @@
       <x86HubUrl>http://192.168.50.175:4445/wd/hub</x86HubUrl>
       <x64HubUrl>http://192.168.50.175:4444/wd/hub</x64HubUrl>
       <HubUrl>http://192.168.50.175:4444/wd/hub</HubUrl>
-      <BrowserVersion>18</BrowserVersion>
-      <PlatformName>Vista</PlatformName>
+      <BrowserVersion>24</BrowserVersion>
+      <PlatformName>XP</PlatformName>
       <GridCapabilities>
         <Capability Platform="Win8x64" Browser="chrome" Version="24" />
       </GridCapabilities>

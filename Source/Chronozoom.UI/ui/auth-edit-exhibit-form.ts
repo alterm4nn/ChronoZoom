@@ -5,20 +5,19 @@
 
 module CZ {
     export module UI {
-        export interface IFormEditExhibitInfo extends IFormBaseInfo {
+        export interface IFormEditExhibitInfo extends IFormUpdateEntityInfo {
             titleTextblock: string;
             titleInput: string;
             datePicker: string;
             createArtifactButton: string;
             contentItemsListBox: string;
             errorMessage: string;
-            saveButton: string;
             deleteButton: string;
             contentItemsTemplate: JQuery;
             context: Object;
         }
 
-        export class FormEditExhibit extends FormBase {
+        export class FormEditExhibit extends FormUpdateEntity {
             private titleTextblock: JQuery;
             private titleInput: JQuery;
             private datePicker: DatePicker;
@@ -142,7 +141,7 @@ module CZ {
                     contentItems: this.exhibit.contentItems || []
                 };
 
-                if (CZ.Authoring.ValidateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) &&
+                if (CZ.Authoring.validateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) &&
                     this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {                    
                     CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(
                         success => {

@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
+using System.Data.SqlTypes;
 
 namespace Chronozoom.Entities
 {
@@ -36,12 +37,16 @@ namespace Chronozoom.Entities
         /// The title of the timeline.
         /// </summary>
         [DataMember(Name = "title")]
+        [MaxLength(200)]
+        [Column(TypeName = "nvarchar")]
         public string Title { get; set; }
 
         /// <summary>
         /// The regime in which the timeline should occur.
         /// </summary>
         [DataMember]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         public string Regime { get; set; }
 
         /// <summary>

@@ -26,12 +26,16 @@ namespace Chronozoom.Entities
         /// The display name of the user.
         /// </summary>
         [DataMember]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         public string DisplayName { get; set; }
 
         /// <summary>
         /// The email address of the user.
         /// </summary>
         [DataMember]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         public string Email { get; set; }
 
         public string NameIdentifier { get; set; }

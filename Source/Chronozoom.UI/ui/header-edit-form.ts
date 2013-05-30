@@ -8,8 +8,6 @@ module CZ {
             createTimeline: string;
             createExhibit: string;
             createTour: string;
-            editTimeline: string;
-            editExhibit: string;
         }
 
         export class FormHeaderEdit extends CZ.UI.FormBase {

@@ -14,7 +14,7 @@ describe("convertYearToCoordinate method should return", function () {
         });
     });
 
-    using("regime =", ["ma"], function (value) {
+    using("regime =", ["Ma"], function (value) {
         it("year * -1000000", function () {
             var year = -5;
             var coordinate = convertYearToCoordinate(year, value);
@@ -22,7 +22,7 @@ describe("convertYearToCoordinate method should return", function () {
         });
     });
 
-    using("regime =", ["KA"], function (value) {
+    using("regime =", ["Ka"], function (value) {
         it("year * -1000", function () {
             var year = .13568;
             var coordinate = convertYearToCoordinate(year, value);
@@ -67,7 +67,7 @@ describe("convertCoordinateToYear method should return", function () {
     });
 
     using("coordinate =", [-1999, -999999], function (value) {
-        it("regime Ka ", function () {
+        it("regime ka ", function () {
             var coordinate = value;
             var result = convertCoordinateToYear(coordinate);
             expect(result.year).toEqual(coordinate / -1000);
@@ -84,7 +84,7 @@ describe("convertCoordinateToYear method should return", function () {
     });
 
     using("coordinate =", [-1000000001], function (value) {
-        it("regime GA ", function () {
+        it("regime Ga ", function () {
             var coordinate = value;
             var result = convertCoordinateToYear(coordinate);
             expect(result.year).toEqual(coordinate / -1000000000);
@@ -94,15 +94,15 @@ describe("convertCoordinateToYear method should return", function () {
 });
 
 // var data1 = [coordinate, exoected year, expected month, expected day];
-var data1 = [-0.3488135039063145, -1, 7, 27];
-var data2 = [2013.0958904109589, 2013, 1, 5];
-var data3 = [1, 1, 0, 1];
-var data4 = [-2013.5, -2014, 6, 3];
-var data5 = [2012.161, 2012, 1, 29]; // - leap year
-var data6 = [2013.161, 2013, 2, 1];
-var data7 = [-1599.839, -1600, 1, 29]; // - leap year
-var data8 = [2000.161, 2000, 1, 29]; // - leap year
-var data9 = [2000.162, 2000, 2, 1];
+var data1 = [-0.34520547945205493, -1, 7, 27];
+var data2 = [2013.3863013698588, 2013, 1, 5];
+var data3 = [1.0027397260273974, 1, 0, 1];
+var data4 = [-2013.495890410959, -2014, 6, 3];
+var data5 = [2012.449315068489, 2012, 1, 29]; // - leap year
+var data6 = [2013.4520547945165, 2013, 2, 1];
+var data7 = [-1599.8383561643836, -1600, 1, 28];
+var data8 = [2000.441095890407, 2000, 1, 29]; // - leap year
+var data9 = [2000.4438356164344, 2000, 2, 1];
 
 
 describe("getDMYFromCoordinate() method should return", function () {
@@ -133,7 +133,7 @@ describe("getPresent() method should return", function () {
     });
 });
 
-describe("getCoordinateFromDecimalYear() method should return", function () {
+/*describe("getCoordinateFromDecimalYear() method should return", function () {
     it("decimalYear date if year != 9999", function () {
         var decimal = 2012.654794520548;
         var result = CZ.Dates.getCoordinateFromDecimalYear(decimal);
@@ -164,6 +164,45 @@ describe("getCoordinateFromDecimalYear() method should return", function () {
         expect(result).not.toEqual(decimal);
     });
 });
+*/
+
+
+/*describe("getYearsBetweenDates() method", function () {
+    describe("should return", function () {
+        it("-1.0027397260273974, if start date = 1600-1-28 and end date = 1601-1-28", function () {
+            var y1 = 1600;
+            var m1 = 1;
+            var d1 = 28;
+            var y2 = 1601;
+            var m2 = 1;
+           var d2 = 28;
+           var result = CZ.Dates.getYearsBetweenDates(y1, m1, d1, y2, m2, d2);
+            expect(-1.0027397260273974).toEqual(result);
+        });
+
+        it("19, if start date = (10)-1-1 and end date = (-10)-1-1", function () {
+            var y1 = 10;
+            var m1 = 1;
+            var d1 = 1;
+            var y2 = -10;
+            var m2 = 1;
+            var d2 = 1;
+            var result = CZ.Dates.getYearsBetweenDates(y1, m1, d1, y2, m2, d2);
+            expect(19).toEqual(result);
+        });
+
+        it("-19, if start date = (-10)-1-1 and end date = (10)-1-1", function () {
+            var y1 = -10;
+            var m1 = 1;
+            var d1 = 1;
+            var y2 = 10;
+            var m2 = 1;
+            var d2 = 1;
+            var result = CZ.Dates.getYearsBetweenDates(y1, m1, d1, y2, m2, d2);
+            expect(-19).toEqual(result);
+        });
+    });
+});*/
 
 function convertCoordinateToYear(coordinate) {
     return CZ.Dates.convertCoordinateToYear(coordinate);
@@ -191,6 +230,7 @@ function usingDMY(name, values, func) {
         jasmine.currentEnv_.currentSpec.description += name;
     }
 }
+
 
 //describe("loadDataUrl() method", function () {
 //    describe("should return", function () {

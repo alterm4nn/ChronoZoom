@@ -1552,7 +1552,6 @@ module CZ {
             }).appendTo(vc);
             
             elem[0].addEventListener("mousemove", CZ.Common.preventbubble, false);
-            //elem[0].addEventListener("mouseup", CZ.Common.preventbubble, false);
             elem[0].addEventListener("mousedown", CZ.Common.preventbubble, false);
             elem[0].addEventListener("DOMMouseScroll", CZ.Common.preventbubble, false);
             elem[0].addEventListener("mousewheel", CZ.Common.preventbubble, false);

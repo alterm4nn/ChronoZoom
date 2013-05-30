@@ -28,6 +28,12 @@ namespace Chronozoom.Entities
     /// </summary>
     public class Storage : DbContext
     {
+        private static Lazy<int> _storageTimeout = new Lazy<int>(() =>
+        {
+            string storageTimeout = ConfigurationManager.AppSettings["StorageTimeout"];
+            return string.IsNullOrEmpty(storageTimeout) ? 30 : int.Parse(storageTimeout, CultureInfo.InvariantCulture);
+        });
+
         // Enables RI-Tree queries.
         private static Lazy<bool> _useRiTreeQuery = new Lazy<bool>(() =>
         {
@@ -44,6 +50,11 @@ namespace Chronozoom.Entities
 
         public Storage()
         {
+            if (System.Configuration.ConfigurationManager.ConnectionStrings[0].ProviderName.Equals("System.Data.​SqlClient"))
+            {
+                ((IObjectContextAdapter)this).ObjectContext.CommandTimeout = _storageTimeout.Value;
+            }
+
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<Storage, StorageMigrationsConfiguration>());
             Configuration.ProxyCreationEnabled = false;
         }
@@ -59,6 +70,8 @@ namespace Chronozoom.Entities
         public DbSet<ContentItem> ContentItems { get; set; }
 
         public DbSet<Tour> Tours { get; set; }
+
+        public DbSet<Bookmark> Bookmarks { get; set; } 
 
         public DbSet<User> Users { get; set; }
 
@@ -404,5 +417,14 @@ namespace Chronozoom.Entities
             return parentTimelinesRaw.FirstOrDefault();
         }
 
+        // Returns the tour associated with a given bookmark id.
+        public Tour GetBookmarkTour(Bookmark bookmark)
+        {
+            if (bookmark == null)
+                return null;
+
+            var bookmarkTour = Database.SqlQuery<Tour>("SELECT * FROM Tours WHERE Id in (SELECT Tour_Id FROM Bookmarks WHERE Id = {0})", bookmark.Id);
+            return bookmarkTour.FirstOrDefault();
+        }
     }
 }

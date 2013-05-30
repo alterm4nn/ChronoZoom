@@ -34,12 +34,16 @@ namespace Chronozoom.Entities
         /// The title of the content item.
         /// </summary>
         [DataMember(Name = "title")]
+        [MaxLength(200)]
+        [Column(TypeName = "nvarchar")]
         public string Title { get; set; }
 
         /// <summary>
         /// The description of the content item.
         /// </summary>
         [DataMember(Name = "description")]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         public string Caption { get; set; }
 
         /// <summary>
@@ -52,12 +56,16 @@ namespace Chronozoom.Entities
         /// Specifies which type of media the content type is.
         /// </summary>
         [DataMember(Name = "mediaType")]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         public string MediaType { get; set; }
 
         /// <summary>
         /// The URL for the content item.
         /// </summary>
         [DataMember(Name = "uri")]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification="Uri not supported in entity framework.")]
         public string Uri { get; set; }
 
@@ -65,12 +73,16 @@ namespace Chronozoom.Entities
         /// Identifies the source of the content item.
         /// </summary>
         [DataMember(Name = "mediaSource", EmitDefaultValue = false)]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         public string MediaSource { get; set; }
 
         /// <summary>
         /// The attribution for the content item.
         /// </summary>
         [DataMember(Name = "attribution", EmitDefaultValue = false)]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         public string Attribution { get; set; }
 
         /// <summary>

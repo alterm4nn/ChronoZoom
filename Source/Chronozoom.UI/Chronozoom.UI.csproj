@@ -205,7 +205,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="pages\sitemap.aspx.cs">
       <DependentUpon>sitemap.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -216,6 +215,7 @@
     <Compile Include="utils\ThumbnailGenerator.cs" />
     <Compile Include="utils\UrlHelper.cs" />
     <Content Include="cz.html" />
+    <Content Include="cz.js" />
     <Content Include="fallback.html" />
     <Content Include="Global.asax" />
     <Content Include="images\edit-icon.png" />
@@ -241,6 +241,7 @@
     <Content Include="ui\auth-edit-tour-form.js">
       <DependentUpon>auth-edit-tour-form.ts</DependentUpon>
     </Content>
+    <Content Include="scripts\external\seadragon-min.js" />
     <Content Include="ui\controls\formbase.js">
       <DependentUpon>formbase.ts</DependentUpon>
     </Content>
@@ -268,8 +269,6 @@
     <Content Include="scripts\cz.ts" />
     <Content Include="scripts\service.ts" />
     <Content Include="scripts\external\flash_detect.js" />
-    <Content Include="scripts\external\jquery-1.7.2.min.js" />
-    <Content Include="scripts\external\jquery-ui-1.8.16.custom.min.js" />
     <Content Include="scripts\external\jquery.cookie.js" />
     <Content Include="scripts\external\jquery.signalR-1.0.0-rc2.js" />
     <Content Include="scripts\external\mouseWheelPlugin.js" />
@@ -277,7 +276,6 @@
     <Content Include="scripts\external\rx.js" />
     <Content Include="scripts\gestures.ts" />
     <Content Include="scripts\layout.ts" />
-    <Content Include="scripts\regimesIE.ts" />
     <Content Include="scripts\search.ts" />
     <Content Include="scripts\timescale.ts" />
     <Content Include="scripts\tours.ts" />
@@ -391,9 +389,6 @@
     <Content Include="robots.txt" />
     <Content Include="scripts\breadcrumbs.js">
       <DependentUpon>breadcrumbs.ts</DependentUpon>
-    </Content>
-    <Content Include="scripts\regimesIE.js">
-      <DependentUpon>regimesIE.ts</DependentUpon>
     </Content>
     <Content Include="scripts\timescale.js">
       <DependentUpon>timescale.ts</DependentUpon>
@@ -568,6 +563,10 @@
     </VisualStudio>
   </ProjectExtensions>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>tsc -target ES5 --out $(ProjectDir)cz.js $(ProjectDir)scripts\cz.ts
+      exit 0</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
