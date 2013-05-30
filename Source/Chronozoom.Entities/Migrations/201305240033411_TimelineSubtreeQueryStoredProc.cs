@@ -8,7 +8,11 @@ namespace Chronozoom.Entities
     {
         public override void Up()
         {
-            this.Sql(Properties.Resources.TimelineSubtreeQuery);
+            if (System.Configuration.ConfigurationManager.ConnectionStrings[0].ProviderName.Equals("System.Data.?SqlClient"))
+            {
+                this.Sql(Properties.Resources.TimelineSubtreeQuery);
+
+            }
         }
         
         public override void Down()
