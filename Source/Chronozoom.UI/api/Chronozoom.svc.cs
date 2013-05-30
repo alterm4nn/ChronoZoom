@@ -1028,6 +1028,7 @@ namespace Chronozoom.UI
             updateContentItem.Uri = contentItemRequest.Uri;
             updateContentItem.MediaSource = contentItemRequest.MediaSource;
             updateContentItem.Attribution = contentItemRequest.Attribution;
+            updateContentItem.Order = contentItemRequest.Order;
             return contentItemRequest.Id;
         }
 
@@ -1043,6 +1044,7 @@ namespace Chronozoom.UI
                 Uri = contentItemRequest.Uri,
                 MediaSource = contentItemRequest.MediaSource,
                 Attribution = contentItemRequest.Attribution,
+                Order = contentItemRequest.Order,
                 Depth = newExhibit.Depth + 1
             };
             newContentItem.Collection = collection;

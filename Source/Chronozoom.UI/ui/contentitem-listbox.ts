@@ -76,7 +76,8 @@ module CZ {
                 this.titleTextblock = this.container.find(uiMap.titleTextblock);
                 this.descrTextblock = this.container.find(uiMap.descrTextblock);
 
-                this.iconImg.attr("src", this.data.icon || "/images/Temp-Thumbnail2.png");
+                this.iconImg.attr("onerror", "this.src='/images/Temp-Thumbnail2.png';");
+                this.iconImg.attr("src", this.data.uri);
                 this.titleTextblock.text(this.data.title);
                 this.descrTextblock.text(this.data.description);
 
