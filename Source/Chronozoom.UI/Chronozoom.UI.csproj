@@ -53,6 +53,8 @@
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="Properties\PublishProfiles\cz-nodelete-chronozoom-test - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\cz-nodelete-chronozoom-test - Web Deploy.pubxml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -224,6 +226,9 @@
     <Content Include="dumps\65M-zachos2001.csv" />
     <Content Include="dumps\timeseries-preloaded.txt" />
     <Compile Include="utils\UrlHelper.cs" />
+    <Content Include="css\cz.min.css">
+      <DependentUpon>cz.less</DependentUpon>
+    </Content>
     <Content Include="cz.html" />
     <Content Include="cz.js" />
     <Content Include="fallback.html" />

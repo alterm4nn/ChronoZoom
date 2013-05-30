@@ -12,6 +12,7 @@ module CZ {
         }
         
         export class FormBase {
+            public isFormVisible: bool;
             public activationSource: JQuery;
             public navButton: JQuery;
             public closeButton: JQuery;
@@ -24,13 +25,15 @@ module CZ {
                 if (!(container instanceof jQuery && container.is("div"))) {
                     throw "Container parameter is invalid! It should be jQuery instance of DIV.";
                 }
-
+                this.isFormVisible = false;
                 this.container = container;
                 this.prevForm = formInfo.prevForm;
                 this.activationSource = formInfo.activationSource;
                 this.navButton = this.container.find(formInfo.navButton);
                 this.closeButton = this.container.find(formInfo.closeButton);
                 this.titleTextblock = this.container.find(formInfo.titleTextblock);
+
+                this.container.data("form", this);
 
                 if (this.prevForm) {
                     this.navButton.show();
@@ -51,10 +54,13 @@ module CZ {
             }
 
             public show(...args: any[]): void {
+                this.isFormVisible = true;
                 this.container.show.apply(this.container, args);
             }
 
             public close(...args: any[]): void {
+                this.isFormVisible = false;
+                this.container.data("form", undefined);
                 this.container.hide.apply(this.container, args);
             }
 

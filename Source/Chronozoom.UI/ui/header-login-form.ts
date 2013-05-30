@@ -6,8 +6,10 @@ module CZ {
     export module UI {
 
         export class FormLogin extends CZ.UI.FormBase {
+
             constructor(container: JQuery, formInfo: CZ.UI.IFormBaseInfo) {
                 super(container, formInfo);
+
             }
 
             public show(): void {
@@ -16,7 +18,6 @@ module CZ {
                     direction: "right",
                     duration: 500
                 });
-
                 this.activationSource.addClass("active");
             }
 
@@ -26,7 +27,6 @@ module CZ {
                     direction: "right",
                     duration: 500
                 });
-
                 this.activationSource.removeClass("active");
             }
         }

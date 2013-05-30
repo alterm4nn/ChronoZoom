@@ -125,12 +125,23 @@ var CZ;
                 var forms = arguments;
                 CZ.timeSeriesChart = new CZ.UI.LineChart(forms[11]);
                 $('#timeSeries_button').click(function () {
-                    var timSeriesDataFormDiv = forms[12];
-                    var timSeriesDataForm = new CZ.UI.TimeSeriesDataForm(timSeriesDataFormDiv, {
-                        activationSource: $("#timeSeries_button"),
-                        closeButton: ".cz-form-close-btn > .cz-form-btn"
-                    });
-                    timSeriesDataForm.show();
+                    var tsForm = getFormById('#timeSeries_button');
+                    if(tsForm === false) {
+                        closeAllForms();
+                        var timSeriesDataFormDiv = forms[12];
+                        var timSeriesDataForm = new CZ.UI.TimeSeriesDataForm(timSeriesDataFormDiv, {
+                            activationSource: $("#timeSeries_button"),
+                            closeButton: ".cz-form-close-btn > .cz-form-btn"
+                        });
+                        timSeriesDataForm.show();
+                    } else {
+                        if(tsForm.isFormVisible) {
+                            tsForm.close();
+                        } else {
+                            closeAllForms();
+                            tsForm.show();
+                        }
+                    }
                 });
                 CZ.Service.getProfile().done(function (profile) {
                     InitializeToursUI(profile, forms);
@@ -138,18 +149,27 @@ var CZ;
                     InitializeToursUI(null, forms);
                 });
                 $(".header-icon.edit-icon").click(function () {
-                    $(".header-icon.active").removeClass("active");
-                    $(this).addClass("active");
-                    var form = new CZ.UI.FormHeaderEdit(forms[0], {
-                        activationSource: $(this),
-                        navButton: ".cz-form-nav",
-                        closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        titleTextblock: ".cz-form-title",
-                        createTimeline: ".cz-form-create-timeline",
-                        createExhibit: ".cz-form-create-exhibit",
-                        createTour: ".cz-form-create-tour"
-                    });
-                    form.show();
+                    var editForm = getFormById("#header-edit-form");
+                    if(editForm === false) {
+                        closeAllForms();
+                        var form = new CZ.UI.FormHeaderEdit(forms[0], {
+                            activationSource: $(this),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            createTimeline: ".cz-form-create-timeline",
+                            createExhibit: ".cz-form-create-exhibit",
+                            createTour: ".cz-form-create-tour"
+                        });
+                        form.show();
+                    } else {
+                        if(editForm.isFormVisible) {
+                            editForm.close();
+                        } else {
+                            closeAllForms();
+                            editForm.show();
+                        }
+                    }
                 });
                 CZ.Authoring.initialize(CZ.Common.vc, {
                     showEditTourForm: function (tour) {
@@ -263,7 +283,7 @@ var CZ;
                     CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
                 }
                 var profileForm = new CZ.UI.FormEditProfile(forms[5], {
-                    activationSource: $(".header-icon.profile-icon"),
+                    activationSource: $("#login-panel"),
                     navButton: ".cz-form-nav",
                     closeButton: ".cz-form-close-btn > .cz-form-btn",
                     titleTextblock: ".cz-form-title",
@@ -275,12 +295,25 @@ var CZ;
                     agreeInput: ".cz-form-agree",
                     loginPanel: "#login-panel",
                     profilePanel: "#profile-panel",
-                    loginPanelLogin: "#profile-panel span.auth-panel-login",
+                    loginPanelLogin: "#profile-panel.auth-panel-login",
                     context: "",
                     allowRedirect: IsFeatureEnabled("Authoring")
                 });
-                $("#edit_profile_button").click(function () {
-                    profileForm.show();
+                var loginForm = new CZ.UI.FormLogin(forms[6], {
+                    activationSource: $("#login-panel"),
+                    navButton: ".cz-form-nav",
+                    closeButton: ".cz-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-form-title",
+                    titleInput: ".cz-form-item-title",
+                    context: ""
+                });
+                $("#profile-panel").click(function () {
+                    if(!profileForm.isFormVisible) {
+                        closeAllForms();
+                        profileForm.show();
+                    } else {
+                        profileForm.close();
+                    }
                 });
                 if(IsFeatureEnabled("Login")) {
                     CZ.Service.getProfile().done(function (data) {
@@ -289,25 +322,27 @@ var CZ;
                         } else if(data != "" && data.DisplayName == null) {
                             $("#profile-panel").show();
                             $("#profile-panel input#username").focus();
-                            profileForm.show();
+                            if(!profileForm.isFormVisible) {
+                                closeAllForms();
+                                profileForm.show();
+                            } else {
+                                profileForm.close();
+                            }
                         } else {
                             $("#profile-panel").show();
-                            $("#profile-panel span.auth-panel-login").html(data.DisplayName);
+                            $(".auth-panel-login").html(data.DisplayName);
                         }
                     }).fail(function (error) {
                         $("#login-panel").show();
                     });
                 }
-                var loginForm = new CZ.UI.FormLogin(forms[6], {
-                    activationSource: $(".header-icon.profile-icon"),
-                    navButton: ".cz-form-nav",
-                    closeButton: ".cz-form-close-btn > .cz-form-btn",
-                    titleTextblock: ".cz-form-title",
-                    titleInput: ".cz-form-item-title",
-                    context: ""
-                });
-                $("#login-button").click(function () {
-                    loginForm.show();
+                $("#login-panel").click(function () {
+                    if(!loginForm.isFormVisible) {
+                        closeAllForms();
+                        loginForm.show();
+                    } else {
+                        loginForm.close();
+                    }
                 });
             });
             CZ.Service.getServiceInformation().then(function (response) {
@@ -582,6 +617,22 @@ var CZ;
                 return e.Name === featureName;
             });
             return feature[0].IsEnabled;
+        }
+        function closeAllForms() {
+            $('.cz-major-form').each(function (i, f) {
+                var form = $(f).data('form');
+                if(form) {
+                    form.close();
+                }
+            });
+        }
+        function getFormById(name) {
+            var form = $(name).data("form");
+            if(form) {
+                return form;
+            } else {
+                return false;
+            }
         }
         function showTimeSeriesChart() {
             $('#timeSeriesContainer').height('30%');
