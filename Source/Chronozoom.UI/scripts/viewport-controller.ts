@@ -476,10 +476,10 @@ module CZ {
                 var vbox = CZ.Common.viewportToViewBox(targetViewport);
                 var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
 
-                if (!CZ.Common.vc.virtualCanvas("inBuffer", wnd, targetViewport.visible.scale)) {
-                    var lca = CZ.Common.vc.virtualCanvas("findLca", wnd);
-                    self.getMissingData(vbox, lca);
-                }
+                //if (!CZ.Common.vc.virtualCanvas("inBuffer", wnd, targetViewport.visible.scale)) {
+                //    var lca = CZ.Common.vc.virtualCanvas("findLca", wnd);
+                //    self.getMissingData(vbox, lca);
+                //}
 
                 if (noAnimation) {
                     self.stopAnimation();
