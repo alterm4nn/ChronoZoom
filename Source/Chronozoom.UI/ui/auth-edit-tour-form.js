@@ -7,7 +7,7 @@ var CZ;
 (function (CZ) {
     (function (UI) {
         var TourStop = (function () {
-            function TourStop(target, title) {
+            function TourStop(target, sequence, title) {
                 if(target == undefined || target == null) {
                     throw "target element of a tour stop is null or undefined";
                 }
@@ -25,6 +25,7 @@ var CZ;
                     this.type = target.type === "timeline" ? "Timeline" : "Event";
                     this.title = title ? title : target.title;
                 }
+                this.sequence = sequence;
             }
             Object.defineProperty(TourStop.prototype, "Target", {
                 get: function () {
@@ -40,12 +41,26 @@ var CZ;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(TourStop.prototype, "Description", {
+                get: function () {
+                    return "";
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(TourStop.prototype, "LapseTime", {
                 get: function () {
                     return this.lapseTime;
                 },
                 set: function (value) {
                     this.lapseTime = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(TourStop.prototype, "Sequence", {
+                get: function () {
+                    return this.sequence;
                 },
                 enumerable: true,
                 configurable: true
@@ -57,9 +72,70 @@ var CZ;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(TourStop.prototype, "NavigationUrl", {
+                get: function () {
+                    return CZ.UrlNav.vcelementToNavString(this.targetElement);
+                },
+                enumerable: true,
+                configurable: true
+            });
             return TourStop;
         })();
         UI.TourStop = TourStop;        
+        var Tour = (function () {
+            function Tour(id, title, description, category, sequence, stops) {
+                this.id = id;
+                this.title = title;
+                this.description = description;
+                this.sequence = sequence;
+                this.stops = stops;
+                this.category = category;
+            }
+            Object.defineProperty(Tour.prototype, "Id", {
+                get: function () {
+                    return this.id;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Tour.prototype, "Title", {
+                get: function () {
+                    return this.title;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Tour.prototype, "Category", {
+                get: function () {
+                    return this.category;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Tour.prototype, "Sequence", {
+                get: function () {
+                    return this.sequence;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Tour.prototype, "Description", {
+                get: function () {
+                    return this.description;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Tour.prototype, "Stops", {
+                get: function () {
+                    return this.stops;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            return Tour;
+        })();
+        UI.Tour = Tour;        
         var FormEditTour = (function (_super) {
             __extends(FormEditTour, _super);
             function FormEditTour(container, formInfo) {
@@ -69,6 +145,7 @@ var CZ;
                 this.addStopButton = container.find(formInfo.addStopButton);
                 this.titleInput = container.find(formInfo.titleInput);
                 this.tourTitleInput = this.container.find(".cz-form-tour-title");
+                this.tourDescriptionInput = this.container.find(".cz-form-tour-description");
                 this.saveButton.off();
                 this.deleteButton.off();
                 this.tour = formInfo.context;
@@ -93,7 +170,7 @@ var CZ;
                         type: "Unknown"
                     };
                 }
-                var stop = new TourStop(target, (!bookmark.caption || $.trim(bookmark.caption) === "") ? undefined : bookmark.caption);
+                var stop = new TourStop(target, bookmark.number + 1, (!bookmark.caption || $.trim(bookmark.caption) === "") ? undefined : bookmark.caption);
                 stop.LapseTime = bookmark.lapseTime;
                 return stop;
             };
@@ -104,17 +181,29 @@ var CZ;
                 var bookmark = new CZ.Tours.TourBookmark(url, title, tourstop.LapseTime, text);
                 return bookmark;
             };
-            FormEditTour.prototype.createTour = function () {
+            FormEditTour.prototype.createTourAsync = function () {
+                var _this = this;
+                var deferred = $.Deferred();
+                var self = this;
                 var name = this.tourTitleInput.val();
-                var tourBookmarks = new Array();
-                for(var j = 0, n = this.tourStopsListBox.items.length; j < n; j++) {
-                    var tourstopItem = this.tourStopsListBox.items[j];
-                    var tourstop = tourstopItem.data;
-                    var bookmark = FormEditTour.tourstopToBookmark(tourstop);
-                    tourBookmarks.push(bookmark);
-                }
-                var tour = new CZ.Tours.Tour(name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, "my tours", "", CZ.Tours.tours.length);
-                return tour;
+                var descr = this.tourDescriptionInput.val();
+                var category = "my tours";
+                var n = this.tourStopsListBox.items.length;
+                var request = CZ.Service.postTour(new CZ.UI.Tour(undefined, name, descr, category, n, this.stops));
+                $.when(request).done(function (q) {
+                    var tourBookmarks = new Array();
+                    for(var j = 0; j < n; j++) {
+                        var tourstopItem = _this.tourStopsListBox.items[j];
+                        var tourstop = tourstopItem.data;
+                        var bookmark = FormEditTour.tourstopToBookmark(tourstop);
+                        tourBookmarks.push(bookmark);
+                    }
+                    var tour = new CZ.Tours.Tour(name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, "", CZ.Tours.tours.length);
+                    deferred.resolveWith(self, tour);
+                }).fail(function (q) {
+                    deferred.rejectWith(self, q);
+                });
+                return deferred.promise();
             };
             FormEditTour.prototype.initializeAsEdit = function () {
                 this.deleteButton.show();
@@ -141,13 +230,20 @@ var CZ;
                 });
                 this.saveButton.click(function (event) {
                     if(_this.tour == null) {
-                        _this.tour = _this.createTour();
-                        CZ.Tours.tours.push(_this.tour);
-                        _this.initializeAsEdit();
+                        _this.createTourAsync().done(function (tour) {
+                            CZ.Tours.tours.push(_this.tour);
+                            _this.initializeAsEdit();
+                            alert("Tour created");
+                        }).fail(function (f) {
+                            if(console && console.error) {
+                                console.error("Failed to create a tour: " + f);
+                            }
+                            alert("Failed to create a tour");
+                        });
                     } else {
                         for(var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
                             if(CZ.Tours.tours[i] === _this.tour) {
-                                _this.tour = CZ.Tours.tours[i] = _this.createTour();
+                                throw "Not implemented";
                                 break;
                             }
                         }
@@ -201,13 +297,15 @@ var CZ;
                 CZ.Authoring.isActive = false;
                 CZ.Authoring.mode = "editTour";
                 CZ.Authoring.callback = null;
-                var stop = new TourStop(targetElement);
-                if(this.tourStopsListBox.items.length > 0) {
+                var n = this.tourStopsListBox.items.length;
+                var stop = new TourStop(targetElement, n + 1);
+                if(n > 0) {
                     stop.LapseTime = ((this.tourStopsListBox.items[this.tourStopsListBox.items.length - 1]).data).LapseTime + CZ.Settings.tourDefaultTransitionTime;
                 } else {
                     stop.LapseTime = 0;
                 }
                 this.tourStopsListBox.add(stop);
+                this.stops.push(stop);
                 this.show();
             };
             return FormEditTour;

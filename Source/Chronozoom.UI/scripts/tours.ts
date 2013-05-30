@@ -908,7 +908,8 @@ module CZ {
                             (tourString.audio == null) ||
                             (typeof tourString.category == 'undefined') ||
                             (typeof tourString.name == 'undefined') ||
-                            (typeof tourString.sequence== 'undefined'))
+                            (typeof tourString.sequence == 'undefined') ||
+                            (tourString.bookmarks.length == 0))
                     continue;
 
                 // build array of bookmarks of current tour
