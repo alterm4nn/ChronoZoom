@@ -556,5 +556,19 @@ namespace Chronozoom.Entities
             return parentTimelinesRaw.FirstOrDefault();
         }
 
+        public TimelineRaw GetExhibitParentTimeline(Guid exhibitId)
+        {
+            var parentTimelinesRaw = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Id in (SELECT Timeline_Id FROM Exhibits WHERE Id = {0})", exhibitId);
+
+            return parentTimelinesRaw.FirstOrDefault();
+        }
+
+        public ExhibitRaw GetContentItemParentExhibit(Guid contentItemId)
+        {
+            var exhibitRaw = Database.SqlQuery<ExhibitRaw>("SELECT * FROM Exhibits WHERE Id in (SELECT Exhibit_Id FROM ContentItems WHERE Id = {0})", contentItemId);
+
+            return exhibitRaw.FirstOrDefault();
+        }
+
     }
 }

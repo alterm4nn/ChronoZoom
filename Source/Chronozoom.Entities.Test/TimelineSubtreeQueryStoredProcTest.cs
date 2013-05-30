@@ -23,7 +23,6 @@ namespace Chronozoom.Entities.Test
         [TestMethod]
         public void TestEntities_SubtreeQueryStoredProc_DataIsCorrect()
         {
-            //TODO: actually add tests for correctness
             IEnumerable<TimelineRaw> result = _storage.TimelineSubtreeQuery(new Guid("2b6cd8e0-5833-ceaf-117e-cf74db7fed1f"), new Guid("48fbb8a8-7c5d-49c3-83e1-98939ae2ae67"), new decimal(-6000000000.0), new decimal(-1000000000.0), new decimal(10000.0), 200);
             TraceSource Trace = new TraceSource("Storage", SourceLevels.All);
             Assert.AreEqual(result.Count(), 41);
