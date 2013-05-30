@@ -1,0 +1,8 @@
+﻿{ "d" : [ 
+{"name": "250 Years", "file":"/dumps/250-be5yavg.csv", "delimiter":" ", "source":"Instrumental, Berkeley Earth (2012)"}, 
+{"name": "2000 Years", "file":"/dumps/2k-moberg2000.csv", "delimiter":" ", "source":"Multiproxy, Moberg (2000)"}, 
+{"name": "420 Thousand Years", "file":"/dumps/420k-vostok.csv", "delimiter":" ", "source":"Vostok ice cores, Petit et al. (1999)"}, 
+{"name": "5.4 Million Years", "file":"/dumps/5.4M-LR04stack.csv", "delimiter":" ", "source":"ODP and DSDP cores, Liesecki and Raymo (2004)"}, 
+{"name": "65 Million Years", "file":"/dumps/65M-zachos2001.csv", "delimiter":" ", "source":"ODP and DSDP cores, Zachos et al. (2001)"}, 
+{"name": "540 Million Years", "file":"/dumps/540M-Veizer1020.csv", "delimiter":" ", "source":"Fossil Record, Veizer (2000)"}
+]}

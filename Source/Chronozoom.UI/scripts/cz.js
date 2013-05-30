@@ -1,5 +1,8 @@
 var CZ;
 (function (CZ) {
+    CZ.timeSeriesChart;
+    CZ.leftDataSet;
+    CZ.rightDataSet;
     (function (HomePageViewModel) {
         var _uiMap = {
             "#header-edit-form": "/ui/header-edit-form.html",
@@ -12,7 +15,9 @@ var CZ;
             "#auth-edit-tours-form": "/ui/auth-edit-tour-form.html",
             "$('<div><!--Tours Authoring--></div>')": "/ui/tourstop-listbox.html",
             "#toursList": "/ui/tourslist-form.html",
-            "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html"
+            "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html",
+            "#timeSeriesContainer": "/ui/timeseries-graph-form.html",
+            "#timeSeriesDataForm": "/ui/timeseries-data-form.html"
         };
         var FeatureActivation;
         (function (FeatureActivation) {
@@ -56,6 +61,11 @@ var CZ;
                 Name: "Regimes",
                 Activation: FeatureActivation.RootCollection,
                 JQueryReference: ".regime-link"
+            }, 
+            {
+                Name: "TimeSeries",
+                Activation: FeatureActivation.NotRootCollection,
+                JQueryReference: "#timeSeriesContainer"
             }, 
             
         ];
@@ -113,6 +123,15 @@ var CZ;
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
+                CZ.timeSeriesChart = new CZ.UI.LineChart(forms[11]);
+                $('#timeSeries_button').click(function () {
+                    var timSeriesDataFormDiv = forms[12];
+                    var timSeriesDataForm = new CZ.UI.TimeSeriesDataForm(timSeriesDataFormDiv, {
+                        activationSource: $("#timeSeries_button"),
+                        closeButton: ".cz-form-close-btn > .cz-form-btn"
+                    });
+                    timSeriesDataForm.show();
+                });
                 CZ.Service.getProfile().done(function (profile) {
                     InitializeToursUI(profile, forms);
                 }).fail(function (err) {
@@ -302,6 +321,11 @@ var CZ;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
+            if(rootCollection) {
+                $('#timeSeries_button').hide();
+            } else {
+                $('#timeSeries_button').show();
+            }
             $('#search_button').mouseup(CZ.Search.onSearchClicked);
             $('#human_rect').click(function () {
                 CZ.Search.navigateToBookmark(CZ.Common.humanityVisible);
@@ -446,6 +470,7 @@ var CZ;
                     var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
                     CZ.Common.updateMarker();
                 }
+                updateTimeSeriesChart(vp);
             }, function () {
                 return CZ.Common.vc.virtualCanvas("getViewport");
             }, jointGesturesStream);
@@ -558,6 +583,78 @@ var CZ;
             });
             return feature[0].IsEnabled;
         }
+        function showTimeSeriesChart() {
+            $('#timeSeriesContainer').height('30%');
+            $('#timeSeriesContainer').show();
+            $('#vc').height('70%');
+            CZ.timeSeriesChart.updateCanvasHeight();
+            CZ.Common.updateLayout();
+        }
+        HomePageViewModel.showTimeSeriesChart = showTimeSeriesChart;
+        function hideTimeSeriesChart() {
+            CZ.leftDataSet = undefined;
+            CZ.rightDataSet = undefined;
+            $('#timeSeriesContainer').height(0);
+            $('#timeSeriesContainer').hide();
+            $('#vc').height('100%');
+            CZ.Common.updateLayout();
+        }
+        HomePageViewModel.hideTimeSeriesChart = hideTimeSeriesChart;
+        function updateTimeSeriesChart(vp) {
+            var left = vp.pointScreenToVirtual(0, 0).x;
+            if(left < CZ.Settings.maxPermitedTimeRange.left) {
+                left = CZ.Settings.maxPermitedTimeRange.left;
+            }
+            var right = vp.pointScreenToVirtual(vp.width, vp.height).x;
+            if(right > CZ.Settings.maxPermitedTimeRange.right) {
+                right = CZ.Settings.maxPermitedTimeRange.right;
+            }
+            if(CZ.timeSeriesChart !== undefined) {
+                var leftCSS = vp.pointVirtualToScreen(left, 0).x;
+                var rightCSS = vp.pointVirtualToScreen(right, 0).x;
+                var leftPlot = CZ.Dates.getDMYFromCoordinate(left).year;
+                var rightPlot = CZ.Dates.getDMYFromCoordinate(right).year;
+                CZ.timeSeriesChart.clear(leftCSS, rightCSS);
+                CZ.timeSeriesChart.clearLegend("left");
+                CZ.timeSeriesChart.clearLegend("right");
+                var chartHeader = "TimeSeries Chart";
+                if(CZ.leftDataSet !== undefined) {
+                    CZ.timeSeriesChart.drawDataSet(CZ.leftDataSet, leftCSS, rightCSS, leftPlot, rightPlot);
+                    CZ.timeSeriesChart.drawAxis(leftCSS, CZ.leftDataSet.series[0].appearanceSettings.yMin, CZ.leftDataSet.series[0].appearanceSettings.yMax, {
+                        labelCount: 4,
+                        tickLength: 10,
+                        majorTickThickness: 1,
+                        stroke: 'black',
+                        axisLocation: 'left',
+                        font: '16px Calibri'
+                    });
+                    for(var i = 0; i < CZ.leftDataSet.series.length; i++) {
+                        CZ.timeSeriesChart.addLegendRecord("left", CZ.leftDataSet.series[i].appearanceSettings.stroke, CZ.leftDataSet.series[i].appearanceSettings.name);
+                    }
+                    chartHeader += " (" + CZ.leftDataSet.name;
+                }
+                if(CZ.rightDataSet !== undefined) {
+                    CZ.timeSeriesChart.drawDataSet(CZ.rightDataSet, leftCSS, rightCSS, leftPlot, rightPlot);
+                    CZ.timeSeriesChart.drawAxis(rightCSS, CZ.rightDataSet.series[0].appearanceSettings.yMin, CZ.rightDataSet.series[0].appearanceSettings.yMax, {
+                        labelCount: 4,
+                        tickLength: 10,
+                        majorTickThickness: 1,
+                        stroke: 'black',
+                        axisLocation: 'right',
+                        font: '16px Calibri'
+                    });
+                    for(var i = 0; i < CZ.rightDataSet.series.length; i++) {
+                        CZ.timeSeriesChart.addLegendRecord("right", CZ.rightDataSet.series[i].appearanceSettings.stroke, CZ.rightDataSet.series[i].appearanceSettings.name);
+                    }
+                    var str = chartHeader.indexOf("(") > 0 ? ", " : " (";
+                    chartHeader += str + CZ.rightDataSet.name + ")";
+                } else {
+                    chartHeader += ")";
+                }
+                $("#timeSeriesChartHeader").text(chartHeader);
+            }
+        }
+        HomePageViewModel.updateTimeSeriesChart = updateTimeSeriesChart;
     })(CZ.HomePageViewModel || (CZ.HomePageViewModel = {}));
     var HomePageViewModel = CZ.HomePageViewModel;
 })(CZ || (CZ = {}));

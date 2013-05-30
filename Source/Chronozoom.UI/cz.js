@@ -2790,12 +2790,8 @@ var CZ;
             var sign = coord / Math.abs(coord);
             var day = 0, month = 0, year = 0;
             var idxYear, countLeapYears = 0;
-            for(idxYear = 0; idxYear < Math.abs(coord) - 1; idxYear++) {
-                year += sign;
-                if(isLeapYear(sign * idxYear)) {
-                    countLeapYears++;
-                }
-            }
+            year = (coord >= 0) ? Math.floor(coord) : Math.floor(coord) + 1;
+            countLeapYears = (sign > 0) ? numberofLeap(year) : 0;
             var day, month;
             var countDays;
             countDays = Math.abs(coord) - Math.abs(year);
@@ -2903,6 +2899,20 @@ var CZ;
             }
         }
         Dates.isLeapYear = isLeapYear;
+        function numberofLeap(year) {
+            var startLeap = 1582;
+            if(year < startLeap) {
+                return 0;
+            }
+            var years1 = Math.floor(year / 4) - Math.floor(startLeap / 4);
+            years1 -= Math.floor(year / 100) - Math.floor(startLeap / 100);
+            years1 += Math.floor(year / 400) - Math.floor(startLeap / 400);
+            if(isLeapYear(year)) {
+                years1--;
+            }
+            return years1;
+        }
+        Dates.numberofLeap = numberofLeap;
     })(CZ.Dates || (CZ.Dates = {}));
     var Dates = CZ.Dates;
 })(CZ || (CZ = {}));
@@ -8601,8 +8611,274 @@ var CZ;
             });
         }
         Data.getTimelines = getTimelines;
+        var DataSet = (function () {
+            function DataSet() { }
+            return DataSet;
+        })();
+        Data.DataSet = DataSet;        
+        var Series = (function () {
+            function Series() {
+                this.values = new Array();
+            }
+            return Series;
+        })();
+        Data.Series = Series;        
+        function generateSampleData() {
+            var rolandData;
+            $.ajax({
+                cache: false,
+                type: "GET",
+                async: false,
+                dataType: "text",
+                url: '/dumps/beta-timeseries.csv',
+                success: function (result) {
+                    rolandData = result;
+                },
+                error: function (xhr) {
+                    alert("Error fetching timeSeries Data: " + xhr.responseText);
+                }
+            });
+            return csvToDataSet(rolandData, ",", "sampleData");
+        }
+        Data.generateSampleData = generateSampleData;
+        function csvToDataSet(csvText, delimiter, name) {
+            var dataText = csvText;
+            var csvArr = dataText.csvToArray({
+                trim: true,
+                fSep: delimiter
+            });
+            var dataLength = csvArr.length - 1;
+            var seriesLength = csvArr[0].length - 1;
+            var result = new DataSet();
+            result.name = name;
+            result.time = new Array();
+            result.series = new Array();
+            for(var i = 1; i <= seriesLength; i++) {
+                var seria = new Series();
+                seria.values = new Array();
+                seria.appearanceSettings = {
+                    thickness: 1,
+                    stroke: 'blue',
+                    name: csvArr[0][i]
+                };
+                seria.appearanceSettings.yMin = parseFloat(csvArr[1][i]);
+                seria.appearanceSettings.yMax = parseFloat(csvArr[1][i]);
+                result.series.push(seria);
+            }
+            for(var i = 0; i < dataLength; i++) {
+                result.time.push(csvArr[i + 1][0]);
+                for(var j = 1; j <= seriesLength; j++) {
+                    var value = parseFloat(csvArr[i + 1][j]);
+                    var seria = result.series[j - 1];
+                    if(seria.appearanceSettings.yMin > value) {
+                        seria.appearanceSettings.yMin = value;
+                    }
+                    if(seria.appearanceSettings.yMax < value) {
+                        seria.appearanceSettings.yMax = value;
+                    }
+                    seria.values.push(value);
+                }
+            }
+            return result;
+        }
+        Data.csvToDataSet = csvToDataSet;
     })(CZ.Data || (CZ.Data = {}));
     var Data = CZ.Data;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var LineChart = (function () {
+            function LineChart(container) {
+                this.container = container;
+                this.canvas = document.createElement("canvas");
+                $(this.canvas).prependTo($("#timeSeries"));
+                this.canvas.width = container.width();
+                this.canvas.height = container.height();
+                this.context = this.canvas.getContext("2d");
+                $("#closeTimeChartBtn").click(function () {
+                    CZ.HomePageViewModel.hideTimeSeriesChart();
+                });
+            }
+            LineChart.prototype.calculateTicks = function (ymin, ymax, labelCount) {
+                var delta = (ymax - ymin) / labelCount;
+                var h = Math.round(Math.log(delta) / Math.LN10);
+                var h10 = Math.pow(10, h);
+                var k = delta / h10;
+                if(k < 1.5) {
+                    k = 1;
+                } else if(k < 3.5) {
+                    k = 2;
+                } else {
+                    k = 5;
+                }
+                var imin = Math.ceil(ymin / (k * h10));
+                var imax = Math.floor(ymax / (k * h10));
+                var actualLabelCount = imax - imin + 1;
+                if(actualLabelCount < labelCount) {
+                    while(true) {
+                        var k1 = k;
+                        var h1 = h;
+                        if(k1 == 5) {
+                            k1 = 2;
+                        } else if(k1 == 2) {
+                            k1 = 1;
+                        } else {
+                            h1--;
+                            k1 = 5;
+                        }
+                        var imin1 = Math.ceil(ymin / (k1 * Math.pow(10, h1)));
+                        var imax1 = Math.floor(ymax / (k1 * Math.pow(10, h1)));
+                        var actualLabelCount1 = imax1 - imin1 + 1;
+                        if(Math.abs(labelCount - actualLabelCount) > Math.abs(labelCount - actualLabelCount1)) {
+                            imin = imin1;
+                            imax = imax1;
+                            k = k1;
+                            h = h1;
+                            h10 = Math.pow(10, h1);
+                        } else {
+                            break;
+                        }
+                    }
+                } else if(actualLabelCount > labelCount) {
+                    while(true) {
+                        var k1 = k;
+                        var h1 = h;
+                        if(k1 == 5) {
+                            k1 = 1;
+                            h1++;
+                        } else if(k1 == 2) {
+                            k1 = 5;
+                        } else {
+                            k1 = 2;
+                        }
+                        var imin1 = Math.ceil(ymin / (k1 * Math.pow(10, h1)));
+                        var imax1 = Math.floor(ymax / (k1 * Math.pow(10, h1)));
+                        var actualLabelCount1 = imax1 - imin1 + 1;
+                        if(Math.abs(labelCount - actualLabelCount) > Math.abs(labelCount - actualLabelCount1) && actualLabelCount1 > 0) {
+                            imin = imin1;
+                            imax = imax1;
+                            k = k1;
+                            h = h1;
+                            h10 = Math.pow(10, h1);
+                        } else {
+                            break;
+                        }
+                    }
+                }
+                var result = [];
+                for(var i = imin; i <= imax; i++) {
+                    result.push(i * k * h10);
+                }
+                return result;
+            };
+            LineChart.prototype.clear = function (screenLeft, screenRight) {
+                this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.context.fillStyle = "gray";
+                this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                this.context.fillStyle = "white";
+                this.context.fillRect(screenLeft, 0, screenRight - screenLeft, this.canvas.height);
+                $("#rightLegend").css("right", $("#timeSeries").width() - screenRight + 30);
+                $("#leftLegend").css("left", screenLeft + 30);
+                $("#timeSeriesChartHeader").text("TimeSeries Chart");
+            };
+            LineChart.prototype.drawDataSet = function (dataSet, screenLeft, screenRight, plotLeft, plotRight) {
+                var _this = this;
+                var plotBottom = Number.MAX_VALUE;
+                var plotTop = Number.MIN_VALUE;
+                dataSet.series.forEach(function (seria) {
+                    if(seria.appearanceSettings && seria.appearanceSettings.yMin && seria.appearanceSettings.yMin < plotBottom) {
+                        plotBottom = seria.appearanceSettings.yMin;
+                    }
+                    if(seria.appearanceSettings && seria.appearanceSettings.yMax && seria.appearanceSettings.yMax > plotTop) {
+                        plotTop = seria.appearanceSettings.yMax;
+                    }
+                });
+                var dataToScreenX = function (x) {
+                    return (x - plotLeft) / (plotRight - plotLeft) * (screenRight - screenLeft) + screenLeft;
+                };
+                var dataToScreenY = function (y) {
+                    return (1 - (y - plotBottom) / (plotTop - plotBottom)) * _this.canvas.height;
+                };
+                var x = dataSet.time;
+                var n = x.length;
+                var ctx = this.context;
+                dataSet.series.forEach(function (seria) {
+                    ctx.strokeStyle = seria.appearanceSettings.stroke;
+                    ctx.lineWidth = seria.appearanceSettings.thickness;
+                    var y = seria.values;
+                    ctx.beginPath();
+                    for(var i = 0; i < n; i++) {
+                        var xi = dataToScreenX(x[i]);
+                        var yi = dataToScreenY(y[i]);
+                        if(i == 0) {
+                            ctx.moveTo(xi, yi);
+                        } else {
+                            ctx.lineTo(xi, yi);
+                        }
+                    }
+                    ctx.stroke();
+                });
+            };
+            LineChart.prototype.drawAxis = function (screenLeft, ymin, ymax, appearence) {
+                var _this = this;
+                var ticks = this.calculateTicks(ymin, ymax, appearence.labelCount);
+                var dataToScreenY = function (y) {
+                    return (1 - (y - ymin) / (ymax - ymin)) * _this.canvas.height;
+                };
+                var ctx = this.context;
+                ctx.font = appearence.font;
+                ctx.textBaseline = 'middle';
+                ctx.strokeStyle = appearence.stroke;
+                ctx.fillStyle = appearence.stroke;
+                ctx.lineWidth = appearence.majorTickThickness;
+                var ticklength = appearence.tickLength;
+                var textOffset = 2;
+                if(appearence.axisLocation == "right") {
+                    ticklength = -ticklength;
+                    textOffset = -textOffset;
+                }
+                ctx.textAlign = appearence.axisLocation;
+                ticks.forEach(function (tick) {
+                    var y = dataToScreenY(tick);
+                    ctx.beginPath();
+                    ctx.moveTo(screenLeft, y);
+                    ctx.lineTo(screenLeft + ticklength, y);
+                    ctx.stroke();
+                    ctx.fillText(tick, screenLeft + ticklength + textOffset, y);
+                });
+            };
+            LineChart.prototype.updateCanvasHeight = function () {
+                this.canvas.height = $("#timeSeries").height() - 36;
+                this.canvas.width = $("#timeSeries").width();
+            };
+            LineChart.prototype.clearLegend = function (location) {
+                var legend = location === "left" ? $("#leftLegend") : $("#rightLegend");
+                legend.empty();
+                legend.hide();
+            };
+            LineChart.prototype.addLegendRecord = function (location, stroke, description) {
+                var legend = location === "left" ? $("#leftLegend") : $("#rightLegend");
+                legend.show();
+                var cont = $('<div></div>');
+                var strokeIndicatior = $('<div></div>');
+                strokeIndicatior.width(16);
+                strokeIndicatior.height(16);
+                strokeIndicatior.css("background-color", stroke);
+                strokeIndicatior.css("margin", "4px");
+                strokeIndicatior.css("float", "left");
+                var descriptionDiv = $('<div></div>');
+                descriptionDiv.css("text-align", "center");
+                descriptionDiv.text(description);
+                strokeIndicatior.appendTo(cont);
+                descriptionDiv.appendTo(cont);
+                cont.appendTo(legend);
+            };
+            return LineChart;
+        })();
+        UI.LineChart = LineChart;        
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
@@ -10127,6 +10403,125 @@ var CZ;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
+    (function (UI) {
+        var TimeSeriesDataForm = (function (_super) {
+            __extends(TimeSeriesDataForm, _super);
+            function TimeSeriesDataForm(container, formInfo) {
+                        _super.call(this, container, formInfo);
+                var existingTimSeriesList = $("#existingTimeSeries");
+                if(existingTimSeriesList.children().length == 0) {
+                    var preloadedlist;
+                    $.ajax({
+                        cache: false,
+                        type: "GET",
+                        async: false,
+                        dataType: "JSON",
+                        url: '/dumps/timeseries-preloaded.txt',
+                        success: function (result) {
+                            preloadedlist = result.d;
+                        },
+                        error: function (xhr) {
+                            alert("Error fetching pre-loaded timeseries list: " + xhr.responseText);
+                        }
+                    });
+                    preloadedlist.forEach(function (preloaded) {
+                        var li = $('<ul></ul>').appendTo(existingTimSeriesList);
+                        var par = $("<p></p>");
+                        var link = $('<a></a>').addClass("cz-form-btn").appendTo(li);
+                        link.css("color", "#25a1ea");
+                        link.css("float", "left");
+                        link.text(preloaded.name);
+                        var div = $("<div>Source:</div>").appendTo(li);
+                        div.css("margin-left", "3px");
+                        div.css("margin-right", "3px");
+                        div.css("float", "left");
+                        var sourceDiv = $("<a></a>").appendTo(li);
+                        sourceDiv.css("color", "blue");
+                        sourceDiv.text(preloaded.source);
+                        link.click(function (e) {
+                            var data;
+                            $.ajax({
+                                cache: false,
+                                type: "GET",
+                                async: false,
+                                dataType: "text",
+                                url: preloaded.file,
+                                success: function (result) {
+                                    data = result;
+                                },
+                                error: function (xhr) {
+                                    alert("Error fetching timeSeries Data: " + xhr.responseText);
+                                }
+                            });
+                            CZ.HomePageViewModel.showTimeSeriesChart();
+                            CZ.rightDataSet = CZ.Data.csvToDataSet(data, preloaded.delimiter, preloaded.source);
+                            var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                            CZ.HomePageViewModel.updateTimeSeriesChart(vp);
+                        });
+                    });
+                }
+                this.input = $("#fileLoader");
+                var that = this;
+                if(this.checkFileLoadCompatibility()) {
+                    $("#loaduserdatabtn").click(function () {
+                        var fr = that.openFile({
+                            "onload": function (e) {
+                                that.updateUserData(fr.result);
+                            }
+                        });
+                    });
+                } else {
+                    $("#uploaduserdatacontainer").hide();
+                }
+            }
+            TimeSeriesDataForm.prototype.show = function () {
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "right",
+                    duration: 500
+                });
+                this.activationSource.addClass("active");
+            };
+            TimeSeriesDataForm.prototype.close = function () {
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "right",
+                    duration: 500
+                });
+                this.activationSource.removeClass("active");
+            };
+            TimeSeriesDataForm.prototype.checkFileLoadCompatibility = function () {
+                return window['File'] && window['FileReader'] && window['FileList'] && window['Blob'];
+            };
+            TimeSeriesDataForm.prototype.openFile = function (callbacks) {
+                var file = this.input[0].files[0];
+                var fileReader = new FileReader();
+                fileReader.onloadstart = callbacks["onloadstart"];
+                fileReader.onerror = callbacks["onerror"];
+                fileReader.onabort = callbacks["onabort"];
+                fileReader.onload = callbacks["onload"];
+                fileReader.onloadend = callbacks["onloadend"];
+                fileReader.readAsText(file);
+                return fileReader;
+            };
+            TimeSeriesDataForm.prototype.updateUserData = function (csvString) {
+                CZ.HomePageViewModel.showTimeSeriesChart();
+                CZ.leftDataSet = CZ.Data.csvToDataSet(csvString, $("#delim").prop("value"), this.input[0].files[0].name);
+                CZ.leftDataSet.series[0].appearanceSettings.stroke = "red";
+                var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                CZ.HomePageViewModel.updateTimeSeriesChart(vp);
+            };
+            return TimeSeriesDataForm;
+        })(CZ.UI.FormBase);
+        UI.TimeSeriesDataForm = TimeSeriesDataForm;        
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    CZ.timeSeriesChart;
+    CZ.leftDataSet;
+    CZ.rightDataSet;
     (function (HomePageViewModel) {
         var _uiMap = {
             "#header-edit-form": "/ui/header-edit-form.html",
@@ -10139,7 +10534,9 @@ var CZ;
             "#auth-edit-tours-form": "/ui/auth-edit-tour-form.html",
             "$('<div><!--Tours Authoring--></div>')": "/ui/tourstop-listbox.html",
             "#toursList": "/ui/tourslist-form.html",
-            "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html"
+            "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html",
+            "#timeSeriesContainer": "/ui/timeseries-graph-form.html",
+            "#timeSeriesDataForm": "/ui/timeseries-data-form.html"
         };
         var FeatureActivation;
         (function (FeatureActivation) {
@@ -10183,6 +10580,11 @@ var CZ;
                 Name: "Regimes",
                 Activation: FeatureActivation.RootCollection,
                 JQueryReference: ".regime-link"
+            }, 
+            {
+                Name: "TimeSeries",
+                Activation: FeatureActivation.NotRootCollection,
+                JQueryReference: "#timeSeriesContainer"
             }, 
             
         ];
@@ -10240,6 +10642,15 @@ var CZ;
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
+                CZ.timeSeriesChart = new CZ.UI.LineChart(forms[11]);
+                $('#timeSeries_button').click(function () {
+                    var timSeriesDataFormDiv = forms[12];
+                    var timSeriesDataForm = new CZ.UI.TimeSeriesDataForm(timSeriesDataFormDiv, {
+                        activationSource: $("#timeSeries_button"),
+                        closeButton: ".cz-form-close-btn > .cz-form-btn"
+                    });
+                    timSeriesDataForm.show();
+                });
                 CZ.Service.getProfile().done(function (profile) {
                     InitializeToursUI(profile, forms);
                 }).fail(function (err) {
@@ -10429,6 +10840,11 @@ var CZ;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
+            if(rootCollection) {
+                $('#timeSeries_button').hide();
+            } else {
+                $('#timeSeries_button').show();
+            }
             $('#search_button').mouseup(CZ.Search.onSearchClicked);
             $('#human_rect').click(function () {
                 CZ.Search.navigateToBookmark(CZ.Common.humanityVisible);
@@ -10573,6 +10989,7 @@ var CZ;
                     var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
                     CZ.Common.updateMarker();
                 }
+                updateTimeSeriesChart(vp);
             }, function () {
                 return CZ.Common.vc.virtualCanvas("getViewport");
             }, jointGesturesStream);
@@ -10685,6 +11102,78 @@ var CZ;
             });
             return feature[0].IsEnabled;
         }
+        function showTimeSeriesChart() {
+            $('#timeSeriesContainer').height('30%');
+            $('#timeSeriesContainer').show();
+            $('#vc').height('70%');
+            CZ.timeSeriesChart.updateCanvasHeight();
+            CZ.Common.updateLayout();
+        }
+        HomePageViewModel.showTimeSeriesChart = showTimeSeriesChart;
+        function hideTimeSeriesChart() {
+            CZ.leftDataSet = undefined;
+            CZ.rightDataSet = undefined;
+            $('#timeSeriesContainer').height(0);
+            $('#timeSeriesContainer').hide();
+            $('#vc').height('100%');
+            CZ.Common.updateLayout();
+        }
+        HomePageViewModel.hideTimeSeriesChart = hideTimeSeriesChart;
+        function updateTimeSeriesChart(vp) {
+            var left = vp.pointScreenToVirtual(0, 0).x;
+            if(left < CZ.Settings.maxPermitedTimeRange.left) {
+                left = CZ.Settings.maxPermitedTimeRange.left;
+            }
+            var right = vp.pointScreenToVirtual(vp.width, vp.height).x;
+            if(right > CZ.Settings.maxPermitedTimeRange.right) {
+                right = CZ.Settings.maxPermitedTimeRange.right;
+            }
+            if(CZ.timeSeriesChart !== undefined) {
+                var leftCSS = vp.pointVirtualToScreen(left, 0).x;
+                var rightCSS = vp.pointVirtualToScreen(right, 0).x;
+                var leftPlot = CZ.Dates.getDMYFromCoordinate(left).year;
+                var rightPlot = CZ.Dates.getDMYFromCoordinate(right).year;
+                CZ.timeSeriesChart.clear(leftCSS, rightCSS);
+                CZ.timeSeriesChart.clearLegend("left");
+                CZ.timeSeriesChart.clearLegend("right");
+                var chartHeader = "TimeSeries Chart";
+                if(CZ.leftDataSet !== undefined) {
+                    CZ.timeSeriesChart.drawDataSet(CZ.leftDataSet, leftCSS, rightCSS, leftPlot, rightPlot);
+                    CZ.timeSeriesChart.drawAxis(leftCSS, CZ.leftDataSet.series[0].appearanceSettings.yMin, CZ.leftDataSet.series[0].appearanceSettings.yMax, {
+                        labelCount: 4,
+                        tickLength: 10,
+                        majorTickThickness: 1,
+                        stroke: 'black',
+                        axisLocation: 'left',
+                        font: '16px Calibri'
+                    });
+                    for(var i = 0; i < CZ.leftDataSet.series.length; i++) {
+                        CZ.timeSeriesChart.addLegendRecord("left", CZ.leftDataSet.series[i].appearanceSettings.stroke, CZ.leftDataSet.series[i].appearanceSettings.name);
+                    }
+                    chartHeader += " (" + CZ.leftDataSet.name;
+                }
+                if(CZ.rightDataSet !== undefined) {
+                    CZ.timeSeriesChart.drawDataSet(CZ.rightDataSet, leftCSS, rightCSS, leftPlot, rightPlot);
+                    CZ.timeSeriesChart.drawAxis(rightCSS, CZ.rightDataSet.series[0].appearanceSettings.yMin, CZ.rightDataSet.series[0].appearanceSettings.yMax, {
+                        labelCount: 4,
+                        tickLength: 10,
+                        majorTickThickness: 1,
+                        stroke: 'black',
+                        axisLocation: 'right',
+                        font: '16px Calibri'
+                    });
+                    for(var i = 0; i < CZ.rightDataSet.series.length; i++) {
+                        CZ.timeSeriesChart.addLegendRecord("right", CZ.rightDataSet.series[i].appearanceSettings.stroke, CZ.rightDataSet.series[i].appearanceSettings.name);
+                    }
+                    var str = chartHeader.indexOf("(") > 0 ? ", " : " (";
+                    chartHeader += str + CZ.rightDataSet.name + ")";
+                } else {
+                    chartHeader += ")";
+                }
+                $("#timeSeriesChartHeader").text(chartHeader);
+            }
+        }
+        HomePageViewModel.updateTimeSeriesChart = updateTimeSeriesChart;
     })(CZ.HomePageViewModel || (CZ.HomePageViewModel = {}));
     var HomePageViewModel = CZ.HomePageViewModel;
 })(CZ || (CZ = {}));
