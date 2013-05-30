@@ -382,7 +382,7 @@ module CZ {
 
             "editTour-selectTarget": {
                 mouseup: function () {
-                    if (callback != null && _hovered != undefined && _hovered != null)
+                    if (callback != null && _hovered != undefined && _hovered != null && typeof _hovered.type != "undefined")
                         callback(_hovered);
                 },
                 mousemove: function () {

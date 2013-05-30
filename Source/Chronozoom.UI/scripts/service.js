@@ -3,6 +3,31 @@ var CZ;
     (function (Service) {
         var Map;
         (function (Map) {
+            function bookmark(ts) {
+                return {
+                    id: ts.bookmarkId,
+                    name: ts.Title,
+                    url: ts.NavigationUrl,
+                    lapseTime: ts.LapseTime,
+                    description: ts.Description,
+                    sequenceId: ts.Sequence
+                };
+            }
+            function tour(t) {
+                var bookmarks = new Array(t.Stops.length);
+                for(var i = 0, n = t.Stops.length; i < n; i++) {
+                    bookmarks[i] = bookmark(t.Stops[i]);
+                }
+                return {
+                    id: t.Id,
+                    name: t.Title,
+                    audio: "",
+                    category: t.Category,
+                    sequence: t.Sequence,
+                    bookmarks: bookmarks
+                };
+            }
+            Map.tour = tour;
             function timeline(t) {
                 return {
                     id: t.guid,
@@ -249,6 +274,56 @@ var CZ;
             });
         }
         Service.deleteContentItem = deleteContentItem;
+        function postTour(t) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("tour");
+            console.log("[POST] " + request.url);
+            return $.ajax({
+                type: "POST",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(Map.tour(t))
+            });
+        }
+        Service.postTour = postTour;
+        function putTour(t) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("tour");
+            console.log("[PUT] " + request.url);
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(Map.tour(t))
+            });
+        }
+        Service.putTour = putTour;
+        function deleteTour(tourId) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("tour");
+            console.log("[DELETE] " + request.url);
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify({
+                    id: tourId
+                })
+            });
+        }
+        Service.deleteTour = deleteTour;
         function getTours() {
             var request = new Service.Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);

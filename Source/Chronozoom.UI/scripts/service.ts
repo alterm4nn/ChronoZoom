@@ -1,10 +1,41 @@
 ﻿/// <reference path='settings.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
+/// <reference path='../ui/auth-edit-tour-form.ts'/>
 
 module CZ {
     export module Service {
 
         module Map {
+            function bookmark(ts: CZ.UI.TourStop) : any
+            {
+                return {
+                    id: ts.bookmarkId,
+                    name: ts.Title,
+                    url: ts.NavigationUrl,
+                    lapseTime: ts.LapseTime,
+                    description: ts.Description,
+                    sequenceId: ts.Sequence
+                };
+            }
+
+            export function tour(t : CZ.UI.Tour) : any
+            {
+                var bookmarks: CZ.UI.TourStop[] = new Array(t.Stops.length);
+                for (var i = 0, n = t.Stops.length; i < n; i++)
+                {
+                    bookmarks[i] = bookmark(t.Stops[i]);
+                }
+
+                return {
+                    id: t.Id,
+                    name: t.Title,
+                    audio: "",
+                    category: t.Category,
+                    sequence: t.Sequence,
+                    bookmarks: bookmarks
+                };
+            }
+
             export function timeline(t) {
                 return {
                     id: t.guid,
@@ -301,6 +332,67 @@ module CZ {
                 contentType: "application/json",
                 url: request.url,
                 data: JSON.stringify(Map.contentItem(ci))
+            });
+        }
+
+
+        // .../{supercollection}/{collection}/tour
+        // Creates new tour
+        export function postTour(t : CZ.UI.Tour) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(superCollectionName);
+            request.addToPath(collectionName);
+            request.addToPath("tour");
+
+            console.log("[POST] " + request.url);
+
+            return $.ajax({
+                type: "POST",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(Map.tour(t))
+            });
+        }
+
+        // .../{supercollection}/{collection}/tour
+        // Updates a tour
+        export function putTour(t: CZ.UI.Tour) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(superCollectionName);
+            request.addToPath(collectionName);
+            request.addToPath("tour");
+
+            console.log("[PUT] " + request.url);
+
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(Map.tour(t))
+            });
+        }
+
+        // .../{supercollection}/{collection}/tour
+        // Deletes a tour
+        export function deleteTour(tourId: string) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(superCollectionName);
+            request.addToPath(collectionName);
+            request.addToPath("tour");
+
+            console.log("[DELETE] " + request.url);
+
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify({ id: tourId })
             });
         }
 

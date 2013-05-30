@@ -89,6 +89,8 @@ module CZ {
         ];
 
         function InitializeToursUI(profile, forms) {
+            //var allowEditing = true;
+            // IF THE FOLLOWING LINE IS COMMENTED IN PULL REQUEST IT IS A MISTAKE!
             var allowEditing = IsFeatureEnabled("Authoring") && (profile && profile != "" && profile.DisplayName === CZ.Service.superCollectionName);
 
             var onToursInitialized = function () {

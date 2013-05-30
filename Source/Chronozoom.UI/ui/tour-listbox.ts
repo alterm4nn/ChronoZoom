@@ -73,7 +73,7 @@ module CZ {
                 container: JQuery,
                 uiMap: ITourListItemUIMap,
                 context: any) {
-
+                if (!context) throw "Tour list item's context is undefined";
                 super(parent, container, uiMap, context);
 
                 this.iconImg = this.container.find(uiMap.iconImg);
