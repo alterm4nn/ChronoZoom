@@ -23,7 +23,9 @@ var CZ;
                 };
                 this.itemRemoveHandler = function (item, idx) {
                 };
-                this.container.sortable(listBoxInfo.sortableSettings);
+                if(listBoxInfo.sortableSettings) {
+                    this.container.sortable(listBoxInfo.sortableSettings);
+                }
             }
             ListBoxBase.prototype.add = function (context) {
                 var type = this.getType(context);
@@ -78,12 +80,11 @@ var CZ;
                     return _this.parent.selectItem(_this);
                 });
                 this.closeButton = this.container.find(uiMap.closeButton);
-                if(!this.closeButton.length) {
-                    throw "Close button is not found in a given UI map.";
+                if(this.closeButton.length) {
+                    this.closeButton.click(function (event) {
+                        return _this.close();
+                    });
                 }
-                this.closeButton.click(function (event) {
-                    return _this.close();
-                });
                 this.parent.container.append(this.container);
             }
             ListItemBase.prototype.close = function () {

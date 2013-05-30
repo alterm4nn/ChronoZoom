@@ -11,9 +11,11 @@
 /// <reference path='../ui/auth-edit-timeline-form.ts'/>
 /// <reference path='../ui/auth-edit-exhibit-form.ts'/>
 /// <reference path='../ui/auth-edit-contentitem-form.ts'/>
+/// <reference path='../ui/auth-edit-tour-form.ts'/>
 /// <reference path='../ui/header-edit-form.ts' />
 /// <reference path='../ui/header-edit-profile-form.ts'/>
 /// <reference path='../ui/header-login-form.ts'/>
+/// <reference path='../ui/tourslist-form.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
 
 module CZ {
@@ -26,7 +28,11 @@ module CZ {
             "#auth-edit-contentitem-form": "/ui/auth-edit-contentitem-form.html",
             "$('<div></div>')": "/ui/contentitem-listbox.html",
             "#profile-form": "/ui/header-edit-profile-form.html",
-            "#login-form": "/ui/header-login-form.html"
+            "#login-form": "/ui/header-login-form.html",
+            "#auth-edit-tours-form": "/ui/auth-edit-tour-form.html", // 7
+            "$('<div><!--Tours Authoring--></div>')": "/ui/tourstop-listbox.html", // 8
+            "#toursList": "/ui/tourslist-form.html", // 9
+            "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html", // 8
         };
 
         enum FeatureActivation {
@@ -82,6 +88,38 @@ module CZ {
             },
         ];
 
+        function InitializeToursUI(profile, forms) {
+            var allowEditing = IsFeatureEnabled("Authoring") && (profile && profile != "" && profile.DisplayName === CZ.Service.superCollectionName);
+
+            var onToursInitialized = function () {
+                CZ.Tours.initializeToursUI();
+                $("#tours_index").click(function () { // show form
+                    CZ.Tours.removeActiveTour();
+                    var form = new CZ.UI.FormToursList(forms[9], {
+                        activationSource: $(this),
+                        navButton: ".cz-form-nav",
+                        closeButton: ".cz-form-close-btn > .cz-form-btn",
+                        titleTextblock: ".cz-form-title",
+                        tourTemplate: forms[10],
+                        tours: CZ.Tours.tours,
+                        takeTour: tour => {
+                            CZ.Tours.removeActiveTour();
+                            CZ.Tours.activateTour(tour, undefined);
+                        },
+                        editTour: allowEditing ? tour => {
+                            if (CZ.Authoring.showEditTourForm)
+                                CZ.Authoring.showEditTourForm(tour);
+                        } : null
+                    });
+                    form.show();
+                });
+            };
+            if (CZ.Tours.tours)
+                onToursInitialized();
+            else
+                $("body").bind("toursInitialized", onToursInitialized);
+        }
+
         var defaultRootTimeline = { title: "My Timeline", x: 1950, endDate: 9999, children: [], parent: { guid: null } };
 
         $(document).ready(function () {
@@ -100,6 +138,10 @@ module CZ {
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
 
+                CZ.Service.getProfile()
+                    .done(profile => { InitializeToursUI(profile, forms); })
+                    .fail(err => { InitializeToursUI(null, forms); });
+
                 $(".header-icon.edit-icon").click(function () {
                     $(".header-icon.active").removeClass("active");
                     $(this).addClass("active");
@@ -110,12 +152,30 @@ module CZ {
                         closeButton: ".cz-form-close-btn > .cz-form-btn",
                         titleTextblock: ".cz-form-title",
                         createTimeline: ".cz-form-create-timeline",
-                        createExhibit: ".cz-form-create-exhibit"
+                        createExhibit: ".cz-form-create-exhibit",
+                        createTour: ".cz-form-create-tour"
                     });
                     form.show();
                 });
 
                 CZ.Authoring.initialize(CZ.Common.vc, {
+                    showEditTourForm: function (tour) {
+                        CZ.Tours.removeActiveTour();
+                        var form = new CZ.UI.FormEditTour(forms[7], {
+                            activationSource: $(".header-icon.edit-icon"),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            saveButton: ".cz-form-save",
+                            deleteButton: ".cz-form-delete",
+                            addStopButton: ".cz-form-tour-addstop",
+                            titleInput: ".cz-form-title",
+                            tourStopsListBox: "#stopsList",
+                            tourStopsTemplate: forms[8],
+                            context: tour
+                        });
+                        form.show();
+                    },
                     showCreateTimelineForm: function (timeline) {
                         CZ.Authoring.mode = "createTimeline";
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
@@ -284,8 +344,12 @@ module CZ {
             $('#search_button')
                 .mouseup(CZ.Search.onSearchClicked);
 
-            $('#tours_index')
-                .mouseup(CZ.Tours.onTourClicked);
+            // Commented by Dmitry Voytsekhovskiy: new tours window is now opened in a handler of UI map loading completion.
+            //$('#tours_index')
+            //    .mouseup(e =>
+            //    {
+            //        CZ.Tours.onTourClicked();
+            //    });
 
             $('#human_rect')
                 .click(() => { CZ.Search.navigateToBookmark(CZ.Common.humanityVisible); });
@@ -366,7 +430,7 @@ module CZ {
 
             // Feature activation control
             for (var idxFeature = 0; idxFeature < _featureMap.length; idxFeature++) {
-                var enabled : bool = true;
+                var enabled: bool = true;
                 var feature = _featureMap[idxFeature];
 
                 if (feature.Activation === FeatureActivation.Disabled) {
@@ -420,7 +484,6 @@ module CZ {
 
             CZ.Search.initializeSearch();
             CZ.Bibliography.initializeBibliography();
-            CZ.Tours.initializeToursUI();
 
             var canvasGestures = CZ.Gestures.getGesturesStream(CZ.Common.vc); //gesture sequence of the virtual canvas
             var axisGestures = CZ.Gestures.applyAxisBehavior(CZ.Gestures.getGesturesStream(CZ.Common.ax)); //gesture sequence of axis (tranformed according to axis behavior logic)

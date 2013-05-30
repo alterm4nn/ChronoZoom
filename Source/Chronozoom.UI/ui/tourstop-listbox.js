@@ -6,9 +6,9 @@ var __extends = this.__extends || function (d, b) {
 var CZ;
 (function (CZ) {
     (function (UI) {
-        var ContentItemListBox = (function (_super) {
-            __extends(ContentItemListBox, _super);
-            function ContentItemListBox(container, listItemContainer, contentItems) {
+        var TourStopListBox = (function (_super) {
+            __extends(TourStopListBox, _super);
+            function TourStopListBox(container, listItemContainer, contentItems) {
                 var listBoxInfo = {
                     context: contentItems,
                     sortableSettings: {
@@ -31,41 +31,42 @@ var CZ;
                             closeButton: ".cz-listitem-close-btn",
                             iconImg: ".cz-contentitem-listitem-icon > img",
                             titleTextblock: ".cz-contentitem-listitem-title",
-                            descrTextblock: ".cz-contentitem-listitem-descr"
+                            typeTextblock: ".cz-contentitem-listitem-highlighted"
                         }
                     }
                 };
-                listItemsInfo.default.ctor = ContentItemListItem;
+                listItemsInfo.default.ctor = TourStopListItem;
                         _super.call(this, container, listBoxInfo, listItemsInfo);
             }
-            return ContentItemListBox;
+            return TourStopListBox;
         })(UI.ListBoxBase);
-        UI.ContentItemListBox = ContentItemListBox;        
-        var ContentItemListItem = (function (_super) {
-            __extends(ContentItemListItem, _super);
-            function ContentItemListItem(parent, container, uiMap, context) {
-                var _this = this;
+        UI.TourStopListBox = TourStopListBox;        
+        var TourStopListItem = (function (_super) {
+            __extends(TourStopListItem, _super);
+            function TourStopListItem(parent, container, uiMap, context) {
                         _super.call(this, parent, container, uiMap, context);
                 this.iconImg = this.container.find(uiMap.iconImg);
                 this.titleTextblock = this.container.find(uiMap.titleTextblock);
-                this.descrTextblock = this.container.find(uiMap.descrTextblock);
-                this.iconImg.attr("src", this.data.icon || "/images/Temp-Thumbnail2.png");
-                this.titleTextblock.text(this.data.title);
-                this.descrTextblock.text(this.data.description);
-                this.closeButton.off();
-                this.closeButton.click(function () {
-                    if(CZ.Authoring.mode === "createExhibit") {
-                        _super.prototype.close.call(_this);
-                    } else if(CZ.Authoring.mode === "editExhibit") {
-                        if(_this.parent.items.length > 1) {
-                            _super.prototype.close.call(_this);
-                        }
+                this.typeTextblock = this.container.find(uiMap.typeTextblock);
+                this.iconImg.attr("src", this.data.Icon || "/images/Temp-Thumbnail2.png");
+                this.titleTextblock.text(this.data.Title);
+                this.typeTextblock.text(this.data.Type);
+                this.container.dblclick(function (e) {
+                    if(typeof context.Target.vc == "undefined") {
+                        return;
                     }
+                    var vp = context.Target.vc.getViewport();
+                    var visible = CZ.VCContent.getVisibleForElement(context.Target, 1.0, vp, true);
+                    var target = {
+                        newvisible: visible,
+                        element: context.Target
+                    };
+                    CZ.Search.navigateToElement(target);
                 });
             }
-            return ContentItemListItem;
+            return TourStopListItem;
         })(UI.ListItemBase);
-        UI.ContentItemListItem = ContentItemListItem;        
+        UI.TourStopListItem = TourStopListItem;        
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));

@@ -38,6 +38,8 @@ var CZ;
         Authoring.showCreateExhibitForm = null;
         Authoring.showEditExhibitForm = null;
         Authoring.showEditContentItemForm = null;
+        Authoring.showEditTourForm = null;
+        Authoring.callback = null;
         function isIntersecting(te, obj) {
             switch(obj.type) {
                 case "timeline":
@@ -204,6 +206,17 @@ var CZ;
                     }
                 }
             },
+            editTour: {
+            },
+            "editTour-selectTarget": {
+                mouseup: function () {
+                    if(Authoring.callback != null && _hovered != undefined && _hovered != null) {
+                        Authoring.callback(_hovered);
+                    }
+                },
+                mousemove: function () {
+                }
+            },
             editTimeline: {
                 mouseup: function () {
                     Authoring.showEditTimelineForm(Authoring.selectedTimeline);
@@ -280,6 +293,8 @@ var CZ;
             Authoring.showEditExhibitForm = formHandlers && formHandlers.showEditExhibitForm || function () {
             };
             Authoring.showEditContentItemForm = formHandlers && formHandlers.showEditContentItemForm || function () {
+            };
+            Authoring.showEditTourForm = formHandlers && formHandlers.showEditTourForm || function () {
             };
         }
         Authoring.initialize = initialize;
