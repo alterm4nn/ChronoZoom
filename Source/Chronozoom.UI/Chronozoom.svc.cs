@@ -926,14 +926,31 @@ namespace Chronozoom.UI
                             {
                                 parentTimeline.ChildTimelines = new System.Collections.ObjectModel.Collection<Timeline>();
                             }
-                            parentTimeline.ChildTimelines.Add(newTimeline);
                             newTimeline.Depth = parentTimeline.Depth + 1;
+                            if (parentTimeline.Predecessor != Guid.Empty)
+                            {
+                                Timeline predecessorTimeline = _storage.Timelines.Find(parentTimeline.Predecessor);
+                                predecessorTimeline.Successor = newTimeline.Id;
+                                newTimeline.Predecessor = predecessorTimeline.Id;
+                            }
+                            if (parentTimeline.FirstNodeInSubtree == parentTimeline.Id)
+                            {
+                                _storage.updateFirstNodeInSubtree(parentTimeline, newTimeline.Id);
+                            }
+                            newTimeline.Successor = parentTimeline.Id;
+                            parentTimeline.Predecessor = newTimeline.Id;
+                            parentTimeline.ChildTimelines.Add(newTimeline);
+               
                         }
                         else
                         {
                             newTimeline.Depth = 0;
+                            newTimeline.FirstNodeInSubtree = newTimeline.Id;
+                            newTimeline.Predecessor = Guid.Empty;
+                            newTimeline.Successor = Guid.Empty;
                         }
                         _storage.Timelines.Add(newTimeline);
+                        
                         returnValue = newTimelineGuid;
                     }
                     else
@@ -1044,6 +1061,28 @@ namespace Chronozoom.UI
                     {
                         updateSubtreeSize(parentTimeline, -deleteTimeline.SubtreeSize);
                     }
+                    if (deleteTimeline.Successor != Guid.Empty)
+                    {
+                        Timeline successorTimeline = _storage.Timelines.Find(deleteTimeline.Successor);
+                        successorTimeline.Predecessor = deleteTimeline.Predecessor;
+                    }
+                    if (deleteTimeline.Predecessor != Guid.Empty)
+                    {
+                        Timeline predecessorTimeline = _storage.Timelines.Find(deleteTimeline.Predecessor);
+                        predecessorTimeline.Successor = deleteTimeline.Successor;
+                    }
+                    if (deleteTimeline.FirstNodeInSubtree == deleteTimeline.Id && parentTimeline != null)
+                    {
+                        if (deleteTimeline.Successor != Guid.Empty)
+                        {
+                            _storage.updateFirstNodeInSubtree(parentTimeline, deleteTimeline.Successor);
+                        }
+                        else
+                        {
+                            _storage.updateFirstNodeInSubtree(parentTimeline, parentTimeline.Id);
+                        }
+                        
+                    }
                     _storage.DeleteTimeline(timelineRequest.Id);
                     _storage.SaveChanges();
                 }
@@ -1152,7 +1191,10 @@ namespace Chronozoom.UI
                         parentTimeline.Exhibits.Add(newExhibit);
                         
                         _storage.Exhibits.Add(newExhibit);
-                        updateSubtreeSize(parentTimeline, newExhibit.ContentItems.Count());
+                        if (newExhibit.ContentItems.Count() > 0 && parentTimeline != null)
+                        {
+                            updateSubtreeSize(parentTimeline, newExhibit.ContentItems.Count());
+                        }
                         _storage.SaveChanges();
                         returnValue.ExhibitId = newExhibitGuid;
 
@@ -1333,7 +1375,10 @@ namespace Chronozoom.UI
                         return;
                     }
                     Timeline parentTimeline = _storage.GetExhibitParentTimeline(deleteExhibit.Id);
-                    updateSubtreeSize(parentTimeline, -deleteExhibit.ContentItems.Count());
+                    if (deleteExhibit.ContentItems.Count() > 0 && parentTimeline != null)
+                    {
+                        updateSubtreeSize(parentTimeline, -deleteExhibit.ContentItems.Count());
+                    }
                     _storage.DeleteExhibit(exhibitRequest.Id);
                     _storage.SaveChanges();
                 }
@@ -1404,7 +1449,11 @@ namespace Chronozoom.UI
                         // Parent content item is valid - add new content item
                         var newContentItemGuid = AddContentItem(collection, parentExhibit, contentItemRequest);
                         returnValue = newContentItemGuid;
-                        updateSubtreeSize(parentTimeline, 1);
+                        if (parentTimeline != null)
+                        {
+                            updateSubtreeSize(parentTimeline, 1);
+
+                        }
                     }
                     else
                     {
@@ -1490,7 +1539,10 @@ namespace Chronozoom.UI
                     ExhibitRaw parentExhibit = _storage.GetContentItemParentExhibit(deleteContentItem.Id);
                     TimelineRaw parentTimeline = _storage.GetExhibitParentTimeline(parentExhibit.Id);
                     _storage.ContentItems.Remove(deleteContentItem);
-                    updateSubtreeSize(parentTimeline, -1);
+                    if (parentTimeline != null)
+                    {
+                        updateSubtreeSize(parentTimeline, -1);
+                    }
                     _storage.SaveChanges();
                 }
             });

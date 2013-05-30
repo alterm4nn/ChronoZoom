@@ -570,5 +570,15 @@ namespace Chronozoom.Entities
             return exhibitRaw.FirstOrDefault();
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "update"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "t")]
+        public void updateFirstNodeInSubtree(Timeline t, Guid firstTimelineId)
+        {
+            TimelineRaw parent = GetParentTimelineRaw(t.Id);
+            t.FirstNodeInSubtree = firstTimelineId;
+            if (parent != null)
+            {
+                updateFirstNodeInSubtree(parent, firstTimelineId);
+            }
+        }
     }
 }
