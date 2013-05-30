@@ -83,9 +83,14 @@ module CZ {
          */
         function isIncluded(tp, obj) {
             switch (obj.type) {
+                case "infodot":
+                    return (tp.x <= obj.infodotDescription.date &&
+                            tp.y <= obj.y &&
+                            tp.x + tp.width >= obj.infodotDescription.date &&
+                            tp.y + tp.height >= obj.y + obj.height);
+                    break;
                 case "timeline":
                 case "rectangle":
-                case "infodot":
                 case "circle":
                     return (tp.x <= obj.x &&
                             tp.y <= obj.y &&
@@ -150,7 +155,7 @@ module CZ {
          * @param  {Boolean} editmode If true, it doesn't take into account edited exhibit.
          * @return {Boolean}          True if test is passed, False otherwise.
          */
-        function checkExhibitIntersections(tp, ec, editmode) {
+        export function checkExhibitIntersections(tp, ec, editmode) {
             var i = 0;
             var len = 0;
             var selfIntersection = false;
@@ -161,12 +166,12 @@ module CZ {
             }
 
             // Test on intersections with parent's children.
-            for (i = 0, len = tp.children.length; i < len; ++i) {
-                selfIntersection = editmode ? (tp.children[i] === selectedExhibit) : (tp.children[i] === ec);
-                if (!selfIntersection && isIntersecting(ec, tp.children[i])) {
-                    return false;
-                }
-            }
+            //for (i = 0, len = tp.children.length; i < len; ++i) {
+            //    selfIntersection = editmode ? (tp.children[i] === selectedExhibit) : (tp.children[i] === ec);
+            //    if (!selfIntersection && isIntersecting(ec, tp.children[i])) {
+            //        return false;
+            //    }
+            //}
 
             return true;
         }
@@ -719,7 +724,7 @@ module CZ {
          * Validates possible input errors for exhibits.
         */
         export function validateExhibitData(date, title, contentItems) {
-            var isValid = CZ.Authoring.validateNumber(date);
+            var isValid = date !== false;
             isValid = isValid && CZ.Authoring.isNotEmpty(title);
             isValid = isValid && CZ.Authoring.validateContentItems(contentItems);
             return isValid;
