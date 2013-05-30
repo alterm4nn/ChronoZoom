@@ -6136,10 +6136,6 @@ var CZ;
                         var newlyEstimatedViewport = calculateTargetViewport(latestViewport, gesture, self.estimatedViewport);
                         var vbox = CZ.Common.viewportToViewBox(newlyEstimatedViewport);
                         var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
-                        if(!CZ.Common.vc.virtualCanvas("inBuffer", wnd, newlyEstimatedViewport.visible.scale)) {
-                            var lca = CZ.Common.vc.virtualCanvas("findLca", wnd);
-                            self.getMissingData(vbox, lca);
-                        }
                         if(!self.estimatedViewport) {
                             self.activeAnimation = new CZ.ViewportAnimation.PanZoomAnimation(latestViewport);
                             self.saveScreenParameters(latestViewport);
