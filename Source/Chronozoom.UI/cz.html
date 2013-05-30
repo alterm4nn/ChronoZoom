@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Pragma" content="no-cache" />
@@ -44,16 +44,16 @@
     <script type="text/javascript" src="/scripts/external/ACS.js"></script>
     <script type="text/javascript" src="/scripts/external/seadragon-min.js"></script>
 
-        <script type="text/javascript">
-            if (Modernizr.canvas) {
-                var script = document.createElement("script");
-                script.type = "text/javascript";
-                script.src = "/cz.js";
-                document.getElementsByTagName("head")[0].appendChild(script);
-            }
-            else {
-                window.location = "/fallback.html"
-            }
+    <script type="text/javascript">
+        if (Modernizr.canvas) {
+            var script = document.createElement("script");
+            script.type = "text/javascript";
+            script.src = "/cz.js";
+            document.getElementsByTagName("head")[0].appendChild(script);
+        }
+        else {
+            window.location = "/fallback.html"
+        }
     </script>
 
     <title>ChronoZoom</title>
@@ -100,20 +100,21 @@
                     <div class="header-icon edit-icon" title="Create your events" data-enabled="true"></div>
                 </li>
                 <li class="fleft">
-                    <div style="display: none" id="login-panel">
-                        <label for="login-button" class="auth-panel-login">Sign in</label><div id="login-button" class="header-icon profile-icon" title="Sign in to ChronoZoom" data-enabled="true"></div>
+                    <div style="display: none" id="login-panel" title="Sign in to ChronoZoom" data-enabled="true">
+                        <label for="login-button">Sign in</label>
+                        <div id="login-button" class="header-icon profile-icon"></div>
                     </div>
                 </li>
                 <li class="fleft">
-                    <div style="display: none" id="profile-panel">
+                    <div style="display: none" id="profile-panel" data-enabled="true" title="Signed on">
                         <label for="edit_profile_button" class="auth-panel-login"></label>
-                        <div id="edit_profile_button" class="header-icon profile-icon" title="Sign in to ChronoZoom" data-enabled="true"></div>
+                        <div id="edit_profile_button" class="header-icon profile-icon"></div>
                     </div>
                 </li>
             </ul>
         </div>
 
-            
+
         <div id="tour_control" class="tour_control fleft">
             <img id="tour_prev" src="/images/tour_prev_off.jpg" alt="previous" />
             <img style="margin: 0 0 0 16px"
@@ -147,7 +148,7 @@
         </div>
 
         <div id="search" class="czWindow" style="z-index: 2010; max-height: 250px; display: none">
-            <div class="header unselectable" >
+            <div class="header unselectable">
                 Search
             </div>
             <div>
@@ -202,23 +203,16 @@
             </div>
         </div>
 
-        <div id="profile-form" class="cz-form unselectable"></div>
-        <div id="login-form" class="cz-form unselectable"></div>
-        <div id="header-edit-form" class="cz-form cz-header-edit-form unselectable"></div>
-        <div id="timeSeriesDataForm" class="cz-form unselectable"></div>
-
-        <div id="toursList" class="cz-form cz-tourlist-form unselectable"></div>
-        <div id="auth-edit-timeline-form" class="cz-form cz-form-timeline unselectable">
-        </div>
-        <div id="auth-edit-exhibit-form" class="cz-form cz-form-exhibit unselectable">
-		</div>
-        <div id="auth-edit-contentitem-form" class="cz-form cz-form-contentitem unselectable">
-        </div>
-
-
+        <div id="profile-form" class="cz-form cz-major-form unselectable"></div>
+        <div id="login-form" class="cz-form cz-major-form unselectable"></div>
+        <div id="header-edit-form" class="cz-form cz-major-form cz-header-edit-form unselectable"></div>
+        <div id="timeSeriesDataForm" class="cz-form cz-major-form unselectable"></div>
+        <div id="toursList" class="cz-form cz-major-form cz-tourlist-form unselectable"></div>
+        <div id="auth-edit-timeline-form" class="cz-form cz-form-timeline unselectable"></div>
+        <div id="auth-edit-exhibit-form" class="cz-form cz-form-exhibit unselectable"></div>
+        <div id="auth-edit-contentitem-form" class="cz-form cz-form-contentitem unselectable"></div>
 
     </div>
-
 
     <script src="https://cz-nodelete-chronozoom-test.accesscontrol.windows.net/v2/metadata/IdentityProviders.js?protocol=wsfederation&amp;realm=http%3a%2f%2ftest.chronozoomproject.org%2f&amp;reply_to=&amp;context=&amp;request_id=&amp;version=1.0&amp;callback=ShowSigninPage" type="text/javascript"></script>
     <div id="welcomeScreenBack" class="welcomeScreenBack">
@@ -227,7 +221,7 @@
                 <div class="titleArea">
                     <img class="closeButton unselectable" id="welcomeScreenCloseButton" src="/images/close_off.png"
                         alt="Close" />
-                    <div class="title unselectable" >
+                    <div class="title unselectable">
                         <span>Welcome to ChronoZoom beta!</span>
                     </div>
                 </div>
@@ -277,12 +271,13 @@
                 <li class="fright">
                     <a class="footer-link" href="http://join.chronozoomproject.org/forum/forums/">Feedback</a>
                 </li>
-                 <li class="fright">
+                <li class="fright">
                     <a class="footer-link" href="http://help.chronozoomproject.org/">Help</a>
-                </li>                
+                </li>
             </ul>
         </div>
         <div class="clearer"></div>
     </div>
+
 </body>
 </html>
