@@ -401,50 +401,47 @@ namespace Chronozoom.UI
                     SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
                     return string.Empty;
                 }
-                lock (_storage.Users)
-                {
-                    Uri collectionUri;
+                
+                Uri collectionUri;
 
+                if (user == null)
+                {
+                    // No ACS so treat as an anonymous user who can access the sandbox collection.
+                    // If anonymous user does not already exist create the user.
+                    user = _storage.Users.Where(candidate => candidate.NameIdentifier == null).FirstOrDefault();
                     if (user == null)
                     {
-                        // No ACS so treat as an anonymous user who can access the sandbox collection.
-                        // If anonymous user does not already exist create the user.
-                        user = _storage.Users.Where(candidate => candidate.NameIdentifier == null).FirstOrDefault();
-                        if (user == null)
-                        {
-                            user = new User { Id = Guid.NewGuid(), DisplayName = _defaultUserName };
-                            _storage.Users.Add(user);
-                            _storage.SaveChanges();
-                        }
-
-                        collectionUri = UpdatePersonalCollection(user.NameIdentifier, userRequest);
-                        return collectionUri.ToString();
-                    }
-
-                    User updateUser = _storage.Users.Where(candidate => candidate.DisplayName == userRequest.DisplayName).FirstOrDefault();
-                    if (userRequest.Id == Guid.Empty && updateUser == null)
-                    {
-                        // Add new user
-                        User newUser = new User { Id = Guid.NewGuid(), DisplayName = userRequest.DisplayName, Email = userRequest.Email };
-                        newUser.NameIdentifier = user.NameIdentifier;
-                        newUser.IdentityProvider = user.IdentityProvider;
-                        collectionUri = UpdatePersonalCollection(user.NameIdentifier, newUser);
-                    }
-                    else
-                    {
-                        if (updateUser == null)
-                        {
-                            SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.UserNotFound);
-                            return String.Empty;
-                        }
-
-                        updateUser.Email = userRequest.Email;
-                        collectionUri = UpdatePersonalCollection(user.NameIdentifier, updateUser);
+                        user = new User { Id = Guid.NewGuid(), DisplayName = _defaultUserName };
+                        _storage.Users.Add(user);
                         _storage.SaveChanges();
                     }
 
+                    collectionUri = UpdatePersonalCollection(user.NameIdentifier, userRequest);
                     return collectionUri.ToString();
                 }
+
+                User updateUser = _storage.Users.Where(candidate => candidate.DisplayName == userRequest.DisplayName).FirstOrDefault();
+                if (userRequest.Id == Guid.Empty && updateUser == null)
+                {
+                    // Add new user
+                    User newUser = new User { Id = Guid.NewGuid(), DisplayName = userRequest.DisplayName, Email = userRequest.Email };
+                    newUser.NameIdentifier = user.NameIdentifier;
+                    newUser.IdentityProvider = user.IdentityProvider;
+                    collectionUri = UpdatePersonalCollection(user.NameIdentifier, newUser);
+                }
+                else
+                {
+                    if (updateUser == null)
+                    {
+                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.UserNotFound);
+                        return String.Empty;
+                    }
+                    updateUser.Email = userRequest.Email;
+                    collectionUri = UpdatePersonalCollection(user.NameIdentifier, updateUser);
+                    _storage.SaveChanges();
+                }
+
+                return collectionUri.ToString();
             });
         }
 
@@ -614,6 +611,10 @@ namespace Chronozoom.UI
                 rootTimeline.FromYear = -13700000000;
                 rootTimeline.ToYear = 9999;
                 rootTimeline.Collection = personalCollection;
+                rootTimeline.Depth = 0;
+                rootTimeline.FirstNodeInSubtree = rootTimeline.Id;
+                rootTimeline.Predecessor = Guid.Empty;
+                rootTimeline.Successor = Guid.Empty;
 
                 _storage.SuperCollections.Add(superCollection);
                 _storage.Collections.Add(personalCollection);
@@ -876,7 +877,7 @@ namespace Chronozoom.UI
                     return Guid.Empty;
                 }
 
-                lock (_storage)  /* note: this operation needs to be atomic w.r.t. storage */
+                lock (_storage)
                 {
                     Guid returnValue;
                     Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
@@ -933,6 +934,10 @@ namespace Chronozoom.UI
                                 predecessorTimeline.Successor = newTimeline.Id;
                                 newTimeline.Predecessor = predecessorTimeline.Id;
                             }
+                            else
+                            {
+                                newTimeline.Predecessor = Guid.Empty;
+                            }
                             if (parentTimeline.FirstNodeInSubtree == parentTimeline.Id)
                             {
                                 _storage.updateFirstNodeInSubtree(parentTimeline, newTimeline.Id);
@@ -940,7 +945,6 @@ namespace Chronozoom.UI
                             newTimeline.Successor = parentTimeline.Id;
                             parentTimeline.Predecessor = newTimeline.Id;
                             parentTimeline.ChildTimelines.Add(newTimeline);
-               
                         }
                         else
                         {
@@ -1057,7 +1061,7 @@ namespace Chronozoom.UI
                         return;
                     }
                     Timeline parentTimeline = _storage.GetParentTimelineRaw(timelineRequest.Id);
-                    if (parentTimeline != null)
+                    if (parentTimeline != null && deleteTimeline.SubtreeSize > 0)
                     {
                         updateSubtreeSize(parentTimeline, -deleteTimeline.SubtreeSize);
                     }
@@ -1081,7 +1085,6 @@ namespace Chronozoom.UI
                         {
                             _storage.updateFirstNodeInSubtree(parentTimeline, parentTimeline.Id);
                         }
-                        
                     }
                     _storage.DeleteTimeline(timelineRequest.Id);
                     _storage.SaveChanges();
