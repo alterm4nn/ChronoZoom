@@ -63,6 +63,7 @@ Specifies a tour stop (can be either a timeline, an exhibit, or a content item).
 |ReferenceId|The ID of the reference that is associated with the bookmark.|
 |LapseTime|The lapse time value for the bookmark.|
 |Description|A text description of the bookmark.|
+|SequenceId|Identifies the ordering of bookmarks within a tour.|
  
 [top](#chronozoom-rest-api-reference)
  
@@ -240,6 +241,10 @@ A registered user.
 - [DeleteExhibit](#deleteexhibit)
 - [PutContentItem](#putcontentitem)
 - [DeleteContentItem](#deletecontentitem)
+- [PostTour](#posttour)
+- [PutTour](#puttour)
+- [DeleteTour](#deletetour)
+- [DeleteBookmarks](#deletebookmarks)
 - [GetContentPath](#getcontentpath)
 - [GetCollections](#getcollections)
 
@@ -507,7 +512,7 @@ Creates a new collection using the specified name.
 |:--------|:----|
 |superCollectionName|The name of the parent supercollection.|
 |collectionName|The name of the collection to create.|
-|collectionRequest|[Collection](#collection) markup in JSON format.|
+|collectionRequest|[Collection](#collection) data in JSON format.|
  
 **Remarks**
 If a collection of the specified name does not exist then a new collection is created. 
@@ -565,7 +570,7 @@ HTTP status code.
             
     Request body (JSON):
     {
-         id: "0123456789"
+         id: "0123456789",
          title: "A New Title"
     }
     
@@ -577,7 +582,7 @@ HTTP status code.
 |:--------|:----|
 |superCollectionName|The parent collection.|
 |collectionName|The name of the collection to update.|
-|timelineRequest|[Timeline](#timeline) markup in JSON format.|
+|timelineRequest|[Timeline](#timeline) data in JSON format.|
  
 **Remarks**
 If an ID is specified but the collection does not exist, the request will fail ("not found" status).
@@ -627,7 +632,7 @@ Deletes the timeline with the specified ID.
 Creates or updates the exhibit and its content items in a given collection. If the collection does not exist, then the command will silently fail.
  
 **Returns**
-Exhibit markup in JSON format.
+[Exhibit](#exhibit) data in JSON format.
  
 **Example**
  
@@ -640,9 +645,9 @@ Exhibit markup in JSON format.
     {
          id: "0123456789",
          title: "Mars Exploration",
-         threshold: "[threshold]",
-         regime: "[regime]",
-         contentItems: "[contentItems]" 
+         threshold: "{threshold}",
+         regime: "{regime}",
+         contentItems: "{contentItems}" 
     }
     
 
@@ -653,7 +658,7 @@ Exhibit markup in JSON format.
 |:--------|:----|
 |superCollectionName|The name of the parent collection.|
 |collectionName|The name of the collection to modify.|
-|exhibitRequest|[Exhibit](#exhibit) markup in JSON format.|
+|exhibitRequest|[Exhibit](#exhibit) data in JSON format.|
  
 **Remarks**
 If an exhibit id is not specified, a new exhibit is added to the collection. 
@@ -693,7 +698,7 @@ Deletes the specified exhibit from the specified collection.
 |:--------|:----|
 |superCollectionName|The name of the parent collection.|
 |collectionName|The name of the collection to modify.|
-|exhibitRequest|The request in JSON format.|
+|exhibitRequest|The exhibit request data in JSON format.|
  
  
 [top](#chronozoom-rest-api-reference)
@@ -702,7 +707,7 @@ Deletes the specified exhibit from the specified collection.
  
 ### PutContentItem ###
  
-Creates or updates the content item in a given collection. If the specified collection does not exist the request will fail.
+Creates or updates the content item in a given collection. If the collection does not exist the request will fail.
  
 **Returns**
 
@@ -729,7 +734,7 @@ Creates or updates the content item in a given collection. If the specified coll
 |:--------|:----|
 |superCollectionName|The name of the parent collection.|
 |collectionName|The name of the collection to modify.|
-|contentItemRequest|[ContentItem](#contentitem) markup in JSON format.|
+|contentItemRequest|[ContentItem](#contentitem) data in JSON format.|
  
  
 [top](#chronozoom-rest-api-reference)
@@ -760,7 +765,152 @@ Delete the specified content item from the specified collection.
 |:--------|:----|
 |superCollectionName|The name of the parent collection.|
 |collectionName|The name of the collection to modify.|
-|contentItemRequest|The request in JSON format.|
+|contentItemRequest|The request data in JSON format.|
+ 
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+### PostTour ###
+ 
+Creates a new tour with bookmark support.
+ 
+**Returns**
+An exhibit in JSON format.
+ 
+**Example**
+ 
+    HTTP verb: POST
+            
+    URL:
+    http://{URL}/api/{supercollection}/{collection}/{collectionName}/tour
+            
+    Request body:
+    {
+             
+    }
+    
+
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|superCollectionName|The name of the parent collection.|
+|collectionName|The name of the collection to modify.|
+|tourRequest|The tour data in JSON format.|
+ 
+**Remarks**
+Do not specify the tour ID, this value is automatically generated.
+    All bookmarks in a tour must belong to the same collection and the user 
+    must have permission to modify that collection.
+    POST is used to create a new tour.
+
+ 
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+### PutTour ###
+ 
+Creates or updates a tour with bookmark support.
+ 
+**Returns**
+An exhibit in JSON format.
+ 
+**Example**
+ 
+    HTTP verb: PUT
+            
+    URL:
+    http://{URL}/api/{supercollection}/{collection}/{collectionName}/tour
+            
+    Request body:
+    {
+             
+    }
+    
+
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|superCollectionName|The name of the parent collection.|
+|collectionName|The name of the collection to modify.|
+|tourRequest|The tour data in JSON format.|
+ 
+**Remarks**
+All bookmarks in a tour must belong to the same collection and the user 
+    must have permission to modify that collection.
+    To modify an existing tour, specify the tour ID.
+    If the tour ID to be updated does not exist a "not found" status is returned. 
+    If an invalid tour ID or bookmark ID (for updates) is specified then the request will fail.
+
+ 
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+### DeleteTour ###
+ 
+Deletes the specified tour.
+ 
+**Example**
+ 
+    HTTP verb: DELETE
+            
+    URL:
+    http://{URL}/api/{supercollection}/{collection}/{collectionName}/tour
+            
+    Request body:
+    {
+        id: "5c07b2bf-65e1-45e1-a9cd-792a7767d685"
+    }
+    
+
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|superCollectionName|The name of the parent collection.|
+|collectionName|The name of the collection to modify.|
+|tourRequest|The tour ID in JSON format.|
+ 
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+### DeleteBookmarks ###
+ 
+Delete a list of bookmarks belonging to the same tour.
+ 
+**Example**
+ 
+    HTTP verb: DELETE
+            
+    URL:
+    http://{URL}/api/{supercollection}/{collection}/{collectionName}/bookmark
+            
+    Request body:
+    {
+         id: "0123456789"
+    }
+    
+
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|superCollectionName|The name of the parent collection.|
+|collectionName|The name of the collection to modify.|
+|tourRequest|The request in JSON format.|
  
  
 [top](#chronozoom-rest-api-reference)

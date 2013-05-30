@@ -225,7 +225,7 @@ namespace Chronozoom.UI
             public const string TourIdCannotBeNull = "Tour id cannot be null";
             public const string TourIdMismatch = "Tour id mismatch";
             public const string BookmarkNotFound = "Bookmark not found";
-            public const string BookmarkSequenceIdDuplicate = "Bookmark sequence id already exisits";
+            public const string BookmarkSequenceIdDuplicate = "Bookmark sequence id already exists";
             public const string BookmarkSequenceIdInvalid = "Bookmark sequence id is invalid";
         }
 
