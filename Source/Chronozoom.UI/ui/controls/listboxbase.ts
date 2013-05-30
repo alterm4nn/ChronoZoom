@@ -31,10 +31,10 @@ module CZ {
             default: {
                 container: JQuery;
                 uiMap: IListItemBaseUIMap;
-                ctor?: new(
+                ctor?: new (
                     parent: ListBoxBase,
                     container: JQuery,
-                    uiMap: IListItemBaseUIMap, 
+                    uiMap: IListItemBaseUIMap,
                     context: any)
                     => ListItemBase;
             };
@@ -56,9 +56,9 @@ module CZ {
             private itemRemoveHandler: (item: ListItemBase, index: number) => void;
 
             constructor(container: JQuery,
-                        listBoxInfo: IListBoxBaseInfo,
-                        listItemsInfo: IListItemBaseInfo,
-                        getType: (context: any) => string = (context: any) => "default") {
+                listBoxInfo: IListBoxBaseInfo,
+                listItemsInfo: IListItemBaseInfo,
+                getType: (context: any) => string = (context: any) => "default") {
 
                 if (!(container instanceof jQuery)) {
                     throw "Container parameter is invalid! It should be jQuery instance.";
@@ -84,7 +84,8 @@ module CZ {
                 this.itemRemoveHandler = (item, idx) => { };
 
                 // Apply jQueryUI sortable widget.
-                this.container.sortable(listBoxInfo.sortableSettings);
+                if (listBoxInfo.sortableSettings)
+                    this.container.sortable(listBoxInfo.sortableSettings);
             }
 
             /**
@@ -164,15 +165,15 @@ module CZ {
          */
         export class ListItemBase {
             public closeButton: JQuery;
-            
+
             public parent: ListBoxBase;
             public container: JQuery;
             public data: any;
-            
+
             constructor(parent: ListBoxBase,
-                        container: JQuery,
-                        uiMap: IListItemBaseUIMap,
-                        context: any) {
+                container: JQuery,
+                uiMap: IListItemBaseUIMap,
+                context: any) {
 
                 if (!(container instanceof jQuery)) {
                     throw "Container parameter is invalid! It should be jQuery instance.";
@@ -188,11 +189,12 @@ module CZ {
                 // Setup close button of a listitem.
                 this.closeButton = this.container.find(uiMap.closeButton);
 
-                if (!this.closeButton.length) {
+                /*if (!this.closeButton.length) {
                     throw "Close button is not found in a given UI map.";
+                }*/ // Commented by Dmitry Voytsekhovskiy - The close button is not a mandatory for an item.
+                if (this.closeButton.length) {
+                    this.closeButton.click(event => this.close());
                 }
-
-                this.closeButton.click(event => this.close());
 
                 // Append listitems container to a listbox.
                 this.parent.container.append(this.container);

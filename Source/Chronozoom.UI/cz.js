@@ -152,6 +152,7 @@
                 ext: 'wav'
             }
         ];
+        Settings.tourDefaultTransitionTime = 10;
         Settings.seadragonServiceURL = "http://api.zoom.it/v1/content/?url=";
         Settings.seadragonImagePath = "/images/seadragonControls/";
         Settings.seadragonMaxConnectionAttempts = 3;
@@ -165,6 +166,308 @@
         Settings.signinUrlYahoo = "";
     })(CZ.Settings || (CZ.Settings = {}));
     var Settings = CZ.Settings;
+})(CZ || (CZ = {}));
+var __extends = this.__extends || function (d, b) {
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var FormBase = (function () {
+            function FormBase(container, formInfo) {
+                var _this = this;
+                if(!(container instanceof jQuery && container.is("div"))) {
+                    throw "Container parameter is invalid! It should be jQuery instance of DIV.";
+                }
+                this.container = container;
+                this.prevForm = formInfo.prevForm;
+                this.activationSource = formInfo.activationSource;
+                this.navButton = this.container.find(formInfo.navButton);
+                this.closeButton = this.container.find(formInfo.closeButton);
+                this.titleTextblock = this.container.find(formInfo.titleTextblock);
+                if(this.prevForm) {
+                    this.navButton.show();
+                } else {
+                    this.navButton.hide();
+                }
+                this.navButton.off();
+                this.closeButton.off();
+                this.navButton.click(function (event) {
+                    _this.back();
+                });
+                this.closeButton.click(function (event) {
+                    _this.close();
+                });
+            }
+            FormBase.prototype.show = function () {
+                var args = [];
+                for (var _i = 0; _i < (arguments.length - 0); _i++) {
+                    args[_i] = arguments[_i + 0];
+                }
+                this.container.show.apply(this.container, args);
+            };
+            FormBase.prototype.close = function () {
+                var args = [];
+                for (var _i = 0; _i < (arguments.length - 0); _i++) {
+                    args[_i] = arguments[_i + 0];
+                }
+                this.container.hide.apply(this.container, args);
+            };
+            FormBase.prototype.back = function () {
+                this.close();
+                this.prevForm.show();
+            };
+            return FormBase;
+        })();
+        UI.FormBase = FormBase;        
+        var FormUpdateEntity = (function (_super) {
+            __extends(FormUpdateEntity, _super);
+            function FormUpdateEntity(container, formInfo) {
+                var _this = this;
+                        _super.call(this, container, formInfo);
+                this.saveButton = this.container.find(formInfo.saveButton);
+                this.container.keypress(function (event) {
+                    if(event.keyCode === 13) {
+                        _this.saveButton.trigger("click");
+                    }
+                });
+            }
+            return FormUpdateEntity;
+        })(FormBase);
+        UI.FormUpdateEntity = FormUpdateEntity;        
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UrlNav) {
+        UrlNav.navigationAnchor = null;
+        function vcelementToNavString(vcElem, vp) {
+            var nav = '';
+            var el = vcElem;
+            while(vcElem) {
+                if(vcElem.type) {
+                    nav = '/' + vcElem.id + nav;
+                }
+                vcElem = vcElem.parent;
+            }
+            if(nav && nav !== '' && vp) {
+                var rx = (vp.visible.centerX - (el.x + el.width / 2)) / el.width;
+                var ry = (vp.visible.centerY - (el.y + el.height / 2)) / el.height;
+                var rw = vp.widthScreenToVirtual(vp.width) / el.width;
+                var rh = vp.heightScreenToVirtual(vp.height) / el.height;
+                var URL = getURL();
+                nav += '@x=' + rx + "&y=" + ry + "&w=" + rw + "&h=" + rh;
+                if(typeof URL.hash.params != 'undefined') {
+                    if(typeof URL.hash.params['tour'] != 'undefined') {
+                        nav += "&tour=" + URL.hash.params["tour"];
+                    }
+                    if(typeof URL.hash.params['bookmark'] != 'undefined') {
+                        nav += "&bookmark=" + URL.hash.params["bookmark"];
+                    }
+                }
+            }
+            return nav;
+        }
+        UrlNav.vcelementToNavString = vcelementToNavString;
+        function navStringTovcElement(nav, root) {
+            if(!nav) {
+                return null;
+            }
+            try  {
+                var k = nav.indexOf('@');
+                if(k >= 0) {
+                    nav = nav.substr(0, k);
+                }
+                var path = nav.split('/');
+                if(path.length <= 1) {
+                    return null;
+                }
+                var lookup = function (id, root) {
+                    if(typeof root.type !== 'undefined' && root.type === 'infodot') {
+                        return CZ.VCContent.getContentItem(root, id);
+                    }
+                    if(!root.children || root.children.length == 0) {
+                        return null;
+                    }
+                    var isTyped = false;
+                    for(var i = 0; i < root.children.length; i++) {
+                        var child = root.children[i];
+                        if(!isTyped) {
+                            if(child.type) {
+                                isTyped = true;
+                            }
+                        }
+                        if(isTyped) {
+                            if(child.id === id) {
+                                return child;
+                            }
+                        }
+                    }
+                    if(isTyped) {
+                        return null;
+                    }
+                    for(var i = 0; i < root.children.length; i++) {
+                        var found = lookup(id, root.children[i]);
+                        if(found) {
+                            return found;
+                        }
+                    }
+                    return null;
+                };
+                for(var n = 1; n < path.length; n++) {
+                    var id = path[n];
+                    root = lookup(id, root);
+                    if(root == null) {
+                        return null;
+                    }
+                }
+                return root;
+            } catch (e) {
+                return root;
+            }
+        }
+        UrlNav.navStringTovcElement = navStringTovcElement;
+        function navStringToVisible(nav, vc) {
+            var k = nav.indexOf('@');
+            var w = 1.05;
+            var h = 1.05;
+            var x = 0;
+            var y = 0;
+            if(k >= 0) {
+                if(k == 0) {
+                    return null;
+                }
+                var s = nav.substr(k + 1);
+                nav = nav.substr(0, k);
+                var parts = s.split('&');
+                for(var i = 0; i < parts.length; i++) {
+                    var start = parts[i].substring(0, 2);
+                    if(start == "x=") {
+                        x = parseFloat(parts[i].substring(2));
+                    } else if(start == "y=") {
+                        y = parseFloat(parts[i].substring(2));
+                    } else if(start == "w=") {
+                        w = parseFloat(parts[i].substring(2));
+                    } else if(start == "h=") {
+                        h = parseFloat(parts[i].substring(2));
+                    }
+                }
+            }
+            var element = navStringTovcElement(nav, vc.virtualCanvas("getLayerContent"));
+            if(!element) {
+                return null;
+            }
+            var vp = vc.virtualCanvas("getViewport");
+            var xc = element.x + element.width / 2 + x * element.width;
+            var yc = element.y + element.height / 2 + y * element.height;
+            var wc = w * element.width;
+            var hc = h * element.height;
+            var ar0 = vp.width / vp.height;
+            var ar1 = wc / hc;
+            if(ar0 > ar1) {
+                wc = ar0 * hc;
+            }
+            var scale = wc / vp.width;
+            var vis2 = {
+                centerX: xc,
+                centerY: yc,
+                scale: scale
+            };
+            return vis2;
+        }
+        UrlNav.navStringToVisible = navStringToVisible;
+        function getURL() {
+            var url;
+            var loc = document.location.toString().split("#");
+            var path = loc[0];
+            var hash = loc[1];
+            var expr = new RegExp("^(https|http):\/\/([a-z_0-9\-.]{4,})(?:\:([0-9]{1,5}))?(?:\/*)([a-z\-_0-9\/.%]*)[?]?([a-z\-_0-9=&]*)$", "i");
+            var result = path.match(expr);
+            if(result != null) {
+                url = {
+                    protocol: result[1],
+                    host: result[2],
+                    port: result[3]
+                };
+                if(result[4] != "") {
+                    url.path = result[4].split("/");
+                    if(url.path.length >= 1 && url.path[0].length > 0 && url.path[0] !== "cz.html") {
+                        url.superCollectionName = url.path[0];
+                        url.collectionName = url.superCollectionName;
+                    }
+                    if(url.path.length >= 2 && url.path[1].length > 0) {
+                        url.collectionName = url.path[1];
+                    }
+                    if(url.path.length >= 3 && url.path[url.path.length - 1].length > 0) {
+                        url.content = url.path[url.path.length - 1];
+                    }
+                }
+                if(result[5] != "") {
+                    url.params = [];
+                    var getParams = result[5].split("&");
+                    for(var i = 0; i < getParams.length; i++) {
+                        var pair = getParams[i].split("=");
+                        url.params[pair[0]] = pair[1];
+                    }
+                }
+            } else {
+                window.location.href = "fallback.html";
+            }
+            url.hash = {
+                params: [],
+                path: ""
+            };
+            if(typeof hash != 'undefined') {
+                var h = hash.split("@");
+                url.hash = {
+                    path: h[0]
+                };
+                if(h.length > 1 && h[1] != "") {
+                    var hashParams = new String(h[1]).split("&");
+                    url.hash.params = [];
+                    for(var i = 0; i < hashParams.length; i++) {
+                        var pair = hashParams[i].split("=");
+                        url.hash.params[pair[0]] = pair[1];
+                    }
+                }
+            }
+            return url;
+        }
+        UrlNav.getURL = getURL;
+        function setURL(url, reload) {
+            if(reload == null) {
+                reload = false;
+            } else {
+                reload = true;
+            }
+            if(url == null) {
+                window.location.href = "fallback.html";
+            }
+            var path = url.protocol + "://" + url.host + ((url.port != "") ? (":" + url.port) : ("")) + "/" + (url.path === undefined ? "" : url.path.join('/'));
+            var params = new Array();
+            for(var key in url.params) {
+                params.push(key + "=" + url.params[key]);
+            }
+            path += ((url.params != null) ? ("?" + params.join("&")) : (""));
+            var hash = url.hash.path;
+            var hash_params = [];
+            for(var key in url.hash.params) {
+                hash_params.push(key + "=" + url.hash.params[key]);
+            }
+            hash += ("@" + hash_params.join("&"));
+            var loc = path + "#" + hash;
+            if(reload == true) {
+                window.location.href = loc;
+            } else {
+                window.location.hash = hash;
+            }
+        }
+        UrlNav.setURL = setURL;
+    })(CZ.UrlNav || (CZ.UrlNav = {}));
+    var UrlNav = CZ.UrlNav;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
@@ -1963,11 +2266,14 @@ var CZ;
             for(var i = 0; i < citems.length; i++) {
                 if(citems[i].id == cid) {
                     return {
+                        id: cid,
                         x: citems[i].x,
                         y: citems[i].y,
                         width: citems[i].width,
                         height: citems[i].height,
-                        parent: infodot
+                        parent: infodot,
+                        type: "contentItem",
+                        vc: infodot.vc
                     };
                 }
             }
@@ -2069,950 +2375,6 @@ var CZ;
         }
     })(CZ.VCContent || (CZ.VCContent = {}));
     var VCContent = CZ.VCContent;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (UrlNav) {
-        UrlNav.navigationAnchor = null;
-        function vcelementToNavString(vcElem, vp) {
-            var nav = '';
-            var el = vcElem;
-            while(vcElem) {
-                if(vcElem.type) {
-                    nav = '/' + vcElem.id + nav;
-                }
-                vcElem = vcElem.parent;
-            }
-            if(nav && nav !== '' && vp) {
-                var rx = (vp.visible.centerX - (el.x + el.width / 2)) / el.width;
-                var ry = (vp.visible.centerY - (el.y + el.height / 2)) / el.height;
-                var rw = vp.widthScreenToVirtual(vp.width) / el.width;
-                var rh = vp.heightScreenToVirtual(vp.height) / el.height;
-                var URL = getURL();
-                nav += '@x=' + rx + "&y=" + ry + "&w=" + rw + "&h=" + rh;
-                if(typeof URL.hash.params != 'undefined') {
-                    if(typeof URL.hash.params['tour'] != 'undefined') {
-                        nav += "&tour=" + URL.hash.params["tour"];
-                    }
-                    if(typeof URL.hash.params['bookmark'] != 'undefined') {
-                        nav += "&bookmark=" + URL.hash.params["bookmark"];
-                    }
-                }
-            }
-            return nav;
-        }
-        UrlNav.vcelementToNavString = vcelementToNavString;
-        function navStringTovcElement(nav, root) {
-            if(!nav) {
-                return null;
-            }
-            try  {
-                var k = nav.indexOf('@');
-                if(k >= 0) {
-                    nav = nav.substr(0, k);
-                }
-                var path = nav.split('/');
-                if(path.length <= 1) {
-                    return null;
-                }
-                var lookup = function (id, root) {
-                    if(typeof root.type !== 'undefined' && root.type === 'infodot') {
-                        return CZ.VCContent.getContentItem(root, id);
-                    }
-                    if(!root.children || root.children.length == 0) {
-                        return null;
-                    }
-                    var isTyped = false;
-                    for(var i = 0; i < root.children.length; i++) {
-                        var child = root.children[i];
-                        if(!isTyped) {
-                            if(child.type) {
-                                isTyped = true;
-                            }
-                        }
-                        if(isTyped) {
-                            if(child.id === id) {
-                                return child;
-                            }
-                        }
-                    }
-                    if(isTyped) {
-                        return null;
-                    }
-                    for(var i = 0; i < root.children.length; i++) {
-                        var found = lookup(id, root.children[i]);
-                        if(found) {
-                            return found;
-                        }
-                    }
-                    return null;
-                };
-                for(var n = 1; n < path.length; n++) {
-                    var id = path[n];
-                    root = lookup(id, root);
-                    if(root == null) {
-                        return null;
-                    }
-                }
-                return root;
-            } catch (e) {
-                return root;
-            }
-        }
-        UrlNav.navStringTovcElement = navStringTovcElement;
-        function navStringToVisible(nav, vc) {
-            var k = nav.indexOf('@');
-            var w = 1.05;
-            var h = 1.05;
-            var x = 0;
-            var y = 0;
-            if(k >= 0) {
-                if(k == 0) {
-                    return null;
-                }
-                var s = nav.substr(k + 1);
-                nav = nav.substr(0, k);
-                var parts = s.split('&');
-                for(var i = 0; i < parts.length; i++) {
-                    var start = parts[i].substring(0, 2);
-                    if(start == "x=") {
-                        x = parseFloat(parts[i].substring(2));
-                    } else if(start == "y=") {
-                        y = parseFloat(parts[i].substring(2));
-                    } else if(start == "w=") {
-                        w = parseFloat(parts[i].substring(2));
-                    } else if(start == "h=") {
-                        h = parseFloat(parts[i].substring(2));
-                    }
-                }
-            }
-            var element = navStringTovcElement(nav, vc.virtualCanvas("getLayerContent"));
-            if(!element) {
-                return null;
-            }
-            var vp = vc.virtualCanvas("getViewport");
-            var xc = element.x + element.width / 2 + x * element.width;
-            var yc = element.y + element.height / 2 + y * element.height;
-            var wc = w * element.width;
-            var hc = h * element.height;
-            var ar0 = vp.width / vp.height;
-            var ar1 = wc / hc;
-            if(ar0 > ar1) {
-                wc = ar0 * hc;
-            }
-            var scale = wc / vp.width;
-            var vis2 = {
-                centerX: xc,
-                centerY: yc,
-                scale: scale
-            };
-            return vis2;
-        }
-        UrlNav.navStringToVisible = navStringToVisible;
-        function getURL() {
-            var url;
-            var loc = document.location.toString().split("#");
-            var path = loc[0];
-            var hash = loc[1];
-            var expr = new RegExp("^(https|http):\/\/([a-z_0-9\-.]{4,})(?:\:([0-9]{1,5}))?(?:\/*)([a-z\-_0-9\/.%]*)[?]?([a-z\-_0-9=&]*)$", "i");
-            var result = path.match(expr);
-            if(result != null) {
-                url = {
-                    protocol: result[1],
-                    host: result[2],
-                    port: result[3]
-                };
-                if(result[4] != "") {
-                    url.path = result[4].split("/");
-                    if(url.path.length >= 1 && url.path[0].length > 0 && url.path[0] !== "cz.html") {
-                        url.superCollectionName = url.path[0];
-                        url.collectionName = url.superCollectionName;
-                    }
-                    if(url.path.length >= 2 && url.path[1].length > 0) {
-                        url.collectionName = url.path[1];
-                    }
-                    if(url.path.length >= 3 && url.path[url.path.length - 1].length > 0) {
-                        url.content = url.path[url.path.length - 1];
-                    }
-                }
-                if(result[5] != "") {
-                    url.params = [];
-                    var getParams = result[5].split("&");
-                    for(var i = 0; i < getParams.length; i++) {
-                        var pair = getParams[i].split("=");
-                        url.params[pair[0]] = pair[1];
-                    }
-                }
-            } else {
-                window.location.href = "fallback.html";
-            }
-            url.hash = {
-                params: [],
-                path: ""
-            };
-            if(typeof hash != 'undefined') {
-                var h = hash.split("@");
-                url.hash = {
-                    path: h[0]
-                };
-                if(h.length > 1 && h[1] != "") {
-                    var hashParams = new String(h[1]).split("&");
-                    url.hash.params = [];
-                    for(var i = 0; i < hashParams.length; i++) {
-                        var pair = hashParams[i].split("=");
-                        url.hash.params[pair[0]] = pair[1];
-                    }
-                }
-            }
-            return url;
-        }
-        UrlNav.getURL = getURL;
-        function setURL(url, reload) {
-            if(reload == null) {
-                reload = false;
-            } else {
-                reload = true;
-            }
-            if(url == null) {
-                window.location.href = "fallback.html";
-            }
-            var path = url.protocol + "://" + url.host + ((url.port != "") ? (":" + url.port) : ("")) + "/" + (url.path === undefined ? "" : url.path.join('/'));
-            var params = new Array();
-            for(var key in url.params) {
-                params.push(key + "=" + url.params[key]);
-            }
-            path += ((url.params != null) ? ("?" + params.join("&")) : (""));
-            var hash = url.hash.path;
-            var hash_params = [];
-            for(var key in url.hash.params) {
-                hash_params.push(key + "=" + url.hash.params[key]);
-            }
-            hash += ("@" + hash_params.join("&"));
-            var loc = path + "#" + hash;
-            if(reload == true) {
-                window.location.href = loc;
-            } else {
-                window.location.hash = hash;
-            }
-        }
-        UrlNav.setURL = setURL;
-    })(CZ.UrlNav || (CZ.UrlNav = {}));
-    var UrlNav = CZ.UrlNav;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (Tours) {
-        Tours.isTourWindowVisible = false;
-        Tours.isBookmarksWindowVisible = false;
-        Tours.isBookmarksWindowExpanded = true;
-        Tours.isBookmarksTextShown = true;
-        Tours.isNarrationOn = true;
-        Tours.tours;
-        Tours.tour;
-        Tours.tourBookmarkTransitionCompleted;
-        Tours.tourBookmarkTransitionInterrupted;
-        Tours.pauseTourAtAnyAnimation = false;
-        Tours.bookmarkAnimation;
-        var isToursDebugEnabled = false;
-        var TourBookmark = (function () {
-            function TourBookmark(url, caption, lapseTime, text) {
-                this.url = url;
-                this.caption = caption;
-                this.lapseTime = lapseTime;
-                this.text = text;
-                this.duration = undefined;
-                this.number = 0;
-                this.elapsed = 0;
-                if(this.text === null) {
-                    this.text = "";
-                }
-            }
-            return TourBookmark;
-        })();        
-        function getBookmarkVisible(bookmark) {
-            return CZ.UrlNav.navStringToVisible(bookmark.url, CZ.Common.vc);
-        }
-        Tours.getBookmarkVisible = getBookmarkVisible;
-        var Tour = (function () {
-            function Tour(title, bookmarks, zoomTo, vc, category, audio, sequenceNum) {
-                this.title = title;
-                this.bookmarks = bookmarks;
-                this.zoomTo = zoomTo;
-                this.vc = vc;
-                this.category = category;
-                this.audio = audio;
-                this.sequenceNum = sequenceNum;
-                this.tour_BookmarkStarted = [];
-                this.tour_BookmarkFinished = [];
-                this.tour_TourStarted = [];
-                this.tour_TourFinished = [];
-                this.state = 'pause';
-                this.currentPlace = {
-                    type: 'goto',
-                    bookmark: 0,
-                    startTime: null,
-                    animationId: null
-                };
-                this.isTourPlayRequested = false;
-                this.isAudioLoaded = false;
-                this.isAudioEnabled = false;
-                if(!bookmarks || bookmarks.length == 0) {
-                    throw "Tour has no bookmarks";
-                }
-                var self = this;
-                bookmarks.sort(function (b1, b2) {
-                    return b1.lapseTime - b2.lapseTime;
-                });
-                for(var i = 1; i < bookmarks.length; i++) {
-                    bookmarks[i - 1].duration = bookmarks[i].lapseTime - bookmarks[i - 1].lapseTime;
-                    bookmarks[i - 1].number = i;
-                }
-                bookmarks[bookmarks.length - 1].duration = 10;
-                bookmarks[bookmarks.length - 1].number = bookmarks.length;
-                self.toggleAudio = function toggleAudio(isOn) {
-                    if(isOn) {
-                        self.isAudioEnabled = true;
-                    } else {
-                        self.isAudioEnabled = false;
-                    }
-                };
-                self.ReinitializeAudio = function ReinitializeAudio() {
-                    if(self.audioElement) {
-                        self.audioElement.pause();
-                    }
-                    self.audioElement = undefined;
-                    self.isAudioLoaded = false;
-                    self.audioElement = document.createElement('audio');
-                    self.audioElement.addEventListener("loadedmetadata", function () {
-                        if(self.audioElement.duration != Infinity) {
-                            self.bookmarks[self.bookmarks.length - 1].duration = self.audioElement.duration - self.bookmarks[self.bookmarks.length - 1].lapseTime;
-                        }
-                        if(isToursDebugEnabled && window.console && console.log("Tour " + self.title + " metadata loaded (readystate 1)")) {
-                            ;
-                        }
-                    });
-                    self.audioElement.addEventListener("canplaythrough", function () {
-                        self.isAudioLoaded = true;
-                        if(isToursDebugEnabled && window.console && console.log("Tour " + self.title + " readystate 4")) {
-                            ;
-                        }
-                    });
-                    self.audioElement.addEventListener("progress", function () {
-                        if(self.audioElement && self.audioElement.buffered.length > 0) {
-                            if(isToursDebugEnabled && window.console && console.log("Tour " + self.title + " downloaded " + (self.audio.buffered.end(self.audio.buffered.length - 1) / self.audio.duration))) {
-                                ;
-                            }
-                        }
-                    });
-                    self.audioElement.controls = false;
-                    self.audioElement.autoplay = false;
-                    self.audioElement.loop = false;
-                    self.audioElement.volume = 1;
-                    self.audioElement.preload = "none";
-                    var blobPrefix = self.audio.substring(0, self.audio.length - 3);
-                    for(var i = 0; i < CZ.Settings.toursAudioFormats.length; i++) {
-                        var audioSource = document.createElement("Source");
-                        audioSource.setAttribute("src", blobPrefix + CZ.Settings.toursAudioFormats[i].ext);
-                        self.audioElement.appendChild(audioSource);
-                    }
-                    self.audioElement.load();
-                    if(isToursDebugEnabled && window.console && console.log("Loading of tour " + self.title + " is queued")) {
-                        ;
-                    }
-                };
-                self.onBookmarkIsOver = function onBookmarkIsOver(goBack) {
-                    self.bookmarks[self.currentPlace.bookmark].elapsed = 0;
-                    if((self.currentPlace.bookmark == self.bookmarks.length - 1) && !goBack) {
-                        self.state = 'pause';
-                        self.currentPlace = {
-                            type: 'goto',
-                            bookmark: 0
-                        };
-                        self.RaiseTourFinished();
-                    } else {
-                        self.goToTheNextBookmark(goBack);
-                    }
-                };
-                self.goToTheNextBookmark = function goToTheNextBookmark(goBack) {
-                    var newBookmark = self.currentPlace.bookmark;
-                    var oldBookmark = newBookmark;
-                    if(goBack) {
-                        newBookmark = Math.max(0, newBookmark - 1);
-                    } else {
-                        newBookmark = Math.min(self.bookmarks.length - 1, newBookmark + 1);
-                    }
-                    self.RaiseBookmarkFinished(oldBookmark);
-                    self.currentPlace = {
-                        type: 'goto',
-                        bookmark: newBookmark
-                    };
-                    var bookmark = self.bookmarks[self.currentPlace.bookmark];
-                    if(newBookmark != 0) {
-                        self.RaiseBookmarkStarted(bookmark);
-                        if(self.isAudioEnabled && self.state === 'play' && self.isAudioLoaded == true) {
-                            self.startBookmarkAudio(bookmark);
-                        }
-                    }
-                    if(self.state != 'pause' && self.isAudioLoaded == true) {
-                        self.setTimer(bookmark);
-                    }
-                    if(isToursDebugEnabled && window.console && console.log("Transitioning to the bm index " + newBookmark)) {
-                        ;
-                    }
-                    self.currentPlace.animationId = self.zoomTo(getBookmarkVisible(bookmark), self.onGoToSuccess, self.onGoToFailure, bookmark.url);
-                };
-                self.startBookmarkAudio = function startBookmarkAudio(bookmark) {
-                    if(isToursDebugEnabled && window.console && console.log("playing source: " + self.audio.currentSrc)) {
-                        ;
-                    }
-                    self.audioElement.pause();
-                    try  {
-                        self.audioElement.currentTime = bookmark.lapseTime + bookmark.elapsed;
-                        if(isToursDebugEnabled && window.console && console.log("audio currentTime is set to " + (bookmark.lapseTime + bookmark.elapsed))) {
-                            ;
-                        }
-                    } catch (ex) {
-                        if(window.console && console.error("currentTime assignment: " + ex)) {
-                            ;
-                        }
-                    }
-                    if(isToursDebugEnabled && window.console && console.log("audio element is forced to play")) {
-                        ;
-                    }
-                    self.audioElement.play();
-                };
-                self.setTimer = function setTimer(bookmark) {
-                    if(self.timerOnBookmarkIsOver) {
-                        clearTimeout(self.timerOnBookmarkIsOver);
-                    }
-                    var duration = bookmark.duration;
-                    if(bookmark.elapsed != 0) {
-                        duration = Math.max(duration - bookmark.elapsed, 0);
-                    }
-                    self.currentPlace.startTime = new Date().getTime();
-                    if(isToursDebugEnabled && window.console && console.log("transition to next bookmark will be in " + duration + " seconds")) {
-                        ;
-                    }
-                    self.timerOnBookmarkIsOver = setTimeout(self.onBookmarkIsOver, duration * 1000);
-                };
-                self.onGoToSuccess = function onGoToSuccess(animationId) {
-                    if(!self.currentPlace || self.currentPlace.animationId == undefined || self.currentPlace.animationId != animationId) {
-                        return;
-                    }
-                    var curURL = CZ.UrlNav.getURL();
-                    if(typeof curURL.hash.params == 'undefined') {
-                        curURL.hash.params = [];
-                    }
-                    curURL.hash.params["tour"] = Tours.tour.sequenceNum;
-                    CZ.Common.hashHandle = false;
-                    CZ.UrlNav.setURL(curURL);
-                    if(isToursDebugEnabled && window.console && console.log("reached the bookmark index " + self.currentPlace.bookmark)) {
-                        ;
-                    }
-                    self.currentPlace = {
-                        type: 'bookmark',
-                        bookmark: self.currentPlace.bookmark
-                    };
-                    if(self.currentPlace.bookmark == 0) {
-                        var bookmark = self.bookmarks[self.currentPlace.bookmark];
-                        self.RaiseBookmarkStarted(bookmark);
-                        if(self.state != 'pause') {
-                            if(self.isAudioLoaded != true) {
-                                tourPause();
-                            } else {
-                                self.setTimer(bookmark);
-                                if(self.isAudioEnabled) {
-                                    self.startBookmarkAudio(bookmark);
-                                }
-                            }
-                        }
-                    }
-                };
-                self.onGoToFailure = function onGoToFailure(animationId) {
-                    if(!self.currentPlace || self.currentPlace.animationId == undefined || self.currentPlace.animationId != animationId) {
-                        return;
-                    }
-                    self.pause();
-                    if(isToursDebugEnabled && window.console && console.log("tour interrupted by user during transition")) {
-                        ;
-                    }
-                };
-                self.play = function play() {
-                    if(self.state !== 'pause') {
-                        return;
-                    }
-                    if(isToursDebugEnabled && window.console && console.log("tour playback activated")) {
-                        ;
-                    }
-                    self.state = 'play';
-                    var visible = self.vc.virtualCanvas("getViewport").visible;
-                    if(self.currentPlace != null && self.currentPlace.bookmark != null && CZ.Common.compareVisibles(visible, getBookmarkVisible(self.bookmarks[self.currentPlace.bookmark]))) {
-                        self.currentPlace = {
-                            type: 'bookmark',
-                            bookmark: self.currentPlace.bookmark
-                        };
-                    } else {
-                        self.currentPlace = {
-                            type: 'goto',
-                            bookmark: self.currentPlace.bookmark
-                        };
-                    }
-                    var bookmark = self.bookmarks[self.currentPlace.bookmark];
-                    var isInTransitionToFirstBookmark = (self.currentPlace.bookmark == 0 && self.currentPlace.type == 'goto');
-                    if(self.currentPlace.type == 'bookmark' || self.currentPlace.bookmark != 0) {
-                        self.RaiseBookmarkStarted(bookmark);
-                        if(self.isAudioLoaded == true) {
-                            self.setTimer(bookmark);
-                            if(self.isAudioEnabled) {
-                                self.startBookmarkAudio(bookmark);
-                            }
-                        }
-                    }
-                    self.currentPlace.animationId = self.zoomTo(getBookmarkVisible(bookmark), self.onGoToSuccess, self.onGoToFailure, bookmark.url);
-                    if(self.currentPlace.bookmark === 0 && isInTransitionToFirstBookmark) {
-                        self.RaiseTourStarted();
-                    }
-                    var curURL = CZ.UrlNav.getURL();
-                    if(typeof curURL.hash.params == 'undefined') {
-                        curURL.hash.params = new Array();
-                    }
-                    if(typeof curURL.hash.params["tour"] == 'undefined') {
-                        curURL.hash.params["tour"] = Tours.tour.sequenceNum;
-                        CZ.Common.hashHandle = false;
-                        CZ.UrlNav.setURL(curURL);
-                    }
-                };
-                self.pause = function pause() {
-                    if(self.state !== 'play') {
-                        return;
-                    }
-                    if(isToursDebugEnabled && window.console && console.log("tour playback paused")) {
-                        ;
-                    }
-                    if(self.isAudioEnabled && self.isTourPlayRequested) {
-                        self.isTourPlayRequested = false;
-                    }
-                    if(self.timerOnBookmarkIsOver) {
-                        clearTimeout(self.timerOnBookmarkIsOver);
-                        self.timerOnBookmarkIsOver = undefined;
-                    }
-                    self.state = 'pause';
-                    if(self.isAudioEnabled) {
-                        self.audioElement.pause();
-                        if(isToursDebugEnabled && window.console && console.log("audio element is forced to pause")) {
-                            ;
-                        }
-                    }
-                    var bookmark = self.bookmarks[self.currentPlace.bookmark];
-                    if(self.currentPlace.startTime) {
-                        bookmark.elapsed += (new Date().getTime() - self.currentPlace.startTime) / 1000;
-                    }
-                };
-                self.next = function next() {
-                    if(self.currentPlace.bookmark != self.bookmarks.length - 1) {
-                        if(self.state === 'play') {
-                            if(self.timerOnBookmarkIsOver) {
-                                clearTimeout(self.timerOnBookmarkIsOver);
-                            }
-                            self.timerOnBookmarkIsOver = undefined;
-                        }
-                        self.onBookmarkIsOver(false);
-                    }
-                };
-                self.prev = function prev() {
-                    if(self.currentPlace.bookmark == 0) {
-                        return;
-                    }
-                    if(self.state === 'play') {
-                        if(self.timerOnBookmarkIsOver) {
-                            clearTimeout(self.timerOnBookmarkIsOver);
-                        }
-                        self.timerOnBookmarkIsOver = undefined;
-                    }
-                    self.onBookmarkIsOver(true);
-                };
-                self.RaiseBookmarkStarted = function RaiseBookmarkStarted(bookmark) {
-                    if(self.tour_BookmarkStarted.length > 0) {
-                        for(var i = 0; i < self.tour_BookmarkStarted.length; i++) {
-                            self.tour_BookmarkStarted[i](self, bookmark);
-                        }
-                    }
-                };
-                self.RaiseBookmarkFinished = function RaiseBookmarkFinished(bookmark) {
-                    if(self.tour_BookmarkFinished.length > 0) {
-                        for(var i = 0; i < self.tour_BookmarkFinished.length; i++) {
-                            self.tour_BookmarkFinished[i](self, bookmark);
-                        }
-                    }
-                };
-                self.RaiseTourStarted = function RaiseTourStarted() {
-                    if(self.tour_TourStarted.length > 0) {
-                        for(var i = 0; i < self.tour_TourStarted.length; i++) {
-                            self.tour_TourStarted[i](self);
-                        }
-                    }
-                };
-                self.RaiseTourFinished = function RaiseTourFinished() {
-                    if(self.tour_TourFinished.length > 0) {
-                        for(var i = 0; i < self.tour_TourFinished.length; i++) {
-                            self.tour_TourFinished[i](self);
-                        }
-                    }
-                };
-            }
-            return Tour;
-        })();
-        Tours.Tour = Tour;        
-        function activateTour(newTour, isAudioEnabled) {
-            if(newTour != undefined) {
-                var tourControlDiv = document.getElementById("tour_control");
-                tourControlDiv.style.display = "block";
-                Tours.tour = newTour;
-                Tours.tour.tour_TourFinished.push(function (tour) {
-                    hideBookmark(tour);
-                    tourPause();
-                    hideBookmarks();
-                });
-                Tours.tour.toggleAudio(isAudioEnabled);
-                for(var i = 0; i < Tours.tour.bookmarks.length; i++) {
-                    Tours.tour.bookmarks[i].elapsed = 0;
-                }
-                Tours.tour.currentPlace.bookmark = 0;
-                if(isAudioEnabled == true) {
-                    Tours.tour.ReinitializeAudio();
-                    Tours.tour.isAudioLoaded = true;
-                }
-                tourResume();
-            }
-        }
-        Tours.activateTour = activateTour;
-        function removeActiveTour() {
-            if(Tours.tour) {
-                tourPause();
-                Tours.tour.isTourPlayRequested = false;
-            }
-            var tourControlDiv = document.getElementById("tour_control");
-            tourControlDiv.style.display = "none";
-            if(Tours.tour) {
-                hideBookmarks();
-                $("#bookmarks .header").text("");
-                if(Tours.tour.audioElement) {
-                    Tours.tour.audioElement = undefined;
-                }
-            }
-            Tours.tour = undefined;
-        }
-        function tourPrev() {
-            if(Tours.tour != undefined) {
-                Tours.tour.prev();
-            }
-        }
-        Tours.tourPrev = tourPrev;
-        function tourNext() {
-            if(Tours.tour != undefined) {
-                Tours.tour.next();
-            }
-        }
-        Tours.tourNext = tourNext;
-        function tourPause() {
-            if(Tours.tour != undefined) {
-                $("#tour_playpause").attr("src", "/images/tour_play_off.jpg");
-                Tours.tour.pause();
-                CZ.Common.controller.stopAnimation();
-                Tours.tour.tourBookmarkTransitionInterrupted = undefined;
-                Tours.tour.tourBookmarkTransitionCompleted = undefined;
-            }
-        }
-        Tours.tourPause = tourPause;
-        function tourResume() {
-            $("#tour_playpause").attr("src", "/images/tour_pause_off.jpg");
-            Tours.tour.play();
-        }
-        function tourPlayPause() {
-            if(Tours.tour != undefined) {
-                if(Tours.tour.state == "pause") {
-                    tourResume();
-                } else if(Tours.tour.state == "play") {
-                    tourPause();
-                }
-            }
-        }
-        Tours.tourPlayPause = tourPlayPause;
-        function tourAbort() {
-            removeActiveTour();
-            $("#bookmarks").hide();
-            Tours.isBookmarksWindowVisible = false;
-            var curURL = CZ.UrlNav.getURL();
-            delete curURL.hash.params["tour"];
-            delete curURL.hash.params["bookmark"];
-            CZ.UrlNav.setURL(curURL);
-        }
-        Tours.tourAbort = tourAbort;
-        function initializeToursUI() {
-            $("#tours").hide();
-            hideBookmarks();
-        }
-        Tours.initializeToursUI = initializeToursUI;
-        function initializeToursContent() {
-            var toursUI = $('#tours-content');
-            Tours.tours.sort(function (u, v) {
-                return u.sequenceNum - v.sequenceNum;
-            });
-            var category = null;
-            var categoryContent;
-            for(var i = 0; i < Tours.tours.length; i++) {
-                var tour = Tours.tours[i];
-                tour.tour_BookmarkStarted.push(function (t, bookmark) {
-                    showBookmark(t, bookmark);
-                });
-                tour.tour_BookmarkFinished.push(function (t, bookmark) {
-                    hideBookmark(t);
-                });
-                if(tour.category !== category) {
-                    var cat = $("<div></div>", {
-                        class: "category",
-                        text: tour.category
-                    }).appendTo(toursUI);
-                    var img = $("<img></img>", {
-                        class: "collapseButton",
-                        src: "/images/collapse-down.png"
-                    }).appendTo(cat);
-                    if(i == 0) {
-                        cat.removeClass('category').addClass('categorySelected');
-                        (img[0]).src = "/images/collapse-up.png";
-                    }
-                    categoryContent = $('<div></div>', {
-                        class: "itemContainer"
-                    }).appendTo(toursUI);
-                    category = tour.category;
-                }
-                $("<div></div>", {
-                    class: "item",
-                    tour: i,
-                    text: tour.title,
-                    click: function () {
-                        removeActiveTour();
-                        $("#tours").hide('slide', {
-                        }, 'slow');
-                        $(".tour-icon").removeClass("active");
-                        Tours.isTourWindowVisible = false;
-                        var mytour = Tours.tours[this.getAttribute("tour")];
-                        activateTour(mytour, Tours.isNarrationOn);
-                        $(".touritem-selected").removeClass("touritem-selected", "slow");
-                        $(this).addClass("touritem-selected", "slow");
-                    }
-                }).appendTo(categoryContent);
-            }
-            ($)("#tours-content").accordion({
-                collapsible: true,
-                heightStyle: "content",
-                beforeActivate: function (event, ui) {
-                    if(ui.newHeader) {
-                        ui.newHeader.removeClass('category');
-                        ui.newHeader.addClass('categorySelected');
-                        var img = ($(".collapseButton", ui.newHeader)[0]);
-                        if(img) {
-                            img.src = "/images/collapse-up.png";
-                        }
-                    }
-                    if(ui.oldHeader) {
-                        ui.oldHeader.removeClass('categorySelected');
-                        ui.oldHeader.addClass('category');
-                        var img = ($(".collapseButton", ui.oldHeader)[0]);
-                        if(img) {
-                            img.src = "/images/collapse-down.png";
-                        }
-                    }
-                }
-            });
-        }
-        Tours.initializeToursContent = initializeToursContent;
-        function hideBookmark(tour) {
-            if(Tours.isBookmarksWindowExpanded && Tours.isBookmarksTextShown) {
-                if(Tours.bookmarkAnimation) {
-                    Tours.bookmarkAnimation.stop(true, true);
-                }
-                Tours.bookmarkAnimation = $("#bookmarks .slideText").hide("drop", {
-                }, 'slow', function () {
-                    Tours.bookmarkAnimation = undefined;
-                });
-                $("#bookmarks .slideHeader").text("");
-                Tours.isBookmarksTextShown = false;
-            }
-        }
-        function showBookmark(tour, bookmark) {
-            if(!Tours.isBookmarksWindowVisible) {
-                Tours.isBookmarksWindowVisible = true;
-                $("#bookmarks .slideText").text(bookmark.text);
-                $("#bookmarks").show('slide', {
-                }, 'slow');
-            }
-            $("#bookmarks .header").text(tour.title);
-            $("#bookmarks .slideHeader").text(bookmark.caption);
-            $("#bookmarks .slideFooter").text(bookmark.number + '/' + tour.bookmarks.length);
-            if(Tours.isBookmarksWindowExpanded) {
-                $("#bookmarks .slideText").text(bookmark.text);
-                if(!Tours.isBookmarksTextShown) {
-                    if(Tours.bookmarkAnimation) {
-                        Tours.bookmarkAnimation.stop(true, true);
-                    }
-                    Tours.bookmarkAnimation = $("#bookmarks .slideText").show("drop", {
-                    }, 'slow', function () {
-                        Tours.bookmarkAnimation = undefined;
-                    });
-                    Tours.isBookmarksTextShown = true;
-                }
-            } else {
-                $("#bookmarks .slideText").text(bookmark.text);
-            }
-        }
-        function hideBookmarks() {
-            $("#bookmarks").hide();
-            Tours.isBookmarksWindowVisible = false;
-        }
-        function onTourClicked() {
-            if(CZ.Search.isSearchWindowVisible) {
-                CZ.Search.onSearchClicked();
-            }
-            if(Tours.isTourWindowVisible) {
-                $(".tour-icon").removeClass("active");
-                $("#tours").hide('slide', {
-                }, 'slow');
-            } else {
-                $(".tour-icon").addClass("active");
-                $("#tours").show('slide', {
-                }, 'slow');
-            }
-            Tours.isTourWindowVisible = !Tours.isTourWindowVisible;
-        }
-        Tours.onTourClicked = onTourClicked;
-        function collapseBookmarks() {
-            if(!Tours.isBookmarksWindowExpanded) {
-                return;
-            }
-            Tours.isBookmarksWindowExpanded = false;
-            $("#bookmarks .header").hide('slide', {
-            }, 'fast');
-            $("#bookmarks .slideHeader").hide('slide', {
-            }, 'fast');
-            $("#bookmarks .slideText").hide('slide', {
-            }, 'fast');
-            $("#bookmarks .slideFooter").hide('slide', {
-            }, 'fast');
-            $("#bookmarks").effect('size', {
-                to: {
-                    width: '30px'
-                }
-            }, 'fast', function () {
-                $("#bookmarks").css('width', '30px');
-            });
-            $("#bookmarksCollapse").attr("src", "/images/expand-right.png");
-        }
-        function expandBookmarks() {
-            if(Tours.isBookmarksWindowExpanded) {
-                return;
-            }
-            Tours.isBookmarksWindowExpanded = true;
-            $("#bookmarks").effect('size', {
-                to: {
-                    width: '200px',
-                    height: 'auto'
-                }
-            }, 'slow', function () {
-                $("#bookmarks").css('width', '200px');
-                $("#bookmarks").css('height', 'auto');
-                $("#bookmarks .header").show('slide', {
-                }, 'fast');
-                $("#bookmarks .slideHeader").show('slide', {
-                }, 'fast');
-                $("#bookmarks .slideText").show('slide', {
-                }, 'fast');
-                $("#bookmarks .slideFooter").show('slide', {
-                }, 'fast');
-            });
-            $("#bookmarksCollapse").attr("src", "/images/collapse-left.png");
-        }
-        function onBookmarksCollapse() {
-            if(!Tours.isBookmarksWindowExpanded) {
-                expandBookmarks();
-            } else {
-                collapseBookmarks();
-            }
-        }
-        Tours.onBookmarksCollapse = onBookmarksCollapse;
-        function onNarrationClick() {
-            if(Tours.isNarrationOn) {
-                $("#tours-narration-on").removeClass("narration-selected", "slow");
-                $("#tours-narration-off").addClass("narration-selected", "slow");
-            } else {
-                $("#tours-narration-on").addClass("narration-selected", "slow");
-                $("#tours-narration-off").removeClass("narration-selected", "slow");
-            }
-            Tours.isNarrationOn = !Tours.isNarrationOn;
-        }
-        Tours.onNarrationClick = onNarrationClick;
-        function parseTours(content) {
-            Tours.tours = new Array();
-            for(var i = 0; i < content.d.length; i++) {
-                var areBookmarksValid = true;
-                var tourString = content.d[i];
-                if((typeof tourString.bookmarks == 'undefined') || (typeof tourString.audio == 'undefined') || (tourString.audio == undefined) || (tourString.audio == null) || (typeof tourString.category == 'undefined') || (typeof tourString.name == 'undefined') || (typeof tourString.sequence == 'undefined')) {
-                    continue;
-                }
-                var tourBookmarks = new Array();
-                for(var j = 0; j < tourString.bookmarks.length; j++) {
-                    var bmString = tourString.bookmarks[j];
-                    if((typeof bmString.description == 'undefined') || (typeof bmString.lapseTime == 'undefined') || (typeof bmString.name == 'undefined') || (typeof bmString.url == 'undefined')) {
-                        areBookmarksValid = false;
-                        break;
-                    }
-                    tourBookmarks.push(new TourBookmark(bmString.url, bmString.name, bmString.lapseTime, bmString.description));
-                }
-                if(!areBookmarksValid) {
-                    continue;
-                }
-                Tours.tours.push(new Tour(tourString.name, tourBookmarks, bookmarkTransition, CZ.Common.vc, tourString.category, tourString.audio, tourString.sequence));
-            }
-        }
-        Tours.parseTours = parseTours;
-        function bookmarkTransition(visible, onCompleted, onInterrupted, bookmark) {
-            Tours.tourBookmarkTransitionCompleted = onCompleted;
-            Tours.tourBookmarkTransitionInterrupted = onInterrupted;
-            Tours.pauseTourAtAnyAnimation = false;
-            var animId = CZ.Common.setVisible(visible);
-            if(animId && bookmark) {
-                CZ.Common.setNavigationStringTo = {
-                    bookmark: bookmark,
-                    id: animId
-                };
-            }
-            return animId;
-        }
-        function loadTourFromURL() {
-            var curURL = CZ.UrlNav.getURL();
-            if((typeof curURL.hash.params !== 'undefined') && (curURL.hash.params["tour"] > Tours.tours.length)) {
-                return;
-            }
-            if(typeof curURL.hash.params !== 'undefined' && typeof curURL.hash.params["tour"] !== 'undefined') {
-                if(Tours.tours == null) {
-                    initializeToursContent();
-                }
-                if(Tours.isTourWindowVisible) {
-                    onTourClicked();
-                }
-                Tours.tour = Tours.tours[curURL.hash.params["tour"] - 1];
-                $(".touritem-selected").removeClass("touritem-selected", "slow");
-                activateTour(Tours.tour, true);
-                if(Tours.tour.audio) {
-                    Tours.tour.audio.pause();
-                    Tours.tour.audio.preload = "none";
-                }
-                tourPause();
-            }
-        }
-        Tours.loadTourFromURL = loadTourFromURL;
-    })(CZ.Tours || (CZ.Tours = {}));
-    var Tours = CZ.Tours;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
@@ -3364,6 +2726,1674 @@ var CZ;
         Service.getProfile = getProfile;
     })(CZ.Service || (CZ.Service = {}));
     var Service = CZ.Service;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (Dates) {
+        Dates.months = [
+            'January', 
+            'February', 
+            'March', 
+            'April', 
+            'May', 
+            'June', 
+            'July', 
+            'August', 
+            'September', 
+            'October', 
+            'November', 
+            'December'
+        ];
+        Dates.daysInMonth = [
+            31, 
+            28, 
+            31, 
+            30, 
+            31, 
+            30, 
+            31, 
+            31, 
+            30, 
+            31, 
+            30, 
+            31
+        ];
+        function getCoordinateFromDMY(year, month, day) {
+            var sign = (year != 0) ? year / Math.abs(year) : 1;
+            var i = 0;
+            var coordinate = 0;
+            for(i = 0; i < Math.abs(year); i++) {
+                coordinate += sign;
+                if(isLeapYear(i * sign)) {
+                    coordinate += sign / 365;
+                }
+            }
+            var days = day;
+            for(i = 0; i < month; i++) {
+                days += Dates.daysInMonth[i];
+                if((i === 1) && (isLeapYear(year))) {
+                    days++;
+                }
+            }
+            if((month > 1) && (isLeapYear(year))) {
+                coordinate += sign * days / 365;
+            } else {
+                coordinate += (sign >= 0) ? sign * days / 365 : sign * (1 - days / 365);
+            }
+            if(year < 0) {
+                coordinate += 1;
+            }
+            return coordinate;
+        }
+        Dates.getCoordinateFromDMY = getCoordinateFromDMY;
+        function getDMYFromCoordinate(coord) {
+            var sign = coord / Math.abs(coord);
+            var day = 0, month = 0, year = 0;
+            var idxYear, countLeapYears = 0;
+            for(idxYear = 0; idxYear < Math.abs(coord) - 1; idxYear++) {
+                year += sign;
+                if(isLeapYear(sign * idxYear)) {
+                    countLeapYears++;
+                }
+            }
+            var day, month;
+            var countDays;
+            countDays = Math.abs(coord) - Math.abs(year);
+            if(sign < 0) {
+                countDays = 1 - countDays;
+            }
+            var daysPerYear = 365.0;
+            var countDaysWithoutLeapDays = countDays - countLeapYears / daysPerYear;
+            var idxMonth = 0;
+            while(countDaysWithoutLeapDays > Dates.daysInMonth[idxMonth] / daysPerYear) {
+                countDaysWithoutLeapDays -= Dates.daysInMonth[idxMonth] / daysPerYear;
+                if(isLeapYear(year) && (idxMonth === 1)) {
+                    countDaysWithoutLeapDays -= 1 / daysPerYear;
+                }
+                idxMonth++;
+            }
+            month = idxMonth;
+            day = countDaysWithoutLeapDays * daysPerYear;
+            while(Math.round(day) <= 0) {
+                month--;
+                if(month === -1) {
+                    year--;
+                    month = 11;
+                }
+                day = Dates.daysInMonth[month] + Math.round(day);
+                if(isLeapYear(year) && (month === 1)) {
+                    day++;
+                }
+            }
+            if(coord < 0) {
+                year--;
+            }
+            return {
+                year: year,
+                month: month,
+                day: Math.round(day)
+            };
+        }
+        Dates.getDMYFromCoordinate = getDMYFromCoordinate;
+        function getCoordinateFromDecimalYear(decimalYear) {
+            var localPresent = getPresent();
+            var presentDate = getCoordinateFromDMY(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+            return decimalYear === 9999 ? presentDate : decimalYear;
+        }
+        Dates.getCoordinateFromDecimalYear = getCoordinateFromDecimalYear;
+        function convertCoordinateToYear(coordinate) {
+            var year = {
+                year: coordinate,
+                regime: "CE"
+            };
+            if(coordinate < -999999999) {
+                year.year /= -1000000000;
+                year.regime = 'Ga';
+            } else if(coordinate < -999999) {
+                year.year /= -1000000;
+                year.regime = 'Ma';
+            } else if(coordinate < -999) {
+                year.year /= -1000;
+                year.regime = 'Ka';
+            } else if(coordinate < 0) {
+                year.year /= -1;
+                year.year = Math.floor(year.year);
+                year.regime = 'BCE';
+            } else {
+                year.year = Math.floor(year.year);
+            }
+            return year;
+        }
+        Dates.convertCoordinateToYear = convertCoordinateToYear;
+        function convertYearToCoordinate(year, regime) {
+            var coordinate = year;
+            switch(regime.toLowerCase()) {
+                case "ga":
+                    coordinate *= -1000000000;
+                    break;
+                case "ma":
+                    coordinate *= -1000000;
+                    break;
+                case "ka":
+                    coordinate *= -1000;
+                    break;
+                case "bce":
+                    coordinate *= -1;
+                    break;
+            }
+            return coordinate;
+        }
+        Dates.convertYearToCoordinate = convertYearToCoordinate;
+        var present = undefined;
+        function getPresent() {
+            if(!present) {
+                present = new Date();
+                present.presentDay = present.getUTCDate();
+                present.presentMonth = present.getUTCMonth();
+                present.presentYear = present.getUTCFullYear();
+            }
+            return present;
+        }
+        Dates.getPresent = getPresent;
+        function isLeapYear(year) {
+            if(year >= 1582 && (year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0))) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        Dates.isLeapYear = isLeapYear;
+    })(CZ.Dates || (CZ.Dates = {}));
+    var Dates = CZ.Dates;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (Authoring) {
+        var _vcwidget;
+        var _dragStart = {
+        };
+        var _dragPrev = {
+        };
+        var _dragCur = {
+        };
+        var _hovered = {
+        };
+        var _rectPrev = {
+            type: "rectangle"
+        };
+        var _rectCur = {
+            type: "rectangle"
+        };
+        var _circlePrev = {
+            type: "circle"
+        };
+        var _circleCur = {
+            type: "circle"
+        };
+        Authoring.selectedTimeline = {
+        };
+        Authoring.selectedExhibit = {
+        };
+        Authoring.selectedContentItem = {
+        };
+        Authoring.isActive = false;
+        Authoring.isEnabled = false;
+        Authoring.isDragging = false;
+        Authoring.mode = null;
+        Authoring.contentItemMode = null;
+        Authoring.showCreateTimelineForm = null;
+        Authoring.showEditTimelineForm = null;
+        Authoring.showCreateExhibitForm = null;
+        Authoring.showEditExhibitForm = null;
+        Authoring.showEditContentItemForm = null;
+        Authoring.showEditTourForm = null;
+        Authoring.callback = null;
+        function isIntersecting(te, obj) {
+            switch(obj.type) {
+                case "timeline":
+                case "infodot":
+                    return (te.x + te.width > obj.x && te.x < obj.x + obj.width && te.y + te.height > obj.y && te.y < obj.y + obj.height);
+                default:
+                    return false;
+            }
+        }
+        function isIncluded(tp, obj) {
+            switch(obj.type) {
+                case "timeline":
+                case "rectangle":
+                case "infodot":
+                case "circle":
+                    return (tp.x <= obj.x && tp.y <= obj.y && tp.x + tp.width >= obj.x + obj.width && tp.y + tp.height >= obj.y + obj.height);
+                default:
+                    return true;
+            }
+        }
+        function checkTimelineIntersections(tp, tc, editmode) {
+            var i = 0;
+            var len = 0;
+            var selfIntersection = false;
+            if(!tp) {
+                return true;
+            }
+            if(!isIncluded(tp, tc) && tp.id !== "__root__") {
+                return false;
+            }
+            for(i = 0 , len = tp.children.length; i < len; ++i) {
+                selfIntersection = editmode ? (tp.children[i] === Authoring.selectedTimeline) : (tp.children[i] === tc);
+                if(!selfIntersection && isIntersecting(tc, tp.children[i])) {
+                    return false;
+                }
+            }
+            if(editmode && Authoring.selectedTimeline.children && Authoring.selectedTimeline.children.length > 0) {
+                for(i = 0 , len = Authoring.selectedTimeline.children.length; i < len; ++i) {
+                    if(!isIncluded(tc, Authoring.selectedTimeline.children[i])) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        function checkExhibitIntersections(tp, ec, editmode) {
+            var i = 0;
+            var len = 0;
+            var selfIntersection = false;
+            if(!isIncluded(tp, ec)) {
+                return false;
+            }
+            for(i = 0 , len = tp.children.length; i < len; ++i) {
+                selfIntersection = editmode ? (tp.children[i] === Authoring.selectedExhibit) : (tp.children[i] === ec);
+                if(!selfIntersection && isIntersecting(ec, tp.children[i])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        function updateNewRectangle() {
+            _rectCur.x = Math.min(_dragStart.x, _dragCur.x);
+            _rectCur.y = Math.min(_dragStart.y, _dragCur.y);
+            _rectCur.width = Math.abs(_dragStart.x - _dragCur.x);
+            _rectCur.height = Math.abs(_dragStart.y - _dragCur.y);
+            if(checkTimelineIntersections(_hovered, _rectCur, false)) {
+                var settings = $.extend({
+                }, _hovered.settings);
+                settings.strokeStyle = "yellow";
+                $.extend(_rectPrev, _rectCur);
+                CZ.VCContent.removeChild(_hovered, "newTimelineRectangle");
+                CZ.VCContent.addRectangle(_hovered, _hovered.layerid, "newTimelineRectangle", _rectCur.x, _rectCur.y, _rectCur.width, _rectCur.height, settings);
+            } else {
+                $.extend(_rectCur, _rectPrev);
+            }
+        }
+        function updateNewCircle() {
+            _circleCur.r = (_hovered.width > _hovered.height) ? _hovered.height / 27.7 : _hovered.width / 10.0;
+            _circleCur.x = _dragCur.x - _circleCur.r;
+            _circleCur.y = _dragCur.y - _circleCur.r;
+            _circleCur.width = _circleCur.height = 2 * _circleCur.r;
+            if(checkExhibitIntersections(_hovered, _circleCur, false)) {
+                $.extend(_circlePrev, _circleCur);
+                CZ.VCContent.removeChild(_hovered, "newExhibitCircle");
+                CZ.VCContent.addCircle(_hovered, "layerInfodots", "newExhibitCircle", _circleCur.x + _circleCur.r, _circleCur.y + _circleCur.r, _circleCur.r, {
+                    strokeStyle: "yellow"
+                }, false);
+            } else {
+                $.extend(_circleCur, _circlePrev);
+            }
+        }
+        function renewExhibit(e) {
+            var vyc = e.y + e.height / 2;
+            var time = e.x + e.width / 2;
+            var id = e.id;
+            var cis = e.contentItems;
+            var descr = e.infodotDescription;
+            descr.opacity = 1;
+            descr.title = e.title;
+            descr.guid = e.guid;
+            var parent = e.parent;
+            var radv = e.outerRad;
+            CZ.VCContent.removeChild(parent, id);
+            return CZ.VCContent.addInfodot(parent, "layerInfodots", id, time, vyc, radv, cis, descr);
+        }
+        Authoring.renewExhibit = renewExhibit;
+        function createNewTimeline() {
+            return CZ.VCContent.addTimeline(_hovered, _hovered.layerid, undefined, {
+                timeStart: _rectCur.x,
+                timeEnd: _rectCur.x + _rectCur.width,
+                header: "Timeline Title",
+                top: _rectCur.y,
+                height: _rectCur.height,
+                fillStyle: _hovered.settings.fillStyle,
+                regime: _hovered.regime,
+                gradientFillStyle: _hovered.settings.gradientFillStyle,
+                lineWidth: _hovered.settings.lineWidth,
+                strokeStyle: _hovered.settings.gradientFillStyle
+            });
+        }
+        Authoring.createNewTimeline = createNewTimeline;
+        function createNewExhibit() {
+            CZ.VCContent.removeChild(_hovered, "newExhibitCircle");
+            return CZ.VCContent.addInfodot(_hovered, "layerInfodots", undefined, _circleCur.x + _circleCur.r, _circleCur.y + _circleCur.r, _circleCur.r, [], {
+                title: "Exhibit Title",
+                date: _circleCur.x + _circleCur.r,
+                guid: undefined
+            });
+        }
+        function updateTimelineTitle(t) {
+            var headerSize = CZ.Settings.timelineHeaderSize * t.height;
+            var marginLeft = CZ.Settings.timelineHeaderMargin * t.height;
+            var marginTop = (1 - CZ.Settings.timelineHeaderMargin) * t.height - headerSize;
+            var baseline = t.y + marginTop + headerSize / 2.0;
+            CZ.VCContent.removeChild(t, t.id + "__header__");
+            if(CZ.Authoring.isEnabled && typeof t.editButton !== "undefined") {
+                t.editButton.x = t.x + t.width - 1.15 * t.titleObject.height;
+                t.editButton.y = t.titleObject.y;
+                t.editButton.width = t.titleObject.height;
+                t.editButton.height = t.titleObject.height;
+            }
+            t.titleObject = CZ.VCContent.addText(t, t.layerid, t.id + "__header__", t.x + marginLeft, t.y + marginTop, baseline, headerSize, t.title, {
+                fontName: CZ.Settings.timelineHeaderFontName,
+                fillStyle: CZ.Settings.timelineHeaderFontColor,
+                textBaseline: "middle",
+                opacity: 1
+            });
+        }
+        Authoring.modeMouseHandlers = {
+            createTimeline: {
+                mousemove: function () {
+                    if(CZ.Authoring.isDragging && _hovered.type === "timeline") {
+                        updateNewRectangle();
+                    }
+                },
+                mouseup: function () {
+                    if(_dragCur.x === _dragStart.x && _dragCur.y === _dragStart.y) {
+                        return;
+                    }
+                    if(_hovered.type === "timeline") {
+                        CZ.VCContent.removeChild(_hovered, "newTimelineRectangle");
+                        Authoring.selectedTimeline = createNewTimeline();
+                        Authoring.showCreateTimelineForm(Authoring.selectedTimeline);
+                    }
+                }
+            },
+            editTour: {
+            },
+            "editTour-selectTarget": {
+                mouseup: function () {
+                    if(Authoring.callback != null && _hovered != undefined && _hovered != null) {
+                        Authoring.callback(_hovered);
+                    }
+                },
+                mousemove: function () {
+                }
+            },
+            editTimeline: {
+                mouseup: function () {
+                    Authoring.showEditTimelineForm(Authoring.selectedTimeline);
+                }
+            },
+            createExhibit: {
+                mousemove: function () {
+                    if(CZ.Authoring.isDragging && _hovered.type === "timeline") {
+                    }
+                },
+                mouseup: function () {
+                    if(_hovered.type === "timeline") {
+                        updateNewCircle();
+                        Authoring.selectedExhibit = createNewExhibit();
+                        Authoring.showCreateExhibitForm(Authoring.selectedExhibit);
+                    }
+                }
+            },
+            editExhibit: {
+                mouseup: function () {
+                    Authoring.showEditExhibitForm(Authoring.selectedExhibit);
+                }
+            },
+            editContentItem: {
+                mouseup: function () {
+                    Authoring.showEditContentItemForm(Authoring.selectedContentItem, Authoring.selectedExhibit);
+                }
+            }
+        };
+        function initialize(vc, formHandlers) {
+            _vcwidget = vc.data("ui-virtualCanvas");
+            _vcwidget.element.on("mousedown", function (event) {
+                if(CZ.Authoring.isActive) {
+                    var viewport = _vcwidget.getViewport();
+                    var origin = CZ.Common.getXBrowserMouseOrigin(_vcwidget.element, event);
+                    var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
+                    CZ.Authoring.isDragging = true;
+                    _dragStart = posv;
+                    _dragPrev = {
+                    };
+                    _dragCur = posv;
+                    _hovered = _vcwidget.hovered || {
+                    };
+                }
+            });
+            _vcwidget.element.on("mouseup", function (event) {
+                if(CZ.Authoring.isActive) {
+                    var viewport = _vcwidget.getViewport();
+                    var origin = CZ.Common.getXBrowserMouseOrigin(_vcwidget.element, event);
+                    var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
+                    CZ.Authoring.isDragging = false;
+                    _dragPrev = _dragCur;
+                    _dragCur = posv;
+                    CZ.Common.controller.stopAnimation();
+                    CZ.Authoring.modeMouseHandlers[CZ.Authoring.mode]["mouseup"]();
+                }
+            });
+            _vcwidget.element.on("mousemove", function (event) {
+                if(CZ.Authoring.isActive) {
+                    var viewport = _vcwidget.getViewport();
+                    var origin = CZ.Common.getXBrowserMouseOrigin(_vcwidget.element, event);
+                    var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
+                    _dragPrev = _dragCur;
+                    _dragCur = posv;
+                    CZ.Authoring.modeMouseHandlers[CZ.Authoring.mode]["mousemove"]();
+                }
+            });
+            Authoring.showCreateTimelineForm = formHandlers && formHandlers.showCreateTimelineForm || function () {
+            };
+            Authoring.showEditTimelineForm = formHandlers && formHandlers.showEditTimelineForm || function () {
+            };
+            Authoring.showCreateExhibitForm = formHandlers && formHandlers.showCreateExhibitForm || function () {
+            };
+            Authoring.showEditExhibitForm = formHandlers && formHandlers.showEditExhibitForm || function () {
+            };
+            Authoring.showEditContentItemForm = formHandlers && formHandlers.showEditContentItemForm || function () {
+            };
+            Authoring.showEditTourForm = formHandlers && formHandlers.showEditTourForm || function () {
+            };
+        }
+        Authoring.initialize = initialize;
+        function updateTimeline(t, prop) {
+            var temp = {
+                x: Number(prop.start),
+                y: t.y,
+                width: Number(CZ.Dates.getCoordinateFromDecimalYear(prop.end) - prop.start),
+                height: t.height,
+                type: "rectangle"
+            };
+            if(checkTimelineIntersections(t.parent, temp, true)) {
+                t.x = temp.x;
+                t.width = temp.width;
+                t.endDate = prop.end;
+            }
+            t.title = prop.title;
+            updateTimelineTitle(t);
+            return CZ.Service.putTimeline(t).then(function (success) {
+                t.id = "t" + success;
+                t.guid = success;
+                t.titleObject.id = "t" + success + "__header__";
+                if(!t.parent.guid) {
+                    document.location.reload(true);
+                } else {
+                    CZ.Common.vc.virtualCanvas("requestInvalidate");
+                }
+            }, function (error) {
+            });
+        }
+        Authoring.updateTimeline = updateTimeline;
+        function removeTimeline(t) {
+            var deferred = $.Deferred();
+            CZ.Service.deleteTimeline(t).then(function (updateCanvas) {
+                CZ.Common.vc.virtualCanvas("requestInvalidate");
+                deferred.resolve();
+            });
+            CZ.VCContent.removeChild(t.parent, t.id);
+        }
+        Authoring.removeTimeline = removeTimeline;
+        function updateExhibit(e, args) {
+            var deferred = $.Deferred();
+            if(e && e.contentItems && args) {
+                var clone = $.extend({
+                }, e, {
+                    children: null
+                });
+                clone = $.extend(true, {
+                }, clone);
+                delete clone.children;
+                delete clone.contentItems;
+                $.extend(true, clone, args);
+                var oldContentItems = $.extend(true, [], e.contentItems);
+                CZ.Service.putExhibit(clone).then(function (response) {
+                    var old_id = e.id;
+                    e.id = clone.id = "e" + response.ExhibitId;
+                    var new_id = e.id;
+                    e.guid = clone.guid = response.ExhibitId;
+                    for(var i = 0; i < e.contentItems.length; i++) {
+                        e.contentItems[i].ParentExhibitId = e.guid;
+                    }
+                    for(var i = 0; i < clone.contentItems.length; i++) {
+                        clone.contentItems[i].ParentExhibitId = clone.guid;
+                    }
+                    CZ.Service.putExhibitContent(clone, oldContentItems).then(function (response) {
+                        $.extend(e, clone);
+                        e.id = old_id;
+                        e = renewExhibit(e);
+                        e.id = new_id;
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                        deferred.resolve();
+                    }, function (error) {
+                        console.log("Error connecting to service: update exhibit (put exhibit content).\n" + error.responseText);
+                        deferred.reject();
+                    });
+                }, function (error) {
+                    console.log("Error connecting to service: update exhibit.\n" + error.responseText);
+                    deferred.reject();
+                });
+            } else {
+                deferred.reject();
+            }
+            return deferred.promise();
+        }
+        Authoring.updateExhibit = updateExhibit;
+        function removeExhibit(e) {
+            var deferred = $.Deferred();
+            if(e && e.id && e.parent) {
+                var clone = $.extend({
+                }, e, {
+                    children: null
+                });
+                clone = $.extend(true, {
+                }, clone);
+                CZ.Service.deleteExhibit(clone).then(function (response) {
+                    CZ.VCContent.removeChild(e.parent, e.id);
+                    CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    deferred.resolve();
+                }, function (error) {
+                    console.log("Error connecting to service: remove exhibit.\n" + error.responseText);
+                    deferred.reject();
+                });
+            } else {
+                deferred.reject();
+            }
+            return deferred.promise();
+        }
+        Authoring.removeExhibit = removeExhibit;
+        function updateContentItem(e, c, args) {
+            var deferred = $.Deferred();
+            if(e && e.contentItems && e.contentItems.length && c && args) {
+                var clone = $.extend(true, {
+                }, c, args);
+                CZ.Service.putContentItem(clone).then(function (response) {
+                    $.extend(c, clone);
+                    c.id = c.guid = response;
+                    e = renewExhibit(e);
+                    CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    deferred.resolve();
+                }, function (error) {
+                    console.log("Error connecting to service: update content item.\n" + error.responseText);
+                    deferred.reject();
+                });
+            } else {
+                deferred.reject();
+            }
+            return deferred.promise();
+        }
+        Authoring.updateContentItem = updateContentItem;
+        function removeContentItem(e, c) {
+            var deferred = $.Deferred();
+            if(e && e.contentItems && e.contentItems.length && c && c.index) {
+                var clone = $.extend(true, {
+                }, c);
+                CZ.Service.deleteContentItem(clone).then(function (response) {
+                    e.contentItems.splice(c.index, 1);
+                    e = renewExhibit(e);
+                    CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    deferred.resolve();
+                }, function (error) {
+                    console.log("Error connecting to service: remove content item.\n" + error.responseText);
+                    deferred.reject();
+                });
+            } else {
+                deferred.reject();
+            }
+            return deferred.promise();
+        }
+        Authoring.removeContentItem = removeContentItem;
+        function validateTimelineData(start, end, title) {
+            var isValid = CZ.Authoring.validateNumber(start) && CZ.Authoring.validateNumber(end);
+            isValid = isValid && CZ.Authoring.isNotEmpty(title) && CZ.Authoring.isNotEmpty(start) && CZ.Authoring.isNotEmpty(end);
+            isValid = isValid && CZ.Authoring.isIntervalPositive(start, end);
+            return isValid;
+        }
+        Authoring.validateTimelineData = validateTimelineData;
+        function validateExhibitData(date, title, contentItems) {
+            var isValid = CZ.Authoring.validateNumber(date);
+            isValid = isValid && CZ.Authoring.isNotEmpty(title);
+            isValid = isValid && CZ.Authoring.validateContentItems(contentItems);
+            return isValid;
+        }
+        Authoring.validateExhibitData = validateExhibitData;
+        function validateNumber(number) {
+            return !isNaN(Number(number) && parseFloat(number)) && isNotEmpty(number);
+        }
+        Authoring.validateNumber = validateNumber;
+        function isNotEmpty(obj) {
+            return (obj !== '' && obj !== null);
+        }
+        Authoring.isNotEmpty = isNotEmpty;
+        function isIntervalPositive(start, end) {
+            return (parseFloat(start) < parseFloat(end));
+        }
+        Authoring.isIntervalPositive = isIntervalPositive;
+        function validateContentItems(contentItems) {
+            var isValid = true;
+            if(contentItems.length == 0) {
+                return false;
+            }
+            var i = 0;
+            while(contentItems[i] != null) {
+                var ci = contentItems[i];
+                isValid = isValid && CZ.Authoring.isNotEmpty(ci.title) && CZ.Authoring.isNotEmpty(ci.uri) && CZ.Authoring.isNotEmpty(ci.mediaType);
+                if(ci.mediaType.toLowerCase() === "image") {
+                    var imageReg = /\.(jpg|jpeg|png)$/i;
+                    if(!imageReg.test(ci.uri)) {
+                        alert("Sorry, only JPG/PNG images are supported");
+                        isValid = false;
+                    }
+                } else if(ci.mediaType.toLowerCase() === "video") {
+                    var youtube = /(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|[\S\?\&]+&v=|\/user\/\S+))([^\/&#]{10,12})/;
+                    var vimeo = /vimeo\.com\/([0-9]+)/i;
+                    var vimeoEmbed = /player.vimeo.com\/video\/([0-9]+)/i;
+                    if(youtube.test(ci.uri)) {
+                        var youtubeVideoId = ci.uri.match(youtube)[1];
+                        ci.uri = "http://www.youtube.com/embed/" + youtubeVideoId;
+                    } else if(vimeo.test(ci.uri)) {
+                        var vimeoVideoId = ci.uri.match(vimeo)[1];
+                        ci.uri = "http://player.vimeo.com/video/" + vimeoVideoId;
+                    } else if(vimeoEmbed.test(ci.uri)) {
+                    } else {
+                        alert("Sorry, only YouTube or Vimeo videos are supported");
+                        isValid = false;
+                    }
+                } else if(ci.mediaType.toLowerCase() === "pdf") {
+                    var pdf = /\.(pdf)$/i;
+                    if(pdf.test(ci.uri)) {
+                        ci.uri = "http://docs.google.com/viewer?url=" + encodeURI(ci.uri) + "&embedded=true";
+                    } else {
+                        alert("Sorry, only PDF extension is supported");
+                        isValid = false;
+                    }
+                }
+                if(!isValid) {
+                    return false;
+                }
+                i++;
+            }
+            return isValid;
+        }
+        Authoring.validateContentItems = validateContentItems;
+    })(CZ.Authoring || (CZ.Authoring = {}));
+    var Authoring = CZ.Authoring;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var ListBoxBase = (function () {
+            function ListBoxBase(container, listBoxInfo, listItemsInfo, getType) {
+                if (typeof getType === "undefined") { getType = function (context) {
+                    return "default";
+                }; }
+                if(!(container instanceof jQuery)) {
+                    throw "Container parameter is invalid! It should be jQuery instance.";
+                }
+                this.container = container;
+                this.listItemsInfo = listItemsInfo;
+                this.getType = getType;
+                this.items = [];
+                if(this.listItemsInfo.default) {
+                    this.listItemsInfo.default.ctor = this.listItemsInfo.default.ctor || ListItemBase;
+                }
+                for(var i = 0, context = listBoxInfo.context, len = context.length; i < len; ++i) {
+                    this.add(context[i]);
+                }
+                this.itemDblClickHandler = function (item, idx) {
+                };
+                this.itemRemoveHandler = function (item, idx) {
+                };
+                if(listBoxInfo.sortableSettings) {
+                    this.container.sortable(listBoxInfo.sortableSettings);
+                }
+            }
+            ListBoxBase.prototype.add = function (context) {
+                var type = this.getType(context);
+                var typeInfo = this.listItemsInfo[type];
+                var container = typeInfo.container.clone();
+                var uiMap = typeInfo.uiMap;
+                var ctor = typeInfo.ctor;
+                var item = new ctor(this, container, uiMap, context);
+                this.items.push(item);
+                return item;
+            };
+            ListBoxBase.prototype.remove = function (item) {
+                var i = this.items.indexOf(item);
+                if(i !== -1) {
+                    item.container.remove();
+                    this.items.splice(i, 1);
+                    this.itemRemoveHandler(item, i);
+                }
+            };
+            ListBoxBase.prototype.clear = function () {
+                for(var i = 0, len = this.items.length; i < len; ++i) {
+                    var item = this.items[i];
+                    item.container.remove();
+                }
+                this.items.length = 0;
+            };
+            ListBoxBase.prototype.selectItem = function (item) {
+                var i = this.items.indexOf(item);
+                if(i !== -1) {
+                    this.itemDblClickHandler(item, i);
+                }
+            };
+            ListBoxBase.prototype.itemDblClick = function (handler) {
+                this.itemDblClickHandler = handler;
+            };
+            ListBoxBase.prototype.itemRemove = function (handler) {
+                this.itemRemoveHandler = handler;
+            };
+            return ListBoxBase;
+        })();
+        UI.ListBoxBase = ListBoxBase;        
+        var ListItemBase = (function () {
+            function ListItemBase(parent, container, uiMap, context) {
+                var _this = this;
+                if(!(container instanceof jQuery)) {
+                    throw "Container parameter is invalid! It should be jQuery instance.";
+                }
+                this.parent = parent;
+                this.container = container;
+                this.data = context;
+                this.container.dblclick(function (_) {
+                    return _this.parent.selectItem(_this);
+                });
+                this.closeButton = this.container.find(uiMap.closeButton);
+                if(this.closeButton.length) {
+                    this.closeButton.click(function (event) {
+                        return _this.close();
+                    });
+                }
+                this.parent.container.append(this.container);
+            }
+            ListItemBase.prototype.close = function () {
+                this.parent.remove(this);
+            };
+            return ListItemBase;
+        })();
+        UI.ListItemBase = ListItemBase;        
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var TourListBox = (function (_super) {
+            __extends(TourListBox, _super);
+            function TourListBox(container, listItemContainer, contentItems, takeTour, editTour) {
+                this.takeTour = takeTour;
+                this.editTour = editTour;
+                var listBoxInfo = {
+                    context: contentItems,
+                    sortableSettings: null
+                };
+                var listItemsInfo = {
+                    default: {
+                        container: listItemContainer,
+                        uiMap: {
+                            closeButton: ".cz-listitem-close-btn",
+                            iconImg: ".cz-contentitem-listitem-icon > img",
+                            titleTextblock: ".cz-contentitem-listitem-title",
+                            typeTextblock: ".cz-contentitem-listitem-highlighted"
+                        }
+                    }
+                };
+                listItemsInfo.default.ctor = TourListItem;
+                        _super.call(this, container, listBoxInfo, listItemsInfo);
+            }
+            Object.defineProperty(TourListBox.prototype, "TakeTour", {
+                get: function () {
+                    return this.takeTour;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(TourListBox.prototype, "EditTour", {
+                get: function () {
+                    return this.editTour;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            return TourListBox;
+        })(UI.ListBoxBase);
+        UI.TourListBox = TourListBox;        
+        var TourListItem = (function (_super) {
+            __extends(TourListItem, _super);
+            function TourListItem(parent, container, uiMap, context) {
+                        _super.call(this, parent, container, uiMap, context);
+                this.iconImg = this.container.find(uiMap.iconImg);
+                this.titleTextblock = this.container.find(uiMap.titleTextblock);
+                this.iconImg.attr("src", this.data.icon || "/images/Temp-Thumbnail2.png");
+                this.titleTextblock.text(this.data.title);
+                this.container.find("#takeTour").click(function (e) {
+                    parent.TakeTour(context);
+                });
+                container.find(".cz-tourslist-editing").css("display", parent.EditTour ? "inline" : "none");
+                if(parent.EditTour) {
+                    this.container.find("#editTour").click(function (e) {
+                        parent.EditTour(context);
+                    });
+                }
+            }
+            return TourListItem;
+        })(UI.ListItemBase);
+        UI.TourListItem = TourListItem;        
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var FormToursList = (function (_super) {
+            __extends(FormToursList, _super);
+            function FormToursList(container, formInfo) {
+                var _this = this;
+                        _super.call(this, container, formInfo);
+                this.takeTour = formInfo.takeTour;
+                this.editTour = formInfo.editTour;
+                this.toursListBox = new CZ.UI.TourListBox(container.find("#tours"), formInfo.tourTemplate, formInfo.tours, function (tour) {
+                    _this.onTakeTour(tour);
+                }, this.editTour ? function (tour) {
+                    _this.onEditTour(tour);
+                } : null);
+                this.initialize();
+            }
+            FormToursList.prototype.initialize = function () {
+            };
+            FormToursList.prototype.show = function () {
+                var self = this;
+                $(window).resize(function (e) {
+                    return self.onWindowResize(e);
+                });
+                this.onWindowResize(null);
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "right",
+                    duration: 500
+                });
+                this.activationSource.addClass("active");
+            };
+            FormToursList.prototype.close = function () {
+                $(window).unbind("resize");
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "right",
+                    duration: 500,
+                    complete: function () {
+                    }
+                });
+                CZ.Authoring.isActive = false;
+                this.activationSource.removeClass("active");
+                this.container.find("cz-form-errormsg").hide();
+                this.container.find("#tours").empty();
+                this.toursListBox.container.empty();
+            };
+            FormToursList.prototype.onTakeTour = function (tour) {
+                this.close();
+                this.takeTour(tour);
+            };
+            FormToursList.prototype.onEditTour = function (tour) {
+                this.close();
+                this.editTour(tour);
+            };
+            FormToursList.prototype.onWindowResize = function (e) {
+                var height = $(window).height();
+                this.container.height(height - 70);
+                this.container.find("#tours").height(height - 200);
+            };
+            return FormToursList;
+        })(CZ.UI.FormBase);
+        UI.FormToursList = FormToursList;        
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (Tours) {
+        Tours.isTourWindowVisible = false;
+        Tours.isBookmarksWindowVisible = false;
+        Tours.isBookmarksWindowExpanded = true;
+        Tours.isBookmarksTextShown = true;
+        Tours.isNarrationOn = true;
+        Tours.tours;
+        Tours.tour;
+        Tours.tourBookmarkTransitionCompleted;
+        Tours.tourBookmarkTransitionInterrupted;
+        Tours.pauseTourAtAnyAnimation = false;
+        Tours.bookmarkAnimation;
+        var isToursDebugEnabled = false;
+        var TourBookmark = (function () {
+            function TourBookmark(url, caption, lapseTime, text) {
+                this.url = url;
+                this.caption = caption;
+                this.lapseTime = lapseTime;
+                this.text = text;
+                this.duration = undefined;
+                this.number = 0;
+                this.elapsed = 0;
+                if(this.text === null) {
+                    this.text = "";
+                }
+            }
+            return TourBookmark;
+        })();
+        Tours.TourBookmark = TourBookmark;        
+        function getBookmarkVisible(bookmark) {
+            return CZ.UrlNav.navStringToVisible(bookmark.url, CZ.Common.vc);
+        }
+        Tours.getBookmarkVisible = getBookmarkVisible;
+        function hasActiveTour() {
+            return Tours.tour != undefined;
+        }
+        Tours.hasActiveTour = hasActiveTour;
+        function bookmarkUrlToElement(bookmarkUrl) {
+            var element = CZ.UrlNav.navStringTovcElement(bookmarkUrl, CZ.Common.vc.virtualCanvas("getLayerContent"));
+            if(!element) {
+                return null;
+            }
+            return element;
+        }
+        Tours.bookmarkUrlToElement = bookmarkUrlToElement;
+        var Tour = (function () {
+            function Tour(title, bookmarks, zoomTo, vc, category, audio, sequenceNum) {
+                this.title = title;
+                this.bookmarks = bookmarks;
+                this.zoomTo = zoomTo;
+                this.vc = vc;
+                this.category = category;
+                this.audio = audio;
+                this.sequenceNum = sequenceNum;
+                this.tour_BookmarkStarted = [];
+                this.tour_BookmarkFinished = [];
+                this.tour_TourStarted = [];
+                this.tour_TourFinished = [];
+                this.state = 'pause';
+                this.currentPlace = {
+                    type: 'goto',
+                    bookmark: 0,
+                    startTime: null,
+                    animationId: null
+                };
+                this.isTourPlayRequested = false;
+                this.isAudioLoaded = false;
+                this.isAudioEnabled = false;
+                if(!bookmarks || bookmarks.length == 0) {
+                    throw "Tour has no bookmarks";
+                }
+                var self = this;
+                bookmarks.sort(function (b1, b2) {
+                    return b1.lapseTime - b2.lapseTime;
+                });
+                for(var i = 1; i < bookmarks.length; i++) {
+                    bookmarks[i - 1].duration = bookmarks[i].lapseTime - bookmarks[i - 1].lapseTime;
+                    bookmarks[i - 1].number = i;
+                }
+                bookmarks[bookmarks.length - 1].duration = 10;
+                bookmarks[bookmarks.length - 1].number = bookmarks.length;
+                self.toggleAudio = function toggleAudio(isOn) {
+                    if(isOn && self.audio) {
+                        self.isAudioEnabled = true;
+                    } else {
+                        self.isAudioEnabled = false;
+                    }
+                };
+                self.ReinitializeAudio = function ReinitializeAudio() {
+                    if(!self.audio) {
+                        return;
+                    }
+                    if(self.audioElement) {
+                        self.audioElement.pause();
+                    }
+                    self.audioElement = undefined;
+                    self.isAudioLoaded = false;
+                    self.audioElement = document.createElement('audio');
+                    self.audioElement.addEventListener("loadedmetadata", function () {
+                        if(self.audioElement.duration != Infinity) {
+                            self.bookmarks[self.bookmarks.length - 1].duration = self.audioElement.duration - self.bookmarks[self.bookmarks.length - 1].lapseTime;
+                        }
+                        if(isToursDebugEnabled && window.console && console.log("Tour " + self.title + " metadata loaded (readystate 1)")) {
+                            ;
+                        }
+                    });
+                    self.audioElement.addEventListener("canplaythrough", function () {
+                        self.isAudioLoaded = true;
+                        if(isToursDebugEnabled && window.console && console.log("Tour " + self.title + " readystate 4")) {
+                            ;
+                        }
+                    });
+                    self.audioElement.addEventListener("progress", function () {
+                        if(self.audioElement && self.audioElement.buffered.length > 0) {
+                            if(isToursDebugEnabled && window.console && console.log("Tour " + self.title + " downloaded " + (self.audio.buffered.end(self.audio.buffered.length - 1) / self.audio.duration))) {
+                                ;
+                            }
+                        }
+                    });
+                    self.audioElement.controls = false;
+                    self.audioElement.autoplay = false;
+                    self.audioElement.loop = false;
+                    self.audioElement.volume = 1;
+                    self.audioElement.preload = "none";
+                    var blobPrefix = self.audio.substring(0, self.audio.length - 3);
+                    for(var i = 0; i < CZ.Settings.toursAudioFormats.length; i++) {
+                        var audioSource = document.createElement("Source");
+                        audioSource.setAttribute("src", blobPrefix + CZ.Settings.toursAudioFormats[i].ext);
+                        self.audioElement.appendChild(audioSource);
+                    }
+                    self.audioElement.load();
+                    if(isToursDebugEnabled && window.console && console.log("Loading of tour " + self.title + " is queued")) {
+                        ;
+                    }
+                };
+                self.onBookmarkIsOver = function onBookmarkIsOver(goBack) {
+                    self.bookmarks[self.currentPlace.bookmark].elapsed = 0;
+                    if((self.currentPlace.bookmark == self.bookmarks.length - 1) && !goBack) {
+                        self.state = 'pause';
+                        self.currentPlace = {
+                            type: 'goto',
+                            bookmark: 0
+                        };
+                        self.RaiseTourFinished();
+                    } else {
+                        self.goToTheNextBookmark(goBack);
+                    }
+                };
+                self.goToTheNextBookmark = function goToTheNextBookmark(goBack) {
+                    var newBookmark = self.currentPlace.bookmark;
+                    var oldBookmark = newBookmark;
+                    if(goBack) {
+                        newBookmark = Math.max(0, newBookmark - 1);
+                    } else {
+                        newBookmark = Math.min(self.bookmarks.length - 1, newBookmark + 1);
+                    }
+                    self.RaiseBookmarkFinished(oldBookmark);
+                    self.currentPlace = {
+                        type: 'goto',
+                        bookmark: newBookmark
+                    };
+                    var bookmark = self.bookmarks[self.currentPlace.bookmark];
+                    if(newBookmark != 0) {
+                        self.RaiseBookmarkStarted(bookmark);
+                        if(self.isAudioEnabled && self.state === 'play' && self.isAudioLoaded == true) {
+                            self.startBookmarkAudio(bookmark);
+                        }
+                    }
+                    if(self.state != 'pause' && self.isAudioLoaded == true) {
+                        self.setTimer(bookmark);
+                    }
+                    if(isToursDebugEnabled && window.console && console.log("Transitioning to the bm index " + newBookmark)) {
+                        ;
+                    }
+                    self.currentPlace.animationId = self.zoomTo(getBookmarkVisible(bookmark), self.onGoToSuccess, self.onGoToFailure, bookmark.url);
+                };
+                self.startBookmarkAudio = function startBookmarkAudio(bookmark) {
+                    if(!self.audio) {
+                        return;
+                    }
+                    if(isToursDebugEnabled && window.console && console.log("playing source: " + self.audio.currentSrc)) {
+                        ;
+                    }
+                    self.audioElement.pause();
+                    try  {
+                        self.audioElement.currentTime = bookmark.lapseTime + bookmark.elapsed;
+                        if(isToursDebugEnabled && window.console && console.log("audio currentTime is set to " + (bookmark.lapseTime + bookmark.elapsed))) {
+                            ;
+                        }
+                    } catch (ex) {
+                        if(window.console && console.error("currentTime assignment: " + ex)) {
+                            ;
+                        }
+                    }
+                    if(isToursDebugEnabled && window.console && console.log("audio element is forced to play")) {
+                        ;
+                    }
+                    self.audioElement.play();
+                };
+                self.setTimer = function setTimer(bookmark) {
+                    if(self.timerOnBookmarkIsOver) {
+                        clearTimeout(self.timerOnBookmarkIsOver);
+                    }
+                    var duration = bookmark.duration;
+                    if(bookmark.elapsed != 0) {
+                        duration = Math.max(duration - bookmark.elapsed, 0);
+                    }
+                    self.currentPlace.startTime = new Date().getTime();
+                    if(isToursDebugEnabled && window.console && console.log("transition to next bookmark will be in " + duration + " seconds")) {
+                        ;
+                    }
+                    self.timerOnBookmarkIsOver = setTimeout(self.onBookmarkIsOver, duration * 1000);
+                };
+                self.onGoToSuccess = function onGoToSuccess(animationId) {
+                    if(!self.currentPlace || self.currentPlace.animationId == undefined || self.currentPlace.animationId != animationId) {
+                        return;
+                    }
+                    var curURL = CZ.UrlNav.getURL();
+                    if(typeof curURL.hash.params == 'undefined') {
+                        curURL.hash.params = [];
+                    }
+                    curURL.hash.params["tour"] = Tours.tour.sequenceNum;
+                    CZ.Common.hashHandle = false;
+                    CZ.UrlNav.setURL(curURL);
+                    if(isToursDebugEnabled && window.console && console.log("reached the bookmark index " + self.currentPlace.bookmark)) {
+                        ;
+                    }
+                    self.currentPlace = {
+                        type: 'bookmark',
+                        bookmark: self.currentPlace.bookmark
+                    };
+                    if(self.currentPlace.bookmark == 0) {
+                        var bookmark = self.bookmarks[self.currentPlace.bookmark];
+                        self.RaiseBookmarkStarted(bookmark);
+                        if(self.state != 'pause') {
+                            if(self.isAudioLoaded != true) {
+                                tourPause();
+                            } else {
+                                self.setTimer(bookmark);
+                                if(self.isAudioEnabled) {
+                                    self.startBookmarkAudio(bookmark);
+                                }
+                            }
+                        }
+                    }
+                };
+                self.onGoToFailure = function onGoToFailure(animationId) {
+                    if(!self.currentPlace || self.currentPlace.animationId == undefined || self.currentPlace.animationId != animationId) {
+                        return;
+                    }
+                    self.pause();
+                    if(isToursDebugEnabled && window.console && console.log("tour interrupted by user during transition")) {
+                        ;
+                    }
+                };
+                self.play = function play() {
+                    if(self.state !== 'pause') {
+                        return;
+                    }
+                    if(isToursDebugEnabled && window.console && console.log("tour playback activated")) {
+                        ;
+                    }
+                    self.state = 'play';
+                    var visible = self.vc.virtualCanvas("getViewport").visible;
+                    if(self.currentPlace != null && self.currentPlace.bookmark != null && CZ.Common.compareVisibles(visible, getBookmarkVisible(self.bookmarks[self.currentPlace.bookmark]))) {
+                        self.currentPlace = {
+                            type: 'bookmark',
+                            bookmark: self.currentPlace.bookmark
+                        };
+                    } else {
+                        self.currentPlace = {
+                            type: 'goto',
+                            bookmark: self.currentPlace.bookmark
+                        };
+                    }
+                    var bookmark = self.bookmarks[self.currentPlace.bookmark];
+                    var isInTransitionToFirstBookmark = (self.currentPlace.bookmark == 0 && self.currentPlace.type == 'goto');
+                    if(self.currentPlace.type == 'bookmark' || self.currentPlace.bookmark != 0) {
+                        self.RaiseBookmarkStarted(bookmark);
+                        if(self.isAudioLoaded == true) {
+                            self.setTimer(bookmark);
+                            if(self.isAudioEnabled) {
+                                self.startBookmarkAudio(bookmark);
+                            }
+                        }
+                    }
+                    self.currentPlace.animationId = self.zoomTo(getBookmarkVisible(bookmark), self.onGoToSuccess, self.onGoToFailure, bookmark.url);
+                    if(self.currentPlace.bookmark === 0 && isInTransitionToFirstBookmark) {
+                        self.RaiseTourStarted();
+                    }
+                    var curURL = CZ.UrlNav.getURL();
+                    if(typeof curURL.hash.params == 'undefined') {
+                        curURL.hash.params = new Array();
+                    }
+                    if(typeof curURL.hash.params["tour"] == 'undefined') {
+                        curURL.hash.params["tour"] = Tours.tour.sequenceNum;
+                        CZ.Common.hashHandle = false;
+                        CZ.UrlNav.setURL(curURL);
+                    }
+                };
+                self.pause = function pause() {
+                    if(self.state !== 'play') {
+                        return;
+                    }
+                    if(isToursDebugEnabled && window.console && console.log("tour playback paused")) {
+                        ;
+                    }
+                    if(self.isAudioEnabled && self.isTourPlayRequested) {
+                        self.isTourPlayRequested = false;
+                    }
+                    if(self.timerOnBookmarkIsOver) {
+                        clearTimeout(self.timerOnBookmarkIsOver);
+                        self.timerOnBookmarkIsOver = undefined;
+                    }
+                    self.state = 'pause';
+                    if(self.isAudioEnabled) {
+                        self.audioElement.pause();
+                        if(isToursDebugEnabled && window.console && console.log("audio element is forced to pause")) {
+                            ;
+                        }
+                    }
+                    var bookmark = self.bookmarks[self.currentPlace.bookmark];
+                    if(self.currentPlace.startTime) {
+                        bookmark.elapsed += (new Date().getTime() - self.currentPlace.startTime) / 1000;
+                    }
+                };
+                self.next = function next() {
+                    if(self.currentPlace.bookmark != self.bookmarks.length - 1) {
+                        if(self.state === 'play') {
+                            if(self.timerOnBookmarkIsOver) {
+                                clearTimeout(self.timerOnBookmarkIsOver);
+                            }
+                            self.timerOnBookmarkIsOver = undefined;
+                        }
+                        self.onBookmarkIsOver(false);
+                    }
+                };
+                self.prev = function prev() {
+                    if(self.currentPlace.bookmark == 0) {
+                        return;
+                    }
+                    if(self.state === 'play') {
+                        if(self.timerOnBookmarkIsOver) {
+                            clearTimeout(self.timerOnBookmarkIsOver);
+                        }
+                        self.timerOnBookmarkIsOver = undefined;
+                    }
+                    self.onBookmarkIsOver(true);
+                };
+                self.RaiseBookmarkStarted = function RaiseBookmarkStarted(bookmark) {
+                    if(self.tour_BookmarkStarted.length > 0) {
+                        for(var i = 0; i < self.tour_BookmarkStarted.length; i++) {
+                            self.tour_BookmarkStarted[i](self, bookmark);
+                        }
+                    }
+                    showBookmark(this, bookmark);
+                };
+                self.RaiseBookmarkFinished = function RaiseBookmarkFinished(bookmark) {
+                    if(self.tour_BookmarkFinished.length > 0) {
+                        for(var i = 0; i < self.tour_BookmarkFinished.length; i++) {
+                            self.tour_BookmarkFinished[i](self, bookmark);
+                        }
+                    }
+                    hideBookmark(this);
+                };
+                self.RaiseTourStarted = function RaiseTourStarted() {
+                    if(self.tour_TourStarted.length > 0) {
+                        for(var i = 0; i < self.tour_TourStarted.length; i++) {
+                            self.tour_TourStarted[i](self);
+                        }
+                    }
+                };
+                self.RaiseTourFinished = function RaiseTourFinished() {
+                    if(self.tour_TourFinished.length > 0) {
+                        for(var i = 0; i < self.tour_TourFinished.length; i++) {
+                            self.tour_TourFinished[i](self);
+                        }
+                    }
+                };
+            }
+            return Tour;
+        })();
+        Tours.Tour = Tour;        
+        function activateTour(newTour, isAudioEnabled) {
+            if(isAudioEnabled == undefined) {
+                isAudioEnabled = Tours.isNarrationOn;
+            }
+            if(newTour != undefined) {
+                var tourControlDiv = document.getElementById("tour_control");
+                tourControlDiv.style.display = "block";
+                Tours.tour = newTour;
+                Tours.tour.tour_TourFinished.push(function (tour) {
+                    hideBookmark(tour);
+                    tourPause();
+                    hideBookmarks();
+                });
+                Tours.tour.toggleAudio(isAudioEnabled);
+                for(var i = 0; i < Tours.tour.bookmarks.length; i++) {
+                    Tours.tour.bookmarks[i].elapsed = 0;
+                }
+                Tours.tour.currentPlace.bookmark = 0;
+                if(isAudioEnabled == true) {
+                    Tours.tour.ReinitializeAudio();
+                    Tours.tour.isAudioLoaded = true;
+                }
+                tourResume();
+            }
+        }
+        Tours.activateTour = activateTour;
+        function removeActiveTour() {
+            if(Tours.tour) {
+                tourPause();
+                Tours.tour.isTourPlayRequested = false;
+            }
+            var tourControlDiv = document.getElementById("tour_control");
+            tourControlDiv.style.display = "none";
+            if(Tours.tour) {
+                hideBookmarks();
+                $("#bookmarks .header").text("");
+                if(Tours.tour.audioElement) {
+                    Tours.tour.audioElement = undefined;
+                }
+            }
+            Tours.tour = undefined;
+        }
+        Tours.removeActiveTour = removeActiveTour;
+        function tourPrev() {
+            if(Tours.tour != undefined) {
+                Tours.tour.prev();
+            }
+        }
+        Tours.tourPrev = tourPrev;
+        function tourNext() {
+            if(Tours.tour != undefined) {
+                Tours.tour.next();
+            }
+        }
+        Tours.tourNext = tourNext;
+        function tourPause() {
+            if(Tours.tour != undefined) {
+                $("#tour_playpause").attr("src", "/images/tour_play_off.jpg");
+                Tours.tour.pause();
+                CZ.Common.controller.stopAnimation();
+                Tours.tour.tourBookmarkTransitionInterrupted = undefined;
+                Tours.tour.tourBookmarkTransitionCompleted = undefined;
+            }
+        }
+        Tours.tourPause = tourPause;
+        function tourResume() {
+            $("#tour_playpause").attr("src", "/images/tour_pause_off.jpg");
+            Tours.tour.play();
+        }
+        function tourPlayPause() {
+            if(Tours.tour != undefined) {
+                if(Tours.tour.state == "pause") {
+                    tourResume();
+                } else if(Tours.tour.state == "play") {
+                    tourPause();
+                }
+            }
+        }
+        Tours.tourPlayPause = tourPlayPause;
+        function tourAbort() {
+            removeActiveTour();
+            $("#bookmarks").hide();
+            Tours.isBookmarksWindowVisible = false;
+            var curURL = CZ.UrlNav.getURL();
+            delete curURL.hash.params["tour"];
+            delete curURL.hash.params["bookmark"];
+            CZ.UrlNav.setURL(curURL);
+        }
+        Tours.tourAbort = tourAbort;
+        function initializeToursUI() {
+            $("#tours").hide();
+            hideBookmarks();
+        }
+        Tours.initializeToursUI = initializeToursUI;
+        function initializeToursContent() {
+            var toursUI = $('#tours-content');
+            Tours.tours.sort(function (u, v) {
+                return u.sequenceNum - v.sequenceNum;
+            });
+            var category = null;
+            var categoryContent;
+            for(var i = 0; i < Tours.tours.length; i++) {
+                var tour = Tours.tours[i];
+                if(tour.category !== category) {
+                    var cat = $("<div></div>", {
+                        class: "category",
+                        text: tour.category
+                    }).appendTo(toursUI);
+                    var img = $("<img></img>", {
+                        class: "collapseButton",
+                        src: "/images/collapse-down.png"
+                    }).appendTo(cat);
+                    if(i == 0) {
+                        cat.removeClass('category').addClass('categorySelected');
+                        (img[0]).src = "/images/collapse-up.png";
+                    }
+                    categoryContent = $('<div></div>', {
+                        class: "itemContainer"
+                    }).appendTo(toursUI);
+                    category = tour.category;
+                }
+                $("<div></div>", {
+                    class: "item",
+                    tour: i,
+                    text: tour.title,
+                    click: function () {
+                        removeActiveTour();
+                        $("#tours").hide('slide', {
+                        }, 'slow');
+                        $(".tour-icon").removeClass("active");
+                        Tours.isTourWindowVisible = false;
+                        var mytour = Tours.tours[this.getAttribute("tour")];
+                        activateTour(mytour, Tours.isNarrationOn);
+                        $(".touritem-selected").removeClass("touritem-selected", "slow");
+                        $(this).addClass("touritem-selected", "slow");
+                    }
+                }).appendTo(categoryContent);
+            }
+            ($)("#tours-content").accordion({
+                collapsible: true,
+                heightStyle: "content",
+                beforeActivate: function (event, ui) {
+                    if(ui.newHeader) {
+                        ui.newHeader.removeClass('category');
+                        ui.newHeader.addClass('categorySelected');
+                        var img = ($(".collapseButton", ui.newHeader)[0]);
+                        if(img) {
+                            img.src = "/images/collapse-up.png";
+                        }
+                    }
+                    if(ui.oldHeader) {
+                        ui.oldHeader.removeClass('categorySelected');
+                        ui.oldHeader.addClass('category');
+                        var img = ($(".collapseButton", ui.oldHeader)[0]);
+                        if(img) {
+                            img.src = "/images/collapse-down.png";
+                        }
+                    }
+                }
+            });
+        }
+        Tours.initializeToursContent = initializeToursContent;
+        function hideBookmark(tour) {
+            if(Tours.isBookmarksWindowExpanded && Tours.isBookmarksTextShown) {
+                if(Tours.bookmarkAnimation) {
+                    Tours.bookmarkAnimation.stop(true, true);
+                }
+                Tours.bookmarkAnimation = $("#bookmarks .slideText").hide("drop", {
+                }, 'slow', function () {
+                    Tours.bookmarkAnimation = undefined;
+                });
+                $("#bookmarks .slideHeader").text("");
+                Tours.isBookmarksTextShown = false;
+            }
+        }
+        function showBookmark(tour, bookmark) {
+            if(!Tours.isBookmarksWindowVisible) {
+                Tours.isBookmarksWindowVisible = true;
+                $("#bookmarks .slideText").text(bookmark.text);
+                $("#bookmarks").show('slide', {
+                }, 'slow');
+            }
+            $("#bookmarks .header").text(tour.title);
+            $("#bookmarks .slideHeader").text(bookmark.caption);
+            $("#bookmarks .slideFooter").text(bookmark.number + '/' + tour.bookmarks.length);
+            if(Tours.isBookmarksWindowExpanded) {
+                $("#bookmarks .slideText").text(bookmark.text);
+                if(!Tours.isBookmarksTextShown) {
+                    if(Tours.bookmarkAnimation) {
+                        Tours.bookmarkAnimation.stop(true, true);
+                    }
+                    Tours.bookmarkAnimation = $("#bookmarks .slideText").show("drop", {
+                    }, 'slow', function () {
+                        Tours.bookmarkAnimation = undefined;
+                    });
+                    Tours.isBookmarksTextShown = true;
+                }
+            } else {
+                $("#bookmarks .slideText").text(bookmark.text);
+            }
+        }
+        function hideBookmarks() {
+            $("#bookmarks").hide();
+            Tours.isBookmarksWindowVisible = false;
+        }
+        function onTourClicked() {
+            if(CZ.Search.isSearchWindowVisible) {
+                CZ.Search.onSearchClicked();
+            }
+            if(Tours.isTourWindowVisible) {
+                $(".tour-icon").removeClass("active");
+                $("#tours").hide('slide', {
+                }, 'slow');
+            } else {
+                $(".tour-icon").addClass("active");
+                $("#tours").show('slide', {
+                }, 'slow');
+            }
+            Tours.isTourWindowVisible = !Tours.isTourWindowVisible;
+        }
+        Tours.onTourClicked = onTourClicked;
+        function collapseBookmarks() {
+            if(!Tours.isBookmarksWindowExpanded) {
+                return;
+            }
+            Tours.isBookmarksWindowExpanded = false;
+            $("#bookmarks .header").hide('slide', {
+            }, 'fast');
+            $("#bookmarks .slideHeader").hide('slide', {
+            }, 'fast');
+            $("#bookmarks .slideText").hide('slide', {
+            }, 'fast');
+            $("#bookmarks .slideFooter").hide('slide', {
+            }, 'fast');
+            $("#bookmarks").effect('size', {
+                to: {
+                    width: '30px'
+                }
+            }, 'fast', function () {
+                $("#bookmarks").css('width', '30px');
+            });
+            $("#bookmarksCollapse").attr("src", "/images/expand-right.png");
+        }
+        function expandBookmarks() {
+            if(Tours.isBookmarksWindowExpanded) {
+                return;
+            }
+            Tours.isBookmarksWindowExpanded = true;
+            $("#bookmarks").effect('size', {
+                to: {
+                    width: '200px',
+                    height: 'auto'
+                }
+            }, 'slow', function () {
+                $("#bookmarks").css('width', '200px');
+                $("#bookmarks").css('height', 'auto');
+                $("#bookmarks .header").show('slide', {
+                }, 'fast');
+                $("#bookmarks .slideHeader").show('slide', {
+                }, 'fast');
+                $("#bookmarks .slideText").show('slide', {
+                }, 'fast');
+                $("#bookmarks .slideFooter").show('slide', {
+                }, 'fast');
+            });
+            $("#bookmarksCollapse").attr("src", "/images/collapse-left.png");
+        }
+        function onBookmarksCollapse() {
+            if(!Tours.isBookmarksWindowExpanded) {
+                expandBookmarks();
+            } else {
+                collapseBookmarks();
+            }
+        }
+        Tours.onBookmarksCollapse = onBookmarksCollapse;
+        function onNarrationClick() {
+            if(Tours.isNarrationOn) {
+                $("#tours-narration-on").removeClass("narration-selected", "slow");
+                $("#tours-narration-off").addClass("narration-selected", "slow");
+            } else {
+                $("#tours-narration-on").addClass("narration-selected", "slow");
+                $("#tours-narration-off").removeClass("narration-selected", "slow");
+            }
+            Tours.isNarrationOn = !Tours.isNarrationOn;
+        }
+        Tours.onNarrationClick = onNarrationClick;
+        function parseTours(content) {
+            Tours.tours = new Array();
+            for(var i = 0; i < content.d.length; i++) {
+                var areBookmarksValid = true;
+                var tourString = content.d[i];
+                if((typeof tourString.bookmarks == 'undefined') || (typeof tourString.audio == 'undefined') || (tourString.audio == undefined) || (tourString.audio == null) || (typeof tourString.category == 'undefined') || (typeof tourString.name == 'undefined') || (typeof tourString.sequence == 'undefined')) {
+                    continue;
+                }
+                var tourBookmarks = new Array();
+                for(var j = 0; j < tourString.bookmarks.length; j++) {
+                    var bmString = tourString.bookmarks[j];
+                    if((typeof bmString.description == 'undefined') || (typeof bmString.lapseTime == 'undefined') || (typeof bmString.name == 'undefined') || (typeof bmString.url == 'undefined')) {
+                        areBookmarksValid = false;
+                        break;
+                    }
+                    tourBookmarks.push(new TourBookmark(bmString.url, bmString.name, bmString.lapseTime, bmString.description));
+                }
+                if(!areBookmarksValid) {
+                    continue;
+                }
+                Tours.tours.push(new Tour(tourString.name, tourBookmarks, bookmarkTransition, CZ.Common.vc, tourString.category, tourString.audio, tourString.sequence));
+            }
+            $("body").trigger("toursInitialized");
+        }
+        Tours.parseTours = parseTours;
+        function bookmarkTransition(visible, onCompleted, onInterrupted, bookmark) {
+            Tours.tourBookmarkTransitionCompleted = onCompleted;
+            Tours.tourBookmarkTransitionInterrupted = onInterrupted;
+            Tours.pauseTourAtAnyAnimation = false;
+            var animId = CZ.Common.setVisible(visible);
+            if(animId && bookmark) {
+                CZ.Common.setNavigationStringTo = {
+                    bookmark: bookmark,
+                    id: animId
+                };
+            }
+            return animId;
+        }
+        Tours.bookmarkTransition = bookmarkTransition;
+        function loadTourFromURL() {
+            var curURL = CZ.UrlNav.getURL();
+            if((typeof curURL.hash.params !== 'undefined') && (curURL.hash.params["tour"] > Tours.tours.length)) {
+                return;
+            }
+            if(typeof curURL.hash.params !== 'undefined' && typeof curURL.hash.params["tour"] !== 'undefined') {
+                if(Tours.tours == null) {
+                    initializeToursContent();
+                }
+                if(Tours.isTourWindowVisible) {
+                    onTourClicked();
+                }
+                Tours.tour = Tours.tours[curURL.hash.params["tour"] - 1];
+                $(".touritem-selected").removeClass("touritem-selected", "slow");
+                activateTour(Tours.tour, true);
+                if(Tours.tour.audio) {
+                    Tours.tour.audio.pause();
+                    Tours.tour.audio.preload = "none";
+                }
+                tourPause();
+            }
+        }
+        Tours.loadTourFromURL = loadTourFromURL;
+    })(CZ.Tours || (CZ.Tours = {}));
+    var Tours = CZ.Tours;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
@@ -4886,185 +5916,6 @@ var CZ;
         Layout.Merge = Merge;
     })(CZ.Layout || (CZ.Layout = {}));
     var Layout = CZ.Layout;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (Dates) {
-        Dates.months = [
-            'January', 
-            'February', 
-            'March', 
-            'April', 
-            'May', 
-            'June', 
-            'July', 
-            'August', 
-            'September', 
-            'October', 
-            'November', 
-            'December'
-        ];
-        Dates.daysInMonth = [
-            31, 
-            28, 
-            31, 
-            30, 
-            31, 
-            30, 
-            31, 
-            31, 
-            30, 
-            31, 
-            30, 
-            31
-        ];
-        function getCoordinateFromDMY(year, month, day) {
-            var sign = (year != 0) ? year / Math.abs(year) : 1;
-            var i = 0;
-            var coordinate = 0;
-            for(i = 0; i < Math.abs(year); i++) {
-                coordinate += sign;
-                if(isLeapYear(i * sign)) {
-                    coordinate += sign / 365;
-                }
-            }
-            var days = day;
-            for(i = 0; i < month; i++) {
-                days += Dates.daysInMonth[i];
-                if((i === 1) && (isLeapYear(year))) {
-                    days++;
-                }
-            }
-            if((month > 1) && (isLeapYear(year))) {
-                coordinate += sign * days / 365;
-            } else {
-                coordinate += (sign >= 0) ? sign * days / 365 : sign * (1 - days / 365);
-            }
-            if(year < 0) {
-                coordinate += 1;
-            }
-            return coordinate;
-        }
-        Dates.getCoordinateFromDMY = getCoordinateFromDMY;
-        function getDMYFromCoordinate(coord) {
-            var sign = coord / Math.abs(coord);
-            var day = 0, month = 0, year = 0;
-            var idxYear, countLeapYears = 0;
-            for(idxYear = 0; idxYear < Math.abs(coord) - 1; idxYear++) {
-                year += sign;
-                if(isLeapYear(sign * idxYear)) {
-                    countLeapYears++;
-                }
-            }
-            var day, month;
-            var countDays;
-            countDays = Math.abs(coord) - Math.abs(year);
-            if(sign < 0) {
-                countDays = 1 - countDays;
-            }
-            var daysPerYear = 365.0;
-            var countDaysWithoutLeapDays = countDays - countLeapYears / daysPerYear;
-            var idxMonth = 0;
-            while(countDaysWithoutLeapDays > Dates.daysInMonth[idxMonth] / daysPerYear) {
-                countDaysWithoutLeapDays -= Dates.daysInMonth[idxMonth] / daysPerYear;
-                if(isLeapYear(year) && (idxMonth === 1)) {
-                    countDaysWithoutLeapDays -= 1 / daysPerYear;
-                }
-                idxMonth++;
-            }
-            month = idxMonth;
-            day = countDaysWithoutLeapDays * daysPerYear;
-            while(Math.round(day) <= 0) {
-                month--;
-                if(month === -1) {
-                    year--;
-                    month = 11;
-                }
-                day = Dates.daysInMonth[month] + Math.round(day);
-                if(isLeapYear(year) && (month === 1)) {
-                    day++;
-                }
-            }
-            if(coord < 0) {
-                year--;
-            }
-            return {
-                year: year,
-                month: month,
-                day: Math.round(day)
-            };
-        }
-        Dates.getDMYFromCoordinate = getDMYFromCoordinate;
-        function getCoordinateFromDecimalYear(decimalYear) {
-            var localPresent = getPresent();
-            var presentDate = getCoordinateFromDMY(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
-            return decimalYear === 9999 ? presentDate : decimalYear;
-        }
-        Dates.getCoordinateFromDecimalYear = getCoordinateFromDecimalYear;
-        function convertCoordinateToYear(coordinate) {
-            var year = {
-                year: coordinate,
-                regime: "CE"
-            };
-            if(coordinate < -999999999) {
-                year.year /= -1000000000;
-                year.regime = 'Ga';
-            } else if(coordinate < -999999) {
-                year.year /= -1000000;
-                year.regime = 'Ma';
-            } else if(coordinate < -999) {
-                year.year /= -1000;
-                year.regime = 'Ka';
-            } else if(coordinate < 0) {
-                year.year /= -1;
-                year.year = Math.floor(year.year);
-                year.regime = 'BCE';
-            } else {
-                year.year = Math.floor(year.year);
-            }
-            return year;
-        }
-        Dates.convertCoordinateToYear = convertCoordinateToYear;
-        function convertYearToCoordinate(year, regime) {
-            var coordinate = year;
-            switch(regime.toLowerCase()) {
-                case "ga":
-                    coordinate *= -1000000000;
-                    break;
-                case "ma":
-                    coordinate *= -1000000;
-                    break;
-                case "ka":
-                    coordinate *= -1000;
-                    break;
-                case "bce":
-                    coordinate *= -1;
-                    break;
-            }
-            return coordinate;
-        }
-        Dates.convertYearToCoordinate = convertYearToCoordinate;
-        var present = undefined;
-        function getPresent() {
-            if(!present) {
-                present = new Date();
-                present.presentDay = present.getUTCDate();
-                present.presentMonth = present.getUTCMonth();
-                present.presentYear = present.getUTCFullYear();
-            }
-            return present;
-        }
-        Dates.getPresent = getPresent;
-        function isLeapYear(year) {
-            if(year >= 1582 && (year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0))) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        Dates.isLeapYear = isLeapYear;
-    })(CZ.Dates || (CZ.Dates = {}));
-    var Dates = CZ.Dates;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
@@ -7476,513 +8327,6 @@ var CZ;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
-    (function (Authoring) {
-        var _vcwidget;
-        var _dragStart = {
-        };
-        var _dragPrev = {
-        };
-        var _dragCur = {
-        };
-        var _hovered = {
-        };
-        var _rectPrev = {
-            type: "rectangle"
-        };
-        var _rectCur = {
-            type: "rectangle"
-        };
-        var _circlePrev = {
-            type: "circle"
-        };
-        var _circleCur = {
-            type: "circle"
-        };
-        Authoring.selectedTimeline = {
-        };
-        Authoring.selectedExhibit = {
-        };
-        Authoring.selectedContentItem = {
-        };
-        Authoring.isActive = false;
-        Authoring.isEnabled = false;
-        Authoring.isDragging = false;
-        Authoring.mode = null;
-        Authoring.contentItemMode = null;
-        Authoring.showCreateTimelineForm = null;
-        Authoring.showEditTimelineForm = null;
-        Authoring.showCreateExhibitForm = null;
-        Authoring.showEditExhibitForm = null;
-        Authoring.showEditContentItemForm = null;
-        function isIntersecting(te, obj) {
-            switch(obj.type) {
-                case "timeline":
-                case "infodot":
-                    return (te.x + te.width > obj.x && te.x < obj.x + obj.width && te.y + te.height > obj.y && te.y < obj.y + obj.height);
-                default:
-                    return false;
-            }
-        }
-        function isIncluded(tp, obj) {
-            switch(obj.type) {
-                case "timeline":
-                case "rectangle":
-                case "infodot":
-                case "circle":
-                    return (tp.x <= obj.x && tp.y <= obj.y && tp.x + tp.width >= obj.x + obj.width && tp.y + tp.height >= obj.y + obj.height);
-                default:
-                    return true;
-            }
-        }
-        function checkTimelineIntersections(tp, tc, editmode) {
-            var i = 0;
-            var len = 0;
-            var selfIntersection = false;
-            if(!tp) {
-                return true;
-            }
-            if(!isIncluded(tp, tc) && tp.id !== "__root__") {
-                return false;
-            }
-            for(i = 0 , len = tp.children.length; i < len; ++i) {
-                selfIntersection = editmode ? (tp.children[i] === Authoring.selectedTimeline) : (tp.children[i] === tc);
-                if(!selfIntersection && isIntersecting(tc, tp.children[i])) {
-                    return false;
-                }
-            }
-            if(editmode && Authoring.selectedTimeline.children && Authoring.selectedTimeline.children.length > 0) {
-                for(i = 0 , len = Authoring.selectedTimeline.children.length; i < len; ++i) {
-                    if(!isIncluded(tc, Authoring.selectedTimeline.children[i])) {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
-        function checkExhibitIntersections(tp, ec, editmode) {
-            var i = 0;
-            var len = 0;
-            var selfIntersection = false;
-            if(!isIncluded(tp, ec)) {
-                return false;
-            }
-            for(i = 0 , len = tp.children.length; i < len; ++i) {
-                selfIntersection = editmode ? (tp.children[i] === Authoring.selectedExhibit) : (tp.children[i] === ec);
-                if(!selfIntersection && isIntersecting(ec, tp.children[i])) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        function updateNewRectangle() {
-            _rectCur.x = Math.min(_dragStart.x, _dragCur.x);
-            _rectCur.y = Math.min(_dragStart.y, _dragCur.y);
-            _rectCur.width = Math.abs(_dragStart.x - _dragCur.x);
-            _rectCur.height = Math.abs(_dragStart.y - _dragCur.y);
-            if(checkTimelineIntersections(_hovered, _rectCur, false)) {
-                var settings = $.extend({
-                }, _hovered.settings);
-                settings.strokeStyle = "yellow";
-                $.extend(_rectPrev, _rectCur);
-                CZ.VCContent.removeChild(_hovered, "newTimelineRectangle");
-                CZ.VCContent.addRectangle(_hovered, _hovered.layerid, "newTimelineRectangle", _rectCur.x, _rectCur.y, _rectCur.width, _rectCur.height, settings);
-            } else {
-                $.extend(_rectCur, _rectPrev);
-            }
-        }
-        function updateNewCircle() {
-            _circleCur.r = (_hovered.width > _hovered.height) ? _hovered.height / 27.7 : _hovered.width / 10.0;
-            _circleCur.x = _dragCur.x - _circleCur.r;
-            _circleCur.y = _dragCur.y - _circleCur.r;
-            _circleCur.width = _circleCur.height = 2 * _circleCur.r;
-            if(checkExhibitIntersections(_hovered, _circleCur, false)) {
-                $.extend(_circlePrev, _circleCur);
-                CZ.VCContent.removeChild(_hovered, "newExhibitCircle");
-                CZ.VCContent.addCircle(_hovered, "layerInfodots", "newExhibitCircle", _circleCur.x + _circleCur.r, _circleCur.y + _circleCur.r, _circleCur.r, {
-                    strokeStyle: "yellow"
-                }, false);
-            } else {
-                $.extend(_circleCur, _circlePrev);
-            }
-        }
-        function renewExhibit(e) {
-            var vyc = e.y + e.height / 2;
-            var time = e.x + e.width / 2;
-            var id = e.id;
-            var cis = e.contentItems;
-            var descr = e.infodotDescription;
-            descr.opacity = 1;
-            descr.title = e.title;
-            descr.guid = e.guid;
-            var parent = e.parent;
-            var radv = e.outerRad;
-            CZ.VCContent.removeChild(parent, id);
-            return CZ.VCContent.addInfodot(parent, "layerInfodots", id, time, vyc, radv, cis, descr);
-        }
-        Authoring.renewExhibit = renewExhibit;
-        function createNewTimeline() {
-            return CZ.VCContent.addTimeline(_hovered, _hovered.layerid, undefined, {
-                timeStart: _rectCur.x,
-                timeEnd: _rectCur.x + _rectCur.width,
-                header: "Timeline Title",
-                top: _rectCur.y,
-                height: _rectCur.height,
-                fillStyle: _hovered.settings.fillStyle,
-                regime: _hovered.regime,
-                gradientFillStyle: _hovered.settings.gradientFillStyle,
-                lineWidth: _hovered.settings.lineWidth,
-                strokeStyle: _hovered.settings.gradientFillStyle
-            });
-        }
-        Authoring.createNewTimeline = createNewTimeline;
-        function createNewExhibit() {
-            CZ.VCContent.removeChild(_hovered, "newExhibitCircle");
-            return CZ.VCContent.addInfodot(_hovered, "layerInfodots", undefined, _circleCur.x + _circleCur.r, _circleCur.y + _circleCur.r, _circleCur.r, [], {
-                title: "Exhibit Title",
-                date: _circleCur.x + _circleCur.r,
-                guid: undefined
-            });
-        }
-        function updateTimelineTitle(t) {
-            var headerSize = CZ.Settings.timelineHeaderSize * t.height;
-            var marginLeft = CZ.Settings.timelineHeaderMargin * t.height;
-            var marginTop = (1 - CZ.Settings.timelineHeaderMargin) * t.height - headerSize;
-            var baseline = t.y + marginTop + headerSize / 2.0;
-            CZ.VCContent.removeChild(t, t.id + "__header__");
-            if(CZ.Authoring.isEnabled && typeof t.editButton !== "undefined") {
-                t.editButton.x = t.x + t.width - 1.15 * t.titleObject.height;
-                t.editButton.y = t.titleObject.y;
-                t.editButton.width = t.titleObject.height;
-                t.editButton.height = t.titleObject.height;
-            }
-            t.titleObject = CZ.VCContent.addText(t, t.layerid, t.id + "__header__", t.x + marginLeft, t.y + marginTop, baseline, headerSize, t.title, {
-                fontName: CZ.Settings.timelineHeaderFontName,
-                fillStyle: CZ.Settings.timelineHeaderFontColor,
-                textBaseline: "middle",
-                opacity: 1
-            });
-        }
-        Authoring.modeMouseHandlers = {
-            createTimeline: {
-                mousemove: function () {
-                    if(CZ.Authoring.isDragging && _hovered.type === "timeline") {
-                        updateNewRectangle();
-                    }
-                },
-                mouseup: function () {
-                    if(_dragCur.x === _dragStart.x && _dragCur.y === _dragStart.y) {
-                        return;
-                    }
-                    if(_hovered.type === "timeline") {
-                        CZ.VCContent.removeChild(_hovered, "newTimelineRectangle");
-                        Authoring.selectedTimeline = createNewTimeline();
-                        Authoring.showCreateTimelineForm(Authoring.selectedTimeline);
-                    }
-                }
-            },
-            editTimeline: {
-                mouseup: function () {
-                    Authoring.showEditTimelineForm(Authoring.selectedTimeline);
-                }
-            },
-            createExhibit: {
-                mousemove: function () {
-                    if(CZ.Authoring.isDragging && _hovered.type === "timeline") {
-                    }
-                },
-                mouseup: function () {
-                    if(_hovered.type === "timeline") {
-                        updateNewCircle();
-                        Authoring.selectedExhibit = createNewExhibit();
-                        Authoring.showCreateExhibitForm(Authoring.selectedExhibit);
-                    }
-                }
-            },
-            editExhibit: {
-                mouseup: function () {
-                    Authoring.showEditExhibitForm(Authoring.selectedExhibit);
-                }
-            },
-            editContentItem: {
-                mouseup: function () {
-                    Authoring.showEditContentItemForm(Authoring.selectedContentItem, Authoring.selectedExhibit);
-                }
-            }
-        };
-        function initialize(vc, formHandlers) {
-            _vcwidget = vc.data("ui-virtualCanvas");
-            _vcwidget.element.on("mousedown", function (event) {
-                if(CZ.Authoring.isActive) {
-                    var viewport = _vcwidget.getViewport();
-                    var origin = CZ.Common.getXBrowserMouseOrigin(_vcwidget.element, event);
-                    var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
-                    CZ.Authoring.isDragging = true;
-                    _dragStart = posv;
-                    _dragPrev = {
-                    };
-                    _dragCur = posv;
-                    _hovered = _vcwidget.hovered || {
-                    };
-                }
-            });
-            _vcwidget.element.on("mouseup", function (event) {
-                if(CZ.Authoring.isActive) {
-                    var viewport = _vcwidget.getViewport();
-                    var origin = CZ.Common.getXBrowserMouseOrigin(_vcwidget.element, event);
-                    var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
-                    CZ.Authoring.isDragging = false;
-                    _dragPrev = _dragCur;
-                    _dragCur = posv;
-                    CZ.Common.controller.stopAnimation();
-                    CZ.Authoring.modeMouseHandlers[CZ.Authoring.mode]["mouseup"]();
-                }
-            });
-            _vcwidget.element.on("mousemove", function (event) {
-                if(CZ.Authoring.isActive) {
-                    var viewport = _vcwidget.getViewport();
-                    var origin = CZ.Common.getXBrowserMouseOrigin(_vcwidget.element, event);
-                    var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
-                    _dragPrev = _dragCur;
-                    _dragCur = posv;
-                    CZ.Authoring.modeMouseHandlers[CZ.Authoring.mode]["mousemove"]();
-                }
-            });
-            Authoring.showCreateTimelineForm = formHandlers && formHandlers.showCreateTimelineForm || function () {
-            };
-            Authoring.showEditTimelineForm = formHandlers && formHandlers.showEditTimelineForm || function () {
-            };
-            Authoring.showCreateExhibitForm = formHandlers && formHandlers.showCreateExhibitForm || function () {
-            };
-            Authoring.showEditExhibitForm = formHandlers && formHandlers.showEditExhibitForm || function () {
-            };
-            Authoring.showEditContentItemForm = formHandlers && formHandlers.showEditContentItemForm || function () {
-            };
-        }
-        Authoring.initialize = initialize;
-        function updateTimeline(t, prop) {
-            var temp = {
-                x: Number(prop.start),
-                y: t.y,
-                width: Number(CZ.Dates.getCoordinateFromDecimalYear(prop.end) - prop.start),
-                height: t.height,
-                type: "rectangle"
-            };
-            if(checkTimelineIntersections(t.parent, temp, true)) {
-                t.x = temp.x;
-                t.width = temp.width;
-                t.endDate = prop.end;
-            }
-            t.title = prop.title;
-            updateTimelineTitle(t);
-            return CZ.Service.putTimeline(t).then(function (success) {
-                t.id = "t" + success;
-                t.guid = success;
-                t.titleObject.id = "t" + success + "__header__";
-                if(!t.parent.guid) {
-                    document.location.reload(true);
-                } else {
-                    CZ.Common.vc.virtualCanvas("requestInvalidate");
-                }
-            }, function (error) {
-            });
-        }
-        Authoring.updateTimeline = updateTimeline;
-        function removeTimeline(t) {
-            var deferred = $.Deferred();
-            CZ.Service.deleteTimeline(t).then(function (updateCanvas) {
-                CZ.Common.vc.virtualCanvas("requestInvalidate");
-                deferred.resolve();
-            });
-            CZ.VCContent.removeChild(t.parent, t.id);
-        }
-        Authoring.removeTimeline = removeTimeline;
-        function updateExhibit(e, args) {
-            var deferred = $.Deferred();
-            if(e && e.contentItems && args) {
-                var clone = $.extend({
-                }, e, {
-                    children: null
-                });
-                clone = $.extend(true, {
-                }, clone);
-                delete clone.children;
-                delete clone.contentItems;
-                $.extend(true, clone, args);
-                var oldContentItems = $.extend(true, [], e.contentItems);
-                CZ.Service.putExhibit(clone).then(function (response) {
-                    var old_id = e.id;
-                    e.id = clone.id = "e" + response.ExhibitId;
-                    var new_id = e.id;
-                    e.guid = clone.guid = response.ExhibitId;
-                    for(var i = 0; i < e.contentItems.length; i++) {
-                        e.contentItems[i].ParentExhibitId = e.guid;
-                    }
-                    for(var i = 0; i < clone.contentItems.length; i++) {
-                        clone.contentItems[i].ParentExhibitId = clone.guid;
-                    }
-                    CZ.Service.putExhibitContent(clone, oldContentItems).then(function (response) {
-                        $.extend(e, clone);
-                        e.id = old_id;
-                        e = renewExhibit(e);
-                        e.id = new_id;
-                        CZ.Common.vc.virtualCanvas("requestInvalidate");
-                        deferred.resolve();
-                    }, function (error) {
-                        console.log("Error connecting to service: update exhibit (put exhibit content).\n" + error.responseText);
-                        deferred.reject();
-                    });
-                }, function (error) {
-                    console.log("Error connecting to service: update exhibit.\n" + error.responseText);
-                    deferred.reject();
-                });
-            } else {
-                deferred.reject();
-            }
-            return deferred.promise();
-        }
-        Authoring.updateExhibit = updateExhibit;
-        function removeExhibit(e) {
-            var deferred = $.Deferred();
-            if(e && e.id && e.parent) {
-                var clone = $.extend({
-                }, e, {
-                    children: null
-                });
-                clone = $.extend(true, {
-                }, clone);
-                CZ.Service.deleteExhibit(clone).then(function (response) {
-                    CZ.VCContent.removeChild(e.parent, e.id);
-                    CZ.Common.vc.virtualCanvas("requestInvalidate");
-                    deferred.resolve();
-                }, function (error) {
-                    console.log("Error connecting to service: remove exhibit.\n" + error.responseText);
-                    deferred.reject();
-                });
-            } else {
-                deferred.reject();
-            }
-            return deferred.promise();
-        }
-        Authoring.removeExhibit = removeExhibit;
-        function updateContentItem(e, c, args) {
-            var deferred = $.Deferred();
-            if(e && e.contentItems && e.contentItems.length && c && args) {
-                var clone = $.extend(true, {
-                }, c, args);
-                CZ.Service.putContentItem(clone).then(function (response) {
-                    $.extend(c, clone);
-                    c.id = c.guid = response;
-                    e = renewExhibit(e);
-                    CZ.Common.vc.virtualCanvas("requestInvalidate");
-                    deferred.resolve();
-                }, function (error) {
-                    console.log("Error connecting to service: update content item.\n" + error.responseText);
-                    deferred.reject();
-                });
-            } else {
-                deferred.reject();
-            }
-            return deferred.promise();
-        }
-        Authoring.updateContentItem = updateContentItem;
-        function removeContentItem(e, c) {
-            var deferred = $.Deferred();
-            if(e && e.contentItems && e.contentItems.length && c && c.index) {
-                var clone = $.extend(true, {
-                }, c);
-                CZ.Service.deleteContentItem(clone).then(function (response) {
-                    e.contentItems.splice(c.index, 1);
-                    e = renewExhibit(e);
-                    CZ.Common.vc.virtualCanvas("requestInvalidate");
-                    deferred.resolve();
-                }, function (error) {
-                    console.log("Error connecting to service: remove content item.\n" + error.responseText);
-                    deferred.reject();
-                });
-            } else {
-                deferred.reject();
-            }
-            return deferred.promise();
-        }
-        Authoring.removeContentItem = removeContentItem;
-        function validateTimelineData(start, end, title) {
-            var isValid = CZ.Authoring.validateNumber(start) && CZ.Authoring.validateNumber(end);
-            isValid = isValid && CZ.Authoring.isNotEmpty(title) && CZ.Authoring.isNotEmpty(start) && CZ.Authoring.isNotEmpty(end);
-            isValid = isValid && CZ.Authoring.isIntervalPositive(start, end);
-            return isValid;
-        }
-        Authoring.validateTimelineData = validateTimelineData;
-        function validateExhibitData(date, title, contentItems) {
-            var isValid = CZ.Authoring.validateNumber(date);
-            isValid = isValid && CZ.Authoring.isNotEmpty(title);
-            isValid = isValid && CZ.Authoring.validateContentItems(contentItems);
-            return isValid;
-        }
-        Authoring.validateExhibitData = validateExhibitData;
-        function validateNumber(number) {
-            return !isNaN(Number(number) && parseFloat(number)) && isNotEmpty(number);
-        }
-        Authoring.validateNumber = validateNumber;
-        function isNotEmpty(obj) {
-            return (obj !== '' && obj !== null);
-        }
-        Authoring.isNotEmpty = isNotEmpty;
-        function isIntervalPositive(start, end) {
-            return (parseFloat(start) < parseFloat(end));
-        }
-        Authoring.isIntervalPositive = isIntervalPositive;
-        function validateContentItems(contentItems) {
-            var isValid = true;
-            if(contentItems.length == 0) {
-                return false;
-            }
-            var i = 0;
-            while(contentItems[i] != null) {
-                var ci = contentItems[i];
-                isValid = isValid && CZ.Authoring.isNotEmpty(ci.title) && CZ.Authoring.isNotEmpty(ci.uri) && CZ.Authoring.isNotEmpty(ci.mediaType);
-                if(ci.mediaType.toLowerCase() === "image") {
-                    var imageReg = /\.(jpg|jpeg|png)$/i;
-                    if(!imageReg.test(ci.uri)) {
-                        alert("Sorry, only JPG/PNG images are supported");
-                        isValid = false;
-                    }
-                } else if(ci.mediaType.toLowerCase() === "video") {
-                    var youtube = /(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|[\S\?\&]+&v=|\/user\/\S+))([^\/&#]{10,12})/;
-                    var vimeo = /vimeo\.com\/([0-9]+)/i;
-                    var vimeoEmbed = /player.vimeo.com\/video\/([0-9]+)/i;
-                    if(youtube.test(ci.uri)) {
-                        var youtubeVideoId = ci.uri.match(youtube)[1];
-                        ci.uri = "http://www.youtube.com/embed/" + youtubeVideoId;
-                    } else if(vimeo.test(ci.uri)) {
-                        var vimeoVideoId = ci.uri.match(vimeo)[1];
-                        ci.uri = "http://player.vimeo.com/video/" + vimeoVideoId;
-                    } else if(vimeoEmbed.test(ci.uri)) {
-                    } else {
-                        alert("Sorry, only YouTube or Vimeo videos are supported");
-                        isValid = false;
-                    }
-                } else if(ci.mediaType.toLowerCase() === "pdf") {
-                    var pdf = /\.(pdf)$/i;
-                    if(pdf.test(ci.uri)) {
-                        ci.uri = "http://docs.google.com/viewer?url=" + encodeURI(ci.uri) + "&embedded=true";
-                    } else {
-                        alert("Sorry, only PDF extension is supported");
-                        isValid = false;
-                    }
-                }
-                if(!isValid) {
-                    return false;
-                }
-                i++;
-            }
-            return isValid;
-        }
-        Authoring.validateContentItems = validateContentItems;
-    })(CZ.Authoring || (CZ.Authoring = {}));
-    var Authoring = CZ.Authoring;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
     (function (UI) {
         var DatePicker = (function () {
             function DatePicker(datePicker) {
@@ -8194,6 +8538,15 @@ var CZ;
 (function (CZ) {
     (function (Authoring) {
         (function (UI) {
+            function createTour() {
+                if(CZ.Layout.animatingElements.length != 0) {
+                    return;
+                }
+                CZ.Authoring.isActive = false;
+                CZ.Authoring.mode = "editTour";
+                Authoring.showEditTourForm(null);
+            }
+            UI.createTour = createTour;
             function createTimeline() {
                 if(CZ.Layout.animatingElements.length != 0) {
                     return;
@@ -8790,79 +9143,6 @@ var CZ;
     })(CZ.UILoader || (CZ.UILoader = {}));
     var UILoader = CZ.UILoader;
 })(CZ || (CZ = {}));
-var __extends = this.__extends || function (d, b) {
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var FormBase = (function () {
-            function FormBase(container, formInfo) {
-                var _this = this;
-                if(!(container instanceof jQuery && container.is("div"))) {
-                    throw "Container parameter is invalid! It should be jQuery instance of DIV.";
-                }
-                this.container = container;
-                this.prevForm = formInfo.prevForm;
-                this.activationSource = formInfo.activationSource;
-                this.navButton = this.container.find(formInfo.navButton);
-                this.closeButton = this.container.find(formInfo.closeButton);
-                this.titleTextblock = this.container.find(formInfo.titleTextblock);
-                if(this.prevForm) {
-                    this.navButton.show();
-                } else {
-                    this.navButton.hide();
-                }
-                this.navButton.off();
-                this.closeButton.off();
-                this.navButton.click(function (event) {
-                    _this.back();
-                });
-                this.closeButton.click(function (event) {
-                    _this.close();
-                });
-            }
-            FormBase.prototype.show = function () {
-                var args = [];
-                for (var _i = 0; _i < (arguments.length - 0); _i++) {
-                    args[_i] = arguments[_i + 0];
-                }
-                this.container.show.apply(this.container, args);
-            };
-            FormBase.prototype.close = function () {
-                var args = [];
-                for (var _i = 0; _i < (arguments.length - 0); _i++) {
-                    args[_i] = arguments[_i + 0];
-                }
-                this.container.hide.apply(this.container, args);
-            };
-            FormBase.prototype.back = function () {
-                this.close();
-                this.prevForm.show();
-            };
-            return FormBase;
-        })();
-        UI.FormBase = FormBase;        
-        var FormUpdateEntity = (function (_super) {
-            __extends(FormUpdateEntity, _super);
-            function FormUpdateEntity(container, formInfo) {
-                var _this = this;
-                        _super.call(this, container, formInfo);
-                this.saveButton = this.container.find(formInfo.saveButton);
-                this.container.keypress(function (event) {
-                    if(event.keyCode === 13) {
-                        _this.saveButton.trigger("click");
-                    }
-                });
-            }
-            return FormUpdateEntity;
-        })(FormBase);
-        UI.FormUpdateEntity = FormUpdateEntity;        
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
     (function (UI) {
@@ -8968,103 +9248,6 @@ var CZ;
             return FormEditTimeline;
         })(CZ.UI.FormUpdateEntity);
         UI.FormEditTimeline = FormEditTimeline;        
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var ListBoxBase = (function () {
-            function ListBoxBase(container, listBoxInfo, listItemsInfo, getType) {
-                if (typeof getType === "undefined") { getType = function (context) {
-                    return "default";
-                }; }
-                if(!(container instanceof jQuery)) {
-                    throw "Container parameter is invalid! It should be jQuery instance.";
-                }
-                this.container = container;
-                this.listItemsInfo = listItemsInfo;
-                this.getType = getType;
-                this.items = [];
-                if(this.listItemsInfo.default) {
-                    this.listItemsInfo.default.ctor = this.listItemsInfo.default.ctor || ListItemBase;
-                }
-                for(var i = 0, context = listBoxInfo.context, len = context.length; i < len; ++i) {
-                    this.add(context[i]);
-                }
-                this.itemDblClickHandler = function (item, idx) {
-                };
-                this.itemRemoveHandler = function (item, idx) {
-                };
-                this.container.sortable(listBoxInfo.sortableSettings);
-            }
-            ListBoxBase.prototype.add = function (context) {
-                var type = this.getType(context);
-                var typeInfo = this.listItemsInfo[type];
-                var container = typeInfo.container.clone();
-                var uiMap = typeInfo.uiMap;
-                var ctor = typeInfo.ctor;
-                var item = new ctor(this, container, uiMap, context);
-                this.items.push(item);
-                return item;
-            };
-            ListBoxBase.prototype.remove = function (item) {
-                var i = this.items.indexOf(item);
-                if(i !== -1) {
-                    item.container.remove();
-                    this.items.splice(i, 1);
-                    this.itemRemoveHandler(item, i);
-                }
-            };
-            ListBoxBase.prototype.clear = function () {
-                for(var i = 0, len = this.items.length; i < len; ++i) {
-                    var item = this.items[i];
-                    item.container.remove();
-                }
-                this.items.length = 0;
-            };
-            ListBoxBase.prototype.selectItem = function (item) {
-                var i = this.items.indexOf(item);
-                if(i !== -1) {
-                    this.itemDblClickHandler(item, i);
-                }
-            };
-            ListBoxBase.prototype.itemDblClick = function (handler) {
-                this.itemDblClickHandler = handler;
-            };
-            ListBoxBase.prototype.itemRemove = function (handler) {
-                this.itemRemoveHandler = handler;
-            };
-            return ListBoxBase;
-        })();
-        UI.ListBoxBase = ListBoxBase;        
-        var ListItemBase = (function () {
-            function ListItemBase(parent, container, uiMap, context) {
-                var _this = this;
-                if(!(container instanceof jQuery)) {
-                    throw "Container parameter is invalid! It should be jQuery instance.";
-                }
-                this.parent = parent;
-                this.container = container;
-                this.data = context;
-                this.container.dblclick(function (_) {
-                    return _this.parent.selectItem(_this);
-                });
-                this.closeButton = this.container.find(uiMap.closeButton);
-                if(!this.closeButton.length) {
-                    throw "Close button is not found in a given UI map.";
-                }
-                this.closeButton.click(function (event) {
-                    return _this.close();
-                });
-                this.parent.container.append(this.container);
-            }
-            ListItemBase.prototype.close = function () {
-                this.parent.remove(this);
-            };
-            return ListItemBase;
-        })();
-        UI.ListItemBase = ListItemBase;        
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
@@ -9481,24 +9664,310 @@ var CZ;
 var CZ;
 (function (CZ) {
     (function (UI) {
+        var TourStopListBox = (function (_super) {
+            __extends(TourStopListBox, _super);
+            function TourStopListBox(container, listItemContainer, contentItems) {
+                var listBoxInfo = {
+                    context: contentItems,
+                    sortableSettings: {
+                        forcePlaceholderSize: true,
+                        cursor: "move",
+                        placeholder: "cz-listbox-placeholder",
+                        revert: 100,
+                        opacity: 0.75,
+                        tolerance: "pointer",
+                        scroll: false,
+                        start: function (event, ui) {
+                            ui.placeholder.height(ui.item.height());
+                        }
+                    }
+                };
+                var listItemsInfo = {
+                    default: {
+                        container: listItemContainer,
+                        uiMap: {
+                            closeButton: ".cz-listitem-close-btn",
+                            iconImg: ".cz-contentitem-listitem-icon > img",
+                            titleTextblock: ".cz-contentitem-listitem-title",
+                            typeTextblock: ".cz-contentitem-listitem-highlighted"
+                        }
+                    }
+                };
+                listItemsInfo.default.ctor = TourStopListItem;
+                        _super.call(this, container, listBoxInfo, listItemsInfo);
+            }
+            return TourStopListBox;
+        })(UI.ListBoxBase);
+        UI.TourStopListBox = TourStopListBox;        
+        var TourStopListItem = (function (_super) {
+            __extends(TourStopListItem, _super);
+            function TourStopListItem(parent, container, uiMap, context) {
+                        _super.call(this, parent, container, uiMap, context);
+                this.iconImg = this.container.find(uiMap.iconImg);
+                this.titleTextblock = this.container.find(uiMap.titleTextblock);
+                this.typeTextblock = this.container.find(uiMap.typeTextblock);
+                this.iconImg.attr("src", this.data.Icon || "/images/Temp-Thumbnail2.png");
+                this.titleTextblock.text(this.data.Title);
+                this.typeTextblock.text(this.data.Type);
+                this.container.dblclick(function (e) {
+                    if(typeof context.Target.vc == "undefined") {
+                        return;
+                    }
+                    var vp = context.Target.vc.getViewport();
+                    var visible = CZ.VCContent.getVisibleForElement(context.Target, 1.0, vp, true);
+                    var target = {
+                        newvisible: visible,
+                        element: context.Target
+                    };
+                    CZ.Search.navigateToElement(target);
+                });
+            }
+            return TourStopListItem;
+        })(UI.ListItemBase);
+        UI.TourStopListItem = TourStopListItem;        
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var TourStop = (function () {
+            function TourStop(target, title) {
+                if(target == undefined || target == null) {
+                    throw "target element of a tour stop is null or undefined";
+                }
+                if(typeof target.type == "undefined") {
+                    throw "type of the tour stop target element is undefined";
+                }
+                this.targetElement = target;
+                if(target.type === "Unknown") {
+                    this.type = target.type;
+                    this.title = title;
+                } else if(target.type === "contentItem") {
+                    this.type = "Content Item";
+                    this.title = title ? title : target.contentItem.title;
+                } else {
+                    this.type = target.type === "timeline" ? "Timeline" : "Event";
+                    this.title = title ? title : target.title;
+                }
+            }
+            Object.defineProperty(TourStop.prototype, "Target", {
+                get: function () {
+                    return this.targetElement;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(TourStop.prototype, "Title", {
+                get: function () {
+                    return this.title;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(TourStop.prototype, "LapseTime", {
+                get: function () {
+                    return this.lapseTime;
+                },
+                set: function (value) {
+                    this.lapseTime = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(TourStop.prototype, "Type", {
+                get: function () {
+                    return this.type;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            return TourStop;
+        })();
+        UI.TourStop = TourStop;        
+        var FormEditTour = (function (_super) {
+            __extends(FormEditTour, _super);
+            function FormEditTour(container, formInfo) {
+                        _super.call(this, container, formInfo);
+                this.saveButton = container.find(formInfo.saveButton);
+                this.deleteButton = container.find(formInfo.deleteButton);
+                this.addStopButton = container.find(formInfo.addStopButton);
+                this.titleInput = container.find(formInfo.titleInput);
+                this.tourTitleInput = this.container.find(".cz-form-tour-title");
+                this.saveButton.off();
+                this.deleteButton.off();
+                this.tour = formInfo.context;
+                this.stops = [];
+                if(this.tour) {
+                    this.tourTitleInput.val(this.tour.title);
+                    for(var i = 0, len = this.tour.bookmarks.length; i < len; i++) {
+                        var bookmark = this.tour.bookmarks[i];
+                        var stop = FormEditTour.bookmarkToTourstop(bookmark);
+                        this.stops.push(stop);
+                    }
+                } else {
+                    this.tourTitleInput.val("");
+                }
+                this.tourStopsListBox = new CZ.UI.TourStopListBox(container.find(formInfo.tourStopsListBox), formInfo.tourStopsTemplate, this.stops);
+                this.initialize();
+            }
+            FormEditTour.bookmarkToTourstop = function bookmarkToTourstop(bookmark) {
+                var target = CZ.Tours.bookmarkUrlToElement(bookmark.url);
+                if(target == null) {
+                    target = {
+                        type: "Unknown"
+                    };
+                }
+                var stop = new TourStop(target, (!bookmark.caption || $.trim(bookmark.caption) === "") ? undefined : bookmark.caption);
+                stop.LapseTime = bookmark.lapseTime;
+                return stop;
+            };
+            FormEditTour.tourstopToBookmark = function tourstopToBookmark(tourstop) {
+                var url = CZ.UrlNav.vcelementToNavString(tourstop.Target);
+                var title = tourstop.Title;
+                var text = "";
+                var bookmark = new CZ.Tours.TourBookmark(url, title, tourstop.LapseTime, text);
+                return bookmark;
+            };
+            FormEditTour.prototype.createTour = function () {
+                var name = this.tourTitleInput.val();
+                var tourBookmarks = new Array();
+                for(var j = 0, n = this.tourStopsListBox.items.length; j < n; j++) {
+                    var tourstopItem = this.tourStopsListBox.items[j];
+                    var tourstop = tourstopItem.data;
+                    var bookmark = FormEditTour.tourstopToBookmark(tourstop);
+                    tourBookmarks.push(bookmark);
+                }
+                var tour = new CZ.Tours.Tour(name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, "my tours", "", CZ.Tours.tours.length);
+                return tour;
+            };
+            FormEditTour.prototype.initializeAsEdit = function () {
+                this.deleteButton.show();
+                this.titleTextblock.text("Edit Tour");
+                this.saveButton.text("update tour");
+            };
+            FormEditTour.prototype.initialize = function () {
+                var _this = this;
+                if(this.tour == null) {
+                    this.deleteButton.hide();
+                    this.titleTextblock.text("Create Tour");
+                    this.saveButton.text("create tour");
+                } else {
+                    this.initializeAsEdit();
+                }
+                var self = this;
+                this.addStopButton.click(function (event) {
+                    CZ.Authoring.isActive = true;
+                    CZ.Authoring.mode = "editTour-selectTarget";
+                    CZ.Authoring.callback = function (arg) {
+                        return self.onTargetElementSelected(arg);
+                    };
+                    self.hide();
+                });
+                this.saveButton.click(function (event) {
+                    if(_this.tour == null) {
+                        _this.tour = _this.createTour();
+                        CZ.Tours.tours.push(_this.tour);
+                        _this.initializeAsEdit();
+                    } else {
+                        for(var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
+                            if(CZ.Tours.tours[i] === _this.tour) {
+                                _this.tour = CZ.Tours.tours[i] = _this.createTour();
+                                break;
+                            }
+                        }
+                    }
+                });
+                this.deleteButton.click(function (event) {
+                    if(_this.tour == null) {
+                        return;
+                    }
+                    for(var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
+                        if(CZ.Tours.tours[i] === _this.tour) {
+                            _this.tour = null;
+                            CZ.Tours.tours.splice(i, 1);
+                            _this.close();
+                            break;
+                        }
+                    }
+                });
+            };
+            FormEditTour.prototype.show = function () {
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
+                this.activationSource.addClass("active");
+            };
+            FormEditTour.prototype.hide = function (noAnimation) {
+                if (typeof noAnimation === "undefined") { noAnimation = false; }
+                _super.prototype.close.call(this, noAnimation ? undefined : {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
+                this.activationSource.removeClass("active");
+            };
+            FormEditTour.prototype.close = function () {
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500,
+                    complete: function () {
+                    }
+                });
+                CZ.Authoring.isActive = false;
+                this.activationSource.removeClass("active");
+                this.container.find("cz-form-errormsg").hide();
+                this.tourStopsListBox.container.empty();
+            };
+            FormEditTour.prototype.onTargetElementSelected = function (targetElement) {
+                CZ.Authoring.isActive = false;
+                CZ.Authoring.mode = "editTour";
+                CZ.Authoring.callback = null;
+                var stop = new TourStop(targetElement);
+                if(this.tourStopsListBox.items.length > 0) {
+                    stop.LapseTime = ((this.tourStopsListBox.items[this.tourStopsListBox.items.length - 1]).data).LapseTime + CZ.Settings.tourDefaultTransitionTime;
+                } else {
+                    stop.LapseTime = 0;
+                }
+                this.tourStopsListBox.add(stop);
+                this.show();
+            };
+            return FormEditTour;
+        })(CZ.UI.FormBase);
+        UI.FormEditTour = FormEditTour;        
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
         var FormHeaderEdit = (function (_super) {
             __extends(FormHeaderEdit, _super);
             function FormHeaderEdit(container, formInfo) {
                         _super.call(this, container, formInfo);
                 this.createTimelineBtn = this.container.find(formInfo.createTimeline);
                 this.createExhibitBtn = this.container.find(formInfo.createExhibit);
+                this.createTourBtn = this.container.find(formInfo.createTour);
                 this.initialize();
             }
             FormHeaderEdit.prototype.initialize = function () {
                 var _this = this;
                 this.createTimelineBtn.off();
                 this.createExhibitBtn.off();
+                this.createTourBtn.off();
                 this.createTimelineBtn.click(function (event) {
                     CZ.Authoring.UI.createTimeline();
                     _this.close();
                 });
                 this.createExhibitBtn.click(function (event) {
                     CZ.Authoring.UI.createExhibit();
+                    _this.close();
+                });
+                this.createTourBtn.click(function (event) {
+                    CZ.Authoring.UI.createTour();
                     _this.close();
                 });
             };
@@ -9666,7 +10135,11 @@ var CZ;
             "#auth-edit-contentitem-form": "/ui/auth-edit-contentitem-form.html",
             "$('<div></div>')": "/ui/contentitem-listbox.html",
             "#profile-form": "/ui/header-edit-profile-form.html",
-            "#login-form": "/ui/header-login-form.html"
+            "#login-form": "/ui/header-login-form.html",
+            "#auth-edit-tours-form": "/ui/auth-edit-tour-form.html",
+            "$('<div><!--Tours Authoring--></div>')": "/ui/tourstop-listbox.html",
+            "#toursList": "/ui/tourslist-form.html",
+            "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html"
         };
         var FeatureActivation;
         (function (FeatureActivation) {
@@ -9713,6 +10186,38 @@ var CZ;
             }, 
             
         ];
+        function InitializeToursUI(profile, forms) {
+            var allowEditing = IsFeatureEnabled("Authoring") && (profile && profile != "" && profile.DisplayName === CZ.Service.superCollectionName);
+            var onToursInitialized = function () {
+                CZ.Tours.initializeToursUI();
+                $("#tours_index").click(function () {
+                    CZ.Tours.removeActiveTour();
+                    var form = new CZ.UI.FormToursList(forms[9], {
+                        activationSource: $(this),
+                        navButton: ".cz-form-nav",
+                        closeButton: ".cz-form-close-btn > .cz-form-btn",
+                        titleTextblock: ".cz-form-title",
+                        tourTemplate: forms[10],
+                        tours: CZ.Tours.tours,
+                        takeTour: function (tour) {
+                            CZ.Tours.removeActiveTour();
+                            CZ.Tours.activateTour(tour, undefined);
+                        },
+                        editTour: allowEditing ? function (tour) {
+                            if(CZ.Authoring.showEditTourForm) {
+                                CZ.Authoring.showEditTourForm(tour);
+                            }
+                        } : null
+                    });
+                    form.show();
+                });
+            };
+            if(CZ.Tours.tours) {
+                onToursInitialized();
+            } else {
+                $("body").bind("toursInitialized", onToursInitialized);
+            }
+        }
         var defaultRootTimeline = {
             title: "My Timeline",
             x: 1950,
@@ -9735,6 +10240,11 @@ var CZ;
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
+                CZ.Service.getProfile().done(function (profile) {
+                    InitializeToursUI(profile, forms);
+                }).fail(function (err) {
+                    InitializeToursUI(null, forms);
+                });
                 $(".header-icon.edit-icon").click(function () {
                     $(".header-icon.active").removeClass("active");
                     $(this).addClass("active");
@@ -9744,11 +10254,29 @@ var CZ;
                         closeButton: ".cz-form-close-btn > .cz-form-btn",
                         titleTextblock: ".cz-form-title",
                         createTimeline: ".cz-form-create-timeline",
-                        createExhibit: ".cz-form-create-exhibit"
+                        createExhibit: ".cz-form-create-exhibit",
+                        createTour: ".cz-form-create-tour"
                     });
                     form.show();
                 });
                 CZ.Authoring.initialize(CZ.Common.vc, {
+                    showEditTourForm: function (tour) {
+                        CZ.Tours.removeActiveTour();
+                        var form = new CZ.UI.FormEditTour(forms[7], {
+                            activationSource: $(".header-icon.edit-icon"),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            saveButton: ".cz-form-save",
+                            deleteButton: ".cz-form-delete",
+                            addStopButton: ".cz-form-tour-addstop",
+                            titleInput: ".cz-form-title",
+                            tourStopsListBox: "#stopsList",
+                            tourStopsTemplate: forms[8],
+                            context: tour
+                        });
+                        form.show();
+                    },
                     showCreateTimelineForm: function (timeline) {
                         CZ.Authoring.mode = "createTimeline";
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
@@ -9902,7 +10430,6 @@ var CZ;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
             $('#search_button').mouseup(CZ.Search.onSearchClicked);
-            $('#tours_index').mouseup(CZ.Tours.onTourClicked);
             $('#human_rect').click(function () {
                 CZ.Search.navigateToBookmark(CZ.Common.humanityVisible);
             });
@@ -10026,7 +10553,6 @@ var CZ;
             });
             CZ.Search.initializeSearch();
             CZ.Bibliography.initializeBibliography();
-            CZ.Tours.initializeToursUI();
             var canvasGestures = CZ.Gestures.getGesturesStream(CZ.Common.vc);
             var axisGestures = CZ.Gestures.applyAxisBehavior(CZ.Gestures.getGesturesStream(CZ.Common.ax));
             var jointGesturesStream = canvasGestures.Merge(axisGestures);
