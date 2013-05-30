@@ -72,7 +72,7 @@ var CZ;
                     mediaType: this.mediaTypeInput.val() || "",
                     attribution: this.attributionInput.val() || "",
                     description: this.descriptionInput.val() || "",
-                    index: this.contentItem.index
+                    order: this.contentItem.order
                 };
                 if(CZ.Authoring.validateContentItems([
                     newContentItem
@@ -81,7 +81,7 @@ var CZ;
                         if(this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
                             this.isCancel = false;
                             (this.prevForm).contentItemsListBox.add(newContentItem);
-                            $.extend(this.exhibit.contentItems[this.contentItem.index], newContentItem);
+                            $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
                             (this.prevForm).exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
                             this.back();
@@ -92,7 +92,7 @@ var CZ;
                             var clickedListItem = (this.prevForm).clickedListItem;
                             clickedListItem.titleTextblock.text(newContentItem.title);
                             clickedListItem.descrTextblock.text(newContentItem.description);
-                            $.extend(this.exhibit.contentItems[this.contentItem.index], newContentItem);
+                            $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
                             (this.prevForm).exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
                             this.back();
