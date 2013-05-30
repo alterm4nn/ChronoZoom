@@ -1552,7 +1552,6 @@ module CZ {
             }).appendTo(vc);
             
             elem[0].addEventListener("mousemove", CZ.Common.preventbubble, false);
-            //elem[0].addEventListener("mouseup", CZ.Common.preventbubble, false);
             elem[0].addEventListener("mousedown", CZ.Common.preventbubble, false);
             elem[0].addEventListener("DOMMouseScroll", CZ.Common.preventbubble, false);
             elem[0].addEventListener("mousewheel", CZ.Common.preventbubble, false);
@@ -2363,7 +2362,7 @@ module CZ {
         /* 
         @param infodot {CanvasElement}  Parent of the content item
         @param cid  {string}            id of the content item
-        Returns {x,y,width,height,parent} of a content item even if it is not presented yet in the infodot children collection.
+        Returns {id,x,y,width,height,parent,type,vc} of a content item even if it is not presented yet in the infodot children collection.
         */
         export function getContentItem(infodot, cid) {
             if (infodot.type !== 'infodot' || infodot.contentItems.length === 0) return null;
@@ -2373,7 +2372,13 @@ module CZ {
             if (!citems) return null;
             for (var i = 0; i < citems.length; i++) {
                 if (citems[i].id == cid)
-                    return { x: citems[i].x, y: citems[i].y, width: citems[i].width, height: citems[i].height, parent: infodot };
+                    return {
+                        id: cid,
+                        x: citems[i].x, y: citems[i].y, width: citems[i].width, height: citems[i].height,
+                        parent: infodot,
+                        type: "contentItem",
+                        vc: infodot.vc
+                    };
             }
             return null;
         }

@@ -8,6 +8,8 @@
 /// <reference path='virtual-canvas.ts'/>
 /// <reference path='authoring-ui.ts'/>
 /// <reference path='data.ts'/>
+/// <reference path='../ui/timeseries-graph-form.ts'/>
+
 
 // Obsolete functions not included in the typescript base library bindings
 declare var escape: any;
@@ -204,7 +206,7 @@ module CZ {
             } else {
                 switch (CZ.Settings.czDataSource) {
                     case 'db':
-                        return "/Chronozoom.svc/get";
+                        return "/api/get";
                     case 'relay':
                         return "ChronozoomRelay";
                     case 'dump':
@@ -217,12 +219,16 @@ module CZ {
 
         //loading the data from the service
         export function loadData() {
-            CZ.Data.getTimelines(null).then(
+            return CZ.Data.getTimelines(null).then(
                 function (response) {
+                    if (!response) {
+                        return;
+                    }
+
                     ProcessContent(response);
                     vc.virtualCanvas("updateViewport");
 
-                    if (CZ.Common.initialContent !== null) {
+                    if (CZ.Common.initialContent) {
                         CZ.Service.getContentPath(CZ.Common.initialContent).then(
                             function (response) {
                                 window.location.hash = response;
@@ -351,6 +357,13 @@ module CZ {
             vc.virtualCanvas("updateViewport");
             //ax.axis("updateWidth");
             updateAxis(vc, ax);
+
+            //updating timeSeries chart
+            //var vp = vc.virtualCanvas("getViewport");
+            //var lt = vp.pointScreenToVirtual(0, 0);
+            //var rb = vp.pointScreenToVirtual(vp.width, vp.height);
+            //timeSeriesChart.updateRange(lt.x, rb.x);
+
             CZ.BreadCrumbs.updateBreadCrumbsLabels();
         }
 

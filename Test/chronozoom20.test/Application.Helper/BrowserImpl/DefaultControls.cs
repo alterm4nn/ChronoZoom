@@ -24,5 +24,11 @@ namespace Application.Helper.BrowserImpl
             ExecuteJavaScript(script);
             Logger.Log("->");
         }
+
+        public virtual void SecurityWarningAccept()
+        {
+            WaitForAlertIsDisplayed();
+            AcceptAlert();
+        }
     }
 }

@@ -152,6 +152,7 @@ var CZ;
                 ext: 'wav'
             }
         ];
+        Settings.tourDefaultTransitionTime = 10;
         Settings.seadragonServiceURL = "http://api.zoom.it/v1/content/?url=";
         Settings.seadragonImagePath = "/images/seadragonControls/";
         Settings.seadragonMaxConnectionAttempts = 3;
@@ -160,6 +161,9 @@ var CZ;
         Settings.longNavigationLength = 10;
         Settings.serverUrlHost = location.protocol + "//" + location.host;
         Settings.minTimelineWidth = 100;
+        Settings.signinUrlMicrosoft = "";
+        Settings.signinUrlGoogle = "";
+        Settings.signinUrlYahoo = "";
     })(CZ.Settings || (CZ.Settings = {}));
     var Settings = CZ.Settings;
 })(CZ || (CZ = {}));

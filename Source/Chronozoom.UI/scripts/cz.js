@@ -1,5 +1,8 @@
 var CZ;
 (function (CZ) {
+    CZ.timeSeriesChart;
+    CZ.leftDataSet;
+    CZ.rightDataSet;
     (function (HomePageViewModel) {
         var _uiMap = {
             "#header-edit-form": "/ui/header-edit-form.html",
@@ -8,7 +11,13 @@ var CZ;
             "#auth-edit-contentitem-form": "/ui/auth-edit-contentitem-form.html",
             "$('<div></div>')": "/ui/contentitem-listbox.html",
             "#profile-form": "/ui/header-edit-profile-form.html",
-            "#login-form": "/ui/header-login-form.html"
+            "#login-form": "/ui/header-login-form.html",
+            "#auth-edit-tours-form": "/ui/auth-edit-tour-form.html",
+            "$('<div><!--Tours Authoring--></div>')": "/ui/tourstop-listbox.html",
+            "#toursList": "/ui/tourslist-form.html",
+            "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html",
+            "#timeSeriesContainer": "/ui/timeseries-graph-form.html",
+            "#timeSeriesDataForm": "/ui/timeseries-data-form.html"
         };
         var FeatureActivation;
         (function (FeatureActivation) {
@@ -25,7 +34,7 @@ var CZ;
         var _featureMap = [
             {
                 Name: "Login",
-                Activation: FeatureActivation.NotRootCollection,
+                Activation: FeatureActivation.Enabled,
                 JQueryReference: "#login-panel"
             }, 
             {
@@ -53,8 +62,54 @@ var CZ;
                 Activation: FeatureActivation.RootCollection,
                 JQueryReference: ".regime-link"
             }, 
+            {
+                Name: "TimeSeries",
+                Activation: FeatureActivation.NotRootCollection,
+                JQueryReference: "#timeSeriesContainer"
+            }, 
             
         ];
+        function InitializeToursUI(profile, forms) {
+            var allowEditing = IsFeatureEnabled("Authoring") && (profile && profile != "" && profile.DisplayName === CZ.Service.superCollectionName);
+            var onToursInitialized = function () {
+                CZ.Tours.initializeToursUI();
+                $("#tours_index").click(function () {
+                    CZ.Tours.removeActiveTour();
+                    var form = new CZ.UI.FormToursList(forms[9], {
+                        activationSource: $(this),
+                        navButton: ".cz-form-nav",
+                        closeButton: ".cz-form-close-btn > .cz-form-btn",
+                        titleTextblock: ".cz-form-title",
+                        tourTemplate: forms[10],
+                        tours: CZ.Tours.tours,
+                        takeTour: function (tour) {
+                            CZ.Tours.removeActiveTour();
+                            CZ.Tours.activateTour(tour, undefined);
+                        },
+                        editTour: allowEditing ? function (tour) {
+                            if(CZ.Authoring.showEditTourForm) {
+                                CZ.Authoring.showEditTourForm(tour);
+                            }
+                        } : null
+                    });
+                    form.show();
+                });
+            };
+            if(CZ.Tours.tours) {
+                onToursInitialized();
+            } else {
+                $("body").bind("toursInitialized", onToursInitialized);
+            }
+        }
+        var defaultRootTimeline = {
+            title: "My Timeline",
+            x: 1950,
+            endDate: 9999,
+            children: [],
+            parent: {
+                guid: null
+            }
+        };
         $(document).ready(function () {
             window.console = window.console || (function () {
                 var c = {
@@ -64,9 +119,24 @@ var CZ;
                 return c;
             })();
             $('.bubbleInfo').hide();
+            var canvasIsEmpty;
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
+                CZ.timeSeriesChart = new CZ.UI.LineChart(forms[11]);
+                $('#timeSeries_button').click(function () {
+                    var timSeriesDataFormDiv = forms[12];
+                    var timSeriesDataForm = new CZ.UI.TimeSeriesDataForm(timSeriesDataFormDiv, {
+                        activationSource: $("#timeSeries_button"),
+                        closeButton: ".cz-form-close-btn > .cz-form-btn"
+                    });
+                    timSeriesDataForm.show();
+                });
+                CZ.Service.getProfile().done(function (profile) {
+                    InitializeToursUI(profile, forms);
+                }).fail(function (err) {
+                    InitializeToursUI(null, forms);
+                });
                 $(".header-icon.edit-icon").click(function () {
                     $(".header-icon.active").removeClass("active");
                     $(this).addClass("active");
@@ -76,12 +146,31 @@ var CZ;
                         closeButton: ".cz-form-close-btn > .cz-form-btn",
                         titleTextblock: ".cz-form-title",
                         createTimeline: ".cz-form-create-timeline",
-                        createExhibit: ".cz-form-create-exhibit"
+                        createExhibit: ".cz-form-create-exhibit",
+                        createTour: ".cz-form-create-tour"
                     });
                     form.show();
                 });
                 CZ.Authoring.initialize(CZ.Common.vc, {
+                    showEditTourForm: function (tour) {
+                        CZ.Tours.removeActiveTour();
+                        var form = new CZ.UI.FormEditTour(forms[7], {
+                            activationSource: $(".header-icon.edit-icon"),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            saveButton: ".cz-form-save",
+                            deleteButton: ".cz-form-delete",
+                            addStopButton: ".cz-form-tour-addstop",
+                            titleInput: ".cz-form-title",
+                            tourStopsListBox: "#stopsList",
+                            tourStopsTemplate: forms[8],
+                            context: tour
+                        });
+                        form.show();
+                    },
                     showCreateTimelineForm: function (timeline) {
+                        CZ.Authoring.mode = "createTimeline";
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
                             activationSource: $(".header-icon.edit-icon"),
                             navButton: ".cz-form-nav",
@@ -170,6 +259,9 @@ var CZ;
                         form.show(noAnimation);
                     }
                 });
+                if(canvasIsEmpty) {
+                    CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
+                }
                 var profileForm = new CZ.UI.FormEditProfile(forms[5], {
                     activationSource: $(".header-icon.profile-icon"),
                     navButton: ".cz-form-nav",
@@ -184,7 +276,8 @@ var CZ;
                     loginPanel: "#login-panel",
                     profilePanel: "#profile-panel",
                     loginPanelLogin: "#profile-panel span.auth-panel-login",
-                    context: ""
+                    context: "",
+                    allowRedirect: IsFeatureEnabled("Authoring")
                 });
                 $("#edit_profile_button").click(function () {
                     profileForm.show();
@@ -218,15 +311,22 @@ var CZ;
                 });
             });
             CZ.Service.getServiceInformation().then(function (response) {
-                CZ.Settings.contentItemThumbnailBaseUri = response.ThumbnailsPath;
+                CZ.Settings.contentItemThumbnailBaseUri = response.thumbnailsPath;
+                CZ.Settings.signinUrlMicrosoft = response.signinUrlMicrosoft;
+                CZ.Settings.signinUrlGoogle = response.signinUrlGoogle;
+                CZ.Settings.signinUrlYahoo = response.signinUrlYahoo;
             });
             var url = CZ.UrlNav.getURL();
             var rootCollection = url.superCollectionName === undefined;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
+            if(rootCollection) {
+                $('#timeSeries_button').hide();
+            } else {
+                $('#timeSeries_button').show();
+            }
             $('#search_button').mouseup(CZ.Search.onSearchClicked);
-            $('#tours_index').mouseup(CZ.Tours.onTourClicked);
             $('#human_rect').click(function () {
                 CZ.Search.navigateToBookmark(CZ.Common.humanityVisible);
             });
@@ -340,10 +440,16 @@ var CZ;
             if(window.location.hash) {
                 CZ.Common.startHash = window.location.hash;
             }
-            CZ.Common.loadData();
+            CZ.Common.loadData().then(function (response) {
+                if(!response) {
+                    canvasIsEmpty = true;
+                    if(CZ.Authoring.showCreateTimelineForm) {
+                        CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
+                    }
+                }
+            });
             CZ.Search.initializeSearch();
             CZ.Bibliography.initializeBibliography();
-            CZ.Tours.initializeToursUI();
             var canvasGestures = CZ.Gestures.getGesturesStream(CZ.Common.vc);
             var axisGestures = CZ.Gestures.applyAxisBehavior(CZ.Gestures.getGesturesStream(CZ.Common.ax));
             var jointGesturesStream = canvasGestures.Merge(axisGestures);
@@ -364,6 +470,7 @@ var CZ;
                     var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
                     CZ.Common.updateMarker();
                 }
+                updateTimeSeriesChart(vp);
             }, function () {
                 return CZ.Common.vc.virtualCanvas("getViewport");
             }, jointGesturesStream);
@@ -476,6 +583,78 @@ var CZ;
             });
             return feature[0].IsEnabled;
         }
+        function showTimeSeriesChart() {
+            $('#timeSeriesContainer').height('30%');
+            $('#timeSeriesContainer').show();
+            $('#vc').height('70%');
+            CZ.timeSeriesChart.updateCanvasHeight();
+            CZ.Common.updateLayout();
+        }
+        HomePageViewModel.showTimeSeriesChart = showTimeSeriesChart;
+        function hideTimeSeriesChart() {
+            CZ.leftDataSet = undefined;
+            CZ.rightDataSet = undefined;
+            $('#timeSeriesContainer').height(0);
+            $('#timeSeriesContainer').hide();
+            $('#vc').height('100%');
+            CZ.Common.updateLayout();
+        }
+        HomePageViewModel.hideTimeSeriesChart = hideTimeSeriesChart;
+        function updateTimeSeriesChart(vp) {
+            var left = vp.pointScreenToVirtual(0, 0).x;
+            if(left < CZ.Settings.maxPermitedTimeRange.left) {
+                left = CZ.Settings.maxPermitedTimeRange.left;
+            }
+            var right = vp.pointScreenToVirtual(vp.width, vp.height).x;
+            if(right > CZ.Settings.maxPermitedTimeRange.right) {
+                right = CZ.Settings.maxPermitedTimeRange.right;
+            }
+            if(CZ.timeSeriesChart !== undefined) {
+                var leftCSS = vp.pointVirtualToScreen(left, 0).x;
+                var rightCSS = vp.pointVirtualToScreen(right, 0).x;
+                var leftPlot = CZ.Dates.getDMYFromCoordinate(left).year;
+                var rightPlot = CZ.Dates.getDMYFromCoordinate(right).year;
+                CZ.timeSeriesChart.clear(leftCSS, rightCSS);
+                CZ.timeSeriesChart.clearLegend("left");
+                CZ.timeSeriesChart.clearLegend("right");
+                var chartHeader = "TimeSeries Chart";
+                if(CZ.leftDataSet !== undefined) {
+                    CZ.timeSeriesChart.drawDataSet(CZ.leftDataSet, leftCSS, rightCSS, leftPlot, rightPlot);
+                    CZ.timeSeriesChart.drawAxis(leftCSS, CZ.leftDataSet.series[0].appearanceSettings.yMin, CZ.leftDataSet.series[0].appearanceSettings.yMax, {
+                        labelCount: 4,
+                        tickLength: 10,
+                        majorTickThickness: 1,
+                        stroke: 'black',
+                        axisLocation: 'left',
+                        font: '16px Calibri'
+                    });
+                    for(var i = 0; i < CZ.leftDataSet.series.length; i++) {
+                        CZ.timeSeriesChart.addLegendRecord("left", CZ.leftDataSet.series[i].appearanceSettings.stroke, CZ.leftDataSet.series[i].appearanceSettings.name);
+                    }
+                    chartHeader += " (" + CZ.leftDataSet.name;
+                }
+                if(CZ.rightDataSet !== undefined) {
+                    CZ.timeSeriesChart.drawDataSet(CZ.rightDataSet, leftCSS, rightCSS, leftPlot, rightPlot);
+                    CZ.timeSeriesChart.drawAxis(rightCSS, CZ.rightDataSet.series[0].appearanceSettings.yMin, CZ.rightDataSet.series[0].appearanceSettings.yMax, {
+                        labelCount: 4,
+                        tickLength: 10,
+                        majorTickThickness: 1,
+                        stroke: 'black',
+                        axisLocation: 'right',
+                        font: '16px Calibri'
+                    });
+                    for(var i = 0; i < CZ.rightDataSet.series.length; i++) {
+                        CZ.timeSeriesChart.addLegendRecord("right", CZ.rightDataSet.series[i].appearanceSettings.stroke, CZ.rightDataSet.series[i].appearanceSettings.name);
+                    }
+                    var str = chartHeader.indexOf("(") > 0 ? ", " : " (";
+                    chartHeader += str + CZ.rightDataSet.name + ")";
+                } else {
+                    chartHeader += ")";
+                }
+                $("#timeSeriesChartHeader").text(chartHeader);
+            }
+        }
+        HomePageViewModel.updateTimeSeriesChart = updateTimeSeriesChart;
     })(CZ.HomePageViewModel || (CZ.HomePageViewModel = {}));
     var HomePageViewModel = CZ.HomePageViewModel;
 })(CZ || (CZ = {}));

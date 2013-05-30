@@ -4,7 +4,7 @@
 
 module CZ {
     export module UI {
-        export interface IFormEditCIInfo extends CZ.UI.IFormBaseInfo {
+        export interface IFormEditCIInfo extends CZ.UI.IFormUpdateEntityInfo {
             titleInput: string;
             mediaInput: string;
             mediaSourceInput: string;
@@ -12,14 +12,13 @@ module CZ {
             attributionInput: string;
             descriptionInput: string;
             errorMessage: string;
-            saveButton: string;
             context: {
                 exhibit: Object;
                 contentItem: Object;
             };
         }
 
-        export class FormEditCI extends CZ.UI.FormBase {
+        export class FormEditCI extends CZ.UI.FormUpdateEntity {
             private titleTextblock: JQuery;
             private titleInput: JQuery;
             private mediaInput: JQuery;
@@ -113,7 +112,7 @@ module CZ {
                     description: this.descriptionInput.val() || "",
                     index: this.contentItem.index
                 };
-                if (CZ.Authoring.ValidateContentItems([newContentItem])) {
+                if (CZ.Authoring.validateContentItems([newContentItem])) {
                     if (CZ.Authoring.contentItemMode === "createContentItem") {
                         if (this.prevForm && this.prevForm instanceof FormEditExhibit) {
                             this.isCancel = false;

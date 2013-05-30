@@ -18,10 +18,14 @@ var CZ;
                 this.loginPanel = $(document.body).find(formInfo.loginPanel);
                 this.profilePanel = $(document.body).find(formInfo.profilePanel);
                 this.loginPanelLogin = $(document.body).find(formInfo.loginPanelLogin);
+                this.allowRedirect = formInfo.allowRedirect;
                 this.initialize();
             }
             FormEditProfile.prototype.validEmail = function (e) {
-                var filter = /^\w+@[a-zA-Z_\.]+?\.[a-zA-Z]{2,4}$/;
+                if(String(e).length > 254) {
+                    return false;
+                }
+                var filter = /^([\w^_]+(?:([-_\.\+][\w^_]+)|)|(xn--[\w^_]+))@([\w^_]+(?:(-+[\w^_]+)|)|(xn--[\w^_]+))(?:\.([\w^_]+(?:([\w-_\.\+][\w^_]+)|)|(xn--[\w^_]+)))$/i;
                 return String(e).search(filter) != -1;
             };
             FormEditProfile.prototype.validUsername = function (e) {
@@ -59,7 +63,11 @@ var CZ;
                         return;
                     }
                     CZ.Service.putProfile(_this.usernameInput.val(), _this.emailInput.val()).then(function (success) {
-                        window.location.assign("\\" + success);
+                        if(_this.allowRedirect) {
+                            window.location.assign("\\" + success);
+                        } else {
+                            _this.close();
+                        }
                     }, function (error) {
                         alert("Unable to save changes. Please try again later.");
                         console.log(error);
@@ -92,7 +100,7 @@ var CZ;
                 this.activationSource.removeClass("active");
             };
             return FormEditProfile;
-        })(CZ.UI.FormBase);
+        })(CZ.UI.FormUpdateEntity);
         UI.FormEditProfile = FormEditProfile;        
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
