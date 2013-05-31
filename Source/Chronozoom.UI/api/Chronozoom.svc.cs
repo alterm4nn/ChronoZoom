@@ -991,7 +991,7 @@ namespace Chronozoom.UI
                             }
                             if (parentTimeline.FirstNodeInSubtree == parentTimeline.Id)
                             {
-                                _storage.updateFirstNodeInSubtree(parentTimeline, newTimeline.Id);
+                                _storage.UpdateFirstNodeInSubtree(parentTimeline, newTimeline.Id);
                             }
                             newTimeline.Successor = parentTimeline.Id;
                             parentTimeline.Predecessor = newTimeline.Id;
@@ -1130,11 +1130,11 @@ namespace Chronozoom.UI
                     {
                         if (deleteTimeline.Successor != Guid.Empty)
                         {
-                            _storage.updateFirstNodeInSubtree(parentTimeline, deleteTimeline.Successor);
+                            _storage.UpdateFirstNodeInSubtree(parentTimeline, deleteTimeline.Successor);
                         }
                         else
                         {
-                            _storage.updateFirstNodeInSubtree(parentTimeline, parentTimeline.Id);
+                            _storage.UpdateFirstNodeInSubtree(parentTimeline, parentTimeline.Id);
                         }
                     }
                     _storage.DeleteTimeline(timelineRequest.Id);

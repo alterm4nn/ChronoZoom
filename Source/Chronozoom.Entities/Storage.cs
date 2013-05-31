@@ -587,14 +587,13 @@ namespace Chronozoom.Entities
             return exhibitRaw.FirstOrDefault();
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "update"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "t")]
-        public void updateFirstNodeInSubtree(Timeline t, Guid firstTimelineId)
+        public void UpdateFirstNodeInSubtree(Timeline currentTimeline, Guid firstTimelineId)
         {
-            TimelineRaw parent = GetParentTimelineRaw(t.Id);
-            t.FirstNodeInSubtree = firstTimelineId;
+            TimelineRaw parent = GetParentTimelineRaw(currentTimeline.Id);
+            currentTimeline.FirstNodeInSubtree = firstTimelineId;
             if (parent != null)
             {
-                updateFirstNodeInSubtree(parent, firstTimelineId);
+                UpdateFirstNodeInSubtree(parent, firstTimelineId);
             }
         }
         // Returns the tour associated with a given bookmark id.
