@@ -49,7 +49,12 @@ module CZ {
                     switch (mode) {
                         case "year":
                             this.editModeYear();
-                            this.setDate(this.coordinate);
+                            if (Number(this.coordinate) == this.INFINITY_VALUE) {
+                                this.setDate(CZ.Dates.getCoordinateFromDecimalYear(CZ.Dates.getPresent().presentYear));
+                            }
+                            else {
+                                this.setDate(this.coordinate);
+                            }
                             break;
                         case "date":
                             this.editModeDate();

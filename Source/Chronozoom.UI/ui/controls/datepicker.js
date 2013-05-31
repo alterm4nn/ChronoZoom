@@ -24,7 +24,11 @@ var CZ;
                     switch(mode) {
                         case "year":
                             _this.editModeYear();
-                            _this.setDate(_this.coordinate);
+                            if(Number(_this.coordinate) == _this.INFINITY_VALUE) {
+                                _this.setDate(CZ.Dates.getCoordinateFromDecimalYear(CZ.Dates.getPresent().presentYear));
+                            } else {
+                                _this.setDate(_this.coordinate);
+                            }
                             break;
                         case "date":
                             _this.editModeDate();
