@@ -479,20 +479,33 @@ namespace Chronozoom.UI
         /// Documentation under IChronozoomSVC
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
-        public User GetUser()
+        public User GetUser(string name = "")
         {
-            return AuthenticatedOperation(delegate(User user)
+            if (String.IsNullOrEmpty(name))
             {
-                Trace.TraceInformation("Get User");
-                if (user == null)
+                return AuthenticatedOperation(delegate(User user)
                 {
-                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
-                    return null;
-                }
-                var u = _storage.Users.Where(candidate => candidate.NameIdentifier == user.NameIdentifier).FirstOrDefault();
-                if (u != null) return u;
-                return user;
-            });
+                    Trace.TraceInformation("Get User");
+                    if (user == null)
+                    {
+                        SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
+                        return null;
+                    }
+                    var u = _storage.Users.Where(candidate => candidate.NameIdentifier == user.NameIdentifier).FirstOrDefault();
+                    if (u != null) return u;
+                    return user;
+                });
+            }
+            else
+            {
+                User u = _storage.Users.Where(candidate => candidate.DisplayName == name).FirstOrDefault();
+                if (u == null) return u;
+                u.Email = String.Empty;
+                u.IdentityProvider = String.Empty;
+                u.NameIdentifier = String.Empty;
+                u.Id = Guid.Empty;
+                return u;
+            }
         }
 
         private void DeleteSuperCollection(string superCollectionName)

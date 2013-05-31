@@ -336,9 +336,13 @@ var CZ;
             });
         }
         Service.deleteProfile = deleteProfile;
-        function getProfile() {
+        function getProfile(displayName) {
+            if (typeof displayName === "undefined") { displayName = ""; }
             var request = new Service.Request(_serviceUrl);
             request.addToPath("user");
+            if(displayName != "") {
+                request.addParameter("name", displayName);
+            }
             return $.ajax({
                 type: "GET",
                 cache: false,
