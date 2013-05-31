@@ -2545,7 +2545,8 @@ var CZ;
 (function (CZ) {
     (function (UI) {
         var TourStop = (function () {
-            function TourStop(target, sequence, title) {
+            function TourStop(bookmarkId, target, sequence, title) {
+                this.bookmarkId = bookmarkId;
                 if(target == undefined || target == null) {
                     throw "target element of a tour stop is null or undefined";
                 }
@@ -2684,6 +2685,7 @@ var CZ;
                 this.titleInput = container.find(formInfo.titleInput);
                 this.tourTitleInput = this.container.find(".cz-form-tour-title");
                 this.tourDescriptionInput = this.container.find(".cz-form-tour-description");
+                this.clean();
                 this.saveButton.off();
                 this.deleteButton.off();
                 this.tour = formInfo.context;
@@ -2708,7 +2710,7 @@ var CZ;
                         type: "Unknown"
                     };
                 }
-                var stop = new TourStop(target, bookmark.number + 1, (!bookmark.caption || $.trim(bookmark.caption) === "") ? undefined : bookmark.caption);
+                var stop = new TourStop(bookmark.id, target, bookmark.number + 1, (!bookmark.caption || $.trim(bookmark.caption) === "") ? undefined : bookmark.caption);
                 stop.LapseTime = bookmark.lapseTime;
                 return stop;
             };
@@ -2716,8 +2718,11 @@ var CZ;
                 var url = CZ.UrlNav.vcelementToNavString(tourstop.Target);
                 var title = tourstop.Title;
                 var text = "";
-                var bookmark = new CZ.Tours.TourBookmark(url, title, tourstop.LapseTime, text);
+                var bookmark = new CZ.Tours.TourBookmark(tourstop.bookmarkId, url, title, tourstop.LapseTime, text);
                 return bookmark;
+            };
+            FormEditTour.prototype.deleteTourAsync = function () {
+                return CZ.Service.deleteTour(this.tour.id);
             };
             FormEditTour.prototype.createTourAsync = function () {
                 var _this = this;
@@ -2733,10 +2738,11 @@ var CZ;
                     for(var j = 0; j < n; j++) {
                         var tourstopItem = _this.tourStopsListBox.items[j];
                         var tourstop = tourstopItem.data;
+                        tourstop.bookmarkId = q.BookmarkId[j];
                         var bookmark = FormEditTour.tourstopToBookmark(tourstop);
                         tourBookmarks.push(bookmark);
                     }
-                    var tour = new CZ.Tours.Tour(name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, "", CZ.Tours.tours.length);
+                    var tour = new CZ.Tours.Tour(q.TourId, name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, "", CZ.Tours.tours.length);
                     deferred.resolve(tour);
                 }).fail(function (q) {
                     deferred.reject(q);
@@ -2767,6 +2773,16 @@ var CZ;
                     self.hide();
                 });
                 this.saveButton.click(function (event) {
+                    var message;
+                    if(!_this.tourTitleInput.val()) {
+                        message = "Please enter the title";
+                    } else if(_this.tourStopsListBox.items.length == 0) {
+                        message = "Please add a tour stop to the tour";
+                    }
+                    if(message) {
+                        alert(message);
+                        return;
+                    }
                     var self = _this;
                     if(_this.tour == null) {
                         _this.createTourAsync().done(function (tour) {
@@ -2776,7 +2792,7 @@ var CZ;
                             alert("Tour created");
                         }).fail(function (f) {
                             if(console && console.error) {
-                                console.error("Failed to create a tour: " + f);
+                                console.error("Failed to create a tour: " + f.status + " " + f.statusText);
                             }
                             alert("Failed to create a tour");
                         });
@@ -2793,14 +2809,21 @@ var CZ;
                     if(_this.tour == null) {
                         return;
                     }
-                    for(var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
-                        if(CZ.Tours.tours[i] === _this.tour) {
-                            _this.tour = null;
-                            CZ.Tours.tours.splice(i, 1);
-                            _this.close();
-                            break;
+                    _this.deleteTourAsync().done(function (q) {
+                        for(var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
+                            if(CZ.Tours.tours[i] === _this.tour) {
+                                _this.tour = null;
+                                CZ.Tours.tours.splice(i, 1);
+                                _this.close();
+                                break;
+                            }
                         }
-                    }
+                    }).fail(function (f) {
+                        if(console && console.error) {
+                            console.error("Failed to delete a tour: " + f.status + " " + f.statusText);
+                        }
+                        alert("Failed to delete a tour");
+                    });
                 });
             };
             FormEditTour.prototype.show = function () {
@@ -2829,16 +2852,21 @@ var CZ;
                     }
                 });
                 CZ.Authoring.isActive = false;
+                this.clean();
+            };
+            FormEditTour.prototype.clean = function () {
                 this.activationSource.removeClass("active");
-                this.container.find("cz-form-errormsg").hide();
-                this.tourStopsListBox.container.empty();
+                this.container.find(".cz-form-errormsg").hide();
+                this.container.find(".cz-listbox").empty();
+                this.tourTitleInput.val("");
+                this.tourDescriptionInput.val("");
             };
             FormEditTour.prototype.onTargetElementSelected = function (targetElement) {
                 CZ.Authoring.isActive = false;
                 CZ.Authoring.mode = "editTour";
                 CZ.Authoring.callback = null;
                 var n = this.tourStopsListBox.items.length;
-                var stop = new TourStop(targetElement, n + 1);
+                var stop = new TourStop("", targetElement, n + 1);
                 if(n > 0) {
                     stop.LapseTime = ((this.tourStopsListBox.items[this.tourStopsListBox.items.length - 1]).data).LapseTime + CZ.Settings.tourDefaultTransitionTime;
                 } else {
@@ -3145,6 +3173,24 @@ var CZ;
             });
         }
         Service.postTour = postTour;
+        function deleteTour(tourId) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("tour");
+            console.log("[DELETE] " + request.url);
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify({
+                    id: tourId
+                })
+            });
+        }
+        Service.deleteTour = deleteTour;
         function getTours() {
             var request = new Service.Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
@@ -4098,7 +4144,8 @@ var CZ;
         Tours.bookmarkAnimation;
         var isToursDebugEnabled = false;
         var TourBookmark = (function () {
-            function TourBookmark(url, caption, lapseTime, text) {
+            function TourBookmark(id, url, caption, lapseTime, text) {
+                this.id = id;
                 this.url = url;
                 this.caption = caption;
                 this.lapseTime = lapseTime;
@@ -4130,7 +4177,8 @@ var CZ;
         }
         Tours.bookmarkUrlToElement = bookmarkUrlToElement;
         var Tour = (function () {
-            function Tour(title, bookmarks, zoomTo, vc, category, audio, sequenceNum) {
+            function Tour(id, title, bookmarks, zoomTo, vc, category, audio, sequenceNum) {
+                this.id = id;
                 this.title = title;
                 this.bookmarks = bookmarks;
                 this.zoomTo = zoomTo;
@@ -4768,12 +4816,12 @@ var CZ;
                         areBookmarksValid = false;
                         break;
                     }
-                    tourBookmarks.push(new TourBookmark(bmString.url, bmString.name, bmString.lapseTime, bmString.description));
+                    tourBookmarks.push(new TourBookmark(bmString.id, bmString.url, bmString.name, bmString.lapseTime, bmString.description));
                 }
                 if(!areBookmarksValid) {
                     continue;
                 }
-                Tours.tours.push(new Tour(tourString.name, tourBookmarks, bookmarkTransition, CZ.Common.vc, tourString.category, tourString.audio, tourString.sequence));
+                Tours.tours.push(new Tour(tourString.id, tourString.name, tourBookmarks, bookmarkTransition, CZ.Common.vc, tourString.category, tourString.audio, tourString.sequence));
             }
             $("body").trigger("toursInitialized");
         }

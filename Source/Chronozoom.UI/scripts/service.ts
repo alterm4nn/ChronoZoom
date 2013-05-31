@@ -356,6 +356,26 @@ module CZ {
             });
         }
 
+        // .../{supercollection}/{collection}/tour
+        // Deletes a tour
+        export function deleteTour(tourId: string) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(superCollectionName);
+            request.addToPath(collectionName);
+            request.addToPath("tour");
+
+            console.log("[DELETE] " + request.url);
+
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify({ id: tourId })
+            });
+        }
+
         // .../{supercollection}/{collection}/tours
         export function getTours () {
             var request = new Service.Request(_serviceUrl);

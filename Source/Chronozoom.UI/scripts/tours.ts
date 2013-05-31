@@ -34,7 +34,7 @@ module CZ {
             public number = 0;
             public elapsed = 0; // number of seconds that were already played (if interrupted).
 
-            constructor(public url, public caption, public lapseTime, public text) {
+            constructor(public id, public url, public caption, public lapseTime, public text) {
                 if (this.text === null) {
                     this.text = "";
                 }
@@ -112,7 +112,7 @@ module CZ {
             @callback tour_TourFinished     Array of (func(tour)) The function is called when the tour is finished
             @callback tour_TourStarted      Array of (func(tour)) The function is called when the tour is finished
             */
-            constructor(public title, public bookmarks, public zoomTo, public vc, public category, public audio, public sequenceNum) {
+            constructor(public id, public title, public bookmarks, public zoomTo, public vc, public category, public audio, public sequenceNum) {
 
                 if (!bookmarks || bookmarks.length == 0) {
                     throw "Tour has no bookmarks";
@@ -927,7 +927,7 @@ module CZ {
                         break;
                     }
 
-                    tourBookmarks.push(new TourBookmark(bmString.url, bmString.name, bmString.lapseTime, bmString.description));
+                    tourBookmarks.push(new TourBookmark(bmString.id, bmString.url, bmString.name, bmString.lapseTime, bmString.description));
                 }
 
                 // skip tour with broken bookmarks
@@ -935,7 +935,7 @@ module CZ {
                     continue;
 
                 // tour is correct and can be played
-                tours.push(new Tour(tourString.name, tourBookmarks, bookmarkTransition, CZ.Common.vc, tourString.category, tourString.audio, tourString.sequence));
+                tours.push(new Tour(tourString.id, tourString.name, tourBookmarks, bookmarkTransition, CZ.Common.vc, tourString.category, tourString.audio, tourString.sequence));
             }
             $("body").trigger("toursInitialized");
         }

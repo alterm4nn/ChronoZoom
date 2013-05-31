@@ -289,6 +289,24 @@ var CZ;
             });
         }
         Service.postTour = postTour;
+        function deleteTour(tourId) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("tour");
+            console.log("[DELETE] " + request.url);
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify({
+                    id: tourId
+                })
+            });
+        }
+        Service.deleteTour = deleteTour;
         function getTours() {
             var request = new Service.Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);

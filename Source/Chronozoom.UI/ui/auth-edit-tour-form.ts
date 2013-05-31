@@ -22,7 +22,7 @@ module CZ {
             private lapseTime: number;
             private sequence: number;
 
-            constructor(target: any, sequence: number, title?: string) {
+            constructor(public bookmarkId: string, target: any, sequence: number, title?: string) {
                 if (target == undefined || target == null)
                     throw "target element of a tour stop is null or undefined";
                 if (typeof target.type == "undefined")
@@ -125,7 +125,7 @@ module CZ {
             private tourTitleInput: JQuery;
             private tourDescriptionInput: JQuery;
             private stops: TourStop[];
-            private tour: any;
+            private tour: CZ.Tours.Tour;
 
             public tourStopsListBox: TourStopListBox;
 
@@ -134,7 +134,6 @@ module CZ {
             constructor(container: JQuery, formInfo: IFormEditTourInfo) {
                 super(container, formInfo);
 
-
                 this.saveButton = container.find(formInfo.saveButton);
                 this.deleteButton = container.find(formInfo.deleteButton);
                 this.addStopButton = container.find(formInfo.addStopButton);
@@ -142,11 +141,12 @@ module CZ {
 
                 this.tourTitleInput = this.container.find(".cz-form-tour-title");
                 this.tourDescriptionInput = this.container.find(".cz-form-tour-description");
+                this.clean();
 
                 this.saveButton.off();
                 this.deleteButton.off();
 
-                this.tour = formInfo.context;
+                this.tour = <CZ.Tours.Tour> formInfo.context;
                 this.stops = [];
                 if (this.tour) {
                     this.tourTitleInput.val(this.tour.title);
@@ -169,7 +169,7 @@ module CZ {
                         type: "Unknown"
                     };
                 }
-                var stop = new TourStop(target, bookmark.number + 1, (!bookmark.caption || $.trim(bookmark.caption) === "") ? undefined : bookmark.caption);
+                var stop = new TourStop(bookmark.id, target, bookmark.number + 1, (!bookmark.caption || $.trim(bookmark.caption) === "") ? undefined : bookmark.caption);
                 stop.LapseTime = bookmark.lapseTime;
                 return stop;
             }
@@ -178,8 +178,12 @@ module CZ {
                 var url = UrlNav.vcelementToNavString(tourstop.Target);
                 var title = tourstop.Title;
                 var text = "";
-                var bookmark = new CZ.Tours.TourBookmark(url, title, tourstop.LapseTime, text);
+                var bookmark = new CZ.Tours.TourBookmark(tourstop.bookmarkId, url, title, tourstop.LapseTime, text);
                 return bookmark;
+            }
+
+            private deleteTourAsync(): any {
+                return CZ.Service.deleteTour(this.tour.id);
             }
 
             // Creates new tour instance from the current state of the UI.
@@ -203,11 +207,13 @@ module CZ {
                     for (var j = 0; j < n; j++) {
                         var tourstopItem = <TourStopListItem> this.tourStopsListBox.items[j];
                         var tourstop = <TourStop> tourstopItem.data;
+                        tourstop.bookmarkId = q.BookmarkId[j];
                         var bookmark = FormEditTour.tourstopToBookmark(tourstop);
                         tourBookmarks.push(bookmark);
                     }
 
-                    var tour = new CZ.Tours.Tour(name,
+                    var tour = new CZ.Tours.Tour(q.TourId,
+                        name,
                         tourBookmarks,
                         CZ.Tours.bookmarkTransition,
                         CZ.Common.vc,
@@ -250,6 +256,15 @@ module CZ {
                 });
                 this.saveButton.click(event =>
                 {
+                    var message: string;
+                    if (!this.tourTitleInput.val()) message = "Please enter the title";
+                    else if (this.tourStopsListBox.items.length == 0) message = "Please add a tour stop to the tour";
+                    if (message)
+                    {
+                        alert(message);
+                        return;
+                    }
+
                     var self = this;
                     // create new tour
                     if (this.tour == null) {
@@ -261,7 +276,7 @@ module CZ {
                             alert("Tour created");
                         }).fail(f => {
                             if (console && console.error) {
-                                console.error("Failed to create a tour: " + f);
+                                console.error("Failed to create a tour: " + f.status + " " + f.statusText);
                             }
                             alert("Failed to create a tour");
                         });
@@ -279,14 +294,21 @@ module CZ {
                 this.deleteButton.click(event =>
                 {
                     if (this.tour == null) return;
-                    for (var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
-                        if (CZ.Tours.tours[i] === this.tour) {
-                            this.tour = null;
-                            CZ.Tours.tours.splice(i, 1);
-                            this.close();
-                            break;
+                    this.deleteTourAsync().done(q => {
+                        for (var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
+                            if (CZ.Tours.tours[i] === this.tour) {
+                                this.tour = null;
+                                CZ.Tours.tours.splice(i, 1);
+                                this.close();
+                                break;
+                            }
                         }
-                    }
+                    }).fail(f => {
+                        if (console && console.error) {
+                            console.error("Failed to delete a tour: " + f.status + " " + f.statusText);
+                        }
+                        alert("Failed to delete a tour");
+                    });
                 });
             }
 
@@ -321,10 +343,15 @@ module CZ {
                 });
 
                 CZ.Authoring.isActive = false;
+                this.clean();
+            }
 
+            private clean() {
                 this.activationSource.removeClass("active");
-                this.container.find("cz-form-errormsg").hide();
-                this.tourStopsListBox.container.empty();
+                this.container.find(".cz-form-errormsg").hide();
+                this.container.find(".cz-listbox").empty();
+                this.tourTitleInput.val("");
+                this.tourDescriptionInput.val("");
             }
 
             private onTargetElementSelected(targetElement: any) {
@@ -333,7 +360,7 @@ module CZ {
                 CZ.Authoring.callback = null;
 
                 var n = this.tourStopsListBox.items.length;
-                var stop = new TourStop(targetElement, n + 1);
+                var stop = new TourStop("", targetElement, n + 1);
                 if (n > 0) {
                     stop.LapseTime = (<TourStop>(<TourStopListItem> this.tourStopsListBox.items[this.tourStopsListBox.items.length - 1]).data).LapseTime
                         + Settings.tourDefaultTransitionTime;
