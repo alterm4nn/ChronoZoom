@@ -7,6 +7,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 
 namespace Chronozoom.Entities
@@ -29,6 +30,8 @@ namespace Chronozoom.Entities
         /// The title of the collection.
         /// </summary>
         [DataMember]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         public string Title { get; set; }
 
         /// <summary>

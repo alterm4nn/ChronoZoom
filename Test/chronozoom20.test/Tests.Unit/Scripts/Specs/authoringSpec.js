@@ -2,6 +2,7 @@
 /// <reference path="../Js/common.js" />
 /// <reference path="../Js/cz.settings.js" />
 /// <reference path="../Js/authoring.js" />
+/// <reference path="../Js/dates.js" />
 
 describe("CZ.Authoring part", function () {
     var alertMessage;
@@ -10,12 +11,12 @@ describe("CZ.Authoring part", function () {
     var authoring;
     beforeEach(function () {
         authoring = CZ.Authoring;
-        validateContentItems = authoring.ValidateContentItems;
-        validateTimelineData = authoring.ValidateTimelineData;
-        validateExhibitData = authoring.ValidateExhibitData;
-        validateNumber = authoring.ValidateNumber;
-        isNotEmpty = authoring.IsNotEmpty;
-        isNonegHeight = authoring.isNonegHeight;
+        validateContentItems = authoring.validateContentItems;
+        validateTimelineData = authoring.validateTimelineData;
+        validateExhibitData = authoring.validateExhibitData;
+        validateNumber = authoring.validateNumber;
+        isNotEmpty = authoring.isNotEmpty;
+        isIntervalPositive = authoring.isIntervalPositive;
         alertMessage = '';
     });
 
@@ -145,22 +146,25 @@ describe("CZ.Authoring part", function () {
     });
 
 
-    describe("ValidateTimelineData() function", function () {
+    describe("validateTimelineData() function", function () {
         describe("should return", function () {
 
             var validInputData = [
                 [1, 2, 'text'],
                 [-1, 10, 'text'],
-                [-1, -10, 'text'],
-                [1, -10, 'text'],
-                [2, 1, 'text']
+                [-10, -1, 'text']
             ];
             var invalidInputData = [
-                [-2, false, 'text'],
+                [-2, false, 'text'], //bug https://github.com/alterm4nn/ChronoZoom/issues/411
                 [false, -2, 'text'],
                 [false, false, 'text'],
                 [-2, -2, 'text'],
-                [2, false, 'text']
+                [2, false, 'text'],
+                [1, -10, 'text'],
+                [2, 1, 'text'],
+                [1, 50, ''],
+                //[1, 50, ], according to https://github.com/alterm4nn/ChronoZoom/issues/259
+                [1, , 'text']
             ];
 
             timelineDataUsing("true", validInputData, function (start, end, title) {
@@ -180,7 +184,7 @@ describe("CZ.Authoring part", function () {
         });
     });
 
-    describe("ValidateNumber() function", function () {
+    describe("validateNumber() function", function () {
         describe("should return", function () {
             it("true, if number not null ", function () {
                 var number = 0;
@@ -226,7 +230,7 @@ describe("CZ.Authoring part", function () {
         });
     });
 
-    describe("IsNotEmpty() function", function () {
+    describe("isNotEmpty() function", function () {
         describe("should return", function () {
             it("false, if object is empty ", function () {
                 var obj = '';
@@ -248,35 +252,126 @@ describe("CZ.Authoring part", function () {
         });
     });
 
-    describe("isNonegHeight() function", function () {
+    describe("isIntervalPositive() function year mode", function () {
         describe("should return", function () {
             it("true, if start < end", function () {
                 var start = 2, end = 5;
-                var result = isNonegHeight(start, end);
+                var result = isIntervalPositive(start, end);
                 expect(true).toEqual(result);
             });
 
             it("false, if start > end", function () {
                 var start = 5, end = 2;
-                var result = isNonegHeight(start, end);
+                var result = isIntervalPositive(start, end);
                 expect(false).toEqual(result);
             });
 
             it("false, if start = end", function () {
                 var start = 5, end = 5;
-                var result = isNonegHeight(start, end);
+                var result = isIntervalPositive(start, end);
                 expect(false).toEqual(result);
             });
         });
     });
 
-    //todo: need to use using, table of data:
-    describe("ValidateExhibitData() function", function () {
+    describe("isIntervalPositive() function date mode", function () {
         describe("should return", function () {
-            it("true, if Date is number, title is not empty, contentItems is not empty", function () {
-                var date = 100, title = 'text', contentItems = [{ mediaType: 'image', uri: 'image.jpg', title: 'Title' }];
-                var result = validateExhibitData(date, title, contentItems);
+            var dates;
+            beforeEach(function () {
+                dates = CZ.Dates;
+            });
+            it("true, if start < end", function () {
+                var start = dates.getCoordinateFromDMY(31, 12, -201);
+                var end = dates.getCoordinateFromDMY(2, 12, 1702);
+                var result = isIntervalPositive(start, end);
                 expect(true).toEqual(result);
+            });
+
+            it("false, if start > end", function () {
+                var start = dates.getCoordinateFromDMY(31, 12, 2011);
+                var end = dates.getCoordinateFromDMY(2, 12, -1702);
+                var result = isIntervalPositive(start, end);
+                expect(false).toEqual(result);
+            });
+
+            it("false, if start = end", function () {
+                var start = dates.getCoordinateFromDMY(31, 12, 1789);
+                var end = dates.getCoordinateFromDMY(31, 12, 1789);
+                var result = isIntervalPositive(start, end);
+                expect(false).toEqual(result);
+            });
+        });
+    });
+
+    describe("isIntervalPositive() function ", function () {
+        describe("Start in date mode and End in year mode", function () {
+            describe("should return", function () {
+                var dates;
+                beforeEach(function () {
+                    dates = CZ.Dates;
+                });
+                it("true, if start < end", function () {
+                    var start = dates.getCoordinateFromDMY(31, 12, -201);
+                    var end = 1703;
+                    var result = isIntervalPositive(start, end);
+                    expect(true).toEqual(result);
+                });
+
+                it("false, if start > end", function () {
+                    var start = dates.getCoordinateFromDMY(31, 12, 2011);
+                    var end = -1702;
+                    var result = isIntervalPositive(start, end);
+                    expect(false).toEqual(result);
+                });
+
+                it("false, if start = end", function () {
+                    var start = dates.getCoordinateFromDMY(31, 12, 1789);
+                    var end = 1789;
+                    var result = isIntervalPositive(start, end);
+                    expect(false).toEqual(result);
+                });
+            });
+        });
+
+        describe("isIntervalPositive() function ", function () {
+            describe("Start in year mode and End in date mode", function () {
+                describe("should return", function () {
+                    var dates;
+                    beforeEach(function () {
+                        dates = CZ.Dates;
+                    });
+                    it("true, if start < end", function () {
+                        var start = -201;
+                        var end = dates.getCoordinateFromDMY(2, 12, 1702);
+                        var result = isIntervalPositive(start, end);
+                        expect(true).toEqual(result);
+                    });
+
+                    it("false, if start > end", function () {
+                        var start = 2011;
+                        var end = dates.getCoordinateFromDMY(2, 12, -1702);
+                        var result = isIntervalPositive(start, end);
+                        expect(false).toEqual(result);
+                    });
+
+                    it("false, if start = end", function () {
+                        var start = 1789;
+                        var end = dates.getCoordinateFromDMY(31, 12, 1789);
+                        var result = isIntervalPositive(start, end);
+                        expect(false).toEqual(result);
+                    });
+                });
+            });
+        });
+
+        //todo: need to use using, table of data:
+        describe("ValidateExhibitData() function", function () {
+            describe("should return", function () {
+                it("true, if Date is number, title is not empty, contentItems is not empty", function () {
+                    var date = 100, title = 'text', contentItems = [{ mediaType: 'image', uri: 'image.jpg', title: 'Title' }];
+                    var result = validateExhibitData(date, title, contentItems);
+                    expect(true).toEqual(result);
+                });
             });
         });
     });

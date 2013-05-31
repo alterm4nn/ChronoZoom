@@ -994,13 +994,13 @@
               "referenceType" : 0,
               "url" : "/t00000000-0000-0000-0000-000000000000"
             },
-            { "description" : "Canada and United States",
+            { "description" : "United States",
               "id" : "a25bbe9a-c1ca-4214-9b18-39668df0db6c",
               "lapseTime" : 433,
               "name" : " ",
               "referenceId" : "b0816cb4-aaad-45fd-b992-97bbb3ce782f",
               "referenceType" : 0,
-              "url" : "/t00000000-0000-0000-0000-000000000000/t48fbb8a8-7c5d-49c3-83e1-98939ae2ae67/td4809be4-3cf9-4ddd-9703-3ca24e4d3a26/ta6b821df-2a4d-4f0e-baf5-28e47ecb720b/t6f6e6f61-7f0e-4ce0-bafb-8d414da6aa28/tb37f255b-782a-4f61-b134-df1ba6b45819/tbebb7918-64da-4866-894c-1896e01030cf/t4afb5bb6-1544-4416-a949-8c8f473e544d/t09ade6ed-adab-456a-98ee-10599304c9ea/tb0816cb4-aaad-45fd-b992-97bbb3ce782f"
+              "url" : "/t00000000-0000-0000-0000-000000000000/t48fbb8a8-7c5d-49c3-83e1-98939ae2ae67/td4809be4-3cf9-4ddd-9703-3ca24e4d3a26/ta6b821df-2a4d-4f0e-baf5-28e47ecb720b/t6f6e6f61-7f0e-4ce0-bafb-8d414da6aa28/tb37f255b-782a-4f61-b134-df1ba6b45819/tbebb7918-64da-4866-894c-1896e01030cf/t4afb5bb6-1544-4416-a949-8c8f473e544d/taff16829-02c1-47c9-9d6b-ebb297a4d89f"
             },
             { "description" : "Walter Alvarez, a geologist at the University of California, Berkeley, explains how ChronoZoom perceives the universe as a timeline and how it helps us better understand history. ",
               "id" : "a502ebca-6225-4d91-906d-bcb3f9ffa172",

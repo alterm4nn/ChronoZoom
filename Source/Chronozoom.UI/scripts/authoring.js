@@ -38,6 +38,8 @@ var CZ;
         Authoring.showCreateExhibitForm = null;
         Authoring.showEditExhibitForm = null;
         Authoring.showEditContentItemForm = null;
+        Authoring.showEditTourForm = null;
+        Authoring.callback = null;
         function isIntersecting(te, obj) {
             switch(obj.type) {
                 case "timeline":
@@ -49,9 +51,11 @@ var CZ;
         }
         function isIncluded(tp, obj) {
             switch(obj.type) {
+                case "infodot":
+                    return (tp.x <= obj.infodotDescription.date && tp.y <= obj.y && tp.x + tp.width >= obj.infodotDescription.date && tp.y + tp.height >= obj.y + obj.height);
+                    break;
                 case "timeline":
                 case "rectangle":
-                case "infodot":
                 case "circle":
                     return (tp.x <= obj.x && tp.y <= obj.y && tp.x + tp.width >= obj.x + obj.width && tp.y + tp.height >= obj.y + obj.height);
                 default:
@@ -90,14 +94,9 @@ var CZ;
             if(!isIncluded(tp, ec)) {
                 return false;
             }
-            for(i = 0 , len = tp.children.length; i < len; ++i) {
-                selfIntersection = editmode ? (tp.children[i] === Authoring.selectedExhibit) : (tp.children[i] === ec);
-                if(!selfIntersection && isIntersecting(ec, tp.children[i])) {
-                    return false;
-                }
-            }
             return true;
         }
+        Authoring.checkExhibitIntersections = checkExhibitIntersections;
         function updateNewRectangle() {
             _rectCur.x = Math.min(_dragStart.x, _dragCur.x);
             _rectCur.y = Math.min(_dragStart.y, _dragCur.y);
@@ -106,7 +105,7 @@ var CZ;
             if(checkTimelineIntersections(_hovered, _rectCur, false)) {
                 var settings = $.extend({
                 }, _hovered.settings);
-                settings.strokeStyle = "red";
+                settings.strokeStyle = "yellow";
                 $.extend(_rectPrev, _rectCur);
                 CZ.VCContent.removeChild(_hovered, "newTimelineRectangle");
                 CZ.VCContent.addRectangle(_hovered, _hovered.layerid, "newTimelineRectangle", _rectCur.x, _rectCur.y, _rectCur.width, _rectCur.height, settings);
@@ -123,7 +122,7 @@ var CZ;
                 $.extend(_circlePrev, _circleCur);
                 CZ.VCContent.removeChild(_hovered, "newExhibitCircle");
                 CZ.VCContent.addCircle(_hovered, "layerInfodots", "newExhibitCircle", _circleCur.x + _circleCur.r, _circleCur.y + _circleCur.r, _circleCur.r, {
-                    strokeStyle: "red"
+                    strokeStyle: "yellow"
                 }, false);
             } else {
                 $.extend(_circleCur, _circlePrev);
@@ -198,10 +197,21 @@ var CZ;
                         return;
                     }
                     if(_hovered.type === "timeline") {
-                        updateNewRectangle();
+                        CZ.VCContent.removeChild(_hovered, "newTimelineRectangle");
                         Authoring.selectedTimeline = createNewTimeline();
                         Authoring.showCreateTimelineForm(Authoring.selectedTimeline);
                     }
+                }
+            },
+            editTour: {
+            },
+            "editTour-selectTarget": {
+                mouseup: function () {
+                    if(Authoring.callback != null && _hovered != undefined && _hovered != null) {
+                        Authoring.callback(_hovered);
+                    }
+                },
+                mousemove: function () {
                 }
             },
             editTimeline: {
@@ -212,7 +222,6 @@ var CZ;
             createExhibit: {
                 mousemove: function () {
                     if(CZ.Authoring.isDragging && _hovered.type === "timeline") {
-                        updateNewCircle();
                     }
                 },
                 mouseup: function () {
@@ -282,6 +291,8 @@ var CZ;
             };
             Authoring.showEditContentItemForm = formHandlers && formHandlers.showEditContentItemForm || function () {
             };
+            Authoring.showEditTourForm = formHandlers && formHandlers.showEditTourForm || function () {
+            };
         }
         Authoring.initialize = initialize;
         function updateTimeline(t, prop) {
@@ -305,13 +316,19 @@ var CZ;
                 t.titleObject.id = "t" + success + "__header__";
                 if(!t.parent.guid) {
                     document.location.reload(true);
+                } else {
+                    CZ.Common.vc.virtualCanvas("requestInvalidate");
                 }
             }, function (error) {
             });
         }
         Authoring.updateTimeline = updateTimeline;
         function removeTimeline(t) {
-            CZ.Service.deleteTimeline(t);
+            var deferred = $.Deferred();
+            CZ.Service.deleteTimeline(t).then(function (updateCanvas) {
+                CZ.Common.vc.virtualCanvas("requestInvalidate");
+                deferred.resolve();
+            });
             CZ.VCContent.removeChild(t.parent, t.id);
         }
         Authoring.removeTimeline = removeTimeline;
@@ -424,33 +441,33 @@ var CZ;
             return deferred.promise();
         }
         Authoring.removeContentItem = removeContentItem;
-        function ValidateTimelineData(start, end, title) {
-            var isValid = CZ.Authoring.ValidateNumber(start) && CZ.Authoring.ValidateNumber(end);
-            isValid = isValid && CZ.Authoring.IsNotEmpty(title) && CZ.Authoring.IsNotEmpty(start) && CZ.Authoring.IsNotEmpty(end);
-            isValid = isValid && CZ.Authoring.isNonegHeight(start, end);
+        function validateTimelineData(start, end, title) {
+            var isValid = (start !== false) && (end !== false);
+            isValid = isValid && CZ.Authoring.isNotEmpty(title);
+            isValid = isValid && CZ.Authoring.isIntervalPositive(start, end);
             return isValid;
         }
-        Authoring.ValidateTimelineData = ValidateTimelineData;
-        function ValidateExhibitData(date, title, contentItems) {
-            var isValid = CZ.Authoring.ValidateNumber(date);
-            isValid = isValid && CZ.Authoring.IsNotEmpty(title);
-            isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
+        Authoring.validateTimelineData = validateTimelineData;
+        function validateExhibitData(date, title, contentItems) {
+            var isValid = date !== false;
+            isValid = isValid && CZ.Authoring.isNotEmpty(title);
+            isValid = isValid && CZ.Authoring.validateContentItems(contentItems);
             return isValid;
         }
-        Authoring.ValidateExhibitData = ValidateExhibitData;
+        Authoring.validateExhibitData = validateExhibitData;
         function ValidateNumber(number) {
             return !isNaN(Number(number) && parseFloat(number)) && IsNotEmpty(number) && (number != false);
         }
         Authoring.ValidateNumber = ValidateNumber;
-        function IsNotEmpty(obj) {
+        function isNotEmpty(obj) {
             return (obj !== '' && obj !== null);
         }
-        Authoring.IsNotEmpty = IsNotEmpty;
-        function isNonegHeight(start, end) {
-            return (start < end);
+        Authoring.isNotEmpty = isNotEmpty;
+        function isIntervalPositive(start, end) {
+            return (parseFloat(start) < parseFloat(end));
         }
-        Authoring.isNonegHeight = isNonegHeight;
-        function ValidateContentItems(contentItems) {
+        Authoring.isIntervalPositive = isIntervalPositive;
+        function validateContentItems(contentItems) {
             var isValid = true;
             if(contentItems.length == 0) {
                 return false;
@@ -458,7 +475,7 @@ var CZ;
             var i = 0;
             while(contentItems[i] != null) {
                 var ci = contentItems[i];
-                isValid = isValid && CZ.Authoring.IsNotEmpty(ci.title) && CZ.Authoring.IsNotEmpty(ci.uri) && CZ.Authoring.IsNotEmpty(ci.mediaType);
+                isValid = isValid && CZ.Authoring.isNotEmpty(ci.title) && CZ.Authoring.isNotEmpty(ci.uri) && CZ.Authoring.isNotEmpty(ci.mediaType);
                 if(ci.mediaType.toLowerCase() === "image") {
                     var imageReg = /\.(jpg|jpeg|png)$/i;
                     if(!imageReg.test(ci.uri)) {
@@ -496,7 +513,7 @@ var CZ;
             }
             return isValid;
         }
-        Authoring.ValidateContentItems = ValidateContentItems;
+        Authoring.validateContentItems = validateContentItems;
     })(CZ.Authoring || (CZ.Authoring = {}));
     var Authoring = CZ.Authoring;
 })(CZ || (CZ = {}));

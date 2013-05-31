@@ -5,6 +5,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
@@ -33,6 +34,7 @@ namespace Chronozoom.Entities
         /// <summary>
         /// The ID of the bookmark.
         /// </summary>
+        [Key]
         [DataMember(Name="id")]
         public Guid Id { get; set; }
 
@@ -40,6 +42,8 @@ namespace Chronozoom.Entities
         /// The name of the bookmark.
         /// </summary>
         [DataMember(Name="name")]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         public string Name { get; set; }
 
         /// <summary>
@@ -49,6 +53,8 @@ namespace Chronozoom.Entities
         /// 
         /// </example>
         [DataMember(Name="url")]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification="Uri not supported in entity framework.")]
         public string Url { get; set; }
 
@@ -62,6 +68,7 @@ namespace Chronozoom.Entities
         /// The ID of the reference that is associated with the bookmark.
         /// </summary>
         [DataMember(Name = "referenceId")]
+        [Obsolete("Duplicates ReferenceId")] 
         public Guid ReferenceId { get; set; }
 
         /// <summary>
@@ -74,6 +81,14 @@ namespace Chronozoom.Entities
         /// A text description of the bookmark.
         /// </summary>
         [DataMember(Name = "description")]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         public string Description { get; set; }
+
+        /// <summary>  
+        /// Identifies the ordering of bookmarks within a tour.
+        /// </summary>  
+        [DataMember(Name = "sequenceId")]  
+        public int SequenceId { get; set; }  
     }
 }

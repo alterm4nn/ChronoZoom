@@ -233,6 +233,25 @@ a:visited {
   color: #E9E9E9 !important;
   font-size: medium 14px;
 }
+#login-panel label {
+  display: inline-block;
+  margin-top: 8px;
+  margin-left: 10px;
+  color: #E9E9E9;
+  vertical-align: top;
+}
+#login-panel[data-enabled~="true"]:hover {
+  background-color: #0464a2;
+}
+#login-panel.active {
+  background-color: #0464a2;
+}
+#profile-panel[data-enabled~="true"]:hover {
+  background-color: #0464a2;
+}
+#profile-panel.active {
+  background-color: #0464a2;
+}
 .header-logo {
   height: 36px;
   line-height: 36px;
@@ -260,6 +279,9 @@ a:visited {
 }
 .search-icon {
   background-image: url('../images/search-icon.png');
+}
+.timeSeries-icon {
+  background-image: url('../images/timseries-icon.png');
 }
 .view-icon {
   background-image: url('../images/view-icon.png');
@@ -320,6 +342,10 @@ a:visited {
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
+}
+#timeSeriesContainer {
+  height: 0%;
+  background-color: gray;
 }
 .virtualCanvas {
   position: relative;
@@ -1257,6 +1283,44 @@ img.fallbackBackground {
   right: 0px;
   width: 330px;
 }
+.cz-form-tour-edit {
+  min-width: 380px;
+  max-width: 450px;
+  width: 30.2734375%;
+  /* 310 / 1024 */
+
+  bottom: 25px;
+  left: 0;
+}
+.cz-form-tour-edit > .cz-form-content {
+  position: absolute;
+  top: 36px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow-y: auto;
+}
+.cz-tourlist-form {
+  min-width: 380px;
+  max-width: 450px;
+  width: 30.2734375%;
+  /* 310 / 1024 */
+
+  right: 0px;
+  bottom: 25px;
+}
+.cz-tourlist-form > .cz-form-content {
+  position: absolute;
+  top: 36px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow-y: auto;
+}
+.cz-tourlist-form > .cz-form-content > #tours {
+  display: block;
+  min-height: 200px;
+}
 .cz-form-timeline {
   min-width: 380px;
   max-width: 450px;
@@ -1342,6 +1406,12 @@ img.fallbackBackground {
   height: 200px;
   overflow: auto;
 }
+.cz-listbox-nocontainer {
+  margin: 15px 0;
+  list-style-type: none;
+  height: 200px;
+  overflow: auto;
+}
 .cz-listbox-placeholder {
   margin: 5px 10px;
   padding: 10px;
@@ -1401,6 +1471,25 @@ img.fallbackBackground {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+}
+.cz-contentitem-listitem-highlighted {
+  margin: 0;
+  color: #3bb6f3;
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.cz-contentitem-listitem-button {
+  margin: 0;
+  color: #3bb6f3;
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  cursor: pointer;
+  width: auto;
+  display: inline;
 }
 /***********************************************************
 
@@ -1472,4 +1561,22 @@ img.fallbackBackground {
 #cz-form-logout,
 #cz-form-save {
   width: 134px;
+}
+/* TimSeries Data Form */
+#timeSeriesDataForm {
+  right: 0px;
+  width: 500px;
+}
+#existingTimeSeries {
+  padding: 0;
+}
+.cz-preloaded-timeseries {
+  margin: 2px;
+  padding: 0px;
+  text-align: left;
+  width: 200px;
+  color: #0388E5;
+}
+.cz-preloaded-timeseries :hover {
+  color: #58B7F9;
 }

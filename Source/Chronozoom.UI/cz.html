@@ -1,15 +1,16 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Pragma" content="no-cache" />
     <meta name="Description" content="ChronoZoom is an open-source community project dedicated to visualizing the history of everything." />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <script type="text/javascript" id="constants"></script>
     <script type="text/javascript" src="http://js.exceptional.io/exceptional.js"></script>
     <script type="text/javascript">
-        Exceptional.setKey('d9b3447eac902a758c3701906bce376fbe510488');
+        Exceptional.setKey(constants.exceptionsId);
 
         var _gaq = _gaq || [];
-        _gaq.push(['_setAccount', 'UA-29180487-2']);
+        _gaq.push(['_setAccount', constants.analyticsId]);
         _gaq.push(['_setDomainName', 'auto']);
         _gaq.push(['_setAllowLinker', true]);
         _gaq.push(['_trackPageview']);
@@ -31,54 +32,30 @@
 
     <link rel="stylesheet" type="text/css" href="/css/cz.css" />
 
-    <script type="text/javascript" src="/scripts/external/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
     <script type="text/javascript" src="/scripts/external/jquery.cookie.js"></script>
     <script type="text/javascript" src="/scripts/external/rx.js"></script>
     <script type="text/javascript" src="/scripts/external/rx.jQuery.js"></script>
     <script type="text/javascript" src="/scripts/external/mouseWheelPlugin.js"></script>
-    <script type="text/javascript" src="http://seadragon.com/ajax/0.8/seadragon-min.js"></script>
-    <script type="text/javascript" src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
-
-    <script type="text/javascript" src="/scripts/settings.js"></script>
-    <script type="text/javascript" src="/scripts/common.js"></script>
-    <script type="text/javascript" src="/scripts/viewport.js"></script>
-    <script type="text/javascript" src="/scripts/viewport-animation.js"></script>
-    <script type="text/javascript" src="/scripts/gestures.js"></script>
-    <script type="text/javascript" src="/scripts/virtual-canvas.js"></script>
-    <script type="text/javascript" src="/scripts/vccontent.js"></script>
-    <script type="text/javascript" src="/scripts/viewport-controller.js"></script>
-    <script type="text/javascript" src="/scripts/urlnav.js"></script>
-    <script type="text/javascript" src="/scripts/layout.js"></script>
-    <script type="text/javascript" src="/scripts/tours.js"></script>
-    <script type="text/javascript" src="/scripts/search.js"></script>
-    <script type="text/javascript" src="/scripts/bibliography.js"></script>
-    <script type="text/javascript" src="/scripts/breadcrumbs.js"></script>
-
-    <script type="text/javascript" src="/scripts/authoring.js"></script>
-    <script type="text/javascript" src="/scripts/authoring-ui.js"></script>
-    <script type="text/javascript" src="/scripts/service.js"></script>
-    <script type="text/javascript" src="/scripts/data.js"></script>
-    <script type="text/javascript" src="/scripts/timescale.js"></script>
-    <script type="text/javascript" src="/scripts/uiloader.js"></script>
-    <script type="text/javascript" src="/scripts/dates.js"></script>
+    <script type="text/javascript" src="/scripts/external/csvToArray.v2.1.js"></script>
     <script type="text/javascript" src="/scripts/external/ACS.js"></script>
+    <script type="text/javascript" src="/scripts/external/seadragon-min.js"></script>
 
-    <script type="text/javascript" src="/ui/controls/datepicker.js"></script>
-    <script type="text/javascript" src="/ui/controls/listboxbase.js"></script>
-    <script type="text/javascript" src="/ui/controls/formbase.js"></script>
-    <script type="text/javascript" src="/ui/contentitem-listbox.js"></script>
-    <script type="text/javascript" src="/ui/auth-edit-timeline-form.js"></script>
-    <script type="text/javascript" src="/ui/auth-edit-exhibit-form.js"></script>
-    <script type="text/javascript" src="/ui/auth-edit-contentitem-form.js"></script>
-    <script type="text/javascript" src="/ui/header-edit-form.js"></script>
-    <script type="text/javascript" src="/ui/header-edit-profile-form.js"></script>
-    <script type="text/javascript" src="/ui/header-login-form.js"></script>
+    <script type="text/javascript">
+        if (Modernizr.canvas) {
+            var script = document.createElement("script");
+            script.type = "text/javascript";
+            script.src = "/cz.js";
+            document.getElementsByTagName("head")[0].appendChild(script);
+        }
+        else {
+            window.location = "/fallback.html"
+        }
+    </script>
 
-    <script type="text/javascript" src="/scripts/cz.js"></script>
-
-    <!--[if IE]>
-    <script type="text/javascript" src="/scripts/regimesIE.js"></script>
-    <![endif]-->
     <title>ChronoZoom</title>
 </head>
 <body>
@@ -117,24 +94,27 @@
                     <div class="header-icon view-icon" title="View Collections" data-enabled="false"></div>
                 </li>
                 <li class="fleft">
+                    <div id="timeSeries_button" class="header-icon timeSeries-icon" title="Show/Hide Time Series" data-enabled="true"></div>
+                </li>
+                <li class="fleft">
                     <div class="header-icon edit-icon" title="Create your events" data-enabled="true"></div>
                 </li>
                 <li class="fleft">
-                    <div style="display: none" id="login-panel">
-                        <label for="login-button" class="auth-panel-login">Sign in</label
-                        ><div id="login-button" class="header-icon profile-icon" title="Sign in to ChronoZoom" data-enabled="true"></div>
+                    <div style="display: none" id="login-panel" title="Sign in to ChronoZoom" data-enabled="true">
+                        <label for="login-button">Sign in</label>
+                        <div id="login-button" class="header-icon profile-icon"></div>
                     </div>
                 </li>
                 <li class="fleft">
-                    <div style="display: none" id="profile-panel">
-                        <label for="edit_profile_button" class="auth-panel-login"></label
-                        ><div id="edit_profile_button" class="header-icon profile-icon" title="Sign in to ChronoZoom" data-enabled="true"></div>
+                    <div style="display: none" id="profile-panel" data-enabled="true" title="Signed on">
+                        <label for="edit_profile_button" class="auth-panel-login"></label>
+                        <div id="edit_profile_button" class="header-icon profile-icon"></div>
                     </div>
                 </li>
             </ul>
         </div>
 
-            
+
         <div id="tour_control" class="tour_control fleft">
             <img id="tour_prev" src="/images/tour_prev_off.jpg" alt="previous" />
             <img style="margin: 0 0 0 16px"
@@ -152,22 +132,23 @@
 
         <div id="vc-container">
             <div id="vc">
-                <div id="layerTimelines" onselectstart="return false;">
+                <div id="layerTimelines" class="unselectable">
                 </div>
                 <!--for popup's-->
                 <p class="bubbleInfo" style="display: inline-block; z-index: 3000;" id="defaultBox">
                     <span></span>
                 </p>
                 <!--//////////-->
-                <div id="layerInfodots" onselectstart="return false;">
+                <div id="layerInfodots" class="unselectable">
                 </div>
-                <div id="iframe_layer" onselectstart="return false;">
+                <div id="iframe_layer" class="unselectable">
                 </div>
             </div>
+            <div id="timeSeriesContainer" style="display: none;"></div>
         </div>
 
         <div id="search" class="czWindow" style="z-index: 2010; max-height: 250px; display: none">
-            <div class="header unselectable" onselectstart="return false;">
+            <div class="header unselectable">
                 Search
             </div>
             <div>
@@ -181,7 +162,7 @@
             </div>
         </div>
 
-        <div id="tours" class="czWindow" onselectstart="return false;" style="display: none">
+        <div id="tours" class="czWindow unselectable" style="display: none">
             <div class="header unselectable">
                 Tours
             </div>
@@ -193,7 +174,11 @@
             </div>
         </div>
 
-        <div id="bookmarks" class="bookmarksWindow unselectable" onselectstart="return false;" style="display: none">
+
+        <div id="auth-edit-tours-form" class="cz-form cz-form-tour-edit unselectable" onselectstart="return false;">
+        </div>
+
+        <div id="bookmarks" class="bookmarksWindow unselectable" style="display: none">
             <img id="bookmarksCollapse" src="/images/collapse-left.png" class="headerButton" />
             <div class="header">
             </div>
@@ -208,8 +193,8 @@
         <div id="bibliographyBack" class="biblBack">
             <div id="bibliographyOut" class="biblOuterWindow">
                 <div id="bibliography" class="biblWindow">
-                    <img class="closeButton unselectable" id="biblCloseButton" src="/images/close_off.png" alt="Close" onselectstart="return false;" />
-                    <div class="title" onselectstart="return false;">
+                    <img class="closeButton unselectable" id="biblCloseButton" src="/images/close_off.png" alt="Close" />
+                    <div class="title">
                         <span>Infodot name</span> &gt; Bibliography
                     </div>
                     <div class="sources">
@@ -218,29 +203,25 @@
             </div>
         </div>
 
-        <div id="profile-form" class="cz-form unselectable"></div>
-        <div id="login-form" class="cz-form unselectable"></div>
-        <div id="header-edit-form" class="cz-form cz-header-edit-form unselectable">
-        </div>
-
-        <div id="auth-edit-timeline-form" class="cz-form cz-form-timeline unselectable">
-        </div>
-        <div id="auth-edit-exhibit-form" class="cz-form cz-form-exhibit unselectable">
-		</div>
-        <div id="auth-edit-contentitem-form" class="cz-form cz-form-contentitem unselectable">
-        </div>
+        <div id="profile-form" class="cz-form cz-major-form unselectable"></div>
+        <div id="login-form" class="cz-form cz-major-form unselectable"></div>
+        <div id="header-edit-form" class="cz-form cz-major-form cz-header-edit-form unselectable"></div>
+        <div id="timeSeriesDataForm" class="cz-form cz-major-form unselectable"></div>
+        <div id="toursList" class="cz-form cz-major-form cz-tourlist-form unselectable"></div>
+        <div id="auth-edit-timeline-form" class="cz-form cz-form-timeline unselectable"></div>
+        <div id="auth-edit-exhibit-form" class="cz-form cz-form-exhibit unselectable"></div>
+        <div id="auth-edit-contentitem-form" class="cz-form cz-form-contentitem unselectable"></div>
 
     </div>
-
 
     <script src="https://cz-nodelete-chronozoom-test.accesscontrol.windows.net/v2/metadata/IdentityProviders.js?protocol=wsfederation&amp;realm=http%3a%2f%2ftest.chronozoomproject.org%2f&amp;reply_to=&amp;context=&amp;request_id=&amp;version=1.0&amp;callback=ShowSigninPage" type="text/javascript"></script>
     <div id="welcomeScreenBack" class="welcomeScreenBack">
         <div id="welcomeScreenOut" class="welcomeScreenOuterWindow">
             <div id="welcomeScreen" class="welcomeScreen">
                 <div class="titleArea">
-                    <img class="closeButton" id="welcomeScreenCloseButton" src="/images/close_off.png"
-                        alt="Close" onselectstart="return false;" />
-                    <div class="title" onselectstart="return false;">
+                    <img class="closeButton unselectable" id="welcomeScreenCloseButton" src="/images/close_off.png"
+                        alt="Close" />
+                    <div class="title unselectable">
                         <span>Welcome to ChronoZoom beta!</span>
                     </div>
                 </div>
@@ -290,12 +271,13 @@
                 <li class="fright">
                     <a class="footer-link" href="http://join.chronozoomproject.org/forum/forums/">Feedback</a>
                 </li>
-                 <li class="fright">
+                <li class="fright">
                     <a class="footer-link" href="http://help.chronozoomproject.org/">Help</a>
-                </li>                
+                </li>
             </ul>
         </div>
         <div class="clearer"></div>
     </div>
+
 </body>
 </html>

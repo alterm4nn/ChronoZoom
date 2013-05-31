@@ -50,6 +50,11 @@ module CZ {
         export var showCreateExhibitForm: (...args: any[]) => any = null;
         export var showEditExhibitForm: (...args: any[]) => any = null;
         export var showEditContentItemForm: (...args: any[]) => any = null;
+        export var showEditTourForm: (...args: any[]) => any = null;
+
+        // Generic callback function set by the form when waits user's input (e.g. mouse click) to continue.
+        export var callback: (...args: any[]) => any = null;
+
 
         /**
          * Tests a timeline/exhibit on intersection with another virtual canvas object.
@@ -78,9 +83,14 @@ module CZ {
          */
         function isIncluded(tp, obj) {
             switch (obj.type) {
+                case "infodot":
+                    return (tp.x <= obj.infodotDescription.date &&
+                            tp.y <= obj.y &&
+                            tp.x + tp.width >= obj.infodotDescription.date &&
+                            tp.y + tp.height >= obj.y + obj.height);
+                    break;
                 case "timeline":
                 case "rectangle":
-                case "infodot":
                 case "circle":
                     return (tp.x <= obj.x &&
                             tp.y <= obj.y &&
@@ -145,7 +155,7 @@ module CZ {
          * @param  {Boolean} editmode If true, it doesn't take into account edited exhibit.
          * @return {Boolean}          True if test is passed, False otherwise.
          */
-        function checkExhibitIntersections(tp, ec, editmode) {
+        export function checkExhibitIntersections(tp, ec, editmode) {
             var i = 0;
             var len = 0;
             var selfIntersection = false;
@@ -156,12 +166,12 @@ module CZ {
             }
 
             // Test on intersections with parent's children.
-            for (i = 0, len = tp.children.length; i < len; ++i) {
-                selfIntersection = editmode ? (tp.children[i] === selectedExhibit) : (tp.children[i] === ec);
-                if (!selfIntersection && isIntersecting(ec, tp.children[i])) {
-                    return false;
-                }
-            }
+            //for (i = 0, len = tp.children.length; i < len; ++i) {
+            //    selfIntersection = editmode ? (tp.children[i] === selectedExhibit) : (tp.children[i] === ec);
+            //    if (!selfIntersection && isIntersecting(ec, tp.children[i])) {
+            //        return false;
+            //    }
+            //}
 
             return true;
         }
@@ -180,7 +190,7 @@ module CZ {
             if (checkTimelineIntersections(_hovered, _rectCur, false)) {
                 // Set border's color of timeline's rectangle.
                 var settings: any = $.extend({}, _hovered.settings);
-                settings.strokeStyle = "red";
+                settings.strokeStyle = "yellow";
 
                 $.extend(_rectPrev, _rectCur);
 
@@ -227,7 +237,7 @@ module CZ {
                     _circleCur.y + _circleCur.r,
                     _circleCur.r,
                     {
-                        strokeStyle: "red"
+                        strokeStyle: "yellow"
                     },
                     false
                 );
@@ -365,11 +375,22 @@ module CZ {
                     }
 
                     if (_hovered.type === "timeline") {
-                        updateNewRectangle();
-
+                        CZ.VCContent.removeChild(_hovered, "newTimelineRectangle");
                         selectedTimeline = createNewTimeline();
                         showCreateTimelineForm(selectedTimeline);
                     }
+                }
+            },
+
+            editTour: {
+            },
+
+            "editTour-selectTarget": {
+                mouseup: function () {
+                    if (callback != null && _hovered != undefined && _hovered != null)
+                        callback(_hovered);
+                },
+                mousemove: function () {
                 }
             },
 
@@ -382,14 +403,14 @@ module CZ {
             createExhibit: {
                 mousemove: function () {
                     if (CZ.Authoring.isDragging && _hovered.type === "timeline") {
-                        updateNewCircle();
+                        
                     }
                 },
 
                 mouseup: function () {
                     if (_hovered.type === "timeline") {
                         updateNewCircle();
-
+                        
                         selectedExhibit = createNewExhibit();
                         showCreateExhibitForm(selectedExhibit);
                     }
@@ -469,6 +490,7 @@ module CZ {
             showCreateExhibitForm = formHandlers && formHandlers.showCreateExhibitForm || function () { };
             showEditExhibitForm = formHandlers && formHandlers.showEditExhibitForm || function () { };
             showEditContentItemForm = formHandlers && formHandlers.showEditContentItemForm || function () { };
+            showEditTourForm = formHandlers && formHandlers.showEditTourForm || function () { };
         }
 
         /**
@@ -509,6 +531,10 @@ module CZ {
                         // Root timeline, refresh page
                         document.location.reload(true);
                     }
+                    else {
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    }
+
                 },
                 function (error) {
                 }
@@ -521,7 +547,13 @@ module CZ {
          * @param  {Object} t A timeline to remove.
          */
         export function removeTimeline(t) {
-            CZ.Service.deleteTimeline(t);
+            var deferred = $.Deferred();
+
+            CZ.Service.deleteTimeline(t).then(
+                    updateCanvas => {                        
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                        deferred.resolve();
+                    })
             CZ.VCContent.removeChild(t.parent, t.id);
         }
 
@@ -681,20 +713,20 @@ module CZ {
         /**
          * Validates possible input errors for timelines.
         */
-        export function ValidateTimelineData(start, end, title) {
-            var isValid = CZ.Authoring.ValidateNumber(start) && CZ.Authoring.ValidateNumber(end);
-            isValid = isValid && CZ.Authoring.IsNotEmpty(title) && CZ.Authoring.IsNotEmpty(start) && CZ.Authoring.IsNotEmpty(end);
-            isValid = isValid && CZ.Authoring.isNonegHeight(start, end);
+        export function validateTimelineData(start, end, title) {
+            var isValid = (start !== false) && (end !== false);
+            isValid = isValid && CZ.Authoring.isNotEmpty(title)
+            isValid = isValid && CZ.Authoring.isIntervalPositive(start, end);
             return isValid;
         }
 
         /**
          * Validates possible input errors for exhibits.
         */
-        export function ValidateExhibitData(date, title, contentItems) {
-            var isValid = CZ.Authoring.ValidateNumber(date);
-            isValid = isValid && CZ.Authoring.IsNotEmpty(title);
-            isValid = isValid && CZ.Authoring.ValidateContentItems(contentItems);
+        export function validateExhibitData(date, title, contentItems) {
+            var isValid = date !== false;
+            isValid = isValid && CZ.Authoring.isNotEmpty(title);
+            isValid = isValid && CZ.Authoring.validateContentItems(contentItems);
             return isValid;
         }
 
@@ -708,26 +740,27 @@ module CZ {
         /**
          * Validates,if field is empty.
         */
-        export function IsNotEmpty(obj) {
+        export function isNotEmpty(obj) {
             return (obj !== '' && obj !== null);
         }
         /**
-         * Validates,if timeline size is not negative
+         * Validates,if timeline size is not negative or null
         */
-        export function isNonegHeight(start, end) {
-            return (start < end);
+        export function isIntervalPositive(start, end) {
+            return (parseFloat(start) < parseFloat(end));
+                
         }
 
         /**
          * Validates,if content item data is correct.
         */
-        export function ValidateContentItems(contentItems) {
+        export function validateContentItems(contentItems) {
             var isValid = true;
             if (contentItems.length == 0) { return false; }
             var i = 0;
             while (contentItems[i] != null) {
                 var ci = contentItems[i];
-                isValid = isValid && CZ.Authoring.IsNotEmpty(ci.title) && CZ.Authoring.IsNotEmpty(ci.uri) && CZ.Authoring.IsNotEmpty(ci.mediaType);
+                isValid = isValid && CZ.Authoring.isNotEmpty(ci.title) && CZ.Authoring.isNotEmpty(ci.uri) && CZ.Authoring.isNotEmpty(ci.mediaType);
                 if (ci.mediaType.toLowerCase() === "image") {
                     var imageReg = /\.(jpg|jpeg|png)$/i;
                     if (!imageReg.test(ci.uri)) {

@@ -119,8 +119,6 @@ var CZ;
         });
         marker.dblclick(function (e) {
             var point = CZ.Common.getXBrowserMouseOrigin(container, e);
-            var test1 = CZ.Dates.getCoordinateFromDMY(-1, 11, 31);
-            console.log(test1);
             var k = (_range.max - _range.min) / _width;
             var time = _range.max - k * (_width - point.x);
             if(time <= _range.min + CZ.Settings.panelWidth * k) {

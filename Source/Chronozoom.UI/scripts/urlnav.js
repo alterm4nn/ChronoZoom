@@ -154,6 +154,7 @@ var CZ;
                     url.path = result[4].split("/");
                     if(url.path.length >= 1 && url.path[0].length > 0 && url.path[0] !== "cz.html") {
                         url.superCollectionName = url.path[0];
+                        url.collectionName = url.superCollectionName;
                     }
                     if(url.path.length >= 2 && url.path[1].length > 0) {
                         url.collectionName = url.path[1];

@@ -23,6 +23,25 @@ var CZ;
                 };
                 this.itemRemoveHandler = function (item, idx) {
                 };
+                this.itemMoveHandler = function (item, idx1, idx2) {
+                };
+                var self = this;
+                var origStart = listBoxInfo.sortableSettings.start;
+                var origStop = listBoxInfo.sortableSettings.stop;
+                $.extend(listBoxInfo.sortableSettings, {
+                    start: function (event, ui) {
+                        ui.item.startPos = ui.item.index();
+                        if(origStart) {
+                            origStart(event, ui);
+                        }
+                    },
+                    stop: function (event, ui) {
+                        self.itemMoveHandler(ui.item, ui.item.startPos, ui.item.index());
+                        if(origStop) {
+                            origStop(event, ui);
+                        }
+                    }
+                });
                 this.container.sortable(listBoxInfo.sortableSettings);
             }
             ListBoxBase.prototype.add = function (context) {
@@ -62,6 +81,9 @@ var CZ;
             ListBoxBase.prototype.itemRemove = function (handler) {
                 this.itemRemoveHandler = handler;
             };
+            ListBoxBase.prototype.itemMove = function (handler) {
+                this.itemMoveHandler = handler;
+            };
             return ListBoxBase;
         })();
         UI.ListBoxBase = ListBoxBase;        
@@ -78,12 +100,11 @@ var CZ;
                     return _this.parent.selectItem(_this);
                 });
                 this.closeButton = this.container.find(uiMap.closeButton);
-                if(!this.closeButton.length) {
-                    throw "Close button is not found in a given UI map.";
+                if(this.closeButton.length) {
+                    this.closeButton.click(function (event) {
+                        return _this.close();
+                    });
                 }
-                this.closeButton.click(function (event) {
-                    return _this.close();
-                });
                 this.parent.container.append(this.container);
             }
             ListItemBase.prototype.close = function () {
