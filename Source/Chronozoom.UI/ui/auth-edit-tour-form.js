@@ -190,7 +190,7 @@ var CZ;
                 var category = "my tours";
                 var n = this.tourStopsListBox.items.length;
                 var request = CZ.Service.postTour(new CZ.UI.Tour(undefined, name, descr, category, n, this.stops));
-                $.when(request).done(function (q) {
+                request.done(function (q) {
                     var tourBookmarks = new Array();
                     for(var j = 0; j < n; j++) {
                         var tourstopItem = _this.tourStopsListBox.items[j];
@@ -199,9 +199,9 @@ var CZ;
                         tourBookmarks.push(bookmark);
                     }
                     var tour = new CZ.Tours.Tour(name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, "", CZ.Tours.tours.length);
-                    deferred.resolveWith(self, tour);
+                    deferred.resolve(tour);
                 }).fail(function (q) {
-                    deferred.rejectWith(self, q);
+                    deferred.reject(q);
                 });
                 return deferred.promise();
             };
@@ -229,10 +229,12 @@ var CZ;
                     self.hide();
                 });
                 this.saveButton.click(function (event) {
+                    var self = _this;
                     if(_this.tour == null) {
                         _this.createTourAsync().done(function (tour) {
-                            CZ.Tours.tours.push(_this.tour);
-                            _this.initializeAsEdit();
+                            self.tour = tour;
+                            CZ.Tours.tours.push(tour);
+                            self.initializeAsEdit();
                             alert("Tour created");
                         }).fail(function (f) {
                             if(console && console.error) {

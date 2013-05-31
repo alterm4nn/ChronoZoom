@@ -184,7 +184,7 @@ module CZ {
 
             // Creates new tour instance from the current state of the UI.
             // Returns a promise of the created tour. May fail.
-            private createTourAsync(): JQueryPromise {
+            private createTourAsync(): any {
                 var deferred = $.Deferred();
                 var self = this;
 
@@ -197,7 +197,7 @@ module CZ {
                 // Posting the tour to the service
                 var request = CZ.Service.postTour(new CZ.UI.Tour(undefined, name, descr, category, n, this.stops));
 
-                $.when(request).done(q => {
+                request.done(q => {
                     // build array of bookmarks of current tour
                     var tourBookmarks = new Array();
                     for (var j = 0; j < n; j++) {
@@ -214,9 +214,9 @@ module CZ {
                         category, // category
                         "", //audio
                         CZ.Tours.tours.length)
-                    deferred.resolveWith(self, tour);
+                    deferred.resolve(tour);
                 }).fail(q => {
-                    deferred.rejectWith(self, q);
+                    deferred.reject(q);
                 });
                 return deferred.promise();
             }
@@ -250,12 +250,14 @@ module CZ {
                 });
                 this.saveButton.click(event =>
                 {
+                    var self = this;
                     // create new tour
                     if (this.tour == null) {
                         // Add the tour to the local tours collection
-                        this.createTourAsync().done(tour => {                            
-                            CZ.Tours.tours.push(this.tour);
-                            this.initializeAsEdit();
+                        this.createTourAsync().done(tour => {
+                            self.tour = tour;
+                            CZ.Tours.tours.push(tour);
+                            self.initializeAsEdit();
                             alert("Tour created");
                         }).fail(f => {
                             if (console && console.error) {

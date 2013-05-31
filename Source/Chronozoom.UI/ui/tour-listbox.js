@@ -49,6 +49,9 @@ var CZ;
         var TourListItem = (function (_super) {
             __extends(TourListItem, _super);
             function TourListItem(parent, container, uiMap, context) {
+                if(!context) {
+                    throw "Tour list item's context is undefined";
+                }
                         _super.call(this, parent, container, uiMap, context);
                 this.iconImg = this.container.find(uiMap.iconImg);
                 this.titleTextblock = this.container.find(uiMap.titleTextblock);

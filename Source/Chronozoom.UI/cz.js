@@ -2728,7 +2728,7 @@ var CZ;
                 var category = "my tours";
                 var n = this.tourStopsListBox.items.length;
                 var request = CZ.Service.postTour(new CZ.UI.Tour(undefined, name, descr, category, n, this.stops));
-                $.when(request).done(function (q) {
+                request.done(function (q) {
                     var tourBookmarks = new Array();
                     for(var j = 0; j < n; j++) {
                         var tourstopItem = _this.tourStopsListBox.items[j];
@@ -2737,9 +2737,9 @@ var CZ;
                         tourBookmarks.push(bookmark);
                     }
                     var tour = new CZ.Tours.Tour(name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, "", CZ.Tours.tours.length);
-                    deferred.resolveWith(self, tour);
+                    deferred.resolve(tour);
                 }).fail(function (q) {
-                    deferred.rejectWith(self, q);
+                    deferred.reject(q);
                 });
                 return deferred.promise();
             };
@@ -2767,10 +2767,12 @@ var CZ;
                     self.hide();
                 });
                 this.saveButton.click(function (event) {
+                    var self = _this;
                     if(_this.tour == null) {
                         _this.createTourAsync().done(function (tour) {
-                            CZ.Tours.tours.push(_this.tour);
-                            _this.initializeAsEdit();
+                            self.tour = tour;
+                            CZ.Tours.tours.push(tour);
+                            self.initializeAsEdit();
                             alert("Tour created");
                         }).fail(function (f) {
                             if(console && console.error) {
@@ -3634,7 +3636,7 @@ var CZ;
             },
             "editTour-selectTarget": {
                 mouseup: function () {
-                    if(Authoring.callback != null && _hovered != undefined && _hovered != null) {
+                    if(Authoring.callback != null && _hovered != undefined && _hovered != null && typeof _hovered.type != "undefined") {
                         Authoring.callback(_hovered);
                     }
                 },
@@ -3990,6 +3992,9 @@ var CZ;
         var TourListItem = (function (_super) {
             __extends(TourListItem, _super);
             function TourListItem(parent, container, uiMap, context) {
+                if(!context) {
+                    throw "Tour list item's context is undefined";
+                }
                         _super.call(this, parent, container, uiMap, context);
                 this.iconImg = this.container.find(uiMap.iconImg);
                 this.titleTextblock = this.container.find(uiMap.titleTextblock);
@@ -10325,7 +10330,7 @@ var CZ;
             
         ];
         function InitializeToursUI(profile, forms) {
-            var allowEditing = IsFeatureEnabled("Authoring") && (profile && profile != "" && profile.DisplayName === CZ.Service.superCollectionName);
+            var allowEditing = true;
             var onToursInitialized = function () {
                 CZ.Tours.initializeToursUI();
                 $("#tours_index").click(function () {

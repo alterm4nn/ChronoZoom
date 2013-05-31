@@ -210,7 +210,7 @@ var CZ;
             },
             "editTour-selectTarget": {
                 mouseup: function () {
-                    if(Authoring.callback != null && _hovered != undefined && _hovered != null) {
+                    if(Authoring.callback != null && _hovered != undefined && _hovered != null && typeof _hovered.type != "undefined") {
                         Authoring.callback(_hovered);
                     }
                 },
