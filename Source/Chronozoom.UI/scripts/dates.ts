@@ -37,7 +37,6 @@ module CZ {
             var sign = (year != 0) ? year / Math.abs(year) : 1;
             var i = 0;
             var coordinate = year;
-            //console.log("1", coordinate);
             var days = day;
             var daysPerYear = isLeapYear(year) ? 366 : 365;
 
@@ -49,7 +48,6 @@ module CZ {
                     days++;
                 }
             }
-            //console.log("2", coordinate);
 
             if ((month > 1) && (isLeapYear(year))) {
                 coordinate += sign * days / daysPerYear;
