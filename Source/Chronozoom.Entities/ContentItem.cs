@@ -88,7 +88,7 @@ namespace Chronozoom.Entities
         /// <summary>
         /// Specifies the order in which the content item should appear.
         /// </summary>
-        [DataMember]
+        [DataMember(Name = "order", EmitDefaultValue = false)]
         public short? Order { get; set; }
 
         /// <summary>

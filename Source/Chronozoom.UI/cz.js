@@ -2295,8 +2295,6 @@ var CZ;
             if(n <= 0) {
                 return null;
             }
-            n--;
-            var vcitems = [];
             var _rad = 450.0 / 2.0;
             var k = 1.0 / _rad;
             var _wc = 260.0 * k;
@@ -2309,33 +2307,24 @@ var CZ;
             var lh = _lh * rad;
             var _ytc = -_hc / 2 - 9.0 * k - _lh / 2;
             var _ybc = -_ytc;
-            for(var i = 0; i < contentItems.length; i++) {
-                contentItems[i].index = i;
-            }
-            vcitems.push(new ContentItem(vc, layerid, contentItems[0].id, -_wc / 2 * rad + xc, -_hc / 2 * rad + yc, _wc * rad, _hc * rad, contentItems[0]));
-            var m1 = Math.floor(n / 3);
-            var m2 = n % 3;
-            var nL = m1 + (m2 > 0 ? 1 : 0);
-            var nR = m1 + (m2 > 1 ? 1 : 0);
-            var nB = m1 + (m2 > 2 ? 1 : 0);
-            var i = 1;
-            var arrange = arrangeContentItemsInField(nL, _lh);
+            var arrangeLeft = arrangeContentItemsInField(3, _lh);
+            var arrangeRight = arrangeContentItemsInField(3, _lh);
+            var arrangeBottom = arrangeContentItemsInField(3, _lw);
             var xl = xc + rad * (_xlc - _lw / 2);
-            for(var j = 0; j < nL; j++ , i++) {
-                var ci = contentItems[i];
-                vcitems.push(new ContentItem(vc, layerid, ci.id, xl, yc + rad * arrange[j], lw, lh, ci));
-            }
-            arrange = arrangeContentItemsInField(nB, _lw);
-            var yb = yc + rad * (_ybc - _lh / 2);
-            for(var j = 0; j < nB; j++ , i++) {
-                var ci = contentItems[i];
-                vcitems.push(new ContentItem(vc, layerid, ci.id, xc + rad * arrange[j], yb, lw, lh, ci));
-            }
-            arrange = arrangeContentItemsInField(nR, _lh);
             var xr = xc + rad * (_xrc - _lw / 2);
-            for(var j = nR; --j >= 0; i++) {
+            var yb = yc + rad * (_ybc - _lh / 2);
+            var vcitems = [];
+            for(var i = 0, len = Math.min(10, n); i < len; i++) {
                 var ci = contentItems[i];
-                vcitems.push(new ContentItem(vc, layerid, ci.id, xr, yc + rad * arrange[j], lw, lh, ci));
+                if(i === 0) {
+                    vcitems.push(new ContentItem(vc, layerid, ci.id, -_wc / 2 * rad + xc, -_hc / 2 * rad + yc, _wc * rad, _hc * rad, ci));
+                } else if(i >= 1 && i <= 3) {
+                    vcitems.push(new ContentItem(vc, layerid, ci.id, xl, yc + rad * arrangeLeft[(i - 1) % 3], lw, lh, ci));
+                } else if(i >= 4 && i <= 6) {
+                    vcitems.push(new ContentItem(vc, layerid, ci.id, xr, yc + rad * arrangeRight[(i - 1) % 3], lw, lh, ci));
+                } else if(i >= 7 && i <= 9) {
+                    vcitems.push(new ContentItem(vc, layerid, ci.id, xc + rad * arrangeBottom[(i - 1) % 3], yb, lw, lh, ci));
+                }
             }
             return vcitems;
         }
@@ -2417,7 +2406,8 @@ var CZ;
                     uri: ci.contentItem ? ci.contentItem.uri : ci.uri,
                     mediaType: ci.contentItem ? ci.contentItem.mediaType : ci.mediaType,
                     attribution: ci.contentItem ? ci.contentItem.attribution : ci.attribution,
-                    mediaSource: ci.contentItem ? ci.contentItem.mediaSource : ci.mediaSource
+                    mediaSource: ci.contentItem ? ci.contentItem.mediaSource : ci.mediaSource,
+                    order: ci.contentItem ? ci.contentItem.order : ci.order
                 };
             }
             Map.contentItem = contentItem;
@@ -3465,9 +3455,26 @@ var CZ;
                 };
                 this.itemRemoveHandler = function (item, idx) {
                 };
-                if(listBoxInfo.sortableSettings) {
-                    this.container.sortable(listBoxInfo.sortableSettings);
-                }
+                this.itemMoveHandler = function (item, idx1, idx2) {
+                };
+                var self = this;
+                var origStart = listBoxInfo.sortableSettings.start;
+                var origStop = listBoxInfo.sortableSettings.stop;
+                $.extend(listBoxInfo.sortableSettings, {
+                    start: function (event, ui) {
+                        ui.item.startPos = ui.item.index();
+                        if(origStart) {
+                            origStart(event, ui);
+                        }
+                    },
+                    stop: function (event, ui) {
+                        self.itemMoveHandler(ui.item, ui.item.startPos, ui.item.index());
+                        if(origStop) {
+                            origStop(event, ui);
+                        }
+                    }
+                });
+                this.container.sortable(listBoxInfo.sortableSettings);
             }
             ListBoxBase.prototype.add = function (context) {
                 var type = this.getType(context);
@@ -3505,6 +3512,9 @@ var CZ;
             };
             ListBoxBase.prototype.itemRemove = function (handler) {
                 this.itemRemoveHandler = handler;
+            };
+            ListBoxBase.prototype.itemMove = function (handler) {
+                this.itemMoveHandler = handler;
             };
             return ListBoxBase;
         })();
@@ -9567,7 +9577,8 @@ var CZ;
                 this.iconImg = this.container.find(uiMap.iconImg);
                 this.titleTextblock = this.container.find(uiMap.titleTextblock);
                 this.descrTextblock = this.container.find(uiMap.descrTextblock);
-                this.iconImg.attr("src", this.data.icon || "/images/Temp-Thumbnail2.png");
+                this.iconImg.attr("onerror", "this.src='/images/Temp-Thumbnail2.png';");
+                this.iconImg.attr("src", this.data.uri);
                 this.titleTextblock.text(this.data.title);
                 this.descrTextblock.text(this.data.description);
                 this.closeButton.off();
@@ -9640,6 +9651,9 @@ var CZ;
                     this.contentItemsListBox.itemRemove(function (item, index) {
                         return _this.onContentItemRemoved(item, index);
                     });
+                    this.contentItemsListBox.itemMove(function (item, indexStart, indexStop) {
+                        return _this.onContentItemMove(item, indexStart, indexStop);
+                    });
                 } else if(this.mode === "editExhibit") {
                     this.titleTextblock.text("Edit Exhibit");
                     this.saveButton.text("update exhibit");
@@ -9667,6 +9681,9 @@ var CZ;
                     this.contentItemsListBox.itemRemove(function (item, index) {
                         return _this.onContentItemRemoved(item, index);
                     });
+                    this.contentItemsListBox.itemMove(function (item, indexStart, indexStop) {
+                        return _this.onContentItemMove(item, indexStart, indexStop);
+                    });
                 } else {
                     console.log("Unexpected authoring mode in exhibit form.");
                 }
@@ -9685,7 +9702,7 @@ var CZ;
                         mediaType: "",
                         attribution: "",
                         description: "",
-                        index: this.exhibit.contentItems.length
+                        order: this.exhibit.contentItems.length
                     };
                     this.exhibit.contentItems.push(newContentItem);
                     this.hide(true);
@@ -9726,7 +9743,8 @@ var CZ;
                 }
             };
             FormEditExhibit.prototype.onContentItemDblClick = function (item, _) {
-                if(item.data.index >= 0) {
+                var idx = item.data.order;
+                if(idx >= 0) {
                     this.clickedListItem = item;
                     this.exhibit.title = this.titleInput.val() || "";
                     this.exhibit.x = this.datePicker.getDate() - this.exhibit.width / 2;
@@ -9735,15 +9753,28 @@ var CZ;
                     };
                     this.hide(true);
                     CZ.Authoring.contentItemMode = "editContentItem";
-                    CZ.Authoring.showEditContentItemForm(this.exhibit.contentItems[item.data.index], this.exhibit, this, true);
+                    CZ.Authoring.showEditContentItemForm(this.exhibit.contentItems[idx], this.exhibit, this, true);
                 }
             };
             FormEditExhibit.prototype.onContentItemRemoved = function (item, _) {
-                if(item.data.index >= 0) {
-                    this.exhibit.contentItems.splice(item.data.index, 1);
+                var idx = item.data.order;
+                if(idx >= 0) {
+                    this.exhibit.contentItems.splice(idx, 1);
+                    for(var i = 0; i < this.exhibit.contentItems.length; i++) {
+                        this.exhibit.contentItems[i].order = i;
+                    }
                     this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
                     CZ.Common.vc.virtualCanvas("requestInvalidate");
                 }
+            };
+            FormEditExhibit.prototype.onContentItemMove = function (item, indexStart, indexStop) {
+                var ci = this.exhibit.contentItems.splice(indexStart, 1)[0];
+                this.exhibit.contentItems.splice(indexStop, 0, ci);
+                for(var i = 0; i < this.exhibit.contentItems.length; i++) {
+                    this.exhibit.contentItems[i].order = i;
+                }
+                this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
+                CZ.Common.vc.virtualCanvas("requestInvalidate");
             };
             FormEditExhibit.prototype.show = function (noAnimation) {
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
@@ -9866,7 +9897,7 @@ var CZ;
                     mediaType: this.mediaTypeInput.val() || "",
                     attribution: this.attributionInput.val() || "",
                     description: this.descriptionInput.val() || "",
-                    index: this.contentItem.index
+                    order: this.contentItem.order
                 };
                 if(CZ.Authoring.validateContentItems([
                     newContentItem
@@ -9875,7 +9906,7 @@ var CZ;
                         if(this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
                             this.isCancel = false;
                             (this.prevForm).contentItemsListBox.add(newContentItem);
-                            $.extend(this.exhibit.contentItems[this.contentItem.index], newContentItem);
+                            $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
                             (this.prevForm).exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
                             this.back();
@@ -9884,9 +9915,10 @@ var CZ;
                         if(this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
                             this.isCancel = false;
                             var clickedListItem = (this.prevForm).clickedListItem;
+                            clickedListItem.iconImg.attr("src", newContentItem.uri);
                             clickedListItem.titleTextblock.text(newContentItem.title);
                             clickedListItem.descrTextblock.text(newContentItem.description);
-                            $.extend(this.exhibit.contentItems[this.contentItem.index], newContentItem);
+                            $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
                             (this.prevForm).exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
                             this.back();
