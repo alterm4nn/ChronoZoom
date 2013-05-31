@@ -71,6 +71,18 @@
     <Compile Include="ContentItem.cs" />
     <Compile Include="Exhibit.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Migrations\201305102053361_RemoveBetaFields.cs" />
+    <Compile Include="Migrations\201305102053361_RemoveBetaFields.Designer.cs">
+      <DependentUpon>201305102053361_RemoveBetaFields.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201305102115428_RemoveRITree.cs" />
+    <Compile Include="Migrations\201305102115428_RemoveRITree.Designer.cs">
+      <DependentUpon>201305102115428_RemoveRITree.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201305102117597_AddRITreeWithIndex.cs" />
+    <Compile Include="Migrations\201305102117597_AddRITreeWithIndex.Designer.cs">
+      <DependentUpon>201305102117597_AddRITreeWithIndex.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\201305240033411_TimelineSubtreeQueryStoredProc.cs" />
     <Compile Include="Migrations\201305240033411_TimelineSubtreeQueryStoredProc.Designer.cs">
       <DependentUpon>201305240033411_TimelineSubtreeQueryStoredProc.cs</DependentUpon>
@@ -111,6 +123,15 @@
     <None Include="Migration\TimelineSubtreeQuery.sql" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Migrations\201305102053361_RemoveBetaFields.resx">
+      <DependentUpon>201305102053361_RemoveBetaFields.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201305102115428_RemoveRITree.resx">
+      <DependentUpon>201305102115428_RemoveRITree.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201305102117597_AddRITreeWithIndex.resx">
+      <DependentUpon>201305102117597_AddRITreeWithIndex.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201305240033411_TimelineSubtreeQueryStoredProc.resx">
       <DependentUpon>201305240033411_TimelineSubtreeQueryStoredProc.cs</DependentUpon>
     </EmbeddedResource>
