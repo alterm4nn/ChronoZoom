@@ -5,6 +5,7 @@ var CZ;
         (function (Map) {
             function bookmark(ts) {
                 return {
+                    id: ts.bookmarkId,
                     name: ts.Title,
                     url: ts.NavigationUrl,
                     lapseTime: ts.LapseTime,
@@ -289,6 +290,22 @@ var CZ;
             });
         }
         Service.postTour = postTour;
+        function putTour(t) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("tour");
+            console.log("[PUT] " + request.url);
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(Map.tour(t))
+            });
+        }
+        Service.putTour = putTour;
         function deleteTour(tourId) {
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);

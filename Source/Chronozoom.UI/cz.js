@@ -2564,6 +2564,9 @@ var CZ;
                     this.type = target.type === "timeline" ? "Timeline" : "Event";
                     this.title = title ? title : target.title;
                 }
+                if(!this.bookmarkId) {
+                    this.bookmarkId = "00000000-0000-0000-0000-000000000000";
+                }
                 this.sequence = sequence;
             }
             Object.defineProperty(TourStop.prototype, "Target", {
@@ -2623,7 +2626,7 @@ var CZ;
         UI.TourStop = TourStop;        
         var Tour = (function () {
             function Tour(id, title, description, category, sequence, stops) {
-                this.id = id;
+                this.id = id ? id : "00000000-0000-0000-0000-000000000000";
                 this.title = title;
                 this.description = description;
                 this.sequence = sequence;
@@ -2749,6 +2752,34 @@ var CZ;
                 });
                 return deferred.promise();
             };
+            FormEditTour.prototype.updateTourAsync = function () {
+                var _this = this;
+                if(!this.tour) {
+                    throw "Tour is undefined";
+                }
+                var deferred = $.Deferred();
+                var self = this;
+                var name = this.tourTitleInput.val();
+                var descr = this.tourDescriptionInput.val();
+                var category = this.tour.category;
+                var n = this.tourStopsListBox.items.length;
+                var request = CZ.Service.putTour(new CZ.UI.Tour(this.tour.id, name, descr, category, n, this.stops));
+                request.done(function (q) {
+                    var tourBookmarks = new Array();
+                    for(var j = 0; j < n; j++) {
+                        var tourstopItem = _this.tourStopsListBox.items[j];
+                        var tourstop = tourstopItem.data;
+                        tourstop.bookmarkId = q.BookmarkId[j];
+                        var bookmark = FormEditTour.tourstopToBookmark(tourstop);
+                        tourBookmarks.push(bookmark);
+                    }
+                    var tour = new CZ.Tours.Tour(q.TourId, name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, "", CZ.Tours.tours.length);
+                    deferred.resolve(tour);
+                }).fail(function (q) {
+                    deferred.reject(q);
+                });
+                return deferred.promise();
+            };
             FormEditTour.prototype.initializeAsEdit = function () {
                 this.deleteButton.show();
                 this.titleTextblock.text("Edit Tour");
@@ -2799,7 +2830,15 @@ var CZ;
                     } else {
                         for(var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
                             if(CZ.Tours.tours[i] === _this.tour) {
-                                throw "Not implemented";
+                                _this.updateTourAsync().done(function (tour) {
+                                    _this.tour = CZ.Tours.tours[i] = tour;
+                                    alert("Tour updated");
+                                }).fail(function (f) {
+                                    if(console && console.error) {
+                                        console.error("Failed to update a tour: " + f.status + " " + f.statusText);
+                                    }
+                                    alert("Failed to update a tour");
+                                });
                                 break;
                             }
                         }
@@ -2889,6 +2928,7 @@ var CZ;
         (function (Map) {
             function bookmark(ts) {
                 return {
+                    id: ts.bookmarkId,
                     name: ts.Title,
                     url: ts.NavigationUrl,
                     lapseTime: ts.LapseTime,
@@ -3173,6 +3213,22 @@ var CZ;
             });
         }
         Service.postTour = postTour;
+        function putTour(t) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("tour");
+            console.log("[PUT] " + request.url);
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(Map.tour(t))
+            });
+        }
+        Service.putTour = putTour;
         function deleteTour(tourId) {
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);

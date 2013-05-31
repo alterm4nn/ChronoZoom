@@ -9,7 +9,7 @@ module CZ {
             function bookmark(ts: CZ.UI.TourStop) : any
             {
                 return {
-                    //id: ts.Id,
+                    id: ts.bookmarkId,
                     name: ts.Title,
                     url: ts.NavigationUrl,
                     lapseTime: ts.LapseTime,
@@ -348,6 +348,26 @@ module CZ {
 
             return $.ajax({
                 type: "POST",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(Map.tour(t))
+            });
+        }
+
+        // .../{supercollection}/{collection}/tour
+        // Updates a tour
+        export function putTour(t: CZ.UI.Tour) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(superCollectionName);
+            request.addToPath(collectionName);
+            request.addToPath("tour");
+
+            console.log("[PUT] " + request.url);
+
+            return $.ajax({
+                type: "PUT",
                 cache: false,
                 contentType: "application/json",
                 dataType: "json",

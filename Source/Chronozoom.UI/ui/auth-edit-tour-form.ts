@@ -39,6 +39,8 @@ module CZ {
                     this.title = title ? title : target.title;
                 }
 
+                if (!this.bookmarkId)
+                    this.bookmarkId = "00000000-0000-0000-0000-000000000000";
                 this.sequence = sequence;
             }
 
@@ -84,7 +86,7 @@ module CZ {
             private category: string;
 
             constructor(id: string, title: string, description: string, category: string, sequence: number, stops: CZ.UI.TourStop[]) {
-                this.id = id;
+                this.id = id ? id : "00000000-0000-0000-0000-000000000000";
                 this.title = title;
                 this.description = description;
                 this.sequence = sequence;
@@ -227,6 +229,45 @@ module CZ {
                 return deferred.promise();
             }
 
+            private updateTourAsync(): any {
+                if (!this.tour) throw "Tour is undefined";
+                var deferred = $.Deferred();
+                var self = this;
+
+                // Add the tour to the local tours collection
+                var name = this.tourTitleInput.val();
+                var descr = this.tourDescriptionInput.val();
+                var category = <string> this.tour.category;
+                var n = this.tourStopsListBox.items.length;
+
+                // Posting the tour to the service
+                var request = CZ.Service.putTour(new CZ.UI.Tour(this.tour.id, name, descr, category, n, this.stops));
+                request.done(q => {
+                    // build array of bookmarks of current tour
+                    var tourBookmarks = new Array();
+                    for (var j = 0; j < n; j++) {
+                        var tourstopItem = <TourStopListItem> this.tourStopsListBox.items[j];
+                        var tourstop = <TourStop> tourstopItem.data;
+                        tourstop.bookmarkId = q.BookmarkId[j];
+                        var bookmark = FormEditTour.tourstopToBookmark(tourstop);
+                        tourBookmarks.push(bookmark);
+                    }
+
+                    var tour = new CZ.Tours.Tour(q.TourId,
+                        name,
+                        tourBookmarks,
+                        CZ.Tours.bookmarkTransition,
+                        CZ.Common.vc,
+                        category, // category
+                        "", //audio
+                        CZ.Tours.tours.length)
+                    deferred.resolve(tour);
+                }).fail(q => {
+                    deferred.reject(q);
+                });
+                return deferred.promise();
+            }
+
             private initializeAsEdit(): void {
                 this.deleteButton.show();
                 this.titleTextblock.text("Edit Tour");
@@ -259,8 +300,7 @@ module CZ {
                     var message: string;
                     if (!this.tourTitleInput.val()) message = "Please enter the title";
                     else if (this.tourStopsListBox.items.length == 0) message = "Please add a tour stop to the tour";
-                    if (message)
-                    {
+                    if (message) {
                         alert(message);
                         return;
                     }
@@ -284,8 +324,15 @@ module CZ {
                         // Update existing tour
                         for (var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
                             if (CZ.Tours.tours[i] === this.tour) {
-                                throw "Not implemented";
-                                //this.tour = CZ.Tours.tours[i] = this.createTour();
+                                this.updateTourAsync().done(tour => {
+                                    this.tour = CZ.Tours.tours[i] = tour;
+                                    alert("Tour updated");
+                                }).fail(f => {
+                                    if (console && console.error) {
+                                        console.error("Failed to update a tour: " + f.status + " " + f.statusText);
+                                    }
+                                    alert("Failed to update a tour");
+                                });
                                 break;
                             }
                         }
