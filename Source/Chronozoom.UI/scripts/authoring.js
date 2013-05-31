@@ -439,7 +439,7 @@ var CZ;
         }
         Authoring.ValidateExhibitData = ValidateExhibitData;
         function ValidateNumber(number) {
-            return !isNaN(Number(number) && parseFloat(number)) && IsNotEmpty(number);
+            return !isNaN(Number(number) && parseFloat(number)) && IsNotEmpty(number) && (number != false);
         }
         Authoring.ValidateNumber = ValidateNumber;
         function IsNotEmpty(obj) {

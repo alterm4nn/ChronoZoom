@@ -45,11 +45,10 @@ module CZ {
                 this.modeSelector.change(event => {
                     var mode = this.modeSelector.find(":selected").val();
                     this.errorMsg.text("");
-
                     switch (mode) {
                         case "year":
                             this.editModeYear();
-                            this.setDate(this.coordinate);
+                            this.setDate(this.coordinate, false);
                             break;
                         case "date":
                             this.editModeDate();
@@ -73,7 +72,7 @@ module CZ {
 
                 // set "year" mode by default
                 this.editModeYear();
-                this.setDate(this.coordinate);
+                this.setDate(this.coordinate, true);
             }
             
             /**
@@ -96,26 +95,30 @@ module CZ {
             /**
             * Sets date corresponding to given virtual coordinate
             */
-            public setDate(coordinate: any) {
+            public setDate(coordinate: any, InfinityConvertation) {
                 // invalid input
-                if (!this.validateNumber(coordinate))
+                if (!this.validateNumber(coordinate)) {
                     return false;
+                }
 
                 coordinate = Number(coordinate);
-
                 this.coordinate = coordinate;
                 var mode = this.modeSelector.find(":selected").val();
-
                 // set edit mode to infinite in case if coordinate is infinity
                 if (this.coordinate === this.INFINITY_VALUE) {
-                    this.regimeSelector.find(":selected").attr("selected", "false");
-                    this.modeSelector.find("option").each(function () {
-                        if ($(this).val() === "infinite") {
-                            $(this).attr("selected", "selected");
-                            return;
-                        }
-                    });
-                    this.editModeInfinite();
+                    if (InfinityConvertation) {
+                        this.regimeSelector.find(":selected").attr("selected", "false");
+                        this.modeSelector.find("option").each(function () {
+                            if ($(this).val() === "infinite") {
+                                $(this).attr("selected", "selected");
+                                return;
+                            }
+                        }); 
+                        this.editModeInfinite();
+                    } else {
+                        var localPresent = CZ.Dates.getPresent();
+                        coordinate = CZ.Dates.getCoordinateFromDMY(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+                    } 
                 }
 
                 switch (mode) {
@@ -162,13 +165,12 @@ module CZ {
                 this.yearSelector.focus(event => {
                     this.errorMsg.text("");
                 });
-
+                
                 this.yearSelector.blur(event => {
                     if (!this.validateNumber(this.yearSelector.val())) {
                         this.errorMsg.text(this.WRONG_YEAR_INPUT);
                     }
                 });
-
                 var optionGa: JQuery = $("<option value='ga'>Ga</option>");
                 var optionMa: JQuery = $("<option value='ma'>Ma</option>");
                 var optionKa: JQuery = $("<option value='ka'>Ka</option>");
@@ -288,7 +290,6 @@ module CZ {
                 var year = this.yearSelector.val();
                 if (!this.validateNumber(year))
                     return false;
-
                 var regime = this.regimeSelector.find(":selected").val();
 
                 return <any>CZ.Dates.convertYearToCoordinate(year, regime);
