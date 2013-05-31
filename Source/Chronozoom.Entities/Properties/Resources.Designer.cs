@@ -62,30 +62,28 @@ namespace Chronozoom.Entities.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to CREATE PROCEDURE TimelineSubtreeQuery
-        ///	@LCA Guid = NULL,
-        ///	@CollectionId GUID,
+        ///	@Collection_Id UNIQUEIDENTIFIER,
+        ///	@LCA UNIQUEIDENTIFIER,
         ///	@min_span DECIMAL,
         ///	@startTime DECIMAL,
         ///	@endTime DECIMAL,
         ///	@max_elem INT
         ///AS
         ///BEGIN
+        ///	DECLARE @return_entire_subtree BIT
+        ///	DECLARE @subtree_size INT
         ///	DECLARE @current_level_cnt INT
         ///	DECLARE @cnt INT
         ///	DECLARE @num_ge_min_span INT
-        ///	DECLARE @current_id GUID
+        ///	DECLARE @current_id UNIQUEIDENTIFIER
         ///	DECLARE @current_level TABLE (
-        ///		Id GUID
+        ///		Id UNIQUEIDENTIFIER
         ///	)
         ///	DECLARE @next_level TABLE (
-        ///		Id GUID
+        ///		Id UNIQUEIDENTIFIER
         ///	)
         ///	DECLARE @results TABLE (
-        ///		Id GUID
-        ///	)
-        ///	DECLARE cur CURSOR FOR SELECT Id FROM @current_level
-        ///
-        ///	IF @LCA = CAST(CAST(0 AS BINARY) AS UN [rest of string was truncated]&quot;;.
+        ///		Id UNIQUEIDE [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string TimelineSubtreeQuery {
             get {
