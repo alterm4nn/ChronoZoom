@@ -181,12 +181,14 @@ var CZ;
                 if(!(container instanceof jQuery && container.is("div"))) {
                     throw "Container parameter is invalid! It should be jQuery instance of DIV.";
                 }
+                this.isFormVisible = false;
                 this.container = container;
                 this.prevForm = formInfo.prevForm;
                 this.activationSource = formInfo.activationSource;
                 this.navButton = this.container.find(formInfo.navButton);
                 this.closeButton = this.container.find(formInfo.closeButton);
                 this.titleTextblock = this.container.find(formInfo.titleTextblock);
+                this.container.data("form", this);
                 if(this.prevForm) {
                     this.navButton.show();
                 } else {
@@ -206,6 +208,7 @@ var CZ;
                 for (var _i = 0; _i < (arguments.length - 0); _i++) {
                     args[_i] = arguments[_i + 0];
                 }
+                this.isFormVisible = true;
                 this.container.show.apply(this.container, args);
             };
             FormBase.prototype.close = function () {
@@ -213,6 +216,8 @@ var CZ;
                 for (var _i = 0; _i < (arguments.length - 0); _i++) {
                     args[_i] = arguments[_i + 0];
                 }
+                this.isFormVisible = false;
+                this.container.data("form", undefined);
                 this.container.hide.apply(this.container, args);
             };
             FormBase.prototype.back = function () {
@@ -2969,9 +2974,11 @@ var CZ;
         }
         function isIncluded(tp, obj) {
             switch(obj.type) {
+                case "infodot":
+                    return (tp.x <= obj.infodotDescription.date && tp.y <= obj.y && tp.x + tp.width >= obj.infodotDescription.date && tp.y + tp.height >= obj.y + obj.height);
+                    break;
                 case "timeline":
                 case "rectangle":
-                case "infodot":
                 case "circle":
                     return (tp.x <= obj.x && tp.y <= obj.y && tp.x + tp.width >= obj.x + obj.width && tp.y + tp.height >= obj.y + obj.height);
                 default:
@@ -3010,14 +3017,9 @@ var CZ;
             if(!isIncluded(tp, ec)) {
                 return false;
             }
-            for(i = 0 , len = tp.children.length; i < len; ++i) {
-                selfIntersection = editmode ? (tp.children[i] === Authoring.selectedExhibit) : (tp.children[i] === ec);
-                if(!selfIntersection && isIntersecting(ec, tp.children[i])) {
-                    return false;
-                }
-            }
             return true;
         }
+        Authoring.checkExhibitIntersections = checkExhibitIntersections;
         function updateNewRectangle() {
             _rectCur.x = Math.min(_dragStart.x, _dragCur.x);
             _rectCur.y = Math.min(_dragStart.y, _dragCur.y);
@@ -3363,14 +3365,14 @@ var CZ;
         }
         Authoring.removeContentItem = removeContentItem;
         function validateTimelineData(start, end, title) {
-            var isValid = CZ.Authoring.validateNumber(start) && CZ.Authoring.validateNumber(end);
-            isValid = isValid && CZ.Authoring.isNotEmpty(title) && CZ.Authoring.isNotEmpty(start) && CZ.Authoring.isNotEmpty(end);
+            var isValid = (start !== false) && (end !== false);
+            isValid = isValid && CZ.Authoring.isNotEmpty(title);
             isValid = isValid && CZ.Authoring.isIntervalPositive(start, end);
             return isValid;
         }
         Authoring.validateTimelineData = validateTimelineData;
         function validateExhibitData(date, title, contentItems) {
-            var isValid = CZ.Authoring.validateNumber(date);
+            var isValid = date !== false;
             isValid = isValid && CZ.Authoring.isNotEmpty(title);
             isValid = isValid && CZ.Authoring.validateContentItems(contentItems);
             return isValid;
@@ -6134,10 +6136,6 @@ var CZ;
                         var newlyEstimatedViewport = calculateTargetViewport(latestViewport, gesture, self.estimatedViewport);
                         var vbox = CZ.Common.viewportToViewBox(newlyEstimatedViewport);
                         var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
-                        if(!CZ.Common.vc.virtualCanvas("inBuffer", wnd, newlyEstimatedViewport.visible.scale)) {
-                            var lca = CZ.Common.vc.virtualCanvas("findLca", wnd);
-                            self.getMissingData(vbox, lca);
-                        }
                         if(!self.estimatedViewport) {
                             self.activeAnimation = new CZ.ViewportAnimation.PanZoomAnimation(latestViewport);
                             self.saveScreenParameters(latestViewport);
@@ -9700,12 +9698,16 @@ var CZ;
                 var newExhibit = {
                     title: this.titleInput.val() || "",
                     x: this.datePicker.getDate() - this.exhibit.width / 2,
+                    y: this.exhibit.y,
+                    height: this.exhibit.height,
+                    width: this.exhibit.width,
                     infodotDescription: {
                         date: this.datePicker.getDate()
                     },
-                    contentItems: this.exhibit.contentItems || []
+                    contentItems: this.exhibit.contentItems || [],
+                    type: "infodot"
                 };
-                if(CZ.Authoring.validateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) && this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {
+                if(CZ.Authoring.validateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) && CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true) && this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {
                     CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(function (success) {
                         _this.isCancel = false;
                         _this.close();
@@ -10277,9 +10279,9 @@ var CZ;
                 this.usernameInput = container.find(formInfo.usernameInput);
                 this.emailInput = container.find(formInfo.emailInput);
                 this.agreeInput = container.find(formInfo.agreeInput);
-                this.loginPanel = $(document.body).find(formInfo.loginPanel);
-                this.profilePanel = $(document.body).find(formInfo.profilePanel);
-                this.loginPanelLogin = $(document.body).find(formInfo.loginPanelLogin);
+                this.loginPanel = $(document.body).find(formInfo.loginPanel).first();
+                this.profilePanel = $(document.body).find(formInfo.profilePanel).first();
+                this.loginPanelLogin = $(document.body).find(formInfo.loginPanelLogin).first();
                 this.allowRedirect = formInfo.allowRedirect;
                 this.initialize();
             }
@@ -10341,7 +10343,7 @@ var CZ;
                     }).done(function (data) {
                         _this.profilePanel.hide();
                         _this.loginPanel.show();
-                        _super.prototype.close.call(_this);
+                        _this.close();
                     });
                 });
             };
@@ -10640,12 +10642,23 @@ var CZ;
                 var forms = arguments;
                 CZ.timeSeriesChart = new CZ.UI.LineChart(forms[11]);
                 $('#timeSeries_button').click(function () {
-                    var timSeriesDataFormDiv = forms[12];
-                    var timSeriesDataForm = new CZ.UI.TimeSeriesDataForm(timSeriesDataFormDiv, {
-                        activationSource: $("#timeSeries_button"),
-                        closeButton: ".cz-form-close-btn > .cz-form-btn"
-                    });
-                    timSeriesDataForm.show();
+                    var tsForm = getFormById('#timeSeries_button');
+                    if(tsForm === false) {
+                        closeAllForms();
+                        var timSeriesDataFormDiv = forms[12];
+                        var timSeriesDataForm = new CZ.UI.TimeSeriesDataForm(timSeriesDataFormDiv, {
+                            activationSource: $("#timeSeries_button"),
+                            closeButton: ".cz-form-close-btn > .cz-form-btn"
+                        });
+                        timSeriesDataForm.show();
+                    } else {
+                        if(tsForm.isFormVisible) {
+                            tsForm.close();
+                        } else {
+                            closeAllForms();
+                            tsForm.show();
+                        }
+                    }
                 });
                 CZ.Service.getProfile().done(function (profile) {
                     InitializeToursUI(profile, forms);
@@ -10653,18 +10666,27 @@ var CZ;
                     InitializeToursUI(null, forms);
                 });
                 $(".header-icon.edit-icon").click(function () {
-                    $(".header-icon.active").removeClass("active");
-                    $(this).addClass("active");
-                    var form = new CZ.UI.FormHeaderEdit(forms[0], {
-                        activationSource: $(this),
-                        navButton: ".cz-form-nav",
-                        closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        titleTextblock: ".cz-form-title",
-                        createTimeline: ".cz-form-create-timeline",
-                        createExhibit: ".cz-form-create-exhibit",
-                        createTour: ".cz-form-create-tour"
-                    });
-                    form.show();
+                    var editForm = getFormById("#header-edit-form");
+                    if(editForm === false) {
+                        closeAllForms();
+                        var form = new CZ.UI.FormHeaderEdit(forms[0], {
+                            activationSource: $(this),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            createTimeline: ".cz-form-create-timeline",
+                            createExhibit: ".cz-form-create-exhibit",
+                            createTour: ".cz-form-create-tour"
+                        });
+                        form.show();
+                    } else {
+                        if(editForm.isFormVisible) {
+                            editForm.close();
+                        } else {
+                            closeAllForms();
+                            editForm.show();
+                        }
+                    }
                 });
                 CZ.Authoring.initialize(CZ.Common.vc, {
                     showEditTourForm: function (tour) {
@@ -10778,7 +10800,7 @@ var CZ;
                     CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
                 }
                 var profileForm = new CZ.UI.FormEditProfile(forms[5], {
-                    activationSource: $(".header-icon.profile-icon"),
+                    activationSource: $("#login-panel"),
                     navButton: ".cz-form-nav",
                     closeButton: ".cz-form-close-btn > .cz-form-btn",
                     titleTextblock: ".cz-form-title",
@@ -10790,12 +10812,25 @@ var CZ;
                     agreeInput: ".cz-form-agree",
                     loginPanel: "#login-panel",
                     profilePanel: "#profile-panel",
-                    loginPanelLogin: "#profile-panel span.auth-panel-login",
+                    loginPanelLogin: "#profile-panel.auth-panel-login",
                     context: "",
                     allowRedirect: IsFeatureEnabled("Authoring")
                 });
-                $("#edit_profile_button").click(function () {
-                    profileForm.show();
+                var loginForm = new CZ.UI.FormLogin(forms[6], {
+                    activationSource: $("#login-panel"),
+                    navButton: ".cz-form-nav",
+                    closeButton: ".cz-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-form-title",
+                    titleInput: ".cz-form-item-title",
+                    context: ""
+                });
+                $("#profile-panel").click(function () {
+                    if(!profileForm.isFormVisible) {
+                        closeAllForms();
+                        profileForm.show();
+                    } else {
+                        profileForm.close();
+                    }
                 });
                 if(IsFeatureEnabled("Login")) {
                     CZ.Service.getProfile().done(function (data) {
@@ -10804,25 +10839,27 @@ var CZ;
                         } else if(data != "" && data.DisplayName == null) {
                             $("#profile-panel").show();
                             $("#profile-panel input#username").focus();
-                            profileForm.show();
+                            if(!profileForm.isFormVisible) {
+                                closeAllForms();
+                                profileForm.show();
+                            } else {
+                                profileForm.close();
+                            }
                         } else {
                             $("#profile-panel").show();
-                            $("#profile-panel span.auth-panel-login").html(data.DisplayName);
+                            $(".auth-panel-login").html(data.DisplayName);
                         }
                     }).fail(function (error) {
                         $("#login-panel").show();
                     });
                 }
-                var loginForm = new CZ.UI.FormLogin(forms[6], {
-                    activationSource: $(".header-icon.profile-icon"),
-                    navButton: ".cz-form-nav",
-                    closeButton: ".cz-form-close-btn > .cz-form-btn",
-                    titleTextblock: ".cz-form-title",
-                    titleInput: ".cz-form-item-title",
-                    context: ""
-                });
-                $("#login-button").click(function () {
-                    loginForm.show();
+                $("#login-panel").click(function () {
+                    if(!loginForm.isFormVisible) {
+                        closeAllForms();
+                        loginForm.show();
+                    } else {
+                        loginForm.close();
+                    }
                 });
             });
             CZ.Service.getServiceInformation().then(function (response) {
@@ -11097,6 +11134,22 @@ var CZ;
                 return e.Name === featureName;
             });
             return feature[0].IsEnabled;
+        }
+        function closeAllForms() {
+            $('.cz-major-form').each(function (i, f) {
+                var form = $(f).data('form');
+                if(form) {
+                    form.close();
+                }
+            });
+        }
+        function getFormById(name) {
+            var form = $(name).data("form");
+            if(form) {
+                return form;
+            } else {
+                return false;
+            }
         }
         function showTimeSeriesChart() {
             $('#timeSeriesContainer').height('30%');

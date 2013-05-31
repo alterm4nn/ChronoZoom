@@ -1,8 +1,8 @@
-.cz-timescale {
+﻿.cz-timescale {
   padding-bottom: 0px;
   font-size: large;
   font-weight: 500;
-  background-color: #0388e5;
+  background-color: #0388E5;
   overflow: hidden;
   cursor: default;
   width: 100%;
@@ -26,13 +26,13 @@
   top: 0px;
   height: 100%;
   width: 185px;
-  background-color: #0388e5;
+  background-color: #0388E5;
   font-size: large;
   text-align: center;
 }
 .cz-timescale-left {
   left: 0px;
-  border-right: 5px solid #58b7f9;
+  border-right: 5px solid #58B7F9;
 }
 .cz-timescale-left p {
   display: table-cell;
@@ -45,7 +45,7 @@
 .timescale_right_border_input {
   color: white;
   display: table-cell;
-  background-color: #0388e5;
+  background-color: #0388E5;
   width: 185px;
   font-family: sans-serif;
   font-size: 25px;
@@ -56,7 +56,7 @@
 .timescale_left_border_input {
   color: white;
   display: table-cell;
-  background-color: #0388e5;
+  background-color: #0388E5;
   width: 185px;
   font-family: sans-serif;
   font-size: 25px;
@@ -66,7 +66,7 @@
 }
 .cz-timescale-right {
   right: 0px;
-  border-left: 5px solid #58b7f9;
+  border-left: 5px solid #58B7F9;
 }
 .cz-timescale-right p {
   display: table-cell;
@@ -101,14 +101,14 @@
   box-sizing: border-box;
   height: 24px;
   padding: 5px 15px;
-  background-color: #00538d;
+  background-color: #00538D;
   line-height: 100%;
   font-size: 15px;
 }
 .cz-timescale-marker-triangle {
   position: absolute;
   bottom: 0;
-  border-top: 14px solid #00538d;
+  border-top: 14px solid   #00538D;
   border-left: 14px solid transparent;
   border-right: 14px solid transparent;
   width: 0;

@@ -225,6 +225,9 @@
     <Content Include="dumps\65M-zachos2001.csv" />
     <Content Include="dumps\timeseries-preloaded.txt" />
     <Compile Include="utils\UrlHelper.cs" />
+    <Content Include="css\cz.min.css">
+      <DependentUpon>cz.less</DependentUpon>
+    </Content>
     <Content Include="cz.html" />
     <Content Include="cz.js" />
     <Content Include="fallback.html" />
@@ -588,7 +591,7 @@
   </ProjectExtensions>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <PropertyGroup>
-    <PostBuildEvent>tsc -target ES5 --out $(ProjectDir)cz.js $(ProjectDir)scripts\cz.ts
+    <PostBuildEvent>tsc -target ES5 --out "$(ProjectDir)cz.js" "$(ProjectDir)scripts\cz.ts"
       exit 0</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
