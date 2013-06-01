@@ -399,7 +399,7 @@ namespace Chronozoom.UI
         /// <param name="superCollectionName">The name of the parent collection.</param>
         /// <param name="collectionName">The name of the collection to modify.</param>
         /// <param name="tourRequest">The tour data in JSON format.</param>
-        /// <returns>An exhibit in JSON format.</returns>
+        /// <returns>A list of guids of tour guid followed by bookmark guids in JSON format.</returns>
         /// <example><![CDATA[ 
         /// HTTP verb: POST
         ///
@@ -429,7 +429,7 @@ namespace Chronozoom.UI
         /// <param name="superCollectionName">The name of the parent collection.</param>
         /// <param name="collectionName">The name of the collection to modify.</param>
         /// <param name="tourRequest">The tour data in JSON format.</param>
-        /// <returns>An exhibit in JSON format.</returns>
+        /// <returns>A list of guids of tour guid followed by bookmark guids in JSON format.</returns>
         /// <example><![CDATA[ 
         /// HTTP verb: PUT
         ///
@@ -466,6 +466,29 @@ namespace Chronozoom.UI
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/tour", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         void DeleteTour(string superCollectionName, string collectionName, Tour tourRequest);
+
+        /// <summary>
+        /// Adds a list of bookmarks to an existing tour.
+        /// </summary>
+        /// <param name="superCollectionName">The name of the parent collection.</param>
+        /// <param name="collectionName">The name of the collection to modify.</param>
+        /// <param name="tourRequest">The request in JSON format.</param>
+        /// <returns>A list of guids of tour guid followed by new bookmark guids in JSON format.</returns>
+        /// <example><![CDATA[ 
+        /// HTTP verb: DELETE
+        ///
+        /// URL:
+        /// http://{URL}/api/{supercollection}/{collection}/{collectionName}/bookmark
+        ///
+        /// Request body:
+        /// {
+        ///      id: "0123456789"
+        /// }
+        /// ]]>
+        /// </example>
+        [OperationContract]
+        [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/bookmark", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        TourResult PutBookmarks(string superCollectionName, string collectionName, Tour tourRequest);
 
         /// <summary>
         /// Delete a list of bookmarks belonging to the same tour.

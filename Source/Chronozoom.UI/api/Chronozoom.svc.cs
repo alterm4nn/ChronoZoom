@@ -1393,12 +1393,16 @@ namespace Chronozoom.UI
                 return Guid.Empty;
             }
 
-            List<Bookmark> bookmarkList = updateTour.Bookmarks.ToList();
-            Bookmark sequenceIdBookmark = bookmarkList.Where(candidate => candidate.SequenceId == bookmarkRequest.SequenceId).FirstOrDefault();
-            if (sequenceIdBookmark != null)
+            _storage.Entry(updateTour).Collection(_ => _.Bookmarks).Load();
+            if (updateTour.Bookmarks != null)
             {
-                SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.BookmarkSequenceIdDuplicate);
-                return Guid.Empty;
+                List<Bookmark> bookmarkList = updateTour.Bookmarks.ToList();
+                Bookmark sequenceIdBookmark = bookmarkList.Where(candidate => candidate.SequenceId == bookmarkRequest.SequenceId).FirstOrDefault();
+                if (sequenceIdBookmark != null)
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.BookmarkSequenceIdDuplicate);
+                    return Guid.Empty;
+                }
             }
 
             updateBookmark.SequenceId = bookmarkRequest.SequenceId;
@@ -1410,7 +1414,7 @@ namespace Chronozoom.UI
             return bookmarkRequest.Id;
         }
 
-        private Guid AddBookmark(Tour newTour, Bookmark bookmarkRequest)
+        private Guid AddBookmark(Tour tour, Bookmark bookmarkRequest)
         {
             Guid newBookmarkGuid = Guid.NewGuid();
             Bookmark newBookmark = new Bookmark
@@ -1429,11 +1433,12 @@ namespace Chronozoom.UI
                 return Guid.Empty;
             }
 
-            if (newTour.Bookmarks == null)
+            _storage.Entry(tour).Collection(_ => _.Bookmarks).Load();
+            if (tour.Bookmarks == null)
             {
-                newTour.Bookmarks = new System.Collections.ObjectModel.Collection<Bookmark>();
+                tour.Bookmarks = new System.Collections.ObjectModel.Collection<Bookmark>();
             }
-            List<Bookmark> bookmarkList = newTour.Bookmarks.ToList();
+            List<Bookmark> bookmarkList = tour.Bookmarks.ToList();
             Bookmark sequenceIdBookmark = bookmarkList.Where(candidate => candidate.SequenceId == bookmarkRequest.SequenceId).FirstOrDefault();
             if (sequenceIdBookmark != null)
             {
@@ -1442,7 +1447,7 @@ namespace Chronozoom.UI
             }
             newBookmark.SequenceId = bookmarkRequest.SequenceId;
 
-            newTour.Bookmarks.Add(newBookmark);
+            tour.Bookmarks.Add(newBookmark);
             _storage.Bookmarks.Add(newBookmark);
             return newBookmarkGuid;
         }
@@ -1487,6 +1492,69 @@ namespace Chronozoom.UI
                 DeleteBookmarks(deleteTour);
                 _storage.Tours.Remove(deleteTour);
                 _storage.SaveChanges();
+            });
+        }
+
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        public TourResult PutBookmarks(string superCollectionName, string collectionName, Tour tourRequest)
+        {
+            return AuthenticatedOperation(delegate(User user)
+            {
+                Trace.TraceInformation("Put Bookmarks");
+                var returnValue = new TourResult();
+
+                if (tourRequest == null)
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
+                    return returnValue;
+                }
+
+                Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
+                Collection collection = _storage.Collections.Find(collectionGuid);
+                if (collection == null)
+                {
+                    // Collection does not exist
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
+                    return returnValue;
+                }
+
+                // Validate user, if required.
+                if (!UserCanModifyCollection(user, collection))
+                {
+                    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                    return returnValue;
+                }
+
+                if (tourRequest.Id == Guid.Empty)
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.TourIdCannotBeNull);
+                    return returnValue;
+                }
+
+                Tour bookmarkTour = _storage.Tours.Find(tourRequest.Id);
+                if (bookmarkTour == null)
+                {
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TourNotFound);
+                    return returnValue;
+                }
+                returnValue.TourId = tourRequest.Id;
+
+                // Populate the bookmarks.
+                if (tourRequest.Bookmarks != null)
+                {
+                    foreach (Bookmark bookmarkRequest in tourRequest.Bookmarks)
+                    {
+                        var newBookmarkGuid = AddBookmark(bookmarkTour, bookmarkRequest);
+                        if (newBookmarkGuid != Guid.Empty)
+                        {
+                            returnValue.Add(newBookmarkGuid);
+                        }
+                    }
+                    _storage.SaveChanges();
+                }
+                return returnValue;
             });
         }
 
