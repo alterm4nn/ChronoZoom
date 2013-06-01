@@ -196,8 +196,6 @@ namespace Chronozoom.UI
         // The Maximum number of elements retured in a Search
         private const int MaxSearchLimit = 50;
       
-        
-
         // error code descriptions
         private static class ErrorDescription
         {
@@ -229,27 +227,14 @@ namespace Chronozoom.UI
             public const string BookmarkSequenceIdInvalid = "Bookmark sequence id is invalid";
         }
 
-        private static Lazy<string> _hostPath = new Lazy<string>(() =>
+        private static Lazy<ChronozoomSVC> _sharedService = new Lazy<ChronozoomSVC>(() =>
         {
-            Uri uri = HttpContext.Current.Request.Url;
-            return uri.Scheme + Uri.SchemeDelimiter + uri.Host + ":" + uri.Port;
-        });
-
-        private static Lazy<IChronozoomSVC> _chronozoomService = new Lazy<IChronozoomSVC>(() =>
-        {
-            WebHttpBinding myBinding = new WebHttpBinding();
-            myBinding.MaxReceivedMessageSize = 100000000;
-
-            EndpointAddress myEndpoint = new EndpointAddress(_hostPath.Value + "/api/chronozoom.svc");
-
-            ChannelFactory<IChronozoomSVC> factory = new ChannelFactory<IChronozoomSVC>(myBinding, myEndpoint);
-            factory.Endpoint.Behaviors.Add(new WebHttpBehavior());
-            return factory.CreateChannel();
+            return new ChronozoomSVC();
         });
 
         internal static IChronozoomSVC Instance
         {
-            get { return _chronozoomService.Value; }
+            get { return _sharedService.Value; }
         }
 
         /// <summary>

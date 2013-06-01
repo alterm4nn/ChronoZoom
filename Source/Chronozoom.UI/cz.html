@@ -45,11 +45,61 @@
     <script type="text/javascript" src="/scripts/external/seadragon-min.js"></script>
 
     <script type="text/javascript">
-        if (Modernizr.canvas) {
+        function AddScript(path) {
             var script = document.createElement("script");
             script.type = "text/javascript";
-            script.src = "/cz.js";
+            script.src = path;
             document.getElementsByTagName("head")[0].appendChild(script);
+        }
+
+        if (Modernizr.canvas) {
+            if (constants.environment == 'Localhost') {
+                AddScript("/scripts/settings.js");
+                AddScript("/scripts/common.js");
+                AddScript("/scripts/viewport.js");
+                AddScript("/scripts/viewport-animation.js");
+                AddScript("/scripts/gestures.js");
+                AddScript("/scripts/virtual-canvas.js");
+                AddScript("/scripts/vccontent.js");
+                AddScript("/scripts/viewport-controller.js");
+                AddScript("/scripts/urlnav.js");
+                AddScript("/scripts/layout.js");
+                AddScript("/scripts/tours.js");
+                AddScript("/scripts/search.js");
+                AddScript("/scripts/bibliography.js");
+                AddScript("/scripts/breadcrumbs.js");
+
+                AddScript("/scripts/authoring.js");
+                AddScript("/scripts/authoring-ui.js");
+                AddScript("/scripts/service.js");
+                AddScript("/scripts/data.js");
+                AddScript("/scripts/timescale.js");
+                AddScript("/scripts/uiloader.js");
+                AddScript("/scripts/dates.js");
+
+                AddScript("/ui/controls/datepicker.js");
+                AddScript("/ui/controls/listboxbase.js");
+                AddScript("/ui/controls/formbase.js");
+                AddScript("/ui/contentitem-listbox.js");
+                AddScript("/ui/auth-edit-timeline-form.js");
+                AddScript("/ui/auth-edit-exhibit-form.js");
+                AddScript("/ui/auth-edit-contentitem-form.js");
+                AddScript("/ui/auth-edit-tour-form.js");
+                AddScript("/ui/header-edit-form.js");
+                AddScript("/ui/header-edit-profile-form.js");
+                AddScript("/ui/header-login-form.js");
+                AddScript("/ui/header-logout-form.js");
+                AddScript("/ui/timeseries-data-form.js");
+                AddScript("/ui/timeseries-graph-form.js");
+                AddScript("/ui/tour-listbox.js");
+                AddScript("/ui/tourlist-form.js");
+                AddScript("/ui/tourstop-listbox.js");
+                
+                AddScript("/scripts/cz.js");
+            }
+            else {
+                AddScript("/cz.js");
+            }
         }
         else {
             window.location = "/fallback.html"
