@@ -169,7 +169,7 @@ namespace Chronozoom.UI
         void DeleteUser(User userRequest);
 
         /// <summary>
-        /// Returns the current user.
+        /// Returns the user by name, if name parameter is empty returns current user.
         /// </summary>
         /// <example>
         /// <![CDATA[
@@ -179,11 +179,15 @@ namespace Chronozoom.UI
         /// http://{URL}/api/user
         /// ]]>
         /// </example>
+        /// <param name="name">The name of user to get.</param>
         /// <returns>JSON containing data for the current user.</returns>
+        /// 
+      
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         [OperationContract]
-        [WebInvoke(Method = "GET", UriTemplate = "/user", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        User GetUser();
+        [WebInvoke(Method = "GET", UriTemplate = "/user?name={name}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        User GetUser(string name);
+
 
         /// <summary>
         /// Creates a new collection using the specified name.
