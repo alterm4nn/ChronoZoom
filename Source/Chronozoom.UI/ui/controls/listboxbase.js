@@ -26,23 +26,25 @@ var CZ;
                 this.itemMoveHandler = function (item, idx1, idx2) {
                 };
                 var self = this;
-                var origStart = listBoxInfo.sortableSettings.start;
-                var origStop = listBoxInfo.sortableSettings.stop;
-                $.extend(listBoxInfo.sortableSettings, {
-                    start: function (event, ui) {
-                        ui.item.startPos = ui.item.index();
-                        if(origStart) {
-                            origStart(event, ui);
+                if(listBoxInfo.sortableSettings) {
+                    var origStart = listBoxInfo.sortableSettings.start;
+                    var origStop = listBoxInfo.sortableSettings.stop;
+                    $.extend(listBoxInfo.sortableSettings, {
+                        start: function (event, ui) {
+                            ui.item.startPos = ui.item.index();
+                            if(origStart) {
+                                origStart(event, ui);
+                            }
+                        },
+                        stop: function (event, ui) {
+                            self.itemMoveHandler(ui.item, ui.item.startPos, ui.item.index());
+                            if(origStop) {
+                                origStop(event, ui);
+                            }
                         }
-                    },
-                    stop: function (event, ui) {
-                        self.itemMoveHandler(ui.item, ui.item.startPos, ui.item.index());
-                        if(origStop) {
-                            origStop(event, ui);
-                        }
-                    }
-                });
-                this.container.sortable(listBoxInfo.sortableSettings);
+                    });
+                    this.container.sortable(listBoxInfo.sortableSettings);
+                }
             }
             ListBoxBase.prototype.add = function (context) {
                 var type = this.getType(context);
