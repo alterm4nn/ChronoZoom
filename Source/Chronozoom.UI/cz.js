@@ -6380,19 +6380,6 @@ var CZ;
         });
         marker.dblclick(function (e) {
             var point = CZ.Common.getXBrowserMouseOrigin(container, e);
-            var test1 = CZ.Dates.getCoordinateFromDMY(-1, 7, 27);
-            var test2 = CZ.Dates.getCoordinateFromDMY(2013, 1, 5);
-            var test3 = CZ.Dates.getCoordinateFromDMY(1, 0, 1);
-            var test4 = CZ.Dates.getCoordinateFromDMY(-2014, 6, 3);
-            var test5 = CZ.Dates.getCoordinateFromDMY(-1, 7, 27);
-            var test6 = CZ.Dates.getCoordinateFromDMY(2012, 1, 29);
-            var test7 = CZ.Dates.getCoordinateFromDMY(2013, 2, 1);
-            var test8 = CZ.Dates.getCoordinateFromDMY(-1600, 1, 28);
-            var test9 = CZ.Dates.getCoordinateFromDMY(2000, 1, 29);
-            var test10 = CZ.Dates.getCoordinateFromDMY(2000, 2, 1);
-            console.log("ol2a", test1, test2, test3, test4);
-            console.log("ol2a", test5, test6, test7, test8);
-            console.log("ol2a", test9, test10);
             var k = (_range.max - _range.min) / _width;
             var time = _range.max - k * (_width - point.x);
             if(time <= _range.min + CZ.Settings.panelWidth * k) {
@@ -9447,10 +9434,10 @@ var CZ;
                 this.startDate = new CZ.UI.DatePicker(container.find(formInfo.startDate));
                 this.endDate = new CZ.UI.DatePicker(container.find(formInfo.endDate));
                 this.titleInput = container.find(formInfo.titleInput);
+                this.errorMessage = container.find(formInfo.errorMessage);
                 this.timeline = formInfo.context;
                 this.saveButton.off();
                 this.deleteButton.off();
-                this.errorMessage = this.container.find("#error-edit-timeline");
                 this.initialize();
             }
             FormEditTimeline.prototype.initialize = function () {
@@ -10762,6 +10749,7 @@ var CZ;
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
+                            errorMessage: "#error-edit-timeline",
                             context: timeline
                         });
                         form.show();
@@ -10777,6 +10765,7 @@ var CZ;
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
+                            errorMessage: "#error-edit-timeline",
                             context: timeline
                         });
                         form.show();
