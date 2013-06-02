@@ -2708,9 +2708,13 @@ var CZ;
             });
         }
         Service.deleteProfile = deleteProfile;
-        function getProfile() {
+        function getProfile(displayName) {
+            if (typeof displayName === "undefined") { displayName = ""; }
             var request = new Service.Request(_serviceUrl);
             request.addToPath("user");
+            if(displayName != "") {
+                request.addParameter("name", displayName);
+            }
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -8359,7 +8363,15 @@ var CZ;
                     switch(mode) {
                         case "year":
                             _this.editModeYear();
+<<<<<<< HEAD
                             _this.setDate(_this.coordinate, false);
+=======
+                            if(Number(_this.coordinate) == _this.INFINITY_VALUE) {
+                                _this.setDate(CZ.Dates.getCoordinateFromDecimalYear(CZ.Dates.getPresent().presentYear));
+                            } else {
+                                _this.setDate(_this.coordinate);
+                            }
+>>>>>>> 59bc4350a3afe94d5f2163c61b12598a1ee2ed2d
                             break;
                         case "date":
                             _this.editModeDate();
@@ -10357,15 +10369,23 @@ var CZ;
                         alert("Please agree with provided terms");
                         return;
                     }
-                    CZ.Service.putProfile(_this.usernameInput.val(), _this.emailInput.val()).then(function (success) {
-                        if(_this.allowRedirect) {
-                            window.location.assign("\\" + success);
-                        } else {
-                            _this.close();
-                        }
-                    }, function (error) {
-                        alert("Unable to save changes. Please try again later.");
-                        console.log(error);
+                    CZ.Service.getProfile().done(function (curUser) {
+                        CZ.Service.getProfile(_this.usernameInput.val()).done(function (getUser) {
+                            if(curUser.DisplayName == null && typeof getUser.DisplayName != "undefined") {
+                                alert("Provided username already exists.");
+                                return;
+                            }
+                            CZ.Service.putProfile(_this.usernameInput.val(), _this.emailInput.val()).then(function (success) {
+                                if(_this.allowRedirect) {
+                                    window.location.assign("\\" + success);
+                                } else {
+                                    _this.close();
+                                }
+                            }, function (error) {
+                                alert("Unable to save changes. Please try again later.");
+                                console.log(error);
+                            });
+                        });
                     });
                 });
                 this.logoutButton.click(function (event) {
