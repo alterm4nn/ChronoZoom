@@ -420,9 +420,11 @@ module CZ {
             });
         }
 
-        export function getProfile() {
+        export function getProfile(displayName = "") {
             var request = new Service.Request(_serviceUrl);
             request.addToPath("user");
+            if(displayName != "")
+                request.addParameter("name", displayName);
             return $.ajax({
                 type: "GET",
                 cache: false,
