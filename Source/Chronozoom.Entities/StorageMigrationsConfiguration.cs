@@ -27,13 +27,21 @@ namespace Chronozoom.Entities
             }
 
             Trace.TraceInformation("Entering storage seed stage");
-
+            try
+            {
+                context.Database.ExecuteSqlCommand("ALTER TABLE Timelines DROP CONSTRAINT DF__Timelines__ForkN__4BAC3F29");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.StackTrace);
+            }
             Migrator migrator = new Migrator(context);
             migrator.Migrate();
         }
 
         public StorageMigrationsConfiguration()
         {
+            AutomaticMigrationDataLossAllowed = true;
             AutomaticMigrationsEnabled = true;
         }
     }
