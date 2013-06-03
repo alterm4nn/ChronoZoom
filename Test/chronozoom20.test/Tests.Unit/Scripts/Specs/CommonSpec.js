@@ -49,7 +49,6 @@ describe("getCookie() method", function () {
         var common;
         beforeEach(function () {
             common = CZ.Common;
-            document.cookie = "Cookie1=Value1;Cookie2=Value2";
         });
         it("unescaped cookie value, if c_name = Cookie1", function () {
             var c_name = "Cookie1";
