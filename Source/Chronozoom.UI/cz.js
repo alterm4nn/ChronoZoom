@@ -3473,7 +3473,10 @@ var CZ;
                             }
                         },
                         stop: function (event, ui) {
-                            self.itemMoveHandler(ui.item, ui.item.startPos, ui.item.index());
+                            ui.item.stopPos = ui.item.index();
+                            var item = self.items.splice(ui.item.startPos, 1)[0];
+                            self.items.splice(ui.item.stopPos, 0, item);
+                            self.itemMoveHandler(ui.item, ui.item.startPos, ui.item.stopPos);
                             if(origStop) {
                                 origStop(event, ui);
                             }
@@ -9547,6 +9550,7 @@ var CZ;
         var ContentItemListBox = (function (_super) {
             __extends(ContentItemListBox, _super);
             function ContentItemListBox(container, listItemContainer, contentItems) {
+                var self = this;
                 var listBoxInfo = {
                     context: contentItems,
                     sortableSettings: {
@@ -9559,6 +9563,13 @@ var CZ;
                         scroll: false,
                         start: function (event, ui) {
                             ui.placeholder.height(ui.item.height());
+                        },
+                        stop: function (event, ui) {
+                            for(var i = 0; i < self.items.length; i++) {
+                                if(self.items[i].data) {
+                                    self.items[i].data.order = i;
+                                }
+                            }
                         }
                     }
                 };
@@ -9576,6 +9587,14 @@ var CZ;
                 listItemsInfo.default.ctor = ContentItemListItem;
                         _super.call(this, container, listBoxInfo, listItemsInfo);
             }
+            ContentItemListBox.prototype.remove = function (item) {
+                for(var i = this.items.indexOf(item) + 1; i < this.items.length; i++) {
+                    if(this.items[i].data && this.items[i].data.order) {
+                        this.items[i].data.order--;
+                    }
+                }
+                _super.prototype.remove.call(this, item);
+            };
             return ContentItemListBox;
         })(UI.ListBoxBase);
         UI.ContentItemListBox = ContentItemListBox;        
