@@ -50,8 +50,26 @@ namespace Chronozoom.UI
         /// <summary>
         /// The path to download thumbanils from.
         /// </summary>
-        [DataMember]
+        [DataMember(Name = "thumbnailsPath")]
         public Uri ThumbnailsPath { get; set; }
+
+        /// <summary>
+        /// The URL to sign in with Microsoft account.
+        /// </summary>
+        [DataMember(Name = "signinUrlMicrosoft")]
+        public Uri SignInUrlMicrosoft { get; set; }
+
+        /// <summary>
+        /// The URL to sign in with Google account.
+        /// </summary>
+        [DataMember(Name = "signinUrlGoogle")]
+        public Uri SignInUrlGoogle { get; set; }
+
+        /// <summary>
+        /// The URL to sign in with Yahoo account.
+        /// </summary>
+        [DataMember(Name = "signinUrlYahoo")]
+        public Uri SignInUrlYahoo { get; set; }
     }
 
     public class PutExhibitResult
@@ -106,7 +124,7 @@ namespace Chronozoom.UI
     [SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly", Justification = "No unmanaged handles")]
     [ServiceContract(Namespace = "")]
     [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
-    public class ChronozoomSVC : IDisposable
+    public class ChronozoomSVC : IDisposable, IChronozoomSVC
     {
         private static readonly MemoryCache Cache = new MemoryCache("Storage");
 
@@ -132,16 +150,43 @@ namespace Chronozoom.UI
         // Points to the absolute path where thumbnails are stored
         private static Lazy<Uri> _thumbnailsPath = new Lazy<Uri>(() =>
         {
-            if (ConfigurationManager.AppSettings["ThumbnailsPath"] == null)
+            if (string.IsNullOrEmpty(ConfigurationManager.AppSettings["ThumbnailsPath"]))
                 return null;
 
             return new Uri(ConfigurationManager.AppSettings["ThumbnailsPath"]);
         });
 
+                // The login URL to sign in with Microsoft account
+        private static Lazy<Uri> _signinUrlMicrosoft = new Lazy<Uri>(() =>
+        {
+            if (string.IsNullOrEmpty(ConfigurationManager.AppSettings["SignInUrlMicrosoft"]))
+                return new Uri(@"https://login.live.com/login.srf?wa=wsignin1.0&wtrealm=https%3a%2f%2faccesscontrol.windows.net%2f&wreply=https%3a%2f%2fcz-nodelete-chronozoom-test.accesscontrol.windows.net%2fv2%2fwsfederation&wp=MBI_FED_SSL&wctx=cHI9d3NmZWRlcmF0aW9uJnJtPWh0dHAlM2ElMmYlMmZ0ZXN0LmNocm9ub3pvb21wcm9qZWN0Lm9yZyUyZiZjeD1ybSUzZDAlMjZpZCUzZHBhc3NpdmUlMjZydSUzZCUyNTJmYWNjb3VudCUyNTJmbG9naW41");
+
+            return new Uri(ConfigurationManager.AppSettings["SignInUrlMicrosoft"]);
+        });
+
+        // The login URL to sign in with Google account
+        private static Lazy<Uri> _signinUrlGoogle = new Lazy<Uri>(() =>
+        {
+            if (string.IsNullOrEmpty(ConfigurationManager.AppSettings["SignInUrlGoogle"]))
+                return new Uri(@"https://www.google.com/accounts/o8/ud?openid.ns=http%3a%2f%2fspecs.openid.net%2fauth%2f2.0&openid.mode=checkid_setup&openid.claimed_id=http%3a%2f%2fspecs.openid.net%2fauth%2f2.0%2fidentifier_select&openid.identity=http%3a%2f%2fspecs.openid.net%2fauth%2f2.0%2fidentifier_select&openid.realm=https%3a%2f%2fcz-nodelete-chronozoom-test.accesscontrol.windows.net%3a443%2fv2%2fopenid&openid.return_to=https%3a%2f%2fcz-nodelete-chronozoom-test.accesscontrol.windows.net%3a443%2fv2%2fopenid%3fcontext%3dcHI9d3NmZWRlcmF0aW9uJnJtPWh0dHAlM2ElMmYlMmZ0ZXN0LmNocm9ub3pvb21wcm9qZWN0Lm9yZyUyZiZjeD1ybSUzZDAlMjZpZCUzZHBhc3NpdmUlMjZydSUzZCUyNTJmYWNjb3VudCUyNTJmbG9naW4mcHJvdmlkZXI9R29vZ2xl0&openid.ns.ax=http%3a%2f%2fopenid.net%2fsrv%2fax%2f1.0&openid.ax.mode=fetch_request&openid.ax.required=email%2cfullname%2cfirstname%2clastname&openid.ax.type.email=http%3a%2f%2faxschema.org%2fcontact%2femail&openid.ax.type.fullname=http%3a%2f%2faxschema.org%2fnamePerson&openid.ax.type.firstname=http%3a%2f%2faxschema.org%2fnamePerson%2ffirst&openid.ax.type.lastname=http%3a%2f%2faxschema.org%2fnamePerson%2flast");
+
+            return new Uri(ConfigurationManager.AppSettings["SignInUrlGoogle"]);
+        });
+
+        // The login URL to sign in with Yahoo account
+        private static Lazy<Uri> _signinUrlYahoo = new Lazy<Uri>(() =>
+        {
+            if (string.IsNullOrEmpty(ConfigurationManager.AppSettings["SignInUrlYahoo"]))
+                return new Uri("https://open.login.yahooapis.com/openid/op/auth?openid.ns=http%3a%2f%2fspecs.openid.net%2fauth%2f2.0&openid.mode=checkid_setup&openid.claimed_id=http%3a%2f%2fspecs.openid.net%2fauth%2f2.0%2fidentifier_select&openid.identity=http%3a%2f%2fspecs.openid.net%2fauth%2f2.0%2fidentifier_select&openid.realm=https%3a%2f%2fcz-nodelete-chronozoom-test.accesscontrol.windows.net%3a443%2fv2%2fopenid&openid.return_to=https%3a%2f%2fcz-nodelete-chronozoom-test.accesscontrol.windows.net%3a443%2fv2%2fopenid%3fcontext%3dcHI9d3NmZWRlcmF0aW9uJnJtPWh0dHAlM2ElMmYlMmZ0ZXN0LmNocm9ub3pvb21wcm9qZWN0Lm9yZyUyZiZjeD1ybSUzZDAlMjZpZCUzZHBhc3NpdmUlMjZydSUzZCUyNTJmYWNjb3VudCUyNTJmbG9naW4mcHJvdmlkZXI9WWFob28h0&openid.ns.ax=http%3a%2f%2fopenid.net%2fsrv%2fax%2f1.0&openid.ax.mode=fetch_request&openid.ax.required=email%2cfullname%2cfirstname%2clastname&openid.ax.type.email=http%3a%2f%2faxschema.org%2fcontact%2femail&openid.ax.type.fullname=http%3a%2f%2faxschema.org%2fnamePerson&openid.ax.type.firstname=http%3a%2f%2faxschema.org%2fnamePerson%2ffirst&openid.ax.type.lastname=http%3a%2f%2faxschema.org%2fnamePerson%2flast");
+
+            return new Uri(ConfigurationManager.AppSettings["SignInUrlYahoo"]);
+        });
+
         private static Lazy<ThumbnailGenerator> _thumbnailGenerator = new Lazy<ThumbnailGenerator>(() =>
         {
             string thumbnailStorage = null;
-            if (ConfigurationManager.AppSettings["ThumbnailStorage"] != null)
+            if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["ThumbnailStorage"]))
             {
                 thumbnailStorage = ConfigurationManager.AppSettings["ThumbnailStorage"];
             }
@@ -171,6 +216,13 @@ namespace Chronozoom.UI
             public const string DefaultUserNotFound = "Default anonymous user not found";
             public const string SuperCollectionNotFound = "SuperCollection not found";
             public const string TimelineRangeInvalid = "Timeline lies outside of bounds of it's parent timeline";
+            public const string TourNotFound = "Tour not found";
+            public const string TourIdShouldBeNull = "Tour id is null";
+            public const string TourIdCannotBeNull = "Tour id cannot be null";
+            public const string TourIdMismatch = "Tour id mismatch";
+            public const string BookmarkNotFound = "Bookmark not found";
+            public const string BookmarkSequenceIdDuplicate = "Bookmark sequence id already exists";
+            public const string BookmarkSequenceIdInvalid = "Bookmark sequence id is invalid";
         }
 
         private static Lazy<string> _hostPath = new Lazy<string>(() =>
@@ -588,6 +640,39 @@ namespace Chronozoom.UI
                 if (u != null) return u;
                 return user;
             });
+        }
+        
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        public User GetUser(string name = "")
+        {
+            if (String.IsNullOrEmpty(name))
+            {
+                return AuthenticatedOperation(delegate(User user)
+                {
+                    Trace.TraceInformation("Get User");
+                    if (user == null)
+                    {
+                        SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
+                        return null;
+                    }
+                    var u = _storage.Users.Where(candidate => candidate.NameIdentifier == user.NameIdentifier).FirstOrDefault();
+                    if (u != null) return u;
+                    return user;
+                });
+            }
+            else
+            {
+                User u = _storage.Users.Where(candidate => candidate.DisplayName == name).FirstOrDefault();
+                if (u == null) return u;
+                u.Email = String.Empty;
+                u.IdentityProvider = String.Empty;
+                u.NameIdentifier = String.Empty;
+                u.Id = Guid.Empty;
+                return u;
+            }
         }
 
         private void DeleteSuperCollection(string superCollectionName)
@@ -1603,6 +1688,418 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
+        public TourResult PostTour(string superCollectionName, string collectionName, Tour tourRequest)
+        {
+            return AuthenticatedOperation(delegate(User user)
+            {
+                Trace.TraceInformation("Post Tour");
+                var returnValue = new TourResult();
+
+                if (tourRequest == null)
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
+                    return returnValue;
+                }
+
+                Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
+                Collection collection = _storage.Collections.Find(collectionGuid);
+                if (collection == null)
+                {
+                    // Collection does not exist
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
+                    return returnValue;
+                }
+
+                // Validate user, if required.
+                if (!UserCanModifyCollection(user, collection))
+                {
+                    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                    return returnValue;
+                }
+
+                if (tourRequest.Id != Guid.Empty)
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.TourIdShouldBeNull);
+                    return returnValue;
+                }
+
+                // Add a new tour
+                Guid newTourGuid = Guid.NewGuid();
+                Tour newTour = new Tour { Id = newTourGuid };
+                newTour.Name = tourRequest.Name;
+                newTour.AudioBlobUrl = tourRequest.AudioBlobUrl;
+                newTour.Collection = collection;
+
+                _storage.Tours.Add(newTour);
+                returnValue.TourId = newTourGuid;
+
+                // Populate the bookmarks.
+                if (tourRequest.Bookmarks != null)
+                {
+                    foreach (Bookmark bookmarkRequest in tourRequest.Bookmarks)
+                    {
+                        var newBookmarkGuid = AddBookmark(newTour, bookmarkRequest);
+                        if (newBookmarkGuid != Guid.Empty)
+                        {
+                            returnValue.Add(newBookmarkGuid);
+                        }
+                    }
+                }
+                _storage.SaveChanges();
+                return returnValue;
+            });
+        }
+
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
+        public TourResult PutTour(string superCollectionName, string collectionName, Tour tourRequest)
+        {
+            return AuthenticatedOperation(delegate(User user)
+            {
+                Trace.TraceInformation("Put Tour");
+                var returnValue = new TourResult();
+
+                if (tourRequest == null)
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
+                    return returnValue;
+                }
+
+                Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
+                Collection collection = _storage.Collections.Find(collectionGuid);
+                if (collection == null)
+                {
+                    // Collection does not exist
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
+                    return returnValue;
+                }
+
+                // Validate user, if required.
+                if (!UserCanModifyCollection(user, collection))
+                {
+                    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                    return returnValue;
+                }
+
+                if (tourRequest.Id == Guid.Empty)
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.TourIdCannotBeNull);
+                    return returnValue;
+                }
+
+                Tour updateTour = _storage.Tours.Find(tourRequest.Id);
+                if (updateTour == null)
+                {
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TourNotFound);
+                    return returnValue;
+                }
+
+                if (updateTour.Collection.Id != collectionGuid)
+                {
+                    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                    return returnValue;
+                }
+
+                // Update the tour
+                updateTour.Name = tourRequest.Name;
+                updateTour.AudioBlobUrl = tourRequest.AudioBlobUrl;
+                returnValue.TourId = tourRequest.Id;
+
+                // Update the bookmarks
+                if (tourRequest.Bookmarks != null)
+                {
+                    foreach (Bookmark bookmarkRequest in tourRequest.Bookmarks)
+                    {
+                        Guid updateBookmarkGuid = UpdateBookmark(updateTour, bookmarkRequest);
+                        if (updateBookmarkGuid != Guid.Empty)
+                        {
+                            returnValue.Add(updateBookmarkGuid);
+                        }
+                    }
+                }
+                _storage.SaveChanges();
+                return returnValue;
+            });
+        }
+
+        private Guid UpdateBookmark(Tour updateTour, Bookmark bookmarkRequest)
+        {
+            Bookmark updateBookmark = _storage.Bookmarks.Find(bookmarkRequest.Id);
+            if (updateBookmark == null)
+            {
+                SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.BookmarkNotFound);
+                return Guid.Empty;
+            }
+
+            // Validate permissions at the tour level.   
+            // The bookmarks being updated should belong to the tour specified by tourGuid.  
+            // If it belong to a different tour the update is disallowed.  
+            Tour bookmarkTour = _storage.GetBookmarkTour(updateBookmark);
+            if (bookmarkTour == null | bookmarkTour.Id != updateTour.Id)
+            {
+                SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.TourIdMismatch);
+                return Guid.Empty;
+            }
+
+
+            // Update the bookmark fields
+            // Validate that the sequence id specified is a positive number and does not already exist.
+            if (bookmarkRequest.SequenceId <= 0)
+            {
+                SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.BookmarkSequenceIdInvalid);
+                return Guid.Empty;
+            }
+
+            _storage.Entry(updateTour).Collection(_ => _.Bookmarks).Load();
+            if (updateTour.Bookmarks != null)
+            {
+                List<Bookmark> bookmarkList = updateTour.Bookmarks.ToList();
+                Bookmark sequenceIdBookmark = bookmarkList.Where(candidate => candidate.SequenceId == bookmarkRequest.SequenceId).FirstOrDefault();
+                if (sequenceIdBookmark != null)
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.BookmarkSequenceIdDuplicate);
+                    return Guid.Empty;
+                }
+            }
+
+            updateBookmark.SequenceId = bookmarkRequest.SequenceId;
+            updateBookmark.Name = bookmarkRequest.Name;
+            updateBookmark.Url = bookmarkRequest.Url;
+            updateBookmark.LapseTime = bookmarkRequest.LapseTime;
+            updateBookmark.Description = bookmarkRequest.Description;
+
+            return bookmarkRequest.Id;
+        }
+
+        private Guid AddBookmark(Tour tour, Bookmark bookmarkRequest)
+        {
+            Guid newBookmarkGuid = Guid.NewGuid();
+            Bookmark newBookmark = new Bookmark
+            {
+                Id = newBookmarkGuid,
+                Name = bookmarkRequest.Name,
+                Url = bookmarkRequest.Url,
+                LapseTime = bookmarkRequest.LapseTime,
+                Description = bookmarkRequest.Description
+            };
+
+            // Validate that the sequence id specified is a positive number and does not already exist.
+            if (bookmarkRequest.SequenceId <= 0)
+            {
+                SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.BookmarkSequenceIdInvalid);
+                return Guid.Empty;
+            }
+
+            _storage.Entry(tour).Collection(_ => _.Bookmarks).Load();
+            if (tour.Bookmarks == null)
+            {
+                tour.Bookmarks = new System.Collections.ObjectModel.Collection<Bookmark>();
+            }
+            List<Bookmark> bookmarkList = tour.Bookmarks.ToList();
+            Bookmark sequenceIdBookmark = bookmarkList.Where(candidate => candidate.SequenceId == bookmarkRequest.SequenceId).FirstOrDefault();
+            if (sequenceIdBookmark != null)
+            {
+                SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.BookmarkSequenceIdDuplicate);
+                return Guid.Empty;
+            }
+            newBookmark.SequenceId = bookmarkRequest.SequenceId;
+
+            tour.Bookmarks.Add(newBookmark);
+            _storage.Bookmarks.Add(newBookmark);
+            return newBookmarkGuid;
+        }
+
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
+        public void DeleteTour(string superCollectionName, string collectionName, Tour tourRequest)
+        {
+            AuthenticatedOperation(user =>
+            {
+                Trace.TraceInformation("Delete Tour");
+
+                if (tourRequest == null)
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
+                    return;
+                }
+
+                Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
+                Collection collection = _storage.Collections.Find(collectionGuid);
+                if (collection == null)
+                {
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
+                    return;
+                }
+
+                if (!UserCanModifyCollection(user, collection))
+                {
+                    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                    return;
+                }
+
+                Tour deleteTour = _storage.Tours.Find(tourRequest.Id);
+                if (deleteTour == null)
+                {
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TourNotFound);
+                    return;
+                }
+                _storage.Entry(deleteTour).Collection(_ => _.Bookmarks).Load();
+                DeleteBookmarks(deleteTour);
+                _storage.Tours.Remove(deleteTour);
+                _storage.SaveChanges();
+            });
+        }
+
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        public TourResult PutBookmarks(string superCollectionName, string collectionName, Tour tourRequest)
+        {
+            return AuthenticatedOperation(delegate(User user)
+            {
+                Trace.TraceInformation("Put Bookmarks");
+                var returnValue = new TourResult();
+
+                if (tourRequest == null)
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
+                    return returnValue;
+                }
+
+                Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
+                Collection collection = _storage.Collections.Find(collectionGuid);
+                if (collection == null)
+                {
+                    // Collection does not exist
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
+                    return returnValue;
+                }
+
+                // Validate user, if required.
+                if (!UserCanModifyCollection(user, collection))
+                {
+                    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                    return returnValue;
+                }
+
+                if (tourRequest.Id == Guid.Empty)
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.TourIdCannotBeNull);
+                    return returnValue;
+                }
+
+                Tour bookmarkTour = _storage.Tours.Find(tourRequest.Id);
+                if (bookmarkTour == null)
+                {
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TourNotFound);
+                    return returnValue;
+                }
+                returnValue.TourId = tourRequest.Id;
+
+                // Populate the bookmarks.
+                if (tourRequest.Bookmarks != null)
+                {
+                    foreach (Bookmark bookmarkRequest in tourRequest.Bookmarks)
+                    {
+                        var newBookmarkGuid = AddBookmark(bookmarkTour, bookmarkRequest);
+                        if (newBookmarkGuid != Guid.Empty)
+                        {
+                            returnValue.Add(newBookmarkGuid);
+                        }
+                    }
+                    _storage.SaveChanges();
+                }
+                return returnValue;
+            });
+        }
+
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
+        public void DeleteBookmarks(string superCollectionName, string collectionName, Tour tourRequest)
+        {
+            AuthenticatedOperation(user =>
+            {
+                Trace.TraceInformation("Delete Bookmarks");
+
+                if (tourRequest == null)
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
+                    return;
+                }
+
+                Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
+                Collection collection = _storage.Collections.Find(collectionGuid);
+                if (collection == null)
+                {
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
+                    return;
+                }
+
+                if (!UserCanModifyCollection(user, collection))
+                {
+                    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                    return;
+                }
+
+                Tour bookmarkTour = _storage.Tours.Find(tourRequest.Id);
+                if (bookmarkTour == null)
+                {
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TourNotFound);
+                    return;
+                }
+
+                if (tourRequest.Bookmarks != null)
+                {
+                    _storage.Entry(bookmarkTour).Collection(_ => _.Bookmarks).Load();
+                    List<Bookmark> tourBookmarks = bookmarkTour.Bookmarks.ToList();
+
+                    foreach (Bookmark bookmark in tourRequest.Bookmarks)
+                    {
+                        Bookmark deleteBookmark = tourBookmarks.Where(candidate => candidate.Id == bookmark.Id).FirstOrDefault();
+                        if (deleteBookmark == null)
+                        {
+                            SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.BookmarkNotFound);
+                            return;
+                        }
+                        _storage.Bookmarks.Remove(deleteBookmark);
+                    }
+                    _storage.SaveChanges();
+                }
+            });
+        }
+
+        // Delete the specified bookmarks that are part of the tour.
+        public void DeleteBookmarks(Tour tour)
+        {
+            if (tour == null)
+                return;
+
+            var bookmarkIds = new List<Guid>();
+
+            foreach (Bookmark bookmark in tour.Bookmarks)
+            {
+                bookmarkIds.Add(bookmark.Id);
+            }
+
+            while (bookmarkIds.Count != 0)
+            {
+                var bookmark = _storage.Bookmarks.Find(bookmarkIds.First());
+                _storage.Bookmarks.Remove(bookmark);
+                bookmarkIds.RemoveAt(0);
+            }
+        }
+
+
+        /// <summary>
         /// Updates content item counts of all ancestor timelines
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "update"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "t")]
@@ -1650,6 +2147,25 @@ namespace Chronozoom.UI
             Cache.Add(cacheKey, value, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
 
             return value;
+        }
+        
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        public IEnumerable<SuperCollection> GetCollections()
+        {
+            // Skip the sandbox collection since it's currently a test-only collection
+            List<SuperCollection> superCollections = _storage.SuperCollections.Where(candidate => candidate.Title != _sandboxSuperCollectionName).ToList();
+
+            foreach (SuperCollection superCollection in superCollections)
+            {
+                if (string.CompareOrdinal(superCollection.Title, _sandboxSuperCollectionName) == 0)
+                    continue;
+
+                _storage.Entry(superCollection).Collection(x => x.Collections).Load();
+            }
+
+            return superCollections;
         }
 
         private bool FindParentTimeline(Guid? parentTimelineGuid, out Timeline parentTimeline)
