@@ -87,19 +87,21 @@ module CZ {
 
                 // Apply jQueryUI sortable widget.
                 var self = this;
-                var origStart = listBoxInfo.sortableSettings.start;
-                var origStop = listBoxInfo.sortableSettings.stop;
-                $.extend(listBoxInfo.sortableSettings, {
-                    start: function (event, ui) {
-                        ui.item.startPos = ui.item.index();
-                        if (origStart) origStart(event, ui);
-                    },
-                    stop: function (event, ui) {
-                        self.itemMoveHandler(ui.item, ui.item.startPos, ui.item.index());
-                        if (origStop) origStop(event, ui);
-                    }
-                });
-                this.container.sortable(listBoxInfo.sortableSettings);
+                if (listBoxInfo.sortableSettings) {
+                    var origStart = listBoxInfo.sortableSettings.start;
+                    var origStop = listBoxInfo.sortableSettings.stop;
+                    $.extend(listBoxInfo.sortableSettings, {
+                        start: function (event, ui) {
+                            ui.item.startPos = ui.item.index();
+                            if (origStart) origStart(event, ui);
+                        },
+                        stop: function (event, ui) {
+                            self.itemMoveHandler(ui.item, ui.item.startPos, ui.item.index());
+                            if (origStop) origStop(event, ui);
+                        }
+                    });
+                    this.container.sortable(listBoxInfo.sortableSettings);
+                }
             }
 
             /**
