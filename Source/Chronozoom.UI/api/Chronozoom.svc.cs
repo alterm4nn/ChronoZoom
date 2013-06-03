@@ -1,4 +1,4 @@
-// --------------------------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright company="Outercurve Foundation">
 //   Copyright (c) 2013, The Outercurve Foundation
 // </copyright>
@@ -155,7 +155,7 @@ namespace Chronozoom.UI
             return new Uri(ConfigurationManager.AppSettings["ThumbnailsPath"]);
         });
 
-                // The login URL to sign in with Microsoft account
+        // The login URL to sign in with Microsoft account
         private static Lazy<Uri> _signinUrlMicrosoft = new Lazy<Uri>(() =>
         {
             if (string.IsNullOrEmpty(ConfigurationManager.AppSettings["SignInUrlMicrosoft"]))
@@ -195,7 +195,7 @@ namespace Chronozoom.UI
 
         // The Maximum number of elements retured in a Search
         private const int MaxSearchLimit = 50;
-
+      
         // error code descriptions
         private static class ErrorDescription
         {
@@ -240,7 +240,6 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "minspan")]
         public Timeline GetTimelines(string superCollection, string collection, string start, string end, string minspan, string commonAncestor, string maxElements, string depth)
         {
             return AuthenticatedOperation(delegate(User user)
@@ -268,7 +267,6 @@ namespace Chronozoom.UI
                 int depthParsed = string.IsNullOrWhiteSpace(depth) ? _defaultDepth : int.Parse(depth, CultureInfo.InvariantCulture);
 
                 Collection<Timeline> timelines = _storage.TimelinesQuery(collectionId, startTime, endTime, span, lcaParsed, maxElementsParsed, depthParsed);
-
                 Timeline timeline = timelines.Where(candidate => candidate.Id == lcaParsed).FirstOrDefault();
 
                 if (timeline == null)
@@ -283,40 +281,6 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "minspan")]
-        public IEnumerable<TimelineRaw> GetTimelineSubtree(Guid collectionId, string start, string end, string minspan, string commonAncestor, string maxElements)
-        {
-            return AuthenticatedOperation(delegate(User user)
-            {
-                Trace.TraceInformation("Get Filtered Timelines");
-                /*
-                Guid collectionId = CollectionIdOrDefault(superCollection, collection);
-
-                // If available, retrieve from cache.
-                if (CanCacheGetTimelines(user, collectionId))
-                {
-                    Timeline cachedTimeline = GetCachedGetTimelines(collectionId, start, end, minspan, commonAncestor, maxElements);
-                    if (cachedTimeline != null)
-                    {
-                        return cachedTimeline;
-                    }
-                }
-                */
-                
-                // initialize filters
-                decimal startTime = string.IsNullOrWhiteSpace(start) ? _minYear : decimal.Parse(start, CultureInfo.InvariantCulture);
-                decimal endTime = string.IsNullOrWhiteSpace(end) ? _maxYear : decimal.Parse(end, CultureInfo.InvariantCulture);
-                decimal minSpanParsed = string.IsNullOrWhiteSpace(minspan) ? 0 : decimal.Parse(minspan, CultureInfo.InvariantCulture);
-                Guid? lcaParsed = string.IsNullOrWhiteSpace(commonAncestor) ? (Guid?)null : Guid.Parse(commonAncestor);
-                int maxElementsParsed = string.IsNullOrWhiteSpace(maxElements) ? _maxElements.Value : int.Parse(maxElements, CultureInfo.InvariantCulture);
-                return _storage.TimelineSubtreeQuery(collectionId, lcaParsed, startTime, endTime, minSpanParsed, maxElementsParsed);
-            });
-        }
-
-        /// <summary>
-        /// Documentation under IChronozoomSVC
-        /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public BaseJsonResult<IEnumerable<SearchResult>> Search(string superCollection, string collection, string searchTerm)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
@@ -347,9 +311,6 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
-        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/tours")]
         public BaseJsonResult<IEnumerable<Tour>> GetDefaultTours()
         {
             return GetTours("", "");
@@ -502,25 +463,14 @@ namespace Chronozoom.UI
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         public User GetUser()
         {
-            return AuthenticatedOperation(delegate(User user)
-            {
-                Trace.TraceInformation("Get User");
-                if (user == null)
-                {
-                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
-                    return null;
-                }
-                var u = _storage.Users.Where(candidate => candidate.NameIdentifier == user.NameIdentifier).FirstOrDefault();
-                if (u != null) return u;
-                return user;
-            });
+            return GetUser("");
         }
         
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
-        public User GetUser(string name = "")
+        public User GetUser(string name)
         {
             if (String.IsNullOrEmpty(name))
             {
@@ -572,73 +522,6 @@ namespace Chronozoom.UI
                 _storage.SuperCollections.Remove(superCollection);
                 _storage.SaveChanges();
             });
-        }
-        private Uri UpdatePersonalCollection(string userId, User user)
-        {
-            if (string.IsNullOrEmpty(userId))
-            {
-                // Anonymous user so use the sandbox superCollection and collection
-                SuperCollection sandboxSuperCollection = _storage.SuperCollections.Where(candidate => candidate.Title == _sandboxSuperCollectionName).FirstOrDefault();
-                if (sandboxSuperCollection == null)
-                {
-                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.SandboxSuperCollectionNotFound);
-                    return new Uri(string.Format(
-                        CultureInfo.InvariantCulture,
-                        @"{0}\{1}\",
-                        String.Empty,
-                        String.Empty), UriKind.Relative);
-                }
-                else
-                {
-                    return new Uri(string.Format(
-                        CultureInfo.InvariantCulture,
-                        @"{0}\{1}\",
-                        FriendlyUrlReplacements(sandboxSuperCollection.Title),
-                        _sandboxCollectionName), UriKind.Relative);
-                }
-            }
-
-            SuperCollection superCollection = _storage.SuperCollections.Where(candidate => candidate.User.NameIdentifier == user.NameIdentifier).FirstOrDefault();
-            if (superCollection == null)
-            {
-                // Create the personal superCollection
-                superCollection = new SuperCollection();
-                superCollection.Title = user.DisplayName;
-                superCollection.Id = CollectionIdFromText(user.DisplayName);
-                superCollection.User = user;
-                superCollection.Collections = new Collection<Collection>();
-
-                // Create the personal collection
-                Collection personalCollection = new Collection();
-                personalCollection.Title = user.DisplayName;
-                personalCollection.Id = CollectionIdFromSuperCollection(superCollection.Title, personalCollection.Title);
-                personalCollection.User = user;
-
-                superCollection.Collections.Add(personalCollection);
-
-                // Add root timeline Cosmos to the personal collection
-                Timeline rootTimeline = new Timeline { Id = Guid.NewGuid(), Title = "Cosmos" , Regime = "Cosmos" };
-                rootTimeline.FromYear = -13700000000;
-                rootTimeline.ToYear = 9999;
-                rootTimeline.Collection = personalCollection;
-                rootTimeline.Depth = 0;
-                rootTimeline.FirstNodeInSubtree = rootTimeline.Id;
-                rootTimeline.Predecessor = Guid.Empty;
-                rootTimeline.Successor = Guid.Empty;
-
-                _storage.SuperCollections.Add(superCollection);
-                _storage.Collections.Add(personalCollection);
-                _storage.Timelines.Add(rootTimeline);
-                _storage.SaveChanges();
-
-                Trace.TraceInformation("Personal collection saved.");
-            }
-
-            return new Uri(string.Format(
-                CultureInfo.InvariantCulture,
-                @"{0}\{1}\",
-                FriendlyUrlReplacements(superCollection.Title),
-                FriendlyUrlReplacements(superCollection.Title)), UriKind.Relative);
         }
         private Uri EnsurePersonalCollection(User user)
         {
@@ -739,18 +622,6 @@ namespace Chronozoom.UI
                 collection.ToLower(CultureInfo.InvariantCulture)));
         }
 
-        // Replace with URL friendly representations. For instance, converts space to '-'.
-        private static string FriendlyUrlReplacements(string value)
-        {
-            return Uri.EscapeDataString(value.Replace(' ', '-'));
-        }
-
-        // Decodes from URL friendly representations. For instance, converts '-' to space.
-        private static string FriendlyUrlDecode(string value)
-        {
-            return Uri.UnescapeDataString(value.Replace('-', ' '));
-        }
-
         [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase")]
         private static Guid CollectionIdFromText(string value)
         {
@@ -789,29 +660,27 @@ namespace Chronozoom.UI
                     SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                     return Guid.Empty;
                 }
-                lock (_storage)
-                {
-                    Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
-                    Collection collection = RetrieveCollection(collectionGuid);
-                    if (collection == null)
-                    {
-                        collection = new Collection { Id = collectionGuid, Title = collectionName, User = user };
-                        _storage.Collections.Add(collection);
-                        returnValue = collectionGuid;
-                    }
-                    else
-                    {
-                        if (collection.User != user)
-                        {
-                            SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                            return Guid.Empty;
-                        }
 
-                        // Modify collection fields. However, title can't be modified since it would change the URL and break indexing.
-                    }
-                    _storage.SaveChanges();
-                    return returnValue;
+                Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
+                Collection collection = RetrieveCollection(collectionGuid);
+                if (collection == null)
+                {
+                    collection = new Collection { Id = collectionGuid, Title = collectionName, User = user };
+                    _storage.Collections.Add(collection);
+                    returnValue = collectionGuid;
                 }
+                else
+                {
+                    if (collection.User != user)
+                    {
+                        SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                        return Guid.Empty;
+                    }
+
+                    // Modify collection fields. However, title can't be modified since it would change the URL and break indexing.
+                }
+                _storage.SaveChanges();
+                return returnValue;
             });
         }
 
@@ -851,127 +720,104 @@ namespace Chronozoom.UI
             return AuthenticatedOperation(delegate(User user)
             {
                 Trace.TraceInformation("Put Timeline");
-                
+                Guid returnValue;
+
                 if (timelineRequest == null)
                 {
                     SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
                     return Guid.Empty;
                 }
 
-                lock (_storage)
+                Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
+                Collection collection = RetrieveCollection(collectionGuid);
+                if (collection == null)
                 {
-                    Guid returnValue;
-                    Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
-                    Collection collection = RetrieveCollection(collectionGuid);
-                    if (collection == null)
+                    // Collection does not exist
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
+                    return Guid.Empty;
+                }
+
+                // Validate user for timelines that require validation
+                if (!UserCanModifyCollection(user, collection))
+                {
+                    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                    return Guid.Empty;
+                }
+
+                if (timelineRequest.Id == Guid.Empty)
+                {
+                    Timeline parentTimeline;
+                    if (!FindParentTimeline(timelineRequest.Timeline_ID, out parentTimeline))
                     {
-                        // Collection does not exist
-                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
+                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
                         return Guid.Empty;
                     }
 
-                    // Validate user for timelines that require validation
-                    if (!UserCanModifyCollection(user, collection))
+                    if (!ValidateTimelineRange(parentTimeline, timelineRequest.FromYear, timelineRequest.ToYear))
+                    {
+                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineRangeInvalid);
+                        return Guid.Empty;
+                    }
+
+                    // Parent timeline is valid - add new timeline
+                    Guid newTimelineGuid = Guid.NewGuid();
+                    Timeline newTimeline = new Timeline { Id = newTimelineGuid, Title = timelineRequest.Title, Regime = timelineRequest.Regime };
+                    newTimeline.FromYear = timelineRequest.FromYear;
+                    newTimeline.ToYear = timelineRequest.ToYear;
+                    newTimeline.Collection = collection;
+
+                    // Update parent timeline.
+                    if (parentTimeline != null)
+                    {
+                        _storage.Entry(parentTimeline).Collection(_ => _.ChildTimelines).Load();
+                        if (parentTimeline.ChildTimelines == null)
+                        {
+                            parentTimeline.ChildTimelines = new System.Collections.ObjectModel.Collection<Timeline>();
+                        }
+                        parentTimeline.ChildTimelines.Add(newTimeline);
+                        newTimeline.Depth = parentTimeline.Depth + 1;
+                    }
+                    else
+                    {
+                        newTimeline.Depth = 0;
+                    }
+
+                    _storage.Timelines.Add(newTimeline);
+                    returnValue = newTimelineGuid;
+                }
+                else
+                {
+                    Guid updateTimelineGuid = timelineRequest.Id;
+                    Timeline updateTimeline = _storage.Timelines.Find(updateTimelineGuid);
+                    if (updateTimeline == null)
+                    {
+                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineNotFound);
+                        return Guid.Empty;
+                    }
+
+                    if (updateTimeline.Collection.Id != collectionGuid)
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                         return Guid.Empty;
                     }
 
-                    if (timelineRequest.Id == Guid.Empty)
+                    TimelineRaw parentTimelineRaw = _storage.GetParentTimelineRaw(updateTimeline.Id);
+
+                    if (!ValidateTimelineRange(parentTimelineRaw, timelineRequest.FromYear, timelineRequest.ToYear))
                     {
-                        Timeline parentTimeline;
-                        if (!FindParentTimeline(timelineRequest.Timeline_ID, out parentTimeline))
-                        {
-                            SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
-                            return Guid.Empty;
-                        }
-
-                        if (!ValidateTimelineRange(parentTimeline, timelineRequest.FromYear, timelineRequest.ToYear))
-                        {
-                            SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineRangeInvalid);
-                            return Guid.Empty;
-                        }
-
-                        // Parent timeline is valid - add new timeline
-
-                        Guid newTimelineGuid = Guid.NewGuid();
-                        Timeline newTimeline = new Timeline { Id = newTimelineGuid, Title = timelineRequest.Title, Regime = timelineRequest.Regime };
-                        newTimeline.FromYear = timelineRequest.FromYear;
-                        newTimeline.ToYear = timelineRequest.ToYear;
-                        newTimeline.Collection = collection;
-
-                        // Update parent timeline.
-                        if (parentTimeline != null)
-                        {
-                            _storage.Entry(parentTimeline).Collection(_ => _.ChildTimelines).Load();
-                            if (parentTimeline.ChildTimelines == null)
-                            {
-                                parentTimeline.ChildTimelines = new System.Collections.ObjectModel.Collection<Timeline>();
-                            }
-                            newTimeline.Depth = parentTimeline.Depth + 1;
-                            if (parentTimeline.Predecessor != Guid.Empty)
-                            {
-                                Timeline predecessorTimeline = _storage.Timelines.Find(parentTimeline.Predecessor);
-                                predecessorTimeline.Successor = newTimeline.Id;
-                                newTimeline.Predecessor = predecessorTimeline.Id;
-                            }
-                            else
-                            {
-                                newTimeline.Predecessor = Guid.Empty;
-                            }
-                            if (parentTimeline.FirstNodeInSubtree == parentTimeline.Id)
-                            {
-                                _storage.UpdateFirstNodeInSubtree(parentTimeline, newTimeline.Id);
-                            }
-                            newTimeline.Successor = parentTimeline.Id;
-                            parentTimeline.Predecessor = newTimeline.Id;
-                            parentTimeline.ChildTimelines.Add(newTimeline);
-                        }
-                        else
-                        {
-                            newTimeline.Depth = 0;
-                            newTimeline.FirstNodeInSubtree = newTimeline.Id;
-                            newTimeline.Predecessor = Guid.Empty;
-                            newTimeline.Successor = Guid.Empty;
-                        }
-                        _storage.Timelines.Add(newTimeline);
-                        
-                        returnValue = newTimelineGuid;
+                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineRangeInvalid);
+                        return Guid.Empty;
                     }
-                    else
-                    {
-                        Guid updateTimelineGuid = timelineRequest.Id;
-                        Timeline updateTimeline = _storage.Timelines.Find(updateTimelineGuid);
-                        if (updateTimeline == null)
-                        {
-                            SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineNotFound);
-                            return Guid.Empty;
-                        }
 
-                        if (updateTimeline.Collection.Id != collectionGuid)
-                        {
-                            SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                            return Guid.Empty;
-                        }
-
-                        TimelineRaw parentTimelineRaw = _storage.GetParentTimelineRaw(updateTimeline.Id);
-
-                        if (!ValidateTimelineRange(parentTimelineRaw, timelineRequest.FromYear, timelineRequest.ToYear))
-                        {
-                            SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineRangeInvalid);
-                            return Guid.Empty;
-                        }
-
-                        // Update the timeline fields
-                        updateTimeline.Title = timelineRequest.Title;
-                        updateTimeline.Regime = timelineRequest.Regime;
-                        updateTimeline.FromYear = timelineRequest.FromYear;
-                        updateTimeline.ToYear = timelineRequest.ToYear;
-                        returnValue = updateTimelineGuid;
-                    }
-                    _storage.SaveChanges();
-                    return returnValue;
+                    // Update the timeline fields
+                    updateTimeline.Title = timelineRequest.Title;
+                    updateTimeline.Regime = timelineRequest.Regime;
+                    updateTimeline.FromYear = timelineRequest.FromYear;
+                    updateTimeline.ToYear = timelineRequest.ToYear;
+                    returnValue = updateTimelineGuid;
                 }
+                _storage.SaveChanges();
+                return returnValue;
             });
         }
 
@@ -990,69 +836,41 @@ namespace Chronozoom.UI
                     return;
                 }
 
-                lock (_storage)
+                Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName); ;
+                Collection collection = RetrieveCollection(collectionGuid);
+                if (collection == null)
                 {
-                    Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName); ;
-                    Collection collection = RetrieveCollection(collectionGuid);
-                    if (collection == null)
-                    {
-                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
-                        return;
-                    }
-
-                    if (!UserCanModifyCollection(user, collection))
-                    {
-                        SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                        return;
-                    }
-
-                    if (timelineRequest.Id == Guid.Empty)
-                    {
-                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineNull);
-                        return;
-                    }
-
-                    Timeline deleteTimeline = _storage.Timelines.Find(timelineRequest.Id);
-                    if (deleteTimeline == null)
-                    {
-                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineNotFound);
-                        return;
-                    }
-
-                    if (deleteTimeline.Collection.Id != collectionGuid)
-                    {
-                        SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                        return;
-                    }
-                    Timeline parentTimeline = _storage.GetParentTimelineRaw(timelineRequest.Id);
-                    if (parentTimeline != null && deleteTimeline.SubtreeSize > 0)
-                    {
-                        updateSubtreeSize(parentTimeline, -deleteTimeline.SubtreeSize);
-                    }
-                    if (deleteTimeline.Successor != Guid.Empty)
-                    {
-                        Timeline successorTimeline = _storage.Timelines.Find(deleteTimeline.Successor);
-                        successorTimeline.Predecessor = deleteTimeline.Predecessor;
-                    }
-                    if (deleteTimeline.Predecessor != Guid.Empty)
-                    {
-                        Timeline predecessorTimeline = _storage.Timelines.Find(deleteTimeline.Predecessor);
-                        predecessorTimeline.Successor = deleteTimeline.Successor;
-                    }
-                    if (deleteTimeline.FirstNodeInSubtree == deleteTimeline.Id && parentTimeline != null)
-                    {
-                        if (deleteTimeline.Successor != Guid.Empty)
-                        {
-                            _storage.UpdateFirstNodeInSubtree(parentTimeline, deleteTimeline.Successor);
-                        }
-                        else
-                        {
-                            _storage.UpdateFirstNodeInSubtree(parentTimeline, parentTimeline.Id);
-                        }
-                    }
-                    _storage.DeleteTimeline(timelineRequest.Id);
-                    _storage.SaveChanges();
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
+                    return;
                 }
+
+                if (!UserCanModifyCollection(user, collection))
+                {
+                    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                    return;
+                }
+
+                if (timelineRequest.Id == Guid.Empty)
+                {
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineNull);
+                    return;
+                }
+
+                Timeline deleteTimeline = _storage.Timelines.Find(timelineRequest.Id);
+                if (deleteTimeline == null)
+                {
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineNotFound);
+                    return;
+                }
+
+                if (deleteTimeline.Collection.Id != collectionGuid)
+                {
+                    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                    return;
+                }
+
+                _storage.DeleteTimeline(timelineRequest.Id);
+                _storage.SaveChanges();
             });
         }
 
@@ -1088,114 +906,107 @@ namespace Chronozoom.UI
                     return returnValue;
                 }
 
-                lock (_storage)
+                Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
+                Collection collection = RetrieveCollection(collectionGuid);
+                if (collection == null)
                 {
-                    Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
-                    Collection collection = RetrieveCollection(collectionGuid);
-                    if (collection == null)
+                    // Collection does not exist
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
+                    return returnValue;
+                }
+
+                // Validate user, if required.
+                if (!UserCanModifyCollection(user, collection))
+                {
+                    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                    return returnValue;
+                }
+
+                if (exhibitRequest.Id == Guid.Empty)
+                {
+                    Timeline parentTimeline;
+                    if (!FindParentTimeline(exhibitRequest.Timeline_ID, out parentTimeline) || parentTimeline == null)
                     {
-                        // Collection does not exist
-                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
+                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
                         return returnValue;
                     }
 
-                    // Validate user, if required.
-                    if (!UserCanModifyCollection(user, collection))
+                    // Parent timeline is valid - add new exhibit
+                    Guid newExhibitGuid = Guid.NewGuid();
+                    Exhibit newExhibit = new Exhibit { Id = newExhibitGuid };
+                    newExhibit.Title = exhibitRequest.Title;
+                    newExhibit.Year = exhibitRequest.Year;
+                    newExhibit.Collection = collection;
+                    newExhibit.Depth = parentTimeline.Depth + 1;
+
+                    // Update parent timeline.
+                    _storage.Entry(parentTimeline).Collection(_ => _.Exhibits).Load();
+                    if (parentTimeline.Exhibits == null)
+                    {
+                        parentTimeline.Exhibits = new System.Collections.ObjectModel.Collection<Exhibit>();
+                    }
+                    parentTimeline.Exhibits.Add(newExhibit);
+
+                    _storage.Exhibits.Add(newExhibit);
+                    _storage.SaveChanges();
+                    returnValue.ExhibitId = newExhibitGuid;
+
+                    // Populate the content items
+                    if (exhibitRequest.ContentItems != null)
+                    {
+                        foreach (ContentItem contentItemRequest in exhibitRequest.ContentItems)
+                        {
+                            // Parent exhibit item will be equal to the newly added exhibit
+                            var newContentItemGuid = AddContentItem(collection, newExhibit, contentItemRequest);
+                            returnValue.Add(newContentItemGuid);
+                        }
+                    }
+
+                }
+                else
+                {
+                    Exhibit updateExhibit = _storage.Exhibits.Find(exhibitRequest.Id);
+                    if (updateExhibit == null)
+                    {
+                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ExhibitNotFound);
+                        return returnValue;
+                    }
+
+                    if (updateExhibit.Collection.Id != collectionGuid)
                     {
                         SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                         return returnValue;
                     }
 
-                    if (exhibitRequest.Id == Guid.Empty)
-                    {
-                        Timeline parentTimeline;
-                        if (!FindParentTimeline(exhibitRequest.Timeline_ID, out parentTimeline) || parentTimeline == null)
-                        {
-                            SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
-                            return returnValue;
-                        }
+                    // Update the exhibit fields
+                    updateExhibit.Title = exhibitRequest.Title;
+                    updateExhibit.Year = exhibitRequest.Year;
+                    returnValue.ExhibitId = exhibitRequest.Id;
 
-                        // Parent timeline is valid - add new exhibit
-                        Guid newExhibitGuid = Guid.NewGuid();
-                        Exhibit newExhibit = new Exhibit { Id = newExhibitGuid };
-                        newExhibit.Title = exhibitRequest.Title;
-                        newExhibit.Year = exhibitRequest.Year;
-                        newExhibit.Collection = collection;
-                        newExhibit.Depth = parentTimeline.Depth + 1;
-
-                        // Update parent timeline.
-                        _storage.Entry(parentTimeline).Collection(_ => _.Exhibits).Load();
-                        if (parentTimeline.Exhibits == null)
-                        {
-                            parentTimeline.Exhibits = new System.Collections.ObjectModel.Collection<Exhibit>();
-                        }
-                        parentTimeline.Exhibits.Add(newExhibit);
-                        
-                        _storage.Exhibits.Add(newExhibit);
-                        if (newExhibit.ContentItems.Count() > 0 && parentTimeline != null)
-                        {
-                            updateSubtreeSize(parentTimeline, newExhibit.ContentItems.Count());
-                        }
-                        _storage.SaveChanges();
-                        returnValue.ExhibitId = newExhibitGuid;
-
-                        // Populate the content items
-                        if (exhibitRequest.ContentItems != null)
-                        {
-                            foreach (ContentItem contentItemRequest in exhibitRequest.ContentItems)
-                            {
-                                // Parent exhibit item will be equal to the newly added exhibit
-                                var newContentItemGuid = AddContentItem(collection, newExhibit, contentItemRequest);
-                                returnValue.Add(newContentItemGuid);
-                            }
-                        }
-
-                    }
-                    else
-                    {
-                        Exhibit updateExhibit = _storage.Exhibits.Find(exhibitRequest.Id);
-                        if (updateExhibit == null)
-                        {
-                            SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ExhibitNotFound);
-                            return returnValue;
-                        }
-
-                        if (updateExhibit.Collection.Id != collectionGuid)
-                        {
-                            SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                            return returnValue;
-                        }
-
-                        // Update the exhibit fields
-                        updateExhibit.Title = exhibitRequest.Title;
-                        updateExhibit.Year = exhibitRequest.Year;
-                        returnValue.ExhibitId = exhibitRequest.Id;
-
-                        // Update the content items
-                        if (exhibitRequest.ContentItems != null)
-                        {
-                            foreach (ContentItem contentItemRequest in exhibitRequest.ContentItems)
-                            {
-                                Guid updateContentItemGuid = UpdateContentItem(collectionGuid, contentItemRequest);
-                                if (updateContentItemGuid != Guid.Empty)
-                                {
-                                    returnValue.Add(updateContentItemGuid);
-                                }
-                            }
-                        }
-                    }
-                    _storage.SaveChanges();
-
+                    // Update the content items
                     if (exhibitRequest.ContentItems != null)
                     {
-                        foreach (ContentItem contentItem in exhibitRequest.ContentItems)
+                        foreach (ContentItem contentItemRequest in exhibitRequest.ContentItems)
                         {
-                            _thumbnailGenerator.Value.CreateThumbnails(contentItem);
+                            Guid updateContentItemGuid = UpdateContentItem(collectionGuid, contentItemRequest);
+                            if (updateContentItemGuid != Guid.Empty)
+                            {
+                                returnValue.Add(updateContentItemGuid);
+                            }
                         }
                     }
-
-                    return returnValue;
                 }
+                _storage.SaveChanges();
+
+                if (exhibitRequest.ContentItems != null)
+                {
+                    foreach (ContentItem contentItem in exhibitRequest.ContentItems)
+                    {
+                        _thumbnailGenerator.Value.CreateThumbnails(contentItem);
+                    }
+                }
+
+                return returnValue;
             });
         }
 
@@ -1267,48 +1078,41 @@ namespace Chronozoom.UI
                     SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
                     return;
                 }
-                lock (_storage)
+
+                Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
+                Collection collection = RetrieveCollection(collectionGuid);
+                if (collection == null)
                 {
-                    Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
-                    Collection collection = RetrieveCollection(collectionGuid);
-                    if (collection == null)
-                    {
-                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
-                        return;
-                    }
-
-                    if (!UserCanModifyCollection(user, collection))
-                    {
-                        SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                        return;
-                    }
-
-                    if (exhibitRequest.Id == Guid.Empty)
-                    {
-                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ExhibitNotFound);
-                        return;
-                    }
-
-                    Exhibit deleteExhibit = _storage.Exhibits.Find(exhibitRequest.Id);
-                    if (deleteExhibit == null)
-                    {
-                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ExhibitNotFound);
-                        return;
-                    }
-
-                    if (deleteExhibit.Collection == null || deleteExhibit.Collection.Id != collectionGuid)
-                    {
-                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionIdMismatch);
-                        return;
-                    }
-                    Timeline parentTimeline = _storage.GetExhibitParentTimeline(deleteExhibit.Id);
-                    if (deleteExhibit.ContentItems.Count() > 0 && parentTimeline != null)
-                    {
-                        updateSubtreeSize(parentTimeline, -deleteExhibit.ContentItems.Count());
-                    }
-                    _storage.DeleteExhibit(exhibitRequest.Id);
-                    _storage.SaveChanges();
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
+                    return;
                 }
+
+                if (!UserCanModifyCollection(user, collection))
+                {
+                    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                    return;
+                }
+
+                if (exhibitRequest.Id == Guid.Empty)
+                {
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ExhibitNotFound);
+                    return;
+                }
+
+                Exhibit deleteExhibit = _storage.Exhibits.Find(exhibitRequest.Id);
+                if (deleteExhibit == null)
+                {
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ExhibitNotFound);
+                    return;
+                }
+
+                if (deleteExhibit.Collection == null || deleteExhibit.Collection.Id != collectionGuid)
+                {
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionIdMismatch);
+                    return;
+                }
+                _storage.DeleteExhibit(exhibitRequest.Id);
+                _storage.SaveChanges();
             });
         }
 
@@ -1329,53 +1133,46 @@ namespace Chronozoom.UI
                     return Guid.Empty;
                 }
 
-                lock(_storage){
-                    Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
-                    Collection collection = RetrieveCollection(collectionGuid);
+                Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
+                Collection collection = RetrieveCollection(collectionGuid);
 
-                    if (collection == null)
-                    {
-                        // Collection does not exist
-                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
-                        return Guid.Empty;
-                    }
-
-                    // Validate user, if required.
-                    if (!UserCanModifyCollection(user, collection))
-                    {
-                        SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                        return Guid.Empty;
-                    }
-
-                    if (contentItemRequest.Id == Guid.Empty)
-                    {
-                        Exhibit parentExhibit = FindParentExhibit(contentItemRequest.Exhibit_ID);
-                        if (parentExhibit == null)
-                        {
-                            SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
-                            return Guid.Empty;
-                        }
-                        TimelineRaw parentTimeline = _storage.GetExhibitParentTimeline(contentItemRequest.Exhibit_ID);
-                        // Parent content item is valid - add new content item
-                        var newContentItemGuid = AddContentItem(collection, parentExhibit, contentItemRequest);
-                        returnValue = newContentItemGuid;
-                        if (parentTimeline != null)
-                        {
-                            updateSubtreeSize(parentTimeline, 1);
-
-                        }
-                    }
-                    else
-                    {
-                        contentItemRequest.Id = UpdateContentItem(collectionGuid, contentItemRequest);
-                        returnValue = contentItemRequest.Id;
-                    }
-                
-                    _storage.SaveChanges();
-                    _thumbnailGenerator.Value.CreateThumbnails(contentItemRequest);
-
-                    return returnValue;
+                if (collection == null)
+                {
+                    // Collection does not exist
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
+                    return Guid.Empty;
                 }
+
+                // Validate user, if required.
+                if (!UserCanModifyCollection(user, collection))
+                {
+                    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                    return Guid.Empty;
+                }
+
+                if (contentItemRequest.Id == Guid.Empty)
+                {
+                    Exhibit parentExhibit = FindParentExhibit(contentItemRequest.Exhibit_ID);
+                    if (parentExhibit == null)
+                    {
+                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
+                        return Guid.Empty;
+                    }
+
+                    // Parent content item is valid - add new content item
+                    var newContentItemGuid = AddContentItem(collection, parentExhibit, contentItemRequest);
+                    returnValue = newContentItemGuid;
+                }
+                else
+                {
+                    contentItemRequest.Id = UpdateContentItem(collectionGuid, contentItemRequest);
+                    returnValue = contentItemRequest.Id;
+                }
+                
+                _storage.SaveChanges();
+                _thumbnailGenerator.Value.CreateThumbnails(contentItemRequest);
+
+                return returnValue;
             });
         }
 
@@ -1394,50 +1191,41 @@ namespace Chronozoom.UI
                     return;
                 }
 
-                lock (_storage)
+                Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
+                Collection collection = RetrieveCollection(collectionGuid);
+                if (collection == null)
                 {
-                    Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
-                    Collection collection = RetrieveCollection(collectionGuid);
-                    if (collection == null)
-                    {
-                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
-                        return;
-                    }
-
-                    if (!UserCanModifyCollection(user, collection))
-                    {
-                        SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                        return;
-                    }
-
-                    if (contentItemRequest.Id == Guid.Empty)
-                    {
-                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ContentItemNotFound);
-                        return;
-                    }
-
-                    ContentItem deleteContentItem = _storage.ContentItems.Find(contentItemRequest.Id);
-                    if (deleteContentItem == null)
-                    {
-                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ContentItemNotFound);
-                        return;
-                    }
-
-                    if (deleteContentItem.Collection == null || deleteContentItem.Collection.Id != collectionGuid)
-                    {
-                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionIdMismatch);
-                        return;
-                    }
-
-                    ExhibitRaw parentExhibit = _storage.GetContentItemParentExhibit(deleteContentItem.Id);
-                    TimelineRaw parentTimeline = _storage.GetExhibitParentTimeline(parentExhibit.Id);
-                    _storage.ContentItems.Remove(deleteContentItem);
-                    if (parentTimeline != null)
-                    {
-                        updateSubtreeSize(parentTimeline, -1);
-                    }
-                    _storage.SaveChanges();
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
+                    return;
                 }
+
+                if (!UserCanModifyCollection(user, collection))
+                {
+                    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                    return;
+                }
+
+                if (contentItemRequest.Id == Guid.Empty)
+                {
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ContentItemNotFound);
+                    return;
+                }
+
+                ContentItem deleteContentItem = _storage.ContentItems.Find(contentItemRequest.Id);
+                if (deleteContentItem == null)
+                {
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ContentItemNotFound);
+                    return;
+                }
+
+                if (deleteContentItem.Collection == null || deleteContentItem.Collection.Id != collectionGuid)
+                {
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionIdMismatch);
+                    return;
+                }
+
+                _storage.ContentItems.Remove(deleteContentItem);
+                _storage.SaveChanges();
             });
         }
 
@@ -1852,21 +1640,6 @@ namespace Chronozoom.UI
             }
         }
 
-
-        /// <summary>
-        /// Updates content item counts of all ancestor timelines
-        /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "update"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "t")]
-        public void updateSubtreeSize(Timeline t, int diff)
-        {
-            t.SubtreeSize += diff;
-            TimelineRaw parentTimeline = _storage.GetParentTimelineRaw(t.Id);
-            if (parentTimeline != null)
-            {
-                updateSubtreeSize(parentTimeline, diff);
-            }
-        }
-
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
@@ -1897,7 +1670,7 @@ namespace Chronozoom.UI
 
             return value;
         }
-        
+
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
@@ -2052,7 +1825,7 @@ namespace Chronozoom.UI
         private Collection RetrieveCollection(Guid collectionId)
         {
             Collection collection = _storage.Collections.Find(collectionId);
-            if (collection != null)   
+            if (collection != null)
                 _storage.Entry(collection).Reference("User").Load();
             return collection;
         }
