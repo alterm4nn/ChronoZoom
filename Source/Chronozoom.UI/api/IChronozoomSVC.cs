@@ -46,15 +46,6 @@ namespace Chronozoom.UI
         Timeline GetTimelines(string superCollection, string collection, string start, string end, string minspan, string commonAncestor, string maxElements, string depth);
 
         /// <summary>
-        /// TODO(Yitao): Document.
-        /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "End")]
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "minspan")]
-        [OperationContract]
-        [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        IEnumerable<TimelineRaw> GetTimelineSubtree(Guid collectionId, string start, string end, string minspan, string commonAncestor, string maxElements);
-
-        /// <summary>
         /// Performs a search for a specific term within a collection or a superCollection.
         /// </summary>
         /// <remarks>

@@ -122,6 +122,7 @@ namespace Chronozoom.UI
 
     [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
     [SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly", Justification = "No unmanaged handles")]
+    [ServiceContract(Namespace = "")]
     [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
     public class ChronozoomSVC : IDisposable, IChronozoomSVC
     {
@@ -240,6 +241,8 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json)]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "minspan")]
         public Timeline GetTimelines(string superCollection, string collection, string start, string end, string minspan, string commonAncestor, string maxElements, string depth)
         {
@@ -280,9 +283,8 @@ namespace Chronozoom.UI
             });
         }
 
-        /// <summary>
-        /// Documentation under IChronozoomSVC
-        /// </summary>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json)]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "minspan")]
         public IEnumerable<TimelineRaw> GetTimelineSubtree(Guid collectionId, string start, string end, string minspan, string commonAncestor, string maxElements)
         {
@@ -317,6 +319,8 @@ namespace Chronozoom.UI
         /// Documentation under IChronozoomSVC
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json)]
         public BaseJsonResult<IEnumerable<SearchResult>> Search(string superCollection, string collection, string searchTerm)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
@@ -361,6 +365,8 @@ namespace Chronozoom.UI
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/{collection}/tours")]
         public BaseJsonResult<IEnumerable<Tour>> GetTours(string superCollection, string collection)
         {
             Trace.TraceInformation("Get Tours");
@@ -444,6 +450,8 @@ namespace Chronozoom.UI
         /// </summary>
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/info", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public ServiceInformation GetServiceInformation()
         {
             Trace.TraceInformation("Get Service Information");
@@ -460,6 +468,8 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
+        [OperationContract]
+        [WebInvoke(Method = "DELETE", UriTemplate = "/user", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public void DeleteUser(User userRequest)
         {
             AuthenticatedOperation(delegate(User user)
@@ -500,6 +510,8 @@ namespace Chronozoom.UI
         }
 
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/user", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public User GetUser()
         {
             return AuthenticatedOperation(delegate(User user)
@@ -769,6 +781,8 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
+        [OperationContract]
+        [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public Guid PutCollectionName(string superCollectionName, string collectionName, Collection collectionRequest)
         {
             return AuthenticatedOperation(delegate(User user)
@@ -818,6 +832,8 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
+        [OperationContract]
+        [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public void DeleteCollection(string superCollectionName, string collectionName)
         {
             AuthenticatedOperation(delegate(User user)
@@ -846,6 +862,8 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
+        [OperationContract]
+        [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/timeline", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public Guid PutTimeline(string superCollectionName, string collectionName, TimelineRaw timelineRequest)
         {
             return AuthenticatedOperation(delegate(User user)
@@ -978,6 +996,8 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
+        [OperationContract]
+        [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/timeline", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public void DeleteTimeline(string superCollectionName, string collectionName, Timeline timelineRequest)
         {
             AuthenticatedOperation(delegate(User user)
@@ -1075,6 +1095,8 @@ namespace Chronozoom.UI
         /// Documentation under IChronozoomSVC
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
+        [OperationContract]
+        [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/exhibit", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public PutExhibitResult PutExhibit(string superCollectionName, string collectionName, ExhibitRaw exhibitRequest)
         {
             return AuthenticatedOperation(delegate(User user)
@@ -1256,6 +1278,8 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
+        [OperationContract]
+        [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/exhibit", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public void DeleteExhibit(string superCollectionName, string collectionName, Exhibit exhibitRequest)
         {
             AuthenticatedOperation(user =>
@@ -1315,6 +1339,8 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
+        [OperationContract]
+        [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/contentitem", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public Guid PutContentItem(string superCollectionName, string collectionName, ContentItemRaw contentItemRequest)
         {
             return AuthenticatedOperation(user =>
@@ -1382,6 +1408,8 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
+        [OperationContract]
+        [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/contentitem", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public void DeleteContentItem(string superCollectionName, string collectionName, ContentItem contentItemRequest)
         {
             AuthenticatedOperation(user =>
@@ -1870,6 +1898,8 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "{supercollection}/{collection}/{reference}/contentpath")]
         public string GetContentPath(string superCollection, string collection, string reference)
         {
             Trace.TraceInformation("Get Content Information");
