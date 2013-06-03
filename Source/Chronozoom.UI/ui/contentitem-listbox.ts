@@ -26,6 +26,7 @@ module CZ {
         
         export class ContentItemListBox extends ListBoxBase {
             constructor(container: JQuery, listItemContainer: JQuery, contentItems: any) {
+                var self = this;
                 var listBoxInfo: IListBoxBaseInfo = {
                     context: contentItems,
                     sortableSettings: {
@@ -39,6 +40,11 @@ module CZ {
 
                         start: function (event, ui) {
                             ui.placeholder.height(ui.item.height());   
+                        },
+                        stop: function (event, ui) {
+                            for (var i = 0; i < self.items.length; i++)
+                                if (self.items[i].data)
+                                    self.items[i].data.order = i;
                         }
                     }
                 };
@@ -57,6 +63,14 @@ module CZ {
 
                 listItemsInfo.default.ctor = ContentItemListItem;
                 super(container, listBoxInfo, listItemsInfo);
+            }
+
+            public remove(item: ListItemBase): void {
+                for (var i = this.items.indexOf(item) + 1; i < this.items.length; i++)
+                    if (this.items[i].data && this.items[i].data.order)
+                        this.items[i].data.order--;
+
+                super.remove(item);
             }
         }
 

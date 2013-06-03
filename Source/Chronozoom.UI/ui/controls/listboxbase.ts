@@ -96,7 +96,10 @@ module CZ {
                             if (origStart) origStart(event, ui);
                         },
                         stop: function (event, ui) {
-                            self.itemMoveHandler(ui.item, ui.item.startPos, ui.item.index());
+                            ui.item.stopPos = ui.item.index();
+                            var item = self.items.splice(ui.item.startPos, 1)[0]; // keep the visual and data order of listboxitems in sync
+                            self.items.splice(ui.item.stopPos, 0, item);
+                            self.itemMoveHandler(ui.item, ui.item.startPos, ui.item.stopPos);
                             if (origStop) origStop(event, ui);
                         }
                     });
