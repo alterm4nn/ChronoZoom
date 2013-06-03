@@ -213,9 +213,6 @@
       <DependentUpon>sitemap.aspx</DependentUpon>
     </Compile>
     <Compile Include="utils\ThumbnailGenerator.cs" />
-    <Content Include="css\cz.min.css">
-      <DependentUpon>cz.less</DependentUpon>
-    </Content>
     <Content Include="dumps\250-be5yavg.csv" />
     <Content Include="dumps\2k-moberg2000.csv" />
     <Content Include="dumps\420k-vostok.csv" />
