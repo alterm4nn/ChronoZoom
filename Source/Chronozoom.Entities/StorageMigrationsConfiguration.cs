@@ -34,6 +34,7 @@ namespace Chronozoom.Entities
 
         public StorageMigrationsConfiguration()
         {
+            AutomaticMigrationDataLossAllowed = true;
             AutomaticMigrationsEnabled = true;
         }
     }
