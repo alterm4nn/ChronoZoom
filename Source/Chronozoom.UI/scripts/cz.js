@@ -201,6 +201,7 @@ var CZ;
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
+                            errorMessage: "#error-edit-timeline",
                             context: timeline
                         });
                         form.show();
@@ -216,6 +217,7 @@ var CZ;
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
+                            errorMessage: "#error-edit-timeline",
                             context: timeline
                         });
                         form.show();

@@ -157,14 +157,15 @@ module CZ {
        });
 
         marker.dblclick(function (e) {
-           var point = CZ.Common.getXBrowserMouseOrigin(container, e);
-           var k = (_range.max - _range.min) / _width;
-           var time = _range.max - k * (_width - point.x);
+            var point = CZ.Common.getXBrowserMouseOrigin(container, e);
+            var k = (_range.max - _range.min) / _width;
+            var time = _range.max - k * (_width - point.x);
+  
            if (time <= _range.min + CZ.Settings.panelWidth * k) {
                marker.css("display", "none");
                LeftPanInput();
            }
-
+            
            if  (time >= _range.max - CZ.Settings.panelWidth * k) {
                marker.css("display", "none");
                RightPanInput();

@@ -9,6 +9,7 @@ module CZ {
             endDate: string;
             deleteButton: string;
             titleInput: string;
+            errorMessage: string;
             context: Object;
         }
 
@@ -32,13 +33,12 @@ module CZ {
                 this.startDate = new CZ.UI.DatePicker(container.find(formInfo.startDate));
                 this.endDate = new CZ.UI.DatePicker(container.find(formInfo.endDate));
                 this.titleInput = container.find(formInfo.titleInput);
+                this.errorMessage = container.find(formInfo.errorMessage);
 
                 this.timeline = formInfo.context;
 
                 this.saveButton.off();
                 this.deleteButton.off();
-
-                this.errorMessage = this.container.find("#error-edit-timeline");
 
                 this.initialize();
             }
@@ -63,15 +63,14 @@ module CZ {
                 this.endDate.addEditMode_Infinite();
 
                 this.titleInput.val(this.timeline.title);
-                this.startDate.setDate(this.timeline.x);
+                this.startDate.setDate(this.timeline.x, true);
 
                 if (this.timeline.endDate === 9999) {
-                    this.endDate.setDate(this.timeline.endDate);
+                    this.endDate.setDate(this.timeline.endDate, true);
                 }
                 else {
-                    this.endDate.setDate(this.timeline.x + this.timeline.width);
+                    this.endDate.setDate(this.timeline.x + this.timeline.width, true);
                 }
-
                 this.saveButton.click(event => {
                     this.errorMessage.empty();
                     var isDataValid = false;

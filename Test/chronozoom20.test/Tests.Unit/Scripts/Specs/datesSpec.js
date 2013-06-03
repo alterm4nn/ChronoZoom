@@ -94,15 +94,15 @@ describe("convertCoordinateToYear method should return", function () {
 });
 
 // var data1 = [coordinate, exoected year, expected month, expected day];
-var data1 = [-0.34520547945205493, -1, 7, 27];
-var data2 = [2013.3863013698588, 2013, 1, 5];
-var data3 = [1.0027397260273974, 1, 0, 1];
-var data4 = [-2013.495890410959, -2014, 6, 3];
-var data5 = [2012.449315068489, 2012, 1, 29]; // - leap year
-var data6 = [2013.4520547945165, 2013, 2, 1];
-var data7 = [-1599.8383561643836, -1600, 1, 28];
-var data8 = [2000.441095890407, 2000, 1, 29]; // - leap year
-var data9 = [2000.4438356164344, 2000, 2, 1];
+var data1 = [-0.3479452054794522, -1, 7, 27];
+var data2 = [2013.0958904109589, 2013, 1, 5];
+var data3 = [1, 1, 0, 1];
+var data4 = [-2013.4986301369863, -2014, 6, 3];
+var data5 = [2012.1612021857925, 2012, 1, 29]; // - leap year
+var data6 = [2013.1616438356166, 2013, 2, 1];
+var data7 = [-1599.841095890411, -1600, 1, 28];
+var data8 = [2000.1612021857925, 2000, 1, 29]; // - leap year
+var data9 = [2000.1639344262296, 2000, 2, 1];
 
 
 describe("getDMYFromCoordinate() method should return", function () {

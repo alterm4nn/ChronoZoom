@@ -24,11 +24,7 @@ var CZ;
                     switch(mode) {
                         case "year":
                             _this.editModeYear();
-                            if(Number(_this.coordinate) == _this.INFINITY_VALUE) {
-                                _this.setDate(CZ.Dates.getCoordinateFromDecimalYear(CZ.Dates.getPresent().presentYear));
-                            } else {
-                                _this.setDate(_this.coordinate);
-                            }
+                            _this.setDate(_this.coordinate, false);
                             break;
                         case "date":
                             _this.editModeDate();
@@ -47,7 +43,7 @@ var CZ;
                 this.datePicker.append(this.dateContainer);
                 this.datePicker.append(this.errorMsg);
                 this.editModeYear();
-                this.setDate(this.coordinate);
+                this.setDate(this.coordinate, true);
             };
             DatePicker.prototype.remove = function () {
                 this.datePicker.empty();
@@ -57,7 +53,7 @@ var CZ;
                 var optionIntinite = $("<option value='infinite'>Infinite</option>");
                 this.modeSelector.append(optionIntinite);
             };
-            DatePicker.prototype.setDate = function (coordinate) {
+            DatePicker.prototype.setDate = function (coordinate, InfinityConvertation) {
                 if(!this.validateNumber(coordinate)) {
                     return false;
                 }
@@ -65,14 +61,19 @@ var CZ;
                 this.coordinate = coordinate;
                 var mode = this.modeSelector.find(":selected").val();
                 if(this.coordinate === this.INFINITY_VALUE) {
-                    this.regimeSelector.find(":selected").attr("selected", "false");
-                    this.modeSelector.find("option").each(function () {
-                        if($(this).val() === "infinite") {
-                            $(this).attr("selected", "selected");
-                            return;
-                        }
-                    });
-                    this.editModeInfinite();
+                    if(InfinityConvertation) {
+                        this.regimeSelector.find(":selected").attr("selected", "false");
+                        this.modeSelector.find("option").each(function () {
+                            if($(this).val() === "infinite") {
+                                $(this).attr("selected", "selected");
+                                return;
+                            }
+                        });
+                        this.editModeInfinite();
+                    } else {
+                        var localPresent = CZ.Dates.getPresent();
+                        coordinate = CZ.Dates.getCoordinateFromDMY(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+                    }
                 }
                 switch(mode) {
                     case "year":

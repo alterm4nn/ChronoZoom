@@ -165,14 +165,6 @@ module CZ {
                 return false;
             }
 
-            // Test on intersections with parent's children.
-            //for (i = 0, len = tp.children.length; i < len; ++i) {
-            //    selfIntersection = editmode ? (tp.children[i] === selectedExhibit) : (tp.children[i] === ec);
-            //    if (!selfIntersection && isIntersecting(ec, tp.children[i])) {
-            //        return false;
-            //    }
-            //}
-
             return true;
         }
 
@@ -733,8 +725,8 @@ module CZ {
         /**
          * Validates,if number is valid.
         */
-        export function validateNumber(number) {
-            return !isNaN(Number(number) && parseFloat(number)) && isNotEmpty(number);
+        export function ValidateNumber(number) {
+            return !isNaN(Number(number) && parseFloat(number)) && IsNotEmpty(number) && (number != false);
         }
 
         /**
