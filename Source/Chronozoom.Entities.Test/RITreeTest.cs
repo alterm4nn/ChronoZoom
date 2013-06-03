@@ -34,7 +34,7 @@ namespace Chronozoom.Entities.Test
             _storage.SaveChanges();
         }
 
-        // Failing/Disable: [TestMethod]
+        [TestMethod]
         public void TestEntities_RITree_DataIsCorrect()
         {   /* test correctness of ForkNode computations */
             Int64 count1, count2, test_start_time = -7333311, test_end_time = 2013;

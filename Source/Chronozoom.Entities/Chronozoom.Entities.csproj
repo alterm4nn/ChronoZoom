@@ -91,8 +91,17 @@
     <Compile Include="Migrations\201305282325585_TitleLength.Designer.cs">
       <DependentUpon>201305282325585_TitleLength.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201305310553103_TimelineSubtreeQueryStoredProc.cs" />
+    <Compile Include="Migrations\201305310553103_TimelineSubtreeQueryStoredProc.Designer.cs">
+      <DependentUpon>201305310553103_TimelineSubtreeQueryStoredProc.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migration\Migrator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="SearchResult.cs" />
     <Compile Include="Storage.cs" />
     <Compile Include="StorageMigrationsConfiguration.cs" />
@@ -110,7 +119,9 @@
     <None Include="Entities.cd" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Migration\TimelineSubtreeQuery.sql" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201305102053361_RemoveBetaFields.resx">
       <DependentUpon>201305102053361_RemoveBetaFields.cs</DependentUpon>
@@ -126,6 +137,13 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201305282325585_TitleLength.resx">
       <DependentUpon>201305282325585_TitleLength.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201305310553103_TimelineSubtreeQueryStoredProc.resx">
+      <DependentUpon>201305310553103_TimelineSubtreeQueryStoredProc.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

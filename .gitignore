@@ -2,6 +2,9 @@
 [Tt]humbs.db
 *.DS_Store
 
+#config files
+*.config
+
 #Visual Studio files
 *.[Oo]bj
 *.user
@@ -51,6 +54,7 @@ _ReSharper*/
 
 #Subversion files
 .svn
+
 
 # Office Temp Files
 ~$*

@@ -268,6 +268,15 @@ describe("CZ.Authoring part", function () {
 
             it("false, if start = end", function () {
                 var start = 5, end = 5;
+<<<<<<< HEAD
+                var result = isNonegHeight(start, end);
+		expect(false).toEqual(result);
+	    });
+        });	
+    });
+    //todo: need to use using, table of data:
+    describe("ValidateExhibitData() function", function () {
+=======
                 var result = isIntervalPositive(start, end);
                 expect(false).toEqual(result);
             });
@@ -275,6 +284,7 @@ describe("CZ.Authoring part", function () {
     });
 
     describe("isIntervalPositive() function date mode", function () {
+>>>>>>> upstream/master
         describe("should return", function () {
             var dates;
             beforeEach(function () {
@@ -386,6 +396,8 @@ function using(name, values, func) {
         jasmine.currentEnv_.currentSpec.description += ' ' + name + '[' + "title: " + values[i][0] + ", start: " + values[i][1] + ", end: " + values[i][2] + ", regimeStart: " + values[i][3] + ", regimeEnd: " + values[i][4];
     }
 }
+<<<<<<< HEAD
+=======
 
 function timelineDataUsing(name, values, func) {
     for (var i = 0, count = values.length; i < count; i++) {
@@ -396,3 +408,4 @@ function timelineDataUsing(name, values, func) {
         jasmine.currentEnv_.currentSpec.description += ' ' + name + ' if input data equal: start: ' + values[i][0] + ', end: ' + values[i][1] + ', title: ' + values[i][2];
     }
 }
+>>>>>>> upstream/master

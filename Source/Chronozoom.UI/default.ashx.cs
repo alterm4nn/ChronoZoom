@@ -1,4 +1,4 @@
-﻿using Chronozoom.Entities;
+using Chronozoom.Entities;
 using System;
 using System.Collections.Generic;
 using System.Configuration;

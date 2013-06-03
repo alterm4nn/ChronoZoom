@@ -56,9 +56,12 @@
   </Choose>
   <ItemGroup>
     <Compile Include="DepthAttrTest.cs" />
+    <Compile Include="PostOrderRetrievalTest.cs" />
     <Compile Include="RITreeTest.cs" />
     <Compile Include="StorageTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="BreadthFirstSubTreeQueryTest.cs" />
+    <Compile Include="TimelineSubtreeQueryStoredProcTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Chronozoom.Entities\Chronozoom.Entities.csproj">

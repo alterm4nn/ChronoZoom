@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Data.Entity;
-
+using Chronozoom.Entities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Chronozoom.Entities.Test
@@ -16,7 +16,6 @@ namespace Chronozoom.Entities.Test
         public void Initialize()
         {
             _storage.Database.Delete();
-
             _betaCollection = _storage.Collections.Where(candidate => candidate.Title == "Beta Content").FirstOrDefault();
             Assert.IsNotNull(_betaCollection);
         }
