@@ -32,7 +32,7 @@ module CZ {
             31];
 
         // by give date gives coordinate in virtual coordinates
-        export function getCoordinateFromDMY(year, month, day) {
+        export function getCoordinateFromYMD(year, month, day) {
             //get sign of coordinate
             var sign = (year != 0) ? year / Math.abs(year) : 1;
             var i = 0;
@@ -112,7 +112,7 @@ module CZ {
         export function getCoordinateFromDecimalYear(decimalYear) {
             // get virtual coordinate of present day
             var localPresent = getPresent();
-            var presentDate = getCoordinateFromDMY(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+            var presentDate = getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
 
             return decimalYear === 9999 ? presentDate : decimalYear;
         }

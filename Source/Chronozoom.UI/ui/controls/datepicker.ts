@@ -117,7 +117,7 @@ module CZ {
                         this.editModeInfinite();
                     } else {
                         var localPresent = CZ.Dates.getPresent();
-                        coordinate = CZ.Dates.getCoordinateFromDMY(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+                        coordinate = CZ.Dates.getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
                     } 
                 }
 
@@ -308,7 +308,7 @@ module CZ {
                 month = CZ.Dates.months.indexOf(month);
                 var day = parseInt(this.daySelector.find(":selected").val());
 
-                return <any>CZ.Dates.getCoordinateFromDMY(year, month, day);
+                return <any>CZ.Dates.getCoordinateFromYMD(year, month, day);
             }
 
             /**

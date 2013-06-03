@@ -29,7 +29,7 @@ var CZ;
             30, 
             31
         ];
-        function getCoordinateFromDMY(year, month, day) {
+        function getCoordinateFromYMD(year, month, day) {
             var sign = (year != 0) ? year / Math.abs(year) : 1;
             var i = 0;
             var coordinate = year;
@@ -52,7 +52,7 @@ var CZ;
             coordinate -= 1 / daysPerYear;
             return coordinate;
         }
-        Dates.getCoordinateFromDMY = getCoordinateFromDMY;
+        Dates.getCoordinateFromYMD = getCoordinateFromYMD;
         function getDMYFromCoordinate(coord) {
             var sign = (coord === 0) ? 1 : coord / Math.abs(coord);
             var day = 0, month = 0, year = 0;
@@ -98,7 +98,7 @@ var CZ;
         Dates.getDMYFromCoordinate = getDMYFromCoordinate;
         function getCoordinateFromDecimalYear(decimalYear) {
             var localPresent = getPresent();
-            var presentDate = getCoordinateFromDMY(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+            var presentDate = getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
             return decimalYear === 9999 ? presentDate : decimalYear;
         }
         Dates.getCoordinateFromDecimalYear = getCoordinateFromDecimalYear;

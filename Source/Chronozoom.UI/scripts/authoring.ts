@@ -725,8 +725,8 @@ module CZ {
         /**
          * Validates,if number is valid.
         */
-        export function ValidateNumber(number) {
-            return !isNaN(Number(number) && parseFloat(number)) && IsNotEmpty(number) && (number != false);
+        export function validateNumber(number) {
+            return !isNaN(Number(number) && parseFloat(number)) && isNotEmpty(number) && (number !== false);
         }
 
         /**

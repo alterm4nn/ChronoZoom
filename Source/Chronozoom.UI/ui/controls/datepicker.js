@@ -72,7 +72,7 @@ var CZ;
                         this.editModeInfinite();
                     } else {
                         var localPresent = CZ.Dates.getPresent();
-                        coordinate = CZ.Dates.getCoordinateFromDMY(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+                        coordinate = CZ.Dates.getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
                     }
                 }
                 switch(mode) {
@@ -201,7 +201,7 @@ var CZ;
                 var month = this.monthSelector.find(":selected").val();
                 month = CZ.Dates.months.indexOf(month);
                 var day = parseInt(this.daySelector.find(":selected").val());
-                return CZ.Dates.getCoordinateFromDMY(year, month, day);
+                return CZ.Dates.getCoordinateFromYMD(year, month, day);
             };
             DatePicker.prototype.validateNumber = function (year) {
                 return !isNaN(Number(year)) && isFinite(Number(year)) && !isNaN(parseFloat(year));

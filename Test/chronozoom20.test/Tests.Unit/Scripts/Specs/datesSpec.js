@@ -114,10 +114,10 @@ describe("getDMYFromCoordinate() method should return", function () {
     });
 });
 
-describe("getCoordinateFromDMY() method should return", function () {
+describe("getCoordinateFromYMD() method should return", function () {
     usingDMY('', [data1, data2, data3, data4, data5, data6, data7, data8, data9], function (coordinate, year, month, day) {
         it("coordinate: " + coordinate + " with { year: " + year + ", month: " + month + ", day: " + day + " } ", function () {
-            var result = CZ.Dates.getCoordinateFromDMY(year, month, day);
+            var result = CZ.Dates.getCoordinateFromYMD(year, month, day);
             expect(1 * coordinate.toFixed(2)).toEqual(1 * result.toFixed(2));
         });
     });

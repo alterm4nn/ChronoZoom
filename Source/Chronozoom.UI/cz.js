@@ -2757,7 +2757,7 @@ var CZ;
             30, 
             31
         ];
-        function getCoordinateFromDMY(year, month, day) {
+        function getCoordinateFromYMD(year, month, day) {
             var sign = (year != 0) ? year / Math.abs(year) : 1;
             var i = 0;
             var coordinate = year;
@@ -2780,7 +2780,7 @@ var CZ;
             coordinate -= 1 / daysPerYear;
             return coordinate;
         }
-        Dates.getCoordinateFromDMY = getCoordinateFromDMY;
+        Dates.getCoordinateFromYMD = getCoordinateFromYMD;
         function getDMYFromCoordinate(coord) {
             var sign = (coord === 0) ? 1 : coord / Math.abs(coord);
             var day = 0, month = 0, year = 0;
@@ -2826,7 +2826,7 @@ var CZ;
         Dates.getDMYFromCoordinate = getDMYFromCoordinate;
         function getCoordinateFromDecimalYear(decimalYear) {
             var localPresent = getPresent();
-            var presentDate = getCoordinateFromDMY(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+            var presentDate = getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
             return decimalYear === 9999 ? presentDate : decimalYear;
         }
         Dates.getCoordinateFromDecimalYear = getCoordinateFromDecimalYear;
@@ -3366,10 +3366,10 @@ var CZ;
             return isValid;
         }
         Authoring.validateExhibitData = validateExhibitData;
-        function ValidateNumber(number) {
-            return !isNaN(Number(number) && parseFloat(number)) && IsNotEmpty(number) && (number != false);
+        function validateNumber(number) {
+            return !isNaN(Number(number) && parseFloat(number)) && isNotEmpty(number) && (number !== false);
         }
-        Authoring.ValidateNumber = ValidateNumber;
+        Authoring.validateNumber = validateNumber;
         function isNotEmpty(obj) {
             return (obj !== '' && obj !== null);
         }
@@ -6855,7 +6855,7 @@ var CZ;
             var firstYear;
             if(_range.min >= -10000) {
                 beta = Math.log(_range.max - _range.min) * log10;
-                firstYear = CZ.Dates.getCoordinateFromDMY(0, 0, 1);
+                firstYear = CZ.Dates.getCoordinateFromYMD(0, 0, 1);
                 if(beta >= 0) {
                     x1 += k * firstYear;
                 }
@@ -7273,7 +7273,7 @@ var CZ;
                 month: localPresent.getUTCMonth(),
                 day: localPresent.getUTCDate()
             };
-            this.firstYear = CZ.Dates.getCoordinateFromDMY(0, 0, 1);
+            this.firstYear = CZ.Dates.getCoordinateFromYMD(0, 0, 1);
             this.range.max -= this.firstYear;
             this.range.min -= this.firstYear;
             this.startDate = this.present;
@@ -7304,7 +7304,7 @@ var CZ;
                 count++;
             }
             for(var i = 0; i < count + 1; i++) {
-                var tick_position = CZ.Dates.getCoordinateFromDMY(x0 + i * dx, 0, 1);
+                var tick_position = CZ.Dates.getCoordinateFromYMD(x0 + i * dx, 0, 1);
                 if(tick_position < 1 && dx > 1) {
                     tick_position += 1;
                 }
@@ -7507,7 +7507,7 @@ var CZ;
                 month: localPresent.getUTCMonth(),
                 day: localPresent.getUTCDate()
             };
-            this.firstYear = CZ.Dates.getCoordinateFromDMY(0, 0, 1);
+            this.firstYear = CZ.Dates.getCoordinateFromYMD(0, 0, 1);
             this.startDate = CZ.Dates.getDMYFromCoordinate(this.range.min);
             this.endDate = CZ.Dates.getDMYFromCoordinate(this.range.max);
             this.delta = 1;
@@ -7577,7 +7577,7 @@ var CZ;
                     year++;
                 }
                 if((this.regime == "Quarters_Month") || (this.regime == "Month_Weeks")) {
-                    var tick = CZ.Dates.getCoordinateFromDMY(year, month, 1);
+                    var tick = CZ.Dates.getCoordinateFromYMD(year, month, 1);
                     if(tick >= this.range.min && tick <= this.range.max) {
                         if(tempDays != 1) {
                             if((month % 3 == 0) || (this.regime == "Month_Weeks")) {
@@ -7598,7 +7598,7 @@ var CZ;
                     tempDays = 1;
                     for(var k = 1; k <= countDays; k += date_step) {
                         day = k;
-                        tick = CZ.Dates.getCoordinateFromDMY(year, month, day);
+                        tick = CZ.Dates.getCoordinateFromYMD(year, month, day);
                         if(tick >= this.range.min && tick <= this.range.max) {
                             if(this.regime == "Weeks_Days") {
                                 if((k == 3) || (k == 10) || (k == 17) || (k == 24) || (k == 28)) {
@@ -7652,12 +7652,12 @@ var CZ;
                 return null;
             }
             date.day -= step;
-            tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
+            tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
             if(this.regime != "Month_Weeks") {
                 while(tick > this.range.min) {
                     minors.push(tick);
                     date.day -= step;
-                    tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
                 }
             } else {
                 var j = CZ.Dates.daysInMonth[date.month];
@@ -7666,7 +7666,7 @@ var CZ;
                         minors.push(tick);
                     }
                     date.day -= step;
-                    tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
                     j--;
                 }
             }
@@ -7676,7 +7676,7 @@ var CZ;
                 var j_step = 1;
                 for(var j = 1; j <= n; j += j_step) {
                     date.day += step;
-                    tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
                     if(this.regime != "Month_Weeks") {
                         if(minors.length == 0 || k * (ticks[i + 1].position - tick) > CZ.Settings.minSmallTickSpace) {
                             minors.push(tick);
@@ -7693,12 +7693,12 @@ var CZ;
             var tick = ticks[ticks.length - 1].position;
             var date = CZ.Dates.getDMYFromCoordinate(tick);
             date.day += step;
-            tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
+            tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
             if(this.regime != "Month_Weeks") {
                 while(tick < this.range.max) {
                     minors.push(tick);
                     date.day += step;
-                    tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
                 }
             } else {
                 var j = 0;
@@ -7707,7 +7707,7 @@ var CZ;
                         minors.push(tick);
                     }
                     date.day += step;
-                    tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
                     j++;
                 }
             }
@@ -7750,9 +7750,9 @@ var CZ;
             if(left_year_val <= 0) {
                 left_year_val++;
             }
-            var right_val = CZ.Dates.getCoordinateFromDMY(right_year_val, right_month_val, right_date_val);
-            var left_val = CZ.Dates.getCoordinateFromDMY(left_year_val, left_month_val, left_date_val);
-            var old_right_val = CZ.Dates.getCoordinateFromDMY(old_right_year_val, old_right_month_val, old_right_date_val);
+            var right_val = CZ.Dates.getCoordinateFromYMD(right_year_val, right_month_val, right_date_val);
+            var left_val = CZ.Dates.getCoordinateFromYMD(left_year_val, left_month_val, left_date_val);
+            var old_right_val = CZ.Dates.getCoordinateFromYMD(old_right_year_val, old_right_month_val, old_right_date_val);
             if(range.min < this.range.min) {
                 range.min = this.range.min;
             }
@@ -7789,9 +7789,9 @@ var CZ;
             if(left_year_val <= 0) {
                 left_year_val++;
             }
-            var right_val = CZ.Dates.getCoordinateFromDMY(right_year_val, right_month_val, right_date_val);
-            var left_val = CZ.Dates.getCoordinateFromDMY(left_year_val, left_month_val, left_date_val);
-            var old_left_val = CZ.Dates.getCoordinateFromDMY(old_left_year_val, old_left_month_val, old_left_date_val);
+            var right_val = CZ.Dates.getCoordinateFromYMD(right_year_val, right_month_val, right_date_val);
+            var left_val = CZ.Dates.getCoordinateFromYMD(left_year_val, left_month_val, left_date_val);
+            var old_left_val = CZ.Dates.getCoordinateFromYMD(old_left_year_val, old_left_month_val, old_left_date_val);
             if(range.min < this.range.min) {
                 range.min = this.range.min;
             }
@@ -8368,15 +8368,7 @@ var CZ;
                     switch(mode) {
                         case "year":
                             _this.editModeYear();
-<<<<<<< HEAD
                             _this.setDate(_this.coordinate, false);
-=======
-                            if(Number(_this.coordinate) == _this.INFINITY_VALUE) {
-                                _this.setDate(CZ.Dates.getCoordinateFromDecimalYear(CZ.Dates.getPresent().presentYear));
-                            } else {
-                                _this.setDate(_this.coordinate);
-                            }
->>>>>>> 59bc4350a3afe94d5f2163c61b12598a1ee2ed2d
                             break;
                         case "date":
                             _this.editModeDate();
@@ -8424,7 +8416,7 @@ var CZ;
                         this.editModeInfinite();
                     } else {
                         var localPresent = CZ.Dates.getPresent();
-                        coordinate = CZ.Dates.getCoordinateFromDMY(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+                        coordinate = CZ.Dates.getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
                     }
                 }
                 switch(mode) {
@@ -8553,7 +8545,7 @@ var CZ;
                 var month = this.monthSelector.find(":selected").val();
                 month = CZ.Dates.months.indexOf(month);
                 var day = parseInt(this.daySelector.find(":selected").val());
-                return CZ.Dates.getCoordinateFromDMY(year, month, day);
+                return CZ.Dates.getCoordinateFromYMD(year, month, day);
             };
             DatePicker.prototype.validateNumber = function (year) {
                 return !isNaN(Number(year)) && isFinite(Number(year)) && !isNaN(parseFloat(year));
