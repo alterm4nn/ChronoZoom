@@ -194,6 +194,9 @@ namespace Chronozoom.UI
             return new ThumbnailGenerator(thumbnailStorage);
         });
 
+        // The Maximum number of elements retured in a Search
+        private const int MaxSearchLimit = 50;
+
         // error code descriptions
         private static class ErrorDescription
         {
@@ -225,56 +228,19 @@ namespace Chronozoom.UI
             public const string BookmarkSequenceIdInvalid = "Bookmark sequence id is invalid";
         }
 
-        private static Lazy<string> _hostPath = new Lazy<string>(() =>
+        private static Lazy<ChronozoomSVC> _sharedService = new Lazy<ChronozoomSVC>(() =>
         {
-            Uri uri = HttpContext.Current.Request.Url;
-            return uri.Scheme + Uri.SchemeDelimiter + uri.Host + ":" + uri.Port;
-        });
-
-        private static Lazy<IChronozoomSVC> _chronozoomService = new Lazy<IChronozoomSVC>(() =>
-        {
-            WebHttpBinding myBinding = new WebHttpBinding();
-            myBinding.MaxReceivedMessageSize = 100000000;
-
-            EndpointAddress myEndpoint = new EndpointAddress(_hostPath.Value + "/api/chronozoom.svc");
-
-            ChannelFactory<IChronozoomSVC> factory = new ChannelFactory<IChronozoomSVC>(myBinding, myEndpoint);
-            factory.Endpoint.Behaviors.Add(new WebHttpBehavior());
-            return factory.CreateChannel();
+            return new ChronozoomSVC();
         });
 
         internal static IChronozoomSVC Instance
         {
-            get { return _chronozoomService.Value; }
+            get { return _sharedService.Value; }
         }
 
         /// <summary>
-        /// Returns timeline data within a specified range of years from a collection or a superCollection.
+        /// Documentation under IChronozoomSVC
         /// </summary>
-        /// <param name="superCollection">Name of the superCollection to query.</param>
-        /// <param name="collection">Name of the collection to query.</param>
-        /// <param name="start">Year at which to begin the search, between -20000000000 and 9999.</param>
-        /// <param name="end">Year at which to end the search, between -20000000000 and 9999.</param>
-        /// <param name="minspan">Filters the search results to a particular time scale.</param>
-        /// <param name="commonAncestor">Least Common Ancestor, a timeline identifier used to hint the server to retrieve timelines close to this location.</param>
-        /// <param name="maxElements">The maximum number of elements to return.</param>
-        /// <returns>Timeline data in JSON format.</returns>
-        /// <example><![CDATA[ 
-        /// HTTP verb: GET
-        ///
-        /// URL:
-        /// http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/timelines
-        ///
-        /// Request body (JSON):
-        /// {
-        ///    start: 1800
-        ///    end: 1920
-        ///    minspan: 
-        ///    lca: 
-        ///    maxElements: 25
-        /// }
-        /// ]]>
-        /// </example>
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "minspan")]
@@ -289,7 +255,7 @@ namespace Chronozoom.UI
                 // If available, retrieve from cache.
                 if (CanCacheGetTimelines(user, collectionId))
                 {
-                    Timeline cachedTimeline = GetCachedGetTimelines(collectionId, start, end, minspan, commonAncestor, maxElements);
+                    Timeline cachedTimeline = GetCachedGetTimelines(collectionId, start, end, minspan, commonAncestor, maxElements, depth);
                     if (cachedTimeline != null)
                     {
                         return cachedTimeline;
@@ -311,7 +277,7 @@ namespace Chronozoom.UI
                 if (timeline == null)
                     timeline = timelines.FirstOrDefault();
 
-                CacheGetTimelines(timeline, collectionId, start, end, minspan, commonAncestor, maxElements);
+                CacheGetTimelines(timeline, collectionId, start, end, minspan, commonAncestor, maxElements, depth);
 
                 return timeline;
             });
@@ -349,27 +315,9 @@ namespace Chronozoom.UI
             });
         }
 
-
-
         /// <summary>
-        /// Performs a search for a specific term within a collection or a superCollection.
+        /// Documentation under IChronozoomSVC
         /// </summary>
-        /// <param name="superCollection">Name of the superCollection to query.</param>
-        /// <param name="collection">Name of the collection to query.</param>
-        /// <param name="searchTerm">The term to search for.</param>
-        /// <returns>Search results in JSON format.</returns>
-        /// <example><![CDATA[ 
-        /// HTTP verb: GET
-        ///
-        /// URL:
-        /// http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/search
-        ///
-        /// Request body (JSON):
-        /// {
-        ///    searchTerm: "Pluto"
-        /// }
-        /// ]]>
-        /// </example>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
@@ -384,16 +332,16 @@ namespace Chronozoom.UI
             Guid collectionId = CollectionIdOrDefault(superCollection, collection);
             searchTerm = searchTerm.ToUpperInvariant();
 
-            var timelines = _storage.Timelines.Where(_ => _.Title.ToUpper().Contains(searchTerm) && _.Collection.Id == collectionId).ToList();
+            var timelines = _storage.Timelines.Where(_ => _.Title.ToUpper().Contains(searchTerm) && _.Collection.Id == collectionId).Take(MaxSearchLimit).ToList();
             var searchResults = timelines.Select(timeline => new SearchResult { Id = timeline.Id, Title = timeline.Title, ObjectType = ObjectType.Timeline }).ToList();
 
-            var exhibits = _storage.Exhibits.Where(_ => _.Title.ToUpper().Contains(searchTerm) && _.Collection.Id == collectionId).ToList();
+            var exhibits = _storage.Exhibits.Where(_ => _.Title.ToUpper().Contains(searchTerm) && _.Collection.Id == collectionId).Take(MaxSearchLimit).ToList();
             searchResults.AddRange(exhibits.Select(exhibit => new SearchResult { Id = exhibit.Id, Title = exhibit.Title, ObjectType = ObjectType.Exhibit }));
 
             var contentItems = _storage.ContentItems.Where(_ =>
                 (_.Title.ToUpper().Contains(searchTerm) || _.Caption.ToUpper().Contains(searchTerm))
                  && _.Collection.Id == collectionId
-                ).ToList();
+                ).Take(MaxSearchLimit).ToList();
             searchResults.AddRange(contentItems.Select(contentItem => new SearchResult { Id = contentItem.Id, Title = contentItem.Title, ObjectType = ObjectType.ContentItem }));
 
             Trace.TraceInformation("Search called for search term {0}", searchTerm);
@@ -401,16 +349,8 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
-        /// Returns a list of tours for the default collection and default superCollection.
+        /// Documentation under IChronozoomSVC
         /// </summary>
-        /// <returns>A list of tours in JSON format.</returns>
-        /// <example><![CDATA[ 
-        /// HTTP verb: GET
-        ///
-        /// URL: 
-        /// http://[site URL]/chronozoom.svc/tours
-        /// ]]>
-        /// </example>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/tours")]
@@ -420,18 +360,8 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
-        /// Returns a list of tours for a given collection or superCollection.
+        /// Documentation under IChronozoomSVC
         /// </summary>
-        /// <param name="superCollection">Name of the superCollection to query.</param>
-        /// <param name="collection">Name of the collection to query.</param>
-        /// <returns>A list of tours in JSON format.</returns>
-        /// <example><![CDATA[ 
-        /// HTTP verb: GET
-        ///
-        /// URL: 
-        /// http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/tours
-        /// ]]>
-        /// </example>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
@@ -462,37 +392,8 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
-        /// Creates a new user, or updates an existing user's information and associated personal collection.
+        /// Documentation under IChronozoomSVC
         /// </summary>
-        /// <remarks>
-        /// If the user ID is omitted then a new user is created.
-        /// If there is no ACS the user is treated as anonymous and granted access to the sandbox collection.
-        /// If the anonymous user does not exist in the database then it is created.
-        /// A new superCollection with the user's display name is added.
-        /// A new default collection with the user's display name is added to this superCollection.
-        /// A new user with the specified attributes is created.
-        ///
-        /// If the specified user display name does not exist it is considered an error.
-        /// If the user display name is specified and it exists then the user's attributes are updated.
-        /// </remarks>
-        /// <param name="userRequest">JSON containing the request details.</param>
-        /// <returns>The URL for the new user collection.</returns>
-        /// <example><![CDATA[ 
-        /// HTTP verb: PUT
-        ///
-        /// URL:
-        /// http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/user
-        /// 
-        /// Request body (JSON):
-        /// {
-        ///     id: "0123456789",
-        ///     displayName: "Joe",
-        ///     email: "email@email.com"
-        /// }
-        /// ]]>
-        /// </example>
-        [OperationContract]
-        [WebInvoke(Method = "PUT", UriTemplate = "/user", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public String PutUser(User userRequest)
         {
             return AuthenticatedOperation<String>(delegate(User user)
@@ -504,25 +405,14 @@ namespace Chronozoom.UI
                     SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
                     return string.Empty;
                 }
-                
-                Uri collectionUri;
 
-                if (user == null)
+                if (user == null || string.IsNullOrEmpty(user.NameIdentifier))
                 {
-                    // No ACS so treat as an anonymous user who can access the sandbox collection.
-                    // If anonymous user does not already exist create the user.
-                    user = _storage.Users.Where(candidate => candidate.NameIdentifier == null).FirstOrDefault();
-                    if (user == null)
-                    {
-                        user = new User { Id = Guid.NewGuid(), DisplayName = _defaultUserName };
-                        _storage.Users.Add(user);
-                        _storage.SaveChanges();
-                    }
-
-                    collectionUri = UpdatePersonalCollection(user.NameIdentifier, userRequest);
-                    return collectionUri.ToString();
+                    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                    return string.Empty; ;
                 }
 
+                Uri collectionUri;
                 User updateUser = _storage.Users.Where(candidate => candidate.DisplayName == userRequest.DisplayName).FirstOrDefault();
                 if (userRequest.Id == Guid.Empty && updateUser == null)
                 {
@@ -530,7 +420,7 @@ namespace Chronozoom.UI
                     User newUser = new User { Id = Guid.NewGuid(), DisplayName = userRequest.DisplayName, Email = userRequest.Email };
                     newUser.NameIdentifier = user.NameIdentifier;
                     newUser.IdentityProvider = user.IdentityProvider;
-                    collectionUri = UpdatePersonalCollection(user.NameIdentifier, newUser);
+                    collectionUri = EnsurePersonalCollection(newUser);
                 }
                 else
                 {
@@ -539,8 +429,15 @@ namespace Chronozoom.UI
                         SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.UserNotFound);
                         return String.Empty;
                     }
+
+                    if (user == null || string.IsNullOrEmpty(user.NameIdentifier) || user.NameIdentifier != updateUser.NameIdentifier)
+                    {
+                        SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                        return string.Empty; ;
+                    }
+
                     updateUser.Email = userRequest.Email;
-                    collectionUri = UpdatePersonalCollection(user.NameIdentifier, updateUser);
+                    collectionUri = EnsurePersonalCollection(updateUser);
                     _storage.SaveChanges();
                 }
 
@@ -549,9 +446,8 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
-        /// Provides information about the ChronoZoom service to the clients. Used internally by the ChronoZoom client.
+        /// Documentation under IChronozoomSVC
         /// </summary>
-        /// <returns>A ServiceInformation object describing parameter from the running service</returns>
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         [OperationContract]
@@ -562,26 +458,16 @@ namespace Chronozoom.UI
 
             ServiceInformation serviceInformation = new ServiceInformation();
             serviceInformation.ThumbnailsPath = _thumbnailsPath.Value;
+            serviceInformation.SignInUrlMicrosoft = _signinUrlMicrosoft.Value;
+            serviceInformation.SignInUrlGoogle = _signinUrlGoogle.Value;
+            serviceInformation.SignInUrlYahoo = _signinUrlYahoo.Value;
 
             return serviceInformation;
         }
 
         /// <summary>
-        /// Deletes the user with the specified user ID.
+        /// Documentation under IChronozoomSVC
         /// </summary>
-        /// <param name="userRequest">JSON containing the request details.</param>
-        /// <returns>HTTP response code.</returns>
-        /// <example><![CDATA[ 
-        /// HTTP verb: DELETE
-        /// URL:
-        /// http://{site URL}/chronozoom.svc/{supercollection}/{collection}/user
-        /// 
-        /// Request body (JSON):
-        /// {
-        ///     id: "0123456789"
-        /// }
-        /// ]]>
-        /// </example>
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/user", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public void DeleteUser(User userRequest)
@@ -766,6 +652,38 @@ namespace Chronozoom.UI
                 FriendlyUrlReplacements(superCollection.Title),
                 FriendlyUrlReplacements(superCollection.Title)), UriKind.Relative);
         }
+        private Uri EnsurePersonalCollection(User user)
+        {
+            SuperCollection superCollection = _storage.SuperCollections.Where(candidate => candidate.User.NameIdentifier == user.NameIdentifier).FirstOrDefault();
+            if (superCollection == null)
+            {
+                // Create the personal superCollection
+                superCollection = new SuperCollection();
+                superCollection.Title = user.DisplayName;
+                superCollection.Id = CollectionIdFromText(user.DisplayName);
+                superCollection.User = user;
+                superCollection.Collections = new Collection<Collection>();
+
+                // Create the personal collection
+                Collection personalCollection = new Collection();
+                personalCollection.Title = user.DisplayName;
+                personalCollection.Id = CollectionIdFromSuperCollection(superCollection.Title, personalCollection.Title);
+                personalCollection.User = user;
+
+                superCollection.Collections.Add(personalCollection);
+                _storage.SuperCollections.Add(superCollection);
+                _storage.Collections.Add(personalCollection);
+                _storage.SaveChanges();
+
+                Trace.TraceInformation("Personal collection saved.");
+            }
+
+            return new Uri(string.Format(
+                CultureInfo.InvariantCulture,
+                @"{0}\{1}\",
+                FriendlyUrl.FriendlyUrlEncode(superCollection.Title),
+                FriendlyUrl.FriendlyUrlEncode(superCollection.Title)), UriKind.Relative);
+        }
 
         public void Dispose()
         {
@@ -861,30 +779,8 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
-        /// Creates a new collection using the specified name.
+        /// Documentation under IChronozoomSVC
         /// </summary>
-        /// <remarks>
-        /// If a collection of the specified name does not exist then a new collection is created. 
-        /// If the collection exists and the authenticated user is the author then the collection is modified. 
-        /// If no author is registered then the authenticated user is set as the author. 
-        /// The title field can't be modified because it is part of the URL (the URL can be indexed).
-        /// </remarks>
-        /// <param name="superCollectionName">The name of the parent superCollection for the collection.</param>
-        /// <param name="collectionName">The name of the collection to create.</param>
-        /// <param name="collectionRequest">The markup for the collection to create in JSON format.</param>
-        /// <returns></returns>
-        /// <example><![CDATA[ 
-        /// HTTP verb: PUT
-        ///
-        /// URL:
-        /// http://{site URL}/chronozoom.svc/{superCollectionName}/{collectionName}
-        ///
-        /// Request body (JSON):
-        /// {
-        ///      name: "My Collection"
-        /// }
-        /// ]]>
-        /// </example>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public Guid PutCollectionName(string superCollectionName, string collectionName, Collection collectionRequest)
@@ -934,18 +830,8 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
-        /// Deletes the specified collection.
+        /// Documentation under IChronozoomSVC
         /// </summary>
-        /// <param name="superCollectionName">The name of the parent collection.</param>
-        /// <param name="collectionName">The name of the collection to delete.</param>
-        /// <returns>HTTP response code.</returns>
-        /// <example><![CDATA[ 
-        /// HTTP verb: DELETE
-        ///
-        /// URL:
-        /// http://{site URL}/chronozoom.svc/{superCollectionName}/{collectionName}
-        /// ]]>
-        /// </example>
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public void DeleteCollection(string superCollectionName, string collectionName)
@@ -974,31 +860,8 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
-        /// Creates or updates the timeline in a given collection. 
+        /// Documentation under IChronozoomSVC
         /// </summary>
-        /// <remarks>
-        /// If an ID is specified but the collection does not exist, the request will fail ("not found" status).
-        /// If an ID is not specified, a new timeline will be added to the collection. 
-        /// For a new timeline, if the parent is not defined the root timeline will be set as the parent.
-        /// If the timeline with the specified identifier exists, then the existing timeline is updated.
-        /// </remarks>
-        /// <param name="superCollectionName">The parent collection.</param>
-        /// <param name="collectionName">The name of the collection to update.</param>
-        /// <param name="timelineRequest">Timeline data in JSON format.</param>
-        /// <returns>HTTP status code.</returns>
-        /// <example><![CDATA[ 
-        /// HTTP verb: PUT
-        ///
-        /// URL:
-        /// http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/timeline
-        ///
-        /// Request body (JSON):
-        /// {
-        ///      id: "0123456789"
-        ///      title: "A New Title"
-        /// }
-        /// ]]>
-        /// </example>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/timeline", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public Guid PutTimeline(string superCollectionName, string collectionName, TimelineRaw timelineRequest)
@@ -1131,23 +994,8 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
-        /// Deletes the timeline with the specified ID.
+        /// Documentation under IChronozoomSVC
         /// </summary>
-        /// <param name="superCollectionName">The name of the parent collection.</param>
-        /// <param name="collectionName">The name of the collection from which the timeline should be deleted.</param>
-        /// <param name="timelineRequest">The request in JSON format.</param>
-        /// <example><![CDATA[ 
-        /// HTTP verb: DELETE
-        ///
-        /// URL:
-        /// http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/timeline
-        ///
-        /// Request body (JSON):
-        /// {
-        ///      timelineRequest: Need request body format.
-        /// }
-        /// ]]>
-        /// </example>
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/timeline", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public void DeleteTimeline(string superCollectionName, string collectionName, Timeline timelineRequest)
@@ -1244,32 +1092,8 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
-        /// Creates or updates the exhibit and its content items in a given collection. If the collection does not exist, then the command will silently fail.
+        /// Documentation under IChronozoomSVC
         /// </summary>
-        /// <remarks>
-        /// If an exhibit id is not specified, a new exhibit is added to the collection. 
-        /// If the ID for an existing exhibit is specified then the exhibit will be updated. 
-        /// If the exhibit ID to be updated does not exist a "not found" status is returned. 
-        /// If the parent timeline is not specified the exhibit is added to the root timeline. 
-        /// Otherwise, the exhibit is added to the specified parent timeline. 
-        /// If an invalid parent timeline is specified then the request will fail. 
-        /// </remarks>
-        /// <param name="superCollectionName">The name of the parent collection.</param>
-        /// <param name="collectionName">The name of the collection to modify.</param>
-        /// <param name="exhibitRequest">The exhibit data in JSON format.</param>
-        /// <returns>An exhibit in JSON format.</returns>
-        /// <example><![CDATA[ 
-        /// **HTTP verb:** PUT
-        ///
-        /// **URL:**
-        ///     http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/exhibit
-        ///
-        /// **Request body:**
-        ///     {
-        ///          
-        ///     }
-        /// ]]>
-        /// </example>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/exhibit", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
@@ -1419,6 +1243,7 @@ namespace Chronozoom.UI
             updateContentItem.Uri = contentItemRequest.Uri;
             updateContentItem.MediaSource = contentItemRequest.MediaSource;
             updateContentItem.Attribution = contentItemRequest.Attribution;
+            updateContentItem.Order = contentItemRequest.Order;
             return contentItemRequest.Id;
         }
 
@@ -1434,6 +1259,7 @@ namespace Chronozoom.UI
                 Uri = contentItemRequest.Uri,
                 MediaSource = contentItemRequest.MediaSource,
                 Attribution = contentItemRequest.Attribution,
+                Order = contentItemRequest.Order,
                 Depth = newExhibit.Depth + 1
             };
             newContentItem.Collection = collection;
@@ -1450,22 +1276,8 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
-        /// Deletes the specified exhibit from the specified collection.
+        /// Documentation under IChronozoomSVC
         /// </summary>
-        /// <param name="superCollectionName">The name of the parent collection.</param>
-        /// <param name="collectionName">The name of the collection to modify.</param>
-        /// <param name="exhibitRequest">The exhibit ID in JSON format.</param>
-        /// <example><![CDATA[ 
-        /// **HTTP verb:** DELETE
-        ///
-        /// **URL:**
-        ///     http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/exhibit
-        ///
-        /// **Request body:**
-        ///     {
-        ///          id: "0123456789"
-        ///     }
-        /// ]]></example>
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/exhibit", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public void DeleteExhibit(string superCollectionName, string collectionName, Exhibit exhibitRequest)
@@ -1525,23 +1337,8 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
-        /// Creates or updates the content item in a given collection. If the collection does not exist the request will fail.
+        /// Documentation under IChronozoomSVC
         /// </summary>
-        /// <param name="superCollectionName">The name of the parent collection.</param>
-        /// <param name="collectionName">The name of the collection to modify.</param>
-        /// <param name="contentItemRequest">The content item data in JSON format.</param>
-        /// <returns></returns>
-        /// <example><![CDATA[ 
-        /// **HTTP verb:** PUT
-        ///
-        /// **URL:**
-        ///     http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/contentitem
-        ///
-        /// **Request body:**
-        ///     {
-        ///          
-        ///     }
-        /// ]]></example>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/contentitem", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public Guid PutContentItem(string superCollectionName, string collectionName, ContentItemRaw contentItemRequest)
@@ -1596,8 +1393,8 @@ namespace Chronozoom.UI
                     }
                     else
                     {
-                        Guid updateContentItemGuid = UpdateContentItem(collectionGuid, contentItemRequest);
-                        returnValue = updateContentItemGuid;
+                        contentItemRequest.Id = UpdateContentItem(collectionGuid, contentItemRequest);
+                        returnValue = contentItemRequest.Id;
                     }
                 
                     _storage.SaveChanges();
@@ -1609,23 +1406,8 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
-        /// Delete the specified content item from the specified collection.
+        /// Documentation under IChronozoomSVC
         /// </summary>
-        /// <param name="superCollectionName">The name of the parent collection.</param>
-        /// <param name="collectionName">The name of the collection to modify.</param>
-        /// <param name="contentItemRequest">The request in JSON format.</param>
-        /// <example><![CDATA[ 
-        /// **HTTP verb:** DELETE
-        ///
-        /// **URL:**
-        ///     http://[site URL]/chronozoom.svc/[superCollectionName]/[collectionName]/contentitem
-        ///
-        /// **Request body:**
-        ///     {
-        ///          id: "0123456789"
-        ///     }
-        /// ]]>
-        /// </example>
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/contentitem", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public void DeleteContentItem(string superCollectionName, string collectionName, ContentItem contentItemRequest)
@@ -2114,11 +1896,8 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
-        /// Retrieves a path to the given content id.
-        /// 
-        /// For t48fbb8a8-7c5d-49c3-83e1-98939ae2ae6, this API retrieves /t00000000-0000-0000-0000-000000000000/t48fbb8a8-7c5d-49c3-83e1-98939ae2ae67
+        /// Documentation under IChronozoomSVC
         /// </summary>
-        /// <returns>The full path to the content</returns>
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "{supercollection}/{collection}/{reference}/contentpath")]
         public string GetContentPath(string superCollection, string collection, string reference)
@@ -2134,7 +1913,7 @@ namespace Chronozoom.UI
             }
             else
             {
-                reference = FriendlyUrlDecode(reference);
+                reference = FriendlyUrl.FriendlyUrlDecode(reference);
             }
 
             Guid collectionId = CollectionIdOrDefault(superCollection, collection);
@@ -2267,9 +2046,9 @@ namespace Chronozoom.UI
 
         // Retrieves the cached timeline.
         // Null if not cached.
-        private static Timeline GetCachedGetTimelines(Guid collectionId, string start, string end, string minspan, string lca, string maxElements)
+        private static Timeline GetCachedGetTimelines(Guid collectionId, string start, string end, string minspan, string lca, string maxElements, string depth)
         {
-            string cacheKey = string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}|{5}", collectionId, start, end, minspan, lca, maxElements);
+            string cacheKey = string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}|{5}|{6}", collectionId, start, end, minspan, lca, maxElements, depth);
             if (Cache.Contains(cacheKey))
             {
                 return (Timeline)Cache[cacheKey];
@@ -2279,9 +2058,9 @@ namespace Chronozoom.UI
         }
 
         // Caches the given timeline for the given GetTimelines request.
-        private static void CacheGetTimelines(Timeline timeline, Guid collectionId, string start, string end, string minspan, string lca, string maxElements)
+        private static void CacheGetTimelines(Timeline timeline, Guid collectionId, string start, string end, string minspan, string lca, string maxElements, string depth)
         {
-            string cacheKey = string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}|{5}", collectionId, start, end, minspan, lca, maxElements);
+            string cacheKey = string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}|{5}|{6}", collectionId, start, end, minspan, lca, maxElements, depth);
             if (!Cache.Contains(cacheKey) && timeline != null)
             {
                 Cache.Add(cacheKey, timeline, DateTime.Now.AddMinutes(int.Parse(ConfigurationManager.AppSettings["CacheDuration"], CultureInfo.InvariantCulture)));
@@ -2303,7 +2082,8 @@ namespace Chronozoom.UI
         private Collection RetrieveCollection(Guid collectionId)
         {
             Collection collection = _storage.Collections.Find(collectionId);
-            _storage.Entry(collection).Reference("User").Load();
+            if (collection != null)   
+                _storage.Entry(collection).Reference("User").Load();
             return collection;
         }
 
