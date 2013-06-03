@@ -205,7 +205,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="pages\sitemap.aspx.cs">
       <DependentUpon>sitemap.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
