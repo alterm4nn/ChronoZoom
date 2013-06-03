@@ -205,6 +205,13 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="pages\crawler.aspx.cs">
+      <DependentUpon>crawler.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="pages\crawler.aspx.designer.cs">
+      <DependentUpon>crawler.aspx</DependentUpon>
+    </Compile>
     <Compile Include="pages\sitemap.aspx.cs">
       <DependentUpon>sitemap.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -235,6 +242,7 @@
     <Content Include="images\tour-icon.png" />
     <Content Include="images\view-icon.png" />
     <Content Include="images\edit.svg" />
+    <Content Include="pages\crawler.aspx" />
     <Content Include="pages\sitemap.aspx" />
     <Content Include="scripts\external\ACS.js" />
     <Content Include="scripts\authoring.ts" />
