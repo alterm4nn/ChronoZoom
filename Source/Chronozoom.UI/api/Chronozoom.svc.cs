@@ -460,11 +460,17 @@ namespace Chronozoom.UI
             });
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        public User GetUser()
+        {
+            return GetUser("");
+        }
+        
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
-        public User GetUser(string name = "")
+        public User GetUser(string name)
         {
             if (String.IsNullOrEmpty(name))
             {

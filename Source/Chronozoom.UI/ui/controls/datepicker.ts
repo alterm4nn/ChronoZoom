@@ -95,7 +95,7 @@ module CZ {
             /**
             * Sets date corresponding to given virtual coordinate
             */
-            public setDate(coordinate: any, InfinityConvertation) {
+            public setDate(coordinate: any, InfinityConvertation = false) {
                 // invalid input
                 if (!this.validateNumber(coordinate)) {
                     return false;

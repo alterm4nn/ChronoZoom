@@ -54,6 +54,7 @@ var CZ;
                 this.modeSelector.append(optionIntinite);
             };
             DatePicker.prototype.setDate = function (coordinate, InfinityConvertation) {
+                if (typeof InfinityConvertation === "undefined") { InfinityConvertation = false; }
                 if(!this.validateNumber(coordinate)) {
                     return false;
                 }
