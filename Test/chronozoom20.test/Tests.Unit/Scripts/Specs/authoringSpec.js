@@ -291,22 +291,22 @@ describe("CZ.Authoring part", function () {
                 dates = CZ.Dates;
             });
             it("true, if start < end", function () {
-                var start = dates.getCoordinateFromDMY(31, 12, -201);
-                var end = dates.getCoordinateFromDMY(2, 12, 1702);
+                var start = dates.getCoordinateFromYMD(-201, 11, 31);
+                var end = dates.getCoordinateFromYMD(1702, 11, 2);
                 var result = isIntervalPositive(start, end);
                 expect(true).toEqual(result);
             });
 
             it("false, if start > end", function () {
-                var start = dates.getCoordinateFromDMY(31, 12, 2011);
-                var end = dates.getCoordinateFromDMY(2, 12, -1702);
+                var start = dates.getCoordinateFromYMD(2011, 11, 31);
+                var end = dates.getCoordinateFromYMD(-1702, 11, 2);
                 var result = isIntervalPositive(start, end);
                 expect(false).toEqual(result);
             });
 
             it("false, if start = end", function () {
-                var start = dates.getCoordinateFromDMY(31, 12, 1789);
-                var end = dates.getCoordinateFromDMY(31, 12, 1789);
+                var start = dates.getCoordinateFromYMD(1789, 11, 31);
+                var end = dates.getCoordinateFromYMD(1789, 11, 31);
                 var result = isIntervalPositive(start, end);
                 expect(false).toEqual(result);
             });
@@ -321,21 +321,21 @@ describe("CZ.Authoring part", function () {
                     dates = CZ.Dates;
                 });
                 it("true, if start < end", function () {
-                    var start = dates.getCoordinateFromDMY(31, 12, -201);
+                    var start = dates.getCoordinateFromYMD(-201, 11, 31);
                     var end = 1703;
                     var result = isIntervalPositive(start, end);
                     expect(true).toEqual(result);
                 });
 
                 it("false, if start > end", function () {
-                    var start = dates.getCoordinateFromDMY(31, 12, 2011);
+                    var start = dates.getCoordinateFromYMD(2011, 11, 31);
                     var end = -1702;
                     var result = isIntervalPositive(start, end);
                     expect(false).toEqual(result);
                 });
 
                 it("false, if start = end", function () {
-                    var start = dates.getCoordinateFromDMY(31, 12, 1789);
+                    var start = dates.getCoordinateFromYMD(1789, 11, 31);
                     var end = 1789;
                     var result = isIntervalPositive(start, end);
                     expect(false).toEqual(result);
@@ -352,21 +352,21 @@ describe("CZ.Authoring part", function () {
                     });
                     it("true, if start < end", function () {
                         var start = -201;
-                        var end = dates.getCoordinateFromDMY(2, 12, 1702);
+                        var end = dates.getCoordinateFromYMD(1702, 11, 2);
                         var result = isIntervalPositive(start, end);
                         expect(true).toEqual(result);
                     });
 
                     it("false, if start > end", function () {
                         var start = 2011;
-                        var end = dates.getCoordinateFromDMY(2, 12, -1702);
+                        var end = dates.getCoordinateFromYMD(-1702, 11, 2);
                         var result = isIntervalPositive(start, end);
                         expect(false).toEqual(result);
                     });
 
-                    it("false, if start = end", function () {
+                    it("fa;se, if start = end", function () {
                         var start = 1789;
-                        var end = dates.getCoordinateFromDMY(31, 12, 1789);
+                        var end = dates.getCoordinateFromYMD(1789, 00, 01);
                         var result = isIntervalPositive(start, end);
                         expect(false).toEqual(result);
                     });

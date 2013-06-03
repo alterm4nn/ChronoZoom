@@ -28,7 +28,7 @@ describe("CZ datepicker", function () {
             function () {
                 var expectedMode = 'infinite';
                 datepicker.addEditMode_Infinite();
-                datepicker.setDate(INFINITY_VALUE);
+                datepicker.setDate(INFINITY_VALUE, true);
 
                 modeSelector = container.find(".cz-datepicker-mode");
                 selected = "";
