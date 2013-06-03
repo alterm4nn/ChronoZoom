@@ -455,10 +455,10 @@ var CZ;
             return isValid;
         }
         Authoring.validateExhibitData = validateExhibitData;
-        function validateNumber(number) {
-            return !isNaN(Number(number) && parseFloat(number)) && isNotEmpty(number);
+        function ValidateNumber(number) {
+            return !isNaN(Number(number) && parseFloat(number)) && IsNotEmpty(number) && (number != false);
         }
-        Authoring.validateNumber = validateNumber;
+        Authoring.ValidateNumber = ValidateNumber;
         function isNotEmpty(obj) {
             return (obj !== '' && obj !== null);
         }
