@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright company="Outercurve Foundation">
 //   Copyright (c) 2013, The Outercurve Foundation
 // </copyright>
@@ -595,6 +595,42 @@ namespace Chronozoom.Entities
                 UpdateFirstNodeInSubtree(parent, firstTimelineId);
             }
         }
+
+        public Timeline GetRootTimeline(Guid collectionId)
+        {
+            var rootCollectionTimeline = Database.SqlQuery<Timeline>("SELECT * FROM Timelines WHERE Timeline_ID is NULL and Collection_ID = {0}", collectionId);
+
+            return rootCollectionTimeline.FirstOrDefault();
+        }
+
+        public Guid GetCollectionGuid(string title)
+        {
+            var collectionGuid = Database.SqlQuery<Guid>("SELECT Id FROM Collections WHERE Title = {0}", title);
+
+            return collectionGuid.FirstOrDefault();
+        }
+
+        public Guid GetCollectionFromGuid(Guid timelineId)
+        {
+            var collectionGuid = Database.SqlQuery<Guid>("SELECT Collection_Id FROM Timelines WHERE Id = {0}", timelineId);
+
+            return collectionGuid.FirstOrDefault();
+        }
+
+        public Guid GetCollectionFromExhibitGuid(Guid exhibitId)
+        {
+            var collectionGuid = Database.SqlQuery<Guid>("SELECT Collection_Id FROM Exhibits WHERE Id = {0}", exhibitId);
+
+            return collectionGuid.FirstOrDefault();
+        }
+
+        public Guid GetCollectionFromContentItemGuid(Guid contentId)
+        {
+            var collectionGuid = Database.SqlQuery<Guid>("SELECT Collection_Id FROM ContentItems WHERE Id = {0}", contentId);
+
+            return collectionGuid.FirstOrDefault();
+        }
+ 
         // Returns the tour associated with a given bookmark id.
         public Tour GetBookmarkTour(Bookmark bookmark)
         {
