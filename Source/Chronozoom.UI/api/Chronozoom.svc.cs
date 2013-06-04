@@ -1272,6 +1272,7 @@ namespace Chronozoom.UI
                 Guid newTourGuid = Guid.NewGuid();
                 Tour newTour = new Tour { Id = newTourGuid };
                 newTour.Name = tourRequest.Name;
+                newTour.Description = tourRequest.Description;
                 newTour.AudioBlobUrl = tourRequest.AudioBlobUrl;
                 newTour.Collection = collection;
 
@@ -1349,6 +1350,7 @@ namespace Chronozoom.UI
 
                 // Update the tour
                 updateTour.Name = tourRequest.Name;
+                updateTour.Description = tourRequest.Description;
                 updateTour.AudioBlobUrl = tourRequest.AudioBlobUrl;
                 returnValue.TourId = tourRequest.Id;
 
