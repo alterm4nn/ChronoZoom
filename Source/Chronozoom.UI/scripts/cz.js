@@ -593,7 +593,10 @@ var CZ;
                 CZ.BreadCrumbs.updateBreadCrumbsLabels(breadCrumbsEvent.breadCrumbs);
             });
             $(window).bind('resize', function () {
+                CZ.timeSeriesChart.updateCanvasHeight();
                 CZ.Common.updateLayout();
+                var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                updateTimeSeriesChart(vp);
             });
             var vp = CZ.Common.vc.virtualCanvas("getViewport");
             CZ.Common.vc.virtualCanvas("setVisible", CZ.VCContent.getVisibleForElement({
@@ -670,14 +673,16 @@ var CZ;
                 CZ.timeSeriesChart.clearLegend("right");
                 var chartHeader = "TimeSeries Chart";
                 if(CZ.leftDataSet !== undefined) {
-                    CZ.timeSeriesChart.drawDataSet(CZ.leftDataSet, leftCSS, rightCSS, leftPlot, rightPlot);
-                    CZ.timeSeriesChart.drawAxis(leftCSS, CZ.leftDataSet.series[0].appearanceSettings.yMin, CZ.leftDataSet.series[0].appearanceSettings.yMax, {
+                    var padding = CZ.leftDataSet.getVerticalPadding() + 10;
+                    CZ.timeSeriesChart.drawDataSet(CZ.leftDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot);
+                    CZ.timeSeriesChart.drawAxis(leftCSS, rightCSS, CZ.leftDataSet.series[0].appearanceSettings.yMin, CZ.leftDataSet.series[0].appearanceSettings.yMax, {
                         labelCount: 4,
                         tickLength: 10,
                         majorTickThickness: 1,
                         stroke: 'black',
                         axisLocation: 'left',
-                        font: '16px Calibri'
+                        font: '16px Calibri',
+                        verticalPadding: padding
                     });
                     for(var i = 0; i < CZ.leftDataSet.series.length; i++) {
                         CZ.timeSeriesChart.addLegendRecord("left", CZ.leftDataSet.series[i].appearanceSettings.stroke, CZ.leftDataSet.series[i].appearanceSettings.name);
@@ -685,14 +690,16 @@ var CZ;
                     chartHeader += " (" + CZ.leftDataSet.name;
                 }
                 if(CZ.rightDataSet !== undefined) {
-                    CZ.timeSeriesChart.drawDataSet(CZ.rightDataSet, leftCSS, rightCSS, leftPlot, rightPlot);
-                    CZ.timeSeriesChart.drawAxis(rightCSS, CZ.rightDataSet.series[0].appearanceSettings.yMin, CZ.rightDataSet.series[0].appearanceSettings.yMax, {
+                    var padding = CZ.rightDataSet.getVerticalPadding() + 10;
+                    CZ.timeSeriesChart.drawDataSet(CZ.rightDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot);
+                    CZ.timeSeriesChart.drawAxis(rightCSS, leftCSS, CZ.rightDataSet.series[0].appearanceSettings.yMin, CZ.rightDataSet.series[0].appearanceSettings.yMax, {
                         labelCount: 4,
                         tickLength: 10,
                         majorTickThickness: 1,
                         stroke: 'black',
                         axisLocation: 'right',
-                        font: '16px Calibri'
+                        font: '16px Calibri',
+                        verticalPadding: padding
                     });
                     for(var i = 0; i < CZ.rightDataSet.series.length; i++) {
                         CZ.timeSeriesChart.addLegendRecord("right", CZ.rightDataSet.series[i].appearanceSettings.stroke, CZ.rightDataSet.series[i].appearanceSettings.name);
@@ -701,6 +708,9 @@ var CZ;
                     chartHeader += str + CZ.rightDataSet.name + ")";
                 } else {
                     chartHeader += ")";
+                }
+                if(CZ.rightDataSet !== undefined || CZ.leftDataSet !== undefined) {
+                    CZ.timeSeriesChart.drawVerticalGridLines(leftCSS, rightCSS, leftPlot, rightPlot);
                 }
                 $("#timeSeriesChartHeader").text(chartHeader);
             }

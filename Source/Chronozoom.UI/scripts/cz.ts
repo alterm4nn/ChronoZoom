@@ -707,7 +707,12 @@ module CZ {
             });
 
             $(window).bind('resize', function () {
+                timeSeriesChart.updateCanvasHeight();
                 CZ.Common.updateLayout();
+
+                //updating timeSeries chart
+                var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                updateTimeSeriesChart(vp);
             });
 
             var vp = CZ.Common.vc.virtualCanvas("getViewport");
@@ -786,8 +791,9 @@ module CZ {
                 var chartHeader = "TimeSeries Chart";
 
                 if (leftDataSet !== undefined) {
-                    timeSeriesChart.drawDataSet(leftDataSet, leftCSS, rightCSS, leftPlot, rightPlot);
-                    timeSeriesChart.drawAxis(leftCSS, leftDataSet.series[0].appearanceSettings.yMin, leftDataSet.series[0].appearanceSettings.yMax, { labelCount: 4, tickLength: 10, majorTickThickness: 1, stroke: 'black', axisLocation: 'left', font: '16px Calibri' });
+                    var padding = leftDataSet.getVerticalPadding() + 10;
+                    timeSeriesChart.drawDataSet(leftDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot);
+                    timeSeriesChart.drawAxis(leftCSS, rightCSS, leftDataSet.series[0].appearanceSettings.yMin, leftDataSet.series[0].appearanceSettings.yMax, { labelCount: 4, tickLength: 10, majorTickThickness: 1, stroke: 'black', axisLocation: 'left', font: '16px Calibri', verticalPadding: padding });
 
                     for (var i = 0; i < leftDataSet.series.length; i++) {
                         timeSeriesChart.addLegendRecord("left", leftDataSet.series[i].appearanceSettings.stroke, leftDataSet.series[i].appearanceSettings.name);
@@ -797,8 +803,9 @@ module CZ {
                 }
 
                 if (rightDataSet !== undefined) {
-                    timeSeriesChart.drawDataSet(rightDataSet, leftCSS, rightCSS, leftPlot, rightPlot);
-                    timeSeriesChart.drawAxis(rightCSS, rightDataSet.series[0].appearanceSettings.yMin, rightDataSet.series[0].appearanceSettings.yMax, { labelCount: 4, tickLength: 10, majorTickThickness: 1, stroke: 'black', axisLocation: 'right', font: '16px Calibri' });
+                    var padding = rightDataSet.getVerticalPadding() + 10;
+                    timeSeriesChart.drawDataSet(rightDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot);
+                    timeSeriesChart.drawAxis(rightCSS, leftCSS, rightDataSet.series[0].appearanceSettings.yMin, rightDataSet.series[0].appearanceSettings.yMax, { labelCount: 4, tickLength: 10, majorTickThickness: 1, stroke: 'black', axisLocation: 'right', font: '16px Calibri', verticalPadding: padding });
 
                     for (var i = 0; i < rightDataSet.series.length; i++) {
                         timeSeriesChart.addLegendRecord("right", rightDataSet.series[i].appearanceSettings.stroke, rightDataSet.series[i].appearanceSettings.name);
@@ -807,11 +814,38 @@ module CZ {
                     var str = chartHeader.indexOf("(") > 0 ? ", " : " (";
                     chartHeader += str + rightDataSet.name + ")";
                 } else {
-                    chartHeader += ")";
+                    chartHeader += ")"; 
+                }
+
+                if (rightDataSet !== undefined || leftDataSet !== undefined) {
+                    timeSeriesChart.drawVerticalGridLines(leftCSS, rightCSS, leftPlot, rightPlot);
                 }
 
                 $("#timeSeriesChartHeader").text(chartHeader);
             }
         }
+
+        //export function FitToTimeSeriesData(vp) {
+        //    if (rightDataSet === undefined && leftDataSet === undefined)
+        //        return;
+
+        //    var leftX = Number.MAX_VALUE, rightX = Number.MAX_VALUE;
+        //    if (rightDataSet != undefined) {
+        //        leftX = rightDataSet.time[0];
+        //        rightX = rightDataSet.time[rightDataSet.time.length - 1];
+        //    }
+
+        //    if (leftDataSet != undefined) {
+        //        if (leftDataSet.time[0] < leftX)
+        //            leftX = leftDataSet.time[0];
+        //        if (leftDataSet.time[leftDataSet.time.length - 1] > rightX)
+        //            rightX = leftDataSet.time[leftDataSet.time.length - 1];
+        //    }
+
+        //    if (leftX < CZ.Settings.maxPermitedTimeRange.left) leftX = CZ.Settings.maxPermitedTimeRange.left;
+        //    if (rightX > CZ.Settings.maxPermitedTimeRange.right) rightX = CZ.Settings.maxPermitedTimeRange.right;
+
+        //    CZ.Common.controller.moveToVisible(visible);
+        //}
     }
 }
