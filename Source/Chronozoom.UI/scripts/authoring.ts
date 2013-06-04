@@ -784,10 +784,15 @@ module CZ {
                     //Google PDF viewer
                     //Example: http://docs.google.com/viewer?url=http%3A%2F%2Fwww.selab.isti.cnr.it%2Fws-mate%2Fexample.pdf&embedded=true
                     var pdf = /\.(pdf)$/i;
-
+                    var docs = /\S+docs.google.com\S+$/i;
                     if (pdf.test(ci.uri)) {
                         ci.uri = "http://docs.google.com/viewer?url=" + encodeURI(ci.uri) + "&embedded=true";
-                    } else {
+                    }
+                    else if (docs.test(ci.uri))
+                    {
+                    }
+                    else
+                    {
                         alert("Sorry, only PDF extension is supported");
                         isValid = false;
                     }

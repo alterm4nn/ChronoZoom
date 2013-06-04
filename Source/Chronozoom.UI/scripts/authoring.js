@@ -499,8 +499,10 @@ var CZ;
                     }
                 } else if(ci.mediaType.toLowerCase() === "pdf") {
                     var pdf = /\.(pdf)$/i;
+                    var docs = /\S+docs.google.com\S+$/i;
                     if(pdf.test(ci.uri)) {
                         ci.uri = "http://docs.google.com/viewer?url=" + encodeURI(ci.uri) + "&embedded=true";
+                    } else if(docs.test(ci.uri)) {
                     } else {
                         alert("Sorry, only PDF extension is supported");
                         isValid = false;
