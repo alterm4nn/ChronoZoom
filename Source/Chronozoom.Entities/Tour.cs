@@ -36,6 +36,14 @@ namespace Chronozoom.Entities
         public string Name { get; set; }
 
         /// <summary>
+        /// The name of the tour.
+        /// </summary>
+        [DataMember(Name = "description")]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
+        public string Description { get; set; }
+
+        /// <summary>
         /// The unique ID of the tour.
         /// </summary>
         public int UniqueId { get; set; }

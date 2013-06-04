@@ -91,6 +91,10 @@
     <Compile Include="Migrations\201305282325585_TitleLength.Designer.cs">
       <DependentUpon>201305282325585_TitleLength.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201306040017265_ToursDescription.cs" />
+    <Compile Include="Migrations\201306040017265_ToursDescription.Designer.cs">
+      <DependentUpon>201306040017265_ToursDescription.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migration\Migrator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SearchResult.cs" />
@@ -126,6 +130,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201305282325585_TitleLength.resx">
       <DependentUpon>201305282325585_TitleLength.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201306040017265_ToursDescription.resx">
+      <DependentUpon>201306040017265_ToursDescription.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
