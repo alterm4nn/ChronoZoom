@@ -224,21 +224,62 @@ var CZ;
                 var name = this.tourTitleInput.val();
                 var descr = this.tourDescriptionInput.val();
                 var category = this.tour.category;
-                var n = this.tourStopsListBox.items.length;
-                var request = CZ.Service.putTour(new CZ.UI.Tour(this.tour.id, name, descr, category, n, this.stops));
-                request.done(function (q) {
-                    var tourBookmarks = new Array();
-                    for(var j = 0; j < n; j++) {
-                        var tourstopItem = _this.tourStopsListBox.items[j];
-                        var tourstop = tourstopItem.data;
-                        tourstop.bookmarkId = q.BookmarkId[j];
-                        var bookmark = FormEditTour.tourstopToBookmark(tourstop);
-                        tourBookmarks.push(bookmark);
+                var n = this.tour.bookmarks.length;
+                var m = this.stops.length;
+                var deletedStops = [];
+                for(var j = 0; j < n; j++) {
+                    var bookmark = this.tour.bookmarks[j];
+                    var found = false;
+                    for(var k = 0; k < m; k++) {
+                        var tourstop = this.stops[k];
+                        if(tourstop.bookmarkId === bookmark.id) {
+                            found = true;
+                            break;
+                        }
                     }
-                    var tour = new CZ.Tours.Tour(q.TourId, name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, "", CZ.Tours.tours.length);
-                    deferred.resolve(tour);
-                }).fail(function (q) {
+                    if(!found) {
+                        deletedStops.push(bookmark);
+                    }
+                }
+                var reqDel = CZ.Service.deleteBookmarks(this.tour.id, deletedStops);
+                reqDel.fail(function (q) {
                     deferred.reject(q);
+                });
+                reqDel.done(function (q) {
+                    var n = _this.stops.length;
+                    var addedStops = new Array();
+                    for(var j = 0; j < n; j++) {
+                        var tourstop = _this.stops[j];
+                        if(tourstop.bookmarkId == "00000000-0000-0000-0000-000000000000") {
+                            addedStops.push(tourstop);
+                        }
+                    }
+                    var reqAdd = CZ.Service.putBookmarks(new CZ.UI.Tour(_this.tour.id, name, descr, category, n, addedStops));
+                    reqAdd.fail(function (q) {
+                        deferred.reject(q);
+                    });
+                    reqAdd.done(function (q) {
+                        var m = addedStops.length;
+                        for(var j = 0; j < m; j++) {
+                            var tourstop = _this.stops[j];
+                            tourstop.bookmarkId = q.BookmarkId[j];
+                        }
+                        var request = CZ.Service.putTour(new CZ.UI.Tour(_this.tour.id, name, descr, category, n, _this.stops));
+                        request.done(function (q) {
+                            var n = _this.stops.length;
+                            var tourBookmarks = new Array();
+                            for(var j = 0; j < n; j++) {
+                                var tourstop = _this.stops[j];
+                                tourstop.bookmarkId = q.BookmarkId[j];
+                                var bookmark = FormEditTour.tourstopToBookmark(tourstop);
+                                tourBookmarks.push(bookmark);
+                            }
+                            var tour = new CZ.Tours.Tour(q.TourId, name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, "", CZ.Tours.tours.length);
+                            deferred.resolve(tour);
+                        }).fail(function (q) {
+                            deferred.reject(q);
+                        });
+                    });
                 });
                 return deferred.promise();
             };

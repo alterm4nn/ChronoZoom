@@ -325,6 +325,47 @@ var CZ;
             });
         }
         Service.deleteTour = deleteTour;
+        function deleteBookmarks(tourId, bookmarks) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("bookmark");
+            console.log("[DELETE] " + request.url);
+            var bids = new Array(bookmarks.length);
+            for(var i = 0, n = bookmarks.length; i < n; i++) {
+                bids[i] = {
+                    id: bookmarks[i].id
+                };
+            }
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify({
+                    id: tourId,
+                    bookmarks: bids
+                })
+            });
+        }
+        Service.deleteBookmarks = deleteBookmarks;
+        function putBookmarks(t) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("tour");
+            console.log("[PUT] " + request.url);
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(Map.tour(t))
+            });
+        }
+        Service.putBookmarks = putBookmarks;
         function getTours() {
             var request = new Service.Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);

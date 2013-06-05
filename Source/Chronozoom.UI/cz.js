@@ -2324,7 +2324,7 @@ var CZ;
                     vcitems.push(new ContentItem(vc, layerid, ci.id, xr, yc + rad * arrangeRight[(i - 1) % 3], lw, lh, ci));
                 } else if(i >= 7 && i <= 9) {
                     vcitems.push(new ContentItem(vc, layerid, ci.id, xc + rad * arrangeBottom[(i - 1) % 3], yb, lw, lh, ci));
-            }
+                }
             }
             return vcitems;
         }
@@ -2395,7 +2395,29 @@ var CZ;
                 };
                 this.itemRemoveHandler = function (item, idx) {
                 };
+                this.itemMoveHandler = function (item, idx1, idx2) {
+                };
+                var self = this;
                 if(listBoxInfo.sortableSettings) {
+                    var origStart = listBoxInfo.sortableSettings.start;
+                    var origStop = listBoxInfo.sortableSettings.stop;
+                    $.extend(listBoxInfo.sortableSettings, {
+                        start: function (event, ui) {
+                            ui.item.startPos = ui.item.index();
+                            if(origStart) {
+                                origStart(event, ui);
+                            }
+                        },
+                        stop: function (event, ui) {
+                            ui.item.stopPos = ui.item.index();
+                            var item = self.items.splice(ui.item.startPos, 1)[0];
+                            self.items.splice(ui.item.stopPos, 0, item);
+                            self.itemMoveHandler(ui.item, ui.item.startPos, ui.item.stopPos);
+                            if(origStop) {
+                                origStop(event, ui);
+                            }
+                        }
+                    });
                     this.container.sortable(listBoxInfo.sortableSettings);
                 }
             }
@@ -2435,6 +2457,9 @@ var CZ;
             };
             ListBoxBase.prototype.itemRemove = function (handler) {
                 this.itemRemoveHandler = handler;
+            };
+            ListBoxBase.prototype.itemMove = function (handler) {
+                this.itemMoveHandler = handler;
             };
             return ListBoxBase;
         })();
@@ -2756,21 +2781,62 @@ var CZ;
                 var name = this.tourTitleInput.val();
                 var descr = this.tourDescriptionInput.val();
                 var category = this.tour.category;
-                var n = this.tourStopsListBox.items.length;
-                var request = CZ.Service.putTour(new CZ.UI.Tour(this.tour.id, name, descr, category, n, this.stops));
-                request.done(function (q) {
-                    var tourBookmarks = new Array();
-                    for(var j = 0; j < n; j++) {
-                        var tourstopItem = _this.tourStopsListBox.items[j];
-                        var tourstop = tourstopItem.data;
-                        tourstop.bookmarkId = q.BookmarkId[j];
-                        var bookmark = FormEditTour.tourstopToBookmark(tourstop);
-                        tourBookmarks.push(bookmark);
+                var n = this.tour.bookmarks.length;
+                var m = this.stops.length;
+                var deletedStops = [];
+                for(var j = 0; j < n; j++) {
+                    var bookmark = this.tour.bookmarks[j];
+                    var found = false;
+                    for(var k = 0; k < m; k++) {
+                        var tourstop = this.stops[k];
+                        if(tourstop.bookmarkId === bookmark.id) {
+                            found = true;
+                            break;
+                        }
                     }
-                    var tour = new CZ.Tours.Tour(q.TourId, name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, "", CZ.Tours.tours.length);
-                    deferred.resolve(tour);
-                }).fail(function (q) {
+                    if(!found) {
+                        deletedStops.push(bookmark);
+                    }
+                }
+                var reqDel = CZ.Service.deleteBookmarks(this.tour.id, deletedStops);
+                reqDel.fail(function (q) {
                     deferred.reject(q);
+                });
+                reqDel.done(function (q) {
+                    var n = _this.stops.length;
+                    var addedStops = new Array();
+                    for(var j = 0; j < n; j++) {
+                        var tourstop = _this.stops[j];
+                        if(tourstop.bookmarkId == "00000000-0000-0000-0000-000000000000") {
+                            addedStops.push(tourstop);
+                        }
+                    }
+                    var reqAdd = CZ.Service.putBookmarks(new CZ.UI.Tour(_this.tour.id, name, descr, category, n, addedStops));
+                    reqAdd.fail(function (q) {
+                        deferred.reject(q);
+                    });
+                    reqAdd.done(function (q) {
+                        var m = addedStops.length;
+                        for(var j = 0; j < m; j++) {
+                            var tourstop = _this.stops[j];
+                            tourstop.bookmarkId = q.BookmarkId[j];
+                        }
+                        var request = CZ.Service.putTour(new CZ.UI.Tour(_this.tour.id, name, descr, category, n, _this.stops));
+                        request.done(function (q) {
+                            var n = _this.stops.length;
+                            var tourBookmarks = new Array();
+                            for(var j = 0; j < n; j++) {
+                                var tourstop = _this.stops[j];
+                                tourstop.bookmarkId = q.BookmarkId[j];
+                                var bookmark = FormEditTour.tourstopToBookmark(tourstop);
+                                tourBookmarks.push(bookmark);
+                            }
+                            var tour = new CZ.Tours.Tour(q.TourId, name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, "", CZ.Tours.tours.length);
+                            deferred.resolve(tour);
+                        }).fail(function (q) {
+                            deferred.reject(q);
+                        });
+                    });
                 });
                 return deferred.promise();
             };
@@ -3242,6 +3308,47 @@ var CZ;
             });
         }
         Service.deleteTour = deleteTour;
+        function deleteBookmarks(tourId, bookmarks) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("bookmark");
+            console.log("[DELETE] " + request.url);
+            var bids = new Array(bookmarks.length);
+            for(var i = 0, n = bookmarks.length; i < n; i++) {
+                bids[i] = {
+                    id: bookmarks[i].id
+                };
+            }
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify({
+                    id: tourId,
+                    bookmarks: bids
+                })
+            });
+        }
+        Service.deleteBookmarks = deleteBookmarks;
+        function putBookmarks(t) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("tour");
+            console.log("[PUT] " + request.url);
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(Map.tour(t))
+            });
+        }
+        Service.putBookmarks = putBookmarks;
         function getTours() {
             var request = new Service.Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
@@ -4049,129 +4156,6 @@ var CZ;
         Authoring.validateContentItems = validateContentItems;
     })(CZ.Authoring || (CZ.Authoring = {}));
     var Authoring = CZ.Authoring;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var ListBoxBase = (function () {
-            function ListBoxBase(container, listBoxInfo, listItemsInfo, getType) {
-                if (typeof getType === "undefined") { getType = function (context) {
-                    return "default";
-                }; }
-                if(!(container instanceof jQuery)) {
-                    throw "Container parameter is invalid! It should be jQuery instance.";
-                }
-                this.container = container;
-                this.listItemsInfo = listItemsInfo;
-                this.getType = getType;
-                this.items = [];
-                if(this.listItemsInfo.default) {
-                    this.listItemsInfo.default.ctor = this.listItemsInfo.default.ctor || ListItemBase;
-                }
-                for(var i = 0, context = listBoxInfo.context, len = context.length; i < len; ++i) {
-                    this.add(context[i]);
-                }
-                this.itemDblClickHandler = function (item, idx) {
-                };
-                this.itemRemoveHandler = function (item, idx) {
-                };
-                this.itemMoveHandler = function (item, idx1, idx2) {
-                };
-                var self = this;
-                if(listBoxInfo.sortableSettings) {
-                    var origStart = listBoxInfo.sortableSettings.start;
-                    var origStop = listBoxInfo.sortableSettings.stop;
-                    $.extend(listBoxInfo.sortableSettings, {
-                        start: function (event, ui) {
-                            ui.item.startPos = ui.item.index();
-                            if(origStart) {
-                                origStart(event, ui);
-                            }
-                        },
-                        stop: function (event, ui) {
-                            ui.item.stopPos = ui.item.index();
-                            var item = self.items.splice(ui.item.startPos, 1)[0];
-                            self.items.splice(ui.item.stopPos, 0, item);
-                            self.itemMoveHandler(ui.item, ui.item.startPos, ui.item.stopPos);
-                            if(origStop) {
-                                origStop(event, ui);
-                            }
-                        }
-                    });
-                    this.container.sortable(listBoxInfo.sortableSettings);
-                }
-            }
-            ListBoxBase.prototype.add = function (context) {
-                var type = this.getType(context);
-                var typeInfo = this.listItemsInfo[type];
-                var container = typeInfo.container.clone();
-                var uiMap = typeInfo.uiMap;
-                var ctor = typeInfo.ctor;
-                var item = new ctor(this, container, uiMap, context);
-                this.items.push(item);
-                return item;
-            };
-            ListBoxBase.prototype.remove = function (item) {
-                var i = this.items.indexOf(item);
-                if(i !== -1) {
-                    item.container.remove();
-                    this.items.splice(i, 1);
-                    this.itemRemoveHandler(item, i);
-                }
-            };
-            ListBoxBase.prototype.clear = function () {
-                for(var i = 0, len = this.items.length; i < len; ++i) {
-                    var item = this.items[i];
-                    item.container.remove();
-                }
-                this.items.length = 0;
-            };
-            ListBoxBase.prototype.selectItem = function (item) {
-                var i = this.items.indexOf(item);
-                if(i !== -1) {
-                    this.itemDblClickHandler(item, i);
-                }
-            };
-            ListBoxBase.prototype.itemDblClick = function (handler) {
-                this.itemDblClickHandler = handler;
-            };
-            ListBoxBase.prototype.itemRemove = function (handler) {
-                this.itemRemoveHandler = handler;
-            };
-            ListBoxBase.prototype.itemMove = function (handler) {
-                this.itemMoveHandler = handler;
-            };
-            return ListBoxBase;
-        })();
-        UI.ListBoxBase = ListBoxBase;        
-        var ListItemBase = (function () {
-            function ListItemBase(parent, container, uiMap, context) {
-                var _this = this;
-                if(!(container instanceof jQuery)) {
-                    throw "Container parameter is invalid! It should be jQuery instance.";
-                }
-                this.parent = parent;
-                this.container = container;
-                this.data = context;
-                this.container.dblclick(function (_) {
-                    return _this.parent.selectItem(_this);
-                });
-                this.closeButton = this.container.find(uiMap.closeButton);
-                if(this.closeButton.length) {
-                    this.closeButton.click(function (event) {
-                        return _this.close();
-                    });
-                }
-                this.parent.container.append(this.container);
-            }
-            ListItemBase.prototype.close = function () {
-                this.parent.remove(this);
-            };
-            return ListItemBase;
-        })();
-        UI.ListItemBase = ListItemBase;        
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
@@ -9034,18 +9018,18 @@ var CZ;
                 var mode = this.modeSelector.find(":selected").val();
                 if(this.coordinate === this.INFINITY_VALUE) {
                     if(InfinityConvertation) {
-                    this.regimeSelector.find(":selected").attr("selected", "false");
-                    this.modeSelector.find("option").each(function () {
-                        if($(this).val() === "infinite") {
-                            $(this).attr("selected", "selected");
-                            return;
-                        }
-                    });
-                    this.editModeInfinite();
+                        this.regimeSelector.find(":selected").attr("selected", "false");
+                        this.modeSelector.find("option").each(function () {
+                            if($(this).val() === "infinite") {
+                                $(this).attr("selected", "selected");
+                                return;
+                            }
+                        });
+                        this.editModeInfinite();
                     } else {
                         var localPresent = CZ.Dates.getPresent();
                         coordinate = CZ.Dates.getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
-                }
+                    }
                 }
                 switch(mode) {
                     case "year":
@@ -10736,17 +10720,17 @@ var CZ;
                                 alert("Provided username already exists.");
                                 return;
                             }
-                    CZ.Service.putProfile(_this.usernameInput.val(), _this.emailInput.val()).then(function (success) {
-                        if(_this.allowRedirect) {
-                            window.location.assign("\\" + success);
-                        } else {
-                            _this.close();
-                        }
-                    }, function (error) {
-                        alert("Unable to save changes. Please try again later.");
-                        console.log(error);
-                    });
-                });
+                            CZ.Service.putProfile(_this.usernameInput.val(), _this.emailInput.val()).then(function (success) {
+                                if(_this.allowRedirect) {
+                                    window.location.assign("\\" + success);
+                                } else {
+                                    _this.close();
+                                }
+                            }, function (error) {
+                                alert("Unable to save changes. Please try again later.");
+                                console.log(error);
+                            });
+                        });
                     });
                 });
                 this.logoutButton.click(function (event) {
@@ -10999,7 +10983,7 @@ var CZ;
             
         ];
         function InitializeToursUI(profile, forms) {
-            var allowEditing = true;
+            var allowEditing = IsFeatureEnabled("Authoring") && (profile && profile != "" && profile.DisplayName === CZ.Service.superCollectionName);
             var onToursInitialized = function () {
                 CZ.Tours.initializeToursUI();
                 $("#tours_index").click(function () {
@@ -11081,16 +11065,16 @@ var CZ;
                     var editForm = getFormById("#header-edit-form");
                     if(editForm === false) {
                         closeAllForms();
-                    var form = new CZ.UI.FormHeaderEdit(forms[0], {
-                        activationSource: $(this),
-                        navButton: ".cz-form-nav",
-                        closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        titleTextblock: ".cz-form-title",
-                        createTimeline: ".cz-form-create-timeline",
-                        createExhibit: ".cz-form-create-exhibit",
-                        createTour: ".cz-form-create-tour"
-                    });
-                    form.show();
+                        var form = new CZ.UI.FormHeaderEdit(forms[0], {
+                            activationSource: $(this),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            createTimeline: ".cz-form-create-timeline",
+                            createExhibit: ".cz-form-create-exhibit",
+                            createTour: ".cz-form-create-tour"
+                        });
+                        form.show();
                     } else {
                         if(editForm.isFormVisible) {
                             editForm.close();
@@ -11241,7 +11225,7 @@ var CZ;
                 $("#profile-panel").click(function () {
                     if(!profileForm.isFormVisible) {
                         closeAllForms();
-                    profileForm.show();
+                        profileForm.show();
                     } else {
                         profileForm.close();
                     }
@@ -11255,8 +11239,8 @@ var CZ;
                             $("#profile-panel input#username").focus();
                             if(!profileForm.isFormVisible) {
                                 closeAllForms();
-                            profileForm.show();
-                        } else {
+                                profileForm.show();
+                            } else {
                                 profileForm.close();
                             }
                         } else {
@@ -11270,7 +11254,7 @@ var CZ;
                 $("#login-panel").click(function () {
                     if(!loginForm.isFormVisible) {
                         closeAllForms();
-                    loginForm.show();
+                        loginForm.show();
                     } else {
                         loginForm.close();
                     }
