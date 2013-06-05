@@ -27,14 +27,18 @@ namespace Chronozoom.Entities
             }
 
             Trace.TraceInformation("Entering storage seed stage");
+
+            /* fixes specific to migration of the no-delete database */
             try
             {
+                context.Database.ExecuteSqlCommand("ALTER TABLE Tours DROP COLUMN Description");
                 context.Database.ExecuteSqlCommand("ALTER TABLE Timelines DROP CONSTRAINT DF__Timelines__ForkN__4BAC3F29");
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.StackTrace);
             }
+
             Migrator migrator = new Migrator(context);
             migrator.Migrate();
         }
