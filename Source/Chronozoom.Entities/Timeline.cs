@@ -27,11 +27,16 @@ namespace Chronozoom.Entities
         [Key]
         [DataMember(Name = "id")]
         public Guid Id { get; set; }
-        
+
         /// <summary>
         /// The depth of the timeline in the timeline tree
         /// </summary>
         public int Depth { get; set; }
+
+        /// <summary>
+        /// The number of content items contained in subtree under current timeline
+        /// </summary>
+        public int SubtreeSize { get; set; }
 
         /// <summary>
         /// The title of the timeline.
@@ -71,6 +76,21 @@ namespace Chronozoom.Entities
         /// </summary>
         [DataMember]
         public decimal? Height { get; set; }
+
+        /// <summary>
+        /// The number of timelines within subtree of this timeline
+        /// </summary>
+        public Guid FirstNodeInSubtree { get; set; }
+
+        /// <summary>
+        /// Reference to predecessor (when traversed in post-order) 
+        /// </summary>
+        public Guid Predecessor { get; set; }
+
+        /// <summary>
+        /// Reference to sucessor (when traversed in post-order) 
+        /// </summary>
+        public Guid Successor { get; set; }
 
         /// <summary>
         /// The collection of child timelines belonging to the timeline.
