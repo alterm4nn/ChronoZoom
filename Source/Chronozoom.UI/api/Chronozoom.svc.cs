@@ -1277,6 +1277,7 @@ namespace Chronozoom.UI
                 newTour.Collection = collection;
 
                 _storage.Tours.Add(newTour);
+                _storage.SaveChanges();
                 returnValue.TourId = newTourGuid;
 
                 // Populate the bookmarks.
