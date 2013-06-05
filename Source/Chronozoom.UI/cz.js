@@ -10603,7 +10603,6 @@ var CZ;
             "#timeSeriesContainer": "/ui/timeseries-graph-form.html",
             "#timeSeriesDataForm": "/ui/timeseries-data-form.html"
         };
-        var FeatureActivation;
         (function (FeatureActivation) {
             FeatureActivation._map = [];
             FeatureActivation._map[0] = "Enabled";
@@ -10614,7 +10613,8 @@ var CZ;
             FeatureActivation.RootCollection = 2;
             FeatureActivation._map[3] = "NotRootCollection";
             FeatureActivation.NotRootCollection = 3;
-        })(FeatureActivation || (FeatureActivation = {}));
+        })(HomePageViewModel.FeatureActivation || (HomePageViewModel.FeatureActivation = {}));
+        var FeatureActivation = HomePageViewModel.FeatureActivation;
         var _featureMap = [
             {
                 Name: "Login",
@@ -10654,7 +10654,7 @@ var CZ;
             
         ];
         function InitializeToursUI(profile, forms) {
-            var allowEditing = IsFeatureEnabled("Authoring") && (profile && profile != "" && profile.DisplayName === CZ.Service.superCollectionName);
+            var allowEditing = IsFeatureEnabled(_featureMap, "Authoring") && (profile && profile != "" && profile.DisplayName === CZ.Service.superCollectionName);
             var onToursInitialized = function () {
                 CZ.Tours.initializeToursUI();
                 $("#tours_index").click(function () {
@@ -10883,7 +10883,7 @@ var CZ;
                     profilePanel: "#profile-panel",
                     loginPanelLogin: "#profile-panel.auth-panel-login",
                     context: "",
-                    allowRedirect: IsFeatureEnabled("Authoring")
+                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring")
                 });
                 var loginForm = new CZ.UI.FormLogin(forms[6], {
                     activationSource: $("#login-panel"),
@@ -10901,7 +10901,7 @@ var CZ;
                         profileForm.close();
                     }
                 });
-                if(IsFeatureEnabled("Login")) {
+                if(IsFeatureEnabled(_featureMap, "Login")) {
                     CZ.Service.getProfile().done(function (data) {
                         if(data == "") {
                             $("#login-panel").show();
@@ -11198,12 +11198,13 @@ var CZ;
                 $("#bibliographyBack").css("display", "block");
             }
         });
-        function IsFeatureEnabled(featureName) {
-            var feature = $.grep(_featureMap, function (e) {
+        function IsFeatureEnabled(featureMap, featureName) {
+            var feature = $.grep(featureMap, function (e) {
                 return e.Name === featureName;
             });
             return feature[0].IsEnabled;
         }
+        HomePageViewModel.IsFeatureEnabled = IsFeatureEnabled;
         function closeAllForms() {
             $('.cz-major-form').each(function (i, f) {
                 var form = $(f).data('form');
