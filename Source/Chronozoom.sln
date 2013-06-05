@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OuterCurve.SignalRTraceList
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chronozoom.Entities.Test", "Chronozoom.Entities.Test\Chronozoom.Entities.Test.csproj", "{0A78CBDB-9511-454C-B697-D919748D306F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chronozoom.UI.UnitTests", "Chronozoom.UI.Unittests\Chronozoom.UI.UnitTests.csproj", "{369C9F1A-4CC1-42B0-9581-D6EE736EB19C}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Chronozoom.vsmdi
@@ -48,6 +50,10 @@ Global
 		{0A78CBDB-9511-454C-B697-D919748D306F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A78CBDB-9511-454C-B697-D919748D306F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A78CBDB-9511-454C-B697-D919748D306F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{369C9F1A-4CC1-42B0-9581-D6EE736EB19C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{369C9F1A-4CC1-42B0-9581-D6EE736EB19C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{369C9F1A-4CC1-42B0-9581-D6EE736EB19C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{369C9F1A-4CC1-42B0-9581-D6EE736EB19C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
