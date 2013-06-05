@@ -154,7 +154,7 @@ module CZ {
 
                 timeSeriesChart = new CZ.UI.LineChart(forms[11]);
 
-                $(' ').click(function () {
+                $('#timeSeries_button').click(function () {
                     var tsForm = getFormById('#timeSeriesDataForm');
                     if (tsForm === false) {
                         closeAllForms();

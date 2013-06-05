@@ -101,7 +101,7 @@ module CZ {
                         Service.getProfile(this.usernameInput.val()).done((getUser) => {
                             if (curUser.DisplayName == null && typeof getUser.DisplayName != "undefined") {
                                 //such username exists
-                                alert("Provided username already exists.");
+                                alert("Sorry, this username is already in use. Please try again.");
                                 return;
                             }
                             CZ.Service.putProfile(this.usernameInput.val(), this.emailInput.val()).then(

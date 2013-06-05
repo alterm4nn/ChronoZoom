@@ -10388,7 +10388,7 @@ var CZ;
                     CZ.Service.getProfile().done(function (curUser) {
                         CZ.Service.getProfile(_this.usernameInput.val()).done(function (getUser) {
                             if(curUser.DisplayName == null && typeof getUser.DisplayName != "undefined") {
-                                alert("Provided username already exists.");
+                                alert("Sorry, this username is already in use. Please try again.");
                                 return;
                             }
                             CZ.Service.putProfile(_this.usernameInput.val(), _this.emailInput.val()).then(function (success) {
@@ -10709,7 +10709,7 @@ var CZ;
                 var forms = arguments;
                 CZ.timeSeriesChart = new CZ.UI.LineChart(forms[11]);
                 $('#timeSeries_button').click(function () {
-                    var tsForm = getFormById('#timeSeries_button');
+                    var tsForm = getFormById('#timeSeriesDataForm');
                     if(tsForm === false) {
                         closeAllForms();
                         var timSeriesDataFormDiv = forms[12];

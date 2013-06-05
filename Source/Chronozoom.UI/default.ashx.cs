@@ -52,6 +52,10 @@ namespace Chronozoom.UI
             [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
             public string Description { get; set; }
 
+            [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+            public string IECompatibile { get; set; }
+
+
             public List<string> Images { get; private set; }
         }
 
@@ -63,10 +67,12 @@ namespace Chronozoom.UI
             context.Response.ContentType = "text/html";
 
             PageInformation pageInformation;
-            if (PageIsDynamic(HttpContext.Current.Request.Url, out pageInformation)) {
+            if (PageIsDynamic(HttpContext.Current.Request.Url, out pageInformation))
+            {
                 context.Response.Write(GenerateDefaultPage(pageInformation));
             }
-            else {
+            else
+            {
                 context.Response.Write(_mainPage.Value);
             }
         }
@@ -156,7 +162,7 @@ namespace Chronozoom.UI
         {
             XElement scriptNode = pageRoot.XPathSelectElement("/xhtml:html/xhtml:head/xhtml:script[@id='constants']", xmlNamespaceManager);
             scriptNode.Value = "var constants = { " +
-                "analyticsId: \"" + pageInformation.AnalyticsServiceId + "\", " + 
+                "analyticsId: \"" + pageInformation.AnalyticsServiceId + "\", " +
                 "exceptionsId: \"" + pageInformation.ExceptionsServiceId + "\", " +
                 "environment: \"" + CurrentEnvironment.ToString() + "\" " +
                 "};";
@@ -172,8 +178,13 @@ namespace Chronozoom.UI
                 XElement metaDescription = pageRoot.XPathSelectElement("/xhtml:html/xhtml:head/xhtml:meta[@name='Description']", xmlNamespaceManager);
                 XName contentAttribute = "content";
 
-                metaDescription.SetAttributeValue(contentAttribute,  pageInformation.Description);
+                metaDescription.SetAttributeValue(contentAttribute, pageInformation.Description);
             }
+
+            XElement metaIECompatibile = pageRoot.XPathSelectElement("/xhtml:html/xhtml:head/xhtml:meta[@http-equiv='X-UA-Compatible']", xmlNamespaceManager);
+            XName contentIEAttribute = "content";
+
+            metaIECompatibile.SetAttributeValue(contentIEAttribute, "IE=edge");
 
             XElement lastMetaTag = pageRoot.XPathSelectElement("/xhtml:html/xhtml:head/xhtml:meta[@name='viewport']", xmlNamespaceManager);
             int imageCount = 0;
