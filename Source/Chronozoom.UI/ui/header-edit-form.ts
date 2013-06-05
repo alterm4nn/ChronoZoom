@@ -53,7 +53,6 @@ module CZ {
                     direction: "right",
                     duration: 500
                 });
-
                 this.activationSource.addClass("active");
             }
 
@@ -63,9 +62,9 @@ module CZ {
                     direction: "right",
                     duration: 500
                 });
-
                 this.activationSource.removeClass("active");
             }
+
         }
     }
 }

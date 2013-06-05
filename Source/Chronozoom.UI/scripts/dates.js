@@ -29,17 +29,12 @@ var CZ;
             30, 
             31
         ];
-        function getCoordinateFromDMY(year, month, day) {
+        function getCoordinateFromYMD(year, month, day) {
             var sign = (year != 0) ? year / Math.abs(year) : 1;
             var i = 0;
-            var coordinate = 0;
-            for(i = 0; i < Math.abs(year); i++) {
-                coordinate += sign;
-                if(isLeapYear(i * sign)) {
-                    coordinate += sign / 365;
-                }
-            }
+            var coordinate = year;
             var days = day;
+            var daysPerYear = isLeapYear(year) ? 366 : 365;
             for(i = 0; i < month; i++) {
                 days += Dates.daysInMonth[i];
                 if((i === 1) && (isLeapYear(year))) {
@@ -47,44 +42,39 @@ var CZ;
                 }
             }
             if((month > 1) && (isLeapYear(year))) {
-                coordinate += sign * days / 365;
+                coordinate += sign * days / daysPerYear;
             } else {
-                coordinate += (sign >= 0) ? sign * days / 365 : sign * (1 - days / 365);
+                coordinate += (sign >= 0) ? sign * days / daysPerYear : sign * (1 - days / daysPerYear);
             }
             if(year < 0) {
                 coordinate += 1;
             }
+            coordinate -= 1 / daysPerYear;
             return coordinate;
         }
-        Dates.getCoordinateFromDMY = getCoordinateFromDMY;
+        Dates.getCoordinateFromYMD = getCoordinateFromYMD;
         function getDMYFromCoordinate(coord) {
-            var sign = coord / Math.abs(coord);
+            var sign = (coord === 0) ? 1 : coord / Math.abs(coord);
             var day = 0, month = 0, year = 0;
             var idxYear, countLeapYears = 0;
-            for(idxYear = 0; idxYear < Math.abs(coord) - 1; idxYear++) {
-                year += sign;
-                if(isLeapYear(sign * idxYear)) {
-                    countLeapYears++;
-                }
-            }
+            year = (coord >= 0) ? Math.floor(coord) : Math.floor(coord) + 1;
+            var daysPerYear = isLeapYear(year) ? 366 : 365;
             var day, month;
             var countDays;
-            countDays = Math.abs(coord) - Math.abs(year);
+            countDays = Math.abs(coord) - Math.abs(year) + sign * 1. / daysPerYear;
             if(sign < 0) {
                 countDays = 1 - countDays;
             }
-            var daysPerYear = 365.0;
-            var countDaysWithoutLeapDays = countDays - countLeapYears / daysPerYear;
             var idxMonth = 0;
-            while(countDaysWithoutLeapDays > Dates.daysInMonth[idxMonth] / daysPerYear) {
-                countDaysWithoutLeapDays -= Dates.daysInMonth[idxMonth] / daysPerYear;
+            while(countDays > Dates.daysInMonth[idxMonth] / daysPerYear) {
+                countDays -= Dates.daysInMonth[idxMonth] / daysPerYear;
                 if(isLeapYear(year) && (idxMonth === 1)) {
-                    countDaysWithoutLeapDays -= 1 / daysPerYear;
+                    countDays -= 1 / daysPerYear;
                 }
                 idxMonth++;
             }
             month = idxMonth;
-            day = countDaysWithoutLeapDays * daysPerYear;
+            day = countDays * daysPerYear;
             while(Math.round(day) <= 0) {
                 month--;
                 if(month === -1) {
@@ -108,7 +98,7 @@ var CZ;
         Dates.getDMYFromCoordinate = getDMYFromCoordinate;
         function getCoordinateFromDecimalYear(decimalYear) {
             var localPresent = getPresent();
-            var presentDate = getCoordinateFromDMY(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+            var presentDate = getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
             return decimalYear === 9999 ? presentDate : decimalYear;
         }
         Dates.getCoordinateFromDecimalYear = getCoordinateFromDecimalYear;
@@ -174,6 +164,20 @@ var CZ;
             }
         }
         Dates.isLeapYear = isLeapYear;
+        function numberofLeap(year) {
+            var startLeap = 1582;
+            if(year < startLeap) {
+                return 0;
+            }
+            var years1 = Math.floor(year / 4) - Math.floor(startLeap / 4);
+            years1 -= Math.floor(year / 100) - Math.floor(startLeap / 100);
+            years1 += Math.floor(year / 400) - Math.floor(startLeap / 400);
+            if(isLeapYear(year)) {
+                years1--;
+            }
+            return years1;
+        }
+        Dates.numberofLeap = numberofLeap;
     })(CZ.Dates || (CZ.Dates = {}));
     var Dates = CZ.Dates;
 })(CZ || (CZ = {}));

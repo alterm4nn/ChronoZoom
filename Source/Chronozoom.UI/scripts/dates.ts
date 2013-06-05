@@ -32,20 +32,14 @@ module CZ {
             31];
 
         // by give date gives coordinate in virtual coordinates
-        export function getCoordinateFromDMY(year, month, day) {
+        export function getCoordinateFromYMD(year, month, day) {
             //get sign of coordinate
-            var sign = (year != 0) ?  year / Math.abs(year) : 1;
+            var sign = (year != 0) ? year / Math.abs(year) : 1;
             var i = 0;
-            var coordinate = 0;
-            //coordinate value given by years
-            for (i = 0; i < Math.abs(year); i++) {
-                coordinate += sign;
-                if (isLeapYear(i * sign)) {
-                     coordinate += sign / 365;
-                }
-            }
+            var coordinate = year;
             var days = day;
-            
+            var daysPerYear = isLeapYear(year) ? 366 : 365;
+
             // calculate count of passed days 
             for (i = 0; i < month; i++) {
                 days += daysInMonth[i];
@@ -54,50 +48,44 @@ module CZ {
                     days++;
                 }
             }
+
             if ((month > 1) && (isLeapYear(year))) {
-                coordinate += sign * days / 365;
+                coordinate += sign * days / daysPerYear;
             } else {
-                coordinate += (sign >= 0) ? sign * days / 365 : sign * (1 - days / 365);
+                coordinate += (sign >= 0) ? sign * days / daysPerYear : sign * (1 - days / daysPerYear);
             }
 
             //zero-year problem solvation
             if (year < 0) coordinate += 1;
+            coordinate -= 1/daysPerYear;
 
             return coordinate;
         }
 
         export function getDMYFromCoordinate(coord) {
-            var sign = coord / Math.abs(coord);
+            var sign = (coord === 0) ? 1 : coord / Math.abs(coord);
             var day = 0, month = 0, year = 0;
             var idxYear, countLeapYears = 0;
             // Define year
-            for (idxYear = 0; idxYear < Math.abs(coord) - 1; idxYear++) {
-                year += sign;
-                if (isLeapYear(sign * idxYear)) {
-                    countLeapYears++;
-                }
-            }
+            year = (coord >= 0) ? Math.floor(coord) : Math.floor(coord) + 1;
+            var daysPerYear = isLeapYear(year) ? 366 : 365;
 
             var day, month;
             var countDays;
             //months and days are remaining
-            countDays = Math.abs(coord) - Math.abs(year);
+            countDays = Math.abs(coord) - Math.abs(year) + sign * 1./daysPerYear;
             //for negative years day and month are converted
             if (sign < 0) countDays = 1 - countDays;
 
-            var daysPerYear = 365.0;
-            var countDaysWithoutLeapDays = countDays - countLeapYears / daysPerYear;
-
             var idxMonth = 0;
             //count month
-            while (countDaysWithoutLeapDays > daysInMonth[idxMonth] / daysPerYear) {
-                countDaysWithoutLeapDays -= daysInMonth[idxMonth] / daysPerYear;
-                if (isLeapYear(year) && (idxMonth === 1)) countDaysWithoutLeapDays -= 1 / daysPerYear;
+            while (countDays > daysInMonth[idxMonth] / daysPerYear) {
+                countDays -= daysInMonth[idxMonth] / daysPerYear;
+                if (isLeapYear(year) && (idxMonth === 1)) countDays -= 1 / daysPerYear;
                 idxMonth++;
             }
             month = idxMonth;
-            day = countDaysWithoutLeapDays * daysPerYear;
-   
+            day = countDays * daysPerYear;
             //remaining value need to be represanted as date
             while (Math.round(day) <= 0) {
                 month--;
@@ -108,7 +96,6 @@ module CZ {
                 day = daysInMonth[month] + Math.round(day);
                 if (isLeapYear(year) && (month === 1)) day++;
             }
-
             //zero-year problem solvation
             if (coord < 0) year--;
 
@@ -118,14 +105,14 @@ module CZ {
                 day: Math.round(day)
             };
 
-         }
+        }
 
         // convert date to virtual coordinate
         // 9999 -> present day
         export function getCoordinateFromDecimalYear(decimalYear) {
             // get virtual coordinate of present day
             var localPresent = getPresent();
-            var presentDate = getCoordinateFromDMY(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+            var presentDate = getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
 
             return decimalYear === 9999 ? presentDate : decimalYear;
         }
@@ -179,7 +166,7 @@ module CZ {
 
             return coordinate;
         }
-
+         
         var present = undefined;
         export function getPresent() {
             if (!present) {
@@ -192,9 +179,19 @@ module CZ {
             return present;
         }
 
-       export function isLeapYear(year) {
+        export function isLeapYear(year) {
             if (year >= 1582 && (year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0))) return true;
             else return false;
-        }
-    }
+       }
+
+       export function numberofLeap(year) {
+           var startLeap = 1582;
+           if (year < startLeap) return 0;
+           var years1 = Math.floor(year / 4) - Math.floor(startLeap / 4);
+           years1 -= Math.floor(year / 100) - Math.floor(startLeap / 100);
+           years1 += Math.floor(year / 400) - Math.floor(startLeap / 400);
+           if (isLeapYear(year)) years1--;
+           return years1;
+       }
+ }
 }

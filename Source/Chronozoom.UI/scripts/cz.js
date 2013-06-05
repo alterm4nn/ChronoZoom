@@ -1,5 +1,8 @@
 var CZ;
 (function (CZ) {
+    CZ.timeSeriesChart;
+    CZ.leftDataSet;
+    CZ.rightDataSet;
     (function (HomePageViewModel) {
         var _uiMap = {
             "#header-edit-form": "/ui/header-edit-form.html",
@@ -12,7 +15,9 @@ var CZ;
             "#auth-edit-tours-form": "/ui/auth-edit-tour-form.html",
             "$('<div><!--Tours Authoring--></div>')": "/ui/tourstop-listbox.html",
             "#toursList": "/ui/tourslist-form.html",
-            "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html"
+            "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html",
+            "#timeSeriesContainer": "/ui/timeseries-graph-form.html",
+            "#timeSeriesDataForm": "/ui/timeseries-data-form.html"
         };
         var FeatureActivation;
         (function (FeatureActivation) {
@@ -56,6 +61,11 @@ var CZ;
                 Name: "Regimes",
                 Activation: FeatureActivation.RootCollection,
                 JQueryReference: ".regime-link"
+            }, 
+            {
+                Name: "TimeSeries",
+                Activation: FeatureActivation.NotRootCollection,
+                JQueryReference: "#timeSeriesContainer"
             }, 
             
         ];
@@ -113,24 +123,53 @@ var CZ;
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
+                CZ.timeSeriesChart = new CZ.UI.LineChart(forms[11]);
+                $('#timeSeries_button').click(function () {
+                    var tsForm = getFormById('#timeSeries_button');
+                    if(tsForm === false) {
+                        closeAllForms();
+                        var timSeriesDataFormDiv = forms[12];
+                        var timSeriesDataForm = new CZ.UI.TimeSeriesDataForm(timSeriesDataFormDiv, {
+                            activationSource: $("#timeSeries_button"),
+                            closeButton: ".cz-form-close-btn > .cz-form-btn"
+                        });
+                        timSeriesDataForm.show();
+                    } else {
+                        if(tsForm.isFormVisible) {
+                            tsForm.close();
+                        } else {
+                            closeAllForms();
+                            tsForm.show();
+                        }
+                    }
+                });
                 CZ.Service.getProfile().done(function (profile) {
                     InitializeToursUI(profile, forms);
                 }).fail(function (err) {
                     InitializeToursUI(null, forms);
                 });
                 $(".header-icon.edit-icon").click(function () {
-                    $(".header-icon.active").removeClass("active");
-                    $(this).addClass("active");
-                    var form = new CZ.UI.FormHeaderEdit(forms[0], {
-                        activationSource: $(this),
-                        navButton: ".cz-form-nav",
-                        closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        titleTextblock: ".cz-form-title",
-                        createTimeline: ".cz-form-create-timeline",
-                        createExhibit: ".cz-form-create-exhibit",
-                        createTour: ".cz-form-create-tour"
-                    });
-                    form.show();
+                    var editForm = getFormById("#header-edit-form");
+                    if(editForm === false) {
+                        closeAllForms();
+                        var form = new CZ.UI.FormHeaderEdit(forms[0], {
+                            activationSource: $(this),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            createTimeline: ".cz-form-create-timeline",
+                            createExhibit: ".cz-form-create-exhibit",
+                            createTour: ".cz-form-create-tour"
+                        });
+                        form.show();
+                    } else {
+                        if(editForm.isFormVisible) {
+                            editForm.close();
+                        } else {
+                            closeAllForms();
+                            editForm.show();
+                        }
+                    }
                 });
                 CZ.Authoring.initialize(CZ.Common.vc, {
                     showEditTourForm: function (tour) {
@@ -162,6 +201,7 @@ var CZ;
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
+                            errorMessage: "#error-edit-timeline",
                             context: timeline
                         });
                         form.show();
@@ -177,6 +217,7 @@ var CZ;
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
+                            errorMessage: "#error-edit-timeline",
                             context: timeline
                         });
                         form.show();
@@ -244,7 +285,7 @@ var CZ;
                     CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
                 }
                 var profileForm = new CZ.UI.FormEditProfile(forms[5], {
-                    activationSource: $(".header-icon.profile-icon"),
+                    activationSource: $("#login-panel"),
                     navButton: ".cz-form-nav",
                     closeButton: ".cz-form-close-btn > .cz-form-btn",
                     titleTextblock: ".cz-form-title",
@@ -256,12 +297,25 @@ var CZ;
                     agreeInput: ".cz-form-agree",
                     loginPanel: "#login-panel",
                     profilePanel: "#profile-panel",
-                    loginPanelLogin: "#profile-panel span.auth-panel-login",
+                    loginPanelLogin: "#profile-panel.auth-panel-login",
                     context: "",
                     allowRedirect: IsFeatureEnabled("Authoring")
                 });
-                $("#edit_profile_button").click(function () {
-                    profileForm.show();
+                var loginForm = new CZ.UI.FormLogin(forms[6], {
+                    activationSource: $("#login-panel"),
+                    navButton: ".cz-form-nav",
+                    closeButton: ".cz-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-form-title",
+                    titleInput: ".cz-form-item-title",
+                    context: ""
+                });
+                $("#profile-panel").click(function () {
+                    if(!profileForm.isFormVisible) {
+                        closeAllForms();
+                        profileForm.show();
+                    } else {
+                        profileForm.close();
+                    }
                 });
                 if(IsFeatureEnabled("Login")) {
                     CZ.Service.getProfile().done(function (data) {
@@ -270,25 +324,27 @@ var CZ;
                         } else if(data != "" && data.DisplayName == null) {
                             $("#profile-panel").show();
                             $("#profile-panel input#username").focus();
-                            profileForm.show();
+                            if(!profileForm.isFormVisible) {
+                                closeAllForms();
+                                profileForm.show();
+                            } else {
+                                profileForm.close();
+                            }
                         } else {
                             $("#profile-panel").show();
-                            $("#profile-panel span.auth-panel-login").html(data.DisplayName);
+                            $(".auth-panel-login").html(data.DisplayName);
                         }
                     }).fail(function (error) {
                         $("#login-panel").show();
                     });
                 }
-                var loginForm = new CZ.UI.FormLogin(forms[6], {
-                    activationSource: $(".header-icon.profile-icon"),
-                    navButton: ".cz-form-nav",
-                    closeButton: ".cz-form-close-btn > .cz-form-btn",
-                    titleTextblock: ".cz-form-title",
-                    titleInput: ".cz-form-item-title",
-                    context: ""
-                });
-                $("#login-button").click(function () {
-                    loginForm.show();
+                $("#login-panel").click(function () {
+                    if(!loginForm.isFormVisible) {
+                        closeAllForms();
+                        loginForm.show();
+                    } else {
+                        loginForm.close();
+                    }
                 });
             });
             CZ.Service.getServiceInformation().then(function (response) {
@@ -302,6 +358,11 @@ var CZ;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
+            if(rootCollection) {
+                $('#timeSeries_button').hide();
+            } else {
+                $('#timeSeries_button').show();
+            }
             $('#search_button').mouseup(CZ.Search.onSearchClicked);
             $('#human_rect').click(function () {
                 CZ.Search.navigateToBookmark(CZ.Common.humanityVisible);
@@ -446,6 +507,7 @@ var CZ;
                     var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
                     CZ.Common.updateMarker();
                 }
+                updateTimeSeriesChart(vp);
             }, function () {
                 return CZ.Common.vc.virtualCanvas("getViewport");
             }, jointGesturesStream);
@@ -558,6 +620,94 @@ var CZ;
             });
             return feature[0].IsEnabled;
         }
+        function closeAllForms() {
+            $('.cz-major-form').each(function (i, f) {
+                var form = $(f).data('form');
+                if(form) {
+                    form.close();
+                }
+            });
+        }
+        function getFormById(name) {
+            var form = $(name).data("form");
+            if(form) {
+                return form;
+            } else {
+                return false;
+            }
+        }
+        function showTimeSeriesChart() {
+            $('#timeSeriesContainer').height('30%');
+            $('#timeSeriesContainer').show();
+            $('#vc').height('70%');
+            CZ.timeSeriesChart.updateCanvasHeight();
+            CZ.Common.updateLayout();
+        }
+        HomePageViewModel.showTimeSeriesChart = showTimeSeriesChart;
+        function hideTimeSeriesChart() {
+            CZ.leftDataSet = undefined;
+            CZ.rightDataSet = undefined;
+            $('#timeSeriesContainer').height(0);
+            $('#timeSeriesContainer').hide();
+            $('#vc').height('100%');
+            CZ.Common.updateLayout();
+        }
+        HomePageViewModel.hideTimeSeriesChart = hideTimeSeriesChart;
+        function updateTimeSeriesChart(vp) {
+            var left = vp.pointScreenToVirtual(0, 0).x;
+            if(left < CZ.Settings.maxPermitedTimeRange.left) {
+                left = CZ.Settings.maxPermitedTimeRange.left;
+            }
+            var right = vp.pointScreenToVirtual(vp.width, vp.height).x;
+            if(right > CZ.Settings.maxPermitedTimeRange.right) {
+                right = CZ.Settings.maxPermitedTimeRange.right;
+            }
+            if(CZ.timeSeriesChart !== undefined) {
+                var leftCSS = vp.pointVirtualToScreen(left, 0).x;
+                var rightCSS = vp.pointVirtualToScreen(right, 0).x;
+                var leftPlot = CZ.Dates.getDMYFromCoordinate(left).year;
+                var rightPlot = CZ.Dates.getDMYFromCoordinate(right).year;
+                CZ.timeSeriesChart.clear(leftCSS, rightCSS);
+                CZ.timeSeriesChart.clearLegend("left");
+                CZ.timeSeriesChart.clearLegend("right");
+                var chartHeader = "TimeSeries Chart";
+                if(CZ.leftDataSet !== undefined) {
+                    CZ.timeSeriesChart.drawDataSet(CZ.leftDataSet, leftCSS, rightCSS, leftPlot, rightPlot);
+                    CZ.timeSeriesChart.drawAxis(leftCSS, CZ.leftDataSet.series[0].appearanceSettings.yMin, CZ.leftDataSet.series[0].appearanceSettings.yMax, {
+                        labelCount: 4,
+                        tickLength: 10,
+                        majorTickThickness: 1,
+                        stroke: 'black',
+                        axisLocation: 'left',
+                        font: '16px Calibri'
+                    });
+                    for(var i = 0; i < CZ.leftDataSet.series.length; i++) {
+                        CZ.timeSeriesChart.addLegendRecord("left", CZ.leftDataSet.series[i].appearanceSettings.stroke, CZ.leftDataSet.series[i].appearanceSettings.name);
+                    }
+                    chartHeader += " (" + CZ.leftDataSet.name;
+                }
+                if(CZ.rightDataSet !== undefined) {
+                    CZ.timeSeriesChart.drawDataSet(CZ.rightDataSet, leftCSS, rightCSS, leftPlot, rightPlot);
+                    CZ.timeSeriesChart.drawAxis(rightCSS, CZ.rightDataSet.series[0].appearanceSettings.yMin, CZ.rightDataSet.series[0].appearanceSettings.yMax, {
+                        labelCount: 4,
+                        tickLength: 10,
+                        majorTickThickness: 1,
+                        stroke: 'black',
+                        axisLocation: 'right',
+                        font: '16px Calibri'
+                    });
+                    for(var i = 0; i < CZ.rightDataSet.series.length; i++) {
+                        CZ.timeSeriesChart.addLegendRecord("right", CZ.rightDataSet.series[i].appearanceSettings.stroke, CZ.rightDataSet.series[i].appearanceSettings.name);
+                    }
+                    var str = chartHeader.indexOf("(") > 0 ? ", " : " (";
+                    chartHeader += str + CZ.rightDataSet.name + ")";
+                } else {
+                    chartHeader += ")";
+                }
+                $("#timeSeriesChartHeader").text(chartHeader);
+            }
+        }
+        HomePageViewModel.updateTimeSeriesChart = updateTimeSeriesChart;
     })(CZ.HomePageViewModel || (CZ.HomePageViewModel = {}));
     var HomePageViewModel = CZ.HomePageViewModel;
 })(CZ || (CZ = {}));

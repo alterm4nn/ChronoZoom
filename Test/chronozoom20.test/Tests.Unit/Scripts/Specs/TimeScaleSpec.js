@@ -249,13 +249,13 @@ describe("CZ.CalendarTickSource part", function () { //this is the class for cre
         var firstYear;
         beforeEach(function () {
             currentDate = new Date();
-            firstYear = CZ.Dates.getCoordinateFromDMY(0, 0, 1);
+            firstYear = CZ.Dates.getCoordinateFromYMD(0, 0, 1);
         });
 
         it("range.min and range.max to input values if l<r", function () {
             var l = -20;
             var r = -10;
-            var firstYear = CZ.Dates.getCoordinateFromDMY(0, 0, 1);
+            var firstYear = CZ.Dates.getCoordinateFromYMD(0, 0, 1);
             calendarTickSrc.getRegime(l, r);
             expect(calendarTickSrc.range.min).toEqual(l -= firstYear);
             expect(calendarTickSrc.range.max).toEqual(r -= firstYear);

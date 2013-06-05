@@ -181,12 +181,14 @@ var CZ;
                 if(!(container instanceof jQuery && container.is("div"))) {
                     throw "Container parameter is invalid! It should be jQuery instance of DIV.";
                 }
+                this.isFormVisible = false;
                 this.container = container;
                 this.prevForm = formInfo.prevForm;
                 this.activationSource = formInfo.activationSource;
                 this.navButton = this.container.find(formInfo.navButton);
                 this.closeButton = this.container.find(formInfo.closeButton);
                 this.titleTextblock = this.container.find(formInfo.titleTextblock);
+                this.container.data("form", this);
                 if(this.prevForm) {
                     this.navButton.show();
                 } else {
@@ -206,6 +208,7 @@ var CZ;
                 for (var _i = 0; _i < (arguments.length - 0); _i++) {
                     args[_i] = arguments[_i + 0];
                 }
+                this.isFormVisible = true;
                 this.container.show.apply(this.container, args);
             };
             FormBase.prototype.close = function () {
@@ -213,6 +216,8 @@ var CZ;
                 for (var _i = 0; _i < (arguments.length - 0); _i++) {
                     args[_i] = arguments[_i + 0];
                 }
+                this.isFormVisible = false;
+                this.container.data("form", undefined);
                 this.container.hide.apply(this.container, args);
             };
             FormBase.prototype.back = function () {
@@ -2290,8 +2295,6 @@ var CZ;
             if(n <= 0) {
                 return null;
             }
-            n--;
-            var vcitems = [];
             var _rad = 450.0 / 2.0;
             var k = 1.0 / _rad;
             var _wc = 260.0 * k;
@@ -2304,33 +2307,24 @@ var CZ;
             var lh = _lh * rad;
             var _ytc = -_hc / 2 - 9.0 * k - _lh / 2;
             var _ybc = -_ytc;
-            for(var i = 0; i < contentItems.length; i++) {
-                contentItems[i].index = i;
-            }
-            vcitems.push(new ContentItem(vc, layerid, contentItems[0].id, -_wc / 2 * rad + xc, -_hc / 2 * rad + yc, _wc * rad, _hc * rad, contentItems[0]));
-            var m1 = Math.floor(n / 3);
-            var m2 = n % 3;
-            var nL = m1 + (m2 > 0 ? 1 : 0);
-            var nR = m1 + (m2 > 1 ? 1 : 0);
-            var nB = m1 + (m2 > 2 ? 1 : 0);
-            var i = 1;
-            var arrange = arrangeContentItemsInField(nL, _lh);
+            var arrangeLeft = arrangeContentItemsInField(3, _lh);
+            var arrangeRight = arrangeContentItemsInField(3, _lh);
+            var arrangeBottom = arrangeContentItemsInField(3, _lw);
             var xl = xc + rad * (_xlc - _lw / 2);
-            for(var j = 0; j < nL; j++ , i++) {
-                var ci = contentItems[i];
-                vcitems.push(new ContentItem(vc, layerid, ci.id, xl, yc + rad * arrange[j], lw, lh, ci));
-            }
-            arrange = arrangeContentItemsInField(nB, _lw);
-            var yb = yc + rad * (_ybc - _lh / 2);
-            for(var j = 0; j < nB; j++ , i++) {
-                var ci = contentItems[i];
-                vcitems.push(new ContentItem(vc, layerid, ci.id, xc + rad * arrange[j], yb, lw, lh, ci));
-            }
-            arrange = arrangeContentItemsInField(nR, _lh);
             var xr = xc + rad * (_xrc - _lw / 2);
-            for(var j = nR; --j >= 0; i++) {
+            var yb = yc + rad * (_ybc - _lh / 2);
+            var vcitems = [];
+            for(var i = 0, len = Math.min(10, n); i < len; i++) {
                 var ci = contentItems[i];
-                vcitems.push(new ContentItem(vc, layerid, ci.id, xr, yc + rad * arrange[j], lw, lh, ci));
+                if(i === 0) {
+                    vcitems.push(new ContentItem(vc, layerid, ci.id, -_wc / 2 * rad + xc, -_hc / 2 * rad + yc, _wc * rad, _hc * rad, ci));
+                } else if(i >= 1 && i <= 3) {
+                    vcitems.push(new ContentItem(vc, layerid, ci.id, xl, yc + rad * arrangeLeft[(i - 1) % 3], lw, lh, ci));
+                } else if(i >= 4 && i <= 6) {
+                    vcitems.push(new ContentItem(vc, layerid, ci.id, xr, yc + rad * arrangeRight[(i - 1) % 3], lw, lh, ci));
+                } else if(i >= 7 && i <= 9) {
+                    vcitems.push(new ContentItem(vc, layerid, ci.id, xc + rad * arrangeBottom[(i - 1) % 3], yb, lw, lh, ci));
+            }
             }
             return vcitems;
         }
@@ -2982,7 +2976,8 @@ var CZ;
                     uri: ci.contentItem ? ci.contentItem.uri : ci.uri,
                     mediaType: ci.contentItem ? ci.contentItem.mediaType : ci.mediaType,
                     attribution: ci.contentItem ? ci.contentItem.attribution : ci.attribution,
-                    mediaSource: ci.contentItem ? ci.contentItem.mediaSource : ci.mediaSource
+                    mediaSource: ci.contentItem ? ci.contentItem.mediaSource : ci.mediaSource,
+                    order: ci.contentItem ? ci.contentItem.order : ci.order
                 };
             }
             Map.contentItem = contentItem;
@@ -3333,9 +3328,13 @@ var CZ;
             });
         }
         Service.deleteProfile = deleteProfile;
-        function getProfile() {
+        function getProfile(displayName) {
+            if (typeof displayName === "undefined") { displayName = ""; }
             var request = new Service.Request(_serviceUrl);
             request.addToPath("user");
+            if(displayName != "") {
+                request.addParameter("name", displayName);
+            }
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -3378,17 +3377,12 @@ var CZ;
             30, 
             31
         ];
-        function getCoordinateFromDMY(year, month, day) {
+        function getCoordinateFromYMD(year, month, day) {
             var sign = (year != 0) ? year / Math.abs(year) : 1;
             var i = 0;
-            var coordinate = 0;
-            for(i = 0; i < Math.abs(year); i++) {
-                coordinate += sign;
-                if(isLeapYear(i * sign)) {
-                    coordinate += sign / 365;
-                }
-            }
+            var coordinate = year;
             var days = day;
+            var daysPerYear = isLeapYear(year) ? 366 : 365;
             for(i = 0; i < month; i++) {
                 days += Dates.daysInMonth[i];
                 if((i === 1) && (isLeapYear(year))) {
@@ -3396,44 +3390,39 @@ var CZ;
                 }
             }
             if((month > 1) && (isLeapYear(year))) {
-                coordinate += sign * days / 365;
+                coordinate += sign * days / daysPerYear;
             } else {
-                coordinate += (sign >= 0) ? sign * days / 365 : sign * (1 - days / 365);
+                coordinate += (sign >= 0) ? sign * days / daysPerYear : sign * (1 - days / daysPerYear);
             }
             if(year < 0) {
                 coordinate += 1;
             }
+            coordinate -= 1 / daysPerYear;
             return coordinate;
         }
-        Dates.getCoordinateFromDMY = getCoordinateFromDMY;
+        Dates.getCoordinateFromYMD = getCoordinateFromYMD;
         function getDMYFromCoordinate(coord) {
-            var sign = coord / Math.abs(coord);
+            var sign = (coord === 0) ? 1 : coord / Math.abs(coord);
             var day = 0, month = 0, year = 0;
             var idxYear, countLeapYears = 0;
-            for(idxYear = 0; idxYear < Math.abs(coord) - 1; idxYear++) {
-                year += sign;
-                if(isLeapYear(sign * idxYear)) {
-                    countLeapYears++;
-                }
-            }
+            year = (coord >= 0) ? Math.floor(coord) : Math.floor(coord) + 1;
+            var daysPerYear = isLeapYear(year) ? 366 : 365;
             var day, month;
             var countDays;
-            countDays = Math.abs(coord) - Math.abs(year);
+            countDays = Math.abs(coord) - Math.abs(year) + sign * 1. / daysPerYear;
             if(sign < 0) {
                 countDays = 1 - countDays;
             }
-            var daysPerYear = 365.0;
-            var countDaysWithoutLeapDays = countDays - countLeapYears / daysPerYear;
             var idxMonth = 0;
-            while(countDaysWithoutLeapDays > Dates.daysInMonth[idxMonth] / daysPerYear) {
-                countDaysWithoutLeapDays -= Dates.daysInMonth[idxMonth] / daysPerYear;
+            while(countDays > Dates.daysInMonth[idxMonth] / daysPerYear) {
+                countDays -= Dates.daysInMonth[idxMonth] / daysPerYear;
                 if(isLeapYear(year) && (idxMonth === 1)) {
-                    countDaysWithoutLeapDays -= 1 / daysPerYear;
+                    countDays -= 1 / daysPerYear;
                 }
                 idxMonth++;
             }
             month = idxMonth;
-            day = countDaysWithoutLeapDays * daysPerYear;
+            day = countDays * daysPerYear;
             while(Math.round(day) <= 0) {
                 month--;
                 if(month === -1) {
@@ -3457,7 +3446,7 @@ var CZ;
         Dates.getDMYFromCoordinate = getDMYFromCoordinate;
         function getCoordinateFromDecimalYear(decimalYear) {
             var localPresent = getPresent();
-            var presentDate = getCoordinateFromDMY(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+            var presentDate = getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
             return decimalYear === 9999 ? presentDate : decimalYear;
         }
         Dates.getCoordinateFromDecimalYear = getCoordinateFromDecimalYear;
@@ -3523,6 +3512,20 @@ var CZ;
             }
         }
         Dates.isLeapYear = isLeapYear;
+        function numberofLeap(year) {
+            var startLeap = 1582;
+            if(year < startLeap) {
+                return 0;
+            }
+            var years1 = Math.floor(year / 4) - Math.floor(startLeap / 4);
+            years1 -= Math.floor(year / 100) - Math.floor(startLeap / 100);
+            years1 += Math.floor(year / 400) - Math.floor(startLeap / 400);
+            if(isLeapYear(year)) {
+                years1--;
+            }
+            return years1;
+        }
+        Dates.numberofLeap = numberofLeap;
     })(CZ.Dates || (CZ.Dates = {}));
     var Dates = CZ.Dates;
 })(CZ || (CZ = {}));
@@ -3579,9 +3582,11 @@ var CZ;
         }
         function isIncluded(tp, obj) {
             switch(obj.type) {
+                case "infodot":
+                    return (tp.x <= obj.infodotDescription.date && tp.y <= obj.y && tp.x + tp.width >= obj.infodotDescription.date && tp.y + tp.height >= obj.y + obj.height);
+                    break;
                 case "timeline":
                 case "rectangle":
-                case "infodot":
                 case "circle":
                     return (tp.x <= obj.x && tp.y <= obj.y && tp.x + tp.width >= obj.x + obj.width && tp.y + tp.height >= obj.y + obj.height);
                 default:
@@ -3620,14 +3625,9 @@ var CZ;
             if(!isIncluded(tp, ec)) {
                 return false;
             }
-            for(i = 0 , len = tp.children.length; i < len; ++i) {
-                selfIntersection = editmode ? (tp.children[i] === Authoring.selectedExhibit) : (tp.children[i] === ec);
-                if(!selfIntersection && isIntersecting(ec, tp.children[i])) {
-                    return false;
-                }
-            }
             return true;
         }
+        Authoring.checkExhibitIntersections = checkExhibitIntersections;
         function updateNewRectangle() {
             _rectCur.x = Math.min(_dragStart.x, _dragCur.x);
             _rectCur.y = Math.min(_dragStart.y, _dragCur.y);
@@ -3973,21 +3973,21 @@ var CZ;
         }
         Authoring.removeContentItem = removeContentItem;
         function validateTimelineData(start, end, title) {
-            var isValid = CZ.Authoring.validateNumber(start) && CZ.Authoring.validateNumber(end);
-            isValid = isValid && CZ.Authoring.isNotEmpty(title) && CZ.Authoring.isNotEmpty(start) && CZ.Authoring.isNotEmpty(end);
+            var isValid = (start !== false) && (end !== false);
+            isValid = isValid && CZ.Authoring.isNotEmpty(title);
             isValid = isValid && CZ.Authoring.isIntervalPositive(start, end);
             return isValid;
         }
         Authoring.validateTimelineData = validateTimelineData;
         function validateExhibitData(date, title, contentItems) {
-            var isValid = CZ.Authoring.validateNumber(date);
+            var isValid = date !== false;
             isValid = isValid && CZ.Authoring.isNotEmpty(title);
             isValid = isValid && CZ.Authoring.validateContentItems(contentItems);
             return isValid;
         }
         Authoring.validateExhibitData = validateExhibitData;
         function validateNumber(number) {
-            return !isNaN(Number(number) && parseFloat(number)) && isNotEmpty(number);
+            return !isNaN(Number(number) && parseFloat(number)) && isNotEmpty(number) && (number !== false);
         }
         Authoring.validateNumber = validateNumber;
         function isNotEmpty(obj) {
@@ -4030,8 +4030,10 @@ var CZ;
                     }
                 } else if(ci.mediaType.toLowerCase() === "pdf") {
                     var pdf = /\.(pdf)$/i;
+                    var docs = /\S+docs.google.com\S+$/i;
                     if(pdf.test(ci.uri)) {
                         ci.uri = "http://docs.google.com/viewer?url=" + encodeURI(ci.uri) + "&embedded=true";
+                    } else if(docs.test(ci.uri)) {
                     } else {
                         alert("Sorry, only PDF extension is supported");
                         isValid = false;
@@ -4047,6 +4049,129 @@ var CZ;
         Authoring.validateContentItems = validateContentItems;
     })(CZ.Authoring || (CZ.Authoring = {}));
     var Authoring = CZ.Authoring;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var ListBoxBase = (function () {
+            function ListBoxBase(container, listBoxInfo, listItemsInfo, getType) {
+                if (typeof getType === "undefined") { getType = function (context) {
+                    return "default";
+                }; }
+                if(!(container instanceof jQuery)) {
+                    throw "Container parameter is invalid! It should be jQuery instance.";
+                }
+                this.container = container;
+                this.listItemsInfo = listItemsInfo;
+                this.getType = getType;
+                this.items = [];
+                if(this.listItemsInfo.default) {
+                    this.listItemsInfo.default.ctor = this.listItemsInfo.default.ctor || ListItemBase;
+                }
+                for(var i = 0, context = listBoxInfo.context, len = context.length; i < len; ++i) {
+                    this.add(context[i]);
+                }
+                this.itemDblClickHandler = function (item, idx) {
+                };
+                this.itemRemoveHandler = function (item, idx) {
+                };
+                this.itemMoveHandler = function (item, idx1, idx2) {
+                };
+                var self = this;
+                if(listBoxInfo.sortableSettings) {
+                    var origStart = listBoxInfo.sortableSettings.start;
+                    var origStop = listBoxInfo.sortableSettings.stop;
+                    $.extend(listBoxInfo.sortableSettings, {
+                        start: function (event, ui) {
+                            ui.item.startPos = ui.item.index();
+                            if(origStart) {
+                                origStart(event, ui);
+                            }
+                        },
+                        stop: function (event, ui) {
+                            ui.item.stopPos = ui.item.index();
+                            var item = self.items.splice(ui.item.startPos, 1)[0];
+                            self.items.splice(ui.item.stopPos, 0, item);
+                            self.itemMoveHandler(ui.item, ui.item.startPos, ui.item.stopPos);
+                            if(origStop) {
+                                origStop(event, ui);
+                            }
+                        }
+                    });
+                    this.container.sortable(listBoxInfo.sortableSettings);
+                }
+            }
+            ListBoxBase.prototype.add = function (context) {
+                var type = this.getType(context);
+                var typeInfo = this.listItemsInfo[type];
+                var container = typeInfo.container.clone();
+                var uiMap = typeInfo.uiMap;
+                var ctor = typeInfo.ctor;
+                var item = new ctor(this, container, uiMap, context);
+                this.items.push(item);
+                return item;
+            };
+            ListBoxBase.prototype.remove = function (item) {
+                var i = this.items.indexOf(item);
+                if(i !== -1) {
+                    item.container.remove();
+                    this.items.splice(i, 1);
+                    this.itemRemoveHandler(item, i);
+                }
+            };
+            ListBoxBase.prototype.clear = function () {
+                for(var i = 0, len = this.items.length; i < len; ++i) {
+                    var item = this.items[i];
+                    item.container.remove();
+                }
+                this.items.length = 0;
+            };
+            ListBoxBase.prototype.selectItem = function (item) {
+                var i = this.items.indexOf(item);
+                if(i !== -1) {
+                    this.itemDblClickHandler(item, i);
+                }
+            };
+            ListBoxBase.prototype.itemDblClick = function (handler) {
+                this.itemDblClickHandler = handler;
+            };
+            ListBoxBase.prototype.itemRemove = function (handler) {
+                this.itemRemoveHandler = handler;
+            };
+            ListBoxBase.prototype.itemMove = function (handler) {
+                this.itemMoveHandler = handler;
+            };
+            return ListBoxBase;
+        })();
+        UI.ListBoxBase = ListBoxBase;        
+        var ListItemBase = (function () {
+            function ListItemBase(parent, container, uiMap, context) {
+                var _this = this;
+                if(!(container instanceof jQuery)) {
+                    throw "Container parameter is invalid! It should be jQuery instance.";
+                }
+                this.parent = parent;
+                this.container = container;
+                this.data = context;
+                this.container.dblclick(function (_) {
+                    return _this.parent.selectItem(_this);
+                });
+                this.closeButton = this.container.find(uiMap.closeButton);
+                if(this.closeButton.length) {
+                    this.closeButton.click(function (event) {
+                        return _this.close();
+                    });
+                }
+                this.parent.container.append(this.container);
+            }
+            ListItemBase.prototype.close = function () {
+                this.parent.remove(this);
+            };
+            return ListItemBase;
+        })();
+        UI.ListItemBase = ListItemBase;        
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
@@ -6651,10 +6776,6 @@ var CZ;
                         var newlyEstimatedViewport = calculateTargetViewport(latestViewport, gesture, self.estimatedViewport);
                         var vbox = CZ.Common.viewportToViewBox(newlyEstimatedViewport);
                         var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
-                        if(!CZ.Common.vc.virtualCanvas("inBuffer", wnd, newlyEstimatedViewport.visible.scale)) {
-                            var lca = CZ.Common.vc.virtualCanvas("findLca", wnd);
-                            self.getMissingData(vbox, lca);
-                        }
                         if(!self.estimatedViewport) {
                             self.activeAnimation = new CZ.ViewportAnimation.PanZoomAnimation(latestViewport);
                             self.saveScreenParameters(latestViewport);
@@ -6742,10 +6863,6 @@ var CZ;
                 var targetViewport = new CZ.Viewport.Viewport2d(currentViewport.aspectRatio, currentViewport.width, currentViewport.height, visible);
                 var vbox = CZ.Common.viewportToViewBox(targetViewport);
                 var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
-                if(!CZ.Common.vc.virtualCanvas("inBuffer", wnd, targetViewport.visible.scale)) {
-                    var lca = CZ.Common.vc.virtualCanvas("findLca", wnd);
-                    self.getMissingData(vbox, lca);
-                }
                 if(noAnimation) {
                     self.stopAnimation();
                     self.setVisible(visible);
@@ -7365,7 +7482,7 @@ var CZ;
             var firstYear;
             if(_range.min >= -10000) {
                 beta = Math.log(_range.max - _range.min) * log10;
-                firstYear = CZ.Dates.getCoordinateFromDMY(0, 0, 1);
+                firstYear = CZ.Dates.getCoordinateFromYMD(0, 0, 1);
                 if(beta >= 0) {
                     x1 += k * firstYear;
                 }
@@ -7783,7 +7900,7 @@ var CZ;
                 month: localPresent.getUTCMonth(),
                 day: localPresent.getUTCDate()
             };
-            this.firstYear = CZ.Dates.getCoordinateFromDMY(0, 0, 1);
+            this.firstYear = CZ.Dates.getCoordinateFromYMD(0, 0, 1);
             this.range.max -= this.firstYear;
             this.range.min -= this.firstYear;
             this.startDate = this.present;
@@ -7814,7 +7931,7 @@ var CZ;
                 count++;
             }
             for(var i = 0; i < count + 1; i++) {
-                var tick_position = CZ.Dates.getCoordinateFromDMY(x0 + i * dx, 0, 1);
+                var tick_position = CZ.Dates.getCoordinateFromYMD(x0 + i * dx, 0, 1);
                 if(tick_position < 1 && dx > 1) {
                     tick_position += 1;
                 }
@@ -8017,7 +8134,7 @@ var CZ;
                 month: localPresent.getUTCMonth(),
                 day: localPresent.getUTCDate()
             };
-            this.firstYear = CZ.Dates.getCoordinateFromDMY(0, 0, 1);
+            this.firstYear = CZ.Dates.getCoordinateFromYMD(0, 0, 1);
             this.startDate = CZ.Dates.getDMYFromCoordinate(this.range.min);
             this.endDate = CZ.Dates.getDMYFromCoordinate(this.range.max);
             this.delta = 1;
@@ -8087,7 +8204,7 @@ var CZ;
                     year++;
                 }
                 if((this.regime == "Quarters_Month") || (this.regime == "Month_Weeks")) {
-                    var tick = CZ.Dates.getCoordinateFromDMY(year, month, 1);
+                    var tick = CZ.Dates.getCoordinateFromYMD(year, month, 1);
                     if(tick >= this.range.min && tick <= this.range.max) {
                         if(tempDays != 1) {
                             if((month % 3 == 0) || (this.regime == "Month_Weeks")) {
@@ -8108,7 +8225,7 @@ var CZ;
                     tempDays = 1;
                     for(var k = 1; k <= countDays; k += date_step) {
                         day = k;
-                        tick = CZ.Dates.getCoordinateFromDMY(year, month, day);
+                        tick = CZ.Dates.getCoordinateFromYMD(year, month, day);
                         if(tick >= this.range.min && tick <= this.range.max) {
                             if(this.regime == "Weeks_Days") {
                                 if((k == 3) || (k == 10) || (k == 17) || (k == 24) || (k == 28)) {
@@ -8162,12 +8279,12 @@ var CZ;
                 return null;
             }
             date.day -= step;
-            tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
+            tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
             if(this.regime != "Month_Weeks") {
                 while(tick > this.range.min) {
                     minors.push(tick);
                     date.day -= step;
-                    tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
                 }
             } else {
                 var j = CZ.Dates.daysInMonth[date.month];
@@ -8176,7 +8293,7 @@ var CZ;
                         minors.push(tick);
                     }
                     date.day -= step;
-                    tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
                     j--;
                 }
             }
@@ -8186,7 +8303,7 @@ var CZ;
                 var j_step = 1;
                 for(var j = 1; j <= n; j += j_step) {
                     date.day += step;
-                    tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
                     if(this.regime != "Month_Weeks") {
                         if(minors.length == 0 || k * (ticks[i + 1].position - tick) > CZ.Settings.minSmallTickSpace) {
                             minors.push(tick);
@@ -8203,12 +8320,12 @@ var CZ;
             var tick = ticks[ticks.length - 1].position;
             var date = CZ.Dates.getDMYFromCoordinate(tick);
             date.day += step;
-            tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
+            tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
             if(this.regime != "Month_Weeks") {
                 while(tick < this.range.max) {
                     minors.push(tick);
                     date.day += step;
-                    tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
                 }
             } else {
                 var j = 0;
@@ -8217,7 +8334,7 @@ var CZ;
                         minors.push(tick);
                     }
                     date.day += step;
-                    tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
                     j++;
                 }
             }
@@ -8260,9 +8377,9 @@ var CZ;
             if(left_year_val <= 0) {
                 left_year_val++;
             }
-            var right_val = CZ.Dates.getCoordinateFromDMY(right_year_val, right_month_val, right_date_val);
-            var left_val = CZ.Dates.getCoordinateFromDMY(left_year_val, left_month_val, left_date_val);
-            var old_right_val = CZ.Dates.getCoordinateFromDMY(old_right_year_val, old_right_month_val, old_right_date_val);
+            var right_val = CZ.Dates.getCoordinateFromYMD(right_year_val, right_month_val, right_date_val);
+            var left_val = CZ.Dates.getCoordinateFromYMD(left_year_val, left_month_val, left_date_val);
+            var old_right_val = CZ.Dates.getCoordinateFromYMD(old_right_year_val, old_right_month_val, old_right_date_val);
             if(range.min < this.range.min) {
                 range.min = this.range.min;
             }
@@ -8299,9 +8416,9 @@ var CZ;
             if(left_year_val <= 0) {
                 left_year_val++;
             }
-            var right_val = CZ.Dates.getCoordinateFromDMY(right_year_val, right_month_val, right_date_val);
-            var left_val = CZ.Dates.getCoordinateFromDMY(left_year_val, left_month_val, left_date_val);
-            var old_left_val = CZ.Dates.getCoordinateFromDMY(old_left_year_val, old_left_month_val, old_left_date_val);
+            var right_val = CZ.Dates.getCoordinateFromYMD(right_year_val, right_month_val, right_date_val);
+            var left_val = CZ.Dates.getCoordinateFromYMD(left_year_val, left_month_val, left_date_val);
+            var old_left_val = CZ.Dates.getCoordinateFromYMD(old_left_year_val, old_left_month_val, old_left_date_val);
             if(range.min < this.range.min) {
                 range.min = this.range.min;
             }
@@ -8878,7 +8995,7 @@ var CZ;
                     switch(mode) {
                         case "year":
                             _this.editModeYear();
-                            _this.setDate(_this.coordinate);
+                            _this.setDate(_this.coordinate, false);
                             break;
                         case "date":
                             _this.editModeDate();
@@ -8897,7 +9014,7 @@ var CZ;
                 this.datePicker.append(this.dateContainer);
                 this.datePicker.append(this.errorMsg);
                 this.editModeYear();
-                this.setDate(this.coordinate);
+                this.setDate(this.coordinate, true);
             };
             DatePicker.prototype.remove = function () {
                 this.datePicker.empty();
@@ -8907,7 +9024,8 @@ var CZ;
                 var optionIntinite = $("<option value='infinite'>Infinite</option>");
                 this.modeSelector.append(optionIntinite);
             };
-            DatePicker.prototype.setDate = function (coordinate) {
+            DatePicker.prototype.setDate = function (coordinate, InfinityConvertation) {
+                if (typeof InfinityConvertation === "undefined") { InfinityConvertation = false; }
                 if(!this.validateNumber(coordinate)) {
                     return false;
                 }
@@ -8915,6 +9033,7 @@ var CZ;
                 this.coordinate = coordinate;
                 var mode = this.modeSelector.find(":selected").val();
                 if(this.coordinate === this.INFINITY_VALUE) {
+                    if(InfinityConvertation) {
                     this.regimeSelector.find(":selected").attr("selected", "false");
                     this.modeSelector.find("option").each(function () {
                         if($(this).val() === "infinite") {
@@ -8923,6 +9042,10 @@ var CZ;
                         }
                     });
                     this.editModeInfinite();
+                    } else {
+                        var localPresent = CZ.Dates.getPresent();
+                        coordinate = CZ.Dates.getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+                }
                 }
                 switch(mode) {
                     case "year":
@@ -9050,7 +9173,7 @@ var CZ;
                 var month = this.monthSelector.find(":selected").val();
                 month = CZ.Dates.months.indexOf(month);
                 var day = parseInt(this.daySelector.find(":selected").val());
-                return CZ.Dates.getCoordinateFromDMY(year, month, day);
+                return CZ.Dates.getCoordinateFromYMD(year, month, day);
             };
             DatePicker.prototype.validateNumber = function (year) {
                 return !isNaN(Number(year)) && isFinite(Number(year)) && !isNaN(parseFloat(year));
@@ -9128,8 +9251,274 @@ var CZ;
             });
         }
         Data.getTimelines = getTimelines;
+        var DataSet = (function () {
+            function DataSet() { }
+            return DataSet;
+        })();
+        Data.DataSet = DataSet;        
+        var Series = (function () {
+            function Series() {
+                this.values = new Array();
+            }
+            return Series;
+        })();
+        Data.Series = Series;        
+        function generateSampleData() {
+            var rolandData;
+            $.ajax({
+                cache: false,
+                type: "GET",
+                async: false,
+                dataType: "text",
+                url: '/dumps/beta-timeseries.csv',
+                success: function (result) {
+                    rolandData = result;
+                },
+                error: function (xhr) {
+                    alert("Error fetching timeSeries Data: " + xhr.responseText);
+                }
+            });
+            return csvToDataSet(rolandData, ",", "sampleData");
+        }
+        Data.generateSampleData = generateSampleData;
+        function csvToDataSet(csvText, delimiter, name) {
+            var dataText = csvText;
+            var csvArr = dataText.csvToArray({
+                trim: true,
+                fSep: delimiter
+            });
+            var dataLength = csvArr.length - 1;
+            var seriesLength = csvArr[0].length - 1;
+            var result = new DataSet();
+            result.name = name;
+            result.time = new Array();
+            result.series = new Array();
+            for(var i = 1; i <= seriesLength; i++) {
+                var seria = new Series();
+                seria.values = new Array();
+                seria.appearanceSettings = {
+                    thickness: 1,
+                    stroke: 'blue',
+                    name: csvArr[0][i]
+                };
+                seria.appearanceSettings.yMin = parseFloat(csvArr[1][i]);
+                seria.appearanceSettings.yMax = parseFloat(csvArr[1][i]);
+                result.series.push(seria);
+            }
+            for(var i = 0; i < dataLength; i++) {
+                result.time.push(csvArr[i + 1][0]);
+                for(var j = 1; j <= seriesLength; j++) {
+                    var value = parseFloat(csvArr[i + 1][j]);
+                    var seria = result.series[j - 1];
+                    if(seria.appearanceSettings.yMin > value) {
+                        seria.appearanceSettings.yMin = value;
+                    }
+                    if(seria.appearanceSettings.yMax < value) {
+                        seria.appearanceSettings.yMax = value;
+                    }
+                    seria.values.push(value);
+                }
+            }
+            return result;
+        }
+        Data.csvToDataSet = csvToDataSet;
     })(CZ.Data || (CZ.Data = {}));
     var Data = CZ.Data;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var LineChart = (function () {
+            function LineChart(container) {
+                this.container = container;
+                this.canvas = document.createElement("canvas");
+                $(this.canvas).prependTo($("#timeSeries"));
+                this.canvas.width = container.width();
+                this.canvas.height = container.height();
+                this.context = this.canvas.getContext("2d");
+                $("#closeTimeChartBtn").click(function () {
+                    CZ.HomePageViewModel.hideTimeSeriesChart();
+                });
+            }
+            LineChart.prototype.calculateTicks = function (ymin, ymax, labelCount) {
+                var delta = (ymax - ymin) / labelCount;
+                var h = Math.round(Math.log(delta) / Math.LN10);
+                var h10 = Math.pow(10, h);
+                var k = delta / h10;
+                if(k < 1.5) {
+                    k = 1;
+                } else if(k < 3.5) {
+                    k = 2;
+                } else {
+                    k = 5;
+                }
+                var imin = Math.ceil(ymin / (k * h10));
+                var imax = Math.floor(ymax / (k * h10));
+                var actualLabelCount = imax - imin + 1;
+                if(actualLabelCount < labelCount) {
+                    while(true) {
+                        var k1 = k;
+                        var h1 = h;
+                        if(k1 == 5) {
+                            k1 = 2;
+                        } else if(k1 == 2) {
+                            k1 = 1;
+                        } else {
+                            h1--;
+                            k1 = 5;
+                        }
+                        var imin1 = Math.ceil(ymin / (k1 * Math.pow(10, h1)));
+                        var imax1 = Math.floor(ymax / (k1 * Math.pow(10, h1)));
+                        var actualLabelCount1 = imax1 - imin1 + 1;
+                        if(Math.abs(labelCount - actualLabelCount) > Math.abs(labelCount - actualLabelCount1)) {
+                            imin = imin1;
+                            imax = imax1;
+                            k = k1;
+                            h = h1;
+                            h10 = Math.pow(10, h1);
+                        } else {
+                            break;
+                        }
+                    }
+                } else if(actualLabelCount > labelCount) {
+                    while(true) {
+                        var k1 = k;
+                        var h1 = h;
+                        if(k1 == 5) {
+                            k1 = 1;
+                            h1++;
+                        } else if(k1 == 2) {
+                            k1 = 5;
+                        } else {
+                            k1 = 2;
+                        }
+                        var imin1 = Math.ceil(ymin / (k1 * Math.pow(10, h1)));
+                        var imax1 = Math.floor(ymax / (k1 * Math.pow(10, h1)));
+                        var actualLabelCount1 = imax1 - imin1 + 1;
+                        if(Math.abs(labelCount - actualLabelCount) > Math.abs(labelCount - actualLabelCount1) && actualLabelCount1 > 0) {
+                            imin = imin1;
+                            imax = imax1;
+                            k = k1;
+                            h = h1;
+                            h10 = Math.pow(10, h1);
+                        } else {
+                            break;
+                        }
+                    }
+                }
+                var result = [];
+                for(var i = imin; i <= imax; i++) {
+                    result.push(i * k * h10);
+                }
+                return result;
+            };
+            LineChart.prototype.clear = function (screenLeft, screenRight) {
+                this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.context.fillStyle = "gray";
+                this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                this.context.fillStyle = "white";
+                this.context.fillRect(screenLeft, 0, screenRight - screenLeft, this.canvas.height);
+                $("#rightLegend").css("right", $("#timeSeries").width() - screenRight + 30);
+                $("#leftLegend").css("left", screenLeft + 30);
+                $("#timeSeriesChartHeader").text("TimeSeries Chart");
+            };
+            LineChart.prototype.drawDataSet = function (dataSet, screenLeft, screenRight, plotLeft, plotRight) {
+                var _this = this;
+                var plotBottom = Number.MAX_VALUE;
+                var plotTop = Number.MIN_VALUE;
+                dataSet.series.forEach(function (seria) {
+                    if(seria.appearanceSettings && seria.appearanceSettings.yMin && seria.appearanceSettings.yMin < plotBottom) {
+                        plotBottom = seria.appearanceSettings.yMin;
+                    }
+                    if(seria.appearanceSettings && seria.appearanceSettings.yMax && seria.appearanceSettings.yMax > plotTop) {
+                        plotTop = seria.appearanceSettings.yMax;
+                    }
+                });
+                var dataToScreenX = function (x) {
+                    return (x - plotLeft) / (plotRight - plotLeft) * (screenRight - screenLeft) + screenLeft;
+                };
+                var dataToScreenY = function (y) {
+                    return (1 - (y - plotBottom) / (plotTop - plotBottom)) * _this.canvas.height;
+                };
+                var x = dataSet.time;
+                var n = x.length;
+                var ctx = this.context;
+                dataSet.series.forEach(function (seria) {
+                    ctx.strokeStyle = seria.appearanceSettings.stroke;
+                    ctx.lineWidth = seria.appearanceSettings.thickness;
+                    var y = seria.values;
+                    ctx.beginPath();
+                    for(var i = 0; i < n; i++) {
+                        var xi = dataToScreenX(x[i]);
+                        var yi = dataToScreenY(y[i]);
+                        if(i == 0) {
+                            ctx.moveTo(xi, yi);
+                        } else {
+                            ctx.lineTo(xi, yi);
+                        }
+                    }
+                    ctx.stroke();
+                });
+            };
+            LineChart.prototype.drawAxis = function (screenLeft, ymin, ymax, appearence) {
+                var _this = this;
+                var ticks = this.calculateTicks(ymin, ymax, appearence.labelCount);
+                var dataToScreenY = function (y) {
+                    return (1 - (y - ymin) / (ymax - ymin)) * _this.canvas.height;
+                };
+                var ctx = this.context;
+                ctx.font = appearence.font;
+                ctx.textBaseline = 'middle';
+                ctx.strokeStyle = appearence.stroke;
+                ctx.fillStyle = appearence.stroke;
+                ctx.lineWidth = appearence.majorTickThickness;
+                var ticklength = appearence.tickLength;
+                var textOffset = 2;
+                if(appearence.axisLocation == "right") {
+                    ticklength = -ticklength;
+                    textOffset = -textOffset;
+                }
+                ctx.textAlign = appearence.axisLocation;
+                ticks.forEach(function (tick) {
+                    var y = dataToScreenY(tick);
+                    ctx.beginPath();
+                    ctx.moveTo(screenLeft, y);
+                    ctx.lineTo(screenLeft + ticklength, y);
+                    ctx.stroke();
+                    ctx.fillText(tick, screenLeft + ticklength + textOffset, y);
+                });
+            };
+            LineChart.prototype.updateCanvasHeight = function () {
+                this.canvas.height = $("#timeSeries").height() - 36;
+                this.canvas.width = $("#timeSeries").width();
+            };
+            LineChart.prototype.clearLegend = function (location) {
+                var legend = location === "left" ? $("#leftLegend") : $("#rightLegend");
+                legend.empty();
+                legend.hide();
+            };
+            LineChart.prototype.addLegendRecord = function (location, stroke, description) {
+                var legend = location === "left" ? $("#leftLegend") : $("#rightLegend");
+                legend.show();
+                var cont = $('<div></div>');
+                var strokeIndicatior = $('<div></div>');
+                strokeIndicatior.width(16);
+                strokeIndicatior.height(16);
+                strokeIndicatior.css("background-color", stroke);
+                strokeIndicatior.css("margin", "4px");
+                strokeIndicatior.css("float", "left");
+                var descriptionDiv = $('<div></div>');
+                descriptionDiv.css("text-align", "center");
+                descriptionDiv.text(description);
+                strokeIndicatior.appendTo(cont);
+                descriptionDiv.appendTo(cont);
+                cont.appendTo(legend);
+            };
+            return LineChart;
+        })();
+        UI.LineChart = LineChart;        
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
@@ -9682,10 +10071,10 @@ var CZ;
                 this.startDate = new CZ.UI.DatePicker(container.find(formInfo.startDate));
                 this.endDate = new CZ.UI.DatePicker(container.find(formInfo.endDate));
                 this.titleInput = container.find(formInfo.titleInput);
+                this.errorMessage = container.find(formInfo.errorMessage);
                 this.timeline = formInfo.context;
                 this.saveButton.off();
                 this.deleteButton.off();
-                this.errorMessage = this.container.find("#error-edit-timeline");
                 this.initialize();
             }
             FormEditTimeline.prototype.initialize = function () {
@@ -9705,11 +10094,11 @@ var CZ;
                 this.isCancel = true;
                 this.endDate.addEditMode_Infinite();
                 this.titleInput.val(this.timeline.title);
-                this.startDate.setDate(this.timeline.x);
+                this.startDate.setDate(this.timeline.x, true);
                 if(this.timeline.endDate === 9999) {
-                    this.endDate.setDate(this.timeline.endDate);
+                    this.endDate.setDate(this.timeline.endDate, true);
                 } else {
-                    this.endDate.setDate(this.timeline.x + this.timeline.width);
+                    this.endDate.setDate(this.timeline.x + this.timeline.width, true);
                 }
                 this.saveButton.click(function (event) {
                     _this.errorMessage.empty();
@@ -9784,6 +10173,7 @@ var CZ;
         var ContentItemListBox = (function (_super) {
             __extends(ContentItemListBox, _super);
             function ContentItemListBox(container, listItemContainer, contentItems) {
+                var self = this;
                 var listBoxInfo = {
                     context: contentItems,
                     sortableSettings: {
@@ -9796,6 +10186,13 @@ var CZ;
                         scroll: false,
                         start: function (event, ui) {
                             ui.placeholder.height(ui.item.height());
+                        },
+                        stop: function (event, ui) {
+                            for(var i = 0; i < self.items.length; i++) {
+                                if(self.items[i].data) {
+                                    self.items[i].data.order = i;
+                                }
+                            }
                         }
                     }
                 };
@@ -9813,6 +10210,14 @@ var CZ;
                 listItemsInfo.default.ctor = ContentItemListItem;
                         _super.call(this, container, listBoxInfo, listItemsInfo);
             }
+            ContentItemListBox.prototype.remove = function (item) {
+                for(var i = this.items.indexOf(item) + 1; i < this.items.length; i++) {
+                    if(this.items[i].data && this.items[i].data.order) {
+                        this.items[i].data.order--;
+                    }
+                }
+                _super.prototype.remove.call(this, item);
+            };
             return ContentItemListBox;
         })(UI.ListBoxBase);
         UI.ContentItemListBox = ContentItemListBox;        
@@ -9824,7 +10229,8 @@ var CZ;
                 this.iconImg = this.container.find(uiMap.iconImg);
                 this.titleTextblock = this.container.find(uiMap.titleTextblock);
                 this.descrTextblock = this.container.find(uiMap.descrTextblock);
-                this.iconImg.attr("src", this.data.icon || "/images/Temp-Thumbnail2.png");
+                this.iconImg.attr("onerror", "this.src='/images/Temp-Thumbnail2.png';");
+                this.iconImg.attr("src", this.data.uri);
                 this.titleTextblock.text(this.data.title);
                 this.descrTextblock.text(this.data.description);
                 this.closeButton.off();
@@ -9897,6 +10303,9 @@ var CZ;
                     this.contentItemsListBox.itemRemove(function (item, index) {
                         return _this.onContentItemRemoved(item, index);
                     });
+                    this.contentItemsListBox.itemMove(function (item, indexStart, indexStop) {
+                        return _this.onContentItemMove(item, indexStart, indexStop);
+                    });
                 } else if(this.mode === "editExhibit") {
                     this.titleTextblock.text("Edit Exhibit");
                     this.saveButton.text("update exhibit");
@@ -9924,6 +10333,9 @@ var CZ;
                     this.contentItemsListBox.itemRemove(function (item, index) {
                         return _this.onContentItemRemoved(item, index);
                     });
+                    this.contentItemsListBox.itemMove(function (item, indexStart, indexStop) {
+                        return _this.onContentItemMove(item, indexStart, indexStop);
+                    });
                 } else {
                     console.log("Unexpected authoring mode in exhibit form.");
                 }
@@ -9942,7 +10354,7 @@ var CZ;
                         mediaType: "",
                         attribution: "",
                         description: "",
-                        index: this.exhibit.contentItems.length
+                        order: this.exhibit.contentItems.length
                     };
                     this.exhibit.contentItems.push(newContentItem);
                     this.hide(true);
@@ -9955,12 +10367,16 @@ var CZ;
                 var newExhibit = {
                     title: this.titleInput.val() || "",
                     x: this.datePicker.getDate() - this.exhibit.width / 2,
+                    y: this.exhibit.y,
+                    height: this.exhibit.height,
+                    width: this.exhibit.width,
                     infodotDescription: {
                         date: this.datePicker.getDate()
                     },
-                    contentItems: this.exhibit.contentItems || []
+                    contentItems: this.exhibit.contentItems || [],
+                    type: "infodot"
                 };
-                if(CZ.Authoring.validateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) && this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {
+                if(CZ.Authoring.validateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) && CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true) && this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {
                     CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(function (success) {
                         _this.isCancel = false;
                         _this.close();
@@ -9979,7 +10395,8 @@ var CZ;
                 }
             };
             FormEditExhibit.prototype.onContentItemDblClick = function (item, _) {
-                if(item.data.index >= 0) {
+                var idx = item.data.order;
+                if(idx >= 0) {
                     this.clickedListItem = item;
                     this.exhibit.title = this.titleInput.val() || "";
                     this.exhibit.x = this.datePicker.getDate() - this.exhibit.width / 2;
@@ -9988,15 +10405,28 @@ var CZ;
                     };
                     this.hide(true);
                     CZ.Authoring.contentItemMode = "editContentItem";
-                    CZ.Authoring.showEditContentItemForm(this.exhibit.contentItems[item.data.index], this.exhibit, this, true);
+                    CZ.Authoring.showEditContentItemForm(this.exhibit.contentItems[idx], this.exhibit, this, true);
                 }
             };
             FormEditExhibit.prototype.onContentItemRemoved = function (item, _) {
-                if(item.data.index >= 0) {
-                    this.exhibit.contentItems.splice(item.data.index, 1);
+                var idx = item.data.order;
+                if(idx >= 0) {
+                    this.exhibit.contentItems.splice(idx, 1);
+                    for(var i = 0; i < this.exhibit.contentItems.length; i++) {
+                        this.exhibit.contentItems[i].order = i;
+                    }
                     this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
                     CZ.Common.vc.virtualCanvas("requestInvalidate");
                 }
+            };
+            FormEditExhibit.prototype.onContentItemMove = function (item, indexStart, indexStop) {
+                var ci = this.exhibit.contentItems.splice(indexStart, 1)[0];
+                this.exhibit.contentItems.splice(indexStop, 0, ci);
+                for(var i = 0; i < this.exhibit.contentItems.length; i++) {
+                    this.exhibit.contentItems[i].order = i;
+                }
+                this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
+                CZ.Common.vc.virtualCanvas("requestInvalidate");
             };
             FormEditExhibit.prototype.show = function (noAnimation) {
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
@@ -10119,7 +10549,7 @@ var CZ;
                     mediaType: this.mediaTypeInput.val() || "",
                     attribution: this.attributionInput.val() || "",
                     description: this.descriptionInput.val() || "",
-                    index: this.contentItem.index
+                    order: this.contentItem.order
                 };
                 if(CZ.Authoring.validateContentItems([
                     newContentItem
@@ -10128,7 +10558,7 @@ var CZ;
                         if(this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
                             this.isCancel = false;
                             (this.prevForm).contentItemsListBox.add(newContentItem);
-                            $.extend(this.exhibit.contentItems[this.contentItem.index], newContentItem);
+                            $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
                             (this.prevForm).exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
                             this.back();
@@ -10137,9 +10567,10 @@ var CZ;
                         if(this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
                             this.isCancel = false;
                             var clickedListItem = (this.prevForm).clickedListItem;
+                            clickedListItem.iconImg.attr("src", newContentItem.uri);
                             clickedListItem.titleTextblock.text(newContentItem.title);
                             clickedListItem.descrTextblock.text(newContentItem.description);
-                            $.extend(this.exhibit.contentItems[this.contentItem.index], newContentItem);
+                            $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
                             (this.prevForm).exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
                             this.back();
@@ -10252,9 +10683,9 @@ var CZ;
                 this.usernameInput = container.find(formInfo.usernameInput);
                 this.emailInput = container.find(formInfo.emailInput);
                 this.agreeInput = container.find(formInfo.agreeInput);
-                this.loginPanel = $(document.body).find(formInfo.loginPanel);
-                this.profilePanel = $(document.body).find(formInfo.profilePanel);
-                this.loginPanelLogin = $(document.body).find(formInfo.loginPanelLogin);
+                this.loginPanel = $(document.body).find(formInfo.loginPanel).first();
+                this.profilePanel = $(document.body).find(formInfo.profilePanel).first();
+                this.loginPanelLogin = $(document.body).find(formInfo.loginPanelLogin).first();
                 this.allowRedirect = formInfo.allowRedirect;
                 this.initialize();
             }
@@ -10299,6 +10730,12 @@ var CZ;
                         alert("Please agree with provided terms");
                         return;
                     }
+                    CZ.Service.getProfile().done(function (curUser) {
+                        CZ.Service.getProfile(_this.usernameInput.val()).done(function (getUser) {
+                            if(curUser.DisplayName == null && typeof getUser.DisplayName != "undefined") {
+                                alert("Provided username already exists.");
+                                return;
+                            }
                     CZ.Service.putProfile(_this.usernameInput.val(), _this.emailInput.val()).then(function (success) {
                         if(_this.allowRedirect) {
                             window.location.assign("\\" + success);
@@ -10310,13 +10747,15 @@ var CZ;
                         console.log(error);
                     });
                 });
+                    });
+                });
                 this.logoutButton.click(function (event) {
                     return $.ajax({
                         url: "/account/logout"
                     }).done(function (data) {
                         _this.profilePanel.hide();
                         _this.loginPanel.show();
-                        _super.prototype.close.call(_this);
+                        _this.close();
                     });
                 });
             };
@@ -10374,6 +10813,125 @@ var CZ;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
+    (function (UI) {
+        var TimeSeriesDataForm = (function (_super) {
+            __extends(TimeSeriesDataForm, _super);
+            function TimeSeriesDataForm(container, formInfo) {
+                        _super.call(this, container, formInfo);
+                var existingTimSeriesList = $("#existingTimeSeries");
+                if(existingTimSeriesList.children().length == 0) {
+                    var preloadedlist;
+                    $.ajax({
+                        cache: false,
+                        type: "GET",
+                        async: false,
+                        dataType: "JSON",
+                        url: '/dumps/timeseries-preloaded.txt',
+                        success: function (result) {
+                            preloadedlist = result.d;
+                        },
+                        error: function (xhr) {
+                            alert("Error fetching pre-loaded timeseries list: " + xhr.responseText);
+                        }
+                    });
+                    preloadedlist.forEach(function (preloaded) {
+                        var li = $('<ul></ul>').appendTo(existingTimSeriesList);
+                        var par = $("<p></p>");
+                        var link = $('<a></a>').addClass("cz-form-btn").appendTo(li);
+                        link.css("color", "#25a1ea");
+                        link.css("float", "left");
+                        link.text(preloaded.name);
+                        var div = $("<div>Source:</div>").appendTo(li);
+                        div.css("margin-left", "3px");
+                        div.css("margin-right", "3px");
+                        div.css("float", "left");
+                        var sourceDiv = $("<a></a>").appendTo(li);
+                        sourceDiv.css("color", "blue");
+                        sourceDiv.text(preloaded.source);
+                        link.click(function (e) {
+                            var data;
+                            $.ajax({
+                                cache: false,
+                                type: "GET",
+                                async: false,
+                                dataType: "text",
+                                url: preloaded.file,
+                                success: function (result) {
+                                    data = result;
+                                },
+                                error: function (xhr) {
+                                    alert("Error fetching timeSeries Data: " + xhr.responseText);
+                                }
+                            });
+                            CZ.HomePageViewModel.showTimeSeriesChart();
+                            CZ.rightDataSet = CZ.Data.csvToDataSet(data, preloaded.delimiter, preloaded.source);
+                            var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                            CZ.HomePageViewModel.updateTimeSeriesChart(vp);
+                        });
+                    });
+                }
+                this.input = $("#fileLoader");
+                var that = this;
+                if(this.checkFileLoadCompatibility()) {
+                    $("#loaduserdatabtn").click(function () {
+                        var fr = that.openFile({
+                            "onload": function (e) {
+                                that.updateUserData(fr.result);
+                            }
+                        });
+                    });
+                } else {
+                    $("#uploaduserdatacontainer").hide();
+                }
+            }
+            TimeSeriesDataForm.prototype.show = function () {
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "right",
+                    duration: 500
+                });
+                this.activationSource.addClass("active");
+            };
+            TimeSeriesDataForm.prototype.close = function () {
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "right",
+                    duration: 500
+                });
+                this.activationSource.removeClass("active");
+            };
+            TimeSeriesDataForm.prototype.checkFileLoadCompatibility = function () {
+                return window['File'] && window['FileReader'] && window['FileList'] && window['Blob'];
+            };
+            TimeSeriesDataForm.prototype.openFile = function (callbacks) {
+                var file = this.input[0].files[0];
+                var fileReader = new FileReader();
+                fileReader.onloadstart = callbacks["onloadstart"];
+                fileReader.onerror = callbacks["onerror"];
+                fileReader.onabort = callbacks["onabort"];
+                fileReader.onload = callbacks["onload"];
+                fileReader.onloadend = callbacks["onloadend"];
+                fileReader.readAsText(file);
+                return fileReader;
+            };
+            TimeSeriesDataForm.prototype.updateUserData = function (csvString) {
+                CZ.HomePageViewModel.showTimeSeriesChart();
+                CZ.leftDataSet = CZ.Data.csvToDataSet(csvString, $("#delim").prop("value"), this.input[0].files[0].name);
+                CZ.leftDataSet.series[0].appearanceSettings.stroke = "red";
+                var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                CZ.HomePageViewModel.updateTimeSeriesChart(vp);
+            };
+            return TimeSeriesDataForm;
+        })(CZ.UI.FormBase);
+        UI.TimeSeriesDataForm = TimeSeriesDataForm;        
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    CZ.timeSeriesChart;
+    CZ.leftDataSet;
+    CZ.rightDataSet;
     (function (HomePageViewModel) {
         var _uiMap = {
             "#header-edit-form": "/ui/header-edit-form.html",
@@ -10386,7 +10944,9 @@ var CZ;
             "#auth-edit-tours-form": "/ui/auth-edit-tour-form.html",
             "$('<div><!--Tours Authoring--></div>')": "/ui/tourstop-listbox.html",
             "#toursList": "/ui/tourslist-form.html",
-            "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html"
+            "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html",
+            "#timeSeriesContainer": "/ui/timeseries-graph-form.html",
+            "#timeSeriesDataForm": "/ui/timeseries-data-form.html"
         };
         var FeatureActivation;
         (function (FeatureActivation) {
@@ -10430,6 +10990,11 @@ var CZ;
                 Name: "Regimes",
                 Activation: FeatureActivation.RootCollection,
                 JQueryReference: ".regime-link"
+            }, 
+            {
+                Name: "TimeSeries",
+                Activation: FeatureActivation.NotRootCollection,
+                JQueryReference: "#timeSeriesContainer"
             }, 
             
         ];
@@ -10487,14 +11052,35 @@ var CZ;
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
+                CZ.timeSeriesChart = new CZ.UI.LineChart(forms[11]);
+                $('#timeSeries_button').click(function () {
+                    var tsForm = getFormById('#timeSeries_button');
+                    if(tsForm === false) {
+                        closeAllForms();
+                        var timSeriesDataFormDiv = forms[12];
+                        var timSeriesDataForm = new CZ.UI.TimeSeriesDataForm(timSeriesDataFormDiv, {
+                            activationSource: $("#timeSeries_button"),
+                            closeButton: ".cz-form-close-btn > .cz-form-btn"
+                        });
+                        timSeriesDataForm.show();
+                    } else {
+                        if(tsForm.isFormVisible) {
+                            tsForm.close();
+                        } else {
+                            closeAllForms();
+                            tsForm.show();
+                        }
+                    }
+                });
                 CZ.Service.getProfile().done(function (profile) {
                     InitializeToursUI(profile, forms);
                 }).fail(function (err) {
                     InitializeToursUI(null, forms);
                 });
                 $(".header-icon.edit-icon").click(function () {
-                    $(".header-icon.active").removeClass("active");
-                    $(this).addClass("active");
+                    var editForm = getFormById("#header-edit-form");
+                    if(editForm === false) {
+                        closeAllForms();
                     var form = new CZ.UI.FormHeaderEdit(forms[0], {
                         activationSource: $(this),
                         navButton: ".cz-form-nav",
@@ -10505,6 +11091,14 @@ var CZ;
                         createTour: ".cz-form-create-tour"
                     });
                     form.show();
+                    } else {
+                        if(editForm.isFormVisible) {
+                            editForm.close();
+                        } else {
+                            closeAllForms();
+                            editForm.show();
+                        }
+                    }
                 });
                 CZ.Authoring.initialize(CZ.Common.vc, {
                     showEditTourForm: function (tour) {
@@ -10536,6 +11130,7 @@ var CZ;
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
+                            errorMessage: "#error-edit-timeline",
                             context: timeline
                         });
                         form.show();
@@ -10551,6 +11146,7 @@ var CZ;
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
+                            errorMessage: "#error-edit-timeline",
                             context: timeline
                         });
                         form.show();
@@ -10618,7 +11214,7 @@ var CZ;
                     CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
                 }
                 var profileForm = new CZ.UI.FormEditProfile(forms[5], {
-                    activationSource: $(".header-icon.profile-icon"),
+                    activationSource: $("#login-panel"),
                     navButton: ".cz-form-nav",
                     closeButton: ".cz-form-close-btn > .cz-form-btn",
                     titleTextblock: ".cz-form-title",
@@ -10630,12 +11226,25 @@ var CZ;
                     agreeInput: ".cz-form-agree",
                     loginPanel: "#login-panel",
                     profilePanel: "#profile-panel",
-                    loginPanelLogin: "#profile-panel span.auth-panel-login",
+                    loginPanelLogin: "#profile-panel.auth-panel-login",
                     context: "",
                     allowRedirect: IsFeatureEnabled("Authoring")
                 });
-                $("#edit_profile_button").click(function () {
+                var loginForm = new CZ.UI.FormLogin(forms[6], {
+                    activationSource: $("#login-panel"),
+                    navButton: ".cz-form-nav",
+                    closeButton: ".cz-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-form-title",
+                    titleInput: ".cz-form-item-title",
+                    context: ""
+                });
+                $("#profile-panel").click(function () {
+                    if(!profileForm.isFormVisible) {
+                        closeAllForms();
                     profileForm.show();
+                    } else {
+                        profileForm.close();
+                    }
                 });
                 if(IsFeatureEnabled("Login")) {
                     CZ.Service.getProfile().done(function (data) {
@@ -10644,25 +11253,27 @@ var CZ;
                         } else if(data != "" && data.DisplayName == null) {
                             $("#profile-panel").show();
                             $("#profile-panel input#username").focus();
+                            if(!profileForm.isFormVisible) {
+                                closeAllForms();
                             profileForm.show();
                         } else {
+                                profileForm.close();
+                            }
+                        } else {
                             $("#profile-panel").show();
-                            $("#profile-panel span.auth-panel-login").html(data.DisplayName);
+                            $(".auth-panel-login").html(data.DisplayName);
                         }
                     }).fail(function (error) {
                         $("#login-panel").show();
                     });
                 }
-                var loginForm = new CZ.UI.FormLogin(forms[6], {
-                    activationSource: $(".header-icon.profile-icon"),
-                    navButton: ".cz-form-nav",
-                    closeButton: ".cz-form-close-btn > .cz-form-btn",
-                    titleTextblock: ".cz-form-title",
-                    titleInput: ".cz-form-item-title",
-                    context: ""
-                });
-                $("#login-button").click(function () {
+                $("#login-panel").click(function () {
+                    if(!loginForm.isFormVisible) {
+                        closeAllForms();
                     loginForm.show();
+                    } else {
+                        loginForm.close();
+                    }
                 });
             });
             CZ.Service.getServiceInformation().then(function (response) {
@@ -10676,6 +11287,11 @@ var CZ;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
+            if(rootCollection) {
+                $('#timeSeries_button').hide();
+            } else {
+                $('#timeSeries_button').show();
+            }
             $('#search_button').mouseup(CZ.Search.onSearchClicked);
             $('#human_rect').click(function () {
                 CZ.Search.navigateToBookmark(CZ.Common.humanityVisible);
@@ -10820,6 +11436,7 @@ var CZ;
                     var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
                     CZ.Common.updateMarker();
                 }
+                updateTimeSeriesChart(vp);
             }, function () {
                 return CZ.Common.vc.virtualCanvas("getViewport");
             }, jointGesturesStream);
@@ -10932,6 +11549,94 @@ var CZ;
             });
             return feature[0].IsEnabled;
         }
+        function closeAllForms() {
+            $('.cz-major-form').each(function (i, f) {
+                var form = $(f).data('form');
+                if(form) {
+                    form.close();
+                }
+            });
+        }
+        function getFormById(name) {
+            var form = $(name).data("form");
+            if(form) {
+                return form;
+            } else {
+                return false;
+            }
+        }
+        function showTimeSeriesChart() {
+            $('#timeSeriesContainer').height('30%');
+            $('#timeSeriesContainer').show();
+            $('#vc').height('70%');
+            CZ.timeSeriesChart.updateCanvasHeight();
+            CZ.Common.updateLayout();
+        }
+        HomePageViewModel.showTimeSeriesChart = showTimeSeriesChart;
+        function hideTimeSeriesChart() {
+            CZ.leftDataSet = undefined;
+            CZ.rightDataSet = undefined;
+            $('#timeSeriesContainer').height(0);
+            $('#timeSeriesContainer').hide();
+            $('#vc').height('100%');
+            CZ.Common.updateLayout();
+        }
+        HomePageViewModel.hideTimeSeriesChart = hideTimeSeriesChart;
+        function updateTimeSeriesChart(vp) {
+            var left = vp.pointScreenToVirtual(0, 0).x;
+            if(left < CZ.Settings.maxPermitedTimeRange.left) {
+                left = CZ.Settings.maxPermitedTimeRange.left;
+            }
+            var right = vp.pointScreenToVirtual(vp.width, vp.height).x;
+            if(right > CZ.Settings.maxPermitedTimeRange.right) {
+                right = CZ.Settings.maxPermitedTimeRange.right;
+            }
+            if(CZ.timeSeriesChart !== undefined) {
+                var leftCSS = vp.pointVirtualToScreen(left, 0).x;
+                var rightCSS = vp.pointVirtualToScreen(right, 0).x;
+                var leftPlot = CZ.Dates.getDMYFromCoordinate(left).year;
+                var rightPlot = CZ.Dates.getDMYFromCoordinate(right).year;
+                CZ.timeSeriesChart.clear(leftCSS, rightCSS);
+                CZ.timeSeriesChart.clearLegend("left");
+                CZ.timeSeriesChart.clearLegend("right");
+                var chartHeader = "TimeSeries Chart";
+                if(CZ.leftDataSet !== undefined) {
+                    CZ.timeSeriesChart.drawDataSet(CZ.leftDataSet, leftCSS, rightCSS, leftPlot, rightPlot);
+                    CZ.timeSeriesChart.drawAxis(leftCSS, CZ.leftDataSet.series[0].appearanceSettings.yMin, CZ.leftDataSet.series[0].appearanceSettings.yMax, {
+                        labelCount: 4,
+                        tickLength: 10,
+                        majorTickThickness: 1,
+                        stroke: 'black',
+                        axisLocation: 'left',
+                        font: '16px Calibri'
+                    });
+                    for(var i = 0; i < CZ.leftDataSet.series.length; i++) {
+                        CZ.timeSeriesChart.addLegendRecord("left", CZ.leftDataSet.series[i].appearanceSettings.stroke, CZ.leftDataSet.series[i].appearanceSettings.name);
+                    }
+                    chartHeader += " (" + CZ.leftDataSet.name;
+                }
+                if(CZ.rightDataSet !== undefined) {
+                    CZ.timeSeriesChart.drawDataSet(CZ.rightDataSet, leftCSS, rightCSS, leftPlot, rightPlot);
+                    CZ.timeSeriesChart.drawAxis(rightCSS, CZ.rightDataSet.series[0].appearanceSettings.yMin, CZ.rightDataSet.series[0].appearanceSettings.yMax, {
+                        labelCount: 4,
+                        tickLength: 10,
+                        majorTickThickness: 1,
+                        stroke: 'black',
+                        axisLocation: 'right',
+                        font: '16px Calibri'
+                    });
+                    for(var i = 0; i < CZ.rightDataSet.series.length; i++) {
+                        CZ.timeSeriesChart.addLegendRecord("right", CZ.rightDataSet.series[i].appearanceSettings.stroke, CZ.rightDataSet.series[i].appearanceSettings.name);
+                    }
+                    var str = chartHeader.indexOf("(") > 0 ? ", " : " (";
+                    chartHeader += str + CZ.rightDataSet.name + ")";
+                } else {
+                    chartHeader += ")";
+                }
+                $("#timeSeriesChartHeader").text(chartHeader);
+            }
+        }
+        HomePageViewModel.updateTimeSeriesChart = updateTimeSeriesChart;
     })(CZ.HomePageViewModel || (CZ.HomePageViewModel = {}));
     var HomePageViewModel = CZ.HomePageViewModel;
 })(CZ || (CZ = {}));

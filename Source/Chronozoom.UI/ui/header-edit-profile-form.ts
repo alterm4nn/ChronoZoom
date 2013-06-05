@@ -5,6 +5,7 @@
 module CZ {
     export module UI {
 
+
         export interface FormEditProfileInfo extends CZ.UI.IFormUpdateEntityInfo {
             logoutButton: string;
             usernameInput: string;
@@ -31,19 +32,19 @@ module CZ {
             private loginPanelLogin: JQuery;
             private allowRedirect: bool;
 
+
             constructor(container: JQuery, formInfo: FormEditProfileInfo) {
                 super(container, formInfo);
-
                 this.saveButton = container.find(formInfo.saveButton);
                 this.logoutButton = container.find(formInfo.logoutButton);
                 this.usernameInput = container.find(formInfo.usernameInput);
                 this.emailInput = container.find(formInfo.emailInput);
                 this.agreeInput = container.find(formInfo.agreeInput);
-                this.loginPanel = $(document.body).find(formInfo.loginPanel);
-                this.profilePanel = $(document.body).find(formInfo.profilePanel);
-                this.loginPanelLogin = $(document.body).find(formInfo.loginPanelLogin);
+                this.loginPanel = $(document.body).find(formInfo.loginPanel).first();
+                this.profilePanel = $(document.body).find(formInfo.profilePanel).first();
+                this.loginPanelLogin = $(document.body).find(formInfo.loginPanelLogin).first();
                 this.allowRedirect = formInfo.allowRedirect;
-                
+
                 this.initialize();
             }
 
@@ -59,6 +60,7 @@ module CZ {
                 var filter = /^[a-z0-9\-_]{4,20}$/i;
                 return String(e).search(filter) != -1;
             }
+
 
             private initialize(): void {
                 var profile = CZ.Service.getProfile();
@@ -81,6 +83,8 @@ module CZ {
                         return;
                     }
 
+
+
                     isValid = this.validEmail(this.emailInput.val());
                     if (!isValid) {
                         alert("Provided incorrect email address");
@@ -93,21 +97,30 @@ module CZ {
                         return;
                     }
 
-                    CZ.Service.putProfile(this.usernameInput.val(), this.emailInput.val()).then(
-                        success => {
-                            // Redirect to personal collection.
-                            if (this.allowRedirect) {
-                                window.location.assign("\\" + success);
+                    Service.getProfile().done((curUser) => {
+                        Service.getProfile(this.usernameInput.val()).done((getUser) => {
+                            if (curUser.DisplayName == null && typeof getUser.DisplayName != "undefined") {
+                                //such username exists
+                                alert("Provided username already exists.");
+                                return;
                             }
-                            else {
-                                this.close();
-                            }
-                        },
-                        function (error) {
-                            alert("Unable to save changes. Please try again later.");
-                            console.log(error);
-                        }
-                    );
+                            CZ.Service.putProfile(this.usernameInput.val(), this.emailInput.val()).then(
+                                success => {
+                                    // Redirect to personal collection.
+                                    if (this.allowRedirect) {
+                                        window.location.assign("\\" + success);
+                                    }
+                                    else {
+                                        this.close();
+                                    }
+                                },
+                                function (error) {
+                                    alert("Unable to save changes. Please try again later.");
+                                    console.log(error);
+                                }
+                            );
+                        });
+                    });
 
                 });
 
@@ -118,7 +131,8 @@ module CZ {
                     }).done(data => {
                         this.profilePanel.hide();
                         this.loginPanel.show();
-                        super.close();
+
+                        this.close();
                     });
                 });
             }
