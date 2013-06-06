@@ -59,7 +59,6 @@ namespace Chronozoom.UI
             routes.MapRoute(
                 "Account", // Route name
                 "account/{action}", // URL with parameters
-                new { customConstraint = new UserAgentConstraint() },
                 new { controller = "Account" } // Parameter defaults
                 );
 
