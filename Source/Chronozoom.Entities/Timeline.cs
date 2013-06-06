@@ -69,7 +69,7 @@ namespace Chronozoom.Entities
         /// <summary>
         /// ???
         /// </summary>
-        public Int64 ForkNode { get; set; }
+        public decimal ForkNode { get; set; }
 
         /// <summary>
         /// The height of the timeline.

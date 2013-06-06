@@ -24,6 +24,15 @@ using System.Runtime.Serialization;
 namespace Chronozoom.Entities
 {
     /// <summary>
+    /// Throw if a query detects that the storage is corrupted
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2237:MarkISerializableTypesWithSerializable")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors")]
+    public class StorageCorruptedException : Exception
+    {
+    }
+
+    /// <summary>
     /// Storage implementation for ChronoZoom based on Entity Framework.
     /// </summary>
     public class Storage : DbContext
@@ -174,8 +183,20 @@ namespace Chronozoom.Entities
             return new Collection<Timeline>(timelines);
         }
 
+        public IEnumerable<Timeline> RetrieveAllTimelines(Guid collectionId)
+        {
+            int maxAllElements = 0;
+            Dictionary<Guid, Timeline> timelinesMap = new Dictionary<Guid, Timeline>();
+
+            IEnumerable<TimelineRaw> allTimelines = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Collection_ID = {0}", collectionId);
+            IEnumerable<Timeline> rootTimelines = FillTimelinesFromFlatList(allTimelines, timelinesMap, null, ref maxAllElements);
+            FillTimelineRelations(timelinesMap, int.MaxValue);
+
+            return rootTimelines;
+        }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
-        public IEnumerable<TimelineRaw> TimelineSubtreeQuery(Guid collectionId, Guid? leastCommonAncestor, decimal startTime, decimal endTime, decimal minSpan, int maxElements)
+        public IEnumerable<Timeline> TimelineSubtreeQuery(Guid collectionId, Guid? leastCommonAncestor, decimal startTime, decimal endTime, decimal minSpan, int maxElements)
         {
             IEnumerable<TimelineRaw> result;
             Dictionary<Guid?, TimelineRaw> map = new Dictionary<Guid?, TimelineRaw>();
@@ -239,6 +260,10 @@ namespace Chronozoom.Entities
                     }
                 }
             }
+
+            // Cache results in list
+            result = result.ToList();
+
             foreach (TimelineRaw t in result)   // note: results are ordered by depth in ascending order
             {
                 map.Add(t.Id, t);
@@ -254,7 +279,62 @@ namespace Chronozoom.Entities
                     map[t.Timeline_ID].ChildTimelines.Add(t);
                 }
             }
+
+            // Fast verification for correctness 
+            foreach (TimelineRaw t in result)
+            {
+                bool isCorrupted = false;
+
+                if (t.ChildTimelines != null 
+                    && t.ChildTimelines.Count() > 0
+                    && t.SubtreeSize < t.ChildTimelines.Count())
+                    isCorrupted = true;
+
+                if (isCorrupted)
+                {
+                    MigrateInPlace(collectionId);
+                    throw new StorageCorruptedException();
+                }
+            }
+
             return result;
+        }
+
+        private void MigrateInPlace(Guid collectionId)
+        {
+            IEnumerable<TimelineRaw> allTimelines = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Collection_ID = {0}", collectionId);
+            Dictionary<Guid, Timeline> timelinesMap = new Dictionary<Guid, Timeline>();
+
+            int maxAllElements = 0;
+            List<Timeline> rootTimelines = FillTimelinesFromFlatList( allTimelines, timelinesMap, null, ref maxAllElements);
+            FillTimelineRelations(timelinesMap, int.MaxValue);
+
+            foreach (Timeline rootTimeline in rootTimelines)
+                Migration.Migrator.MigrateInPlace(rootTimeline);
+
+            Collection collection = Collections.Where(candidate => candidate.Id == collectionId).FirstOrDefault();
+
+            int notSavedTimelines = 0;
+            foreach (Timeline timelineChange in Timelines.Where(timeline => timeline.Collection.Id == collection.Id).ToList())
+            {
+                if (timelinesMap.Keys.Contains(timelineChange.Id))
+                {
+                    Timeline timelineMapInstance = timelinesMap[timelineChange.Id];
+                    timelineChange.Depth = timelineMapInstance.Depth;
+                    timelineChange.SubtreeSize = timelineMapInstance.SubtreeSize;
+                    timelineChange.ForkNode = timelineMapInstance.ForkNode;
+                    timelineChange.FirstNodeInSubtree = timelineMapInstance.FirstNodeInSubtree;
+                    timelineChange.Predecessor = timelineMapInstance.Predecessor;
+                    timelineChange.Successor = timelineMapInstance.Successor;
+
+                    if (++notSavedTimelines > 100)
+                    {
+                        SaveChanges();
+                        notSavedTimelines = 0;
+                    }
+                }
+            }
+            SaveChanges();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "FromYear+13700000001"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "ToYear+13700000001")]
@@ -597,11 +677,11 @@ namespace Chronozoom.Entities
             }
         }
 
-        public Timeline GetRootTimeline(Guid collectionId)
+        public IEnumerable<Timeline> GetRootTimelines(Guid collectionId)
         {
             var rootCollectionTimeline = Database.SqlQuery<Timeline>("SELECT * FROM Timelines WHERE Timeline_ID is NULL and Collection_ID = {0}", collectionId);
 
-            return rootCollectionTimeline.FirstOrDefault();
+            return rootCollectionTimeline;
         }
 
         public Guid GetCollectionGuid(string title)

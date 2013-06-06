@@ -196,6 +196,14 @@ namespace Chronozoom.UI
         // The Maximum number of elements retured in a Search
         private const int MaxSearchLimit = 50;
 
+        // Is default progressive load enabled?
+        private static Lazy<bool> _progressiveLoadEnabled = new Lazy<bool>(() =>
+        {
+            string progressiveLoadEnabled = ConfigurationManager.AppSettings["ProgressiveLoadEnabled"];
+
+            return string.IsNullOrEmpty(progressiveLoadEnabled) ? true : bool.Parse(progressiveLoadEnabled);
+        });
+
         // error code descriptions
         private static class ErrorDescription
         {
@@ -263,11 +271,24 @@ namespace Chronozoom.UI
                 decimal startTime = string.IsNullOrWhiteSpace(start) ? _minYear : decimal.Parse(start, CultureInfo.InvariantCulture);
                 decimal endTime = string.IsNullOrWhiteSpace(end) ? _maxYear : decimal.Parse(end, CultureInfo.InvariantCulture);
                 decimal span = string.IsNullOrWhiteSpace(minspan) ? 0 : decimal.Parse(minspan, CultureInfo.InvariantCulture);
-                Guid? lcaParsed = string.IsNullOrWhiteSpace(commonAncestor) ? (Guid?)null : Guid.Parse(commonAncestor);
+                Guid lcaParsed = string.IsNullOrWhiteSpace(commonAncestor) ? Guid.Empty : Guid.Parse(commonAncestor);
                 int maxElementsParsed = string.IsNullOrWhiteSpace(maxElements) ? _maxElements.Value : int.Parse(maxElements, CultureInfo.InvariantCulture);
                 int depthParsed = string.IsNullOrWhiteSpace(depth) ? _defaultDepth : int.Parse(depth, CultureInfo.InvariantCulture);
 
-                Collection<Timeline> timelines = _storage.TimelinesQuery(collectionId, startTime, endTime, span, lcaParsed, maxElementsParsed, depthParsed);
+                IEnumerable<Timeline> timelines = null;
+                if (!_progressiveLoadEnabled.Value || !string.IsNullOrWhiteSpace(depth))
+                    timelines = _storage.TimelinesQuery(collectionId, startTime, endTime, span, lcaParsed == Guid.Empty ? (Guid?)null : lcaParsed, maxElementsParsed, depthParsed);
+                else
+                {
+                    if (ShouldRetrieveAllTimelines(commonAncestor, collectionId, maxElementsParsed))
+                    {
+                        timelines = _storage.RetrieveAllTimelines(collectionId);
+                    }
+                    else
+                    {
+                        timelines = _storage.TimelineSubtreeQuery(collectionId, lcaParsed, startTime, endTime, span, maxElementsParsed);
+                    }
+                }
 
                 Timeline timeline = timelines.Where(candidate => candidate.Id == lcaParsed).FirstOrDefault();
 
@@ -280,24 +301,24 @@ namespace Chronozoom.UI
             });
         }
 
-        /// <summary>
-        /// Documentation under IChronozoomSVC
-        /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "minspan")]
-        public IEnumerable<TimelineRaw> GetTimelineSubtree(Guid collectionId, string start, string end, string minspan, string commonAncestor, string maxElements)
+        private bool ShouldRetrieveAllTimelines(string commonAncestor, Guid collectionId, int maxElements)
         {
-            return AuthenticatedOperation(delegate(User user)
-            {
-                Trace.TraceInformation("Get Filtered Timelines");
-                
-                // initialize filters
-                decimal startTime = string.IsNullOrWhiteSpace(start) ? _minYear : decimal.Parse(start, CultureInfo.InvariantCulture);
-                decimal endTime = string.IsNullOrWhiteSpace(end) ? _maxYear : decimal.Parse(end, CultureInfo.InvariantCulture);
-                decimal minSpanParsed = string.IsNullOrWhiteSpace(minspan) ? 0 : decimal.Parse(minspan, CultureInfo.InvariantCulture);
-                Guid? lcaParsed = string.IsNullOrWhiteSpace(commonAncestor) ? (Guid?)null : Guid.Parse(commonAncestor);
-                int maxElementsParsed = string.IsNullOrWhiteSpace(maxElements) ? _maxElements.Value : int.Parse(maxElements, CultureInfo.InvariantCulture);
-                return _storage.TimelineSubtreeQuery(collectionId, lcaParsed, startTime, endTime, minSpanParsed, maxElementsParsed);
-            });
+            if (!string.IsNullOrEmpty(commonAncestor))
+                return false;
+
+            Timeline rootTimeline = _storage.GetRootTimelines(collectionId).FirstOrDefault();
+
+            if (rootTimeline == null)
+                return true;
+
+            // Allow code to revalidate counts since zero count could mean old timeline
+            if (rootTimeline.SubtreeSize == 0)
+                return false;
+
+            if (rootTimeline.SubtreeSize < maxElements)
+                return true;
+
+            return false;
         }
 
         /// <summary>
