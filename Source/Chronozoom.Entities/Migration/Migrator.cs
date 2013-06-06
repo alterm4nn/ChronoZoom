@@ -15,6 +15,7 @@ using System.Text;
 using System.IO;
 using System.Security.Cryptography;
 using System.Data;
+using System.Diagnostics;
 
 using Chronozoom.Entities;
 
@@ -51,7 +52,7 @@ namespace Chronozoom.Entities.Migration
             LoadDataFromDump("Beta Content", "beta-get.json", "beta-gettours.json", false, _baseContentAdmin.Value);
             LoadDataFromDump("Sandbox", "beta-get.json", "beta-gettours.json", true, null);
             LoadDataFromDump("AIDS Timeline", "aidstimeline-get.json", "aidstimeline-gettours.json", false, _baseContentAdmin.Value);
-        }
+       }
 
         private void MigrateRiTree()
         {
@@ -188,11 +189,21 @@ namespace Chronozoom.Entities.Migration
             {
                 if (replaceGuids) timeline.Id = Guid.NewGuid();
                 timeline.Collection = collection;
-                timeline.Depth = 0;
-                MigrateInPlace(timeline);
+                timeline.Depth = -1;  // this denotes no migration has been applied to current timeline
                 timeline.ForkNode = Storage.ForkNode((long)timeline.FromYear, (long)timeline.ToYear);
+            }
+
+            foreach (var timeline in timelines)  // note: timeline objects in "timelines" are ordered by depth already since they are parsed from a nested-JSON file 
+            {
+                if (timeline.Depth == -1)
+                {
+                    timeline.Depth = 0;
+                    MigrateInPlace(timeline);
+                }
                 _storage.Timelines.Add(timeline);
             }
+            _storage.CreatePostOrderIndex(timelines);
+            _storage.SaveChanges();
 
             if (dataTours != null)
             {
@@ -210,14 +221,15 @@ namespace Chronozoom.Entities.Migration
                             bookmark.Id = Guid.NewGuid();
                         }
                     }
-
                     _storage.Tours.Add(tour);
                 }
+                _storage.SaveChanges();
             }
         }
 
         private void MigrateInPlace(Timeline timeline)
         {
+            int subtreeSize = 0;
             if (timeline.Exhibits != null)
             {
                 foreach (var exhibit in timeline.Exhibits)
@@ -229,6 +241,7 @@ namespace Chronozoom.Entities.Migration
                         {
                             contentItem.Depth = exhibit.Depth + 1;
                         }
+                        subtreeSize += exhibit.ContentItems.Count();
                     }
                 }
             }
@@ -239,8 +252,10 @@ namespace Chronozoom.Entities.Migration
                 {
                     child.Depth = timeline.Depth + 1;
                     MigrateInPlace(child);
+                    subtreeSize += child.SubtreeSize;
                 }
             }
+            timeline.SubtreeSize = subtreeSize;
         }
 
         [DataContract]
