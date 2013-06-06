@@ -292,49 +292,11 @@ namespace Chronozoom.Entities
 
                 if (isCorrupted)
                 {
-                    MigrateInPlace(collectionId);
                     throw new StorageCorruptedException();
                 }
             }
 
             return result;
-        }
-
-        private void MigrateInPlace(Guid collectionId)
-        {
-            IEnumerable<TimelineRaw> allTimelines = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Collection_ID = {0}", collectionId);
-            Dictionary<Guid, Timeline> timelinesMap = new Dictionary<Guid, Timeline>();
-
-            int maxAllElements = 0;
-            List<Timeline> rootTimelines = FillTimelinesFromFlatList( allTimelines, timelinesMap, null, ref maxAllElements);
-            FillTimelineRelations(timelinesMap, int.MaxValue);
-
-            foreach (Timeline rootTimeline in rootTimelines)
-                Migration.Migrator.MigrateInPlace(rootTimeline);
-
-            Collection collection = Collections.Where(candidate => candidate.Id == collectionId).FirstOrDefault();
-
-            int notSavedTimelines = 0;
-            foreach (Timeline timelineChange in Timelines.Where(timeline => timeline.Collection.Id == collection.Id).ToList())
-            {
-                if (timelinesMap.Keys.Contains(timelineChange.Id))
-                {
-                    Timeline timelineMapInstance = timelinesMap[timelineChange.Id];
-                    timelineChange.Depth = timelineMapInstance.Depth;
-                    timelineChange.SubtreeSize = timelineMapInstance.SubtreeSize;
-                    timelineChange.ForkNode = timelineMapInstance.ForkNode;
-                    timelineChange.FirstNodeInSubtree = timelineMapInstance.FirstNodeInSubtree;
-                    timelineChange.Predecessor = timelineMapInstance.Predecessor;
-                    timelineChange.Successor = timelineMapInstance.Successor;
-
-                    if (++notSavedTimelines > 100)
-                    {
-                        SaveChanges();
-                        notSavedTimelines = 0;
-                    }
-                }
-            }
-            SaveChanges();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "FromYear+13700000001"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "ToYear+13700000001")]

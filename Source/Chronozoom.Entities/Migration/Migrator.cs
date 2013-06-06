@@ -234,6 +234,7 @@ namespace Chronozoom.Entities.Migration
             {
                 foreach (var exhibit in timeline.Exhibits)
                 {
+                    subtreeSize++;
                     exhibit.Depth = timeline.Depth + 1;
                     if (exhibit.ContentItems != null)
                     {
@@ -241,6 +242,7 @@ namespace Chronozoom.Entities.Migration
                         {
                             contentItem.Depth = exhibit.Depth + 1;
                         }
+                        subtreeSize += exhibit.ContentItems.Count();
                     }
                 }
             }
