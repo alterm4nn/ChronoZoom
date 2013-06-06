@@ -91,7 +91,7 @@ module CZ {
                         tl.height = (tl.right - tl.left) / tl.AspectRatio;
                     } else if (timeline.height && tl.Height) {
                         //If Child timeline has height in percentage of parent, calculate it before layout pass
-                        tl.height = timeline.height * tl.Height;
+                        tl.height = Math.min(timeline.height * tl.Height, (tl.right - tl.left) * CZ.Settings.timelineMinAspect);
                     }
                     //Calculate layout for each child timeline
                     LayoutTimeline(tl, timelineWidth, measureContext);
