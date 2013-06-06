@@ -41,6 +41,14 @@ namespace Chronozoom.Entities.Migration
             return AppDomain.CurrentDomain.BaseDirectory;
         });
 
+        private static Lazy<int> _maxTimelinesToImport = new Lazy<int>(() =>
+        {
+            if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["MaxTimelinesToImport"]))
+                return int.Parse(ConfigurationManager.AppSettings["MaxTimelinesToImport"], CultureInfo.InvariantCulture);
+
+            return 10000;
+        });
+
         public Migrator(Storage storage)
         {
             _storage = storage;
@@ -140,22 +148,31 @@ namespace Chronozoom.Entities.Migration
 
             _storage.Collections.Add(collection);
 
+            int importedTimelinesCount = 0;
+
             // Associate each timeline with the root collection
             TraverseTimelines(timelines, timeline =>
             {
-                timeline.Collection = collection;
-
-                foreach (Exhibit exhibit in timeline.Exhibits)
+                if (++importedTimelinesCount < _maxTimelinesToImport.Value)
                 {
-                    exhibit.Collection = collection;
+                    timeline.Collection = collection;
 
-                    if (exhibit.ContentItems != null)
+                    foreach (Exhibit exhibit in timeline.Exhibits)
                     {
-                        foreach (ContentItem contentItem in exhibit.ContentItems)
+                        exhibit.Collection = collection;
+
+                        if (exhibit.ContentItems != null)
                         {
-                            contentItem.Collection = collection;
+                            foreach (ContentItem contentItem in exhibit.ContentItems)
+                            {
+                                contentItem.Collection = collection;
+                            }
                         }
                     }
+                }
+                else if (timeline.ChildTimelines != null)
+                {
+                    timeline.ChildTimelines.Clear();
                 }
             });
 
