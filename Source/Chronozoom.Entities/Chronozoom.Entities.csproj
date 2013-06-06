@@ -124,7 +124,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Migration\TimelineSubtreeQuery.sql" />
     <Content Include="SQL\TimelineSubtreeQuery.sql" />
   </ItemGroup>
   <ItemGroup />
