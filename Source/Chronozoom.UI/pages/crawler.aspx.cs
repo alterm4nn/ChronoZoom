@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
+using System.Collections.ObjectModel;
 using Chronozoom.Entities;
 
 namespace Chronozoom.UI
@@ -24,7 +25,7 @@ namespace Chronozoom.UI
         /// <returns>The URL segment for the SuperCollection.</returns>
         public static string UrlSuperCollection(Uri url)
         {
-            string superCollection = ConfigurationManager.AppSettings["DefaultSuperCollection"] +"/";
+            string superCollection = ConfigurationManager.AppSettings["DefaultSuperCollection"] + "/";
 
             if (url != null && url.Segments.Length >= 2)
             {
@@ -50,31 +51,38 @@ namespace Chronozoom.UI
         {
             string collection = ConfigurationManager.AppSettings["DefaultSuperCollection"] + "/";
 
-            if (url != null && url.Segments.Length == 2)
+            if (url != null)
             {
-                if (url.Segments[1] != "pages/")
+
+                string realUrl = url.ToString().Split('#')[0];
+                    url = new Uri(realUrl);
+
+                if (url.Segments.Length == 2)
                 {
-                    collection = url.Segments[1];
+                    if (url.Segments[1] != "pages/")
+                    {
+                        collection = url.Segments[1];
+                    }
+                }
+                else
+                {
+                    if (url != null && url.Segments.Length > 2)
+                    {
+                        if (IsGuid(url.Segments[2]))
+                        {
+                            return null;
+                        }
+                        if (url.Segments[2] == "crawler.aspx" || url.Segments[2] == "crawler.aspx/" || url.Segments[2] == "pages/")
+                        {
+                            return collection.ToString().Split('/')[0];
+                        }
+
+                        collection = url.Segments[2];
+                    }
                 }
             }
-            else
-            {
-                if (url != null && url.Segments.Length > 2)
-                {
-                    if (IsGuid(url.Segments[2]))
-                    {
-                        return null;
-                    }
-                    if (url.Segments[2] == "crawler.aspx" || url.Segments[2] == "crawler.aspx/" || url.Segments[2] == "pages/")
-                    {
-                        return collection;
-                    }
 
-                    collection = url.Segments[2];
-                }
-            }
-
-            return collection;
+            return collection.ToString().Split('/')[0];
         }
 
         /// <summary>
@@ -117,7 +125,7 @@ namespace Chronozoom.UI
                 return null;
             }
 
-            return new Uri(_hostPath.Value + "/" + FriendlyUrl.FriendlyUrlEncode(superCollection) + "/" + FriendlyUrl.FriendlyUrlEncode(collection) + "/");
+            return new Uri(_hostPath.Value + "/" + FriendlyUrl.FriendlyUrlEncode(superCollection) + FriendlyUrl.FriendlyUrlEncode(collection)+ "/");
         }
 
         public static string RootTimelineId(Uri collection)
@@ -158,13 +166,34 @@ namespace Chronozoom.UI
                 }
                 else
                 {
-                    string title = FriendlyUrl.FriendlyUrlDecode(UrlCollection(collection).Substring(0, UrlCollection(collection).Length - 1));
-                    Timeline timeline = _storage.GetRootTimeline(_storage.GetCollectionGuid(title));
-
-                    if (timeline != null)
+                    if (IsTimeline(UrlGuid(collection)))
                     {
-                        root = timeline.Id.ToString();
+                        string title = FriendlyUrl.FriendlyUrlDecode(UrlCollection(collection));
+                        Timeline timeline = _storage.GetRootTimeline(_storage.GetCollectionGuid(title));
+
+                        if (timeline != null)
+                        {
+                            root = timeline.Id.ToString();
+                        }
+                        else
+                        {
+                            title = FriendlyUrl.FriendlyUrlDecode(UrlCollection(collection).Substring(0, UrlCollection(collection).Length - 1));
+                            timeline = _storage.GetRootTimeline(_storage.GetCollectionGuid(title));
+
+                            if (timeline != null)
+                            {
+                                root = timeline.Id.ToString();
+                            }
+                        }
                     }
+                }
+
+                string name = FriendlyUrl.FriendlyUrlDecode(UrlCollection(collection)).ToString().Split('#')[0];
+                Timeline rootTimeline = _storage.GetRootTimeline(_storage.GetCollectionGuid(name));
+
+                if (rootTimeline != null)
+                {
+                    root = rootTimeline.Id.ToString();
                 }
             }
 
@@ -219,7 +248,8 @@ namespace Chronozoom.UI
             }
             else
             {
-                return false;
+                string parsedTitle = FriendlyUrl.FriendlyUrlDecode(id);
+                return _storage.Timelines.Any(candidate => candidate.Title == parsedTitle);
             }
         }
 
