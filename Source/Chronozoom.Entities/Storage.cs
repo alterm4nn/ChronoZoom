@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright company="Outercurve Foundation">
 //   Copyright (c) 2013, The Outercurve Foundation
 // </copyright>
@@ -23,6 +23,15 @@ using System.Runtime.Serialization;
 
 namespace Chronozoom.Entities
 {
+    /// <summary>
+    /// Throw if a query detects that the storage is corrupted
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2237:MarkISerializableTypesWithSerializable")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors")]
+    public class StorageCorruptedException : Exception
+    {
+    }
+
     /// <summary>
     /// Storage implementation for ChronoZoom based on Entity Framework.
     /// </summary>
@@ -54,9 +63,9 @@ namespace Chronozoom.Entities
             {
                 ((IObjectContextAdapter)this).ObjectContext.CommandTimeout = _storageTimeout.Value;
             }
-
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<Storage, StorageMigrationsConfiguration>());
             Configuration.ProxyCreationEnabled = false;
+            Trace.TraceInformation("providerName: " + System.Configuration.ConfigurationManager.ConnectionStrings[0].ProviderName);
         }
 
         public static TraceSource Trace { get; private set; }
@@ -71,13 +80,85 @@ namespace Chronozoom.Entities
 
         public DbSet<Tour> Tours { get; set; }
 
-        public DbSet<Bookmark> Bookmarks { get; set; }
+        public DbSet<Bookmark> Bookmarks { get; set; } 
 
         public DbSet<User> Users { get; set; }
 
         public DbSet<Entities.Collection> Collections { get; set; }
 
         public DbSet<SuperCollection> SuperCollections { get; set; }
+        
+        public void CreatePostOrderIndex()
+        {
+            foreach (Timeline t in Timelines)
+            {
+                t.Successor = Guid.Empty;
+                t.Predecessor = Guid.Empty;
+                t.FirstNodeInSubtree = Guid.Empty;
+
+            }
+            foreach (Timeline t in Timelines)
+            {
+                if (t.Depth == 0)
+                {
+                    PostOrderTraversal(t);
+                }
+            }
+            SaveChanges();
+        }
+
+        public void CreatePostOrderIndex(IEnumerable<Timeline> timelines)
+        {
+            if (timelines == null) throw new ArgumentNullException("timelines");
+            foreach (Timeline t in timelines)
+            {
+                t.Successor = Guid.Empty;
+                t.Predecessor = Guid.Empty;
+                t.FirstNodeInSubtree = Guid.Empty;
+
+            }
+            foreach (Timeline t in timelines)
+            {
+                if (t.Depth == 0)
+                {
+                    PostOrderTraversal(t);
+                }
+            }
+            SaveChanges();
+        }
+
+        private Timeline PostOrderTraversal(Timeline root)
+        {
+            if (root.ChildTimelines != null)
+            {
+                int count = root.ChildTimelines.Count;
+                if (count > 0)
+                {
+                    Timeline rs = PostOrderTraversal(root.ChildTimelines[0]);
+                    root.FirstNodeInSubtree = rs.Id;
+                    for (int i = 0; i < count - 1; ++i)
+                    {
+                        Timeline s = PostOrderTraversal(root.ChildTimelines[i + 1]);
+                        root.ChildTimelines[i].Successor = s.Id;
+                        s.Predecessor = root.ChildTimelines[i].Id;
+                    }
+                    root.ChildTimelines[count - 1].Successor = root.Id;
+                    root.Predecessor = root.ChildTimelines[count - 1].Id;
+                    return rs;
+                }
+                else
+                {
+                    root.FirstNodeInSubtree = root.Id;
+                    return root;
+                }
+            }
+            else
+            {
+                root.FirstNodeInSubtree = root.Id;
+                return root;
+            }
+        }
+
 
         public Collection<Timeline> TimelinesQuery(Guid collectionId, decimal startTime, decimal endTime, decimal span, Guid? commonAncestor, int maxElements, int depth)
         {
@@ -100,6 +181,122 @@ namespace Chronozoom.Entities
             }
 
             return new Collection<Timeline>(timelines);
+        }
+
+        public IEnumerable<Timeline> RetrieveAllTimelines(Guid collectionId)
+        {
+            int maxAllElements = 0;
+            Dictionary<Guid, Timeline> timelinesMap = new Dictionary<Guid, Timeline>();
+
+            IEnumerable<TimelineRaw> allTimelines = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Collection_ID = {0}", collectionId);
+            IEnumerable<Timeline> rootTimelines = FillTimelinesFromFlatList(allTimelines, timelinesMap, null, ref maxAllElements);
+            FillTimelineRelations(timelinesMap, int.MaxValue);
+
+            return rootTimelines;
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
+        public IEnumerable<Timeline> TimelineSubtreeQuery(Guid collectionId, Guid? leastCommonAncestor, decimal startTime, decimal endTime, decimal minSpan, int maxElements)
+        {
+            IEnumerable<TimelineRaw> result;
+            Dictionary<Guid?, TimelineRaw> map = new Dictionary<Guid?, TimelineRaw>();
+            if (System.Configuration.ConfigurationManager.ConnectionStrings[0].ProviderName.Equals("System.Data.SqlClient"))
+            {
+                result = Database.SqlQuery<TimelineRaw>("EXEC TimelineSubtreeQuery {0}, {1}, {2}, {3}, {4}, {5}", collectionId, leastCommonAncestor, minSpan, startTime, endTime, maxElements);
+            }
+            else
+            {
+                bool return_entire_subtree = false;
+                result = new Collection<TimelineRaw>();
+                if (leastCommonAncestor != null)
+                {
+                    Timeline root = Timelines.Where(r => r.Id == leastCommonAncestor).FirstOrDefault();
+                    if (root != null && root.SubtreeSize <= maxElements)
+                    {
+                        for (Timeline c = Timelines.Where(_c => _c.Id == root.FirstNodeInSubtree).FirstOrDefault(); c != root; c = Timelines.Where(_c => _c.Id == c.Successor).FirstOrDefault())
+                        {
+                            ((Collection<TimelineRaw>)result).Add(new TimelineRaw(c));
+                        }
+                        return_entire_subtree = true;
+                    }
+                }
+                if (!return_entire_subtree)
+                {
+                    Queue<TimelineRaw> q = new Queue<TimelineRaw>();
+                    var init_timelines = leastCommonAncestor == null ? Database.SqlQuery<TimelineRaw>("SELECT * FROM [Timelines] WHERE [Depth] = 0 AND CollectionID = {0}", collectionId) : Database.SqlQuery<TimelineRaw>("SELECT * FROM [Timelines] WHERE [Id] = {0}", leastCommonAncestor);   // select the root element
+                    foreach (TimelineRaw t in init_timelines)   //under normal circumstances this result should only contain a single timeline
+                    {
+                        q.Enqueue(t);
+                    }
+                    while (q.Count > 0 && maxElements > 0)
+                    {
+                        bool childGreaterThanMinspan = false;
+                        TimelineRaw t = q.Dequeue();
+                        var childTimelines = Database.SqlQuery<TimelineRaw>("SELECT * FROM [Timelines] WHERE [Timeline_ID] = {0}", t.Id);
+                        foreach (TimelineRaw c in childTimelines)
+                        {
+                            if (c.ToYear - c.FromYear > minSpan)
+                            {
+                                childGreaterThanMinspan = true;
+                                break;
+                            }
+                        }
+                        ((Collection<TimelineRaw>)result).Add(t);
+                        --maxElements;
+                        if (childGreaterThanMinspan)
+                        {
+                            if (maxElements >= t.ChildTimelines.Count())
+                            {
+                                foreach (TimelineRaw c in childTimelines)
+                                {
+                                    --maxElements;
+                                    if ((c.FromYear >= startTime && c.FromYear <= endTime) || (c.ToYear >= startTime && c.ToYear <= endTime) || (c.FromYear <= startTime && c.ToYear >= endTime) || (c.FromYear >= startTime && c.ToYear <= endTime))
+                                    {   //if c overlaps with current viewport, then c may be further expanded
+                                        q.Enqueue(c);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Cache results in list
+            result = result.ToList();
+
+            foreach (TimelineRaw t in result)   // note: results are ordered by depth in ascending order
+            {
+                map.Add(t.Id, t);
+            }
+            foreach (TimelineRaw t in result)   // note: results are ordered by depth in ascending order
+            {
+                if (t.Timeline_ID != null && map.ContainsKey(t.Timeline_ID))
+                {
+                    if (map[t.Timeline_ID].ChildTimelines == null)
+                    {
+                        map[t.Timeline_ID].ChildTimelines = new Collection<Timeline>();
+                    }
+                    map[t.Timeline_ID].ChildTimelines.Add(t);
+                }
+            }
+
+            // Fast verification for correctness 
+            foreach (TimelineRaw t in result)
+            {
+                bool isCorrupted = false;
+
+                if (t.ChildTimelines != null 
+                    && t.ChildTimelines.Count() > 0
+                    && t.SubtreeSize < t.ChildTimelines.Count())
+                    isCorrupted = true;
+
+                if (isCorrupted)
+                {
+                    throw new StorageCorruptedException();
+                }
+            }
+
+            return result;
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "FromYear+13700000001"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "ToYear+13700000001")]
@@ -354,7 +551,7 @@ namespace Chronozoom.Entities
             {
                 contentPath = "/t" + timeline.Id + contentPath;
                 timeline = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Id = {0}", timeline.Timeline_ID).FirstOrDefault();
-            }
+            } 
 
             return contentPath.ToString();
         }
@@ -417,11 +614,36 @@ namespace Chronozoom.Entities
             return parentTimelinesRaw.FirstOrDefault();
         }
 
-        public Timeline GetRootTimeline(Guid collectionId)
+        public TimelineRaw GetExhibitParentTimeline(Guid exhibitId)
+        {
+            var parentTimelinesRaw = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Id in (SELECT Timeline_Id FROM Exhibits WHERE Id = {0})", exhibitId);
+
+            return parentTimelinesRaw.FirstOrDefault();
+        }
+
+        public ExhibitRaw GetContentItemParentExhibit(Guid contentItemId)
+        {
+            var exhibitRaw = Database.SqlQuery<ExhibitRaw>("SELECT * FROM Exhibits WHERE Id in (SELECT Exhibit_Id FROM ContentItems WHERE Id = {0})", contentItemId);
+
+            return exhibitRaw.FirstOrDefault();
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0")]
+        public void UpdateFirstNodeInSubtree(Timeline currentTimeline, Guid firstTimelineId)
+        {
+            TimelineRaw parent = GetParentTimelineRaw(currentTimeline.Id);
+            currentTimeline.FirstNodeInSubtree = firstTimelineId;
+            if (parent != null)
+            {
+                UpdateFirstNodeInSubtree(parent, firstTimelineId);
+            }
+        }
+
+        public IEnumerable<Timeline> GetRootTimelines(Guid collectionId)
         {
             var rootCollectionTimeline = Database.SqlQuery<Timeline>("SELECT * FROM Timelines WHERE Timeline_ID is NULL and Collection_ID = {0}", collectionId);
 
-            return rootCollectionTimeline.FirstOrDefault();
+            return rootCollectionTimeline;
         }
 
         public Guid GetCollectionGuid(string title)
@@ -451,7 +673,7 @@ namespace Chronozoom.Entities
 
             return collectionGuid.FirstOrDefault();
         }
-
+ 
         // Returns the tour associated with a given bookmark id.
         public Tour GetBookmarkTour(Bookmark bookmark)
         {

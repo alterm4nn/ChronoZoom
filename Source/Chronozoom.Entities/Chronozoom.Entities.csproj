@@ -124,6 +124,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Migrations\201306050753190_ProgressiveLoad.sql" />
+    <Content Include="Migration\TimelineSubtreeQuery.sql" />
     <Content Include="SQL\TimelineSubtreeQuery.sql" />
   </ItemGroup>
   <ItemGroup />
