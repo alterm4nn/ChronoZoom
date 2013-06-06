@@ -6,18 +6,25 @@ using System.Web;
 
 namespace Chronozoom.UI
 {
-    internal static class FriendlyUrl
+    public static class FriendlyUrl
     {
         // Replace with URL friendly representations. For instance, converts space to '-'.
-        [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase")]
-        internal static string FriendlyUrlEncode(string value)
+        [SuppressMessage("Microsoft.Design", "CA1055:UriReturnValuesShouldNotBeStrings"), SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase")]
+        public static string FriendlyUrlEncode(string value)
         {
+            if (value == null)
+                return null;
+
             return Uri.EscapeDataString(value.Replace(' ', '-').ToLowerInvariant());
         }
 
         // Decodes from URL friendly representations. For instance, converts '-' to space.
-        internal static string FriendlyUrlDecode(string value)
+        [SuppressMessage("Microsoft.Design", "CA1055:UriReturnValuesShouldNotBeStrings")]
+        public static string FriendlyUrlDecode(string value)
         {
+            if (value == null)
+                return null;
+
             return Uri.UnescapeDataString(value.Replace('-', ' '));
         }
     }
