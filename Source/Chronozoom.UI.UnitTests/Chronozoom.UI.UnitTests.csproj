@@ -95,6 +95,9 @@
     <Content Include="Scripts\Specs\commonSpec.js" />
     <Content Include="Scripts\Specs\datepickerSpec.js" />
     <Content Include="Scripts\Specs\datesSpec.js" />
+    <Content Include="Scripts\Specs\featureActivationSpec.js">
+      <DependentUpon>featureActivationSpec.ts</DependentUpon>
+    </Content>
     <Content Include="Scripts\typings\jasmine\jasmine.d.ts" />
     <TypeScriptCompile Include="Scripts\Specs\featureActivationSpec.ts" />
     <Content Include="Scripts\Specs\profileDataSpec.js" />
