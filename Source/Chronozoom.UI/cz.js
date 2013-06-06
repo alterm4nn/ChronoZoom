@@ -1937,7 +1937,7 @@ var CZ;
                             CZ.Authoring.mode = "editContentItem";
                             CZ.Authoring.contentItemMode = "editContentItem";
                             CZ.Authoring.selectedExhibit = self.parent.parent.parent;
-                            CZ.Authoring.selectedContentItem = CZ.Authoring.selectedExhibit.contentItems[self.contentItem.index];
+                            CZ.Authoring.selectedContentItem = self.contentItem;
                             return true;
                         };
                         editButton.onmouseenter = function () {
@@ -2295,8 +2295,6 @@ var CZ;
             if(n <= 0) {
                 return null;
             }
-            n--;
-            var vcitems = [];
             var _rad = 450.0 / 2.0;
             var k = 1.0 / _rad;
             var _wc = 260.0 * k;
@@ -2309,33 +2307,24 @@ var CZ;
             var lh = _lh * rad;
             var _ytc = -_hc / 2 - 9.0 * k - _lh / 2;
             var _ybc = -_ytc;
-            for(var i = 0; i < contentItems.length; i++) {
-                contentItems[i].index = i;
-            }
-            vcitems.push(new ContentItem(vc, layerid, contentItems[0].id, -_wc / 2 * rad + xc, -_hc / 2 * rad + yc, _wc * rad, _hc * rad, contentItems[0]));
-            var m1 = Math.floor(n / 3);
-            var m2 = n % 3;
-            var nL = m1 + (m2 > 0 ? 1 : 0);
-            var nR = m1 + (m2 > 1 ? 1 : 0);
-            var nB = m1 + (m2 > 2 ? 1 : 0);
-            var i = 1;
-            var arrange = arrangeContentItemsInField(nL, _lh);
+            var arrangeLeft = arrangeContentItemsInField(3, _lh);
+            var arrangeRight = arrangeContentItemsInField(3, _lh);
+            var arrangeBottom = arrangeContentItemsInField(3, _lw);
             var xl = xc + rad * (_xlc - _lw / 2);
-            for(var j = 0; j < nL; j++ , i++) {
-                var ci = contentItems[i];
-                vcitems.push(new ContentItem(vc, layerid, ci.id, xl, yc + rad * arrange[j], lw, lh, ci));
-            }
-            arrange = arrangeContentItemsInField(nB, _lw);
-            var yb = yc + rad * (_ybc - _lh / 2);
-            for(var j = 0; j < nB; j++ , i++) {
-                var ci = contentItems[i];
-                vcitems.push(new ContentItem(vc, layerid, ci.id, xc + rad * arrange[j], yb, lw, lh, ci));
-            }
-            arrange = arrangeContentItemsInField(nR, _lh);
             var xr = xc + rad * (_xrc - _lw / 2);
-            for(var j = nR; --j >= 0; i++) {
+            var yb = yc + rad * (_ybc - _lh / 2);
+            var vcitems = [];
+            for(var i = 0, len = Math.min(10, n); i < len; i++) {
                 var ci = contentItems[i];
-                vcitems.push(new ContentItem(vc, layerid, ci.id, xr, yc + rad * arrange[j], lw, lh, ci));
+                if(i === 0) {
+                    vcitems.push(new ContentItem(vc, layerid, ci.id, -_wc / 2 * rad + xc, -_hc / 2 * rad + yc, _wc * rad, _hc * rad, ci));
+                } else if(i >= 1 && i <= 3) {
+                    vcitems.push(new ContentItem(vc, layerid, ci.id, xl, yc + rad * arrangeLeft[(i - 1) % 3], lw, lh, ci));
+                } else if(i >= 4 && i <= 6) {
+                    vcitems.push(new ContentItem(vc, layerid, ci.id, xr, yc + rad * arrangeRight[(i - 1) % 3], lw, lh, ci));
+                } else if(i >= 7 && i <= 9) {
+                    vcitems.push(new ContentItem(vc, layerid, ci.id, xc + rad * arrangeBottom[(i - 1) % 3], yb, lw, lh, ci));
+                }
             }
             return vcitems;
         }
@@ -2417,7 +2406,8 @@ var CZ;
                     uri: ci.contentItem ? ci.contentItem.uri : ci.uri,
                     mediaType: ci.contentItem ? ci.contentItem.mediaType : ci.mediaType,
                     attribution: ci.contentItem ? ci.contentItem.attribution : ci.attribution,
-                    mediaSource: ci.contentItem ? ci.contentItem.mediaSource : ci.mediaSource
+                    mediaSource: ci.contentItem ? ci.contentItem.mediaSource : ci.mediaSource,
+                    order: ci.contentItem ? ci.contentItem.order : ci.order
                 };
             }
             Map.contentItem = contentItem;
@@ -2718,9 +2708,13 @@ var CZ;
             });
         }
         Service.deleteProfile = deleteProfile;
-        function getProfile() {
+        function getProfile(displayName) {
+            if (typeof displayName === "undefined") { displayName = ""; }
             var request = new Service.Request(_serviceUrl);
             request.addToPath("user");
+            if(displayName != "") {
+                request.addParameter("name", displayName);
+            }
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -2763,17 +2757,12 @@ var CZ;
             30, 
             31
         ];
-        function getCoordinateFromDMY(year, month, day) {
+        function getCoordinateFromYMD(year, month, day) {
             var sign = (year != 0) ? year / Math.abs(year) : 1;
             var i = 0;
-            var coordinate = 0;
-            for(i = 0; i < Math.abs(year); i++) {
-                coordinate += sign;
-                if(isLeapYear(i * sign)) {
-                    coordinate += sign / 365;
-                }
-            }
+            var coordinate = year;
             var days = day;
+            var daysPerYear = isLeapYear(year) ? 366 : 365;
             for(i = 0; i < month; i++) {
                 days += Dates.daysInMonth[i];
                 if((i === 1) && (isLeapYear(year))) {
@@ -2781,40 +2770,39 @@ var CZ;
                 }
             }
             if((month > 1) && (isLeapYear(year))) {
-                coordinate += sign * days / 365;
+                coordinate += sign * days / daysPerYear;
             } else {
-                coordinate += (sign >= 0) ? sign * days / 365 : sign * (1 - days / 365);
+                coordinate += (sign >= 0) ? sign * days / daysPerYear : sign * (1 - days / daysPerYear);
             }
             if(year < 0) {
                 coordinate += 1;
             }
+            coordinate -= 1 / daysPerYear;
             return coordinate;
         }
-        Dates.getCoordinateFromDMY = getCoordinateFromDMY;
+        Dates.getCoordinateFromYMD = getCoordinateFromYMD;
         function getDMYFromCoordinate(coord) {
-            var sign = coord / Math.abs(coord);
+            var sign = (coord === 0) ? 1 : coord / Math.abs(coord);
             var day = 0, month = 0, year = 0;
             var idxYear, countLeapYears = 0;
             year = (coord >= 0) ? Math.floor(coord) : Math.floor(coord) + 1;
-            countLeapYears = (sign > 0) ? numberofLeap(year) : 0;
+            var daysPerYear = isLeapYear(year) ? 366 : 365;
             var day, month;
             var countDays;
-            countDays = Math.abs(coord) - Math.abs(year);
+            countDays = Math.abs(coord) - Math.abs(year) + sign * 1. / daysPerYear;
             if(sign < 0) {
                 countDays = 1 - countDays;
             }
-            var daysPerYear = 365.0;
-            var countDaysWithoutLeapDays = countDays - countLeapYears / daysPerYear;
             var idxMonth = 0;
-            while(countDaysWithoutLeapDays > Dates.daysInMonth[idxMonth] / daysPerYear) {
-                countDaysWithoutLeapDays -= Dates.daysInMonth[idxMonth] / daysPerYear;
+            while(countDays > Dates.daysInMonth[idxMonth] / daysPerYear) {
+                countDays -= Dates.daysInMonth[idxMonth] / daysPerYear;
                 if(isLeapYear(year) && (idxMonth === 1)) {
-                    countDaysWithoutLeapDays -= 1 / daysPerYear;
+                    countDays -= 1 / daysPerYear;
                 }
                 idxMonth++;
             }
             month = idxMonth;
-            day = countDaysWithoutLeapDays * daysPerYear;
+            day = countDays * daysPerYear;
             while(Math.round(day) <= 0) {
                 month--;
                 if(month === -1) {
@@ -2838,7 +2826,7 @@ var CZ;
         Dates.getDMYFromCoordinate = getDMYFromCoordinate;
         function getCoordinateFromDecimalYear(decimalYear) {
             var localPresent = getPresent();
-            var presentDate = getCoordinateFromDMY(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+            var presentDate = getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
             return decimalYear === 9999 ? presentDate : decimalYear;
         }
         Dates.getCoordinateFromDecimalYear = getCoordinateFromDecimalYear;
@@ -3379,7 +3367,7 @@ var CZ;
         }
         Authoring.validateExhibitData = validateExhibitData;
         function validateNumber(number) {
-            return !isNaN(Number(number) && parseFloat(number)) && isNotEmpty(number);
+            return !isNaN(Number(number) && parseFloat(number)) && isNotEmpty(number) && (number !== false);
         }
         Authoring.validateNumber = validateNumber;
         function isNotEmpty(obj) {
@@ -3422,8 +3410,10 @@ var CZ;
                     }
                 } else if(ci.mediaType.toLowerCase() === "pdf") {
                     var pdf = /\.(pdf)$/i;
+                    var docs = /\S+docs.google.com\S+$/i;
                     if(pdf.test(ci.uri)) {
                         ci.uri = "http://docs.google.com/viewer?url=" + encodeURI(ci.uri) + "&embedded=true";
+                    } else if(docs.test(ci.uri)) {
                     } else {
                         alert("Sorry, only PDF extension is supported");
                         isValid = false;
@@ -3465,7 +3455,29 @@ var CZ;
                 };
                 this.itemRemoveHandler = function (item, idx) {
                 };
+                this.itemMoveHandler = function (item, idx1, idx2) {
+                };
+                var self = this;
                 if(listBoxInfo.sortableSettings) {
+                    var origStart = listBoxInfo.sortableSettings.start;
+                    var origStop = listBoxInfo.sortableSettings.stop;
+                    $.extend(listBoxInfo.sortableSettings, {
+                        start: function (event, ui) {
+                            ui.item.startPos = ui.item.index();
+                            if(origStart) {
+                                origStart(event, ui);
+                            }
+                        },
+                        stop: function (event, ui) {
+                            ui.item.stopPos = ui.item.index();
+                            var item = self.items.splice(ui.item.startPos, 1)[0];
+                            self.items.splice(ui.item.stopPos, 0, item);
+                            self.itemMoveHandler(ui.item, ui.item.startPos, ui.item.stopPos);
+                            if(origStop) {
+                                origStop(event, ui);
+                            }
+                        }
+                    });
                     this.container.sortable(listBoxInfo.sortableSettings);
                 }
             }
@@ -3505,6 +3517,9 @@ var CZ;
             };
             ListBoxBase.prototype.itemRemove = function (handler) {
                 this.itemRemoveHandler = handler;
+            };
+            ListBoxBase.prototype.itemMove = function (handler) {
+                this.itemMoveHandler = handler;
             };
             return ListBoxBase;
         })();
@@ -6842,7 +6857,7 @@ var CZ;
             var firstYear;
             if(_range.min >= -10000) {
                 beta = Math.log(_range.max - _range.min) * log10;
-                firstYear = CZ.Dates.getCoordinateFromDMY(0, 0, 1);
+                firstYear = CZ.Dates.getCoordinateFromYMD(0, 0, 1);
                 if(beta >= 0) {
                     x1 += k * firstYear;
                 }
@@ -7260,7 +7275,7 @@ var CZ;
                 month: localPresent.getUTCMonth(),
                 day: localPresent.getUTCDate()
             };
-            this.firstYear = CZ.Dates.getCoordinateFromDMY(0, 0, 1);
+            this.firstYear = CZ.Dates.getCoordinateFromYMD(0, 0, 1);
             this.range.max -= this.firstYear;
             this.range.min -= this.firstYear;
             this.startDate = this.present;
@@ -7291,7 +7306,7 @@ var CZ;
                 count++;
             }
             for(var i = 0; i < count + 1; i++) {
-                var tick_position = CZ.Dates.getCoordinateFromDMY(x0 + i * dx, 0, 1);
+                var tick_position = CZ.Dates.getCoordinateFromYMD(x0 + i * dx, 0, 1);
                 if(tick_position < 1 && dx > 1) {
                     tick_position += 1;
                 }
@@ -7494,7 +7509,7 @@ var CZ;
                 month: localPresent.getUTCMonth(),
                 day: localPresent.getUTCDate()
             };
-            this.firstYear = CZ.Dates.getCoordinateFromDMY(0, 0, 1);
+            this.firstYear = CZ.Dates.getCoordinateFromYMD(0, 0, 1);
             this.startDate = CZ.Dates.getDMYFromCoordinate(this.range.min);
             this.endDate = CZ.Dates.getDMYFromCoordinate(this.range.max);
             this.delta = 1;
@@ -7564,7 +7579,7 @@ var CZ;
                     year++;
                 }
                 if((this.regime == "Quarters_Month") || (this.regime == "Month_Weeks")) {
-                    var tick = CZ.Dates.getCoordinateFromDMY(year, month, 1);
+                    var tick = CZ.Dates.getCoordinateFromYMD(year, month, 1);
                     if(tick >= this.range.min && tick <= this.range.max) {
                         if(tempDays != 1) {
                             if((month % 3 == 0) || (this.regime == "Month_Weeks")) {
@@ -7585,7 +7600,7 @@ var CZ;
                     tempDays = 1;
                     for(var k = 1; k <= countDays; k += date_step) {
                         day = k;
-                        tick = CZ.Dates.getCoordinateFromDMY(year, month, day);
+                        tick = CZ.Dates.getCoordinateFromYMD(year, month, day);
                         if(tick >= this.range.min && tick <= this.range.max) {
                             if(this.regime == "Weeks_Days") {
                                 if((k == 3) || (k == 10) || (k == 17) || (k == 24) || (k == 28)) {
@@ -7639,12 +7654,12 @@ var CZ;
                 return null;
             }
             date.day -= step;
-            tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
+            tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
             if(this.regime != "Month_Weeks") {
                 while(tick > this.range.min) {
                     minors.push(tick);
                     date.day -= step;
-                    tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
                 }
             } else {
                 var j = CZ.Dates.daysInMonth[date.month];
@@ -7653,7 +7668,7 @@ var CZ;
                         minors.push(tick);
                     }
                     date.day -= step;
-                    tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
                     j--;
                 }
             }
@@ -7663,7 +7678,7 @@ var CZ;
                 var j_step = 1;
                 for(var j = 1; j <= n; j += j_step) {
                     date.day += step;
-                    tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
                     if(this.regime != "Month_Weeks") {
                         if(minors.length == 0 || k * (ticks[i + 1].position - tick) > CZ.Settings.minSmallTickSpace) {
                             minors.push(tick);
@@ -7680,12 +7695,12 @@ var CZ;
             var tick = ticks[ticks.length - 1].position;
             var date = CZ.Dates.getDMYFromCoordinate(tick);
             date.day += step;
-            tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
+            tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
             if(this.regime != "Month_Weeks") {
                 while(tick < this.range.max) {
                     minors.push(tick);
                     date.day += step;
-                    tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
                 }
             } else {
                 var j = 0;
@@ -7694,7 +7709,7 @@ var CZ;
                         minors.push(tick);
                     }
                     date.day += step;
-                    tick = CZ.Dates.getCoordinateFromDMY(date.year, date.month, date.day);
+                    tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
                     j++;
                 }
             }
@@ -7737,9 +7752,9 @@ var CZ;
             if(left_year_val <= 0) {
                 left_year_val++;
             }
-            var right_val = CZ.Dates.getCoordinateFromDMY(right_year_val, right_month_val, right_date_val);
-            var left_val = CZ.Dates.getCoordinateFromDMY(left_year_val, left_month_val, left_date_val);
-            var old_right_val = CZ.Dates.getCoordinateFromDMY(old_right_year_val, old_right_month_val, old_right_date_val);
+            var right_val = CZ.Dates.getCoordinateFromYMD(right_year_val, right_month_val, right_date_val);
+            var left_val = CZ.Dates.getCoordinateFromYMD(left_year_val, left_month_val, left_date_val);
+            var old_right_val = CZ.Dates.getCoordinateFromYMD(old_right_year_val, old_right_month_val, old_right_date_val);
             if(range.min < this.range.min) {
                 range.min = this.range.min;
             }
@@ -7776,9 +7791,9 @@ var CZ;
             if(left_year_val <= 0) {
                 left_year_val++;
             }
-            var right_val = CZ.Dates.getCoordinateFromDMY(right_year_val, right_month_val, right_date_val);
-            var left_val = CZ.Dates.getCoordinateFromDMY(left_year_val, left_month_val, left_date_val);
-            var old_left_val = CZ.Dates.getCoordinateFromDMY(old_left_year_val, old_left_month_val, old_left_date_val);
+            var right_val = CZ.Dates.getCoordinateFromYMD(right_year_val, right_month_val, right_date_val);
+            var left_val = CZ.Dates.getCoordinateFromYMD(left_year_val, left_month_val, left_date_val);
+            var old_left_val = CZ.Dates.getCoordinateFromYMD(old_left_year_val, old_left_month_val, old_left_date_val);
             if(range.min < this.range.min) {
                 range.min = this.range.min;
             }
@@ -8355,7 +8370,7 @@ var CZ;
                     switch(mode) {
                         case "year":
                             _this.editModeYear();
-                            _this.setDate(_this.coordinate);
+                            _this.setDate(_this.coordinate, false);
                             break;
                         case "date":
                             _this.editModeDate();
@@ -8374,7 +8389,7 @@ var CZ;
                 this.datePicker.append(this.dateContainer);
                 this.datePicker.append(this.errorMsg);
                 this.editModeYear();
-                this.setDate(this.coordinate);
+                this.setDate(this.coordinate, true);
             };
             DatePicker.prototype.remove = function () {
                 this.datePicker.empty();
@@ -8384,7 +8399,8 @@ var CZ;
                 var optionIntinite = $("<option value='infinite'>Infinite</option>");
                 this.modeSelector.append(optionIntinite);
             };
-            DatePicker.prototype.setDate = function (coordinate) {
+            DatePicker.prototype.setDate = function (coordinate, InfinityConvertation) {
+                if (typeof InfinityConvertation === "undefined") { InfinityConvertation = false; }
                 if(!this.validateNumber(coordinate)) {
                     return false;
                 }
@@ -8392,14 +8408,19 @@ var CZ;
                 this.coordinate = coordinate;
                 var mode = this.modeSelector.find(":selected").val();
                 if(this.coordinate === this.INFINITY_VALUE) {
-                    this.regimeSelector.find(":selected").attr("selected", "false");
-                    this.modeSelector.find("option").each(function () {
-                        if($(this).val() === "infinite") {
-                            $(this).attr("selected", "selected");
-                            return;
-                        }
-                    });
-                    this.editModeInfinite();
+                    if(InfinityConvertation) {
+                        this.regimeSelector.find(":selected").attr("selected", "false");
+                        this.modeSelector.find("option").each(function () {
+                            if($(this).val() === "infinite") {
+                                $(this).attr("selected", "selected");
+                                return;
+                            }
+                        });
+                        this.editModeInfinite();
+                    } else {
+                        var localPresent = CZ.Dates.getPresent();
+                        coordinate = CZ.Dates.getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+                    }
                 }
                 switch(mode) {
                     case "year":
@@ -8527,7 +8548,7 @@ var CZ;
                 var month = this.monthSelector.find(":selected").val();
                 month = CZ.Dates.months.indexOf(month);
                 var day = parseInt(this.daySelector.find(":selected").val());
-                return CZ.Dates.getCoordinateFromDMY(year, month, day);
+                return CZ.Dates.getCoordinateFromYMD(year, month, day);
             };
             DatePicker.prototype.validateNumber = function (year) {
                 return !isNaN(Number(year)) && isFinite(Number(year)) && !isNaN(parseFloat(year));
@@ -9425,10 +9446,10 @@ var CZ;
                 this.startDate = new CZ.UI.DatePicker(container.find(formInfo.startDate));
                 this.endDate = new CZ.UI.DatePicker(container.find(formInfo.endDate));
                 this.titleInput = container.find(formInfo.titleInput);
+                this.errorMessage = container.find(formInfo.errorMessage);
                 this.timeline = formInfo.context;
                 this.saveButton.off();
                 this.deleteButton.off();
-                this.errorMessage = this.container.find("#error-edit-timeline");
                 this.initialize();
             }
             FormEditTimeline.prototype.initialize = function () {
@@ -9448,11 +9469,11 @@ var CZ;
                 this.isCancel = true;
                 this.endDate.addEditMode_Infinite();
                 this.titleInput.val(this.timeline.title);
-                this.startDate.setDate(this.timeline.x);
+                this.startDate.setDate(this.timeline.x, true);
                 if(this.timeline.endDate === 9999) {
-                    this.endDate.setDate(this.timeline.endDate);
+                    this.endDate.setDate(this.timeline.endDate, true);
                 } else {
-                    this.endDate.setDate(this.timeline.x + this.timeline.width);
+                    this.endDate.setDate(this.timeline.x + this.timeline.width, true);
                 }
                 this.saveButton.click(function (event) {
                     _this.errorMessage.empty();
@@ -9527,6 +9548,7 @@ var CZ;
         var ContentItemListBox = (function (_super) {
             __extends(ContentItemListBox, _super);
             function ContentItemListBox(container, listItemContainer, contentItems) {
+                var self = this;
                 var listBoxInfo = {
                     context: contentItems,
                     sortableSettings: {
@@ -9539,6 +9561,13 @@ var CZ;
                         scroll: false,
                         start: function (event, ui) {
                             ui.placeholder.height(ui.item.height());
+                        },
+                        stop: function (event, ui) {
+                            for(var i = 0; i < self.items.length; i++) {
+                                if(self.items[i].data) {
+                                    self.items[i].data.order = i;
+                                }
+                            }
                         }
                     }
                 };
@@ -9556,6 +9585,14 @@ var CZ;
                 listItemsInfo.default.ctor = ContentItemListItem;
                         _super.call(this, container, listBoxInfo, listItemsInfo);
             }
+            ContentItemListBox.prototype.remove = function (item) {
+                for(var i = this.items.indexOf(item) + 1; i < this.items.length; i++) {
+                    if(this.items[i].data && this.items[i].data.order) {
+                        this.items[i].data.order--;
+                    }
+                }
+                _super.prototype.remove.call(this, item);
+            };
             return ContentItemListBox;
         })(UI.ListBoxBase);
         UI.ContentItemListBox = ContentItemListBox;        
@@ -9567,7 +9604,8 @@ var CZ;
                 this.iconImg = this.container.find(uiMap.iconImg);
                 this.titleTextblock = this.container.find(uiMap.titleTextblock);
                 this.descrTextblock = this.container.find(uiMap.descrTextblock);
-                this.iconImg.attr("src", this.data.icon || "/images/Temp-Thumbnail2.png");
+                this.iconImg.attr("onerror", "this.src='/images/Temp-Thumbnail2.png';");
+                this.iconImg.attr("src", this.data.uri);
                 this.titleTextblock.text(this.data.title);
                 this.descrTextblock.text(this.data.description);
                 this.closeButton.off();
@@ -9640,6 +9678,9 @@ var CZ;
                     this.contentItemsListBox.itemRemove(function (item, index) {
                         return _this.onContentItemRemoved(item, index);
                     });
+                    this.contentItemsListBox.itemMove(function (item, indexStart, indexStop) {
+                        return _this.onContentItemMove(item, indexStart, indexStop);
+                    });
                 } else if(this.mode === "editExhibit") {
                     this.titleTextblock.text("Edit Exhibit");
                     this.saveButton.text("update exhibit");
@@ -9667,6 +9708,9 @@ var CZ;
                     this.contentItemsListBox.itemRemove(function (item, index) {
                         return _this.onContentItemRemoved(item, index);
                     });
+                    this.contentItemsListBox.itemMove(function (item, indexStart, indexStop) {
+                        return _this.onContentItemMove(item, indexStart, indexStop);
+                    });
                 } else {
                     console.log("Unexpected authoring mode in exhibit form.");
                 }
@@ -9685,7 +9729,7 @@ var CZ;
                         mediaType: "",
                         attribution: "",
                         description: "",
-                        index: this.exhibit.contentItems.length
+                        order: this.exhibit.contentItems.length
                     };
                     this.exhibit.contentItems.push(newContentItem);
                     this.hide(true);
@@ -9726,7 +9770,8 @@ var CZ;
                 }
             };
             FormEditExhibit.prototype.onContentItemDblClick = function (item, _) {
-                if(item.data.index >= 0) {
+                var idx = item.data.order;
+                if(idx >= 0) {
                     this.clickedListItem = item;
                     this.exhibit.title = this.titleInput.val() || "";
                     this.exhibit.x = this.datePicker.getDate() - this.exhibit.width / 2;
@@ -9735,15 +9780,28 @@ var CZ;
                     };
                     this.hide(true);
                     CZ.Authoring.contentItemMode = "editContentItem";
-                    CZ.Authoring.showEditContentItemForm(this.exhibit.contentItems[item.data.index], this.exhibit, this, true);
+                    CZ.Authoring.showEditContentItemForm(this.exhibit.contentItems[idx], this.exhibit, this, true);
                 }
             };
             FormEditExhibit.prototype.onContentItemRemoved = function (item, _) {
-                if(item.data.index >= 0) {
-                    this.exhibit.contentItems.splice(item.data.index, 1);
+                var idx = item.data.order;
+                if(idx >= 0) {
+                    this.exhibit.contentItems.splice(idx, 1);
+                    for(var i = 0; i < this.exhibit.contentItems.length; i++) {
+                        this.exhibit.contentItems[i].order = i;
+                    }
                     this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
                     CZ.Common.vc.virtualCanvas("requestInvalidate");
                 }
+            };
+            FormEditExhibit.prototype.onContentItemMove = function (item, indexStart, indexStop) {
+                var ci = this.exhibit.contentItems.splice(indexStart, 1)[0];
+                this.exhibit.contentItems.splice(indexStop, 0, ci);
+                for(var i = 0; i < this.exhibit.contentItems.length; i++) {
+                    this.exhibit.contentItems[i].order = i;
+                }
+                this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
+                CZ.Common.vc.virtualCanvas("requestInvalidate");
             };
             FormEditExhibit.prototype.show = function (noAnimation) {
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
@@ -9866,7 +9924,7 @@ var CZ;
                     mediaType: this.mediaTypeInput.val() || "",
                     attribution: this.attributionInput.val() || "",
                     description: this.descriptionInput.val() || "",
-                    index: this.contentItem.index
+                    order: this.contentItem.order
                 };
                 if(CZ.Authoring.validateContentItems([
                     newContentItem
@@ -9875,7 +9933,7 @@ var CZ;
                         if(this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
                             this.isCancel = false;
                             (this.prevForm).contentItemsListBox.add(newContentItem);
-                            $.extend(this.exhibit.contentItems[this.contentItem.index], newContentItem);
+                            $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
                             (this.prevForm).exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
                             this.back();
@@ -9884,9 +9942,10 @@ var CZ;
                         if(this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
                             this.isCancel = false;
                             var clickedListItem = (this.prevForm).clickedListItem;
+                            clickedListItem.iconImg.attr("src", newContentItem.uri);
                             clickedListItem.titleTextblock.text(newContentItem.title);
                             clickedListItem.descrTextblock.text(newContentItem.description);
-                            $.extend(this.exhibit.contentItems[this.contentItem.index], newContentItem);
+                            $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
                             (this.prevForm).exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
                             this.back();
@@ -10326,15 +10385,23 @@ var CZ;
                         alert("Please agree with provided terms");
                         return;
                     }
-                    CZ.Service.putProfile(_this.usernameInput.val(), _this.emailInput.val()).then(function (success) {
-                        if(_this.allowRedirect) {
-                            window.location.assign("\\" + success);
-                        } else {
-                            _this.close();
-                        }
-                    }, function (error) {
-                        alert("Unable to save changes. Please try again later.");
-                        console.log(error);
+                    CZ.Service.getProfile().done(function (curUser) {
+                        CZ.Service.getProfile(_this.usernameInput.val()).done(function (getUser) {
+                            if(curUser.DisplayName == null && typeof getUser.DisplayName != "undefined") {
+                                alert("Sorry, this username is already in use. Please try again.");
+                                return;
+                            }
+                            CZ.Service.putProfile(_this.usernameInput.val(), _this.emailInput.val()).then(function (success) {
+                                if(_this.allowRedirect) {
+                                    window.location.assign("\\" + success);
+                                } else {
+                                    _this.close();
+                                }
+                            }, function (error) {
+                                alert("Unable to save changes. Please try again later.");
+                                console.log(error);
+                            });
+                        });
                     });
                 });
                 this.logoutButton.click(function (event) {
@@ -10536,7 +10603,6 @@ var CZ;
             "#timeSeriesContainer": "/ui/timeseries-graph-form.html",
             "#timeSeriesDataForm": "/ui/timeseries-data-form.html"
         };
-        var FeatureActivation;
         (function (FeatureActivation) {
             FeatureActivation._map = [];
             FeatureActivation._map[0] = "Enabled";
@@ -10547,7 +10613,8 @@ var CZ;
             FeatureActivation.RootCollection = 2;
             FeatureActivation._map[3] = "NotRootCollection";
             FeatureActivation.NotRootCollection = 3;
-        })(FeatureActivation || (FeatureActivation = {}));
+        })(HomePageViewModel.FeatureActivation || (HomePageViewModel.FeatureActivation = {}));
+        var FeatureActivation = HomePageViewModel.FeatureActivation;
         var _featureMap = [
             {
                 Name: "Login",
@@ -10587,7 +10654,7 @@ var CZ;
             
         ];
         function InitializeToursUI(profile, forms) {
-            var allowEditing = IsFeatureEnabled("Authoring") && (profile && profile != "" && profile.DisplayName === CZ.Service.superCollectionName);
+            var allowEditing = IsFeatureEnabled(_featureMap, "Authoring") && (profile && profile != "" && profile.DisplayName === CZ.Service.superCollectionName);
             var onToursInitialized = function () {
                 CZ.Tours.initializeToursUI();
                 $("#tours_index").click(function () {
@@ -10642,7 +10709,7 @@ var CZ;
                 var forms = arguments;
                 CZ.timeSeriesChart = new CZ.UI.LineChart(forms[11]);
                 $('#timeSeries_button').click(function () {
-                    var tsForm = getFormById('#timeSeries_button');
+                    var tsForm = getFormById('#timeSeriesDataForm');
                     if(tsForm === false) {
                         closeAllForms();
                         var timSeriesDataFormDiv = forms[12];
@@ -10718,6 +10785,7 @@ var CZ;
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
+                            errorMessage: "#error-edit-timeline",
                             context: timeline
                         });
                         form.show();
@@ -10733,6 +10801,7 @@ var CZ;
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
+                            errorMessage: "#error-edit-timeline",
                             context: timeline
                         });
                         form.show();
@@ -10814,7 +10883,7 @@ var CZ;
                     profilePanel: "#profile-panel",
                     loginPanelLogin: "#profile-panel.auth-panel-login",
                     context: "",
-                    allowRedirect: IsFeatureEnabled("Authoring")
+                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring")
                 });
                 var loginForm = new CZ.UI.FormLogin(forms[6], {
                     activationSource: $("#login-panel"),
@@ -10832,7 +10901,7 @@ var CZ;
                         profileForm.close();
                     }
                 });
-                if(IsFeatureEnabled("Login")) {
+                if(IsFeatureEnabled(_featureMap, "Login")) {
                     CZ.Service.getProfile().done(function (data) {
                         if(data == "") {
                             $("#login-panel").show();
@@ -11129,12 +11198,13 @@ var CZ;
                 $("#bibliographyBack").css("display", "block");
             }
         });
-        function IsFeatureEnabled(featureName) {
-            var feature = $.grep(_featureMap, function (e) {
+        function IsFeatureEnabled(featureMap, featureName) {
+            var feature = $.grep(featureMap, function (e) {
                 return e.Name === featureName;
             });
             return feature[0].IsEnabled;
         }
+        HomePageViewModel.IsFeatureEnabled = IsFeatureEnabled;
         function closeAllForms() {
             $('.cz-major-form').each(function (i, f) {
                 var form = $(f).data('form');

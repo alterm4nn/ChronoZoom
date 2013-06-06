@@ -1343,7 +1343,7 @@ var CZ;
                             CZ.Authoring.mode = "editContentItem";
                             CZ.Authoring.contentItemMode = "editContentItem";
                             CZ.Authoring.selectedExhibit = self.parent.parent.parent;
-                            CZ.Authoring.selectedContentItem = CZ.Authoring.selectedExhibit.contentItems[self.contentItem.index];
+                            CZ.Authoring.selectedContentItem = self.contentItem;
                             return true;
                         };
                         editButton.onmouseenter = function () {
@@ -1701,8 +1701,6 @@ var CZ;
             if(n <= 0) {
                 return null;
             }
-            n--;
-            var vcitems = [];
             var _rad = 450.0 / 2.0;
             var k = 1.0 / _rad;
             var _wc = 260.0 * k;
@@ -1715,33 +1713,24 @@ var CZ;
             var lh = _lh * rad;
             var _ytc = -_hc / 2 - 9.0 * k - _lh / 2;
             var _ybc = -_ytc;
-            for(var i = 0; i < contentItems.length; i++) {
-                contentItems[i].index = i;
-            }
-            vcitems.push(new ContentItem(vc, layerid, contentItems[0].id, -_wc / 2 * rad + xc, -_hc / 2 * rad + yc, _wc * rad, _hc * rad, contentItems[0]));
-            var m1 = Math.floor(n / 3);
-            var m2 = n % 3;
-            var nL = m1 + (m2 > 0 ? 1 : 0);
-            var nR = m1 + (m2 > 1 ? 1 : 0);
-            var nB = m1 + (m2 > 2 ? 1 : 0);
-            var i = 1;
-            var arrange = arrangeContentItemsInField(nL, _lh);
+            var arrangeLeft = arrangeContentItemsInField(3, _lh);
+            var arrangeRight = arrangeContentItemsInField(3, _lh);
+            var arrangeBottom = arrangeContentItemsInField(3, _lw);
             var xl = xc + rad * (_xlc - _lw / 2);
-            for(var j = 0; j < nL; j++ , i++) {
-                var ci = contentItems[i];
-                vcitems.push(new ContentItem(vc, layerid, ci.id, xl, yc + rad * arrange[j], lw, lh, ci));
-            }
-            arrange = arrangeContentItemsInField(nB, _lw);
-            var yb = yc + rad * (_ybc - _lh / 2);
-            for(var j = 0; j < nB; j++ , i++) {
-                var ci = contentItems[i];
-                vcitems.push(new ContentItem(vc, layerid, ci.id, xc + rad * arrange[j], yb, lw, lh, ci));
-            }
-            arrange = arrangeContentItemsInField(nR, _lh);
             var xr = xc + rad * (_xrc - _lw / 2);
-            for(var j = nR; --j >= 0; i++) {
+            var yb = yc + rad * (_ybc - _lh / 2);
+            var vcitems = [];
+            for(var i = 0, len = Math.min(10, n); i < len; i++) {
                 var ci = contentItems[i];
-                vcitems.push(new ContentItem(vc, layerid, ci.id, xr, yc + rad * arrange[j], lw, lh, ci));
+                if(i === 0) {
+                    vcitems.push(new ContentItem(vc, layerid, ci.id, -_wc / 2 * rad + xc, -_hc / 2 * rad + yc, _wc * rad, _hc * rad, ci));
+                } else if(i >= 1 && i <= 3) {
+                    vcitems.push(new ContentItem(vc, layerid, ci.id, xl, yc + rad * arrangeLeft[(i - 1) % 3], lw, lh, ci));
+                } else if(i >= 4 && i <= 6) {
+                    vcitems.push(new ContentItem(vc, layerid, ci.id, xr, yc + rad * arrangeRight[(i - 1) % 3], lw, lh, ci));
+                } else if(i >= 7 && i <= 9) {
+                    vcitems.push(new ContentItem(vc, layerid, ci.id, xc + rad * arrangeBottom[(i - 1) % 3], yb, lw, lh, ci));
+                }
             }
             return vcitems;
         }

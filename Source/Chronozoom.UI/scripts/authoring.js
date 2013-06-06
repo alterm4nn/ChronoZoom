@@ -456,7 +456,7 @@ var CZ;
         }
         Authoring.validateExhibitData = validateExhibitData;
         function validateNumber(number) {
-            return !isNaN(Number(number) && parseFloat(number)) && isNotEmpty(number);
+            return !isNaN(Number(number) && parseFloat(number)) && isNotEmpty(number) && (number !== false);
         }
         Authoring.validateNumber = validateNumber;
         function isNotEmpty(obj) {
@@ -499,8 +499,10 @@ var CZ;
                     }
                 } else if(ci.mediaType.toLowerCase() === "pdf") {
                     var pdf = /\.(pdf)$/i;
+                    var docs = /\S+docs.google.com\S+$/i;
                     if(pdf.test(ci.uri)) {
                         ci.uri = "http://docs.google.com/viewer?url=" + encodeURI(ci.uri) + "&embedded=true";
+                    } else if(docs.test(ci.uri)) {
                     } else {
                         alert("Sorry, only PDF extension is supported");
                         isValid = false;

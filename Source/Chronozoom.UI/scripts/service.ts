@@ -36,7 +36,8 @@ module CZ {
                     uri: ci.contentItem ? ci.contentItem.uri : ci.uri,
                     mediaType: ci.contentItem ? ci.contentItem.mediaType : ci.mediaType,
                     attribution: ci.contentItem ? ci.contentItem.attribution : ci.attribution,
-                    mediaSource: ci.contentItem ? ci.contentItem.mediaSource : ci.mediaSource
+                    mediaSource: ci.contentItem ? ci.contentItem.mediaSource : ci.mediaSource,
+                    order: ci.contentItem ? ci.contentItem.order : ci.order
                 };
             }
         }
@@ -419,9 +420,11 @@ module CZ {
             });
         }
 
-        export function getProfile() {
+        export function getProfile(displayName = "") {
             var request = new Service.Request(_serviceUrl);
             request.addToPath("user");
+            if(displayName != "")
+                request.addParameter("name", displayName);
             return $.ajax({
                 type: "GET",
                 cache: false,
