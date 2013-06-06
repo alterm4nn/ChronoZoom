@@ -27,6 +27,12 @@ namespace Chronozoom.UI
             return GenerateDefaultPage(pageInforamtion);
         });
 
+        private static Lazy<string> _hostPath = new Lazy<string>(() =>
+        {
+            Uri uri = HttpContext.Current.Request.Url;
+            return uri.Scheme + Uri.SchemeDelimiter + uri.Host + ":" + uri.Port;
+        });
+
         private class PageInformation
         {
             public PageInformation()
@@ -46,6 +52,10 @@ namespace Chronozoom.UI
             [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
             public string Description { get; set; }
 
+            [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+            public string IECompatibile { get; set; }
+
+
             public List<string> Images { get; private set; }
         }
 
@@ -57,10 +67,12 @@ namespace Chronozoom.UI
             context.Response.ContentType = "text/html";
 
             PageInformation pageInformation;
-            if (PageIsDynamic(HttpContext.Current.Request.Url, out pageInformation)) {
+            if (PageIsDynamic(HttpContext.Current.Request.Url, out pageInformation))
+            {
                 context.Response.Write(GenerateDefaultPage(pageInformation));
             }
-            else {
+            else
+            {
                 context.Response.Write(_mainPage.Value);
             }
         }
@@ -125,11 +137,35 @@ namespace Chronozoom.UI
             }
         }
 
+        private enum Environment
+        {
+            Localhost,
+            Test,
+            Production,
+        }
+
+        private static Environment CurrentEnvironment
+        {
+            get
+            {
+                if (_hostPath.Value.ToString().Contains("localhost"))
+                    return Environment.Localhost;
+                else if (_hostPath.Value.ToString().Contains("www."))
+                    return Environment.Production;
+                else
+                    return Environment.Test;
+            }
+        }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "ns")]
         private static void ComposePage(XDocument pageRoot, XmlNamespaceManager xmlNamespaceManager, PageInformation pageInformation)
         {
             XElement scriptNode = pageRoot.XPathSelectElement("/xhtml:html/xhtml:head/xhtml:script[@id='constants']", xmlNamespaceManager);
-            scriptNode.Value = "var constants = { analyticsId: \"" + pageInformation.AnalyticsServiceId + "\", exceptionsId: \"" + pageInformation.ExceptionsServiceId + "\" };";
+            scriptNode.Value = "var constants = { " +
+                "analyticsId: \"" + pageInformation.AnalyticsServiceId + "\", " +
+                "exceptionsId: \"" + pageInformation.ExceptionsServiceId + "\", " +
+                "environment: \"" + CurrentEnvironment.ToString() + "\" " +
+                "};";
 
             if (!string.IsNullOrEmpty(pageInformation.Title))
             {
@@ -142,8 +178,13 @@ namespace Chronozoom.UI
                 XElement metaDescription = pageRoot.XPathSelectElement("/xhtml:html/xhtml:head/xhtml:meta[@name='Description']", xmlNamespaceManager);
                 XName contentAttribute = "content";
 
-                metaDescription.SetAttributeValue(contentAttribute,  pageInformation.Description);
+                metaDescription.SetAttributeValue(contentAttribute, pageInformation.Description);
             }
+
+            XElement metaIECompatibile = pageRoot.XPathSelectElement("/xhtml:html/xhtml:head/xhtml:meta[@http-equiv='X-UA-Compatible']", xmlNamespaceManager);
+            XName contentIEAttribute = "content";
+
+            metaIECompatibile.SetAttributeValue(contentIEAttribute, "IE=edge");
 
             XElement lastMetaTag = pageRoot.XPathSelectElement("/xhtml:html/xhtml:head/xhtml:meta[@name='viewport']", xmlNamespaceManager);
             int imageCount = 0;

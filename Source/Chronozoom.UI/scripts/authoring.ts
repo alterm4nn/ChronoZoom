@@ -165,14 +165,6 @@ module CZ {
                 return false;
             }
 
-            // Test on intersections with parent's children.
-            //for (i = 0, len = tp.children.length; i < len; ++i) {
-            //    selfIntersection = editmode ? (tp.children[i] === selectedExhibit) : (tp.children[i] === ec);
-            //    if (!selfIntersection && isIntersecting(ec, tp.children[i])) {
-            //        return false;
-            //    }
-            //}
-
             return true;
         }
 
@@ -734,7 +726,7 @@ module CZ {
          * Validates,if number is valid.
         */
         export function validateNumber(number) {
-            return !isNaN(Number(number) && parseFloat(number)) && isNotEmpty(number);
+            return !isNaN(Number(number) && parseFloat(number)) && isNotEmpty(number) && (number !== false);
         }
 
         /**
@@ -792,10 +784,15 @@ module CZ {
                     //Google PDF viewer
                     //Example: http://docs.google.com/viewer?url=http%3A%2F%2Fwww.selab.isti.cnr.it%2Fws-mate%2Fexample.pdf&embedded=true
                     var pdf = /\.(pdf)$/i;
-
+                    var docs = /\S+docs.google.com\S+$/i;
                     if (pdf.test(ci.uri)) {
                         ci.uri = "http://docs.google.com/viewer?url=" + encodeURI(ci.uri) + "&embedded=true";
-                    } else {
+                    }
+                    else if (docs.test(ci.uri))
+                    {
+                    }
+                    else
+                    {
                         alert("Sorry, only PDF extension is supported");
                         isValid = false;
                     }

@@ -11,7 +11,7 @@ module CZ {
          */
         export interface IListBoxBaseInfo {
             context: any[];
-            sortableSettings: Object;
+            sortableSettings: any;
         }
 
         /**
@@ -54,6 +54,7 @@ module CZ {
             public getType: (context: any) => string;
             private itemDblClickHandler: (item: ListItemBase, index: number) => void;
             private itemRemoveHandler: (item: ListItemBase, index: number) => void;
+            private itemMoveHandler: (item: ListItemBase, indexStart: number, indexStop: number) => void;
 
             constructor(container: JQuery,
                 listBoxInfo: IListBoxBaseInfo,
@@ -82,10 +83,28 @@ module CZ {
                 // Setup default handlers
                 this.itemDblClickHandler = (item, idx) => { };
                 this.itemRemoveHandler = (item, idx) => { };
+                this.itemMoveHandler = (item, idx1, idx2) => { };
 
                 // Apply jQueryUI sortable widget.
-                if (listBoxInfo.sortableSettings)
+                var self = this;
+                if (listBoxInfo.sortableSettings) {
+                    var origStart = listBoxInfo.sortableSettings.start;
+                    var origStop = listBoxInfo.sortableSettings.stop;
+                    $.extend(listBoxInfo.sortableSettings, {
+                        start: function (event, ui) {
+                            ui.item.startPos = ui.item.index();
+                            if (origStart) origStart(event, ui);
+                        },
+                        stop: function (event, ui) {
+                            ui.item.stopPos = ui.item.index();
+                            var item = self.items.splice(ui.item.startPos, 1)[0]; // keep the visual and data order of listboxitems in sync
+                            self.items.splice(ui.item.stopPos, 0, item);
+                            self.itemMoveHandler(ui.item, ui.item.startPos, ui.item.stopPos);
+                            if (origStop) origStop(event, ui);
+                        }
+                    });
                     this.container.sortable(listBoxInfo.sortableSettings);
+                }
             }
 
             /**
@@ -153,6 +172,13 @@ module CZ {
             */
             public itemRemove(handler: (item: ListItemBase, index: number) => void ) {
                 this.itemRemoveHandler = handler;
+            }
+
+            /**
+            * Setup listitem move handler
+            */
+            public itemMove(handler: (item: ListItemBase, indexStart: number, indexStop: number) => void ) {
+                this.itemMoveHandler = handler;
             }
         }
 

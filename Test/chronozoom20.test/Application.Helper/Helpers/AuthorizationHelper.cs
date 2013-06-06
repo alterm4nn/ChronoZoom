@@ -84,7 +84,7 @@ namespace Application.Helper.Helpers
         public bool IsNewUserAuthenticated()
         {
             Logger.Log("<-");
-            WaitForElementIsDisplayed(By.ClassName("cz-form-content"));
+            WaitForElementIsDisplayed(By.XPath("//*[@id='profile-form']//*[@class='cz-form-content']"));
             bool result = IsUserAuthenticated();
             Logger.Log("-> result: " + result);
             return result;
