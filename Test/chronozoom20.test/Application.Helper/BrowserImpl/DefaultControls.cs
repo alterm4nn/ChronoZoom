@@ -27,8 +27,7 @@ namespace Application.Helper.BrowserImpl
 
         public virtual void SecurityWarningAccept()
         {
-            WaitForAlertIsDisplayed();
-            AcceptAlert();
+            //No alert by default (chrome and IE).
         }
     }
 }
