@@ -7,22 +7,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Chronozoom.Entities.Test
 {
     [TestClass]
-    public class StorageTest
+    public partial class StorageTest : StorageTestBase
     {
-        protected Storage _storage = new Storage();
-        Collection _betaCollection = null;
-
-        [TestInitialize]
-        public void Initialize()
-        {
-            _storage.Database.Delete();
-
-            _betaCollection = _storage.Collections.Where(candidate => candidate.Title == "Beta Content").FirstOrDefault();
-            Assert.IsNotNull(_betaCollection);
-        }
-
         [TestMethod]
-        [TestCategoryAttribute("Entities")]
         public void TestEntities_TimelinesQuery_RetrievesMaxElements()
         {
             const int maxElements = 10;
@@ -46,11 +33,10 @@ namespace Chronozoom.Entities.Test
         }
 
         [TestMethod]
-        [TestCategoryAttribute("Entities")]
         public void TestEntities_DeleteTimeline_DeletesTimeline()
         {
-            Timeline unitedStateTimeline = _storage.Timelines.Where(candidate => candidate.Title == "United States").FirstOrDefault();
-            Guid timelineDeleteId = unitedStateTimeline.Id;
+            Timeline toDeleteTimeline = _storage.Timelines.Where(candidate => candidate.Title == "Mesoproterozoic Era").FirstOrDefault();
+            Guid timelineDeleteId = toDeleteTimeline.Id;
             _storage.DeleteTimeline(timelineDeleteId);
             _storage.SaveChanges();
 
@@ -59,7 +45,6 @@ namespace Chronozoom.Entities.Test
         }
 
         [TestMethod]
-        [TestCategoryAttribute("Entities")]
         public void TestEntities_TimelinesQuery_RetrievesImmediateLevel()
         {
             const int minYear = -10000000;

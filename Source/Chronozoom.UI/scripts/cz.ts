@@ -44,14 +44,14 @@ module CZ {
             "#timeSeriesDataForm": "/ui/timeseries-data-form.html" //12
         };
 
-        enum FeatureActivation {
+        export enum FeatureActivation {
             Enabled,
             Disabled,
             RootCollection,
             NotRootCollection,
         }
 
-        interface FeatureInfo {
+        export interface FeatureInfo {
             Name: string;
             Activation: FeatureActivation;
             JQueryReference: string;
@@ -103,7 +103,7 @@ module CZ {
         ];
 
         function InitializeToursUI(profile, forms) {
-            var allowEditing = IsFeatureEnabled("Authoring") && (profile && profile != "" && profile.DisplayName === CZ.Service.superCollectionName);
+            var allowEditing = IsFeatureEnabled(_featureMap, "Authoring") && (profile && profile != "" && profile.DisplayName === CZ.Service.superCollectionName);
 
             var onToursInitialized = function () {
                 CZ.Tours.initializeToursUI();
@@ -154,7 +154,7 @@ module CZ {
 
                 timeSeriesChart = new CZ.UI.LineChart(forms[11]);
 
-                $(' ').click(function () {
+                $('#timeSeries_button').click(function () {
                     var tsForm = getFormById('#timeSeriesDataForm');
                     if (tsForm === false) {
                         closeAllForms();
@@ -337,7 +337,7 @@ module CZ {
                     profilePanel: "#profile-panel",
                     loginPanelLogin: "#profile-panel.auth-panel-login",
                     context: "",
-                    allowRedirect: IsFeatureEnabled("Authoring")
+                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring")
                 });
 
                 var loginForm = new CZ.UI.FormLogin(forms[6], {
@@ -360,7 +360,7 @@ module CZ {
 
                 });
 
-                if (IsFeatureEnabled("Login")) {
+                if (IsFeatureEnabled(_featureMap, "Login")) {
                     CZ.Service.getProfile().done(data => {
                         //Not authorized
                         if (data == "") {
@@ -733,8 +733,8 @@ module CZ {
             }
         });
 
-        function IsFeatureEnabled(featureName) {
-            var feature: FeatureInfo[] = $.grep(_featureMap, function (e) { return e.Name === featureName; });
+        export function IsFeatureEnabled(featureMap: FeatureInfo[], featureName: string) {
+            var feature: FeatureInfo[] = $.grep(featureMap, function (e) { return e.Name === featureName; });
             return feature[0].IsEnabled;
         }
 

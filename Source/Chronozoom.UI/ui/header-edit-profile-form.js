@@ -65,7 +65,7 @@ var CZ;
                     CZ.Service.getProfile().done(function (curUser) {
                         CZ.Service.getProfile(_this.usernameInput.val()).done(function (getUser) {
                             if(curUser.DisplayName == null && typeof getUser.DisplayName != "undefined") {
-                                alert("Provided username already exists.");
+                                alert("Sorry, this username is already in use. Please try again.");
                                 return;
                             }
                             CZ.Service.putProfile(_this.usernameInput.val(), _this.emailInput.val()).then(function (success) {

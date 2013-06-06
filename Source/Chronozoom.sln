@@ -19,11 +19,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{83B2C8
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OuterCurve.SignalRTraceListener", "SignalRTraceListener\OuterCurve.SignalRTraceListener.csproj", "{E9C7A64B-D03B-47D7-89DD-48D046DE564C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chronozoom.Entities.Test", "Chronozoom.Entities.Test\Chronozoom.Entities.Test.csproj", "{0A78CBDB-9511-454C-B697-D919748D306F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chronozoom.UI.UnitTests", "Chronozoom.UI.Unittests\Chronozoom.UI.UnitTests.csproj", "{369C9F1A-4CC1-42B0-9581-D6EE736EB19C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chronozoom.Entities.UnitTest", "Chronozoom.Entities.UnitTest\Chronozoom.Entities.UnitTest.csproj", "{0A78CBDB-9511-454C-B697-D919748D306F}"
 EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
@@ -42,18 +40,14 @@ Global
 		{B995D3CF-E31F-4986-A7F7-77988EA275D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B995D3CF-E31F-4986-A7F7-77988EA275D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B995D3CF-E31F-4986-A7F7-77988EA275D3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E9C7A64B-D03B-47D7-89DD-48D046DE564C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E9C7A64B-D03B-47D7-89DD-48D046DE564C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E9C7A64B-D03B-47D7-89DD-48D046DE564C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E9C7A64B-D03B-47D7-89DD-48D046DE564C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0A78CBDB-9511-454C-B697-D919748D306F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0A78CBDB-9511-454C-B697-D919748D306F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0A78CBDB-9511-454C-B697-D919748D306F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0A78CBDB-9511-454C-B697-D919748D306F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{369C9F1A-4CC1-42B0-9581-D6EE736EB19C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{369C9F1A-4CC1-42B0-9581-D6EE736EB19C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{369C9F1A-4CC1-42B0-9581-D6EE736EB19C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{369C9F1A-4CC1-42B0-9581-D6EE736EB19C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A78CBDB-9511-454C-B697-D919748D306F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A78CBDB-9511-454C-B697-D919748D306F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A78CBDB-9511-454C-B697-D919748D306F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A78CBDB-9511-454C-B697-D919748D306F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
