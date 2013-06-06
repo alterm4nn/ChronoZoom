@@ -21,7 +21,7 @@ using Chronozoom.Entities;
 
 namespace Chronozoom.Entities.Migration
 {
-    class Migrator
+    internal class Migrator
     {
         private Storage _storage;
         private static MD5 _md5Hasher = MD5.Create();
@@ -227,9 +227,9 @@ namespace Chronozoom.Entities.Migration
             }
         }
 
-        private void MigrateInPlace(Timeline timeline)
+        public static void MigrateInPlace(Timeline timeline)
         {
-            int subtreeSize = 0;
+            int subtreeSize = 1;
             if (timeline.Exhibits != null)
             {
                 foreach (var exhibit in timeline.Exhibits)
@@ -241,7 +241,6 @@ namespace Chronozoom.Entities.Migration
                         {
                             contentItem.Depth = exhibit.Depth + 1;
                         }
-                        subtreeSize += exhibit.ContentItems.Count();
                     }
                 }
             }

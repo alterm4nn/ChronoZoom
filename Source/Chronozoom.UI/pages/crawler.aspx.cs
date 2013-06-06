@@ -130,7 +130,7 @@ namespace Chronozoom.UI
                 {
                     if (IsTimeline(collection.Segments[collection.Segments.Length - 1]))
                     {
-                        Timeline timeline = _storage.GetRootTimeline(_storage.GetCollectionFromGuid(Guid.Parse(collection.Segments[collection.Segments.Length - 1])));
+                        Timeline timeline = _storage.GetRootTimelines(_storage.GetCollectionFromGuid(Guid.Parse(collection.Segments[collection.Segments.Length - 1]))).FirstOrDefault();
                         Guid rootGuid = timeline.Id;
                         if (Guid.Parse(root) != rootGuid)
                         {
@@ -139,7 +139,7 @@ namespace Chronozoom.UI
                     }
                     if (IsExhibit(collection.Segments[collection.Segments.Length - 1]))
                     {
-                        Timeline exhibit = _storage.GetRootTimeline(_storage.GetCollectionFromExhibitGuid(Guid.Parse(collection.Segments[collection.Segments.Length - 1])));
+                        Timeline exhibit = _storage.GetRootTimelines(_storage.GetCollectionFromExhibitGuid(Guid.Parse(collection.Segments[collection.Segments.Length - 1]))).FirstOrDefault();
                         Guid rootGuid = exhibit.Id;
                         if (Guid.Parse(root) != rootGuid)
                         {
@@ -148,7 +148,7 @@ namespace Chronozoom.UI
                     }
                     if (IsContentItem(collection.Segments[collection.Segments.Length - 1]))
                     {
-                        Timeline contentItem = _storage.GetRootTimeline(_storage.GetCollectionFromContentItemGuid(Guid.Parse(collection.Segments[collection.Segments.Length - 1])));
+                        Timeline contentItem = _storage.GetRootTimelines(_storage.GetCollectionFromContentItemGuid(Guid.Parse(collection.Segments[collection.Segments.Length - 1]))).FirstOrDefault();
                         Guid rootGuid = contentItem.Id;
                         if (Guid.Parse(root) != rootGuid)
                         {
@@ -159,7 +159,7 @@ namespace Chronozoom.UI
                 else
                 {
                     string title = FriendlyUrl.FriendlyUrlDecode(UrlCollection(collection).Substring(0, UrlCollection(collection).Length - 1));
-                    Timeline timeline = _storage.GetRootTimeline(_storage.GetCollectionGuid(title));
+                    Timeline timeline = _storage.GetRootTimelines(_storage.GetCollectionGuid(title)).FirstOrDefault();
 
                     if (timeline != null)
                     {

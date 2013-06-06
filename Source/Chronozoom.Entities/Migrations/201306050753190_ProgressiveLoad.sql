@@ -14,6 +14,8 @@ INSERT INTO [__MigrationHistory] ([MigrationId], [Model], [ProductVersion]) VALU
 
 SELECT COunt(*) FROM ContentItems
 
+GO
+
 CREATE PROCEDURE TimelineSubtreeQuery
 	@Collection_Id UNIQUEIDENTIFIER,
 	@LCA UNIQUEIDENTIFIER,
