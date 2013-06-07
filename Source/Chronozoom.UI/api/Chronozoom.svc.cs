@@ -311,10 +311,6 @@ namespace Chronozoom.UI
             if (rootTimeline == null)
                 return true;
 
-            // Allow code to revalidate counts since zero count could mean old timeline
-            if (rootTimeline.SubtreeSize == 0)
-                return false;
-
             if (rootTimeline.SubtreeSize < maxElements)
                 return true;
 
