@@ -29,6 +29,7 @@ Use JSON for the request body:
 - [RemoveBetaFields](#removebetafields)
 - [RemoveRITree](#removeritree)
 - [AddRITreeWithIndex](#addritreewithindex)
+- [Properties.Resources](#properties.resources)
 - [ObjectType](#objecttype)
 - [SearchResult](#searchresult)
 - [Storage](#storage)
@@ -148,6 +149,43 @@ Migration to add RI-Tree with index field.
  
 ----------
  
+### Properties.Resources ###
+ 
+A strongly-typed resource class, for looking up localized strings, etc.
+ 
+|Property|Value|
+|:-------|:----|
+|ResourceManager|Returns the cached ResourceManager instance used by this class.|
+|Culture|Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.|
+|TimelineSubtreeQuery|Looks up a localized string similar to CREATE PROCEDURE TimelineSubtreeQuery
+            	@Collection_Id UNIQUEIDENTIFIER,
+            	@LCA UNIQUEIDENTIFIER,
+            	@min_span DECIMAL,
+            	@startTime DECIMAL,
+            	@endTime DECIMAL,
+            	@max_elem INT
+            AS
+            BEGIN
+            	DECLARE @return_entire_subtree BIT
+            	DECLARE @subtree_size INT
+            	DECLARE @current_level_cnt INT
+            	DECLARE @cnt INT
+            	DECLARE @num_ge_min_span INT
+            	DECLARE @current_id UNIQUEIDENTIFIER
+            	DECLARE @current_level TABLE (
+            		Id UNIQUEIDENTIFIER
+            	)
+            	DECLARE @next_level TABLE (
+            		Id UNIQUEIDENTIFIER
+            	)
+            	DECLARE @results TABLE (
+            		Id UNIQUEIDE [rest of string was truncated]";.|
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
 ### ObjectType ###
  
 Specifies the type of object contained by the search result.
@@ -244,6 +282,7 @@ A registered user.
 - [PostTour](#posttour)
 - [PutTour](#puttour)
 - [DeleteTour](#deletetour)
+- [PutBookmarks](#putbookmarks)
 - [DeleteBookmarks](#deletebookmarks)
 - [GetContentPath](#getcontentpath)
 - [GetCollections](#getcollections)
@@ -462,7 +501,7 @@ HTTP response code.
  
 ### GetUser ###
  
-Returns the current user.
+Returns the user by name, if name parameter is empty returns current user.
  
 **Returns**
 JSON containing data for the current user.
@@ -477,7 +516,10 @@ JSON containing data for the current user.
 
  
 **Parameters**
-None.
+ 
+|Parameter|Value|
+|:--------|:----|
+|name|The name of user to get.|
  
  
 [top](#chronozoom-rest-api-reference)
@@ -777,7 +819,7 @@ Delete the specified content item from the specified collection.
 Creates a new tour with bookmark support.
  
 **Returns**
-An exhibit in JSON format.
+A list of guids of tour guid followed by bookmark guids in JSON format.
  
 **Example**
  
@@ -818,7 +860,7 @@ Do not specify the tour ID, this value is automatically generated.
 Creates or updates a tour with bookmark support.
  
 **Returns**
-An exhibit in JSON format.
+A list of guids of tour guid followed by bookmark guids in JSON format.
  
 **Example**
  
@@ -880,6 +922,40 @@ Deletes the specified tour.
 |superCollectionName|The name of the parent collection.|
 |collectionName|The name of the collection to modify.|
 |tourRequest|The tour ID in JSON format.|
+ 
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+### PutBookmarks ###
+ 
+Adds a list of bookmarks to an existing tour.
+ 
+**Returns**
+A list of guids of tour guid followed by new bookmark guids in JSON format.
+ 
+**Example**
+ 
+    HTTP verb: DELETE
+            
+    URL:
+    http://{URL}/api/{supercollection}/{collection}/{collectionName}/bookmark
+            
+    Request body:
+    {
+         id: "0123456789"
+    }
+    
+
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|superCollectionName|The name of the parent collection.|
+|collectionName|The name of the collection to modify.|
+|tourRequest|The request in JSON format.|
  
  
 [top](#chronozoom-rest-api-reference)

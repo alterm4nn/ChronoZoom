@@ -9758,6 +9758,12 @@ var CZ;
                     }, function (error) {
                         alert("Unable to save changes. Please try again later.");
                     });
+                } else if(this.exhibit.contentItems.length === 0) {
+                    var self = this;
+                    var origMsg = this.errorMessage.text();
+                    this.errorMessage.text("Cannot create exhibit without content items.").show().delay(7000).fadeOut(function () {
+                        return self.errorMessage.text(origMsg);
+                    });
                 } else {
                     this.errorMessage.show().delay(7000).fadeOut();
                 }

@@ -166,7 +166,14 @@ namespace Chronozoom.UI
                 }
                 else
                 {
+<<<<<<< HEAD
+                    if (IsTimeline(UrlGuid(collection)))
+=======
                     string title = FriendlyUrl.FriendlyUrlDecode(UrlCollection(collection).Substring(0, UrlCollection(collection).Length - 1));
+                    Timeline timeline = _storage.GetRootTimelines(_storage.GetCollectionGuid(title)).FirstOrDefault();
+
+                    if (timeline != null)
+>>>>>>> d0bdbb1fc69ae27043fe771541a833d4d86759ea
                     {
                         string title = FriendlyUrl.FriendlyUrlDecode(UrlCollection(collection));
                         Timeline timeline = _storage.GetRootTimeline(_storage.GetCollectionGuid(title));
