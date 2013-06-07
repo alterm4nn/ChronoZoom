@@ -38,7 +38,12 @@ namespace Chronozoom.Entities
         [Column(TypeName = "nvarchar")]
         public string Email { get; set; }
 
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         public string NameIdentifier { get; set; }
+
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         public string IdentityProvider { get; set; }
     }
 }
