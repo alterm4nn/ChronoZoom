@@ -306,7 +306,7 @@ namespace Chronozoom.UI
             if (!string.IsNullOrEmpty(commonAncestor))
                 return false;
 
-            Timeline rootTimeline = _storage.GetRootTimelines(collectionId).FirstOrDefault();
+            Timeline rootTimeline = _storage.GetRootTimelines(collectionId);
 
             if (rootTimeline == null)
                 return true;
