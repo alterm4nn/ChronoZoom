@@ -639,11 +639,11 @@ namespace Chronozoom.Entities
             }
         }
 
-        public IEnumerable<Timeline> GetRootTimelines(Guid collectionId)
+        public Timeline GetRootTimelines(Guid collectionId)
         {
             var rootCollectionTimeline = Database.SqlQuery<Timeline>("SELECT * FROM Timelines WHERE Timeline_ID is NULL and Collection_ID = {0}", collectionId);
 
-            return rootCollectionTimeline;
+            return rootCollectionTimeline.FirstOrDefault();
         }
 
         public Guid GetCollectionGuid(string title)
