@@ -169,7 +169,7 @@ var CZ;
                 });
             };
             DatePicker.prototype.setDate_DateMode = function (coordinate) {
-                var date = CZ.Dates.getDMYFromCoordinate(coordinate);
+                var date = CZ.Dates.getYMDFromCoordinate(coordinate);
                 this.yearSelector.val(date.year);
                 var self = this;
                 this.monthSelector.find("option").each(function (index) {

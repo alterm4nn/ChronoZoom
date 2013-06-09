@@ -101,10 +101,10 @@ var data8 = [2000.1612021857925, 2000, 1, 29]; // - leap year
 var data9 = [2000.1639344262296, 2000, 2, 1];
 
 
-describe("getDMYFromCoordinate() method should return", function () {
+describe("getYMDFromCoordinate() method should return", function () {
     usingDMY("", [data1, data2, data3, data4, data5, data6, data7, data8, data9], function (coordinate, year, month, day) {
         it("{ year: " + year + ", month: " + month + ", day: " + day + " }  with coordinate: " + coordinate, function () {
-            var result = CZ.Dates.getDMYFromCoordinate(coordinate);
+            var result = CZ.Dates.getYMDFromCoordinate(coordinate);
             expect({ year: year, month: month, day: day }).toEqual(result);
         });
     });

@@ -666,8 +666,8 @@ var CZ;
             if(CZ.timeSeriesChart !== undefined) {
                 var leftCSS = vp.pointVirtualToScreen(left, 0).x;
                 var rightCSS = vp.pointVirtualToScreen(right, 0).x;
-                var leftPlot = CZ.Dates.getDMYFromCoordinate(left).year;
-                var rightPlot = CZ.Dates.getDMYFromCoordinate(right).year;
+                var leftPlot = CZ.Dates.getYMDFromCoordinate(left).year;
+                var rightPlot = CZ.Dates.getYMDFromCoordinate(right).year;
                 CZ.timeSeriesChart.clear(leftCSS, rightCSS);
                 CZ.timeSeriesChart.clearLegend("left");
                 CZ.timeSeriesChart.clearLegend("right");

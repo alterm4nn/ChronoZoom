@@ -260,7 +260,7 @@ module CZ {
             * Sets date corresponding to given virtual coordinate
             */
             private setDate_DateMode(coordinate: number): void {
-                var date = CZ.Dates.getDMYFromCoordinate(coordinate);
+                var date = CZ.Dates.getYMDFromCoordinate(coordinate);
 
                 this.yearSelector.val(date.year);
                 var self = this;

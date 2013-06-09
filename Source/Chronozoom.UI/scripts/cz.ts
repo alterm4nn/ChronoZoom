@@ -777,8 +777,8 @@ module CZ {
             if (timeSeriesChart !== undefined) {
                 var leftCSS = vp.pointVirtualToScreen(left, 0).x;
                 var rightCSS = vp.pointVirtualToScreen(right, 0).x;
-                var leftPlot = Dates.getDMYFromCoordinate(left).year;
-                var rightPlot = Dates.getDMYFromCoordinate(right).year;
+                var leftPlot = Dates.getYMDFromCoordinate(left).year;
+                var rightPlot = Dates.getYMDFromCoordinate(right).year;
 
 
                 timeSeriesChart.clear(leftCSS, rightCSS);
