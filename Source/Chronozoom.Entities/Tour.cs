@@ -53,6 +53,8 @@ namespace Chronozoom.Entities
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "To be fixed when entities are revisited")]
         [DataMember(Name = "audio")]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         public string AudioBlobUrl { get; set; }
 
         /// <summary>

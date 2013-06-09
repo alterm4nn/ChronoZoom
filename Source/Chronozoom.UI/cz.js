@@ -1937,7 +1937,7 @@ var CZ;
                             CZ.Authoring.mode = "editContentItem";
                             CZ.Authoring.contentItemMode = "editContentItem";
                             CZ.Authoring.selectedExhibit = self.parent.parent.parent;
-                            CZ.Authoring.selectedContentItem = CZ.Authoring.selectedExhibit.contentItems[self.contentItem.index];
+                            CZ.Authoring.selectedContentItem = self.contentItem;
                             return true;
                         };
                         editButton.onmouseenter = function () {
@@ -5259,7 +5259,7 @@ var CZ;
                     if(tl.AspectRatio) {
                         tl.height = (tl.right - tl.left) / tl.AspectRatio;
                     } else if(timeline.height && tl.Height) {
-                        tl.height = timeline.height * tl.Height;
+                        tl.height = Math.min(timeline.height * tl.Height, (tl.right - tl.left) * CZ.Settings.timelineMinAspect);
                     }
                     LayoutTimeline(tl, timelineWidth, measureContext);
                 });
@@ -9757,6 +9757,12 @@ var CZ;
                         _this.close();
                     }, function (error) {
                         alert("Unable to save changes. Please try again later.");
+                    });
+                } else if(this.exhibit.contentItems.length === 0) {
+                    var self = this;
+                    var origMsg = this.errorMessage.text();
+                    this.errorMessage.text("Cannot create exhibit without content items.").show().delay(7000).fadeOut(function () {
+                        return self.errorMessage.text(origMsg);
                     });
                 } else {
                     this.errorMessage.show().delay(7000).fadeOut();

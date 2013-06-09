@@ -22,7 +22,7 @@
             <h1><%Response.Write(timeline.Title); %></h1>
             <%  foreach (Chronozoom.Entities.Exhibit exhibit in timeline.Exhibits.OrderBy(exhibit => exhibit.Year))
                 { %>
-            <h2><a href="<% Response.Write(Chronozoom.UI.Crawler.GetFriendlyUrl(exhibit.Id)); %>"><% Response.Write(exhibit.Title); %></a></h2>
+            <h2><a href="<% Response.Write(Chronozoom.UI.Crawler.UrlForCollection(Chronozoom.UI.Crawler.UrlSuperCollection(url), Chronozoom.UI.Crawler.UrlCollection(url)) + exhibit.Id.ToString()); %>"><% Response.Write(exhibit.Title); %></a></h2>
             <% } %>
         </div>
         <div>
@@ -32,7 +32,7 @@
                        foreach (Chronozoom.Entities.Timeline childtimeline in timeline.ChildTimelines)
                            if (childtimeline != null)
                            { %>
-                <% Response.Write("<a href='" + Chronozoom.UI.Crawler.GetFriendlyUrl(childtimeline.Id) + "'>" + childtimeline.Title + "</a><br/>"); %>
+                <% Response.Write("<a href='" + Chronozoom.UI.Crawler.UrlForCollection(Chronozoom.UI.Crawler.UrlSuperCollection(url), Chronozoom.UI.Crawler.UrlCollection(url)) + childtimeline.Id.ToString() + "'>" + childtimeline.Title + "</a><br/>"); %>
                 <% } %>
                 <% } %>
             </section>
@@ -50,14 +50,16 @@
         <% if (contentitem.MediaType == "Image" || contentitem.MediaType == "Picture")
            { %>
         <p>
-            <img src="<% Response.Write(contentitem.Uri); %>" /></p>
+            <img src="<% Response.Write(contentitem.Uri); %>" />
+        </p>
         <% } %>
         <% if (contentitem.MediaType == "PDF" || contentitem.MediaType == "Video" || contentitem.MediaType == "Audio" || contentitem.MediaType == "Photosynth")
            { %>
         <p>
-            <embed src="<% Response.Write(contentitem.Uri); %>" width="435" height="325" /></p>
+            <embed src="<% Response.Write(contentitem.Uri); %>" width="435" height="325" />
+        </p>
         <% } %>
-        <a href="<% Response.Write(Chronozoom.UI.Crawler.GetFriendlyUrl(contentitem.Id)); %>"><%Response.Write(contentitem.Title); %></a> - <% Response.Write(contentitem.Caption); %>
+        <a href="<% Response.Write(Chronozoom.UI.Crawler.UrlForCollection(Chronozoom.UI.Crawler.UrlSuperCollection(url), Chronozoom.UI.Crawler.UrlCollection(url)) + contentitem.Id.ToString()); %>"><%Response.Write(contentitem.Title); %></a> - <% Response.Write(contentitem.Caption); %>
         <% } %>
         <% } %>
         <% ////  #### IF GUID == CONTENTITEM #### -->
@@ -68,19 +70,22 @@
         <% if (contentitem.MediaType == "Image" || contentitem.MediaType == "Picture")
            { %>
         <p>
-            <img src="<% Response.Write(contentitem.Uri); %>" /></p>
+            <img src="<% Response.Write(contentitem.Uri); %>" />
+        </p>
         <% } %>
         <% if (contentitem.MediaType == "PDF" || contentitem.MediaType == "Video" || contentitem.MediaType == "Audio" || contentitem.MediaType == "Photosynth")
            { %>
         <p>
-            <embed src="<% Response.Write(contentitem.Uri); %>" width="435" height="325" /></p>
+            <embed src="<% Response.Write(contentitem.Uri); %>" width="435" height="325" />
+        </p>
         <% } %>
-        <a href="<% Response.Write(Chronozoom.UI.Crawler.GetFriendlyUrl(contentitem.Id)); %>"><%Response.Write(contentitem.Title); %></a> - <% Response.Write(contentitem.Caption); %>
+        <a href="<% Response.Write(Chronozoom.UI.Crawler.UrlForCollection(Chronozoom.UI.Crawler.UrlSuperCollection(url), Chronozoom.UI.Crawler.UrlCollection(url)) + contentitem.Id.ToString()); %>"><%Response.Write(contentitem.Title); %></a> - <% Response.Write(contentitem.Caption); %>
         <% } %>
         <footer>
             <p>
                 <% //// Here we need a link to point to the Root Timeline of the collection, based on the FriendlyURL passed to the page %>
-                <% Response.Write("<a href='http://" + Request.ServerVariables["HTTP_HOST"] + "/" + Chronozoom.UI.Crawler.RootTimelineId(url) + "'>Home</a>"); %>
+                <%--<% Response.Write("<a href='http://" + Request.ServerVariables["HTTP_HOST"] + "/" + Chronozoom.UI.Crawler.RootTimelineId(url) + "'>Home</a>"); %>--%>
+                <% Response.Write("<a href='" + Chronozoom.UI.Crawler.UrlForCollection(Chronozoom.UI.Crawler.UrlSuperCollection(url), Chronozoom.UI.Crawler.UrlCollection(url)) + Chronozoom.UI.Crawler.RootTimelineId(url) + "'>Home</a>"); %>
             </p>
         </footer>
     </form>

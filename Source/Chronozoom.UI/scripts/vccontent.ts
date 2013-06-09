@@ -1964,7 +1964,7 @@ module CZ {
                             CZ.Authoring.mode = "editContentItem";
                             CZ.Authoring.contentItemMode = "editContentItem";
                             CZ.Authoring.selectedExhibit = self.parent.parent.parent;
-                            CZ.Authoring.selectedContentItem = CZ.Authoring.selectedExhibit.contentItems[self.contentItem.index];
+                            CZ.Authoring.selectedContentItem = self.contentItem;
                             return true;
                         }
 
