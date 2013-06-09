@@ -2781,7 +2781,7 @@ var CZ;
             return coordinate;
         }
         Dates.getCoordinateFromYMD = getCoordinateFromYMD;
-        function getDMYFromCoordinate(coord) {
+        function getYMDFromCoordinate(coord) {
             var sign = (coord === 0) ? 1 : coord / Math.abs(coord);
             var day = 0, month = 0, year = 0;
             var idxYear, countLeapYears = 0;
@@ -2823,7 +2823,7 @@ var CZ;
                 day: Math.round(day)
             };
         }
-        Dates.getDMYFromCoordinate = getDMYFromCoordinate;
+        Dates.getYMDFromCoordinate = getYMDFromCoordinate;
         function getCoordinateFromDecimalYear(decimalYear) {
             var localPresent = getPresent();
             var presentDate = getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
@@ -2851,6 +2851,13 @@ var CZ;
             } else {
                 year.year = Math.floor(year.year);
             }
+            if(year.regime === 'BCE') {
+                year.year += 2;
+            }
+            if((year.regime === 'CE') && (year.year === 0)) {
+                year.regime = 'BCE';
+                year.year = 1;
+            }
             return year;
         }
         Dates.convertCoordinateToYear = convertCoordinateToYear;
@@ -2868,6 +2875,7 @@ var CZ;
                     break;
                 case "bce":
                     coordinate *= -1;
+                    coordinate += 1;
                     break;
             }
             return coordinate;
@@ -6393,6 +6401,10 @@ var CZ;
             var point = CZ.Common.getXBrowserMouseOrigin(container, e);
             var k = (_range.max - _range.min) / _width;
             var time = _range.max - k * (_width - point.x);
+            var test1 = CZ.Dates.getCoordinateFromYMD(1, 0, 1);
+            var test2 = CZ.Dates.getYMDFromCoordinate(test1);
+            var test3 = CZ.Dates.convertCoordinateToYear(test1);
+            console.log(test1, test2, test3);
             if(time <= _range.min + CZ.Settings.panelWidth * k) {
                 marker.css("display", "none");
                 LeftPanInput();
@@ -7246,7 +7258,7 @@ var CZ;
         this.base();
         this.getLabel = function (x) {
             var text;
-            var DMY = CZ.Dates.getDMYFromCoordinate(x);
+            var DMY = CZ.Dates.getYMDFromCoordinate(x);
             var year = DMY.year;
             if(year <= 0) {
                 text = -year + 1 + " BCE";
@@ -7281,10 +7293,10 @@ var CZ;
             this.startDate = this.present;
             this.endDate = this.present;
             if(this.range.min < 0) {
-                this.startDate = CZ.Dates.getDMYFromCoordinate(this.range.min);
+                this.startDate = CZ.Dates.getYMDFromCoordinate(this.range.min);
             }
             if(this.range.max < 0) {
-                this.endDate = CZ.Dates.getDMYFromCoordinate(this.range.max);
+                this.endDate = CZ.Dates.getYMDFromCoordinate(this.range.max);
             }
             this.delta = 1;
             this.beta = Math.floor(Math.log(this.range.max - this.range.min) * this.log10);
@@ -7510,8 +7522,8 @@ var CZ;
                 day: localPresent.getUTCDate()
             };
             this.firstYear = CZ.Dates.getCoordinateFromYMD(0, 0, 1);
-            this.startDate = CZ.Dates.getDMYFromCoordinate(this.range.min);
-            this.endDate = CZ.Dates.getDMYFromCoordinate(this.range.max);
+            this.startDate = CZ.Dates.getYMDFromCoordinate(this.range.min);
+            this.endDate = CZ.Dates.getYMDFromCoordinate(this.range.max);
             this.delta = 1;
             this.beta = Math.log(this.range.max - this.range.min) * this.log10;
             if(this.beta >= -0.2) {
@@ -7631,7 +7643,7 @@ var CZ;
             var step;
             var n;
             var tick = ticks[0].position;
-            var date = CZ.Dates.getDMYFromCoordinate(tick);
+            var date = CZ.Dates.getYMDFromCoordinate(tick);
             if(this.regime == "Quarters_Month") {
                 n = 2;
             } else if(this.regime == "Month_Weeks") {
@@ -7674,7 +7686,7 @@ var CZ;
             }
             for(var i = 0; i < ticks.length - 1; i++) {
                 var tick = ticks[i].position;
-                var date = CZ.Dates.getDMYFromCoordinate(tick);
+                var date = CZ.Dates.getYMDFromCoordinate(tick);
                 var j_step = 1;
                 for(var j = 1; j <= n; j += j_step) {
                     date.day += step;
@@ -7693,7 +7705,7 @@ var CZ;
                 }
             }
             var tick = ticks[ticks.length - 1].position;
-            var date = CZ.Dates.getDMYFromCoordinate(tick);
+            var date = CZ.Dates.getYMDFromCoordinate(tick);
             date.day += step;
             tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
             if(this.regime != "Month_Weeks") {
@@ -7717,7 +7729,7 @@ var CZ;
         };
         this.getMarkerLabel = function (range, time) {
             this.getRegime(range.min, range.max);
-            var date = CZ.Dates.getDMYFromCoordinate(time);
+            var date = CZ.Dates.getYMDFromCoordinate(time);
             if(date.year <= 0) {
                 date.year--;
             }
@@ -7726,7 +7738,7 @@ var CZ;
         };
         this.getPanelLabel = function (range, time) {
             this.getRegime(range.min, range.max);
-            var date = CZ.Dates.getDMYFromCoordinate(time);
+            var date = CZ.Dates.getYMDFromCoordinate(time);
             if(date.year <= 0) {
                 date.year--;
             }
@@ -8515,7 +8527,7 @@ var CZ;
                 });
             };
             DatePicker.prototype.setDate_DateMode = function (coordinate) {
-                var date = CZ.Dates.getDMYFromCoordinate(coordinate);
+                var date = CZ.Dates.getYMDFromCoordinate(coordinate);
                 this.yearSelector.val(date.year);
                 var self = this;
                 this.monthSelector.find("option").each(function (index) {
@@ -11256,8 +11268,8 @@ var CZ;
             if(CZ.timeSeriesChart !== undefined) {
                 var leftCSS = vp.pointVirtualToScreen(left, 0).x;
                 var rightCSS = vp.pointVirtualToScreen(right, 0).x;
-                var leftPlot = CZ.Dates.getDMYFromCoordinate(left).year;
-                var rightPlot = CZ.Dates.getDMYFromCoordinate(right).year;
+                var leftPlot = CZ.Dates.getYMDFromCoordinate(left).year;
+                var rightPlot = CZ.Dates.getYMDFromCoordinate(right).year;
                 CZ.timeSeriesChart.clear(leftCSS, rightCSS);
                 CZ.timeSeriesChart.clearLegend("left");
                 CZ.timeSeriesChart.clearLegend("right");

@@ -974,7 +974,7 @@ var CZ;
         this.base();
         this.getLabel = function (x) {
             var text;
-            var DMY = CZ.Dates.getDMYFromCoordinate(x);
+            var DMY = CZ.Dates.getYMDFromCoordinate(x);
             var year = DMY.year;
             if(year <= 0) {
                 text = -year + 1 + " BCE";
@@ -1009,10 +1009,10 @@ var CZ;
             this.startDate = this.present;
             this.endDate = this.present;
             if(this.range.min < 0) {
-                this.startDate = CZ.Dates.getDMYFromCoordinate(this.range.min);
+                this.startDate = CZ.Dates.getYMDFromCoordinate(this.range.min);
             }
             if(this.range.max < 0) {
-                this.endDate = CZ.Dates.getDMYFromCoordinate(this.range.max);
+                this.endDate = CZ.Dates.getYMDFromCoordinate(this.range.max);
             }
             this.delta = 1;
             this.beta = Math.floor(Math.log(this.range.max - this.range.min) * this.log10);
@@ -1238,8 +1238,8 @@ var CZ;
                 day: localPresent.getUTCDate()
             };
             this.firstYear = CZ.Dates.getCoordinateFromYMD(0, 0, 1);
-            this.startDate = CZ.Dates.getDMYFromCoordinate(this.range.min);
-            this.endDate = CZ.Dates.getDMYFromCoordinate(this.range.max);
+            this.startDate = CZ.Dates.getYMDFromCoordinate(this.range.min);
+            this.endDate = CZ.Dates.getYMDFromCoordinate(this.range.max);
             this.delta = 1;
             this.beta = Math.log(this.range.max - this.range.min) * this.log10;
             if(this.beta >= -0.2) {
@@ -1359,7 +1359,7 @@ var CZ;
             var step;
             var n;
             var tick = ticks[0].position;
-            var date = CZ.Dates.getDMYFromCoordinate(tick);
+            var date = CZ.Dates.getYMDFromCoordinate(tick);
             if(this.regime == "Quarters_Month") {
                 n = 2;
             } else if(this.regime == "Month_Weeks") {
@@ -1402,7 +1402,7 @@ var CZ;
             }
             for(var i = 0; i < ticks.length - 1; i++) {
                 var tick = ticks[i].position;
-                var date = CZ.Dates.getDMYFromCoordinate(tick);
+                var date = CZ.Dates.getYMDFromCoordinate(tick);
                 var j_step = 1;
                 for(var j = 1; j <= n; j += j_step) {
                     date.day += step;
@@ -1421,7 +1421,7 @@ var CZ;
                 }
             }
             var tick = ticks[ticks.length - 1].position;
-            var date = CZ.Dates.getDMYFromCoordinate(tick);
+            var date = CZ.Dates.getYMDFromCoordinate(tick);
             date.day += step;
             tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
             if(this.regime != "Month_Weeks") {
@@ -1445,7 +1445,7 @@ var CZ;
         };
         this.getMarkerLabel = function (range, time) {
             this.getRegime(range.min, range.max);
-            var date = CZ.Dates.getDMYFromCoordinate(time);
+            var date = CZ.Dates.getYMDFromCoordinate(time);
             if(date.year <= 0) {
                 date.year--;
             }
@@ -1454,7 +1454,7 @@ var CZ;
         };
         this.getPanelLabel = function (range, time) {
             this.getRegime(range.min, range.max);
-            var date = CZ.Dates.getDMYFromCoordinate(time);
+            var date = CZ.Dates.getYMDFromCoordinate(time);
             if(date.year <= 0) {
                 date.year--;
             }
