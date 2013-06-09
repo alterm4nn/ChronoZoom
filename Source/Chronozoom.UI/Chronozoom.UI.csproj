@@ -201,6 +201,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="api\errorhandler.cs" />
+    <Compile Include="api\storagecache.cs" />
     <Compile Include="default.ashx.cs">
       <DependentUpon>default.ashx</DependentUpon>
     </Compile>
