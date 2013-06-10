@@ -3,12 +3,11 @@
 /// <reference path="../../../Chronozoom.UI/scripts/timescale.js" />
 /// <reference path="../../../Chronozoom.UI/scripts/dates.js" />
 
-
 var oneDay = 0.0027397260274;
 var currentDate = new Date();
 var curY = currentDate.getFullYear();
 var curM = currentDate.getMonth();
-var curD = currentDate.getDate();
+var curD = currentDate.getUTCDate();
 
 describe("CZ.Timescale part", function () {
     describe("constructor", function () {
@@ -44,11 +43,11 @@ describe("CZ.Timescale part", function () {
                 expect(timescale.mode).toEqual("calendar");
             });
 
-            //it("to 'date' if range.min > -10000 and beta < 0", function () {
-            //    range = { min: 99.1, max: 100 };
-            //    timescale.update(range);
-            //    expect(timescale.mode).toEqual("date");
-            //});
+            it("to 'date' if range.min > -10000 and beta < 0", function () {
+                range = { min: 99.1, max: 100 };
+                timescale.update(range);
+                expect(timescale.mode).toEqual("date");
+            });
         });
 
     });
@@ -143,14 +142,43 @@ describe("CZ.CosmosTickSource part", function () { //this is the class for creat
         cosmosTickSrc = new CZ.CosmosTickSource();
     });
 
-    //describe("getLabel() method should return", function () {
-    //    it("'10 ka' if x = -10000", function () {
-    //        var x = -10000;
-    //        var result = cosmosTickSrc.getLabel(x);
-    //        expect("10 ka").toEqual(cosmosTickSrc.regime);
-    //        expect("10 ka").toEqual(result);
-    //    });
-    //});
+    describe("getLabel() method should return", function () {
+        it("'80 ka' if x = -10000", function () {
+            var x = -80000;
+            var l = -90000;
+            var r = 0;
+            cosmosTickSrc.getRegime(l, r);
+            var result = cosmosTickSrc.getLabel(x);
+            expect("80 ka").toEqual(result);
+        });
+
+        it("'8 Ma' if x = -8000000", function () {
+            var x = -8000000;
+            var l = -90000000;
+            var r = 0;
+            cosmosTickSrc.getRegime(l, r);
+            var result = cosmosTickSrc.getLabel(x);
+            expect("8 Ma").toEqual(result);
+        });
+
+        it("'7 Ga' if x = -7000000000", function () {
+            var x = -7000000000;
+            var l = -13000000000;
+            var r = 0;
+            cosmosTickSrc.getRegime(l, r);
+            var result = cosmosTickSrc.getLabel(x);
+            expect("7 Ga").toEqual(result);
+        });
+
+        it("'11.5 Ma' if x = -11500000", function () {
+            var x = -11500000;
+            var l = -10168815.716898847;
+            var r = -1438905.9972291654;
+            cosmosTickSrc.getRegime(l, r);
+            var result = cosmosTickSrc.getLabel(x);
+            expect("11.5 Ma").toEqual(result);
+        });
+    });
 
     describe("getRegime() method should set", function () {
         it("regime to 'Ga' if l <= -10000000000", function () {
@@ -291,7 +319,7 @@ describe("CZ.CalendarTickSource part", function () { //this is the class for cre
             var l = 2000;
             var r = 4000;
             calendarTickSrc.getRegime(l, r);
-            expect({ year: currentDate.getFullYear(), month: currentDate.getMonth(), day: currentDate.getDate() }).toEqual(calendarTickSrc.startDate);
+            expect({ year: curY, month: curM, day: curD }).toEqual(calendarTickSrc.startDate);
         });
         
     });
