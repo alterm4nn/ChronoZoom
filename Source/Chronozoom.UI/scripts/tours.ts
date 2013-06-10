@@ -1,5 +1,5 @@
 ﻿/// <reference path='typings/jqueryui/jqueryui.d.ts'/>
-
+/// <reference path='../ui/tourslist-form.ts' />
 /// <reference path='urlnav.ts'/>
 /// <reference path='common.ts'/>
 
@@ -28,7 +28,7 @@ module CZ {
         @param caption (string) text describing the bookmark
         @param lapseTime (number) a position in the audiotreck of the bookmark in seconds
         */
-        class TourBookmark {
+        export class TourBookmark {
 
             public duration = undefined;
             public number = 0;
@@ -53,6 +53,17 @@ module CZ {
             bookmark: number;
             startTime: number;
             animationId: number;
+        }
+
+        export function hasActiveTour(): bool {
+            return tour != undefined;
+        }
+
+        export function bookmarkUrlToElement(bookmarkUrl: string): any
+        {
+            var element = CZ.UrlNav.navStringTovcElement(bookmarkUrl, CZ.Common.vc.virtualCanvas("getLayerContent"));
+            if (!element) return null;
+            return element;
         }
 
         export class Tour {
@@ -126,13 +137,15 @@ module CZ {
                 @param isOn (Boolean) whether the audio is enabled
                 */
                 self.toggleAudio = function toggleAudio(isOn) {
-                    if (isOn)
+                    if (isOn && self.audio)
                         self.isAudioEnabled = true;
                     else
                         self.isAudioEnabled = false;
                 }
 
                 self.ReinitializeAudio = function ReinitializeAudio() {
+                    if (!self.audio) return;
+
                     // stop audio playback and clear audio element
                     if (self.audioElement) {
                         self.audioElement.pause();
@@ -249,6 +262,7 @@ module CZ {
                 @param bookmark         (bookmark) bookmark which audio narration part should be played.
                 */
                 self.startBookmarkAudio = function startBookmarkAudio(bookmark) {
+                    if (!self.audio) return;
                     if (isToursDebugEnabled && window.console && console.log("playing source: " + self.audio.currentSrc));
 
                     self.audioElement.pause();
@@ -459,6 +473,7 @@ module CZ {
                         for (var i = 0; i < self.tour_BookmarkStarted.length; i++)
                             self.tour_BookmarkStarted[i](self, bookmark);
                     }
+                    showBookmark(this, bookmark);
                 }
 
                 // calls every bookmarkFinished callback function
@@ -467,6 +482,7 @@ module CZ {
                         for (var i = 0; i < self.tour_BookmarkFinished.length; i++)
                             self.tour_BookmarkFinished[i](self, bookmark);
                     }
+                    hideBookmark(this);
                 }
 
                 // calls every tourStarted callback function
@@ -493,6 +509,8 @@ module CZ {
         @param    isAudioEnabled (Boolean) Whether to play audio during the tour or not
         */
         export function activateTour(newTour, isAudioEnabled) {
+            if (isAudioEnabled == undefined) isAudioEnabled = isNarrationOn;
+
             if (newTour != undefined) {
                 var tourControlDiv = document.getElementById("tour_control");
                 tourControlDiv.style.display = "block";
@@ -525,9 +543,9 @@ module CZ {
         }
 
         /*
-        Diactivates a tour. Removes all tour controlls.
+        Deactivates a tour. Removes all tour controls.
         */
-        function removeActiveTour() {
+        export function removeActiveTour() {
             // stop active tour
             if (tour) {
                 tourPause();
@@ -631,7 +649,7 @@ module CZ {
         }
 
         export function initializeToursUI() {
-            $("#tours").hide();
+            $("#tours").hide();    
 
             // Bookmarks window
             hideBookmarks();
@@ -648,14 +666,14 @@ module CZ {
                 var tour = tours[i];
 
                 // add new bookmarkStarted callback function
-                tour.tour_BookmarkStarted.push(function (t, bookmark) {
-                    showBookmark(t, bookmark);
-                });
+                //tour.tour_BookmarkStarted.push(function (t, bookmark) {
+                //    showBookmark(t, bookmark);
+                //});
 
-                // add new bookmarkFinished callback function
-                tour.tour_BookmarkFinished.push(function (t, bookmark) {
-                    hideBookmark(t);
-                });
+                //// add new bookmarkFinished callback function
+                //tour.tour_BookmarkFinished.push(function (t, bookmark) {
+                //    hideBookmark(t);
+                //});
 
                 // add new category to tours menu
                 if (tour.category !== category) {
@@ -806,7 +824,7 @@ module CZ {
                 $(".tour-icon").addClass("active");
                 $("#tours").show('slide', {}, 'slow');
             }
-            isTourWindowVisible = !isTourWindowVisible;
+            isTourWindowVisible = !isTourWindowVisible;            
         }
 
         /*
@@ -918,12 +936,13 @@ module CZ {
                 // tour is correct and can be played
                 tours.push(new Tour(tourString.name, tourBookmarks, bookmarkTransition, CZ.Common.vc, tourString.category, tourString.audio, tourString.sequence));
             }
+            $("body").trigger("toursInitialized");
         }
 
         /*
         Bookmark' transition handler function to be passed to tours.
         */
-        function bookmarkTransition(visible, onCompleted, onInterrupted, bookmark) {
+        export function bookmarkTransition(visible, onCompleted, onInterrupted, bookmark) {
             tourBookmarkTransitionCompleted = onCompleted; // reinitialize animation completed handler for bookmark' transition
             tourBookmarkTransitionInterrupted = onInterrupted; // reinitialize animation interrupted handler for bookmark' transition
 

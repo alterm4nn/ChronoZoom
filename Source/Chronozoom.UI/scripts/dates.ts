@@ -31,16 +31,80 @@ module CZ {
             30,
             31];
 
-        export function getCoordinateFromDate(dateTime) {
-            return getYearsBetweenDates(dateTime.getFullYear(), dateTime.getMonth(), dateTime.getDay(), 0, 0, 0);
+        // by give date gives coordinate in virtual coordinates
+        export function getCoordinateFromYMD(year, month, day) {
+            //get sign of coordinate
+            var sign = (year != 0) ? year / Math.abs(year) : 1;
+            var i = 0;
+            var coordinate = year;
+            var days = day;
+            var daysPerYear = isLeapYear(year) ? 366 : 365;
+
+            // calculate count of passed days 
+            for (i = 0; i < month; i++) {
+                days += daysInMonth[i];
+                //if Feb and leap year
+                if ((i === 1) && (isLeapYear(year))) {
+                    days++;
+                }
+            }
+
+            if ((month > 1) && (isLeapYear(year))) {
+                coordinate += sign * days / daysPerYear;
+            } else {
+                coordinate += (sign >= 0) ? sign * days / daysPerYear : sign * (1 - days / daysPerYear);
+            }
+
+            //zero-year problem solvation
+            if (year < 0) coordinate += 1;
+            coordinate -= 1/daysPerYear;
+
+            return coordinate;
         }
 
-        export function getCoordinateFromDMY(year, month, day) {
-            return getYearsBetweenDates(year, month, day, 0, 0, 0);
-        }
+        export function getYMDFromCoordinate(coord) {
+            var sign = (coord === 0) ? 1 : coord / Math.abs(coord);
+            var day = 0, month = 0, year = 0;
+            var idxYear, countLeapYears = 0;
+            // Define year
+            year = (coord >= 0) ? Math.floor(coord) : Math.floor(coord) + 1;
+            var daysPerYear = isLeapYear(year) ? 366 : 365;
 
-        export function getDMYFromCoordinate(coord) {
-            return getDateFrom(0, 0, 1, coord);
+            var day, month;
+            var countDays;
+            //months and days are remaining
+            countDays = Math.abs(coord) - Math.abs(year) + sign * 1./daysPerYear;
+            //for negative years day and month are converted
+            if (sign < 0) countDays = 1 - countDays;
+
+            var idxMonth = 0;
+            //count month
+            while (countDays > daysInMonth[idxMonth] / daysPerYear) {
+                countDays -= daysInMonth[idxMonth] / daysPerYear;
+                if (isLeapYear(year) && (idxMonth === 1)) countDays -= 1 / daysPerYear;
+                idxMonth++;
+            }
+            month = idxMonth;
+            day = countDays * daysPerYear;
+            //remaining value need to be represanted as date
+            while (Math.round(day) <= 0) {
+                month--;
+                if (month === -1) {
+                    year--;
+                    month = 11;
+                }
+                day = daysInMonth[month] + Math.round(day);
+                if (isLeapYear(year) && (month === 1)) day++;
+            }
+            //zero-year problem solvation
+            if (coord < 0) year--;
+
+            return {
+                year: year,
+                month: month,
+                day: Math.round(day)
+            };
+
         }
 
         // convert date to virtual coordinate
@@ -48,7 +112,7 @@ module CZ {
         export function getCoordinateFromDecimalYear(decimalYear) {
             // get virtual coordinate of present day
             var localPresent = getPresent();
-            var presentDate = getYearsBetweenDates(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay, 0, 0, 0);
+            var presentDate = getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
 
             return decimalYear === 9999 ? presentDate : decimalYear;
         }
@@ -78,7 +142,14 @@ module CZ {
                 // remove fraction part of year
                 year.year = Math.floor(year.year);
             }
+            if (year.regime === 'BCE') {
+                year.year += 2;
+               }
 
+            if ((year.regime === 'CE') && (year.year === 0)) {
+                year.regime = 'BCE';
+                year.year = 1;
+               }
             return year;
         }
 
@@ -97,12 +168,13 @@ module CZ {
                     break;
                 case "bce":
                     coordinate *= -1;
+                    coordinate += 1;
                     break;
             }
 
             return coordinate;
         }
-
+         
         var present = undefined;
         export function getPresent() {
             if (!present) {
@@ -115,96 +187,19 @@ module CZ {
             return present;
         }
 
-        // gets the gap between two dates
-        // y1, m1, d1 is first date (year, month, day)
-        // y2, m2, d2 is second date (year, month, day)
-        // returns count of years between given dates
-        function getYearsBetweenDates(y1, m1, d1, y2, m2, d2) {
-            // get full years and month passed
-            var years = y2 - y1;
-
-            if (y2 > 0 && y1 < 0)
-                years -= 1;
-
-            var months = m2 - m1;
-
-            if (m1 > m2 || (m1 == m2 && d1 > d2)) {
-                years--;
-                months += 12;
-            }
-
-            var month = m1;
-            var days = -d1;
-
-            // calculate count of passed days 
-            for (var i = 0; i < months; i++) {
-                if (month == 12) {
-                    month = 0;
-                }
-                days += daysInMonth[month];
-                month++;
-            }
-            days += d2;
-
-            // add plus 1 day to make 1 january as 0 offset from year
-            days += 1;
-            var res = years + days / 365;
-            return -res;
-        }
-
-        // gets the end date by given start date and gap between them
-        // year, month, day is known date
-        // n is count of years between known and result dates; n is negative, so result date in earlier then given
-        function getDateFrom(year, month, day, n) {
-            var endYear = year;
-            var endMonth = month;
-            var endDay = day;
-
-            // get full year of result date
-            endYear -= Math.floor(-n);
-
-            // get count of days in a gap
-            var nDays = (n + Math.floor(-n)) * 365;
-
-            // calculate how many full months have passed
-            while (nDays < 0) {
-                var tempMonth = endMonth > 0 ? endMonth - 1 : 11;
-                nDays += daysInMonth[tempMonth];
-                endMonth--;
-                if (endMonth < 0) {
-                    endYear--;
-                    endMonth = 11;
-                }
-            }
-
-            endDay += Math.round(nDays);
-            // get count of days in current month
-            var tempDays = daysInMonth[endMonth];
-            //if (isLeapYear(endYear)) tempDays++;
-            // if result day is bigger than count of days then one more month has passed too            
-            while (endDay > tempDays) {
-                endDay -= tempDays;
-                endMonth++;
-                if (endMonth > 11) {
-                    endMonth = 0;
-                    endYear++;
-                }
-                tempDays = daysInMonth[endMonth];
-              //  if (isLeapYear(endYear)) tempDays++;
-            }
-            if (endYear < 0 && year > 0)
-                endYear -= 1;
-
-            return {
-                year: endYear,
-                month: endMonth,
-                day: endDay
-            };
-        }
-
-        function isLeapYear(year) {
-            if (year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0)) return true;
+        export function isLeapYear(year) {
+            if (year >= 1582 && (year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0))) return true;
             else return false;
-        }
-    }
+       }
+
+       export function numberofLeap(year) {
+           var startLeap = 1582;
+           if (year < startLeap) return 0;
+           var years1 = Math.floor(year / 4) - Math.floor(startLeap / 4);
+           years1 -= Math.floor(year / 100) - Math.floor(startLeap / 100);
+           years1 += Math.floor(year / 400) - Math.floor(startLeap / 400);
+           if (isLeapYear(year)) years1--;
+           return years1;
+       }
+ }
 }

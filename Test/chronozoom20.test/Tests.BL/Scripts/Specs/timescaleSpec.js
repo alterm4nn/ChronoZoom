@@ -1,7 +1,7 @@
 ﻿/// <reference path="../Utils/jquery-1.7.2.min.js" />
 /// <reference path="../Utils/jasmine-jquery.js" />
 /// <reference path="../Js/timescale.js" />
-/// <reference path="../Js/cz.dates.js" />
+/// <reference path="../Js/dates.js" />
 /// <reference path="../Js/common.js" />
 /// <reference path="../Js/cz.settings.js" />
 /// <reference path="../Js/settings.js" />
@@ -71,21 +71,33 @@ describe("CZ.DateTickSource part", function () {
             expect(ticksLabels).toContain('1 January, 1');
         });
 
-        //it("should contain 29 February in leap year (1600)", function () {
-        //    throw "Bug #34 is not resolved!";
+        it("should contain 29 February in leap year (1600)", function () {
+            var range = { min: 1600.144803433211, max: 1600.1702031121245 };
+            CZ.Settings.maxPermitedTimeRange.right = 2013;
 
-        //    var range = { min: 1600.144803433211, max: 1600.1702031121245 };
-        //    CZ.Settings.maxPermitedTimeRange.right = 2013;
+            var ticks = dateTickSource.getTicks(range);
+            var ticksLabels = [];
 
-        //    var ticks = dateTickSource.getTicks(range);
-        //    var ticksLabels = [];
+            for (var i in ticks) {
+                ticksLabels.push(ticks[i].label[0].innerHTML);
+            }
 
-        //    for (var i in ticks) {
-        //        ticksLabels.push(ticks[i].label[0].innerHTML);
-        //    }
+            expect(ticksLabels).toContain('29 February');
+        });
 
-        //    expect(ticksLabels).toContain('29 February');
-        //});
+        it("should not contain 29 February in not leap year (1987)", function () {
+            var range = { min: 1987.144803433211, max: 1987.1702031121245 };
+            CZ.Settings.maxPermitedTimeRange.right = 2013;
+
+            var ticks = dateTickSource.getTicks(range);
+            var ticksLabels = [];
+
+            for (var i in ticks) {
+                ticksLabels.push(ticks[i].label[0].innerHTML);
+            }
+
+            expect(ticksLabels).not.toContain('29 February');
+        });
 
     });
 });
@@ -221,7 +233,7 @@ describe("When user set mouse to timescale point", function () {
         });
         describe("and CE area", function () {
             beforeEach(function () {
-                time = 1000.996412540633;
+                time = 1001;
                 expectedResult = "1001 CE";
                 var range = { min: -3447.996412540633, max: 2461.289563225633 };
                 tm.update(range);
@@ -248,7 +260,7 @@ describe("When user set mouse to timescale point", function () {
         describe("and one year area", function () {
             beforeEach(function () {
                 time = 2012.1946866592516;
-                expectedResult = '13.3.2012';
+                expectedResult = '2012.3.12';
                 var range = { min: 2011.5541057045, max: 2012.5469000468117 };
                 tm.update(range);
             });

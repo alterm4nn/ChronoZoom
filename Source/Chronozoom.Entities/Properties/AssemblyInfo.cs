@@ -8,6 +8,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 
 [assembly: AssemblyTitle("Chronozoom Entities")]
 [assembly: AssemblyCompany("OuterCurve Foundation")]
@@ -21,3 +22,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("1.0.0.0")]
 
 [assembly: SuppressMessage("Microsoft.Design", "CA2210:AssembliesShouldHaveValidStrongNames", Justification = "Open source project")]
+
+[assembly: InternalsVisibleTo("Chronozoom.Entitites.UnitTests")]

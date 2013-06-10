@@ -5,20 +5,19 @@
 
 module CZ {
     export module UI {
-        export interface IFormEditExhibitInfo extends IFormBaseInfo {
+        export interface IFormEditExhibitInfo extends IFormUpdateEntityInfo {
             titleTextblock: string;
             titleInput: string;
             datePicker: string;
             createArtifactButton: string;
             contentItemsListBox: string;
             errorMessage: string;
-            saveButton: string;
             deleteButton: string;
             contentItemsTemplate: JQuery;
             context: Object;
         }
 
-        export class FormEditExhibit extends FormBase {
+        export class FormEditExhibit extends FormUpdateEntity {
             private titleTextblock: JQuery;
             private titleInput: JQuery;
             private datePicker: DatePicker;
@@ -84,6 +83,7 @@ module CZ {
 
                     this.contentItemsListBox.itemDblClick((item, index) => this.onContentItemDblClick(item, index));
                     this.contentItemsListBox.itemRemove((item, index) => this.onContentItemRemoved(item, index));
+                    this.contentItemsListBox.itemMove((item, indexStart, indexStop) => this.onContentItemMove(item, indexStart, indexStop));
 
                 } else if (this.mode === "editExhibit") {
                     this.titleTextblock.text("Edit Exhibit");
@@ -107,6 +107,7 @@ module CZ {
 
                     this.contentItemsListBox.itemDblClick((item, index) => this.onContentItemDblClick(item, index));
                     this.contentItemsListBox.itemRemove((item, index) => this.onContentItemRemoved(item, index));
+                    this.contentItemsListBox.itemMove((item, indexStart, indexStop) => this.onContentItemMove(item, indexStart, indexStop));
 
                 } else {
                     console.log("Unexpected authoring mode in exhibit form.");
@@ -125,7 +126,7 @@ module CZ {
                         mediaType: "",
                         attribution: "",
                         description: "",
-                        index: this.exhibit.contentItems.length
+                        order: this.exhibit.contentItems.length
                     };
                     this.exhibit.contentItems.push(newContentItem);
                     this.hide(true);
@@ -138,22 +139,34 @@ module CZ {
                 var newExhibit = {
                     title: this.titleInput.val() || "",
                     x: this.datePicker.getDate() - this.exhibit.width / 2,
+                    y: this.exhibit.y,
+                    height: this.exhibit.height,
+                    width: this.exhibit.width,
                     infodotDescription: { date: this.datePicker.getDate() },
-                    contentItems: this.exhibit.contentItems || []
+                    contentItems: this.exhibit.contentItems || [],
+                    type: "infodot"
                 };
 
-                if (CZ.Authoring.ValidateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) &&
-                    this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {                    
+                if (CZ.Authoring.validateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) &&
+                    CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true) &&
+                    this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {
                     CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(
                         success => {
                             this.isCancel = false;
                             this.close();
                         },
                         error => {
-                           alert("Unable to save changes. Please try again later.");
-                       }
+                            alert("Unable to save changes. Please try again later.");
+                        }
                     );
-                    
+                } else if (this.exhibit.contentItems.length === 0) {
+                    var self = this;
+                    var origMsg = this.errorMessage.text();
+                    this.errorMessage
+                        .text("Cannot create exhibit without content items.")
+                        .show()
+                        .delay(7000)
+                        .fadeOut(() => self.errorMessage.text(origMsg));
                 } else {
                     this.errorMessage.show().delay(7000).fadeOut();
                 }
@@ -168,23 +181,34 @@ module CZ {
             }
 
             private onContentItemDblClick(item: ListItemBase, _: number) {
-                if (item.data.index >= 0) {
+                var idx = item.data.order;
+                if (idx >= 0) {
                     this.clickedListItem = <ContentItemListItem>item;
                     this.exhibit.title = this.titleInput.val() || "";
                     this.exhibit.x = this.datePicker.getDate() - this.exhibit.width / 2;
                     this.exhibit.infodotDescription = { date: this.datePicker.getDate() };
                     this.hide(true);
                     CZ.Authoring.contentItemMode = "editContentItem";
-                    CZ.Authoring.showEditContentItemForm(this.exhibit.contentItems[item.data.index], this.exhibit, this, true);
+                    CZ.Authoring.showEditContentItemForm(this.exhibit.contentItems[idx], this.exhibit, this, true);
                 }
             }
 
             private onContentItemRemoved(item: ListItemBase, _: number) {
-                if (item.data.index >= 0) {
-                    this.exhibit.contentItems.splice(item.data.index, 1);
+                var idx = item.data.order;
+                if (idx >= 0) {
+                    this.exhibit.contentItems.splice(idx, 1);
+                    for (var i = 0; i < this.exhibit.contentItems.length; i++) this.exhibit.contentItems[i].order = i;
                     this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
                     CZ.Common.vc.virtualCanvas("requestInvalidate");
                 }
+            }
+
+            public onContentItemMove(item: ListItemBase, indexStart: number, indexStop: number) {
+                var ci = this.exhibit.contentItems.splice(indexStart, 1)[0];
+                this.exhibit.contentItems.splice(indexStop, 0, ci);
+                for (var i = 0; i < this.exhibit.contentItems.length; i++) this.exhibit.contentItems[i].order = i;
+                this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
+                CZ.Common.vc.virtualCanvas("requestInvalidate");
             }
 
             public show(noAnimation?: bool = false) {

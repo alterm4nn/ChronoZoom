@@ -24,5 +24,10 @@ namespace Application.Helper.BrowserImpl
             ExecuteJavaScript(script);
             Logger.Log("->");
         }
+
+        public virtual void SecurityWarningAccept()
+        {
+            //No alert by default (chrome and IE).
+        }
     }
 }

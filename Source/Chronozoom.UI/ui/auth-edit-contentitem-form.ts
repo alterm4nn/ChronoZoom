@@ -4,7 +4,7 @@
 
 module CZ {
     export module UI {
-        export interface IFormEditCIInfo extends CZ.UI.IFormBaseInfo {
+        export interface IFormEditCIInfo extends CZ.UI.IFormUpdateEntityInfo {
             titleInput: string;
             mediaInput: string;
             mediaSourceInput: string;
@@ -12,14 +12,13 @@ module CZ {
             attributionInput: string;
             descriptionInput: string;
             errorMessage: string;
-            saveButton: string;
             context: {
                 exhibit: Object;
                 contentItem: Object;
             };
         }
 
-        export class FormEditCI extends CZ.UI.FormBase {
+        export class FormEditCI extends CZ.UI.FormUpdateEntity {
             private titleTextblock: JQuery;
             private titleInput: JQuery;
             private mediaInput: JQuery;
@@ -111,14 +110,14 @@ module CZ {
                     mediaType: this.mediaTypeInput.val() || "",
                     attribution: this.attributionInput.val() || "",
                     description: this.descriptionInput.val() || "",
-                    index: this.contentItem.index
+                    order: this.contentItem.order
                 };
-                if (CZ.Authoring.ValidateContentItems([newContentItem])) {
+                if (CZ.Authoring.validateContentItems([newContentItem])) {
                     if (CZ.Authoring.contentItemMode === "createContentItem") {
                         if (this.prevForm && this.prevForm instanceof FormEditExhibit) {
                             this.isCancel = false;
                             (<FormEditExhibit>this.prevForm).contentItemsListBox.add(newContentItem);
-                            $.extend(this.exhibit.contentItems[this.contentItem.index], newContentItem);
+                            $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
                             (<FormEditExhibit>this.prevForm).exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
                             this.back();
@@ -127,9 +126,10 @@ module CZ {
                         if (this.prevForm && this.prevForm instanceof FormEditExhibit) {
                             this.isCancel = false;
                             var clickedListItem = (<FormEditExhibit>this.prevForm).clickedListItem;
+                            clickedListItem.iconImg.attr("src", newContentItem.uri);
                             clickedListItem.titleTextblock.text(newContentItem.title);
                             clickedListItem.descrTextblock.text(newContentItem.description);
-                            $.extend(this.exhibit.contentItems[this.contentItem.index], newContentItem);
+                            $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
                             (<FormEditExhibit>this.prevForm).exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
                             this.back();

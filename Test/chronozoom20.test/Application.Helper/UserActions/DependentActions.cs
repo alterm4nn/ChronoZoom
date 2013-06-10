@@ -22,5 +22,10 @@ namespace Application.Helper.UserActions
         {
             _controls.NavigateBceToCeEra();
         }
+
+        protected void AcceptSecurityWarning()
+        {
+            _controls.SecurityWarningAccept();
+        }
     }
 }

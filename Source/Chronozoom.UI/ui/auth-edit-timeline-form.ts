@@ -4,21 +4,22 @@
 
 module CZ {
     export module UI {
-        export interface IFormEditTimelineInfo extends CZ.UI.IFormBaseInfo {
+        export interface IFormEditTimelineInfo extends CZ.UI.IFormUpdateEntityInfo {
             startDate: string;
             endDate: string;
-            saveButton: string;
             deleteButton: string;
             titleInput: string;
+            errorMessage: string;
             context: Object;
         }
 
-        export class FormEditTimeline extends CZ.UI.FormBase {
+        export class FormEditTimeline extends CZ.UI.FormUpdateEntity {
             private saveButton: JQuery;
             private deleteButton: JQuery;
             private startDate: CZ.UI.DatePicker;
             private endDate: CZ.UI.DatePicker;
             private titleInput: JQuery;
+            private errorMessage: JQuery;
 
             private timeline: any;
             private isCancel: bool;
@@ -32,6 +33,7 @@ module CZ {
                 this.startDate = new CZ.UI.DatePicker(container.find(formInfo.startDate));
                 this.endDate = new CZ.UI.DatePicker(container.find(formInfo.endDate));
                 this.titleInput = container.find(formInfo.titleInput);
+                this.errorMessage = container.find(formInfo.errorMessage);
 
                 this.timeline = formInfo.context;
 
@@ -61,22 +63,33 @@ module CZ {
                 this.endDate.addEditMode_Infinite();
 
                 this.titleInput.val(this.timeline.title);
-                this.startDate.setDate(this.timeline.x);
+                this.startDate.setDate(this.timeline.x, true);
 
                 if (this.timeline.endDate === 9999) {
-                    this.endDate.setDate(this.timeline.endDate);
+                    this.endDate.setDate(this.timeline.endDate, true);
                 }
                 else {
-                    this.endDate.setDate(this.timeline.x + this.timeline.width);
+                    this.endDate.setDate(this.timeline.x + this.timeline.width, true);
                 }
-
                 this.saveButton.click(event => {
-                    var isValid = CZ.Authoring.ValidateTimelineData(this.startDate.getDate(), this.endDate.getDate(), this.titleInput.val());
-                    if (!isValid) {
-                        this.container.find("#error-edit-timeline").show().delay(7000).fadeOut();
+                    this.errorMessage.empty();
+                    var isDataValid = false;
+                    isDataValid = CZ.Authoring.validateTimelineData(this.startDate.getDate(), this.endDate.getDate(), this.titleInput.val());
+                    // Other cases are covered by datepicker
+                    if (!CZ.Authoring.isNotEmpty(this.titleInput.val())) {
+                        this.errorMessage.text('Title is empty');
                     }
-                    if (isValid) {
+                    else if (!CZ.Authoring.isIntervalPositive(this.startDate.getDate(), this.endDate.getDate())) {
+                        this.errorMessage.text('Result interval is not positive');
+                    }      
+                    
+                    if (!isDataValid) {
+                        return;
+                    }
+                    else {
+                        this.errorMessage.empty();
                         var self = this;
+
                         CZ.Authoring.updateTimeline(this.timeline, {
                             title: this.titleInput.val(),
                             start: this.startDate.getDate(),
@@ -112,6 +125,8 @@ module CZ {
             }
 
             public close() {
+                this.errorMessage.empty();
+
                 super.close({
                     effect: "slide", 
                     direction: "left",
@@ -122,14 +137,15 @@ module CZ {
                     }
                 });
 
-                if (this.isCancel && CZ.Authoring.mode === "createTimeline") {
-                    CZ.Authoring.removeTimeline(this.timeline);
+                if (this.isCancel && CZ.Authoring.mode === "createTimeline") {                    
+                    CZ.VCContent.removeChild(this.timeline.parent, this.timeline.id);
+                    CZ.Common.vc.virtualCanvas("requestInvalidate");
                 }
 
                 CZ.Authoring.isActive = false;
 
                 this.activationSource.removeClass("active");
-                this.container.find("#error-edit-timeline").hide();
+                
             }
         }
     }

@@ -1,15 +1,16 @@
 @import "timescale";
 @import "datepicker";
 
-html, body {
+html, body
+{
     margin: 0;
     padding: 0;
     height: 100%;
 }
 
-body {
+body
+{
     overflow: hidden;
-
     min-width: 950px;
     min-height: 250px;
     background-color: #232323;
@@ -17,20 +18,24 @@ body {
     -ms-touch-action: none;
 }
 
-a {
+a
+{
     color: #fff;
     text-decoration: none;
 }
 
-a:hover {
+    a:hover
+    {
     color: #fff;
 }
 
-a:active {
+    a:active
+    {
     color: #fff;
 }
 
-a:visited {
+    a:visited
+    {
     color: #fff;
     text-decoration: none;
 }
@@ -41,14 +46,16 @@ a:visited {
       
 ***********************************************************/
 
-#header {    
+#header
+{
     position: relative;
     padding-right: 20px;
     padding-left: 20px;
     height: 36px;
 }
 
-#header ul {
+    #header ul
+    {
     overflow: hidden;
     margin: 0;
     padding: 0;
@@ -56,15 +63,18 @@ a:visited {
     height: 100%;
 }
 
-#header ul li {
+        #header ul li
+        {
     height: 100%;
 }
 
-#header ul:after {
+        #header ul:after
+        {
     clear: both;
 }
 
-.regime-link {
+.regime-link
+{
     margin-right: 15px;
     margin-left: 15px;
     height: 100%;
@@ -72,37 +82,75 @@ a:visited {
     line-height: 36px;
 }
 
-.regime-link:hover {
+    .regime-link:hover
+    {
     cursor: pointer;
 }
 
-#regime-link-cosmos {
+#regime-link-cosmos
+{
     color: #FF5BEE;
 }
 
-#regime-link-earth {
+#regime-link-earth
+{
     color: #C874F4;
 }
 
-#regime-link-life {
+#regime-link-life
+{
     color: #A8B3FE;
 }
 
-#regime-link-prehistory {
+#regime-link-prehistory
+{
     color: #83BAFF;
 }
 
-#regime-link-humanity {
+#regime-link-humanity
+{
     color: #66D5BF;
 }
 
-#login-panel {
+#login-panel
+{
     height: 100%;
     color: #E9E9E9 !important;
     font-size: medium 14px;
 }
 
-.header-logo {
+#login-panel label
+{
+    display: inline-block;
+    margin-top: 8px;
+    margin-left: 10px;
+    color: #E9E9E9;
+    vertical-align: top;
+}
+
+#login-panel[data-enabled~="true"]:hover
+{
+  background-color: #0464a2;
+}
+
+#login-panel.active
+{
+  background-color: #0464a2; 
+}
+
+#profile-panel[data-enabled~="true"]:hover
+{
+  background-color: #0464a2;
+}
+
+#profile-panel.active
+{
+  background-color: #0464a2; 
+}
+
+
+.header-logo
+{
     height: 36px;
     line-height: 36px;
     width: 200px;
@@ -112,7 +160,8 @@ a:visited {
     background-image: url('../images/chronzoom-200px-white.png');
 }
 
-.header-icon {
+.header-icon
+{
     height: 36px;
     width: 36px;
     line-height: 36px;
@@ -120,20 +169,28 @@ a:visited {
     background-position: center;
 }
 
-.header-icon[data-enabled~="true"]:hover {
+    .header-icon[data-enabled~="true"]:hover
+    {
     background-color: #0464a2;
 }
 
-.header-icon.active {
-    background-color: #0464a2
+    .header-icon.active
+    {
+        background-color: #0464a2;
 }
 
-.tour-icon {
+.tour-icon
+{
     background-image: url('../images/tour-icon.png');
 }
 
-.search-icon {
+.search-icon
+{
     background-image: url('../images/search-icon.png');
+}
+
+.timeSeries-icon {
+    background-image: url('../images/timseries-icon.png');
 }
 
 .view-icon {
@@ -141,20 +198,24 @@ a:visited {
     opacity: .5;
 }
 
-.edit-icon {
+.edit-icon
+{
     background-image: url('../images/edit-icon.png');
 }
 
-.profile-icon {
+.profile-icon
+{
     background-image: url('../images/profile-icon.png');
     display: inline-block;
 }
 
-.header__edit-button:hover {
+.header__edit-button:hover
+{
     background-color: #0464a2;
 }
 
-.header__tour-icon {
+.header__tour-icon
+{
     background-image: url('../images/tour-icon.png');
     background-repeat: no-repeat;
     background-position: center;
@@ -169,8 +230,8 @@ a:visited {
 
 ***********************************************************/
 
-#content {    
-            
+#content
+{
     -webkit-box-sizing: border-box;
        -moz-box-sizing: border-box;
             box-sizing: border-box;
@@ -182,8 +243,8 @@ a:visited {
     min-height: 100%;
 }
 
-#vc-container {    
-            
+#vc-container
+{
     -webkit-box-sizing: border-box;
        -moz-box-sizing: border-box;
             box-sizing: border-box;
@@ -193,7 +254,8 @@ a:visited {
     min-height: 100%;
 }
 
-#vc {
+#vc
+{
     overflow: hidden;
     width: 100%;
     height: 100%;
@@ -207,43 +269,51 @@ a:visited {
     background-attachment: fixed;
 }
 
+#timeSeriesContainer {
+    height: 0%;
+    background-color: gray;
+}
+
 .virtualCanvas {
     position: relative;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 
-.virtualCanvasLayerDiv {
+.virtualCanvasLayerDiv
+{
     position: absolute;
     z-index: 0;
     overflow: hidden;
 }
 
-.virtualCanvasLayerCanvas {
+.virtualCanvasLayerCanvas
+{
     position: absolute;
     left: 0;
     z-index: 0;
 }
 
-.contentItemDescription {
+.contentItemDescription
+{
     position: absolute;
     top: 0;
     left: 0;
-    
     background-color: transparent;
     color: rgb(232,232,232);
     font-size: 10px;
     font-family: Arial;
 }
 
-.contentItemDescription .text {    
+    .contentItemDescription .text
+    {
     position: relative;
-
     overflow-x: hidden;
     overflow-y: auto;
     height: inherit;
 }
 
-.tour_control {
+.tour_control
+{
     display: none;
     margin: 5px;
     width: 190px;
@@ -256,62 +326,60 @@ a:visited {
                    
 ***********************************************************/
 
-.biblBack {
+.biblBack
+{
     display: none;
     position: fixed;
     top: 0;
     left: 0;
     z-index: 5000;
-
     width: 100%;
     height: 100%;
-
     background-color: rgba(255,255,255,0.2);
 }
 
-.biblOuterWindow {
+.biblOuterWindow
+{
     position: absolute;
     top: 10%;
     bottom: 10%;
     left: 25%;
     right: 25%;
-    
     min-width: 300px;
     border-radius: 8px;
     background-color: rgba(0,0,0,0.6);
     cursor: default;
 }
 
-.biblWindow {
+.biblWindow
+{
     position: absolute;
     top: 25px;
     right: 25px;
     bottom: 25px;
     left: 25px;
     overflow: hidden;
-    
     border-radius: 8px;
     background-color: #434343;
     color: #fff;
-
     vertical-align: middle;
     font-size: 18.5px;
-
     font-family: Arial;
     cursor: default;
 }
 
-.biblWindow .closeButton {
+    .biblWindow .closeButton
+    {
     position: absolute;
     top: 12px;
     right: 12px;
     z-index: 5005;
-    
     width: 30px;
     height: 30px;
 }
 
-.biblWindow .title {
+    .biblWindow .title
+    {
     overflow: hidden;
     margin-right: 60px;
     margin-left: 32px;
@@ -319,7 +387,6 @@ a:visited {
     padding-bottom: 7px;
     border-bottom: 1px solid #DBDBDB;
     color: #fff;
-
     -ms-text-overflow: ellipsis;
         -o-text-overflow: ellipsis;
         text-overflow: ellipsis;
@@ -330,13 +397,13 @@ a:visited {
     cursor: default;
 }
 
-.biblWindow .sources {
+    .biblWindow .sources
+    {
     position: absolute;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
-
     overflow-x: hidden;
     overflow-y: auto;
     margin: 55px 20px 13px 32px;
@@ -344,13 +411,15 @@ a:visited {
     height: auto;
 }
 
-.biblWindow .sources .source {
+        .biblWindow .sources .source
+        {
     margin: 0;
     padding: 0 5px 0 5px;
     border-bottom: 1px solid #DBDBDB;
 }
 
-.biblWindow .sources .sectionTitle {
+        .biblWindow .sources .sectionTitle
+        {
     overflow: hidden;
     margin: 0;
     padding-top: 20px;
@@ -362,17 +431,16 @@ a:visited {
         text-overflow: ellipsis;  
     white-space: nowrap;
     font-size: 18px;
-
     cursor: default;
 }
 
 
-.biblWindow .sources .source .sourceName {
+        .biblWindow .sources .source .sourceName
+        {
     overflow: hidden;
     margin-right: 50px;
     padding-top: 20px;    
     padding-bottom: 12px;
-
     color: #DBDBDB;
     text-align: left;
     -ms-text-overflow: ellipsis;
@@ -383,11 +451,11 @@ a:visited {
     cursor: pointer;
 }
 
-.biblWindow .sources .source .sourceDescr {
+        .biblWindow .sources .source .sourceDescr
+        {
     margin: 0 50px 25px 12px;
     padding: 12px;
     border-radius: 8px;
-
     background-color: #DBDBDB;
     color: #424242;
     text-align: left;
@@ -395,24 +463,24 @@ a:visited {
     cursor: auto;
 }
 
-.czWindow {
+.czWindow
+{
     position: absolute;
     top: 144px;
     left: 0;
     z-index: 2000;
     margin-bottom: 0;
     margin-left: 0;
-
     width: 220px;
     border-bottom-right-radius: 8px;
     background-color: #424242;
     color: #BFBFBF;
     font-size: 14.5px;
-
     font-family: Arial;
 }
 
-.czWindow .header {
+    .czWindow .header
+    {
     padding: 4px 0 2px 14px;
     width: 167px;
     background: #515151; /* for non-css3 browsers */
@@ -420,95 +488,102 @@ a:visited {
     background: -webkit-gradient(linear, left top, right top, from(#FDFDFD), to(#424242)); /* Chrome, Safari:*/
     color: #424242;
     vertical-align: middle;
-
     font-size: 19px;
     cursor: default;
     filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#FDFDFD', EndColorStr='#424242', GradientType=1);
 /* MSIE */
 }
 
-.czWindow .czTextBox {
+    .czWindow .czTextBox
+    {
     margin: 3px 5px 3px 5px;
     height: 20px;
     border: 1px solid #BFBFBF;
     background-color: #424242;
     color: #fff;
     font-size: 12px;
-
     font-family: Arial;
 }
 
-.czWindow .czTextBox:focus {
+        .czWindow .czTextBox:focus
+        {
     border: 1px solid #fff;
 }
 
-.czWindow .emptyTextBox {
+    .czWindow .emptyTextBox
+    {
     color: #BFBFBF;
     font-style: italic;
     font-size: 12px;
     font-family: Arial;
 }
 
-.czWindow .narration {
+    .czWindow .narration
+    {
     margin-right: 15px;
     margin-left: 5px;
     padding-top: 10px;
     width: 181px;
     border-bottom: none; /*1px solid #424242;*/
     text-align: center;
-
     font-size: 13px;
     cursor: pointer;
 }
 
-.czWindow .narration-selected {
+    .czWindow .narration-selected
+    {
     color: #fff;
 }
 
 
-.czWindow .content {
+    .czWindow .content
+    {
     margin: 10px 13px 0 10px;
     width: 196px;
     border-bottom: 1px solid #424242;
 }
 
-.czWindow .content .category {
+        .czWindow .content .category
+        {
     margin-right: 13px;
     margin-bottom: 10px;
     width: 196px;
     border-bottom: 2px solid #BFBFBF;
-
     vertical-align: middle;
     cursor: pointer;
 }
 
-.czWindow .content .category:hover {
+            .czWindow .content .category:hover
+            {
     color: #fff;
 }
 
 
-.czWindow .content .collapseButton {
+        .czWindow .content .collapseButton
+        {
     position: absolute;
     left: 194px;
 }
 
 
 
-.czWindow .content .categorySelected {
+        .czWindow .content .categorySelected
+        {
     margin-right: 13px;
     margin-bottom: 10px;
     width: 196px;
     border-bottom: none;
-
     vertical-align: middle;
     cursor: pointer;
 }
 
-.czWindow .content .categorySelected:hover {
+            .czWindow .content .categorySelected:hover
+            {
     color: #fff;
 }
 
-.czWindow .content .itemContainer {
+        .czWindow .content .itemContainer
+        {
     margin-right: 15px;
     margin-left: 5px;
     padding-bottom: 10px;
@@ -517,7 +592,8 @@ a:visited {
 }
 
 
-.czWindow .content .itemContainer .item {
+            .czWindow .content .itemContainer .item
+            {
     overflow: hidden;
     -ms-text-overflow: ellipsis;
      -o-text-overflow: ellipsis;
@@ -526,23 +602,26 @@ a:visited {
     cursor: pointer;
 }
 
-.czWindow .content .itemContainer .item:hover {
+                .czWindow .content .itemContainer .item:hover
+                {
     color: #fff;
 }
 
-.czWindow .content .itemContainer .touritem-selected {
+            .czWindow .content .itemContainer .touritem-selected
+            {
     color: #fff;
 }
 
-.czWindow .searchResults {
-
+    .czWindow .searchResults
+    {
     overflow-x: hidden;
     overflow-y: auto;
     margin: 0 15px 10px 10px;
     border-bottom: none; /*1px solid #424242;*/
 }
 
-.czWindow .searchResults .searchResultSection {
+        .czWindow .searchResults .searchResultSection
+        {
     overflow: hidden;
     margin: 5px 10px 5px 0;
     padding: 0;
@@ -552,12 +631,12 @@ a:visited {
      -o-text-overflow: ellipsis;
         text-overflow: ellipsis;
     white-space: nowrap;
-
     font-size: 13px;
     cursor: default;
 }
 
-.czWindow .searchResults .searchResult {
+        .czWindow .searchResults .searchResult
+        {
     overflow: hidden;
     margin-right: 10px;
     margin-left: 7px;
@@ -568,16 +647,17 @@ a:visited {
      -o-text-overflow: ellipsis;
         text-overflow: ellipsis;
     white-space: nowrap;
-
     font-size: 13px;
     cursor: pointer;
 }
 
-.czWindow .searchResults .searchResult:hover {
+            .czWindow .searchResults .searchResult:hover
+            {
     color: #fff;
 }
 
-.czWindow .searchResults .searchNoResult {
+        .czWindow .searchResults .searchNoResult
+        {
     overflow: hidden;
     margin-right: 10px;
     padding: 0;
@@ -587,20 +667,19 @@ a:visited {
      -o-text-overflow: ellipsis;
         text-overflow: ellipsis;
     white-space: nowrap;
-
-    font-style:italic;
+            font-style: italic;
     font-size: 13px;
     cursor: default;
 }
 
 
-.bookmarksWindow {
+.bookmarksWindow
+{
     position: absolute;
     bottom: 44px;
     left: 0;
     z-index: 1999;
     margin-left: 0;
-    
     width: 200px;
     min-height: 200px;
     max-height: 410px;
@@ -608,39 +687,39 @@ a:visited {
     background-color: #424242;
     color: #BFBFBF;
     font-size: 14.5px;
-
     font-family: Arial;
 }
 
-.bookmarksWindow .header {
+    .bookmarksWindow .header
+    {
     padding: 10px 6px 9px 5px;
     padding-right: 6px;
     padding-left: 5px;
     border-bottom: 2px solid #BFBFBF;
     color: #fff;
-
     font-size: 14.5px;
     cursor: default;
 }
 
-.bookmarksWindow .headerButton {
+    .bookmarksWindow .headerButton
+    {
     position: absolute;
     top: 9px;
     right: 12px;
 }
 
-.bookmarksWindow .slideHeader {
+    .bookmarksWindow .slideHeader
+    {
     margin-right: 19px;
     margin-left: 10px;
     padding: 5px 6px 10px 4px;
     color: White;
-
     font-size: 14.5px;
     cursor: default;
 }
 
-.bookmarksWindow .slideText {
-
+    .bookmarksWindow .slideText
+    {
     overflow-x: hidden;
     overflow-y: auto;
     margin-right: 19px;
@@ -648,18 +727,17 @@ a:visited {
     padding: 5px 3px 5px 3px;    
     max-height: 250px;
     color: #BFBFBF;
-
     font-size: 13px;
 }
 
-.bookmarksWindow .slideFooter {
+    .bookmarksWindow .slideFooter
+    {
     margin: 20px 19px 0 10px;
     padding: 5px 0 13px 4px;
     height: 15px;
     border-top: 1px solid #BFBFBF;
     color: #fff;
     text-align: right;
-
     font-size: 12px;
     cursor: default;
 }
@@ -671,7 +749,8 @@ a:visited {
 
 ***********************************************************/
 
-.bubbleInfo {
+.bubbleInfo
+{
     position: absolute;
     float: left;
     clear: both;
@@ -687,39 +766,47 @@ a:visited {
     opacity: 0.9;
 }
 
-#defaultBox {
-    background-image: url('../images/defaultGradientBox.jpg') ;
+#defaultBox
+{
+    background-image: url('../images/defaultGradientBox.jpg');
 }
 
-#cosmosRegimeBox {
-    background-image: url('../images/cosmosRegimeBox.jpg') ;
+#cosmosRegimeBox
+{
+    background-image: url('../images/cosmosRegimeBox.jpg');
 }
 
-#earthRegimeBox {
-    background-image: url('../images/earthRegimeBox.jpg') ;
+#earthRegimeBox
+{
+    background-image: url('../images/earthRegimeBox.jpg');
 }
 
-#humanityRegimeBox {
-    background-image: url('../images/humanityRegimeBox.jpg') ;
+#humanityRegimeBox
+{
+    background-image: url('../images/humanityRegimeBox.jpg');
 }
 
-#lifeRegimeBox {
-    background-image: url('../images/lifeRegimeBox.jpg') ;
+#lifeRegimeBox
+{
+    background-image: url('../images/lifeRegimeBox.jpg');
 }
 
 
-#prehistoryRegimeBox {
-    background-image: url('../images/prehistoryRegimeBox.jpg') ;
+#prehistoryRegimeBox
+{
+    background-image: url('../images/prehistoryRegimeBox.jpg');
     background-position: center;
 }
 
-.bubbleInfo span {
+.bubbleInfo span
+{
     color: #fff;
     font-size: 14px;
     font-family: Verdana, Arial, Helvetica, sans-serif;
 }
 
-.block {
+.block
+{
     position: relative;
     display: block;
     background-color: #abc;
@@ -734,35 +821,34 @@ a:visited {
                         Welcome Screen
        
 ***********************************************************/
-.welcomeScreenBack {   
+.welcomeScreenBack
+{
     position: absolute;
     top: 0;
     left: 0;
     z-index: 5000;
-
     width: 100%;
     height: 100%;
-
     background-color: rgba(255,255,255,0.2);
 }
 
-.welcomeScreenOuterWindow {
+.welcomeScreenOuterWindow
+{
     position: relative;
     margin-right: auto;
     margin-left: auto;
     width: 900px;
     height: 443px;
-
     min-height: 443px;       
     border-radius: 8px;
-
     background-color: rgba(0,0,0,0.6);
     cursor: default;
     top: 50%;
     margin-top: -220px;
 }
 
-.welcomeScreen {
+.welcomeScreen
+{
     position: relative;
     top: 16px;
     right: 0;
@@ -770,8 +856,6 @@ a:visited {
     left: 0;
     overflow: hidden;
     margin-right: auto;
-
-    
     margin-left: auto;
     width: 864px;
     height: auto;
@@ -781,28 +865,29 @@ a:visited {
     color: #fff;   
     vertical-align: middle;
     font-size: 18.5px; 
-
     font-family: Arial;
     cursor: default;
 }
 
-.welcomeScreen .titleArea {
+    .welcomeScreen .titleArea
+    {
     margin-right: 22px;
     margin-left: 32px;
     border-bottom: 1px solid #DBDBDB;
 }
 
-.welcomeScreen .titleArea .closeButton {
+        .welcomeScreen .titleArea .closeButton
+        {
     position: absolute;
     top: 12px;
     right: 22px;
     z-index: 5005;
-    
     width: 30px;
     height: 30px;
 }
 
-.welcomeScreen .titleArea .title {
+        .welcomeScreen .titleArea .title
+        {
     overflow: hidden;
     margin-right: 60px;
     padding-top: 22px;
@@ -814,43 +899,41 @@ a:visited {
     white-space: nowrap;
     font-weight: bold;
     font-size: 18px; 
-
     font-family: Arial;
     cursor: default;
 }
 
-.welcomeScreen .content {
+    .welcomeScreen .content
+    {
     position: absolute;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
     display: block;
-
     overflow: hidden;
     margin: 75px 32px 13px 32px;
-
     width: 810px;
     height: auto;
     font-size: 16px;
     font-family: Arial;
 }
 
-.welcomeScreen .content .description {
+        .welcomeScreen .content .description
+        {
     position: absolute;
-
     display: inline-block;
     margin-right: 20px;
     width: 220px;
     height: 315px;
 }
 
-.welcomeScreen .content .description .button {
+            .welcomeScreen .content .description .button
+            {
     margin-bottom: 10px;
     width: 220px; 
     height: 36px;
     border: 1px solid #EF4136;
-     
     background: #EA7134;
     color: #fff;
     font-weight: bold;
@@ -858,16 +941,17 @@ a:visited {
     font-family: Arial;
 }
 
-.welcomeScreen .content .media {   
+        .welcomeScreen .content .media
+        {
     position: absolute; 
     right: 0px;
-
     display: inline-block;
     width: 560px;
     height: 315px;
 }
 
-.welcomeScreen .content .media .player {
+            .welcomeScreen .content .media .player
+            {
     position: absolute; 
     right: 0px; 
     width: 100%; 
@@ -879,73 +963,68 @@ a:visited {
                         Fallbackpage
 
 ***********************************************************/
-img.fallbackBackground {
+img.fallbackBackground
+{
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: auto;
-            
     /* Set up positioning */
     min-width: 1024px;
-            
     /* Set up proportionate scaling */
     /* Set rules to fill background */
     min-height: 100%;
 }
         
-    @media screen and (max-width: 1024px){
-        img.fallbackBackground {
+@media screen and (max-width: 1024px)
+{
+    img.fallbackBackground
+    {
             left: 50%;
             margin-left: -512px;
         }
     }
 
-.fallbackOuterContent  {
-    
-    position:absolute; 
-    
-    top:50%;
+.fallbackOuterContent
+{
+    position: absolute;
+    top: 50%;
     left: 50%; 
-
-    margin-top:-241px;
+    margin-top: -241px;
     margin-left: -450px;
-    
     width: 900px;
-    height:482px;   
+    height: 482px;
     background-image: url('../images/fallbackOuterBackground.jpg');
     background-position: top center;
-    
     cursor: default;
 }
 
-.fallbackContent  {
+.fallbackContent
+{
     position: relative;
     overflow: hidden; 
-
     margin: 25px auto 0 auto;
-    
     width: 864px;
-    height:432px;
-    
+    height: 432px;
     background-color: #3C5F96;
     color: White;
-    
     vertical-align: middle;
     font-size: 18.5px;
-
     font-family: Arial;
     cursor: default;
 }
 
 
-.fallbackContent .titleArea {
+    .fallbackContent .titleArea
+    {
     margin-right: 22px;
     margin-left: 32px;
     border-bottom: 1px solid #DBDBDB;
 }
 
-.fallbackContent .titleArea .title {
+        .fallbackContent .titleArea .title
+        {
     overflow: hidden;
     margin-right: 60px;
     padding-top: 22px;
@@ -957,29 +1036,28 @@ img.fallbackBackground {
     white-space: nowrap;
     font-weight: bold;
     font-size: 18px;
-     
     font-family: Arial;
     cursor: default;
 }
 
-.fallbackContent .content {
+    .fallbackContent .content
+    {
     position: absolute;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
     display: block;
-
     overflow: hidden;
     margin: 75px 32px 13px 32px;
-
     width: 810px;
     height: auto;
     font-size: 16px;
     font-family: Arial;
 }
 
-.fallbackContent .content .description {
+        .fallbackContent .content .description
+        {
     position: absolute;
     display: inline-block;
     margin-right: 20px;
@@ -987,28 +1065,30 @@ img.fallbackBackground {
     height: 315px;
 }
 
-.fallbackContent .content .description a {
+            .fallbackContent .content .description a
+            {
    color: #fff;
    text-decoration: underline;
    font-size: 16px;
    font-family: Arial;
 }
 
-.fallbackContent .content .description .button { 
+            .fallbackContent .content .description .button
+            {
     width: 220px; 
     height: 36px;
     border: 1px solid #EF4136; 
     background: #EA7134;
     color: White;
-    vertical-align:middle;
-
+                vertical-align: middle;
     text-align: center;
     font-weight: bold;
     font-size: 18px;
     font-family: Arial; 
 }
 
-.fallbackContent .content .media {
+        .fallbackContent .content .media
+        {
     position: absolute;
     right: 0;    
     display: inline-block;
@@ -1016,7 +1096,8 @@ img.fallbackBackground {
     height: 315px;
 }
 
-.fallbackContent .content .media .player {
+            .fallbackContent .content .media .player
+            {
     position: absolute; 
     right: 0px; 
     width: 100%; 
@@ -1030,33 +1111,37 @@ img.fallbackBackground {
 
 ***********************************************************/
 
-#footer {
+#footer
+{
     position: relative;
     height: 25px;
 }    
 
-#footer ul {
+    #footer ul
+    {
     overflow: hidden;
     margin: 0;
     padding: 0;
     list-style: none;
 }
 
-#footer ul li {
+        #footer ul li
+        {
     height: 100%;
 }
 
-.footer-link {
+.footer-link
+{
     margin-right: 20px;
     margin-left: 20px;
     height: 100%; 
-    
-    color:  #FFF;
+    color: #FFF;
     white-space: nowrap;
     line-height: 25px;
 }
 
-.footer-link:hover {
+    .footer-link:hover
+    {
     cursor: pointer;
 }
 
@@ -1067,7 +1152,8 @@ img.fallbackBackground {
 
 ***********************************************************/
 
-.breadcrumbs-nav {
+.breadcrumbs-nav
+{
     width: 25px;
     height: 25px;
     color: #BFBFBF;
@@ -1076,28 +1162,33 @@ img.fallbackBackground {
     line-height: 100%;
 }
 
-.breadcrumbs-nav:hover {
+    .breadcrumbs-nav:hover
+    {
     color: #fff;
 }
 
-#breadcrumbs-nav-left {
+#breadcrumbs-nav-left
+{
     display: none;    
     cursor: pointer;
 }
 
-#breadcrumbs-nav-right {
+#breadcrumbs-nav-right
+{
     display: none;    
     cursor: pointer;
 }
 
-.breadcrumbs-container {    
+.breadcrumbs-container
+{
     overflow: hidden;
     width: 50%;
     height: 100%;
     line-height: 100%;
 }
 
-#breadcrumbs-table {
+#breadcrumbs-table
+{
     position: relative; 
     margin: 0;
     padding: 0;
@@ -1109,13 +1200,15 @@ img.fallbackBackground {
     border-spacing: 0;
 }
     
-#breadcrumbs-table tr {
+    #breadcrumbs-table tr
+    {
     position: absolute;
     height: 100%;
     white-space: nowrap;
 }
 
-#breadcrumbs-table tr td {
+        #breadcrumbs-table tr td
+        {
     margin: 0;
     padding: 0;
     height: 25px;
@@ -1135,7 +1228,8 @@ img.fallbackBackground {
     cursor: default;
 }
   
-.breadcrumb-link {
+.breadcrumb-link
+{
     position: relative;
     display: inline-block;
     height: 25px;
@@ -1143,29 +1237,36 @@ img.fallbackBackground {
     font-family: verdana;
     line-height: 25px;
     cursor: pointer;
+	color: lightgrey;
 }
 
-.breadcrumb-cosmos {       
+.breadcrumb-cosmos
+{
     color: #986C9D;
 }
 
-.breadcrumb-earth {    
+.breadcrumb-earth
+{
     color: #517F95;
 }
 
-.breadcrumb-life {     
+.breadcrumb-life
+{
     color: #499649;
 }
 
-.breadcrumb-prehistory {       
+.breadcrumb-prehistory
+{
     color: #ED9132;
 }
 
-.breadcrumb-humanity {     
+.breadcrumb-humanity
+{
     color: #D45C46;
 }
 
-.breadcrumb-hover {
+.breadcrumb-hover
+{
     color: #fff;
 }
 
@@ -1175,19 +1276,23 @@ img.fallbackBackground {
 
 ***********************************************************/
 
-.fleft {
+.fleft
+{
     float: left;
 }
 
-.fright {
+.fright
+{
     float: right;
 }
 
-.clearer {
-    clear:  both;
+.clearer
+{
+    clear: both;
 }
 
-.unselectable {
+.unselectable
+{
     -webkit-user-select: none;    
      -khtml-user-select: none;
        -moz-user-select: none;
@@ -1196,7 +1301,8 @@ img.fallbackBackground {
             user-select: none;
 }
 
-.text-selectable {
+.text-selectable
+{
     -webkit-user-select: text;
      -khtml-user-select: text;
        -moz-user-select: text;
@@ -1211,7 +1317,8 @@ img.fallbackBackground {
 
 ***********************************************************/
 
-.cz-form {
+.cz-form
+{
     position: absolute;
     top: 36px;
     z-index: 100000001;
@@ -1219,14 +1326,16 @@ img.fallbackBackground {
     cursor: default;
 }
 
-.cz-form-header {
+.cz-form-header
+{
     position: relative;
     width: 100%;
     height: 36px;
     background-color: #0464A2;
 }
 
-.cz-form-header > ul {
+    .cz-form-header > ul
+    {
     margin: 0;
     padding: 0;
     width: 100%;
@@ -1234,7 +1343,8 @@ img.fallbackBackground {
     list-style: none;
 }
 
-.cz-form-nav {
+.cz-form-nav
+{
     float: left;
     margin-left: 15px;
     height: 100%;
@@ -1244,7 +1354,8 @@ img.fallbackBackground {
     cursor: pointer;
 }
 
-.cz-form-title {
+.cz-form-title
+{
     float: left;
     margin-left: 15px;
     height: 100%;
@@ -1253,7 +1364,8 @@ img.fallbackBackground {
     line-height: 36px;
 }
 
-.cz-form-close-btn {
+.cz-form-close-btn
+{
     float: right;
     margin-right: 15px;
     color: #fff;
@@ -1262,20 +1374,23 @@ img.fallbackBackground {
     line-height: 36px;
 }
 
-.cz-form-btn {
+.cz-form-btn
+{
     cursor: pointer;
     border: none;
     color: #fff;
 }
 
-.cz-form-content {
+.cz-form-content
+{
     position: absolute;
     padding: 15px;
     background-color: #fff;
     text-align: justify;
 }
 
-.cz-input {
+.cz-input
+{
     margin: 5px 0;
     color: #232323;
     background-color: #E9E9E9;
@@ -1284,13 +1399,13 @@ img.fallbackBackground {
     font-size: 12px;
     font-family: 'Segoe UI', Helvetica, Arial, 'Trebuchet MS', 'San Serif';
     vertical-align: top;
-    
     -webkit-box-sizing: border-box;
        -moz-box-sizing: border-box;
             box-sizing: border-box;
 }
 
-.cz-button {
+.cz-button
+{
     margin: 5px 0;
     cursor: pointer;
     border: none;
@@ -1299,7 +1414,6 @@ img.fallbackBackground {
     font-size: 12px;
     line-height: 36px;
     padding: 0 5px;
-
     /* IE9 */
     filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#1B6AAB', EndColorStr='#0E4073', GradientType=0);
     /* IE10 Consumer Preview */ 
@@ -1316,12 +1430,14 @@ img.fallbackBackground {
     background-image: linear-gradient(to top, #0E4073 0%, #1B6AAB 100%);
 }
 
-.cz-header-edit-form {
+.cz-header-edit-form
+{
     right: 0px;
     width: 330px;
 }
 
-.cz-form-timeline {
+.cz-form-tour-edit
+{
     min-width: 380px;
     max-width: 450px;
     width: 30.2734375%; /* 310 / 1024 */
@@ -1329,17 +1445,43 @@ img.fallbackBackground {
     left: 0;
 }
 
-.cz-form-timeline > .cz-form-content {
+    .cz-form-tour-edit > .cz-form-content
+    {
     position: absolute;
     top: 36px;
     right: 0;
     bottom: 0;
     left: 0;
+        overflow-y: auto;
+    }
 
+.cz-tourlist-form
+{
+    min-width: 380px;
+    max-width: 450px;
+    width: 30.2734375%; /* 310 / 1024 */
+    right: 0px;
+    bottom: 25px;
+}
+
+    .cz-tourlist-form > .cz-form-content
+    {
+        position: absolute;
+        top: 36px;
+        right: 0;
+        bottom: 0;
+        left: 0;
     overflow-y: auto;
 }
 
-.cz-form-exhibit {
+        .cz-tourlist-form > .cz-form-content > #tours
+        {
+            display: block;
+            min-height: 200px;
+        }
+
+.cz-form-timeline
+{
     min-width: 380px;
     max-width: 450px;
     width: 30.2734375%; /* 310 / 1024 */
@@ -1347,17 +1489,18 @@ img.fallbackBackground {
     left: 0;
 }
 
-.cz-form-exhibit > .cz-form-content {
+    .cz-form-timeline > .cz-form-content
+    {
     position: absolute;
     top: 36px;
     right: 0;
     bottom: 0;
     left: 0;
+        overflow-y: auto;
+    }
 
-    overflow-y: auto;
-}
-
-.cz-form-contentitem {
+.cz-form-exhibit
+{
     min-width: 380px;
     max-width: 450px;
     width: 30.2734375%; /* 310 / 1024 */
@@ -1365,17 +1508,37 @@ img.fallbackBackground {
     left: 0;
 }
 
-.cz-form-contentitem > .cz-form-content {
+    .cz-form-exhibit > .cz-form-content
+    {
+        position: absolute;
+        top: 36px;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    overflow-y: auto;
+}
+
+.cz-form-contentitem
+{
+    min-width: 380px;
+    max-width: 450px;
+    width: 30.2734375%; /* 310 / 1024 */
+    bottom: 25px;
+    left: 0;
+}
+
+    .cz-form-contentitem > .cz-form-content
+    {
     position: absolute;
     top: 36px;
     right: 0;
     bottom: 0;
     left: 0;
-
     overflow-y: auto;
 }
 
-.blocking-layer {
+.blocking-layer
+{
     position: fixed;
     left: 0;
     top: 0;
@@ -1385,17 +1548,20 @@ img.fallbackBackground {
     background-color: rgba(0,0,0,0.2);
 }
 
-.truncateText {
+.truncateText
+{
     text-overflow: ellipsis;
     overflow: hidden;
 }
 
-.cz-form-errormsg {
+.cz-form-errormsg
+{
     color: #dd4b39;
     display: block;
 }
 
-.cz-lightgray {
+.cz-lightgray
+{
     color: #aeaeae;
 }
 
@@ -1405,17 +1571,27 @@ img.fallbackBackground {
 
 ***********************************************************/
 
-.cz-listbox {
+.cz-listbox
+{
     margin: 15px 0;
     padding: 10px;
     background-color: #e9e9e9;
     list-style-type: none;
     border: solid 2px #c7c7c7;
     height: 200px;
-    overflow:auto;
+    overflow: auto;
 }
 
-.cz-listbox-placeholder {
+.cz-listbox-nocontainer
+{
+    margin: 15px 0;
+    list-style-type: none;
+    height: 200px;
+    overflow: auto;
+}
+
+.cz-listbox-placeholder
+{
     margin: 5px 10px;
     padding: 10px;
     height: auto;
@@ -1423,7 +1599,8 @@ img.fallbackBackground {
     background-color: #e9e9e9;
 }
 
-.cz-listitem {
+.cz-listitem
+{
     clear: both;
     margin: 5px 10px;
     padding: 10px;
@@ -1438,7 +1615,8 @@ img.fallbackBackground {
     background-image: linear-gradient(to top, #e9e9e9 0%, #fff 100%);
 }
 
-.cz-listitem-close-btn {
+.cz-listitem-close-btn
+{
     float: right;
     cursor: pointer;
     font-size: 14px;
@@ -1450,23 +1628,27 @@ img.fallbackBackground {
 
 ***********************************************************/
 
-.cz-contentitem-listitem-icon {
+.cz-contentitem-listitem-icon
+{
     display: inline-block;
     width: 15%;
 }
 
-.cz-contentitem-listitem-icon > img {
+    .cz-contentitem-listitem-icon > img
+    {
     max-width: 100%;
 }
 
-.cz-contentitem-listitem-content {
+.cz-contentitem-listitem-content
+{
     display: inline-block;
     margin: 0px 5px;
     vertical-align: top;
     width: 75%;
 }
 
-.cz-contentitem-listitem-title {
+.cz-contentitem-listitem-title
+{
     margin: 0 0 10px 0;
     color: #232323;
     font-size: 12px;
@@ -1475,13 +1657,38 @@ img.fallbackBackground {
     overflow: hidden;
 }
 
-.cz-contentitem-listitem-descr {
+.cz-contentitem-listitem-descr
+{
     margin: 0;
     color: #aeaeae;
     font-size: 12px;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+}
+
+.cz-contentitem-listitem-highlighted
+{
+    margin: 0;
+    color: rgb(59, 182, 243);
+    font-size: 12px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+
+.cz-contentitem-listitem-button
+{
+    margin: 0;
+    color: rgb(59, 182, 243);
+    font-size: 12px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    cursor: pointer;
+    width: auto;
+    display: inline;
 }
 
 /***********************************************************
@@ -1491,57 +1698,68 @@ img.fallbackBackground {
 ***********************************************************/
 
 /* Profile Form */
-#profile-form {
+#profile-form
+{
     right: 0;
     width: 304px;
     background-color: #f5f5f5;
     font-size: 14px;
 }
 
-#profile-form div.czform_cb_div label {
+    #profile-form div.czform_cb_div label
+    {
     margin-left: 2em;
 }
 
-#profile-form a:link {
+    #profile-form a:link
+    {
     color: #25a1ea;
 }
 
-#profile-form a:visited {
+    #profile-form a:visited
+    {
     color: #25a1ea;
 }
 
-#profile-form div.czform_text {
+    #profile-form div.czform_text
+    {
     color: black;
 }
 
-#profile-form label {
+    #profile-form label
+    {
     display: block;
     margin-left: 2px;
 }
 
-#profile-form input[type=text] {
+    #profile-form input[type=text]
+    {
     min-width: 270px;
 }
 
-#profile-form input[type=checkbox] {
+    #profile-form input[type=checkbox]
+    {
     float: left;
     margin-left: 0px;
     padding: 6px;
     color: #fff;
 }
 
-#profile-form div.cz-form-content div {
+    #profile-form div.cz-form-content div
+    {
     clear: both;
     margin-bottom: 14px;
     margin-left: 0px;
 }
 
-#profile-form button.cz-form-save {
+    #profile-form button.cz-form-save
+    {
     width: 134px;
     color: #fff;
 }
 
-.auth-panel-login {
+.auth-panel-login
+{
     display: inline-block;
     margin-top: 8px;
     margin-left: 10px;
@@ -1550,22 +1768,49 @@ img.fallbackBackground {
 }
 
 /* Login Form */
-#login-form {
+#login-form
+{
     right: 0px;
     width: 304px;
     font-size: 14px;
 }
 
-#login-form div.cz-form-content div {
+    #login-form div.cz-form-content div
+    {
     clear: both;
     margin-bottom: 14px;
     margin-left: 0;
 }
 
-#login-form div.cz-form-content {
+    #login-form div.cz-form-content
+    {
     width: 304px;
 }
 
-#cz-form-logout,#cz-form-save {
+#cz-form-logout, #cz-form-save
+{
     width: 134px;
 }
+
+/* TimSeries Data Form */
+#timeSeriesDataForm {
+    right: 0px;
+    width: 500px;
+}
+
+#existingTimeSeries {
+    padding: 0;
+}
+
+.cz-preloaded-timeseries {
+    margin: 2px;
+    padding: 0px;
+    text-align: left;
+    width: 200px;
+    color: #0388E5;
+}
+
+.cz-preloaded-timeseries :hover {
+    color: #58B7F9;
+}
+

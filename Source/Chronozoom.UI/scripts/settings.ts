@@ -135,6 +135,7 @@
             { ext: 'mp3' }, //the order of the elements affects the priority of the format to use. the first format has the higher priority
             { ext: 'wav' }
         ];
+        export var tourDefaultTransitionTime = 10; // seconds
 
         // seadragon
         export var seadragonServiceURL = "http://api.zoom.it/v1/content/?url=";

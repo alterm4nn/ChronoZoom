@@ -58,7 +58,7 @@ var CZ;
                     if(tl.AspectRatio) {
                         tl.height = (tl.right - tl.left) / tl.AspectRatio;
                     } else if(timeline.height && tl.Height) {
-                        tl.height = timeline.height * tl.Height;
+                        tl.height = Math.min(timeline.height * tl.Height, (tl.right - tl.left) * CZ.Settings.timelineMinAspect);
                     }
                     LayoutTimeline(tl, timelineWidth, measureContext);
                 });

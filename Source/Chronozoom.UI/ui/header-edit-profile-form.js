@@ -15,9 +15,9 @@ var CZ;
                 this.usernameInput = container.find(formInfo.usernameInput);
                 this.emailInput = container.find(formInfo.emailInput);
                 this.agreeInput = container.find(formInfo.agreeInput);
-                this.loginPanel = $(document.body).find(formInfo.loginPanel);
-                this.profilePanel = $(document.body).find(formInfo.profilePanel);
-                this.loginPanelLogin = $(document.body).find(formInfo.loginPanelLogin);
+                this.loginPanel = $(document.body).find(formInfo.loginPanel).first();
+                this.profilePanel = $(document.body).find(formInfo.profilePanel).first();
+                this.loginPanelLogin = $(document.body).find(formInfo.loginPanelLogin).first();
                 this.allowRedirect = formInfo.allowRedirect;
                 this.initialize();
             }
@@ -25,7 +25,7 @@ var CZ;
                 if(String(e).length > 254) {
                     return false;
                 }
-                var filter = /^(([\w^_]+((?:([-_\.\+][\w^_]+))|))|(xn--[\w^_]+))@(([\w^_]+((?:(-+[\w^_]+))|))|(xn--[\w^_]+))(?:\.(([\w^_]+((?:([\w-_\.\+][\w^_]+))|))|(xn--[\w^_]+)))$/i;
+                var filter = /^([\w^_]+(?:([-_\.\+][\w^_]+)|)|(xn--[\w^_]+))@([\w^_]+(?:(-+[\w^_]+)|)|(xn--[\w^_]+))(?:\.([\w^_]+(?:([\w-_\.\+][\w^_]+)|)|(xn--[\w^_]+)))$/i;
                 return String(e).search(filter) != -1;
             };
             FormEditProfile.prototype.validUsername = function (e) {
@@ -62,15 +62,23 @@ var CZ;
                         alert("Please agree with provided terms");
                         return;
                     }
-                    CZ.Service.putProfile(_this.usernameInput.val(), _this.emailInput.val()).then(function (success) {
-                        if(_this.allowRedirect) {
-                            window.location.assign("\\" + success);
-                        } else {
-                            _this.close();
-                        }
-                    }, function (error) {
-                        alert("Unable to save changes. Please try again later.");
-                        console.log(error);
+                    CZ.Service.getProfile().done(function (curUser) {
+                        CZ.Service.getProfile(_this.usernameInput.val()).done(function (getUser) {
+                            if(curUser.DisplayName == null && typeof getUser.DisplayName != "undefined") {
+                                alert("Sorry, this username is already in use. Please try again.");
+                                return;
+                            }
+                            CZ.Service.putProfile(_this.usernameInput.val(), _this.emailInput.val()).then(function (success) {
+                                if(_this.allowRedirect) {
+                                    window.location.assign("\\" + success);
+                                } else {
+                                    _this.close();
+                                }
+                            }, function (error) {
+                                alert("Unable to save changes. Please try again later.");
+                                console.log(error);
+                            });
+                        });
                     });
                 });
                 this.logoutButton.click(function (event) {
@@ -79,7 +87,7 @@ var CZ;
                     }).done(function (data) {
                         _this.profilePanel.hide();
                         _this.loginPanel.show();
-                        _super.prototype.close.call(_this);
+                        _this.close();
                     });
                 });
             };
@@ -100,7 +108,7 @@ var CZ;
                 this.activationSource.removeClass("active");
             };
             return FormEditProfile;
-        })(CZ.UI.FormBase);
+        })(CZ.UI.FormUpdateEntity);
         UI.FormEditProfile = FormEditProfile;        
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;

@@ -4,5 +4,6 @@
     {
         void ClickCloseButton();
         void NavigateBceToCeEra();
+        void SecurityWarningAccept();
     }
 }

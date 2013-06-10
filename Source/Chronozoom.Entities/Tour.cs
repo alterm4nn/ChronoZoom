@@ -7,8 +7,10 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
+using System.Data.SqlTypes;
 
 namespace Chronozoom.Entities
 {
@@ -29,7 +31,17 @@ namespace Chronozoom.Entities
         /// The name of the tour.
         /// </summary>
         [DataMember(Name = "name")]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         public string Name { get; set; }
+
+        /// <summary>
+        /// The name of the tour.
+        /// </summary>
+        [DataMember(Name = "description")]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
+        public string Description { get; set; }
 
         /// <summary>
         /// The unique ID of the tour.
@@ -41,12 +53,16 @@ namespace Chronozoom.Entities
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "To be fixed when entities are revisited")]
         [DataMember(Name = "audio")]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         public string AudioBlobUrl { get; set; }
 
         /// <summary>
         /// The category to which the tour belongs.
         /// </summary>
         [DataMember(Name = "category")]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         public string Category { get; set; }
 
         /// <summary>
@@ -58,10 +74,9 @@ namespace Chronozoom.Entities
         /// <summary>
         /// The collection of bookmarks for the tour.
         /// </summary>
-        [DataMember(Name = "bookmarks")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification="Automatically implemented properties must define both get and set accessors.")]
-        public virtual Collection<Bookmark> Bookmarks { get; private set; }
-
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly"), DataMember(Name = "bookmarks")]
+        public virtual Collection<Bookmark> Bookmarks { get; set; }
+        
         public virtual Entities.Collection Collection { get; set; }
     }
 }

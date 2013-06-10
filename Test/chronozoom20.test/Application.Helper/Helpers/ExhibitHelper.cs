@@ -17,7 +17,7 @@ namespace Application.Helper.Helpers
         {
             _manager = new HelperManager();
         }
-        
+
         public void AddExhibit(Exhibit exhibit)
         {
             Logger.Log("<- " + exhibit);
@@ -44,30 +44,30 @@ namespace Application.Helper.Helpers
             Logger.Log("<-");
             const string script = Javascripts.LastCanvasElement;
             var exhibit = new Exhibit();
-            var contentItem = new ContentItem();
             exhibit.ContentItems = new Collection<Chronozoom.Entities.ContentItem>();
             exhibit.Title = GetJavaScriptExecutionResult(script + ".title");
             int contentItemsCount = int.Parse(GetJavaScriptExecutionResult(script + ".contentItems.length"));
-            Logger.Log("- contentItemsCount: " + contentItemsCount);
+            Logger.Log("- contentItemsCount: " + contentItemsCount, LogType.MessageWithoutScreenshot);
             for (int i = 0; i < contentItemsCount; i++)
             {
+                var contentItem = new ContentItem();
                 string item = string.Format("{0}.contentItems[{1}].", script, i);
                 contentItem.Title = GetJavaScriptExecutionResult(item + "title");
-                Logger.Log("- contentItem.Title: " + contentItem.Title);
+                Logger.Log("- contentItem.Title: " + contentItem.Title, LogType.MessageWithoutScreenshot);
                 contentItem.Caption = GetJavaScriptExecutionResult(item + "description");
-                Logger.Log("- contentItem.Caption: " + contentItem.Caption);
+                Logger.Log("- contentItem.Caption: " + contentItem.Caption, LogType.MessageWithoutScreenshot);
                 contentItem.Uri = GetJavaScriptExecutionResult(item + "uri");
-                Logger.Log("- contentItem.MediaSource: " + contentItem.MediaSource);
+                Logger.Log("- contentItem.Uri: " + contentItem.Uri, LogType.MessageWithoutScreenshot);
                 contentItem.MediaType = GetJavaScriptExecutionResult(item + "mediaType");
-                Logger.Log("- contentItem.MediaType: " + contentItem.MediaType);
+                Logger.Log("- contentItem.MediaType: " + contentItem.MediaType, LogType.MessageWithoutScreenshot);
                 contentItem.MediaSource = GetJavaScriptExecutionResult(item + "mediaSource");
-                Logger.Log("- contentItem.MediaSource: " + contentItem.MediaSource);
+                Logger.Log("- contentItem.MediaSource: " + contentItem.MediaSource, LogType.MessageWithoutScreenshot);
                 contentItem.Attribution = GetJavaScriptExecutionResult(item + "attribution");
-                Logger.Log("- contentItem.attribution: " + contentItem.Attribution);
+                Logger.Log("- contentItem.attribution: " + contentItem.Attribution, LogType.MessageWithoutScreenshot);
                 exhibit.ContentItems.Add(contentItem);
             }
             exhibit.Id = new Guid(GetJavaScriptExecutionResult(script + ".guid"));
-            Logger.Log("- exhibit.Id: " + exhibit.Id);
+            Logger.Log("- exhibit.Id: " + exhibit.Id, LogType.MessageWithoutScreenshot);
             Logger.Log("->" + exhibit);
             return exhibit;
         }
@@ -108,7 +108,7 @@ namespace Application.Helper.Helpers
 
         public bool IsExhibitFound(Exhibit exhibit)
         {
-            Logger.Log("<- timeline: " + exhibit);
+            Logger.Log("<- exhibit: " + exhibit);
             try
             {
                 ExecuteJavaScript(string.Format("CZ.Search.goToSearchResult('e{0}', 'timeline')", exhibit.Id));
@@ -117,7 +117,6 @@ namespace Application.Helper.Helpers
             }
             catch (Exception)
             {
-                //AcceptAlert();
                 Logger.Log("-> false");
                 return false;
             }
@@ -131,6 +130,14 @@ namespace Application.Helper.Helpers
             string description = GetContentItemDescription();
             Logger.Log("-> description: " + description);
             return description;
+        }
+
+        public string GetExpectedYouTubeUri(string uri)
+        {
+            Logger.Log("<- uri: " + uri, LogType.MessageWithoutScreenshot);
+            string expectedUri = "http://www.youtube.com/embed/" + (uri.Split('=')[1]);
+            Logger.Log("-> expected uri: " + expectedUri, LogType.MessageWithoutScreenshot);
+            return expectedUri;
         }
 
         private void ConfirmDeletion()
@@ -157,7 +164,7 @@ namespace Application.Helper.Helpers
         private void NavigateToExhibit(Exhibit exhibit)
         {
             Logger.Log("<- title: " + exhibit.Title);
-            ExecuteJavaScript(string.Format("CZ.Search.goToSearchResult('e{0}')",exhibit.Id));
+            ExecuteJavaScript(string.Format("CZ.Search.goToSearchResult('e{0}')", exhibit.Id));
             WaitAnimation();
             MoveToElementAndClick(By.ClassName("virtualCanvasLayerCanvas"));
             Logger.Log("->");
@@ -195,12 +202,12 @@ namespace Application.Helper.Helpers
         private void FillArtifact(Chronozoom.Entities.ContentItem contentItem)
         {
             Logger.Log("<-");
-            SetTitle(contentItem.Title);
-            SetDescription(contentItem.Caption);
-            SetUrl(contentItem.Uri);
-            SelectMediaType(contentItem.MediaType);
-            SetAttribution(contentItem.Attribution);
-            SetMediaSourse(contentItem.MediaSource);
+            if (contentItem.Title != null) SetTitle(contentItem.Title);
+            if (contentItem.Caption != null) SetDescription(contentItem.Caption);
+            if (contentItem.Uri != null) SetUrl(contentItem.Uri);
+            if (contentItem.MediaType != null) SelectMediaType(contentItem.MediaType);
+            if (contentItem.Attribution != null) SetAttribution(contentItem.Attribution);
+            if (contentItem.MediaSource != null) SetMediaSourse(contentItem.MediaSource);
             Logger.Log("->");
         }
 
@@ -216,7 +223,7 @@ namespace Application.Helper.Helpers
 
         private void SelectMediaType(string mediaType)
         {
-            Select(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-media-type cz-input']"), mediaType);
+            SelectByText(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-media-type cz-input']"), mediaType);
         }
 
         private void SetUrl(string mediaSourse)
@@ -239,7 +246,9 @@ namespace Application.Helper.Helpers
         {
             foreach (Chronozoom.Entities.ContentItem contentItem in contentItems)
             {
-                Click(By.XPath("//*[@class='cz-form-create-artifact cz-button']"));
+                By createArtifactButton = By.XPath("//*[@class='cz-form-create-artifact cz-button']");
+                WaitForElementEnabled(createArtifactButton);
+                Click(createArtifactButton);
                 FillArtifact(contentItem);
                 Click(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-save cz-button']"));
             }

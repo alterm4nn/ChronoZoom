@@ -34,7 +34,8 @@ var CZ;
                     uri: ci.contentItem ? ci.contentItem.uri : ci.uri,
                     mediaType: ci.contentItem ? ci.contentItem.mediaType : ci.mediaType,
                     attribution: ci.contentItem ? ci.contentItem.attribution : ci.attribution,
-                    mediaSource: ci.contentItem ? ci.contentItem.mediaSource : ci.mediaSource
+                    mediaSource: ci.contentItem ? ci.contentItem.mediaSource : ci.mediaSource,
+                    order: ci.contentItem ? ci.contentItem.order : ci.order
                 };
             }
             Map.contentItem = contentItem;
@@ -335,9 +336,13 @@ var CZ;
             });
         }
         Service.deleteProfile = deleteProfile;
-        function getProfile() {
+        function getProfile(displayName) {
+            if (typeof displayName === "undefined") { displayName = ""; }
             var request = new Service.Request(_serviceUrl);
             request.addToPath("user");
+            if(displayName != "") {
+                request.addParameter("name", displayName);
+            }
             return $.ajax({
                 type: "GET",
                 cache: false,
