@@ -6,8 +6,8 @@
     <ProjectGuid>{0A78CBDB-9511-454C-B697-D919748D306F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Chronozoom.Entities.Test</RootNamespace>
-    <AssemblyName>Chronozoom.Entities.Test</AssemblyName>
+    <RootNamespace>Chronozoom.Entities.UnitTests</RootNamespace>
+    <AssemblyName>Chronozoom.Entities.UnitTests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
