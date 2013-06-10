@@ -8,7 +8,7 @@ var CZ;
     (function (UI) {
         var TourStopListBox = (function (_super) {
             __extends(TourStopListBox, _super);
-            function TourStopListBox(container, listItemContainer, contentItems) {
+            function TourStopListBox(container, listItemContainer, contentItems, onStopsReordered) {
                 var listBoxInfo = {
                     context: contentItems,
                     sortableSettings: {
@@ -21,6 +21,9 @@ var CZ;
                         scroll: false,
                         start: function (event, ui) {
                             ui.placeholder.height(ui.item.height());
+                        },
+                        stop: function (event, ui) {
+                            onStopsReordered(event, ui);
                         }
                     }
                 };

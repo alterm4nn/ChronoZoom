@@ -154,18 +154,24 @@ var CZ;
                 this.saveButton.off();
                 this.deleteButton.off();
                 this.tour = formInfo.context;
-                this.stops = [];
+                var stops = [];
+                var self = this;
                 if(this.tour) {
                     this.tourTitleInput.val(this.tour.title);
                     for(var i = 0, len = this.tour.bookmarks.length; i < len; i++) {
                         var bookmark = this.tour.bookmarks[i];
                         var stop = FormEditTour.bookmarkToTourstop(bookmark);
-                        this.stops.push(stop);
+                        stops.push(stop);
                     }
                 } else {
                     this.tourTitleInput.val("");
                 }
-                this.tourStopsListBox = new CZ.UI.TourStopListBox(container.find(formInfo.tourStopsListBox), formInfo.tourStopsTemplate, this.stops);
+                this.tourStopsListBox = new CZ.UI.TourStopListBox(container.find(formInfo.tourStopsListBox), formInfo.tourStopsTemplate, stops, function (event, ui) {
+                    return self.onStopsReordered.apply(self, [
+                        event, 
+                        ui
+                    ]);
+                });
                 this.initialize();
             }
             FormEditTour.bookmarkToTourstop = function bookmarkToTourstop(bookmark) {
@@ -190,19 +196,18 @@ var CZ;
                 return CZ.Service.deleteTour(this.tour.id);
             };
             FormEditTour.prototype.createTourAsync = function () {
-                var _this = this;
                 var deferred = $.Deferred();
                 var self = this;
+                var stops = this.getStops();
                 var name = this.tourTitleInput.val();
                 var descr = this.tourDescriptionInput.val();
                 var category = "my tours";
-                var n = this.tourStopsListBox.items.length;
-                var request = CZ.Service.postTour(new CZ.UI.Tour(undefined, name, descr, category, n, this.stops));
+                var n = stops.length;
+                var request = CZ.Service.postTour(new CZ.UI.Tour(undefined, name, descr, category, n, stops));
                 request.done(function (q) {
                     var tourBookmarks = new Array();
                     for(var j = 0; j < n; j++) {
-                        var tourstopItem = _this.tourStopsListBox.items[j];
-                        var tourstop = tourstopItem.data;
+                        var tourstop = stops[j];
                         tourstop.bookmarkId = q.BookmarkId[j];
                         var bookmark = FormEditTour.tourstopToBookmark(tourstop);
                         tourBookmarks.push(bookmark);
@@ -215,72 +220,11 @@ var CZ;
                 return deferred.promise();
             };
             FormEditTour.prototype.updateTourAsync = function () {
-                var _this = this;
                 if(!this.tour) {
                     throw "Tour is undefined";
                 }
                 var deferred = $.Deferred();
                 var self = this;
-                var name = this.tourTitleInput.val();
-                var descr = this.tourDescriptionInput.val();
-                var category = this.tour.category;
-                var n = this.tour.bookmarks.length;
-                var m = this.stops.length;
-                var deletedStops = [];
-                for(var j = 0; j < n; j++) {
-                    var bookmark = this.tour.bookmarks[j];
-                    var found = false;
-                    for(var k = 0; k < m; k++) {
-                        var tourstop = this.stops[k];
-                        if(tourstop.bookmarkId === bookmark.id) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if(!found) {
-                        deletedStops.push(bookmark);
-                    }
-                }
-                var reqDel = CZ.Service.deleteBookmarks(this.tour.id, deletedStops);
-                reqDel.fail(function (q) {
-                    deferred.reject(q);
-                });
-                reqDel.done(function (q) {
-                    var n = _this.stops.length;
-                    var addedStops = new Array();
-                    for(var j = 0; j < n; j++) {
-                        var tourstop = _this.stops[j];
-                        if(tourstop.bookmarkId == "00000000-0000-0000-0000-000000000000") {
-                            addedStops.push(tourstop);
-                        }
-                    }
-                    var reqAdd = CZ.Service.putBookmarks(new CZ.UI.Tour(_this.tour.id, name, descr, category, n, addedStops));
-                    reqAdd.fail(function (q) {
-                        deferred.reject(q);
-                    });
-                    reqAdd.done(function (q) {
-                        var m = addedStops.length;
-                        for(var j = 0; j < m; j++) {
-                            var tourstop = _this.stops[j];
-                            tourstop.bookmarkId = q.BookmarkId[j];
-                        }
-                        var request = CZ.Service.putTour(new CZ.UI.Tour(_this.tour.id, name, descr, category, n, _this.stops));
-                        request.done(function (q) {
-                            var n = _this.stops.length;
-                            var tourBookmarks = new Array();
-                            for(var j = 0; j < n; j++) {
-                                var tourstop = _this.stops[j];
-                                tourstop.bookmarkId = q.BookmarkId[j];
-                                var bookmark = FormEditTour.tourstopToBookmark(tourstop);
-                                tourBookmarks.push(bookmark);
-                            }
-                            var tour = new CZ.Tours.Tour(q.TourId, name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, "", CZ.Tours.tours.length);
-                            deferred.resolve(tour);
-                        }).fail(function (q) {
-                            deferred.reject(q);
-                        });
-                    });
-                });
                 return deferred.promise();
             };
             FormEditTour.prototype.initializeAsEdit = function () {
@@ -368,6 +312,14 @@ var CZ;
                     });
                 });
             };
+            FormEditTour.prototype.getStops = function () {
+                var n = this.tourStopsListBox.items.length;
+                var stops = new Array(n);
+                for(; --n >= 0; ) {
+                    stops[n] = this.tourStopsListBox.items[n].data;
+                }
+                return stops;
+            };
             FormEditTour.prototype.show = function () {
                 _super.prototype.show.call(this, {
                     effect: "slide",
@@ -403,6 +355,8 @@ var CZ;
                 this.tourTitleInput.val("");
                 this.tourDescriptionInput.val("");
             };
+            FormEditTour.prototype.onStopsReordered = function () {
+            };
             FormEditTour.prototype.onTargetElementSelected = function (targetElement) {
                 CZ.Authoring.isActive = false;
                 CZ.Authoring.mode = "editTour";
@@ -415,7 +369,6 @@ var CZ;
                     stop.LapseTime = 0;
                 }
                 this.tourStopsListBox.add(stop);
-                this.stops.push(stop);
                 this.show();
             };
             return FormEditTour;

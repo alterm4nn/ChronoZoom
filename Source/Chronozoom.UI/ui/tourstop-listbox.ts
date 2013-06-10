@@ -25,7 +25,8 @@ module CZ {
         }
 
         export class TourStopListBox extends ListBoxBase {
-            constructor(container: JQuery, listItemContainer: JQuery, contentItems: any) {
+
+            constructor(container: JQuery, listItemContainer: JQuery, contentItems: any, onStopsReordered) {
                 var listBoxInfo: IListBoxBaseInfo = {
                     context: contentItems,
                     sortableSettings: {
@@ -39,6 +40,9 @@ module CZ {
 
                         start: function (event, ui) {
                             ui.placeholder.height(ui.item.height());
+                        },
+                        stop: function (event, ui) {
+                            onStopsReordered(event, ui);
                         }
                     }
                 };

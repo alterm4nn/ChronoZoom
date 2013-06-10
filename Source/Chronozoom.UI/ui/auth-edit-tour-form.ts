@@ -126,7 +126,6 @@ module CZ {
             private titleInput: JQuery;
             private tourTitleInput: JQuery;
             private tourDescriptionInput: JQuery;
-            private stops: TourStop[];
             private tour: CZ.Tours.Tour;
 
             public tourStopsListBox: TourStopListBox;
@@ -149,18 +148,20 @@ module CZ {
                 this.deleteButton.off();
 
                 this.tour = <CZ.Tours.Tour> formInfo.context;
-                this.stops = [];
+                var stops = [];
+                var self = this;
                 if (this.tour) {
                     this.tourTitleInput.val(this.tour.title);
                     for (var i = 0, len = this.tour.bookmarks.length; i < len; i++) {
                         var bookmark = this.tour.bookmarks[i];
                         var stop = FormEditTour.bookmarkToTourstop(bookmark);
-                        this.stops.push(stop);
+                        stops.push(stop);
                     }
                 } else {
                     this.tourTitleInput.val("");
                 }
-                this.tourStopsListBox = new CZ.UI.TourStopListBox(container.find(formInfo.tourStopsListBox), formInfo.tourStopsTemplate, this.stops);
+                this.tourStopsListBox = new CZ.UI.TourStopListBox(container.find(formInfo.tourStopsListBox), formInfo.tourStopsTemplate, stops,
+                    (event, ui) => self.onStopsReordered.apply(self, [event, ui]));
                 this.initialize();
             }
 
@@ -193,22 +194,23 @@ module CZ {
             private createTourAsync(): any {
                 var deferred = $.Deferred();
                 var self = this;
+                var stops = this.getStops();
+
 
                 // Add the tour to the local tours collection
                 var name = this.tourTitleInput.val();
                 var descr = this.tourDescriptionInput.val();
                 var category = "my tours";
-                var n = this.tourStopsListBox.items.length;
+                var n = stops.length;
 
                 // Posting the tour to the service
-                var request = CZ.Service.postTour(new CZ.UI.Tour(undefined, name, descr, category, n, this.stops));
+                var request = CZ.Service.postTour(new CZ.UI.Tour(undefined, name, descr, category, n, stops));
 
                 request.done(q => {
                     // build array of bookmarks of current tour
                     var tourBookmarks = new Array();
                     for (var j = 0; j < n; j++) {
-                        var tourstopItem = <TourStopListItem> this.tourStopsListBox.items[j];
-                        var tourstop = <TourStop> tourstopItem.data;
+                        var tourstop = stops[j];
                         tourstop.bookmarkId = q.BookmarkId[j];
                         var bookmark = FormEditTour.tourstopToBookmark(tourstop);
                         tourBookmarks.push(bookmark);
@@ -235,81 +237,81 @@ module CZ {
                 var self = this;
 
                 // Add the tour to the local tours collection
-                var name = this.tourTitleInput.val();
-                var descr = this.tourDescriptionInput.val();
-                var category = <string> this.tour.category;
+                //var name = this.tourTitleInput.val();
+                //var descr = this.tourDescriptionInput.val();
+                //var category = <string> this.tour.category;
 
-                // Removing removed bookmarks
-                var n = this.tour.bookmarks.length;
-                var m = this.stops.length;
-                var deletedStops = [];
-                for (var j = 0; j < n; j++) {
-                    var bookmark = <CZ.Tours.TourBookmark>this.tour.bookmarks[j];
-                    var found = false;
-                    for (var k = 0; k < m; k++) {
-                        var tourstop = this.stops[k];
-                        if (tourstop.bookmarkId === bookmark.id) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) deletedStops.push(bookmark);
-                }
-                // todo: lapse time correction for the rest bookmarks
-                var reqDel = CZ.Service.deleteBookmarks(this.tour.id, deletedStops);
-                reqDel.fail(q => {
-                    deferred.reject(q);
-                });
-                reqDel.done(q => { // delete bookmarks succeeded
-                    var n = this.stops.length;
-                    var addedStops : TourStop[] = new Array();
-                    for (var j = 0; j < n; j++)
-                    {
-                        var tourstop = this.stops[j];
-                        if (tourstop.bookmarkId == "00000000-0000-0000-0000-000000000000")
-                            addedStops.push(tourstop);
-                    }
-                    var reqAdd = CZ.Service.putBookmarks(new CZ.UI.Tour(this.tour.id, name, descr, category, n, addedStops));
-                    reqAdd.fail(q => {
-                        deferred.reject(q);
-                    });
+                //// Removing removed bookmarks
+                //var n = this.tour.bookmarks.length;
+                //var m = this.stops.length;
+                //var deletedStops = [];
+                //for (var j = 0; j < n; j++) {
+                //    var bookmark = <CZ.Tours.TourBookmark>this.tour.bookmarks[j];
+                //    var found = false;
+                //    for (var k = 0; k < m; k++) {
+                //        var tourstop = this.stops[k];
+                //        if (tourstop.bookmarkId === bookmark.id) {
+                //            found = true;
+                //            break;
+                //        }
+                //    }
+                //    if (!found) deletedStops.push(bookmark);
+                //}
+                //// todo: lapse time correction for the rest bookmarks
+                //var reqDel = CZ.Service.deleteBookmarks(this.tour.id, deletedStops);
+                //reqDel.fail(q => {
+                //    deferred.reject(q);
+                //});
+                //reqDel.done(q => { // delete bookmarks succeeded
+                //    var n = this.stops.length;
+                //    var addedStops: TourStop[] = new Array();
+                //    for (var j = 0; j < n; j++) {
+                //        var tourstop = this.stops[j];
+                //        if (tourstop.bookmarkId == "00000000-0000-0000-0000-000000000000")
+                //            addedStops.push(tourstop);
+                //    }
+                //    var reqAdd = CZ.Service.putBookmarks(new CZ.UI.Tour(this.tour.id, name, descr, category, n, addedStops));
+                //    reqAdd.fail(q => {
+                //        deferred.reject(q);
+                //    });
 
-                    reqAdd.done(q => { // add bookmarks succeeded
-                        // saving ids
-                        var m = addedStops.length;
-                        for (var j = 0; j < m; j++)
-                        {
-                            var tourstop = this.stops[j];
-                            tourstop.bookmarkId = q.BookmarkId[j];
-                        }
+                //    reqAdd.done(q => { // add bookmarks succeeded
+                //        var stops = this.getStops();
 
-                        // Posting the tour to the service
-                        var request = CZ.Service.putTour(new CZ.UI.Tour(this.tour.id, name, descr, category, n, this.stops));
-                        request.done(q => {
-                            // build array of bookmarks of current tour
-                            var n = this.stops.length;
-                            var tourBookmarks = new Array();
-                            for (var j = 0; j < n; j++) {
-                                var tourstop = this.stops[j];
-                                tourstop.bookmarkId = q.BookmarkId[j];
-                                var bookmark = FormEditTour.tourstopToBookmark(tourstop);
-                                tourBookmarks.push(bookmark);
-                            }
+                //        // saving ids
+                //        var m = addedStops.length;
+                //        for (var j = 0; j < m; j++) {
+                //            var tourstop = stops[j];
+                //            tourstop.bookmarkId = q.BookmarkId[j];
+                //        }
 
-                            var tour = new CZ.Tours.Tour(q.TourId,
-                                name,
-                                tourBookmarks,
-                                CZ.Tours.bookmarkTransition,
-                                CZ.Common.vc,
-                                category, // category
-                                "", //audio
-                                CZ.Tours.tours.length)
-                            deferred.resolve(tour);
-                        }).fail(q => {
-                            deferred.reject(q);
-                        });
-                    });
-                });
+                //        // Posting the tour to the service
+                //        var request = CZ.Service.putTour(new CZ.UI.Tour(this.tour.id, name, descr, category, n, stops));
+                //        request.done(q => {
+                //            // build array of bookmarks of current tour
+                //            var n = stops.length;
+                //            var tourBookmarks = new Array();
+                //            for (var j = 0; j < n; j++) {
+                //                var tourstop = stops[j];
+                //                tourstop.bookmarkId = q.BookmarkId[j];
+                //                var bookmark = FormEditTour.tourstopToBookmark(tourstop);
+                //                tourBookmarks.push(bookmark);
+                //            }
+
+                //            var tour = new CZ.Tours.Tour(q.TourId,
+                //                name,
+                //                tourBookmarks,
+                //                CZ.Tours.bookmarkTransition,
+                //                CZ.Common.vc,
+                //                category, // category
+                //                "", //audio
+                //                CZ.Tours.tours.length)
+                //            deferred.resolve(tour);
+                //        }).fail(q => {
+                //            deferred.reject(q);
+                //        });
+                //    });
+                //});
                 return deferred.promise();
             }
 
@@ -404,6 +406,16 @@ module CZ {
                 });
             }
 
+            // Gets an array of TourStops as they are currently in the listbox.
+            private getStops(): TourStop[] {
+                var n = this.tourStopsListBox.items.length;
+                var stops: TourStop[] = <TourStop[]>new Array(n);
+                for (; --n >= 0;) {
+                    stops[n] = <TourStop> this.tourStopsListBox.items[n].data;
+                }
+                return stops;
+            }
+
             public show(): void {
                 super.show({
                     effect: "slide",
@@ -446,6 +458,11 @@ module CZ {
                 this.tourDescriptionInput.val("");
             }
 
+            private onStopsReordered() {
+
+            }
+
+            // New tour stop is added.
             private onTargetElementSelected(targetElement: any) {
                 CZ.Authoring.isActive = false;
                 CZ.Authoring.mode = "editTour";
@@ -461,7 +478,6 @@ module CZ {
                     stop.LapseTime = 0;
                 }
                 this.tourStopsListBox.add(stop);
-                this.stops.push(stop);
                 this.show();
             }
         }
