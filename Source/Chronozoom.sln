@@ -21,7 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{83B2C8
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chronozoom.UI.UnitTests", "Chronozoom.UI.Unittests\Chronozoom.UI.UnitTests.csproj", "{369C9F1A-4CC1-42B0-9581-D6EE736EB19C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chronozoom.Entities.UnitTest", "Chronozoom.Entities.UnitTest\Chronozoom.Entities.UnitTest.csproj", "{0A78CBDB-9511-454C-B697-D919748D306F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chronozoom.Entities.UnitTests", "Chronozoom.Entities.UnitTests\Chronozoom.Entities.UnitTests.csproj", "{0A78CBDB-9511-454C-B697-D919748D306F}"
 EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution

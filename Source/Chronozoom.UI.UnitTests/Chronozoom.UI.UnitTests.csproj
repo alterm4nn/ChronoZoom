@@ -52,6 +52,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(ProgramFiles)\Microsoft ASP.NET\ASP.NET MVC 4\Assemblies\System.Web.Mvc.dll</HintPath>
@@ -78,6 +79,7 @@
     <Compile Include="Controllers\JasmineController.cs" />
     <Compile Include="FriendlyUrlTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="DefaultHttpHandlerTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -95,7 +97,7 @@
     <Content Include="Scripts\Specs\commonSpec.js" />
     <Content Include="Scripts\Specs\datepickerSpec.js" />
     <Content Include="Scripts\Specs\datesSpec.js" />
-    <Content Include="Scripts\Specs\featureActivationSpec.js"/>
+    <Content Include="Scripts\Specs\featureActivationSpec.js" />
     <Content Include="Scripts\typings\jasmine\jasmine.d.ts" />
     <Content Include="Scripts\Specs\profileDataSpec.js" />
     <Content Include="Scripts\Specs\timeScaleSpec.js" />
