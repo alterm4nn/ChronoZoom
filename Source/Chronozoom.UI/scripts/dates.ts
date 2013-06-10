@@ -62,7 +62,7 @@ module CZ {
             return coordinate;
         }
 
-        export function getDMYFromCoordinate(coord) {
+        export function getYMDFromCoordinate(coord) {
             var sign = (coord === 0) ? 1 : coord / Math.abs(coord);
             var day = 0, month = 0, year = 0;
             var idxYear, countLeapYears = 0;
@@ -142,7 +142,14 @@ module CZ {
                 // remove fraction part of year
                 year.year = Math.floor(year.year);
             }
+            if (year.regime === 'BCE') {
+                year.year += 2;
+               }
 
+            if ((year.regime === 'CE') && (year.year === 0)) {
+                year.regime = 'BCE';
+                year.year = 1;
+               }
             return year;
         }
 
@@ -161,6 +168,7 @@ module CZ {
                     break;
                 case "bce":
                     coordinate *= -1;
+                    coordinate += 1;
                     break;
             }
 
