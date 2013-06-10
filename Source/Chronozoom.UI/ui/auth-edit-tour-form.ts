@@ -19,6 +19,7 @@ module CZ {
             private targetElement: any;
             private title: string;
             private type: string;
+            private description: string;
             private lapseTime: number;
             private sequence: number;
 
@@ -53,7 +54,11 @@ module CZ {
             }
 
             public get Description(): string {
-                return "";
+                return this.description;
+            }
+
+            public set Description(d: string) {
+                this.description = d;
             }
 
             public get LapseTime(): number {
@@ -65,6 +70,10 @@ module CZ {
 
             public get Sequence(): number {
                 return this.sequence;
+            }
+
+            public set Sequence(n: number) {
+                this.sequence = n;
             }
 
             public get Type(): string {
@@ -112,6 +121,10 @@ module CZ {
 
             public get Description(): string {
                 return this.description;
+            }
+
+            public set Description(val: string) {
+                this.description = val;
             }
 
             public get Stops(): TourStop[] {
@@ -173,6 +186,7 @@ module CZ {
                     };
                 }
                 var stop = new TourStop(bookmark.id, target, bookmark.number + 1, (!bookmark.caption || $.trim(bookmark.caption) === "") ? undefined : bookmark.caption);
+                stop.Description = bookmark.description;
                 stop.LapseTime = bookmark.lapseTime;
                 return stop;
             }
@@ -182,6 +196,7 @@ module CZ {
                 var title = tourstop.Title;
                 var text = "";
                 var bookmark = new CZ.Tours.TourBookmark(tourstop.bookmarkId, url, title, tourstop.LapseTime, text);
+                bookmark.description = tourstop.Description;
                 return bookmark;
             }
 
@@ -459,7 +474,15 @@ module CZ {
             }
 
             private onStopsReordered() {
-
+                var stops = this.getStops();
+                var n = stops.length;
+                var lapseTime = 0;
+                for (var i = 0; i < n; i++) {
+                    var stop = stops[i];
+                    stop.Sequence = i + 1;
+                    stop.LapseTime = lapseTime;
+                    lapseTime += Settings.tourDefaultTransitionTime;
+                }
             }
 
             // New tour stop is added.

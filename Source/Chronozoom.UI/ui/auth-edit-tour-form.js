@@ -47,7 +47,10 @@ var CZ;
             });
             Object.defineProperty(TourStop.prototype, "Description", {
                 get: function () {
-                    return "";
+                    return this.description;
+                },
+                set: function (d) {
+                    this.description = d;
                 },
                 enumerable: true,
                 configurable: true
@@ -65,6 +68,9 @@ var CZ;
             Object.defineProperty(TourStop.prototype, "Sequence", {
                 get: function () {
                     return this.sequence;
+                },
+                set: function (n) {
+                    this.sequence = n;
                 },
                 enumerable: true,
                 configurable: true
@@ -127,6 +133,9 @@ var CZ;
                 get: function () {
                     return this.description;
                 },
+                set: function (val) {
+                    this.description = val;
+                },
                 enumerable: true,
                 configurable: true
             });
@@ -182,6 +191,7 @@ var CZ;
                     };
                 }
                 var stop = new TourStop(bookmark.id, target, bookmark.number + 1, (!bookmark.caption || $.trim(bookmark.caption) === "") ? undefined : bookmark.caption);
+                stop.Description = bookmark.description;
                 stop.LapseTime = bookmark.lapseTime;
                 return stop;
             };
@@ -190,6 +200,7 @@ var CZ;
                 var title = tourstop.Title;
                 var text = "";
                 var bookmark = new CZ.Tours.TourBookmark(tourstop.bookmarkId, url, title, tourstop.LapseTime, text);
+                bookmark.description = tourstop.Description;
                 return bookmark;
             };
             FormEditTour.prototype.deleteTourAsync = function () {
@@ -356,6 +367,15 @@ var CZ;
                 this.tourDescriptionInput.val("");
             };
             FormEditTour.prototype.onStopsReordered = function () {
+                var stops = this.getStops();
+                var n = stops.length;
+                var lapseTime = 0;
+                for(var i = 0; i < n; i++) {
+                    var stop = stops[i];
+                    stop.Sequence = i + 1;
+                    stop.LapseTime = lapseTime;
+                    lapseTime += CZ.Settings.tourDefaultTransitionTime;
+                }
             };
             FormEditTour.prototype.onTargetElementSelected = function (targetElement) {
                 CZ.Authoring.isActive = false;

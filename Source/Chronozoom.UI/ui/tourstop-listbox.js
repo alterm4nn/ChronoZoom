@@ -51,9 +51,18 @@ var CZ;
                 this.iconImg = this.container.find(uiMap.iconImg);
                 this.titleTextblock = this.container.find(uiMap.titleTextblock);
                 this.typeTextblock = this.container.find(uiMap.typeTextblock);
+                var self = this;
+                var descr = this.container.find(".cz-tourstop-description");
+                descr.change(function (ev) {
+                    self.data.Desription = self.Description;
+                });
                 this.iconImg.attr("src", this.data.Icon || "/images/Temp-Thumbnail2.png");
                 this.titleTextblock.text(this.data.Title);
                 this.typeTextblock.text(this.data.Type);
+                this.Activate();
+                this.container.click(function (e) {
+                    self.Activate();
+                });
                 this.container.dblclick(function (e) {
                     if(typeof context.Target.vc == "undefined") {
                         return;
@@ -67,6 +76,19 @@ var CZ;
                     CZ.Search.navigateToElement(target);
                 });
             }
+            Object.defineProperty(TourStopListItem.prototype, "Description", {
+                get: function () {
+                    var descr = this.container.find(".cz-tourstop-description");
+                    return descr.val();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            TourStopListItem.prototype.Activate = function () {
+                var myDescr = this.container.find(".cz-tourstop-description");
+                this.parent.container.find(".cz-tourstop-description").not(myDescr).hide();
+                myDescr.show(500);
+            };
             return TourStopListItem;
         })(UI.ListItemBase);
         UI.TourStopListItem = TourStopListItem;        

@@ -33,6 +33,7 @@ module CZ {
             public duration = undefined;
             public number = 0;
             public elapsed = 0; // number of seconds that were already played (if interrupted).
+            public description : string = "";
 
             constructor(public id, public url, public caption, public lapseTime, public text) {
                 if (this.text === null) {

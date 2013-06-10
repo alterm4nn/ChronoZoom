@@ -2541,9 +2541,18 @@ var CZ;
                 this.iconImg = this.container.find(uiMap.iconImg);
                 this.titleTextblock = this.container.find(uiMap.titleTextblock);
                 this.typeTextblock = this.container.find(uiMap.typeTextblock);
+                var self = this;
+                var descr = this.container.find(".cz-tourstop-description");
+                descr.change(function (ev) {
+                    self.data.Desription = self.Description;
+                });
                 this.iconImg.attr("src", this.data.Icon || "/images/Temp-Thumbnail2.png");
                 this.titleTextblock.text(this.data.Title);
                 this.typeTextblock.text(this.data.Type);
+                this.Activate();
+                this.container.click(function (e) {
+                    self.Activate();
+                });
                 this.container.dblclick(function (e) {
                     if(typeof context.Target.vc == "undefined") {
                         return;
@@ -2557,6 +2566,19 @@ var CZ;
                     CZ.Search.navigateToElement(target);
                 });
             }
+            Object.defineProperty(TourStopListItem.prototype, "Description", {
+                get: function () {
+                    var descr = this.container.find(".cz-tourstop-description");
+                    return descr.val();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            TourStopListItem.prototype.Activate = function () {
+                var myDescr = this.container.find(".cz-tourstop-description");
+                this.parent.container.find(".cz-tourstop-description").not(myDescr).hide();
+                myDescr.show(500);
+            };
             return TourStopListItem;
         })(UI.ListItemBase);
         UI.TourStopListItem = TourStopListItem;        
@@ -2607,7 +2629,10 @@ var CZ;
             });
             Object.defineProperty(TourStop.prototype, "Description", {
                 get: function () {
-                    return "";
+                    return this.description;
+                },
+                set: function (d) {
+                    this.description = d;
                 },
                 enumerable: true,
                 configurable: true
@@ -2625,6 +2650,9 @@ var CZ;
             Object.defineProperty(TourStop.prototype, "Sequence", {
                 get: function () {
                     return this.sequence;
+                },
+                set: function (n) {
+                    this.sequence = n;
                 },
                 enumerable: true,
                 configurable: true
@@ -2687,6 +2715,9 @@ var CZ;
                 get: function () {
                     return this.description;
                 },
+                set: function (val) {
+                    this.description = val;
+                },
                 enumerable: true,
                 configurable: true
             });
@@ -2742,6 +2773,7 @@ var CZ;
                     };
                 }
                 var stop = new TourStop(bookmark.id, target, bookmark.number + 1, (!bookmark.caption || $.trim(bookmark.caption) === "") ? undefined : bookmark.caption);
+                stop.Description = bookmark.description;
                 stop.LapseTime = bookmark.lapseTime;
                 return stop;
             };
@@ -2750,6 +2782,7 @@ var CZ;
                 var title = tourstop.Title;
                 var text = "";
                 var bookmark = new CZ.Tours.TourBookmark(tourstop.bookmarkId, url, title, tourstop.LapseTime, text);
+                bookmark.description = tourstop.Description;
                 return bookmark;
             };
             FormEditTour.prototype.deleteTourAsync = function () {
@@ -2916,6 +2949,15 @@ var CZ;
                 this.tourDescriptionInput.val("");
             };
             FormEditTour.prototype.onStopsReordered = function () {
+                var stops = this.getStops();
+                var n = stops.length;
+                var lapseTime = 0;
+                for(var i = 0; i < n; i++) {
+                    var stop = stops[i];
+                    stop.Sequence = i + 1;
+                    stop.LapseTime = lapseTime;
+                    lapseTime += CZ.Settings.tourDefaultTransitionTime;
+                }
             };
             FormEditTour.prototype.onTargetElementSelected = function (targetElement) {
                 CZ.Authoring.isActive = false;
@@ -4274,6 +4316,7 @@ var CZ;
                 this.duration = undefined;
                 this.number = 0;
                 this.elapsed = 0;
+                this.description = "";
                 if(this.text === null) {
                     this.text = "";
                 }
