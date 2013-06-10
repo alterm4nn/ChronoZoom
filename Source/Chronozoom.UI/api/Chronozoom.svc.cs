@@ -20,6 +20,7 @@ using System.ServiceModel;
 using System.ServiceModel.Activation;
 using System.ServiceModel.Web;
 using System.Text;
+using System.Transactions;
 using System.Web;
 using Chronozoom.Entities;
 
@@ -823,70 +824,76 @@ namespace Chronozoom.UI
             return ApiOperationUnderCollection(timelineRequest, superCollectionName, collectionName, delegate(User user, Storage storage, Collection collection)
             {
                 Trace.TraceInformation("Put Timeline");
-
                 Guid returnValue;
                 if (timelineRequest.Id == Guid.Empty)
                 {
-                    Timeline parentTimeline;
-                    if (!FindParentTimeline(storage, timelineRequest.Timeline_ID, out parentTimeline))
+                    using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.Serializable }))
                     {
-                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
-                        return Guid.Empty;
-                    }
-
-                    if (!ValidateTimelineRange(parentTimeline, timelineRequest.FromYear, timelineRequest.ToYear))
-                    {
-                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineRangeInvalid);
-                        return Guid.Empty;
-                    }
-
-                    // Parent timeline is valid - add new timeline
-
-                    Guid newTimelineGuid = Guid.NewGuid();
-                    Timeline newTimeline = new Timeline { Id = newTimelineGuid, Title = timelineRequest.Title, Regime = timelineRequest.Regime };
-                    newTimeline.FromYear = timelineRequest.FromYear;
-                    newTimeline.ToYear = timelineRequest.ToYear;
-                    newTimeline.Collection = collection;
-
-                    // Update parent timeline.
-                    if (parentTimeline != null)
-                    {
-                        storage.Entry(parentTimeline).Collection(_ => _.ChildTimelines).Load();
-                        if (parentTimeline.ChildTimelines == null)
+                        Timeline parentTimeline;
+                        if (!FindParentTimeline(storage, timelineRequest.Timeline_ID, out parentTimeline))
                         {
-                            parentTimeline.ChildTimelines = new System.Collections.ObjectModel.Collection<Timeline>();
+                            SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
+                            scope.Complete();
+                            return Guid.Empty;
                         }
-                        newTimeline.Depth = parentTimeline.Depth + 1;
-                        if (parentTimeline.Predecessor != Guid.Empty)
+
+                        if (!ValidateTimelineRange(parentTimeline, timelineRequest.FromYear, timelineRequest.ToYear))
                         {
-                            Timeline predecessorTimeline = storage.Timelines.Find(parentTimeline.Predecessor);
-                            predecessorTimeline.Successor = newTimeline.Id;
-                            newTimeline.Predecessor = predecessorTimeline.Id;
+                            SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineRangeInvalid);
+                            scope.Complete();
+                            return Guid.Empty;
+                        }
+
+                        // Parent timeline is valid - add new timeline
+
+                        Guid newTimelineGuid = Guid.NewGuid();
+                        Timeline newTimeline = new Timeline { Id = newTimelineGuid, Title = timelineRequest.Title, Regime = timelineRequest.Regime };
+                        newTimeline.FromYear = timelineRequest.FromYear;
+                        newTimeline.ToYear = timelineRequest.ToYear;
+                        newTimeline.Collection = collection;
+
+                        // Update parent timeline.
+                        if (parentTimeline != null)
+                        {
+                            storage.Entry(parentTimeline).Collection(_ => _.ChildTimelines).Load();
+                            if (parentTimeline.ChildTimelines == null)
+                            {
+                                parentTimeline.ChildTimelines = new System.Collections.ObjectModel.Collection<Timeline>();
+                            }
+                            newTimeline.Depth = parentTimeline.Depth + 1;
+                            if (parentTimeline.Predecessor != Guid.Empty)
+                            {
+                                Timeline predecessorTimeline = storage.Timelines.Find(parentTimeline.Predecessor);
+                                predecessorTimeline.Successor = newTimeline.Id;
+                                newTimeline.Predecessor = predecessorTimeline.Id;
+                            }
+                            else
+                            {
+                                newTimeline.Predecessor = Guid.Empty;
+                            }
+                            if (parentTimeline.FirstNodeInSubtree == parentTimeline.Id)
+                            {
+                                storage.UpdateFirstNodeInSubtree(parentTimeline, newTimeline.Id);
+                            }
+                            newTimeline.Successor = parentTimeline.Id;
+                            parentTimeline.Predecessor = newTimeline.Id;
+                            parentTimeline.ChildTimelines.Add(newTimeline);
+                            UpdateSubtreeSize(storage, parentTimeline, 1);
                         }
                         else
                         {
+                            newTimeline.Depth = 0;
+                            newTimeline.FirstNodeInSubtree = newTimeline.Id;
                             newTimeline.Predecessor = Guid.Empty;
+                            newTimeline.Successor = Guid.Empty;
+                            newTimeline.SubtreeSize = 1;
                         }
-                        if (parentTimeline.FirstNodeInSubtree == parentTimeline.Id)
-                        {
-                            storage.UpdateFirstNodeInSubtree(parentTimeline, newTimeline.Id);
-                        }
-                        newTimeline.Successor = parentTimeline.Id;
-                        parentTimeline.Predecessor = newTimeline.Id;
-                        parentTimeline.ChildTimelines.Add(newTimeline);
-                        UpdateSubtreeSize(storage, parentTimeline, 1);
+                        storage.Timelines.Add(newTimeline);
+
+                        returnValue = newTimelineGuid;
+                        storage.SaveChanges();
+                        scope.Complete();
                     }
-                    else
-                    {
-                        newTimeline.Depth = 0;
-                        newTimeline.FirstNodeInSubtree = newTimeline.Id;
-                        newTimeline.Predecessor = Guid.Empty;
-                        newTimeline.Successor = Guid.Empty;
-                        newTimeline.SubtreeSize = 1;
-                    }
-                    storage.Timelines.Add(newTimeline);
-                        
-                    returnValue = newTimelineGuid;
                 }
                 else
                 {
@@ -938,45 +945,50 @@ namespace Chronozoom.UI
                     SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineNull);
                     return;
                 }
+                using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.Serializable }))
+                {
+                    Timeline deleteTimeline = storage.Timelines.Find(timelineRequest.Id);
+                    if (deleteTimeline == null)
+                    {
+                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineNotFound);
+                        scope.Complete();
+                        return;
+                    }
 
-                Timeline deleteTimeline = storage.Timelines.Find(timelineRequest.Id);
-                if (deleteTimeline == null)
-                {
-                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineNotFound);
-                    return;
-                }
+                    if (deleteTimeline.Collection.Id != collection.Id)
+                    {
+                        SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                        scope.Complete();
+                        return;
+                    }
+                    Timeline parentTimeline = storage.GetParentTimelineRaw(timelineRequest.Id);
+                    UpdateSubtreeSize(storage, parentTimeline, (deleteTimeline.SubtreeSize > 0 ? -deleteTimeline.SubtreeSize : 0) - 1);
 
-                if (deleteTimeline.Collection.Id != collection.Id)
-                {
-                    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                    return;
-                }
-                Timeline parentTimeline = storage.GetParentTimelineRaw(timelineRequest.Id);
-                UpdateSubtreeSize(storage, parentTimeline, (deleteTimeline.SubtreeSize > 0 ? -deleteTimeline.SubtreeSize : 0) - 1);
-
-                if (deleteTimeline.Successor != Guid.Empty)
-                {
-                    Timeline successorTimeline = storage.Timelines.Find(deleteTimeline.Successor);
-                    successorTimeline.Predecessor = deleteTimeline.Predecessor;
-                }
-                if (deleteTimeline.Predecessor != Guid.Empty)
-                {
-                    Timeline predecessorTimeline = storage.Timelines.Find(deleteTimeline.Predecessor);
-                    predecessorTimeline.Successor = deleteTimeline.Successor;
-                }
-                if (deleteTimeline.FirstNodeInSubtree == deleteTimeline.Id && parentTimeline != null)
-                {
                     if (deleteTimeline.Successor != Guid.Empty)
                     {
-                        storage.UpdateFirstNodeInSubtree(parentTimeline, deleteTimeline.Successor);
+                        Timeline successorTimeline = storage.Timelines.Find(deleteTimeline.Successor);
+                        successorTimeline.Predecessor = deleteTimeline.Predecessor;
                     }
-                    else
+                    if (deleteTimeline.Predecessor != Guid.Empty)
                     {
-                        storage.UpdateFirstNodeInSubtree(parentTimeline, parentTimeline.Id);
+                        Timeline predecessorTimeline = storage.Timelines.Find(deleteTimeline.Predecessor);
+                        predecessorTimeline.Successor = deleteTimeline.Successor;
                     }
+                    if (deleteTimeline.FirstNodeInSubtree == deleteTimeline.Id && parentTimeline != null)
+                    {
+                        if (deleteTimeline.Successor != Guid.Empty)
+                        {
+                            storage.UpdateFirstNodeInSubtree(parentTimeline, deleteTimeline.Successor);
+                        }
+                        else
+                        {
+                            storage.UpdateFirstNodeInSubtree(parentTimeline, parentTimeline.Id);
+                        }
+                    }
+                    storage.DeleteTimeline(timelineRequest.Id);
+                    storage.SaveChanges();
+                    scope.Complete();
                 }
-                storage.DeleteTimeline(timelineRequest.Id);
-                storage.SaveChanges();
             });
         }
 
@@ -1008,46 +1020,50 @@ namespace Chronozoom.UI
 
                 if (exhibitRequest.Id == Guid.Empty)
                 {
-                    Timeline parentTimeline;
-                    if (!FindParentTimeline(storage, exhibitRequest.Timeline_ID, out parentTimeline) || parentTimeline == null)
+                    using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.Serializable }))
                     {
-                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
-                        return returnValue;
-                    }
 
-                    // Parent timeline is valid - add new exhibit
-                    Guid newExhibitGuid = Guid.NewGuid();
-                    Exhibit newExhibit = new Exhibit { Id = newExhibitGuid };
-                    newExhibit.Title = exhibitRequest.Title;
-                    newExhibit.Year = exhibitRequest.Year;
-                    newExhibit.Collection = collection;
-                    newExhibit.Depth = parentTimeline.Depth + 1;
-
-                    // Update parent timeline.
-                    storage.Entry(parentTimeline).Collection(_ => _.Exhibits).Load();
-                    if (parentTimeline.Exhibits == null)
-                    {
-                        parentTimeline.Exhibits = new System.Collections.ObjectModel.Collection<Exhibit>();
-                    }
-                    parentTimeline.Exhibits.Add(newExhibit);
-                        
-                    storage.Exhibits.Add(newExhibit);
-                    UpdateSubtreeSize(storage, parentTimeline, 1 + (newExhibit.ContentItems != null ? newExhibit.ContentItems.Count() : 0));
-
-                    storage.SaveChanges();
-                    returnValue.ExhibitId = newExhibitGuid;
-
-                    // Populate the content items
-                    if (exhibitRequest.ContentItems != null)
-                    {
-                        foreach (ContentItem contentItemRequest in exhibitRequest.ContentItems)
+                        Timeline parentTimeline;
+                        if (!FindParentTimeline(storage, exhibitRequest.Timeline_ID, out parentTimeline) || parentTimeline == null)
                         {
-                            // Parent exhibit item will be equal to the newly added exhibit
-                            var newContentItemGuid = AddContentItem(storage, collection, newExhibit, contentItemRequest);
-                            returnValue.Add(newContentItemGuid);
+                            SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
+                            scope.Complete();
+                            return returnValue;
                         }
-                    }
 
+                        // Parent timeline is valid - add new exhibit
+                        Guid newExhibitGuid = Guid.NewGuid();
+                        Exhibit newExhibit = new Exhibit { Id = newExhibitGuid };
+                        newExhibit.Title = exhibitRequest.Title;
+                        newExhibit.Year = exhibitRequest.Year;
+                        newExhibit.Collection = collection;
+                        newExhibit.Depth = parentTimeline.Depth + 1;
+
+                        // Update parent timeline.
+                        storage.Entry(parentTimeline).Collection(_ => _.Exhibits).Load();
+                        if (parentTimeline.Exhibits == null)
+                        {
+                            parentTimeline.Exhibits = new System.Collections.ObjectModel.Collection<Exhibit>();
+                        }
+                        parentTimeline.Exhibits.Add(newExhibit);
+
+                        storage.Exhibits.Add(newExhibit);
+                        UpdateSubtreeSize(storage, parentTimeline, 1 + (newExhibit.ContentItems != null ? newExhibit.ContentItems.Count() : 0));
+
+                        storage.SaveChanges();
+                        returnValue.ExhibitId = newExhibitGuid;
+                        // Populate the content items
+                        if (exhibitRequest.ContentItems != null)
+                        {
+                            foreach (ContentItem contentItemRequest in exhibitRequest.ContentItems)
+                            {
+                                // Parent exhibit item will be equal to the newly added exhibit
+                                var newContentItemGuid = AddContentItem(storage, collection, newExhibit, contentItemRequest);
+                                returnValue.Add(newContentItemGuid);
+                            }
+                        }
+                        scope.Complete();
+                    }
                 }
                 else
                 {
@@ -1164,26 +1180,31 @@ namespace Chronozoom.UI
                     SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ExhibitNotFound);
                     return;
                 }
-
-                Exhibit deleteExhibit = storage.Exhibits.Find(exhibitRequest.Id);
-                if (deleteExhibit == null)
+                using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.Serializable }))
                 {
-                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ExhibitNotFound);
-                    return;
+                    Exhibit deleteExhibit = storage.Exhibits.Find(exhibitRequest.Id);
+                    if (deleteExhibit == null)
+                    {
+                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ExhibitNotFound);
+                        scope.Complete();
+                        return;
+                    }
+
+                    if (deleteExhibit.Collection == null || deleteExhibit.Collection.Id != collection.Id)
+                    {
+                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionIdMismatch);
+                        scope.Complete();
+                        return;
+                    }
+                    Timeline parentTimeline = storage.GetExhibitParentTimeline(deleteExhibit.Id);
+
+                    storage.Entry(deleteExhibit).Collection(_ => _.ContentItems).Load();
+                    UpdateSubtreeSize(storage, parentTimeline, (deleteExhibit.ContentItems != null ? -deleteExhibit.ContentItems.Count() : 0) - 1);
+
+                    storage.DeleteExhibit(exhibitRequest.Id);
+                    storage.SaveChanges();
+                    scope.Complete();
                 }
-
-                if (deleteExhibit.Collection == null || deleteExhibit.Collection.Id != collection.Id)
-                {
-                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionIdMismatch);
-                    return;
-                }
-                Timeline parentTimeline = storage.GetExhibitParentTimeline(deleteExhibit.Id);
-
-                storage.Entry(deleteExhibit).Collection(_ => _.ContentItems).Load();
-                UpdateSubtreeSize(storage, parentTimeline, (deleteExhibit.ContentItems != null ? - deleteExhibit.ContentItems.Count() : 0) - 1);
-
-                storage.DeleteExhibit(exhibitRequest.Id);
-                storage.SaveChanges();
             });
         }
 
@@ -1200,17 +1221,21 @@ namespace Chronozoom.UI
 
                 if (contentItemRequest.Id == Guid.Empty)
                 {
-                    Exhibit parentExhibit = FindParentExhibit(storage, contentItemRequest.Exhibit_ID);
-                    if (parentExhibit == null)
+                    using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.Serializable }))
                     {
-                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
-                        return Guid.Empty;
+                        Exhibit parentExhibit = FindParentExhibit(storage, contentItemRequest.Exhibit_ID);
+                        if (parentExhibit == null)
+                        {
+                            SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
+                            return Guid.Empty;
+                        }
+                        TimelineRaw parentTimeline = storage.GetExhibitParentTimeline(contentItemRequest.Exhibit_ID);
+                        // Parent content item is valid - add new content item
+                        var newContentItemGuid = AddContentItem(storage, collection, parentExhibit, contentItemRequest);
+                        returnValue = newContentItemGuid;
+                        UpdateSubtreeSize(storage, parentTimeline, 1);
+                        scope.Complete();
                     }
-                    TimelineRaw parentTimeline = storage.GetExhibitParentTimeline(contentItemRequest.Exhibit_ID);
-                    // Parent content item is valid - add new content item
-                    var newContentItemGuid = AddContentItem(storage, collection, parentExhibit, contentItemRequest);
-                    returnValue = newContentItemGuid;
-                    UpdateSubtreeSize(storage, parentTimeline, 1);
                 }
                 else
                 {
@@ -1240,25 +1265,30 @@ namespace Chronozoom.UI
                     return;
                 }
 
-                ContentItem deleteContentItem = storage.ContentItems.Find(contentItemRequest.Id);
-                if (deleteContentItem == null)
+                using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.Serializable }))
                 {
-                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ContentItemNotFound);
-                    return;
+                    ContentItem deleteContentItem = storage.ContentItems.Find(contentItemRequest.Id);
+                    if (deleteContentItem == null)
+                    {
+                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ContentItemNotFound);
+                        scope.Complete();
+                        return;
+                    }
+
+                    if (deleteContentItem.Collection == null || deleteContentItem.Collection.Id != collection.Id)
+                    {
+                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionIdMismatch);
+                        scope.Complete();
+                        return;
+                    }
+
+                    ExhibitRaw parentExhibit = storage.GetContentItemParentExhibit(deleteContentItem.Id);
+                    TimelineRaw parentTimeline = storage.GetExhibitParentTimeline(parentExhibit.Id);
+                    storage.ContentItems.Remove(deleteContentItem);
+                    UpdateSubtreeSize(storage, parentTimeline, -1);
+                    storage.SaveChanges();
+                    scope.Complete();
                 }
-
-                if (deleteContentItem.Collection == null || deleteContentItem.Collection.Id != collection.Id)
-                {
-                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionIdMismatch);
-                    return;
-                }
-
-                ExhibitRaw parentExhibit = storage.GetContentItemParentExhibit(deleteContentItem.Id);
-                TimelineRaw parentTimeline = storage.GetExhibitParentTimeline(parentExhibit.Id);
-                storage.ContentItems.Remove(deleteContentItem);
-                UpdateSubtreeSize(storage, parentTimeline, -1);
-
-                storage.SaveChanges();
             });
         }
 

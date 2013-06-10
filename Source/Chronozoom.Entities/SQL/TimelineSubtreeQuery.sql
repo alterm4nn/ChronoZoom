@@ -1,3 +1,7 @@
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'TimelineSubtreeQuery') AND type in (N'P', N'PC'))
+	DROP PROCEDURE TimelineSubtreeQuery
+GO
+
 CREATE PROCEDURE TimelineSubtreeQuery
 	@Collection_Id UNIQUEIDENTIFIER,
 	@LCA UNIQUEIDENTIFIER,
@@ -22,10 +26,10 @@ BEGIN
 	DECLARE @results TABLE (
 		Id UNIQUEIDENTIFIER
 	)
-	DECLARE cur CURSOR FOR SELECT Id FROM @current_level
+	DECLARE timeline_subtree_query_cur CURSOR LOCAL FOR SELECT Id FROM @current_level
 	SET @return_entire_subtree = 0
 	SET @subtree_size = 0
-	IF @LCA = CAST(CAST(0 AS BINARY) AS UNIQUEIDENTIFIER)
+	IF @LCA = CAST(CAST(0 AS BINARY) AS UNIQUEIDENTIFIER) OR @LCA IS NULL
 		INSERT INTO @current_level SELECT Id FROM Timelines WHERE Depth = 0 AND Collection_ID =  @Collection_Id
 	ELSE
 	BEGIN
@@ -52,8 +56,8 @@ BEGIN
 			SELECT @current_level_cnt=COUNT(Id) FROM @current_level
 			IF @current_level_cnt = 0
 				BREAK
-			OPEN cur
-			FETCH NEXT FROM cur INTO @current_id
+			OPEN timeline_subtree_query_cur
+			FETCH NEXT FROM timeline_subtree_query_cur INTO @current_id
 			WHILE @@FETCH_STATUS = 0
 			BEGIN
 				INSERT INTO @results VALUES(@current_id)
@@ -66,14 +70,15 @@ BEGIN
 					ELSE
 						BREAK
 				END 
-				FETCH NEXT FROM cur INTO @current_id
+				FETCH NEXT FROM timeline_subtree_query_cur INTO @current_id
 			END
 			DELETE FROM @current_level
 			INSERT INTO @current_level SELECT Id FROM @next_level
 			DELETE FROM @next_level
-			CLOSE cur 
+			CLOSE timeline_subtree_query_cur 
 		END
-		DEALLOCATE cur
+		DEALLOCATE timeline_subtree_query_cur
 	END
 	SELECT * FROM Timelines WHERE Id IN (SELECT Id FROM @results) ORDER BY Depth 
 END
+GO
