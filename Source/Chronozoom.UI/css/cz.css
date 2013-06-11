@@ -1260,6 +1260,10 @@ img.fallbackBackground {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
+.cz-form-required-field-text {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
 .cz-button {
   margin: 5px 0;
   cursor: pointer;
