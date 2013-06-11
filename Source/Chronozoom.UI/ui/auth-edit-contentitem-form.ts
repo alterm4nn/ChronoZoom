@@ -90,7 +90,11 @@ module CZ {
                     this.attributionInput.val(this.contentItem.attribution || "")
                     this.descriptionInput.val(this.contentItem.description || "");
 
-                    this.closeButton.show();
+                    if (this.prevForm && this.prevForm instanceof FormEditExhibit)
+                        this.closeButton.hide();
+                    else
+                        this.closeButton.show();
+
                     this.saveButton.show();
 
                     // this.closeButton.click() is handled by base
