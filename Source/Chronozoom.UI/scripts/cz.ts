@@ -44,14 +44,14 @@ module CZ {
             "#timeSeriesDataForm": "/ui/timeseries-data-form.html" //12
         };
 
-        enum FeatureActivation {
+        export enum FeatureActivation {
             Enabled,
             Disabled,
             RootCollection,
             NotRootCollection,
         }
 
-        interface FeatureInfo {
+        export interface FeatureInfo {
             Name: string;
             Activation: FeatureActivation;
             JQueryReference: string;
@@ -103,9 +103,7 @@ module CZ {
         ];
 
         function InitializeToursUI(profile, forms) {
-            //var allowEditing = true;
-            // IF THE FOLLOWING LINE IS COMMENTED IN PULL REQUEST IT IS A MISTAKE!
-            var allowEditing = IsFeatureEnabled("Authoring") && (profile && profile != "" && profile.DisplayName === CZ.Service.superCollectionName);
+            var allowEditing = IsFeatureEnabled(_featureMap, "Authoring") && (profile && profile != "" && profile.DisplayName === CZ.Service.superCollectionName);
 
             var onToursInitialized = function () {
                 CZ.Tours.initializeToursUI();
@@ -157,7 +155,7 @@ module CZ {
                 timeSeriesChart = new CZ.UI.LineChart(forms[11]);
 
                 $('#timeSeries_button').click(function () {
-                    var tsForm = getFormById('#timeSeries_button');
+                    var tsForm = getFormById('#timeSeriesDataForm');
                     if (tsForm === false) {
                         closeAllForms();
 
@@ -187,16 +185,16 @@ module CZ {
                     var editForm = getFormById("#header-edit-form");
                     if (editForm === false) {
                         closeAllForms();
-                    var form = new CZ.UI.FormHeaderEdit(forms[0], {
-                        activationSource: $(this),
-                        navButton: ".cz-form-nav",
-                        closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        titleTextblock: ".cz-form-title",
-                        createTimeline: ".cz-form-create-timeline",
-                        createExhibit: ".cz-form-create-exhibit",
-                        createTour: ".cz-form-create-tour"
-                    });
-                    form.show();
+                        var form = new CZ.UI.FormHeaderEdit(forms[0], {
+                            activationSource: $(this),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            createTimeline: ".cz-form-create-timeline",
+                            createExhibit: ".cz-form-create-exhibit",
+                        	createTour: ".cz-form-create-tour"
+                        });
+                        form.show();
                     }
                     else {
                         if (editForm.isFormVisible) {
@@ -246,17 +244,17 @@ module CZ {
                     },
                     showEditTimelineForm: function (timeline) {
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
-                        	activationSource: $(".header-icon.edit-icon"),
-                        	navButton: ".cz-form-nav",
-                        	closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        	titleTextblock: ".cz-form-title",
-                        	startDate: ".cz-form-time-start",
-                        	endDate: ".cz-form-time-end",
-                        	saveButton: ".cz-form-save",
-                        	deleteButton: ".cz-form-delete",
-                        	titleInput: ".cz-form-item-title",
+                            activationSource: $(".header-icon.edit-icon"),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            startDate: ".cz-form-time-start",
+                            endDate: ".cz-form-time-end",
+                            saveButton: ".cz-form-save",
+                            deleteButton: ".cz-form-delete",
+                            titleInput: ".cz-form-item-title",
                             errorMessage: "#error-edit-timeline",
-                        	context: timeline
+                            context: timeline
                         });
                         form.show();
                     },
@@ -293,29 +291,29 @@ module CZ {
                             deleteButton: ".cz-form-delete",
                             contentItemsTemplate: forms[4],
                             context: exhibit
-						});
+                        });
                         form.show();
                     },
                     showEditContentItemForm: function (ci, e, prevForm, noAnimation) {
                         var form = new CZ.UI.FormEditCI(forms[3], {
                             activationSource: $(".header-icon.edit-icon"),
                             prevForm: prevForm,
-                        	navButton: ".cz-form-nav",
-                        	closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        	titleTextblock: ".cz-form-title",
-                        	errorMessage: ".cz-form-errormsg",
-                        	saveButton: ".cz-form-save",
-                        	titleInput: ".cz-form-item-title",
-                        	mediaSourceInput: ".cz-form-item-mediasource",
-                        	mediaInput: ".cz-form-item-mediaurl",
-                        	descriptionInput: ".cz-form-item-descr",
-                       		attributionInput: ".cz-form-item-attribution",
-                        	mediaTypeInput: ".cz-form-item-media-type",
-                        	context: {
-                        	    exhibit: e,
-                        	    contentItem: ci
-                        	}
-                         });
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            errorMessage: ".cz-form-errormsg",
+                            saveButton: ".cz-form-save",
+                            titleInput: ".cz-form-item-title",
+                            mediaSourceInput: ".cz-form-item-mediasource",
+                            mediaInput: ".cz-form-item-mediaurl",
+                            descriptionInput: ".cz-form-item-descr",
+                            attributionInput: ".cz-form-item-attribution",
+                            mediaTypeInput: ".cz-form-item-media-type",
+                            context: {
+                                exhibit: e,
+                                contentItem: ci
+                            }
+                        });
                         form.show(noAnimation);
                     }
                 });
@@ -339,7 +337,7 @@ module CZ {
                     profilePanel: "#profile-panel",
                     loginPanelLogin: "#profile-panel.auth-panel-login",
                     context: "",
-                    allowRedirect: IsFeatureEnabled("Authoring")
+                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring")
                 });
 
                 var loginForm = new CZ.UI.FormLogin(forms[6], {
@@ -354,7 +352,7 @@ module CZ {
                 $("#profile-panel").click(function () {
                     if (!profileForm.isFormVisible) {
                         closeAllForms();
-                    profileForm.show();
+                        profileForm.show();
                     }
                     else {
                         profileForm.close();
@@ -362,7 +360,7 @@ module CZ {
 
                 });
 
-                if (IsFeatureEnabled("Login")) {
+                if (IsFeatureEnabled(_featureMap, "Login")) {
                     CZ.Service.getProfile().done(data => {
                         //Not authorized
                         if (data == "") {
@@ -375,7 +373,7 @@ module CZ {
 
                             if (!profileForm.isFormVisible) {
                                 closeAllForms();
-                            profileForm.show();
+                                profileForm.show();
                             }
                             else {
                                 profileForm.close();
@@ -393,7 +391,7 @@ module CZ {
                 $("#login-panel").click(function () {
                     if (!loginForm.isFormVisible) {
                         closeAllForms();
-                    loginForm.show();
+                        loginForm.show();
                     }
                     else {
                         loginForm.close();
@@ -484,8 +482,8 @@ module CZ {
             $('#biblCloseButton')
                 .mouseout(() => { CZ.Common.toggleOffImage('biblCloseButton', 'png'); })
                 .mouseover(() => { CZ.Common.toggleOnImage('biblCloseButton', 'png'); })
-            
-            
+
+
             $('#welcomeScreenCloseButton')
                 .mouseover(() => { CZ.Common.toggleOnImage('welcomeScreenCloseButton', 'png'); })
                 .mouseout(() => { CZ.Common.toggleOffImage('welcomeScreenCloseButton', 'png'); })
@@ -735,8 +733,8 @@ module CZ {
             }
         });
 
-        function IsFeatureEnabled(featureName) {
-            var feature: FeatureInfo[] = $.grep(_featureMap, function (e) { return e.Name === featureName; });
+        export function IsFeatureEnabled(featureMap: FeatureInfo[], featureName: string) {
+            var feature: FeatureInfo[] = $.grep(featureMap, function (e) { return e.Name === featureName; });
             return feature[0].IsEnabled;
         }
 
@@ -779,8 +777,8 @@ module CZ {
             if (timeSeriesChart !== undefined) {
                 var leftCSS = vp.pointVirtualToScreen(left, 0).x;
                 var rightCSS = vp.pointVirtualToScreen(right, 0).x;
-                var leftPlot = Dates.getDMYFromCoordinate(left).year;
-                var rightPlot = Dates.getDMYFromCoordinate(right).year;
+                var leftPlot = Dates.getYMDFromCoordinate(left).year;
+                var rightPlot = Dates.getYMDFromCoordinate(right).year;
 
 
                 timeSeriesChart.clear(leftCSS, rightCSS);

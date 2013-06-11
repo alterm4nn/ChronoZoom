@@ -15,6 +15,29 @@ using System.Xml.XPath;
 
 namespace Chronozoom.UI
 {
+    public class PageInformation
+    {
+        public PageInformation()
+        {
+            AnalyticsServiceId = ConfigurationManager.AppSettings["AnalyticsServiceId"];
+            ExceptionsServiceId = ConfigurationManager.AppSettings["ExceptionsServiceId"];
+            Images = new List<string>();
+        }
+
+        public string AnalyticsServiceId { get; set; }
+
+        public string ExceptionsServiceId { get; set; }
+
+        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+        public string Title { get; set; }
+
+        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+        public string Description { get; set; }
+
+        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
+        public List<string> Images { get; private set; }
+    }
+
     /// <summary>
     /// Summary description for _default
     /// </summary>
@@ -33,27 +56,13 @@ namespace Chronozoom.UI
             return uri.Scheme + Uri.SchemeDelimiter + uri.Host + ":" + uri.Port;
         });
 
-        private class PageInformation
+        private static Lazy<string> _baseDirectory = new Lazy<string>(() =>
         {
-            public PageInformation()
-            {
-                AnalyticsServiceId = ConfigurationManager.AppSettings["AnalyticsServiceId"];
-                ExceptionsServiceId = ConfigurationManager.AppSettings["ExceptionsServiceId"];
-                Images = new List<string>();
-            }
+            if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["BaseDirectory"]))
+                return ConfigurationManager.AppSettings["BaseDirectory"];
 
-            public string AnalyticsServiceId { get; set; }
-
-            public string ExceptionsServiceId { get; set; }
-
-            [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-            public string Title { get; set; }
-
-            [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-            public string Description { get; set; }
-
-            public List<string> Images { get; private set; }
-        }
+            return AppDomain.CurrentDomain.BaseDirectory;
+        });
 
         public void ProcessRequest(HttpContext context)
         {
@@ -63,10 +72,12 @@ namespace Chronozoom.UI
             context.Response.ContentType = "text/html";
 
             PageInformation pageInformation;
-            if (PageIsDynamic(HttpContext.Current.Request.Url, out pageInformation)) {
+            if (PageIsDynamic(HttpContext.Current.Request.Url, out pageInformation))
+            {
                 context.Response.Write(GenerateDefaultPage(pageInformation));
             }
-            else {
+            else
+            {
                 context.Response.Write(_mainPage.Value);
             }
         }
@@ -115,19 +126,30 @@ namespace Chronozoom.UI
             }
         }
 
-        private static string GenerateDefaultPage(PageInformation pageInformation)
+        internal static string GenerateDefaultPage(PageInformation pageInformation)
         {
-            using (StreamReader streamReader = new StreamReader(AppDomain.CurrentDomain.BaseDirectory + _mainPageName))
+            try
             {
-                XmlReader xmlReader = new XmlTextReader(streamReader);
-                XDocument pageRoot = XDocument.Load(xmlReader);
+                using (StreamReader streamReader = new StreamReader(_baseDirectory.Value + _mainPageName))
+                {
+                    XmlReader xmlReader = new XmlTextReader(streamReader);
+                    XDocument pageRoot = XDocument.Load(xmlReader);
 
-                XNamespace ns = "http://www.w3.org/1999/xhtml";
-                XmlNamespaceManager xmlNamespaceManager = new XmlNamespaceManager(xmlReader.NameTable);
-                xmlNamespaceManager.AddNamespace("xhtml", ns.ToString());
+                    XNamespace ns = "http://www.w3.org/1999/xhtml";
+                    XmlNamespaceManager xmlNamespaceManager = new XmlNamespaceManager(xmlReader.NameTable);
+                    xmlNamespaceManager.AddNamespace("xhtml", ns.ToString());
 
-                ComposePage(pageRoot, xmlNamespaceManager, pageInformation);
-                return pageRoot.ToString();
+                    ComposePage(pageRoot, xmlNamespaceManager, pageInformation);
+                    return pageRoot.ToString();
+                }
+            }
+            catch (Exception e)
+            {
+                if (e is OutOfMemoryException)
+                    throw;
+
+                // Not critical since the generated page only contains additional metadata used in SEO/Embedding
+                return _mainPage.Value;
             }
         }
 
@@ -156,7 +178,7 @@ namespace Chronozoom.UI
         {
             XElement scriptNode = pageRoot.XPathSelectElement("/xhtml:html/xhtml:head/xhtml:script[@id='constants']", xmlNamespaceManager);
             scriptNode.Value = "var constants = { " +
-                "analyticsId: \"" + pageInformation.AnalyticsServiceId + "\", " + 
+                "analyticsId: \"" + pageInformation.AnalyticsServiceId + "\", " +
                 "exceptionsId: \"" + pageInformation.ExceptionsServiceId + "\", " +
                 "environment: \"" + CurrentEnvironment.ToString() + "\" " +
                 "};";
@@ -172,8 +194,13 @@ namespace Chronozoom.UI
                 XElement metaDescription = pageRoot.XPathSelectElement("/xhtml:html/xhtml:head/xhtml:meta[@name='Description']", xmlNamespaceManager);
                 XName contentAttribute = "content";
 
-                metaDescription.SetAttributeValue(contentAttribute,  pageInformation.Description);
+                metaDescription.SetAttributeValue(contentAttribute, pageInformation.Description);
             }
+
+            XElement metaIECompatibile = pageRoot.XPathSelectElement("/xhtml:html/xhtml:head/xhtml:meta[@http-equiv='X-UA-Compatible']", xmlNamespaceManager);
+            XName contentIEAttribute = "content";
+
+            metaIECompatibile.SetAttributeValue(contentIEAttribute, "IE=edge");
 
             XElement lastMetaTag = pageRoot.XPathSelectElement("/xhtml:html/xhtml:head/xhtml:meta[@name='viewport']", xmlNamespaceManager);
             int imageCount = 0;

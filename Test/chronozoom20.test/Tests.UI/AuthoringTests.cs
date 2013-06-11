@@ -111,7 +111,7 @@ namespace Tests
                 Title = "WebdriverExhibitWithContent",
                 ContentItems = new Collection<Chronozoom.Entities.ContentItem> {  contentItemPdf }
             };
-
+            string expectedUrl = string.Format(@"http://docs.google.com/viewer?url={0}&embedded=true",contentItemPdf.Uri);
             ExhibitHelper.AddExhibitWithContentItem(exhibit);
             _newExhibit = ExhibitHelper.GetNewExhibit();
             Assert.AreEqual(exhibit.ContentItems.Count, _newExhibit.ContentItems.Count, "Content items count are not equal");
@@ -119,7 +119,7 @@ namespace Tests
             {
                 Assert.AreEqual(exhibit.ContentItems[i].Title, _newExhibit.ContentItems[i].Title, "Content items titles are not equal");
                 Assert.AreEqual(exhibit.ContentItems[i].MediaType, _newExhibit.ContentItems[i].MediaType, true, "Content items mediaTypes are not equal");
-                Assert.AreEqual(exhibit.ContentItems[i].Uri, _newExhibit.ContentItems[i].Uri, "Content items Uri are not equal");
+                Assert.AreEqual(expectedUrl, _newExhibit.ContentItems[i].Uri, "Content items Uri are not equal");
             }
         }
     }

@@ -92,10 +92,10 @@ module CZ {
                 case "timeline":
                 case "rectangle":
                 case "circle":
-                    return (tp.x <= obj.x &&
-                            tp.y <= obj.y &&
-                            tp.x + tp.width >= obj.x + obj.width &&
-                            tp.y + tp.height >= obj.y + obj.height);
+                    return (tp.x <= obj.x + CZ.Settings.allowedMathImprecision &&
+                            tp.y <= obj.y + CZ.Settings.allowedMathImprecision &&
+                            tp.x + tp.width >= obj.x + obj.width - CZ.Settings.allowedMathImprecision &&
+                            tp.y + tp.height >= obj.y + obj.height - CZ.Settings.allowedMathImprecision);
                 default:
                     return true;
             }
@@ -314,13 +314,32 @@ module CZ {
          * @param  {Object} t Edited timeline, whose title to update.
          */
         function updateTimelineTitle(t) {
-            // NOTE: This code from CanvasTimeline's constructor.
-            var headerSize = CZ.Settings.timelineHeaderSize * t.height;
-            var marginLeft = CZ.Settings.timelineHeaderMargin * t.height;
-            var marginTop = (1 - CZ.Settings.timelineHeaderMargin) * t.height - headerSize;
-            var baseline = t.y + marginTop + headerSize / 2.0;
+            // computing titleBorderBox - margins, width, height of canvas text based on algorithm in layout.ts
+            var canvas: any = document.createElement("canvas");
+            var ctx = canvas.getContext("2d");
+            t.left = t.x;
+            t.right = t.x + t.width;
+            var titleBorderBox = CZ.Layout.GenerateTitleObject(t.height, t, ctx)
 
+            // remove old timeline header
             CZ.VCContent.removeChild(t, t.id + "__header__");
+
+            // add new timeline's header
+            var baseline = t.y + titleBorderBox.marginTop + titleBorderBox.height / 2.0;
+            t.titleObject = CZ.VCContent.addText(t,
+                t.layerid,
+                t.id + "__header__",
+                t.x + titleBorderBox.marginLeft,
+                t.y + titleBorderBox.marginTop,
+                baseline,
+                titleBorderBox.height,
+                t.title, {
+                    fontName: CZ.Settings.timelineHeaderFontName,
+                    fillStyle: CZ.Settings.timelineHeaderFontColor,
+                    textBaseline: 'middle',
+                    opacity: 1
+                },
+                titleBorderBox.width);
 
             //remove edit button to reinitialize it
             if (CZ.Authoring.isEnabled && typeof t.editButton !== "undefined") {
@@ -329,23 +348,6 @@ module CZ {
                 t.editButton.width = t.titleObject.height;
                 t.editButton.height = t.titleObject.height;
             }
-
-            t.titleObject = CZ.VCContent.addText(
-                t,
-                t.layerid,
-                t.id + "__header__",
-                t.x + marginLeft,
-                t.y + marginTop,
-                baseline,
-                headerSize,
-                t.title,
-                {
-                    fontName: CZ.Settings.timelineHeaderFontName,
-                    fillStyle: CZ.Settings.timelineHeaderFontColor,
-                    textBaseline: "middle",
-                    opacity: 1
-                }
-            );
         }
 
         /**

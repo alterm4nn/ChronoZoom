@@ -4,23 +4,17 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using Chronozoom.Api;
-using Chronozoom.Entities;
-using Newtonsoft.Json;
-using OuterCurve;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
+using System.ServiceModel.Activation;
 using System.Web;
 using System.Web.Compilation;
-using System.Web.Hosting;
-using System.Web.Http;
+using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.UI;
-using System.Web.Mvc;
-using System.Text.RegularExpressions;
-using System.Collections.Generic;
-using System.ServiceModel.Activation;
+using Chronozoom.Entities;
+using OuterCurve;
 
 
 namespace Chronozoom.UI
@@ -48,25 +42,47 @@ namespace Chronozoom.UI
             }
         }
 
+        internal class UserAgentConstraint : IRouteConstraint
+        {
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0")]
+            public bool Match(HttpContextBase httpContext, Route route, string parameterName, RouteValueDictionary values, RouteDirection routeDirection)
+            {
+                return httpContext.Request.Browser.Crawler;
+            }
+        }
+
         internal static void RegisterRoutes(RouteCollection routes)
         {
             var routeHandlerDetails = new WebFormRouteHandler<DefaultHttpHandler>(null);
+            var crawlerRouteHandler = new WebFormRouteHandler<Page>("/pages/crawler.aspx");
+
             routes.MapRoute(
                 "Account", // Route name
                 "account/{action}", // URL with parameters
                 new { controller = "Account" } // Parameter defaults
                 );
-            
+
             routes.Add(new ServiceRoute("api", new WebServiceHostFactory(), typeof(ChronozoomSVC)));
 
             routes.Add(new Route("sitemap.xml", new WebFormRouteHandler<Page>("/pages/sitemap.aspx")));
 
-            routes.Add(new Route("{supercollection}", routeHandlerDetails));
-            routes.Add(new Route("{supercollection}/{collection}", routeHandlerDetails));
-            routes.Add(new Route("{supercollection}/{collection}/{reference}", routeHandlerDetails));
-            routes.Add(new Route("{supercollection}/{collection}/{timelineTitle}/{reference}", routeHandlerDetails));
-            routes.Add(new Route("{supercollection}/{collection}/{timelineTitle}/{exhibitTitle}/{reference}", routeHandlerDetails));
-            routes.Add(new Route("{supercollection}/{collection}/{timelineTitle}/{exhibitTitle}/{contentItemTitle}/{reference}", routeHandlerDetails));
+            RouteValueDictionary crawlerConstraint = new RouteValueDictionary()
+            {
+                { "crawler", new UserAgentConstraint() }
+            };
+
+            AddFriendlyUrlRoutes(routes, crawlerRouteHandler, crawlerConstraint);
+            AddFriendlyUrlRoutes(routes, routeHandlerDetails, null);
+        }
+
+        private static void AddFriendlyUrlRoutes(RouteCollection routes, IRouteHandler routeHandlerDetails, RouteValueDictionary constraint)
+        {
+            routes.Add(new Route("{supercollection}", null, constraint, routeHandlerDetails));
+            routes.Add(new Route("{supercollection}/{collection}", null, constraint, routeHandlerDetails));
+            routes.Add(new Route("{supercollection}/{collection}/{reference}", null, constraint, routeHandlerDetails));
+            routes.Add(new Route("{supercollection}/{collection}/{timelineTitle}/{reference}", null, constraint, routeHandlerDetails));
+            routes.Add(new Route("{supercollection}/{collection}/{timelineTitle}/{exhibitTitle}/{reference}", null, constraint, routeHandlerDetails));
+            routes.Add(new Route("{supercollection}/{collection}/{timelineTitle}/{exhibitTitle}/{contentItemTitle}/{reference}", null, constraint, routeHandlerDetails));
         }
 
         public void Application_Start(object sender, EventArgs e)
@@ -96,13 +112,20 @@ namespace Chronozoom.UI
 
             if (app.Context.Request.Url.LocalPath == "/")
             {
-                if (BrowserIsSupported())
+                if (Request.Browser.Crawler)
                 {
-                    app.Context.RewritePath(string.Concat(app.Context.Request.Url.LocalPath, "default.ashx"));
+                    app.Context.RewritePath(string.Concat(app.Context.Request.Url.LocalPath, "/pages/crawler.aspx"));
                 }
                 else
                 {
-                    app.Context.RewritePath(string.Concat(app.Context.Request.Url.LocalPath, "fallback.html"));
+                    if (BrowserIsSupported())
+                    {
+                        app.Context.RewritePath(string.Concat(app.Context.Request.Url.LocalPath, "default.ashx"));
+                    }
+                    else
+                    {
+                        app.Context.RewritePath(string.Concat(app.Context.Request.Url.LocalPath, "fallback.html"));
+                    }
                 }
             }
         }

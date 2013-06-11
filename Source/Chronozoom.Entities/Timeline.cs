@@ -27,11 +27,16 @@ namespace Chronozoom.Entities
         [Key]
         [DataMember(Name = "id")]
         public Guid Id { get; set; }
-        
+
         /// <summary>
         /// The depth of the timeline in the timeline tree
         /// </summary>
         public int Depth { get; set; }
+
+        /// <summary>
+        /// The number of content items contained in subtree under current timeline
+        /// </summary>
+        public int SubtreeSize { get; set; }
 
         /// <summary>
         /// The title of the timeline.
@@ -68,9 +73,25 @@ namespace Chronozoom.Entities
 
         /// <summary>
         /// The height of the timeline.
+
         /// </summary>
         [DataMember]
         public decimal? Height { get; set; }
+
+        /// <summary>
+        /// The number of timelines within subtree of this timeline
+        /// </summary>
+        public Guid FirstNodeInSubtree { get; set; }
+
+        /// <summary>
+        /// Reference to predecessor (when traversed in post-order) 
+        /// </summary>
+        public Guid Predecessor { get; set; }
+
+        /// <summary>
+        /// Reference to sucessor (when traversed in post-order) 
+        /// </summary>
+        public Guid Successor { get; set; }
 
         /// <summary>
         /// The collection of child timelines belonging to the timeline.
@@ -93,6 +114,24 @@ namespace Chronozoom.Entities
     [NotMapped]
     public class TimelineRaw : Timeline
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "t")]
+        public TimelineRaw() { }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "t")]
+        public TimelineRaw(Timeline t)
+        {
+            Id = t.Id;
+            Depth = t.Depth;
+            SubtreeSize = t.SubtreeSize;
+            Title = t.Title;
+            Regime = t.Regime;
+            FromYear = t.FromYear;
+            ToYear = t.ToYear;
+            ForkNode = t.ForkNode;
+            Height = t.Height;
+            FirstNodeInSubtree = t.FirstNodeInSubtree;
+            Predecessor = t.Predecessor;
+            Successor = t.Successor;
+        }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "Needs to match storage column name")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "ID", Justification = "Needs to match storage column name")]
         [DataMember(Name = "ParentTimelineId", EmitDefaultValue = false)]

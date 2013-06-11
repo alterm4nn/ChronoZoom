@@ -8,7 +8,7 @@
 /// <reference path="../Js/cz.settings.js" />
 /// <reference path="../Js/settings.js" />
 /// <reference path="../Js/authoring.js" />
-/// <reference path="../Js/czservice.js" />
+/// <reference path="../Js/service.js" />
 /// <reference path="js-ignore.js" />
 
 describe("CZ.Authoring", function () {
@@ -147,7 +147,7 @@ describe("CZ.Authoring", function () {
         });
     });
     
-    describe("Exhibit are", function () {
+    xdescribe("Exhibit are", function () {
         var exhibitParentTimeline = {};
         exhibitParentTimeline.guid = "00000000-0000-0000-0000-000000000000";
         exhibitParentTimeline.id = "t55";
