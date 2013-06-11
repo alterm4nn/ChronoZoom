@@ -342,6 +342,7 @@ var CZ;
                 bboxHeight: height + 2 * margin
             };
         }
+        Layout.GenerateTitleObject = GenerateTitleObject;
         function Convert(parent, timeline) {
             var tlColor = GetTimelineColor(timeline);
             var t1 = CZ.VCContent.addTimeline(parent, "layerTimelines", 't' + timeline.id, {
