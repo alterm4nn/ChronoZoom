@@ -6401,10 +6401,6 @@ var CZ;
             var point = CZ.Common.getXBrowserMouseOrigin(container, e);
             var k = (_range.max - _range.min) / _width;
             var time = _range.max - k * (_width - point.x);
-            var test1 = CZ.Dates.getCoordinateFromYMD(1, 0, 1);
-            var test2 = CZ.Dates.getYMDFromCoordinate(test1);
-            var test3 = CZ.Dates.convertCoordinateToYear(test1);
-            console.log(test1, test2, test3);
             if(time <= _range.min + CZ.Settings.panelWidth * k) {
                 marker.css("display", "none");
                 LeftPanInput();
