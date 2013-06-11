@@ -57,7 +57,7 @@ var CZ;
                 case "timeline":
                 case "rectangle":
                 case "circle":
-                    return (tp.x <= obj.x && tp.y <= obj.y && tp.x + tp.width >= obj.x + obj.width && tp.y + tp.height >= obj.y + obj.height);
+                    return (tp.x <= obj.x + CZ.Settings.allowedMathImprecision && tp.y <= obj.y + CZ.Settings.allowedMathImprecision && tp.x + tp.width >= obj.x + obj.width - CZ.Settings.allowedMathImprecision && tp.y + tp.height >= obj.y + obj.height - CZ.Settings.allowedMathImprecision);
                 default:
                     return true;
             }
@@ -167,23 +167,25 @@ var CZ;
             });
         }
         function updateTimelineTitle(t) {
-            var headerSize = CZ.Settings.timelineHeaderSize * t.height;
-            var marginLeft = CZ.Settings.timelineHeaderMargin * t.height;
-            var marginTop = (1 - CZ.Settings.timelineHeaderMargin) * t.height - headerSize;
-            var baseline = t.y + marginTop + headerSize / 2.0;
+            var canvas = document.createElement("canvas");
+            var ctx = canvas.getContext("2d");
+            t.left = t.x;
+            t.right = t.x + t.width;
+            var titleBorderBox = CZ.Layout.GenerateTitleObject(t.height, t, ctx);
             CZ.VCContent.removeChild(t, t.id + "__header__");
+            var baseline = t.y + titleBorderBox.marginTop + titleBorderBox.height / 2.0;
+            t.titleObject = CZ.VCContent.addText(t, t.layerid, t.id + "__header__", t.x + titleBorderBox.marginLeft, t.y + titleBorderBox.marginTop, baseline, titleBorderBox.height, t.title, {
+                fontName: CZ.Settings.timelineHeaderFontName,
+                fillStyle: CZ.Settings.timelineHeaderFontColor,
+                textBaseline: 'middle',
+                opacity: 1
+            }, titleBorderBox.width);
             if(CZ.Authoring.isEnabled && typeof t.editButton !== "undefined") {
                 t.editButton.x = t.x + t.width - 1.15 * t.titleObject.height;
                 t.editButton.y = t.titleObject.y;
                 t.editButton.width = t.titleObject.height;
                 t.editButton.height = t.titleObject.height;
             }
-            t.titleObject = CZ.VCContent.addText(t, t.layerid, t.id + "__header__", t.x + marginLeft, t.y + marginTop, baseline, headerSize, t.title, {
-                fontName: CZ.Settings.timelineHeaderFontName,
-                fillStyle: CZ.Settings.timelineHeaderFontColor,
-                textBaseline: "middle",
-                opacity: 1
-            });
         }
         Authoring.modeMouseHandlers = {
             createTimeline: {

@@ -389,7 +389,7 @@ module CZ {
             return (timeline.right - timeline.left) / 20.0;
         }
 
-        function GenerateTitleObject(tlHeight, timeline, measureContext) {
+        export function GenerateTitleObject(tlHeight, timeline, measureContext) {
             var tlW = timeline.right - timeline.left;
 
             measureContext.font = "100pt " + CZ.Settings.timelineHeaderFontName;
