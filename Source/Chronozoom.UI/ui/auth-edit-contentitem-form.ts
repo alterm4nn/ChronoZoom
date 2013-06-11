@@ -172,6 +172,9 @@ module CZ {
                         this.exhibit.contentItems.pop();
                     }
                 }
+                if (this.prevForm && this.prevForm instanceof FormEditExhibit) {
+                    this.prevForm.show(true);
+                }
                 this.activationSource.removeClass("active");
                 CZ.Authoring.isActive = false;
             }
