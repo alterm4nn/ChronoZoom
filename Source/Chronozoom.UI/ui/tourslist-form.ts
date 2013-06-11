@@ -26,6 +26,7 @@ module CZ {
 
                 this.takeTour = formInfo.takeTour;
                 this.editTour = formInfo.editTour;
+                var tours = formInfo.tours.sort((a, b) => a.sequenceNum - b.sequenceNum);
                 this.toursListBox = new CZ.UI.TourListBox(container.find("#tours"), formInfo.tourTemplate, formInfo.tours,
                     tour => {
                         this.onTakeTour(tour);

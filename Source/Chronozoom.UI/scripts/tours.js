@@ -23,7 +23,6 @@ var CZ;
                 this.duration = undefined;
                 this.number = 0;
                 this.elapsed = 0;
-                this.description = "";
                 if(this.text === null) {
                     this.text = "";
                 }
@@ -48,7 +47,7 @@ var CZ;
         }
         Tours.bookmarkUrlToElement = bookmarkUrlToElement;
         var Tour = (function () {
-            function Tour(id, title, bookmarks, zoomTo, vc, category, audio, sequenceNum) {
+            function Tour(id, title, bookmarks, zoomTo, vc, category, audio, sequenceNum, description) {
                 this.id = id;
                 this.title = title;
                 this.bookmarks = bookmarks;
@@ -57,6 +56,7 @@ var CZ;
                 this.category = category;
                 this.audio = audio;
                 this.sequenceNum = sequenceNum;
+                this.description = description;
                 this.tour_BookmarkStarted = [];
                 this.tour_BookmarkFinished = [];
                 this.tour_TourStarted = [];
@@ -692,7 +692,8 @@ var CZ;
                 if(!areBookmarksValid) {
                     continue;
                 }
-                Tours.tours.push(new Tour(tourString.id, tourString.name, tourBookmarks, bookmarkTransition, CZ.Common.vc, tourString.category, tourString.audio, tourString.sequence));
+                var tour = new Tour(tourString.id, tourString.name, tourBookmarks, bookmarkTransition, CZ.Common.vc, tourString.category, tourString.audio, tourString.sequence, tourString.description);
+                Tours.tours.push(tour);
             }
             $("body").trigger("toursInitialized");
         }

@@ -89,6 +89,20 @@ var CZ;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(TourStop.prototype, "ThumbnailUrl", {
+                get: function () {
+                    if(this.targetElement) {
+                        if(this.targetElement.type === "contentItem") {
+                            var type = this.targetElement.contentItem.mediaType.toLowerCase();
+                            var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x64/' + this.targetElement.contentItem.guid + '.png';
+                            return thumbnailUri;
+                        }
+                    }
+                    return "/images/Temp-Thumbnail2.png";
+                },
+                enumerable: true,
+                configurable: true
+            });
             return TourStop;
         })();
         UI.TourStop = TourStop;        
@@ -175,10 +189,18 @@ var CZ;
                 } else {
                     this.tourTitleInput.val("");
                 }
-                this.tourStopsListBox = new CZ.UI.TourStopListBox(container.find(formInfo.tourStopsListBox), formInfo.tourStopsTemplate, stops, function (event, ui) {
+                this.tourStopsListBox = new CZ.UI.TourStopListBox(container.find(formInfo.tourStopsListBox), formInfo.tourStopsTemplate, stops);
+                this.tourStopsListBox.itemMove(function (item, startPos, endPos) {
                     return self.onStopsReordered.apply(self, [
-                        event, 
-                        ui
+                        item, 
+                        startPos, 
+                        endPos
+                    ]);
+                });
+                this.tourStopsListBox.itemRemove(function (item, index) {
+                    return self.onStopRemoved.apply(self, [
+                        item, 
+                        index
                     ]);
                 });
                 this.initialize();
@@ -191,16 +213,14 @@ var CZ;
                     };
                 }
                 var stop = new TourStop(bookmark.id, target, bookmark.number + 1, (!bookmark.caption || $.trim(bookmark.caption) === "") ? undefined : bookmark.caption);
-                stop.Description = bookmark.description;
+                stop.Description = bookmark.text;
                 stop.LapseTime = bookmark.lapseTime;
                 return stop;
             };
             FormEditTour.tourstopToBookmark = function tourstopToBookmark(tourstop) {
                 var url = CZ.UrlNav.vcelementToNavString(tourstop.Target);
                 var title = tourstop.Title;
-                var text = "";
-                var bookmark = new CZ.Tours.TourBookmark(tourstop.bookmarkId, url, title, tourstop.LapseTime, text);
-                bookmark.description = tourstop.Description;
+                var bookmark = new CZ.Tours.TourBookmark(tourstop.bookmarkId, url, title, tourstop.LapseTime, tourstop.Description);
                 return bookmark;
             };
             FormEditTour.prototype.deleteTourAsync = function () {
@@ -223,7 +243,7 @@ var CZ;
                         var bookmark = FormEditTour.tourstopToBookmark(tourstop);
                         tourBookmarks.push(bookmark);
                     }
-                    var tour = new CZ.Tours.Tour(q.TourId, name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, "", CZ.Tours.tours.length);
+                    var tour = new CZ.Tours.Tour(q.TourId, name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, "", CZ.Tours.tours.length, descr);
                     deferred.resolve(tour);
                 }).fail(function (q) {
                     deferred.reject(q);
@@ -231,11 +251,87 @@ var CZ;
                 return deferred.promise();
             };
             FormEditTour.prototype.updateTourAsync = function () {
+                var _this = this;
                 if(!this.tour) {
                     throw "Tour is undefined";
                 }
                 var deferred = $.Deferred();
                 var self = this;
+                var stops = this.getStops();
+                var name = this.tourTitleInput.val();
+                var descr = this.tourDescriptionInput.val();
+                var category = this.tour.category;
+                var n = this.tour.bookmarks.length;
+                var m = stops.length;
+                var deletedStops = [];
+                for(var j = 0; j < n; j++) {
+                    var bookmark = this.tour.bookmarks[j];
+                    var found = false;
+                    for(var k = 0; k < m; k++) {
+                        if(stops[k].bookmarkId === bookmark.id) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if(!found) {
+                        deletedStops.push(bookmark);
+                    }
+                }
+                var reqDel;
+                if(deletedStops.length > 0) {
+                    reqDel = CZ.Service.deleteBookmarks(this.tour.id, deletedStops);
+                } else {
+                    reqDel = $.Deferred();
+                    reqDel.resolve([]);
+                }
+                reqDel.fail(function (q) {
+                    deferred.reject(q);
+                });
+                reqDel.done(function (q) {
+                    var n = stops.length;
+                    var addedStops = new Array();
+                    for(var j = 0; j < n; j++) {
+                        var tourstop = stops[j];
+                        if(!tourstop.bookmarkId || tourstop.bookmarkId == "00000000-0000-0000-0000-000000000000") {
+                            addedStops.push(tourstop);
+                        }
+                    }
+                    var reqAdd;
+                    if(addedStops.length > 0) {
+                        reqAdd = CZ.Service.putBookmarks(new CZ.UI.Tour(_this.tour.id, name, descr, category, n, addedStops));
+                    } else {
+                        reqAdd = $.Deferred();
+                        reqAdd.resolve([]);
+                    }
+                    reqAdd.fail(function (q) {
+                        deferred.reject(q);
+                    });
+                    reqAdd.done(function (q) {
+                        var m = addedStops.length;
+                        for(var j = 0; j < m; j++) {
+                            var tourstop = addedStops[j];
+                            tourstop.bookmarkId = q.BookmarkId[j];
+                        }
+                        var request = CZ.Service.putTour(new CZ.UI.Tour(_this.tour.id, name, descr, category, n, stops));
+                        request.done(function (q) {
+                            var n = stops.length;
+                            var tourBookmarks = new Array();
+                            for(var j = 0; j < n; j++) {
+                                var tourstop = stops[j];
+                                tourstop.bookmarkId = q.BookmarkId[j];
+                                var bookmark = FormEditTour.tourstopToBookmark(tourstop);
+                                tourBookmarks.push(bookmark);
+                            }
+                            var tour = new CZ.Tours.Tour(q.TourId, name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, "", CZ.Tours.tours.length, descr);
+                            deferred.resolve(tour);
+                        }).fail(function (q) {
+                            deferred.reject(q);
+                        });
+                    }).fail(function (q) {
+                        deferred.reject(q);
+                    });
+                    ;
+                });
                 return deferred.promise();
             };
             FormEditTour.prototype.initializeAsEdit = function () {
@@ -367,6 +463,12 @@ var CZ;
                 this.tourDescriptionInput.val("");
             };
             FormEditTour.prototype.onStopsReordered = function () {
+                this.updateSequence();
+            };
+            FormEditTour.prototype.onStopRemoved = function () {
+                this.updateSequence();
+            };
+            FormEditTour.prototype.updateSequence = function () {
                 var stops = this.getStops();
                 var n = stops.length;
                 var lapseTime = 0;

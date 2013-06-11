@@ -20,7 +20,7 @@ module CZ {
 
             export function tour(t : CZ.UI.Tour) : any
             {
-                var bookmarks: CZ.UI.TourStop[] = new Array(t.Stops.length);
+                var bookmarks = new Array(t.Stops.length);
                 for (var i = 0, n = t.Stops.length; i < n; i++)
                 {
                     bookmarks[i] = bookmark(t.Stops[i]);
@@ -29,6 +29,7 @@ module CZ {
                 return {
                     id: t.Id,
                     name: t.Title,
+                    description: t.Description,
                     audio: "",
                     category: t.Category,
                     sequence: t.Sequence,
@@ -431,7 +432,7 @@ module CZ {
             var request = new Request(_serviceUrl);
             request.addToPath(superCollectionName);
             request.addToPath(collectionName);
-            request.addToPath("tour");
+            request.addToPath("bookmark");
 
             console.log("[PUT] " + request.url);
 

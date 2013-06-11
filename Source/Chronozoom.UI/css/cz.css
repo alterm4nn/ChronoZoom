@@ -136,21 +136,17 @@
 }
 .cz-datepicker-regime {
   margin-left: 10px;
-  height: 31px;
 }
 .cz-datepicker-year-year {
   width: 80px;
-  height: 31px;
 }
 .cz-datepicker-year-date {
   width: 50px;
-  height: 31px;
 }
 .cz-datepicker-day-selector {
   max-height: 200px;
   margin-left: 10px;
   margin-right: 10px;
-  height: 31px;
 }
 .cz-datepicker-errormsg {
   color: #dd4b39;

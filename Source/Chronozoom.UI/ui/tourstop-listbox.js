@@ -8,7 +8,7 @@ var CZ;
     (function (UI) {
         var TourStopListBox = (function (_super) {
             __extends(TourStopListBox, _super);
-            function TourStopListBox(container, listItemContainer, contentItems, onStopsReordered) {
+            function TourStopListBox(container, listItemContainer, contentItems) {
                 var listBoxInfo = {
                     context: contentItems,
                     sortableSettings: {
@@ -21,9 +21,6 @@ var CZ;
                         scroll: false,
                         start: function (event, ui) {
                             ui.placeholder.height(ui.item.height());
-                        },
-                        stop: function (event, ui) {
-                            onStopsReordered(event, ui);
                         }
                     }
                 };
@@ -53,10 +50,11 @@ var CZ;
                 this.typeTextblock = this.container.find(uiMap.typeTextblock);
                 var self = this;
                 var descr = this.container.find(".cz-tourstop-description");
+                descr.text(self.data.Description);
                 descr.change(function (ev) {
-                    self.data.Desription = self.Description;
+                    self.data.Description = self.Description;
                 });
-                this.iconImg.attr("src", this.data.Icon || "/images/Temp-Thumbnail2.png");
+                this.iconImg.attr("src", this.data.ThumbnailUrl || "/images/Temp-Thumbnail2.png");
                 this.titleTextblock.text(this.data.Title);
                 this.typeTextblock.text(this.data.Type);
                 this.Activate();

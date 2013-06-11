@@ -21,6 +21,7 @@ var CZ;
                 return {
                     id: t.Id,
                     name: t.Title,
+                    description: t.Description,
                     audio: "",
                     category: t.Category,
                     sequence: t.Sequence,
@@ -354,7 +355,7 @@ var CZ;
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
-            request.addToPath("tour");
+            request.addToPath("bookmark");
             console.log("[PUT] " + request.url);
             return $.ajax({
                 type: "PUT",

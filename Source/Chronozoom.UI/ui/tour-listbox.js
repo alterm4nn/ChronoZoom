@@ -55,8 +55,15 @@ var CZ;
                         _super.call(this, parent, container, uiMap, context);
                 this.iconImg = this.container.find(uiMap.iconImg);
                 this.titleTextblock = this.container.find(uiMap.titleTextblock);
+                this.titleTextblock = this.container.find(uiMap.titleTextblock);
+                this.descrTextblock = this.container.find(".cz-contentitem-listitem-descr");
                 this.iconImg.attr("src", this.data.icon || "/images/Temp-Thumbnail2.png");
                 this.titleTextblock.text(this.data.title);
+                if(this.data.description) {
+                    this.descrTextblock.text(this.data.description);
+                } else {
+                    this.descrTextblock.hide();
+                }
                 this.container.find("#takeTour").click(function (e) {
                     parent.TakeTour(context);
                 });
