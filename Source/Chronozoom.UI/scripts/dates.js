@@ -123,13 +123,6 @@ var CZ;
             } else {
                 year.year = Math.floor(year.year);
             }
-            if(year.regime === 'BCE') {
-                year.year += 2;
-            }
-            if((year.regime === 'CE') && (year.year === 0)) {
-                year.regime = 'BCE';
-                year.year = 1;
-            }
             return year;
         }
         Dates.convertCoordinateToYear = convertCoordinateToYear;
@@ -147,7 +140,6 @@ var CZ;
                     break;
                 case "bce":
                     coordinate *= -1;
-                    coordinate += 1;
                     break;
             }
             return coordinate;
