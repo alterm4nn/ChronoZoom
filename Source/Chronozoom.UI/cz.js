@@ -9922,7 +9922,11 @@ var CZ;
                     this.mediaTypeInput.val(this.contentItem.mediaType || "");
                     this.attributionInput.val(this.contentItem.attribution || "");
                     this.descriptionInput.val(this.contentItem.description || "");
-                    this.closeButton.show();
+                    if(this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
+                        this.closeButton.hide();
+                    } else {
+                        this.closeButton.show();
+                    }
                     this.saveButton.show();
                     this.saveButton.off();
                     this.saveButton.click(function () {
