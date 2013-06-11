@@ -11,18 +11,25 @@
   clear: both;
 }
 .cz-datepicker-regime {
+  height: 30px;
   margin-left: 10px;
 }
 .cz-datepicker-year-year {
+  height: 30px;
   width: 80px;
 }
 .cz-datepicker-year-date {
+  height: 30px;
   width: 50px;
 }
 .cz-datepicker-day-selector {
+  height: 30px;
   max-height: 200px;
   margin-left: 10px;
   margin-right: 10px;
+}
+.cz-datepicker-month-selector {
+  height: 30px;
 }
 .cz-datepicker-errormsg {
   color: #dd4b39;
