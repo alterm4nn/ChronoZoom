@@ -9,22 +9,10 @@ using System.Runtime.Serialization.Json;
 using System.Text.RegularExpressions;
 using System.Text;
 
+using Chronozoom.Entities;
+
 namespace WebServiceApiTest
 {
-    [DataContract]
-    public class TimelineQueryResult
-    {
-        [DataMember]
-        public List<Chronozoom.Entities.Timeline> d;
-    }
-
-    [DataContract]
-    public class ThesholdsQueryResult
-    {
-        [DataMember]
-        public List<Chronozoom.Entities.Threshold> d;
-    }
-
     [DataContract]
     public class ToursQueryResult
     {
@@ -42,47 +30,45 @@ namespace WebServiceApiTest
     [TestClass]
     public class WebServiceApiTest
     {
-        static string endpointLocator = "http://{0}/chronozoom.svc/{1}";
-        static string endpointSearch = "http://{0}/chronozoom.svc/search?searchTerm={1}";
+        static string endpointLocator = "http://{0}/api/{1}";
+        static string endpointSearch = "http://{0}/api/search?searchTerm={1}";
 
         static string serviceUrl = "test.chronozoomproject.org";
 
-        static string verbDefault = "get";
-        static string verbThresholds = "getThresholds";
-        static string verbTours = "getTours";
+        static string verbTimelines = "getTimelines";
+        static string verbTours = "tours";
 
         [TestMethod]
         public void TestFirstTimelineRequest()
         {
-            string endPoint = String.Format(endpointLocator, serviceUrl, verbDefault);
+            string endPoint = String.Format(endpointLocator, serviceUrl, verbTimelines);
             HttpWebRequest request = CreateRequest(endPoint);
 
             WebResponse response = request.GetResponse();
             Stream responseStream = response.GetResponseStream();
 
-            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineQueryResult));
-            TimelineQueryResult timelines = (TimelineQueryResult)serializer.ReadObject(responseStream);
+            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineRaw));
+            TimelineRaw timelines = (TimelineRaw)serializer.ReadObject(responseStream);
 
-            Assert.AreNotEqual<int>(0, timelines.d.Count, "No timelines returned");
-
-            Assert.AreEqual<int>(1, timelines.d.Count, "Expecting one root timeline");
+            Assert.IsNotNull(timelines, "No timelines returned");
         }
 
         [TestMethod]
         public void TestTimelineUniqueId()
         {
-            string endPoint = String.Format(endpointLocator, serviceUrl, verbDefault);
+            string endPoint = String.Format(endpointLocator, serviceUrl, verbTimelines);
             HttpWebRequest request = CreateRequest(endPoint);
 
             WebResponse response = request.GetResponse();
             Stream responseStream = response.GetResponseStream();
 
-            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineQueryResult));
-            TimelineQueryResult timelines = (TimelineQueryResult)serializer.ReadObject(responseStream);
+            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineRaw));
+            TimelineRaw timelines = (TimelineRaw)serializer.ReadObject(responseStream);
 
-            foreach (Chronozoom.Entities.Timeline timeline in timelines.d)
+            foreach (Timeline timeline in timelines.ChildTimelines)
             {
-                Assert.AreNotEqual<int>(0, timeline.UniqueId, "Timeline ID should not be 0");
+                Assert.IsNotNull(timeline.Id, "Timeline ID should not be null");
+                Assert.AreNotEqual<Guid>(Guid.Empty, timeline.Id, "Timeline ID should not be empty");
             }
         }
 
@@ -94,13 +80,14 @@ namespace WebServiceApiTest
             WebResponse response = request.GetResponse();
             Stream responseStream = response.GetResponseStream();
 
-            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineQueryResult));
-            TimelineQueryResult timelines = (TimelineQueryResult)serializer.ReadObject(responseStream);
+            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineRaw));
+            TimelineRaw timelines = (TimelineRaw)serializer.ReadObject(responseStream);
 
-            Assert.AreNotEqual<int>(0, timelines.d.Count, "No timelines returned");
+            Assert.IsNotNull(timelines, "No timelines returned");
         }
 
         [TestMethod]
+        [ExpectedException(typeof(WebException))]
         public void TestFilterMalformedStartDate()
         {
             HttpWebRequest request = CreateGetRequest(null, null, "1000ASDF");
@@ -108,8 +95,8 @@ namespace WebServiceApiTest
             WebResponse response = request.GetResponse();
             Stream responseStream = response.GetResponseStream();
 
-            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineQueryResult));
-            TimelineQueryResult timelines = (TimelineQueryResult)serializer.ReadObject(responseStream);
+            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineRaw));
+            TimelineRaw timelines = (TimelineRaw)serializer.ReadObject(responseStream);
         }
 
         [TestMethod]
@@ -120,13 +107,14 @@ namespace WebServiceApiTest
             WebResponse response = request.GetResponse();
             Stream responseStream = response.GetResponseStream();
 
-            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineQueryResult));
-            TimelineQueryResult timelines = (TimelineQueryResult)serializer.ReadObject(responseStream);
+            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineRaw));
+            TimelineRaw timelines = (TimelineRaw)serializer.ReadObject(responseStream);
 
-            Assert.AreNotEqual<int>(0, timelines.d.Count, "No timelines returned");
+            Assert.IsNotNull(timelines, "No timelines returned");
         }
 
         [TestMethod]
+        [ExpectedException(typeof(WebException))]
         public void TestFilterMalformedEndDate()
         {
             HttpWebRequest request = CreateGetRequest(null, null, null, "1000ASDF");
@@ -134,8 +122,8 @@ namespace WebServiceApiTest
             WebResponse response = request.GetResponse();
             Stream responseStream = response.GetResponseStream();
 
-            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineQueryResult));
-            TimelineQueryResult timelines = (TimelineQueryResult)serializer.ReadObject(responseStream);
+            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineRaw));
+            TimelineRaw timelines = (TimelineRaw)serializer.ReadObject(responseStream);
         }
 
         [TestMethod]
@@ -146,10 +134,10 @@ namespace WebServiceApiTest
             WebResponse response = request.GetResponse();
             Stream responseStream = response.GetResponseStream();
 
-            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineQueryResult));
-            TimelineQueryResult timelines = (TimelineQueryResult)serializer.ReadObject(responseStream);
+            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineRaw));
+            TimelineRaw timelines = (TimelineRaw)serializer.ReadObject(responseStream);
 
-            Assert.AreNotEqual<int>(0, timelines.d.Count, "No timelines returned");
+            Assert.IsNotNull(timelines, "No timelines returned");
         }
 
         [TestMethod]
@@ -160,48 +148,33 @@ namespace WebServiceApiTest
             WebResponse response = request.GetResponse();
             Stream responseStream = response.GetResponseStream();
 
-            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineQueryResult));
-            TimelineQueryResult timelines = (TimelineQueryResult)serializer.ReadObject(responseStream);
+            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineRaw));
+            TimelineRaw timelines = (TimelineRaw)serializer.ReadObject(responseStream);
         }
 
-        [TestMethod]
-        public void TestContentItemReferences()
-        {
-            string endPoint = String.Format(endpointLocator, serviceUrl, verbDefault);
-            HttpWebRequest request = CreateRequest(endPoint);
+        //[TestMethod]
+        //public void TestContentItemReferences()
+        //{
+        //    string endPoint = String.Format(endpointLocator, serviceUrl, verbDefault);
+        //    HttpWebRequest request = CreateRequest(endPoint);
 
-            WebResponse response = request.GetResponse();
-            Stream responseStream = response.GetResponseStream();
+        //    WebResponse response = request.GetResponse();
+        //    Stream responseStream = response.GetResponseStream();
 
-            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineQueryResult));
-            TimelineQueryResult timelines = (TimelineQueryResult)serializer.ReadObject(responseStream);
+        //    DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineRaw));
+        //    TimelineRaw timelines = (TimelineRaw)serializer.ReadObject(responseStream);
 
-            foreach (Chronozoom.Entities.Timeline timeline in timelines.d)
-            {
-                foreach (Chronozoom.Entities.Exhibit exhibit in timeline.Exhibits)
-                {
-                    if (exhibit.UniqueId == 118)
-                    {
-                        Assert.AreNotEqual<int>(0, exhibit.References.Count, "Expecting references");
-                    }
-                }
-            }
-        }
-
-        [TestMethod]
-        public void TestThresholdsRequest()
-        {
-            string endPoint = String.Format(endpointLocator, serviceUrl, verbThresholds);
-            HttpWebRequest request = CreateRequest(endPoint);
-
-            WebResponse response = request.GetResponse();
-            Stream responseStream = response.GetResponseStream();
-
-            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(ThesholdsQueryResult));
-            ThesholdsQueryResult thresholds = (ThesholdsQueryResult)serializer.ReadObject(responseStream);
-
-            Assert.AreEqual<int>(8, thresholds.d.Count, "Expected 8 thresholds");
-        }
+        //    foreach (Chronozoom.Entities.Timeline timeline in timelines.d)
+        //    {
+        //        foreach (Chronozoom.Entities.Exhibit exhibit in timeline.Exhibits)
+        //        {
+        //            if (exhibit.UniqueId == 118)
+        //            {
+        //                Assert.AreNotEqual<int>(0, exhibit.References.Count, "Expecting references");
+        //            }
+        //        }
+        //    }
+        //}
 
         [TestMethod]
         public void TestToursRequest()
@@ -287,7 +260,7 @@ namespace WebServiceApiTest
                                       "timespan"
                                   };
 
-            StringBuilder sb = new StringBuilder(verbDefault);
+            StringBuilder sb = new StringBuilder(verbTimelines);
 
             bool firstParam = true;
 

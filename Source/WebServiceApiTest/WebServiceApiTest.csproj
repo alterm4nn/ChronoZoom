@@ -35,6 +35,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Chronozoom.Entities, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Chronozoom.Entities\bin\Chronozoom.Entities.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.XML" />
@@ -55,12 +59,6 @@
     <Compile Include="AuthoringApiTest.cs" />
     <Compile Include="WebServiceApiTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Chronozoom.Entities\Chronozoom.Entities.csproj">
-      <Project>{b995d3cf-e31f-4986-a7f7-77988ea275d3}</Project>
-      <Name>Chronozoom.Entities</Name>
-    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
