@@ -24,7 +24,7 @@
 module CZ {
     export var timeSeriesChart: CZ.UI.LineChart;
     export var leftDataSet: CZ.Data.DataSet;
-    export var rightDataSet: CZ.Data.DataSet; 
+    export var rightDataSet: CZ.Data.DataSet;
 
     export module HomePageViewModel {
         // Contains mapping: CSS selector -> html file.
@@ -192,7 +192,7 @@ module CZ {
                             titleTextblock: ".cz-form-title",
                             createTimeline: ".cz-form-create-timeline",
                             createExhibit: ".cz-form-create-exhibit",
-                        	createTour: ".cz-form-create-tour"
+                            createTour: ".cz-form-create-tour"
                         });
                         form.show();
                     }
@@ -365,9 +365,14 @@ module CZ {
                         //Not authorized
                         if (data == "") {
                             $("#login-panel").show();
+                            $(".edit-cover-icon").show();
+                            $(".edit-icon").hide();
                         }
                             //Authorized for a first time
                         else if (data != "" && data.DisplayName == null) {
+                            $(".edit-cover-icon").hide();
+                            $(".edit-icon").show();
+
                             $("#profile-panel").show();
                             $("#profile-panel input#username").focus();
 
@@ -380,13 +385,27 @@ module CZ {
                             }
                         }
                         else {
+                            $(".edit-cover-icon").hide();
+                            $(".edit-icon").show();
                             $("#profile-panel").show();
                             $(".auth-panel-login").html(data.DisplayName);
                         }
                     }).fail((error) => {
+                        $(".edit-cover-icon").show();
+                        $(".edit-icon").hide();
                         $("#login-panel").show();
                     });
                 }
+
+                $(".edit-cover-icon").click(function () {
+                    if (!loginForm.isFormVisible) {
+                        closeAllForms();
+                        loginForm.show();
+                    }
+                    else {
+                        loginForm.close();
+                    }
+                });
 
                 $("#login-panel").click(function () {
                     if (!loginForm.isFormVisible) {
@@ -397,6 +416,8 @@ module CZ {
                         loginForm.close();
                     }
                 });
+
+
             });
 
             CZ.Service.getServiceInformation().then(
@@ -413,7 +434,7 @@ module CZ {
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
 
-            if (rootCollection) {
+            if (IsFeatureEnabled(_featureMap, "TimeSeries")) {
                 $('#timeSeries_button').hide();
             } else {
                 $('#timeSeries_button').show();
@@ -738,9 +759,9 @@ module CZ {
             return feature[0].IsEnabled;
         }
 
-		function closeAllForms() {
+        function closeAllForms() {
             $('.cz-major-form').each((i, f) => { var form = $(f).data('form'); if (form) { form.close(); } });
-                     
+
         }
 
         function getFormById(name) {
@@ -750,7 +771,7 @@ module CZ {
             else
                 return false;
         }
-        
+
         export function showTimeSeriesChart() {
             $('#timeSeriesContainer').height('30%');
             $('#timeSeriesContainer').show();

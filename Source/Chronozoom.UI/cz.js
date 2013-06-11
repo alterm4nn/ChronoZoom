@@ -10927,7 +10927,11 @@ var CZ;
                     CZ.Service.getProfile().done(function (data) {
                         if(data == "") {
                             $("#login-panel").show();
+                            $(".edit-cover-icon").show();
+                            $(".edit-icon").hide();
                         } else if(data != "" && data.DisplayName == null) {
+                            $(".edit-cover-icon").hide();
+                            $(".edit-icon").show();
                             $("#profile-panel").show();
                             $("#profile-panel input#username").focus();
                             if(!profileForm.isFormVisible) {
@@ -10937,13 +10941,25 @@ var CZ;
                                 profileForm.close();
                             }
                         } else {
+                            $(".edit-cover-icon").hide();
+                            $(".edit-icon").show();
                             $("#profile-panel").show();
                             $(".auth-panel-login").html(data.DisplayName);
                         }
                     }).fail(function (error) {
+                        $(".edit-cover-icon").show();
+                        $(".edit-icon").hide();
                         $("#login-panel").show();
                     });
                 }
+                $(".edit-cover-icon").click(function () {
+                    if(!loginForm.isFormVisible) {
+                        closeAllForms();
+                        loginForm.show();
+                    } else {
+                        loginForm.close();
+                    }
+                });
                 $("#login-panel").click(function () {
                     if(!loginForm.isFormVisible) {
                         closeAllForms();
@@ -10964,7 +10980,7 @@ var CZ;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
-            if(rootCollection) {
+            if(IsFeatureEnabled(_featureMap, "TimeSeries")) {
                 $('#timeSeries_button').hide();
             } else {
                 $('#timeSeries_button').show();

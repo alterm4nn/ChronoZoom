@@ -297,6 +297,9 @@ a:visited {
 .edit-icon {
   background-image: url('../images/edit-icon.png');
 }
+.edit-cover-icon {
+  background-image: url('../images/edit-icon.png');
+}
 .profile-icon {
   background-image: url('../images/profile-icon.png');
   display: inline-block;
