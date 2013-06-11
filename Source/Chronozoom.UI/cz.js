@@ -9,6 +9,7 @@
         Settings.zoomSpeedFactor = 2.0;
         Settings.zoomLevelFactor = 1.4;
         Settings.allowedVisibileImprecision = 0.00001;
+        Settings.allowedMathImprecision = 0.0000001;
         Settings.canvasElementAnimationTime = 1300;
         Settings.canvasElementFadeInTime = 400;
         Settings.contentScaleMargin = 20;
@@ -2976,7 +2977,7 @@ var CZ;
                 case "timeline":
                 case "rectangle":
                 case "circle":
-                    return (tp.x <= obj.x && tp.y <= obj.y && tp.x + tp.width >= obj.x + obj.width && tp.y + tp.height >= obj.y + obj.height);
+                    return (tp.x <= obj.x + CZ.Settings.allowedMathImprecision && tp.y <= obj.y + CZ.Settings.allowedMathImprecision && tp.x + tp.width >= obj.x + obj.width - CZ.Settings.allowedMathImprecision && tp.y + tp.height >= obj.y + obj.height - CZ.Settings.allowedMathImprecision);
                 default:
                     return true;
             }
@@ -3086,23 +3087,25 @@ var CZ;
             });
         }
         function updateTimelineTitle(t) {
-            var headerSize = CZ.Settings.timelineHeaderSize * t.height;
-            var marginLeft = CZ.Settings.timelineHeaderMargin * t.height;
-            var marginTop = (1 - CZ.Settings.timelineHeaderMargin) * t.height - headerSize;
-            var baseline = t.y + marginTop + headerSize / 2.0;
+            var canvas = document.createElement("canvas");
+            var ctx = canvas.getContext("2d");
+            t.left = t.x;
+            t.right = t.x + t.width;
+            var titleBorderBox = CZ.Layout.GenerateTitleObject(t.height, t, ctx);
             CZ.VCContent.removeChild(t, t.id + "__header__");
+            var baseline = t.y + titleBorderBox.marginTop + titleBorderBox.height / 2.0;
+            t.titleObject = CZ.VCContent.addText(t, t.layerid, t.id + "__header__", t.x + titleBorderBox.marginLeft, t.y + titleBorderBox.marginTop, baseline, titleBorderBox.height, t.title, {
+                fontName: CZ.Settings.timelineHeaderFontName,
+                fillStyle: CZ.Settings.timelineHeaderFontColor,
+                textBaseline: 'middle',
+                opacity: 1
+            }, titleBorderBox.width);
             if(CZ.Authoring.isEnabled && typeof t.editButton !== "undefined") {
                 t.editButton.x = t.x + t.width - 1.15 * t.titleObject.height;
                 t.editButton.y = t.titleObject.y;
                 t.editButton.width = t.titleObject.height;
                 t.editButton.height = t.titleObject.height;
             }
-            t.titleObject = CZ.VCContent.addText(t, t.layerid, t.id + "__header__", t.x + marginLeft, t.y + marginTop, baseline, headerSize, t.title, {
-                fontName: CZ.Settings.timelineHeaderFontName,
-                fillStyle: CZ.Settings.timelineHeaderFontColor,
-                textBaseline: "middle",
-                opacity: 1
-            });
         }
         Authoring.modeMouseHandlers = {
             createTimeline: {
@@ -5551,6 +5554,7 @@ var CZ;
                 bboxHeight: height + 2 * margin
             };
         }
+        Layout.GenerateTitleObject = GenerateTitleObject;
         function Convert(parent, timeline) {
             var tlColor = GetTimelineColor(timeline);
             var t1 = CZ.VCContent.addTimeline(parent, "layerTimelines", 't' + timeline.id, {
@@ -6401,10 +6405,6 @@ var CZ;
             var point = CZ.Common.getXBrowserMouseOrigin(container, e);
             var k = (_range.max - _range.min) / _width;
             var time = _range.max - k * (_width - point.x);
-            var test1 = CZ.Dates.getCoordinateFromYMD(1, 0, 1);
-            var test2 = CZ.Dates.getYMDFromCoordinate(test1);
-            var test3 = CZ.Dates.convertCoordinateToYear(test1);
-            console.log(test1, test2, test3);
             if(time <= _range.min + CZ.Settings.panelWidth * k) {
                 marker.css("display", "none");
                 LeftPanInput();
@@ -9922,7 +9922,11 @@ var CZ;
                     this.mediaTypeInput.val(this.contentItem.mediaType || "");
                     this.attributionInput.val(this.contentItem.attribution || "");
                     this.descriptionInput.val(this.contentItem.description || "");
-                    this.closeButton.show();
+                    if(this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
+                        this.closeButton.hide();
+                    } else {
+                        this.closeButton.show();
+                    }
                     this.saveButton.show();
                     this.saveButton.off();
                     this.saveButton.click(function () {
@@ -9937,7 +9941,7 @@ var CZ;
                 var _this = this;
                 var newContentItem = {
                     title: this.titleInput.val() || "",
-                    uri: this.mediaInput.val() || "",
+                    uri: decodeURIComponent(this.mediaInput.val()) || "",
                     mediaSource: this.mediaSourceInput.val() || "",
                     mediaType: this.mediaTypeInput.val() || "",
                     attribution: this.attributionInput.val() || "",
