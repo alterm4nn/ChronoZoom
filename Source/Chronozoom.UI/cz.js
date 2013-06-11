@@ -9788,7 +9788,16 @@ var CZ;
                 }
             };
             FormEditExhibit.prototype.onContentItemDblClick = function (item, _) {
-                var idx = item.data.order;
+                var idx;
+                if(typeof item.data.order != 'undefined' && item.data.order != null && item.data.order >= 0 && item.data.order < CZ.Settings.infodotMaxContentItemsCount) {
+                    idx = item.data.order;
+                } else if(typeof item.data.guid != 'undefined' && item.data.guid != null) {
+                    idx = this.exhibit.contentItems.map(function (ci) {
+                        return ci.guid;
+                    }).indexOf(item.data.guid);
+                } else {
+                    idx = -1;
+                }
                 if(idx >= 0) {
                     this.clickedListItem = item;
                     this.exhibit.title = this.titleInput.val() || "";
@@ -9802,7 +9811,16 @@ var CZ;
                 }
             };
             FormEditExhibit.prototype.onContentItemRemoved = function (item, _) {
-                var idx = item.data.order;
+                var idx;
+                if(typeof item.data.order != 'undefined' && item.data.order != null && item.data.order >= 0 && item.data.order < CZ.Settings.infodotMaxContentItemsCount) {
+                    idx = item.data.order;
+                } else if(typeof item.data.guid != 'undefined' && item.data.guid != null) {
+                    idx = this.exhibit.contentItems.map(function (ci) {
+                        return ci.guid;
+                    }).indexOf(item.data.guid);
+                } else {
+                    idx = -1;
+                }
                 if(idx >= 0) {
                     this.exhibit.contentItems.splice(idx, 1);
                     for(var i = 0; i < this.exhibit.contentItems.length; i++) {
@@ -9937,7 +9955,7 @@ var CZ;
                 var _this = this;
                 var newContentItem = {
                     title: this.titleInput.val() || "",
-                    uri: this.mediaInput.val() || "",
+                    uri: decodeURIComponent(this.mediaInput.val()) || "",
                     mediaSource: this.mediaSourceInput.val() || "",
                     mediaType: this.mediaTypeInput.val() || "",
                     attribution: this.attributionInput.val() || "",
