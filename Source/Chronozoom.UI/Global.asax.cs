@@ -101,15 +101,14 @@ namespace Chronozoom.UI
 
         void SessionAuthenticationModule_SessionSecurityTokenReceived(object sender, SessionSecurityTokenReceivedEventArgs e)
         {
-            int minutes = 10;
+            int minutes = 30;
             DateTime now = DateTime.UtcNow;
             DateTime validFrom = e.SessionToken.ValidFrom;
             DateTime validTo = e.SessionToken.ValidTo;
-            if ((now < validTo) && (now > validFrom.AddMinutes((validTo.Minute - validFrom.Minute) / minutes)))
+            if ((now < validTo) && (now > validFrom.AddMinutes(((validTo - validFrom).TotalMinutes) / 2)))
             {
                 SessionAuthenticationModule sam = sender as SessionAuthenticationModule;
-                e.SessionToken = sam.CreateSessionSecurityToken(e.SessionToken.ClaimsPrincipal, e.SessionToken.Context,
-                now, now.AddMinutes(minutes), e.SessionToken.IsPersistent);
+                e.SessionToken = sam.CreateSessionSecurityToken(e.SessionToken.ClaimsPrincipal, e.SessionToken.Context, now, now.AddMinutes(minutes), e.SessionToken.IsPersistent);
                 e.ReissueCookie = true;
             }
         }
