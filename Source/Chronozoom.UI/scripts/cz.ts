@@ -103,7 +103,7 @@ module CZ {
         ];
 
         function InitializeToursUI(profile, forms) {
-            var allowEditing = true; //IsFeatureEnabled(_featureMap, "Authoring") && (profile && profile != "" && profile.DisplayName === CZ.Service.superCollectionName);
+            var allowEditing = IsFeatureEnabled(_featureMap, "Authoring") && (profile && profile != "" && profile.DisplayName === CZ.Service.superCollectionName);
 
             var onToursInitialized = function () {
                 CZ.Tours.initializeToursUI();
