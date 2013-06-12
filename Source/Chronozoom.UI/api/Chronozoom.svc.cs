@@ -1288,7 +1288,7 @@ namespace Chronozoom.UI
                 newTour.Collection = collection;
 
                 storage.Tours.Add(newTour);
-		storage.SaveChanges();
+                storage.SaveChanges();
                 returnValue.TourId = newTourGuid;
 
                 // Populate the bookmarks.
@@ -1389,15 +1389,19 @@ namespace Chronozoom.UI
                 return Guid.Empty;
             }
 
-            storage.Entry(updateTour).Collection(_ => _.Bookmarks).Load();
-            if (updateTour.Bookmarks != null)
+            // If the bookmark sequence id is unchanged then skip the uniqueness test.
+            if (updateBookmark.SequenceId != bookmarkRequest.SequenceId)
             {
-                List<Bookmark> bookmarkList = updateTour.Bookmarks.ToList();
-                Bookmark sequenceIdBookmark = bookmarkList.Where(candidate => candidate.SequenceId == bookmarkRequest.SequenceId).FirstOrDefault();
-                if (sequenceIdBookmark != null)
+                storage.Entry(updateTour).Collection(_ => _.Bookmarks).Load();
+                if (updateTour.Bookmarks != null)
                 {
-                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.BookmarkSequenceIdDuplicate);
-                    return Guid.Empty;
+                    List<Bookmark> bookmarkList = updateTour.Bookmarks.ToList();
+                    Bookmark sequenceIdBookmark = bookmarkList.Where(candidate => candidate.SequenceId == bookmarkRequest.SequenceId).FirstOrDefault();
+                    if (sequenceIdBookmark != null)
+                    {
+                        SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.BookmarkSequenceIdDuplicate);
+                        return Guid.Empty;
+                    }
                 }
             }
 

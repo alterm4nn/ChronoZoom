@@ -2762,6 +2762,7 @@ var CZ;
                 var self = this;
                 if(this.tour) {
                     this.tourTitleInput.val(this.tour.title);
+                    this.tourDescriptionInput.val(this.tour.description);
                     for(var i = 0, len = this.tour.bookmarks.length; i < len; i++) {
                         var bookmark = this.tour.bookmarks[i];
                         var stop = FormEditTour.bookmarkToTourstop(bookmark);
@@ -2769,6 +2770,7 @@ var CZ;
                     }
                 } else {
                     this.tourTitleInput.val("");
+                    this.tourDescriptionInput.val("");
                 }
                 this.tourStopsListBox = new CZ.UI.TourStopListBox(container.find(formInfo.tourStopsListBox), formInfo.tourStopsTemplate, stops);
                 this.tourStopsListBox.itemMove(function (item, startPos, endPos) {
@@ -2793,7 +2795,7 @@ var CZ;
                         type: "Unknown"
                     };
                 }
-                var stop = new TourStop(bookmark.id, target, bookmark.number + 1, (!bookmark.caption || $.trim(bookmark.caption) === "") ? undefined : bookmark.caption);
+                var stop = new TourStop(bookmark.id, target, bookmark.number, (!bookmark.caption || $.trim(bookmark.caption) === "") ? undefined : bookmark.caption);
                 stop.Description = bookmark.text;
                 stop.LapseTime = bookmark.lapseTime;
                 return stop;
@@ -2802,6 +2804,7 @@ var CZ;
                 var url = CZ.UrlNav.vcelementToNavString(tourstop.Target);
                 var title = tourstop.Title;
                 var bookmark = new CZ.Tours.TourBookmark(tourstop.bookmarkId, url, title, tourstop.LapseTime, tourstop.Description);
+                bookmark.number = tourstop.Sequence;
                 return bookmark;
             };
             FormEditTour.prototype.deleteTourAsync = function () {
@@ -2831,7 +2834,7 @@ var CZ;
                 });
                 return deferred.promise();
             };
-            FormEditTour.prototype.updateTourAsync = function () {
+            FormEditTour.prototype.updateTourAsync = function (sequenceNum) {
                 var _this = this;
                 if(!this.tour) {
                     throw "Tour is undefined";
@@ -2879,7 +2882,7 @@ var CZ;
                     }
                     var reqAdd;
                     if(addedStops.length > 0) {
-                        reqAdd = CZ.Service.putBookmarks(new CZ.UI.Tour(_this.tour.id, name, descr, category, n, addedStops));
+                        reqAdd = CZ.Service.putBookmarks(new CZ.UI.Tour(_this.tour.id, name, descr, category, sequenceNum, addedStops));
                     } else {
                         reqAdd = $.Deferred();
                         reqAdd.resolve([]);
@@ -2893,7 +2896,7 @@ var CZ;
                             var tourstop = addedStops[j];
                             tourstop.bookmarkId = q.BookmarkId[j];
                         }
-                        var request = CZ.Service.putTour(new CZ.UI.Tour(_this.tour.id, name, descr, category, n, stops));
+                        var request = CZ.Service.putTour(new CZ.UI.Tour(_this.tour.id, name, descr, category, sequenceNum, stops));
                         request.done(function (q) {
                             var n = stops.length;
                             var tourBookmarks = new Array();
@@ -2903,7 +2906,7 @@ var CZ;
                                 var bookmark = FormEditTour.tourstopToBookmark(tourstop);
                                 tourBookmarks.push(bookmark);
                             }
-                            var tour = new CZ.Tours.Tour(q.TourId, name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, "", CZ.Tours.tours.length, descr);
+                            var tour = new CZ.Tours.Tour(q.TourId, name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, "", sequenceNum, descr);
                             deferred.resolve(tour);
                         }).fail(function (q) {
                             deferred.reject(q);
@@ -2955,7 +2958,7 @@ var CZ;
                             self.tour = tour;
                             CZ.Tours.tours.push(tour);
                             self.initializeAsEdit();
-                            alert("Tour created");
+                            alert("Tour created.");
                         }).fail(function (f) {
                             if(console && console.error) {
                                 console.error("Failed to create a tour: " + f.status + " " + f.statusText);
@@ -2965,9 +2968,9 @@ var CZ;
                     } else {
                         for(var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
                             if(CZ.Tours.tours[i] === _this.tour) {
-                                _this.updateTourAsync().done(function (tour) {
+                                _this.updateTourAsync(i).done(function (tour) {
                                     _this.tour = CZ.Tours.tours[i] = tour;
-                                    alert("Tour updated");
+                                    alert("Tour updated.");
                                 }).fail(function (f) {
                                     if(console && console.error) {
                                         console.error("Failed to update a tour: " + f.status + " " + f.statusText);
@@ -3678,13 +3681,6 @@ var CZ;
             } else {
                 year.year = Math.floor(year.year);
             }
-            if(year.regime === 'BCE') {
-                year.year += 2;
-            }
-            if((year.regime === 'CE') && (year.year === 0)) {
-                year.regime = 'BCE';
-                year.year = 1;
-            }
             return year;
         }
         Dates.convertCoordinateToYear = convertCoordinateToYear;
@@ -3702,7 +3698,6 @@ var CZ;
                     break;
                 case "bce":
                     coordinate *= -1;
-                    coordinate += 1;
                     break;
             }
             return coordinate;
@@ -10642,7 +10637,11 @@ var CZ;
                     this.mediaTypeInput.val(this.contentItem.mediaType || "");
                     this.attributionInput.val(this.contentItem.attribution || "");
                     this.descriptionInput.val(this.contentItem.description || "");
-                    this.closeButton.show();
+                    if(this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
+                        this.closeButton.hide();
+                    } else {
+                        this.closeButton.show();
+                    }
                     this.saveButton.show();
                     this.saveButton.off();
                     this.saveButton.click(function () {

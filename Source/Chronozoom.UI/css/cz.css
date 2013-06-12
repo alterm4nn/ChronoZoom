@@ -135,18 +135,25 @@
   clear: both;
 }
 .cz-datepicker-regime {
+  height: 30px;
   margin-left: 10px;
 }
 .cz-datepicker-year-year {
+  height: 30px;
   width: 80px;
 }
 .cz-datepicker-year-date {
+  height: 30px;
   width: 50px;
 }
 .cz-datepicker-day-selector {
+  height: 30px;
   max-height: 200px;
   margin-left: 10px;
   margin-right: 10px;
+}
+.cz-datepicker-month-selector {
+  height: 30px;
 }
 .cz-datepicker-errormsg {
   color: #dd4b39;
@@ -1242,7 +1249,6 @@ img.fallbackBackground {
   text-align: justify;
 }
 .cz-input {
-  margin: 5px 0;
   color: #232323;
   background-color: #E9E9E9;
   border: 1px solid #D5D5D5;
@@ -1253,6 +1259,10 @@ img.fallbackBackground {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
+}
+.cz-form-required-field-text {
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 .cz-button {
   margin: 5px 0;
@@ -1267,22 +1277,16 @@ img.fallbackBackground {
 
   filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#1B6AAB', EndColorStr='#0E4073', GradientType=0);
   /* IE10 Consumer Preview */
-
   background-image: -ms-linear-gradient(bottom, #0e4073 0%, #1b6aab 100%);
   /* Mozilla Firefox */
-
   background-image: -moz-linear-gradient(bottom, #0e4073 0%, #1b6aab 100%);
   /* Opera */
-
   background-image: -o-linear-gradient(bottom, #0e4073 0%, #1b6aab 100%);
   /* Webkit (Safari/Chrome 10) */
-
   background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #0e4073), color-stop(1, #1b6aab));
   /* Webkit (Chrome 11+) */
-
   background-image: -webkit-linear-gradient(bottom, #0e4073 0%, #1b6aab 100%);
   /* W3C Markup, IE10 Release Preview */
-
   background-image: linear-gradient(to top, #0e4073 0%, #1b6aab 100%);
 }
 .cz-header-edit-form {
@@ -1397,6 +1401,10 @@ img.fallbackBackground {
 }
 .cz-lightgray {
   color: #aeaeae;
+}
+.cz-form-label {
+  margin: 5px 0;
+  display: inline-block;
 }
 /***********************************************************
 

@@ -142,14 +142,14 @@ module CZ {
                 // remove fraction part of year
                 year.year = Math.floor(year.year);
             }
-            if (year.regime === 'BCE') {
-                year.year += 2;
-               }
+            //if (year.regime === 'BCE') {
+            //    year.year += 2;
+            //   }
 
-            if ((year.regime === 'CE') && (year.year === 0)) {
-                year.regime = 'BCE';
-                year.year = 1;
-               }
+            //if ((year.regime === 'CE') && (year.year === 0)) {
+            //    year.regime = 'BCE';
+            //    year.year = 1;
+            //   }
             return year;
         }
 
@@ -168,7 +168,7 @@ module CZ {
                     break;
                 case "bce":
                     coordinate *= -1;
-                    coordinate += 1;
+                    //coordinate += 1;
                     break;
             }
 

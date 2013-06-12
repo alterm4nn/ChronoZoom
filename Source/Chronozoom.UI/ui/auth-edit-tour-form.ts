@@ -177,6 +177,7 @@ module CZ {
                 var self = this;
                 if (this.tour) {
                     this.tourTitleInput.val(this.tour.title);
+                    this.tourDescriptionInput.val(this.tour.description);
                     for (var i = 0, len = this.tour.bookmarks.length; i < len; i++) {
                         var bookmark = this.tour.bookmarks[i]; // bookmarks are already ordered in the tour
                         var stop = FormEditTour.bookmarkToTourstop(bookmark);
@@ -184,6 +185,7 @@ module CZ {
                     }
                 } else {
                     this.tourTitleInput.val("");
+                    this.tourDescriptionInput.val("");
                 }
                 this.tourStopsListBox = new CZ.UI.TourStopListBox(container.find(formInfo.tourStopsListBox), formInfo.tourStopsTemplate, stops);
                 this.tourStopsListBox.itemMove((item, startPos, endPos) => self.onStopsReordered.apply(self, [<any>item, <any>startPos, <any>endPos]));
@@ -198,7 +200,7 @@ module CZ {
                         type: "Unknown"
                     };
                 }
-                var stop = new TourStop(bookmark.id, target, bookmark.number + 1, (!bookmark.caption || $.trim(bookmark.caption) === "") ? undefined : bookmark.caption);
+                var stop = new TourStop(bookmark.id, target, bookmark.number, (!bookmark.caption || $.trim(bookmark.caption) === "") ? undefined : bookmark.caption);
                 stop.Description = bookmark.text;
                 stop.LapseTime = bookmark.lapseTime;
                 return stop;
@@ -208,6 +210,7 @@ module CZ {
                 var url = UrlNav.vcelementToNavString(tourstop.Target);
                 var title = tourstop.Title;
                 var bookmark = new CZ.Tours.TourBookmark(tourstop.bookmarkId, url, title, tourstop.LapseTime, tourstop.Description);
+                bookmark.number = tourstop.Sequence;
                 return bookmark;
             }
 
@@ -258,7 +261,7 @@ module CZ {
                 return deferred.promise();
             }
 
-            private updateTourAsync(): any {
+            private updateTourAsync(sequenceNum): any {
                 if (!this.tour) throw "Tour is undefined";
                 var deferred = $.Deferred();
                 var self = this;
@@ -304,7 +307,7 @@ module CZ {
                     }
                     var reqAdd;
                     if (addedStops.length > 0)
-                        reqAdd = CZ.Service.putBookmarks(new CZ.UI.Tour(this.tour.id, name, descr, category, n, addedStops));
+                        reqAdd = CZ.Service.putBookmarks(new CZ.UI.Tour(this.tour.id, name, descr, category, sequenceNum, addedStops));
                     else {
                         reqAdd = $.Deferred();
                         reqAdd.resolve([]);
@@ -322,7 +325,7 @@ module CZ {
                         }
 
                         // Updating the tour 
-                        var request = CZ.Service.putTour(new CZ.UI.Tour(this.tour.id, name, descr, category, n, stops));
+                        var request = CZ.Service.putTour(new CZ.UI.Tour(this.tour.id, name, descr, category, sequenceNum, stops));
                         request.done(q => {
                             // build array of bookmarks of current tour
                             var n = stops.length;
@@ -341,7 +344,7 @@ module CZ {
                                 CZ.Common.vc,
                                 category, // category
                                 "", //audio
-                                CZ.Tours.tours.length,
+                                sequenceNum,
                                 descr);
                             deferred.resolve(tour);
                         }).fail(q => {
@@ -399,7 +402,7 @@ module CZ {
                             self.tour = tour;
                             CZ.Tours.tours.push(tour);
                             self.initializeAsEdit();
-                            alert("Tour created");
+                            alert("Tour created.");
                         }).fail(f => {
                             if (console && console.error) {
                                 console.error("Failed to create a tour: " + f.status + " " + f.statusText);
@@ -410,9 +413,9 @@ module CZ {
                         // Update existing tour
                         for (var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
                             if (CZ.Tours.tours[i] === this.tour) {
-                                this.updateTourAsync().done(tour => {
+                                this.updateTourAsync(i).done(tour => {
                                     this.tour = CZ.Tours.tours[i] = tour;
-                                    alert("Tour updated");
+                                    alert("Tour updated.");
                                 }).fail(f => {
                                     if (console && console.error) {
                                         console.error("Failed to update a tour: " + f.status + " " + f.statusText);
