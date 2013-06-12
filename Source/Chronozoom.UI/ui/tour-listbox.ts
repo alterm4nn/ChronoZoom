@@ -68,19 +68,26 @@ module CZ {
         export class TourListItem extends ListItemBase {
             public iconImg: JQuery;
             public titleTextblock: JQuery;
+            public descrTextblock: JQuery;
 
             constructor(parent: TourListBox,
                 container: JQuery,
                 uiMap: ITourListItemUIMap,
                 context: any) {
-
+                if (!context) throw "Tour list item's context is undefined";
                 super(parent, container, uiMap, context);
 
                 this.iconImg = this.container.find(uiMap.iconImg);
                 this.titleTextblock = this.container.find(uiMap.titleTextblock);
+                this.titleTextblock = this.container.find(uiMap.titleTextblock);
+                this.descrTextblock = this.container.find(".cz-contentitem-listitem-descr");
 
                 this.iconImg.attr("src", this.data.icon || "/images/Temp-Thumbnail2.png");
                 this.titleTextblock.text(this.data.title);
+                if (this.data.description)
+                    this.descrTextblock.text(this.data.description);
+                else
+                    this.descrTextblock.hide();
 
                 this.container.find("#takeTour").click(e =>
                 {
