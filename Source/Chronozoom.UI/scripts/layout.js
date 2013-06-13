@@ -58,7 +58,7 @@ var CZ;
                     if(tl.AspectRatio) {
                         tl.height = (tl.right - tl.left) / tl.AspectRatio;
                     } else if(timeline.height && tl.Height) {
-                        tl.height = timeline.height * tl.Height;
+                        tl.height = Math.min(timeline.height * tl.Height, (tl.right - tl.left) * CZ.Settings.timelineMinAspect);
                     }
                     LayoutTimeline(tl, timelineWidth, measureContext);
                 });
@@ -342,6 +342,7 @@ var CZ;
                 bboxHeight: height + 2 * margin
             };
         }
+        Layout.GenerateTitleObject = GenerateTitleObject;
         function Convert(parent, timeline) {
             var tlColor = GetTimelineColor(timeline);
             var t1 = CZ.VCContent.addTimeline(parent, "layerTimelines", 't' + timeline.id, {

@@ -14,5 +14,11 @@ namespace Application.Helper.BrowserImpl
         {
             OpenUrl(Configuration.BaseUrl + @"#/t55/t174/t66/t46/t361/t364/t377/t161@x=0.09842277303042166&y=-0.04391631637999881&w=0.0002611895548267019&h=0.00039153105944797343");
         }
+
+        public override void SecurityWarningAccept()
+        {
+            WaitForAlertIsDisplayed();
+            AcceptAlert();
+        }
     }
 }

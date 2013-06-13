@@ -113,6 +113,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="OuterCurve.SignalRTraceListener">
+      <HintPath>..\..\External\OuterCurve.TraceListener\OuterCurve.SignalRTraceListener.dll</HintPath>
+    </Reference>
     <Reference Include="Owin">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
@@ -199,12 +202,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="api\errorhandler.cs" />
+    <Compile Include="api\storagecache.cs" />
     <Compile Include="default.ashx.cs">
       <DependentUpon>default.ashx</DependentUpon>
     </Compile>
     <Compile Include="api\ichronozoomsvc.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="pages\crawler.aspx.cs">
+      <DependentUpon>crawler.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="pages\crawler.aspx.designer.cs">
+      <DependentUpon>crawler.aspx</DependentUpon>
     </Compile>
     <Compile Include="pages\sitemap.aspx.cs">
       <DependentUpon>sitemap.aspx</DependentUpon>
@@ -214,9 +225,6 @@
       <DependentUpon>sitemap.aspx</DependentUpon>
     </Compile>
     <Compile Include="utils\ThumbnailGenerator.cs" />
-    <Content Include="css\cz.min.css">
-      <DependentUpon>cz.less</DependentUpon>
-    </Content>
     <Content Include="dumps\250-be5yavg.csv" />
     <Content Include="dumps\2k-moberg2000.csv" />
     <Content Include="dumps\420k-vostok.csv" />
@@ -236,6 +244,7 @@
     <Content Include="images\tour-icon.png" />
     <Content Include="images\view-icon.png" />
     <Content Include="images\edit.svg" />
+    <Content Include="pages\crawler.aspx" />
     <Content Include="pages\sitemap.aspx" />
     <Content Include="scripts\external\ACS.js" />
     <Content Include="scripts\authoring.ts" />
@@ -250,6 +259,8 @@
     <Content Include="scripts\breadcrumbs.ts" />
     <Content Include="scripts\common.ts" />
     <Content Include="scripts\external\csvToArray.v2.1.js" />
+    <Content Include="scripts\external\jquery-1.7.2.min.js" />
+    <Content Include="scripts\external\jquery-ui.js" />
     <Content Include="ui\auth-edit-tour-form.html" />
     <Content Include="ui\auth-edit-tour-form.js">
       <DependentUpon>auth-edit-tour-form.ts</DependentUpon>
@@ -537,10 +548,6 @@
     <ProjectReference Include="..\Chronozoom.Entities\Chronozoom.Entities.csproj">
       <Project>{B995D3CF-E31F-4986-A7F7-77988EA275D3}</Project>
       <Name>Chronozoom.Entities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SignalRTraceListener\OuterCurve.SignalRTraceListener.csproj">
-      <Project>{e9c7a64b-d03b-47d7-89dd-48d046de564c}</Project>
-      <Name>OuterCurve.SignalRTraceListener</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

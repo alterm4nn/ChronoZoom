@@ -91,8 +91,25 @@
     <Compile Include="Migrations\201305282325585_TitleLength.Designer.cs">
       <DependentUpon>201305282325585_TitleLength.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201306040017265_ToursDescription.cs" />
+    <Compile Include="Migrations\201306040017265_ToursDescription.Designer.cs">
+      <DependentUpon>201306040017265_ToursDescription.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201306050753190_ProgressiveLoad.cs" />
+    <Compile Include="Migrations\201306050753190_ProgressiveLoad.Designer.cs">
+      <DependentUpon>201306050753190_ProgressiveLoad.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201306072040327_ToursUserMissingMaxLen.cs" />
+    <Compile Include="Migrations\201306072040327_ToursUserMissingMaxLen.Designer.cs">
+      <DependentUpon>201306072040327_ToursUserMissingMaxLen.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migration\Migrator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="SearchResult.cs" />
     <Compile Include="Storage.cs" />
     <Compile Include="StorageMigrationsConfiguration.cs" />
@@ -110,6 +127,9 @@
     <None Include="Entities.cd" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="SQL\TimelineSubtreeQuery.sql" />
+  </ItemGroup>
   <ItemGroup />
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201305102053361_RemoveBetaFields.resx">
@@ -126,6 +146,20 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201305282325585_TitleLength.resx">
       <DependentUpon>201305282325585_TitleLength.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201306040017265_ToursDescription.resx">
+      <DependentUpon>201306040017265_ToursDescription.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201306050753190_ProgressiveLoad.resx">
+      <DependentUpon>201306050753190_ProgressiveLoad.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201306072040327_ToursUserMissingMaxLen.resx">
+      <DependentUpon>201306072040327_ToursUserMissingMaxLen.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

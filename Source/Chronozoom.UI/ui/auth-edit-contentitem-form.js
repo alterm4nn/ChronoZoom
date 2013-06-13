@@ -52,7 +52,11 @@ var CZ;
                     this.mediaTypeInput.val(this.contentItem.mediaType || "");
                     this.attributionInput.val(this.contentItem.attribution || "");
                     this.descriptionInput.val(this.contentItem.description || "");
-                    this.closeButton.show();
+                    if(this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
+                        this.closeButton.hide();
+                    } else {
+                        this.closeButton.show();
+                    }
                     this.saveButton.show();
                     this.saveButton.off();
                     this.saveButton.click(function () {
@@ -67,7 +71,7 @@ var CZ;
                 var _this = this;
                 var newContentItem = {
                     title: this.titleInput.val() || "",
-                    uri: this.mediaInput.val() || "",
+                    uri: decodeURIComponent(this.mediaInput.val()) || "",
                     mediaSource: this.mediaSourceInput.val() || "",
                     mediaType: this.mediaTypeInput.val() || "",
                     attribution: this.attributionInput.val() || "",

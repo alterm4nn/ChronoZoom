@@ -136,6 +136,12 @@ var CZ;
                     }, function (error) {
                         alert("Unable to save changes. Please try again later.");
                     });
+                } else if(this.exhibit.contentItems.length === 0) {
+                    var self = this;
+                    var origMsg = this.errorMessage.text();
+                    this.errorMessage.text("Cannot create exhibit without content items.").show().delay(7000).fadeOut(function () {
+                        return self.errorMessage.text(origMsg);
+                    });
                 } else {
                     this.errorMessage.show().delay(7000).fadeOut();
                 }
@@ -148,7 +154,16 @@ var CZ;
                 }
             };
             FormEditExhibit.prototype.onContentItemDblClick = function (item, _) {
-                var idx = item.data.order;
+                var idx;
+                if(typeof item.data.order !== 'undefined' && item.data.order !== null && item.data.order >= 0 && item.data.order < CZ.Settings.infodotMaxContentItemsCount) {
+                    idx = item.data.order;
+                } else if(typeof item.data.guid !== 'undefined' && item.data.guid !== null) {
+                    idx = this.exhibit.contentItems.map(function (ci) {
+                        return ci.guid;
+                    }).indexOf(item.data.guid);
+                } else {
+                    idx = -1;
+                }
                 if(idx >= 0) {
                     this.clickedListItem = item;
                     this.exhibit.title = this.titleInput.val() || "";
@@ -162,7 +177,16 @@ var CZ;
                 }
             };
             FormEditExhibit.prototype.onContentItemRemoved = function (item, _) {
-                var idx = item.data.order;
+                var idx;
+                if(typeof item.data.order !== 'undefined' && item.data.order !== null && item.data.order >= 0 && item.data.order < CZ.Settings.infodotMaxContentItemsCount) {
+                    idx = item.data.order;
+                } else if(typeof item.data.guid !== 'undefined' && item.data.guid !== null) {
+                    idx = this.exhibit.contentItems.map(function (ci) {
+                        return ci.guid;
+                    }).indexOf(item.data.guid);
+                } else {
+                    idx = -1;
+                }
                 if(idx >= 0) {
                     this.exhibit.contentItems.splice(idx, 1);
                     for(var i = 0; i < this.exhibit.contentItems.length; i++) {

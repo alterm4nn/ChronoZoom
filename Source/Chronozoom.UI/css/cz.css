@@ -135,18 +135,25 @@
   clear: both;
 }
 .cz-datepicker-regime {
+  height: 30px;
   margin-left: 10px;
 }
 .cz-datepicker-year-year {
+  height: 30px;
   width: 80px;
 }
 .cz-datepicker-year-date {
+  height: 30px;
   width: 50px;
 }
 .cz-datepicker-day-selector {
+  height: 30px;
   max-height: 200px;
   margin-left: 10px;
   margin-right: 10px;
+}
+.cz-datepicker-month-selector {
+  height: 30px;
 }
 .cz-datepicker-errormsg {
   color: #dd4b39;
@@ -1242,7 +1249,6 @@ img.fallbackBackground {
   text-align: justify;
 }
 .cz-input {
-  margin: 5px 0;
   color: #232323;
   background-color: #E9E9E9;
   border: 1px solid #D5D5D5;
@@ -1253,6 +1259,10 @@ img.fallbackBackground {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
+}
+.cz-form-required-field-text {
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 .cz-button {
   margin: 5px 0;
@@ -1391,6 +1401,10 @@ img.fallbackBackground {
 }
 .cz-lightgray {
   color: #aeaeae;
+}
+.cz-form-label {
+  margin: 5px 0;
+  display: inline-block;
 }
 /***********************************************************
 

@@ -40,7 +40,7 @@ namespace Application.Helper.Helpers
 
         private void SelectTour(string tour)
         {
-            string xpath = String.Format("//*[@id='tours-content']/div[2]/*[text()='{0}']", tour);
+            string xpath = String.Format("//*[@id='toursList']//*[text()='{0}']/following-sibling::div[1]", tour);
             Click(By.XPath(xpath));
         }
     }

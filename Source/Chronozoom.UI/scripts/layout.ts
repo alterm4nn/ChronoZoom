@@ -91,7 +91,7 @@ module CZ {
                         tl.height = (tl.right - tl.left) / tl.AspectRatio;
                     } else if (timeline.height && tl.Height) {
                         //If Child timeline has height in percentage of parent, calculate it before layout pass
-                        tl.height = timeline.height * tl.Height;
+                        tl.height = Math.min(timeline.height * tl.Height, (tl.right - tl.left) * CZ.Settings.timelineMinAspect);
                     }
                     //Calculate layout for each child timeline
                     LayoutTimeline(tl, timelineWidth, measureContext);
@@ -389,7 +389,7 @@ module CZ {
             return (timeline.right - timeline.left) / 20.0;
         }
 
-        function GenerateTitleObject(tlHeight, timeline, measureContext) {
+        export function GenerateTitleObject(tlHeight, timeline, measureContext) {
             var tlW = timeline.right - timeline.left;
 
             measureContext.font = "100pt " + CZ.Settings.timelineHeaderFontName;

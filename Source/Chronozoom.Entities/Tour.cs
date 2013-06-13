@@ -36,6 +36,14 @@ namespace Chronozoom.Entities
         public string Name { get; set; }
 
         /// <summary>
+        /// The name of the tour.
+        /// </summary>
+        [DataMember(Name = "description")]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
+        public string Description { get; set; }
+
+        /// <summary>
         /// The unique ID of the tour.
         /// </summary>
         public int UniqueId { get; set; }
@@ -45,6 +53,8 @@ namespace Chronozoom.Entities
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "To be fixed when entities are revisited")]
         [DataMember(Name = "audio")]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         public string AudioBlobUrl { get; set; }
 
         /// <summary>
