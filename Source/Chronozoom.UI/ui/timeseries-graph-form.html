@@ -9,7 +9,60 @@
         </li>
     </ul>
 </div>
-<div id="timeSeries" style="width: 100%; height: 100%; position: relative">
-    <div id="rightLegend" style="position: absolute; top: 10px; border: 1px solid black; min-width: 50px; background-color: white;"></div>
-    <div id="leftLegend" style="position: absolute; top: 10px; border: 1px solid black; min-width: 50px; background-color: white;"></div>
+<div id="timeSeries">
+    <div id="rightLegend" class="tsc-legend">
+        <ul id="rightLegendList" class="tsc-legend-ul"></ul>
+    </div>
+    <div id="leftLegend" class="tsc-legend">
+        <ul id="leftLegendList" class="tsc-legend-ul"></ul>
+    </div>
 </div>
+
+<style>
+    #timeSeries {
+        width: 100%;
+        position: relative;
+        background-image: url('/images/background.jpg');
+        background-position: center center;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+
+    .tsc-legend-ul {
+        clear: both;
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .tsc-legend {
+        position: absolute;
+        top: 10px;
+        border: 1px solid black;
+        background-color: white;
+    }
+
+    .tsc-legend-description {
+        overflow: hidden;
+        white-space: nowrap;
+        -o-text-overflow: ellipsis;
+        -ms-text-overflow: ellipsis;
+        text-overflow: ellipsis;
+        display: inline-block;
+        text-align: center;
+        margin-right: 4px;
+    }
+
+    .tsc-legend-indicator {
+        float: left;
+        margin: 4px;
+        width: 16px;
+        height: 16px;
+    }
+</style>
