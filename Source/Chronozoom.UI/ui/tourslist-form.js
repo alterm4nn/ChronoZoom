@@ -13,6 +13,9 @@ var CZ;
                         _super.call(this, container, formInfo);
                 this.takeTour = formInfo.takeTour;
                 this.editTour = formInfo.editTour;
+                var tours = formInfo.tours.sort(function (a, b) {
+                    return a.sequenceNum - b.sequenceNum;
+                });
                 this.toursListBox = new CZ.UI.TourListBox(container.find("#tours"), formInfo.tourTemplate, formInfo.tours, function (tour) {
                     _this.onTakeTour(tour);
                 }, this.editTour ? function (tour) {

@@ -358,12 +358,6 @@ module CZ {
             //ax.axis("updateWidth");
             updateAxis(vc, ax);
 
-            //updating timeSeries chart
-            //var vp = vc.virtualCanvas("getViewport");
-            //var lt = vp.pointScreenToVirtual(0, 0);
-            //var rb = vp.pointScreenToVirtual(vp.width, vp.height);
-            //timeSeriesChart.updateRange(lt.x, rb.x);
-
             CZ.BreadCrumbs.updateBreadCrumbsLabels();
         }
 

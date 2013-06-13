@@ -15,6 +15,7 @@ using System.Web.Routing;
 using System.Web.UI;
 using Chronozoom.Entities;
 using OuterCurve;
+using Microsoft.IdentityModel.Web;
 
 
 namespace Chronozoom.UI
@@ -95,6 +96,22 @@ namespace Chronozoom.UI
             RegisterRoutes(RouteTable.Routes);
 
             Trace.TraceInformation("Application Starting");
+
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+        void SessionAuthenticationModule_SessionSecurityTokenReceived(object sender, SessionSecurityTokenReceivedEventArgs e)
+        {
+            int minutes = 30;
+            DateTime now = DateTime.UtcNow;
+            DateTime validFrom = e.SessionToken.ValidFrom;
+            DateTime validTo = e.SessionToken.ValidTo;
+            if ((now < validTo) && (now > validFrom.AddMinutes(((validTo - validFrom).TotalMinutes) / 2)))
+            {
+                SessionAuthenticationModule sam = sender as SessionAuthenticationModule;
+                e.SessionToken = sam.CreateSessionSecurityToken(e.SessionToken.ClaimsPrincipal, e.SessionToken.Context, now, now.AddMinutes(minutes), e.SessionToken.IsPersistent);
+                e.ReissueCookie = true;
+            }
         }
 
         public void Application_End(object sender, EventArgs e)
@@ -139,6 +156,7 @@ namespace Chronozoom.UI
             { "Safari", 5 },
             { "Opera", 10 },
         };
+
 
         private bool BrowserIsSupported()
         {
