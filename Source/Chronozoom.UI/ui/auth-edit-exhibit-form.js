@@ -124,7 +124,7 @@ var CZ;
                     height: this.exhibit.height,
                     width: this.exhibit.width,
                     infodotDescription: {
-                        date: this.datePicker.getDate()
+                        date: CZ.Dates.getDecimalYearFromCoordinate(this.datePicker.getDate())
                     },
                     contentItems: this.exhibit.contentItems || [],
                     type: "infodot"
