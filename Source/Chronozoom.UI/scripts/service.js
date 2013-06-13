@@ -33,8 +33,8 @@ var CZ;
                 return {
                     id: t.guid,
                     ParentTimelineId: t.parent.guid,
-                    start: t.x,
-                    end: typeof t.endDate !== 'undefined' ? t.endDate : (t.x + t.width),
+                    start: CZ.Dates.getDecimalYearFromCoordinate(t.x),
+                    end: typeof t.endDate !== 'undefined' ? t.endDate : CZ.Dates.getDecimalYearFromCoordinate(t.x + t.width),
                     title: t.title,
                     Regime: t.regime
                 };

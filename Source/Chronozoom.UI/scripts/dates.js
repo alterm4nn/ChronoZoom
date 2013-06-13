@@ -99,26 +99,30 @@ var CZ;
         function getCoordinateFromDecimalYear(decimalYear) {
             var localPresent = getPresent();
             var presentDate = getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
-            return decimalYear === 9999 ? presentDate : decimalYear;
+            return decimalYear === 9999 ? presentDate : (decimalYear < 0 ? decimalYear + 1 : decimalYear);
         }
         Dates.getCoordinateFromDecimalYear = getCoordinateFromDecimalYear;
+        function getDecimalYearFromCoordinate(coordinate) {
+            return coordinate < 1 ? --coordinate : coordinate;
+        }
+        Dates.getDecimalYearFromCoordinate = getDecimalYearFromCoordinate;
         function convertCoordinateToYear(coordinate) {
             var year = {
                 year: coordinate,
                 regime: "CE"
             };
             if(coordinate < -999999999) {
-                year.year /= -1000000000;
+                year.year = (year.year - 1) / (-1000000000);
                 year.regime = 'Ga';
             } else if(coordinate < -999999) {
-                year.year /= -1000000;
+                year.year = (year.year - 1) / (-1000000);
                 year.regime = 'Ma';
-            } else if(coordinate < -999) {
-                year.year /= -1000;
+            } else if(coordinate < -9999) {
+                year.year = (year.year - 1) / (-1000);
                 year.regime = 'Ka';
-            } else if(coordinate < 0) {
-                year.year /= -1;
-                year.year = Math.floor(year.year);
+            } else if(coordinate < 1) {
+                year.year = (year.year - 1) / (-1);
+                year.year = Math.ceil(year.year);
                 year.regime = 'BCE';
             } else {
                 year.year = Math.floor(year.year);
@@ -130,16 +134,16 @@ var CZ;
             var coordinate = year;
             switch(regime.toLowerCase()) {
                 case "ga":
-                    coordinate *= -1000000000;
+                    coordinate = year * (-1000000000) + 1;
                     break;
                 case "ma":
-                    coordinate *= -1000000;
+                    coordinate = year * (-1000000) + 1;
                     break;
                 case "ka":
-                    coordinate *= -1000;
+                    coordinate = year * (-1000) + 1;
                     break;
                 case "bce":
-                    coordinate *= -1;
+                    coordinate = year * (-1) + 1;
                     break;
             }
             return coordinate;
