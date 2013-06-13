@@ -1,8 +1,7 @@
-﻿/// <reference path="../Js/data.js"/>
-/// <reference path="../Js/timeseries-data-form.js"/>
-/// <reference path="../Js/timeseries-graph-form.js"/>
-/// <reference path="../Utils/csvToArray.v2.1.js"/>
-
+﻿/// <reference path="../../../Chronozoom.UI/scripts/data.js"/>
+/// <reference path="../../../Chronozoom.UI/ui/timeseries-data-form.js"/>
+/// <reference path="../../../Chronozoom.UI/ui/timeseries-graph-form.js"/>
+/// <reference path="../../../Chronozoom.UI/scripts/external/csvToArray.v2.1.js"/>
 
 describe("csvToDataSet() method", function () {
 
