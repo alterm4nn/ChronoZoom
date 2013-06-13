@@ -11,25 +11,80 @@
 </div>
 <div class="cz-form-content" style="width: 500px;">
     <div>View one of pre-loaded series</div>
-    <ul id="existingTimeSeries">
+    <ul id="existingTimeSeries" style="list-style-type: none; margin-top: 10px;">
     </ul>
-    <div id="uploaduserdatacontainer">
-        <div>Upload and view your own</div>
-        <input id="fileLoader" type="file" accept="text/csv" name="csvfile" />
-        <div>
-            <div style="margin-right: 4px; float: left">delimiter</div>
-            <input id="delim" type="text" name="delimiter" value="," style="width: 20px;" />
+
+    <div id="uploadDataCnt">
+        <div style="margin-bottom: 16px;">Upload and view your own</div>
+
+        <div style="width: 70px; float:left; height: 22px; overflow: hidden;">
+            <div class="cz-form-input-file-btn">Select file</div>
+            <input type="file" accept="text/csv" id="fileLoader" class="cz-form-input-file" >
         </div>
-        <button id="loaduserdatabtn">Load</button>
+
+        <div id="selectedFile" class="cz-form-selectedfileinfo"></div>
+
+        <div style="float: left; margin-right: 4px;">
+            <div style="margin-right: 4px; margin-left: 4px; float: left">delimiter</div>
+            <select id="delim" style="width: 65px; height: 21px; text-align: center">
+                <option>,</option>
+                <option>;</option>
+                <option>space</option>
+                <option>tab</option>
+            </select>
+        </div>
+        <button id="loadDataBtn">Load</button>
     </div>
 </div>
 
 <style>
-    #loaduserdatabtn {
+    #loadDataBtn {
         width: 70px;
-        height: 30px;
+        height: 24px;
         background-color: #0464a2;
-        display: block;
-        color: white;
+        color: white;  
+        margin-top: -1px;
+        display: inline-block;
+    }
+
+    .cz-form-input-file {
+        margin-top: -22px; 
+        -moz-opacity: 0; 
+        filter: alpha(opacity=0); 
+        opacity: 0; 
+        font-size: 150px; 
+        height: 22px; 
+        width: 70px;
+    }
+
+    .cz-form-input-file-btn {
+        text-align: center;
+        overflow: hidden;
+        width: 70px;
+        height: 22px;
+        background-color: #0464a2;
+        color: #fff;
+    }
+
+    .cz-form-selectedfileinfo {
+        border: 1px solid black; 
+        width: 150px; 
+        height: 21px; 
+        margin-left: 4px; 
+        float: left; 
+        overflow: hidden; 
+        white-space: nowrap;
+        -o-text-overflow: ellipsis;
+        -ms-text-overflow: ellipsis;
+        text-overflow: ellipsis; 
+    }
+
+    .cz-form-preloadedrecord {
+        display: table-cell;
+        vertical-align: bottom;
+        font-size: 9pt;
+        padding-right: 2px;
+        padding-left: 2px;
+        height: 20px;
     }
 </style>
