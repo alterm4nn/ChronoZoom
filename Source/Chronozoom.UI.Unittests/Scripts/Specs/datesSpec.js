@@ -3,38 +3,38 @@
 describe("convertYearToCoordinate method should return", function () {
 
     using("regime =", ["Ga"], function (value) {
-        it("year * -1000000000", function () {
+        it("year * -1000000000 + 1", function () {
             var year = 100;
             var coordinate = convertYearToCoordinate(year, value);
-            expect(coordinate).toEqual(year * -1000000000);
+            expect(coordinate).toEqual(year * -1000000000 + 1);
         });
     });
 
     using("regime =", ["Ma"], function (value) {
-        it("year * -1000000", function () {
+        it("year * -1000000 + 1", function () {
             var year = -5;
             var coordinate = convertYearToCoordinate(year, value);
-            expect(coordinate).toEqual(year * -1000000);
+            expect(coordinate).toEqual(year * -1000000 + 1);
         });
     });
 
     using("regime =", ["Ka"], function (value) {
-        it("year * -1000", function () {
+        it("year * -1000 + 1", function () {
             var year = .13568;
             var coordinate = convertYearToCoordinate(year, value);
-            expect(coordinate).toEqual(year * -1000);
+            expect(coordinate).toEqual(year * -1000 + 1);
         });
     });
 
-    using("regime =", ["bCe"], function (value) {
-        it("year * -1", function () {
+    using("regime =", ["BCE"], function (value) {
+        it("year * -1 + 1", function () {
             var year = 45.50;
             var coordinate = convertYearToCoordinate(year, value);
-            expect(coordinate).toEqual(year * -1);
+            expect(coordinate).toEqual(year * -1 + 1);
         });
     });
 
-    using("regime =", ["cE"], function (value) {
+    using("regime =", ["CE"], function (value) {
         it("year", function () {
             var year = 0.11;
             var coordinate = convertYearToCoordinate(year, value);
@@ -44,7 +44,7 @@ describe("convertYearToCoordinate method should return", function () {
 });
 
 describe("convertCoordinateToYear method should return", function () {
-    using("coordinate =", [153.56, 0], function (value) {
+    using("coordinate =", [153.56, 1], function (value) {
         it("regime CE ", function () {
             var coordinate = value;
             var result = convertCoordinateToYear(coordinate);
@@ -53,20 +53,20 @@ describe("convertCoordinateToYear method should return", function () {
         });
     });
 
-    using("coordinate =", [-1, -999], function (value) {
+    using("coordinate =", [0, -999], function (value) {
         it("regime BCE ", function () {
             var coordinate = value;
             var result = convertCoordinateToYear(coordinate);
-            expect(result.year).toEqual(coordinate / -1);
+            expect(result.year).toEqual((coordinate - 1) / -1);
             expect(result.regime).toEqual('BCE');
         });
     });
 
-    using("coordinate =", [-1999, -999999], function (value) {
-        it("regime ka ", function () {
+    using("coordinate =", [-10000, -999999], function (value) {
+        it("regime Ka ", function () {
             var coordinate = value;
             var result = convertCoordinateToYear(coordinate);
-            expect(result.year).toEqual(coordinate / -1000);
+            expect(result.year).toEqual((coordinate - 1) / -1000);
             expect(result.regime).toEqual('Ka');
         });
     });
@@ -74,7 +74,7 @@ describe("convertCoordinateToYear method should return", function () {
         it("regime Ma ", function () {
             var coordinate = value;
             var result = convertCoordinateToYear(coordinate);
-            expect(result.year).toEqual(coordinate / -1000000);
+            expect(result.year).toEqual((coordinate - 1) / -1000000);
             expect(result.regime).toEqual('Ma');
         });
     });
@@ -83,7 +83,7 @@ describe("convertCoordinateToYear method should return", function () {
         it("regime Ga ", function () {
             var coordinate = value;
             var result = convertCoordinateToYear(coordinate);
-            expect(result.year).toEqual(coordinate / -1000000000);
+            expect(result.year).toEqual((coordinate - 1) / -1000000000);
             expect(result.regime).toEqual('Ga');
         });
     });
@@ -145,7 +145,7 @@ describe("getCoordinateFromDecimalYear() method should return", function () {
     it("decimalYear date if year = -9999", function () {
         var decimal = -9999;
         var result = CZ.Dates.getCoordinateFromDecimalYear(decimal);
-        expect(result).toEqual(decimal);
+        expect(result).toEqual(decimal + 1);
     });
 
     it("not decimalYear if year = 9999.00", function () {
