@@ -79,24 +79,34 @@ var CZ;
                         }
                     }
                 }
-                var result = [];
+                var ticks = [];
                 for(var i = imin; i <= imax; i++) {
-                    result.push(i * k * h10);
+                    ticks.push(i * k * h10);
                 }
+                var result = {
+                };
+                result.ticks = ticks;
+                result.h = h;
+                result.h10 = h10;
                 return result;
+            };
+            LineChart.prototype.generateAxisParameters = function (ymin, ymax, labelCount) {
+                var ticks = this.calculateTicks(ymin, ymax, labelCount);
+                return null;
             };
             LineChart.prototype.clear = function (screenLeft, screenRight) {
                 this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                this.context.fillStyle = "gray";
-                this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
                 this.context.fillStyle = "white";
                 this.context.fillRect(screenLeft, 0, screenRight - screenLeft, this.canvas.height);
+                var maxLegendWidth = Math.max(24, (screenRight - screenLeft) / 2 - 60);
                 $("#rightLegend").css("right", $("#timeSeries").width() - screenRight + 30);
+                $("#rightLegend").css("max-width", maxLegendWidth + "px");
                 $("#leftLegend").css("left", screenLeft + 30);
+                $("#leftLegend").css("max-width", maxLegendWidth + "px");
                 $("#timeSeriesChartHeader").text("TimeSeries Chart");
             };
-            LineChart.prototype.drawDataSet = function (dataSet, screenLeft, screenRight, plotLeft, plotRight) {
-                var _this = this;
+            LineChart.prototype.drawDataSet = function (dataSet, screenLeft, screenRight, verticalPadding, plotLeft, plotRight) {
+                var that = this;
                 var plotBottom = Number.MAX_VALUE;
                 var plotTop = Number.MIN_VALUE;
                 dataSet.series.forEach(function (seria) {
@@ -106,39 +116,159 @@ var CZ;
                     if(seria.appearanceSettings && seria.appearanceSettings.yMax && seria.appearanceSettings.yMax > plotTop) {
                         plotTop = seria.appearanceSettings.yMax;
                     }
+                    if(seria.appearanceSettings && seria.appearanceSettings.thickness && seria.appearanceSettings.thickness > verticalPadding) {
+                        verticalPadding = seria.appearanceSettings.thickness;
+                    }
                 });
+                if((plotTop - plotBottom) === 0) {
+                    var absY = Math.max(0.1, Math.abs(plotBottom));
+                    var offsetConstant = 0.01;
+                    plotTop += absY * offsetConstant;
+                    plotBottom -= absY * offsetConstant;
+                }
+                var screenHeight = this.canvas.height - 2 * verticalPadding;
                 var dataToScreenX = function (x) {
                     return (x - plotLeft) / (plotRight - plotLeft) * (screenRight - screenLeft) + screenLeft;
                 };
                 var dataToScreenY = function (y) {
-                    return (1 - (y - plotBottom) / (plotTop - plotBottom)) * _this.canvas.height;
+                    return verticalPadding + screenHeight * (plotTop - y) / (plotTop - plotBottom);
                 };
                 var x = dataSet.time;
                 var n = x.length;
-                var ctx = this.context;
+                var context = this.context;
+                var xmin = screenLeft, xmax = screenRight;
+                var ymin = 0, ymax = this.canvas.height;
                 dataSet.series.forEach(function (seria) {
-                    ctx.strokeStyle = seria.appearanceSettings.stroke;
-                    ctx.lineWidth = seria.appearanceSettings.thickness;
+                    context.strokeStyle = seria.appearanceSettings.stroke;
+                    context.lineWidth = seria.appearanceSettings.thickness;
                     var y = seria.values;
-                    ctx.beginPath();
-                    for(var i = 0; i < n; i++) {
-                        var xi = dataToScreenX(x[i]);
-                        var yi = dataToScreenY(y[i]);
-                        if(i == 0) {
-                            ctx.moveTo(xi, yi);
-                        } else {
-                            ctx.lineTo(xi, yi);
+                    context.beginPath();
+                    var x1, x2, y1, y2;
+                    var i = 0;
+                    var nextValuePoint = function () {
+                        for(; i < n; i++) {
+                            if(isNaN(x[i]) || isNaN(y[i])) {
+                                continue;
+                            }
+                            x1 = dataToScreenX(x[i]);
+                            y1 = dataToScreenY(y[i]);
+                            c1 = that.code(x1, y1, xmin, xmax, ymin, ymax);
+                            break;
                         }
+                        if(c1 == 0) {
+                            context.moveTo(x1, y1);
+                        }
+                    };
+                    nextValuePoint();
+                    var c1, c2, c1_, c2_;
+                    var dx, dy;
+                    var x2_, y2_;
+                    var m = 1;
+                    for(i++; i < n; i++) {
+                        if(isNaN(x[i]) || isNaN(y[i])) {
+                            if(m == 1) {
+                                context.stroke();
+                                var c = that.code(x1, y1, xmin, xmax, ymin, ymax);
+                                if(c == 0) {
+                                    context.beginPath();
+                                    context.arc(x1, y1, seria.appearanceSettings.thickness / 2, 0, 2 * Math.PI);
+                                    context.fill();
+                                }
+                            } else {
+                                context.stroke();
+                            }
+                            context.beginPath();
+                            i++;
+                            nextValuePoint();
+                            m = 1;
+                            continue;
+                        }
+                        x2_ = x2 = dataToScreenX(x[i]);
+                        y2_ = y2 = dataToScreenY(y[i]);
+                        if(Math.abs(x1 - x2) < 1 && Math.abs(y1 - y2) < 1) {
+                            continue;
+                        }
+                        c1_ = c1;
+                        c2_ = c2 = that.code(x2, y2, xmin, xmax, ymin, ymax);
+                        while(c1 | c2) {
+                            if(c1 & c2) {
+                                break;
+                            }
+                            dx = x2 - x1;
+                            dy = y2 - y1;
+                            if(c1) {
+                                if(x1 < xmin) {
+                                    y1 += dy * (xmin - x1) / dx;
+                                    x1 = xmin;
+                                } else if(x1 > xmax) {
+                                    y1 += dy * (xmax - x1) / dx;
+                                    x1 = xmax;
+                                } else if(y1 < ymin) {
+                                    x1 += dx * (ymin - y1) / dy;
+                                    y1 = ymin;
+                                } else if(y1 > ymax) {
+                                    x1 += dx * (ymax - y1) / dy;
+                                    y1 = ymax;
+                                }
+                                c1 = that.code(x1, y1, xmin, xmax, ymin, ymax);
+                            } else {
+                                if(x2 < xmin) {
+                                    y2 += dy * (xmin - x2) / dx;
+                                    x2 = xmin;
+                                } else if(x2 > xmax) {
+                                    y2 += dy * (xmax - x2) / dx;
+                                    x2 = xmax;
+                                } else if(y2 < ymin) {
+                                    x2 += dx * (ymin - y2) / dy;
+                                    y2 = ymin;
+                                } else if(y2 > ymax) {
+                                    x2 += dx * (ymax - y2) / dy;
+                                    y2 = ymax;
+                                }
+                                c2 = that.code(x2, y2, xmin, xmax, ymin, ymax);
+                            }
+                        }
+                        if(!(c1 & c2)) {
+                            if(c1_ != 0) {
+                                context.moveTo(x1, y1);
+                            }
+                            context.lineTo(x2, y2);
+                            m++;
+                        }
+                        x1 = x2_;
+                        y1 = y2_;
+                        c1 = c2_;
                     }
-                    ctx.stroke();
+                    if(m == 1) {
+                        context.stroke();
+                        var c = that.code(x1, y1, xmin, xmax, ymin, ymax);
+                        if(c == 0) {
+                            context.beginPath();
+                            context.arc(x1, y1, seria.appearanceSettings.thickness / 2, 0, 2 * Math.PI);
+                            context.fill();
+                        }
+                    } else {
+                        context.stroke();
+                    }
                 });
             };
-            LineChart.prototype.drawAxis = function (screenLeft, ymin, ymax, appearence) {
-                var _this = this;
-                var ticks = this.calculateTicks(ymin, ymax, appearence.labelCount);
+            LineChart.prototype.code = function (x, y, xmin, xmax, ymin, ymax) {
+                var a = x < xmin ? 1 : 0;
+                var b = x > xmax ? 1 : 0;
+                var c = y < ymin ? 1 : 0;
+                var d = y > ymax ? 1 : 0;
+                return a << 3 | b << 2 | c << 1 | d;
+            };
+            LineChart.prototype.drawAxis = function (tickOrigin, secondScreenBorder, ymin, ymax, appearence) {
+                var verticalPadding = appearence.verticalPadding ? appearence.verticalPadding : 0;
+                var screenHeight = this.canvas.height - 2 * verticalPadding;
                 var dataToScreenY = function (y) {
-                    return (1 - (y - ymin) / (ymax - ymin)) * _this.canvas.height;
+                    return verticalPadding + screenHeight * (ymax - y) / (ymax - ymin);
                 };
+                var plotToScreenY = function (top) {
+                    return (ymax - ymin) * (1 - ((top - verticalPadding) / screenHeight)) + ymin;
+                };
+                var ticks = this.calculateTicks(plotToScreenY(this.canvas.height), plotToScreenY(0), appearence.labelCount).ticks;
                 var ctx = this.context;
                 ctx.font = appearence.font;
                 ctx.textBaseline = 'middle';
@@ -154,38 +284,60 @@ var CZ;
                 ctx.textAlign = appearence.axisLocation;
                 ticks.forEach(function (tick) {
                     var y = dataToScreenY(tick);
+                    ctx.strokeStyle = appearence.stroke;
                     ctx.beginPath();
-                    ctx.moveTo(screenLeft, y);
-                    ctx.lineTo(screenLeft + ticklength, y);
+                    ctx.moveTo(tickOrigin, y);
+                    ctx.lineTo(tickOrigin + ticklength, y);
                     ctx.stroke();
-                    ctx.fillText(tick, screenLeft + ticklength + textOffset, y);
+                    ctx.fillText(tick, tickOrigin + ticklength + textOffset, y);
+                    ctx.strokeStyle = 'lightgray';
+                    var textWidth = ctx.measureText(tick).width;
+                    if(appearence.axisLocation == "right") {
+                        textWidth = -textWidth;
+                    }
+                    var offset = ticklength + textWidth + 2 * textOffset;
+                    ctx.beginPath();
+                    ctx.moveTo(tickOrigin + offset, y);
+                    ctx.lineTo(secondScreenBorder, y);
+                    ctx.stroke();
+                });
+            };
+            LineChart.prototype.drawVerticalGridLines = function (screenLeft, screenRight, plotLeft, plotRight) {
+                var ctx = this.context;
+                var verticalTicks = CZ.Common.axis.ticksInfo;
+                var height = this.canvas.height;
+                ctx.strokeStyle = 'lightgray';
+                verticalTicks.forEach(function (tick) {
+                    var coord = tick.position;
+                    ctx.beginPath();
+                    ctx.moveTo(coord, 0);
+                    ctx.lineTo(coord, height);
+                    ctx.stroke();
                 });
             };
             LineChart.prototype.updateCanvasHeight = function () {
-                this.canvas.height = $("#timeSeries").height() - 36;
+                $("#timeSeries").height($("#timeSeriesContainer").height() - 36);
+                this.canvas.height = $("#timeSeries").height();
                 this.canvas.width = $("#timeSeries").width();
             };
             LineChart.prototype.clearLegend = function (location) {
-                var legend = location === "left" ? $("#leftLegend") : $("#rightLegend");
+                var legend = location === "left" ? $("#leftLegendList") : $("#rightLegendList");
                 legend.empty();
                 legend.hide();
             };
             LineChart.prototype.addLegendRecord = function (location, stroke, description) {
-                var legend = location === "left" ? $("#leftLegend") : $("#rightLegend");
+                var legend = location === "left" ? $("#leftLegendList") : $("#rightLegendList");
+                var legendCont = location === "left" ? $("#leftLegend") : $("#rightLegend");
                 legend.show();
-                var cont = $('<div></div>');
-                var strokeIndicatior = $('<div></div>');
-                strokeIndicatior.width(16);
-                strokeIndicatior.height(16);
+                var cont = $('<li></li>');
+                var strokeIndicatior = $('<div></div>').addClass("tsc-legend-indicator");
                 strokeIndicatior.css("background-color", stroke);
-                strokeIndicatior.css("margin", "4px");
-                strokeIndicatior.css("float", "left");
-                var descriptionDiv = $('<div></div>');
-                descriptionDiv.css("text-align", "center");
+                var descriptionDiv = $('<div></div>').addClass("tsc-legend-description");
+                descriptionDiv.css("max-width", parseFloat(legendCont.css("max-width")) - 24);
                 descriptionDiv.text(description);
                 strokeIndicatior.appendTo(cont);
                 descriptionDiv.appendTo(cont);
-                cont.appendTo(legend);
+                cont.height(24).appendTo(legend);
             };
             return LineChart;
         })();
