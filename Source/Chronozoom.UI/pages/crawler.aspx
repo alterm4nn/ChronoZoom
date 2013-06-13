@@ -9,6 +9,12 @@
               if (Chronozoom.UI.Crawler.IsExhibit(Chronozoom.UI.Crawler.UrlGuid(url))) { Response.Write(Chronozoom.UI.Crawler.Exhibits(Chronozoom.UI.Crawler.UrlGuid(url)).Title + " - "); }
               if (Chronozoom.UI.Crawler.IsContentItem(Chronozoom.UI.Crawler.UrlGuid(url))) { Response.Write(Chronozoom.UI.Crawler.ContentItems(Chronozoom.UI.Crawler.UrlGuid(url)).Title + " - "); } %>ChronoZoom</title>
     <%if (Chronozoom.UI.Crawler.IsGuid(UrlGuid(url)).Equals(false)) { Response.Write("<meta name='description' content='ChronoZoom is an open-source community project dedicated to visualizing the history of everything' />"); } %>
+    <%else
+      {
+          if (Chronozoom.UI.Crawler.IsTimeline(Chronozoom.UI.Crawler.UrlGuid(url))) { Response.Write("<meta name='description' content='ChronoZoom is an open-source community project dedicated to visualizing the history of everything' />"); }
+          if (Chronozoom.UI.Crawler.IsExhibit(Chronozoom.UI.Crawler.UrlGuid(url))) { Response.Write("<meta name='description' content='" + Chronozoom.UI.Crawler.Exhibits(Chronozoom.UI.Crawler.UrlGuid(url)).ContentItems.OrderBy(c => c.Order).First().Caption + "' />"); }
+          if (Chronozoom.UI.Crawler.IsContentItem(Chronozoom.UI.Crawler.UrlGuid(url))) { Response.Write("<meta name='description' content='" + Chronozoom.UI.Crawler.ContentItems(Chronozoom.UI.Crawler.UrlGuid(url)).Caption + "' />"); }
+      } %>
 </head>
 
 <body>
