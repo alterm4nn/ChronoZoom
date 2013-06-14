@@ -2520,7 +2520,7 @@ var CZ;
                         container: listItemContainer,
                         uiMap: {
                             closeButton: ".cz-listitem-close-btn",
-                            iconImg: ".cz-contentitem-listitem-icon > img",
+                            iconImg: ".cz-form-tour-contentitem-listitem-icon > img",
                             titleTextblock: ".cz-contentitem-listitem-title",
                             typeTextblock: ".cz-contentitem-listitem-highlighted"
                         }
@@ -2545,7 +2545,17 @@ var CZ;
                 descr.change(function (ev) {
                     self.data.Description = self.Description;
                 });
-                this.iconImg.attr("src", this.data.ThumbnailUrl || "/images/Temp-Thumbnail2.png");
+                var thumbUrl = this.data.ThumbnailUrl;
+                var img = new Image();
+                img.onload = function () {
+                    self.iconImg.replaceWith(img);
+                };
+                img.onerror = function () {
+                    if(console && console.warn) {
+                        console.warn("Could not load a thumbnail image " + thumbUrl);
+                    }
+                };
+                img.src = thumbUrl;
                 this.titleTextblock.text(this.data.Title);
                 this.typeTextblock.text(this.data.Type);
                 this.Activate();
@@ -2672,18 +2682,48 @@ var CZ;
             });
             Object.defineProperty(TourStop.prototype, "ThumbnailUrl", {
                 get: function () {
-                    if(this.targetElement) {
-                        if(this.targetElement.type === "contentItem") {
-                            var type = this.targetElement.contentItem.mediaType.toLowerCase();
-                            var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x64/' + this.targetElement.contentItem.guid + '.png';
-                            return thumbnailUri;
-                        }
+                    if(!this.thumbUrl) {
+                        this.thumbUrl = this.GetThumbnail(this.targetElement);
                     }
-                    return "/images/Temp-Thumbnail2.png";
+                    return this.thumbUrl;
                 },
                 enumerable: true,
                 configurable: true
             });
+            TourStop.prototype.GetThumbnail = function (element) {
+                var defaultThumb = "/images/Temp-Thumbnail2.png";
+                try  {
+                    if(!element) {
+                        return defaultThumb;
+                    }
+                    if(element.type === "contentItem") {
+                        var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x64/' + element.id + '.png';
+                        return thumbnailUri;
+                    }
+                    if(element.type === "infodot") {
+                        if(element.contentItems && element.contentItems.length > 0) {
+                            var child = element.contentItems[0];
+                            var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x64/' + child.id + '.png';
+                            return thumbnailUri;
+                        }
+                    } else if(element.type === "timeline") {
+                        for(var n = element.children.length, i = 0; i < n; i++) {
+                            var child = element.children[i];
+                            if(child.type === "infodot" || child.type === "timeline") {
+                                var thumb = this.GetThumbnail(child);
+                                if(thumb && thumb !== defaultThumb) {
+                                    return thumb;
+                                }
+                            }
+                        }
+                    }
+                } catch (exc) {
+                    if(console && console.error) {
+                        console.error("Failed to get a thumbnail url: " + exc);
+                    }
+                }
+                return defaultThumb;
+            };
             return TourStop;
         })();
         UI.TourStop = TourStop;        
@@ -4314,9 +4354,20 @@ var CZ;
                         _super.call(this, parent, container, uiMap, context);
                 this.iconImg = this.container.find(uiMap.iconImg);
                 this.titleTextblock = this.container.find(uiMap.titleTextblock);
-                this.titleTextblock = this.container.find(uiMap.titleTextblock);
                 this.descrTextblock = this.container.find(".cz-contentitem-listitem-descr");
+                var self = this;
+                var thumbUrl = this.data.thumbnailUrl;
                 this.iconImg.attr("src", this.data.icon || "/images/Temp-Thumbnail2.png");
+                var img = new Image();
+                img.onload = function () {
+                    self.iconImg.replaceWith(img);
+                };
+                img.onerror = function () {
+                    if(console && console.warn) {
+                        console.warn("Could not load a thumbnail image " + thumbUrl);
+                    }
+                };
+                img.src = thumbUrl;
                 this.titleTextblock.text(this.data.title);
                 if(this.data.description) {
                     this.descrTextblock.text(this.data.description);
@@ -4485,6 +4536,7 @@ var CZ;
                     throw "Tour has no bookmarks";
                 }
                 var self = this;
+                this.thumbnailUrl = CZ.Settings.contentItemThumbnailBaseUri + id + '.png';
                 bookmarks.sort(function (b1, b2) {
                     return b1.lapseTime - b2.lapseTime;
                 });
