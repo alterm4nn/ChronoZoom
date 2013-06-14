@@ -1034,7 +1034,6 @@ namespace Chronozoom.UI
                     storage.Exhibits.Add(newExhibit);
                     UpdateSubtreeSize(storage, parentTimeline, 1 + (newExhibit.ContentItems != null ? newExhibit.ContentItems.Count() : 0));
 
-                    storage.SaveChanges();
                     returnValue.ExhibitId = newExhibitGuid;
 
                     // Populate the content items
@@ -1043,11 +1042,10 @@ namespace Chronozoom.UI
                         foreach (ContentItem contentItemRequest in exhibitRequest.ContentItems)
                         {
                             // Parent exhibit item will be equal to the newly added exhibit
-                            var newContentItemGuid = AddContentItem(storage, collection, newExhibit, contentItemRequest);
-                            returnValue.Add(newContentItemGuid);
+                            contentItemRequest.Id = AddContentItem(storage, collection, newExhibit, contentItemRequest);
+                            returnValue.Add(contentItemRequest.Id);
                         }
                     }
-
                 }
                 else
                 {
@@ -1072,12 +1070,33 @@ namespace Chronozoom.UI
                     // Update the content items
                     if (exhibitRequest.ContentItems != null)
                     {
+                        // For each contentItem not in the request, mark for deletion
+                        storage.Entry(updateExhibit).Collection(_ => _.ContentItems).Load();
+                        List<ContentItem> contentItemsForDeletion = new List<ContentItem>();
+                        foreach (ContentItem contentItemInStorage in updateExhibit.ContentItems)
+                            if (!exhibitRequest.ContentItems.Any(candidate => candidate.Id == contentItemInStorage.Id))
+                                contentItemsForDeletion.Add(contentItemInStorage);
+
+                        // For each contentItem not in the request, delete
+                        foreach (ContentItem contentItemForDeletion in contentItemsForDeletion)
+                            storage.ContentItems.Remove(contentItemForDeletion);
+
+                        // For each object in the request, either update or add.
                         foreach (ContentItem contentItemRequest in exhibitRequest.ContentItems)
                         {
-                            Guid updateContentItemGuid = UpdateContentItem(storage, collection.Id, contentItemRequest);
-                            if (updateContentItemGuid != Guid.Empty)
+                            if (storage.ContentItems.Any(candidate => candidate.Id == contentItemRequest.Id))
                             {
-                                returnValue.Add(updateContentItemGuid);
+                                Guid updateContentItemGuid = UpdateContentItem(storage, collection.Id, contentItemRequest);
+                                if (updateContentItemGuid != Guid.Empty)
+                                {
+                                    returnValue.Add(updateContentItemGuid);
+                                }
+                            }
+                            else
+                            {
+                                // Parent exhibit item will be equal to the newly added exhibit
+                                contentItemRequest.Id = AddContentItem(storage, collection, updateExhibit, contentItemRequest);
+                                returnValue.Add(contentItemRequest.Id);
                             }
                         }
                     }
@@ -1140,7 +1159,6 @@ namespace Chronozoom.UI
             newContentItem.Collection = collection;
 
             // Update parent exhibit.
-            storage.Entry(newExhibit).Collection(_ => _.ContentItems).Load();
             if (newExhibit.ContentItems == null)
             {
                 newExhibit.ContentItems = new System.Collections.ObjectModel.Collection<ContentItem>();
@@ -1206,6 +1224,8 @@ namespace Chronozoom.UI
                         SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
                         return Guid.Empty;
                     }
+                    storage.Entry(parentExhibit).Collection(_ => _.ContentItems).Load();
+
                     TimelineRaw parentTimeline = storage.GetExhibitParentTimeline(contentItemRequest.Exhibit_ID);
                     // Parent content item is valid - add new content item
                     var newContentItemGuid = AddContentItem(storage, collection, parentExhibit, contentItemRequest);
