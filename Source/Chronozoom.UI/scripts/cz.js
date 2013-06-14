@@ -489,7 +489,8 @@ var CZ;
             CZ.Bibliography.initializeBibliography();
             var canvasGestures = CZ.Gestures.getGesturesStream(CZ.Common.vc);
             var axisGestures = CZ.Gestures.applyAxisBehavior(CZ.Gestures.getGesturesStream(CZ.Common.ax));
-            var jointGesturesStream = canvasGestures.Merge(axisGestures);
+            var timeSeriesGestures = CZ.Gestures.getPanPinGesturesStream($("#timeSeriesContainer"));
+            var jointGesturesStream = canvasGestures.Merge(axisGestures.Merge(timeSeriesGestures));
             CZ.Common.controller = new CZ.ViewportController.ViewportController2(function (visible) {
                 var vp = CZ.Common.vc.virtualCanvas("getViewport");
                 var markerPos = CZ.Common.axis.MarkerPosition();
@@ -675,10 +676,33 @@ var CZ;
                 CZ.timeSeriesChart.clearLegend("left");
                 CZ.timeSeriesChart.clearLegend("right");
                 var chartHeader = "TimeSeries Chart";
+                if(CZ.rightDataSet !== undefined || CZ.leftDataSet !== undefined) {
+                    CZ.timeSeriesChart.drawVerticalGridLines(leftCSS, rightCSS, leftPlot, rightPlot);
+                }
+                var screenWidthForLegend = rightCSS - leftCSS;
+                if(CZ.rightDataSet !== undefined && CZ.leftDataSet !== undefined) {
+                    screenWidthForLegend /= 2;
+                }
+                var isLegendVisible = CZ.timeSeriesChart.checkLegendVisibility(screenWidthForLegend);
                 if(CZ.leftDataSet !== undefined) {
                     var padding = CZ.leftDataSet.getVerticalPadding() + 10;
-                    CZ.timeSeriesChart.drawDataSet(CZ.leftDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot);
-                    CZ.timeSeriesChart.drawAxis(leftCSS, rightCSS, CZ.leftDataSet.series[0].appearanceSettings.yMin, CZ.leftDataSet.series[0].appearanceSettings.yMax, {
+                    var plotBottom = Number.MAX_VALUE;
+                    var plotTop = Number.MIN_VALUE;
+                    CZ.leftDataSet.series.forEach(function (seria) {
+                        if(seria.appearanceSettings !== undefined && seria.appearanceSettings.yMin !== undefined && seria.appearanceSettings.yMin < plotBottom) {
+                            plotBottom = seria.appearanceSettings.yMin;
+                        }
+                        if(seria.appearanceSettings !== undefined && seria.appearanceSettings.yMax !== undefined && seria.appearanceSettings.yMax > plotTop) {
+                            plotTop = seria.appearanceSettings.yMax;
+                        }
+                    });
+                    if((plotTop - plotBottom) === 0) {
+                        var absY = Math.max(0.1, Math.abs(plotBottom));
+                        var offsetConstant = 0.01;
+                        plotTop += absY * offsetConstant;
+                        plotBottom -= absY * offsetConstant;
+                    }
+                    var axisAppearence = {
                         labelCount: 4,
                         tickLength: 10,
                         majorTickThickness: 1,
@@ -686,16 +710,37 @@ var CZ;
                         axisLocation: 'left',
                         font: '16px Calibri',
                         verticalPadding: padding
-                    });
-                    for(var i = 0; i < CZ.leftDataSet.series.length; i++) {
-                        CZ.timeSeriesChart.addLegendRecord("left", CZ.leftDataSet.series[i].appearanceSettings.stroke, CZ.leftDataSet.series[i].appearanceSettings.name);
+                    };
+                    var tickForDraw = CZ.timeSeriesChart.generateAxisParameters(leftCSS, rightCSS, plotBottom, plotTop, axisAppearence);
+                    CZ.timeSeriesChart.drawHorizontalGridLines(tickForDraw, axisAppearence);
+                    CZ.timeSeriesChart.drawDataSet(CZ.leftDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot, plotTop, plotBottom);
+                    CZ.timeSeriesChart.drawAxis(tickForDraw, axisAppearence);
+                    if(isLegendVisible) {
+                        for(var i = 0; i < CZ.leftDataSet.series.length; i++) {
+                            CZ.timeSeriesChart.addLegendRecord("left", CZ.leftDataSet.series[i].appearanceSettings.stroke, CZ.leftDataSet.series[i].appearanceSettings.name);
+                        }
                     }
                     chartHeader += " (" + CZ.leftDataSet.name;
                 }
                 if(CZ.rightDataSet !== undefined) {
                     var padding = CZ.rightDataSet.getVerticalPadding() + 10;
-                    CZ.timeSeriesChart.drawDataSet(CZ.rightDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot);
-                    CZ.timeSeriesChart.drawAxis(rightCSS, leftCSS, CZ.rightDataSet.series[0].appearanceSettings.yMin, CZ.rightDataSet.series[0].appearanceSettings.yMax, {
+                    var plotBottom = Number.MAX_VALUE;
+                    var plotTop = Number.MIN_VALUE;
+                    CZ.rightDataSet.series.forEach(function (seria) {
+                        if(seria.appearanceSettings !== undefined && seria.appearanceSettings.yMin !== undefined && seria.appearanceSettings.yMin < plotBottom) {
+                            plotBottom = seria.appearanceSettings.yMin;
+                        }
+                        if(seria.appearanceSettings !== undefined && seria.appearanceSettings.yMax !== undefined && seria.appearanceSettings.yMax > plotTop) {
+                            plotTop = seria.appearanceSettings.yMax;
+                        }
+                    });
+                    if((plotTop - plotBottom) === 0) {
+                        var absY = Math.max(0.1, Math.abs(plotBottom));
+                        var offsetConstant = 0.01;
+                        plotTop += absY * offsetConstant;
+                        plotBottom -= absY * offsetConstant;
+                    }
+                    var axisAppearence = {
                         labelCount: 4,
                         tickLength: 10,
                         majorTickThickness: 1,
@@ -703,17 +748,20 @@ var CZ;
                         axisLocation: 'right',
                         font: '16px Calibri',
                         verticalPadding: padding
-                    });
-                    for(var i = 0; i < CZ.rightDataSet.series.length; i++) {
-                        CZ.timeSeriesChart.addLegendRecord("right", CZ.rightDataSet.series[i].appearanceSettings.stroke, CZ.rightDataSet.series[i].appearanceSettings.name);
+                    };
+                    var tickForDraw = CZ.timeSeriesChart.generateAxisParameters(rightCSS, leftCSS, plotBottom, plotTop, axisAppearence);
+                    CZ.timeSeriesChart.drawHorizontalGridLines(tickForDraw, axisAppearence);
+                    CZ.timeSeriesChart.drawDataSet(CZ.rightDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot, plotTop, plotBottom);
+                    CZ.timeSeriesChart.drawAxis(tickForDraw, axisAppearence);
+                    if(isLegendVisible) {
+                        for(var i = 0; i < CZ.rightDataSet.series.length; i++) {
+                            CZ.timeSeriesChart.addLegendRecord("right", CZ.rightDataSet.series[i].appearanceSettings.stroke, CZ.rightDataSet.series[i].appearanceSettings.name);
+                        }
                     }
                     var str = chartHeader.indexOf("(") > 0 ? ", " : " (";
                     chartHeader += str + CZ.rightDataSet.name + ")";
                 } else {
                     chartHeader += ")";
-                }
-                if(CZ.rightDataSet !== undefined || CZ.leftDataSet !== undefined) {
-                    CZ.timeSeriesChart.drawVerticalGridLines(leftCSS, rightCSS, leftPlot, rightPlot);
                 }
                 $("#timeSeriesChartHeader").text(chartHeader);
             }
