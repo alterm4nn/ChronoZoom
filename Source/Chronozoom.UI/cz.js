@@ -484,7 +484,7 @@ var CZ;
                 pendingBibliographyForExhibitID = null;
                 $("#bibliographyBack").hide('clip', {
                 }, 'slow');
-                window.location.hash = window.location.hash.replace(new RegExp("&b=[a-z0-9_]+$", "gi"), "");
+                window.location.hash = window.location.hash.replace(new RegExp("&b=[a-z0-9_\-]+$", "gi"), "");
             });
         }
         Bibliography.initializeBibliography = initializeBibliography;
@@ -498,7 +498,7 @@ var CZ;
             }
             var vp = CZ.Common.vc.virtualCanvas("getViewport");
             var nav = CZ.UrlNav.vcelementToNavString(element, vp);
-            if(window.location.hash.match("b=([a-z0-9_]+)") == null) {
+            if(window.location.hash.match("b=([a-z0-9_\-]+)") == null) {
                 var bibl = "&b=" + id;
                 if(window.location.hash.indexOf('@') == -1) {
                     bibl = "@" + bibl;
@@ -2373,15 +2373,753 @@ var CZ;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
+    (function (UI) {
+        var ListBoxBase = (function () {
+            function ListBoxBase(container, listBoxInfo, listItemsInfo, getType) {
+                if (typeof getType === "undefined") { getType = function (context) {
+                    return "default";
+                }; }
+                if(!(container instanceof jQuery)) {
+                    throw "Container parameter is invalid! It should be jQuery instance.";
+                }
+                this.container = container;
+                this.listItemsInfo = listItemsInfo;
+                this.getType = getType;
+                this.items = [];
+                if(this.listItemsInfo.default) {
+                    this.listItemsInfo.default.ctor = this.listItemsInfo.default.ctor || ListItemBase;
+                }
+                for(var i = 0, context = listBoxInfo.context, len = context.length; i < len; ++i) {
+                    this.add(context[i]);
+                }
+                this.itemDblClickHandler = function (item, idx) {
+                };
+                this.itemRemoveHandler = function (item, idx) {
+                };
+                this.itemMoveHandler = function (item, idx1, idx2) {
+                };
+                var self = this;
+                if(listBoxInfo.sortableSettings) {
+                    var origStart = listBoxInfo.sortableSettings.start;
+                    var origStop = listBoxInfo.sortableSettings.stop;
+                    $.extend(listBoxInfo.sortableSettings, {
+                        start: function (event, ui) {
+                            ui.item.startPos = ui.item.index();
+                            if(origStart) {
+                                origStart(event, ui);
+                            }
+                        },
+                        stop: function (event, ui) {
+                            ui.item.stopPos = ui.item.index();
+                            var item = self.items.splice(ui.item.startPos, 1)[0];
+                            self.items.splice(ui.item.stopPos, 0, item);
+                            self.itemMoveHandler(ui.item, ui.item.startPos, ui.item.stopPos);
+                            if(origStop) {
+                                origStop(event, ui);
+                            }
+                        }
+                    });
+                    this.container.sortable(listBoxInfo.sortableSettings);
+                }
+            }
+            ListBoxBase.prototype.add = function (context) {
+                var type = this.getType(context);
+                var typeInfo = this.listItemsInfo[type];
+                var container = typeInfo.container.clone();
+                var uiMap = typeInfo.uiMap;
+                var ctor = typeInfo.ctor;
+                var item = new ctor(this, container, uiMap, context);
+                this.items.push(item);
+                return item;
+            };
+            ListBoxBase.prototype.remove = function (item) {
+                var i = this.items.indexOf(item);
+                if(i !== -1) {
+                    item.container.remove();
+                    this.items.splice(i, 1);
+                    this.itemRemoveHandler(item, i);
+                }
+            };
+            ListBoxBase.prototype.clear = function () {
+                for(var i = 0, len = this.items.length; i < len; ++i) {
+                    var item = this.items[i];
+                    item.container.remove();
+                }
+                this.items.length = 0;
+            };
+            ListBoxBase.prototype.selectItem = function (item) {
+                var i = this.items.indexOf(item);
+                if(i !== -1) {
+                    this.itemDblClickHandler(item, i);
+                }
+            };
+            ListBoxBase.prototype.itemDblClick = function (handler) {
+                this.itemDblClickHandler = handler;
+            };
+            ListBoxBase.prototype.itemRemove = function (handler) {
+                this.itemRemoveHandler = handler;
+            };
+            ListBoxBase.prototype.itemMove = function (handler) {
+                this.itemMoveHandler = handler;
+            };
+            return ListBoxBase;
+        })();
+        UI.ListBoxBase = ListBoxBase;        
+        var ListItemBase = (function () {
+            function ListItemBase(parent, container, uiMap, context) {
+                var _this = this;
+                if(!(container instanceof jQuery)) {
+                    throw "Container parameter is invalid! It should be jQuery instance.";
+                }
+                this.parent = parent;
+                this.container = container;
+                this.data = context;
+                this.container.dblclick(function (_) {
+                    return _this.parent.selectItem(_this);
+                });
+                this.closeButton = this.container.find(uiMap.closeButton);
+                if(this.closeButton.length) {
+                    this.closeButton.click(function (event) {
+                        return _this.close();
+                    });
+                }
+                this.parent.container.append(this.container);
+            }
+            ListItemBase.prototype.close = function () {
+                this.parent.remove(this);
+            };
+            return ListItemBase;
+        })();
+        UI.ListItemBase = ListItemBase;        
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var TourStopListBox = (function (_super) {
+            __extends(TourStopListBox, _super);
+            function TourStopListBox(container, listItemContainer, contentItems) {
+                var listBoxInfo = {
+                    context: contentItems,
+                    sortableSettings: {
+                        forcePlaceholderSize: true,
+                        cursor: "move",
+                        placeholder: "cz-listbox-placeholder",
+                        revert: 100,
+                        opacity: 0.75,
+                        tolerance: "pointer",
+                        scroll: false,
+                        start: function (event, ui) {
+                            ui.placeholder.height(ui.item.height());
+                        }
+                    }
+                };
+                var listItemsInfo = {
+                    default: {
+                        container: listItemContainer,
+                        uiMap: {
+                            closeButton: ".cz-listitem-close-btn",
+                            iconImg: ".cz-contentitem-listitem-icon > img",
+                            titleTextblock: ".cz-contentitem-listitem-title",
+                            typeTextblock: ".cz-contentitem-listitem-highlighted"
+                        }
+                    }
+                };
+                listItemsInfo.default.ctor = TourStopListItem;
+                        _super.call(this, container, listBoxInfo, listItemsInfo);
+            }
+            return TourStopListBox;
+        })(UI.ListBoxBase);
+        UI.TourStopListBox = TourStopListBox;        
+        var TourStopListItem = (function (_super) {
+            __extends(TourStopListItem, _super);
+            function TourStopListItem(parent, container, uiMap, context) {
+                        _super.call(this, parent, container, uiMap, context);
+                this.iconImg = this.container.find(uiMap.iconImg);
+                this.titleTextblock = this.container.find(uiMap.titleTextblock);
+                this.typeTextblock = this.container.find(uiMap.typeTextblock);
+                var self = this;
+                var descr = this.container.find(".cz-tourstop-description");
+                descr.text(self.data.Description);
+                descr.change(function (ev) {
+                    self.data.Description = self.Description;
+                });
+                this.iconImg.attr("src", this.data.ThumbnailUrl || "/images/Temp-Thumbnail2.png");
+                this.titleTextblock.text(this.data.Title);
+                this.typeTextblock.text(this.data.Type);
+                this.Activate();
+                this.container.click(function (e) {
+                    self.Activate();
+                });
+                this.container.dblclick(function (e) {
+                    if(typeof context.Target.vc == "undefined") {
+                        return;
+                    }
+                    var vp = context.Target.vc.getViewport();
+                    var visible = CZ.VCContent.getVisibleForElement(context.Target, 1.0, vp, true);
+                    var target = {
+                        newvisible: visible,
+                        element: context.Target
+                    };
+                    CZ.Search.navigateToElement(target);
+                });
+            }
+            Object.defineProperty(TourStopListItem.prototype, "Description", {
+                get: function () {
+                    var descr = this.container.find(".cz-tourstop-description");
+                    return descr.val();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            TourStopListItem.prototype.Activate = function () {
+                var myDescr = this.container.find(".cz-tourstop-description");
+                this.parent.container.find(".cz-tourstop-description").not(myDescr).hide();
+                myDescr.show(500);
+            };
+            return TourStopListItem;
+        })(UI.ListItemBase);
+        UI.TourStopListItem = TourStopListItem;        
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var TourStop = (function () {
+            function TourStop(bookmarkId, target, sequence, title) {
+                this.bookmarkId = bookmarkId;
+                if(target == undefined || target == null) {
+                    throw "target element of a tour stop is null or undefined";
+                }
+                if(typeof target.type == "undefined") {
+                    throw "type of the tour stop target element is undefined";
+                }
+                this.targetElement = target;
+                if(target.type === "Unknown") {
+                    this.type = target.type;
+                    this.title = title;
+                } else if(target.type === "contentItem") {
+                    this.type = "Content Item";
+                    this.title = title ? title : target.contentItem.title;
+                } else {
+                    this.type = target.type === "timeline" ? "Timeline" : "Event";
+                    this.title = title ? title : target.title;
+                }
+                if(!this.bookmarkId) {
+                    this.bookmarkId = "00000000-0000-0000-0000-000000000000";
+                }
+                this.sequence = sequence;
+            }
+            Object.defineProperty(TourStop.prototype, "Target", {
+                get: function () {
+                    return this.targetElement;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(TourStop.prototype, "Title", {
+                get: function () {
+                    return this.title;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(TourStop.prototype, "Description", {
+                get: function () {
+                    return this.description;
+                },
+                set: function (d) {
+                    this.description = d;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(TourStop.prototype, "LapseTime", {
+                get: function () {
+                    return this.lapseTime;
+                },
+                set: function (value) {
+                    this.lapseTime = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(TourStop.prototype, "Sequence", {
+                get: function () {
+                    return this.sequence;
+                },
+                set: function (n) {
+                    this.sequence = n;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(TourStop.prototype, "Type", {
+                get: function () {
+                    return this.type;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(TourStop.prototype, "NavigationUrl", {
+                get: function () {
+                    return CZ.UrlNav.vcelementToNavString(this.targetElement);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(TourStop.prototype, "ThumbnailUrl", {
+                get: function () {
+                    if(this.targetElement) {
+                        if(this.targetElement.type === "contentItem") {
+                            var type = this.targetElement.contentItem.mediaType.toLowerCase();
+                            var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x64/' + this.targetElement.contentItem.guid + '.png';
+                            return thumbnailUri;
+                        }
+                    }
+                    return "/images/Temp-Thumbnail2.png";
+                },
+                enumerable: true,
+                configurable: true
+            });
+            return TourStop;
+        })();
+        UI.TourStop = TourStop;        
+        var Tour = (function () {
+            function Tour(id, title, description, category, sequence, stops) {
+                this.id = id ? id : "00000000-0000-0000-0000-000000000000";
+                this.title = title;
+                this.description = description;
+                this.sequence = sequence;
+                this.stops = stops;
+                this.category = category;
+            }
+            Object.defineProperty(Tour.prototype, "Id", {
+                get: function () {
+                    return this.id;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Tour.prototype, "Title", {
+                get: function () {
+                    return this.title;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Tour.prototype, "Category", {
+                get: function () {
+                    return this.category;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Tour.prototype, "Sequence", {
+                get: function () {
+                    return this.sequence;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Tour.prototype, "Description", {
+                get: function () {
+                    return this.description;
+                },
+                set: function (val) {
+                    this.description = val;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Tour.prototype, "Stops", {
+                get: function () {
+                    return this.stops;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            return Tour;
+        })();
+        UI.Tour = Tour;        
+        var FormEditTour = (function (_super) {
+            __extends(FormEditTour, _super);
+            function FormEditTour(container, formInfo) {
+                        _super.call(this, container, formInfo);
+                this.saveButton = container.find(formInfo.saveButton);
+                this.deleteButton = container.find(formInfo.deleteButton);
+                this.addStopButton = container.find(formInfo.addStopButton);
+                this.titleInput = container.find(formInfo.titleInput);
+                this.tourTitleInput = this.container.find(".cz-form-tour-title");
+                this.tourDescriptionInput = this.container.find(".cz-form-tour-description");
+                this.clean();
+                this.saveButton.off();
+                this.deleteButton.off();
+                this.tour = formInfo.context;
+                var stops = [];
+                var self = this;
+                if(this.tour) {
+                    this.tourTitleInput.val(this.tour.title);
+                    this.tourDescriptionInput.val(this.tour.description);
+                    for(var i = 0, len = this.tour.bookmarks.length; i < len; i++) {
+                        var bookmark = this.tour.bookmarks[i];
+                        var stop = FormEditTour.bookmarkToTourstop(bookmark);
+                        stops.push(stop);
+                    }
+                } else {
+                    this.tourTitleInput.val("");
+                    this.tourDescriptionInput.val("");
+                }
+                this.tourStopsListBox = new CZ.UI.TourStopListBox(container.find(formInfo.tourStopsListBox), formInfo.tourStopsTemplate, stops);
+                this.tourStopsListBox.itemMove(function (item, startPos, endPos) {
+                    return self.onStopsReordered.apply(self, [
+                        item, 
+                        startPos, 
+                        endPos
+                    ]);
+                });
+                this.tourStopsListBox.itemRemove(function (item, index) {
+                    return self.onStopRemoved.apply(self, [
+                        item, 
+                        index
+                    ]);
+                });
+                this.initialize();
+            }
+            FormEditTour.bookmarkToTourstop = function bookmarkToTourstop(bookmark) {
+                var target = CZ.Tours.bookmarkUrlToElement(bookmark.url);
+                if(target == null) {
+                    target = {
+                        type: "Unknown"
+                    };
+                }
+                var stop = new TourStop(bookmark.id, target, bookmark.number, (!bookmark.caption || $.trim(bookmark.caption) === "") ? undefined : bookmark.caption);
+                stop.Description = bookmark.text;
+                stop.LapseTime = bookmark.lapseTime;
+                return stop;
+            };
+            FormEditTour.tourstopToBookmark = function tourstopToBookmark(tourstop) {
+                var url = CZ.UrlNav.vcelementToNavString(tourstop.Target);
+                var title = tourstop.Title;
+                var bookmark = new CZ.Tours.TourBookmark(tourstop.bookmarkId, url, title, tourstop.LapseTime, tourstop.Description);
+                bookmark.number = tourstop.Sequence;
+                return bookmark;
+            };
+            FormEditTour.prototype.deleteTourAsync = function () {
+                return CZ.Service.deleteTour(this.tour.id);
+            };
+            FormEditTour.prototype.createTourAsync = function () {
+                var deferred = $.Deferred();
+                var self = this;
+                var stops = this.getStops();
+                var name = this.tourTitleInput.val();
+                var descr = this.tourDescriptionInput.val();
+                var category = "my tours";
+                var n = stops.length;
+                var request = CZ.Service.postTour(new CZ.UI.Tour(undefined, name, descr, category, n, stops));
+                request.done(function (q) {
+                    var tourBookmarks = new Array();
+                    for(var j = 0; j < n; j++) {
+                        var tourstop = stops[j];
+                        tourstop.bookmarkId = q.BookmarkId[j];
+                        var bookmark = FormEditTour.tourstopToBookmark(tourstop);
+                        tourBookmarks.push(bookmark);
+                    }
+                    var tour = new CZ.Tours.Tour(q.TourId, name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, "", CZ.Tours.tours.length, descr);
+                    deferred.resolve(tour);
+                }).fail(function (q) {
+                    deferred.reject(q);
+                });
+                return deferred.promise();
+            };
+            FormEditTour.prototype.updateTourAsync = function (sequenceNum) {
+                var _this = this;
+                if(!this.tour) {
+                    throw "Tour is undefined";
+                }
+                var deferred = $.Deferred();
+                var self = this;
+                var stops = this.getStops();
+                var name = this.tourTitleInput.val();
+                var descr = this.tourDescriptionInput.val();
+                var category = this.tour.category;
+                var n = this.tour.bookmarks.length;
+                var m = stops.length;
+                var deletedStops = [];
+                for(var j = 0; j < n; j++) {
+                    var bookmark = this.tour.bookmarks[j];
+                    var found = false;
+                    for(var k = 0; k < m; k++) {
+                        if(stops[k].bookmarkId === bookmark.id) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if(!found) {
+                        deletedStops.push(bookmark);
+                    }
+                }
+                var reqDel;
+                if(deletedStops.length > 0) {
+                    reqDel = CZ.Service.deleteBookmarks(this.tour.id, deletedStops);
+                } else {
+                    reqDel = $.Deferred();
+                    reqDel.resolve([]);
+                }
+                reqDel.fail(function (q) {
+                    deferred.reject(q);
+                });
+                reqDel.done(function (q) {
+                    var n = stops.length;
+                    var addedStops = new Array();
+                    for(var j = 0; j < n; j++) {
+                        var tourstop = stops[j];
+                        if(!tourstop.bookmarkId || tourstop.bookmarkId == "00000000-0000-0000-0000-000000000000") {
+                            addedStops.push(tourstop);
+                        }
+                    }
+                    var reqAdd;
+                    if(addedStops.length > 0) {
+                        reqAdd = CZ.Service.putBookmarks(new CZ.UI.Tour(_this.tour.id, name, descr, category, sequenceNum, addedStops));
+                    } else {
+                        reqAdd = $.Deferred();
+                        reqAdd.resolve([]);
+                    }
+                    reqAdd.fail(function (q) {
+                        deferred.reject(q);
+                    });
+                    reqAdd.done(function (q) {
+                        var m = addedStops.length;
+                        for(var j = 0; j < m; j++) {
+                            var tourstop = addedStops[j];
+                            tourstop.bookmarkId = q.BookmarkId[j];
+                        }
+                        var request = CZ.Service.putTour(new CZ.UI.Tour(_this.tour.id, name, descr, category, sequenceNum, stops));
+                        request.done(function (q) {
+                            var n = stops.length;
+                            var tourBookmarks = new Array();
+                            for(var j = 0; j < n; j++) {
+                                var tourstop = stops[j];
+                                tourstop.bookmarkId = q.BookmarkId[j];
+                                var bookmark = FormEditTour.tourstopToBookmark(tourstop);
+                                tourBookmarks.push(bookmark);
+                            }
+                            var tour = new CZ.Tours.Tour(q.TourId, name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, "", sequenceNum, descr);
+                            deferred.resolve(tour);
+                        }).fail(function (q) {
+                            deferred.reject(q);
+                        });
+                    }).fail(function (q) {
+                        deferred.reject(q);
+                    });
+                    ;
+                });
+                return deferred.promise();
+            };
+            FormEditTour.prototype.initializeAsEdit = function () {
+                this.deleteButton.show();
+                this.titleTextblock.text("Edit Tour");
+                this.saveButton.text("update tour");
+            };
+            FormEditTour.prototype.initialize = function () {
+                var _this = this;
+                if(this.tour == null) {
+                    this.deleteButton.hide();
+                    this.titleTextblock.text("Create Tour");
+                    this.saveButton.text("create tour");
+                } else {
+                    this.initializeAsEdit();
+                }
+                var self = this;
+                this.addStopButton.click(function (event) {
+                    CZ.Authoring.isActive = true;
+                    CZ.Authoring.mode = "editTour-selectTarget";
+                    CZ.Authoring.callback = function (arg) {
+                        return self.onTargetElementSelected(arg);
+                    };
+                    self.hide();
+                });
+                this.saveButton.click(function (event) {
+                    var message;
+                    if(!_this.tourTitleInput.val()) {
+                        message = "Please enter the title";
+                    } else if(_this.tourStopsListBox.items.length == 0) {
+                        message = "Please add a tour stop to the tour";
+                    }
+                    if(message) {
+                        alert(message);
+                        return;
+                    }
+                    var self = _this;
+                    if(_this.tour == null) {
+                        _this.createTourAsync().done(function (tour) {
+                            self.tour = tour;
+                            CZ.Tours.tours.push(tour);
+                            self.initializeAsEdit();
+                            alert("Tour created.");
+                        }).fail(function (f) {
+                            if(console && console.error) {
+                                console.error("Failed to create a tour: " + f.status + " " + f.statusText);
+                            }
+                            alert("Failed to create a tour");
+                        });
+                    } else {
+                        for(var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
+                            if(CZ.Tours.tours[i] === _this.tour) {
+                                _this.updateTourAsync(i).done(function (tour) {
+                                    _this.tour = CZ.Tours.tours[i] = tour;
+                                    alert("Tour updated.");
+                                }).fail(function (f) {
+                                    if(console && console.error) {
+                                        console.error("Failed to update a tour: " + f.status + " " + f.statusText);
+                                    }
+                                    alert("Failed to update a tour");
+                                });
+                                break;
+                            }
+                        }
+                    }
+                });
+                this.deleteButton.click(function (event) {
+                    if(_this.tour == null) {
+                        return;
+                    }
+                    _this.deleteTourAsync().done(function (q) {
+                        for(var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
+                            if(CZ.Tours.tours[i] === _this.tour) {
+                                _this.tour = null;
+                                CZ.Tours.tours.splice(i, 1);
+                                _this.close();
+                                break;
+                            }
+                        }
+                    }).fail(function (f) {
+                        if(console && console.error) {
+                            console.error("Failed to delete a tour: " + f.status + " " + f.statusText);
+                        }
+                        alert("Failed to delete a tour");
+                    });
+                });
+            };
+            FormEditTour.prototype.getStops = function () {
+                var n = this.tourStopsListBox.items.length;
+                var stops = new Array(n);
+                for(; --n >= 0; ) {
+                    stops[n] = this.tourStopsListBox.items[n].data;
+                }
+                return stops;
+            };
+            FormEditTour.prototype.show = function () {
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
+                this.activationSource.addClass("active");
+            };
+            FormEditTour.prototype.hide = function (noAnimation) {
+                if (typeof noAnimation === "undefined") { noAnimation = false; }
+                _super.prototype.close.call(this, noAnimation ? undefined : {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
+                this.activationSource.removeClass("active");
+            };
+            FormEditTour.prototype.close = function () {
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500,
+                    complete: function () {
+                    }
+                });
+                CZ.Authoring.isActive = false;
+                this.clean();
+            };
+            FormEditTour.prototype.clean = function () {
+                this.activationSource.removeClass("active");
+                this.container.find(".cz-form-errormsg").hide();
+                this.container.find(".cz-listbox").empty();
+                this.tourTitleInput.val("");
+                this.tourDescriptionInput.val("");
+            };
+            FormEditTour.prototype.onStopsReordered = function () {
+                this.updateSequence();
+            };
+            FormEditTour.prototype.onStopRemoved = function () {
+                this.updateSequence();
+            };
+            FormEditTour.prototype.updateSequence = function () {
+                var stops = this.getStops();
+                var n = stops.length;
+                var lapseTime = 0;
+                for(var i = 0; i < n; i++) {
+                    var stop = stops[i];
+                    stop.Sequence = i + 1;
+                    stop.LapseTime = lapseTime;
+                    lapseTime += CZ.Settings.tourDefaultTransitionTime;
+                }
+            };
+            FormEditTour.prototype.onTargetElementSelected = function (targetElement) {
+                CZ.Authoring.isActive = false;
+                CZ.Authoring.mode = "editTour";
+                CZ.Authoring.callback = null;
+                var n = this.tourStopsListBox.items.length;
+                var stop = new TourStop("", targetElement, n + 1);
+                if(n > 0) {
+                    stop.LapseTime = ((this.tourStopsListBox.items[this.tourStopsListBox.items.length - 1]).data).LapseTime + CZ.Settings.tourDefaultTransitionTime;
+                } else {
+                    stop.LapseTime = 0;
+                }
+                this.tourStopsListBox.add(stop);
+                this.show();
+            };
+            return FormEditTour;
+        })(CZ.UI.FormBase);
+        UI.FormEditTour = FormEditTour;        
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
     (function (Service) {
         var Map;
         (function (Map) {
+            function bookmark(ts) {
+                return {
+                    id: ts.bookmarkId,
+                    name: ts.Title,
+                    url: ts.NavigationUrl,
+                    lapseTime: ts.LapseTime,
+                    description: ts.Description,
+                    sequenceId: ts.Sequence
+                };
+            }
+            function tour(t) {
+                var bookmarks = new Array(t.Stops.length);
+                for(var i = 0, n = t.Stops.length; i < n; i++) {
+                    bookmarks[i] = bookmark(t.Stops[i]);
+                }
+                return {
+                    id: t.Id,
+                    name: t.Title,
+                    description: t.Description,
+                    audio: "",
+                    category: t.Category,
+                    sequence: t.Sequence,
+                    bookmarks: bookmarks
+                };
+            }
+            Map.tour = tour;
             function timeline(t) {
                 return {
                     id: t.guid,
                     ParentTimelineId: t.parent.guid,
-                    start: t.x,
-                    end: typeof t.endDate !== 'undefined' ? t.endDate : (t.x + t.width),
+                    start: CZ.Dates.getDecimalYearFromCoordinate(t.x),
+                    end: typeof t.endDate !== 'undefined' ? t.endDate : CZ.Dates.getDecimalYearFromCoordinate(t.x + t.width),
                     title: t.title,
                     Regime: t.regime
                 };
@@ -2398,6 +3136,21 @@ var CZ;
                 };
             }
             Map.exhibit = exhibit;
+            function exhibitWithContentItems(e) {
+                var mappedContentItems = [];
+                $(e.contentItems).each(function (contentItemIndex, contentItem) {
+                    mappedContentItems.push(Map.contentItem(contentItem));
+                });
+                return {
+                    id: e.guid,
+                    ParentTimelineId: e.parent.guid,
+                    time: e.infodotDescription.date,
+                    title: e.title,
+                    description: undefined,
+                    contentItems: mappedContentItems
+                };
+            }
+            Map.exhibitWithContentItems = exhibitWithContentItems;
             function contentItem(ci) {
                 return {
                     id: ci.guid,
@@ -2573,7 +3326,7 @@ var CZ;
                 contentType: "application/json",
                 dataType: "json",
                 url: request.url,
-                data: JSON.stringify(Map.exhibit(e))
+                data: JSON.stringify(Map.exhibitWithContentItems(e))
             });
         }
         Service.putExhibit = putExhibit;
@@ -2623,6 +3376,97 @@ var CZ;
             });
         }
         Service.deleteContentItem = deleteContentItem;
+        function postTour(t) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("tour");
+            console.log("[POST] " + request.url);
+            return $.ajax({
+                type: "POST",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(Map.tour(t))
+            });
+        }
+        Service.postTour = postTour;
+        function putTour(t) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("tour");
+            console.log("[PUT] " + request.url);
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(Map.tour(t))
+            });
+        }
+        Service.putTour = putTour;
+        function deleteTour(tourId) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("tour");
+            console.log("[DELETE] " + request.url);
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify({
+                    id: tourId
+                })
+            });
+        }
+        Service.deleteTour = deleteTour;
+        function deleteBookmarks(tourId, bookmarks) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("bookmark");
+            console.log("[DELETE] " + request.url);
+            var bids = new Array(bookmarks.length);
+            for(var i = 0, n = bookmarks.length; i < n; i++) {
+                bids[i] = {
+                    id: bookmarks[i].id
+                };
+            }
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify({
+                    id: tourId,
+                    bookmarks: bids
+                })
+            });
+        }
+        Service.deleteBookmarks = deleteBookmarks;
+        function putBookmarks(t) {
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("bookmark");
+            console.log("[PUT] " + request.url);
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(Map.tour(t))
+            });
+        }
+        Service.putBookmarks = putBookmarks;
         function getTours() {
             var request = new Service.Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
@@ -2828,26 +3672,30 @@ var CZ;
         function getCoordinateFromDecimalYear(decimalYear) {
             var localPresent = getPresent();
             var presentDate = getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
-            return decimalYear === 9999 ? presentDate : decimalYear;
+            return decimalYear === 9999 ? presentDate : (decimalYear < 0 ? decimalYear + 1 : decimalYear);
         }
         Dates.getCoordinateFromDecimalYear = getCoordinateFromDecimalYear;
+        function getDecimalYearFromCoordinate(coordinate) {
+            return coordinate < 1 ? --coordinate : coordinate;
+        }
+        Dates.getDecimalYearFromCoordinate = getDecimalYearFromCoordinate;
         function convertCoordinateToYear(coordinate) {
             var year = {
                 year: coordinate,
                 regime: "CE"
             };
             if(coordinate < -999999999) {
-                year.year /= -1000000000;
+                year.year = (year.year - 1) / (-1000000000);
                 year.regime = 'Ga';
             } else if(coordinate < -999999) {
-                year.year /= -1000000;
+                year.year = (year.year - 1) / (-1000000);
                 year.regime = 'Ma';
-            } else if(coordinate < -999) {
-                year.year /= -1000;
+            } else if(coordinate < -9999) {
+                year.year = (year.year - 1) / (-1000);
                 year.regime = 'Ka';
-            } else if(coordinate < 0) {
-                year.year /= -1;
-                year.year = Math.floor(year.year);
+            } else if(coordinate < 1) {
+                year.year = (year.year - 1) / (-1);
+                year.year = Math.ceil(year.year);
                 year.regime = 'BCE';
             } else {
                 year.year = Math.floor(year.year);
@@ -2859,16 +3707,16 @@ var CZ;
             var coordinate = year;
             switch(regime.toLowerCase()) {
                 case "ga":
-                    coordinate *= -1000000000;
+                    coordinate = year * (-1000000000) + 1;
                     break;
                 case "ma":
-                    coordinate *= -1000000;
+                    coordinate = year * (-1000000) + 1;
                     break;
                 case "ka":
-                    coordinate *= -1000;
+                    coordinate = year * (-1000) + 1;
                     break;
                 case "bce":
-                    coordinate *= -1;
+                    coordinate = year * (-1) + 1;
                     break;
             }
             return coordinate;
@@ -3121,7 +3969,7 @@ var CZ;
             },
             "editTour-selectTarget": {
                 mouseup: function () {
-                    if(Authoring.callback != null && _hovered != undefined && _hovered != null) {
+                    if(Authoring.callback != null && _hovered != undefined && _hovered != null && typeof _hovered.type != "undefined") {
                         Authoring.callback(_hovered);
                     }
                 },
@@ -3213,7 +4061,7 @@ var CZ;
             var temp = {
                 x: Number(prop.start),
                 y: t.y,
-                width: Number(CZ.Dates.getCoordinateFromDecimalYear(prop.end) - prop.start),
+                width: prop.end === 9999 ? Number(CZ.Dates.getCoordinateFromDecimalYear(prop.end) - prop.start) : Number(prop.end - prop.start),
                 height: t.height,
                 type: "rectangle"
             };
@@ -3246,41 +4094,31 @@ var CZ;
             CZ.VCContent.removeChild(t.parent, t.id);
         }
         Authoring.removeTimeline = removeTimeline;
-        function updateExhibit(e, args) {
+        function updateExhibit(oldExhibit, args) {
             var deferred = $.Deferred();
-            if(e && e.contentItems && args) {
-                var clone = $.extend({
-                }, e, {
+            if(oldExhibit && oldExhibit.contentItems && args) {
+                var newExhibit = $.extend({
+                }, oldExhibit, {
                     children: null
                 });
-                clone = $.extend(true, {
-                }, clone);
-                delete clone.children;
-                delete clone.contentItems;
-                $.extend(true, clone, args);
-                var oldContentItems = $.extend(true, [], e.contentItems);
-                CZ.Service.putExhibit(clone).then(function (response) {
-                    var old_id = e.id;
-                    e.id = clone.id = "e" + response.ExhibitId;
-                    var new_id = e.id;
-                    e.guid = clone.guid = response.ExhibitId;
-                    for(var i = 0; i < e.contentItems.length; i++) {
-                        e.contentItems[i].ParentExhibitId = e.guid;
+                newExhibit = $.extend(true, {
+                }, newExhibit);
+                delete newExhibit.children;
+                delete newExhibit.contentItems;
+                $.extend(true, newExhibit, args);
+                CZ.Service.putExhibit(newExhibit).then(function (response) {
+                    newExhibit.guid = response.ExhibitId;
+                    for(var i = 0; i < newExhibit.contentItems.length; i++) {
+                        newExhibit.contentItems[i].ParentExhibitId = newExhibit.guid;
                     }
-                    for(var i = 0; i < clone.contentItems.length; i++) {
-                        clone.contentItems[i].ParentExhibitId = clone.guid;
-                    }
-                    CZ.Service.putExhibitContent(clone, oldContentItems).then(function (response) {
-                        $.extend(e, clone);
-                        e.id = old_id;
-                        e = renewExhibit(e);
-                        e.id = new_id;
-                        CZ.Common.vc.virtualCanvas("requestInvalidate");
-                        deferred.resolve();
-                    }, function (error) {
-                        console.log("Error connecting to service: update exhibit (put exhibit content).\n" + error.responseText);
-                        deferred.reject();
+                    $(response.ContentItemId).each(function (contentItemIdIndex, contentItemId) {
+                        newExhibit.contentItems[contentItemIdIndex].id = contentItemId;
+                        newExhibit.contentItems[contentItemIdIndex].guid = contentItemId;
                     });
+                    newExhibit = renewExhibit(newExhibit);
+                    newExhibit.id = "e" + response.ExhibitId;
+                    CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    deferred.resolve();
                 }, function (error) {
                     console.log("Error connecting to service: update exhibit.\n" + error.responseText);
                     deferred.reject();
@@ -3436,129 +4274,6 @@ var CZ;
 var CZ;
 (function (CZ) {
     (function (UI) {
-        var ListBoxBase = (function () {
-            function ListBoxBase(container, listBoxInfo, listItemsInfo, getType) {
-                if (typeof getType === "undefined") { getType = function (context) {
-                    return "default";
-                }; }
-                if(!(container instanceof jQuery)) {
-                    throw "Container parameter is invalid! It should be jQuery instance.";
-                }
-                this.container = container;
-                this.listItemsInfo = listItemsInfo;
-                this.getType = getType;
-                this.items = [];
-                if(this.listItemsInfo.default) {
-                    this.listItemsInfo.default.ctor = this.listItemsInfo.default.ctor || ListItemBase;
-                }
-                for(var i = 0, context = listBoxInfo.context, len = context.length; i < len; ++i) {
-                    this.add(context[i]);
-                }
-                this.itemDblClickHandler = function (item, idx) {
-                };
-                this.itemRemoveHandler = function (item, idx) {
-                };
-                this.itemMoveHandler = function (item, idx1, idx2) {
-                };
-                var self = this;
-                if(listBoxInfo.sortableSettings) {
-                    var origStart = listBoxInfo.sortableSettings.start;
-                    var origStop = listBoxInfo.sortableSettings.stop;
-                    $.extend(listBoxInfo.sortableSettings, {
-                        start: function (event, ui) {
-                            ui.item.startPos = ui.item.index();
-                            if(origStart) {
-                                origStart(event, ui);
-                            }
-                        },
-                        stop: function (event, ui) {
-                            ui.item.stopPos = ui.item.index();
-                            var item = self.items.splice(ui.item.startPos, 1)[0];
-                            self.items.splice(ui.item.stopPos, 0, item);
-                            self.itemMoveHandler(ui.item, ui.item.startPos, ui.item.stopPos);
-                            if(origStop) {
-                                origStop(event, ui);
-                            }
-                        }
-                    });
-                    this.container.sortable(listBoxInfo.sortableSettings);
-                }
-            }
-            ListBoxBase.prototype.add = function (context) {
-                var type = this.getType(context);
-                var typeInfo = this.listItemsInfo[type];
-                var container = typeInfo.container.clone();
-                var uiMap = typeInfo.uiMap;
-                var ctor = typeInfo.ctor;
-                var item = new ctor(this, container, uiMap, context);
-                this.items.push(item);
-                return item;
-            };
-            ListBoxBase.prototype.remove = function (item) {
-                var i = this.items.indexOf(item);
-                if(i !== -1) {
-                    item.container.remove();
-                    this.items.splice(i, 1);
-                    this.itemRemoveHandler(item, i);
-                }
-            };
-            ListBoxBase.prototype.clear = function () {
-                for(var i = 0, len = this.items.length; i < len; ++i) {
-                    var item = this.items[i];
-                    item.container.remove();
-                }
-                this.items.length = 0;
-            };
-            ListBoxBase.prototype.selectItem = function (item) {
-                var i = this.items.indexOf(item);
-                if(i !== -1) {
-                    this.itemDblClickHandler(item, i);
-                }
-            };
-            ListBoxBase.prototype.itemDblClick = function (handler) {
-                this.itemDblClickHandler = handler;
-            };
-            ListBoxBase.prototype.itemRemove = function (handler) {
-                this.itemRemoveHandler = handler;
-            };
-            ListBoxBase.prototype.itemMove = function (handler) {
-                this.itemMoveHandler = handler;
-            };
-            return ListBoxBase;
-        })();
-        UI.ListBoxBase = ListBoxBase;        
-        var ListItemBase = (function () {
-            function ListItemBase(parent, container, uiMap, context) {
-                var _this = this;
-                if(!(container instanceof jQuery)) {
-                    throw "Container parameter is invalid! It should be jQuery instance.";
-                }
-                this.parent = parent;
-                this.container = container;
-                this.data = context;
-                this.container.dblclick(function (_) {
-                    return _this.parent.selectItem(_this);
-                });
-                this.closeButton = this.container.find(uiMap.closeButton);
-                if(this.closeButton.length) {
-                    this.closeButton.click(function (event) {
-                        return _this.close();
-                    });
-                }
-                this.parent.container.append(this.container);
-            }
-            ListItemBase.prototype.close = function () {
-                this.parent.remove(this);
-            };
-            return ListItemBase;
-        })();
-        UI.ListItemBase = ListItemBase;        
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (UI) {
         var TourListBox = (function (_super) {
             __extends(TourListBox, _super);
             function TourListBox(container, listItemContainer, contentItems, takeTour, editTour) {
@@ -3602,11 +4317,21 @@ var CZ;
         var TourListItem = (function (_super) {
             __extends(TourListItem, _super);
             function TourListItem(parent, container, uiMap, context) {
+                if(!context) {
+                    throw "Tour list item's context is undefined";
+                }
                         _super.call(this, parent, container, uiMap, context);
                 this.iconImg = this.container.find(uiMap.iconImg);
                 this.titleTextblock = this.container.find(uiMap.titleTextblock);
+                this.titleTextblock = this.container.find(uiMap.titleTextblock);
+                this.descrTextblock = this.container.find(".cz-contentitem-listitem-descr");
                 this.iconImg.attr("src", this.data.icon || "/images/Temp-Thumbnail2.png");
                 this.titleTextblock.text(this.data.title);
+                if(this.data.description) {
+                    this.descrTextblock.text(this.data.description);
+                } else {
+                    this.descrTextblock.hide();
+                }
                 this.container.find("#takeTour").click(function (e) {
                     parent.TakeTour(context);
                 });
@@ -3633,6 +4358,9 @@ var CZ;
                         _super.call(this, container, formInfo);
                 this.takeTour = formInfo.takeTour;
                 this.editTour = formInfo.editTour;
+                var tours = formInfo.tours.sort(function (a, b) {
+                    return a.sequenceNum - b.sequenceNum;
+                });
                 this.toursListBox = new CZ.UI.TourListBox(container.find("#tours"), formInfo.tourTemplate, formInfo.tours, function (tour) {
                     _this.onTakeTour(tour);
                 }, this.editTour ? function (tour) {
@@ -3705,7 +4433,8 @@ var CZ;
         Tours.bookmarkAnimation;
         var isToursDebugEnabled = false;
         var TourBookmark = (function () {
-            function TourBookmark(url, caption, lapseTime, text) {
+            function TourBookmark(id, url, caption, lapseTime, text) {
+                this.id = id;
                 this.url = url;
                 this.caption = caption;
                 this.lapseTime = lapseTime;
@@ -3737,7 +4466,8 @@ var CZ;
         }
         Tours.bookmarkUrlToElement = bookmarkUrlToElement;
         var Tour = (function () {
-            function Tour(title, bookmarks, zoomTo, vc, category, audio, sequenceNum) {
+            function Tour(id, title, bookmarks, zoomTo, vc, category, audio, sequenceNum, description) {
+                this.id = id;
                 this.title = title;
                 this.bookmarks = bookmarks;
                 this.zoomTo = zoomTo;
@@ -3745,6 +4475,7 @@ var CZ;
                 this.category = category;
                 this.audio = audio;
                 this.sequenceNum = sequenceNum;
+                this.description = description;
                 this.tour_BookmarkStarted = [];
                 this.tour_BookmarkFinished = [];
                 this.tour_TourStarted = [];
@@ -4365,7 +5096,7 @@ var CZ;
             for(var i = 0; i < content.d.length; i++) {
                 var areBookmarksValid = true;
                 var tourString = content.d[i];
-                if((typeof tourString.bookmarks == 'undefined') || (typeof tourString.audio == 'undefined') || (tourString.audio == undefined) || (tourString.audio == null) || (typeof tourString.category == 'undefined') || (typeof tourString.name == 'undefined') || (typeof tourString.sequence == 'undefined')) {
+                if((typeof tourString.bookmarks == 'undefined') || (typeof tourString.audio == 'undefined') || (tourString.audio == undefined) || (tourString.audio == null) || (typeof tourString.category == 'undefined') || (typeof tourString.name == 'undefined') || (typeof tourString.sequence == 'undefined') || (tourString.bookmarks.length == 0)) {
                     continue;
                 }
                 var tourBookmarks = new Array();
@@ -4375,12 +5106,13 @@ var CZ;
                         areBookmarksValid = false;
                         break;
                     }
-                    tourBookmarks.push(new TourBookmark(bmString.url, bmString.name, bmString.lapseTime, bmString.description));
+                    tourBookmarks.push(new TourBookmark(bmString.id, bmString.url, bmString.name, bmString.lapseTime, bmString.description));
                 }
                 if(!areBookmarksValid) {
                     continue;
                 }
-                Tours.tours.push(new Tour(tourString.name, tourBookmarks, bookmarkTransition, CZ.Common.vc, tourString.category, tourString.audio, tourString.sequence));
+                var tour = new Tour(tourString.id, tourString.name, tourBookmarks, bookmarkTransition, CZ.Common.vc, tourString.category, tourString.audio, tourString.sequence, tourString.description);
+                Tours.tours.push(tour);
             }
             $("body").trigger("toursInitialized");
         }
@@ -8632,6 +9364,15 @@ var CZ;
         Data.getTimelines = getTimelines;
         var DataSet = (function () {
             function DataSet() { }
+            DataSet.prototype.getVerticalPadding = function () {
+                var padding = 0;
+                this.series.forEach(function (seria) {
+                    if(seria.appearanceSettings && seria.appearanceSettings.thickness && seria.appearanceSettings.thickness > padding) {
+                        padding = seria.appearanceSettings.thickness;
+                    }
+                });
+                return padding;
+            };
             return DataSet;
         })();
         Data.DataSet = DataSet;        
@@ -8664,10 +9405,20 @@ var CZ;
             var dataText = csvText;
             var csvArr = dataText.csvToArray({
                 trim: true,
-                fSep: delimiter
+                fSep: delimiter,
+                quot: "'"
             });
+            if(csvArr === undefined) {
+                throw "Error parsing input file: file has incorrect format";
+            }
             var dataLength = csvArr.length - 1;
+            if(dataLength < 2) {
+                throw "Error parsing input file: Input should be csv/text file with header and at least one data row";
+            }
             var seriesLength = csvArr[0].length - 1;
+            if(seriesLength < 1) {
+                throw "Error parsing input file: table should contain one column with X-axis data and at least one column for Y-axis data";
+            }
             var result = new DataSet();
             result.name = name;
             result.time = new Array();
@@ -8677,15 +9428,33 @@ var CZ;
                 seria.values = new Array();
                 seria.appearanceSettings = {
                     thickness: 1,
-                    stroke: 'blue',
-                    name: csvArr[0][i]
+                    stroke: 'blue'
                 };
+                var seriaHeader = csvArr[0][i];
+                var appearanceRegex = new RegExp("{(.*)}");
+                var loadedAppearence = appearanceRegex.exec(seriaHeader);
+                if(loadedAppearence !== null) {
+                    loadedAppearence = parseStyleString(loadedAppearence[1]);
+                    for(var prop in loadedAppearence) {
+                        seria.appearanceSettings[prop] = loadedAppearence[prop];
+                    }
+                }
+                var headerRegex = new RegExp("(.*){");
+                var header = headerRegex.exec(seriaHeader);
+                if(header !== null) {
+                    seria.appearanceSettings.name = header[1];
+                } else {
+                    seria.appearanceSettings.name = seriaHeader;
+                }
                 seria.appearanceSettings.yMin = parseFloat(csvArr[1][i]);
                 seria.appearanceSettings.yMax = parseFloat(csvArr[1][i]);
                 result.series.push(seria);
             }
             for(var i = 0; i < dataLength; i++) {
-                result.time.push(csvArr[i + 1][0]);
+                if(csvArr[i + 1].length !== (seriesLength + 1)) {
+                    throw "Error parsing input file: incompatible data row " + (i + 1);
+                }
+                result.time.push(parseFloat(csvArr[i + 1][0]));
                 for(var j = 1; j <= seriesLength; j++) {
                     var value = parseFloat(csvArr[i + 1][j]);
                     var seria = result.series[j - 1];
@@ -8701,6 +9470,25 @@ var CZ;
             return result;
         }
         Data.csvToDataSet = csvToDataSet;
+        function parseStyleString(styleString) {
+            var result = {
+            };
+            var items = styleString.split(";");
+            var n = items.length;
+            for(var i = 0; i < n; i++) {
+                var pair = items[i].split(':', 2);
+                if(pair && pair.length === 2) {
+                    var name = pair[0].trim();
+                    var val = pair[1].trim();
+                    if(/^\d+$/.test(val)) {
+                        val = parseFloat(val);
+                    }
+                    result[name] = val;
+                }
+            }
+            return result;
+        }
+        Data.parseStyleString = parseStyleString;
     })(CZ.Data || (CZ.Data = {}));
     var Data = CZ.Data;
 })(CZ || (CZ = {}));
@@ -8785,24 +9573,34 @@ var CZ;
                         }
                     }
                 }
-                var result = [];
+                var ticks = [];
                 for(var i = imin; i <= imax; i++) {
-                    result.push(i * k * h10);
+                    ticks.push(i * k * h10);
                 }
+                var result = {
+                };
+                result.ticks = ticks;
+                result.h = h;
+                result.h10 = h10;
                 return result;
+            };
+            LineChart.prototype.generateAxisParameters = function (ymin, ymax, labelCount) {
+                var ticks = this.calculateTicks(ymin, ymax, labelCount);
+                return null;
             };
             LineChart.prototype.clear = function (screenLeft, screenRight) {
                 this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                this.context.fillStyle = "gray";
-                this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
                 this.context.fillStyle = "white";
                 this.context.fillRect(screenLeft, 0, screenRight - screenLeft, this.canvas.height);
+                var maxLegendWidth = Math.max(24, (screenRight - screenLeft) / 2 - 60);
                 $("#rightLegend").css("right", $("#timeSeries").width() - screenRight + 30);
+                $("#rightLegend").css("max-width", maxLegendWidth + "px");
                 $("#leftLegend").css("left", screenLeft + 30);
+                $("#leftLegend").css("max-width", maxLegendWidth + "px");
                 $("#timeSeriesChartHeader").text("TimeSeries Chart");
             };
-            LineChart.prototype.drawDataSet = function (dataSet, screenLeft, screenRight, plotLeft, plotRight) {
-                var _this = this;
+            LineChart.prototype.drawDataSet = function (dataSet, screenLeft, screenRight, verticalPadding, plotLeft, plotRight) {
+                var that = this;
                 var plotBottom = Number.MAX_VALUE;
                 var plotTop = Number.MIN_VALUE;
                 dataSet.series.forEach(function (seria) {
@@ -8812,39 +9610,159 @@ var CZ;
                     if(seria.appearanceSettings && seria.appearanceSettings.yMax && seria.appearanceSettings.yMax > plotTop) {
                         plotTop = seria.appearanceSettings.yMax;
                     }
+                    if(seria.appearanceSettings && seria.appearanceSettings.thickness && seria.appearanceSettings.thickness > verticalPadding) {
+                        verticalPadding = seria.appearanceSettings.thickness;
+                    }
                 });
+                if((plotTop - plotBottom) === 0) {
+                    var absY = Math.max(0.1, Math.abs(plotBottom));
+                    var offsetConstant = 0.01;
+                    plotTop += absY * offsetConstant;
+                    plotBottom -= absY * offsetConstant;
+                }
+                var screenHeight = this.canvas.height - 2 * verticalPadding;
                 var dataToScreenX = function (x) {
                     return (x - plotLeft) / (plotRight - plotLeft) * (screenRight - screenLeft) + screenLeft;
                 };
                 var dataToScreenY = function (y) {
-                    return (1 - (y - plotBottom) / (plotTop - plotBottom)) * _this.canvas.height;
+                    return verticalPadding + screenHeight * (plotTop - y) / (plotTop - plotBottom);
                 };
                 var x = dataSet.time;
                 var n = x.length;
-                var ctx = this.context;
+                var context = this.context;
+                var xmin = screenLeft, xmax = screenRight;
+                var ymin = 0, ymax = this.canvas.height;
                 dataSet.series.forEach(function (seria) {
-                    ctx.strokeStyle = seria.appearanceSettings.stroke;
-                    ctx.lineWidth = seria.appearanceSettings.thickness;
+                    context.strokeStyle = seria.appearanceSettings.stroke;
+                    context.lineWidth = seria.appearanceSettings.thickness;
                     var y = seria.values;
-                    ctx.beginPath();
-                    for(var i = 0; i < n; i++) {
-                        var xi = dataToScreenX(x[i]);
-                        var yi = dataToScreenY(y[i]);
-                        if(i == 0) {
-                            ctx.moveTo(xi, yi);
-                        } else {
-                            ctx.lineTo(xi, yi);
+                    context.beginPath();
+                    var x1, x2, y1, y2;
+                    var i = 0;
+                    var nextValuePoint = function () {
+                        for(; i < n; i++) {
+                            if(isNaN(x[i]) || isNaN(y[i])) {
+                                continue;
+                            }
+                            x1 = dataToScreenX(x[i]);
+                            y1 = dataToScreenY(y[i]);
+                            c1 = that.code(x1, y1, xmin, xmax, ymin, ymax);
+                            break;
                         }
+                        if(c1 == 0) {
+                            context.moveTo(x1, y1);
+                        }
+                    };
+                    nextValuePoint();
+                    var c1, c2, c1_, c2_;
+                    var dx, dy;
+                    var x2_, y2_;
+                    var m = 1;
+                    for(i++; i < n; i++) {
+                        if(isNaN(x[i]) || isNaN(y[i])) {
+                            if(m == 1) {
+                                context.stroke();
+                                var c = that.code(x1, y1, xmin, xmax, ymin, ymax);
+                                if(c == 0) {
+                                    context.beginPath();
+                                    context.arc(x1, y1, seria.appearanceSettings.thickness / 2, 0, 2 * Math.PI);
+                                    context.fill();
+                                }
+                            } else {
+                                context.stroke();
+                            }
+                            context.beginPath();
+                            i++;
+                            nextValuePoint();
+                            m = 1;
+                            continue;
+                        }
+                        x2_ = x2 = dataToScreenX(x[i]);
+                        y2_ = y2 = dataToScreenY(y[i]);
+                        if(Math.abs(x1 - x2) < 1 && Math.abs(y1 - y2) < 1) {
+                            continue;
+                        }
+                        c1_ = c1;
+                        c2_ = c2 = that.code(x2, y2, xmin, xmax, ymin, ymax);
+                        while(c1 | c2) {
+                            if(c1 & c2) {
+                                break;
+                            }
+                            dx = x2 - x1;
+                            dy = y2 - y1;
+                            if(c1) {
+                                if(x1 < xmin) {
+                                    y1 += dy * (xmin - x1) / dx;
+                                    x1 = xmin;
+                                } else if(x1 > xmax) {
+                                    y1 += dy * (xmax - x1) / dx;
+                                    x1 = xmax;
+                                } else if(y1 < ymin) {
+                                    x1 += dx * (ymin - y1) / dy;
+                                    y1 = ymin;
+                                } else if(y1 > ymax) {
+                                    x1 += dx * (ymax - y1) / dy;
+                                    y1 = ymax;
+                                }
+                                c1 = that.code(x1, y1, xmin, xmax, ymin, ymax);
+                            } else {
+                                if(x2 < xmin) {
+                                    y2 += dy * (xmin - x2) / dx;
+                                    x2 = xmin;
+                                } else if(x2 > xmax) {
+                                    y2 += dy * (xmax - x2) / dx;
+                                    x2 = xmax;
+                                } else if(y2 < ymin) {
+                                    x2 += dx * (ymin - y2) / dy;
+                                    y2 = ymin;
+                                } else if(y2 > ymax) {
+                                    x2 += dx * (ymax - y2) / dy;
+                                    y2 = ymax;
+                                }
+                                c2 = that.code(x2, y2, xmin, xmax, ymin, ymax);
+                            }
+                        }
+                        if(!(c1 & c2)) {
+                            if(c1_ != 0) {
+                                context.moveTo(x1, y1);
+                            }
+                            context.lineTo(x2, y2);
+                            m++;
+                        }
+                        x1 = x2_;
+                        y1 = y2_;
+                        c1 = c2_;
                     }
-                    ctx.stroke();
+                    if(m == 1) {
+                        context.stroke();
+                        var c = that.code(x1, y1, xmin, xmax, ymin, ymax);
+                        if(c == 0) {
+                            context.beginPath();
+                            context.arc(x1, y1, seria.appearanceSettings.thickness / 2, 0, 2 * Math.PI);
+                            context.fill();
+                        }
+                    } else {
+                        context.stroke();
+                    }
                 });
             };
-            LineChart.prototype.drawAxis = function (screenLeft, ymin, ymax, appearence) {
-                var _this = this;
-                var ticks = this.calculateTicks(ymin, ymax, appearence.labelCount);
+            LineChart.prototype.code = function (x, y, xmin, xmax, ymin, ymax) {
+                var a = x < xmin ? 1 : 0;
+                var b = x > xmax ? 1 : 0;
+                var c = y < ymin ? 1 : 0;
+                var d = y > ymax ? 1 : 0;
+                return a << 3 | b << 2 | c << 1 | d;
+            };
+            LineChart.prototype.drawAxis = function (tickOrigin, secondScreenBorder, ymin, ymax, appearence) {
+                var verticalPadding = appearence.verticalPadding ? appearence.verticalPadding : 0;
+                var screenHeight = this.canvas.height - 2 * verticalPadding;
                 var dataToScreenY = function (y) {
-                    return (1 - (y - ymin) / (ymax - ymin)) * _this.canvas.height;
+                    return verticalPadding + screenHeight * (ymax - y) / (ymax - ymin);
                 };
+                var plotToScreenY = function (top) {
+                    return (ymax - ymin) * (1 - ((top - verticalPadding) / screenHeight)) + ymin;
+                };
+                var ticks = this.calculateTicks(plotToScreenY(this.canvas.height), plotToScreenY(0), appearence.labelCount).ticks;
                 var ctx = this.context;
                 ctx.font = appearence.font;
                 ctx.textBaseline = 'middle';
@@ -8860,38 +9778,60 @@ var CZ;
                 ctx.textAlign = appearence.axisLocation;
                 ticks.forEach(function (tick) {
                     var y = dataToScreenY(tick);
+                    ctx.strokeStyle = appearence.stroke;
                     ctx.beginPath();
-                    ctx.moveTo(screenLeft, y);
-                    ctx.lineTo(screenLeft + ticklength, y);
+                    ctx.moveTo(tickOrigin, y);
+                    ctx.lineTo(tickOrigin + ticklength, y);
                     ctx.stroke();
-                    ctx.fillText(tick, screenLeft + ticklength + textOffset, y);
+                    ctx.fillText(tick, tickOrigin + ticklength + textOffset, y);
+                    ctx.strokeStyle = 'lightgray';
+                    var textWidth = ctx.measureText(tick).width;
+                    if(appearence.axisLocation == "right") {
+                        textWidth = -textWidth;
+                    }
+                    var offset = ticklength + textWidth + 2 * textOffset;
+                    ctx.beginPath();
+                    ctx.moveTo(tickOrigin + offset, y);
+                    ctx.lineTo(secondScreenBorder, y);
+                    ctx.stroke();
+                });
+            };
+            LineChart.prototype.drawVerticalGridLines = function (screenLeft, screenRight, plotLeft, plotRight) {
+                var ctx = this.context;
+                var verticalTicks = CZ.Common.axis.ticksInfo;
+                var height = this.canvas.height;
+                ctx.strokeStyle = 'lightgray';
+                verticalTicks.forEach(function (tick) {
+                    var coord = tick.position;
+                    ctx.beginPath();
+                    ctx.moveTo(coord, 0);
+                    ctx.lineTo(coord, height);
+                    ctx.stroke();
                 });
             };
             LineChart.prototype.updateCanvasHeight = function () {
-                this.canvas.height = $("#timeSeries").height() - 36;
+                $("#timeSeries").height($("#timeSeriesContainer").height() - 36);
+                this.canvas.height = $("#timeSeries").height();
                 this.canvas.width = $("#timeSeries").width();
             };
             LineChart.prototype.clearLegend = function (location) {
-                var legend = location === "left" ? $("#leftLegend") : $("#rightLegend");
+                var legend = location === "left" ? $("#leftLegendList") : $("#rightLegendList");
                 legend.empty();
                 legend.hide();
             };
             LineChart.prototype.addLegendRecord = function (location, stroke, description) {
-                var legend = location === "left" ? $("#leftLegend") : $("#rightLegend");
+                var legend = location === "left" ? $("#leftLegendList") : $("#rightLegendList");
+                var legendCont = location === "left" ? $("#leftLegend") : $("#rightLegend");
                 legend.show();
-                var cont = $('<div></div>');
-                var strokeIndicatior = $('<div></div>');
-                strokeIndicatior.width(16);
-                strokeIndicatior.height(16);
+                var cont = $('<li></li>');
+                var strokeIndicatior = $('<div></div>').addClass("tsc-legend-indicator");
                 strokeIndicatior.css("background-color", stroke);
-                strokeIndicatior.css("margin", "4px");
-                strokeIndicatior.css("float", "left");
-                var descriptionDiv = $('<div></div>');
-                descriptionDiv.css("text-align", "center");
+                var descriptionDiv = $('<div></div>').addClass("tsc-legend-description");
+                descriptionDiv.css("max-width", parseFloat(legendCont.css("max-width")) - 24);
                 descriptionDiv.text(description);
                 strokeIndicatior.appendTo(cont);
                 descriptionDiv.appendTo(cont);
-                cont.appendTo(legend);
+                cont.height(24).appendTo(legend);
             };
             return LineChart;
         })();
@@ -9750,7 +10690,7 @@ var CZ;
                     height: this.exhibit.height,
                     width: this.exhibit.width,
                     infodotDescription: {
-                        date: this.datePicker.getDate()
+                        date: CZ.Dates.getDecimalYearFromCoordinate(this.datePicker.getDate())
                     },
                     contentItems: this.exhibit.contentItems || [],
                     type: "infodot"
@@ -10029,286 +10969,6 @@ var CZ;
 var CZ;
 (function (CZ) {
     (function (UI) {
-        var TourStopListBox = (function (_super) {
-            __extends(TourStopListBox, _super);
-            function TourStopListBox(container, listItemContainer, contentItems) {
-                var listBoxInfo = {
-                    context: contentItems,
-                    sortableSettings: {
-                        forcePlaceholderSize: true,
-                        cursor: "move",
-                        placeholder: "cz-listbox-placeholder",
-                        revert: 100,
-                        opacity: 0.75,
-                        tolerance: "pointer",
-                        scroll: false,
-                        start: function (event, ui) {
-                            ui.placeholder.height(ui.item.height());
-                        }
-                    }
-                };
-                var listItemsInfo = {
-                    default: {
-                        container: listItemContainer,
-                        uiMap: {
-                            closeButton: ".cz-listitem-close-btn",
-                            iconImg: ".cz-contentitem-listitem-icon > img",
-                            titleTextblock: ".cz-contentitem-listitem-title",
-                            typeTextblock: ".cz-contentitem-listitem-highlighted"
-                        }
-                    }
-                };
-                listItemsInfo.default.ctor = TourStopListItem;
-                        _super.call(this, container, listBoxInfo, listItemsInfo);
-            }
-            return TourStopListBox;
-        })(UI.ListBoxBase);
-        UI.TourStopListBox = TourStopListBox;        
-        var TourStopListItem = (function (_super) {
-            __extends(TourStopListItem, _super);
-            function TourStopListItem(parent, container, uiMap, context) {
-                        _super.call(this, parent, container, uiMap, context);
-                this.iconImg = this.container.find(uiMap.iconImg);
-                this.titleTextblock = this.container.find(uiMap.titleTextblock);
-                this.typeTextblock = this.container.find(uiMap.typeTextblock);
-                this.iconImg.attr("src", this.data.Icon || "/images/Temp-Thumbnail2.png");
-                this.titleTextblock.text(this.data.Title);
-                this.typeTextblock.text(this.data.Type);
-                this.container.dblclick(function (e) {
-                    if(typeof context.Target.vc == "undefined") {
-                        return;
-                    }
-                    var vp = context.Target.vc.getViewport();
-                    var visible = CZ.VCContent.getVisibleForElement(context.Target, 1.0, vp, true);
-                    var target = {
-                        newvisible: visible,
-                        element: context.Target
-                    };
-                    CZ.Search.navigateToElement(target);
-                });
-            }
-            return TourStopListItem;
-        })(UI.ListItemBase);
-        UI.TourStopListItem = TourStopListItem;        
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var TourStop = (function () {
-            function TourStop(target, title) {
-                if(target == undefined || target == null) {
-                    throw "target element of a tour stop is null or undefined";
-                }
-                if(typeof target.type == "undefined") {
-                    throw "type of the tour stop target element is undefined";
-                }
-                this.targetElement = target;
-                if(target.type === "Unknown") {
-                    this.type = target.type;
-                    this.title = title;
-                } else if(target.type === "contentItem") {
-                    this.type = "Content Item";
-                    this.title = title ? title : target.contentItem.title;
-                } else {
-                    this.type = target.type === "timeline" ? "Timeline" : "Event";
-                    this.title = title ? title : target.title;
-                }
-            }
-            Object.defineProperty(TourStop.prototype, "Target", {
-                get: function () {
-                    return this.targetElement;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(TourStop.prototype, "Title", {
-                get: function () {
-                    return this.title;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(TourStop.prototype, "LapseTime", {
-                get: function () {
-                    return this.lapseTime;
-                },
-                set: function (value) {
-                    this.lapseTime = value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(TourStop.prototype, "Type", {
-                get: function () {
-                    return this.type;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            return TourStop;
-        })();
-        UI.TourStop = TourStop;        
-        var FormEditTour = (function (_super) {
-            __extends(FormEditTour, _super);
-            function FormEditTour(container, formInfo) {
-                        _super.call(this, container, formInfo);
-                this.saveButton = container.find(formInfo.saveButton);
-                this.deleteButton = container.find(formInfo.deleteButton);
-                this.addStopButton = container.find(formInfo.addStopButton);
-                this.titleInput = container.find(formInfo.titleInput);
-                this.tourTitleInput = this.container.find(".cz-form-tour-title");
-                this.saveButton.off();
-                this.deleteButton.off();
-                this.tour = formInfo.context;
-                this.stops = [];
-                if(this.tour) {
-                    this.tourTitleInput.val(this.tour.title);
-                    for(var i = 0, len = this.tour.bookmarks.length; i < len; i++) {
-                        var bookmark = this.tour.bookmarks[i];
-                        var stop = FormEditTour.bookmarkToTourstop(bookmark);
-                        this.stops.push(stop);
-                    }
-                } else {
-                    this.tourTitleInput.val("");
-                }
-                this.tourStopsListBox = new CZ.UI.TourStopListBox(container.find(formInfo.tourStopsListBox), formInfo.tourStopsTemplate, this.stops);
-                this.initialize();
-            }
-            FormEditTour.bookmarkToTourstop = function bookmarkToTourstop(bookmark) {
-                var target = CZ.Tours.bookmarkUrlToElement(bookmark.url);
-                if(target == null) {
-                    target = {
-                        type: "Unknown"
-                    };
-                }
-                var stop = new TourStop(target, (!bookmark.caption || $.trim(bookmark.caption) === "") ? undefined : bookmark.caption);
-                stop.LapseTime = bookmark.lapseTime;
-                return stop;
-            };
-            FormEditTour.tourstopToBookmark = function tourstopToBookmark(tourstop) {
-                var url = CZ.UrlNav.vcelementToNavString(tourstop.Target);
-                var title = tourstop.Title;
-                var text = "";
-                var bookmark = new CZ.Tours.TourBookmark(url, title, tourstop.LapseTime, text);
-                return bookmark;
-            };
-            FormEditTour.prototype.createTour = function () {
-                var name = this.tourTitleInput.val();
-                var tourBookmarks = new Array();
-                for(var j = 0, n = this.tourStopsListBox.items.length; j < n; j++) {
-                    var tourstopItem = this.tourStopsListBox.items[j];
-                    var tourstop = tourstopItem.data;
-                    var bookmark = FormEditTour.tourstopToBookmark(tourstop);
-                    tourBookmarks.push(bookmark);
-                }
-                var tour = new CZ.Tours.Tour(name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, "my tours", "", CZ.Tours.tours.length);
-                return tour;
-            };
-            FormEditTour.prototype.initializeAsEdit = function () {
-                this.deleteButton.show();
-                this.titleTextblock.text("Edit Tour");
-                this.saveButton.text("update tour");
-            };
-            FormEditTour.prototype.initialize = function () {
-                var _this = this;
-                if(this.tour == null) {
-                    this.deleteButton.hide();
-                    this.titleTextblock.text("Create Tour");
-                    this.saveButton.text("create tour");
-                } else {
-                    this.initializeAsEdit();
-                }
-                var self = this;
-                this.addStopButton.click(function (event) {
-                    CZ.Authoring.isActive = true;
-                    CZ.Authoring.mode = "editTour-selectTarget";
-                    CZ.Authoring.callback = function (arg) {
-                        return self.onTargetElementSelected(arg);
-                    };
-                    self.hide();
-                });
-                this.saveButton.click(function (event) {
-                    if(_this.tour == null) {
-                        _this.tour = _this.createTour();
-                        CZ.Tours.tours.push(_this.tour);
-                        _this.initializeAsEdit();
-                    } else {
-                        for(var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
-                            if(CZ.Tours.tours[i] === _this.tour) {
-                                _this.tour = CZ.Tours.tours[i] = _this.createTour();
-                                break;
-                            }
-                        }
-                    }
-                });
-                this.deleteButton.click(function (event) {
-                    if(_this.tour == null) {
-                        return;
-                    }
-                    for(var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
-                        if(CZ.Tours.tours[i] === _this.tour) {
-                            _this.tour = null;
-                            CZ.Tours.tours.splice(i, 1);
-                            _this.close();
-                            break;
-                        }
-                    }
-                });
-            };
-            FormEditTour.prototype.show = function () {
-                _super.prototype.show.call(this, {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500
-                });
-                this.activationSource.addClass("active");
-            };
-            FormEditTour.prototype.hide = function (noAnimation) {
-                if (typeof noAnimation === "undefined") { noAnimation = false; }
-                _super.prototype.close.call(this, noAnimation ? undefined : {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500
-                });
-                this.activationSource.removeClass("active");
-            };
-            FormEditTour.prototype.close = function () {
-                _super.prototype.close.call(this, {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500,
-                    complete: function () {
-                    }
-                });
-                CZ.Authoring.isActive = false;
-                this.activationSource.removeClass("active");
-                this.container.find("cz-form-errormsg").hide();
-                this.tourStopsListBox.container.empty();
-            };
-            FormEditTour.prototype.onTargetElementSelected = function (targetElement) {
-                CZ.Authoring.isActive = false;
-                CZ.Authoring.mode = "editTour";
-                CZ.Authoring.callback = null;
-                var stop = new TourStop(targetElement);
-                if(this.tourStopsListBox.items.length > 0) {
-                    stop.LapseTime = ((this.tourStopsListBox.items[this.tourStopsListBox.items.length - 1]).data).LapseTime + CZ.Settings.tourDefaultTransitionTime;
-                } else {
-                    stop.LapseTime = 0;
-                }
-                this.tourStopsListBox.add(stop);
-                this.show();
-            };
-            return FormEditTour;
-        })(CZ.UI.FormBase);
-        UI.FormEditTour = FormEditTour;        
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (UI) {
         var FormHeaderEdit = (function (_super) {
             __extends(FormHeaderEdit, _super);
             function FormHeaderEdit(container, formInfo) {
@@ -10522,19 +11182,17 @@ var CZ;
                         }
                     });
                     preloadedlist.forEach(function (preloaded) {
-                        var li = $('<ul></ul>').appendTo(existingTimSeriesList);
-                        var par = $("<p></p>");
+                        var li = $('<li></li>').css("margin-left", 10).css("margin-bottom", "3px").height(22).appendTo(existingTimSeriesList);
                         var link = $('<a></a>').addClass("cz-form-btn").appendTo(li);
                         link.css("color", "#25a1ea");
                         link.css("float", "left");
                         link.text(preloaded.name);
-                        var div = $("<div>Source:</div>").appendTo(li);
-                        div.css("margin-left", "3px");
-                        div.css("margin-right", "3px");
-                        div.css("float", "left");
-                        var sourceDiv = $("<a></a>").appendTo(li);
+                        var div = $("<div></div>").addClass("cz-form-preloadedrecord").appendTo(li);
+                        div.text("Source:");
+                        var sourceDiv = $("<a></a>").addClass("cz-form-preloadedrecord").appendTo(li);
                         sourceDiv.css("color", "blue");
                         sourceDiv.text(preloaded.source);
+                        sourceDiv.prop("href", preloaded.link);
                         link.click(function (e) {
                             var data;
                             $.ajax({
@@ -10550,8 +11208,15 @@ var CZ;
                                     alert("Error fetching timeSeries Data: " + xhr.responseText);
                                 }
                             });
+                            var dataSet = undefined;
+                            try  {
+                                dataSet = CZ.Data.csvToDataSet(data, preloaded.delimiter, preloaded.source);
+                            } catch (err) {
+                                alert(err);
+                                return;
+                            }
                             CZ.HomePageViewModel.showTimeSeriesChart();
-                            CZ.rightDataSet = CZ.Data.csvToDataSet(data, preloaded.delimiter, preloaded.source);
+                            CZ.rightDataSet = dataSet;
                             var vp = CZ.Common.vc.virtualCanvas("getViewport");
                             CZ.HomePageViewModel.updateTimeSeriesChart(vp);
                         });
@@ -10559,8 +11224,12 @@ var CZ;
                 }
                 this.input = $("#fileLoader");
                 var that = this;
+                $("#fileLoader").change(function () {
+                    var fl = $("#fileLoader");
+                    $("#selectedFile").text(fl[0].files[0].name);
+                });
                 if(this.checkFileLoadCompatibility()) {
-                    $("#loaduserdatabtn").click(function () {
+                    $("#loadDataBtn").click(function () {
                         var fr = that.openFile({
                             "onload": function (e) {
                                 that.updateUserData(fr.result);
@@ -10568,7 +11237,7 @@ var CZ;
                         });
                     });
                 } else {
-                    $("#uploaduserdatacontainer").hide();
+                    $("#uploadDataCnt").hide();
                 }
             }
             TimeSeriesDataForm.prototype.show = function () {
@@ -10602,9 +11271,21 @@ var CZ;
                 return fileReader;
             };
             TimeSeriesDataForm.prototype.updateUserData = function (csvString) {
+                var dataSet = undefined;
+                var delimValue = $("#delim").prop("value");
+                if(delimValue === "tab") {
+                    delimValue = "\t";
+                } else if(delimValue === "space") {
+                    delimValue = " ";
+                }
+                try  {
+                    dataSet = CZ.Data.csvToDataSet(csvString, delimValue, this.input[0].files[0].name);
+                } catch (err) {
+                    alert(err);
+                    return;
+                }
                 CZ.HomePageViewModel.showTimeSeriesChart();
-                CZ.leftDataSet = CZ.Data.csvToDataSet(csvString, $("#delim").prop("value"), this.input[0].files[0].name);
-                CZ.leftDataSet.series[0].appearanceSettings.stroke = "red";
+                CZ.leftDataSet = dataSet;
                 var vp = CZ.Common.vc.virtualCanvas("getViewport");
                 CZ.HomePageViewModel.updateTimeSeriesChart(vp);
             };
@@ -11211,7 +11892,10 @@ var CZ;
                 CZ.BreadCrumbs.updateBreadCrumbsLabels(breadCrumbsEvent.breadCrumbs);
             });
             $(window).bind('resize', function () {
+                CZ.timeSeriesChart.updateCanvasHeight();
                 CZ.Common.updateLayout();
+                var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                updateTimeSeriesChart(vp);
             });
             var vp = CZ.Common.vc.virtualCanvas("getViewport");
             CZ.Common.vc.virtualCanvas("setVisible", CZ.VCContent.getVisibleForElement({
@@ -11289,14 +11973,16 @@ var CZ;
                 CZ.timeSeriesChart.clearLegend("right");
                 var chartHeader = "TimeSeries Chart";
                 if(CZ.leftDataSet !== undefined) {
-                    CZ.timeSeriesChart.drawDataSet(CZ.leftDataSet, leftCSS, rightCSS, leftPlot, rightPlot);
-                    CZ.timeSeriesChart.drawAxis(leftCSS, CZ.leftDataSet.series[0].appearanceSettings.yMin, CZ.leftDataSet.series[0].appearanceSettings.yMax, {
+                    var padding = CZ.leftDataSet.getVerticalPadding() + 10;
+                    CZ.timeSeriesChart.drawDataSet(CZ.leftDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot);
+                    CZ.timeSeriesChart.drawAxis(leftCSS, rightCSS, CZ.leftDataSet.series[0].appearanceSettings.yMin, CZ.leftDataSet.series[0].appearanceSettings.yMax, {
                         labelCount: 4,
                         tickLength: 10,
                         majorTickThickness: 1,
                         stroke: 'black',
                         axisLocation: 'left',
-                        font: '16px Calibri'
+                        font: '16px Calibri',
+                        verticalPadding: padding
                     });
                     for(var i = 0; i < CZ.leftDataSet.series.length; i++) {
                         CZ.timeSeriesChart.addLegendRecord("left", CZ.leftDataSet.series[i].appearanceSettings.stroke, CZ.leftDataSet.series[i].appearanceSettings.name);
@@ -11304,14 +11990,16 @@ var CZ;
                     chartHeader += " (" + CZ.leftDataSet.name;
                 }
                 if(CZ.rightDataSet !== undefined) {
-                    CZ.timeSeriesChart.drawDataSet(CZ.rightDataSet, leftCSS, rightCSS, leftPlot, rightPlot);
-                    CZ.timeSeriesChart.drawAxis(rightCSS, CZ.rightDataSet.series[0].appearanceSettings.yMin, CZ.rightDataSet.series[0].appearanceSettings.yMax, {
+                    var padding = CZ.rightDataSet.getVerticalPadding() + 10;
+                    CZ.timeSeriesChart.drawDataSet(CZ.rightDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot);
+                    CZ.timeSeriesChart.drawAxis(rightCSS, leftCSS, CZ.rightDataSet.series[0].appearanceSettings.yMin, CZ.rightDataSet.series[0].appearanceSettings.yMax, {
                         labelCount: 4,
                         tickLength: 10,
                         majorTickThickness: 1,
                         stroke: 'black',
                         axisLocation: 'right',
-                        font: '16px Calibri'
+                        font: '16px Calibri',
+                        verticalPadding: padding
                     });
                     for(var i = 0; i < CZ.rightDataSet.series.length; i++) {
                         CZ.timeSeriesChart.addLegendRecord("right", CZ.rightDataSet.series[i].appearanceSettings.stroke, CZ.rightDataSet.series[i].appearanceSettings.name);
@@ -11320,6 +12008,9 @@ var CZ;
                     chartHeader += str + CZ.rightDataSet.name + ")";
                 } else {
                     chartHeader += ")";
+                }
+                if(CZ.rightDataSet !== undefined || CZ.leftDataSet !== undefined) {
+                    CZ.timeSeriesChart.drawVerticalGridLines(leftCSS, rightCSS, leftPlot, rightPlot);
                 }
                 $("#timeSeriesChartHeader").text(chartHeader);
             }

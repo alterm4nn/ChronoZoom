@@ -381,7 +381,7 @@ module CZ {
 
             "editTour-selectTarget": {
                 mouseup: function () {
-                    if (callback != null && _hovered != undefined && _hovered != null)
+                    if (callback != null && _hovered != undefined && _hovered != null && typeof _hovered.type != "undefined")
                         callback(_hovered);
                 },
                 mousemove: function () {
@@ -498,7 +498,7 @@ module CZ {
             var temp = {
                 x: Number(prop.start),
                 y: t.y,
-                width: Number(CZ.Dates.getCoordinateFromDecimalYear(prop.end) - prop.start),
+                width: prop.end === 9999 ? Number(CZ.Dates.getCoordinateFromDecimalYear(prop.end) - prop.start) : Number(prop.end - prop.start),
                 height: t.height,
                 type: "rectangle"
             };
@@ -557,45 +557,34 @@ module CZ {
          * @param  {Object} e    An exhibit to update.
          * @param  {Object} args An object with properties' values.
          */
-        export function updateExhibit(e, args) {
+        export function updateExhibit(oldExhibit, args) {
             var deferred = $.Deferred();
 
-            if (e && e.contentItems && args) {
-                var clone: any = $.extend({}, e, { children: null }); // shallow copy of exhibit (without children)
-                clone = $.extend(true, {}, clone); // deep copy exhibit
-                delete clone.children;
-                delete clone.contentItems;
-                $.extend(true, clone, args); // overwrite and append properties
-
-                var oldContentItems = $.extend(true, [], e.contentItems);
+            if (oldExhibit && oldExhibit.contentItems && args) {
+                var newExhibit: any = $.extend({}, oldExhibit, { children: null }); // shallow copy of exhibit (without children)
+                newExhibit = $.extend(true, {}, newExhibit); // deep copy exhibit
+                delete newExhibit.children;
+                delete newExhibit.contentItems;
+                $.extend(true, newExhibit, args); // overwrite and append properties
 
                 // pass cloned objects to CZ.Service calls to avoid any side effects
-                CZ.Service.putExhibit(clone).then(
+                CZ.Service.putExhibit(newExhibit).then(
                     response => {
-                        var old_id = e.id;
-                        e.id = clone.id = "e" + response.ExhibitId;
-                        var new_id = e.id;
-                        e.guid = clone.guid = response.ExhibitId;
-                        for (var i = 0; i < e.contentItems.length; i++) {
-                            e.contentItems[i].ParentExhibitId = e.guid;
+                        newExhibit.guid = response.ExhibitId;
+                        for (var i = 0; i < newExhibit.contentItems.length; i++) {
+                            newExhibit.contentItems[i].ParentExhibitId = newExhibit.guid;
                         }
-                        for (var i = 0; i < clone.contentItems.length; i++) {
-                            clone.contentItems[i].ParentExhibitId = clone.guid;
-                        }
-                        CZ.Service.putExhibitContent(clone, oldContentItems).then(
-                            response => {
-                                $.extend(e, clone);
-                                e.id = old_id;
-                                e = renewExhibit(e);
-                                e.id = new_id;
-                                CZ.Common.vc.virtualCanvas("requestInvalidate");
-                                deferred.resolve();
-                            },
-                            error => {
-                                console.log("Error connecting to service: update exhibit (put exhibit content).\n" + error.responseText);
-                                deferred.reject();
-                            }
-                        );
+
+                        $(response.ContentItemId).each(function (contentItemIdIndex, contentItemId) {
+                            newExhibit.contentItems[contentItemIdIndex].id = contentItemId;
+                            newExhibit.contentItems[contentItemIdIndex].guid = contentItemId;
+                        });
+
+                        newExhibit = renewExhibit(newExhibit);
+                        newExhibit.id = "e" + response.ExhibitId;
+
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                        deferred.resolve();
                     },
                     error => {
                         console.log("Error connecting to service: update exhibit.\n" + error.responseText);

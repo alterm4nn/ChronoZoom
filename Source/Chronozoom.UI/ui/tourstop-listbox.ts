@@ -25,6 +25,7 @@ module CZ {
         }
 
         export class TourStopListBox extends ListBoxBase {
+
             constructor(container: JQuery, listItemContainer: JQuery, contentItems: any) {
                 var listBoxInfo: IListBoxBaseInfo = {
                     context: contentItems,
@@ -76,9 +77,22 @@ module CZ {
                 this.titleTextblock = this.container.find(uiMap.titleTextblock);
                 this.typeTextblock = this.container.find(uiMap.typeTextblock);
 
-                this.iconImg.attr("src", this.data.Icon || "/images/Temp-Thumbnail2.png");
+                var self = this;
+                var descr = this.container.find(".cz-tourstop-description");
+                descr.text(self.data.Description);
+                descr.change(ev => {
+                    self.data.Description = self.Description;
+                });
+
+                this.iconImg.attr("src", this.data.ThumbnailUrl || "/images/Temp-Thumbnail2.png");
                 this.titleTextblock.text(this.data.Title);
                 this.typeTextblock.text(this.data.Type);
+
+                this.Activate();
+                this.container.click(e =>
+                {
+                    self.Activate();
+                });
 
                 this.container.dblclick(e =>
                 {
@@ -91,6 +105,18 @@ module CZ {
                     };
                     CZ.Search.navigateToElement(target);
                 });
+            }
+
+            public get Description(): string {
+                var descr = this.container.find(".cz-tourstop-description");
+                return descr.val();
+            }
+
+            public Activate()
+            {
+                var myDescr = this.container.find(".cz-tourstop-description");
+                this.parent.container.find(".cz-tourstop-description").not(myDescr).hide();
+                myDescr.show(500);
             }
         }
     }

@@ -107,14 +107,22 @@ module CZ {
 
         }
 
-        // convert date to virtual coordinate
+        // convert decimal year to virtual coordinate
         // 9999 -> present day
+        // TODO: currently in database 1 BCE = -1 in virtual coords, but on client side 1 BCE = 0 in virtual coords
+        // decimalYear in database has to be equal to virtual coordinate?
         export function getCoordinateFromDecimalYear(decimalYear) {
             // get virtual coordinate of present day
             var localPresent = getPresent();
             var presentDate = getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
 
-            return decimalYear === 9999 ? presentDate : decimalYear;
+            return decimalYear === 9999 ? presentDate: (decimalYear < 0 ? decimalYear + 1: decimalYear);
+        }
+
+        // convert virtual coordinate to decimal year
+        export function getDecimalYearFromCoordinate(coordinate) {
+            // in database 1 BCE = -1, on client side 1 BCE = 0
+            return coordinate < 1 ? --coordinate : coordinate;
         }
 
         export function convertCoordinateToYear(coordinate: number) {
@@ -124,18 +132,18 @@ module CZ {
             }
 
             if (coordinate < -999999999) {
-                year.year /= -1000000000;
+                year.year = (year.year - 1) / (-1000000000);
                 year.regime = 'Ga';
             } else if (coordinate < -999999) {
-                year.year /= -1000000;
+                year.year = (year.year - 1) / (-1000000);
                 year.regime = 'Ma';
-            } else if (coordinate < -999) {
-                year.year /= -1000;
+            } else if (coordinate < -9999) {
+                year.year = (year.year - 1) / (-1000);
                 year.regime = 'Ka';
-            } else if (coordinate < 0) {
-                year.year /= -1;
+            } else if (coordinate < 1) {
+                year.year = (year.year - 1) / (-1);
                 // remove fraction part of year
-                year.year = Math.floor(year.year);
+                year.year = Math.ceil(year.year);
                 year.regime = 'BCE';
             }
             else {
@@ -158,16 +166,16 @@ module CZ {
 
             switch (regime.toLowerCase()) {
                 case "ga":
-                    coordinate *= -1000000000;
+                    coordinate = year * (-1000000000) + 1;
                     break;
                 case "ma":
-                    coordinate *= -1000000;
+                    coordinate = year * (-1000000) + 1;
                     break;
                 case "ka":
-                    coordinate *= -1000;
+                    coordinate = year * (-1000) + 1;
                     break;
                 case "bce":
-                    coordinate *= -1;
+                    coordinate = year * (-1) + 1;
                     //coordinate += 1;
                     break;
             }
