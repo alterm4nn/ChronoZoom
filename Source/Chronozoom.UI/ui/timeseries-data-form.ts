@@ -31,21 +31,20 @@ module CZ {
                     });
 
                     preloadedlist.forEach(function (preloaded) {
-                        var li = $('<ul></ul>').appendTo(existingTimSeriesList);
-
-                        var par = $("<p></p>");
+                        var li = $('<li></li>').css("margin-left", 10).css("margin-bottom", "3px").height(22).appendTo(existingTimSeriesList);
 
                         var link = $('<a></a>').addClass("cz-form-btn").appendTo(li);
                         link.css("color", "#25a1ea");
                         link.css("float", "left");
                         link.text(preloaded.name);
-                        var div = $("<div>Source:</div>").appendTo(li);
-                        div.css("margin-left", "3px");
-                        div.css("margin-right", "3px");
-                        div.css("float", "left");
-                        var sourceDiv = $("<a></a>").appendTo(li);
+
+                        var div = $("<div></div>").addClass("cz-form-preloadedrecord").appendTo(li);
+                        div.text("Source:");
+
+                        var sourceDiv = $("<a></a>").addClass("cz-form-preloadedrecord").appendTo(li);
                         sourceDiv.css("color", "blue");
                         sourceDiv.text(preloaded.source);
+                        sourceDiv.prop("href", preloaded.link);
 
                         link.click(function (e) {
                             var data;
@@ -63,8 +62,18 @@ module CZ {
                                 }
                             });
 
+                            var dataSet = undefined;
+
+                            try {
+                                dataSet = CZ.Data.csvToDataSet(data, preloaded.delimiter, preloaded.source);
+                            }
+                            catch (err) {
+                                alert(err);
+                                return;
+                            }
+
                             CZ.HomePageViewModel.showTimeSeriesChart();
-                            CZ.rightDataSet = CZ.Data.csvToDataSet(data, preloaded.delimiter, preloaded.source);
+                            CZ.rightDataSet = dataSet;
                             var vp = CZ.Common.vc.virtualCanvas("getViewport");
                             CZ.HomePageViewModel.updateTimeSeriesChart(vp);
                         });
@@ -74,8 +83,13 @@ module CZ {
                 this.input = $("#fileLoader");
                 var that = this;
 
+                $("#fileLoader").change(function () {
+                    var fl: any = $("#fileLoader");
+                    $("#selectedFile").text(fl[0].files[0].name);
+                });
+
                 if (this.checkFileLoadCompatibility()) {
-                    $("#loaduserdatabtn").click(function () {
+                    $("#loadDataBtn").click(function () {
                         var fr = that.openFile({
                             "onload": function (e) {
                                 that.updateUserData(fr.result); // this -> FileReader
@@ -83,7 +97,7 @@ module CZ {
                         });
                     });
                 } else {
-                    $("#uploaduserdatacontainer").hide();
+                    $("#uploadDataCnt").hide();
                 }
             }
 
@@ -128,9 +142,24 @@ module CZ {
             }
 
             private updateUserData(csvString): void {
+                var dataSet = undefined;
+
+                var delimValue = $("#delim").prop("value");
+                if (delimValue === "tab")
+                    delimValue = "\t";
+                else if (delimValue === "space")
+                    delimValue = " ";
+
+                try {
+                    dataSet = CZ.Data.csvToDataSet(csvString, delimValue, this.input[0].files[0].name);
+                }
+                catch (err) {
+                    alert(err);
+                    return;
+                }
+
                 CZ.HomePageViewModel.showTimeSeriesChart();
-                CZ.leftDataSet = CZ.Data.csvToDataSet(csvString, $("#delim").prop("value"), this.input[0].files[0].name);
-                CZ.leftDataSet.series[0].appearanceSettings.stroke = "red";
+                CZ.leftDataSet = dataSet;
                 var vp = CZ.Common.vc.virtualCanvas("getViewport");
                 CZ.HomePageViewModel.updateTimeSeriesChart(vp);
             }
