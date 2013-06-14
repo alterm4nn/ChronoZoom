@@ -75,6 +75,7 @@ var CZ;
                     throw "Tour has no bookmarks";
                 }
                 var self = this;
+                this.thumbnailUrl = CZ.Settings.contentItemThumbnailBaseUri + id + '.png';
                 bookmarks.sort(function (b1, b2) {
                     return b1.lapseTime - b2.lapseTime;
                 });
