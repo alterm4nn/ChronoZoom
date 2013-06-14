@@ -56,7 +56,7 @@
         <% if (contentitem.MediaType == "Image" || contentitem.MediaType == "Picture")
            { %>
         <p>
-            <img src="<% Response.Write(contentitem.Uri); %>" />
+            <img src="<% Response.Write(contentitem.Uri); %>" alt="<% Response.Write(contentitem.Title); %>" />
         </p>
         <% } %>
         <% if (contentitem.MediaType == "PDF" || contentitem.MediaType == "Video" || contentitem.MediaType == "Audio" || contentitem.MediaType == "Photosynth")
@@ -76,7 +76,7 @@
         <% if (contentitem.MediaType == "Image" || contentitem.MediaType == "Picture")
            { %>
         <p>
-            <img src="<% Response.Write(contentitem.Uri); %>" />
+            <img src="<% Response.Write(contentitem.Uri); %>" alt="<% Response.Write(contentitem.Title); %>" />
         </p>
         <% } %>
         <% if (contentitem.MediaType == "PDF" || contentitem.MediaType == "Video" || contentitem.MediaType == "Audio" || contentitem.MediaType == "Photosynth")
