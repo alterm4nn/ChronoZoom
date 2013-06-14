@@ -79,10 +79,21 @@ module CZ {
 
                 this.iconImg = this.container.find(uiMap.iconImg);
                 this.titleTextblock = this.container.find(uiMap.titleTextblock);
-                this.titleTextblock = this.container.find(uiMap.titleTextblock);
                 this.descrTextblock = this.container.find(".cz-contentitem-listitem-descr");
 
+                var self = this;
+                var thumbUrl = this.data.thumbnailUrl;
                 this.iconImg.attr("src", this.data.icon || "/images/Temp-Thumbnail2.png");
+                var img = new Image();
+                img.onload = function () {
+                    self.iconImg.replaceWith(img);
+                };
+                img.onerror = function () {
+                    if (console && console.warn)
+                        console.warn("Could not load a thumbnail image " + thumbUrl);
+                };
+                img.src = thumbUrl; // fires off loading of image
+
                 this.titleTextblock.text(this.data.title);
                 if (this.data.description)
                     this.descrTextblock.text(this.data.description);

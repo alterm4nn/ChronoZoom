@@ -1277,16 +1277,22 @@ img.fallbackBackground {
 
   filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#1B6AAB', EndColorStr='#0E4073', GradientType=0);
   /* IE10 Consumer Preview */
+
   background-image: -ms-linear-gradient(bottom, #0e4073 0%, #1b6aab 100%);
   /* Mozilla Firefox */
+
   background-image: -moz-linear-gradient(bottom, #0e4073 0%, #1b6aab 100%);
   /* Opera */
+
   background-image: -o-linear-gradient(bottom, #0e4073 0%, #1b6aab 100%);
   /* Webkit (Safari/Chrome 10) */
+
   background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #0e4073), color-stop(1, #1b6aab));
   /* Webkit (Chrome 11+) */
+
   background-image: -webkit-linear-gradient(bottom, #0e4073 0%, #1b6aab 100%);
   /* W3C Markup, IE10 Release Preview */
+
   background-image: linear-gradient(to top, #0e4073 0%, #1b6aab 100%);
 }
 .cz-header-edit-form {
@@ -1309,6 +1315,14 @@ img.fallbackBackground {
   bottom: 0;
   left: 0;
   overflow-y: auto;
+}
+.cz-form-tour-contentitem-listitem-icon {
+  display: inline-block;
+  width: 15%;
+}
+.cz-form-tour-contentitem-listitem-icon > img {
+  width: 50px;
+  height: 50px;
 }
 .cz-tourlist-form {
   min-width: 380px;
