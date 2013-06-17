@@ -20,6 +20,7 @@ namespace Application.Helper
         private static AuthorizationHelper _authorizationHelper;
         private static SearchHelper _searchHelper;
         private static BreadcrumbsHelper _breadcrumbsHelper;
+        private static ApiHelper _apiHelper;
 
         public static void Stop()
         {
@@ -103,6 +104,11 @@ namespace Application.Helper
         public BreadcrumbsHelper GetBreadcrumbsHelper()
         {
             return _breadcrumbsHelper ?? (_breadcrumbsHelper = new BreadcrumbsHelper());
+        } 
+        
+        public ApiHelper GetApiHelper()
+        {
+            return _apiHelper ?? (_apiHelper = new ApiHelper());
         }
     }
 }

@@ -1,6 +1,8 @@
-﻿namespace Application.Helper.Entities
+﻿using System.Runtime.Serialization;
+
+namespace Application.Helper.Entities
 {
-    public class ContentItem : Chronozoom.Entities.ContentItem
+    public class ContentItem : Chronozoom.Entities.ContentItemRaw
     {
         public override string ToString()
         {

@@ -45,6 +45,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -55,9 +56,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants\ApiConstants.cs" />
     <Compile Include="Constants\Javascripts.cs" />
     <Compile Include="Entities\ContentItem.cs" />
     <Compile Include="Entities\Exhibit.cs" />
+    <Compile Include="Entities\NewExhibitApiResponse.cs" />
     <Compile Include="Entities\Timeline.cs" />
     <Compile Include="Entities\User.cs" />
     <Compile Include="HelperManager.cs" />
@@ -66,6 +69,7 @@
     <Compile Include="BrowserImpl\FirefoxControls.cs" />
     <Compile Include="BrowserImpl\IeControls.cs" />
     <Compile Include="BrowserImpl\SafariControls.cs" />
+    <Compile Include="Helpers\ApiHelper.cs" />
     <Compile Include="Helpers\AuthorizationHelper.cs" />
     <Compile Include="Helpers\BookmarkHelper.cs" />
     <Compile Include="Helpers\BreadcrumbsHelper.cs" />

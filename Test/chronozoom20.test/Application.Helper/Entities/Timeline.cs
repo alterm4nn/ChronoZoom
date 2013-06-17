@@ -1,6 +1,8 @@
-﻿namespace Application.Helper.Entities
+﻿using System.Runtime.Serialization;
+
+namespace Application.Helper.Entities
 {
-    public class Timeline : Chronozoom.Entities.Timeline
+    public class Timeline : Chronozoom.Entities.TimelineRaw
     {
         public string TimelineId { get; set; }
 
