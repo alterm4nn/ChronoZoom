@@ -32,6 +32,7 @@ Use JSON for the request body:
 - [Properties.Resources](#properties.resources)
 - [ObjectType](#objecttype)
 - [SearchResult](#searchresult)
+- [StorageCorruptedException](#storagecorruptedexception)
 - [Storage](#storage)
 - [StorageMigrationsConfiguration](#storagemigrationsconfiguration)
 - [SuperCollection](#supercollection)
@@ -209,6 +210,15 @@ Contains a search result.
 |Id|The ID of the search result.|
 |Title|The title of the search result.|
 |ObjectType|The type of object contained by the search result.|
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+### StorageCorruptedException ###
+ 
+Thrown whenever a query detects that the storage is corrupted.
+ 
  
 [top](#chronozoom-rest-api-reference)
  
