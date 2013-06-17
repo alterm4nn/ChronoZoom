@@ -233,6 +233,7 @@ namespace Chronozoom.UI
             public const string BookmarkNotFound = "Bookmark not found";
             public const string BookmarkSequenceIdDuplicate = "Bookmark sequence id already exists";
             public const string BookmarkSequenceIdInvalid = "Bookmark sequence id is invalid";
+            public const string BookmarkIdInvalid = "Bookmark sequence id is invalid";
         }
 
         private static Lazy<ChronozoomSVC> _sharedService = new Lazy<ChronozoomSVC>(() =>
@@ -386,6 +387,12 @@ namespace Chronozoom.UI
                         foreach (var t in tours)
                         {
                             storage.Entry(t).Collection(x => x.Bookmarks).Load();
+                            var orderedBookmarks = t.Bookmarks.OrderBy(candidate => candidate.SequenceId);
+                            t.Bookmarks = new Collection<Bookmark>();
+                            foreach (Bookmark bookmark in orderedBookmarks)
+                            {
+                                t.Bookmarks.Add(bookmark);
+                            }
                         }
 
                         Cache.Add(toursCacheKey, tours);
@@ -1381,6 +1388,95 @@ namespace Chronozoom.UI
             });
         }
 
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
+        public TourResult PutTour2(string superCollectionName, string collectionName, Tour tourRequest)
+        {
+            return ApiOperationUnderCollection(tourRequest, superCollectionName, collectionName, delegate(User user, Storage storage, Collection collection)
+            {
+                Trace.TraceInformation("Put Tour2");
+                var returnValue = new TourResult();
+
+                if (tourRequest.Id == Guid.Empty)
+                {
+                    // Add a new tour.
+                    Guid newTourGuid = Guid.NewGuid();
+                    Tour newTour = new Tour { Id = newTourGuid };
+                    newTour.Name = tourRequest.Name;
+                    newTour.Description = tourRequest.Description;
+                    newTour.AudioBlobUrl = tourRequest.AudioBlobUrl;
+                    newTour.Collection = collection;
+                    storage.Tours.Add(newTour);
+                    returnValue.TourId = newTourGuid;
+
+                    AddBookmarks(storage, newTour, tourRequest.Bookmarks, returnValue);
+                }
+                else
+                {
+                    // Update an existing tour.
+                    Tour updateTour = storage.Tours.Find(tourRequest.Id);
+                    if (updateTour == null)
+                    {
+                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TourNotFound);
+                        return returnValue;
+                    }
+
+                    if (updateTour.Collection.Id != collection.Id)
+                    {
+                        SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
+                        return returnValue;
+                    }
+
+                    // Update the tour
+                    updateTour.Name = tourRequest.Name;
+                    updateTour.Description = tourRequest.Description;
+                    updateTour.AudioBlobUrl = tourRequest.AudioBlobUrl;
+                    returnValue.TourId = tourRequest.Id;
+
+                    // Delete the existing bookmarks and add the bookmarks specified in the request object.
+                    DeleteBookmarks(storage, updateTour);
+                    AddBookmarks(storage, updateTour, tourRequest.Bookmarks, returnValue);
+                }
+
+                storage.SaveChanges();
+                return returnValue;
+            });
+        }
+
+        private static void AddBookmarks(Storage storage, Tour tour, Collection<Bookmark> bookmarkRequest, TourResult returnValue)
+        {
+            if (bookmarkRequest == null)
+                return;
+
+            int sequenceId = 1;
+            foreach (Bookmark bookmark in bookmarkRequest)
+            {
+                Guid newBookmarkGuid = Guid.NewGuid();
+                Bookmark newBookmark = new Bookmark
+                {
+                    Id = newBookmarkGuid,
+                    SequenceId = sequenceId,
+                    Name = bookmark.Name,
+                    Url = bookmark.Url,
+                    LapseTime = bookmark.LapseTime,
+                    Description = bookmark.Description
+                };
+
+                if (tour.Bookmarks == null)
+                {
+                    tour.Bookmarks = new System.Collections.ObjectModel.Collection<Bookmark>();
+                }
+
+                tour.Bookmarks.Add(newBookmark);
+                storage.Bookmarks.Add(newBookmark);
+                returnValue.Add(newBookmarkGuid);
+                sequenceId++;
+            }
+            
+        }
+        
         private static Guid UpdateBookmark(Storage storage, Tour updateTour, Bookmark bookmarkRequest)
         {
             Bookmark updateBookmark = storage.Bookmarks.Find(bookmarkRequest.Id);
@@ -1488,8 +1584,7 @@ namespace Chronozoom.UI
                     SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TourNotFound);
                     return;
                 }
-                storage.Entry(deleteTour).Collection(_ => _.Bookmarks).Load();
-                DeleteBookmarks(deleteTour);
+                DeleteBookmarks(storage, deleteTour);
                 storage.Tours.Remove(deleteTour);
                 storage.SaveChanges();
             });
@@ -1574,15 +1669,15 @@ namespace Chronozoom.UI
         }
 
         // Delete the specified bookmarks that are part of the tour.
-        private static void DeleteBookmarks(Tour tour)
+        private static void DeleteBookmarks(Storage storage, Tour tour)
         {
-            ApiOperation(delegate(User user, Storage storage)
+            if (tour == null)
+                return;
+
+            storage.Entry(tour).Collection(_ => _.Bookmarks).Load();
+            if (tour.Bookmarks != null)
             {
-                if (tour == null)
-                    return;
-
                 var bookmarkIds = new List<Guid>();
-
                 foreach (Bookmark bookmark in tour.Bookmarks)
                 {
                     bookmarkIds.Add(bookmark.Id);
@@ -1591,10 +1686,11 @@ namespace Chronozoom.UI
                 while (bookmarkIds.Count != 0)
                 {
                     var bookmark = storage.Bookmarks.Find(bookmarkIds.First());
+                    tour.Bookmarks.Remove(bookmark);
                     storage.Bookmarks.Remove(bookmark);
                     bookmarkIds.RemoveAt(0);
                 }
-            });
+            }
         }
 
 
