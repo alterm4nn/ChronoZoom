@@ -22,6 +22,7 @@
 /// <reference path='../ui/message-window.ts'/>
 /// <reference path='../ui/header-session-expired-form.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
+/// <reference path='extensions/extensions.ts'/>
 
 var constants: any;
 
@@ -199,6 +200,9 @@ module CZ {
 
             $('.bubbleInfo').hide();
             var canvasIsEmpty;
+
+            // Register ChronoZoom Extensions
+            CZ.Extensions.registerExtensions();
 
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {

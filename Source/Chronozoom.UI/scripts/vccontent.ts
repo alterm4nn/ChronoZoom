@@ -3,6 +3,7 @@
 /// <reference path='bibliography.ts'/>
 /// <reference path='urlnav.ts'/>
 /// <reference path='cz.ts'/>
+/// <reference path='extensions/extensions.ts'/>
 
 declare var Seadragon: any;
 
@@ -148,6 +149,13 @@ module CZ {
         export var addSeadragonImage = function (element, layerid, id, vx, vy, vw, vh, z, imgSrc, onload?) {
             if (vw <= 0 || vh <= 0) throw "Image size must be positive";
             return addChild(element, new SeadragonImage(element.vc, /*parent*/element, layerid, id, imgSrc, vx, vy, vw, vh, z, onload), false);
+        };
+
+        export var addExtension = function (extensionName, element, layerid, id, vx, vy, vw, vh, z, imgSrc, onload?) {
+            if (vw <= 0 || vh <= 0) throw "Extension size must be positive";
+            var initializer = CZ.Extensions.getInitializer(extensionName);
+
+            return addChild(element, initializer(element.vc, /*parent*/element, layerid, id, imgSrc, vx, vy, vw, vh, z, onload), false);
         };
 
         /* Adds a video as a child of the given virtual canvas element.
@@ -1439,7 +1447,7 @@ module CZ {
         @param vh        (number)   height of in virtual space
         @param z         (number) z-index
         */
-        function CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z) {
+        export function CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z) {
             this.base = CanvasElement;
             this.base(vc, layerid, id, vx, vy, vw, vh);
 
@@ -1901,6 +1909,9 @@ module CZ {
                     }
                     else if (this.contentItem.mediaType.toLowerCase() === 'pdf') {
                         addPdf(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
+                    }
+                    else if (CZ.Extensions.mediaTypeIsExtension(contentItem.mediaType)) {
+                        addExtension(contentItem.mediaType, container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);
                     }
 
                     // Title
