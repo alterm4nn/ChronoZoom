@@ -18,13 +18,14 @@
 /// <reference path='../ui/timeseries-graph-form.ts'/>
 /// <reference path='../ui/timeseries-data-form.ts'/>
 /// <reference path='../ui/tourslist-form.ts'/>
+/// <reference path='../ui/message-window.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
 
 
 module CZ {
     export var timeSeriesChart: CZ.UI.LineChart;
     export var leftDataSet: CZ.Data.DataSet;
-    export var rightDataSet: CZ.Data.DataSet; 
+    export var rightDataSet: CZ.Data.DataSet;
 
     export module HomePageViewModel {
         // Contains mapping: CSS selector -> html file.
@@ -41,7 +42,8 @@ module CZ {
             "#toursList": "/ui/tourslist-form.html", // 9
             "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html", // 10
             "#timeSeriesContainer": "/ui/timeseries-graph-form.html", //11
-            "#timeSeriesDataForm": "/ui/timeseries-data-form.html" //12
+            "#timeSeriesDataForm": "/ui/timeseries-data-form.html", //12
+            "#message-window": "/ui/message-window.html" // 13
         };
 
         export enum FeatureActivation {
@@ -192,7 +194,7 @@ module CZ {
                             titleTextblock: ".cz-form-title",
                             createTimeline: ".cz-form-create-timeline",
                             createExhibit: ".cz-form-create-exhibit",
-                        	createTour: ".cz-form-create-tour"
+                            createTour: ".cz-form-create-tour"
                         });
                         form.show();
                     }
@@ -208,6 +210,20 @@ module CZ {
                 });
 
                 CZ.Authoring.initialize(CZ.Common.vc, {
+                    showMessageWindow: function (message: string, title?: string, onClose?: () => any) {
+                        var wnd = new CZ.UI.MessageWindow(forms[13], message, title);
+                        if (onClose) wnd.container.bind("close", () =>
+                        {
+                            wnd.container.unbind("close", onClose);
+                            onClose();
+                        });
+                        wnd.show();
+                    },
+                    hideMessageWindow: function () {
+                        var wnd = <CZ.UI.MessageWindow>forms[13].data("form");
+                        if (wnd)
+                            wnd.close();
+                    },
                     showEditTourForm: function (tour) {
                         CZ.Tours.removeActiveTour();
                         var form = new CZ.UI.FormEditTour(forms[7], {
@@ -743,9 +759,9 @@ module CZ {
             return feature[0].IsEnabled;
         }
 
-		function closeAllForms() {
+        function closeAllForms() {
             $('.cz-major-form').each((i, f) => { var form = $(f).data('form'); if (form) { form.close(); } });
-                     
+
         }
 
         function getFormById(name) {
@@ -755,7 +771,7 @@ module CZ {
             else
                 return false;
         }
-        
+
         export function showTimeSeriesChart() {
             $('#timeSeriesContainer').height('30%');
             $('#timeSeriesContainer').show();
@@ -816,7 +832,7 @@ module CZ {
                     var str = chartHeader.indexOf("(") > 0 ? ", " : " (";
                     chartHeader += str + rightDataSet.name + ")";
                 } else {
-                    chartHeader += ")"; 
+                    chartHeader += ")";
                 }
 
                 if (rightDataSet !== undefined || leftDataSet !== undefined) {

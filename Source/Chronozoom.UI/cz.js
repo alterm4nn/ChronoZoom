@@ -220,6 +220,7 @@ var CZ;
                 this.isFormVisible = false;
                 this.container.data("form", undefined);
                 this.container.hide.apply(this.container, args);
+                this.container.trigger("close");
             };
             FormBase.prototype.back = function () {
                 this.close();
@@ -2980,6 +2981,13 @@ var CZ;
                         return self.onTargetElementSelected(arg);
                     };
                     self.hide();
+                    setTimeout(function () {
+                        CZ.Authoring.showMessageWindow("Click an element to select it as a tour stop.", "New tour stop", function () {
+                            if(CZ.Authoring.mode == "editTour-selectTarget") {
+                                self.onTargetElementSelected(null);
+                            }
+                        });
+                    }, 500);
                 });
                 this.saveButton.click(function (event) {
                     var message;
@@ -3104,17 +3112,20 @@ var CZ;
                 }
             };
             FormEditTour.prototype.onTargetElementSelected = function (targetElement) {
-                CZ.Authoring.isActive = false;
                 CZ.Authoring.mode = "editTour";
+                CZ.Authoring.hideMessageWindow();
+                CZ.Authoring.isActive = false;
                 CZ.Authoring.callback = null;
-                var n = this.tourStopsListBox.items.length;
-                var stop = new TourStop("", targetElement, n + 1);
-                if(n > 0) {
-                    stop.LapseTime = ((this.tourStopsListBox.items[this.tourStopsListBox.items.length - 1]).data).LapseTime + CZ.Settings.tourDefaultTransitionTime;
-                } else {
-                    stop.LapseTime = 0;
+                if(targetElement) {
+                    var n = this.tourStopsListBox.items.length;
+                    var stop = new TourStop("", targetElement, n + 1);
+                    if(n > 0) {
+                        stop.LapseTime = ((this.tourStopsListBox.items[this.tourStopsListBox.items.length - 1]).data).LapseTime + CZ.Settings.tourDefaultTransitionTime;
+                    } else {
+                        stop.LapseTime = 0;
+                    }
+                    this.tourStopsListBox.add(stop);
                 }
-                this.tourStopsListBox.add(stop);
                 this.show();
             };
             return FormEditTour;
@@ -3824,6 +3835,8 @@ var CZ;
         Authoring.showEditExhibitForm = null;
         Authoring.showEditContentItemForm = null;
         Authoring.showEditTourForm = null;
+        Authoring.showMessageWindow = null;
+        Authoring.hideMessageWindow = null;
         Authoring.callback = null;
         function isIntersecting(te, obj) {
             switch(obj.type) {
@@ -4079,6 +4092,10 @@ var CZ;
             Authoring.showEditContentItemForm = formHandlers && formHandlers.showEditContentItemForm || function () {
             };
             Authoring.showEditTourForm = formHandlers && formHandlers.showEditTourForm || function () {
+            };
+            Authoring.showMessageWindow = formHandlers && formHandlers.showMessageWindow || function (mess, title) {
+            };
+            Authoring.hideMessageWindow = formHandlers && formHandlers.hideMessageWindow || function () {
             };
         }
         Authoring.initialize = initialize;
@@ -11344,6 +11361,53 @@ var CZ;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
+    (function (UI) {
+        var MessageWindow = (function (_super) {
+            __extends(MessageWindow, _super);
+            function MessageWindow(container, message, title) {
+                        _super.call(this, container, {
+            activationSource: null,
+            prevForm: null,
+            navButton: ".cz-form-nav",
+            closeButton: ".cz-form-close-btn > .cz-form-btn",
+            titleTextblock: ".cz-form-title"
+        });
+                var tourTitleInput = this.container.find(".cz-form-label");
+                tourTitleInput.text(message);
+                this.titleTextblock.text(title || "ChronoZoom");
+            }
+            MessageWindow.prototype.show = function () {
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
+                $(document).bind("keypress", this, this.onDocumentKeyPress);
+            };
+            MessageWindow.prototype.close = function () {
+                $(document).unbind("keypress", this.onDocumentKeyPress);
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 100,
+                    complete: function () {
+                    }
+                });
+            };
+            MessageWindow.prototype.onDocumentKeyPress = function (e) {
+                var self = e.data;
+                if(e.which == 27 && self.isFormVisible) {
+                    self.close();
+                }
+            };
+            return MessageWindow;
+        })(CZ.UI.FormBase);
+        UI.MessageWindow = MessageWindow;        
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
     CZ.timeSeriesChart;
     CZ.leftDataSet;
     CZ.rightDataSet;
@@ -11361,7 +11425,8 @@ var CZ;
             "#toursList": "/ui/tourslist-form.html",
             "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html",
             "#timeSeriesContainer": "/ui/timeseries-graph-form.html",
-            "#timeSeriesDataForm": "/ui/timeseries-data-form.html"
+            "#timeSeriesDataForm": "/ui/timeseries-data-form.html",
+            "#message-window": "/ui/message-window.html"
         };
         (function (FeatureActivation) {
             FeatureActivation._map = [];
@@ -11516,6 +11581,22 @@ var CZ;
                     }
                 });
                 CZ.Authoring.initialize(CZ.Common.vc, {
+                    showMessageWindow: function (message, title, onClose) {
+                        var wnd = new CZ.UI.MessageWindow(forms[13], message, title);
+                        if(onClose) {
+                            wnd.container.bind("close", function () {
+                                wnd.container.unbind("close", onClose);
+                                onClose();
+                            });
+                        }
+                        wnd.show();
+                    },
+                    hideMessageWindow: function () {
+                        var wnd = forms[13].data("form");
+                        if(wnd) {
+                            wnd.close();
+                        }
+                    },
                     showEditTourForm: function (tour) {
                         CZ.Tours.removeActiveTour();
                         var form = new CZ.UI.FormEditTour(forms[7], {

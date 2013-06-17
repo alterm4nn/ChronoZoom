@@ -407,10 +407,19 @@ module CZ {
                 var self = this;
                 this.addStopButton.click(event =>
                 {
-                    CZ.Authoring.isActive = true; // for now we do not watch for mouse moves
+                    CZ.Authoring.isActive = true; // for now we do not watch for mouse moves                    
                     CZ.Authoring.mode = "editTour-selectTarget";
                     CZ.Authoring.callback = arg => self.onTargetElementSelected(arg);
                     self.hide();
+                    setTimeout(() =>
+                    {
+                        CZ.Authoring.showMessageWindow("Click an element to select it as a tour stop.", "New tour stop",
+                            () => // on close/cancel
+                            {
+                                if (CZ.Authoring.mode == "editTour-selectTarget")
+                                    self.onTargetElementSelected(null);
+                            });
+                    }, 500);
                 });
                 this.saveButton.click(event =>
                 {
@@ -550,20 +559,23 @@ module CZ {
 
             // New tour stop is added.
             private onTargetElementSelected(targetElement: any) {
-                CZ.Authoring.isActive = false;
                 CZ.Authoring.mode = "editTour";
+                CZ.Authoring.hideMessageWindow();
+                CZ.Authoring.isActive = false;
                 CZ.Authoring.callback = null;
 
-                var n = this.tourStopsListBox.items.length;
-                var stop = new TourStop("", targetElement, n + 1);
-                if (n > 0) {
-                    stop.LapseTime = (<TourStop>(<TourStopListItem> this.tourStopsListBox.items[this.tourStopsListBox.items.length - 1]).data).LapseTime
-                        + Settings.tourDefaultTransitionTime;
+                if (targetElement) {
+                    var n = this.tourStopsListBox.items.length;
+                    var stop = new TourStop("", targetElement, n + 1);
+                    if (n > 0) {
+                        stop.LapseTime = (<TourStop>(<TourStopListItem> this.tourStopsListBox.items[this.tourStopsListBox.items.length - 1]).data).LapseTime
+                            + Settings.tourDefaultTransitionTime;
+                    }
+                    else {
+                        stop.LapseTime = 0;
+                    }
+                    this.tourStopsListBox.add(stop);
                 }
-                else {
-                    stop.LapseTime = 0;
-                }
-                this.tourStopsListBox.add(stop);
                 this.show();
             }
         }

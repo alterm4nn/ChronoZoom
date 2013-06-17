@@ -1299,6 +1299,20 @@ img.fallbackBackground {
   right: 0px;
   width: 330px;
 }
+.cz-message-window {
+  width: 330px;
+  height: 100px;
+  top: 36px;
+  left: 0;
+}
+.cz-message-window > .cz-form-content {
+  position: absolute;
+  top: 36px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow-y: auto;
+}
 .cz-form-tour-edit {
   min-width: 380px;
   max-width: 450px;

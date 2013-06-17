@@ -51,6 +51,9 @@ module CZ {
         export var showEditExhibitForm: (...args: any[]) => any = null;
         export var showEditContentItemForm: (...args: any[]) => any = null;
         export var showEditTourForm: (...args: any[]) => any = null;
+        export var showMessageWindow: (message: string, title?: string, onClose?: () => any) => any = null;
+        export var hideMessageWindow: () => any = null;
+
 
         // Generic callback function set by the form when waits user's input (e.g. mouse click) to continue.
         export var callback: (...args: any[]) => any = null;
@@ -397,14 +400,14 @@ module CZ {
             createExhibit: {
                 mousemove: function () {
                     if (CZ.Authoring.isDragging && _hovered.type === "timeline") {
-                        
+
                     }
                 },
 
                 mouseup: function () {
                     if (_hovered.type === "timeline") {
                         updateNewCircle();
-                        
+
                         selectedExhibit = createNewExhibit();
                         showCreateExhibitForm(selectedExhibit);
                     }
@@ -485,6 +488,8 @@ module CZ {
             showEditExhibitForm = formHandlers && formHandlers.showEditExhibitForm || function () { };
             showEditContentItemForm = formHandlers && formHandlers.showEditContentItemForm || function () { };
             showEditTourForm = formHandlers && formHandlers.showEditTourForm || function () { };
+            showMessageWindow = formHandlers && formHandlers.showMessageWindow || function (mess: string, title?: string) { };
+            hideMessageWindow = formHandlers && formHandlers.hideMessageWindow || function () { };
         }
 
         /**
@@ -544,7 +549,7 @@ module CZ {
             var deferred = $.Deferred();
 
             CZ.Service.deleteTimeline(t).then(
-                    updateCanvas => {                        
+                    updateCanvas => {
                         CZ.Common.vc.virtualCanvas("requestInvalidate");
                         deferred.resolve();
                     })
@@ -742,7 +747,7 @@ module CZ {
         */
         export function isIntervalPositive(start, end) {
             return (parseFloat(start) < parseFloat(end));
-                
+
         }
 
         /**
@@ -790,11 +795,9 @@ module CZ {
                     if (pdf.test(ci.uri)) {
                         ci.uri = "http://docs.google.com/viewer?url=" + encodeURI(ci.uri) + "&embedded=true";
                     }
-                    else if (docs.test(ci.uri))
-                    {
+                    else if (docs.test(ci.uri)) {
                     }
-                    else
-                    {
+                    else {
                         alert("Sorry, only PDF extension is supported");
                         isValid = false;
                     }
