@@ -22,6 +22,7 @@ module CZ {
             private description: string;
             private lapseTime: number;
             private sequence: number;
+            private thumbUrl: string;
 
             constructor(public bookmarkId: string, target: any, sequence: number, title?: string) {
                 if (target == undefined || target == null)
@@ -83,19 +84,46 @@ module CZ {
             public get NavigationUrl(): string {
                 return CZ.UrlNav.vcelementToNavString(this.targetElement);
             }
-            
 
-            public get ThumbnailUrl(): string{
-                if (this.targetElement) {
-                    if (this.targetElement.type === "contentItem") {
-                        var type = this.targetElement.contentItem.mediaType.toLowerCase();
-                        var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x64/' + this.targetElement.contentItem.guid + '.png';
-                        return thumbnailUri;
-                    }
-                }
-                return "/images/Temp-Thumbnail2.png";
+
+            public get ThumbnailUrl(): string {
+                if (!this.thumbUrl)
+                    this.thumbUrl = this.GetThumbnail(this.targetElement);
+                return this.thumbUrl;
             }
 
+
+            private GetThumbnail(element): string {
+                // uncomment for debug: return "http://upload.wikimedia.org/wikipedia/commons/7/71/Ivan_kramskoy_self_portrait_tr.gif";
+                var defaultThumb = "/images/Temp-Thumbnail2.png";
+                try {
+                    if (!element) return defaultThumb;
+                    if (element.type === "contentItem") {
+                        var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x64/' + element.id + '.png';
+                        return thumbnailUri;
+                    }
+                    if (element.type === "infodot") {
+                        if (element.contentItems && element.contentItems.length > 0) {
+                            var child = element.contentItems[0];
+                            var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x64/' + child.id + '.png';
+                            return thumbnailUri;
+                        }
+                    }
+                    else if (element.type === "timeline") {
+                        for (var n = element.children.length, i = 0; i < n; i++) {
+                            var child = element.children[i];
+                            if (child.type === "infodot" || child.type === "timeline") {
+                                var thumb = this.GetThumbnail(child);
+                                if (thumb && thumb !== defaultThumb) return thumb;
+                            }
+                        }
+                    }
+                } catch (exc) {
+                    if (console && console.error)
+                        console.error("Failed to get a thumbnail url: " + exc);
+                }
+                return defaultThumb;
+            }
         }
 
         export class Tour {
@@ -189,7 +217,7 @@ module CZ {
                 }
                 this.tourStopsListBox = new CZ.UI.TourStopListBox(container.find(formInfo.tourStopsListBox), formInfo.tourStopsTemplate, stops);
                 this.tourStopsListBox.itemMove((item, startPos, endPos) => self.onStopsReordered.apply(self, [<any>item, <any>startPos, <any>endPos]));
-                this.tourStopsListBox.itemRemove((item,index) => self.onStopRemoved.apply(self, [<any>item, <any>index]));
+                this.tourStopsListBox.itemRemove((item, index) => self.onStopRemoved.apply(self, [<any>item, <any>index]));
                 this.initialize();
             }
 
