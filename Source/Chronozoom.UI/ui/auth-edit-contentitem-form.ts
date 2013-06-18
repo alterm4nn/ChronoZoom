@@ -109,7 +109,7 @@ module CZ {
             private onSave() {
                 var newContentItem = {
                     title: this.titleInput.val() || "",
-                    uri: decodeURIComponent(this.mediaInput.val()) || "",
+                    uri: this.mediaInput.val() || "",
                     mediaSource: this.mediaSourceInput.val() || "",
                     mediaType: this.mediaTypeInput.val() || "",
                     attribution: this.attributionInput.val() || "",
