@@ -538,8 +538,8 @@ namespace Chronozoom.UI
                         Trace.TraceInformation("Get User");
                         if (user == null)
                         {
-                            SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
-                            return null;
+                            SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.RequestBodyEmpty);
+                            return new User();
                         }
                         var u = storage.Users.Where(candidate => candidate.NameIdentifier == user.NameIdentifier).FirstOrDefault();
                         if (u != null) return u;
