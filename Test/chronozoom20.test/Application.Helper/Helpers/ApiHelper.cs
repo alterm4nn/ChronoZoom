@@ -7,6 +7,8 @@ using Application.Helper.UserActions;
 using System.IO;
 using System.Runtime.Serialization.Json;
 using Chronozoom.Entities;
+using Exhibit = Application.Helper.Entities.Exhibit;
+using Timeline = Application.Helper.Entities.Timeline;
 
 namespace Application.Helper.Helpers
 {
@@ -15,31 +17,47 @@ namespace Application.Helper.Helpers
         private readonly string _serviceUrl = Configuration.BaseUrl;
         private const string EndpointLocator = ApiConstants.EndpointLocator;
         private const string CosmosGuidTemplate = ApiConstants.CosmosGuidTemplate;
-        private const string SuperCollectionUrl = ApiConstants.SuperCollectionUrl;
         private const string TimelineApiServiceUrl = ApiConstants.TimelineApiServiceUrl;
         private const string ExhibitApiServiceUrl = ApiConstants.ExhibitApiServiceUrl;
 
-        public Guid CreateTimelineByApi(TimelineRaw timeline)
+        public Guid CreateTimelineByApi(Timeline timeline)
         {
-            TimelineRaw newTimelineRequest = timeline;
-            newTimelineRequest.Timeline_ID = new Guid(CosmosGuidTemplate);
+            timeline.Timeline_ID = new Guid(CosmosGuidTemplate);
 
-            DataContractJsonSerializer putSerializer = new DataContractJsonSerializer(typeof(TimelineRaw));
+            DataContractJsonSerializer putSerializer = new DataContractJsonSerializer(typeof(Timeline));
             DataContractJsonSerializer guidSerializer = new DataContractJsonSerializer(typeof(Guid));
-            
-            Stream responseStream = GetResponseStream(putSerializer, TimelineApiServiceUrl, newTimelineRequest);
 
+
+            HttpWebRequest request = MakePutRequest(TimelineApiServiceUrl);
+            Stream requestStream = request.GetRequestStream();
+            putSerializer.WriteObject(requestStream, timeline);
+            WebResponse response = request.GetResponse();
+            Stream responseStream = response.GetResponseStream();
+            if (responseStream == null)
+            {
+                throw new NullReferenceException("responseStream is null");
+            }
+            
             Guid timelineId = (Guid)guidSerializer.ReadObject(responseStream);
             return timelineId;
         }
 
-        public NewExhibitApiResponse CreateExhibitByApi(ExhibitRaw exhibit)
+        public NewExhibitApiResponse CreateExhibitByApi(Exhibit exhibit)
         {
-            DataContractJsonSerializer putSerializer = new DataContractJsonSerializer(typeof(ExhibitRaw));
+            DataContractJsonSerializer putSerializer = new DataContractJsonSerializer(typeof(Exhibit));
             DataContractJsonSerializer guidSerializer = new DataContractJsonSerializer(typeof(NewExhibitApiResponse));
 
             exhibit.Timeline_ID = new Guid(CosmosGuidTemplate);
-            Stream responseStream = GetResponseStream(putSerializer, ExhibitApiServiceUrl, exhibit);
+
+            HttpWebRequest request = MakePutRequest(ExhibitApiServiceUrl);
+            Stream requestStream = request.GetRequestStream();
+            putSerializer.WriteObject(requestStream, exhibit);
+            WebResponse response = request.GetResponse();
+            Stream responseStream = response.GetResponseStream();
+            if (responseStream == null)
+            {
+                throw new NullReferenceException("responseStream is null");
+            }
 
             NewExhibitApiResponse newExhibitApiResponse = (NewExhibitApiResponse)guidSerializer.ReadObject(responseStream);
             return newExhibitApiResponse;

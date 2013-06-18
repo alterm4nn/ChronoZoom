@@ -1,8 +1,12 @@
-﻿using System.Runtime.Serialization;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
+using Chronozoom.Entities;
 
 namespace Application.Helper.Entities
 {
-    public class Exhibit : Chronozoom.Entities.ExhibitRaw
+    [DataContract]
+    [NotMapped]
+    public class Exhibit : ExhibitRaw
     {
         public override string ToString()
         {
