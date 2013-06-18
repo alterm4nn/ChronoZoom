@@ -7,7 +7,7 @@
     <ProjectGuid>{1559EBFF-DB13-4522-B8C1-6ACD22D08FC9}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>xslcon</RootNamespace>
+    <RootNamespace>apicon</RootNamespace>
     <AssemblyName>xslcon</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

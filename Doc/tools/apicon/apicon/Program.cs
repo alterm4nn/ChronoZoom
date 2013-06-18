@@ -24,7 +24,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 
-namespace xslcon
+namespace apicon
 {
     class MDConverter
     {
