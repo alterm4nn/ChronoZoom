@@ -90,7 +90,7 @@ namespace Application.Helper.Helpers
         public string GetContentItemDescription()
         {
             Logger.Log("<-");
-            string description = GetText(By.XPath("//*[@id='vc']/*[@class='contentItemDescription']/div"));
+            string description = GetText(By.XPath("(//*[@id='vc']/*[@class='contentItemDescription']/div)[2]"));
             Logger.Log("-> description: " + description);
             return description;
         }
