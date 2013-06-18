@@ -1,7 +1,10 @@
-﻿using System.Runtime.Serialization;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
 
 namespace Application.Helper.Entities
 {
+    [DataContract]
+    [NotMapped]
     public class ContentItem : Chronozoom.Entities.ContentItemRaw
     {
         public override string ToString()
