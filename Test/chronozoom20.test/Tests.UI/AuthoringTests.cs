@@ -1,7 +1,10 @@
 ﻿using System.Collections.ObjectModel;
 using Application.Driver;
-using Application.Helper.Entities;
+using Chronozoom.Entities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ContentItem = Application.Helper.Entities.ContentItem;
+using Exhibit = Application.Helper.Entities.Exhibit;
+using Timeline = Application.Helper.Entities.Timeline;
 
 namespace Tests
 {
@@ -59,6 +62,35 @@ namespace Tests
         }
 
         [TestMethod]
+        [Ignore]
+        public void timeline__mode()
+        {
+            var contentItemImage = new ContentItemRaw()
+            {
+                Title = "ContentItemImage",
+                MediaType = "Image",
+                Uri = "http://i.telegraph.co.uk/multimedia/archive/02429/eleanor_scriven_2429776k.jpg"
+
+            };
+            var contentItemMusic = new ContentItemRaw()
+            {
+                Title = "ContentItemMusic",
+                MediaType = "Audio",
+                Uri = "http://libsyn.com/media/eslpod/ESLPod900.mp3"
+
+            };
+            var exhibit = new ExhibitRaw()
+            {
+                Title = "TestExhibit",
+                Year = -6849998994,
+                ContentItems = new Collection<Chronozoom.Entities.ContentItem> { contentItemImage, contentItemMusic }
+            };
+            ApiHelper.CreateExhibitByApi(exhibit);
+            var timeline = new TimelineRaw() { Title = "ApiTimeline", FromYear = -10000000000, ToYear = -5000000000 };
+            //   ApiHelper.CreateTimelineByApi(timeline);
+        }
+
+        [TestMethod]
         public void exhibit_should_allow_two_content_items_adding()
         {
             var contentItemImage = new ContentItem
@@ -91,7 +123,7 @@ namespace Tests
                 Assert.AreEqual(exhibit.ContentItems[i].Uri, _newExhibit.ContentItems[i].Uri, "Content items Uri are not equal");
             }
         }
-        
+
         [TestMethod]
         public void exhibit_should_allow_pdf_content_item_adding()
         {
@@ -109,9 +141,9 @@ namespace Tests
             var exhibit = new Exhibit
             {
                 Title = "WebdriverExhibitWithContent",
-                ContentItems = new Collection<Chronozoom.Entities.ContentItem> {  contentItemPdf }
+                ContentItems = new Collection<Chronozoom.Entities.ContentItem> { contentItemPdf }
             };
-            string expectedUrl = string.Format(@"http://docs.google.com/viewer?url={0}&embedded=true",contentItemPdf.Uri);
+            string expectedUrl = string.Format(@"http://docs.google.com/viewer?url={0}&embedded=true", contentItemPdf.Uri);
             ExhibitHelper.AddExhibitWithContentItem(exhibit);
             _newExhibit = ExhibitHelper.GetNewExhibit();
             Assert.AreEqual(exhibit.ContentItems.Count, _newExhibit.ContentItems.Count, "Content items count are not equal");
