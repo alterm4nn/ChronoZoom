@@ -129,6 +129,15 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
+        public void OpenHistoryOfScienceTimeline()
+        {
+            Logger.Log("<-");
+            _manager.GetNavigationHelper().NavigateToHistoryOfScienceTimeline();
+            WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='History of Science']"));
+            WaitAnimation();
+            Logger.Log("->");
+        }
+
         private void ConfirmDeletion()
         {
             AcceptAlert();
