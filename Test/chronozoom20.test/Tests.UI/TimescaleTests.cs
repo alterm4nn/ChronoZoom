@@ -87,7 +87,18 @@ namespace Tests
         {
             TimelineHelper.OpenHumanityTimeline();
             TimelineHelper.OpenRomanHistoryTimeline();
-            const double expected = 942;
+            const double expected = 943;
+            double leftBorder = TimescaleHelper.GetLeftBorderDate();
+            double rightBorder = TimescaleHelper.GetRightBorderDate();
+            Assert.AreEqual(expected, rightBorder - leftBorder);
+        }   
+        
+        [TestMethod]
+        public void History_Of_Science_TimeLine_Borders()
+        {
+            TimelineHelper.OpenHumanityTimeline();
+            TimelineHelper.OpenHistoryOfScienceTimeline();
+            const double expected = 485;
             double leftBorder = TimescaleHelper.GetLeftBorderDate();
             double rightBorder = TimescaleHelper.GetRightBorderDate();
             Assert.AreEqual(expected, rightBorder - leftBorder);
@@ -111,12 +122,12 @@ namespace Tests
         {
             TimelineHelper.OpenHumanityTimeline();
             string mouseMarkerText = TimescaleHelper.GetMouseMarkerText();
+            HomePageHelper.MoveMouseToLeft();
+            string mouseMarkerLeftText = TimescaleHelper.GetMouseMarkerText();
+            Assert.AreNotEqual(mouseMarkerText, mouseMarkerLeftText);
             HomePageHelper.MoveMouseToCenter();
             string mouseMarkerCenterText = TimescaleHelper.GetMouseMarkerText();
-            Assert.AreNotEqual(mouseMarkerText, mouseMarkerCenterText);
-            HomePageHelper.MoveMouseToLeft();
-            mouseMarkerText = TimescaleHelper.GetMouseMarkerText();
-            Assert.AreNotEqual(mouseMarkerText, mouseMarkerCenterText);
+            Assert.AreNotEqual(mouseMarkerLeftText, mouseMarkerCenterText);
         }
     }
 }
