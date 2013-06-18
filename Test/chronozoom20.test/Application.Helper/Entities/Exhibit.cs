@@ -1,6 +1,8 @@
-﻿namespace Application.Helper.Entities
+﻿using System.Runtime.Serialization;
+
+namespace Application.Helper.Entities
 {
-    public class Exhibit : Chronozoom.Entities.Exhibit
+    public class Exhibit : Chronozoom.Entities.ExhibitRaw
     {
         public override string ToString()
         {
