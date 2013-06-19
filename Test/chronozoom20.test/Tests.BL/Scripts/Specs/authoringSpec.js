@@ -13,7 +13,6 @@
 
 describe("CZ.Authoring", function () {
     var authoring;
-    var service;
     var existedTimeline;
     var parentTimeline = {};
     parentTimeline.guid = "00000000-0000-0000-0000-000000000000";
@@ -39,6 +38,20 @@ describe("CZ.Authoring", function () {
                     _selectedTimeline = newTimeline;
                     authoring.updateTimeline(newTimeline, propFake);
                     expect(newTimeline.width).toEqual(propFake.end - propFake.start);
+                });
+            });
+
+            describe("When: user expands timeline to present day without overlay ", function () {
+                var propFake1 = { title: "Timeline Title11", start: "-5", end: 9999 };
+                var dates = CZ.Dates;
+                var localPresent = dates.getPresent();
+                var presentDate = dates.getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+                var newTimeline = { y: 1, height: 2, x: -8, width: presentDate - propFake1.start, parent: parentTimeline, title: "Timeline Title", type: "timeline", children: [] };
+                
+                it("Then: The timeline should be expanded to present day", function () {
+                    _selectedTimeline = newTimeline;
+                    authoring.updateTimeline(newTimeline, propFake1);
+                    expect(newTimeline.width).toEqual(dates.getCoordinateFromDecimalYear(propFake1.end) - propFake1.start);
                 });
             });
 
@@ -127,9 +140,9 @@ describe("CZ.Authoring", function () {
         existedTimeline = { y: 5, height: 2, x: -5, width: 3, parent: parentTimeline, title: "Timeline Title", type: "timeline", children: [] };
         var newTimeline = { y: 1, height: 2, x: -8, width: 1, parent: parentTimeline, title: "Timeline Title", type: "timeline", children: [] };
         _selectedTimeline = newTimeline;
-        var propFake = { title: title, start: start, end: end };        
-        dataIncorrect = ["-5", "-2", "title","incorrect timeline values"]
-        dataCorrect = ["-8", "-6", "title", "correct timeline values"]
+        var propFake = { title: title, start: start, end: end };
+        dataIncorrect = ["-5", "-2", "title", "incorrect timeline values"];
+        dataCorrect = ["-8", "-6", "title", "correct timeline values"];
 
         using("When", [dataIncorrect, dataCorrect], function (startValue, endValue, titleValue) {
             it("The title should be changed", function () {
@@ -141,12 +154,138 @@ describe("CZ.Authoring", function () {
         xdescribe("And: title is empty", function () {
             it("Then: error should be thrown", function () {
                 //Bug: https://github.com/alterm4nn/ChronoZoom/issues/259
-                var propFake = { title: "", start: "-5", end: "-4" };                
+                var propFake = { title: "", start: "-5", end: "-4" };
                 expect(function () { authoring.updateTimeline(newTimeline, propFake); }).toThrow(new Error("Title is empty"));
             });
         });
     });
-    
+
+    describe("When: user deletes timeline", function () {
+        var vcc;
+        var service;
+        beforeEach(function () {
+            vcc = CZ.VCContent;
+            service = CZ.Service;
+            spyOn(vcc, 'removeChild');
+        });
+        it("Then: deleteTimeline and removeChild should be called", function () {
+            spyOn(service, 'deleteTimeline').andCallThrough();
+            authoring.removeTimeline(existedTimeline);
+            expect(service.deleteTimeline).toHaveBeenCalledWith(existedTimeline);
+            expect(vcc.removeChild).toHaveBeenCalledWith(existedTimeline.parent, existedTimeline.id);
+        });
+    });
+
+    var contentItem = {
+        ParentExhibitId: "e23e6734f-1f71-4d20-bf46-b452b25f2931",
+        __type: "ContentItemRaw:#Chronozoom.Entities",
+        attribution: "",
+        description: "",
+        guid: "c319cbb8-454f-4ca3-95fc-ae2ef2962222",
+        id: "c319cbb8-454f-4ca3-95fc-ae2ef2962222",
+        mediaSource: "",
+        mediaType: "image",
+        order: 0,
+        title: "ContentItemImage",
+        uri: "http://i.telegraph.co.uk/multimedia/archive/02429/eleanor_scriven_2429776k.jpg"
+    };
+    var infodotDescription = {
+        date: -5481026446.42,
+        guid: "23e6734f-1f71-4d20-bf46-b452b25f2931",
+        isBuffered: false,
+        opacity: 1,
+        title: "Exhibit Title"
+    };
+
+    var exhibitParentTimeline = {
+        guid: "00000000-0000-0000-0000-000000000000",
+        id: "t55",
+        height: 10,
+        width: 10,
+        x: 0,
+        y: 0,
+        children: [],
+        type: "timeline"
+    };
+
+    var exhibit = {
+        id: "e23e6734f-1f71-4d20-bf46-b452b25f2931",
+        infodotDescription: infodotDescription,
+        parent: exhibitParentTimeline,
+        children: null,
+        contentItems: [contentItem]
+    };
+    describe("When: user deletes exhibit", function () {
+        var service;
+        beforeEach(function () {
+            service = CZ.Service;
+        });
+
+        it("Then: deleteExhibit should be called", function () {
+            spyOn(service, 'deleteExhibit').andCallThrough();
+            authoring.removeExhibit(exhibit);
+            expect(service.deleteExhibit).toHaveBeenCalledWith(exhibit);
+        });
+    });
+
+    describe("When: user updates exhibit", function () {
+        var service;
+        var clone;
+        var args = {
+            contentItems: {},
+            height: 548000080.5376438,
+            infodotDescription: infodotDescription,
+            title: "1",
+            type: "infodot",
+            width: 548000080.5376438,
+            x: -9219240083.628822,
+            y: 4101223227.086694
+        };
+        beforeEach(function () {
+            service = CZ.Service;
+            clone = $.extend({
+            }, exhibit, {
+                children: null
+            });
+            clone = $.extend(true, {
+            }, clone);
+            delete clone.children;
+            delete clone.contentItems;
+            $.extend(true, clone, args);
+        });
+
+        it("Then: putExhibit should be called", function () {
+            spyOn(service, 'putExhibit').andCallThrough();
+            authoring.updateExhibit(exhibit, args);
+            expect(service.putExhibit).toHaveBeenCalledWith(clone);
+        });
+    });
+
+    describe("When: user updates contentItem", function () {
+        var service;
+        var clone;
+        var args = {
+            attribution: "",
+            description: "",
+            mediaSource: "",
+            mediaType: "image",
+            order: 0,
+            title: "ContentItemImage",
+            uri: "http://i.telegraph.co.uk/multimedia/archive/02429/eleanor_scriven_2429776k.jpg",
+        };
+        beforeEach(function () {
+            service = CZ.Service;
+            clone = $.extend(true, {
+            }, contentItem, args);
+        });
+
+        it("Then: putContentItem should be called", function () {
+            spyOn(service, 'putContentItem').andCallThrough();
+            authoring.updateContentItem(exhibit, contentItem, args);
+            expect(service.putContentItem).toHaveBeenCalledWith(clone);
+        });
+    });
+
     xdescribe("Exhibit are", function () {
         var exhibitParentTimeline = {};
         exhibitParentTimeline.guid = "00000000-0000-0000-0000-000000000000";
@@ -163,7 +302,6 @@ describe("CZ.Authoring", function () {
             var _selectedExhibit = {};
 
             beforeEach(function () {
-                //setFixtures('<body></body>');
                 $('body').prepend('<div id="vc"></div>');
                 $('#vc').data('ui-virtualCanvas', { hovered: exhibitParentTimeline, element: $('#vc'), getViewport: function () { return { pointScreenToVirtual: function (xvalue, yvalue) { return { x: xvalue, y: yvalue }; } }; } });
                 var vc = $('#vc');

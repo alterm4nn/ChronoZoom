@@ -83,6 +83,7 @@ module CZ {
             private timerOnBookmarkIsOver;  // timer id which is set for bookmark complete event (stored to be able to cancel it if paused)
 
             public toggleAudio;
+            public thumbnailUrl: string;
 
             private ReinitializeAudio;
             private play;
@@ -119,6 +120,7 @@ module CZ {
                 }
 
                 var self = this;
+                this.thumbnailUrl = CZ.Settings.contentItemThumbnailBaseUri + id + '.jpg';
 
                 //ordering the bookmarks by the lapsetime
                 bookmarks.sort(function (b1, b2) {

@@ -7,7 +7,7 @@ var CZ;
                 pendingBibliographyForExhibitID = null;
                 $("#bibliographyBack").hide('clip', {
                 }, 'slow');
-                window.location.hash = window.location.hash.replace(new RegExp("&b=[a-z0-9_]+$", "gi"), "");
+                window.location.hash = window.location.hash.replace(new RegExp("&b=[a-z0-9_\-]+$", "gi"), "");
             });
         }
         Bibliography.initializeBibliography = initializeBibliography;
@@ -21,7 +21,7 @@ var CZ;
             }
             var vp = CZ.Common.vc.virtualCanvas("getViewport");
             var nav = CZ.UrlNav.vcelementToNavString(element, vp);
-            if(window.location.hash.match("b=([a-z0-9_]+)") == null) {
+            if(window.location.hash.match("b=([a-z0-9_\-]+)") == null) {
                 var bibl = "&b=" + id;
                 if(window.location.hash.indexOf('@') == -1) {
                     bibl = "@" + bibl;

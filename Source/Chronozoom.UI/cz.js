@@ -484,7 +484,7 @@ var CZ;
                 pendingBibliographyForExhibitID = null;
                 $("#bibliographyBack").hide('clip', {
                 }, 'slow');
-                window.location.hash = window.location.hash.replace(new RegExp("&b=[a-z0-9_]+$", "gi"), "");
+                window.location.hash = window.location.hash.replace(new RegExp("&b=[a-z0-9_\-]+$", "gi"), "");
             });
         }
         Bibliography.initializeBibliography = initializeBibliography;
@@ -498,7 +498,7 @@ var CZ;
             }
             var vp = CZ.Common.vc.virtualCanvas("getViewport");
             var nav = CZ.UrlNav.vcelementToNavString(element, vp);
-            if(window.location.hash.match("b=([a-z0-9_]+)") == null) {
+            if(window.location.hash.match("b=([a-z0-9_\-]+)") == null) {
                 var bibl = "&b=" + id;
                 if(window.location.hash.indexOf('@') == -1) {
                     bibl = "@" + bibl;
@@ -1873,6 +1873,8 @@ var CZ;
                     var mediaID = id + "__media__";
                     var imageElem = null;
                     if(this.contentItem.mediaType.toLowerCase() === 'image' || this.contentItem.mediaType.toLowerCase() === 'picture') {
+                        imageElem = VCContent.addImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, this.contentItem.uri);
+                    } else if(this.contentItem.mediaType.toLowerCase() === 'deepimage') {
                         imageElem = VCContent.addSeadragonImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);
                     } else if(this.contentItem.mediaType.toLowerCase() === 'video') {
                         VCContent.addVideo(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
@@ -2520,7 +2522,7 @@ var CZ;
                         container: listItemContainer,
                         uiMap: {
                             closeButton: ".cz-listitem-close-btn",
-                            iconImg: ".cz-contentitem-listitem-icon > img",
+                            iconImg: ".cz-form-tour-contentitem-listitem-icon > img",
                             titleTextblock: ".cz-contentitem-listitem-title",
                             typeTextblock: ".cz-contentitem-listitem-highlighted"
                         }
@@ -2545,7 +2547,17 @@ var CZ;
                 descr.change(function (ev) {
                     self.data.Description = self.Description;
                 });
-                this.iconImg.attr("src", this.data.ThumbnailUrl || "/images/Temp-Thumbnail2.png");
+                var thumbUrl = this.data.ThumbnailUrl;
+                var img = new Image();
+                img.onload = function () {
+                    self.iconImg.replaceWith(img);
+                };
+                img.onerror = function () {
+                    if(console && console.warn) {
+                        console.warn("Could not load a thumbnail image " + thumbUrl);
+                    }
+                };
+                img.src = thumbUrl;
                 this.titleTextblock.text(this.data.Title);
                 this.typeTextblock.text(this.data.Type);
                 this.Activate();
@@ -2672,18 +2684,48 @@ var CZ;
             });
             Object.defineProperty(TourStop.prototype, "ThumbnailUrl", {
                 get: function () {
-                    if(this.targetElement) {
-                        if(this.targetElement.type === "contentItem") {
-                            var type = this.targetElement.contentItem.mediaType.toLowerCase();
-                            var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x64/' + this.targetElement.contentItem.guid + '.png';
-                            return thumbnailUri;
-                        }
+                    if(!this.thumbUrl) {
+                        this.thumbUrl = this.GetThumbnail(this.targetElement);
                     }
-                    return "/images/Temp-Thumbnail2.png";
+                    return this.thumbUrl;
                 },
                 enumerable: true,
                 configurable: true
             });
+            TourStop.prototype.GetThumbnail = function (element) {
+                var defaultThumb = "/images/Temp-Thumbnail2.png";
+                try  {
+                    if(!element) {
+                        return defaultThumb;
+                    }
+                    if(element.type === "contentItem") {
+                        var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x64/' + element.id + '.png';
+                        return thumbnailUri;
+                    }
+                    if(element.type === "infodot") {
+                        if(element.contentItems && element.contentItems.length > 0) {
+                            var child = element.contentItems[0];
+                            var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x64/' + child.id + '.png';
+                            return thumbnailUri;
+                        }
+                    } else if(element.type === "timeline") {
+                        for(var n = element.children.length, i = 0; i < n; i++) {
+                            var child = element.children[i];
+                            if(child.type === "infodot" || child.type === "timeline") {
+                                var thumb = this.GetThumbnail(child);
+                                if(thumb && thumb !== defaultThumb) {
+                                    return thumb;
+                                }
+                            }
+                        }
+                    }
+                } catch (exc) {
+                    if(console && console.error) {
+                        console.error("Failed to get a thumbnail url: " + exc);
+                    }
+                }
+                return defaultThumb;
+            };
             return TourStop;
         })();
         UI.TourStop = TourStop;        
@@ -3118,8 +3160,8 @@ var CZ;
                 return {
                     id: t.guid,
                     ParentTimelineId: t.parent.guid,
-                    start: t.x,
-                    end: typeof t.endDate !== 'undefined' ? t.endDate : (t.x + t.width),
+                    start: CZ.Dates.getDecimalYearFromCoordinate(t.x),
+                    end: typeof t.endDate !== 'undefined' ? t.endDate : CZ.Dates.getDecimalYearFromCoordinate(t.x + t.width),
                     title: t.title,
                     Regime: t.regime
                 };
@@ -3136,6 +3178,21 @@ var CZ;
                 };
             }
             Map.exhibit = exhibit;
+            function exhibitWithContentItems(e) {
+                var mappedContentItems = [];
+                $(e.contentItems).each(function (contentItemIndex, contentItem) {
+                    mappedContentItems.push(Map.contentItem(contentItem));
+                });
+                return {
+                    id: e.guid,
+                    ParentTimelineId: e.parent.guid,
+                    time: e.infodotDescription.date,
+                    title: e.title,
+                    description: undefined,
+                    contentItems: mappedContentItems
+                };
+            }
+            Map.exhibitWithContentItems = exhibitWithContentItems;
             function contentItem(ci) {
                 return {
                     id: ci.guid,
@@ -3311,7 +3368,7 @@ var CZ;
                 contentType: "application/json",
                 dataType: "json",
                 url: request.url,
-                data: JSON.stringify(Map.exhibit(e))
+                data: JSON.stringify(Map.exhibitWithContentItems(e))
             });
         }
         Service.putExhibit = putExhibit;
@@ -3550,6 +3607,11 @@ var CZ;
                 cache: false,
                 contentType: "application/json",
                 url: request.url
+            }).done(function (profile) {
+                if(!profile.id) {
+                    return null;
+                }
+                return profile;
             });
         }
         Service.getProfile = getProfile;
@@ -3657,26 +3719,30 @@ var CZ;
         function getCoordinateFromDecimalYear(decimalYear) {
             var localPresent = getPresent();
             var presentDate = getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
-            return decimalYear === 9999 ? presentDate : decimalYear;
+            return decimalYear === 9999 ? presentDate : (decimalYear < 0 ? decimalYear + 1 : decimalYear);
         }
         Dates.getCoordinateFromDecimalYear = getCoordinateFromDecimalYear;
+        function getDecimalYearFromCoordinate(coordinate) {
+            return coordinate < 1 ? --coordinate : coordinate;
+        }
+        Dates.getDecimalYearFromCoordinate = getDecimalYearFromCoordinate;
         function convertCoordinateToYear(coordinate) {
             var year = {
                 year: coordinate,
                 regime: "CE"
             };
             if(coordinate < -999999999) {
-                year.year /= -1000000000;
+                year.year = (year.year - 1) / (-1000000000);
                 year.regime = 'Ga';
             } else if(coordinate < -999999) {
-                year.year /= -1000000;
+                year.year = (year.year - 1) / (-1000000);
                 year.regime = 'Ma';
-            } else if(coordinate < -999) {
-                year.year /= -1000;
+            } else if(coordinate < -9999) {
+                year.year = (year.year - 1) / (-1000);
                 year.regime = 'Ka';
-            } else if(coordinate < 0) {
-                year.year /= -1;
-                year.year = Math.floor(year.year);
+            } else if(coordinate < 1) {
+                year.year = (year.year - 1) / (-1);
+                year.year = Math.ceil(year.year);
                 year.regime = 'BCE';
             } else {
                 year.year = Math.floor(year.year);
@@ -3688,16 +3754,16 @@ var CZ;
             var coordinate = year;
             switch(regime.toLowerCase()) {
                 case "ga":
-                    coordinate *= -1000000000;
+                    coordinate = year * (-1000000000) + 1;
                     break;
                 case "ma":
-                    coordinate *= -1000000;
+                    coordinate = year * (-1000000) + 1;
                     break;
                 case "ka":
-                    coordinate *= -1000;
+                    coordinate = year * (-1000) + 1;
                     break;
                 case "bce":
-                    coordinate *= -1;
+                    coordinate = year * (-1) + 1;
                     break;
             }
             return coordinate;
@@ -4042,7 +4108,7 @@ var CZ;
             var temp = {
                 x: Number(prop.start),
                 y: t.y,
-                width: Number(CZ.Dates.getCoordinateFromDecimalYear(prop.end) - prop.start),
+                width: prop.end === 9999 ? Number(CZ.Dates.getCoordinateFromDecimalYear(prop.end) - prop.start) : Number(prop.end - prop.start),
                 height: t.height,
                 type: "rectangle"
             };
@@ -4075,41 +4141,31 @@ var CZ;
             CZ.VCContent.removeChild(t.parent, t.id);
         }
         Authoring.removeTimeline = removeTimeline;
-        function updateExhibit(e, args) {
+        function updateExhibit(oldExhibit, args) {
             var deferred = $.Deferred();
-            if(e && e.contentItems && args) {
-                var clone = $.extend({
-                }, e, {
+            if(oldExhibit && oldExhibit.contentItems && args) {
+                var newExhibit = $.extend({
+                }, oldExhibit, {
                     children: null
                 });
-                clone = $.extend(true, {
-                }, clone);
-                delete clone.children;
-                delete clone.contentItems;
-                $.extend(true, clone, args);
-                var oldContentItems = $.extend(true, [], e.contentItems);
-                CZ.Service.putExhibit(clone).then(function (response) {
-                    var old_id = e.id;
-                    e.id = clone.id = "e" + response.ExhibitId;
-                    var new_id = e.id;
-                    e.guid = clone.guid = response.ExhibitId;
-                    for(var i = 0; i < e.contentItems.length; i++) {
-                        e.contentItems[i].ParentExhibitId = e.guid;
+                newExhibit = $.extend(true, {
+                }, newExhibit);
+                delete newExhibit.children;
+                delete newExhibit.contentItems;
+                $.extend(true, newExhibit, args);
+                CZ.Service.putExhibit(newExhibit).then(function (response) {
+                    newExhibit.guid = response.ExhibitId;
+                    for(var i = 0; i < newExhibit.contentItems.length; i++) {
+                        newExhibit.contentItems[i].ParentExhibitId = newExhibit.guid;
                     }
-                    for(var i = 0; i < clone.contentItems.length; i++) {
-                        clone.contentItems[i].ParentExhibitId = clone.guid;
-                    }
-                    CZ.Service.putExhibitContent(clone, oldContentItems).then(function (response) {
-                        $.extend(e, clone);
-                        e.id = old_id;
-                        e = renewExhibit(e);
-                        e.id = new_id;
-                        CZ.Common.vc.virtualCanvas("requestInvalidate");
-                        deferred.resolve();
-                    }, function (error) {
-                        console.log("Error connecting to service: update exhibit (put exhibit content).\n" + error.responseText);
-                        deferred.reject();
+                    $(response.ContentItemId).each(function (contentItemIdIndex, contentItemId) {
+                        newExhibit.contentItems[contentItemIdIndex].id = contentItemId;
+                        newExhibit.contentItems[contentItemIdIndex].guid = contentItemId;
                     });
+                    newExhibit = renewExhibit(newExhibit);
+                    newExhibit.id = "e" + response.ExhibitId;
+                    CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    deferred.resolve();
                 }, function (error) {
                     console.log("Error connecting to service: update exhibit.\n" + error.responseText);
                     deferred.reject();
@@ -4314,9 +4370,20 @@ var CZ;
                         _super.call(this, parent, container, uiMap, context);
                 this.iconImg = this.container.find(uiMap.iconImg);
                 this.titleTextblock = this.container.find(uiMap.titleTextblock);
-                this.titleTextblock = this.container.find(uiMap.titleTextblock);
                 this.descrTextblock = this.container.find(".cz-contentitem-listitem-descr");
+                var self = this;
+                var thumbUrl = this.data.thumbnailUrl;
                 this.iconImg.attr("src", this.data.icon || "/images/Temp-Thumbnail2.png");
+                var img = new Image();
+                img.onload = function () {
+                    self.iconImg.replaceWith(img);
+                };
+                img.onerror = function () {
+                    if(console && console.warn) {
+                        console.warn("Could not load a thumbnail image " + thumbUrl);
+                    }
+                };
+                img.src = thumbUrl;
                 this.titleTextblock.text(this.data.title);
                 if(this.data.description) {
                     this.descrTextblock.text(this.data.description);
@@ -4485,6 +4552,7 @@ var CZ;
                     throw "Tour has no bookmarks";
                 }
                 var self = this;
+                this.thumbnailUrl = CZ.Settings.contentItemThumbnailBaseUri + id + '.jpg';
                 bookmarks.sort(function (b1, b2) {
                     return b1.lapseTime - b2.lapseTime;
                 });
@@ -10744,7 +10812,7 @@ var CZ;
                     height: this.exhibit.height,
                     width: this.exhibit.width,
                     infodotDescription: {
-                        date: this.datePicker.getDate()
+                        date: CZ.Dates.getDecimalYearFromCoordinate(this.datePicker.getDate())
                     },
                     contentItems: this.exhibit.contentItems || [],
                     type: "infodot"
@@ -10945,7 +11013,7 @@ var CZ;
                 var _this = this;
                 var newContentItem = {
                     title: this.titleInput.val() || "",
-                    uri: decodeURIComponent(this.mediaInput.val()) || "",
+                    uri: this.mediaInput.val() || "",
                     mediaSource: this.mediaSourceInput.val() || "",
                     mediaType: this.mediaTypeInput.val() || "",
                     attribution: this.attributionInput.val() || "",

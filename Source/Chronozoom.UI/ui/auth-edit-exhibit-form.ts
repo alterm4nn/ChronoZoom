@@ -142,7 +142,7 @@ module CZ {
                     y: this.exhibit.y,
                     height: this.exhibit.height,
                     width: this.exhibit.width,
-                    infodotDescription: { date: this.datePicker.getDate() },
+                    infodotDescription: { date: CZ.Dates.getDecimalYearFromCoordinate(this.datePicker.getDate()) },
                     contentItems: this.exhibit.contentItems || [],
                     type: "infodot"
                 };

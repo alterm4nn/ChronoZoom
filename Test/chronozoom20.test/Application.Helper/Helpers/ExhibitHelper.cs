@@ -90,7 +90,7 @@ namespace Application.Helper.Helpers
         public string GetContentItemDescription()
         {
             Logger.Log("<-");
-            string description = GetText(By.XPath("//*[@id='vc']/*[@class='contentItemDescription']/div"));
+            string description = GetText(By.XPath("(//*[@id='vc']/*[@class='contentItemDescription']/div)[2]"));
             Logger.Log("-> description: " + description);
             return description;
         }
@@ -140,6 +140,15 @@ namespace Application.Helper.Helpers
             return expectedUri;
         }
 
+        public void NavigateToExhibit(Exhibit exhibit)
+        {
+            Logger.Log("<- title: " + exhibit.Title);
+            ExecuteJavaScript(string.Format("CZ.Search.goToSearchResult('e{0}')", exhibit.Id));
+            WaitAnimation();
+            MoveToElementAndClick(By.ClassName("virtualCanvasLayerCanvas"));
+            Logger.Log("->");
+        }
+
         private void ConfirmDeletion()
         {
             AcceptAlert();
@@ -158,15 +167,6 @@ namespace Application.Helper.Helpers
             ExecuteJavaScript("CZ.Authoring.mode = 'editExhibit'");
             ExecuteJavaScript("CZ.Authoring.selectedExhibit = " + Javascripts.LastCanvasElement);
             ExecuteJavaScript("CZ.Authoring.showEditExhibitForm(CZ.Authoring.selectedExhibit)");
-            Logger.Log("->");
-        }
-
-        private void NavigateToExhibit(Exhibit exhibit)
-        {
-            Logger.Log("<- title: " + exhibit.Title);
-            ExecuteJavaScript(string.Format("CZ.Search.goToSearchResult('e{0}')", exhibit.Id));
-            WaitAnimation();
-            MoveToElementAndClick(By.ClassName("virtualCanvasLayerCanvas"));
             Logger.Log("->");
         }
 

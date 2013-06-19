@@ -41,8 +41,8 @@ module CZ {
                 return {
                     id: t.guid,
                     ParentTimelineId: t.parent.guid,
-                    start: t.x,
-                    end: typeof t.endDate !== 'undefined' ? t.endDate : (t.x + t.width),
+                    start: CZ.Dates.getDecimalYearFromCoordinate(t.x),
+                    end: typeof t.endDate !== 'undefined' ? t.endDate : CZ.Dates.getDecimalYearFromCoordinate(t.x + t.width),
                     title: t.title,
                     Regime: t.regime
                 };
@@ -56,6 +56,22 @@ module CZ {
                     title: e.title,
                     description: undefined,
                     contentItems: undefined
+                };
+            }
+
+            export function exhibitWithContentItems(e) {
+                var mappedContentItems = [];
+                $(e.contentItems).each(function (contentItemIndex, contentItem) {
+                    mappedContentItems.push(Map.contentItem(contentItem))
+                });
+
+                return {
+                    id: e.guid,
+                    ParentTimelineId: e.parent.guid,
+                    time: e.infodotDescription.date,
+                    title: e.title,
+                    description: undefined,
+                    contentItems: mappedContentItems
                 };
             }
 
@@ -278,7 +294,7 @@ module CZ {
                 contentType: "application/json",
                 dataType: "json",
                 url: request.url,
-                data: JSON.stringify(Map.exhibit(e))
+                data: JSON.stringify(Map.exhibitWithContentItems(e))
             });
         }
 
@@ -571,6 +587,11 @@ module CZ {
                 cache: false,
                 contentType: "application/json",
                 url: request.url
+            }).done(profile => {
+                if (!profile.id)
+                    return null;
+                
+                return profile;
             });
         }
     }

@@ -29,7 +29,7 @@ var CZ;
                         container: listItemContainer,
                         uiMap: {
                             closeButton: ".cz-listitem-close-btn",
-                            iconImg: ".cz-contentitem-listitem-icon > img",
+                            iconImg: ".cz-form-tour-contentitem-listitem-icon > img",
                             titleTextblock: ".cz-contentitem-listitem-title",
                             typeTextblock: ".cz-contentitem-listitem-highlighted"
                         }
@@ -54,7 +54,17 @@ var CZ;
                 descr.change(function (ev) {
                     self.data.Description = self.Description;
                 });
-                this.iconImg.attr("src", this.data.ThumbnailUrl || "/images/Temp-Thumbnail2.png");
+                var thumbUrl = this.data.ThumbnailUrl;
+                var img = new Image();
+                img.onload = function () {
+                    self.iconImg.replaceWith(img);
+                };
+                img.onerror = function () {
+                    if(console && console.warn) {
+                        console.warn("Could not load a thumbnail image " + thumbUrl);
+                    }
+                };
+                img.src = thumbUrl;
                 this.titleTextblock.text(this.data.Title);
                 this.typeTextblock.text(this.data.Type);
                 this.Activate();

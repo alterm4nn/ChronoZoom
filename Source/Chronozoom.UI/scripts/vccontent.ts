@@ -1876,9 +1876,11 @@ module CZ {
                     var mediaID = id + "__media__";
                     var imageElem = null;
                     if (this.contentItem.mediaType.toLowerCase() === 'image' || this.contentItem.mediaType.toLowerCase() === 'picture') {
-                        imageElem = addSeadragonImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);
+                        imageElem = addImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, this.contentItem.uri);
                     }
-                    else if (this.contentItem.mediaType.toLowerCase() === 'video') {
+                    else if (this.contentItem.mediaType.toLowerCase() === 'deepimage') {
+                        imageElem = addSeadragonImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);
+                    } else if (this.contentItem.mediaType.toLowerCase() === 'video') {
                         addVideo(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     }
                     else if (this.contentItem.mediaType.toLowerCase() === 'audio') {
