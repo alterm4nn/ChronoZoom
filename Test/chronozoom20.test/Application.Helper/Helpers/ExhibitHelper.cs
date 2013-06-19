@@ -11,12 +11,6 @@ namespace Application.Helper.Helpers
 {
     public class ExhibitHelper : DependentActions
     {
-        private readonly HelperManager _manager;
-
-        public ExhibitHelper()
-        {
-            _manager = new HelperManager();
-        }
 
         public void AddExhibit(Exhibit exhibit)
         {
@@ -105,7 +99,6 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
-
         public bool IsExhibitFound(Exhibit exhibit)
         {
             Logger.Log("<- exhibit: " + exhibit);
@@ -125,7 +118,7 @@ namespace Application.Helper.Helpers
         public string GetEukaryoticCellsDescription()
         {
             Logger.Log("<-");
-            _manager.GetNavigationHelper().OpenExhibitEukaryoticCells();
+            HelperManager<NavigationHelper>.GetInstance.OpenExhibitEukaryoticCells();
             Logger.Log("ExhibitEukaryotic Cell is opened");
             string description = GetFirstContentItemDescription();
             Logger.Log("-> description: " + description);
@@ -148,7 +141,6 @@ namespace Application.Helper.Helpers
             MoveToElementAndClick(By.ClassName("virtualCanvasLayerCanvas"));
             Logger.Log("->");
         }
-
 
         public string GetTakeOurSurveyArtifactContentItemDescription()
         {
@@ -261,7 +253,6 @@ namespace Application.Helper.Helpers
                 FillArtifact(contentItem);
                 Click(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-save cz-button']"));
             }
-
         }
     }
 }
