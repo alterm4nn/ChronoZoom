@@ -92,17 +92,6 @@ namespace Tests
             double rightBorder = TimescaleHelper.GetRightBorderDate();
             Assert.AreEqual(expected, rightBorder - leftBorder);
         }   
-        
-        [TestMethod]
-        public void History_Of_Science_TimeLine_Borders()
-        {
-            TimelineHelper.OpenHumanityTimeline();
-            TimelineHelper.OpenHistoryOfScienceTimeline();
-            const double expected = 485;
-            double leftBorder = TimescaleHelper.GetLeftBorderDate();
-            double rightBorder = TimescaleHelper.GetRightBorderDate();
-            Assert.AreEqual(expected, rightBorder - leftBorder);
-        }
 
         [TestMethod]
         public void Roman_History_TimeLine_Borders_Ages()
