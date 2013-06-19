@@ -126,14 +126,7 @@ module CZ {
 
                 this.logoutButton.click(event =>
                 {
-                    return $.ajax({
-                        url: "/account/logout"
-                    }).done(data => {
-                        this.profilePanel.hide();
-                        this.loginPanel.show();
-
-                        this.close();
-                    });
+                    window.location.assign("/pages/logoff.aspx");
                 });
             }
 
