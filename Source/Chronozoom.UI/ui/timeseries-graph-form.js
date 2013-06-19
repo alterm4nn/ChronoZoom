@@ -81,7 +81,11 @@ var CZ;
                 }
                 var ticks = [];
                 for(var i = imin; i <= imax; i++) {
-                    ticks.push(i * k * h10);
+                    var newTick = i * k * h10;
+                    if(h < 0) {
+                        newTick = newTick.toPrecision(-h);
+                    }
+                    ticks.push(newTick);
                 }
                 var result = {
                 };
@@ -89,10 +93,6 @@ var CZ;
                 result.h = h;
                 result.h10 = h10;
                 return result;
-            };
-            LineChart.prototype.generateAxisParameters = function (ymin, ymax, labelCount) {
-                var ticks = this.calculateTicks(ymin, ymax, labelCount);
-                return null;
             };
             LineChart.prototype.clear = function (screenLeft, screenRight) {
                 this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -105,27 +105,13 @@ var CZ;
                 $("#leftLegend").css("max-width", maxLegendWidth + "px");
                 $("#timeSeriesChartHeader").text("TimeSeries Chart");
             };
-            LineChart.prototype.drawDataSet = function (dataSet, screenLeft, screenRight, verticalPadding, plotLeft, plotRight) {
+            LineChart.prototype.drawDataSet = function (dataSet, screenLeft, screenRight, verticalPadding, plotLeft, plotRight, plotTop, plotBottom) {
                 var that = this;
-                var plotBottom = Number.MAX_VALUE;
-                var plotTop = Number.MIN_VALUE;
                 dataSet.series.forEach(function (seria) {
-                    if(seria.appearanceSettings && seria.appearanceSettings.yMin && seria.appearanceSettings.yMin < plotBottom) {
-                        plotBottom = seria.appearanceSettings.yMin;
-                    }
-                    if(seria.appearanceSettings && seria.appearanceSettings.yMax && seria.appearanceSettings.yMax > plotTop) {
-                        plotTop = seria.appearanceSettings.yMax;
-                    }
                     if(seria.appearanceSettings && seria.appearanceSettings.thickness && seria.appearanceSettings.thickness > verticalPadding) {
                         verticalPadding = seria.appearanceSettings.thickness;
                     }
                 });
-                if((plotTop - plotBottom) === 0) {
-                    var absY = Math.max(0.1, Math.abs(plotBottom));
-                    var offsetConstant = 0.01;
-                    plotTop += absY * offsetConstant;
-                    plotBottom -= absY * offsetConstant;
-                }
                 var screenHeight = this.canvas.height - 2 * verticalPadding;
                 var dataToScreenX = function (x) {
                     return (x - plotLeft) / (plotRight - plotLeft) * (screenRight - screenLeft) + screenLeft;
@@ -259,7 +245,9 @@ var CZ;
                 var d = y > ymax ? 1 : 0;
                 return a << 3 | b << 2 | c << 1 | d;
             };
-            LineChart.prototype.drawAxis = function (tickOrigin, secondScreenBorder, ymin, ymax, appearence) {
+            LineChart.prototype.generateAxisParameters = function (tickOrigin, secondScreenBorder, ymin, ymax, appearence) {
+                var that = this;
+                var ticksForDraw = [];
                 var verticalPadding = appearence.verticalPadding ? appearence.verticalPadding : 0;
                 var screenHeight = this.canvas.height - 2 * verticalPadding;
                 var dataToScreenY = function (y) {
@@ -283,23 +271,57 @@ var CZ;
                 }
                 ctx.textAlign = appearence.axisLocation;
                 ticks.forEach(function (tick) {
+                    var tickForDraw = {
+                    };
+                    tickForDraw.tick = tick;
                     var y = dataToScreenY(tick);
-                    ctx.strokeStyle = appearence.stroke;
-                    ctx.beginPath();
-                    ctx.moveTo(tickOrigin, y);
-                    ctx.lineTo(tickOrigin + ticklength, y);
-                    ctx.stroke();
-                    ctx.fillText(tick, tickOrigin + ticklength + textOffset, y);
-                    ctx.strokeStyle = 'lightgray';
+                    tickForDraw.y = y;
+                    tickForDraw.xLineStart = tickOrigin;
+                    tickForDraw.xLineEnd = tickOrigin + ticklength;
+                    tickForDraw.xText = tickOrigin + ticklength + textOffset;
                     var textWidth = ctx.measureText(tick).width;
                     if(appearence.axisLocation == "right") {
                         textWidth = -textWidth;
                     }
                     var offset = ticklength + textWidth + 2 * textOffset;
+                    tickForDraw.isGridLineVisible = offset > 0 && (tickOrigin + offset) <= secondScreenBorder || offset < 0 && (tickOrigin + offset) >= secondScreenBorder;
+                    tickForDraw.xGridLineStart = tickOrigin + offset;
+                    tickForDraw.xGridLineEnd = secondScreenBorder;
+                    ticksForDraw.push(tickForDraw);
+                });
+                return ticksForDraw;
+            };
+            LineChart.prototype.drawAxis = function (ticksForDraw, appearence) {
+                var that = this;
+                var ctx = this.context;
+                ctx.font = appearence.font;
+                ctx.textBaseline = 'middle';
+                ctx.strokeStyle = appearence.stroke;
+                ctx.fillStyle = appearence.stroke;
+                ctx.lineWidth = appearence.majorTickThickness;
+                ctx.textAlign = appearence.axisLocation;
+                ticksForDraw.forEach(function (tick) {
+                    ctx.strokeStyle = appearence.stroke;
                     ctx.beginPath();
-                    ctx.moveTo(tickOrigin + offset, y);
-                    ctx.lineTo(secondScreenBorder, y);
+                    ctx.moveTo(tick.xLineStart, tick.y);
+                    ctx.lineTo(tick.xLineEnd, tick.y);
                     ctx.stroke();
+                    var minTextOffset = 8;
+                    ctx.fillText(tick.tick, tick.xText, Math.max(minTextOffset, Math.min(that.canvas.height - minTextOffset, tick.y)));
+                });
+            };
+            LineChart.prototype.drawHorizontalGridLines = function (ticksForDraw, appearence) {
+                var that = this;
+                var ctx = this.context;
+                ctx.strokeStyle = 'lightgray';
+                ctx.lineWidth = appearence.majorTickThickness;
+                ticksForDraw.forEach(function (tick) {
+                    if(tick.isGridLineVisible) {
+                        ctx.beginPath();
+                        ctx.moveTo(tick.xGridLineStart, tick.y);
+                        ctx.lineTo(tick.xGridLineEnd, tick.y);
+                        ctx.stroke();
+                    }
                 });
             };
             LineChart.prototype.drawVerticalGridLines = function (screenLeft, screenRight, plotLeft, plotRight) {
@@ -321,14 +343,15 @@ var CZ;
                 this.canvas.width = $("#timeSeries").width();
             };
             LineChart.prototype.clearLegend = function (location) {
+                var legendCnt = location === "left" ? $("#leftLegend") : $("#rightLegend");
                 var legend = location === "left" ? $("#leftLegendList") : $("#rightLegendList");
                 legend.empty();
-                legend.hide();
+                legendCnt.hide();
             };
             LineChart.prototype.addLegendRecord = function (location, stroke, description) {
                 var legend = location === "left" ? $("#leftLegendList") : $("#rightLegendList");
                 var legendCont = location === "left" ? $("#leftLegend") : $("#rightLegend");
-                legend.show();
+                legendCont.show();
                 var cont = $('<li></li>');
                 var strokeIndicatior = $('<div></div>').addClass("tsc-legend-indicator");
                 strokeIndicatior.css("background-color", stroke);
@@ -338,6 +361,12 @@ var CZ;
                 strokeIndicatior.appendTo(cont);
                 descriptionDiv.appendTo(cont);
                 cont.height(24).appendTo(legend);
+            };
+            LineChart.prototype.checkLegendVisibility = function (screenWidth) {
+                var baseIndicatorSize = 24;
+                var horOffset = 30;
+                var topOffset = 10;
+                return screenWidth >= baseIndicatorSize + horOffset && this.canvas.height >= baseIndicatorSize + topOffset;
             };
             return LineChart;
         })();

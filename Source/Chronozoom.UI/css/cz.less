@@ -275,6 +275,15 @@ a
 {
     height: 0%;
     background-color: gray;
+    cursor: pointer;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+#timeSeriesContainer::selection {
+    cursor: pointer;
 }
 
 .virtualCanvas
