@@ -14,7 +14,7 @@ namespace Application.Helper.Helpers
 {
     public class ApiHelper : DependentActions
     {
-        private readonly string _serviceUrl = Configuration.BaseUrl;
+        private readonly string _baseUrl = Configuration.BaseUrl;
         private const string EndpointLocator = ApiConstants.EndpointLocator;
         private const string CosmosGuidTemplate = ApiConstants.CosmosGuidTemplate;
         private const string TimelineApiServiceUrl = ApiConstants.TimelineApiServiceUrl;
@@ -65,22 +65,8 @@ namespace Application.Helper.Helpers
 
         private HttpWebRequest MakePutRequest(string serviceUrl)
         {
-            string endPoint = String.Format(EndpointLocator, _serviceUrl, serviceUrl);
+            string endPoint = String.Format(EndpointLocator, _baseUrl, serviceUrl);
             return CreateRequest(endPoint);
-        }
-
-        private Stream GetResponseStream(DataContractJsonSerializer putSerializer, string serviceApi, dynamic element)
-        {
-            HttpWebRequest request = MakePutRequest(serviceApi);
-            Stream requestStream = request.GetRequestStream();
-            putSerializer.WriteObject(requestStream, element);
-            WebResponse response = request.GetResponse();
-            Stream responseStream = response.GetResponseStream();
-            if (responseStream == null)
-            {
-                throw new NullReferenceException("responseStream is null");
-            }
-            return responseStream;
         }
 
         private static HttpWebRequest CreateRequest(string endPoint)

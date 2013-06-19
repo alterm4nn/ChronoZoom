@@ -39,14 +39,14 @@ namespace Tests
         {
             HomePageHelper.OpenHelpLink();
             Assert.AreEqual("User Guide – ChronoZoom Project", HomePageHelper.GetTitle());
-            Assert.AreEqual("http://join.chronozoomproject.org/user-guide/", HomePageHelper.GetUrl());
+            Assert.AreEqual("http://join.chronozoom.com/user-guide/", HomePageHelper.GetUrl());
         }
 
         [TestMethod]
         public void FeedbackLink()
         {
             HomePageHelper.OpenFeedbackLink();
-            Assert.AreEqual("Forum: Forums - ChronoZoom Project", HomePageHelper.GetTitle());
+            Assert.AreEqual("Forum: Discuss - ChronoZoom Project", HomePageHelper.GetTitle());
         }
 
         [TestMethod]
