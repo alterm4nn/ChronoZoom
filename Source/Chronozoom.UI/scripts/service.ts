@@ -59,6 +59,22 @@ module CZ {
                 };
             }
 
+            export function exhibitWithContentItems(e) {
+                var mappedContentItems = [];
+                $(e.contentItems).each(function (contentItemIndex, contentItem) {
+                    mappedContentItems.push(Map.contentItem(contentItem))
+                });
+
+                return {
+                    id: e.guid,
+                    ParentTimelineId: e.parent.guid,
+                    time: e.infodotDescription.date,
+                    title: e.title,
+                    description: undefined,
+                    contentItems: mappedContentItems
+                };
+            }
+
             export function contentItem(ci) {
                 return {
                     id: ci.guid,
@@ -278,7 +294,7 @@ module CZ {
                 contentType: "application/json",
                 dataType: "json",
                 url: request.url,
-                data: JSON.stringify(Map.exhibit(e))
+                data: JSON.stringify(Map.exhibitWithContentItems(e))
             });
         }
 
@@ -571,6 +587,11 @@ module CZ {
                 cache: false,
                 contentType: "application/json",
                 url: request.url
+            }).done(profile => {
+                if (!profile.id)
+                    return null;
+                
+                return profile;
             });
         }
     }

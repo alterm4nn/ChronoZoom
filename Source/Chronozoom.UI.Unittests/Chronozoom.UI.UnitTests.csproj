@@ -93,6 +93,7 @@
     <Content Include="Content\jasmine\jasmine_favicon.png" />
     <Content Include="Scripts\jasmine\jasmine-html.js" />
     <Content Include="Scripts\jasmine\jasmine.js" />
+    <Content Include="Scripts\Specs\authoringExhibitSpec.js" />
     <Content Include="Scripts\Specs\authoringSpec.js" />
     <Content Include="Scripts\Specs\commonSpec.js" />
     <Content Include="Scripts\Specs\datepickerSpec.js" />

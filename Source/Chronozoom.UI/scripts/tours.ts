@@ -120,7 +120,7 @@ module CZ {
                 }
 
                 var self = this;
-                this.thumbnailUrl = CZ.Settings.contentItemThumbnailBaseUri + id + '.png';
+                this.thumbnailUrl = CZ.Settings.contentItemThumbnailBaseUri + id + '.jpg';
 
                 //ordering the bookmarks by the lapsetime
                 bookmarks.sort(function (b1, b2) {

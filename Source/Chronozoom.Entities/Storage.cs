@@ -24,7 +24,7 @@ using System.Runtime.Serialization;
 namespace Chronozoom.Entities
 {
     /// <summary>
-    /// Throw if a query detects that the storage is corrupted
+    /// Thrown whenever a query detects that the storage is corrupted.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2237:MarkISerializableTypesWithSerializable")]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors")]

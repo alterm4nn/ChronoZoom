@@ -1874,6 +1874,8 @@ var CZ;
                     var mediaID = id + "__media__";
                     var imageElem = null;
                     if(this.contentItem.mediaType.toLowerCase() === 'image' || this.contentItem.mediaType.toLowerCase() === 'picture') {
+                        imageElem = VCContent.addImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, this.contentItem.uri);
+                    } else if(this.contentItem.mediaType.toLowerCase() === 'deepimage') {
                         imageElem = VCContent.addSeadragonImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);
                     } else if(this.contentItem.mediaType.toLowerCase() === 'video') {
                         VCContent.addVideo(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
@@ -3187,6 +3189,21 @@ var CZ;
                 };
             }
             Map.exhibit = exhibit;
+            function exhibitWithContentItems(e) {
+                var mappedContentItems = [];
+                $(e.contentItems).each(function (contentItemIndex, contentItem) {
+                    mappedContentItems.push(Map.contentItem(contentItem));
+                });
+                return {
+                    id: e.guid,
+                    ParentTimelineId: e.parent.guid,
+                    time: e.infodotDescription.date,
+                    title: e.title,
+                    description: undefined,
+                    contentItems: mappedContentItems
+                };
+            }
+            Map.exhibitWithContentItems = exhibitWithContentItems;
             function contentItem(ci) {
                 return {
                     id: ci.guid,
@@ -3362,7 +3379,7 @@ var CZ;
                 contentType: "application/json",
                 dataType: "json",
                 url: request.url,
-                data: JSON.stringify(Map.exhibit(e))
+                data: JSON.stringify(Map.exhibitWithContentItems(e))
             });
         }
         Service.putExhibit = putExhibit;
@@ -3601,6 +3618,11 @@ var CZ;
                 cache: false,
                 contentType: "application/json",
                 url: request.url
+            }).done(function (profile) {
+                if(!profile.id) {
+                    return null;
+                }
+                return profile;
             });
         }
         Service.getProfile = getProfile;
@@ -4103,7 +4125,7 @@ var CZ;
             var temp = {
                 x: Number(prop.start),
                 y: t.y,
-                width: Number(CZ.Dates.getCoordinateFromDecimalYear(prop.end) - prop.start),
+                width: prop.end === 9999 ? Number(CZ.Dates.getCoordinateFromDecimalYear(prop.end) - prop.start) : Number(prop.end - prop.start),
                 height: t.height,
                 type: "rectangle"
             };
@@ -4136,41 +4158,31 @@ var CZ;
             CZ.VCContent.removeChild(t.parent, t.id);
         }
         Authoring.removeTimeline = removeTimeline;
-        function updateExhibit(e, args) {
+        function updateExhibit(oldExhibit, args) {
             var deferred = $.Deferred();
-            if(e && e.contentItems && args) {
-                var clone = $.extend({
-                }, e, {
+            if(oldExhibit && oldExhibit.contentItems && args) {
+                var newExhibit = $.extend({
+                }, oldExhibit, {
                     children: null
                 });
-                clone = $.extend(true, {
-                }, clone);
-                delete clone.children;
-                delete clone.contentItems;
-                $.extend(true, clone, args);
-                var oldContentItems = $.extend(true, [], e.contentItems);
-                CZ.Service.putExhibit(clone).then(function (response) {
-                    var old_id = e.id;
-                    e.id = clone.id = "e" + response.ExhibitId;
-                    var new_id = e.id;
-                    e.guid = clone.guid = response.ExhibitId;
-                    for(var i = 0; i < e.contentItems.length; i++) {
-                        e.contentItems[i].ParentExhibitId = e.guid;
+                newExhibit = $.extend(true, {
+                }, newExhibit);
+                delete newExhibit.children;
+                delete newExhibit.contentItems;
+                $.extend(true, newExhibit, args);
+                CZ.Service.putExhibit(newExhibit).then(function (response) {
+                    newExhibit.guid = response.ExhibitId;
+                    for(var i = 0; i < newExhibit.contentItems.length; i++) {
+                        newExhibit.contentItems[i].ParentExhibitId = newExhibit.guid;
                     }
-                    for(var i = 0; i < clone.contentItems.length; i++) {
-                        clone.contentItems[i].ParentExhibitId = clone.guid;
-                    }
-                    CZ.Service.putExhibitContent(clone, oldContentItems).then(function (response) {
-                        $.extend(e, clone);
-                        e.id = old_id;
-                        e = renewExhibit(e);
-                        e.id = new_id;
-                        CZ.Common.vc.virtualCanvas("requestInvalidate");
-                        deferred.resolve();
-                    }, function (error) {
-                        console.log("Error connecting to service: update exhibit (put exhibit content).\n" + error.responseText);
-                        deferred.reject();
+                    $(response.ContentItemId).each(function (contentItemIdIndex, contentItemId) {
+                        newExhibit.contentItems[contentItemIdIndex].id = contentItemId;
+                        newExhibit.contentItems[contentItemIdIndex].guid = contentItemId;
                     });
+                    newExhibit = renewExhibit(newExhibit);
+                    newExhibit.id = "e" + response.ExhibitId;
+                    CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    deferred.resolve();
                 }, function (error) {
                     console.log("Error connecting to service: update exhibit.\n" + error.responseText);
                     deferred.reject();
@@ -4557,7 +4569,7 @@ var CZ;
                     throw "Tour has no bookmarks";
                 }
                 var self = this;
-                this.thumbnailUrl = CZ.Settings.contentItemThumbnailBaseUri + id + '.png';
+                this.thumbnailUrl = CZ.Settings.contentItemThumbnailBaseUri + id + '.jpg';
                 bookmarks.sort(function (b1, b2) {
                     return b1.lapseTime - b2.lapseTime;
                 });
@@ -10955,7 +10967,7 @@ var CZ;
                 var _this = this;
                 var newContentItem = {
                     title: this.titleInput.val() || "",
-                    uri: decodeURIComponent(this.mediaInput.val()) || "",
+                    uri: this.mediaInput.val() || "",
                     mediaSource: this.mediaSourceInput.val() || "",
                     mediaType: this.mediaTypeInput.val() || "",
                     attribution: this.attributionInput.val() || "",

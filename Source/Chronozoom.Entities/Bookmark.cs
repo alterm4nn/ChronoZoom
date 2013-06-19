@@ -88,7 +88,6 @@ namespace Chronozoom.Entities
         /// <summary>  
         /// Identifies the ordering of bookmarks within a tour.
         /// </summary>  
-        [DataMember(Name = "sequenceId")]  
         public int SequenceId { get; set; }  
     }
 }
