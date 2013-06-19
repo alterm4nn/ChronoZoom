@@ -29,12 +29,11 @@ module CZ {
         @param lapseTime (number) a position in the audiotreck of the bookmark in seconds
         */
         export class TourBookmark {
-
+            public number: number;
             public duration = undefined;
-            public number = 0;
             public elapsed = 0; // number of seconds that were already played (if interrupted).
 
-            constructor(public id, public url, public caption, public lapseTime, public text) {
+            constructor(public url: string, public caption: string, public lapseTime: number, public text: string) {
                 if (this.text === null) {
                     this.text = "";
                 }
@@ -59,8 +58,7 @@ module CZ {
             return tour != undefined;
         }
 
-        export function bookmarkUrlToElement(bookmarkUrl: string): any
-        {
+        export function bookmarkUrlToElement(bookmarkUrl: string): any {
             var element = CZ.UrlNav.navStringTovcElement(bookmarkUrl, CZ.Common.vc.virtualCanvas("getLayerContent"));
             if (!element) return null;
             return element;
@@ -113,7 +111,7 @@ module CZ {
             @callback tour_TourFinished     Array of (func(tour)) The function is called when the tour is finished
             @callback tour_TourStarted      Array of (func(tour)) The function is called when the tour is finished
             */
-            constructor(public id, public title, public bookmarks, public zoomTo, public vc, public category, public audio, public sequenceNum, public description) {
+            constructor(public id: string, public title: string, public bookmarks: TourBookmark[], public zoomTo, public vc, public category: string, public audio: any, public sequenceNum: number, public description: string) {
 
                 if (!bookmarks || bookmarks.length == 0) {
                     throw "Tour has no bookmarks";
@@ -127,9 +125,9 @@ module CZ {
                     return b1.lapseTime - b2.lapseTime;
                 });
 
-                for (var i = 1; i < bookmarks.length; i++) {  //calculating bookmarks durations        
-                    bookmarks[i - 1].duration = bookmarks[i].lapseTime - bookmarks[i - 1].lapseTime;
+                for (var i = 1; i < bookmarks.length; i++) {  //calculating bookmarks durations     
                     bookmarks[i - 1].number = i;
+                    bookmarks[i - 1].duration = bookmarks[i].lapseTime - bookmarks[i - 1].lapseTime;
                 }
                 bookmarks[bookmarks.length - 1].duration = 10; //this will be overrided when the audio will be downloaded
                 bookmarks[bookmarks.length - 1].number = bookmarks.length;
@@ -318,7 +316,7 @@ module CZ {
                         curURL.hash.params = [];
                     curURL.hash.params["tour"] = tour.sequenceNum;
                     //curURL.hash.params["bookmark"] = self.currentPlace.bookmark+1;
-                    
+
                     //This flag is used to overcome hashchange event handler
                     CZ.Common.hashHandle = false;
                     CZ.UrlNav.setURL(curURL);
@@ -651,7 +649,7 @@ module CZ {
         }
 
         export function initializeToursUI() {
-            $("#tours").hide();    
+            $("#tours").hide();
 
             // Bookmarks window
             hideBookmarks();
@@ -660,95 +658,95 @@ module CZ {
         export function initializeToursContent() {
             var toursUI = $('#tours-content');
             tours.sort(function (u, v) { return u.sequenceNum - v.sequenceNum });
-            var category = null;
-            var categoryContent;
 
+            // Following lines are for the obsolete tour list design (commented by Dmitry Voytsekhovskiy, 12/06/2013)
+            //var category = null;
+            //var categoryContent;
             // add every tour in a categoried list in tours panel
-            for (var i = 0; i < tours.length; i++) {
-                var tour = tours[i];
+            //for (var i = 0; i < tours.length; i++) {
+            //var tour = tours[i];
+            // add new bookmarkStarted callback function
+            //tour.tour_BookmarkStarted.push(function (t, bookmark) {
+            //    showBookmark(t, bookmark);
+            //});
 
-                // add new bookmarkStarted callback function
-                //tour.tour_BookmarkStarted.push(function (t, bookmark) {
-                //    showBookmark(t, bookmark);
-                //});
+            //// add new bookmarkFinished callback function
+            //tour.tour_BookmarkFinished.push(function (t, bookmark) {
+            //    hideBookmark(t);
+            //});
 
-                //// add new bookmarkFinished callback function
-                //tour.tour_BookmarkFinished.push(function (t, bookmark) {
-                //    hideBookmark(t);
-                //});
+            // add new category to tours menu
+            //if (tour.category !== category) {
+            //    var cat = $("<div></div>", {
+            //        class: "category",
+            //        text: tour.category
+            //    }).appendTo(toursUI);
 
-                // add new category to tours menu
-                if (tour.category !== category) {
-                    var cat = $("<div></div>", {
-                        class: "category",
-                        text: tour.category
-                    }).appendTo(toursUI);
+            //    // add category' UI
+            //    var img = $("<img></img>", {
+            //        class: "collapseButton",
+            //        src: "/images/collapse-down.png"
+            //    }).appendTo(cat);
 
-                    // add category' UI
-                    var img = $("<img></img>", {
-                        class: "collapseButton",
-                        src: "/images/collapse-down.png"
-                    }).appendTo(cat);
+            //    if (i == 0) {
+            //        cat.removeClass('category').addClass('categorySelected');
+            //        (<HTMLImageElement>img[0]).src = "/images/collapse-up.png";
+            //    }
 
-                    if (i == 0) {
-                        cat.removeClass('category').addClass('categorySelected');
-                        (<HTMLImageElement>img[0]).src = "/images/collapse-up.png";
-                    }
+            //    categoryContent = $('<div></div>', {
+            //        class: "itemContainer"
+            //    }).appendTo(toursUI);
 
-                    categoryContent = $('<div></div>', {
-                        class: "itemContainer"
-                    }).appendTo(toursUI);
+            //    category = tour.category;
+            //}
 
-                    category = tour.category;
-                }
+            // add tour element into category
+            //$("<div></div>", {
+            //    class: "item",
+            //    tour: i,
+            //    text: tour.title,
+            //    click: function () {
+            //        // close active tour                            
+            //        removeActiveTour();
 
-                // add tour element into category
-                $("<div></div>", {
-                    class: "item",
-                    tour: i,
-                    text: tour.title,
-                    click: function () {
-                        // close active tour                            
-                        removeActiveTour();
+            //        // hide tour UI
+            //        $("#tours").hide('slide', {}, 'slow');
+            //        $(".tour-icon").removeClass("active");
+            //        isTourWindowVisible = false;
 
-                        // hide tour UI
-                        $("#tours").hide('slide', {}, 'slow');
-                        $(".tour-icon").removeClass("active");
-                        isTourWindowVisible = false;
+            //        // activate selected tour  
+            //        var mytour = tours[this.getAttribute("tour")];
+            //        activateTour(mytour, isNarrationOn);
 
-                        // activate selected tour  
-                        var mytour = tours[this.getAttribute("tour")];
-                        activateTour(mytour, isNarrationOn);
-
-                        // deselect previously active tour in tours panel
-                        $(".touritem-selected").removeClass("touritem-selected", "slow");
-                        // mark this tour as selected in tours panel
-                        $(this).addClass("touritem-selected", "slow");
-                    }
-                }).appendTo(categoryContent);
-            }
+            //        // deselect previously active tour in tours panel
+            //        $(".touritem-selected").removeClass("touritem-selected", "slow");
+            //        // mark this tour as selected in tours panel
+            //        $(this).addClass("touritem-selected", "slow");
+            //    }
+            //}).appendTo(categoryContent);
+            //}
 
             // create jquery widget for category' content sliding
-            (<any>$)("#tours-content").accordion({
-                collapsible: true,
-                heightStyle: "content",
-                beforeActivate: function (event, ui) {
-                    if (ui.newHeader) {
-                        ui.newHeader.removeClass('category');
-                        ui.newHeader.addClass('categorySelected');
+            //(<any>$)("#tours-content").accordion({
+            //    collapsible: true,
+            //    heightStyle: "content",
+            //    beforeActivate: function (event, ui) {
+            //        if (ui.newHeader) {
+            //            ui.newHeader.removeClass('category');
+            //            ui.newHeader.addClass('categorySelected');
 
-                        var img = (<HTMLImageElement>$(".collapseButton", ui.newHeader)[0]);
-                        if (img) img.src = "/images/collapse-up.png";
-                    }
-                    if (ui.oldHeader) {
-                        ui.oldHeader.removeClass('categorySelected');
-                        ui.oldHeader.addClass('category');
+            //            var img = (<HTMLImageElement>$(".collapseButton", ui.newHeader)[0]);
+            //            if (img) img.src = "/images/collapse-up.png";
+            //        }
+            //        if (ui.oldHeader) {
+            //            ui.oldHeader.removeClass('categorySelected');
+            //            ui.oldHeader.addClass('category');
 
-                        var img = (<HTMLImageElement>$(".collapseButton", ui.oldHeader)[0]);
-                        if (img) img.src = "/images/collapse-down.png";
-                    }
-                }
-            });
+            //            var img = (<HTMLImageElement>$(".collapseButton", ui.oldHeader)[0]);
+            //            if (img) img.src = "/images/collapse-down.png";
+            //        }
+            //    }
+            //});
         }
 
         /*
@@ -773,7 +771,7 @@ module CZ {
         /*
         Shows bookmark description text.
         */
-        function showBookmark(tour, bookmark) {
+        function showBookmark(tour: Tour, bookmark: TourBookmark) {
             if (!isBookmarksWindowVisible) {
                 isBookmarksWindowVisible = true;
                 // todo: check whether the bookmarks are expanded
@@ -826,7 +824,7 @@ module CZ {
                 $(".tour-icon").addClass("active");
                 $("#tours").show('slide', {}, 'slow');
             }
-            isTourWindowVisible = !isTourWindowVisible;            
+            isTourWindowVisible = !isTourWindowVisible;
         }
 
         /*
@@ -905,10 +903,6 @@ module CZ {
 
                 // skip tours with invalid parameters
                 if ((typeof tourString.bookmarks == 'undefined') ||
-                            (typeof tourString.audio == 'undefined') ||
-                            (tourString.audio == undefined) ||
-                            (tourString.audio == null) ||
-                            (typeof tourString.category == 'undefined') ||
                             (typeof tourString.name == 'undefined') ||
                             (typeof tourString.sequence == 'undefined') ||
                             (tourString.bookmarks.length == 0))
@@ -929,7 +923,7 @@ module CZ {
                         break;
                     }
 
-                    tourBookmarks.push(new TourBookmark(bmString.id, bmString.url, bmString.name, bmString.lapseTime, bmString.description));
+                    tourBookmarks.push(new TourBookmark(bmString.url, bmString.name, bmString.lapseTime, bmString.description));
                 }
 
                 // skip tour with broken bookmarks
@@ -957,7 +951,7 @@ module CZ {
 
             if (animId && bookmark) {
                 CZ.Common.setNavigationStringTo = { bookmark: bookmark, id: animId };
-            }
+            } 
             return animId;
         }
 

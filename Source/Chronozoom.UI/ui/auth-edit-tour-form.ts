@@ -21,10 +21,9 @@ module CZ {
             private type: string;
             private description: string;
             private lapseTime: number;
-            private sequence: number;
             private thumbUrl: string;
 
-            constructor(public bookmarkId: string, target: any, sequence: number, title?: string) {
+            constructor(target: any, title?: string) {
                 if (target == undefined || target == null)
                     throw "target element of a tour stop is null or undefined";
                 if (typeof target.type == "undefined")
@@ -40,10 +39,6 @@ module CZ {
                     this.type = target.type === "timeline" ? "Timeline" : "Event";
                     this.title = title ? title : target.title;
                 }
-
-                if (!this.bookmarkId)
-                    this.bookmarkId = "00000000-0000-0000-0000-000000000000";
-                this.sequence = sequence;
             }
 
             public get Target(): string {
@@ -67,14 +62,6 @@ module CZ {
             }
             public set LapseTime(value: number) {
                 this.lapseTime = value;
-            }
-
-            public get Sequence(): number {
-                return this.sequence;
-            }
-
-            public set Sequence(n: number) {
-                this.sequence = n;
             }
 
             public get Type(): string {
@@ -135,7 +122,7 @@ module CZ {
             private category: string;
 
             constructor(id: string, title: string, description: string, category: string, sequence: number, stops: CZ.UI.TourStop[]) {
-                this.id = id ? id : "00000000-0000-0000-0000-000000000000";
+                this.id = id;
                 this.title = title;
                 this.description = description;
                 this.sequence = sequence;
@@ -228,17 +215,17 @@ module CZ {
                         type: "Unknown"
                     };
                 }
-                var stop = new TourStop(bookmark.id, target, bookmark.number, (!bookmark.caption || $.trim(bookmark.caption) === "") ? undefined : bookmark.caption);
+                var stop = new TourStop(target, (!bookmark.caption || $.trim(bookmark.caption) === "") ? undefined : bookmark.caption);
                 stop.Description = bookmark.text;
                 stop.LapseTime = bookmark.lapseTime;
                 return stop;
             }
 
-            private static tourstopToBookmark(tourstop: TourStop): CZ.Tours.TourBookmark {
+            private static tourstopToBookmark(tourstop: TourStop, index: number): CZ.Tours.TourBookmark {
                 var url = UrlNav.vcelementToNavString(tourstop.Target);
                 var title = tourstop.Title;
-                var bookmark = new CZ.Tours.TourBookmark(tourstop.bookmarkId, url, title, tourstop.LapseTime, tourstop.Description);
-                bookmark.number = tourstop.Sequence;
+                var bookmark = new CZ.Tours.TourBookmark(url, title, tourstop.LapseTime, tourstop.Description);
+                bookmark.number = index + 1;
                 return bookmark;
             }
 
@@ -248,7 +235,7 @@ module CZ {
 
             // Creates new tour instance from the current state of the UI.
             // Returns a promise of the created tour. May fail.
-            private createTourAsync(): any {
+            private putTourAsync(sequenceNum): any {
                 var deferred = $.Deferred();
                 var self = this;
                 var stops = this.getStops();
@@ -257,19 +244,24 @@ module CZ {
                 // Add the tour to the local tours collection
                 var name = this.tourTitleInput.val();
                 var descr = this.tourDescriptionInput.val();
-                var category = "my tours";
+                var category = "tours";
                 var n = stops.length;
+                var tourId = undefined;
+                if (this.tour) // updating the tour
+                {
+                    category = <string> this.tour.category;
+                    tourId = this.tour.id;
+                }
 
                 // Posting the tour to the service
-                var request = CZ.Service.postTour(new CZ.UI.Tour(undefined, name, descr, category, n, stops));
+                var request = CZ.Service.putTour2(new CZ.UI.Tour(tourId, name, descr, category, n, stops));
 
                 request.done(q => {
                     // build array of bookmarks of current tour
                     var tourBookmarks = new Array();
                     for (var j = 0; j < n; j++) {
                         var tourstop = stops[j];
-                        tourstop.bookmarkId = q.BookmarkId[j];
-                        var bookmark = FormEditTour.tourstopToBookmark(tourstop);
+                        var bookmark = FormEditTour.tourstopToBookmark(tourstop, j);
                         tourBookmarks.push(bookmark);
                     }
 
@@ -280,7 +272,7 @@ module CZ {
                         CZ.Common.vc,
                         category, // category
                         "", //audio
-                        CZ.Tours.tours.length,
+                        sequenceNum,
                         descr);
                     deferred.resolve(tour);
                 }).fail(q => {
@@ -288,103 +280,7 @@ module CZ {
                 });
                 return deferred.promise();
             }
-
-            private updateTourAsync(sequenceNum): any {
-                if (!this.tour) throw "Tour is undefined";
-                var deferred = $.Deferred();
-                var self = this;
-                var stops = this.getStops();
-
-                // Add the tour to the local tours collection
-                var name = this.tourTitleInput.val();
-                var descr = this.tourDescriptionInput.val();
-                var category = <string> this.tour.category;
-
-                // Removing removed bookmarks
-                var n = this.tour.bookmarks.length;
-                var m = stops.length;
-                var deletedStops = [];
-                for (var j = 0; j < n; j++) {
-                    var bookmark = <CZ.Tours.TourBookmark>this.tour.bookmarks[j];
-                    var found = false;
-                    for (var k = 0; k < m; k++) {
-                        if (stops[k].bookmarkId === bookmark.id) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) deletedStops.push(bookmark);
-                }
-                var reqDel;
-                if (deletedStops.length > 0)
-                    reqDel = CZ.Service.deleteBookmarks(this.tour.id, deletedStops)
-                else {
-                    reqDel = $.Deferred();
-                    reqDel.resolve([]);
-                }
-                reqDel.fail(q => {
-                    deferred.reject(q);
-                });
-                reqDel.done(q => { // delete bookmarks succeeded
-                    var n = stops.length;
-                    var addedStops: TourStop[] = new Array();
-                    for (var j = 0; j < n; j++) {
-                        var tourstop = stops[j];
-                        if (!tourstop.bookmarkId || tourstop.bookmarkId == "00000000-0000-0000-0000-000000000000")
-                            addedStops.push(tourstop);
-                    }
-                    var reqAdd;
-                    if (addedStops.length > 0)
-                        reqAdd = CZ.Service.putBookmarks(new CZ.UI.Tour(this.tour.id, name, descr, category, sequenceNum, addedStops));
-                    else {
-                        reqAdd = $.Deferred();
-                        reqAdd.resolve([]);
-                    }
-                    reqAdd.fail(q => {
-                        deferred.reject(q);
-                    });
-
-                    reqAdd.done(q => { // add bookmarks succeeded
-                        // saving ids
-                        var m = addedStops.length;
-                        for (var j = 0; j < m; j++) {
-                            var tourstop = addedStops[j];
-                            tourstop.bookmarkId = q.BookmarkId[j];
-                        }
-
-                        // Updating the tour 
-                        var request = CZ.Service.putTour(new CZ.UI.Tour(this.tour.id, name, descr, category, sequenceNum, stops));
-                        request.done(q => {
-                            // build array of bookmarks of current tour
-                            var n = stops.length;
-                            var tourBookmarks = new Array();
-                            for (var j = 0; j < n; j++) {
-                                var tourstop = stops[j];
-                                tourstop.bookmarkId = q.BookmarkId[j];
-                                var bookmark = FormEditTour.tourstopToBookmark(tourstop);
-                                tourBookmarks.push(bookmark);
-                            }
-
-                            var tour = new CZ.Tours.Tour(q.TourId,
-                                name,
-                                tourBookmarks,
-                                CZ.Tours.bookmarkTransition,
-                                CZ.Common.vc,
-                                category, // category
-                                "", //audio
-                                sequenceNum,
-                                descr);
-                            deferred.resolve(tour);
-                        }).fail(q => {
-                            deferred.reject(q);
-                        });
-                    }).fail(q => {
-                        deferred.reject(q);
-                    });;
-                });
-                return deferred.promise();
-            }
-
+            
             private initializeAsEdit(): void {
                 this.deleteButton.show();
                 this.titleTextblock.text("Edit Tour");
@@ -424,8 +320,8 @@ module CZ {
                 this.saveButton.click(event =>
                 {
                     var message: string;
-                    if (!this.tourTitleInput.val()) message = "Please enter the title";
-                    else if (this.tourStopsListBox.items.length == 0) message = "Please add a tour stop to the tour";
+                    if (!this.tourTitleInput.val()) message = "Please enter the title.";
+                    else if (this.tourStopsListBox.items.length == 0) message = "Please add a tour stop to the tour.";
                     if (message) {
                         alert(message);
                         return;
@@ -435,7 +331,7 @@ module CZ {
                     // create new tour
                     if (this.tour == null) {
                         // Add the tour to the local tours collection
-                        this.createTourAsync().done(tour => {
+                        this.putTourAsync(CZ.Tours.tours.length).done(tour => {
                             self.tour = tour;
                             CZ.Tours.tours.push(tour);
                             self.initializeAsEdit();
@@ -450,7 +346,7 @@ module CZ {
                         // Update existing tour
                         for (var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
                             if (CZ.Tours.tours[i] === this.tour) {
-                                this.updateTourAsync(i).done(tour => {
+                                this.putTourAsync(i).done(tour => {
                                     this.tour = CZ.Tours.tours[i] = tour;
                                     alert("Tour updated.");
                                 }).fail(f => {
@@ -551,7 +447,6 @@ module CZ {
                 var lapseTime = 0;
                 for (var i = 0; i < n; i++) {
                     var stop = stops[i];
-                    stop.Sequence = i + 1;
                     stop.LapseTime = lapseTime;
                     lapseTime += Settings.tourDefaultTransitionTime;
                 }
@@ -566,14 +461,8 @@ module CZ {
 
                 if (targetElement) {
                     var n = this.tourStopsListBox.items.length;
-                    var stop = new TourStop("", targetElement, n + 1);
-                    if (n > 0) {
-                        stop.LapseTime = (<TourStop>(<TourStopListItem> this.tourStopsListBox.items[this.tourStopsListBox.items.length - 1]).data).LapseTime
-                            + Settings.tourDefaultTransitionTime;
-                    }
-                    else {
-                        stop.LapseTime = 0;
-                    }
+                    var stop = new TourStop(targetElement);
+                    stop.LapseTime = n == 0 ? 0 : (<TourStop>(<TourStopListItem> this.tourStopsListBox.items[this.tourStopsListBox.items.length - 1]).data).LapseTime + Settings.tourDefaultTransitionTime;
                     this.tourStopsListBox.add(stop);
                 }
                 this.show();

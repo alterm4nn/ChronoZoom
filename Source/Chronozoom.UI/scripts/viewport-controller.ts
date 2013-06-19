@@ -506,7 +506,12 @@ module CZ {
                 if (!wasAnimationActive) {
                     if (this.activeAnimation.isActive)
                         AnimationStarted(this.activeAnimation.ID);
-                    self.animationStep(self);
+                    // Added by Dmitry Voytsekhovskiy, 20/06/2013
+                    // I make the animation step call asynchronous to first return the active animation id, then call the step.
+                    // This would fix a bug when a target viewport is very close to the current viewport and animation finishes in a single step,
+                    // hence it calls the animation completed handlers which accept the animation id, but these handler couldn't yet get the id to expect
+                    // if the call is synchronous.
+                    setTimeout(() => self.animationStep(self), 0);
                 }
                 else {
                     animationUpdated(oldId, this.activeAnimation.ID);
