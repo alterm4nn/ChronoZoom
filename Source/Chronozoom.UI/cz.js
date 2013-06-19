@@ -11156,13 +11156,7 @@ var CZ;
                     });
                 });
                 this.logoutButton.click(function (event) {
-                    return $.ajax({
-                        url: "/account/logout"
-                    }).done(function (data) {
-                        _this.profilePanel.hide();
-                        _this.loginPanel.show();
-                        _this.close();
-                    });
+                    window.location.assign("/pages/logoff.aspx");
                 });
             };
             FormEditProfile.prototype.show = function () {
