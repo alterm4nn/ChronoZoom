@@ -86,11 +86,6 @@ var CZ;
                     day++;
                 }
             }
-            if(month == 12) {
-                year++;
-                month = 0;
-                day = 1;
-            }
             if(coord < 0) {
                 year--;
             }

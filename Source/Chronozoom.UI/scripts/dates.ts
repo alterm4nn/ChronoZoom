@@ -97,11 +97,11 @@ module CZ {
                 if (isLeapYear(year) && (month === 1)) day++;
             }
 
-            if (month == 12) {
-                year++;
-                month = 0;
-                day = 1;
-            }
+            //if (month == 12) {
+            //    year++;
+            //    month = 0;
+            //    day = 1;
+            //}
 
             //zero-year problem solvation
             if (coord < 0) year--;
