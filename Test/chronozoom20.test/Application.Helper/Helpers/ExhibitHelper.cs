@@ -87,10 +87,10 @@ namespace Application.Helper.Helpers
             }
         }
 
-        public string GetContentItemDescription()
+        public string GetFirstContentItemDescription()
         {
             Logger.Log("<-");
-            string description = GetText(By.XPath("(//*[@id='vc']/*[@class='contentItemDescription']/div)[2]"));
+            string description = GetText(By.XPath("//*[@id='vc']/*[@class='contentItemDescription']/div"));
             Logger.Log("-> description: " + description);
             return description;
         }
@@ -127,7 +127,7 @@ namespace Application.Helper.Helpers
             Logger.Log("<-");
             _manager.GetNavigationHelper().OpenExhibitEukaryoticCells();
             Logger.Log("ExhibitEukaryotic Cell is opened");
-            string description = GetContentItemDescription();
+            string description = GetFirstContentItemDescription();
             Logger.Log("-> description: " + description);
             return description;
         }
@@ -147,6 +147,15 @@ namespace Application.Helper.Helpers
             WaitAnimation();
             MoveToElementAndClick(By.ClassName("virtualCanvasLayerCanvas"));
             Logger.Log("->");
+        }
+
+
+        public string GetTakeOurSurveyArtifactContentItemDescription()
+        {
+            Logger.Log("<-");
+            string description = GetText(By.XPath("//*[@id='vc']/*[@class='contentItemDescription']/div"));
+            Logger.Log("-> description: " + description);
+            return description;
         }
 
         private void ConfirmDeletion()
@@ -254,6 +263,5 @@ namespace Application.Helper.Helpers
             }
 
         }
-
     }
 }
