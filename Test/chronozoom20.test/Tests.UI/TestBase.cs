@@ -8,7 +8,6 @@ namespace Tests
     [TestClass]
     public class TestBase
     {
-        public static HelperManager HelperManager { get; set; }
         public static NavigationHelper NavigationHelper { get; set; }
         public static BrowserStateManager BrowserStateManager { get; set; }
         public static TourHelper TourHelper { get; set; }
@@ -27,29 +26,28 @@ namespace Tests
         [AssemblyInitialize]
         public static void AssemblyInit(TestContext testContext)
         {
-            HelperManager = HelperManager.GetInstance();
-            NavigationHelper = HelperManager.GetNavigationHelper();
-            BrowserStateManager = HelperManager.GetBrowserStateManager();
-            HomePageHelper = HelperManager.GetHomePageHelper();
-            TourHelper = HelperManager.GetTourHelper();
-            BookmarkHelper = HelperManager.GetBookmarkHelper();
-            TimescaleHelper = HelperManager.GetTimescaleHelper();
-            ScreenshotManager = HelperManager.GetScreenshotManager();
-            WelcomeScreenHelper = HelperManager.GetWelcomeScreenHelper();
-            TimelineHelper = HelperManager.GetTimelineHelper();
-            ExhibitHelper = HelperManager.GetExhibitHelper();
-            SearchHelper = HelperManager.GetSearchHelper();
-            AuthorizationHelper = HelperManager.GetAuthorizationHelper();
-            BreadcrumbsHelper = HelperManager.GetBreadcrumbsHelper();
-            ApiHelper = HelperManager.GetApiHelper();
-        }
+            IoC.Initialize(new UnityDependencyResolver());
 
-        
+            NavigationHelper = HelperManager<NavigationHelper>.GetInstance;
+            BrowserStateManager = HelperManager<BrowserStateManager>.GetInstance;
+            HomePageHelper = HelperManager<HomePageHelper>.GetInstance;
+            TourHelper = HelperManager<TourHelper>.GetInstance;
+            BookmarkHelper = HelperManager<BookmarkHelper>.GetInstance;
+            TimescaleHelper = HelperManager<TimescaleHelper>.GetInstance;
+            ScreenshotManager = HelperManager<ScreenshotManager>.GetInstance;
+            WelcomeScreenHelper = HelperManager<WelcomeScreenHelper>.GetInstance;
+            TimelineHelper = HelperManager<TimelineHelper>.GetInstance;
+            ExhibitHelper = HelperManager<ExhibitHelper>.GetInstance;
+            SearchHelper = HelperManager<SearchHelper>.GetInstance;
+            AuthorizationHelper = HelperManager<AuthorizationHelper>.GetInstance;
+            BreadcrumbsHelper = HelperManager<BreadcrumbsHelper>.GetInstance;
+            ApiHelper = HelperManager<ApiHelper>.GetInstance;
+        }
 
         [AssemblyCleanup]
         public static void AssemblyCleanup()
         {
-            HelperManager.Stop();
+            Stop();
         }
 
         internal void CreateScreenshotsIfTestFail(TestContext testContext)
@@ -61,6 +59,14 @@ namespace Tests
             else
             {
                 ScreenshotManager.Screenshots.Clear();
+            }
+        }
+
+        internal static void Stop()
+        {
+            if (DriverManager.GetEnvironmentInstance() != null)
+            {
+                DriverManager.GetEnvironmentInstance().StopDriver();
             }
         }
     }
