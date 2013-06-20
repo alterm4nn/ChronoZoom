@@ -2995,6 +2995,7 @@ var CZ;
                         return;
                     }
                     var self = _this;
+                    _this.saveButton.prop('disabled', true);
                     if(_this.tour == null) {
                         _this.createTourAsync().done(function (tour) {
                             self.tour = tour;
@@ -3006,6 +3007,8 @@ var CZ;
                                 console.error("Failed to create a tour: " + f.status + " " + f.statusText);
                             }
                             alert("Failed to create a tour");
+                        }).done(function () {
+                            _this.saveButton.prop('disabled', false);
                         });
                     } else {
                         for(var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
@@ -3018,6 +3021,8 @@ var CZ;
                                         console.error("Failed to update a tour: " + f.status + " " + f.statusText);
                                     }
                                     alert("Failed to update a tour");
+                                }).done(function () {
+                                    _this.saveButton.prop('disabled', false);
                                 });
                                 break;
                             }
@@ -10555,6 +10560,7 @@ var CZ;
                     } else {
                         _this.errorMessage.empty();
                         var self = _this;
+                        _this.saveButton.prop('disabled', true);
                         CZ.Authoring.updateTimeline(_this.timeline, {
                             title: _this.titleInput.val(),
                             start: _this.startDate.getDate(),
@@ -10565,6 +10571,8 @@ var CZ;
                         }, function (error) {
                             alert("Unable to save changes. Please try again later.");
                             console.log(error);
+                        }).done(function () {
+                            _this.saveButton.prop('disabled', false);
                         });
                     }
                 });
@@ -10818,11 +10826,14 @@ var CZ;
                     type: "infodot"
                 };
                 if(CZ.Authoring.validateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) && CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true) && this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {
+                    this.saveButton.prop('disabled', true);
                     CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(function (success) {
                         _this.isCancel = false;
                         _this.close();
                     }, function (error) {
                         alert("Unable to save changes. Please try again later.");
+                    }).done(function () {
+                        _this.saveButton.prop('disabled', false);
                     });
                 } else if(this.exhibit.contentItems.length === 0) {
                     var self = this;
@@ -11044,11 +11055,14 @@ var CZ;
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
                             this.back();
                         } else {
+                            this.saveButton.prop('disabled', true);
                             CZ.Authoring.updateContentItem(this.exhibit, this.contentItem, newContentItem).then(function (response) {
                                 _this.isCancel = false;
                                 _this.close();
                             }, function (error) {
                                 alert("Unable to save changes. Please try again later.");
+                            }).done(function () {
+                                _this.saveButton.prop('disabled', false);
                             });
                         }
                     }

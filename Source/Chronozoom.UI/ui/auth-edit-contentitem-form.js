@@ -102,11 +102,14 @@ var CZ;
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
                             this.back();
                         } else {
+                            this.saveButton.prop('disabled', true);
                             CZ.Authoring.updateContentItem(this.exhibit, this.contentItem, newContentItem).then(function (response) {
                                 _this.isCancel = false;
                                 _this.close();
                             }, function (error) {
                                 alert("Unable to save changes. Please try again later.");
+                            }).done(function () {
+                                _this.saveButton.prop('disabled', false);
                             });
                         }
                     }
