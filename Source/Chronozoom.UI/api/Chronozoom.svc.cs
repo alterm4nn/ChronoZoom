@@ -1172,14 +1172,14 @@ namespace Chronozoom.UI
             Uri uriResult;
 
             // If Media Source is present, validate it
-            if (contentitem.MediaSource.Length > 0 && !(Uri.TryCreate(contentitem.MediaSource, UriKind.Absolute, out uriResult) && uriResult.Scheme == Uri.UriSchemeHttp))
+            if (contentitem.MediaSource.Length > 0 && !(Uri.TryCreate(contentitem.MediaSource, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)))
             {
                 SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidMediaSourceUrl);
                 return false;
             }
 
             // Check if valid url
-            if (!(Uri.TryCreate(contentitem.Uri, UriKind.Absolute, out uriResult) && uriResult.Scheme == Uri.UriSchemeHttp))
+            if (!(Uri.TryCreate(contentitem.Uri, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)))
             {
                 SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
                 return false;
