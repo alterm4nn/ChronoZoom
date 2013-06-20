@@ -68,13 +68,13 @@ module CZ {
                     if (data.DisplayName != null) {
                         this.usernameInput.val(data.DisplayName);
                         if (data.DisplayName != "") {
-                            this.usernameInput.prop('disabled', true);
-
-                            if (this.emailInput.val()) {
-                                this.agreeInput.attr('checked', true);
-                            }
+                            this.usernameInput.prop('disabled', true);                            
                         }
                         this.emailInput.val(data.Email);
+                        if (data.Email !== undefined && data.Email !== '' && data.Email != null) {
+                            this.agreeInput.attr('checked', true);
+                            this.agreeInput.prop('disabled', true);
+                        }
                     }
                 });
 
