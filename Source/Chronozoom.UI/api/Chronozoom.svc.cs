@@ -234,6 +234,7 @@ namespace Chronozoom.UI
             public const string BookmarkSequenceIdDuplicate = "Bookmark sequence id already exists";
             public const string BookmarkSequenceIdInvalid = "Bookmark sequence id is invalid";
             public const string BookmarkIdInvalid = "Bookmark sequence id is invalid";
+            public const string ParentTimelineCollectionMismatch = "Parent timeline does not match collection timeline";
         }
 
         private static Lazy<ChronozoomSVC> _sharedService = new Lazy<ChronozoomSVC>(() =>
@@ -841,6 +842,11 @@ namespace Chronozoom.UI
                         return Guid.Empty;
                     }
 
+                    if (!ValidateTimelineInCollection(storage, timelineRequest.Timeline_ID, collection.Id))
+                    {
+                        return Guid.Empty;
+                    }
+
                     if (!ValidateTimelineRange(parentTimeline, timelineRequest.FromYear, timelineRequest.ToYear))
                     {
                         SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineRangeInvalid);
@@ -848,7 +854,6 @@ namespace Chronozoom.UI
                     }
 
                     // Parent timeline is valid - add new timeline
-
                     Guid newTimelineGuid = Guid.NewGuid();
                     Timeline newTimeline = new Timeline { Id = newTimelineGuid, Title = timelineRequest.Title, Regime = timelineRequest.Regime };
                     newTimeline.FromYear = timelineRequest.FromYear;
@@ -1005,7 +1010,7 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         public PutExhibitResult PutExhibit(string superCollectionName, string collectionName, ExhibitRaw exhibitRequest)
         {
             return ApiOperationUnderCollection(exhibitRequest, superCollectionName, collectionName, delegate(User user, Storage storage, Collection collection)
@@ -1019,6 +1024,11 @@ namespace Chronozoom.UI
                     if (!FindParentTimeline(storage, exhibitRequest.Timeline_ID, out parentTimeline) || parentTimeline == null)
                     {
                         SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
+                        return returnValue;
+                    }
+
+                    if (!ValidateTimelineInCollection(storage, exhibitRequest.Timeline_ID, collection.Id))
+                    {
                         return returnValue;
                     }
 
@@ -1228,12 +1238,18 @@ namespace Chronozoom.UI
                     Exhibit parentExhibit = FindParentExhibit(storage, contentItemRequest.Exhibit_ID);
                     if (parentExhibit == null)
                     {
-                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
+                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentExhibitNotFound);
                         return Guid.Empty;
                     }
                     storage.Entry(parentExhibit).Collection(_ => _.ContentItems).Load();
 
                     TimelineRaw parentTimeline = storage.GetExhibitParentTimeline(contentItemRequest.Exhibit_ID);
+
+                    if (!ValidateTimelineInCollection(storage, parentTimeline.Id, collection.Id))
+                    {
+                        return Guid.Empty;
+                    }
+
                     // Parent content item is valid - add new content item
                     var newContentItemGuid = AddContentItem(storage, collection, parentExhibit, contentItemRequest);
                     returnValue = newContentItemGuid;
@@ -1957,6 +1973,19 @@ namespace Chronozoom.UI
             SuperCollection superCollection = storage.SuperCollections.Find(superCollectionId);
             storage.Entry(superCollection).Reference("User").Load();
             return superCollection;
+        }
+
+        static bool ValidateTimelineInCollection(Storage storage, Guid? timelineId, Guid collectionId)
+        {
+            // Validate that the collection of the parent timeline in the request object corresponds to the collection specified in the uri.
+            Guid timelineCollectionId = storage.GetCollectionFromTimeline(timelineId);
+            if (timelineCollectionId != collectionId)
+            {
+                SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.ParentTimelineCollectionMismatch);
+                return false;
+            }
+
+            return true;
         }
     }
 }

@@ -138,7 +138,7 @@ namespace Chronozoom.UI
                 {
                     if (IsTimeline(collection.Segments[collection.Segments.Length - 1]))
                     {
-                        Timeline timeline = _storage.GetRootTimelines(_storage.GetCollectionFromGuid(Guid.Parse(collection.Segments[collection.Segments.Length - 1])));
+                        Timeline timeline = _storage.GetRootTimelines(_storage.GetCollectionFromTimeline(Guid.Parse(collection.Segments[collection.Segments.Length - 1])));
                         Guid rootGuid = timeline.Id;
                         if (Guid.Parse(root) != rootGuid)
                         {
