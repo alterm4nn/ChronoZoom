@@ -233,6 +233,8 @@ namespace Chronozoom.UI
             public const string BookmarkNotFound = "Bookmark not found";
             public const string BookmarkSequenceIdDuplicate = "Bookmark sequence id already exists";
             public const string BookmarkSequenceIdInvalid = "Bookmark sequence id is invalid";
+            public const string InvalidContentItemUrl = "Artifact URL is invalid";
+            public const string InvalidMediaSourceUrl = "Media Source URL is invalid";
             public const string BookmarkIdInvalid = "Bookmark sequence id is invalid";
             public const string ParentTimelineCollectionMismatch = "Parent timeline does not match collection timeline";
         }
@@ -1016,7 +1018,14 @@ namespace Chronozoom.UI
             return ApiOperationUnderCollection(exhibitRequest, superCollectionName, collectionName, delegate(User user, Storage storage, Collection collection)
             {
                 Trace.TraceInformation("Put Exhibit");
+
                 var returnValue = new PutExhibitResult();
+
+                foreach (ContentItem contentItemRequest in exhibitRequest.ContentItems)
+                {
+                    if (!ValidateContentItemUrl(contentItemRequest))
+                        return returnValue;
+                }
 
                 if (exhibitRequest.Id == Guid.Empty)
                 {
@@ -1158,6 +1167,28 @@ namespace Chronozoom.UI
             return contentItemRequest.Id;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1304:SpecifyCultureInfo", MessageId = "System.String.ToLower")]
+        private static Boolean ValidateContentItemUrl(ContentItem contentitem)
+        {
+            Uri uriResult;
+
+            // If Media Source is present, validate it
+            if (contentitem.MediaSource.Length > 0 && !(Uri.TryCreate(contentitem.MediaSource, UriKind.Absolute, out uriResult) && uriResult.Scheme == Uri.UriSchemeHttp))
+            {
+                SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidMediaSourceUrl);
+                return false;
+            }
+
+            // Check if valid url
+            if (!(Uri.TryCreate(contentitem.Uri, UriKind.Absolute, out uriResult) && uriResult.Scheme == Uri.UriSchemeHttp))
+            {
+                SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
+                return false;
+            }
+
+            return true;
+        }
+
         private static Guid AddContentItem(Storage storage, Collection collection, Exhibit newExhibit, ContentItem contentItemRequest)
         {
             Guid newContentItemGuid = Guid.NewGuid();
@@ -1230,6 +1261,8 @@ namespace Chronozoom.UI
             return ApiOperationUnderCollection(contentItemRequest, superCollectionName, collectionName, delegate(User user, Storage storage, Collection collection)
             {
                 Trace.TraceInformation("Put Content Item");
+                if (!ValidateContentItemUrl(contentItemRequest))
+                    return Guid.Empty;
 
                 Guid returnValue;
 
