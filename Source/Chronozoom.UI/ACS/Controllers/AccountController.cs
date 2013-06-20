@@ -1,5 +1,6 @@
 ﻿using ASC.Hrd;
 using ASC.Models;
+using Chronozoom.Entities;
 using Microsoft.IdentityModel.Protocols.WSFederation;
 using Microsoft.IdentityModel.Web;
 using System;
@@ -51,31 +52,28 @@ namespace Chronozoom.Api.Controllers
             {
                 var user = (Microsoft.IdentityModel.Claims.IClaimsIdentity)HttpContext.User.Identity;
 
-                string NameIdentifier = "";
-                string IdentityProvider = "";
+                string nameIdentifier = "";
+                string identityProvider = "";
 
                 foreach (var item in user.Claims)
                 {
                     if (item.ClaimType.EndsWith("nameidentifier"))
                     {
-                        NameIdentifier = item.Value;
+                        nameIdentifier = item.Value;
                     }
                     else if (item.ClaimType.EndsWith("identityprovider"))
                     {
-                        IdentityProvider = item.Value;
+                        identityProvider = item.Value;
                     }
                 }
 
-                // We use return url as context
-                //string returnUrl = GetUrlFromContext(forms);
-
-                //if (!string.IsNullOrEmpty(returnUrl))
-                //{
-                //    return Redirect(returnUrl);
-                //}
+                using (Storage storage = new Storage())
+                {
+                    Entities.User storedUser = storage.Users.FirstOrDefault(candidate => candidate.IdentityProvider == identityProvider && candidate.NameIdentifier == nameIdentifier);
+                    return Redirect("/" + storedUser.DisplayName);
+                }
             }
 
-            // Temporary redirect to sandbox
             return Redirect("/");
         }
 

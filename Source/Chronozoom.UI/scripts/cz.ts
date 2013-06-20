@@ -20,6 +20,7 @@
 /// <reference path='../ui/tourslist-form.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
 
+var constants: any;
 
 module CZ {
     export var timeSeriesChart: CZ.UI.LineChart;
@@ -49,6 +50,7 @@ module CZ {
             Disabled,
             RootCollection,
             NotRootCollection,
+            NotProduction,
         }
 
         export interface FeatureInfo {
@@ -82,8 +84,13 @@ module CZ {
             },
             {
                 Name: "Authoring",
-                Activation: FeatureActivation.NotRootCollection,
+                Activation: FeatureActivation.Enabled,
                 JQueryReference: ".header-icon.edit-icon"
+            },
+            {
+                Name: "TourAuthoring",
+                Activation: FeatureActivation.NotProduction,
+                JQueryReference: ".cz-form-create-tour"
             },
             {
                 Name: "WelcomeScreen",
@@ -107,8 +114,22 @@ module CZ {
             },
         ];
 
+        var rootCollection: bool;
+
+        function UserCanEditCollection(profile) {
+            if (CZ.Service.superCollectionName === "sandbox") {
+                return true;
+            }
+            
+            if (!profile || profile.DisplayName !== CZ.Service.superCollectionName) {
+                return false
+            }
+
+            return true;
+        }
+
         function InitializeToursUI(profile, forms) {
-            var allowEditing = IsFeatureEnabled(_featureMap, "Authoring") && (profile && profile != "" && profile.DisplayName === CZ.Service.superCollectionName);
+            var allowEditing = IsFeatureEnabled(_featureMap, "TourAuthoring") && UserCanEditCollection(profile);
 
             var onToursInitialized = function () {
                 CZ.Tours.initializeToursUI();
@@ -182,10 +203,6 @@ module CZ {
                     }
                 });
 
-                CZ.Service.getProfile()
-                    .done(profile => { InitializeToursUI(profile, forms); })
-                    .fail(err => { InitializeToursUI(null, forms); });
-
                 $(".header-icon.edit-icon").click(function () {
                     var editForm = getFormById("#header-edit-form");
                     if (editForm === false) {
@@ -200,6 +217,7 @@ module CZ {
                             createTour: ".cz-form-create-tour"
                         });
                         form.show();
+                        ApplyFeatureActivation();
                     }
                     else {
                         if (editForm.isFormVisible) {
@@ -388,8 +406,18 @@ module CZ {
                             $("#profile-panel").show();
                             $(".auth-panel-login").html(data.DisplayName);
                         }
+
+                        CZ.Authoring.isEnabled = UserCanEditCollection(data);
+                        InitializeToursUI(data, forms);
                     }).fail((error) => {
                         $("#login-panel").show();
+
+                        CZ.Authoring.isEnabled = UserCanEditCollection(null);
+                        InitializeToursUI(null, forms);
+                    }).always(() => {
+                        if (!CZ.Authoring.isEnabled) {
+                            $(".edit-icon").hide();
+                        }
                     });
                 }
 
@@ -413,7 +441,7 @@ module CZ {
                 });
 
             var url = CZ.UrlNav.getURL();
-            var rootCollection = url.superCollectionName === undefined;
+            this.rootCollection = url.superCollectionName === undefined;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
@@ -498,31 +526,7 @@ module CZ {
                 });
             }
 
-            // Feature activation control
-            for (var idxFeature = 0; idxFeature < _featureMap.length; idxFeature++) {
-                var enabled: bool = true;
-                var feature = _featureMap[idxFeature];
-
-                if (feature.Activation === FeatureActivation.Disabled) {
-                    enabled = false;
-                }
-
-                if (feature.Activation === FeatureActivation.NotRootCollection && rootCollection) {
-                    enabled = false;
-                }
-
-                if (feature.Activation === FeatureActivation.RootCollection && !rootCollection) {
-                    enabled = false;
-                }
-
-                _featureMap[idxFeature].IsEnabled = enabled;
-                if (!enabled) {
-                    $(feature.JQueryReference).css("display", "none");
-                }
-            }
-
-            if (!rootCollection)
-                CZ.Authoring.isEnabled = true;
+            ApplyFeatureActivation();
 
             if (navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
                 // Suppress the default iOS elastic pan/zoom actions.
@@ -875,6 +879,38 @@ module CZ {
                 }
 
                 $("#timeSeriesChartHeader").text(chartHeader);
+            }
+        }
+
+        function ApplyFeatureActivation() {
+            // Feature activation control
+            for (var idxFeature = 0; idxFeature < _featureMap.length; idxFeature++) {
+                var feature = _featureMap[idxFeature];
+
+                if (feature.IsEnabled === undefined) {
+                    var enabled: bool = true;
+                    if (feature.Activation === FeatureActivation.Disabled) {
+                        enabled = false;
+                    }
+
+                    if (feature.Activation === FeatureActivation.NotRootCollection && this.rootCollection) {
+                        enabled = false;
+                    }
+
+                    if (feature.Activation === FeatureActivation.RootCollection && !this.rootCollection) {
+                        enabled = false;
+                    }
+
+                    if (feature.Activation === FeatureActivation.NotProduction && (!constants || constants.environment === "Production")) {
+                        enabled = false;
+                    }
+
+                    _featureMap[idxFeature].IsEnabled = enabled;
+                }
+
+                if (!_featureMap[idxFeature].IsEnabled && feature.JQueryReference) {
+                    $(feature.JQueryReference).css("display", "none");
+                }
             }
         }
 

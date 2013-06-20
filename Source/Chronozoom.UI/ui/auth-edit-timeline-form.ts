@@ -44,6 +44,7 @@ module CZ {
             }
 
             private initialize(): void {
+                this.saveButton.prop('disabled', false);
                 if (CZ.Authoring.mode === "createTimeline") {
                     this.deleteButton.hide();
                     this.titleTextblock.text("Create Timeline");
@@ -104,7 +105,7 @@ module CZ {
                                 alert("Unable to save changes. Please try again later.");
                                 console.log(error);
                             }
-                        ).done(() => {
+                        ).always(() => {
                             this.saveButton.prop('disabled', false);
                         });
                     }

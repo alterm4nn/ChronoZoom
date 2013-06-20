@@ -63,6 +63,7 @@ module CZ {
             }
 
             private initUI() {
+                this.saveButton.prop('disabled', false);
                 if (this.mode === "createExhibit") {
                     this.titleTextblock.text("Create Exhibit");
                     this.saveButton.text("create exhibit");
@@ -160,7 +161,7 @@ module CZ {
                         error => {
                             alert("Unable to save changes. Please try again later.");
                         }
-                    ).done(() => {
+                    ).always(() => {
                         this.saveButton.prop('disabled', false);
                     });
                 } else if (this.exhibit.contentItems.length === 0) {

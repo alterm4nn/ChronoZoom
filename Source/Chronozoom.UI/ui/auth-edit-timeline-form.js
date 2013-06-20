@@ -23,6 +23,7 @@ var CZ;
             }
             FormEditTimeline.prototype.initialize = function () {
                 var _this = this;
+                this.saveButton.prop('disabled', false);
                 if(CZ.Authoring.mode === "createTimeline") {
                     this.deleteButton.hide();
                     this.titleTextblock.text("Create Timeline");
@@ -69,7 +70,7 @@ var CZ;
                         }, function (error) {
                             alert("Unable to save changes. Please try again later.");
                             console.log(error);
-                        }).done(function () {
+                        }).always(function () {
                             _this.saveButton.prop('disabled', false);
                         });
                     }
