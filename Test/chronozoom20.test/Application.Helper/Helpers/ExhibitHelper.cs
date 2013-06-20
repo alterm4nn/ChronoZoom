@@ -37,9 +37,11 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<-");
             const string script = Javascripts.LastCanvasElement;
-            var exhibit = new Exhibit();
-            exhibit.ContentItems = new Collection<Chronozoom.Entities.ContentItem>();
-            exhibit.Title = GetJavaScriptExecutionResult(script + ".title");
+            var exhibit = new Exhibit
+                {
+                    ContentItems = new Collection<Chronozoom.Entities.ContentItem>(),
+                    Title = GetJavaScriptExecutionResult(script + ".title")
+                };
             int contentItemsCount = int.Parse(GetJavaScriptExecutionResult(script + ".contentItems.length"));
             Logger.Log("- contentItemsCount: " + contentItemsCount, LogType.MessageWithoutScreenshot);
             for (int i = 0; i < contentItemsCount; i++)
@@ -57,7 +59,7 @@ namespace Application.Helper.Helpers
                 contentItem.MediaSource = GetJavaScriptExecutionResult(item + "mediaSource");
                 Logger.Log("- contentItem.MediaSource: " + contentItem.MediaSource, LogType.MessageWithoutScreenshot);
                 contentItem.Attribution = GetJavaScriptExecutionResult(item + "attribution");
-                Logger.Log("- contentItem.attribution: " + contentItem.Attribution, LogType.MessageWithoutScreenshot);
+                Logger.Log("- contentItem.Attribution: " + contentItem.Attribution, LogType.MessageWithoutScreenshot);
                 exhibit.ContentItems.Add(contentItem);
             }
             exhibit.Id = new Guid(GetJavaScriptExecutionResult(script + ".guid"));
@@ -200,9 +202,9 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
-        private void FillArtifact(Chronozoom.Entities.ContentItem contentItem)
+        private void FillArtifact(ContentItem contentItem)
         {
-            Logger.Log("<-");
+            Logger.Log("<- contentItem: " + contentItem);
             if (contentItem.Title != null) SetTitle(contentItem.Title);
             if (contentItem.Caption != null) SetDescription(contentItem.Caption);
             if (contentItem.Uri != null) SetUrl(contentItem.Uri);
@@ -245,14 +247,17 @@ namespace Application.Helper.Helpers
 
         private void AddArtifacts(IEnumerable<Chronozoom.Entities.ContentItem> contentItems)
         {
-            foreach (Chronozoom.Entities.ContentItem contentItem in contentItems)
+            Logger.Log("->");
+            foreach (ContentItem contentItem in contentItems)
             {
+                Logger.Log("-- " + contentItem.ToString());
                 By createArtifactButton = By.XPath("//*[@class='cz-form-create-artifact cz-button']");
                 WaitForElementEnabled(createArtifactButton);
                 Click(createArtifactButton);
                 FillArtifact(contentItem);
                 Click(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-save cz-button']"));
             }
+            Logger.Log("<-");
         }
     }
 }

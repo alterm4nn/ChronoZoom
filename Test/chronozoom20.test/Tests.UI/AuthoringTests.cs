@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using Application.Driver;
-using Chronozoom.Entities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ContentItem = Application.Helper.Entities.ContentItem;
 using Exhibit = Application.Helper.Entities.Exhibit;
@@ -75,8 +73,8 @@ namespace Tests
             var contentItemMusic = new ContentItem
             {
                 Title = "ContentItemMusic",
-                MediaType = "Audio",
-                Uri = "http://libsyn.com/media/eslpod/ESLPod900.mp3"
+                MediaType = "Image",
+                Uri = "http://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Aeroflot_Airbus_A330_Kustov_edit.jpg/800px-Aeroflot_Airbus_A330_Kustov_edit.jpg"
 
             };
             var exhibit = new Exhibit
