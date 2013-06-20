@@ -90,6 +90,7 @@ module CZ {
                         this.errorMessage.empty();
                         var self = this;
 
+                        this.saveButton.prop('disabled', true);
                         CZ.Authoring.updateTimeline(this.timeline, {
                             title: this.titleInput.val(),
                             start: this.startDate.getDate(),
@@ -102,7 +103,10 @@ module CZ {
                             function (error) {
                                 alert("Unable to save changes. Please try again later.");
                                 console.log(error);
-                            });
+                            }
+                        ).done(() => {
+                            this.saveButton.prop('disabled', false);
+                        });
                     }
                 });
 
