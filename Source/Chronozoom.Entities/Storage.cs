@@ -653,10 +653,14 @@ namespace Chronozoom.Entities
             return collectionGuid.FirstOrDefault();
         }
 
-        public Guid GetCollectionFromGuid(Guid timelineId)
+        public Guid GetCollectionFromTimeline(Guid? timelineId)
         {
-            var collectionGuid = Database.SqlQuery<Guid>("SELECT Collection_Id FROM Timelines WHERE Id = {0}", timelineId);
+            if (timelineId == null)
+            {
+                return Guid.Empty;
+            }
 
+            var collectionGuid = Database.SqlQuery<Guid>("SELECT Collection_Id FROM Timelines WHERE Id = {0}", timelineId);
             return collectionGuid.FirstOrDefault();
         }
 
