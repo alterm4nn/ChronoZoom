@@ -233,6 +233,7 @@ namespace Chronozoom.UI
             public const string BookmarkNotFound = "Bookmark not found";
             public const string BookmarkSequenceIdDuplicate = "Bookmark sequence id already exists";
             public const string BookmarkSequenceIdInvalid = "Bookmark sequence id is invalid";
+            public const string InvalidUrl = "URL is not valid";
         }
 
         private static Lazy<ChronozoomSVC> _sharedService = new Lazy<ChronozoomSVC>(() =>
@@ -998,13 +999,20 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         public PutExhibitResult PutExhibit(string superCollectionName, string collectionName, ExhibitRaw exhibitRequest)
         {
             return ApiOperationUnderCollection(exhibitRequest, superCollectionName, collectionName, delegate(User user, Storage storage, Collection collection)
             {
                 Trace.TraceInformation("Put Exhibit");
+
                 var returnValue = new PutExhibitResult();
+
+                foreach (ContentItem contentItemRequest in exhibitRequest.ContentItems)
+                {
+                    if (!ValidateContentItemUrl(contentItemRequest))
+                        return returnValue;
+                }
 
                 if (exhibitRequest.Id == Guid.Empty)
                 {
@@ -1141,6 +1149,21 @@ namespace Chronozoom.UI
             return contentItemRequest.Id;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1304:SpecifyCultureInfo", MessageId = "System.String.ToLower")]
+        private static Boolean ValidateContentItemUrl(ContentItem contentitem)
+        {
+            Uri uriResult;
+
+            // Check if valid url
+            if (Uri.TryCreate(contentitem.Uri, UriKind.Absolute, out uriResult) && uriResult.Scheme == Uri.UriSchemeHttp)
+            {
+                return true;
+            }
+
+            SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidUrl);
+            return false;
+        }
+
         private static Guid AddContentItem(Storage storage, Collection collection, Exhibit newExhibit, ContentItem contentItemRequest)
         {
             Guid newContentItemGuid = Guid.NewGuid();
@@ -1213,6 +1236,8 @@ namespace Chronozoom.UI
             return ApiOperationUnderCollection(contentItemRequest, superCollectionName, collectionName, delegate(User user, Storage storage, Collection collection)
             {
                 Trace.TraceInformation("Put Content Item");
+                if (!ValidateContentItemUrl(contentItemRequest))
+                    return Guid.Empty;
 
                 Guid returnValue;
 
