@@ -135,6 +135,9 @@ namespace Chronozoom.UI
                     XmlReader xmlReader = new XmlTextReader(streamReader);
                     XDocument pageRoot = XDocument.Load(xmlReader);
 
+                    // Remove DOCTYPE extra []
+                    pageRoot.DocumentType.InternalSubset = null;
+
                     XNamespace ns = "http://www.w3.org/1999/xhtml";
                     XmlNamespaceManager xmlNamespaceManager = new XmlNamespaceManager(xmlReader.NameTable);
                     xmlNamespaceManager.AddNamespace("xhtml", ns.ToString());
@@ -196,11 +199,6 @@ namespace Chronozoom.UI
 
                 metaDescription.SetAttributeValue(contentAttribute, pageInformation.Description);
             }
-
-            XElement metaIECompatibile = pageRoot.XPathSelectElement("/xhtml:html/xhtml:head/xhtml:meta[@http-equiv='X-UA-Compatible']", xmlNamespaceManager);
-            XName contentIEAttribute = "content";
-
-            metaIECompatibile.SetAttributeValue(contentIEAttribute, "IE=edge");
 
             XElement lastMetaTag = pageRoot.XPathSelectElement("/xhtml:html/xhtml:head/xhtml:meta[@name='viewport']", xmlNamespaceManager);
             int imageCount = 0;

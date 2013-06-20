@@ -1,7 +1,11 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using Application.Driver;
-using Application.Helper.Entities;
+using Chronozoom.Entities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ContentItem = Application.Helper.Entities.ContentItem;
+using Exhibit = Application.Helper.Entities.Exhibit;
+using Timeline = Application.Helper.Entities.Timeline;
 
 namespace Tests
 {
@@ -91,7 +95,7 @@ namespace Tests
                 Assert.AreEqual(exhibit.ContentItems[i].Uri, _newExhibit.ContentItems[i].Uri, "Content items Uri are not equal");
             }
         }
-        
+
         [TestMethod]
         public void exhibit_should_allow_pdf_content_item_adding()
         {
@@ -109,9 +113,9 @@ namespace Tests
             var exhibit = new Exhibit
             {
                 Title = "WebdriverExhibitWithContent",
-                ContentItems = new Collection<Chronozoom.Entities.ContentItem> {  contentItemPdf }
+                ContentItems = new Collection<Chronozoom.Entities.ContentItem> { contentItemPdf }
             };
-            string expectedUrl = string.Format(@"http://docs.google.com/viewer?url={0}&embedded=true",contentItemPdf.Uri);
+            string expectedUrl = string.Format(@"http://docs.google.com/viewer?url={0}&embedded=true", contentItemPdf.Uri);
             ExhibitHelper.AddExhibitWithContentItem(exhibit);
             _newExhibit = ExhibitHelper.GetNewExhibit();
             Assert.AreEqual(exhibit.ContentItems.Count, _newExhibit.ContentItems.Count, "Content items count are not equal");

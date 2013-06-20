@@ -587,6 +587,11 @@ module CZ {
                 cache: false,
                 contentType: "application/json",
                 url: request.url
+            }).done(profile => {
+                if (!profile.id)
+                    return null;
+                
+                return profile;
             });
         }
     }

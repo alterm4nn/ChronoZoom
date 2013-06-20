@@ -8,22 +8,15 @@ namespace Application.Helper.Helpers
 {
     public class HomePageHelper : DependentActions
     {
-        private readonly HelperManager _manager;
-
-        public HomePageHelper()
-        {
-            _manager = new HelperManager();
-        }
-
         public void OpenPage()
         {
-            _manager.GetNavigationHelper().OpenHomePage();
+            HelperManager<NavigationHelper>.GetInstance.OpenHomePage();
             WaitWhileHomePageIsLoaded();
         }
 
         public void OpenSandboxPage()
         {
-            _manager.GetNavigationHelper().OpenSandboxPage();
+            HelperManager<NavigationHelper>.GetInstance.OpenSandboxPage();
             WaitWhileHomePageIsLoaded();
         }
         

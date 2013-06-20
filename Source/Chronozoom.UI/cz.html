@@ -2,7 +2,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="Description" content="ChronoZoom is an open-source community project dedicated to visualizing the history of everything." />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <script type="text/javascript" id="constants"></script>
@@ -142,7 +141,7 @@
                     <div id="search_button" class="header-icon search-icon" title="Search ChronoZoom" data-enabled="true"></div>
                 </li>
                 <li class="fleft">
-                    <div class="header-icon view-icon" title="View Collections" data-enabled="false"></div>
+                    <div style="display: none" id="collections_button" class="header-icon view-icon" title="View Collections" data-enabled="false"></div>
                 </li>
                 <li class="fleft">
                     <div id="timeSeries_button" class="header-icon timeSeries-icon" title="Show/Hide Time Series" data-enabled="true"></div>
@@ -152,7 +151,7 @@
                 </li>
                 <li class="fleft">
                     <div style="display: none" id="login-panel" title="Sign in to ChronoZoom" data-enabled="true">
-                        <label for="login-button">Sign in</label>
+                        <label for="login-button" class="header-icon-label"></label>
                         <div id="login-button" class="header-icon profile-icon"></div>
                     </div>
                 </li>
@@ -314,16 +313,16 @@
         <div class="fright">
             <ul>
                 <li class="fright">
-                    <a class="footer-link" href="http://join.chronozoomproject.org/develop/">Developers</a>
+                    <a class="footer-link" href="http://join.chronozoom.com/develop/">Developers</a>
                 </li>
                 <li class="fright">
-                    <a class="footer-link" href="http://join.chronozoomproject.org/notices">Notices</a>
+                    <a class="footer-link" href="http://join.chronozoom.com/notices">Notices</a>
                 </li>
                 <li class="fright">
-                    <a class="footer-link" href="http://join.chronozoomproject.org/forum/forums/">Feedback</a>
+                    <a class="footer-link" href="http://join.chronozoom.com/forum/forums/">Feedback</a>
                 </li>
                 <li class="fright">
-                    <a class="footer-link" href="http://help.chronozoomproject.org/">Help</a>
+                    <a class="footer-link" href="http://help.chronozoom.com/">Help</a>
                 </li>
             </ul>
         </div>

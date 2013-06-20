@@ -1,0 +1,33 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="xslcon.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="MemberPath" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">C:\Users\v-wfren\Documents\GitHub\ChronoZoom\Source\Chronozoom.UI\bin\Chronozoom.UI.XML</Value>
+    </Setting>
+    <Setting Name="EntityPath" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">C:\Users\v-wfren\Documents\GitHub\ChronoZoom\Source\Chronozoom.Entities\bin\Chronozoom.Entities.XML</Value>
+    </Setting>
+    <Setting Name="MemberClass" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">M:Chronozoom.UI.IChronozoomSVC.</Value>
+    </Setting>
+    <Setting Name="MemberRgx" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">M:Chronozoom\.UI\.IChronozoomSVC\.\w*</Value>
+    </Setting>
+    <Setting Name="EntityTypeClass" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">T:Chronozoom.Entities.</Value>
+    </Setting>
+    <Setting Name="EntityTypeRgx" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">T:Chronozoom\.Entities\.\w*</Value>
+    </Setting>
+    <Setting Name="EntityPropClass" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">P:Chronozoom.Entities.</Value>
+    </Setting>
+    <Setting Name="TopMatter" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">C:\Users\v-wfren\Documents\GitHub\ChronoZoom\Doc\Chronozoom_REST_API_top.md</Value>
+    </Setting>
+    <Setting Name="OutFile" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">C:\Users\v-wfren\Documents\GitHub\docteam\xslcon\xslcon\output\ChronoZoom_REST_API.md</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

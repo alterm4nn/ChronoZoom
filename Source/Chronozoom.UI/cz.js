@@ -1873,6 +1873,8 @@ var CZ;
                     var mediaID = id + "__media__";
                     var imageElem = null;
                     if(this.contentItem.mediaType.toLowerCase() === 'image' || this.contentItem.mediaType.toLowerCase() === 'picture') {
+                        imageElem = VCContent.addImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, this.contentItem.uri);
+                    } else if(this.contentItem.mediaType.toLowerCase() === 'deepimage') {
                         imageElem = VCContent.addSeadragonImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);
                     } else if(this.contentItem.mediaType.toLowerCase() === 'video') {
                         VCContent.addVideo(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
@@ -2111,7 +2113,7 @@ var CZ;
                     var title = '';
                     if(infodotDescription && infodotDescription.title && infodotDescription.date) {
                         var exhibitDate = CZ.Dates.convertCoordinateToYear(infodotDescription.date);
-                        title = infodotDescription.title + '\n(' + exhibitDate.year + ' ' + exhibitDate.regime + ')';
+                        title = infodotDescription.title + '\n(' + parseFloat(exhibitDate.year.toFixed(2)) + ' ' + exhibitDate.regime + ')';
                     }
                     var infodotTitle = addText(contentItem, layerid, id + "__title", time - titleWidth / 2, titleTop, titleTop, titleHeight, title, {
                         fontName: CZ.Settings.contentItemHeaderFontName,
@@ -2520,7 +2522,7 @@ var CZ;
                         container: listItemContainer,
                         uiMap: {
                             closeButton: ".cz-listitem-close-btn",
-                            iconImg: ".cz-contentitem-listitem-icon > img",
+                            iconImg: ".cz-form-tour-contentitem-listitem-icon > img",
                             titleTextblock: ".cz-contentitem-listitem-title",
                             typeTextblock: ".cz-contentitem-listitem-highlighted"
                         }
@@ -2545,7 +2547,17 @@ var CZ;
                 descr.change(function (ev) {
                     self.data.Description = self.Description;
                 });
-                this.iconImg.attr("src", this.data.ThumbnailUrl || "/images/Temp-Thumbnail2.png");
+                var thumbUrl = this.data.ThumbnailUrl;
+                var img = new Image();
+                img.onload = function () {
+                    self.iconImg.replaceWith(img);
+                };
+                img.onerror = function () {
+                    if(console && console.warn) {
+                        console.warn("Could not load a thumbnail image " + thumbUrl);
+                    }
+                };
+                img.src = thumbUrl;
                 this.titleTextblock.text(this.data.Title);
                 this.typeTextblock.text(this.data.Type);
                 this.Activate();
@@ -2672,18 +2684,48 @@ var CZ;
             });
             Object.defineProperty(TourStop.prototype, "ThumbnailUrl", {
                 get: function () {
-                    if(this.targetElement) {
-                        if(this.targetElement.type === "contentItem") {
-                            var type = this.targetElement.contentItem.mediaType.toLowerCase();
-                            var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x64/' + this.targetElement.contentItem.guid + '.png';
-                            return thumbnailUri;
-                        }
+                    if(!this.thumbUrl) {
+                        this.thumbUrl = this.GetThumbnail(this.targetElement);
                     }
-                    return "/images/Temp-Thumbnail2.png";
+                    return this.thumbUrl;
                 },
                 enumerable: true,
                 configurable: true
             });
+            TourStop.prototype.GetThumbnail = function (element) {
+                var defaultThumb = "/images/Temp-Thumbnail2.png";
+                try  {
+                    if(!element) {
+                        return defaultThumb;
+                    }
+                    if(element.type === "contentItem") {
+                        var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x64/' + element.id + '.png';
+                        return thumbnailUri;
+                    }
+                    if(element.type === "infodot") {
+                        if(element.contentItems && element.contentItems.length > 0) {
+                            var child = element.contentItems[0];
+                            var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x64/' + child.id + '.png';
+                            return thumbnailUri;
+                        }
+                    } else if(element.type === "timeline") {
+                        for(var n = element.children.length, i = 0; i < n; i++) {
+                            var child = element.children[i];
+                            if(child.type === "infodot" || child.type === "timeline") {
+                                var thumb = this.GetThumbnail(child);
+                                if(thumb && thumb !== defaultThumb) {
+                                    return thumb;
+                                }
+                            }
+                        }
+                    }
+                } catch (exc) {
+                    if(console && console.error) {
+                        console.error("Failed to get a thumbnail url: " + exc);
+                    }
+                }
+                return defaultThumb;
+            };
             return TourStop;
         })();
         UI.TourStop = TourStop;        
@@ -3565,6 +3607,11 @@ var CZ;
                 cache: false,
                 contentType: "application/json",
                 url: request.url
+            }).done(function (profile) {
+                if(!profile.id) {
+                    return null;
+                }
+                return profile;
             });
         }
         Service.getProfile = getProfile;
@@ -4323,9 +4370,20 @@ var CZ;
                         _super.call(this, parent, container, uiMap, context);
                 this.iconImg = this.container.find(uiMap.iconImg);
                 this.titleTextblock = this.container.find(uiMap.titleTextblock);
-                this.titleTextblock = this.container.find(uiMap.titleTextblock);
                 this.descrTextblock = this.container.find(".cz-contentitem-listitem-descr");
+                var self = this;
+                var thumbUrl = this.data.thumbnailUrl;
                 this.iconImg.attr("src", this.data.icon || "/images/Temp-Thumbnail2.png");
+                var img = new Image();
+                img.onload = function () {
+                    self.iconImg.replaceWith(img);
+                };
+                img.onerror = function () {
+                    if(console && console.warn) {
+                        console.warn("Could not load a thumbnail image " + thumbUrl);
+                    }
+                };
+                img.src = thumbUrl;
                 this.titleTextblock.text(this.data.title);
                 if(this.data.description) {
                     this.descrTextblock.text(this.data.description);
@@ -4494,6 +4552,7 @@ var CZ;
                     throw "Tour has no bookmarks";
                 }
                 var self = this;
+                this.thumbnailUrl = CZ.Settings.contentItemThumbnailBaseUri + id + '.jpg';
                 bookmarks.sort(function (b1, b2) {
                     return b1.lapseTime - b2.lapseTime;
                 });
@@ -9494,6 +9553,225 @@ var CZ;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
+    (function (Gestures) {
+        function PanGesture(xOffset, yOffset, src) {
+            this.Type = "Pan";
+            this.Source = src;
+            this.xOffset = xOffset;
+            this.yOffset = yOffset;
+        }
+        function ZoomGesture(xOrigin, yOrigin, scaleFactor, src) {
+            this.Type = "Zoom";
+            this.Source = src;
+            this.xOrigin = xOrigin;
+            this.yOrigin = yOrigin;
+            this.scaleFactor = scaleFactor;
+        }
+        function PinGesture(src) {
+            this.Type = "Pin";
+            this.Source = src;
+        }
+        function createPanSubject(vc) {
+            var _doc = ($(document));
+            var mouseDown = vc.toObservable("mousedown");
+            var mouseMove = vc.toObservable("mousemove");
+            var mouseUp = _doc.toObservable("mouseup");
+            var mouseMoves = mouseMove.Skip(1).Zip(mouseMove, function (left, right) {
+                return new PanGesture(left.clientX - right.clientX, left.clientY - right.clientY, "Mouse");
+            });
+            var stopPanning = mouseUp;
+            var mouseDrags = mouseDown.SelectMany(function (md) {
+                return mouseMoves.TakeUntil(stopPanning);
+            });
+            return mouseDrags;
+        }
+        function createPinSubject(vc) {
+            var mouseDown = vc.toObservable("mousedown");
+            return mouseDown.Select(function (md) {
+                return new PinGesture("Mouse");
+            });
+        }
+        function createZoomSubject(vc) {
+            vc.mousewheel(function (objEvent, intDelta) {
+                var event = ($).Event("xbrowserwheel");
+                event.delta = intDelta;
+                event.origin = CZ.Common.getXBrowserMouseOrigin(vc, objEvent);
+                vc.trigger(event);
+            });
+            var mouseWheel = vc.toObservable("xbrowserwheel");
+            var mouseWheels = mouseWheel.Zip(mouseWheel, function (arg) {
+                return new ZoomGesture(arg.origin.x, arg.origin.y, arg.delta > 0 ? 1 / CZ.Settings.zoomLevelFactor : 1 * CZ.Settings.zoomLevelFactor, "Mouse");
+            });
+            var mousedblclick = vc.toObservable("dblclick");
+            var mousedblclicks = mousedblclick.Zip(mousedblclick, function (event) {
+                var origin = CZ.Common.getXBrowserMouseOrigin(vc, event);
+                return new ZoomGesture(origin.x, origin.y, 1.0 / CZ.Settings.zoomLevelFactor, "Mouse");
+            });
+            return mouseWheels;
+        }
+        function createTouchPanSubject(vc) {
+            var _doc = ($)(document);
+            var touchStart = vc.toObservable("touchstart");
+            var touchMove = vc.toObservable("touchmove");
+            var touchEnd = _doc.toObservable("touchend");
+            var touchCancel = _doc.toObservable("touchcancel");
+            var gestures = touchStart.SelectMany(function (o) {
+                return touchMove.TakeUntil(touchEnd.Merge(touchCancel)).Skip(1).Zip(touchMove, function (left, right) {
+                    return {
+                        "left": left.originalEvent,
+                        "right": right.originalEvent
+                    };
+                }).Where(function (g) {
+                    return g.left.scale === g.right.scale;
+                }).Select(function (g) {
+                    return new PanGesture(g.left.pageX - g.right.pageX, g.left.pageY - g.right.pageY, "Touch");
+                });
+            });
+            return gestures;
+        }
+        function createTouchPinSubject(vc) {
+            var touchStart = vc.toObservable("touchstart");
+            return touchStart.Select(function (ts) {
+                return new PinGesture("Touch");
+            });
+        }
+        function createTouchZoomSubject(vc) {
+            var _doc = ($)(document);
+            var gestureStart = vc.toObservable("gesturestart");
+            var gestureChange = vc.toObservable("gesturechange");
+            var gestureEnd = _doc.toObservable("gestureend");
+            var touchCancel = _doc.toObservable("touchcancel");
+            var gestures = gestureStart.SelectMany(function (o) {
+                return gestureChange.TakeUntil(gestureEnd.Merge(touchCancel)).Skip(1).Zip(gestureChange, function (left, right) {
+                    return {
+                        "left": left.originalEvent,
+                        "right": right.originalEvent
+                    };
+                }).Where(function (g) {
+                    return g.left.scale !== g.right.scale && g.right.scale !== 0;
+                }).Select(function (g) {
+                    var delta = g.left.scale / g.right.scale;
+                    return new ZoomGesture(o.originalEvent.layerX, o.originalEvent.layerY, 1 / delta, "Touch");
+                });
+            });
+            return gestures;
+        }
+        function createTouchPanSubjectWin8(vc) {
+            var gestureStart = vc.toObservable("MSGestureStart");
+            var gestureChange = vc.toObservable("MSGestureChange");
+            var gestureEnd = vc.toObservable("MSGestureEnd");
+            var gestures = gestureStart.SelectMany(function (o) {
+                return gestureChange.TakeUntil(gestureEnd).Skip(1).Zip(gestureChange, function (left, right) {
+                    return {
+                        "left": left.originalEvent,
+                        "right": right.originalEvent
+                    };
+                }).Where(function (g) {
+                    return g.left.scale === g.right.scale && g.left.detail != g.left.MSGESTURE_FLAG_INERTIA && g.right.detail != g.right.MSGESTURE_FLAG_INERTIA;
+                }).Select(function (g) {
+                    return new PanGesture(g.left.offsetX - g.right.offsetX, g.left.offsetY - g.right.offsetY, "Touch");
+                });
+            });
+            return gestures;
+        }
+        function createTouchPinSubjectWin8(vc) {
+            var pointerDown = vc.toObservable("MSPointerDown");
+            return pointerDown.Select(function (gt) {
+                return new PinGesture("Touch");
+            });
+        }
+        function createTouchZoomSubjectWin8(vc) {
+            var gestureStart = vc.toObservable("MSGestureStart");
+            var gestureChange = vc.toObservable("MSGestureChange");
+            var gestureEnd = vc.toObservable("MSGestureEnd");
+            var gestures = gestureStart.SelectMany(function (o) {
+                return gestureChange.TakeUntil(gestureEnd).Where(function (g) {
+                    return g.originalEvent.scale !== 0 && g.originalEvent.detail != g.originalEvent.MSGESTURE_FLAG_INERTIA;
+                }).Select(function (g) {
+                    return new ZoomGesture(o.originalEvent.offsetX, o.originalEvent.offsetY, 1 / g.originalEvent.scale, "Touch");
+                });
+            });
+            return gestures;
+        }
+        var gesturesDictionary = [];
+        function addMSGestureSource(dom) {
+            gesturesDictionary.forEach(function (child) {
+                if(child === dom) {
+                    return;
+                }
+            });
+            gesturesDictionary.push(dom);
+            dom.addEventListener("MSPointerDown", function (e) {
+                if(dom.gesture === undefined) {
+                    var newGesture = new MSGesture();
+                    newGesture.target = dom;
+                    dom.gesture = newGesture;
+                }
+                dom.gesture.addPointer(e.pointerId);
+            }, false);
+        }
+        ;
+        function getGesturesStream(source) {
+            var panController;
+            var zoomController;
+            var pinController;
+            if(window.navigator.msPointerEnabled && (window).MSGesture) {
+                addMSGestureSource(source[0]);
+                panController = createTouchPanSubjectWin8(source);
+                var zoomControllerTouch = createTouchZoomSubjectWin8(source);
+                var zoomControllerMouse = createZoomSubject(source);
+                zoomController = zoomControllerTouch.Merge(zoomControllerMouse);
+                pinController = createTouchPinSubjectWin8(source);
+            } else if('ontouchstart' in document.documentElement) {
+                panController = createTouchPanSubject(source);
+                zoomController = createTouchZoomSubject(source);
+                pinController = createTouchPinSubject(source);
+            } else {
+                panController = createPanSubject(source);
+                zoomController = createZoomSubject(source);
+                pinController = createPinSubject(source);
+            }
+            return pinController.Merge(panController.Merge(zoomController));
+        }
+        Gestures.getGesturesStream = getGesturesStream;
+        function getPanPinGesturesStream(source) {
+            var panController;
+            var pinController;
+            if(window.navigator.msPointerEnabled && (window).MSGesture) {
+                addMSGestureSource(source[0]);
+                panController = createTouchPanSubjectWin8(source);
+                var zoomControllerTouch = createTouchZoomSubjectWin8(source);
+                var zoomControllerMouse = createZoomSubject(source);
+                pinController = createTouchPinSubjectWin8(source);
+            } else if('ontouchstart' in document.documentElement) {
+                panController = createTouchPanSubject(source);
+                pinController = createTouchPinSubject(source);
+            } else {
+                panController = createPanSubject(source);
+                pinController = createPinSubject(source);
+            }
+            return pinController.Merge(panController.Select(function (el) {
+                el.yOffset = 0;
+                return el;
+            }));
+        }
+        Gestures.getPanPinGesturesStream = getPanPinGesturesStream;
+        function applyAxisBehavior(gestureSequence) {
+            return gestureSequence.Where(function (el) {
+                return el.Type != "Zoom";
+            }).Select(function (el) {
+                if(el.Type == "Pan") {
+                    el.yOffset = 0;
+                }
+                return el;
+            });
+        }
+        Gestures.applyAxisBehavior = applyAxisBehavior;
+    })(CZ.Gestures || (CZ.Gestures = {}));
+    var Gestures = CZ.Gestures;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
     (function (UI) {
         var LineChart = (function () {
             function LineChart(container) {
@@ -9575,7 +9853,11 @@ var CZ;
                 }
                 var ticks = [];
                 for(var i = imin; i <= imax; i++) {
-                    ticks.push(i * k * h10);
+                    var newTick = i * k * h10;
+                    if(h < 0) {
+                        newTick = newTick.toPrecision(-h);
+                    }
+                    ticks.push(newTick);
                 }
                 var result = {
                 };
@@ -9583,10 +9865,6 @@ var CZ;
                 result.h = h;
                 result.h10 = h10;
                 return result;
-            };
-            LineChart.prototype.generateAxisParameters = function (ymin, ymax, labelCount) {
-                var ticks = this.calculateTicks(ymin, ymax, labelCount);
-                return null;
             };
             LineChart.prototype.clear = function (screenLeft, screenRight) {
                 this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -9599,27 +9877,13 @@ var CZ;
                 $("#leftLegend").css("max-width", maxLegendWidth + "px");
                 $("#timeSeriesChartHeader").text("TimeSeries Chart");
             };
-            LineChart.prototype.drawDataSet = function (dataSet, screenLeft, screenRight, verticalPadding, plotLeft, plotRight) {
+            LineChart.prototype.drawDataSet = function (dataSet, screenLeft, screenRight, verticalPadding, plotLeft, plotRight, plotTop, plotBottom) {
                 var that = this;
-                var plotBottom = Number.MAX_VALUE;
-                var plotTop = Number.MIN_VALUE;
                 dataSet.series.forEach(function (seria) {
-                    if(seria.appearanceSettings && seria.appearanceSettings.yMin && seria.appearanceSettings.yMin < plotBottom) {
-                        plotBottom = seria.appearanceSettings.yMin;
-                    }
-                    if(seria.appearanceSettings && seria.appearanceSettings.yMax && seria.appearanceSettings.yMax > plotTop) {
-                        plotTop = seria.appearanceSettings.yMax;
-                    }
                     if(seria.appearanceSettings && seria.appearanceSettings.thickness && seria.appearanceSettings.thickness > verticalPadding) {
                         verticalPadding = seria.appearanceSettings.thickness;
                     }
                 });
-                if((plotTop - plotBottom) === 0) {
-                    var absY = Math.max(0.1, Math.abs(plotBottom));
-                    var offsetConstant = 0.01;
-                    plotTop += absY * offsetConstant;
-                    plotBottom -= absY * offsetConstant;
-                }
                 var screenHeight = this.canvas.height - 2 * verticalPadding;
                 var dataToScreenX = function (x) {
                     return (x - plotLeft) / (plotRight - plotLeft) * (screenRight - screenLeft) + screenLeft;
@@ -9753,7 +10017,9 @@ var CZ;
                 var d = y > ymax ? 1 : 0;
                 return a << 3 | b << 2 | c << 1 | d;
             };
-            LineChart.prototype.drawAxis = function (tickOrigin, secondScreenBorder, ymin, ymax, appearence) {
+            LineChart.prototype.generateAxisParameters = function (tickOrigin, secondScreenBorder, ymin, ymax, appearence) {
+                var that = this;
+                var ticksForDraw = [];
                 var verticalPadding = appearence.verticalPadding ? appearence.verticalPadding : 0;
                 var screenHeight = this.canvas.height - 2 * verticalPadding;
                 var dataToScreenY = function (y) {
@@ -9777,23 +10043,57 @@ var CZ;
                 }
                 ctx.textAlign = appearence.axisLocation;
                 ticks.forEach(function (tick) {
+                    var tickForDraw = {
+                    };
+                    tickForDraw.tick = tick;
                     var y = dataToScreenY(tick);
-                    ctx.strokeStyle = appearence.stroke;
-                    ctx.beginPath();
-                    ctx.moveTo(tickOrigin, y);
-                    ctx.lineTo(tickOrigin + ticklength, y);
-                    ctx.stroke();
-                    ctx.fillText(tick, tickOrigin + ticklength + textOffset, y);
-                    ctx.strokeStyle = 'lightgray';
+                    tickForDraw.y = y;
+                    tickForDraw.xLineStart = tickOrigin;
+                    tickForDraw.xLineEnd = tickOrigin + ticklength;
+                    tickForDraw.xText = tickOrigin + ticklength + textOffset;
                     var textWidth = ctx.measureText(tick).width;
                     if(appearence.axisLocation == "right") {
                         textWidth = -textWidth;
                     }
                     var offset = ticklength + textWidth + 2 * textOffset;
+                    tickForDraw.isGridLineVisible = offset > 0 && (tickOrigin + offset) <= secondScreenBorder || offset < 0 && (tickOrigin + offset) >= secondScreenBorder;
+                    tickForDraw.xGridLineStart = tickOrigin + offset;
+                    tickForDraw.xGridLineEnd = secondScreenBorder;
+                    ticksForDraw.push(tickForDraw);
+                });
+                return ticksForDraw;
+            };
+            LineChart.prototype.drawAxis = function (ticksForDraw, appearence) {
+                var that = this;
+                var ctx = this.context;
+                ctx.font = appearence.font;
+                ctx.textBaseline = 'middle';
+                ctx.strokeStyle = appearence.stroke;
+                ctx.fillStyle = appearence.stroke;
+                ctx.lineWidth = appearence.majorTickThickness;
+                ctx.textAlign = appearence.axisLocation;
+                ticksForDraw.forEach(function (tick) {
+                    ctx.strokeStyle = appearence.stroke;
                     ctx.beginPath();
-                    ctx.moveTo(tickOrigin + offset, y);
-                    ctx.lineTo(secondScreenBorder, y);
+                    ctx.moveTo(tick.xLineStart, tick.y);
+                    ctx.lineTo(tick.xLineEnd, tick.y);
                     ctx.stroke();
+                    var minTextOffset = 8;
+                    ctx.fillText(tick.tick, tick.xText, Math.max(minTextOffset, Math.min(that.canvas.height - minTextOffset, tick.y)));
+                });
+            };
+            LineChart.prototype.drawHorizontalGridLines = function (ticksForDraw, appearence) {
+                var that = this;
+                var ctx = this.context;
+                ctx.strokeStyle = 'lightgray';
+                ctx.lineWidth = appearence.majorTickThickness;
+                ticksForDraw.forEach(function (tick) {
+                    if(tick.isGridLineVisible) {
+                        ctx.beginPath();
+                        ctx.moveTo(tick.xGridLineStart, tick.y);
+                        ctx.lineTo(tick.xGridLineEnd, tick.y);
+                        ctx.stroke();
+                    }
                 });
             };
             LineChart.prototype.drawVerticalGridLines = function (screenLeft, screenRight, plotLeft, plotRight) {
@@ -9815,14 +10115,15 @@ var CZ;
                 this.canvas.width = $("#timeSeries").width();
             };
             LineChart.prototype.clearLegend = function (location) {
+                var legendCnt = location === "left" ? $("#leftLegend") : $("#rightLegend");
                 var legend = location === "left" ? $("#leftLegendList") : $("#rightLegendList");
                 legend.empty();
-                legend.hide();
+                legendCnt.hide();
             };
             LineChart.prototype.addLegendRecord = function (location, stroke, description) {
                 var legend = location === "left" ? $("#leftLegendList") : $("#rightLegendList");
                 var legendCont = location === "left" ? $("#leftLegend") : $("#rightLegend");
-                legend.show();
+                legendCont.show();
                 var cont = $('<li></li>');
                 var strokeIndicatior = $('<div></div>').addClass("tsc-legend-indicator");
                 strokeIndicatior.css("background-color", stroke);
@@ -9832,6 +10133,12 @@ var CZ;
                 strokeIndicatior.appendTo(cont);
                 descriptionDiv.appendTo(cont);
                 cont.height(24).appendTo(legend);
+            };
+            LineChart.prototype.checkLegendVisibility = function (screenWidth) {
+                var baseIndicatorSize = 24;
+                var horOffset = 30;
+                var topOffset = 10;
+                return screenWidth >= baseIndicatorSize + horOffset && this.canvas.height >= baseIndicatorSize + topOffset;
             };
             return LineChart;
         })();
@@ -10164,191 +10471,6 @@ var CZ;
         Common.viewportToViewBox = viewportToViewBox;
     })(CZ.Common || (CZ.Common = {}));
     var Common = CZ.Common;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (Gestures) {
-        function PanGesture(xOffset, yOffset, src) {
-            this.Type = "Pan";
-            this.Source = src;
-            this.xOffset = xOffset;
-            this.yOffset = yOffset;
-        }
-        function ZoomGesture(xOrigin, yOrigin, scaleFactor, src) {
-            this.Type = "Zoom";
-            this.Source = src;
-            this.xOrigin = xOrigin;
-            this.yOrigin = yOrigin;
-            this.scaleFactor = scaleFactor;
-        }
-        function PinGesture(src) {
-            this.Type = "Pin";
-            this.Source = src;
-        }
-        function createPanSubject(vc) {
-            var _doc = ($(document));
-            var mouseDown = vc.toObservable("mousedown");
-            var mouseMove = vc.toObservable("mousemove");
-            var mouseUp = _doc.toObservable("mouseup");
-            var mouseMoves = mouseMove.Skip(1).Zip(mouseMove, function (left, right) {
-                return new PanGesture(left.clientX - right.clientX, left.clientY - right.clientY, "Mouse");
-            });
-            var stopPanning = mouseUp;
-            var mouseDrags = mouseDown.SelectMany(function (md) {
-                return mouseMoves.TakeUntil(stopPanning);
-            });
-            return mouseDrags;
-        }
-        function createPinSubject(vc) {
-            var mouseDown = vc.toObservable("mousedown");
-            return mouseDown.Select(function (md) {
-                return new PinGesture("Mouse");
-            });
-        }
-        function createZoomSubject(vc) {
-            vc.mousewheel(function (objEvent, intDelta) {
-                var event = ($).Event("xbrowserwheel");
-                event.delta = intDelta;
-                event.origin = CZ.Common.getXBrowserMouseOrigin(vc, objEvent);
-                vc.trigger(event);
-            });
-            var mouseWheel = vc.toObservable("xbrowserwheel");
-            var mouseWheels = mouseWheel.Zip(mouseWheel, function (arg) {
-                return new ZoomGesture(arg.origin.x, arg.origin.y, arg.delta > 0 ? 1 / CZ.Settings.zoomLevelFactor : 1 * CZ.Settings.zoomLevelFactor, "Mouse");
-            });
-            var mousedblclick = vc.toObservable("dblclick");
-            var mousedblclicks = mousedblclick.Zip(mousedblclick, function (event) {
-                var origin = CZ.Common.getXBrowserMouseOrigin(vc, event);
-                return new ZoomGesture(origin.x, origin.y, 1.0 / CZ.Settings.zoomLevelFactor, "Mouse");
-            });
-            return mouseWheels;
-        }
-        function createTouchPanSubject(vc) {
-            var _doc = ($)(document);
-            var touchStart = vc.toObservable("touchstart");
-            var touchMove = vc.toObservable("touchmove");
-            var touchEnd = _doc.toObservable("touchend");
-            var touchCancel = _doc.toObservable("touchcancel");
-            var gestures = touchStart.SelectMany(function (o) {
-                return touchMove.TakeUntil(touchEnd.Merge(touchCancel)).Skip(1).Zip(touchMove, function (left, right) {
-                    return {
-                        "left": left.originalEvent,
-                        "right": right.originalEvent
-                    };
-                }).Where(function (g) {
-                    return g.left.scale === g.right.scale;
-                }).Select(function (g) {
-                    return new PanGesture(g.left.pageX - g.right.pageX, g.left.pageY - g.right.pageY, "Touch");
-                });
-            });
-            return gestures;
-        }
-        function createTouchPinSubject(vc) {
-            var touchStart = vc.toObservable("touchstart");
-            return touchStart.Select(function (ts) {
-                return new PinGesture("Touch");
-            });
-        }
-        function createTouchZoomSubject(vc) {
-            var _doc = ($)(document);
-            var gestureStart = vc.toObservable("gesturestart");
-            var gestureChange = vc.toObservable("gesturechange");
-            var gestureEnd = _doc.toObservable("gestureend");
-            var touchCancel = _doc.toObservable("touchcancel");
-            var gestures = gestureStart.SelectMany(function (o) {
-                return gestureChange.TakeUntil(gestureEnd.Merge(touchCancel)).Skip(1).Zip(gestureChange, function (left, right) {
-                    return {
-                        "left": left.originalEvent,
-                        "right": right.originalEvent
-                    };
-                }).Where(function (g) {
-                    return g.left.scale !== g.right.scale && g.right.scale !== 0;
-                }).Select(function (g) {
-                    var delta = g.left.scale / g.right.scale;
-                    return new ZoomGesture(o.originalEvent.layerX, o.originalEvent.layerY, 1 / delta, "Touch");
-                });
-            });
-            return gestures;
-        }
-        function createTouchPanSubjectWin8(vc) {
-            var gestureStart = vc.toObservable("MSGestureStart");
-            var gestureChange = vc.toObservable("MSGestureChange");
-            var gestureEnd = vc.toObservable("MSGestureEnd");
-            var gestures = gestureStart.SelectMany(function (o) {
-                return gestureChange.TakeUntil(gestureEnd).Skip(1).Zip(gestureChange, function (left, right) {
-                    return {
-                        "left": left.originalEvent,
-                        "right": right.originalEvent
-                    };
-                }).Where(function (g) {
-                    return g.left.scale === g.right.scale && g.left.detail != g.left.MSGESTURE_FLAG_INERTIA && g.right.detail != g.right.MSGESTURE_FLAG_INERTIA;
-                }).Select(function (g) {
-                    return new PanGesture(g.left.offsetX - g.right.offsetX, g.left.offsetY - g.right.offsetY, "Touch");
-                });
-            });
-            return gestures;
-        }
-        function createTouchPinSubjectWin8(vc) {
-            var pointerDown = vc.toObservable("MSPointerDown");
-            return pointerDown.Select(function (gt) {
-                return new PinGesture("Touch");
-            });
-        }
-        function createTouchZoomSubjectWin8(vc) {
-            var gestureStart = vc.toObservable("MSGestureStart");
-            var gestureChange = vc.toObservable("MSGestureChange");
-            var gestureEnd = vc.toObservable("MSGestureEnd");
-            var gestures = gestureStart.SelectMany(function (o) {
-                return gestureChange.TakeUntil(gestureEnd).Where(function (g) {
-                    return g.originalEvent.scale !== 0 && g.originalEvent.detail != g.originalEvent.MSGESTURE_FLAG_INERTIA;
-                }).Select(function (g) {
-                    return new ZoomGesture(o.originalEvent.offsetX, o.originalEvent.offsetY, 1 / g.originalEvent.scale, "Touch");
-                });
-            });
-            return gestures;
-        }
-        var vcGestureObject;
-        function addPointerToGesture(evt) {
-            vcGestureObject.addPointer(evt.pointerId);
-        }
-        function getGesturesStream(source) {
-            var panController;
-            var zoomController;
-            var pinController;
-            if(window.navigator.msPointerEnabled && (window).MSGesture) {
-                vcGestureObject = new MSGesture();
-                vcGestureObject.target = CZ.Common.vc[0];
-                CZ.Common.vc[0].addEventListener("MSPointerMove", addPointerToGesture, false);
-                panController = createTouchPanSubjectWin8(source);
-                var zoomControllerTouch = createTouchZoomSubjectWin8(source);
-                var zoomControllerMouse = createZoomSubject(source);
-                zoomController = zoomControllerTouch.Merge(zoomControllerMouse);
-                pinController = createTouchPinSubjectWin8(source);
-            } else if('ontouchstart' in document.documentElement) {
-                panController = createTouchPanSubject(source);
-                zoomController = createTouchZoomSubject(source);
-                pinController = createTouchPinSubject(source);
-            } else {
-                panController = createPanSubject(source);
-                zoomController = createZoomSubject(source);
-                pinController = createPinSubject(source);
-            }
-            return pinController.Merge(panController.Merge(zoomController));
-        }
-        Gestures.getGesturesStream = getGesturesStream;
-        function applyAxisBehavior(gestureSequence) {
-            return gestureSequence.Where(function (el) {
-                return el.Type != "Zoom";
-            }).Select(function (el) {
-                if(el.Type == "Pan") {
-                    el.yOffset = 0;
-                }
-                return el;
-            });
-        }
-        Gestures.applyAxisBehavior = applyAxisBehavior;
-    })(CZ.Gestures || (CZ.Gestures = {}));
-    var Gestures = CZ.Gestures;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
@@ -10891,7 +11013,7 @@ var CZ;
                 var _this = this;
                 var newContentItem = {
                     title: this.titleInput.val() || "",
-                    uri: decodeURIComponent(this.mediaInput.val()) || "",
+                    uri: this.mediaInput.val() || "",
                     mediaSource: this.mediaSourceInput.val() || "",
                     mediaType: this.mediaTypeInput.val() || "",
                     attribution: this.attributionInput.val() || "",
@@ -11055,8 +11177,9 @@ var CZ;
                         _this.usernameInput.val(data.DisplayName);
                         if(data.DisplayName != "") {
                             _this.usernameInput.prop('disabled', true);
-                            _this.agreeInput.attr('checked', true);
-                            _this.agreeInput.prop('disabled', true);
+                            if(_this.emailInput.val()) {
+                                _this.agreeInput.attr('checked', true);
+                            }
                         }
                         _this.emailInput.val(data.Email);
                     }
@@ -11067,15 +11190,19 @@ var CZ;
                         alert("Provided incorrect username, \n'a-z', '0-9', '-', '_' - characters allowed only. ");
                         return;
                     }
-                    isValid = _this.validEmail(_this.emailInput.val());
-                    if(!isValid) {
-                        alert("Provided incorrect email address");
-                        return;
-                    }
-                    isValid = _this.agreeInput.prop("checked");
-                    if(!isValid) {
-                        alert("Please agree with provided terms");
-                        return;
+                    var emailAddress = "";
+                    if(_this.emailInput.val()) {
+                        var emailIsValid = _this.validEmail(_this.emailInput.val());
+                        if(!emailIsValid) {
+                            alert("Provided incorrect email address");
+                            return;
+                        }
+                        var agreeTerms = _this.agreeInput.prop("checked");
+                        if(!agreeTerms) {
+                            alert("Please agree with provided terms");
+                            return;
+                        }
+                        emailAddress = _this.emailInput.val();
                     }
                     CZ.Service.getProfile().done(function (curUser) {
                         CZ.Service.getProfile(_this.usernameInput.val()).done(function (getUser) {
@@ -11083,7 +11210,7 @@ var CZ;
                                 alert("Sorry, this username is already in use. Please try again.");
                                 return;
                             }
-                            CZ.Service.putProfile(_this.usernameInput.val(), _this.emailInput.val()).then(function (success) {
+                            CZ.Service.putProfile(_this.usernameInput.val(), emailAddress).then(function (success) {
                                 if(_this.allowRedirect) {
                                     window.location.assign("\\" + success);
                                 } else {
@@ -11097,13 +11224,7 @@ var CZ;
                     });
                 });
                 this.logoutButton.click(function (event) {
-                    return $.ajax({
-                        url: "/account/logout"
-                    }).done(function (data) {
-                        _this.profilePanel.hide();
-                        _this.loginPanel.show();
-                        _this.close();
-                    });
+                    window.location.assign("/pages/logoff.aspx");
                 });
             };
             FormEditProfile.prototype.show = function () {
@@ -11361,8 +11482,13 @@ var CZ;
             }, 
             {
                 Name: "TimeSeries",
-                Activation: FeatureActivation.NotRootCollection,
+                Activation: FeatureActivation.Enabled,
                 JQueryReference: "#timeSeriesContainer"
+            }, 
+            {
+                Name: "ManageCollections",
+                Activation: FeatureActivation.Disabled,
+                JQueryReference: "#collections_button"
             }, 
             
         ];
@@ -11655,11 +11781,6 @@ var CZ;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
-            if(rootCollection) {
-                $('#timeSeries_button').hide();
-            } else {
-                $('#timeSeries_button').show();
-            }
             $('#search_button').mouseup(CZ.Search.onSearchClicked);
             $('#human_rect').click(function () {
                 CZ.Search.navigateToBookmark(CZ.Common.humanityVisible);
@@ -11786,7 +11907,8 @@ var CZ;
             CZ.Bibliography.initializeBibliography();
             var canvasGestures = CZ.Gestures.getGesturesStream(CZ.Common.vc);
             var axisGestures = CZ.Gestures.applyAxisBehavior(CZ.Gestures.getGesturesStream(CZ.Common.ax));
-            var jointGesturesStream = canvasGestures.Merge(axisGestures);
+            var timeSeriesGestures = CZ.Gestures.getPanPinGesturesStream($("#timeSeriesContainer"));
+            var jointGesturesStream = canvasGestures.Merge(axisGestures.Merge(timeSeriesGestures));
             CZ.Common.controller = new CZ.ViewportController.ViewportController2(function (visible) {
                 var vp = CZ.Common.vc.virtualCanvas("getViewport");
                 var markerPos = CZ.Common.axis.MarkerPosition();
@@ -11972,10 +12094,33 @@ var CZ;
                 CZ.timeSeriesChart.clearLegend("left");
                 CZ.timeSeriesChart.clearLegend("right");
                 var chartHeader = "TimeSeries Chart";
+                if(CZ.rightDataSet !== undefined || CZ.leftDataSet !== undefined) {
+                    CZ.timeSeriesChart.drawVerticalGridLines(leftCSS, rightCSS, leftPlot, rightPlot);
+                }
+                var screenWidthForLegend = rightCSS - leftCSS;
+                if(CZ.rightDataSet !== undefined && CZ.leftDataSet !== undefined) {
+                    screenWidthForLegend /= 2;
+                }
+                var isLegendVisible = CZ.timeSeriesChart.checkLegendVisibility(screenWidthForLegend);
                 if(CZ.leftDataSet !== undefined) {
                     var padding = CZ.leftDataSet.getVerticalPadding() + 10;
-                    CZ.timeSeriesChart.drawDataSet(CZ.leftDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot);
-                    CZ.timeSeriesChart.drawAxis(leftCSS, rightCSS, CZ.leftDataSet.series[0].appearanceSettings.yMin, CZ.leftDataSet.series[0].appearanceSettings.yMax, {
+                    var plotBottom = Number.MAX_VALUE;
+                    var plotTop = Number.MIN_VALUE;
+                    CZ.leftDataSet.series.forEach(function (seria) {
+                        if(seria.appearanceSettings !== undefined && seria.appearanceSettings.yMin !== undefined && seria.appearanceSettings.yMin < plotBottom) {
+                            plotBottom = seria.appearanceSettings.yMin;
+                        }
+                        if(seria.appearanceSettings !== undefined && seria.appearanceSettings.yMax !== undefined && seria.appearanceSettings.yMax > plotTop) {
+                            plotTop = seria.appearanceSettings.yMax;
+                        }
+                    });
+                    if((plotTop - plotBottom) === 0) {
+                        var absY = Math.max(0.1, Math.abs(plotBottom));
+                        var offsetConstant = 0.01;
+                        plotTop += absY * offsetConstant;
+                        plotBottom -= absY * offsetConstant;
+                    }
+                    var axisAppearence = {
                         labelCount: 4,
                         tickLength: 10,
                         majorTickThickness: 1,
@@ -11983,16 +12128,37 @@ var CZ;
                         axisLocation: 'left',
                         font: '16px Calibri',
                         verticalPadding: padding
-                    });
-                    for(var i = 0; i < CZ.leftDataSet.series.length; i++) {
-                        CZ.timeSeriesChart.addLegendRecord("left", CZ.leftDataSet.series[i].appearanceSettings.stroke, CZ.leftDataSet.series[i].appearanceSettings.name);
+                    };
+                    var tickForDraw = CZ.timeSeriesChart.generateAxisParameters(leftCSS, rightCSS, plotBottom, plotTop, axisAppearence);
+                    CZ.timeSeriesChart.drawHorizontalGridLines(tickForDraw, axisAppearence);
+                    CZ.timeSeriesChart.drawDataSet(CZ.leftDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot, plotTop, plotBottom);
+                    CZ.timeSeriesChart.drawAxis(tickForDraw, axisAppearence);
+                    if(isLegendVisible) {
+                        for(var i = 0; i < CZ.leftDataSet.series.length; i++) {
+                            CZ.timeSeriesChart.addLegendRecord("left", CZ.leftDataSet.series[i].appearanceSettings.stroke, CZ.leftDataSet.series[i].appearanceSettings.name);
+                        }
                     }
                     chartHeader += " (" + CZ.leftDataSet.name;
                 }
                 if(CZ.rightDataSet !== undefined) {
                     var padding = CZ.rightDataSet.getVerticalPadding() + 10;
-                    CZ.timeSeriesChart.drawDataSet(CZ.rightDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot);
-                    CZ.timeSeriesChart.drawAxis(rightCSS, leftCSS, CZ.rightDataSet.series[0].appearanceSettings.yMin, CZ.rightDataSet.series[0].appearanceSettings.yMax, {
+                    var plotBottom = Number.MAX_VALUE;
+                    var plotTop = Number.MIN_VALUE;
+                    CZ.rightDataSet.series.forEach(function (seria) {
+                        if(seria.appearanceSettings !== undefined && seria.appearanceSettings.yMin !== undefined && seria.appearanceSettings.yMin < plotBottom) {
+                            plotBottom = seria.appearanceSettings.yMin;
+                        }
+                        if(seria.appearanceSettings !== undefined && seria.appearanceSettings.yMax !== undefined && seria.appearanceSettings.yMax > plotTop) {
+                            plotTop = seria.appearanceSettings.yMax;
+                        }
+                    });
+                    if((plotTop - plotBottom) === 0) {
+                        var absY = Math.max(0.1, Math.abs(plotBottom));
+                        var offsetConstant = 0.01;
+                        plotTop += absY * offsetConstant;
+                        plotBottom -= absY * offsetConstant;
+                    }
+                    var axisAppearence = {
                         labelCount: 4,
                         tickLength: 10,
                         majorTickThickness: 1,
@@ -12000,17 +12166,20 @@ var CZ;
                         axisLocation: 'right',
                         font: '16px Calibri',
                         verticalPadding: padding
-                    });
-                    for(var i = 0; i < CZ.rightDataSet.series.length; i++) {
-                        CZ.timeSeriesChart.addLegendRecord("right", CZ.rightDataSet.series[i].appearanceSettings.stroke, CZ.rightDataSet.series[i].appearanceSettings.name);
+                    };
+                    var tickForDraw = CZ.timeSeriesChart.generateAxisParameters(rightCSS, leftCSS, plotBottom, plotTop, axisAppearence);
+                    CZ.timeSeriesChart.drawHorizontalGridLines(tickForDraw, axisAppearence);
+                    CZ.timeSeriesChart.drawDataSet(CZ.rightDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot, plotTop, plotBottom);
+                    CZ.timeSeriesChart.drawAxis(tickForDraw, axisAppearence);
+                    if(isLegendVisible) {
+                        for(var i = 0; i < CZ.rightDataSet.series.length; i++) {
+                            CZ.timeSeriesChart.addLegendRecord("right", CZ.rightDataSet.series[i].appearanceSettings.stroke, CZ.rightDataSet.series[i].appearanceSettings.name);
+                        }
                     }
                     var str = chartHeader.indexOf("(") > 0 ? ", " : " (";
                     chartHeader += str + CZ.rightDataSet.name + ")";
                 } else {
                     chartHeader += ")";
-                }
-                if(CZ.rightDataSet !== undefined || CZ.leftDataSet !== undefined) {
-                    CZ.timeSeriesChart.drawVerticalGridLines(leftCSS, rightCSS, leftPlot, rightPlot);
                 }
                 $("#timeSeriesChartHeader").text(chartHeader);
             }

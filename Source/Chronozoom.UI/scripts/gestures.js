@@ -140,18 +140,30 @@ var CZ;
             });
             return gestures;
         }
-        var vcGestureObject;
-        function addPointerToGesture(evt) {
-            vcGestureObject.addPointer(evt.pointerId);
+        var gesturesDictionary = [];
+        function addMSGestureSource(dom) {
+            gesturesDictionary.forEach(function (child) {
+                if(child === dom) {
+                    return;
+                }
+            });
+            gesturesDictionary.push(dom);
+            dom.addEventListener("MSPointerDown", function (e) {
+                if(dom.gesture === undefined) {
+                    var newGesture = new MSGesture();
+                    newGesture.target = dom;
+                    dom.gesture = newGesture;
+                }
+                dom.gesture.addPointer(e.pointerId);
+            }, false);
         }
+        ;
         function getGesturesStream(source) {
             var panController;
             var zoomController;
             var pinController;
             if(window.navigator.msPointerEnabled && (window).MSGesture) {
-                vcGestureObject = new MSGesture();
-                vcGestureObject.target = CZ.Common.vc[0];
-                CZ.Common.vc[0].addEventListener("MSPointerMove", addPointerToGesture, false);
+                addMSGestureSource(source[0]);
                 panController = createTouchPanSubjectWin8(source);
                 var zoomControllerTouch = createTouchZoomSubjectWin8(source);
                 var zoomControllerMouse = createZoomSubject(source);
@@ -169,6 +181,28 @@ var CZ;
             return pinController.Merge(panController.Merge(zoomController));
         }
         Gestures.getGesturesStream = getGesturesStream;
+        function getPanPinGesturesStream(source) {
+            var panController;
+            var pinController;
+            if(window.navigator.msPointerEnabled && (window).MSGesture) {
+                addMSGestureSource(source[0]);
+                panController = createTouchPanSubjectWin8(source);
+                var zoomControllerTouch = createTouchZoomSubjectWin8(source);
+                var zoomControllerMouse = createZoomSubject(source);
+                pinController = createTouchPinSubjectWin8(source);
+            } else if('ontouchstart' in document.documentElement) {
+                panController = createTouchPanSubject(source);
+                pinController = createTouchPinSubject(source);
+            } else {
+                panController = createPanSubject(source);
+                pinController = createPinSubject(source);
+            }
+            return pinController.Merge(panController.Select(function (el) {
+                el.yOffset = 0;
+                return el;
+            }));
+        }
+        Gestures.getPanPinGesturesStream = getPanPinGesturesStream;
         function applyAxisBehavior(gestureSequence) {
             return gestureSequence.Where(function (el) {
                 return el.Type != "Zoom";
