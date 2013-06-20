@@ -167,7 +167,7 @@ module CZ {
                     var self = this;
                     var origMsg = this.errorMessage.text();
                     this.errorMessage
-                        .text("Cannot create exhibit without content items.")
+                        .text("Cannot create exhibit without artifacts.")
                         .show()
                         .delay(7000)
                         .fadeOut(() => self.errorMessage.text(origMsg));
