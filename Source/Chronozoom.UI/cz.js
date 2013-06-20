@@ -2113,7 +2113,7 @@ var CZ;
                     var title = '';
                     if(infodotDescription && infodotDescription.title && infodotDescription.date) {
                         var exhibitDate = CZ.Dates.convertCoordinateToYear(infodotDescription.date);
-                        title = infodotDescription.title + '\n(' + exhibitDate.year + ' ' + exhibitDate.regime + ')';
+                        title = infodotDescription.title + '\n(' + parseFloat(exhibitDate.year.toFixed(2)) + ' ' + exhibitDate.regime + ')';
                     }
                     var infodotTitle = addText(contentItem, layerid, id + "__title", time - titleWidth / 2, titleTop, titleTop, titleHeight, title, {
                         fontName: CZ.Settings.contentItemHeaderFontName,
@@ -11177,8 +11177,9 @@ var CZ;
                         _this.usernameInput.val(data.DisplayName);
                         if(data.DisplayName != "") {
                             _this.usernameInput.prop('disabled', true);
-                            _this.agreeInput.attr('checked', true);
-                            _this.agreeInput.prop('disabled', true);
+                            if(_this.emailInput.val()) {
+                                _this.agreeInput.attr('checked', true);
+                            }
                         }
                         _this.emailInput.val(data.Email);
                     }
@@ -11189,15 +11190,19 @@ var CZ;
                         alert("Provided incorrect username, \n'a-z', '0-9', '-', '_' - characters allowed only. ");
                         return;
                     }
-                    isValid = _this.validEmail(_this.emailInput.val());
-                    if(!isValid) {
-                        alert("Provided incorrect email address");
-                        return;
-                    }
-                    isValid = _this.agreeInput.prop("checked");
-                    if(!isValid) {
-                        alert("Please agree with provided terms");
-                        return;
+                    var emailAddress = "";
+                    if(_this.emailInput.val()) {
+                        var emailIsValid = _this.validEmail(_this.emailInput.val());
+                        if(!emailIsValid) {
+                            alert("Provided incorrect email address");
+                            return;
+                        }
+                        var agreeTerms = _this.agreeInput.prop("checked");
+                        if(!agreeTerms) {
+                            alert("Please agree with provided terms");
+                            return;
+                        }
+                        emailAddress = _this.emailInput.val();
                     }
                     CZ.Service.getProfile().done(function (curUser) {
                         CZ.Service.getProfile(_this.usernameInput.val()).done(function (getUser) {
@@ -11205,7 +11210,7 @@ var CZ;
                                 alert("Sorry, this username is already in use. Please try again.");
                                 return;
                             }
-                            CZ.Service.putProfile(_this.usernameInput.val(), _this.emailInput.val()).then(function (success) {
+                            CZ.Service.putProfile(_this.usernameInput.val(), emailAddress).then(function (success) {
                                 if(_this.allowRedirect) {
                                     window.location.assign("\\" + success);
                                 } else {
@@ -11477,8 +11482,13 @@ var CZ;
             }, 
             {
                 Name: "TimeSeries",
-                Activation: FeatureActivation.NotRootCollection,
+                Activation: FeatureActivation.Enabled,
                 JQueryReference: "#timeSeriesContainer"
+            }, 
+            {
+                Name: "ManageCollections",
+                Activation: FeatureActivation.Disabled,
+                JQueryReference: "#collections_button"
             }, 
             
         ];
@@ -11771,11 +11781,6 @@ var CZ;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
-            if(rootCollection) {
-                $('#timeSeries_button').hide();
-            } else {
-                $('#timeSeries_button').show();
-            }
             $('#search_button').mouseup(CZ.Search.onSearchClicked);
             $('#human_rect').click(function () {
                 CZ.Search.navigateToBookmark(CZ.Common.humanityVisible);

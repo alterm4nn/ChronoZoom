@@ -62,7 +62,7 @@ module CZ {
         //
         // FEATURES CAN ONLY BE ACTIVATED IN ROOTCOLLECTION AFTER HITTING ZERO ACTIVE BUGS.
         //
-        // REMOVING THIS COMMENT OR BYPASSING THIS CHECK MAYBE BRING YOU BAD KARMA, ITS TRUE.
+        // REMOVING THIS COMMENT OR BYPASSING THIS CHECK MAY BRING YOU BAD KARMA, ITS TRUE.
         //
         var _featureMap: FeatureInfo[] = [
             {
@@ -97,8 +97,13 @@ module CZ {
             },
             {
                 Name: "TimeSeries",
-                Activation: FeatureActivation.NotRootCollection,
+                Activation: FeatureActivation.Enabled,
                 JQueryReference: "#timeSeriesContainer"
+            },
+            {
+                Name: "ManageCollections",
+                Activation: FeatureActivation.Disabled,
+                JQueryReference: "#collections_button"
             },
         ];
 
@@ -413,21 +418,8 @@ module CZ {
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
 
-            if (rootCollection) {
-                $('#timeSeries_button').hide();
-            } else {
-                $('#timeSeries_button').show();
-            }
-
             $('#search_button')
                 .mouseup(CZ.Search.onSearchClicked);
-
-            // Commented by Dmitry Voytsekhovskiy: new tours window is now opened in a handler of UI map loading completion.
-            //$('#tours_index')
-            //    .mouseup(e =>
-            //    {
-            //        CZ.Tours.onTourClicked();
-            //    });
 
             $('#human_rect')
                 .click(() => { CZ.Search.navigateToBookmark(CZ.Common.humanityVisible); });
