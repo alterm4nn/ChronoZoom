@@ -421,13 +421,6 @@ module CZ {
             $('#search_button')
                 .mouseup(CZ.Search.onSearchClicked);
 
-            // Commented by Dmitry Voytsekhovskiy: new tours window is now opened in a handler of UI map loading completion.
-            //$('#tours_index')
-            //    .mouseup(e =>
-            //    {
-            //        CZ.Tours.onTourClicked();
-            //    });
-
             $('#human_rect')
                 .click(() => { CZ.Search.navigateToBookmark(CZ.Common.humanityVisible); });
             $('#prehuman_rect')
