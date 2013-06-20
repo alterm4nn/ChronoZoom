@@ -138,6 +138,7 @@ module CZ {
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
                             this.back();
                         } else {
+                            this.saveButton.prop('disabled', true);
                             CZ.Authoring.updateContentItem(this.exhibit, this.contentItem, newContentItem).then(
                                 response => {
                                     this.isCancel = false;
@@ -146,7 +147,9 @@ module CZ {
                                 error => {
                                     alert("Unable to save changes. Please try again later.");
                                 }
-                            );
+                            ).done(() => {
+                                this.saveButton.prop('disabled', false);
+                            });
                         }
                     }
                 } else {

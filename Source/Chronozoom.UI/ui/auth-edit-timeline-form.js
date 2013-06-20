@@ -58,6 +58,7 @@ var CZ;
                     } else {
                         _this.errorMessage.empty();
                         var self = _this;
+                        _this.saveButton.prop('disabled', true);
                         CZ.Authoring.updateTimeline(_this.timeline, {
                             title: _this.titleInput.val(),
                             start: _this.startDate.getDate(),
@@ -68,6 +69,8 @@ var CZ;
                         }, function (error) {
                             alert("Unable to save changes. Please try again later.");
                             console.log(error);
+                        }).done(function () {
+                            _this.saveButton.prop('disabled', false);
                         });
                     }
                 });
