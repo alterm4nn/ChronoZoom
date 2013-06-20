@@ -374,6 +374,7 @@ var CZ;
             };
             FormEditTour.prototype.initialize = function () {
                 var _this = this;
+                this.saveButton.prop('disabled', false);
                 if(this.tour == null) {
                     this.deleteButton.hide();
                     this.titleTextblock.text("Create Tour");
@@ -428,7 +429,7 @@ var CZ;
                                         console.error("Failed to update a tour: " + f.status + " " + f.statusText);
                                     }
                                     alert("Failed to update a tour");
-                                }).done(function () {
+                                }).always(function () {
                                     _this.saveButton.prop('disabled', false);
                                 });
                                 break;

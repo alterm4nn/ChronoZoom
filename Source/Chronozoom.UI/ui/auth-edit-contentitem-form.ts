@@ -62,6 +62,7 @@ module CZ {
             }
 
             private initUI() {
+                this.saveButton.prop('disabled', false);
                 if (CZ.Authoring.contentItemMode === "createContentItem") {
                     this.titleTextblock.text("Create New");
                     this.saveButton.text("create artifiact");
@@ -147,7 +148,7 @@ module CZ {
                                 error => {
                                     alert("Unable to save changes. Please try again later.");
                                 }
-                            ).done(() => {
+                            ).always(() => {
                                 this.saveButton.prop('disabled', false);
                             });
                         }
