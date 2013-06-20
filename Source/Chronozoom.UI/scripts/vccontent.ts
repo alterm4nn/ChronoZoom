@@ -2187,7 +2187,9 @@ module CZ {
 
                     if (infodotDescription && infodotDescription.title && infodotDescription.date) {
                         var exhibitDate = CZ.Dates.convertCoordinateToYear(infodotDescription.date);
-                        title = infodotDescription.title + '\n(' + exhibitDate.year + ' ' + exhibitDate.regime + ')';
+
+                        // Format year title with fixed precision
+                        title = infodotDescription.title + '\n(' + parseFloat(exhibitDate.year.toFixed(2)) + ' ' + exhibitDate.regime + ')';
                     }
 
                     var infodotTitle = addText(contentItem, layerid, id + "__title", time - titleWidth / 2, titleTop, titleTop, titleHeight,
