@@ -11191,11 +11191,12 @@ var CZ;
                         _this.usernameInput.val(data.DisplayName);
                         if(data.DisplayName != "") {
                             _this.usernameInput.prop('disabled', true);
-                            if(_this.emailInput.val()) {
-                                _this.agreeInput.attr('checked', true);
-                            }
                         }
                         _this.emailInput.val(data.Email);
+                        if(data.Email !== undefined && data.Email !== '' && data.Email != null) {
+                            _this.agreeInput.attr('checked', true);
+                            _this.agreeInput.prop('disabled', true);
+                        }
                     }
                 });
                 this.saveButton.click(function (event) {
