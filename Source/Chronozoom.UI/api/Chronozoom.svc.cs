@@ -237,6 +237,7 @@ namespace Chronozoom.UI
             public const string ParentTimelineCollectionMismatch = "Parent timeline does not match collection timeline";
             public const string InvalidContentItemUrl = "Artifact URL is invalid";
             public const string InvalidMediaSourceUrl = "Media Source URL is invalid";
+            public const string CollectionRootTimelineExists = "Root timeline for the collection already exists";
         }
 
         private static Lazy<ChronozoomSVC> _sharedService = new Lazy<ChronozoomSVC>(() =>
@@ -844,8 +845,15 @@ namespace Chronozoom.UI
                         return Guid.Empty;
                     }
 
-                    if (!ValidateTimelineInCollection(storage, timelineRequest.Timeline_ID, collection.Id))
+                    if (parentTimeline != null && !ValidateTimelineInCollection(storage, timelineRequest.Timeline_ID, collection.Id))
                     {
+                        return Guid.Empty;
+                    }
+
+                    // Prevent more than one root timeline from being created in the same collection
+                    if (parentTimeline == null && storage.GetRootTimelines(collection.Id) != null)
+                    {
+                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionRootTimelineExists);
                         return Guid.Empty;
                     }
 
