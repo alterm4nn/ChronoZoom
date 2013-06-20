@@ -66,7 +66,7 @@ var CZ;
             var i = 0;
             var len = 0;
             var selfIntersection = false;
-            if(!tp) {
+            if(!tp || tp.guid === null) {
                 return true;
             }
             if(!isIncluded(tp, tc) && tp.id !== "__root__") {

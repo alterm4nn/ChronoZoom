@@ -117,7 +117,7 @@ module CZ {
             var selfIntersection = false;
 
             // If creating root timeline, skip intersection validations
-            if (!tp) {
+            if (!tp || tp.guid === null) {
                 return true;
             }
 
