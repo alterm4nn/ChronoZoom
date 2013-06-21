@@ -246,6 +246,12 @@ describe("CZ.Authoring part", function () {
                 var result = isNotEmpty(obj);
                 expect(true).toEqual(result);
             });
+
+            it("true, if object is \"space\"", function () {
+                var obj = ' ';
+                var result = isNotEmpty(obj);
+                expect(true).toEqual(result);
+            });
         });
     });
 
@@ -357,17 +363,6 @@ describe("CZ.Authoring part", function () {
                         var result = isIntervalPositive(start, end);
                         expect(false).toEqual(result);
                     });
-                });
-            });
-        });
-
-        //todo: need to use using, table of data:
-        describe("ValidateExhibitData() function", function () {
-            describe("should return", function () {
-                it("true, if Date is number, title is not empty, contentItems is not empty", function () {
-                    var date = 100, title = 'text', contentItems = [{ mediaType: 'image', uri: 'image.jpg', title: 'Title' }];
-                    var result = validateExhibitData(date, title, contentItems);
-                    expect(true).toEqual(result);
                 });
             });
         });

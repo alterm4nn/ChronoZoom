@@ -166,10 +166,16 @@ module CZ {
                     this.errorMsg.text("");
                 });
                 
+                this.regimeSelector.change(event => {
+                    this.checkAndRemoveNonIntegerPart();
+                });
+
                 this.yearSelector.blur(event => {
                     if (!this.validateNumber(this.yearSelector.val())) {
                         this.errorMsg.text(this.WRONG_YEAR_INPUT);
                     }
+
+                    this.checkAndRemoveNonIntegerPart();
                 });
                 var optionGa: JQuery = $("<option value='ga'>Ga</option>");
                 var optionMa: JQuery = $("<option value='ma'>Ma</option>");
@@ -204,6 +210,8 @@ module CZ {
                 this.yearSelector.blur(event => {
                     if (!this.validateNumber(this.yearSelector.val()))
                         this.errorMsg.text(this.WRONG_YEAR_INPUT);
+
+                    this.checkAndRemoveNonIntegerPart();
                 });
 
                 var self = this;
@@ -238,6 +246,18 @@ module CZ {
                 this.dateContainer.empty();
             }
 
+            /**
+            * If year in CE and BCE mode is not integer - remove non integral part in the box
+            */
+            private checkAndRemoveNonIntegerPart(): void {
+                var regime = this.regimeSelector.find(":selected").val().toLowerCase();
+                var mode = this.modeSelector.find(":selected").val().toLowerCase();
+
+                if (regime === 'ce' || regime === 'bce' || mode === 'date') {
+                    this.yearSelector.val(parseFloat(this.yearSelector.val()).toFixed());
+                }                
+            }
+            
             /**
             * Sets year corresponding to given virtual coordinate
             */

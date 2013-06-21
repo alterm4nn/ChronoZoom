@@ -41,21 +41,22 @@ namespace Tests
         {
             SearchHelper.SearchMayanHistoryTimeline();
             Assert.AreEqual("Mayan History", BreadcrumbsHelper.GetLastBreadcrumbs());
-        }  
-        
+        }
+
         [TestMethod]
         public void Search_Evidence_Earliest_Stone_Tools_Exhibit()
         {
             SearchHelper.SearchEvidenceEarliestStoneToolsExhibit();
             Assert.AreEqual("Genus Homo", BreadcrumbsHelper.GetLastBreadcrumbs());
-        }  
-        
+        }
+
         [TestMethod]
+        [Ignore]
         public void Search_Take_Our_Survey_Artifact()
         {
             //https://github.com/alterm4nn/ChronoZoom/issues/355
             SearchHelper.Search_Take_Our_Survey_Artifact();
-            StringAssert.Contains(ExhibitHelper.GetContentItemDescription(), "Your responses to these 12 questions will help us prioritize the next set");
+            StringAssert.Contains(ExhibitHelper.GetTakeOurSurveyArtifactContentItemDescription(), "Your responses to these 12 questions will help us prioritize the next set");
         }
     }
 }

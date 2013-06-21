@@ -23,21 +23,7 @@ module CZ {
             throw "Container parameter is invalid! It should be DIV, or ID of DIV, or jQuery instance of DIV.";
         }
 
-
-        //    var self = this;
         container.mousemove(function (e) { mouseMove(e) });
-
-        // TODO:
-        // Visual color: #0388E5
-        // Implement data transform for rotation.
-        // axis.dataTransform = new DataTransform(
-        //         function (x) {
-        //             return -x;
-        //         },
-        //         function (y) {
-        //             return -y;
-        //         },
-        //         undefined);
 
         /**
          * Private variables of timescale.
@@ -50,7 +36,6 @@ module CZ {
         var _mode = "cosmos";
         var _position = "top";
         var _deltaRange;
-        // TODO: Consider to remove or replace.
         var _size;
         var _width;
         var _height;
@@ -80,10 +65,7 @@ module CZ {
         var LeftInputShown = false;
         var old_left_val;
 
-
-        // TODO: Consider to rename.
         var canvasSize = CZ.Settings.tickLength + CZ.Settings.timescaleThickness;
-        // TODO: Consider to rename.
         var text_size;
         var fontSize;
         var strokeStyle;
@@ -95,7 +77,6 @@ module CZ {
          * Properties of timescale.
          */
         Object.defineProperties(this, {
-            // TODO: Consider to update orientation of timescale.
             position: {
                 configurable: false,
                 get: function () {
@@ -161,23 +142,27 @@ module CZ {
             var k = (_range.max - _range.min) / _width;
             var time = _range.max - k * (_width - point.x);
 
-           if (time <= _range.min + CZ.Settings.panelWidth * k) {
-               marker.css("display", "none");
-               LeftPanInput();
-           }
-            
-           if  (time >= _range.max - CZ.Settings.panelWidth * k) {
-               marker.css("display", "none");
-               RightPanInput();
-             }
-       });
+            var test1 = CZ.Dates.getYMDFromCoordinate(time);
+            var test2 = CZ.Dates.getCoordinateFromYMD(test1.year, test1.month, test1.day);
+            var test3 = CZ.Dates.getYMDFromCoordinate(test2);
+            console.log(time,test1,test2,test3);
+
+            if (time <= _range.min + CZ.Settings.panelWidth * k) {
+                marker.css("display", "none");
+                LeftPanInput();
+            }
+             
+            if  (time >= _range.max - CZ.Settings.panelWidth * k) {
+                marker.css("display", "none");
+                RightPanInput();
+            }
+        });
 
 
         /**
          * Initializes timescale.
          */
         function init() {
-            // TODO: #50, change timescale position.
             _container.addClass("cz-timescale");
             _container.addClass("unselectable");
             rightDatePanel.addClass("cz-timescale-right");
@@ -202,7 +187,6 @@ module CZ {
             _container[0].appendChild(rightDatePanel[0]);
             (<any>canvas[0]).height = canvasSize;
 
-            // TODO: #99-121, refine it.
             text_size = -1;
             strokeStyle = _container ? _container.css("color") : "Black";
             ctx = (<any>canvas[0]).getContext("2d");
@@ -1184,7 +1168,7 @@ module CZ {
             var text;
             var DMY = CZ.Dates.getYMDFromCoordinate(x);
             var year = DMY.year;
-            if (year <= 0) text = -year + 1 + " BCE";//text = x - 1;
+            if (year <= 0) text = -year + " BCE";
             else text = year + " CE";
             return text;
         };
@@ -1250,7 +1234,7 @@ module CZ {
             if (dx == 2) count++;
             for (var i = 0; i < count + 1; i++) {
                 var tick_position = CZ.Dates.getCoordinateFromYMD(x0 + i * dx, 0, 1);
-                if (tick_position < 1 && dx > 1) tick_position += 1;// Move tick from 1BCE to 1CE
+                if (tick_position === 0 && dx > 1) tick_position += 1;// Move tick from 1BCE to 1CE
                 if (tick_position >= this.range.min && tick_position <= this.range.max && tick_position != ticks[ticks.length - 1]) {
                     ticks[num] = { position: tick_position, label: this.getDiv(tick_position) };
                     num++;
@@ -1484,7 +1468,7 @@ module CZ {
             while (tempYear < this.endDate.year || (tempYear == this.endDate.year && tempMonth <= this.endDate.month)) {
                 countMonths++;
                 tempMonth++;
-                if (tempMonth == 12) {
+                if (tempMonth >= 12) {
                     tempMonth = 0;
                     tempYear++;
                 }
@@ -1627,14 +1611,12 @@ module CZ {
                     j++;
                 }
             }
-
             return minors;
         };
 
         this.getMarkerLabel = function (range, time) {
             this.getRegime(range.min, range.max);
             var date = CZ.Dates.getYMDFromCoordinate(time);
-            if (date.year <= 0) date.year--;
             var labelText = date.year + "." + (date.month + 1) + "." + date.day;
             return labelText;
         };
@@ -1643,9 +1625,8 @@ module CZ {
         this.getPanelLabel = function (range, time) {
             this.getRegime(range.min, range.max);
             var date = CZ.Dates.getYMDFromCoordinate(time);
-            if (date.year <= 0) date.year--;
             var labelText = date.year + "." + (date.month + 1) + "." + date.day;
-             return labelText;
+            return labelText;
         };
 
 

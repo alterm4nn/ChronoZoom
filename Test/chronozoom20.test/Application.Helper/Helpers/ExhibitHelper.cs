@@ -11,12 +11,6 @@ namespace Application.Helper.Helpers
 {
     public class ExhibitHelper : DependentActions
     {
-        private readonly HelperManager _manager;
-
-        public ExhibitHelper()
-        {
-            _manager = new HelperManager();
-        }
 
         public void AddExhibit(Exhibit exhibit)
         {
@@ -87,7 +81,7 @@ namespace Application.Helper.Helpers
             }
         }
 
-        public string GetContentItemDescription()
+        public string GetFirstContentItemDescription()
         {
             Logger.Log("<-");
             string description = GetText(By.XPath("//*[@id='vc']/*[@class='contentItemDescription']/div"));
@@ -104,7 +98,6 @@ namespace Application.Helper.Helpers
             ConfirmDeletion();
             Logger.Log("->");
         }
-
 
         public bool IsExhibitFound(Exhibit exhibit)
         {
@@ -125,9 +118,9 @@ namespace Application.Helper.Helpers
         public string GetEukaryoticCellsDescription()
         {
             Logger.Log("<-");
-            _manager.GetNavigationHelper().OpenExhibitEukaryoticCells();
+            HelperManager<NavigationHelper>.GetInstance.OpenExhibitEukaryoticCells();
             Logger.Log("ExhibitEukaryotic Cell is opened");
-            string description = GetContentItemDescription();
+            string description = GetFirstContentItemDescription();
             Logger.Log("-> description: " + description);
             return description;
         }
@@ -138,6 +131,23 @@ namespace Application.Helper.Helpers
             string expectedUri = "http://www.youtube.com/embed/" + (uri.Split('=')[1]);
             Logger.Log("-> expected uri: " + expectedUri, LogType.MessageWithoutScreenshot);
             return expectedUri;
+        }
+
+        public void NavigateToExhibit(Exhibit exhibit)
+        {
+            Logger.Log("<- title: " + exhibit.Title);
+            ExecuteJavaScript(string.Format("CZ.Search.goToSearchResult('e{0}')", exhibit.Id));
+            WaitAnimation();
+            MoveToElementAndClick(By.ClassName("virtualCanvasLayerCanvas"));
+            Logger.Log("->");
+        }
+
+        public string GetTakeOurSurveyArtifactContentItemDescription()
+        {
+            Logger.Log("<-");
+            string description = GetText(By.XPath("//*[@id='vc']/*[@class='contentItemDescription']/div"));
+            Logger.Log("-> description: " + description);
+            return description;
         }
 
         private void ConfirmDeletion()
@@ -158,15 +168,6 @@ namespace Application.Helper.Helpers
             ExecuteJavaScript("CZ.Authoring.mode = 'editExhibit'");
             ExecuteJavaScript("CZ.Authoring.selectedExhibit = " + Javascripts.LastCanvasElement);
             ExecuteJavaScript("CZ.Authoring.showEditExhibitForm(CZ.Authoring.selectedExhibit)");
-            Logger.Log("->");
-        }
-
-        private void NavigateToExhibit(Exhibit exhibit)
-        {
-            Logger.Log("<- title: " + exhibit.Title);
-            ExecuteJavaScript(string.Format("CZ.Search.goToSearchResult('e{0}')", exhibit.Id));
-            WaitAnimation();
-            MoveToElementAndClick(By.ClassName("virtualCanvasLayerCanvas"));
             Logger.Log("->");
         }
 
@@ -252,8 +253,6 @@ namespace Application.Helper.Helpers
                 FillArtifact(contentItem);
                 Click(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-save cz-button']"));
             }
-
         }
-
     }
 }

@@ -41,6 +41,20 @@ describe("CZ.Authoring", function () {
                 });
             });
 
+            describe("When: user expands timeline to present day without overlay ", function () {
+                var propFake1 = { title: "Timeline Title11", start: "-5", end: 9999 };
+                var dates = CZ.Dates;
+                var localPresent = dates.getPresent();
+                var presentDate = dates.getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+                var newTimeline = { y: 1, height: 2, x: -8, width: presentDate - propFake1.start, parent: parentTimeline, title: "Timeline Title", type: "timeline", children: [] };
+                
+                it("Then: The timeline should be expanded to present day", function () {
+                    _selectedTimeline = newTimeline;
+                    authoring.updateTimeline(newTimeline, propFake1);
+                    expect(newTimeline.width).toEqual(dates.getCoordinateFromDecimalYear(propFake1.end) - propFake1.start);
+                });
+            });
+
             describe("When: user expands timeline with parent right border overlay ", function () {
                 var propFake = { title: "Timeline Title11", start: "-5", end: "0.01" };
                 it("Then: The timeline should not be expanded", function () {
@@ -288,7 +302,6 @@ describe("CZ.Authoring", function () {
             var _selectedExhibit = {};
 
             beforeEach(function () {
-                //setFixtures('<body></body>');
                 $('body').prepend('<div id="vc"></div>');
                 $('#vc').data('ui-virtualCanvas', { hovered: exhibitParentTimeline, element: $('#vc'), getViewport: function () { return { pointScreenToVirtual: function (xvalue, yvalue) { return { x: xvalue, y: yvalue }; } }; } });
                 var vc = $('#vc');

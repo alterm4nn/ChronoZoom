@@ -50,6 +50,7 @@ var CZ;
                 this.isFormVisible = false;
                 this.container.data("form", undefined);
                 this.container.hide.apply(this.container, args);
+                this.container.trigger("close");
             };
             FormBase.prototype.back = function () {
                 this.close();

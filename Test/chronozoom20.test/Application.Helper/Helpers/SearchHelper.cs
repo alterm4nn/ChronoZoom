@@ -39,7 +39,7 @@ namespace Application.Helper.Helpers
             TypeSearchString("Take our survey");
             WaitSearchProcess();
             NavigateToSearchResult("Take our Survey");
-            WaitNavigationToChronozoomProject();
+            WaitNavigationToTakeOurSurveyItem();
             Logger.Log("->");
         }
 
@@ -80,11 +80,12 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }    
         
-        private void WaitNavigationToChronozoomProject()
+        private void WaitNavigationToTakeOurSurveyItem()
         {
             Logger.Log("<-");
             WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='ChronoZoom Project']"));
             WaitAnimation();
+            WaitForElementIsDisplayed(By.XPath("//*[contains(text(),'ChronoZoom is made by the academic community')]"));
             Logger.Log("->");
         }
     }

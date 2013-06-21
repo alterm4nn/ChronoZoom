@@ -2,10 +2,11 @@
 /// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
 /// <reference path='../scripts/data.ts'/>
 /// <reference path='../scripts/cz.ts'/>
+/// <reference path='../scripts/gestures.ts'/>
 
 module CZ {
     export module UI {
-         
+
         export class LineChart {
 
             private canvas: any;
@@ -96,8 +97,14 @@ module CZ {
                 }
 
                 var ticks = [];
-                for (var i = imin; i <= imax; i++)
-                    ticks.push(i * k * h10);
+                for (var i = imin; i <= imax; i++) {
+                    var newTick: any = i * k * h10;
+                    if (h < 0) {
+                        newTick = newTick.toPrecision(-h);
+                    }
+
+                    ticks.push(newTick);
+                }
 
                 var result: any = {};
                 result.ticks = ticks;
@@ -107,11 +114,6 @@ module CZ {
                 return result;
             }
 
-            public generateAxisParameters(ymin: number, ymax: number, labelCount: number): any {
-                var ticks = this.calculateTicks(ymin, ymax, labelCount);
-
-                return null;
-            }
 
             public clear(screenLeft: number, screenRight: number): void {
                 this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -126,35 +128,17 @@ module CZ {
 
                 $("#leftLegend").css("left", screenLeft + 30);
                 $("#leftLegend").css("max-width", maxLegendWidth + "px");
-                
+
                 $("#timeSeriesChartHeader").text("TimeSeries Chart");
             }
 
-            public drawDataSet(dataSet: CZ.Data.DataSet, screenLeft: number, screenRight: number, verticalPadding: number, plotLeft: number, plotRight: number): void {
+            public drawDataSet(dataSet: CZ.Data.DataSet, screenLeft: number, screenRight: number, verticalPadding: number, plotLeft: number, plotRight: number, plotTop: number, plotBottom: number): void {
                 var that = this;
-                var plotBottom = Number.MAX_VALUE;
-                var plotTop = Number.MIN_VALUE;
-
                 dataSet.series.forEach(function (seria) {
-                    if (seria.appearanceSettings && seria.appearanceSettings.yMin && seria.appearanceSettings.yMin < plotBottom) {
-                        plotBottom = seria.appearanceSettings.yMin;
-                    }
-
-                    if (seria.appearanceSettings && seria.appearanceSettings.yMax && seria.appearanceSettings.yMax > plotTop) {
-                        plotTop = seria.appearanceSettings.yMax;
-                    }
-
                     if (seria.appearanceSettings && seria.appearanceSettings.thickness && seria.appearanceSettings.thickness > verticalPadding) {
                         verticalPadding = seria.appearanceSettings.thickness;
                     }
                 });
-
-                if ((plotTop - plotBottom) === 0) {
-                    var absY = Math.max(0.1, Math.abs(plotBottom));
-                    var offsetConstant = 0.01;
-                    plotTop += absY * offsetConstant;
-                    plotBottom -= absY * offsetConstant;
-                }
 
                 var screenHeight = this.canvas.height - 2 * verticalPadding;
 
@@ -272,8 +256,6 @@ module CZ {
                         context.stroke(); // finishing previous segment (it is broken by missing value)
                     }
                 });
-
-
             }
 
             // Clipping algorithms
@@ -285,7 +267,9 @@ module CZ {
                 return a << 3 | b << 2 | c << 1 | d;
             };
 
-            public drawAxis(tickOrigin: number, secondScreenBorder: number, ymin: number, ymax: number, appearence: any): void {
+            public generateAxisParameters(tickOrigin: number, secondScreenBorder: number, ymin: number, ymax: number, appearence: any): any {
+                var that = this;
+                var ticksForDraw = [];
                 var verticalPadding = appearence.verticalPadding ? appearence.verticalPadding : 0;
                 var screenHeight = this.canvas.height - 2 * verticalPadding;
 
@@ -311,27 +295,66 @@ module CZ {
                 ctx.textAlign = appearence.axisLocation;
 
                 ticks.forEach(function (tick) {
+                    var tickForDraw: any = {};
+                    tickForDraw.tick = tick;
+
                     var y = dataToScreenY(tick);
-                    ctx.strokeStyle = appearence.stroke;
-                    ctx.beginPath();
-                    ctx.moveTo(tickOrigin, y);
-                    ctx.lineTo(tickOrigin + ticklength, y);
-                    ctx.stroke();
+                    tickForDraw.y = y;
+                    tickForDraw.xLineStart = tickOrigin;
+                    tickForDraw.xLineEnd = tickOrigin + ticklength;
+                    tickForDraw.xText = tickOrigin + ticklength + textOffset;
 
-
-                    ctx.fillText(tick, tickOrigin + ticklength + textOffset, y);
-
-                    ctx.strokeStyle = 'lightgray';
-                    //drawing gridline
                     var textWidth = ctx.measureText(tick).width;
                     if (appearence.axisLocation == "right") {
                         textWidth = -textWidth;
                     }
                     var offset = ticklength + textWidth + 2 * textOffset;
+
+                    tickForDraw.isGridLineVisible = offset > 0 && (tickOrigin + offset) <= secondScreenBorder || offset < 0 && (tickOrigin + offset) >= secondScreenBorder
+                    tickForDraw.xGridLineStart = tickOrigin + offset;
+                    tickForDraw.xGridLineEnd = secondScreenBorder;
+
+                    ticksForDraw.push(tickForDraw);
+                });
+
+                return ticksForDraw;
+            }
+
+            public drawAxis(ticksForDraw: any, appearence: any): void {
+                var that = this;
+                var ctx = this.context;
+                ctx.font = appearence.font;
+                ctx.textBaseline = 'middle';
+                ctx.strokeStyle = appearence.stroke;
+                ctx.fillStyle = appearence.stroke;
+                ctx.lineWidth = appearence.majorTickThickness;
+                ctx.textAlign = appearence.axisLocation;
+
+                ticksForDraw.forEach(function (tick) {
+                    ctx.strokeStyle = appearence.stroke;
                     ctx.beginPath();
-                    ctx.moveTo(tickOrigin + offset, y);
-                    ctx.lineTo(secondScreenBorder, y);
+                    ctx.moveTo(tick.xLineStart, tick.y);
+                    ctx.lineTo(tick.xLineEnd, tick.y);
                     ctx.stroke();
+
+                    var minTextOffset = 8; //default font is 16px, if it would be customizable, this constant should be changed
+                    ctx.fillText(tick.tick, tick.xText, Math.max(minTextOffset, Math.min(that.canvas.height - minTextOffset, tick.y)));
+                });
+            }
+
+            public drawHorizontalGridLines(ticksForDraw: any, appearence: any): void {
+                var that = this;
+                var ctx = this.context;
+                ctx.strokeStyle = 'lightgray';
+                ctx.lineWidth = appearence.majorTickThickness;
+
+                ticksForDraw.forEach(function (tick) {
+                    if (tick.isGridLineVisible) {
+                        ctx.beginPath();
+                        ctx.moveTo(tick.xGridLineStart, tick.y);
+                        ctx.lineTo(tick.xGridLineEnd, tick.y);
+                        ctx.stroke();
+                    }
                 });
             }
 
@@ -356,16 +379,17 @@ module CZ {
             }
 
             public clearLegend(location: string): void {
+                var legendCnt = location === "left" ? $("#leftLegend") : $("#rightLegend");
                 var legend = location === "left" ? $("#leftLegendList") : $("#rightLegendList");
                 legend.empty();
-                legend.hide();
+                legendCnt.hide();
             }
 
             public addLegendRecord(location: string, stroke: any, description: string): void {
                 var legend = location === "left" ? $("#leftLegendList") : $("#rightLegendList");
                 var legendCont = location === "left" ? $("#leftLegend") : $("#rightLegend");
 
-                legend.show();
+                legendCont.show();
                 var cont = $('<li></li>');
                 var strokeIndicatior = $('<div></div>').addClass("tsc-legend-indicator");
                 strokeIndicatior.css("background-color", stroke);
@@ -377,6 +401,13 @@ module CZ {
                 strokeIndicatior.appendTo(cont);
                 descriptionDiv.appendTo(cont);
                 cont.height(24).appendTo(legend);
+            }
+
+            public checkLegendVisibility(screenWidth: number): bool {
+                var baseIndicatorSize = 24;
+                var horOffset = 30;
+                var topOffset = 10;
+                return screenWidth >= baseIndicatorSize + horOffset && this.canvas.height >= baseIndicatorSize + topOffset;
             }
         }
     }

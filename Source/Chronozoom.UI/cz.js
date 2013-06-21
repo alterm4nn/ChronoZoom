@@ -165,6 +165,7 @@
         Settings.signinUrlMicrosoft = "";
         Settings.signinUrlGoogle = "";
         Settings.signinUrlYahoo = "";
+        Settings.guidEmpty = "00000000-0000-0000-0000-000000000000";
     })(CZ.Settings || (CZ.Settings = {}));
     var Settings = CZ.Settings;
 })(CZ || (CZ = {}));
@@ -220,6 +221,7 @@ var CZ;
                 this.isFormVisible = false;
                 this.container.data("form", undefined);
                 this.container.hide.apply(this.container, args);
+                this.container.trigger("close");
             };
             FormBase.prototype.back = function () {
                 this.close();
@@ -1873,6 +1875,8 @@ var CZ;
                     var mediaID = id + "__media__";
                     var imageElem = null;
                     if(this.contentItem.mediaType.toLowerCase() === 'image' || this.contentItem.mediaType.toLowerCase() === 'picture') {
+                        imageElem = VCContent.addImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, this.contentItem.uri);
+                    } else if(this.contentItem.mediaType.toLowerCase() === 'deepimage') {
                         imageElem = VCContent.addSeadragonImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);
                     } else if(this.contentItem.mediaType.toLowerCase() === 'video') {
                         VCContent.addVideo(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
@@ -1992,8 +1996,23 @@ var CZ;
             this.title = infodotDescription.title;
             this.opacity = typeof infodotDescription.opacity !== 'undefined' ? infodotDescription.opacity : 1;
             contentItems.sort(function (a, b) {
-                return a.order - b.order;
+                if(typeof a.order !== 'undefined' && typeof b.order === 'undefined') {
+                    return -1;
+                } else if(typeof a.order === 'undefined' && typeof b.order !== 'undefined') {
+                    return 1;
+                } else if(typeof a.order === 'undefined' && typeof b.order === 'undefined') {
+                    return 0;
+                } else if(a.order < b.order) {
+                    return -1;
+                } else if(a.order > b.order) {
+                    return 1;
+                } else {
+                    return 0;
+                }
             });
+            for(var i = 0; i < contentItems.length; i++) {
+                contentItems[i].order = i;
+            }
             var vyc = this.newY + radv;
             var innerRad = radv - CZ.Settings.infoDotHoveredBorderWidth * radv;
             this.outerRad = radv;
@@ -2111,7 +2130,7 @@ var CZ;
                     var title = '';
                     if(infodotDescription && infodotDescription.title && infodotDescription.date) {
                         var exhibitDate = CZ.Dates.convertCoordinateToYear(infodotDescription.date);
-                        title = infodotDescription.title + '\n(' + exhibitDate.year + ' ' + exhibitDate.regime + ')';
+                        title = infodotDescription.title + '\n(' + parseFloat(exhibitDate.year.toFixed(2)) + ' ' + exhibitDate.regime + ')';
                     }
                     var infodotTitle = addText(contentItem, layerid, id + "__title", time - titleWidth / 2, titleTop, titleTop, titleHeight, title, {
                         fontName: CZ.Settings.contentItemHeaderFontName,
@@ -2315,7 +2334,7 @@ var CZ;
             var xr = xc + rad * (_xrc - _lw / 2);
             var yb = yc + rad * (_ybc - _lh / 2);
             var vcitems = [];
-            for(var i = 0, len = Math.min(10, n); i < len; i++) {
+            for(var i = 0, len = Math.min(CZ.Settings.infodotMaxContentItemsCount, n); i < len; i++) {
                 var ci = contentItems[i];
                 if(i === 0) {
                     vcitems.push(new ContentItem(vc, layerid, ci.id, -_wc / 2 * rad + xc, -_hc / 2 * rad + yc, _wc * rad, _hc * rad, ci));
@@ -2520,7 +2539,7 @@ var CZ;
                         container: listItemContainer,
                         uiMap: {
                             closeButton: ".cz-listitem-close-btn",
-                            iconImg: ".cz-contentitem-listitem-icon > img",
+                            iconImg: ".cz-form-tour-contentitem-listitem-icon > img",
                             titleTextblock: ".cz-contentitem-listitem-title",
                             typeTextblock: ".cz-contentitem-listitem-highlighted"
                         }
@@ -2545,7 +2564,17 @@ var CZ;
                 descr.change(function (ev) {
                     self.data.Description = self.Description;
                 });
-                this.iconImg.attr("src", this.data.ThumbnailUrl || "/images/Temp-Thumbnail2.png");
+                var thumbUrl = this.data.ThumbnailUrl;
+                var img = new Image();
+                img.onload = function () {
+                    self.iconImg.replaceWith(img);
+                };
+                img.onerror = function () {
+                    if(console && console.warn) {
+                        console.warn("Could not load a thumbnail image " + thumbUrl);
+                    }
+                };
+                img.src = thumbUrl;
                 this.titleTextblock.text(this.data.Title);
                 this.typeTextblock.text(this.data.Type);
                 this.Activate();
@@ -2588,8 +2617,7 @@ var CZ;
 (function (CZ) {
     (function (UI) {
         var TourStop = (function () {
-            function TourStop(bookmarkId, target, sequence, title) {
-                this.bookmarkId = bookmarkId;
+            function TourStop(target, title) {
                 if(target == undefined || target == null) {
                     throw "target element of a tour stop is null or undefined";
                 }
@@ -2607,10 +2635,6 @@ var CZ;
                     this.type = target.type === "timeline" ? "Timeline" : "Event";
                     this.title = title ? title : target.title;
                 }
-                if(!this.bookmarkId) {
-                    this.bookmarkId = "00000000-0000-0000-0000-000000000000";
-                }
-                this.sequence = sequence;
             }
             Object.defineProperty(TourStop.prototype, "Target", {
                 get: function () {
@@ -2646,16 +2670,6 @@ var CZ;
                 enumerable: true,
                 configurable: true
             });
-            Object.defineProperty(TourStop.prototype, "Sequence", {
-                get: function () {
-                    return this.sequence;
-                },
-                set: function (n) {
-                    this.sequence = n;
-                },
-                enumerable: true,
-                configurable: true
-            });
             Object.defineProperty(TourStop.prototype, "Type", {
                 get: function () {
                     return this.type;
@@ -2672,24 +2686,54 @@ var CZ;
             });
             Object.defineProperty(TourStop.prototype, "ThumbnailUrl", {
                 get: function () {
-                    if(this.targetElement) {
-                        if(this.targetElement.type === "contentItem") {
-                            var type = this.targetElement.contentItem.mediaType.toLowerCase();
-                            var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x64/' + this.targetElement.contentItem.guid + '.png';
-                            return thumbnailUri;
-                        }
+                    if(!this.thumbUrl) {
+                        this.thumbUrl = this.GetThumbnail(this.targetElement);
                     }
-                    return "/images/Temp-Thumbnail2.png";
+                    return this.thumbUrl;
                 },
                 enumerable: true,
                 configurable: true
             });
+            TourStop.prototype.GetThumbnail = function (element) {
+                var defaultThumb = "/images/Temp-Thumbnail2.png";
+                try  {
+                    if(!element) {
+                        return defaultThumb;
+                    }
+                    if(element.type === "contentItem") {
+                        var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x64/' + element.id + '.png';
+                        return thumbnailUri;
+                    }
+                    if(element.type === "infodot") {
+                        if(element.contentItems && element.contentItems.length > 0) {
+                            var child = element.contentItems[0];
+                            var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x64/' + child.id + '.png';
+                            return thumbnailUri;
+                        }
+                    } else if(element.type === "timeline") {
+                        for(var n = element.children.length, i = 0; i < n; i++) {
+                            var child = element.children[i];
+                            if(child.type === "infodot" || child.type === "timeline") {
+                                var thumb = this.GetThumbnail(child);
+                                if(thumb && thumb !== defaultThumb) {
+                                    return thumb;
+                                }
+                            }
+                        }
+                    }
+                } catch (exc) {
+                    if(console && console.error) {
+                        console.error("Failed to get a thumbnail url: " + exc);
+                    }
+                }
+                return defaultThumb;
+            };
             return TourStop;
         })();
         UI.TourStop = TourStop;        
         var Tour = (function () {
             function Tour(id, title, description, category, sequence, stops) {
-                this.id = id ? id : "00000000-0000-0000-0000-000000000000";
+                this.id = id;
                 this.title = title;
                 this.description = description;
                 this.sequence = sequence;
@@ -2795,126 +2839,46 @@ var CZ;
                         type: "Unknown"
                     };
                 }
-                var stop = new TourStop(bookmark.id, target, bookmark.number, (!bookmark.caption || $.trim(bookmark.caption) === "") ? undefined : bookmark.caption);
+                var stop = new TourStop(target, (!bookmark.caption || $.trim(bookmark.caption) === "") ? undefined : bookmark.caption);
                 stop.Description = bookmark.text;
                 stop.LapseTime = bookmark.lapseTime;
                 return stop;
             };
-            FormEditTour.tourstopToBookmark = function tourstopToBookmark(tourstop) {
+            FormEditTour.tourstopToBookmark = function tourstopToBookmark(tourstop, index) {
                 var url = CZ.UrlNav.vcelementToNavString(tourstop.Target);
                 var title = tourstop.Title;
-                var bookmark = new CZ.Tours.TourBookmark(tourstop.bookmarkId, url, title, tourstop.LapseTime, tourstop.Description);
-                bookmark.number = tourstop.Sequence;
+                var bookmark = new CZ.Tours.TourBookmark(url, title, tourstop.LapseTime, tourstop.Description);
+                bookmark.number = index + 1;
                 return bookmark;
             };
             FormEditTour.prototype.deleteTourAsync = function () {
                 return CZ.Service.deleteTour(this.tour.id);
             };
-            FormEditTour.prototype.createTourAsync = function () {
+            FormEditTour.prototype.putTourAsync = function (sequenceNum) {
                 var deferred = $.Deferred();
                 var self = this;
                 var stops = this.getStops();
                 var name = this.tourTitleInput.val();
                 var descr = this.tourDescriptionInput.val();
-                var category = "my tours";
+                var category = "tours";
                 var n = stops.length;
-                var request = CZ.Service.postTour(new CZ.UI.Tour(undefined, name, descr, category, n, stops));
+                var tourId = undefined;
+                if(this.tour) {
+                    category = this.tour.category;
+                    tourId = this.tour.id;
+                }
+                var request = CZ.Service.putTour2(new CZ.UI.Tour(tourId, name, descr, category, n, stops));
                 request.done(function (q) {
                     var tourBookmarks = new Array();
                     for(var j = 0; j < n; j++) {
                         var tourstop = stops[j];
-                        tourstop.bookmarkId = q.BookmarkId[j];
-                        var bookmark = FormEditTour.tourstopToBookmark(tourstop);
+                        var bookmark = FormEditTour.tourstopToBookmark(tourstop, j);
                         tourBookmarks.push(bookmark);
                     }
-                    var tour = new CZ.Tours.Tour(q.TourId, name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, "", CZ.Tours.tours.length, descr);
+                    var tour = new CZ.Tours.Tour(q.TourId, name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, "", sequenceNum, descr);
                     deferred.resolve(tour);
                 }).fail(function (q) {
                     deferred.reject(q);
-                });
-                return deferred.promise();
-            };
-            FormEditTour.prototype.updateTourAsync = function (sequenceNum) {
-                var _this = this;
-                if(!this.tour) {
-                    throw "Tour is undefined";
-                }
-                var deferred = $.Deferred();
-                var self = this;
-                var stops = this.getStops();
-                var name = this.tourTitleInput.val();
-                var descr = this.tourDescriptionInput.val();
-                var category = this.tour.category;
-                var n = this.tour.bookmarks.length;
-                var m = stops.length;
-                var deletedStops = [];
-                for(var j = 0; j < n; j++) {
-                    var bookmark = this.tour.bookmarks[j];
-                    var found = false;
-                    for(var k = 0; k < m; k++) {
-                        if(stops[k].bookmarkId === bookmark.id) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if(!found) {
-                        deletedStops.push(bookmark);
-                    }
-                }
-                var reqDel;
-                if(deletedStops.length > 0) {
-                    reqDel = CZ.Service.deleteBookmarks(this.tour.id, deletedStops);
-                } else {
-                    reqDel = $.Deferred();
-                    reqDel.resolve([]);
-                }
-                reqDel.fail(function (q) {
-                    deferred.reject(q);
-                });
-                reqDel.done(function (q) {
-                    var n = stops.length;
-                    var addedStops = new Array();
-                    for(var j = 0; j < n; j++) {
-                        var tourstop = stops[j];
-                        if(!tourstop.bookmarkId || tourstop.bookmarkId == "00000000-0000-0000-0000-000000000000") {
-                            addedStops.push(tourstop);
-                        }
-                    }
-                    var reqAdd;
-                    if(addedStops.length > 0) {
-                        reqAdd = CZ.Service.putBookmarks(new CZ.UI.Tour(_this.tour.id, name, descr, category, sequenceNum, addedStops));
-                    } else {
-                        reqAdd = $.Deferred();
-                        reqAdd.resolve([]);
-                    }
-                    reqAdd.fail(function (q) {
-                        deferred.reject(q);
-                    });
-                    reqAdd.done(function (q) {
-                        var m = addedStops.length;
-                        for(var j = 0; j < m; j++) {
-                            var tourstop = addedStops[j];
-                            tourstop.bookmarkId = q.BookmarkId[j];
-                        }
-                        var request = CZ.Service.putTour(new CZ.UI.Tour(_this.tour.id, name, descr, category, sequenceNum, stops));
-                        request.done(function (q) {
-                            var n = stops.length;
-                            var tourBookmarks = new Array();
-                            for(var j = 0; j < n; j++) {
-                                var tourstop = stops[j];
-                                tourstop.bookmarkId = q.BookmarkId[j];
-                                var bookmark = FormEditTour.tourstopToBookmark(tourstop);
-                                tourBookmarks.push(bookmark);
-                            }
-                            var tour = new CZ.Tours.Tour(q.TourId, name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, "", sequenceNum, descr);
-                            deferred.resolve(tour);
-                        }).fail(function (q) {
-                            deferred.reject(q);
-                        });
-                    }).fail(function (q) {
-                        deferred.reject(q);
-                    });
-                    ;
                 });
                 return deferred.promise();
             };
@@ -2925,6 +2889,7 @@ var CZ;
             };
             FormEditTour.prototype.initialize = function () {
                 var _this = this;
+                this.saveButton.prop('disabled', false);
                 if(this.tour == null) {
                     this.deleteButton.hide();
                     this.titleTextblock.text("Create Tour");
@@ -2940,21 +2905,29 @@ var CZ;
                         return self.onTargetElementSelected(arg);
                     };
                     self.hide();
+                    setTimeout(function () {
+                        CZ.Authoring.showMessageWindow("Click an element to select it as a tour stop.", "New tour stop", function () {
+                            if(CZ.Authoring.mode == "editTour-selectTarget") {
+                                self.onTargetElementSelected(null);
+                            }
+                        });
+                    }, 500);
                 });
                 this.saveButton.click(function (event) {
                     var message;
                     if(!_this.tourTitleInput.val()) {
-                        message = "Please enter the title";
+                        message = "Please enter the title.";
                     } else if(_this.tourStopsListBox.items.length == 0) {
-                        message = "Please add a tour stop to the tour";
+                        message = "Please add a tour stop to the tour.";
                     }
                     if(message) {
                         alert(message);
                         return;
                     }
                     var self = _this;
+                    _this.saveButton.prop('disabled', true);
                     if(_this.tour == null) {
-                        _this.createTourAsync().done(function (tour) {
+                        _this.putTourAsync(CZ.Tours.tours.length).done(function (tour) {
                             self.tour = tour;
                             CZ.Tours.tours.push(tour);
                             self.initializeAsEdit();
@@ -2964,11 +2937,13 @@ var CZ;
                                 console.error("Failed to create a tour: " + f.status + " " + f.statusText);
                             }
                             alert("Failed to create a tour");
+                        }).done(function () {
+                            _this.saveButton.prop('disabled', false);
                         });
                     } else {
                         for(var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
                             if(CZ.Tours.tours[i] === _this.tour) {
-                                _this.updateTourAsync(i).done(function (tour) {
+                                _this.putTourAsync(i).done(function (tour) {
                                     _this.tour = CZ.Tours.tours[i] = tour;
                                     alert("Tour updated.");
                                 }).fail(function (f) {
@@ -2976,6 +2951,8 @@ var CZ;
                                         console.error("Failed to update a tour: " + f.status + " " + f.statusText);
                                     }
                                     alert("Failed to update a tour");
+                                }).always(function () {
+                                    _this.saveButton.prop('disabled', false);
                                 });
                                 break;
                             }
@@ -3058,23 +3035,21 @@ var CZ;
                 var lapseTime = 0;
                 for(var i = 0; i < n; i++) {
                     var stop = stops[i];
-                    stop.Sequence = i + 1;
                     stop.LapseTime = lapseTime;
                     lapseTime += CZ.Settings.tourDefaultTransitionTime;
                 }
             };
             FormEditTour.prototype.onTargetElementSelected = function (targetElement) {
-                CZ.Authoring.isActive = false;
                 CZ.Authoring.mode = "editTour";
+                CZ.Authoring.hideMessageWindow();
+                CZ.Authoring.isActive = false;
                 CZ.Authoring.callback = null;
-                var n = this.tourStopsListBox.items.length;
-                var stop = new TourStop("", targetElement, n + 1);
-                if(n > 0) {
-                    stop.LapseTime = ((this.tourStopsListBox.items[this.tourStopsListBox.items.length - 1]).data).LapseTime + CZ.Settings.tourDefaultTransitionTime;
-                } else {
-                    stop.LapseTime = 0;
+                if(targetElement) {
+                    var n = this.tourStopsListBox.items.length;
+                    var stop = new TourStop(targetElement);
+                    stop.LapseTime = n == 0 ? 0 : ((this.tourStopsListBox.items[this.tourStopsListBox.items.length - 1]).data).LapseTime + CZ.Settings.tourDefaultTransitionTime;
+                    this.tourStopsListBox.add(stop);
                 }
-                this.tourStopsListBox.add(stop);
                 this.show();
             };
             return FormEditTour;
@@ -3090,12 +3065,10 @@ var CZ;
         (function (Map) {
             function bookmark(ts) {
                 return {
-                    id: ts.bookmarkId,
                     name: ts.Title,
                     url: ts.NavigationUrl,
                     lapseTime: ts.LapseTime,
-                    description: ts.Description,
-                    sequenceId: ts.Sequence
+                    description: ts.Description
                 };
             }
             function tour(t) {
@@ -3103,7 +3076,7 @@ var CZ;
                 for(var i = 0, n = t.Stops.length; i < n; i++) {
                     bookmarks[i] = bookmark(t.Stops[i]);
                 }
-                return {
+                var tourRequest = {
                     id: t.Id,
                     name: t.Title,
                     description: t.Description,
@@ -3112,6 +3085,7 @@ var CZ;
                     sequence: t.Sequence,
                     bookmarks: bookmarks
                 };
+                return tourRequest;
             }
             Map.tour = tour;
             function timeline(t) {
@@ -3136,6 +3110,21 @@ var CZ;
                 };
             }
             Map.exhibit = exhibit;
+            function exhibitWithContentItems(e) {
+                var mappedContentItems = [];
+                $(e.contentItems).each(function (contentItemIndex, contentItem) {
+                    mappedContentItems.push(Map.contentItem(contentItem));
+                });
+                return {
+                    id: e.guid,
+                    ParentTimelineId: e.parent.guid,
+                    time: e.infodotDescription.date,
+                    title: e.title,
+                    description: undefined,
+                    contentItems: mappedContentItems
+                };
+            }
+            Map.exhibitWithContentItems = exhibitWithContentItems;
             function contentItem(ci) {
                 return {
                     id: ci.guid,
@@ -3311,7 +3300,7 @@ var CZ;
                 contentType: "application/json",
                 dataType: "json",
                 url: request.url,
-                data: JSON.stringify(Map.exhibit(e))
+                data: JSON.stringify(Map.exhibitWithContentItems(e))
             });
         }
         Service.putExhibit = putExhibit;
@@ -3361,27 +3350,11 @@ var CZ;
             });
         }
         Service.deleteContentItem = deleteContentItem;
-        function postTour(t) {
+        function putTour2(t) {
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
-            request.addToPath("tour");
-            console.log("[POST] " + request.url);
-            return $.ajax({
-                type: "POST",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: request.url,
-                data: JSON.stringify(Map.tour(t))
-            });
-        }
-        Service.postTour = postTour;
-        function putTour(t) {
-            var request = new Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
-            request.addToPath("tour");
+            request.addToPath("tour2");
             console.log("[PUT] " + request.url);
             return $.ajax({
                 type: "PUT",
@@ -3392,7 +3365,7 @@ var CZ;
                 data: JSON.stringify(Map.tour(t))
             });
         }
-        Service.putTour = putTour;
+        Service.putTour2 = putTour2;
         function deleteTour(tourId) {
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
@@ -3411,47 +3384,6 @@ var CZ;
             });
         }
         Service.deleteTour = deleteTour;
-        function deleteBookmarks(tourId, bookmarks) {
-            var request = new Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
-            request.addToPath("bookmark");
-            console.log("[DELETE] " + request.url);
-            var bids = new Array(bookmarks.length);
-            for(var i = 0, n = bookmarks.length; i < n; i++) {
-                bids[i] = {
-                    id: bookmarks[i].id
-                };
-            }
-            return $.ajax({
-                type: "DELETE",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: request.url,
-                data: JSON.stringify({
-                    id: tourId,
-                    bookmarks: bids
-                })
-            });
-        }
-        Service.deleteBookmarks = deleteBookmarks;
-        function putBookmarks(t) {
-            var request = new Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
-            request.addToPath("bookmark");
-            console.log("[PUT] " + request.url);
-            return $.ajax({
-                type: "PUT",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: request.url,
-                data: JSON.stringify(Map.tour(t))
-            });
-        }
-        Service.putBookmarks = putBookmarks;
         function getTours() {
             var request = new Service.Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
@@ -3550,6 +3482,11 @@ var CZ;
                 cache: false,
                 contentType: "application/json",
                 url: request.url
+            }).done(function (profile) {
+                if(!profile.id) {
+                    return null;
+                }
+                return profile;
             });
         }
         Service.getProfile = getProfile;
@@ -3588,69 +3525,30 @@ var CZ;
             31
         ];
         function getCoordinateFromYMD(year, month, day) {
-            var sign = (year != 0) ? year / Math.abs(year) : 1;
-            var i = 0;
-            var coordinate = year;
-            var days = day;
-            var daysPerYear = isLeapYear(year) ? 366 : 365;
-            for(i = 0; i < month; i++) {
-                days += Dates.daysInMonth[i];
-                if((i === 1) && (isLeapYear(year))) {
-                    days++;
-                }
-            }
-            if((month > 1) && (isLeapYear(year))) {
-                coordinate += sign * days / daysPerYear;
-            } else {
-                coordinate += (sign >= 0) ? sign * days / daysPerYear : sign * (1 - days / daysPerYear);
-            }
-            if(year < 0) {
-                coordinate += 1;
-            }
-            coordinate -= 1 / daysPerYear;
-            return coordinate;
+            var sign = (year === -1) ? 1 : year / Math.abs(year), isLeap = isLeapYear(year), daysInYear = isLeap ? 366 : 365, coord = (year > -1) ? year : year + 1;
+            var sumDaysOfMonths = function (s, d, i) {
+                return s + (i < month) * d;
+            };
+            var days = Dates.daysInMonth.reduce(sumDaysOfMonths, +(isLeap && month > 1)) + day;
+            coord += (days - 1) / daysInYear;
+            return coord;
         }
         Dates.getCoordinateFromYMD = getCoordinateFromYMD;
         function getYMDFromCoordinate(coord) {
-            var sign = (coord === 0) ? 1 : coord / Math.abs(coord);
-            var day = 0, month = 0, year = 0;
-            var idxYear, countLeapYears = 0;
-            year = (coord >= 0) ? Math.floor(coord) : Math.floor(coord) + 1;
-            var daysPerYear = isLeapYear(year) ? 366 : 365;
-            var day, month;
-            var countDays;
-            countDays = Math.abs(coord) - Math.abs(year) + sign * 1. / daysPerYear;
-            if(sign < 0) {
-                countDays = 1 - countDays;
-            }
-            var idxMonth = 0;
-            while(countDays > Dates.daysInMonth[idxMonth] / daysPerYear) {
-                countDays -= Dates.daysInMonth[idxMonth] / daysPerYear;
-                if(isLeapYear(year) && (idxMonth === 1)) {
-                    countDays -= 1 / daysPerYear;
+            var absCoord = Math.abs(coord), floorCoord = Math.floor(coord), sign = (coord === 0) ? 1 : coord / absCoord, day = 0, month = 0, year = (coord >= 1) ? floorCoord : floorCoord - 1, isLeap = isLeapYear(year), daysInYear = isLeap ? 366 : 365, daysFraction = sign * (absCoord - Math.abs(floorCoord));
+            day = Math.round(daysFraction * daysInYear);
+            day += +(day < daysInYear);
+            while(day > Dates.daysInMonth[month] + (+(isLeap && month === 1))) {
+                day -= Dates.daysInMonth[month];
+                if(isLeap && month === 1) {
+                    day--;
                 }
-                idxMonth++;
-            }
-            month = idxMonth;
-            day = countDays * daysPerYear;
-            while(Math.round(day) <= 0) {
-                month--;
-                if(month === -1) {
-                    year--;
-                    month = 11;
-                }
-                day = Dates.daysInMonth[month] + Math.round(day);
-                if(isLeapYear(year) && (month === 1)) {
-                    day++;
-                }
-            }
-            if(coord < 0) {
-                year--;
+                month++;
             }
             return {
                 year: year,
                 month: month,
-                day: Math.round(day)
+                day: day
             };
         }
         Dates.getYMDFromCoordinate = getYMDFromCoordinate;
@@ -3670,16 +3568,16 @@ var CZ;
                 regime: "CE"
             };
             if(coordinate < -999999999) {
-                year.year = (year.year - 1) / (-1000000000);
+                year.year = (year.year) / (-1000000000);
                 year.regime = 'Ga';
             } else if(coordinate < -999999) {
-                year.year = (year.year - 1) / (-1000000);
+                year.year = (year.year) / (-1000000);
                 year.regime = 'Ma';
             } else if(coordinate < -9999) {
-                year.year = (year.year - 1) / (-1000);
+                year.year = (year.year) / (-1000);
                 year.regime = 'Ka';
             } else if(coordinate < 1) {
-                year.year = (year.year - 1) / (-1);
+                year.year = (year.year) / (-1);
                 year.year = Math.ceil(year.year);
                 year.regime = 'BCE';
             } else {
@@ -3719,11 +3617,7 @@ var CZ;
         }
         Dates.getPresent = getPresent;
         function isLeapYear(year) {
-            if(year >= 1582 && (year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0))) {
-                return true;
-            } else {
-                return false;
-            }
+            return (year >= 1582 && (year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0)));
         }
         Dates.isLeapYear = isLeapYear;
         function numberofLeap(year) {
@@ -3784,6 +3678,8 @@ var CZ;
         Authoring.showEditExhibitForm = null;
         Authoring.showEditContentItemForm = null;
         Authoring.showEditTourForm = null;
+        Authoring.showMessageWindow = null;
+        Authoring.hideMessageWindow = null;
         Authoring.callback = null;
         function isIntersecting(te, obj) {
             switch(obj.type) {
@@ -3811,7 +3707,7 @@ var CZ;
             var i = 0;
             var len = 0;
             var selfIntersection = false;
-            if(!tp) {
+            if(!tp || tp.guid === null) {
                 return true;
             }
             if(!isIncluded(tp, tc) && tp.id !== "__root__") {
@@ -4040,13 +3936,17 @@ var CZ;
             };
             Authoring.showEditTourForm = formHandlers && formHandlers.showEditTourForm || function () {
             };
+            Authoring.showMessageWindow = formHandlers && formHandlers.showMessageWindow || function (mess, title) {
+            };
+            Authoring.hideMessageWindow = formHandlers && formHandlers.hideMessageWindow || function () {
+            };
         }
         Authoring.initialize = initialize;
         function updateTimeline(t, prop) {
             var temp = {
                 x: Number(prop.start),
                 y: t.y,
-                width: Number(CZ.Dates.getCoordinateFromDecimalYear(prop.end) - prop.start),
+                width: prop.end === 9999 ? Number(CZ.Dates.getCoordinateFromDecimalYear(prop.end) - prop.start) : Number(prop.end - prop.start),
                 height: t.height,
                 type: "rectangle"
             };
@@ -4079,41 +3979,31 @@ var CZ;
             CZ.VCContent.removeChild(t.parent, t.id);
         }
         Authoring.removeTimeline = removeTimeline;
-        function updateExhibit(e, args) {
+        function updateExhibit(oldExhibit, args) {
             var deferred = $.Deferred();
-            if(e && e.contentItems && args) {
-                var clone = $.extend({
-                }, e, {
+            if(oldExhibit && oldExhibit.contentItems && args) {
+                var newExhibit = $.extend({
+                }, oldExhibit, {
                     children: null
                 });
-                clone = $.extend(true, {
-                }, clone);
-                delete clone.children;
-                delete clone.contentItems;
-                $.extend(true, clone, args);
-                var oldContentItems = $.extend(true, [], e.contentItems);
-                CZ.Service.putExhibit(clone).then(function (response) {
-                    var old_id = e.id;
-                    e.id = clone.id = "e" + response.ExhibitId;
-                    var new_id = e.id;
-                    e.guid = clone.guid = response.ExhibitId;
-                    for(var i = 0; i < e.contentItems.length; i++) {
-                        e.contentItems[i].ParentExhibitId = e.guid;
+                newExhibit = $.extend(true, {
+                }, newExhibit);
+                delete newExhibit.children;
+                delete newExhibit.contentItems;
+                $.extend(true, newExhibit, args);
+                CZ.Service.putExhibit(newExhibit).then(function (response) {
+                    newExhibit.guid = response.ExhibitId;
+                    for(var i = 0; i < newExhibit.contentItems.length; i++) {
+                        newExhibit.contentItems[i].ParentExhibitId = newExhibit.guid;
                     }
-                    for(var i = 0; i < clone.contentItems.length; i++) {
-                        clone.contentItems[i].ParentExhibitId = clone.guid;
-                    }
-                    CZ.Service.putExhibitContent(clone, oldContentItems).then(function (response) {
-                        $.extend(e, clone);
-                        e.id = old_id;
-                        e = renewExhibit(e);
-                        e.id = new_id;
-                        CZ.Common.vc.virtualCanvas("requestInvalidate");
-                        deferred.resolve();
-                    }, function (error) {
-                        console.log("Error connecting to service: update exhibit (put exhibit content).\n" + error.responseText);
-                        deferred.reject();
+                    $(response.ContentItemId).each(function (contentItemIdIndex, contentItemId) {
+                        newExhibit.contentItems[contentItemIdIndex].id = contentItemId;
+                        newExhibit.contentItems[contentItemIdIndex].guid = contentItemId;
                     });
+                    newExhibit = renewExhibit(newExhibit);
+                    newExhibit.id = "e" + response.ExhibitId;
+                    CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    deferred.resolve();
                 }, function (error) {
                     console.log("Error connecting to service: update exhibit.\n" + error.responseText);
                     deferred.reject();
@@ -4211,7 +4101,7 @@ var CZ;
         }
         Authoring.isNotEmpty = isNotEmpty;
         function isIntervalPositive(start, end) {
-            return (parseFloat(start) < parseFloat(end));
+            return (parseFloat(start) + 1 / 366 <= parseFloat(end));
         }
         Authoring.isIntervalPositive = isIntervalPositive;
         function validateContentItems(contentItems) {
@@ -4318,9 +4208,20 @@ var CZ;
                         _super.call(this, parent, container, uiMap, context);
                 this.iconImg = this.container.find(uiMap.iconImg);
                 this.titleTextblock = this.container.find(uiMap.titleTextblock);
-                this.titleTextblock = this.container.find(uiMap.titleTextblock);
                 this.descrTextblock = this.container.find(".cz-contentitem-listitem-descr");
+                var self = this;
+                var thumbUrl = this.data.thumbnailUrl;
                 this.iconImg.attr("src", this.data.icon || "/images/Temp-Thumbnail2.png");
+                var img = new Image();
+                img.onload = function () {
+                    self.iconImg.replaceWith(img);
+                };
+                img.onerror = function () {
+                    if(console && console.warn) {
+                        console.warn("Could not load a thumbnail image " + thumbUrl);
+                    }
+                };
+                img.src = thumbUrl;
                 this.titleTextblock.text(this.data.title);
                 if(this.data.description) {
                     this.descrTextblock.text(this.data.description);
@@ -4428,14 +4329,12 @@ var CZ;
         Tours.bookmarkAnimation;
         var isToursDebugEnabled = false;
         var TourBookmark = (function () {
-            function TourBookmark(id, url, caption, lapseTime, text) {
-                this.id = id;
+            function TourBookmark(url, caption, lapseTime, text) {
                 this.url = url;
                 this.caption = caption;
                 this.lapseTime = lapseTime;
                 this.text = text;
                 this.duration = undefined;
-                this.number = 0;
                 this.elapsed = 0;
                 if(this.text === null) {
                     this.text = "";
@@ -4489,12 +4388,13 @@ var CZ;
                     throw "Tour has no bookmarks";
                 }
                 var self = this;
+                this.thumbnailUrl = CZ.Settings.contentItemThumbnailBaseUri + id + '.jpg';
                 bookmarks.sort(function (b1, b2) {
                     return b1.lapseTime - b2.lapseTime;
                 });
                 for(var i = 1; i < bookmarks.length; i++) {
-                    bookmarks[i - 1].duration = bookmarks[i].lapseTime - bookmarks[i - 1].lapseTime;
                     bookmarks[i - 1].number = i;
+                    bookmarks[i - 1].duration = bookmarks[i].lapseTime - bookmarks[i - 1].lapseTime;
                 }
                 bookmarks[bookmarks.length - 1].duration = 10;
                 bookmarks[bookmarks.length - 1].number = bookmarks.length;
@@ -4895,70 +4795,8 @@ var CZ;
         }
         Tours.initializeToursUI = initializeToursUI;
         function initializeToursContent() {
-            var toursUI = $('#tours-content');
             Tours.tours.sort(function (u, v) {
                 return u.sequenceNum - v.sequenceNum;
-            });
-            var category = null;
-            var categoryContent;
-            for(var i = 0; i < Tours.tours.length; i++) {
-                var tour = Tours.tours[i];
-                if(tour.category !== category) {
-                    var cat = $("<div></div>", {
-                        class: "category",
-                        text: tour.category
-                    }).appendTo(toursUI);
-                    var img = $("<img></img>", {
-                        class: "collapseButton",
-                        src: "/images/collapse-down.png"
-                    }).appendTo(cat);
-                    if(i == 0) {
-                        cat.removeClass('category').addClass('categorySelected');
-                        (img[0]).src = "/images/collapse-up.png";
-                    }
-                    categoryContent = $('<div></div>', {
-                        class: "itemContainer"
-                    }).appendTo(toursUI);
-                    category = tour.category;
-                }
-                $("<div></div>", {
-                    class: "item",
-                    tour: i,
-                    text: tour.title,
-                    click: function () {
-                        removeActiveTour();
-                        $("#tours").hide('slide', {
-                        }, 'slow');
-                        $(".tour-icon").removeClass("active");
-                        Tours.isTourWindowVisible = false;
-                        var mytour = Tours.tours[this.getAttribute("tour")];
-                        activateTour(mytour, Tours.isNarrationOn);
-                        $(".touritem-selected").removeClass("touritem-selected", "slow");
-                        $(this).addClass("touritem-selected", "slow");
-                    }
-                }).appendTo(categoryContent);
-            }
-            ($)("#tours-content").accordion({
-                collapsible: true,
-                heightStyle: "content",
-                beforeActivate: function (event, ui) {
-                    if(ui.newHeader) {
-                        ui.newHeader.removeClass('category');
-                        ui.newHeader.addClass('categorySelected');
-                        var img = ($(".collapseButton", ui.newHeader)[0]);
-                        if(img) {
-                            img.src = "/images/collapse-up.png";
-                        }
-                    }
-                    if(ui.oldHeader) {
-                        ui.oldHeader.removeClass('categorySelected');
-                        ui.oldHeader.addClass('category');
-                        var img = ($(".collapseButton", ui.oldHeader)[0]);
-                        if(img) {
-                            img.src = "/images/collapse-down.png";
-                        }
-                    }
-                }
             });
         }
         Tours.initializeToursContent = initializeToursContent;
@@ -5091,7 +4929,7 @@ var CZ;
             for(var i = 0; i < content.d.length; i++) {
                 var areBookmarksValid = true;
                 var tourString = content.d[i];
-                if((typeof tourString.bookmarks == 'undefined') || (typeof tourString.audio == 'undefined') || (tourString.audio == undefined) || (tourString.audio == null) || (typeof tourString.category == 'undefined') || (typeof tourString.name == 'undefined') || (typeof tourString.sequence == 'undefined') || (tourString.bookmarks.length == 0)) {
+                if((typeof tourString.bookmarks == 'undefined') || (typeof tourString.name == 'undefined') || (typeof tourString.sequence == 'undefined') || (tourString.bookmarks.length == 0)) {
                     continue;
                 }
                 var tourBookmarks = new Array();
@@ -5101,7 +4939,7 @@ var CZ;
                         areBookmarksValid = false;
                         break;
                     }
-                    tourBookmarks.push(new TourBookmark(bmString.id, bmString.url, bmString.name, bmString.lapseTime, bmString.description));
+                    tourBookmarks.push(new TourBookmark(bmString.url, bmString.name, bmString.lapseTime, bmString.description));
                 }
                 if(!areBookmarksValid) {
                     continue;
@@ -6990,7 +6828,9 @@ var CZ;
                     if(this.activeAnimation.isActive) {
                         AnimationStarted(this.activeAnimation.ID);
                     }
-                    self.animationStep(self);
+                    setTimeout(function () {
+                        return self.animationStep(self);
+                    }, 0);
                 } else {
                     animationUpdated(oldId, this.activeAnimation.ID);
                 }
@@ -7124,6 +6964,10 @@ var CZ;
             var point = CZ.Common.getXBrowserMouseOrigin(container, e);
             var k = (_range.max - _range.min) / _width;
             var time = _range.max - k * (_width - point.x);
+            var test1 = CZ.Dates.getYMDFromCoordinate(time);
+            var test2 = CZ.Dates.getCoordinateFromYMD(test1.year, test1.month, test1.day);
+            var test3 = CZ.Dates.getYMDFromCoordinate(test2);
+            console.log(time, test1, test2, test3);
             if(time <= _range.min + CZ.Settings.panelWidth * k) {
                 marker.css("display", "none");
                 LeftPanInput();
@@ -7980,7 +7824,7 @@ var CZ;
             var DMY = CZ.Dates.getYMDFromCoordinate(x);
             var year = DMY.year;
             if(year <= 0) {
-                text = -year + 1 + " BCE";
+                text = -year + " BCE";
             } else {
                 text = year + " CE";
             }
@@ -8038,7 +7882,7 @@ var CZ;
             }
             for(var i = 0; i < count + 1; i++) {
                 var tick_position = CZ.Dates.getCoordinateFromYMD(x0 + i * dx, 0, 1);
-                if(tick_position < 1 && dx > 1) {
+                if(tick_position === 0 && dx > 1) {
                     tick_position += 1;
                 }
                 if(tick_position >= this.range.min && tick_position <= this.range.max && tick_position != ticks[ticks.length - 1]) {
@@ -8294,7 +8138,7 @@ var CZ;
             while(tempYear < this.endDate.year || (tempYear == this.endDate.year && tempMonth <= this.endDate.month)) {
                 countMonths++;
                 tempMonth++;
-                if(tempMonth == 12) {
+                if(tempMonth >= 12) {
                     tempMonth = 0;
                     tempYear++;
                 }
@@ -8449,18 +8293,12 @@ var CZ;
         this.getMarkerLabel = function (range, time) {
             this.getRegime(range.min, range.max);
             var date = CZ.Dates.getYMDFromCoordinate(time);
-            if(date.year <= 0) {
-                date.year--;
-            }
             var labelText = date.year + "." + (date.month + 1) + "." + date.day;
             return labelText;
         };
         this.getPanelLabel = function (range, time) {
             this.getRegime(range.min, range.max);
             var date = CZ.Dates.getYMDFromCoordinate(time);
-            if(date.year <= 0) {
-                date.year--;
-            }
             var labelText = date.year + "." + (date.month + 1) + "." + date.day;
             return labelText;
         };
@@ -9186,10 +9024,14 @@ var CZ;
                 this.yearSelector.focus(function (event) {
                     _this.errorMsg.text("");
                 });
+                this.regimeSelector.change(function (event) {
+                    _this.checkAndRemoveNonIntegerPart();
+                });
                 this.yearSelector.blur(function (event) {
                     if(!_this.validateNumber(_this.yearSelector.val())) {
                         _this.errorMsg.text(_this.WRONG_YEAR_INPUT);
                     }
+                    _this.checkAndRemoveNonIntegerPart();
                 });
                 var optionGa = $("<option value='ga'>Ga</option>");
                 var optionMa = $("<option value='ma'>Ma</option>");
@@ -9213,6 +9055,7 @@ var CZ;
                     if(!_this.validateNumber(_this.yearSelector.val())) {
                         _this.errorMsg.text(_this.WRONG_YEAR_INPUT);
                     }
+                    _this.checkAndRemoveNonIntegerPart();
                 });
                 var self = this;
                 this.monthSelector.change(function (event) {
@@ -9234,6 +9077,13 @@ var CZ;
             };
             DatePicker.prototype.editModeInfinite = function () {
                 this.dateContainer.empty();
+            };
+            DatePicker.prototype.checkAndRemoveNonIntegerPart = function () {
+                var regime = this.regimeSelector.find(":selected").val().toLowerCase();
+                var mode = this.modeSelector.find(":selected").val().toLowerCase();
+                if(regime === 'ce' || regime === 'bce' || mode === 'date') {
+                    this.yearSelector.val(parseFloat(this.yearSelector.val()).toFixed());
+                }
             };
             DatePicker.prototype.setDate_YearMode = function (coordinate) {
                 var date = CZ.Dates.convertCoordinateToYear(coordinate);
@@ -9489,6 +9339,225 @@ var CZ;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
+    (function (Gestures) {
+        function PanGesture(xOffset, yOffset, src) {
+            this.Type = "Pan";
+            this.Source = src;
+            this.xOffset = xOffset;
+            this.yOffset = yOffset;
+        }
+        function ZoomGesture(xOrigin, yOrigin, scaleFactor, src) {
+            this.Type = "Zoom";
+            this.Source = src;
+            this.xOrigin = xOrigin;
+            this.yOrigin = yOrigin;
+            this.scaleFactor = scaleFactor;
+        }
+        function PinGesture(src) {
+            this.Type = "Pin";
+            this.Source = src;
+        }
+        function createPanSubject(vc) {
+            var _doc = ($(document));
+            var mouseDown = vc.toObservable("mousedown");
+            var mouseMove = vc.toObservable("mousemove");
+            var mouseUp = _doc.toObservable("mouseup");
+            var mouseMoves = mouseMove.Skip(1).Zip(mouseMove, function (left, right) {
+                return new PanGesture(left.clientX - right.clientX, left.clientY - right.clientY, "Mouse");
+            });
+            var stopPanning = mouseUp;
+            var mouseDrags = mouseDown.SelectMany(function (md) {
+                return mouseMoves.TakeUntil(stopPanning);
+            });
+            return mouseDrags;
+        }
+        function createPinSubject(vc) {
+            var mouseDown = vc.toObservable("mousedown");
+            return mouseDown.Select(function (md) {
+                return new PinGesture("Mouse");
+            });
+        }
+        function createZoomSubject(vc) {
+            vc.mousewheel(function (objEvent, intDelta) {
+                var event = ($).Event("xbrowserwheel");
+                event.delta = intDelta;
+                event.origin = CZ.Common.getXBrowserMouseOrigin(vc, objEvent);
+                vc.trigger(event);
+            });
+            var mouseWheel = vc.toObservable("xbrowserwheel");
+            var mouseWheels = mouseWheel.Zip(mouseWheel, function (arg) {
+                return new ZoomGesture(arg.origin.x, arg.origin.y, arg.delta > 0 ? 1 / CZ.Settings.zoomLevelFactor : 1 * CZ.Settings.zoomLevelFactor, "Mouse");
+            });
+            var mousedblclick = vc.toObservable("dblclick");
+            var mousedblclicks = mousedblclick.Zip(mousedblclick, function (event) {
+                var origin = CZ.Common.getXBrowserMouseOrigin(vc, event);
+                return new ZoomGesture(origin.x, origin.y, 1.0 / CZ.Settings.zoomLevelFactor, "Mouse");
+            });
+            return mouseWheels;
+        }
+        function createTouchPanSubject(vc) {
+            var _doc = ($)(document);
+            var touchStart = vc.toObservable("touchstart");
+            var touchMove = vc.toObservable("touchmove");
+            var touchEnd = _doc.toObservable("touchend");
+            var touchCancel = _doc.toObservable("touchcancel");
+            var gestures = touchStart.SelectMany(function (o) {
+                return touchMove.TakeUntil(touchEnd.Merge(touchCancel)).Skip(1).Zip(touchMove, function (left, right) {
+                    return {
+                        "left": left.originalEvent,
+                        "right": right.originalEvent
+                    };
+                }).Where(function (g) {
+                    return g.left.scale === g.right.scale;
+                }).Select(function (g) {
+                    return new PanGesture(g.left.pageX - g.right.pageX, g.left.pageY - g.right.pageY, "Touch");
+                });
+            });
+            return gestures;
+        }
+        function createTouchPinSubject(vc) {
+            var touchStart = vc.toObservable("touchstart");
+            return touchStart.Select(function (ts) {
+                return new PinGesture("Touch");
+            });
+        }
+        function createTouchZoomSubject(vc) {
+            var _doc = ($)(document);
+            var gestureStart = vc.toObservable("gesturestart");
+            var gestureChange = vc.toObservable("gesturechange");
+            var gestureEnd = _doc.toObservable("gestureend");
+            var touchCancel = _doc.toObservable("touchcancel");
+            var gestures = gestureStart.SelectMany(function (o) {
+                return gestureChange.TakeUntil(gestureEnd.Merge(touchCancel)).Skip(1).Zip(gestureChange, function (left, right) {
+                    return {
+                        "left": left.originalEvent,
+                        "right": right.originalEvent
+                    };
+                }).Where(function (g) {
+                    return g.left.scale !== g.right.scale && g.right.scale !== 0;
+                }).Select(function (g) {
+                    var delta = g.left.scale / g.right.scale;
+                    return new ZoomGesture(o.originalEvent.layerX, o.originalEvent.layerY, 1 / delta, "Touch");
+                });
+            });
+            return gestures;
+        }
+        function createTouchPanSubjectWin8(vc) {
+            var gestureStart = vc.toObservable("MSGestureStart");
+            var gestureChange = vc.toObservable("MSGestureChange");
+            var gestureEnd = vc.toObservable("MSGestureEnd");
+            var gestures = gestureStart.SelectMany(function (o) {
+                return gestureChange.TakeUntil(gestureEnd).Skip(1).Zip(gestureChange, function (left, right) {
+                    return {
+                        "left": left.originalEvent,
+                        "right": right.originalEvent
+                    };
+                }).Where(function (g) {
+                    return g.left.scale === g.right.scale && g.left.detail != g.left.MSGESTURE_FLAG_INERTIA && g.right.detail != g.right.MSGESTURE_FLAG_INERTIA;
+                }).Select(function (g) {
+                    return new PanGesture(g.left.offsetX - g.right.offsetX, g.left.offsetY - g.right.offsetY, "Touch");
+                });
+            });
+            return gestures;
+        }
+        function createTouchPinSubjectWin8(vc) {
+            var pointerDown = vc.toObservable("MSPointerDown");
+            return pointerDown.Select(function (gt) {
+                return new PinGesture("Touch");
+            });
+        }
+        function createTouchZoomSubjectWin8(vc) {
+            var gestureStart = vc.toObservable("MSGestureStart");
+            var gestureChange = vc.toObservable("MSGestureChange");
+            var gestureEnd = vc.toObservable("MSGestureEnd");
+            var gestures = gestureStart.SelectMany(function (o) {
+                return gestureChange.TakeUntil(gestureEnd).Where(function (g) {
+                    return g.originalEvent.scale !== 0 && g.originalEvent.detail != g.originalEvent.MSGESTURE_FLAG_INERTIA;
+                }).Select(function (g) {
+                    return new ZoomGesture(o.originalEvent.offsetX, o.originalEvent.offsetY, 1 / g.originalEvent.scale, "Touch");
+                });
+            });
+            return gestures;
+        }
+        var gesturesDictionary = [];
+        function addMSGestureSource(dom) {
+            gesturesDictionary.forEach(function (child) {
+                if(child === dom) {
+                    return;
+                }
+            });
+            gesturesDictionary.push(dom);
+            dom.addEventListener("MSPointerDown", function (e) {
+                if(dom.gesture === undefined) {
+                    var newGesture = new MSGesture();
+                    newGesture.target = dom;
+                    dom.gesture = newGesture;
+                }
+                dom.gesture.addPointer(e.pointerId);
+            }, false);
+        }
+        ;
+        function getGesturesStream(source) {
+            var panController;
+            var zoomController;
+            var pinController;
+            if(window.navigator.msPointerEnabled && (window).MSGesture) {
+                addMSGestureSource(source[0]);
+                panController = createTouchPanSubjectWin8(source);
+                var zoomControllerTouch = createTouchZoomSubjectWin8(source);
+                var zoomControllerMouse = createZoomSubject(source);
+                zoomController = zoomControllerTouch.Merge(zoomControllerMouse);
+                pinController = createTouchPinSubjectWin8(source);
+            } else if('ontouchstart' in document.documentElement) {
+                panController = createTouchPanSubject(source);
+                zoomController = createTouchZoomSubject(source);
+                pinController = createTouchPinSubject(source);
+            } else {
+                panController = createPanSubject(source);
+                zoomController = createZoomSubject(source);
+                pinController = createPinSubject(source);
+            }
+            return pinController.Merge(panController.Merge(zoomController));
+        }
+        Gestures.getGesturesStream = getGesturesStream;
+        function getPanPinGesturesStream(source) {
+            var panController;
+            var pinController;
+            if(window.navigator.msPointerEnabled && (window).MSGesture) {
+                addMSGestureSource(source[0]);
+                panController = createTouchPanSubjectWin8(source);
+                var zoomControllerTouch = createTouchZoomSubjectWin8(source);
+                var zoomControllerMouse = createZoomSubject(source);
+                pinController = createTouchPinSubjectWin8(source);
+            } else if('ontouchstart' in document.documentElement) {
+                panController = createTouchPanSubject(source);
+                pinController = createTouchPinSubject(source);
+            } else {
+                panController = createPanSubject(source);
+                pinController = createPinSubject(source);
+            }
+            return pinController.Merge(panController.Select(function (el) {
+                el.yOffset = 0;
+                return el;
+            }));
+        }
+        Gestures.getPanPinGesturesStream = getPanPinGesturesStream;
+        function applyAxisBehavior(gestureSequence) {
+            return gestureSequence.Where(function (el) {
+                return el.Type != "Zoom";
+            }).Select(function (el) {
+                if(el.Type == "Pan") {
+                    el.yOffset = 0;
+                }
+                return el;
+            });
+        }
+        Gestures.applyAxisBehavior = applyAxisBehavior;
+    })(CZ.Gestures || (CZ.Gestures = {}));
+    var Gestures = CZ.Gestures;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
     (function (UI) {
         var LineChart = (function () {
             function LineChart(container) {
@@ -9570,7 +9639,11 @@ var CZ;
                 }
                 var ticks = [];
                 for(var i = imin; i <= imax; i++) {
-                    ticks.push(i * k * h10);
+                    var newTick = i * k * h10;
+                    if(h < 0) {
+                        newTick = newTick.toPrecision(-h);
+                    }
+                    ticks.push(newTick);
                 }
                 var result = {
                 };
@@ -9578,10 +9651,6 @@ var CZ;
                 result.h = h;
                 result.h10 = h10;
                 return result;
-            };
-            LineChart.prototype.generateAxisParameters = function (ymin, ymax, labelCount) {
-                var ticks = this.calculateTicks(ymin, ymax, labelCount);
-                return null;
             };
             LineChart.prototype.clear = function (screenLeft, screenRight) {
                 this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -9594,27 +9663,13 @@ var CZ;
                 $("#leftLegend").css("max-width", maxLegendWidth + "px");
                 $("#timeSeriesChartHeader").text("TimeSeries Chart");
             };
-            LineChart.prototype.drawDataSet = function (dataSet, screenLeft, screenRight, verticalPadding, plotLeft, plotRight) {
+            LineChart.prototype.drawDataSet = function (dataSet, screenLeft, screenRight, verticalPadding, plotLeft, plotRight, plotTop, plotBottom) {
                 var that = this;
-                var plotBottom = Number.MAX_VALUE;
-                var plotTop = Number.MIN_VALUE;
                 dataSet.series.forEach(function (seria) {
-                    if(seria.appearanceSettings && seria.appearanceSettings.yMin && seria.appearanceSettings.yMin < plotBottom) {
-                        plotBottom = seria.appearanceSettings.yMin;
-                    }
-                    if(seria.appearanceSettings && seria.appearanceSettings.yMax && seria.appearanceSettings.yMax > plotTop) {
-                        plotTop = seria.appearanceSettings.yMax;
-                    }
                     if(seria.appearanceSettings && seria.appearanceSettings.thickness && seria.appearanceSettings.thickness > verticalPadding) {
                         verticalPadding = seria.appearanceSettings.thickness;
                     }
                 });
-                if((plotTop - plotBottom) === 0) {
-                    var absY = Math.max(0.1, Math.abs(plotBottom));
-                    var offsetConstant = 0.01;
-                    plotTop += absY * offsetConstant;
-                    plotBottom -= absY * offsetConstant;
-                }
                 var screenHeight = this.canvas.height - 2 * verticalPadding;
                 var dataToScreenX = function (x) {
                     return (x - plotLeft) / (plotRight - plotLeft) * (screenRight - screenLeft) + screenLeft;
@@ -9748,7 +9803,9 @@ var CZ;
                 var d = y > ymax ? 1 : 0;
                 return a << 3 | b << 2 | c << 1 | d;
             };
-            LineChart.prototype.drawAxis = function (tickOrigin, secondScreenBorder, ymin, ymax, appearence) {
+            LineChart.prototype.generateAxisParameters = function (tickOrigin, secondScreenBorder, ymin, ymax, appearence) {
+                var that = this;
+                var ticksForDraw = [];
                 var verticalPadding = appearence.verticalPadding ? appearence.verticalPadding : 0;
                 var screenHeight = this.canvas.height - 2 * verticalPadding;
                 var dataToScreenY = function (y) {
@@ -9772,23 +9829,57 @@ var CZ;
                 }
                 ctx.textAlign = appearence.axisLocation;
                 ticks.forEach(function (tick) {
+                    var tickForDraw = {
+                    };
+                    tickForDraw.tick = tick;
                     var y = dataToScreenY(tick);
-                    ctx.strokeStyle = appearence.stroke;
-                    ctx.beginPath();
-                    ctx.moveTo(tickOrigin, y);
-                    ctx.lineTo(tickOrigin + ticklength, y);
-                    ctx.stroke();
-                    ctx.fillText(tick, tickOrigin + ticklength + textOffset, y);
-                    ctx.strokeStyle = 'lightgray';
+                    tickForDraw.y = y;
+                    tickForDraw.xLineStart = tickOrigin;
+                    tickForDraw.xLineEnd = tickOrigin + ticklength;
+                    tickForDraw.xText = tickOrigin + ticklength + textOffset;
                     var textWidth = ctx.measureText(tick).width;
                     if(appearence.axisLocation == "right") {
                         textWidth = -textWidth;
                     }
                     var offset = ticklength + textWidth + 2 * textOffset;
+                    tickForDraw.isGridLineVisible = offset > 0 && (tickOrigin + offset) <= secondScreenBorder || offset < 0 && (tickOrigin + offset) >= secondScreenBorder;
+                    tickForDraw.xGridLineStart = tickOrigin + offset;
+                    tickForDraw.xGridLineEnd = secondScreenBorder;
+                    ticksForDraw.push(tickForDraw);
+                });
+                return ticksForDraw;
+            };
+            LineChart.prototype.drawAxis = function (ticksForDraw, appearence) {
+                var that = this;
+                var ctx = this.context;
+                ctx.font = appearence.font;
+                ctx.textBaseline = 'middle';
+                ctx.strokeStyle = appearence.stroke;
+                ctx.fillStyle = appearence.stroke;
+                ctx.lineWidth = appearence.majorTickThickness;
+                ctx.textAlign = appearence.axisLocation;
+                ticksForDraw.forEach(function (tick) {
+                    ctx.strokeStyle = appearence.stroke;
                     ctx.beginPath();
-                    ctx.moveTo(tickOrigin + offset, y);
-                    ctx.lineTo(secondScreenBorder, y);
+                    ctx.moveTo(tick.xLineStart, tick.y);
+                    ctx.lineTo(tick.xLineEnd, tick.y);
                     ctx.stroke();
+                    var minTextOffset = 8;
+                    ctx.fillText(tick.tick, tick.xText, Math.max(minTextOffset, Math.min(that.canvas.height - minTextOffset, tick.y)));
+                });
+            };
+            LineChart.prototype.drawHorizontalGridLines = function (ticksForDraw, appearence) {
+                var that = this;
+                var ctx = this.context;
+                ctx.strokeStyle = 'lightgray';
+                ctx.lineWidth = appearence.majorTickThickness;
+                ticksForDraw.forEach(function (tick) {
+                    if(tick.isGridLineVisible) {
+                        ctx.beginPath();
+                        ctx.moveTo(tick.xGridLineStart, tick.y);
+                        ctx.lineTo(tick.xGridLineEnd, tick.y);
+                        ctx.stroke();
+                    }
                 });
             };
             LineChart.prototype.drawVerticalGridLines = function (screenLeft, screenRight, plotLeft, plotRight) {
@@ -9810,14 +9901,15 @@ var CZ;
                 this.canvas.width = $("#timeSeries").width();
             };
             LineChart.prototype.clearLegend = function (location) {
+                var legendCnt = location === "left" ? $("#leftLegend") : $("#rightLegend");
                 var legend = location === "left" ? $("#leftLegendList") : $("#rightLegendList");
                 legend.empty();
-                legend.hide();
+                legendCnt.hide();
             };
             LineChart.prototype.addLegendRecord = function (location, stroke, description) {
                 var legend = location === "left" ? $("#leftLegendList") : $("#rightLegendList");
                 var legendCont = location === "left" ? $("#leftLegend") : $("#rightLegend");
-                legend.show();
+                legendCont.show();
                 var cont = $('<li></li>');
                 var strokeIndicatior = $('<div></div>').addClass("tsc-legend-indicator");
                 strokeIndicatior.css("background-color", stroke);
@@ -9827,6 +9919,12 @@ var CZ;
                 strokeIndicatior.appendTo(cont);
                 descriptionDiv.appendTo(cont);
                 cont.height(24).appendTo(legend);
+            };
+            LineChart.prototype.checkLegendVisibility = function (screenWidth) {
+                var baseIndicatorSize = 24;
+                var horOffset = 30;
+                var topOffset = 10;
+                return screenWidth >= baseIndicatorSize + horOffset && this.canvas.height >= baseIndicatorSize + topOffset;
             };
             return LineChart;
         })();
@@ -10162,191 +10260,6 @@ var CZ;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
-    (function (Gestures) {
-        function PanGesture(xOffset, yOffset, src) {
-            this.Type = "Pan";
-            this.Source = src;
-            this.xOffset = xOffset;
-            this.yOffset = yOffset;
-        }
-        function ZoomGesture(xOrigin, yOrigin, scaleFactor, src) {
-            this.Type = "Zoom";
-            this.Source = src;
-            this.xOrigin = xOrigin;
-            this.yOrigin = yOrigin;
-            this.scaleFactor = scaleFactor;
-        }
-        function PinGesture(src) {
-            this.Type = "Pin";
-            this.Source = src;
-        }
-        function createPanSubject(vc) {
-            var _doc = ($(document));
-            var mouseDown = vc.toObservable("mousedown");
-            var mouseMove = vc.toObservable("mousemove");
-            var mouseUp = _doc.toObservable("mouseup");
-            var mouseMoves = mouseMove.Skip(1).Zip(mouseMove, function (left, right) {
-                return new PanGesture(left.clientX - right.clientX, left.clientY - right.clientY, "Mouse");
-            });
-            var stopPanning = mouseUp;
-            var mouseDrags = mouseDown.SelectMany(function (md) {
-                return mouseMoves.TakeUntil(stopPanning);
-            });
-            return mouseDrags;
-        }
-        function createPinSubject(vc) {
-            var mouseDown = vc.toObservable("mousedown");
-            return mouseDown.Select(function (md) {
-                return new PinGesture("Mouse");
-            });
-        }
-        function createZoomSubject(vc) {
-            vc.mousewheel(function (objEvent, intDelta) {
-                var event = ($).Event("xbrowserwheel");
-                event.delta = intDelta;
-                event.origin = CZ.Common.getXBrowserMouseOrigin(vc, objEvent);
-                vc.trigger(event);
-            });
-            var mouseWheel = vc.toObservable("xbrowserwheel");
-            var mouseWheels = mouseWheel.Zip(mouseWheel, function (arg) {
-                return new ZoomGesture(arg.origin.x, arg.origin.y, arg.delta > 0 ? 1 / CZ.Settings.zoomLevelFactor : 1 * CZ.Settings.zoomLevelFactor, "Mouse");
-            });
-            var mousedblclick = vc.toObservable("dblclick");
-            var mousedblclicks = mousedblclick.Zip(mousedblclick, function (event) {
-                var origin = CZ.Common.getXBrowserMouseOrigin(vc, event);
-                return new ZoomGesture(origin.x, origin.y, 1.0 / CZ.Settings.zoomLevelFactor, "Mouse");
-            });
-            return mouseWheels;
-        }
-        function createTouchPanSubject(vc) {
-            var _doc = ($)(document);
-            var touchStart = vc.toObservable("touchstart");
-            var touchMove = vc.toObservable("touchmove");
-            var touchEnd = _doc.toObservable("touchend");
-            var touchCancel = _doc.toObservable("touchcancel");
-            var gestures = touchStart.SelectMany(function (o) {
-                return touchMove.TakeUntil(touchEnd.Merge(touchCancel)).Skip(1).Zip(touchMove, function (left, right) {
-                    return {
-                        "left": left.originalEvent,
-                        "right": right.originalEvent
-                    };
-                }).Where(function (g) {
-                    return g.left.scale === g.right.scale;
-                }).Select(function (g) {
-                    return new PanGesture(g.left.pageX - g.right.pageX, g.left.pageY - g.right.pageY, "Touch");
-                });
-            });
-            return gestures;
-        }
-        function createTouchPinSubject(vc) {
-            var touchStart = vc.toObservable("touchstart");
-            return touchStart.Select(function (ts) {
-                return new PinGesture("Touch");
-            });
-        }
-        function createTouchZoomSubject(vc) {
-            var _doc = ($)(document);
-            var gestureStart = vc.toObservable("gesturestart");
-            var gestureChange = vc.toObservable("gesturechange");
-            var gestureEnd = _doc.toObservable("gestureend");
-            var touchCancel = _doc.toObservable("touchcancel");
-            var gestures = gestureStart.SelectMany(function (o) {
-                return gestureChange.TakeUntil(gestureEnd.Merge(touchCancel)).Skip(1).Zip(gestureChange, function (left, right) {
-                    return {
-                        "left": left.originalEvent,
-                        "right": right.originalEvent
-                    };
-                }).Where(function (g) {
-                    return g.left.scale !== g.right.scale && g.right.scale !== 0;
-                }).Select(function (g) {
-                    var delta = g.left.scale / g.right.scale;
-                    return new ZoomGesture(o.originalEvent.layerX, o.originalEvent.layerY, 1 / delta, "Touch");
-                });
-            });
-            return gestures;
-        }
-        function createTouchPanSubjectWin8(vc) {
-            var gestureStart = vc.toObservable("MSGestureStart");
-            var gestureChange = vc.toObservable("MSGestureChange");
-            var gestureEnd = vc.toObservable("MSGestureEnd");
-            var gestures = gestureStart.SelectMany(function (o) {
-                return gestureChange.TakeUntil(gestureEnd).Skip(1).Zip(gestureChange, function (left, right) {
-                    return {
-                        "left": left.originalEvent,
-                        "right": right.originalEvent
-                    };
-                }).Where(function (g) {
-                    return g.left.scale === g.right.scale && g.left.detail != g.left.MSGESTURE_FLAG_INERTIA && g.right.detail != g.right.MSGESTURE_FLAG_INERTIA;
-                }).Select(function (g) {
-                    return new PanGesture(g.left.offsetX - g.right.offsetX, g.left.offsetY - g.right.offsetY, "Touch");
-                });
-            });
-            return gestures;
-        }
-        function createTouchPinSubjectWin8(vc) {
-            var pointerDown = vc.toObservable("MSPointerDown");
-            return pointerDown.Select(function (gt) {
-                return new PinGesture("Touch");
-            });
-        }
-        function createTouchZoomSubjectWin8(vc) {
-            var gestureStart = vc.toObservable("MSGestureStart");
-            var gestureChange = vc.toObservable("MSGestureChange");
-            var gestureEnd = vc.toObservable("MSGestureEnd");
-            var gestures = gestureStart.SelectMany(function (o) {
-                return gestureChange.TakeUntil(gestureEnd).Where(function (g) {
-                    return g.originalEvent.scale !== 0 && g.originalEvent.detail != g.originalEvent.MSGESTURE_FLAG_INERTIA;
-                }).Select(function (g) {
-                    return new ZoomGesture(o.originalEvent.offsetX, o.originalEvent.offsetY, 1 / g.originalEvent.scale, "Touch");
-                });
-            });
-            return gestures;
-        }
-        var vcGestureObject;
-        function addPointerToGesture(evt) {
-            vcGestureObject.addPointer(evt.pointerId);
-        }
-        function getGesturesStream(source) {
-            var panController;
-            var zoomController;
-            var pinController;
-            if(window.navigator.msPointerEnabled && (window).MSGesture) {
-                vcGestureObject = new MSGesture();
-                vcGestureObject.target = CZ.Common.vc[0];
-                CZ.Common.vc[0].addEventListener("MSPointerMove", addPointerToGesture, false);
-                panController = createTouchPanSubjectWin8(source);
-                var zoomControllerTouch = createTouchZoomSubjectWin8(source);
-                var zoomControllerMouse = createZoomSubject(source);
-                zoomController = zoomControllerTouch.Merge(zoomControllerMouse);
-                pinController = createTouchPinSubjectWin8(source);
-            } else if('ontouchstart' in document.documentElement) {
-                panController = createTouchPanSubject(source);
-                zoomController = createTouchZoomSubject(source);
-                pinController = createTouchPinSubject(source);
-            } else {
-                panController = createPanSubject(source);
-                zoomController = createZoomSubject(source);
-                pinController = createPinSubject(source);
-            }
-            return pinController.Merge(panController.Merge(zoomController));
-        }
-        Gestures.getGesturesStream = getGesturesStream;
-        function applyAxisBehavior(gestureSequence) {
-            return gestureSequence.Where(function (el) {
-                return el.Type != "Zoom";
-            }).Select(function (el) {
-                if(el.Type == "Pan") {
-                    el.yOffset = 0;
-                }
-                return el;
-            });
-        }
-        Gestures.applyAxisBehavior = applyAxisBehavior;
-    })(CZ.Gestures || (CZ.Gestures = {}));
-    var Gestures = CZ.Gestures;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
     (function (UILoader) {
         function loadHtml(selector, filepath) {
             var container = $(selector);
@@ -10393,6 +10306,7 @@ var CZ;
             }
             FormEditTimeline.prototype.initialize = function () {
                 var _this = this;
+                this.saveButton.prop('disabled', false);
                 if(CZ.Authoring.mode === "createTimeline") {
                     this.deleteButton.hide();
                     this.titleTextblock.text("Create Timeline");
@@ -10421,13 +10335,14 @@ var CZ;
                     if(!CZ.Authoring.isNotEmpty(_this.titleInput.val())) {
                         _this.errorMessage.text('Title is empty');
                     } else if(!CZ.Authoring.isIntervalPositive(_this.startDate.getDate(), _this.endDate.getDate())) {
-                        _this.errorMessage.text('Result interval is not positive');
+                        _this.errorMessage.text('Time interval should no less than one day');
                     }
                     if(!isDataValid) {
                         return;
                     } else {
                         _this.errorMessage.empty();
                         var self = _this;
+                        _this.saveButton.prop('disabled', true);
                         CZ.Authoring.updateTimeline(_this.timeline, {
                             title: _this.titleInput.val(),
                             start: _this.startDate.getDate(),
@@ -10435,9 +10350,12 @@ var CZ;
                         }).then(function (success) {
                             self.isCancel = false;
                             self.close();
+                            self.timeline.onmouseclick();
                         }, function (error) {
                             alert("Unable to save changes. Please try again later.");
                             console.log(error);
+                        }).always(function () {
+                            _this.saveButton.prop('disabled', false);
                         });
                     }
                 });
@@ -10594,6 +10512,7 @@ var CZ;
             }
             FormEditExhibit.prototype.initUI = function () {
                 var _this = this;
+                this.saveButton.prop('disabled', false);
                 if(this.mode === "createExhibit") {
                     this.titleTextblock.text("Create Exhibit");
                     this.saveButton.text("create exhibit");
@@ -10691,16 +10610,19 @@ var CZ;
                     type: "infodot"
                 };
                 if(CZ.Authoring.validateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) && CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true) && this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {
+                    this.saveButton.prop('disabled', true);
                     CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(function (success) {
                         _this.isCancel = false;
                         _this.close();
                     }, function (error) {
                         alert("Unable to save changes. Please try again later.");
+                    }).always(function () {
+                        _this.saveButton.prop('disabled', false);
                     });
                 } else if(this.exhibit.contentItems.length === 0) {
                     var self = this;
                     var origMsg = this.errorMessage.text();
-                    this.errorMessage.text("Cannot create exhibit without content items.").show().delay(7000).fadeOut(function () {
+                    this.errorMessage.text("Cannot create exhibit without artifacts.").show().delay(7000).fadeOut(function () {
                         return self.errorMessage.text(origMsg);
                     });
                 } else {
@@ -10843,6 +10765,7 @@ var CZ;
             }
             FormEditCI.prototype.initUI = function () {
                 var _this = this;
+                this.saveButton.prop('disabled', false);
                 if(CZ.Authoring.contentItemMode === "createContentItem") {
                     this.titleTextblock.text("Create New");
                     this.saveButton.text("create artifiact");
@@ -10886,7 +10809,7 @@ var CZ;
                 var _this = this;
                 var newContentItem = {
                     title: this.titleInput.val() || "",
-                    uri: decodeURIComponent(this.mediaInput.val()) || "",
+                    uri: this.mediaInput.val() || "",
                     mediaSource: this.mediaSourceInput.val() || "",
                     mediaType: this.mediaTypeInput.val() || "",
                     attribution: this.attributionInput.val() || "",
@@ -10917,11 +10840,14 @@ var CZ;
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
                             this.back();
                         } else {
+                            this.saveButton.prop('disabled', true);
                             CZ.Authoring.updateContentItem(this.exhibit, this.contentItem, newContentItem).then(function (response) {
                                 _this.isCancel = false;
                                 _this.close();
                             }, function (error) {
                                 alert("Unable to save changes. Please try again later.");
+                            }).always(function () {
+                                _this.saveButton.prop('disabled', false);
                             });
                         }
                     }
@@ -11050,10 +10976,12 @@ var CZ;
                         _this.usernameInput.val(data.DisplayName);
                         if(data.DisplayName != "") {
                             _this.usernameInput.prop('disabled', true);
+                        }
+                        _this.emailInput.val(data.Email);
+                        if(data.Email !== undefined && data.Email !== '' && data.Email != null) {
                             _this.agreeInput.attr('checked', true);
                             _this.agreeInput.prop('disabled', true);
                         }
-                        _this.emailInput.val(data.Email);
                     }
                 });
                 this.saveButton.click(function (event) {
@@ -11062,15 +10990,19 @@ var CZ;
                         alert("Provided incorrect username, \n'a-z', '0-9', '-', '_' - characters allowed only. ");
                         return;
                     }
-                    isValid = _this.validEmail(_this.emailInput.val());
-                    if(!isValid) {
-                        alert("Provided incorrect email address");
-                        return;
-                    }
-                    isValid = _this.agreeInput.prop("checked");
-                    if(!isValid) {
-                        alert("Please agree with provided terms");
-                        return;
+                    var emailAddress = "";
+                    if(_this.emailInput.val()) {
+                        var emailIsValid = _this.validEmail(_this.emailInput.val());
+                        if(!emailIsValid) {
+                            alert("Provided incorrect email address");
+                            return;
+                        }
+                        var agreeTerms = _this.agreeInput.prop("checked");
+                        if(!agreeTerms) {
+                            alert("Please agree with provided terms");
+                            return;
+                        }
+                        emailAddress = _this.emailInput.val();
                     }
                     CZ.Service.getProfile().done(function (curUser) {
                         CZ.Service.getProfile(_this.usernameInput.val()).done(function (getUser) {
@@ -11078,7 +11010,7 @@ var CZ;
                                 alert("Sorry, this username is already in use. Please try again.");
                                 return;
                             }
-                            CZ.Service.putProfile(_this.usernameInput.val(), _this.emailInput.val()).then(function (success) {
+                            CZ.Service.putProfile(_this.usernameInput.val(), emailAddress).then(function (success) {
                                 if(_this.allowRedirect) {
                                     window.location.assign("\\" + success);
                                 } else {
@@ -11092,13 +11024,7 @@ var CZ;
                     });
                 });
                 this.logoutButton.click(function (event) {
-                    return $.ajax({
-                        url: "/account/logout"
-                    }).done(function (data) {
-                        _this.profilePanel.hide();
-                        _this.loginPanel.show();
-                        _this.close();
-                    });
+                    window.location.assign("/pages/logoff.aspx");
                 });
             };
             FormEditProfile.prototype.show = function () {
@@ -11292,6 +11218,54 @@ var CZ;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
+    (function (UI) {
+        var MessageWindow = (function (_super) {
+            __extends(MessageWindow, _super);
+            function MessageWindow(container, message, title) {
+                        _super.call(this, container, {
+            activationSource: null,
+            prevForm: null,
+            navButton: ".cz-form-nav",
+            closeButton: ".cz-form-close-btn > .cz-form-btn",
+            titleTextblock: ".cz-form-title"
+        });
+                var tourTitleInput = this.container.find(".cz-form-label");
+                tourTitleInput.text(message);
+                this.titleTextblock.text(title || "ChronoZoom");
+            }
+            MessageWindow.prototype.show = function () {
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
+                $(document).bind("keypress", this, this.onDocumentKeyPress);
+            };
+            MessageWindow.prototype.close = function () {
+                $(document).unbind("keypress", this.onDocumentKeyPress);
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 100,
+                    complete: function () {
+                    }
+                });
+            };
+            MessageWindow.prototype.onDocumentKeyPress = function (e) {
+                var self = e.data;
+                if(e.which == 27 && self.isFormVisible) {
+                    self.close();
+                }
+            };
+            return MessageWindow;
+        })(CZ.UI.FormBase);
+        UI.MessageWindow = MessageWindow;        
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var constants;
+var CZ;
+(function (CZ) {
     CZ.timeSeriesChart;
     CZ.leftDataSet;
     CZ.rightDataSet;
@@ -11309,7 +11283,8 @@ var CZ;
             "#toursList": "/ui/tourslist-form.html",
             "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html",
             "#timeSeriesContainer": "/ui/timeseries-graph-form.html",
-            "#timeSeriesDataForm": "/ui/timeseries-data-form.html"
+            "#timeSeriesDataForm": "/ui/timeseries-data-form.html",
+            "#message-window": "/ui/message-window.html"
         };
         (function (FeatureActivation) {
             FeatureActivation._map = [];
@@ -11321,6 +11296,8 @@ var CZ;
             FeatureActivation.RootCollection = 2;
             FeatureActivation._map[3] = "NotRootCollection";
             FeatureActivation.NotRootCollection = 3;
+            FeatureActivation._map[4] = "NotProduction";
+            FeatureActivation.NotProduction = 4;
         })(HomePageViewModel.FeatureActivation || (HomePageViewModel.FeatureActivation = {}));
         var FeatureActivation = HomePageViewModel.FeatureActivation;
         var _featureMap = [
@@ -11341,8 +11318,13 @@ var CZ;
             }, 
             {
                 Name: "Authoring",
-                Activation: FeatureActivation.NotRootCollection,
+                Activation: FeatureActivation.Enabled,
                 JQueryReference: ".header-icon.edit-icon"
+            }, 
+            {
+                Name: "TourAuthoring",
+                Activation: FeatureActivation.NotProduction,
+                JQueryReference: ".cz-form-create-tour"
             }, 
             {
                 Name: "WelcomeScreen",
@@ -11356,13 +11338,28 @@ var CZ;
             }, 
             {
                 Name: "TimeSeries",
-                Activation: FeatureActivation.NotRootCollection,
+                Activation: FeatureActivation.Enabled,
                 JQueryReference: "#timeSeriesContainer"
+            }, 
+            {
+                Name: "ManageCollections",
+                Activation: FeatureActivation.Disabled,
+                JQueryReference: "#collections_button"
             }, 
             
         ];
+        HomePageViewModel.rootCollection;
+        function UserCanEditCollection(profile) {
+            if(CZ.Service.superCollectionName === "sandbox") {
+                return true;
+            }
+            if(!profile || profile.DisplayName !== CZ.Service.superCollectionName) {
+                return false;
+            }
+            return true;
+        }
         function InitializeToursUI(profile, forms) {
-            var allowEditing = IsFeatureEnabled(_featureMap, "Authoring") && (profile && profile != "" && profile.DisplayName === CZ.Service.superCollectionName);
+            var allowEditing = IsFeatureEnabled(_featureMap, "TourAuthoring") && UserCanEditCollection(profile);
             var onToursInitialized = function () {
                 CZ.Tours.initializeToursUI();
                 $("#tours_index").click(function () {
@@ -11435,11 +11432,6 @@ var CZ;
                         }
                     }
                 });
-                CZ.Service.getProfile().done(function (profile) {
-                    InitializeToursUI(profile, forms);
-                }).fail(function (err) {
-                    InitializeToursUI(null, forms);
-                });
                 $(".header-icon.edit-icon").click(function () {
                     var editForm = getFormById("#header-edit-form");
                     if(editForm === false) {
@@ -11454,6 +11446,7 @@ var CZ;
                             createTour: ".cz-form-create-tour"
                         });
                         form.show();
+                        ApplyFeatureActivation();
                     } else {
                         if(editForm.isFormVisible) {
                             editForm.close();
@@ -11464,6 +11457,22 @@ var CZ;
                     }
                 });
                 CZ.Authoring.initialize(CZ.Common.vc, {
+                    showMessageWindow: function (message, title, onClose) {
+                        var wnd = new CZ.UI.MessageWindow(forms[13], message, title);
+                        if(onClose) {
+                            wnd.container.bind("close", function () {
+                                wnd.container.unbind("close", onClose);
+                                onClose();
+                            });
+                        }
+                        wnd.show();
+                    },
+                    hideMessageWindow: function () {
+                        var wnd = forms[13].data("form");
+                        if(wnd) {
+                            wnd.close();
+                        }
+                    },
                     showEditTourForm: function (tour) {
                         CZ.Tours.removeActiveTour();
                         var form = new CZ.UI.FormEditTour(forms[7], {
@@ -11626,8 +11635,16 @@ var CZ;
                             $("#profile-panel").show();
                             $(".auth-panel-login").html(data.DisplayName);
                         }
+                        CZ.Authoring.isEnabled = UserCanEditCollection(data);
+                        InitializeToursUI(data, forms);
                     }).fail(function (error) {
                         $("#login-panel").show();
+                        CZ.Authoring.isEnabled = UserCanEditCollection(null);
+                        InitializeToursUI(null, forms);
+                    }).always(function () {
+                        if(!CZ.Authoring.isEnabled) {
+                            $(".edit-icon").hide();
+                        }
                     });
                 }
                 $("#login-panel").click(function () {
@@ -11646,15 +11663,10 @@ var CZ;
                 CZ.Settings.signinUrlYahoo = response.signinUrlYahoo;
             });
             var url = CZ.UrlNav.getURL();
-            var rootCollection = url.superCollectionName === undefined;
+            HomePageViewModel.rootCollection = url.superCollectionName === undefined;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
-            if(rootCollection) {
-                $('#timeSeries_button').hide();
-            } else {
-                $('#timeSeries_button').show();
-            }
             $('#search_button').mouseup(CZ.Search.onSearchClicked);
             $('#human_rect').click(function () {
                 CZ.Search.navigateToBookmark(CZ.Common.humanityVisible);
@@ -11732,26 +11744,7 @@ var CZ;
                     CZ.Common.startExploring();
                 });
             }
-            for(var idxFeature = 0; idxFeature < _featureMap.length; idxFeature++) {
-                var enabled = true;
-                var feature = _featureMap[idxFeature];
-                if(feature.Activation === FeatureActivation.Disabled) {
-                    enabled = false;
-                }
-                if(feature.Activation === FeatureActivation.NotRootCollection && rootCollection) {
-                    enabled = false;
-                }
-                if(feature.Activation === FeatureActivation.RootCollection && !rootCollection) {
-                    enabled = false;
-                }
-                _featureMap[idxFeature].IsEnabled = enabled;
-                if(!enabled) {
-                    $(feature.JQueryReference).css("display", "none");
-                }
-            }
-            if(!rootCollection) {
-                CZ.Authoring.isEnabled = true;
-            }
+            ApplyFeatureActivation();
             if(navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
                 document.addEventListener('touchmove', function (e) {
                     e.preventDefault();
@@ -11781,7 +11774,8 @@ var CZ;
             CZ.Bibliography.initializeBibliography();
             var canvasGestures = CZ.Gestures.getGesturesStream(CZ.Common.vc);
             var axisGestures = CZ.Gestures.applyAxisBehavior(CZ.Gestures.getGesturesStream(CZ.Common.ax));
-            var jointGesturesStream = canvasGestures.Merge(axisGestures);
+            var timeSeriesGestures = CZ.Gestures.getPanPinGesturesStream($("#timeSeriesContainer"));
+            var jointGesturesStream = canvasGestures.Merge(axisGestures.Merge(timeSeriesGestures));
             CZ.Common.controller = new CZ.ViewportController.ViewportController2(function (visible) {
                 var vp = CZ.Common.vc.virtualCanvas("getViewport");
                 var markerPos = CZ.Common.axis.MarkerPosition();
@@ -11967,10 +11961,33 @@ var CZ;
                 CZ.timeSeriesChart.clearLegend("left");
                 CZ.timeSeriesChart.clearLegend("right");
                 var chartHeader = "TimeSeries Chart";
+                if(CZ.rightDataSet !== undefined || CZ.leftDataSet !== undefined) {
+                    CZ.timeSeriesChart.drawVerticalGridLines(leftCSS, rightCSS, leftPlot, rightPlot);
+                }
+                var screenWidthForLegend = rightCSS - leftCSS;
+                if(CZ.rightDataSet !== undefined && CZ.leftDataSet !== undefined) {
+                    screenWidthForLegend /= 2;
+                }
+                var isLegendVisible = CZ.timeSeriesChart.checkLegendVisibility(screenWidthForLegend);
                 if(CZ.leftDataSet !== undefined) {
                     var padding = CZ.leftDataSet.getVerticalPadding() + 10;
-                    CZ.timeSeriesChart.drawDataSet(CZ.leftDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot);
-                    CZ.timeSeriesChart.drawAxis(leftCSS, rightCSS, CZ.leftDataSet.series[0].appearanceSettings.yMin, CZ.leftDataSet.series[0].appearanceSettings.yMax, {
+                    var plotBottom = Number.MAX_VALUE;
+                    var plotTop = Number.MIN_VALUE;
+                    CZ.leftDataSet.series.forEach(function (seria) {
+                        if(seria.appearanceSettings !== undefined && seria.appearanceSettings.yMin !== undefined && seria.appearanceSettings.yMin < plotBottom) {
+                            plotBottom = seria.appearanceSettings.yMin;
+                        }
+                        if(seria.appearanceSettings !== undefined && seria.appearanceSettings.yMax !== undefined && seria.appearanceSettings.yMax > plotTop) {
+                            plotTop = seria.appearanceSettings.yMax;
+                        }
+                    });
+                    if((plotTop - plotBottom) === 0) {
+                        var absY = Math.max(0.1, Math.abs(plotBottom));
+                        var offsetConstant = 0.01;
+                        plotTop += absY * offsetConstant;
+                        plotBottom -= absY * offsetConstant;
+                    }
+                    var axisAppearence = {
                         labelCount: 4,
                         tickLength: 10,
                         majorTickThickness: 1,
@@ -11978,16 +11995,37 @@ var CZ;
                         axisLocation: 'left',
                         font: '16px Calibri',
                         verticalPadding: padding
-                    });
-                    for(var i = 0; i < CZ.leftDataSet.series.length; i++) {
-                        CZ.timeSeriesChart.addLegendRecord("left", CZ.leftDataSet.series[i].appearanceSettings.stroke, CZ.leftDataSet.series[i].appearanceSettings.name);
+                    };
+                    var tickForDraw = CZ.timeSeriesChart.generateAxisParameters(leftCSS, rightCSS, plotBottom, plotTop, axisAppearence);
+                    CZ.timeSeriesChart.drawHorizontalGridLines(tickForDraw, axisAppearence);
+                    CZ.timeSeriesChart.drawDataSet(CZ.leftDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot, plotTop, plotBottom);
+                    CZ.timeSeriesChart.drawAxis(tickForDraw, axisAppearence);
+                    if(isLegendVisible) {
+                        for(var i = 0; i < CZ.leftDataSet.series.length; i++) {
+                            CZ.timeSeriesChart.addLegendRecord("left", CZ.leftDataSet.series[i].appearanceSettings.stroke, CZ.leftDataSet.series[i].appearanceSettings.name);
+                        }
                     }
                     chartHeader += " (" + CZ.leftDataSet.name;
                 }
                 if(CZ.rightDataSet !== undefined) {
                     var padding = CZ.rightDataSet.getVerticalPadding() + 10;
-                    CZ.timeSeriesChart.drawDataSet(CZ.rightDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot);
-                    CZ.timeSeriesChart.drawAxis(rightCSS, leftCSS, CZ.rightDataSet.series[0].appearanceSettings.yMin, CZ.rightDataSet.series[0].appearanceSettings.yMax, {
+                    var plotBottom = Number.MAX_VALUE;
+                    var plotTop = Number.MIN_VALUE;
+                    CZ.rightDataSet.series.forEach(function (seria) {
+                        if(seria.appearanceSettings !== undefined && seria.appearanceSettings.yMin !== undefined && seria.appearanceSettings.yMin < plotBottom) {
+                            plotBottom = seria.appearanceSettings.yMin;
+                        }
+                        if(seria.appearanceSettings !== undefined && seria.appearanceSettings.yMax !== undefined && seria.appearanceSettings.yMax > plotTop) {
+                            plotTop = seria.appearanceSettings.yMax;
+                        }
+                    });
+                    if((plotTop - plotBottom) === 0) {
+                        var absY = Math.max(0.1, Math.abs(plotBottom));
+                        var offsetConstant = 0.01;
+                        plotTop += absY * offsetConstant;
+                        plotBottom -= absY * offsetConstant;
+                    }
+                    var axisAppearence = {
                         labelCount: 4,
                         tickLength: 10,
                         majorTickThickness: 1,
@@ -11995,22 +12033,49 @@ var CZ;
                         axisLocation: 'right',
                         font: '16px Calibri',
                         verticalPadding: padding
-                    });
-                    for(var i = 0; i < CZ.rightDataSet.series.length; i++) {
-                        CZ.timeSeriesChart.addLegendRecord("right", CZ.rightDataSet.series[i].appearanceSettings.stroke, CZ.rightDataSet.series[i].appearanceSettings.name);
+                    };
+                    var tickForDraw = CZ.timeSeriesChart.generateAxisParameters(rightCSS, leftCSS, plotBottom, plotTop, axisAppearence);
+                    CZ.timeSeriesChart.drawHorizontalGridLines(tickForDraw, axisAppearence);
+                    CZ.timeSeriesChart.drawDataSet(CZ.rightDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot, plotTop, plotBottom);
+                    CZ.timeSeriesChart.drawAxis(tickForDraw, axisAppearence);
+                    if(isLegendVisible) {
+                        for(var i = 0; i < CZ.rightDataSet.series.length; i++) {
+                            CZ.timeSeriesChart.addLegendRecord("right", CZ.rightDataSet.series[i].appearanceSettings.stroke, CZ.rightDataSet.series[i].appearanceSettings.name);
+                        }
                     }
                     var str = chartHeader.indexOf("(") > 0 ? ", " : " (";
                     chartHeader += str + CZ.rightDataSet.name + ")";
                 } else {
                     chartHeader += ")";
                 }
-                if(CZ.rightDataSet !== undefined || CZ.leftDataSet !== undefined) {
-                    CZ.timeSeriesChart.drawVerticalGridLines(leftCSS, rightCSS, leftPlot, rightPlot);
-                }
                 $("#timeSeriesChartHeader").text(chartHeader);
             }
         }
         HomePageViewModel.updateTimeSeriesChart = updateTimeSeriesChart;
+        function ApplyFeatureActivation() {
+            for(var idxFeature = 0; idxFeature < _featureMap.length; idxFeature++) {
+                var feature = _featureMap[idxFeature];
+                if(feature.IsEnabled === undefined) {
+                    var enabled = true;
+                    if(feature.Activation === FeatureActivation.Disabled) {
+                        enabled = false;
+                    }
+                    if(feature.Activation === FeatureActivation.NotRootCollection && HomePageViewModel.rootCollection) {
+                        enabled = false;
+                    }
+                    if(feature.Activation === FeatureActivation.RootCollection && !HomePageViewModel.rootCollection) {
+                        enabled = false;
+                    }
+                    if(feature.Activation === FeatureActivation.NotProduction && (!constants || constants.environment === "Production")) {
+                        enabled = false;
+                    }
+                    _featureMap[idxFeature].IsEnabled = enabled;
+                }
+                if(!_featureMap[idxFeature].IsEnabled && feature.JQueryReference) {
+                    $(feature.JQueryReference).css("display", "none");
+                }
+            }
+        }
     })(CZ.HomePageViewModel || (CZ.HomePageViewModel = {}));
     var HomePageViewModel = CZ.HomePageViewModel;
 })(CZ || (CZ = {}));
