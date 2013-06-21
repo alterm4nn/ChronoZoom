@@ -52,25 +52,29 @@ namespace Chronozoom.Api.Controllers
             {
                 var user = (Microsoft.IdentityModel.Claims.IClaimsIdentity)HttpContext.User.Identity;
 
-                string nameIdentifier = "";
-                string identityProvider = "";
-
-                foreach (var item in user.Claims)
+                if (user != null)
                 {
-                    if (item.ClaimType.EndsWith("nameidentifier"))
-                    {
-                        nameIdentifier = item.Value;
-                    }
-                    else if (item.ClaimType.EndsWith("identityprovider"))
-                    {
-                        identityProvider = item.Value;
-                    }
-                }
+                    string nameIdentifier = "";
+                    string identityProvider = "";
 
-                using (Storage storage = new Storage())
-                {
-                    Entities.User storedUser = storage.Users.FirstOrDefault(candidate => candidate.IdentityProvider == identityProvider && candidate.NameIdentifier == nameIdentifier);
-                    return Redirect("/" + storedUser.DisplayName);
+                    foreach (var item in user.Claims)
+                    {
+                        if (item.ClaimType.EndsWith("nameidentifier"))
+                        {
+                            nameIdentifier = item.Value;
+                        }
+                        else if (item.ClaimType.EndsWith("identityprovider"))
+                        {
+                            identityProvider = item.Value;
+                        }
+                    }
+
+                    using (Storage storage = new Storage())
+                    {
+                        Entities.User storedUser = storage.Users.FirstOrDefault(candidate => candidate.IdentityProvider == identityProvider && candidate.NameIdentifier == nameIdentifier);
+                        if (storedUser != null)
+                            return Redirect("/" + storedUser.DisplayName);
+                    }
                 }
             }
 
