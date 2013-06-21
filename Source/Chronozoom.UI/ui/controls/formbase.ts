@@ -10,7 +10,7 @@ module CZ {
             closeButton: string;
             titleTextblock: string;
         }
-        
+
         export class FormBase {
             public isFormVisible: bool;
             public activationSource: JQuery;
@@ -62,6 +62,7 @@ module CZ {
                 this.isFormVisible = false;
                 this.container.data("form", undefined);
                 this.container.hide.apply(this.container, args);
+                this.container.trigger("close");
             }
 
             public back(): void {
@@ -82,7 +83,7 @@ module CZ {
                 super(container, formInfo);
 
                 this.saveButton = this.container.find(formInfo.saveButton);
-                
+
                 this.container.keypress(event => {
                     // trigger click on save button if ENTER was pressed
                     if (event.keyCode === 13) {

@@ -5,12 +5,10 @@ var CZ;
         (function (Map) {
             function bookmark(ts) {
                 return {
-                    id: ts.bookmarkId,
                     name: ts.Title,
                     url: ts.NavigationUrl,
                     lapseTime: ts.LapseTime,
-                    description: ts.Description,
-                    sequenceId: ts.Sequence
+                    description: ts.Description
                 };
             }
             function tour(t) {
@@ -18,7 +16,7 @@ var CZ;
                 for(var i = 0, n = t.Stops.length; i < n; i++) {
                     bookmarks[i] = bookmark(t.Stops[i]);
                 }
-                return {
+                var tourRequest = {
                     id: t.Id,
                     name: t.Title,
                     description: t.Description,
@@ -27,6 +25,7 @@ var CZ;
                     sequence: t.Sequence,
                     bookmarks: bookmarks
                 };
+                return tourRequest;
             }
             Map.tour = tour;
             function timeline(t) {
@@ -291,27 +290,11 @@ var CZ;
             });
         }
         Service.deleteContentItem = deleteContentItem;
-        function postTour(t) {
+        function putTour2(t) {
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
-            request.addToPath("tour");
-            console.log("[POST] " + request.url);
-            return $.ajax({
-                type: "POST",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: request.url,
-                data: JSON.stringify(Map.tour(t))
-            });
-        }
-        Service.postTour = postTour;
-        function putTour(t) {
-            var request = new Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
-            request.addToPath("tour");
+            request.addToPath("tour2");
             console.log("[PUT] " + request.url);
             return $.ajax({
                 type: "PUT",
@@ -322,7 +305,7 @@ var CZ;
                 data: JSON.stringify(Map.tour(t))
             });
         }
-        Service.putTour = putTour;
+        Service.putTour2 = putTour2;
         function deleteTour(tourId) {
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
@@ -341,47 +324,6 @@ var CZ;
             });
         }
         Service.deleteTour = deleteTour;
-        function deleteBookmarks(tourId, bookmarks) {
-            var request = new Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
-            request.addToPath("bookmark");
-            console.log("[DELETE] " + request.url);
-            var bids = new Array(bookmarks.length);
-            for(var i = 0, n = bookmarks.length; i < n; i++) {
-                bids[i] = {
-                    id: bookmarks[i].id
-                };
-            }
-            return $.ajax({
-                type: "DELETE",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: request.url,
-                data: JSON.stringify({
-                    id: tourId,
-                    bookmarks: bids
-                })
-            });
-        }
-        Service.deleteBookmarks = deleteBookmarks;
-        function putBookmarks(t) {
-            var request = new Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
-            request.addToPath("bookmark");
-            console.log("[PUT] " + request.url);
-            return $.ajax({
-                type: "PUT",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: request.url,
-                data: JSON.stringify(Map.tour(t))
-            });
-        }
-        Service.putBookmarks = putBookmarks;
         function getTours() {
             var request = new Service.Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
