@@ -52,7 +52,7 @@
         export var infoDotHoveredBorderColor = 'white'; // color of infdot's circle border when mouse cursor is over it
         export var infoDotFillColor = 'rgb(92,92,92)'; // color of infdot's circle border
         export var infoDotTinyContentImageUri = '/images/tinyContent.png';
-        export var infodotMaxContentItemsCount = 10;
+        export var infodotMaxContentItemsCount = 10; // range [1, 10]
 
         export var mediaContentElementZIndex = 100;
         export var contentItemDescriptionNumberOfLines = 10;
@@ -156,5 +156,8 @@
         export var signinUrlMicrosoft = "";
         export var signinUrlGoogle = "";
         export var signinUrlYahoo = "";
+
+        // General constants
+        export var guidEmpty = "00000000-0000-0000-0000-000000000000";
     }
 }

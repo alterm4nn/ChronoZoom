@@ -18,13 +18,15 @@
 /// <reference path='../ui/timeseries-graph-form.ts'/>
 /// <reference path='../ui/timeseries-data-form.ts'/>
 /// <reference path='../ui/tourslist-form.ts'/>
+/// <reference path='../ui/message-window.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
 
+var constants: any;
 
 module CZ {
     export var timeSeriesChart: CZ.UI.LineChart;
     export var leftDataSet: CZ.Data.DataSet;
-    export var rightDataSet: CZ.Data.DataSet; 
+    export var rightDataSet: CZ.Data.DataSet;
 
     export module HomePageViewModel {
         // Contains mapping: CSS selector -> html file.
@@ -41,7 +43,8 @@ module CZ {
             "#toursList": "/ui/tourslist-form.html", // 9
             "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html", // 10
             "#timeSeriesContainer": "/ui/timeseries-graph-form.html", //11
-            "#timeSeriesDataForm": "/ui/timeseries-data-form.html" //12
+            "#timeSeriesDataForm": "/ui/timeseries-data-form.html", //12
+            "#message-window": "/ui/message-window.html" // 13
         };
 
         export enum FeatureActivation {
@@ -49,6 +52,7 @@ module CZ {
             Disabled,
             RootCollection,
             NotRootCollection,
+            NotProduction,
         }
 
         export interface FeatureInfo {
@@ -62,7 +66,7 @@ module CZ {
         //
         // FEATURES CAN ONLY BE ACTIVATED IN ROOTCOLLECTION AFTER HITTING ZERO ACTIVE BUGS.
         //
-        // REMOVING THIS COMMENT OR BYPASSING THIS CHECK MAYBE BRING YOU BAD KARMA, ITS TRUE.
+        // REMOVING THIS COMMENT OR BYPASSING THIS CHECK MAY BRING YOU BAD KARMA, ITS TRUE.
         //
         var _featureMap: FeatureInfo[] = [
             {
@@ -82,8 +86,13 @@ module CZ {
             },
             {
                 Name: "Authoring",
-                Activation: FeatureActivation.NotRootCollection,
+                Activation: FeatureActivation.Enabled,
                 JQueryReference: ".header-icon.edit-icon"
+            },
+            {
+                Name: "TourAuthoring",
+                Activation: FeatureActivation.NotProduction,
+                JQueryReference: ".cz-form-create-tour"
             },
             {
                 Name: "WelcomeScreen",
@@ -97,13 +106,32 @@ module CZ {
             },
             {
                 Name: "TimeSeries",
-                Activation: FeatureActivation.NotRootCollection,
+                Activation: FeatureActivation.Enabled,
                 JQueryReference: "#timeSeriesContainer"
+            },
+            {
+                Name: "ManageCollections",
+                Activation: FeatureActivation.Disabled,
+                JQueryReference: "#collections_button"
             },
         ];
 
+        export var rootCollection: bool;
+
+        function UserCanEditCollection(profile) {
+            if (CZ.Service.superCollectionName === "sandbox") {
+                return true;
+            }
+            
+            if (!profile || profile.DisplayName !== CZ.Service.superCollectionName) {
+                return false
+            }
+
+            return true;
+        }
+
         function InitializeToursUI(profile, forms) {
-            var allowEditing = IsFeatureEnabled(_featureMap, "Authoring") && (profile && profile != "" && profile.DisplayName === CZ.Service.superCollectionName);
+            var allowEditing = IsFeatureEnabled(_featureMap, "TourAuthoring") && UserCanEditCollection(profile);
 
             var onToursInitialized = function () {
                 CZ.Tours.initializeToursUI();
@@ -177,10 +205,6 @@ module CZ {
                     }
                 });
 
-                CZ.Service.getProfile()
-                    .done(profile => { InitializeToursUI(profile, forms); })
-                    .fail(err => { InitializeToursUI(null, forms); });
-
                 $(".header-icon.edit-icon").click(function () {
                     var editForm = getFormById("#header-edit-form");
                     if (editForm === false) {
@@ -192,9 +216,10 @@ module CZ {
                             titleTextblock: ".cz-form-title",
                             createTimeline: ".cz-form-create-timeline",
                             createExhibit: ".cz-form-create-exhibit",
-                        	createTour: ".cz-form-create-tour"
+                            createTour: ".cz-form-create-tour"
                         });
                         form.show();
+                        ApplyFeatureActivation();
                     }
                     else {
                         if (editForm.isFormVisible) {
@@ -208,6 +233,20 @@ module CZ {
                 });
 
                 CZ.Authoring.initialize(CZ.Common.vc, {
+                    showMessageWindow: function (message: string, title?: string, onClose?: () => any) {
+                        var wnd = new CZ.UI.MessageWindow(forms[13], message, title);
+                        if (onClose) wnd.container.bind("close", () =>
+                        {
+                            wnd.container.unbind("close", onClose);
+                            onClose();
+                        });
+                        wnd.show();
+                    },
+                    hideMessageWindow: function () {
+                        var wnd = <CZ.UI.MessageWindow>forms[13].data("form");
+                        if (wnd)
+                            wnd.close();
+                    },
                     showEditTourForm: function (tour) {
                         CZ.Tours.removeActiveTour();
                         var form = new CZ.UI.FormEditTour(forms[7], {
@@ -383,8 +422,18 @@ module CZ {
                             $("#profile-panel").show();
                             $(".auth-panel-login").html(data.DisplayName);
                         }
+
+                        CZ.Authoring.isEnabled = UserCanEditCollection(data);
+                        InitializeToursUI(data, forms);
                     }).fail((error) => {
                         $("#login-panel").show();
+
+                        CZ.Authoring.isEnabled = UserCanEditCollection(null);
+                        InitializeToursUI(null, forms);
+                    }).always(() => {
+                        if (!CZ.Authoring.isEnabled) {
+                            $(".edit-icon").hide();
+                        }
                     });
                 }
 
@@ -408,26 +457,13 @@ module CZ {
                 });
 
             var url = CZ.UrlNav.getURL();
-            var rootCollection = url.superCollectionName === undefined;
+            rootCollection = url.superCollectionName === undefined;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
 
-            if (rootCollection) {
-                $('#timeSeries_button').hide();
-            } else {
-                $('#timeSeries_button').show();
-            }
-
             $('#search_button')
                 .mouseup(CZ.Search.onSearchClicked);
-
-            // Commented by Dmitry Voytsekhovskiy: new tours window is now opened in a handler of UI map loading completion.
-            //$('#tours_index')
-            //    .mouseup(e =>
-            //    {
-            //        CZ.Tours.onTourClicked();
-            //    });
 
             $('#human_rect')
                 .click(() => { CZ.Search.navigateToBookmark(CZ.Common.humanityVisible); });
@@ -506,31 +542,7 @@ module CZ {
                 });
             }
 
-            // Feature activation control
-            for (var idxFeature = 0; idxFeature < _featureMap.length; idxFeature++) {
-                var enabled: bool = true;
-                var feature = _featureMap[idxFeature];
-
-                if (feature.Activation === FeatureActivation.Disabled) {
-                    enabled = false;
-                }
-
-                if (feature.Activation === FeatureActivation.NotRootCollection && rootCollection) {
-                    enabled = false;
-                }
-
-                if (feature.Activation === FeatureActivation.RootCollection && !rootCollection) {
-                    enabled = false;
-                }
-
-                _featureMap[idxFeature].IsEnabled = enabled;
-                if (!enabled) {
-                    $(feature.JQueryReference).css("display", "none");
-                }
-            }
-
-            if (!rootCollection)
-                CZ.Authoring.isEnabled = true;
+            ApplyFeatureActivation();
 
             if (navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
                 // Suppress the default iOS elastic pan/zoom actions.
@@ -565,7 +577,8 @@ module CZ {
 
             var canvasGestures = CZ.Gestures.getGesturesStream(CZ.Common.vc); //gesture sequence of the virtual canvas
             var axisGestures = CZ.Gestures.applyAxisBehavior(CZ.Gestures.getGesturesStream(CZ.Common.ax)); //gesture sequence of axis (tranformed according to axis behavior logic)
-            var jointGesturesStream = canvasGestures.Merge(axisGestures);
+            var timeSeriesGestures = CZ.Gestures.getPanPinGesturesStream($("#timeSeriesContainer"));
+            var jointGesturesStream = canvasGestures.Merge(axisGestures.Merge(timeSeriesGestures));
 
             CZ.Common.controller = new CZ.ViewportController.ViewportController2(
                             function (visible) {
@@ -743,9 +756,9 @@ module CZ {
             return feature[0].IsEnabled;
         }
 
-		function closeAllForms() {
+        function closeAllForms() {
             $('.cz-major-form').each((i, f) => { var form = $(f).data('form'); if (form) { form.close(); } });
-                     
+
         }
 
         function getFormById(name) {
@@ -755,7 +768,7 @@ module CZ {
             else
                 return false;
         }
-        
+
         export function showTimeSeriesChart() {
             $('#timeSeriesContainer').height('30%');
             $('#timeSeriesContainer').show();
@@ -792,13 +805,49 @@ module CZ {
 
                 var chartHeader = "TimeSeries Chart";
 
+                if (rightDataSet !== undefined || leftDataSet !== undefined) {
+                    timeSeriesChart.drawVerticalGridLines(leftCSS, rightCSS, leftPlot, rightPlot);
+                }
+
+                var screenWidthForLegend = rightCSS - leftCSS;
+                if (rightDataSet !== undefined && leftDataSet !== undefined) {
+                    screenWidthForLegend /= 2;
+                }
+                var isLegendVisible = timeSeriesChart.checkLegendVisibility(screenWidthForLegend);
+
                 if (leftDataSet !== undefined) {
                     var padding = leftDataSet.getVerticalPadding() + 10;
-                    timeSeriesChart.drawDataSet(leftDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot);
-                    timeSeriesChart.drawAxis(leftCSS, rightCSS, leftDataSet.series[0].appearanceSettings.yMin, leftDataSet.series[0].appearanceSettings.yMax, { labelCount: 4, tickLength: 10, majorTickThickness: 1, stroke: 'black', axisLocation: 'left', font: '16px Calibri', verticalPadding: padding });
 
-                    for (var i = 0; i < leftDataSet.series.length; i++) {
-                        timeSeriesChart.addLegendRecord("left", leftDataSet.series[i].appearanceSettings.stroke, leftDataSet.series[i].appearanceSettings.name);
+                    var plotBottom: number = Number.MAX_VALUE;
+                    var plotTop: number = Number.MIN_VALUE;
+
+                    leftDataSet.series.forEach(function (seria) {
+                        if (seria.appearanceSettings !== undefined && seria.appearanceSettings.yMin !== undefined && seria.appearanceSettings.yMin < plotBottom) {
+                            plotBottom = seria.appearanceSettings.yMin;
+                        }
+
+                        if (seria.appearanceSettings !== undefined && seria.appearanceSettings.yMax !== undefined && seria.appearanceSettings.yMax > plotTop) {
+                            plotTop = seria.appearanceSettings.yMax;
+                        }
+                    });
+
+                    if ((plotTop - plotBottom) === 0) {
+                        var absY = Math.max(0.1, Math.abs(plotBottom));
+                        var offsetConstant = 0.01;
+                        plotTop += absY * offsetConstant;
+                        plotBottom -= absY * offsetConstant;
+                    }
+
+                    var axisAppearence = { labelCount: 4, tickLength: 10, majorTickThickness: 1, stroke: 'black', axisLocation: 'left', font: '16px Calibri', verticalPadding: padding };
+                    var tickForDraw = timeSeriesChart.generateAxisParameters(leftCSS, rightCSS, plotBottom, plotTop, axisAppearence);
+                    timeSeriesChart.drawHorizontalGridLines(tickForDraw, axisAppearence);
+                    timeSeriesChart.drawDataSet(leftDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot, plotTop, plotBottom);
+                    timeSeriesChart.drawAxis(tickForDraw, axisAppearence);
+
+                    if (isLegendVisible) {
+                        for (var i = 0; i < leftDataSet.series.length; i++) {
+                            timeSeriesChart.addLegendRecord("left", leftDataSet.series[i].appearanceSettings.stroke, leftDataSet.series[i].appearanceSettings.name);
+                        }
                     }
 
                     chartHeader += " (" + leftDataSet.name;
@@ -806,24 +855,78 @@ module CZ {
 
                 if (rightDataSet !== undefined) {
                     var padding = rightDataSet.getVerticalPadding() + 10;
-                    timeSeriesChart.drawDataSet(rightDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot);
-                    timeSeriesChart.drawAxis(rightCSS, leftCSS, rightDataSet.series[0].appearanceSettings.yMin, rightDataSet.series[0].appearanceSettings.yMax, { labelCount: 4, tickLength: 10, majorTickThickness: 1, stroke: 'black', axisLocation: 'right', font: '16px Calibri', verticalPadding: padding });
 
-                    for (var i = 0; i < rightDataSet.series.length; i++) {
-                        timeSeriesChart.addLegendRecord("right", rightDataSet.series[i].appearanceSettings.stroke, rightDataSet.series[i].appearanceSettings.name);
+                    var plotBottom: number = Number.MAX_VALUE;
+                    var plotTop: number = Number.MIN_VALUE;
+
+                    rightDataSet.series.forEach(function (seria) {
+                        if (seria.appearanceSettings !== undefined && seria.appearanceSettings.yMin !== undefined && seria.appearanceSettings.yMin < plotBottom) {
+                            plotBottom = seria.appearanceSettings.yMin;
+                        }
+
+                        if (seria.appearanceSettings !== undefined && seria.appearanceSettings.yMax !== undefined && seria.appearanceSettings.yMax > plotTop) {
+                            plotTop = seria.appearanceSettings.yMax;
+                        }
+                    });
+
+                    if ((plotTop - plotBottom) === 0) {
+                        var absY = Math.max(0.1, Math.abs(plotBottom));
+                        var offsetConstant = 0.01;
+                        plotTop += absY * offsetConstant;
+                        plotBottom -= absY * offsetConstant;
+                    }
+
+                    var axisAppearence = { labelCount: 4, tickLength: 10, majorTickThickness: 1, stroke: 'black', axisLocation: 'right', font: '16px Calibri', verticalPadding: padding };
+                    var tickForDraw = timeSeriesChart.generateAxisParameters(rightCSS, leftCSS, plotBottom, plotTop, axisAppearence);
+                    timeSeriesChart.drawHorizontalGridLines(tickForDraw, axisAppearence);
+                    timeSeriesChart.drawDataSet(rightDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot, plotTop, plotBottom);
+                    timeSeriesChart.drawAxis(tickForDraw, axisAppearence);
+
+                    if (isLegendVisible) {
+                        for (var i = 0; i < rightDataSet.series.length; i++) {
+                            timeSeriesChart.addLegendRecord("right", rightDataSet.series[i].appearanceSettings.stroke, rightDataSet.series[i].appearanceSettings.name);
+                        }
                     }
 
                     var str = chartHeader.indexOf("(") > 0 ? ", " : " (";
                     chartHeader += str + rightDataSet.name + ")";
                 } else {
-                    chartHeader += ")"; 
-                }
-
-                if (rightDataSet !== undefined || leftDataSet !== undefined) {
-                    timeSeriesChart.drawVerticalGridLines(leftCSS, rightCSS, leftPlot, rightPlot);
+                    chartHeader += ")";
                 }
 
                 $("#timeSeriesChartHeader").text(chartHeader);
+            }
+        }
+
+        function ApplyFeatureActivation() {
+            // Feature activation control
+            for (var idxFeature = 0; idxFeature < _featureMap.length; idxFeature++) {
+                var feature = _featureMap[idxFeature];
+
+                if (feature.IsEnabled === undefined) {
+                    var enabled: bool = true;
+                    if (feature.Activation === FeatureActivation.Disabled) {
+                        enabled = false;
+                    }
+
+                    if (feature.Activation === FeatureActivation.NotRootCollection && rootCollection) {
+                        enabled = false;
+                    }
+
+                    if (feature.Activation === FeatureActivation.RootCollection && !rootCollection) {
+                        enabled = false;
+                    }
+
+                    if (feature.Activation === FeatureActivation.NotProduction && (!constants || constants.environment === "Production")) {
+                        enabled = false;
+                    }
+
+                    _featureMap[idxFeature].IsEnabled = enabled;
+                }
+
+                if (!_featureMap[idxFeature].IsEnabled && feature.JQueryReference) {
+                    $(feature.JQueryReference).css("display", "none");
+                }
             }
         }
 

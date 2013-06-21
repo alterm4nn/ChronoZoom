@@ -55,6 +55,13 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
+        public void NavigateToHistoryOfScienceTimeline()
+        {
+            Logger.Log("<-");
+            ExecuteJavaScript("CZ.Search.goToSearchResult('t0c12100b-2ba1-4208-9523-d38224624068')");
+            Logger.Log("->");
+        }
+
         private void NavigateToProterozoic()
         {
             Logger.Log("<-");

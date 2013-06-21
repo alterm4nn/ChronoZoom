@@ -187,7 +187,6 @@ namespace Application.Driver.UserActions
             }
         }
 
-
         protected void ClickByJavaScript(By by)
         {
             object[] objects = { FindElement(by) };

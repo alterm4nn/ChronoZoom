@@ -73,7 +73,7 @@ describe("CZ datepicker", function () {
             it("shouldn't set date if it isn't a number", function () {
                 datepicker.setDate(incorrectDates);
                 var result = datepicker.getDate();
-                expect(0).toEqual(result);               
+                expect(1).toEqual(result);               
             });
         });
     });

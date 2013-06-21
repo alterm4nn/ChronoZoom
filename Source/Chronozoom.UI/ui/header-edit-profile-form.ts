@@ -68,11 +68,13 @@ module CZ {
                     if (data.DisplayName != null) {
                         this.usernameInput.val(data.DisplayName);
                         if (data.DisplayName != "") {
-                            this.usernameInput.prop('disabled', true);
+                            this.usernameInput.prop('disabled', true);                            
+                        }
+                        this.emailInput.val(data.Email);
+                        if (data.Email !== undefined && data.Email !== '' && data.Email != null) {
                             this.agreeInput.attr('checked', true);
                             this.agreeInput.prop('disabled', true);
                         }
-                        this.emailInput.val(data.Email);
                     }
                 });
 
@@ -83,18 +85,21 @@ module CZ {
                         return;
                     }
 
+                    var emailAddress = "";
+                    if (this.emailInput.val()) {
+                        var emailIsValid = this.validEmail(this.emailInput.val());
+                        if (!emailIsValid) {
+                            alert("Provided incorrect email address");
+                            return;
+                        }
 
+                        var agreeTerms = this.agreeInput.prop("checked");
+                        if (!agreeTerms) {
+                            alert("Please agree with provided terms");
+                            return;
+                        }
 
-                    isValid = this.validEmail(this.emailInput.val());
-                    if (!isValid) {
-                        alert("Provided incorrect email address");
-                        return;
-                    }
-
-                    isValid = this.agreeInput.prop("checked");
-                    if (!isValid) {
-                        alert("Please agree with provided terms");
-                        return;
+                        emailAddress = this.emailInput.val();
                     }
 
                     Service.getProfile().done((curUser) => {
@@ -104,7 +109,7 @@ module CZ {
                                 alert("Sorry, this username is already in use. Please try again.");
                                 return;
                             }
-                            CZ.Service.putProfile(this.usernameInput.val(), this.emailInput.val()).then(
+                            CZ.Service.putProfile(this.usernameInput.val(), emailAddress).then(
                                 success => {
                                     // Redirect to personal collection.
                                     if (this.allowRedirect) {
@@ -126,14 +131,7 @@ module CZ {
 
                 this.logoutButton.click(event =>
                 {
-                    return $.ajax({
-                        url: "/account/logout"
-                    }).done(data => {
-                        this.profilePanel.hide();
-                        this.loginPanel.show();
-
-                        this.close();
-                    });
+                    window.location.assign("/pages/logoff.aspx");
                 });
             }
 

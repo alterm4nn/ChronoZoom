@@ -62,6 +62,7 @@ module CZ {
             }
 
             private initUI() {
+                this.saveButton.prop('disabled', false);
                 if (CZ.Authoring.contentItemMode === "createContentItem") {
                     this.titleTextblock.text("Create New");
                     this.saveButton.text("create artifiact");
@@ -109,7 +110,7 @@ module CZ {
             private onSave() {
                 var newContentItem = {
                     title: this.titleInput.val() || "",
-                    uri: decodeURIComponent(this.mediaInput.val()) || "",
+                    uri: this.mediaInput.val() || "",
                     mediaSource: this.mediaSourceInput.val() || "",
                     mediaType: this.mediaTypeInput.val() || "",
                     attribution: this.attributionInput.val() || "",
@@ -138,6 +139,7 @@ module CZ {
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
                             this.back();
                         } else {
+                            this.saveButton.prop('disabled', true);
                             CZ.Authoring.updateContentItem(this.exhibit, this.contentItem, newContentItem).then(
                                 response => {
                                     this.isCancel = false;
@@ -146,7 +148,9 @@ module CZ {
                                 error => {
                                     alert("Unable to save changes. Please try again later.");
                                 }
-                            );
+                            ).always(() => {
+                                this.saveButton.prop('disabled', false);
+                            });
                         }
                     }
                 } else {

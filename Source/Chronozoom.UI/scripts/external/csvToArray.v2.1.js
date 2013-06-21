@@ -43,49 +43,64 @@ String.prototype.csvToArray = function (o) {
     var a = [
         ['']
     ];
+    var endLine = '\n';
     for (var r = f = p = q = 0; p < this.length; p++) {
         switch (c = this.charAt(p)) {
-        case o.quot:
-            if (q && this.charAt(p + 1) == o.quot) {
-                a[r][f] += o.quot;
-                ++p;
-            } else {
-                q ^= 1;
-            }
-            break;
-        case o.fSep:
-            if (!q) {
-                if (o.trim) {
-                    a[r][f] = a[r][f].replace(/^\s\s*/, '').replace(/\s\s*$/, '');
-                }
-                a[r][++f] = '';
-            } else {
-                a[r][f] += c;
-            }
-            break;
-        case o.rSep.charAt(0):
-            if (!q && (!o.rSep.charAt(1) || (o.rSep.charAt(1) && o.rSep.charAt(1) == this.charAt(p + 1)))) {
-                if (o.trim) {
-                    a[r][f] = a[r][f].replace(/^\s\s*/, '').replace(/\s\s*$/, '');
-                }
-                a[++r] = [''];
-                a[r][f = 0] = '';
-                if (o.rSep.charAt(1)) {
+            case o.quot:
+                if (q && this.charAt(p + 1) == o.quot) {
+                    a[r][f] += o.quot;
                     ++p;
+                } else {
+                    q ^= 1;
                 }
-            } else {
+                break;
+            case o.fSep:
+                if (!q) {
+                    if (o.trim) {
+                        a[r][f] = a[r][f].replace(/^\s\s*/, '').replace(/\s\s*$/, '');
+                    }
+                    a[r][++f] = '';
+                } else {
+                    a[r][f] += c;
+                }
+                break;
+            case o.rSep.charAt(0):
+                if (!q && (!o.rSep.charAt(1) || (o.rSep.charAt(1) && o.rSep.charAt(1) == this.charAt(p + 1)))) {
+                    if (o.trim) {
+                        a[r][f] = a[r][f].replace(/^\s\s*/, '').replace(/\s\s*$/, '');
+                    }
+                    a[++r] = [''];
+                    a[r][f = 0] = '';
+                    if (o.rSep.charAt(1)) {
+                        ++p;
+                    }
+                } else {
+                    a[r][f] += c;
+                }
+                break;
+            case endLine.charAt(0):
+                if (!q && (!endLine.charAt(1) || (endLine.charAt(1) && endLine.charAt(1) == this.charAt(p + 1)))) {
+                    if (o.trim) {
+                        a[r][f] = a[r][f].replace(/^\s\s*/, '').replace(/\s\s*$/, '');
+                    }
+                    a[++r] = [''];
+                    a[r][f = 0] = '';
+                    if (endLine.charAt(1)) {
+                        ++p;
+                    }
+                } else {
+                    a[r][f] += c;
+                }
+                break;
+            default:
                 a[r][f] += c;
-            }
-            break;
-        default:
-            a[r][f] += c;
         }
     }
     if (o.head) {
-        a.shift()
+        a.shift();
     }
-    if (a[a.length - 1].length < a[0].length) {
-        a.pop()
+    while (a[a.length - 1].length < a[0].length) {
+        a.pop();
     }
     return a;
 }

@@ -33,6 +33,7 @@ var CZ;
             }
             FormEditExhibit.prototype.initUI = function () {
                 var _this = this;
+                this.saveButton.prop('disabled', false);
                 if(this.mode === "createExhibit") {
                     this.titleTextblock.text("Create Exhibit");
                     this.saveButton.text("create exhibit");
@@ -130,16 +131,19 @@ var CZ;
                     type: "infodot"
                 };
                 if(CZ.Authoring.validateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) && CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true) && this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {
+                    this.saveButton.prop('disabled', true);
                     CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(function (success) {
                         _this.isCancel = false;
                         _this.close();
                     }, function (error) {
                         alert("Unable to save changes. Please try again later.");
+                    }).always(function () {
+                        _this.saveButton.prop('disabled', false);
                     });
                 } else if(this.exhibit.contentItems.length === 0) {
                     var self = this;
                     var origMsg = this.errorMessage.text();
-                    this.errorMessage.text("Cannot create exhibit without content items.").show().delay(7000).fadeOut(function () {
+                    this.errorMessage.text("Cannot create exhibit without artifacts.").show().delay(7000).fadeOut(function () {
                         return self.errorMessage.text(origMsg);
                     });
                 } else {

@@ -23,6 +23,7 @@ var CZ;
             }
             FormEditTimeline.prototype.initialize = function () {
                 var _this = this;
+                this.saveButton.prop('disabled', false);
                 if(CZ.Authoring.mode === "createTimeline") {
                     this.deleteButton.hide();
                     this.titleTextblock.text("Create Timeline");
@@ -51,13 +52,14 @@ var CZ;
                     if(!CZ.Authoring.isNotEmpty(_this.titleInput.val())) {
                         _this.errorMessage.text('Title is empty');
                     } else if(!CZ.Authoring.isIntervalPositive(_this.startDate.getDate(), _this.endDate.getDate())) {
-                        _this.errorMessage.text('Result interval is not positive');
+                        _this.errorMessage.text('Time interval should no less than one day');
                     }
                     if(!isDataValid) {
                         return;
                     } else {
                         _this.errorMessage.empty();
                         var self = _this;
+                        _this.saveButton.prop('disabled', true);
                         CZ.Authoring.updateTimeline(_this.timeline, {
                             title: _this.titleInput.val(),
                             start: _this.startDate.getDate(),
@@ -65,9 +67,12 @@ var CZ;
                         }).then(function (success) {
                             self.isCancel = false;
                             self.close();
+                            self.timeline.onmouseclick();
                         }, function (error) {
                             alert("Unable to save changes. Please try again later.");
                             console.log(error);
+                        }).always(function () {
+                            _this.saveButton.prop('disabled', false);
                         });
                     }
                 });

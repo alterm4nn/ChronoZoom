@@ -5,6 +5,8 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.Collections.ObjectModel;
 using Chronozoom.Entities;
+using System.Text;
+using System.Globalization;
 
 namespace Chronozoom.UI
 {
@@ -130,7 +132,7 @@ namespace Chronozoom.UI
 
         public static string RootTimelineId(Uri collection)
         {
-            string root = "00000000-0000-0000-0000-000000000000";
+            string root = Guid.Empty.ToString();
 
             if (collection != null)
             {
@@ -138,7 +140,7 @@ namespace Chronozoom.UI
                 {
                     if (IsTimeline(collection.Segments[collection.Segments.Length - 1]))
                     {
-                        Timeline timeline = _storage.GetRootTimelines(_storage.GetCollectionFromGuid(Guid.Parse(collection.Segments[collection.Segments.Length - 1])));
+                        Timeline timeline = _storage.GetRootTimelines(_storage.GetCollectionFromTimeline(Guid.Parse(collection.Segments[collection.Segments.Length - 1])));
                         Guid rootGuid = timeline.Id;
                         if (Guid.Parse(root) != rootGuid)
                         {
@@ -183,6 +185,10 @@ namespace Chronozoom.UI
                             if (timeline != null)
                             {
                                 root = timeline.Id.ToString();
+                            }
+                            else
+                            {
+                                root = "";
                             }
                         }
                     }
@@ -277,6 +283,23 @@ namespace Chronozoom.UI
             {
                 return false;
             }
+        }
+
+        public static string GetTitle(Uri url)
+        {
+            StringBuilder title = new StringBuilder();
+
+            string urlGuid = Chronozoom.UI.Crawler.UrlGuid(url);
+            if (IsTimeline(urlGuid)) { 
+                title.Append(Timelines(urlGuid).Title + " - ");
+            } else if (IsExhibit(urlGuid)) {
+                title.Append(Exhibits(urlGuid).Title + " - ");
+            } else if (IsContentItem(urlGuid)) {
+                title.Append(ContentItems(urlGuid).Title + " - ");
+            }
+
+            title.Append("ChronoZoom");
+            return title.ToString();
         }
 
         private static Regex isGuid =

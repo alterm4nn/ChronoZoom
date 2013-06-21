@@ -4,6 +4,5 @@
 {"name": "420 Thousand Years", "file":"/dumps/420k-vostok.csv", "delimiter":" ", "source":"Vostok ice cores, Petit et al. (1999)", "link":"http://www.nature.com/nature/journal/v399/n6735/abs/399429a0.html"}, 
 {"name": "5.4 Million Years", "file":"/dumps/5.4M-LR04stack.csv", "delimiter":" ", "source":"ODP and DSDP cores, Liesecki and Raymo (2004)", "link":"http://www.lorraine-lisiecki.com/stack.html"}, 
 {"name": "65 Million Years", "file":"/dumps/65M-zachos2001.csv", "delimiter":" ", "source":"ODP and DSDP cores, Zachos et al. (2001)", "link":"http://www.sciencemag.org/content/292/5517/686"}, 
-{"name": "540 Million Years", "file":"/dumps/540M-Veizer1020.csv", "delimiter":" ", "source":"Fossil Record, Veizer (2000)", "link":"http://www.nature.com/nature/journal/v408/n6813/full/408698a0.html"},
-{"name": "Entire Timeline", "file":"/dumps/sample.csv", "delimiter":",", "source":"Sample Data with visual hints and multiple series", "link":"/dumps/sample.csv"}
+{"name": "540 Million Years", "file":"/dumps/540M-Veizer1020.csv", "delimiter":" ", "source":"Fossil Record, Veizer (2000)", "link":"http://www.nature.com/nature/journal/v408/n6813/full/408698a0.html"}
 ]}
