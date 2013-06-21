@@ -52,7 +52,7 @@ var CZ;
                     if(!CZ.Authoring.isNotEmpty(_this.titleInput.val())) {
                         _this.errorMessage.text('Title is empty');
                     } else if(!CZ.Authoring.isIntervalPositive(_this.startDate.getDate(), _this.endDate.getDate())) {
-                        _this.errorMessage.text('Result interval is not positive');
+                        _this.errorMessage.text('Time interval should no less than one day');
                     }
                     if(!isDataValid) {
                         return;

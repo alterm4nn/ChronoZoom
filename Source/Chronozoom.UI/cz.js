@@ -3787,6 +3787,7 @@ var CZ;
                     coordinate = year * (-1) + 1;
                     break;
             }
+            coordinate = Math.ceil(coordinate);
             return coordinate;
         }
         Dates.convertYearToCoordinate = convertYearToCoordinate;
@@ -4284,7 +4285,7 @@ var CZ;
         }
         Authoring.isNotEmpty = isNotEmpty;
         function isIntervalPositive(start, end) {
-            return (parseFloat(start) < parseFloat(end));
+            return (parseFloat(start) + 1 / 366 <= parseFloat(end));
         }
         Authoring.isIntervalPositive = isIntervalPositive;
         function validateContentItems(contentItems) {
@@ -9271,10 +9272,14 @@ var CZ;
                 this.yearSelector.focus(function (event) {
                     _this.errorMsg.text("");
                 });
+                this.regimeSelector.change(function (event) {
+                    _this.checkAndRemoveNonIntegerPart();
+                });
                 this.yearSelector.blur(function (event) {
                     if(!_this.validateNumber(_this.yearSelector.val())) {
                         _this.errorMsg.text(_this.WRONG_YEAR_INPUT);
                     }
+                    _this.checkAndRemoveNonIntegerPart();
                 });
                 var optionGa = $("<option value='ga'>Ga</option>");
                 var optionMa = $("<option value='ma'>Ma</option>");
@@ -9298,6 +9303,7 @@ var CZ;
                     if(!_this.validateNumber(_this.yearSelector.val())) {
                         _this.errorMsg.text(_this.WRONG_YEAR_INPUT);
                     }
+                    _this.checkAndRemoveNonIntegerPart();
                 });
                 var self = this;
                 this.monthSelector.change(function (event) {
@@ -9319,6 +9325,13 @@ var CZ;
             };
             DatePicker.prototype.editModeInfinite = function () {
                 this.dateContainer.empty();
+            };
+            DatePicker.prototype.checkAndRemoveNonIntegerPart = function () {
+                var regime = this.regimeSelector.find(":selected").val().toLowerCase();
+                var mode = this.modeSelector.find(":selected").val().toLowerCase();
+                if(regime === 'ce' || regime === 'bce' || mode === 'date') {
+                    this.yearSelector.val(parseFloat(this.yearSelector.val()).toFixed());
+                }
             };
             DatePicker.prototype.setDate_YearMode = function (coordinate) {
                 var date = CZ.Dates.convertCoordinateToYear(coordinate);
@@ -10570,7 +10583,7 @@ var CZ;
                     if(!CZ.Authoring.isNotEmpty(_this.titleInput.val())) {
                         _this.errorMessage.text('Title is empty');
                     } else if(!CZ.Authoring.isIntervalPositive(_this.startDate.getDate(), _this.endDate.getDate())) {
-                        _this.errorMessage.text('Result interval is not positive');
+                        _this.errorMessage.text('Time interval should no less than one day');
                     }
                     if(!isDataValid) {
                         return;
@@ -11534,7 +11547,7 @@ var CZ;
             }, 
             
         ];
-        var rootCollection;
+        HomePageViewModel.rootCollection;
         function UserCanEditCollection(profile) {
             if(CZ.Service.superCollectionName === "sandbox") {
                 return true;
@@ -11833,7 +11846,7 @@ var CZ;
                 CZ.Settings.signinUrlYahoo = response.signinUrlYahoo;
             });
             var url = CZ.UrlNav.getURL();
-            this.rootCollection = url.superCollectionName === undefined;
+            HomePageViewModel.rootCollection = url.superCollectionName === undefined;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
@@ -12230,10 +12243,10 @@ var CZ;
                     if(feature.Activation === FeatureActivation.Disabled) {
                         enabled = false;
                     }
-                    if(feature.Activation === FeatureActivation.NotRootCollection && this.rootCollection) {
+                    if(feature.Activation === FeatureActivation.NotRootCollection && HomePageViewModel.rootCollection) {
                         enabled = false;
                     }
-                    if(feature.Activation === FeatureActivation.RootCollection && !this.rootCollection) {
+                    if(feature.Activation === FeatureActivation.RootCollection && !HomePageViewModel.rootCollection) {
                         enabled = false;
                     }
                     if(feature.Activation === FeatureActivation.NotProduction && (!constants || constants.environment === "Production")) {

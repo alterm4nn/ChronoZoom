@@ -82,7 +82,7 @@ var CZ;
             }, 
             
         ];
-        var rootCollection;
+        HomePageViewModel.rootCollection;
         function UserCanEditCollection(profile) {
             if(CZ.Service.superCollectionName === "sandbox") {
                 return true;
@@ -381,7 +381,7 @@ var CZ;
                 CZ.Settings.signinUrlYahoo = response.signinUrlYahoo;
             });
             var url = CZ.UrlNav.getURL();
-            this.rootCollection = url.superCollectionName === undefined;
+            HomePageViewModel.rootCollection = url.superCollectionName === undefined;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
@@ -778,10 +778,10 @@ var CZ;
                     if(feature.Activation === FeatureActivation.Disabled) {
                         enabled = false;
                     }
-                    if(feature.Activation === FeatureActivation.NotRootCollection && this.rootCollection) {
+                    if(feature.Activation === FeatureActivation.NotRootCollection && HomePageViewModel.rootCollection) {
                         enabled = false;
                     }
-                    if(feature.Activation === FeatureActivation.RootCollection && !this.rootCollection) {
+                    if(feature.Activation === FeatureActivation.RootCollection && !HomePageViewModel.rootCollection) {
                         enabled = false;
                     }
                     if(feature.Activation === FeatureActivation.NotProduction && (!constants || constants.environment === "Production")) {

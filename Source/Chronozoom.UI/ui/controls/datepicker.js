@@ -109,10 +109,14 @@ var CZ;
                 this.yearSelector.focus(function (event) {
                     _this.errorMsg.text("");
                 });
+                this.regimeSelector.change(function (event) {
+                    _this.checkAndRemoveNonIntegerPart();
+                });
                 this.yearSelector.blur(function (event) {
                     if(!_this.validateNumber(_this.yearSelector.val())) {
                         _this.errorMsg.text(_this.WRONG_YEAR_INPUT);
                     }
+                    _this.checkAndRemoveNonIntegerPart();
                 });
                 var optionGa = $("<option value='ga'>Ga</option>");
                 var optionMa = $("<option value='ma'>Ma</option>");
@@ -136,6 +140,7 @@ var CZ;
                     if(!_this.validateNumber(_this.yearSelector.val())) {
                         _this.errorMsg.text(_this.WRONG_YEAR_INPUT);
                     }
+                    _this.checkAndRemoveNonIntegerPart();
                 });
                 var self = this;
                 this.monthSelector.change(function (event) {
@@ -157,6 +162,13 @@ var CZ;
             };
             DatePicker.prototype.editModeInfinite = function () {
                 this.dateContainer.empty();
+            };
+            DatePicker.prototype.checkAndRemoveNonIntegerPart = function () {
+                var regime = this.regimeSelector.find(":selected").val().toLowerCase();
+                var mode = this.modeSelector.find(":selected").val().toLowerCase();
+                if(regime === 'ce' || regime === 'bce' || mode === 'date') {
+                    this.yearSelector.val(parseFloat(this.yearSelector.val()).toFixed());
+                }
             };
             DatePicker.prototype.setDate_YearMode = function (coordinate) {
                 var date = CZ.Dates.convertCoordinateToYear(coordinate);

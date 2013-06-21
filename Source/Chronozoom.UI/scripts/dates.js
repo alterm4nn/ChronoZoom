@@ -146,6 +146,7 @@ var CZ;
                     coordinate = year * (-1) + 1;
                     break;
             }
+            coordinate = Math.ceil(coordinate);
             return coordinate;
         }
         Dates.convertYearToCoordinate = convertYearToCoordinate;

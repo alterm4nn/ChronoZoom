@@ -114,7 +114,7 @@ module CZ {
             },
         ];
 
-        var rootCollection: bool;
+        export var rootCollection: bool;
 
         function UserCanEditCollection(profile) {
             if (CZ.Service.superCollectionName === "sandbox") {
@@ -441,7 +441,7 @@ module CZ {
                 });
 
             var url = CZ.UrlNav.getURL();
-            this.rootCollection = url.superCollectionName === undefined;
+            rootCollection = url.superCollectionName === undefined;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
@@ -893,11 +893,11 @@ module CZ {
                         enabled = false;
                     }
 
-                    if (feature.Activation === FeatureActivation.NotRootCollection && this.rootCollection) {
+                    if (feature.Activation === FeatureActivation.NotRootCollection && rootCollection) {
                         enabled = false;
                     }
 
-                    if (feature.Activation === FeatureActivation.RootCollection && !this.rootCollection) {
+                    if (feature.Activation === FeatureActivation.RootCollection && !rootCollection) {
                         enabled = false;
                     }
 

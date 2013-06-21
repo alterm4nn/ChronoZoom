@@ -73,6 +73,8 @@ module CZ {
                     this.endDate.setDate(this.timeline.x + this.timeline.width, true);
                 }
                 this.saveButton.click(event => {
+                    
+
                     this.errorMessage.empty();
                     var isDataValid = false;
                     isDataValid = CZ.Authoring.validateTimelineData(this.startDate.getDate(), this.endDate.getDate(), this.titleInput.val());
@@ -81,7 +83,7 @@ module CZ {
                         this.errorMessage.text('Title is empty');
                     }
                     else if (!CZ.Authoring.isIntervalPositive(this.startDate.getDate(), this.endDate.getDate())) {
-                        this.errorMessage.text('Result interval is not positive');
+                        this.errorMessage.text('Time interval should no less than one day');
                     }      
                     
                     if (!isDataValid) {
