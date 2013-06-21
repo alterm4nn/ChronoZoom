@@ -11350,10 +11350,10 @@ var CZ;
         ];
         HomePageViewModel.rootCollection;
         function UserCanEditCollection(profile) {
-            if(CZ.Service.superCollectionName === "sandbox") {
+            if(CZ.Service.superCollectionName && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
                 return true;
             }
-            if(!profile || profile.DisplayName !== CZ.Service.superCollectionName) {
+            if(!profile || !profile.DisplayName || !CZ.Service.superCollectionName || profile.DisplayName.toLowerCase() !== CZ.Service.superCollectionName.toLowerCase()) {
                 return false;
             }
             return true;
