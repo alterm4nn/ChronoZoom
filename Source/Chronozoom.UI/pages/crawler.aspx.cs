@@ -5,6 +5,8 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.Collections.ObjectModel;
 using Chronozoom.Entities;
+using System.Text;
+using System.Globalization;
 
 namespace Chronozoom.UI
 {
@@ -130,7 +132,7 @@ namespace Chronozoom.UI
 
         public static string RootTimelineId(Uri collection)
         {
-            string root = "00000000-0000-0000-0000-000000000000";
+            string root = string.Empty;
 
             if (collection != null)
             {
@@ -277,6 +279,23 @@ namespace Chronozoom.UI
             {
                 return false;
             }
+        }
+
+        public static string GetTitle(Uri url)
+        {
+            StringBuilder title = new StringBuilder();
+
+            string urlGuid = Chronozoom.UI.Crawler.UrlGuid(url);
+            if (IsTimeline(urlGuid)) { 
+                title.Append(Timelines(urlGuid).Title + " - ");
+            } else if (IsExhibit(urlGuid)) {
+                title.Append(Exhibits(urlGuid).Title + " - ");
+            } else if (IsContentItem(urlGuid)) {
+                title.Append(ContentItems(urlGuid).Title + " - ");
+            }
+
+            title.Append("ChronoZoom");
+            return title.ToString();
         }
 
         private static Regex isGuid =
