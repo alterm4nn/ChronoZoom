@@ -187,8 +187,6 @@ module CZ {
                     break;
             }
 
-            coordinate = Math.ceil(coordinate);
-
             return coordinate;
         }
          

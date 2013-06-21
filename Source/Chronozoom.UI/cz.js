@@ -3641,7 +3641,6 @@ var CZ;
                     coordinate = year * (-1) + 1;
                     break;
             }
-            coordinate = Math.ceil(coordinate);
             return coordinate;
         }
         Dates.convertYearToCoordinate = convertYearToCoordinate;
@@ -4839,7 +4838,6 @@ var CZ;
         }
         Tours.initializeToursUI = initializeToursUI;
         function initializeToursContent() {
-            var toursUI = $('#tours-content');
             Tours.tours.sort(function (u, v) {
                 return u.sequenceNum - v.sequenceNum;
             });
@@ -10397,6 +10395,7 @@ var CZ;
                         }).then(function (success) {
                             self.isCancel = false;
                             self.close();
+                            self.timeline.onmouseclick();
                         }, function (error) {
                             alert("Unable to save changes. Please try again later.");
                             console.log(error);
@@ -11262,7 +11261,6 @@ var CZ;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
-var constants;
 var CZ;
 (function (CZ) {
     (function (UI) {
@@ -11310,6 +11308,7 @@ var CZ;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
+var constants;
 var CZ;
 (function (CZ) {
     CZ.timeSeriesChart;

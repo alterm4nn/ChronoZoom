@@ -67,6 +67,7 @@ var CZ;
                         }).then(function (success) {
                             self.isCancel = false;
                             self.close();
+                            self.timeline.onmouseclick();
                         }, function (error) {
                             alert("Unable to save changes. Please try again later.");
                             console.log(error);
