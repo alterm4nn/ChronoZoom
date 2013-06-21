@@ -392,7 +392,7 @@ module CZ {
             }
 
             private initialize(): void {
-
+                this.saveButton.prop('disabled', false);
                 if (this.tour == null) // creating new tour
                 {
                     this.deleteButton.hide();
@@ -454,7 +454,7 @@ module CZ {
                                         console.error("Failed to update a tour: " + f.status + " " + f.statusText);
                                     }
                                     alert("Failed to update a tour");
-                                }).done(() => {
+                                }).always(() => {
                                     this.saveButton.prop('disabled', false);
                                 });
                                 break;

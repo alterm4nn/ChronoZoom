@@ -28,6 +28,7 @@ var CZ;
             }
             FormEditCI.prototype.initUI = function () {
                 var _this = this;
+                this.saveButton.prop('disabled', false);
                 if(CZ.Authoring.contentItemMode === "createContentItem") {
                     this.titleTextblock.text("Create New");
                     this.saveButton.text("create artifiact");
@@ -108,7 +109,7 @@ var CZ;
                                 _this.close();
                             }, function (error) {
                                 alert("Unable to save changes. Please try again later.");
-                            }).done(function () {
+                            }).always(function () {
                                 _this.saveButton.prop('disabled', false);
                             });
                         }
