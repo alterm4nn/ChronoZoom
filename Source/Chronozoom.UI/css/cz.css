@@ -303,7 +303,7 @@ a:visited {
   display: inline-block;
 }
 #login-panel label.header-icon-label {
-    margin-left: 0px;
+  margin-left: 0px;
 }
 .header__edit-button:hover {
   background-color: #0464a2;
@@ -397,7 +397,7 @@ a:visited {
 }
 .tour_control {
   display: none;
-  margin: 5px;
+  margin: 2px;
   width: 190px;
   cursor: pointer;
 }
