@@ -636,9 +636,6 @@ namespace Chronozoom.UI
                 rootTimeline.ToYear = 9999;
                 rootTimeline.Collection = personalCollection;
                 rootTimeline.Depth = 0;
-                rootTimeline.FirstNodeInSubtree = rootTimeline.Id;
-                rootTimeline.Predecessor = Guid.Empty;
-                rootTimeline.Successor = Guid.Empty;
 
                 storage.SuperCollections.Add(superCollection);
                 storage.Collections.Add(personalCollection);
@@ -879,31 +876,13 @@ namespace Chronozoom.UI
                             parentTimeline.ChildTimelines = new System.Collections.ObjectModel.Collection<Timeline>();
                         }
                         newTimeline.Depth = parentTimeline.Depth + 1;
-                        if (parentTimeline.Predecessor != Guid.Empty)
-                        {
-                            Timeline predecessorTimeline = storage.Timelines.Find(parentTimeline.Predecessor);
-                            predecessorTimeline.Successor = newTimeline.Id;
-                            newTimeline.Predecessor = predecessorTimeline.Id;
-                        }
-                        else
-                        {
-                            newTimeline.Predecessor = Guid.Empty;
-                        }
-                        if (parentTimeline.FirstNodeInSubtree == parentTimeline.Id)
-                        {
-                            storage.UpdateFirstNodeInSubtree(parentTimeline, newTimeline.Id);
-                        }
-                        newTimeline.Successor = parentTimeline.Id;
-                        parentTimeline.Predecessor = newTimeline.Id;
+
                         parentTimeline.ChildTimelines.Add(newTimeline);
                         UpdateSubtreeSize(storage, parentTimeline, 1);
                     }
                     else
                     {
                         newTimeline.Depth = 0;
-                        newTimeline.FirstNodeInSubtree = newTimeline.Id;
-                        newTimeline.Predecessor = Guid.Empty;
-                        newTimeline.Successor = Guid.Empty;
                         newTimeline.SubtreeSize = 1;
                     }
                     storage.Timelines.Add(newTimeline);
@@ -976,27 +955,6 @@ namespace Chronozoom.UI
                 Timeline parentTimeline = storage.GetParentTimelineRaw(timelineRequest.Id);
                 UpdateSubtreeSize(storage, parentTimeline, (deleteTimeline.SubtreeSize > 0 ? -deleteTimeline.SubtreeSize : 0) - 1);
 
-                if (deleteTimeline.Successor != Guid.Empty)
-                {
-                    Timeline successorTimeline = storage.Timelines.Find(deleteTimeline.Successor);
-                    successorTimeline.Predecessor = deleteTimeline.Predecessor;
-                }
-                if (deleteTimeline.Predecessor != Guid.Empty)
-                {
-                    Timeline predecessorTimeline = storage.Timelines.Find(deleteTimeline.Predecessor);
-                    predecessorTimeline.Successor = deleteTimeline.Successor;
-                }
-                if (deleteTimeline.FirstNodeInSubtree == deleteTimeline.Id && parentTimeline != null)
-                {
-                    if (deleteTimeline.Successor != Guid.Empty)
-                    {
-                        storage.UpdateFirstNodeInSubtree(parentTimeline, deleteTimeline.Successor);
-                    }
-                    else
-                    {
-                        storage.UpdateFirstNodeInSubtree(parentTimeline, parentTimeline.Id);
-                    }
-                }
                 storage.DeleteTimeline(timelineRequest.Id);
                 storage.SaveChanges();
             });
