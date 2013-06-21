@@ -9,12 +9,10 @@ module CZ {
             function bookmark(ts: CZ.UI.TourStop) : any
             {
                 return {
-                    id: ts.bookmarkId,
                     name: ts.Title,
                     url: ts.NavigationUrl,
                     lapseTime: ts.LapseTime,
                     description: ts.Description,
-                    sequenceId: ts.Sequence
                 };
             }
 
@@ -26,7 +24,7 @@ module CZ {
                     bookmarks[i] = bookmark(t.Stops[i]);
                 }
 
-                return {
+                var tourRequest = {
                     id: t.Id,
                     name: t.Title,
                     description: t.Description,
@@ -35,6 +33,8 @@ module CZ {
                     sequence: t.Sequence,
                     bookmarks: bookmarks
                 };
+
+                return tourRequest;
             }
 
             export function timeline(t) {
@@ -353,34 +353,13 @@ module CZ {
             });
         }
 
-
-        // .../{supercollection}/{collection}/tour
-        // Creates new tour
-        export function postTour(t : CZ.UI.Tour) {
+           // .../{supercollection}/{collection}/tour
+        // Creates or updates a tour
+        export function putTour2(t: CZ.UI.Tour) {
             var request = new Request(_serviceUrl);
             request.addToPath(superCollectionName);
             request.addToPath(collectionName);
-            request.addToPath("tour");
-
-            console.log("[POST] " + request.url);
-
-            return $.ajax({
-                type: "POST",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: request.url,
-                data: JSON.stringify(Map.tour(t))
-            });
-        }
-
-        // .../{supercollection}/{collection}/tour
-        // Updates a tour
-        export function putTour(t: CZ.UI.Tour) {
-            var request = new Request(_serviceUrl);
-            request.addToPath(superCollectionName);
-            request.addToPath(collectionName);
-            request.addToPath("tour");
+            request.addToPath("tour2");
 
             console.log("[PUT] " + request.url);
 
@@ -413,55 +392,7 @@ module CZ {
                 data: JSON.stringify({ id: tourId })
             });
         }
-
-        // .../{supercollection}/{collection}/bookmark
-        // Deletes bookmarks
-        export function deleteBookmarks(tourId: string, bookmarks: CZ.Tours.TourBookmark[]) {
-            var request = new Request(_serviceUrl);
-            request.addToPath(superCollectionName);
-            request.addToPath(collectionName);
-            request.addToPath("bookmark");
-
-            console.log("[DELETE] " + request.url);
-
-            var bids = new Array(bookmarks.length);
-            for (var i = 0, n = bookmarks.length; i < n; i++){
-                bids[i] = { id: bookmarks[i].id };
-            }
-
-            return $.ajax({
-                type: "DELETE",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: request.url,
-                data: JSON.stringify({
-                    id: tourId,
-                    bookmarks: bids
-                })
-            });
-        }
-
-        // .../{supercollection}/{collection}/bookmark
-        // Adds bookmarks to a tour
-        export function putBookmarks(t: CZ.UI.Tour) {
-            var request = new Request(_serviceUrl);
-            request.addToPath(superCollectionName);
-            request.addToPath(collectionName);
-            request.addToPath("bookmark");
-
-            console.log("[PUT] " + request.url);
-
-            return $.ajax({
-                type: "PUT",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: request.url,
-                data: JSON.stringify(Map.tour(t))
-            });
-        }
-
+        
         // .../{supercollection}/{collection}/tours
         export function getTours () {
             var request = new Service.Request(_serviceUrl);

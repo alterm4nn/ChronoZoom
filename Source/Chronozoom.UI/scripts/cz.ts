@@ -18,6 +18,7 @@
 /// <reference path='../ui/timeseries-graph-form.ts'/>
 /// <reference path='../ui/timeseries-data-form.ts'/>
 /// <reference path='../ui/tourslist-form.ts'/>
+/// <reference path='../ui/message-window.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
 
 var constants: any;
@@ -42,7 +43,8 @@ module CZ {
             "#toursList": "/ui/tourslist-form.html", // 9
             "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html", // 10
             "#timeSeriesContainer": "/ui/timeseries-graph-form.html", //11
-            "#timeSeriesDataForm": "/ui/timeseries-data-form.html" //12
+            "#timeSeriesDataForm": "/ui/timeseries-data-form.html", //12
+            "#message-window": "/ui/message-window.html" // 13
         };
 
         export enum FeatureActivation {
@@ -231,6 +233,20 @@ module CZ {
                 });
 
                 CZ.Authoring.initialize(CZ.Common.vc, {
+                    showMessageWindow: function (message: string, title?: string, onClose?: () => any) {
+                        var wnd = new CZ.UI.MessageWindow(forms[13], message, title);
+                        if (onClose) wnd.container.bind("close", () =>
+                        {
+                            wnd.container.unbind("close", onClose);
+                            onClose();
+                        });
+                        wnd.show();
+                    },
+                    hideMessageWindow: function () {
+                        var wnd = <CZ.UI.MessageWindow>forms[13].data("form");
+                        if (wnd)
+                            wnd.close();
+                    },
                     showEditTourForm: function (tour) {
                         CZ.Tours.removeActiveTour();
                         var form = new CZ.UI.FormEditTour(forms[7], {
