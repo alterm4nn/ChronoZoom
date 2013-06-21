@@ -480,7 +480,6 @@ var CZ;
         }
         Tours.initializeToursUI = initializeToursUI;
         function initializeToursContent() {
-            var toursUI = $('#tours-content');
             Tours.tours.sort(function (u, v) {
                 return u.sequenceNum - v.sequenceNum;
             });

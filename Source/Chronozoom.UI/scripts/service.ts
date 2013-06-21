@@ -9,12 +9,10 @@ module CZ {
             function bookmark(ts: CZ.UI.TourStop) : any
             {
                 return {
-                    //id: ts.bookmarkId,
                     name: ts.Title,
                     url: ts.NavigationUrl,
                     lapseTime: ts.LapseTime,
                     description: ts.Description,
-                    //sequenceId: ts.Sequence
                 };
             }
 
