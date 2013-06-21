@@ -132,7 +132,7 @@ namespace Chronozoom.UI
 
         public static string RootTimelineId(Uri collection)
         {
-            string root = string.Empty;
+            string root = Guid.Empty.ToString();
 
             if (collection != null)
             {
@@ -185,6 +185,10 @@ namespace Chronozoom.UI
                             if (timeline != null)
                             {
                                 root = timeline.Id.ToString();
+                            }
+                            else
+                            {
+                                root = "";
                             }
                         }
                     }
