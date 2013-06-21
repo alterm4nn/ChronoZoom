@@ -402,8 +402,10 @@ describe("CZ.DateTickSource part", function () {
             CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
         });
 
+        // NOTE: https://github.com/ariya/phantomjs/issues/11013
+        //       It's recommended to run this test in browser.
         it("should not hang in January range", function () {
-            if (!window.Blob || !window.Worker) {
+            if (typeof (window.Blob) !== typeof (Function) || !window.Worker) {
                 return;
             }
 
@@ -436,7 +438,6 @@ describe("CZ.DateTickSource part", function () {
                 var worker = new Worker(window.URL.createObjectURL(blob));
 
                 worker.onmessage = function(e) {
-                    console.log("message");
                     flag = true;
                 };
 
