@@ -313,7 +313,9 @@ var CZ;
                     if(this.activeAnimation.isActive) {
                         AnimationStarted(this.activeAnimation.ID);
                     }
-                    self.animationStep(self);
+                    setTimeout(function () {
+                        return self.animationStep(self);
+                    }, 0);
                 } else {
                     animationUpdated(oldId, this.activeAnimation.ID);
                 }

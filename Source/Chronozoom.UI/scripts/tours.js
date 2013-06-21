@@ -14,14 +14,12 @@ var CZ;
         Tours.bookmarkAnimation;
         var isToursDebugEnabled = false;
         var TourBookmark = (function () {
-            function TourBookmark(id, url, caption, lapseTime, text) {
-                this.id = id;
+            function TourBookmark(url, caption, lapseTime, text) {
                 this.url = url;
                 this.caption = caption;
                 this.lapseTime = lapseTime;
                 this.text = text;
                 this.duration = undefined;
-                this.number = 0;
                 this.elapsed = 0;
                 if(this.text === null) {
                     this.text = "";
@@ -80,8 +78,8 @@ var CZ;
                     return b1.lapseTime - b2.lapseTime;
                 });
                 for(var i = 1; i < bookmarks.length; i++) {
-                    bookmarks[i - 1].duration = bookmarks[i].lapseTime - bookmarks[i - 1].lapseTime;
                     bookmarks[i - 1].number = i;
+                    bookmarks[i - 1].duration = bookmarks[i].lapseTime - bookmarks[i - 1].lapseTime;
                 }
                 bookmarks[bookmarks.length - 1].duration = 10;
                 bookmarks[bookmarks.length - 1].number = bookmarks.length;
@@ -482,70 +480,8 @@ var CZ;
         }
         Tours.initializeToursUI = initializeToursUI;
         function initializeToursContent() {
-            var toursUI = $('#tours-content');
             Tours.tours.sort(function (u, v) {
                 return u.sequenceNum - v.sequenceNum;
-            });
-            var category = null;
-            var categoryContent;
-            for(var i = 0; i < Tours.tours.length; i++) {
-                var tour = Tours.tours[i];
-                if(tour.category !== category) {
-                    var cat = $("<div></div>", {
-                        class: "category",
-                        text: tour.category
-                    }).appendTo(toursUI);
-                    var img = $("<img></img>", {
-                        class: "collapseButton",
-                        src: "/images/collapse-down.png"
-                    }).appendTo(cat);
-                    if(i == 0) {
-                        cat.removeClass('category').addClass('categorySelected');
-                        (img[0]).src = "/images/collapse-up.png";
-                    }
-                    categoryContent = $('<div></div>', {
-                        class: "itemContainer"
-                    }).appendTo(toursUI);
-                    category = tour.category;
-                }
-                $("<div></div>", {
-                    class: "item",
-                    tour: i,
-                    text: tour.title,
-                    click: function () {
-                        removeActiveTour();
-                        $("#tours").hide('slide', {
-                        }, 'slow');
-                        $(".tour-icon").removeClass("active");
-                        Tours.isTourWindowVisible = false;
-                        var mytour = Tours.tours[this.getAttribute("tour")];
-                        activateTour(mytour, Tours.isNarrationOn);
-                        $(".touritem-selected").removeClass("touritem-selected", "slow");
-                        $(this).addClass("touritem-selected", "slow");
-                    }
-                }).appendTo(categoryContent);
-            }
-            ($)("#tours-content").accordion({
-                collapsible: true,
-                heightStyle: "content",
-                beforeActivate: function (event, ui) {
-                    if(ui.newHeader) {
-                        ui.newHeader.removeClass('category');
-                        ui.newHeader.addClass('categorySelected');
-                        var img = ($(".collapseButton", ui.newHeader)[0]);
-                        if(img) {
-                            img.src = "/images/collapse-up.png";
-                        }
-                    }
-                    if(ui.oldHeader) {
-                        ui.oldHeader.removeClass('categorySelected');
-                        ui.oldHeader.addClass('category');
-                        var img = ($(".collapseButton", ui.oldHeader)[0]);
-                        if(img) {
-                            img.src = "/images/collapse-down.png";
-                        }
-                    }
-                }
             });
         }
         Tours.initializeToursContent = initializeToursContent;
@@ -678,7 +614,7 @@ var CZ;
             for(var i = 0; i < content.d.length; i++) {
                 var areBookmarksValid = true;
                 var tourString = content.d[i];
-                if((typeof tourString.bookmarks == 'undefined') || (typeof tourString.audio == 'undefined') || (tourString.audio == undefined) || (tourString.audio == null) || (typeof tourString.category == 'undefined') || (typeof tourString.name == 'undefined') || (typeof tourString.sequence == 'undefined') || (tourString.bookmarks.length == 0)) {
+                if((typeof tourString.bookmarks == 'undefined') || (typeof tourString.name == 'undefined') || (typeof tourString.sequence == 'undefined') || (tourString.bookmarks.length == 0)) {
                     continue;
                 }
                 var tourBookmarks = new Array();
@@ -688,7 +624,7 @@ var CZ;
                         areBookmarksValid = false;
                         break;
                     }
-                    tourBookmarks.push(new TourBookmark(bmString.id, bmString.url, bmString.name, bmString.lapseTime, bmString.description));
+                    tourBookmarks.push(new TourBookmark(bmString.url, bmString.name, bmString.lapseTime, bmString.description));
                 }
                 if(!areBookmarksValid) {
                     continue;
