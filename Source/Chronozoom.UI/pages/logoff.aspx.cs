@@ -49,7 +49,8 @@ namespace Chronozoom.UI
             return logOffUrl;
         }
 
-        private static string GetIdentityProvider()
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        public static string GetIdentityProvider()
         {
             Microsoft.IdentityModel.Claims.ClaimsIdentity claimsIdentity = System.Web.HttpContext.Current.User.Identity as Microsoft.IdentityModel.Claims.ClaimsIdentity;
 
