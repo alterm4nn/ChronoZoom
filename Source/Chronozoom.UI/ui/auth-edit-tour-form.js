@@ -279,6 +279,7 @@ var CZ;
             };
             FormEditTour.prototype.initialize = function () {
                 var _this = this;
+                this.saveButton.prop('disabled', false);
                 if(this.tour == null) {
                     this.deleteButton.hide();
                     this.titleTextblock.text("Create Tour");
@@ -314,6 +315,7 @@ var CZ;
                         return;
                     }
                     var self = _this;
+                    _this.saveButton.prop('disabled', true);
                     if(_this.tour == null) {
                         _this.putTourAsync(CZ.Tours.tours.length).done(function (tour) {
                             self.tour = tour;
@@ -325,6 +327,8 @@ var CZ;
                                 console.error("Failed to create a tour: " + f.status + " " + f.statusText);
                             }
                             alert("Failed to create a tour");
+                        }).done(function () {
+                            _this.saveButton.prop('disabled', false);
                         });
                     } else {
                         for(var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
@@ -337,6 +341,8 @@ var CZ;
                                         console.error("Failed to update a tour: " + f.status + " " + f.statusText);
                                     }
                                     alert("Failed to update a tour");
+                                }).always(function () {
+                                    _this.saveButton.prop('disabled', false);
                                 });
                                 break;
                             }

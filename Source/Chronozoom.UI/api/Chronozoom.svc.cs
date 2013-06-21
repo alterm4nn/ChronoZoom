@@ -234,6 +234,10 @@ namespace Chronozoom.UI
             public const string BookmarkSequenceIdDuplicate = "Bookmark sequence id already exists";
             public const string BookmarkSequenceIdInvalid = "Bookmark sequence id is invalid";
             public const string BookmarkIdInvalid = "Bookmark sequence id is invalid";
+            public const string ParentTimelineCollectionMismatch = "Parent timeline does not match collection timeline";
+            public const string InvalidContentItemUrl = "Artifact URL is invalid";
+            public const string InvalidMediaSourceUrl = "Media Source URL is invalid";
+            public const string CollectionRootTimelineExists = "Root timeline for the collection already exists";
         }
 
         private static Lazy<ChronozoomSVC> _sharedService = new Lazy<ChronozoomSVC>(() =>
@@ -632,9 +636,6 @@ namespace Chronozoom.UI
                 rootTimeline.ToYear = 9999;
                 rootTimeline.Collection = personalCollection;
                 rootTimeline.Depth = 0;
-                rootTimeline.FirstNodeInSubtree = rootTimeline.Id;
-                rootTimeline.Predecessor = Guid.Empty;
-                rootTimeline.Successor = Guid.Empty;
 
                 storage.SuperCollections.Add(superCollection);
                 storage.Collections.Add(personalCollection);
@@ -841,6 +842,18 @@ namespace Chronozoom.UI
                         return Guid.Empty;
                     }
 
+                    if (parentTimeline != null && !ValidateTimelineInCollection(storage, timelineRequest.Timeline_ID, collection.Id))
+                    {
+                        return Guid.Empty;
+                    }
+
+                    // Prevent more than one root timeline from being created in the same collection
+                    if (parentTimeline == null && storage.GetRootTimelines(collection.Id) != null)
+                    {
+                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionRootTimelineExists);
+                        return Guid.Empty;
+                    }
+
                     if (!ValidateTimelineRange(parentTimeline, timelineRequest.FromYear, timelineRequest.ToYear))
                     {
                         SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineRangeInvalid);
@@ -848,7 +861,6 @@ namespace Chronozoom.UI
                     }
 
                     // Parent timeline is valid - add new timeline
-
                     Guid newTimelineGuid = Guid.NewGuid();
                     Timeline newTimeline = new Timeline { Id = newTimelineGuid, Title = timelineRequest.Title, Regime = timelineRequest.Regime };
                     newTimeline.FromYear = timelineRequest.FromYear;
@@ -864,31 +876,13 @@ namespace Chronozoom.UI
                             parentTimeline.ChildTimelines = new System.Collections.ObjectModel.Collection<Timeline>();
                         }
                         newTimeline.Depth = parentTimeline.Depth + 1;
-                        if (parentTimeline.Predecessor != Guid.Empty)
-                        {
-                            Timeline predecessorTimeline = storage.Timelines.Find(parentTimeline.Predecessor);
-                            predecessorTimeline.Successor = newTimeline.Id;
-                            newTimeline.Predecessor = predecessorTimeline.Id;
-                        }
-                        else
-                        {
-                            newTimeline.Predecessor = Guid.Empty;
-                        }
-                        if (parentTimeline.FirstNodeInSubtree == parentTimeline.Id)
-                        {
-                            storage.UpdateFirstNodeInSubtree(parentTimeline, newTimeline.Id);
-                        }
-                        newTimeline.Successor = parentTimeline.Id;
-                        parentTimeline.Predecessor = newTimeline.Id;
+
                         parentTimeline.ChildTimelines.Add(newTimeline);
                         UpdateSubtreeSize(storage, parentTimeline, 1);
                     }
                     else
                     {
                         newTimeline.Depth = 0;
-                        newTimeline.FirstNodeInSubtree = newTimeline.Id;
-                        newTimeline.Predecessor = Guid.Empty;
-                        newTimeline.Successor = Guid.Empty;
                         newTimeline.SubtreeSize = 1;
                     }
                     storage.Timelines.Add(newTimeline);
@@ -961,27 +955,6 @@ namespace Chronozoom.UI
                 Timeline parentTimeline = storage.GetParentTimelineRaw(timelineRequest.Id);
                 UpdateSubtreeSize(storage, parentTimeline, (deleteTimeline.SubtreeSize > 0 ? -deleteTimeline.SubtreeSize : 0) - 1);
 
-                if (deleteTimeline.Successor != Guid.Empty)
-                {
-                    Timeline successorTimeline = storage.Timelines.Find(deleteTimeline.Successor);
-                    successorTimeline.Predecessor = deleteTimeline.Predecessor;
-                }
-                if (deleteTimeline.Predecessor != Guid.Empty)
-                {
-                    Timeline predecessorTimeline = storage.Timelines.Find(deleteTimeline.Predecessor);
-                    predecessorTimeline.Successor = deleteTimeline.Successor;
-                }
-                if (deleteTimeline.FirstNodeInSubtree == deleteTimeline.Id && parentTimeline != null)
-                {
-                    if (deleteTimeline.Successor != Guid.Empty)
-                    {
-                        storage.UpdateFirstNodeInSubtree(parentTimeline, deleteTimeline.Successor);
-                    }
-                    else
-                    {
-                        storage.UpdateFirstNodeInSubtree(parentTimeline, parentTimeline.Id);
-                    }
-                }
                 storage.DeleteTimeline(timelineRequest.Id);
                 storage.SaveChanges();
             });
@@ -1005,7 +978,7 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         public PutExhibitResult PutExhibit(string superCollectionName, string collectionName, ExhibitRaw exhibitRequest)
         {
             return ApiOperationUnderCollection(exhibitRequest, superCollectionName, collectionName, delegate(User user, Storage storage, Collection collection)
@@ -1013,12 +986,23 @@ namespace Chronozoom.UI
                 Trace.TraceInformation("Put Exhibit");
                 var returnValue = new PutExhibitResult();
 
+                foreach (ContentItem contentItemRequest in exhibitRequest.ContentItems)
+                {
+                    if (!ValidateContentItemUrl(contentItemRequest))
+                        return returnValue;
+                }
+
                 if (exhibitRequest.Id == Guid.Empty)
                 {
                     Timeline parentTimeline;
                     if (!FindParentTimeline(storage, exhibitRequest.Timeline_ID, out parentTimeline) || parentTimeline == null)
                     {
                         SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
+                        return returnValue;
+                    }
+
+                    if (!ValidateTimelineInCollection(storage, exhibitRequest.Timeline_ID, collection.Id))
+                    {
                         return returnValue;
                     }
 
@@ -1148,6 +1132,28 @@ namespace Chronozoom.UI
             return contentItemRequest.Id;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1304:SpecifyCultureInfo", MessageId = "System.String.ToLower")]
+        private static Boolean ValidateContentItemUrl(ContentItem contentitem)
+        {
+            Uri uriResult;
+
+            // If Media Source is present, validate it
+            if (contentitem.MediaSource.Length > 0 && !(Uri.TryCreate(contentitem.MediaSource, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)))
+            {
+                SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidMediaSourceUrl);
+                return false;
+            }
+
+            // Check if valid url
+            if (!(Uri.TryCreate(contentitem.Uri, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)))
+            {
+                SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
+                return false;
+            }
+
+            return true;
+        }
+
         private static Guid AddContentItem(Storage storage, Collection collection, Exhibit newExhibit, ContentItem contentItemRequest)
         {
             Guid newContentItemGuid = Guid.NewGuid();
@@ -1221,6 +1227,9 @@ namespace Chronozoom.UI
             {
                 Trace.TraceInformation("Put Content Item");
 
+                if (!ValidateContentItemUrl(contentItemRequest))
+                    return Guid.Empty;
+
                 Guid returnValue;
 
                 if (contentItemRequest.Id == Guid.Empty)
@@ -1228,12 +1237,18 @@ namespace Chronozoom.UI
                     Exhibit parentExhibit = FindParentExhibit(storage, contentItemRequest.Exhibit_ID);
                     if (parentExhibit == null)
                     {
-                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentTimelineNotFound);
+                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.ParentExhibitNotFound);
                         return Guid.Empty;
                     }
                     storage.Entry(parentExhibit).Collection(_ => _.ContentItems).Load();
 
                     TimelineRaw parentTimeline = storage.GetExhibitParentTimeline(contentItemRequest.Exhibit_ID);
+
+                    if (!ValidateTimelineInCollection(storage, parentTimeline.Id, collection.Id))
+                    {
+                        return Guid.Empty;
+                    }
+
                     // Parent content item is valid - add new content item
                     var newContentItemGuid = AddContentItem(storage, collection, parentExhibit, contentItemRequest);
                     returnValue = newContentItemGuid;
@@ -1957,6 +1972,19 @@ namespace Chronozoom.UI
             SuperCollection superCollection = storage.SuperCollections.Find(superCollectionId);
             storage.Entry(superCollection).Reference("User").Load();
             return superCollection;
+        }
+
+        static bool ValidateTimelineInCollection(Storage storage, Guid? timelineId, Guid collectionId)
+        {
+            // Validate that the collection of the parent timeline in the request object corresponds to the collection specified in the uri.
+            Guid timelineCollectionId = storage.GetCollectionFromTimeline(timelineId);
+            if (timelineCollectionId != collectionId)
+            {
+                SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.ParentTimelineCollectionMismatch);
+                return false;
+            }
+
+            return true;
         }
     }
 }

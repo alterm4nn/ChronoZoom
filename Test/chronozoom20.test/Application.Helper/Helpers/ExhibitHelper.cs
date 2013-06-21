@@ -11,12 +11,6 @@ namespace Application.Helper.Helpers
 {
     public class ExhibitHelper : DependentActions
     {
-        private readonly HelperManager _manager;
-
-        public ExhibitHelper()
-        {
-            _manager = new HelperManager();
-        }
 
         public void AddExhibit(Exhibit exhibit)
         {
@@ -87,10 +81,10 @@ namespace Application.Helper.Helpers
             }
         }
 
-        public string GetContentItemDescription()
+        public string GetFirstContentItemDescription()
         {
             Logger.Log("<-");
-            string description = GetText(By.XPath("(//*[@id='vc']/*[@class='contentItemDescription']/div)[2]"));
+            string description = GetText(By.XPath("//*[@id='vc']/*[@class='contentItemDescription']/div"));
             Logger.Log("-> description: " + description);
             return description;
         }
@@ -104,7 +98,6 @@ namespace Application.Helper.Helpers
             ConfirmDeletion();
             Logger.Log("->");
         }
-
 
         public bool IsExhibitFound(Exhibit exhibit)
         {
@@ -125,9 +118,9 @@ namespace Application.Helper.Helpers
         public string GetEukaryoticCellsDescription()
         {
             Logger.Log("<-");
-            _manager.GetNavigationHelper().OpenExhibitEukaryoticCells();
+            HelperManager<NavigationHelper>.GetInstance.OpenExhibitEukaryoticCells();
             Logger.Log("ExhibitEukaryotic Cell is opened");
-            string description = GetContentItemDescription();
+            string description = GetFirstContentItemDescription();
             Logger.Log("-> description: " + description);
             return description;
         }
@@ -147,6 +140,14 @@ namespace Application.Helper.Helpers
             WaitAnimation();
             MoveToElementAndClick(By.ClassName("virtualCanvasLayerCanvas"));
             Logger.Log("->");
+        }
+
+        public string GetTakeOurSurveyArtifactContentItemDescription()
+        {
+            Logger.Log("<-");
+            string description = GetText(By.XPath("//*[@id='vc']/*[@class='contentItemDescription']/div"));
+            Logger.Log("-> description: " + description);
+            return description;
         }
 
         private void ConfirmDeletion()
@@ -252,8 +253,6 @@ namespace Application.Helper.Helpers
                 FillArtifact(contentItem);
                 Click(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-save cz-button']"));
             }
-
         }
-
     }
 }

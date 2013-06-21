@@ -2031,8 +2031,18 @@ module CZ {
             this.opacity = typeof infodotDescription.opacity !== 'undefined' ? infodotDescription.opacity : 1;
 
             contentItems.sort(function (a, b) {
-                return a.order - b.order;
+                if (typeof a.order !== 'undefined' && typeof b.order === 'undefined') return -1;
+                else if (typeof a.order === 'undefined' && typeof b.order !== 'undefined') return 1;
+                else if (typeof a.order === 'undefined' && typeof b.order === 'undefined') return 0;
+                else if (a.order < b.order) return -1;
+                else if (a.order > b.order) return 1;
+                else return 0;
             });
+
+            // convert relative content item order to absolute position
+            for (var i = 0; i < contentItems.length; i++) {
+                contentItems[i].order = i;
+            }
 
             var vyc = this.newY + radv;
             var innerRad = radv - CZ.Settings.infoDotHoveredBorderWidth * radv;
@@ -2187,7 +2197,9 @@ module CZ {
 
                     if (infodotDescription && infodotDescription.title && infodotDescription.date) {
                         var exhibitDate = CZ.Dates.convertCoordinateToYear(infodotDescription.date);
-                        title = infodotDescription.title + '\n(' + exhibitDate.year + ' ' + exhibitDate.regime + ')';
+
+                        // Format year title with fixed precision
+                        title = infodotDescription.title + '\n(' + parseFloat(exhibitDate.year.toFixed(2)) + ' ' + exhibitDate.regime + ')';
                     }
 
                     var infodotTitle = addText(contentItem, layerid, id + "__title", time - titleWidth / 2, titleTop, titleTop, titleHeight,
@@ -2428,7 +2440,7 @@ module CZ {
             // build content items
             var vcitems = [];
 
-            for (var i = 0, len = Math.min(10, n); i < len; i++) {
+            for (var i = 0, len = Math.min(CZ.Settings.infodotMaxContentItemsCount, n); i < len; i++) {
                 var ci = contentItems[i];
                 if (i === 0) { // center
                     vcitems.push(new ContentItem(vc, layerid, ci.id, -_wc / 2 * rad + xc, -_hc / 2 * rad + yc, _wc * rad, _hc * rad, ci));

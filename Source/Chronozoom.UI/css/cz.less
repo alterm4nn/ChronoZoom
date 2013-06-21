@@ -191,7 +191,7 @@ a
 
 .timeSeries-icon
 {
-    background-image: url('../images/timseries-icon.png');
+    background-image: url('../images/timeseries-icon.png');
 }
 
 .view-icon
@@ -208,7 +208,13 @@ a
 .profile-icon
 {
     background-image: url('../images/profile-icon.png');
+    background-position-x: 3px;
     display: inline-block;
+}
+
+#login-panel label.header-icon-label
+{
+    margin-left: 0px;
 }
 
 .header__edit-button:hover
@@ -275,6 +281,15 @@ a
 {
     height: 0%;
     background-color: gray;
+    cursor: pointer;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+#timeSeriesContainer::selection {
+    cursor: pointer;
 }
 
 .virtualCanvas
@@ -319,7 +334,7 @@ a
 .tour_control
 {
     display: none;
-    margin: 5px;
+    margin: 2px;
     width: 190px;
     cursor: pointer;
 }

@@ -1996,8 +1996,23 @@ var CZ;
             this.title = infodotDescription.title;
             this.opacity = typeof infodotDescription.opacity !== 'undefined' ? infodotDescription.opacity : 1;
             contentItems.sort(function (a, b) {
-                return a.order - b.order;
+                if(typeof a.order !== 'undefined' && typeof b.order === 'undefined') {
+                    return -1;
+                } else if(typeof a.order === 'undefined' && typeof b.order !== 'undefined') {
+                    return 1;
+                } else if(typeof a.order === 'undefined' && typeof b.order === 'undefined') {
+                    return 0;
+                } else if(a.order < b.order) {
+                    return -1;
+                } else if(a.order > b.order) {
+                    return 1;
+                } else {
+                    return 0;
+                }
             });
+            for(var i = 0; i < contentItems.length; i++) {
+                contentItems[i].order = i;
+            }
             var vyc = this.newY + radv;
             var innerRad = radv - CZ.Settings.infoDotHoveredBorderWidth * radv;
             this.outerRad = radv;
@@ -2115,7 +2130,7 @@ var CZ;
                     var title = '';
                     if(infodotDescription && infodotDescription.title && infodotDescription.date) {
                         var exhibitDate = CZ.Dates.convertCoordinateToYear(infodotDescription.date);
-                        title = infodotDescription.title + '\n(' + exhibitDate.year + ' ' + exhibitDate.regime + ')';
+                        title = infodotDescription.title + '\n(' + parseFloat(exhibitDate.year.toFixed(2)) + ' ' + exhibitDate.regime + ')';
                     }
                     var infodotTitle = addText(contentItem, layerid, id + "__title", time - titleWidth / 2, titleTop, titleTop, titleHeight, title, {
                         fontName: CZ.Settings.contentItemHeaderFontName,
@@ -2319,7 +2334,7 @@ var CZ;
             var xr = xc + rad * (_xrc - _lw / 2);
             var yb = yc + rad * (_ybc - _lh / 2);
             var vcitems = [];
-            for(var i = 0, len = Math.min(10, n); i < len; i++) {
+            for(var i = 0, len = Math.min(CZ.Settings.infodotMaxContentItemsCount, n); i < len; i++) {
                 var ci = contentItems[i];
                 if(i === 0) {
                     vcitems.push(new ContentItem(vc, layerid, ci.id, -_wc / 2 * rad + xc, -_hc / 2 * rad + yc, _wc * rad, _hc * rad, ci));
@@ -2874,6 +2889,7 @@ var CZ;
             };
             FormEditTour.prototype.initialize = function () {
                 var _this = this;
+                this.saveButton.prop('disabled', false);
                 if(this.tour == null) {
                     this.deleteButton.hide();
                     this.titleTextblock.text("Create Tour");
@@ -2909,6 +2925,7 @@ var CZ;
                         return;
                     }
                     var self = _this;
+                    _this.saveButton.prop('disabled', true);
                     if(_this.tour == null) {
                         _this.putTourAsync(CZ.Tours.tours.length).done(function (tour) {
                             self.tour = tour;
@@ -2920,6 +2937,8 @@ var CZ;
                                 console.error("Failed to create a tour: " + f.status + " " + f.statusText);
                             }
                             alert("Failed to create a tour");
+                        }).done(function () {
+                            _this.saveButton.prop('disabled', false);
                         });
                     } else {
                         for(var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
@@ -2932,6 +2951,8 @@ var CZ;
                                         console.error("Failed to update a tour: " + f.status + " " + f.statusText);
                                     }
                                     alert("Failed to update a tour");
+                                }).always(function () {
+                                    _this.saveButton.prop('disabled', false);
                                 });
                                 break;
                             }
@@ -3729,7 +3750,7 @@ var CZ;
             var i = 0;
             var len = 0;
             var selfIntersection = false;
-            if(!tp) {
+            if(!tp || tp.guid === null) {
                 return true;
             }
             if(!isIncluded(tp, tc) && tp.id !== "__root__") {
@@ -9352,6 +9373,225 @@ var CZ;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
+    (function (Gestures) {
+        function PanGesture(xOffset, yOffset, src) {
+            this.Type = "Pan";
+            this.Source = src;
+            this.xOffset = xOffset;
+            this.yOffset = yOffset;
+        }
+        function ZoomGesture(xOrigin, yOrigin, scaleFactor, src) {
+            this.Type = "Zoom";
+            this.Source = src;
+            this.xOrigin = xOrigin;
+            this.yOrigin = yOrigin;
+            this.scaleFactor = scaleFactor;
+        }
+        function PinGesture(src) {
+            this.Type = "Pin";
+            this.Source = src;
+        }
+        function createPanSubject(vc) {
+            var _doc = ($(document));
+            var mouseDown = vc.toObservable("mousedown");
+            var mouseMove = vc.toObservable("mousemove");
+            var mouseUp = _doc.toObservable("mouseup");
+            var mouseMoves = mouseMove.Skip(1).Zip(mouseMove, function (left, right) {
+                return new PanGesture(left.clientX - right.clientX, left.clientY - right.clientY, "Mouse");
+            });
+            var stopPanning = mouseUp;
+            var mouseDrags = mouseDown.SelectMany(function (md) {
+                return mouseMoves.TakeUntil(stopPanning);
+            });
+            return mouseDrags;
+        }
+        function createPinSubject(vc) {
+            var mouseDown = vc.toObservable("mousedown");
+            return mouseDown.Select(function (md) {
+                return new PinGesture("Mouse");
+            });
+        }
+        function createZoomSubject(vc) {
+            vc.mousewheel(function (objEvent, intDelta) {
+                var event = ($).Event("xbrowserwheel");
+                event.delta = intDelta;
+                event.origin = CZ.Common.getXBrowserMouseOrigin(vc, objEvent);
+                vc.trigger(event);
+            });
+            var mouseWheel = vc.toObservable("xbrowserwheel");
+            var mouseWheels = mouseWheel.Zip(mouseWheel, function (arg) {
+                return new ZoomGesture(arg.origin.x, arg.origin.y, arg.delta > 0 ? 1 / CZ.Settings.zoomLevelFactor : 1 * CZ.Settings.zoomLevelFactor, "Mouse");
+            });
+            var mousedblclick = vc.toObservable("dblclick");
+            var mousedblclicks = mousedblclick.Zip(mousedblclick, function (event) {
+                var origin = CZ.Common.getXBrowserMouseOrigin(vc, event);
+                return new ZoomGesture(origin.x, origin.y, 1.0 / CZ.Settings.zoomLevelFactor, "Mouse");
+            });
+            return mouseWheels;
+        }
+        function createTouchPanSubject(vc) {
+            var _doc = ($)(document);
+            var touchStart = vc.toObservable("touchstart");
+            var touchMove = vc.toObservable("touchmove");
+            var touchEnd = _doc.toObservable("touchend");
+            var touchCancel = _doc.toObservable("touchcancel");
+            var gestures = touchStart.SelectMany(function (o) {
+                return touchMove.TakeUntil(touchEnd.Merge(touchCancel)).Skip(1).Zip(touchMove, function (left, right) {
+                    return {
+                        "left": left.originalEvent,
+                        "right": right.originalEvent
+                    };
+                }).Where(function (g) {
+                    return g.left.scale === g.right.scale;
+                }).Select(function (g) {
+                    return new PanGesture(g.left.pageX - g.right.pageX, g.left.pageY - g.right.pageY, "Touch");
+                });
+            });
+            return gestures;
+        }
+        function createTouchPinSubject(vc) {
+            var touchStart = vc.toObservable("touchstart");
+            return touchStart.Select(function (ts) {
+                return new PinGesture("Touch");
+            });
+        }
+        function createTouchZoomSubject(vc) {
+            var _doc = ($)(document);
+            var gestureStart = vc.toObservable("gesturestart");
+            var gestureChange = vc.toObservable("gesturechange");
+            var gestureEnd = _doc.toObservable("gestureend");
+            var touchCancel = _doc.toObservable("touchcancel");
+            var gestures = gestureStart.SelectMany(function (o) {
+                return gestureChange.TakeUntil(gestureEnd.Merge(touchCancel)).Skip(1).Zip(gestureChange, function (left, right) {
+                    return {
+                        "left": left.originalEvent,
+                        "right": right.originalEvent
+                    };
+                }).Where(function (g) {
+                    return g.left.scale !== g.right.scale && g.right.scale !== 0;
+                }).Select(function (g) {
+                    var delta = g.left.scale / g.right.scale;
+                    return new ZoomGesture(o.originalEvent.layerX, o.originalEvent.layerY, 1 / delta, "Touch");
+                });
+            });
+            return gestures;
+        }
+        function createTouchPanSubjectWin8(vc) {
+            var gestureStart = vc.toObservable("MSGestureStart");
+            var gestureChange = vc.toObservable("MSGestureChange");
+            var gestureEnd = vc.toObservable("MSGestureEnd");
+            var gestures = gestureStart.SelectMany(function (o) {
+                return gestureChange.TakeUntil(gestureEnd).Skip(1).Zip(gestureChange, function (left, right) {
+                    return {
+                        "left": left.originalEvent,
+                        "right": right.originalEvent
+                    };
+                }).Where(function (g) {
+                    return g.left.scale === g.right.scale && g.left.detail != g.left.MSGESTURE_FLAG_INERTIA && g.right.detail != g.right.MSGESTURE_FLAG_INERTIA;
+                }).Select(function (g) {
+                    return new PanGesture(g.left.offsetX - g.right.offsetX, g.left.offsetY - g.right.offsetY, "Touch");
+                });
+            });
+            return gestures;
+        }
+        function createTouchPinSubjectWin8(vc) {
+            var pointerDown = vc.toObservable("MSPointerDown");
+            return pointerDown.Select(function (gt) {
+                return new PinGesture("Touch");
+            });
+        }
+        function createTouchZoomSubjectWin8(vc) {
+            var gestureStart = vc.toObservable("MSGestureStart");
+            var gestureChange = vc.toObservable("MSGestureChange");
+            var gestureEnd = vc.toObservable("MSGestureEnd");
+            var gestures = gestureStart.SelectMany(function (o) {
+                return gestureChange.TakeUntil(gestureEnd).Where(function (g) {
+                    return g.originalEvent.scale !== 0 && g.originalEvent.detail != g.originalEvent.MSGESTURE_FLAG_INERTIA;
+                }).Select(function (g) {
+                    return new ZoomGesture(o.originalEvent.offsetX, o.originalEvent.offsetY, 1 / g.originalEvent.scale, "Touch");
+                });
+            });
+            return gestures;
+        }
+        var gesturesDictionary = [];
+        function addMSGestureSource(dom) {
+            gesturesDictionary.forEach(function (child) {
+                if(child === dom) {
+                    return;
+                }
+            });
+            gesturesDictionary.push(dom);
+            dom.addEventListener("MSPointerDown", function (e) {
+                if(dom.gesture === undefined) {
+                    var newGesture = new MSGesture();
+                    newGesture.target = dom;
+                    dom.gesture = newGesture;
+                }
+                dom.gesture.addPointer(e.pointerId);
+            }, false);
+        }
+        ;
+        function getGesturesStream(source) {
+            var panController;
+            var zoomController;
+            var pinController;
+            if(window.navigator.msPointerEnabled && (window).MSGesture) {
+                addMSGestureSource(source[0]);
+                panController = createTouchPanSubjectWin8(source);
+                var zoomControllerTouch = createTouchZoomSubjectWin8(source);
+                var zoomControllerMouse = createZoomSubject(source);
+                zoomController = zoomControllerTouch.Merge(zoomControllerMouse);
+                pinController = createTouchPinSubjectWin8(source);
+            } else if('ontouchstart' in document.documentElement) {
+                panController = createTouchPanSubject(source);
+                zoomController = createTouchZoomSubject(source);
+                pinController = createTouchPinSubject(source);
+            } else {
+                panController = createPanSubject(source);
+                zoomController = createZoomSubject(source);
+                pinController = createPinSubject(source);
+            }
+            return pinController.Merge(panController.Merge(zoomController));
+        }
+        Gestures.getGesturesStream = getGesturesStream;
+        function getPanPinGesturesStream(source) {
+            var panController;
+            var pinController;
+            if(window.navigator.msPointerEnabled && (window).MSGesture) {
+                addMSGestureSource(source[0]);
+                panController = createTouchPanSubjectWin8(source);
+                var zoomControllerTouch = createTouchZoomSubjectWin8(source);
+                var zoomControllerMouse = createZoomSubject(source);
+                pinController = createTouchPinSubjectWin8(source);
+            } else if('ontouchstart' in document.documentElement) {
+                panController = createTouchPanSubject(source);
+                pinController = createTouchPinSubject(source);
+            } else {
+                panController = createPanSubject(source);
+                pinController = createPinSubject(source);
+            }
+            return pinController.Merge(panController.Select(function (el) {
+                el.yOffset = 0;
+                return el;
+            }));
+        }
+        Gestures.getPanPinGesturesStream = getPanPinGesturesStream;
+        function applyAxisBehavior(gestureSequence) {
+            return gestureSequence.Where(function (el) {
+                return el.Type != "Zoom";
+            }).Select(function (el) {
+                if(el.Type == "Pan") {
+                    el.yOffset = 0;
+                }
+                return el;
+            });
+        }
+        Gestures.applyAxisBehavior = applyAxisBehavior;
+    })(CZ.Gestures || (CZ.Gestures = {}));
+    var Gestures = CZ.Gestures;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
     (function (UI) {
         var LineChart = (function () {
             function LineChart(container) {
@@ -9433,7 +9673,11 @@ var CZ;
                 }
                 var ticks = [];
                 for(var i = imin; i <= imax; i++) {
-                    ticks.push(i * k * h10);
+                    var newTick = i * k * h10;
+                    if(h < 0) {
+                        newTick = newTick.toPrecision(-h);
+                    }
+                    ticks.push(newTick);
                 }
                 var result = {
                 };
@@ -9441,10 +9685,6 @@ var CZ;
                 result.h = h;
                 result.h10 = h10;
                 return result;
-            };
-            LineChart.prototype.generateAxisParameters = function (ymin, ymax, labelCount) {
-                var ticks = this.calculateTicks(ymin, ymax, labelCount);
-                return null;
             };
             LineChart.prototype.clear = function (screenLeft, screenRight) {
                 this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -9457,27 +9697,13 @@ var CZ;
                 $("#leftLegend").css("max-width", maxLegendWidth + "px");
                 $("#timeSeriesChartHeader").text("TimeSeries Chart");
             };
-            LineChart.prototype.drawDataSet = function (dataSet, screenLeft, screenRight, verticalPadding, plotLeft, plotRight) {
+            LineChart.prototype.drawDataSet = function (dataSet, screenLeft, screenRight, verticalPadding, plotLeft, plotRight, plotTop, plotBottom) {
                 var that = this;
-                var plotBottom = Number.MAX_VALUE;
-                var plotTop = Number.MIN_VALUE;
                 dataSet.series.forEach(function (seria) {
-                    if(seria.appearanceSettings && seria.appearanceSettings.yMin && seria.appearanceSettings.yMin < plotBottom) {
-                        plotBottom = seria.appearanceSettings.yMin;
-                    }
-                    if(seria.appearanceSettings && seria.appearanceSettings.yMax && seria.appearanceSettings.yMax > plotTop) {
-                        plotTop = seria.appearanceSettings.yMax;
-                    }
                     if(seria.appearanceSettings && seria.appearanceSettings.thickness && seria.appearanceSettings.thickness > verticalPadding) {
                         verticalPadding = seria.appearanceSettings.thickness;
                     }
                 });
-                if((plotTop - plotBottom) === 0) {
-                    var absY = Math.max(0.1, Math.abs(plotBottom));
-                    var offsetConstant = 0.01;
-                    plotTop += absY * offsetConstant;
-                    plotBottom -= absY * offsetConstant;
-                }
                 var screenHeight = this.canvas.height - 2 * verticalPadding;
                 var dataToScreenX = function (x) {
                     return (x - plotLeft) / (plotRight - plotLeft) * (screenRight - screenLeft) + screenLeft;
@@ -9611,7 +9837,9 @@ var CZ;
                 var d = y > ymax ? 1 : 0;
                 return a << 3 | b << 2 | c << 1 | d;
             };
-            LineChart.prototype.drawAxis = function (tickOrigin, secondScreenBorder, ymin, ymax, appearence) {
+            LineChart.prototype.generateAxisParameters = function (tickOrigin, secondScreenBorder, ymin, ymax, appearence) {
+                var that = this;
+                var ticksForDraw = [];
                 var verticalPadding = appearence.verticalPadding ? appearence.verticalPadding : 0;
                 var screenHeight = this.canvas.height - 2 * verticalPadding;
                 var dataToScreenY = function (y) {
@@ -9635,23 +9863,57 @@ var CZ;
                 }
                 ctx.textAlign = appearence.axisLocation;
                 ticks.forEach(function (tick) {
+                    var tickForDraw = {
+                    };
+                    tickForDraw.tick = tick;
                     var y = dataToScreenY(tick);
-                    ctx.strokeStyle = appearence.stroke;
-                    ctx.beginPath();
-                    ctx.moveTo(tickOrigin, y);
-                    ctx.lineTo(tickOrigin + ticklength, y);
-                    ctx.stroke();
-                    ctx.fillText(tick, tickOrigin + ticklength + textOffset, y);
-                    ctx.strokeStyle = 'lightgray';
+                    tickForDraw.y = y;
+                    tickForDraw.xLineStart = tickOrigin;
+                    tickForDraw.xLineEnd = tickOrigin + ticklength;
+                    tickForDraw.xText = tickOrigin + ticklength + textOffset;
                     var textWidth = ctx.measureText(tick).width;
                     if(appearence.axisLocation == "right") {
                         textWidth = -textWidth;
                     }
                     var offset = ticklength + textWidth + 2 * textOffset;
+                    tickForDraw.isGridLineVisible = offset > 0 && (tickOrigin + offset) <= secondScreenBorder || offset < 0 && (tickOrigin + offset) >= secondScreenBorder;
+                    tickForDraw.xGridLineStart = tickOrigin + offset;
+                    tickForDraw.xGridLineEnd = secondScreenBorder;
+                    ticksForDraw.push(tickForDraw);
+                });
+                return ticksForDraw;
+            };
+            LineChart.prototype.drawAxis = function (ticksForDraw, appearence) {
+                var that = this;
+                var ctx = this.context;
+                ctx.font = appearence.font;
+                ctx.textBaseline = 'middle';
+                ctx.strokeStyle = appearence.stroke;
+                ctx.fillStyle = appearence.stroke;
+                ctx.lineWidth = appearence.majorTickThickness;
+                ctx.textAlign = appearence.axisLocation;
+                ticksForDraw.forEach(function (tick) {
+                    ctx.strokeStyle = appearence.stroke;
                     ctx.beginPath();
-                    ctx.moveTo(tickOrigin + offset, y);
-                    ctx.lineTo(secondScreenBorder, y);
+                    ctx.moveTo(tick.xLineStart, tick.y);
+                    ctx.lineTo(tick.xLineEnd, tick.y);
                     ctx.stroke();
+                    var minTextOffset = 8;
+                    ctx.fillText(tick.tick, tick.xText, Math.max(minTextOffset, Math.min(that.canvas.height - minTextOffset, tick.y)));
+                });
+            };
+            LineChart.prototype.drawHorizontalGridLines = function (ticksForDraw, appearence) {
+                var that = this;
+                var ctx = this.context;
+                ctx.strokeStyle = 'lightgray';
+                ctx.lineWidth = appearence.majorTickThickness;
+                ticksForDraw.forEach(function (tick) {
+                    if(tick.isGridLineVisible) {
+                        ctx.beginPath();
+                        ctx.moveTo(tick.xGridLineStart, tick.y);
+                        ctx.lineTo(tick.xGridLineEnd, tick.y);
+                        ctx.stroke();
+                    }
                 });
             };
             LineChart.prototype.drawVerticalGridLines = function (screenLeft, screenRight, plotLeft, plotRight) {
@@ -9673,14 +9935,15 @@ var CZ;
                 this.canvas.width = $("#timeSeries").width();
             };
             LineChart.prototype.clearLegend = function (location) {
+                var legendCnt = location === "left" ? $("#leftLegend") : $("#rightLegend");
                 var legend = location === "left" ? $("#leftLegendList") : $("#rightLegendList");
                 legend.empty();
-                legend.hide();
+                legendCnt.hide();
             };
             LineChart.prototype.addLegendRecord = function (location, stroke, description) {
                 var legend = location === "left" ? $("#leftLegendList") : $("#rightLegendList");
                 var legendCont = location === "left" ? $("#leftLegend") : $("#rightLegend");
-                legend.show();
+                legendCont.show();
                 var cont = $('<li></li>');
                 var strokeIndicatior = $('<div></div>').addClass("tsc-legend-indicator");
                 strokeIndicatior.css("background-color", stroke);
@@ -9690,6 +9953,12 @@ var CZ;
                 strokeIndicatior.appendTo(cont);
                 descriptionDiv.appendTo(cont);
                 cont.height(24).appendTo(legend);
+            };
+            LineChart.prototype.checkLegendVisibility = function (screenWidth) {
+                var baseIndicatorSize = 24;
+                var horOffset = 30;
+                var topOffset = 10;
+                return screenWidth >= baseIndicatorSize + horOffset && this.canvas.height >= baseIndicatorSize + topOffset;
             };
             return LineChart;
         })();
@@ -10025,191 +10294,6 @@ var CZ;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
-    (function (Gestures) {
-        function PanGesture(xOffset, yOffset, src) {
-            this.Type = "Pan";
-            this.Source = src;
-            this.xOffset = xOffset;
-            this.yOffset = yOffset;
-        }
-        function ZoomGesture(xOrigin, yOrigin, scaleFactor, src) {
-            this.Type = "Zoom";
-            this.Source = src;
-            this.xOrigin = xOrigin;
-            this.yOrigin = yOrigin;
-            this.scaleFactor = scaleFactor;
-        }
-        function PinGesture(src) {
-            this.Type = "Pin";
-            this.Source = src;
-        }
-        function createPanSubject(vc) {
-            var _doc = ($(document));
-            var mouseDown = vc.toObservable("mousedown");
-            var mouseMove = vc.toObservable("mousemove");
-            var mouseUp = _doc.toObservable("mouseup");
-            var mouseMoves = mouseMove.Skip(1).Zip(mouseMove, function (left, right) {
-                return new PanGesture(left.clientX - right.clientX, left.clientY - right.clientY, "Mouse");
-            });
-            var stopPanning = mouseUp;
-            var mouseDrags = mouseDown.SelectMany(function (md) {
-                return mouseMoves.TakeUntil(stopPanning);
-            });
-            return mouseDrags;
-        }
-        function createPinSubject(vc) {
-            var mouseDown = vc.toObservable("mousedown");
-            return mouseDown.Select(function (md) {
-                return new PinGesture("Mouse");
-            });
-        }
-        function createZoomSubject(vc) {
-            vc.mousewheel(function (objEvent, intDelta) {
-                var event = ($).Event("xbrowserwheel");
-                event.delta = intDelta;
-                event.origin = CZ.Common.getXBrowserMouseOrigin(vc, objEvent);
-                vc.trigger(event);
-            });
-            var mouseWheel = vc.toObservable("xbrowserwheel");
-            var mouseWheels = mouseWheel.Zip(mouseWheel, function (arg) {
-                return new ZoomGesture(arg.origin.x, arg.origin.y, arg.delta > 0 ? 1 / CZ.Settings.zoomLevelFactor : 1 * CZ.Settings.zoomLevelFactor, "Mouse");
-            });
-            var mousedblclick = vc.toObservable("dblclick");
-            var mousedblclicks = mousedblclick.Zip(mousedblclick, function (event) {
-                var origin = CZ.Common.getXBrowserMouseOrigin(vc, event);
-                return new ZoomGesture(origin.x, origin.y, 1.0 / CZ.Settings.zoomLevelFactor, "Mouse");
-            });
-            return mouseWheels;
-        }
-        function createTouchPanSubject(vc) {
-            var _doc = ($)(document);
-            var touchStart = vc.toObservable("touchstart");
-            var touchMove = vc.toObservable("touchmove");
-            var touchEnd = _doc.toObservable("touchend");
-            var touchCancel = _doc.toObservable("touchcancel");
-            var gestures = touchStart.SelectMany(function (o) {
-                return touchMove.TakeUntil(touchEnd.Merge(touchCancel)).Skip(1).Zip(touchMove, function (left, right) {
-                    return {
-                        "left": left.originalEvent,
-                        "right": right.originalEvent
-                    };
-                }).Where(function (g) {
-                    return g.left.scale === g.right.scale;
-                }).Select(function (g) {
-                    return new PanGesture(g.left.pageX - g.right.pageX, g.left.pageY - g.right.pageY, "Touch");
-                });
-            });
-            return gestures;
-        }
-        function createTouchPinSubject(vc) {
-            var touchStart = vc.toObservable("touchstart");
-            return touchStart.Select(function (ts) {
-                return new PinGesture("Touch");
-            });
-        }
-        function createTouchZoomSubject(vc) {
-            var _doc = ($)(document);
-            var gestureStart = vc.toObservable("gesturestart");
-            var gestureChange = vc.toObservable("gesturechange");
-            var gestureEnd = _doc.toObservable("gestureend");
-            var touchCancel = _doc.toObservable("touchcancel");
-            var gestures = gestureStart.SelectMany(function (o) {
-                return gestureChange.TakeUntil(gestureEnd.Merge(touchCancel)).Skip(1).Zip(gestureChange, function (left, right) {
-                    return {
-                        "left": left.originalEvent,
-                        "right": right.originalEvent
-                    };
-                }).Where(function (g) {
-                    return g.left.scale !== g.right.scale && g.right.scale !== 0;
-                }).Select(function (g) {
-                    var delta = g.left.scale / g.right.scale;
-                    return new ZoomGesture(o.originalEvent.layerX, o.originalEvent.layerY, 1 / delta, "Touch");
-                });
-            });
-            return gestures;
-        }
-        function createTouchPanSubjectWin8(vc) {
-            var gestureStart = vc.toObservable("MSGestureStart");
-            var gestureChange = vc.toObservable("MSGestureChange");
-            var gestureEnd = vc.toObservable("MSGestureEnd");
-            var gestures = gestureStart.SelectMany(function (o) {
-                return gestureChange.TakeUntil(gestureEnd).Skip(1).Zip(gestureChange, function (left, right) {
-                    return {
-                        "left": left.originalEvent,
-                        "right": right.originalEvent
-                    };
-                }).Where(function (g) {
-                    return g.left.scale === g.right.scale && g.left.detail != g.left.MSGESTURE_FLAG_INERTIA && g.right.detail != g.right.MSGESTURE_FLAG_INERTIA;
-                }).Select(function (g) {
-                    return new PanGesture(g.left.offsetX - g.right.offsetX, g.left.offsetY - g.right.offsetY, "Touch");
-                });
-            });
-            return gestures;
-        }
-        function createTouchPinSubjectWin8(vc) {
-            var pointerDown = vc.toObservable("MSPointerDown");
-            return pointerDown.Select(function (gt) {
-                return new PinGesture("Touch");
-            });
-        }
-        function createTouchZoomSubjectWin8(vc) {
-            var gestureStart = vc.toObservable("MSGestureStart");
-            var gestureChange = vc.toObservable("MSGestureChange");
-            var gestureEnd = vc.toObservable("MSGestureEnd");
-            var gestures = gestureStart.SelectMany(function (o) {
-                return gestureChange.TakeUntil(gestureEnd).Where(function (g) {
-                    return g.originalEvent.scale !== 0 && g.originalEvent.detail != g.originalEvent.MSGESTURE_FLAG_INERTIA;
-                }).Select(function (g) {
-                    return new ZoomGesture(o.originalEvent.offsetX, o.originalEvent.offsetY, 1 / g.originalEvent.scale, "Touch");
-                });
-            });
-            return gestures;
-        }
-        var vcGestureObject;
-        function addPointerToGesture(evt) {
-            vcGestureObject.addPointer(evt.pointerId);
-        }
-        function getGesturesStream(source) {
-            var panController;
-            var zoomController;
-            var pinController;
-            if(window.navigator.msPointerEnabled && (window).MSGesture) {
-                vcGestureObject = new MSGesture();
-                vcGestureObject.target = CZ.Common.vc[0];
-                CZ.Common.vc[0].addEventListener("MSPointerMove", addPointerToGesture, false);
-                panController = createTouchPanSubjectWin8(source);
-                var zoomControllerTouch = createTouchZoomSubjectWin8(source);
-                var zoomControllerMouse = createZoomSubject(source);
-                zoomController = zoomControllerTouch.Merge(zoomControllerMouse);
-                pinController = createTouchPinSubjectWin8(source);
-            } else if('ontouchstart' in document.documentElement) {
-                panController = createTouchPanSubject(source);
-                zoomController = createTouchZoomSubject(source);
-                pinController = createTouchPinSubject(source);
-            } else {
-                panController = createPanSubject(source);
-                zoomController = createZoomSubject(source);
-                pinController = createPinSubject(source);
-            }
-            return pinController.Merge(panController.Merge(zoomController));
-        }
-        Gestures.getGesturesStream = getGesturesStream;
-        function applyAxisBehavior(gestureSequence) {
-            return gestureSequence.Where(function (el) {
-                return el.Type != "Zoom";
-            }).Select(function (el) {
-                if(el.Type == "Pan") {
-                    el.yOffset = 0;
-                }
-                return el;
-            });
-        }
-        Gestures.applyAxisBehavior = applyAxisBehavior;
-    })(CZ.Gestures || (CZ.Gestures = {}));
-    var Gestures = CZ.Gestures;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
     (function (UILoader) {
         function loadHtml(selector, filepath) {
             var container = $(selector);
@@ -10256,6 +10340,7 @@ var CZ;
             }
             FormEditTimeline.prototype.initialize = function () {
                 var _this = this;
+                this.saveButton.prop('disabled', false);
                 if(CZ.Authoring.mode === "createTimeline") {
                     this.deleteButton.hide();
                     this.titleTextblock.text("Create Timeline");
@@ -10291,6 +10376,7 @@ var CZ;
                     } else {
                         _this.errorMessage.empty();
                         var self = _this;
+                        _this.saveButton.prop('disabled', true);
                         CZ.Authoring.updateTimeline(_this.timeline, {
                             title: _this.titleInput.val(),
                             start: _this.startDate.getDate(),
@@ -10301,6 +10387,8 @@ var CZ;
                         }, function (error) {
                             alert("Unable to save changes. Please try again later.");
                             console.log(error);
+                        }).always(function () {
+                            _this.saveButton.prop('disabled', false);
                         });
                     }
                 });
@@ -10457,6 +10545,7 @@ var CZ;
             }
             FormEditExhibit.prototype.initUI = function () {
                 var _this = this;
+                this.saveButton.prop('disabled', false);
                 if(this.mode === "createExhibit") {
                     this.titleTextblock.text("Create Exhibit");
                     this.saveButton.text("create exhibit");
@@ -10554,16 +10643,19 @@ var CZ;
                     type: "infodot"
                 };
                 if(CZ.Authoring.validateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) && CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true) && this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {
+                    this.saveButton.prop('disabled', true);
                     CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(function (success) {
                         _this.isCancel = false;
                         _this.close();
                     }, function (error) {
                         alert("Unable to save changes. Please try again later.");
+                    }).always(function () {
+                        _this.saveButton.prop('disabled', false);
                     });
                 } else if(this.exhibit.contentItems.length === 0) {
                     var self = this;
                     var origMsg = this.errorMessage.text();
-                    this.errorMessage.text("Cannot create exhibit without content items.").show().delay(7000).fadeOut(function () {
+                    this.errorMessage.text("Cannot create exhibit without artifacts.").show().delay(7000).fadeOut(function () {
                         return self.errorMessage.text(origMsg);
                     });
                 } else {
@@ -10706,6 +10798,7 @@ var CZ;
             }
             FormEditCI.prototype.initUI = function () {
                 var _this = this;
+                this.saveButton.prop('disabled', false);
                 if(CZ.Authoring.contentItemMode === "createContentItem") {
                     this.titleTextblock.text("Create New");
                     this.saveButton.text("create artifiact");
@@ -10780,11 +10873,14 @@ var CZ;
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
                             this.back();
                         } else {
+                            this.saveButton.prop('disabled', true);
                             CZ.Authoring.updateContentItem(this.exhibit, this.contentItem, newContentItem).then(function (response) {
                                 _this.isCancel = false;
                                 _this.close();
                             }, function (error) {
                                 alert("Unable to save changes. Please try again later.");
+                            }).always(function () {
+                                _this.saveButton.prop('disabled', false);
                             });
                         }
                     }
@@ -10913,10 +11009,12 @@ var CZ;
                         _this.usernameInput.val(data.DisplayName);
                         if(data.DisplayName != "") {
                             _this.usernameInput.prop('disabled', true);
+                        }
+                        _this.emailInput.val(data.Email);
+                        if(data.Email !== undefined && data.Email !== '' && data.Email != null) {
                             _this.agreeInput.attr('checked', true);
                             _this.agreeInput.prop('disabled', true);
                         }
-                        _this.emailInput.val(data.Email);
                     }
                 });
                 this.saveButton.click(function (event) {
@@ -10925,15 +11023,19 @@ var CZ;
                         alert("Provided incorrect username, \n'a-z', '0-9', '-', '_' - characters allowed only. ");
                         return;
                     }
-                    isValid = _this.validEmail(_this.emailInput.val());
-                    if(!isValid) {
-                        alert("Provided incorrect email address");
-                        return;
-                    }
-                    isValid = _this.agreeInput.prop("checked");
-                    if(!isValid) {
-                        alert("Please agree with provided terms");
-                        return;
+                    var emailAddress = "";
+                    if(_this.emailInput.val()) {
+                        var emailIsValid = _this.validEmail(_this.emailInput.val());
+                        if(!emailIsValid) {
+                            alert("Provided incorrect email address");
+                            return;
+                        }
+                        var agreeTerms = _this.agreeInput.prop("checked");
+                        if(!agreeTerms) {
+                            alert("Please agree with provided terms");
+                            return;
+                        }
+                        emailAddress = _this.emailInput.val();
                     }
                     CZ.Service.getProfile().done(function (curUser) {
                         CZ.Service.getProfile(_this.usernameInput.val()).done(function (getUser) {
@@ -10941,7 +11043,7 @@ var CZ;
                                 alert("Sorry, this username is already in use. Please try again.");
                                 return;
                             }
-                            CZ.Service.putProfile(_this.usernameInput.val(), _this.emailInput.val()).then(function (success) {
+                            CZ.Service.putProfile(_this.usernameInput.val(), emailAddress).then(function (success) {
                                 if(_this.allowRedirect) {
                                     window.location.assign("\\" + success);
                                 } else {
@@ -10955,13 +11057,7 @@ var CZ;
                     });
                 });
                 this.logoutButton.click(function (event) {
-                    return $.ajax({
-                        url: "/account/logout"
-                    }).done(function (data) {
-                        _this.profilePanel.hide();
-                        _this.loginPanel.show();
-                        _this.close();
-                    });
+                    window.location.assign("/pages/logoff.aspx");
                 });
             };
             FormEditProfile.prototype.show = function () {
@@ -11153,6 +11249,7 @@ var CZ;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
+var constants;
 var CZ;
 (function (CZ) {
     (function (UI) {
@@ -11232,6 +11329,8 @@ var CZ;
             FeatureActivation.RootCollection = 2;
             FeatureActivation._map[3] = "NotRootCollection";
             FeatureActivation.NotRootCollection = 3;
+            FeatureActivation._map[4] = "NotProduction";
+            FeatureActivation.NotProduction = 4;
         })(HomePageViewModel.FeatureActivation || (HomePageViewModel.FeatureActivation = {}));
         var FeatureActivation = HomePageViewModel.FeatureActivation;
         var _featureMap = [
@@ -11252,8 +11351,13 @@ var CZ;
             }, 
             {
                 Name: "Authoring",
-                Activation: FeatureActivation.NotRootCollection,
+                Activation: FeatureActivation.Enabled,
                 JQueryReference: ".header-icon.edit-icon"
+            }, 
+            {
+                Name: "TourAuthoring",
+                Activation: FeatureActivation.NotProduction,
+                JQueryReference: ".cz-form-create-tour"
             }, 
             {
                 Name: "WelcomeScreen",
@@ -11267,13 +11371,28 @@ var CZ;
             }, 
             {
                 Name: "TimeSeries",
-                Activation: FeatureActivation.NotRootCollection,
+                Activation: FeatureActivation.Enabled,
                 JQueryReference: "#timeSeriesContainer"
+            }, 
+            {
+                Name: "ManageCollections",
+                Activation: FeatureActivation.Disabled,
+                JQueryReference: "#collections_button"
             }, 
             
         ];
+        var rootCollection;
+        function UserCanEditCollection(profile) {
+            if(CZ.Service.superCollectionName === "sandbox") {
+                return true;
+            }
+            if(!profile || profile.DisplayName !== CZ.Service.superCollectionName) {
+                return false;
+            }
+            return true;
+        }
         function InitializeToursUI(profile, forms) {
-            var allowEditing = IsFeatureEnabled(_featureMap, "Authoring") && (profile && profile != "" && profile.DisplayName === CZ.Service.superCollectionName);
+            var allowEditing = IsFeatureEnabled(_featureMap, "TourAuthoring") && UserCanEditCollection(profile);
             var onToursInitialized = function () {
                 CZ.Tours.initializeToursUI();
                 $("#tours_index").click(function () {
@@ -11346,11 +11465,6 @@ var CZ;
                         }
                     }
                 });
-                CZ.Service.getProfile().done(function (profile) {
-                    InitializeToursUI(profile, forms);
-                }).fail(function (err) {
-                    InitializeToursUI(null, forms);
-                });
                 $(".header-icon.edit-icon").click(function () {
                     var editForm = getFormById("#header-edit-form");
                     if(editForm === false) {
@@ -11365,6 +11479,7 @@ var CZ;
                             createTour: ".cz-form-create-tour"
                         });
                         form.show();
+                        ApplyFeatureActivation();
                     } else {
                         if(editForm.isFormVisible) {
                             editForm.close();
@@ -11553,8 +11668,16 @@ var CZ;
                             $("#profile-panel").show();
                             $(".auth-panel-login").html(data.DisplayName);
                         }
+                        CZ.Authoring.isEnabled = UserCanEditCollection(data);
+                        InitializeToursUI(data, forms);
                     }).fail(function (error) {
                         $("#login-panel").show();
+                        CZ.Authoring.isEnabled = UserCanEditCollection(null);
+                        InitializeToursUI(null, forms);
+                    }).always(function () {
+                        if(!CZ.Authoring.isEnabled) {
+                            $(".edit-icon").hide();
+                        }
                     });
                 }
                 $("#login-panel").click(function () {
@@ -11573,15 +11696,10 @@ var CZ;
                 CZ.Settings.signinUrlYahoo = response.signinUrlYahoo;
             });
             var url = CZ.UrlNav.getURL();
-            var rootCollection = url.superCollectionName === undefined;
+            this.rootCollection = url.superCollectionName === undefined;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
-            if(rootCollection) {
-                $('#timeSeries_button').hide();
-            } else {
-                $('#timeSeries_button').show();
-            }
             $('#search_button').mouseup(CZ.Search.onSearchClicked);
             $('#human_rect').click(function () {
                 CZ.Search.navigateToBookmark(CZ.Common.humanityVisible);
@@ -11659,26 +11777,7 @@ var CZ;
                     CZ.Common.startExploring();
                 });
             }
-            for(var idxFeature = 0; idxFeature < _featureMap.length; idxFeature++) {
-                var enabled = true;
-                var feature = _featureMap[idxFeature];
-                if(feature.Activation === FeatureActivation.Disabled) {
-                    enabled = false;
-                }
-                if(feature.Activation === FeatureActivation.NotRootCollection && rootCollection) {
-                    enabled = false;
-                }
-                if(feature.Activation === FeatureActivation.RootCollection && !rootCollection) {
-                    enabled = false;
-                }
-                _featureMap[idxFeature].IsEnabled = enabled;
-                if(!enabled) {
-                    $(feature.JQueryReference).css("display", "none");
-                }
-            }
-            if(!rootCollection) {
-                CZ.Authoring.isEnabled = true;
-            }
+            ApplyFeatureActivation();
             if(navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
                 document.addEventListener('touchmove', function (e) {
                     e.preventDefault();
@@ -11708,7 +11807,8 @@ var CZ;
             CZ.Bibliography.initializeBibliography();
             var canvasGestures = CZ.Gestures.getGesturesStream(CZ.Common.vc);
             var axisGestures = CZ.Gestures.applyAxisBehavior(CZ.Gestures.getGesturesStream(CZ.Common.ax));
-            var jointGesturesStream = canvasGestures.Merge(axisGestures);
+            var timeSeriesGestures = CZ.Gestures.getPanPinGesturesStream($("#timeSeriesContainer"));
+            var jointGesturesStream = canvasGestures.Merge(axisGestures.Merge(timeSeriesGestures));
             CZ.Common.controller = new CZ.ViewportController.ViewportController2(function (visible) {
                 var vp = CZ.Common.vc.virtualCanvas("getViewport");
                 var markerPos = CZ.Common.axis.MarkerPosition();
@@ -11894,10 +11994,33 @@ var CZ;
                 CZ.timeSeriesChart.clearLegend("left");
                 CZ.timeSeriesChart.clearLegend("right");
                 var chartHeader = "TimeSeries Chart";
+                if(CZ.rightDataSet !== undefined || CZ.leftDataSet !== undefined) {
+                    CZ.timeSeriesChart.drawVerticalGridLines(leftCSS, rightCSS, leftPlot, rightPlot);
+                }
+                var screenWidthForLegend = rightCSS - leftCSS;
+                if(CZ.rightDataSet !== undefined && CZ.leftDataSet !== undefined) {
+                    screenWidthForLegend /= 2;
+                }
+                var isLegendVisible = CZ.timeSeriesChart.checkLegendVisibility(screenWidthForLegend);
                 if(CZ.leftDataSet !== undefined) {
                     var padding = CZ.leftDataSet.getVerticalPadding() + 10;
-                    CZ.timeSeriesChart.drawDataSet(CZ.leftDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot);
-                    CZ.timeSeriesChart.drawAxis(leftCSS, rightCSS, CZ.leftDataSet.series[0].appearanceSettings.yMin, CZ.leftDataSet.series[0].appearanceSettings.yMax, {
+                    var plotBottom = Number.MAX_VALUE;
+                    var plotTop = Number.MIN_VALUE;
+                    CZ.leftDataSet.series.forEach(function (seria) {
+                        if(seria.appearanceSettings !== undefined && seria.appearanceSettings.yMin !== undefined && seria.appearanceSettings.yMin < plotBottom) {
+                            plotBottom = seria.appearanceSettings.yMin;
+                        }
+                        if(seria.appearanceSettings !== undefined && seria.appearanceSettings.yMax !== undefined && seria.appearanceSettings.yMax > plotTop) {
+                            plotTop = seria.appearanceSettings.yMax;
+                        }
+                    });
+                    if((plotTop - plotBottom) === 0) {
+                        var absY = Math.max(0.1, Math.abs(plotBottom));
+                        var offsetConstant = 0.01;
+                        plotTop += absY * offsetConstant;
+                        plotBottom -= absY * offsetConstant;
+                    }
+                    var axisAppearence = {
                         labelCount: 4,
                         tickLength: 10,
                         majorTickThickness: 1,
@@ -11905,16 +12028,37 @@ var CZ;
                         axisLocation: 'left',
                         font: '16px Calibri',
                         verticalPadding: padding
-                    });
-                    for(var i = 0; i < CZ.leftDataSet.series.length; i++) {
-                        CZ.timeSeriesChart.addLegendRecord("left", CZ.leftDataSet.series[i].appearanceSettings.stroke, CZ.leftDataSet.series[i].appearanceSettings.name);
+                    };
+                    var tickForDraw = CZ.timeSeriesChart.generateAxisParameters(leftCSS, rightCSS, plotBottom, plotTop, axisAppearence);
+                    CZ.timeSeriesChart.drawHorizontalGridLines(tickForDraw, axisAppearence);
+                    CZ.timeSeriesChart.drawDataSet(CZ.leftDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot, plotTop, plotBottom);
+                    CZ.timeSeriesChart.drawAxis(tickForDraw, axisAppearence);
+                    if(isLegendVisible) {
+                        for(var i = 0; i < CZ.leftDataSet.series.length; i++) {
+                            CZ.timeSeriesChart.addLegendRecord("left", CZ.leftDataSet.series[i].appearanceSettings.stroke, CZ.leftDataSet.series[i].appearanceSettings.name);
+                        }
                     }
                     chartHeader += " (" + CZ.leftDataSet.name;
                 }
                 if(CZ.rightDataSet !== undefined) {
                     var padding = CZ.rightDataSet.getVerticalPadding() + 10;
-                    CZ.timeSeriesChart.drawDataSet(CZ.rightDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot);
-                    CZ.timeSeriesChart.drawAxis(rightCSS, leftCSS, CZ.rightDataSet.series[0].appearanceSettings.yMin, CZ.rightDataSet.series[0].appearanceSettings.yMax, {
+                    var plotBottom = Number.MAX_VALUE;
+                    var plotTop = Number.MIN_VALUE;
+                    CZ.rightDataSet.series.forEach(function (seria) {
+                        if(seria.appearanceSettings !== undefined && seria.appearanceSettings.yMin !== undefined && seria.appearanceSettings.yMin < plotBottom) {
+                            plotBottom = seria.appearanceSettings.yMin;
+                        }
+                        if(seria.appearanceSettings !== undefined && seria.appearanceSettings.yMax !== undefined && seria.appearanceSettings.yMax > plotTop) {
+                            plotTop = seria.appearanceSettings.yMax;
+                        }
+                    });
+                    if((plotTop - plotBottom) === 0) {
+                        var absY = Math.max(0.1, Math.abs(plotBottom));
+                        var offsetConstant = 0.01;
+                        plotTop += absY * offsetConstant;
+                        plotBottom -= absY * offsetConstant;
+                    }
+                    var axisAppearence = {
                         labelCount: 4,
                         tickLength: 10,
                         majorTickThickness: 1,
@@ -11922,22 +12066,49 @@ var CZ;
                         axisLocation: 'right',
                         font: '16px Calibri',
                         verticalPadding: padding
-                    });
-                    for(var i = 0; i < CZ.rightDataSet.series.length; i++) {
-                        CZ.timeSeriesChart.addLegendRecord("right", CZ.rightDataSet.series[i].appearanceSettings.stroke, CZ.rightDataSet.series[i].appearanceSettings.name);
+                    };
+                    var tickForDraw = CZ.timeSeriesChart.generateAxisParameters(rightCSS, leftCSS, plotBottom, plotTop, axisAppearence);
+                    CZ.timeSeriesChart.drawHorizontalGridLines(tickForDraw, axisAppearence);
+                    CZ.timeSeriesChart.drawDataSet(CZ.rightDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot, plotTop, plotBottom);
+                    CZ.timeSeriesChart.drawAxis(tickForDraw, axisAppearence);
+                    if(isLegendVisible) {
+                        for(var i = 0; i < CZ.rightDataSet.series.length; i++) {
+                            CZ.timeSeriesChart.addLegendRecord("right", CZ.rightDataSet.series[i].appearanceSettings.stroke, CZ.rightDataSet.series[i].appearanceSettings.name);
+                        }
                     }
                     var str = chartHeader.indexOf("(") > 0 ? ", " : " (";
                     chartHeader += str + CZ.rightDataSet.name + ")";
                 } else {
                     chartHeader += ")";
                 }
-                if(CZ.rightDataSet !== undefined || CZ.leftDataSet !== undefined) {
-                    CZ.timeSeriesChart.drawVerticalGridLines(leftCSS, rightCSS, leftPlot, rightPlot);
-                }
                 $("#timeSeriesChartHeader").text(chartHeader);
             }
         }
         HomePageViewModel.updateTimeSeriesChart = updateTimeSeriesChart;
+        function ApplyFeatureActivation() {
+            for(var idxFeature = 0; idxFeature < _featureMap.length; idxFeature++) {
+                var feature = _featureMap[idxFeature];
+                if(feature.IsEnabled === undefined) {
+                    var enabled = true;
+                    if(feature.Activation === FeatureActivation.Disabled) {
+                        enabled = false;
+                    }
+                    if(feature.Activation === FeatureActivation.NotRootCollection && this.rootCollection) {
+                        enabled = false;
+                    }
+                    if(feature.Activation === FeatureActivation.RootCollection && !this.rootCollection) {
+                        enabled = false;
+                    }
+                    if(feature.Activation === FeatureActivation.NotProduction && (!constants || constants.environment === "Production")) {
+                        enabled = false;
+                    }
+                    _featureMap[idxFeature].IsEnabled = enabled;
+                }
+                if(!_featureMap[idxFeature].IsEnabled && feature.JQueryReference) {
+                    $(feature.JQueryReference).css("display", "none");
+                }
+            }
+        }
     })(CZ.HomePageViewModel || (CZ.HomePageViewModel = {}));
     var HomePageViewModel = CZ.HomePageViewModel;
 })(CZ || (CZ = {}));

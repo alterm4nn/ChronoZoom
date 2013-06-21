@@ -288,7 +288,7 @@ module CZ {
             }
 
             private initialize(): void {
-
+                this.saveButton.prop('disabled', false);
                 if (this.tour == null) // creating new tour
                 {
                     this.deleteButton.hide();
@@ -328,6 +328,9 @@ module CZ {
                     }
 
                     var self = this;
+
+                    this.saveButton.prop('disabled', true);
+
                     // create new tour
                     if (this.tour == null) {
                         // Add the tour to the local tours collection
@@ -341,6 +344,8 @@ module CZ {
                                 console.error("Failed to create a tour: " + f.status + " " + f.statusText);
                             }
                             alert("Failed to create a tour");
+                        }).done(() => {
+                            this.saveButton.prop('disabled', false);
                         });
                     } else {
                         // Update existing tour
@@ -354,6 +359,8 @@ module CZ {
                                         console.error("Failed to update a tour: " + f.status + " " + f.statusText);
                                     }
                                     alert("Failed to update a tour");
+                                }).always(() => {
+                                    this.saveButton.prop('disabled', false);
                                 });
                                 break;
                             }

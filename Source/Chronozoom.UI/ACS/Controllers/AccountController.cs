@@ -1,5 +1,6 @@
 ﻿using ASC.Hrd;
 using ASC.Models;
+using Chronozoom.Entities;
 using Microsoft.IdentityModel.Protocols.WSFederation;
 using Microsoft.IdentityModel.Web;
 using System;
@@ -51,31 +52,32 @@ namespace Chronozoom.Api.Controllers
             {
                 var user = (Microsoft.IdentityModel.Claims.IClaimsIdentity)HttpContext.User.Identity;
 
-                string NameIdentifier = "";
-                string IdentityProvider = "";
-
-                foreach (var item in user.Claims)
+                if (user != null)
                 {
-                    if (item.ClaimType.EndsWith("nameidentifier"))
+                    string nameIdentifier = "";
+                    string identityProvider = "";
+
+                    foreach (var item in user.Claims)
                     {
-                        NameIdentifier = item.Value;
+                        if (item.ClaimType.EndsWith("nameidentifier"))
+                        {
+                            nameIdentifier = item.Value;
+                        }
+                        else if (item.ClaimType.EndsWith("identityprovider"))
+                        {
+                            identityProvider = item.Value;
+                        }
                     }
-                    else if (item.ClaimType.EndsWith("identityprovider"))
+
+                    using (Storage storage = new Storage())
                     {
-                        IdentityProvider = item.Value;
+                        Entities.User storedUser = storage.Users.FirstOrDefault(candidate => candidate.IdentityProvider == identityProvider && candidate.NameIdentifier == nameIdentifier);
+                        if (storedUser != null)
+                            return Redirect("/" + storedUser.DisplayName);
                     }
                 }
-
-                // We use return url as context
-                //string returnUrl = GetUrlFromContext(forms);
-
-                //if (!string.IsNullOrEmpty(returnUrl))
-                //{
-                //    return Redirect(returnUrl);
-                //}
             }
 
-            // Temporary redirect to sandbox
             return Redirect("/");
         }
 

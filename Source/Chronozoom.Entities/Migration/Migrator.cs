@@ -219,7 +219,6 @@ namespace Chronozoom.Entities.Migration
                 }
                 _storage.Timelines.Add(timeline);
             }
-            _storage.CreatePostOrderIndex(timelines);
             _storage.SaveChanges();
 
             if (dataTours != null)

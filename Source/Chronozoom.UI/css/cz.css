@@ -288,7 +288,7 @@ a:visited {
   background-image: url('../images/search-icon.png');
 }
 .timeSeries-icon {
-  background-image: url('../images/timseries-icon.png');
+  background-image: url('../images/timeseries-icon.png');
 }
 .view-icon {
   background-image: url('../images/view-icon.png');
@@ -299,7 +299,11 @@ a:visited {
 }
 .profile-icon {
   background-image: url('../images/profile-icon.png');
+  background-position-x: 3px;
   display: inline-block;
+}
+#login-panel label.header-icon-label {
+  margin-left: 0px;
 }
 .header__edit-button:hover {
   background-color: #0464a2;
@@ -353,6 +357,14 @@ a:visited {
 #timeSeriesContainer {
   height: 0%;
   background-color: gray;
+  cursor: pointer;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+#timeSeriesContainer::selection {
+  cursor: pointer;
 }
 .virtualCanvas {
   position: relative;
@@ -385,7 +397,7 @@ a:visited {
 }
 .tour_control {
   display: none;
-  margin: 5px;
+  margin: 2px;
   width: 190px;
   cursor: pointer;
 }
