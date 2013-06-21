@@ -121,6 +121,10 @@ var CZ;
             var point = CZ.Common.getXBrowserMouseOrigin(container, e);
             var k = (_range.max - _range.min) / _width;
             var time = _range.max - k * (_width - point.x);
+            var test1 = CZ.Dates.getYMDFromCoordinate(time);
+            var test2 = CZ.Dates.getCoordinateFromYMD(test1.year, test1.month, test1.day);
+            var test3 = CZ.Dates.getYMDFromCoordinate(test2);
+            console.log(time, test1, test2, test3);
             if(time <= _range.min + CZ.Settings.panelWidth * k) {
                 marker.css("display", "none");
                 LeftPanInput();
@@ -977,7 +981,7 @@ var CZ;
             var DMY = CZ.Dates.getYMDFromCoordinate(x);
             var year = DMY.year;
             if(year <= 0) {
-                text = -year + 1 + " BCE";
+                text = -year + " BCE";
             } else {
                 text = year + " CE";
             }
@@ -1035,7 +1039,7 @@ var CZ;
             }
             for(var i = 0; i < count + 1; i++) {
                 var tick_position = CZ.Dates.getCoordinateFromYMD(x0 + i * dx, 0, 1);
-                if(tick_position < 1 && dx > 1) {
+                if(tick_position === 0 && dx > 1) {
                     tick_position += 1;
                 }
                 if(tick_position >= this.range.min && tick_position <= this.range.max && tick_position != ticks[ticks.length - 1]) {
@@ -1291,7 +1295,7 @@ var CZ;
             while(tempYear < this.endDate.year || (tempYear == this.endDate.year && tempMonth <= this.endDate.month)) {
                 countMonths++;
                 tempMonth++;
-                if(tempMonth == 12) {
+                if(tempMonth >= 12) {
                     tempMonth = 0;
                     tempYear++;
                 }
@@ -1446,18 +1450,12 @@ var CZ;
         this.getMarkerLabel = function (range, time) {
             this.getRegime(range.min, range.max);
             var date = CZ.Dates.getYMDFromCoordinate(time);
-            if(date.year <= 0) {
-                date.year--;
-            }
             var labelText = date.year + "." + (date.month + 1) + "." + date.day;
             return labelText;
         };
         this.getPanelLabel = function (range, time) {
             this.getRegime(range.min, range.max);
             var date = CZ.Dates.getYMDFromCoordinate(time);
-            if(date.year <= 0) {
-                date.year--;
-            }
             var labelText = date.year + "." + (date.month + 1) + "." + date.day;
             return labelText;
         };

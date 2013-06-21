@@ -33,85 +33,53 @@ module CZ {
 
         // by give date gives coordinate in virtual coordinates
         export function getCoordinateFromYMD(year, month, day) {
-            //get sign of coordinate
-            var sign = (year != 0) ? year / Math.abs(year) : 1;
-            var i = 0;
-            var coordinate = year;
-            var days = day;
-            var daysPerYear = isLeapYear(year) ? 366 : 365;
+            var sign = (year === -1) ? 1 : year / Math.abs(year),
+                isLeap = isLeapYear(year),
+                daysInYear = isLeap ? 366 : 365,
+                coord = (year > -1) ? year : year + 1;
 
-            // calculate count of passed days 
-            for (i = 0; i < month; i++) {
-                days += daysInMonth[i];
-                //if Feb and leap year
-                if ((i === 1) && (isLeapYear(year))) {
-                    days++;
-                }
+            // Get the number of day in the year.
+            var sumDaysOfMonths = function (s, d, i) {
+                return s + (i < month) * d;
             }
+            var days = daysInMonth.reduce(sumDaysOfMonths, +(isLeap && month > 1)) + day;
 
-            if ((month > 1) && (isLeapYear(year))) {
-                coordinate += sign * days / daysPerYear;
-            } else {
-                coordinate += (sign >= 0) ? sign * days / daysPerYear : sign * (1 - days / daysPerYear);
-            }
+            coord += (days - 1) / daysInYear;
 
-            //zero-year problem solvation
-            if (year < 0) coordinate += 1;
-            coordinate -= 1/daysPerYear;
-
-            return coordinate;
+            return coord;
         }
 
         export function getYMDFromCoordinate(coord) {
-            var sign = (coord === 0) ? 1 : coord / Math.abs(coord);
-            var day = 0, month = 0, year = 0;
-            var idxYear, countLeapYears = 0;
-            // Define year
-            year = (coord >= 0) ? Math.floor(coord) : Math.floor(coord) + 1;
-            var daysPerYear = isLeapYear(year) ? 366 : 365;
+            var absCoord = Math.abs(coord),
+                floorCoord = Math.floor(coord),
+                sign = (coord === 0) ? 1 : coord / absCoord,
+                day = 0,
+                month = 0,
+                year = (coord >= 1) ? floorCoord : floorCoord - 1,
+                isLeap = isLeapYear(year),
+                daysInYear = isLeap ? 366 : 365,
+                daysFraction = sign * (absCoord - Math.abs(floorCoord));
+            
+            // NOTE: Using Math.round() here causes day to be rounded to 365(366)
+            //       in case of the last day in a year. Do not increment day in
+            //       in this case.
+            day = Math.round(daysFraction * daysInYear);
+            day += +(day < daysInYear);
 
-            var day, month;
-            var countDays;
-            //months and days are remaining
-            countDays = Math.abs(coord) - Math.abs(year) + sign * 1./daysPerYear;
-            //for negative years day and month are converted
-            if (sign < 0) countDays = 1 - countDays;
-
-            var idxMonth = 0;
-            //count month
-            while (countDays > daysInMonth[idxMonth] / daysPerYear) {
-                countDays -= daysInMonth[idxMonth] / daysPerYear;
-                if (isLeapYear(year) && (idxMonth === 1)) countDays -= 1 / daysPerYear;
-                idxMonth++;
-            }
-            month = idxMonth;
-            day = countDays * daysPerYear;
-            //remaining value need to be represanted as date
-            while (Math.round(day) <= 0) {
-                month--;
-                if (month === -1) {
-                    year--;
-                    month = 11;
+            // Evaluate day and month of the year.
+            while (day > daysInMonth[month] + (+(isLeap && month === 1))) {
+                day -= daysInMonth[month];
+                if (isLeap && month === 1) {
+                    day--;
                 }
-                day = daysInMonth[month] + Math.round(day);
-                if (isLeapYear(year) && (month === 1)) day++;
+                month++;
             }
-
-            //if (month == 12) {
-            //    year++;
-            //    month = 0;
-            //    day = 1;
-            //}
-
-            //zero-year problem solvation
-            if (coord < 0) year--;
 
             return {
                 year: year,
                 month: month,
-                day: Math.round(day)
+                day: day
             };
-
         }
 
         // convert decimal year to virtual coordinate
@@ -203,18 +171,17 @@ module CZ {
         }
 
         export function isLeapYear(year) {
-            if (year >= 1582 && (year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0))) return true;
-            else return false;
-       }
+            return (year >= 1582 && (year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0)));
+        }
 
-       export function numberofLeap(year) {
-           var startLeap = 1582;
-           if (year < startLeap) return 0;
-           var years1 = Math.floor(year / 4) - Math.floor(startLeap / 4);
-           years1 -= Math.floor(year / 100) - Math.floor(startLeap / 100);
-           years1 += Math.floor(year / 400) - Math.floor(startLeap / 400);
-           if (isLeapYear(year)) years1--;
-           return years1;
-       }
- }
+        export function numberofLeap(year) {
+            var startLeap = 1582;
+            if (year < startLeap) return 0;
+            var years1 = Math.floor(year / 4) - Math.floor(startLeap / 4);
+            years1 -= Math.floor(year / 100) - Math.floor(startLeap / 100);
+            years1 += Math.floor(year / 400) - Math.floor(startLeap / 400);
+            if (isLeapYear(year)) years1--;
+            return years1;
+        }
+    }
 }
