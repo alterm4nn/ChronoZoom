@@ -51,13 +51,13 @@
         <% foreach (Chronozoom.Entities.ContentItem contentitem in exhibit.ContentItems.OrderBy(c => c.Order))
                if (contentitem != null)
                { %>
-        <% if (contentitem.MediaType == "Image" || contentitem.MediaType == "Picture")
+        <% if (contentitem.MediaType.ToLower() == "image" || contentitem.MediaType.ToLower() == "picture")
            { %>
         <p>
             <img src="<% Response.Write(contentitem.Uri); %>" alt="<% Response.Write(contentitem.Title); %>" />
         </p>
         <% } %>
-        <% if (contentitem.MediaType == "PDF" || contentitem.MediaType == "Video" || contentitem.MediaType == "Audio" || contentitem.MediaType == "Photosynth")
+        <% if (contentitem.MediaType.ToLower() == "pdf" || contentitem.MediaType.ToLower() == "video" || contentitem.MediaType.ToLower() == "audio" || contentitem.MediaType.ToLower() == "photosynth")
            { %>
         <p>
             <embed src="<% Response.Write(contentitem.Uri); %>" width="435" height="325" />
@@ -71,13 +71,13 @@
             {
                 Chronozoom.Entities.ContentItem contentitem = Chronozoom.UI.Crawler.ContentItems(Chronozoom.UI.Crawler.UrlGuid(url)); %>
         <h1><%Response.Write(contentitem.Title); %></h1>
-        <% if (contentitem.MediaType == "Image" || contentitem.MediaType == "Picture")
+        <% if (contentitem.MediaType.ToLower() == "image" || contentitem.MediaType.ToLower() == "picture")
            { %>
         <p>
             <img src="<% Response.Write(contentitem.Uri); %>" alt="<% Response.Write(contentitem.Title); %>" />
         </p>
         <% } %>
-        <% if (contentitem.MediaType == "PDF" || contentitem.MediaType == "Video" || contentitem.MediaType == "Audio" || contentitem.MediaType == "Photosynth")
+        <% if (contentitem.MediaType.ToLower() == "pdf" || contentitem.MediaType.ToLower() == "video" || contentitem.MediaType.ToLower() == "audio" || contentitem.MediaType.ToLower() == "photosynth")
            { %>
         <p>
             <embed src="<% Response.Write(contentitem.Uri); %>" width="435" height="325" />
