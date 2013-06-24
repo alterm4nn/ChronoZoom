@@ -39,6 +39,8 @@ var CZ;
         Authoring.showEditExhibitForm = null;
         Authoring.showEditContentItemForm = null;
         Authoring.showEditTourForm = null;
+        Authoring.showMessageWindow = null;
+        Authoring.hideMessageWindow = null;
         Authoring.callback = null;
         function isIntersecting(te, obj) {
             switch(obj.type) {
@@ -295,6 +297,10 @@ var CZ;
             };
             Authoring.showEditTourForm = formHandlers && formHandlers.showEditTourForm || function () {
             };
+            Authoring.showMessageWindow = formHandlers && formHandlers.showMessageWindow || function (mess, title) {
+            };
+            Authoring.hideMessageWindow = formHandlers && formHandlers.hideMessageWindow || function () {
+            };
         }
         Authoring.initialize = initialize;
         function updateTimeline(t, prop) {
@@ -456,7 +462,7 @@ var CZ;
         }
         Authoring.isNotEmpty = isNotEmpty;
         function isIntervalPositive(start, end) {
-            return (parseFloat(start) < parseFloat(end));
+            return (parseFloat(start) + 1 / 366 <= parseFloat(end));
         }
         Authoring.isIntervalPositive = isIntervalPositive;
         function validateContentItems(contentItems) {

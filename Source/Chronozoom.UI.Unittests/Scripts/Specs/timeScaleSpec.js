@@ -1,7 +1,13 @@
 ﻿/// <reference path="../../../Chronozoom.UI/scripts/external/jquery-1.7.2.min.js" />
+/// <reference path="../../../Chronozoom.UI/scripts/external/jquery-ui.js" />
 /// <reference path="../../../Chronozoom.UI/scripts/settings.js" />
 /// <reference path="../../../Chronozoom.UI/scripts/timescale.js" />
 /// <reference path="../../../Chronozoom.UI/scripts/dates.js" />
+
+/// <reference path="../../../Chronozoom.UI/scripts/common.ts"/>
+/// <reference path="../../../Chronozoom.UI/scripts/viewport.ts"/>
+/// <reference path="../../../Chronozoom.UI/scripts/vccontent.ts"/>
+/// <reference path="../../../Chronozoom.UI/scripts/virtual-canvas.js" />
 
 var oneDay = 0.0027397260274;
 var currentDate = new Date();
@@ -341,12 +347,12 @@ describe("CZ.DateTickSource part", function () {
             expect("Quarters_Month").toEqual(dateTickSrc.regime);
         });
 
-        //it("'Quarters_Month' if beta = -0.2", function () {
-        //    var l = 0.3;
-        //    var r = 1;
-        //    dateTickSrc.getRegime(l, r);
-        //    expect("Quarters_Month").toEqual(dateTickSrc.regime);
-        //});
+        xit("'Quarters_Month' if beta = -0.2", function () {
+           var l = 0.3;
+           var r = 1;
+           dateTickSrc.getRegime(l, r);
+           expect("Quarters_Month").toEqual(dateTickSrc.regime);
+        });
         
         it("'Month_Weeks' if beta < -0.2 and > -0.8", function () {
             var l = 0.8;
@@ -355,12 +361,12 @@ describe("CZ.DateTickSource part", function () {
             expect("Month_Weeks").toEqual(dateTickSrc.regime);
         });
 
-        //it("'Month_Weeks' if beta = -0.8", function () {
-        //    var l = 0.8;
-        //    var r = 1;
-        //    dateTickSrc.getRegime(l, r);
-        //    expect("Month_Weeks").toEqual(dateTickSrc.regime);
-        //});
+        xit("'Month_Weeks' if beta = -0.8", function () {
+           var l = 0.8;
+           var r = 1;
+           dateTickSrc.getRegime(l, r);
+           expect("Month_Weeks").toEqual(dateTickSrc.regime);
+        });
         
         it("'Weeks_Days' if beta < -0.8 and > -1.4", function () {
             var l = 0.9;
@@ -369,12 +375,12 @@ describe("CZ.DateTickSource part", function () {
             expect("Weeks_Days").toEqual(dateTickSrc.regime);
         });
         
-        //it("'Month_Weeks' if beta = -1.4", function () {
-        //    var l = 0.9601893;
-        //    var r = 1;
-        //    dateTickSrc.getRegime(l, r);
-        //    expect("Weeks_Days").toEqual(dateTickSrc.regime);
-        //});
+        xit("'Month_Weeks' if beta = -1.4", function () {
+           var l = 0.9601893;
+           var r = 1;
+           dateTickSrc.getRegime(l, r);
+           expect("Weeks_Days").toEqual(dateTickSrc.regime);
+        });
         
         it("'Days_Quarters' if beta < -0.8 and > -1.4", function () {
             var l = 0.99;
@@ -383,5 +389,73 @@ describe("CZ.DateTickSource part", function () {
             expect("Days_Quarters").toEqual(dateTickSrc.regime);
         });
     });
-});
+    
+    describe("createTicks() method", function () {
+        xit("should not hang in January range", function () {
+            var testVisible = {
+                centerX: -1598.985736056717,
+                centerY: 2074963999.3720536,
+                scale: 0.000015807448151022422
+            };
 
+            CZ.Common.vc.virtualCanvas("setVisible", testVisible);
+            CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
+        });
+
+        // NOTE: https://github.com/ariya/phantomjs/issues/11013
+        //       It's recommended to run this test in browser.
+        it("should not hang in January range", function () {
+            if (typeof (window.Blob) !== typeof (Function) || !window.Worker) {
+                return;
+            }
+
+            var flag = false;
+            var testRange = {
+                min: -1599.000911206942,
+                max: -1598.9705609064922
+            };
+
+            // NOTE: http://www.html5rocks.com/en/tutorials/workers/basics/#toc-inlineworkers
+            runs(function() {
+                var blob = new Blob([
+                    "self.onmessage = function(e) {\n" +
+                        "var data = JSON.parse(e.data);\n" +
+                        "var url = data.url;\n" +
+                        "var i = url.indexOf('Source/');\n" +
+                        "var sourceDir = url.substring(0, i + 7);\n" +
+                        "var scriptsDir = sourceDir + 'Chronozoom.UI/scripts/';\n" +
+                        "var externalDir = scriptsDir + 'external/';\n" +
+                        "importScripts(scriptsDir + 'timescale.js');\n" +
+                        "var dateTickSrc = new CZ.DateTickSource();\n" +
+                        "dateTickSrc.range = data.range;\n" +
+                        "dateTickSrc.startDate = data.startDate;\n" +
+                        "dateTickSrc.endDate = data.endDate;\n" +
+                        "dateTickSrc.createTicks();\n" +
+                        "self.postMessage();\n" +
+                    "};"
+                ]);
+
+                var worker = new Worker(window.URL.createObjectURL(blob));
+
+                worker.onmessage = function(e) {
+                    flag = true;
+                };
+
+                worker.postMessage(JSON.stringify({
+                    url: document.location.href,
+                    range: testRange,
+                    startDate: CZ.Dates.getYMDFromCoordinate(testRange.min),
+                    endDate: CZ.Dates.getYMDFromCoordinate(testRange.max)
+                }));
+
+                setTimeout(function () {
+                    worker.terminate();
+                }, 1900);
+            });
+
+            waitsFor(function () {
+                return flag;
+            }, "createTicks() method", 2000);
+        });
+    });
+});

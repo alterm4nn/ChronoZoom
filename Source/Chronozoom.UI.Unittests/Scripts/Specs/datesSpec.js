@@ -57,7 +57,7 @@ describe("convertCoordinateToYear method should return", function () {
         it("regime BCE ", function () {
             var coordinate = value;
             var result = convertCoordinateToYear(coordinate);
-            expect(result.year).toEqual((coordinate - 1) / -1);
+            expect(result.year).toEqual((coordinate) / -1);
             expect(result.regime).toEqual('BCE');
         });
     });
@@ -66,7 +66,7 @@ describe("convertCoordinateToYear method should return", function () {
         it("regime Ka ", function () {
             var coordinate = value;
             var result = convertCoordinateToYear(coordinate);
-            expect(result.year).toEqual((coordinate - 1) / -1000);
+            expect(result.year).toEqual((coordinate) / -1000);
             expect(result.regime).toEqual('Ka');
         });
     });
@@ -74,7 +74,7 @@ describe("convertCoordinateToYear method should return", function () {
         it("regime Ma ", function () {
             var coordinate = value;
             var result = convertCoordinateToYear(coordinate);
-            expect(result.year).toEqual((coordinate - 1) / -1000000);
+            expect(result.year).toEqual((coordinate) / -1000000);
             expect(result.regime).toEqual('Ma');
         });
     });
@@ -83,26 +83,39 @@ describe("convertCoordinateToYear method should return", function () {
         it("regime Ga ", function () {
             var coordinate = value;
             var result = convertCoordinateToYear(coordinate);
-            expect(result.year).toEqual((coordinate - 1) / -1000000000);
+            expect(result.year).toEqual((coordinate) / -1000000000);
             expect(result.regime).toEqual('Ga');
         });
     });
 });
 
 // var data1 = [coordinate, exoected year, expected month, expected day];
-var data1 = [-0.3479452054794522, -1, 7, 27];
+var data1 = [-0.3479452054794522, -2, 7, 27];
 var data2 = [2013.0958904109589, 2013, 1, 5];
 var data3 = [1, 1, 0, 1];
-var data4 = [-2013.4986301369863, -2014, 6, 3];
+var data4 = [-2013.4986301369863, -2015, 6, 3];
 var data5 = [2012.1612021857925, 2012, 1, 29]; // - leap year
 var data6 = [2013.1616438356166, 2013, 2, 1];
-var data7 = [-1599.841095890411, -1600, 1, 28];
+var data7 = [-1599.841095890411, -1601, 1, 28];
 var data8 = [2000.1612021857925, 2000, 1, 29]; // - leap year
 var data9 = [2000.1639344262296, 2000, 2, 1];
+var data10 = [0, -1, 0, 1];
+var data11 = [-1, -2, 0, 1];
+var data12 = [0.25, -1, 3, 2];
+var data13 = [-0.25, -2, 9, 2];
+var data14 = [0.9982602739726028, -1, 11, 31]; // check 12th month
 
 
 describe("getYMDFromCoordinate() method should return", function () {
-    usingDMY("", [data1, data2, data3, data4, data5, data6, data7, data8, data9], function (coordinate, year, month, day) {
+    var data = [
+        data1, data2, data3,
+        data4, data5, data6,
+        data7, data8, data9,
+        data10, data11, data12,
+        data13, data14
+    ];
+
+    usingDMY("", data, function (coordinate, year, month, day) {
         it("{ year: " + year + ", month: " + month + ", day: " + day + " }  with coordinate: " + coordinate, function () {
             var result = CZ.Dates.getYMDFromCoordinate(coordinate);
             expect({ year: year, month: month, day: day }).toEqual(result);
@@ -111,7 +124,15 @@ describe("getYMDFromCoordinate() method should return", function () {
 });
 
 describe("getCoordinateFromYMD() method should return", function () {
-    usingDMY('', [data1, data2, data3, data4, data5, data6, data7, data8, data9], function (coordinate, year, month, day) {
+    var data = [
+        data1, data2, data3,
+        data4, data5, data6,
+        data7, data8, data9,
+        data10, data11, data12,
+        data13, data14
+    ];
+
+    usingDMY('', data, function (coordinate, year, month, day) {
         it("coordinate: " + coordinate + " with { year: " + year + ", month: " + month + ", day: " + day + " } ", function () {
             var result = CZ.Dates.getCoordinateFromYMD(year, month, day);
             expect(1 * coordinate.toFixed(2)).toEqual(1 * result.toFixed(2));

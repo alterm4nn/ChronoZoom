@@ -63,6 +63,7 @@ module CZ {
             }
 
             private initUI() {
+                this.saveButton.prop('disabled', false);
                 if (this.mode === "createExhibit") {
                     this.titleTextblock.text("Create Exhibit");
                     this.saveButton.text("create exhibit");
@@ -160,14 +161,14 @@ module CZ {
                         error => {
                             alert("Unable to save changes. Please try again later.");
                         }
-                    ).done(() => {
+                    ).always(() => {
                         this.saveButton.prop('disabled', false);
                     });
                 } else if (this.exhibit.contentItems.length === 0) {
                     var self = this;
                     var origMsg = this.errorMessage.text();
                     this.errorMessage
-                        .text("Cannot create exhibit without content items.")
+                        .text("Cannot create exhibit without artifacts.")
                         .show()
                         .delay(7000)
                         .fadeOut(() => self.errorMessage.text(origMsg));

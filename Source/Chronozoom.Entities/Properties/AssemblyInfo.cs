@@ -23,4 +23,4 @@ using System.Runtime.CompilerServices;
 
 [assembly: SuppressMessage("Microsoft.Design", "CA2210:AssembliesShouldHaveValidStrongNames", Justification = "Open source project")]
 
-[assembly: InternalsVisibleTo("Chronozoom.Entitites.UnitTests")]
+[assembly: InternalsVisibleTo("Chronozoom.Entities.UnitTests")]

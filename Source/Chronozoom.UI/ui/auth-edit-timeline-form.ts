@@ -44,6 +44,7 @@ module CZ {
             }
 
             private initialize(): void {
+                this.saveButton.prop('disabled', false);
                 if (CZ.Authoring.mode === "createTimeline") {
                     this.deleteButton.hide();
                     this.titleTextblock.text("Create Timeline");
@@ -72,6 +73,8 @@ module CZ {
                     this.endDate.setDate(this.timeline.x + this.timeline.width, true);
                 }
                 this.saveButton.click(event => {
+                    
+
                     this.errorMessage.empty();
                     var isDataValid = false;
                     isDataValid = CZ.Authoring.validateTimelineData(this.startDate.getDate(), this.endDate.getDate(), this.titleInput.val());
@@ -80,7 +83,7 @@ module CZ {
                         this.errorMessage.text('Title is empty');
                     }
                     else if (!CZ.Authoring.isIntervalPositive(this.startDate.getDate(), this.endDate.getDate())) {
-                        this.errorMessage.text('Result interval is not positive');
+                        this.errorMessage.text('Time interval should no less than one day');
                     }      
                     
                     if (!isDataValid) {
@@ -99,12 +102,15 @@ module CZ {
                             function (success) {
                                 self.isCancel = false;
                                 self.close();
+                                
+                                //Move to new created timeline                              
+                                self.timeline.onmouseclick();
                             },
                             function (error) {
                                 alert("Unable to save changes. Please try again later.");
                                 console.log(error);
                             }
-                        ).done(() => {
+                        ).always(() => {
                             this.saveButton.prop('disabled', false);
                         });
                     }
@@ -120,7 +126,7 @@ module CZ {
 
             public show(): void {
                 super.show({
-                    effect: "slide", 
+                    effect: "slide",
                     direction: "left",
                     duration: 500
                 });
@@ -132,7 +138,7 @@ module CZ {
                 this.errorMessage.empty();
 
                 super.close({
-                    effect: "slide", 
+                    effect: "slide",
                     direction: "left",
                     duration: 500,
                     complete: () => {
@@ -141,7 +147,7 @@ module CZ {
                     }
                 });
 
-                if (this.isCancel && CZ.Authoring.mode === "createTimeline") {                    
+                if (this.isCancel && CZ.Authoring.mode === "createTimeline") {
                     CZ.VCContent.removeChild(this.timeline.parent, this.timeline.id);
                     CZ.Common.vc.virtualCanvas("requestInvalidate");
                 }
@@ -149,7 +155,7 @@ module CZ {
                 CZ.Authoring.isActive = false;
 
                 this.activationSource.removeClass("active");
-                
+
             }
         }
     }
