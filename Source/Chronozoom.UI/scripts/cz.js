@@ -99,24 +99,30 @@ var CZ;
                 CZ.Tours.initializeToursUI();
                 $("#tours_index").click(function () {
                     CZ.Tours.removeActiveTour();
-                    var form = new CZ.UI.FormToursList(forms[9], {
-                        activationSource: $(this),
-                        navButton: ".cz-form-nav",
-                        closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        titleTextblock: ".cz-form-title",
-                        tourTemplate: forms[10],
-                        tours: CZ.Tours.tours,
-                        takeTour: function (tour) {
-                            CZ.Tours.removeActiveTour();
-                            CZ.Tours.activateTour(tour, undefined);
-                        },
-                        editTour: allowEditing ? function (tour) {
-                            if(CZ.Authoring.showEditTourForm) {
-                                CZ.Authoring.showEditTourForm(tour);
-                            }
-                        } : null
-                    });
-                    form.show();
+                    var toursListForm = getFormById("#toursList");
+                    if(toursListForm.isFormVisible) {
+                        toursListForm.close();
+                    } else {
+                        closeAllForms();
+                        var form = new CZ.UI.FormToursList(forms[9], {
+                            activationSource: $(this),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            tourTemplate: forms[10],
+                            tours: CZ.Tours.tours,
+                            takeTour: function (tour) {
+                                CZ.Tours.removeActiveTour();
+                                CZ.Tours.activateTour(tour, undefined);
+                            },
+                            editTour: allowEditing ? function (tour) {
+                                if(CZ.Authoring.showEditTourForm) {
+                                    CZ.Authoring.showEditTourForm(tour);
+                                }
+                            } : null
+                        });
+                        form.show();
+                    }
                 });
             };
             if(CZ.Tours.tours) {
@@ -382,7 +388,8 @@ var CZ;
                         }
                     });
                 }
-                $("#login-panel").click(function () {
+                $("#login-panel").click(function (event) {
+                    event.preventDefault();
                     if(!loginForm.isFormVisible) {
                         closeAllForms();
                         loginForm.show();

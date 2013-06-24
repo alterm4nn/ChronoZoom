@@ -10955,6 +10955,8 @@ var CZ;
                 this.profilePanel = $(document.body).find(formInfo.profilePanel).first();
                 this.loginPanelLogin = $(document.body).find(formInfo.loginPanelLogin).first();
                 this.allowRedirect = formInfo.allowRedirect;
+                this.usernameInput.off("keypress");
+                this.emailInput.off("keypress");
                 this.initialize();
             }
             FormEditProfile.prototype.validEmail = function (e) {
@@ -11026,6 +11028,13 @@ var CZ;
                 this.logoutButton.click(function (event) {
                     window.location.assign("/pages/logoff.aspx");
                 });
+                var preventEnterKeyPress = function (event) {
+                    if(event.which == 13) {
+                        event.preventDefault();
+                    }
+                };
+                this.usernameInput.keypress(preventEnterKeyPress);
+                this.emailInput.keypress(preventEnterKeyPress);
             };
             FormEditProfile.prototype.show = function () {
                 _super.prototype.show.call(this, {
@@ -11364,24 +11373,30 @@ var CZ;
                 CZ.Tours.initializeToursUI();
                 $("#tours_index").click(function () {
                     CZ.Tours.removeActiveTour();
-                    var form = new CZ.UI.FormToursList(forms[9], {
-                        activationSource: $(this),
-                        navButton: ".cz-form-nav",
-                        closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        titleTextblock: ".cz-form-title",
-                        tourTemplate: forms[10],
-                        tours: CZ.Tours.tours,
-                        takeTour: function (tour) {
-                            CZ.Tours.removeActiveTour();
-                            CZ.Tours.activateTour(tour, undefined);
-                        },
-                        editTour: allowEditing ? function (tour) {
-                            if(CZ.Authoring.showEditTourForm) {
-                                CZ.Authoring.showEditTourForm(tour);
-                            }
-                        } : null
-                    });
-                    form.show();
+                    var toursListForm = getFormById("#toursList");
+                    if(toursListForm.isFormVisible) {
+                        toursListForm.close();
+                    } else {
+                        closeAllForms();
+                        var form = new CZ.UI.FormToursList(forms[9], {
+                            activationSource: $(this),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            tourTemplate: forms[10],
+                            tours: CZ.Tours.tours,
+                            takeTour: function (tour) {
+                                CZ.Tours.removeActiveTour();
+                                CZ.Tours.activateTour(tour, undefined);
+                            },
+                            editTour: allowEditing ? function (tour) {
+                                if(CZ.Authoring.showEditTourForm) {
+                                    CZ.Authoring.showEditTourForm(tour);
+                                }
+                            } : null
+                        });
+                        form.show();
+                    }
                 });
             };
             if(CZ.Tours.tours) {
@@ -11647,7 +11662,8 @@ var CZ;
                         }
                     });
                 }
-                $("#login-panel").click(function () {
+                $("#login-panel").click(function (event) {
+                    event.preventDefault();
                     if(!loginForm.isFormVisible) {
                         closeAllForms();
                         loginForm.show();
