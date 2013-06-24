@@ -41,7 +41,7 @@ namespace Chronozoom.UI
                 }
             }
 
-            return superCollection;
+            return superCollection.ToString().Split('/')[0];
         }
 
         /// <summary>
@@ -102,7 +102,9 @@ namespace Chronozoom.UI
                 guid = url.Segments[url.Segments.Length - 1];
             }
 
-            return guid;
+            if(IsGuid(guid))
+                return guid;
+            return RootTimelineId(url);
         }
 
         /// <summary>
@@ -127,7 +129,7 @@ namespace Chronozoom.UI
                 return null;
             }
 
-            return new Uri(_hostPath.Value + "/" + FriendlyUrl.FriendlyUrlEncode(superCollection) + FriendlyUrl.FriendlyUrlEncode(collection)+ "/");
+            return new Uri(_hostPath.Value + "/" + FriendlyUrl.FriendlyUrlEncode(superCollection) + "/" + FriendlyUrl.FriendlyUrlEncode(collection)+ "/");
         }
 
         public static string RootTimelineId(Uri collection)
@@ -289,16 +291,24 @@ namespace Chronozoom.UI
         {
             StringBuilder title = new StringBuilder();
 
-            string urlGuid = Chronozoom.UI.Crawler.UrlGuid(url);
-            if (IsTimeline(urlGuid)) { 
-                title.Append(Timelines(urlGuid).Title + " - ");
-            } else if (IsExhibit(urlGuid)) {
-                title.Append(Exhibits(urlGuid).Title + " - ");
-            } else if (IsContentItem(urlGuid)) {
-                title.Append(ContentItems(urlGuid).Title + " - ");
-            }
+            string urlGuid = UrlGuid(url);
+            
+            if(url != null && url.Segments.Length > 1 && IsGuid(url.Segments[url.Segments.Length - 1]))
+                if (IsTimeline(urlGuid)) { 
+                    title.Append(Timelines(urlGuid).Title + " - ");
+                } else if (IsExhibit(urlGuid)) {
+                    title.Append(Exhibits(urlGuid).Title + " - ");
+                } else if (IsContentItem(urlGuid)) {
+                    title.Append(ContentItems(urlGuid).Title + " - ");
+                }
 
             title.Append("ChronoZoom");
+
+            if (!string.IsNullOrEmpty(UrlSuperCollection(url)))
+                title.Append(FriendlyUrl.FriendlyUrlDecode(" (" + UrlSuperCollection(url)) + ") ");
+            else if (!string.IsNullOrEmpty(UrlCollection(url)))
+                title.Append(FriendlyUrl.FriendlyUrlDecode(" (" + UrlCollection(url)) + ") ");
+
             return title.ToString();
         }
 
