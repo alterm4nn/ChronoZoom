@@ -1,5 +1,4 @@
-/* The height of the page header */
-.cz-timescale {
+﻿.cz-timescale {
   padding-bottom: 0px;
   font-size: large;
   font-weight: 500;
@@ -274,7 +273,7 @@ a:visited {
   line-height: 36px;
   width: 170px;
   background-repeat: no-repeat;
-  background-position-x: center;
+  background-position: center;
   background-image: url('../images/chronozoom.png');
 }
 .header-controls {
@@ -584,7 +583,7 @@ a:visited {
   vertical-align: middle;
   font-size: 19px;
   cursor: default;
-  filter: progid:dximagetransform.microsoft.gradient(StartColorStr='#FDFDFD', EndColorStr='#424242', GradientType=1);
+  filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#FDFDFD', EndColorStr='#424242', GradientType=1);
   /* MSIE */
 
 }
@@ -1143,7 +1142,7 @@ img.fallbackBackground {
   height: 25px;
   color: #555;
   text-align: center;
-  font-size: 20px;
+  font-size: 14px;
   line-height: 100%;
   display: none;
 }
@@ -1196,7 +1195,7 @@ img.fallbackBackground {
   margin-left: 3px;
   height: 100%;
   color: #bfbfbf;
-  font-size: 24px;
+  font-size: 16px;
   font-family: verdana;
   line-height: 100%;
   cursor: default;
@@ -1205,7 +1204,7 @@ img.fallbackBackground {
   position: relative;
   display: inline-block;
   height: 25px;
-  font-size: 20px;
+  font-size: 14px;
   font-family: verdana;
   line-height: 25px;
   cursor: pointer;
@@ -1332,7 +1331,7 @@ img.fallbackBackground {
   padding: 0 5px;
   /* IE9 */
 
-  filter: progid:dximagetransform.microsoft.gradient(StartColorStr='#1B6AAB', EndColorStr='#0E4073', GradientType=0);
+  filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#1B6AAB', EndColorStr='#0E4073', GradientType=0);
   /* IE10 Consumer Preview */
 
   background-image: -ms-linear-gradient(bottom, #0e4073 0%, #1b6aab 100%);
