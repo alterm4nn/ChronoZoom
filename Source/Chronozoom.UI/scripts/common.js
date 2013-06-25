@@ -89,18 +89,6 @@ var CZ;
             }, 'slow');
         }
         Common.showFooter = showFooter;
-        function startExploring() {
-            if($('#welcomeScreenCheckbox').is(':checked')) {
-                setCookie("welcomeScreenDisallowed", "1", 365);
-            }
-            hideWelcomeScreen();
-        }
-        Common.startExploring = startExploring;
-        function hideWelcomeScreen() {
-            $('#welcomeScreen').remove();
-            $('#welcomeScreenBack').css("display", "none");
-        }
-        Common.hideWelcomeScreen = hideWelcomeScreen;
         Common.animationTooltipRunning = null;
         Common.tooltipMode = "default";
         function stopAnimationTooltip() {
