@@ -25,7 +25,7 @@ namespace Application.Helper.Helpers
         public bool IsWelcomeScreenDispalyed()
         {
             Logger.Log("<-");
-            bool result = IsElementExists(By.Id("welcomeScreen"));
+            bool result = IsElementExisted(By.Id("welcomeScreen"));
             Logger.Log("-> result: " + result);
             return result;
         }

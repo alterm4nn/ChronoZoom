@@ -10,13 +10,13 @@ namespace Application.Helper.Helpers
     {
         public void OpenPage()
         {
-            HelperManager<NavigationHelper>.GetInstance.OpenHomePage();
+            HelperManager<NavigationHelper>.Instance.OpenHomePage();
             WaitWhileHomePageIsLoaded();
         }
 
         public void OpenSandboxPage()
         {
-            HelperManager<NavigationHelper>.GetInstance.OpenSandboxPage();
+            HelperManager<NavigationHelper>.Instance.OpenSandboxPage();
             WaitWhileHomePageIsLoaded();
         }
         

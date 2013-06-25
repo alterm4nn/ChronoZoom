@@ -81,6 +81,7 @@
     <Compile Include="Helpers\SearchHelper.cs" />
     <Compile Include="Helpers\TimelineHelper.cs" />
     <Compile Include="Helpers\TimescaleHelper.cs" />
+    <Compile Include="Helpers\TimeSeriesHelper.cs" />
     <Compile Include="Helpers\TourHelper.cs" />
     <Compile Include="Helpers\WelcomeScreenHelper.cs" />
     <Compile Include="Interfaces\IControls.cs" />
