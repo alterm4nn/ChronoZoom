@@ -114,6 +114,12 @@ var CZ;
                     this.hide(true);
                     CZ.Authoring.contentItemMode = "createContentItem";
                     CZ.Authoring.showEditContentItemForm(newContentItem, this.exhibit, this, true);
+                } else {
+                    var self = this;
+                    var origMsg = this.errorMessage.text();
+                    this.errorMessage.text("Sorry, only 10 artifacts are allowed in one exhibit").show().delay(7000).fadeOut(function () {
+                        return self.errorMessage.text(origMsg);
+                    });
                 }
             };
             FormEditExhibit.prototype.onSave = function () {
@@ -135,6 +141,8 @@ var CZ;
                     CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(function (success) {
                         _this.isCancel = false;
                         _this.close();
+                        _this.exhibit.id = arguments[0].id;
+                        _this.exhibit.onmouseclick();
                     }, function (error) {
                         alert("Unable to save changes. Please try again later.");
                     }).always(function () {

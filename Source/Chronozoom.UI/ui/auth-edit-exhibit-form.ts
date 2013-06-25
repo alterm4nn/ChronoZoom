@@ -134,6 +134,15 @@ module CZ {
                     CZ.Authoring.contentItemMode = "createContentItem";
                     CZ.Authoring.showEditContentItemForm(newContentItem, this.exhibit, this, true);
                 }
+                else {
+                    var self = this;
+                    var origMsg = this.errorMessage.text();
+                    this.errorMessage
+                        .text("Sorry, only 10 artifacts are allowed in one exhibit")
+                        .show()
+                        .delay(7000)
+                        .fadeOut(() => self.errorMessage.text(origMsg));
+                }
             }
 
             private onSave() {
@@ -154,9 +163,14 @@ module CZ {
 
                     this.saveButton.prop('disabled', true);
                     CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(
-                        success => {
+                        success => { 
                             this.isCancel = false;
                             this.close();
+                            
+                            this.exhibit.id = arguments[0].id;
+
+                            this.exhibit.onmouseclick();
+
                         },
                         error => {
                             alert("Unable to save changes. Please try again later.");
