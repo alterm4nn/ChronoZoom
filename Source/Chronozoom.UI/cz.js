@@ -3865,6 +3865,7 @@ var CZ;
             createExhibit: {
                 mousemove: function () {
                     if(CZ.Authoring.isDragging && _hovered.type === "timeline") {
+                        updateNewCircle();
                     }
                 },
                 mouseup: function () {
@@ -4003,7 +4004,7 @@ var CZ;
                     newExhibit = renewExhibit(newExhibit);
                     newExhibit.id = "e" + response.ExhibitId;
                     CZ.Common.vc.virtualCanvas("requestInvalidate");
-                    deferred.resolve();
+                    deferred.resolve(newExhibit);
                 }, function (error) {
                     console.log("Error connecting to service: update exhibit.\n" + error.responseText);
                     deferred.reject();
@@ -10564,6 +10565,12 @@ var CZ;
                     this.hide(true);
                     CZ.Authoring.contentItemMode = "createContentItem";
                     CZ.Authoring.showEditContentItemForm(newContentItem, this.exhibit, this, true);
+                } else {
+                    var self = this;
+                    var origMsg = this.errorMessage.text();
+                    this.errorMessage.text("Sorry, only 10 artifacts are allowed in one exhibit").show().delay(7000).fadeOut(function () {
+                        return self.errorMessage.text(origMsg);
+                    });
                 }
             };
             FormEditExhibit.prototype.onSave = function () {
@@ -10585,6 +10592,8 @@ var CZ;
                     CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(function (success) {
                         _this.isCancel = false;
                         _this.close();
+                        _this.exhibit.id = arguments[0].id;
+                        _this.exhibit.onmouseclick();
                     }, function (error) {
                         alert("Unable to save changes. Please try again later.");
                     }).always(function () {
