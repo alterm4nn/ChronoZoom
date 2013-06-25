@@ -9,7 +9,6 @@ module CZ {
 
             constructor(container: JQuery, formInfo: CZ.UI.IFormBaseInfo) {
                 super(container, formInfo);
-
             }
 
             public show(): void {
