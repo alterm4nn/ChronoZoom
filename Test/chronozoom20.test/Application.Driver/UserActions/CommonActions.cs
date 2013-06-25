@@ -163,6 +163,12 @@ namespace Application.Driver.UserActions
             IWebElement element = FindElement(by);
             element.Clear();
             element.SendKeys(text);
+        }  
+        
+        protected void SetFilePath(By by, string text)
+        {
+            IWebElement element = FindElement(by);
+            element.SendKeys(text);
         }
 
         protected void WaitCondition(Func<bool> condition, int timeoutInSeconds, int pauseInSeconds = 1)

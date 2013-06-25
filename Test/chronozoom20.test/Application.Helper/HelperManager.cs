@@ -4,7 +4,7 @@
     {
         private HelperManager() { }
 
-        public static T GetInstance
+        public static T Instance
         {
             get
             {
