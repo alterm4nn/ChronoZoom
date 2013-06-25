@@ -1,4 +1,5 @@
-﻿.cz-timescale {
+/* The height of the page header */
+.cz-timescale {
   padding-bottom: 0px;
   font-size: large;
   font-weight: 500;
@@ -158,6 +159,12 @@
 .cz-datepicker-errormsg {
   color: #dd4b39;
 }
+/* The height of the page header */
+/* The width of the logo area */
+/* The width of the action icons area */
+/* The width of the tour player area */
+/* The height of the page footer */
+/* The width of the footers links area */
 html,
 body {
   margin: 0;
@@ -166,7 +173,7 @@ body {
 }
 body {
   overflow: hidden;
-  min-width: 950px;
+  min-width: 250px;
   min-height: 250px;
   background-color: #232323;
   font-family: 'Segoe UI', Helvetica, Arial, 'Trebuchet MS', San Serif;
@@ -191,23 +198,26 @@ a:visited {
                             Header            
       
 ***********************************************************/
-#header {
+.navigation {
   position: relative;
-  padding-right: 20px;
-  padding-left: 20px;
+  margin: 0;
+  padding: 0;
   height: 36px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
 }
-#header ul {
+.navigation ul {
   overflow: hidden;
   margin: 0;
   padding: 0;
   list-style: none;
   height: 100%;
 }
-#header ul li {
+.navigation ul li {
   height: 100%;
 }
-#header ul:after {
+.navigation ul:after {
   clear: both;
 }
 .regime-link {
@@ -262,11 +272,32 @@ a:visited {
 .header-logo {
   height: 36px;
   line-height: 36px;
-  width: 200px;
-  margin-right: 40px;
+  width: 170px;
   background-repeat: no-repeat;
   background-position: center;
-  background-image: url('../images/chronzoom-200px-white.png');
+  background-image: url('../images/chronozoom.png');
+}
+.header-controls {
+  height: 36px;
+  width: calc(100% - 170px - 150px);
+  width: -moz-calc(100% - 170px - 150px);
+  width: -webkit-calc(100% - 170px - 150px);
+  width: -o-calc(100% - 170px - 150px);
+}
+.header-regimes {
+  height: 36px;
+  width: 100%;
+  display: none;
+}
+.header-breadcrumbs {
+  height: 36px;
+  width: 100%;
+  display: none;
+  margin-top: 5px;
+}
+.header-icons {
+  height: 36px;
+  width: 150px;
 }
 .header-icon {
   height: 36px;
@@ -325,12 +356,11 @@ a:visited {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
-  margin-top: -36px;
-  margin-bottom: -25px;
-  padding-top: 36px;
-  padding-bottom: 25px;
-  height: 100%;
-  min-height: 100%;
+  width: 100%;
+  height: calc(100% - 36px - 25px);
+  height: -moz-calc(100% - 36px - 25px);
+  height: -webkit-calc(100% - 36px - 25px);
+  height: -o-calc(100% - 36px - 25px);
 }
 #vc-container {
   -webkit-box-sizing: border-box;
@@ -396,10 +426,12 @@ a:visited {
   height: inherit;
 }
 .tour_control {
-  display: none;
-  margin: 5px 2px 2px 2px;
+  height: 36px;
   width: 190px;
+  display: none;
   cursor: pointer;
+  margin-top: 5px;
+  margin-left: 10px;
 }
 /***********************************************************
 
@@ -552,7 +584,7 @@ a:visited {
   vertical-align: middle;
   font-size: 19px;
   cursor: default;
-  filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#FDFDFD', EndColorStr='#424242', GradientType=1);
+  filter: progid:dximagetransform.microsoft.gradient(StartColorStr='#FDFDFD', EndColorStr='#424242', GradientType=1);
   /* MSIE */
 
 }
@@ -1068,8 +1100,8 @@ img.fallbackBackground {
   height: 100%;
 }
 .footer-link {
-  margin-right: 20px;
-  margin-left: 20px;
+  margin-right: 10px;
+  margin-left: 10px;
   height: 100%;
   color: #FFF;
   white-space: nowrap;
@@ -1077,6 +1109,29 @@ img.fallbackBackground {
 }
 .footer-link:hover {
   cursor: pointer;
+}
+.footer-links {
+  height: 25px;
+  width: 350px;
+  color: #AAA;
+}
+.footer-credits {
+  height: 25px;
+  width: calc(100% - 350px);
+  width: -moz-calc(100% - 350px);
+  width: -webkit-calc(100% - 350px);
+  width: -o-calc(100% - 350px);
+  color: #AAA;
+}
+.footer-link-credits,
+.footer-link-credits:visited,
+.footer-link-credits:link {
+  margin-right: 6px;
+  margin-left: 6px;
+}
+.footer-text {
+  margin-left: 6px;
+  color: #AAA;
 }
 /***********************************************************
 
@@ -1086,13 +1141,14 @@ img.fallbackBackground {
 .breadcrumbs-nav {
   width: 25px;
   height: 25px;
-  color: #BFBFBF;
+  color: #555;
   text-align: center;
   font-size: 20px;
   line-height: 100%;
+  display: none;
 }
 .breadcrumbs-nav:hover {
-  color: #fff;
+  color: #999;
 }
 #breadcrumbs-nav-left {
   display: none;
@@ -1104,9 +1160,13 @@ img.fallbackBackground {
 }
 .breadcrumbs-container {
   overflow: hidden;
-  width: 50%;
+  width: calc(100% - 25px - 25px);
+  width: -moz-calc(100% - 25px - 25px);
+  width: -webkit-calc(100% - 25px - 25px);
+  width: -o-calc(100% - 25px - 25px);
   height: 100%;
   line-height: 100%;
+  margin-left: 20px;
 }
 #breadcrumbs-table {
   position: relative;
@@ -1136,7 +1196,7 @@ img.fallbackBackground {
   margin-left: 3px;
   height: 100%;
   color: #bfbfbf;
-  font-size: 12.5px;
+  font-size: 24px;
   font-family: verdana;
   line-height: 100%;
   cursor: default;
@@ -1145,26 +1205,11 @@ img.fallbackBackground {
   position: relative;
   display: inline-block;
   height: 25px;
-  font-size: 12.5px;
+  font-size: 20px;
   font-family: verdana;
   line-height: 25px;
   cursor: pointer;
-  color: lightgrey;
-}
-.breadcrumb-cosmos {
-  color: #986C9D;
-}
-.breadcrumb-earth {
-  color: #517F95;
-}
-.breadcrumb-life {
-  color: #499649;
-}
-.breadcrumb-prehistory {
-  color: #ED9132;
-}
-.breadcrumb-humanity {
-  color: #D45C46;
+  color: #FFF;
 }
 .breadcrumb-hover {
   color: #fff;
@@ -1287,7 +1332,7 @@ img.fallbackBackground {
   padding: 0 5px;
   /* IE9 */
 
-  filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#1B6AAB', EndColorStr='#0E4073', GradientType=0);
+  filter: progid:dximagetransform.microsoft.gradient(StartColorStr='#1B6AAB', EndColorStr='#0E4073', GradientType=0);
   /* IE10 Consumer Preview */
 
   background-image: -ms-linear-gradient(bottom, #0e4073 0%, #1b6aab 100%);
