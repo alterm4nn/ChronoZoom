@@ -765,7 +765,9 @@ namespace Chronozoom.UI
                     return Guid.Empty;
                 }
 
-                if (user == null)
+                Guid superCollectionId = CollectionIdFromText(superCollectionName);
+                SuperCollection superCollection = RetrieveSuperCollection(storage, superCollectionId);
+                if (user == null || superCollection.User != user)
                 {
                     // No ACS so treat as an anonymous user who cannot add or modify a collection.
                     SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
