@@ -226,6 +226,7 @@ var CZ;
             createExhibit: {
                 mousemove: function () {
                     if(CZ.Authoring.isDragging && _hovered.type === "timeline") {
+                        updateNewCircle();
                     }
                 },
                 mouseup: function () {
