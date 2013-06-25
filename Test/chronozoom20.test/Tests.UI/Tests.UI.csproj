@@ -66,6 +66,7 @@
     <Compile Include="TimescaleTests.cs" />
     <Compile Include="TimeSeriesTests.cs" />
     <Compile Include="TourTests.cs" />
+    <Compile Include="UserProfileFormTests.cs" />
     <Compile Include="WelcomeScreenTests.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -150,7 +150,7 @@ namespace Application.Driver.UserActions
 
         protected void WaitForElementIsExisted(By by)
         {
-            _wait.Until(w => IsElementExists(by));
+            _wait.Until(w => IsElementExisted(by));
         }
 
         protected void WaitForAlertIsDisplayed()
@@ -204,7 +204,7 @@ namespace Application.Driver.UserActions
             return Executor.ExecuteScript("return " + script).ToString();
         }
 
-        protected bool IsElementExists(By by)
+        protected bool IsElementExisted(By by)
         {
             try
             {
@@ -350,7 +350,6 @@ namespace Application.Driver.UserActions
             WaitCondition(AreEqualViewports, 60);
         }
 
-
         protected void MoveToElementAndDrugAndDrop(By by, int x = 0, int y = 0)
         {
             IWebElement element = FindElement(by);
@@ -362,7 +361,20 @@ namespace Application.Driver.UserActions
             WebDriver.SwitchTo().Alert().Accept();
         }
 
-        private bool IsAlertPresented()
+        protected void PressEnter(By by)
+        {
+            IWebElement element = FindElement(by);
+            try
+            {
+                InvokeChain(() => Builder.MoveToElement(element).SendKeys(Keys.Return));
+            }
+            catch (UnhandledAlertException)
+            {
+                return;
+            }
+        }
+
+        protected bool IsAlertPresented()
         {
             try
             {
@@ -382,6 +394,5 @@ namespace Application.Driver.UserActions
             string v2 = GetJavaScriptExecutionResult("$('#vc').virtualCanvas('getViewport')");
             return v1 == v2;
         }
-
     }
 }
