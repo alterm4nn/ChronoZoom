@@ -244,6 +244,7 @@
     <Content Include="cz.js" />
     <Content Include="fallback.html" />
     <Content Include="Global.asax" />
+    <Content Include="images\chronozoom.png" />
     <Content Include="images\edit-icon.png" />
     <Content Include="images\profile-icon.png" />
     <Content Include="images\search-icon.png" />
@@ -392,8 +393,6 @@
     <Content Include="favicon.ico" />
     <Content Include="images\background.jpg" />
     <Content Include="images\backgroundWithBlur.jpg" />
-    <Content Include="images\chronzoom-200px-white-mob.png" />
-    <Content Include="images\chronzoom-200px-white.png" />
     <Content Include="images\cosmosRegimeBox.jpg" />
     <Content Include="images\defaultGradientBox.jpg" />
     <Content Include="images\earthRegimeBox.jpg" />

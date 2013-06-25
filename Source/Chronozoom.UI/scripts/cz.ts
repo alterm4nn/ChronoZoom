@@ -102,17 +102,21 @@ module CZ {
             {
                 Name: "Regimes",
                 Activation: FeatureActivation.RootCollection,
-                JQueryReference: ".regime-link"
+                JQueryReference: ".header-regimes"
             },
             {
                 Name: "TimeSeries",
-                Activation: FeatureActivation.Enabled,
-                JQueryReference: "#timeSeriesContainer"
+                Activation: FeatureActivation.Enabled
             },
             {
                 Name: "ManageCollections",
                 Activation: FeatureActivation.Disabled,
                 JQueryReference: "#collections_button"
+            },
+            {
+                Name: "BreadCrumbs",
+                Activation: FeatureActivation.NotRootCollection,
+                JQueryReference: ".header-breadcrumbs"
             },
         ];
 
@@ -519,29 +523,6 @@ module CZ {
                 .mouseout(() => { CZ.Common.toggleOffImage('biblCloseButton', 'png'); })
                 .mouseover(() => { CZ.Common.toggleOnImage('biblCloseButton', 'png'); })
 
-
-            $('#welcomeScreenCloseButton')
-                .mouseover(() => { CZ.Common.toggleOnImage('welcomeScreenCloseButton', 'png'); })
-                .mouseout(() => { CZ.Common.toggleOffImage('welcomeScreenCloseButton', 'png'); })
-                .click(CZ.Common.startExploring);
-            $('#welcomeScreenStartButton')
-                .click(CZ.Common.startExploring);
-
-            var wlcmScrnCookie = CZ.Common.getCookie("welcomeScreenDisallowed");
-            if (wlcmScrnCookie != null) {
-                CZ.Common.hideWelcomeScreen();
-            }
-            else {
-                // click on gray area hides welcome screen
-                $("#welcomeScreenOut").click(function (e) {
-                    e.stopPropagation();
-                });
-
-                $("#welcomeScreenBack").click(function () {
-                    CZ.Common.startExploring();
-                });
-            }
-
             ApplyFeatureActivation();
 
             if (navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
@@ -924,8 +905,13 @@ module CZ {
                     _featureMap[idxFeature].IsEnabled = enabled;
                 }
 
-                if (!_featureMap[idxFeature].IsEnabled && feature.JQueryReference) {
-                    $(feature.JQueryReference).css("display", "none");
+                if (feature.JQueryReference) {
+                    if (!_featureMap[idxFeature].IsEnabled) {
+                        $(feature.JQueryReference).css("display", "none");
+                    }
+                    else {
+                        $(feature.JQueryReference).css("display", "block");
+                    }
                 }
             }
         }
