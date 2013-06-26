@@ -182,6 +182,23 @@
                 class: "breadcrumb-separator",
                 text: "›"
             })));
+            switch(element.regime) {
+                case "Cosmos":
+                    $("#bc_link_" + element.id).addClass("breadcrumb-cosmos");
+                    break;
+                case "Earth":
+                    $("#bc_link_" + element.id).addClass("breadcrumb-earth");
+                    break;
+                case "Life":
+                    $("#bc_link_" + element.id).addClass("breadcrumb-life");
+                    break;
+                case "Pre-history":
+                    $("#bc_link_" + element.id).addClass("breadcrumb-prehistory");
+                    break;
+                case "Humanity":
+                    $("#bc_link_" + element.id).addClass("breadcrumb-humanity");
+                    break;
+            }
             $("#bc_" + length + " .breadcrumb-separator").hide();
             if(length > 0) {
                 $("#bc_" + (length - 1) + " .breadcrumb-separator").show();

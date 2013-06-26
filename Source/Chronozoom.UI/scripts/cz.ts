@@ -115,7 +115,7 @@ module CZ {
             },
             {
                 Name: "BreadCrumbs",
-                Activation: FeatureActivation.NotRootCollection,
+                Activation: FeatureActivation.Enabled,
                 JQueryReference: ".header-breadcrumbs"
             },
         ];
