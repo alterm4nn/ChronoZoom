@@ -60,6 +60,7 @@ module CZ {
             Activation: FeatureActivation;
             JQueryReference: string;
             IsEnabled: bool;
+            HasBeenActivated: bool;
         }
 
         // Basic Flight-Control (Tracks the features that are enabled)
@@ -430,6 +431,7 @@ module CZ {
                             }
                         }
                         else {
+                            $("#login-panel").hide();
                             $("#profile-panel").show();
                             $(".auth-panel-login").html(data.DisplayName);
                         }
@@ -917,7 +919,8 @@ module CZ {
                     if (!_featureMap[idxFeature].IsEnabled) {
                         $(feature.JQueryReference).css("display", "none");
                     }
-                    else {
+                    else if (!_featureMap[idxFeature].HasBeenActivated) {
+                        _featureMap[idxFeature].HasBeenActivated = true;
                         $(feature.JQueryReference).css("display", "block");
                     }
                 }

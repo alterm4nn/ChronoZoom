@@ -3,7 +3,6 @@
 
 @headerHeight: 36px; /* The height of the page header */
 @headerLogoWidth: 170px; /* The width of the logo area */
-@headerIconsWidth: 200px; /* The width of the action icons area */
 @headerTourWidth: 140px; /* The width of the tour player area */
 @headerRegimesWidth: 420px; /* The width of the regimes area */
 @headerBreadcrumbsHeight: 25px; /* The height of the breadcrumbs area */
@@ -174,16 +173,6 @@ a
     margin-left: 10px;
 }
 
-.header-controls
-{
-    min-width: @headerTourWidth;
-    height: @headerHeight;
-    width: calc(~"100% -" @headerLogoWidth ~"-" @headerIconsWidth);
-    width: -moz-calc(~"100% -" @headerLogoWidth ~"-" @headerIconsWidth);
-    width: -webkit-calc(~"100% -" @headerLogoWidth ~"-" @headerIconsWidth);
-    width: -o-calc(~"100% -" @headerLogoWidth ~"-" @headerIconsWidth);
-}
-
 .header-regimes
 {
     height: @headerHeight;
@@ -202,7 +191,6 @@ a
 .header-icons
 {
     height: @headerHeight;
-    width: @headerIconsWidth;
 }
 
 .header-icon
@@ -1225,6 +1213,11 @@ img.fallbackBackground
     color: #AAA;
 }
 
+    .footer-credits ul
+    {
+        margin-top: 4px;
+    }
+
 .footer-link-credits, .footer-link-credits:visited, .footer-link-credits:link
 {
     margin-right: 6px;
@@ -1387,10 +1380,19 @@ img.fallbackBackground
 .cz-form
 {
     position: absolute;
-    top: 36px;
     z-index: 100000001;
     display: none;
     cursor: default;
+}
+
+.cz-form-right
+{
+    top: 36px;
+}
+
+.cz-form-left
+{
+    top: 53px;
 }
 
 .cz-form-header

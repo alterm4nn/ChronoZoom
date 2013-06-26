@@ -161,7 +161,6 @@
 }
 /* The height of the page header */
 /* The width of the logo area */
-/* The width of the action icons area */
 /* The width of the tour player area */
 /* The width of the regimes area */
 /* The height of the breadcrumbs area */
@@ -282,14 +281,6 @@ a:visited {
   background-image: url('../images/chronozoom.png');
   margin-left: 10px;
 }
-.header-controls {
-  min-width: 140px;
-  height: 36px;
-  width: calc(100% - 170px - 200px);
-  width: -moz-calc(100% - 170px - 200px);
-  width: -webkit-calc(100% - 170px - 200px);
-  width: -o-calc(100% - 170px - 200px);
-}
 .header-regimes {
   height: 36px;
   width: 420px;
@@ -303,7 +294,6 @@ a:visited {
 }
 .header-icons {
   height: 36px;
-  width: 200px;
 }
 .header-icon {
   height: 36px;
@@ -1128,6 +1118,9 @@ img.fallbackBackground {
   width: -o-calc(100% - 350px);
   color: #AAA;
 }
+.footer-credits ul {
+  margin-top: 4px;
+}
 .footer-link-credits,
 .footer-link-credits:visited,
 .footer-link-credits:link {
@@ -1252,10 +1245,15 @@ img.fallbackBackground {
 ***********************************************************/
 .cz-form {
   position: absolute;
-  top: 36px;
   z-index: 100000001;
   display: none;
   cursor: default;
+}
+.cz-form-right {
+  top: 36px;
+}
+.cz-form-left {
+  top: 53px;
 }
 .cz-form-header {
   position: relative;

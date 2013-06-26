@@ -78,7 +78,7 @@ var CZ;
                             }
                             CZ.Service.putProfile(_this.usernameInput.val(), emailAddress).then(function (success) {
                                 if(_this.allowRedirect) {
-                                    window.location.assign("\\" + success);
+                                    window.location.assign("/" + success);
                                 } else {
                                     _this.close();
                                 }
