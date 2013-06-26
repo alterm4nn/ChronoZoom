@@ -6,15 +6,6 @@ namespace Application.Helper.Helpers
 {
     public class WelcomeScreenHelper : DependentActions
     {
-        public void CloseWelcomePopup()
-        {
-            if (IsElementDisplayed(By.Id("welcomeScreenOut")))
-            {
-                Click(By.Id("welcomeScreenCheckbox"));
-                Click(By.Id("welcomeScreenCloseButton"));                
-            }
-        }
-
         public void StartExploring()
         {
             Logger.Log("<-");

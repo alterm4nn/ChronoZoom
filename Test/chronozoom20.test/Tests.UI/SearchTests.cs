@@ -20,7 +20,6 @@ namespace Tests
         {
             BrowserStateManager.RefreshState();
             HomePageHelper.OpenPage();
-            WelcomeScreenHelper.CloseWelcomePopup();
             SearchHelper.InitSearchWindow();
         }
 

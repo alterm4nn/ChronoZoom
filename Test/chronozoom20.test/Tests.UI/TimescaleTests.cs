@@ -24,7 +24,6 @@ namespace Tests
         public static void ClassInitialize(TestContext testContext)
         {
             HomePageHelper.OpenPage();
-            WelcomeScreenHelper.CloseWelcomePopup();
         }
 
         [TestInitialize]
@@ -45,7 +44,6 @@ namespace Tests
             if (TestContext.CurrentTestOutcome != UnitTestOutcome.Passed && TestContext.CurrentTestOutcome != UnitTestOutcome.Inconclusive)
             {
                 HomePageHelper.OpenPage();
-                WelcomeScreenHelper.CloseWelcomePopup();
             }
         }
 
