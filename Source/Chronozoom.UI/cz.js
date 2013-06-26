@@ -11011,7 +11011,7 @@ var CZ;
                             }
                             CZ.Service.putProfile(_this.usernameInput.val(), emailAddress).then(function (success) {
                                 if(_this.allowRedirect) {
-                                    window.location.assign("\\" + success);
+                                    window.location.assign("/" + success);
                                 } else {
                                     _this.close();
                                 }
@@ -11648,6 +11648,7 @@ var CZ;
                                 profileForm.close();
                             }
                         } else {
+                            $("#login-panel").hide();
                             $("#profile-panel").show();
                             $(".auth-panel-login").html(data.DisplayName);
                         }
@@ -12074,7 +12075,8 @@ var CZ;
                 if(feature.JQueryReference) {
                     if(!_featureMap[idxFeature].IsEnabled) {
                         $(feature.JQueryReference).css("display", "none");
-                    } else {
+                    } else if(!_featureMap[idxFeature].HasBeenActivated) {
+                        _featureMap[idxFeature].HasBeenActivated = true;
                         $(feature.JQueryReference).css("display", "block");
                     }
                 }
