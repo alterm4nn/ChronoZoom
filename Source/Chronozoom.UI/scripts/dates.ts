@@ -138,20 +138,29 @@ module CZ {
 
         export function convertYearToCoordinate(year: number, regime: string) {
             var coordinate = year;
+            var localPresent = CZ.Dates.getPresent();
 
             switch (regime.toLowerCase()) {
                 case "ga":
                     coordinate = year * (-1000000000) + 1;
+                    if (year == 0) {
+                        coordinate = CZ.Dates.getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+                    }
                     break;
                 case "ma":
                     coordinate = year * (-1000000) + 1;
+                    if (year == 0) {
+                        coordinate = CZ.Dates.getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+                    }
                     break;
                 case "ka":
                     coordinate = year * (-1000) + 1;
+                    if (year == 0) {
+                        coordinate = CZ.Dates.getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+                    }
                     break;
                 case "bce":
                     coordinate = year * (-1) + 1;
-                    //coordinate += 1;
                     break;
             }
 

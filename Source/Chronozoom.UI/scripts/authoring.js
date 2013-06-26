@@ -46,7 +46,7 @@ var CZ;
             switch(obj.type) {
                 case "timeline":
                 case "infodot":
-                    return (te.x + te.width > obj.x && te.x < obj.x + obj.width && te.y + te.height > obj.y && te.y < obj.y + obj.height);
+                    return (te.x + te.width >= obj.x && te.x <= obj.x + obj.width && te.y + te.height >= obj.y && te.y <= obj.y + obj.height);
                 default:
                     return false;
             }
@@ -365,7 +365,7 @@ var CZ;
                     newExhibit = renewExhibit(newExhibit);
                     newExhibit.id = "e" + response.ExhibitId;
                     CZ.Common.vc.virtualCanvas("requestInvalidate");
-                    deferred.resolve();
+                    deferred.resolve(newExhibit);
                 }, function (error) {
                     console.log("Error connecting to service: update exhibit.\n" + error.responseText);
                     deferred.reject();
