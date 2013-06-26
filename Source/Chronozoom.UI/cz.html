@@ -111,78 +111,75 @@
 </head>
 <body>
     <div class="fleft navigation header-logo"></div>
-    <div class="fleft navigation header-controls">
-        <div id="tour_control" class="tour_control fleft">
-            <img id="tour_prev" src="/images/tour_prev_off.jpg" alt="previous" />
-            <img id="tour_playpause" src="/images/tour_pause_off.jpg" alt="play/pause" />
-            <img id="tour_next" src="/images/tour_next_off.jpg" alt="next" />
-            <img id="tour_exit" src="/images/tour_exit_off.jpg" alt="exit" />
-        </div>
-        <div class="fleft header header-regimes">
-            <ul>
-                <li class="fleft">
-                    <div id="regime-link-cosmos" class="regime-link">Cosmos</div>
-                </li>
-                <li class="fleft">
-                    <div id="regime-link-earth" class="regime-link">Earth</div>
-                </li>
-                <li class="fleft">
-                    <div id="regime-link-life" class="regime-link">Life</div>
-                </li>
-                <li class="fleft">
-                    <div id="regime-link-prehistory" class="regime-link">Prehistory</div>
-                </li>
-                <li class="fleft">
-                    <div id="regime-link-humanity" class="regime-link">Humanity</div>
-                </li>
-            </ul>
-        </div>
-        <div class="fleft header-breadcrumbs">
-            <div class="breadcrumbs-nav fleft">
-                <div id="Div1">&#171;</div>
-            </div>
-            <div class="breadcrumbs-container fleft">
-                <table id="breadcrumbs-table">
-                    <tr></tr>
-                </table>
-            </div>
-            <div class="breadcrumbs-nav fleft">
-                <div id="Div2" class="">&#187;</div>
-            </div>
-        </div>
+    <div class="fleft navigation header-regimes">
+        <ul>
+            <li class="fleft">
+                <div id="regime-link-cosmos" class="regime-link">Cosmos</div>
+            </li>
+            <li class="fleft">
+                <div id="regime-link-earth" class="regime-link">Earth</div>
+            </li>
+            <li class="fleft">
+                <div id="regime-link-life" class="regime-link">Life</div>
+            </li>
+            <li class="fleft">
+                <div id="regime-link-prehistory" class="regime-link">Prehistory</div>
+            </li>
+            <li class="fleft">
+                <div id="regime-link-humanity" class="regime-link">Humanity</div>
+            </li>
+        </ul>
     </div>
     <div class="fright navigation header-icons">
         <ul>
-            <li class="fleft">
-                <div id="tours_index" class="header-icon tour-icon" title="Take a guided tour" data-enabled="true"></div>
-            </li>
-            <li class="fleft">
-                <div id="search_button" class="header-icon search-icon" title="Search ChronoZoom" data-enabled="true"></div>
-            </li>
-            <li class="fleft">
-                <div style="display: none" id="collections_button" class="header-icon view-icon" title="View Collections" data-enabled="false"></div>
-            </li>
-            <li class="fleft">
-                <div id="timeSeries_button" class="header-icon timeSeries-icon" title="Show/Hide Time Series" data-enabled="true"></div>
-            </li>
-            <li class="fleft">
-                <div class="header-icon edit-icon" title="Create your events" data-enabled="true"></div>
-            </li>
-            <li class="fleft">
-                <div style="display: none" id="login-panel" title="Sign in to ChronoZoom" data-enabled="true">
-                    <label for="login-button" class="header-icon-label"></label>
-                    <div id="login-button" class="header-icon profile-icon"></div>
-                </div>
-            </li>
             <li class="fleft">
                 <div style="display: none" id="profile-panel" data-enabled="true" title="Signed on">
                     <label for="edit_profile_button" class="auth-panel-login"></label>
                     <div id="edit_profile_button" class="header-icon profile-icon"></div>
                 </div>
             </li>
+            <li class="fright">
+                <div style="display: none" id="login-panel" title="Sign in to ChronoZoom" data-enabled="true">
+                    <label for="login-button" class="header-icon-label"></label>
+                    <div id="login-button" class="header-icon profile-icon"></div>
+                </div>
+            </li>
+            <li class="fright">
+                <div class="header-icon edit-icon" title="Create your events" data-enabled="true"></div>
+            </li>
+            <li class="fright">
+                <div id="timeSeries_button" class="header-icon timeSeries-icon" title="Show/Hide Time Series" data-enabled="true"></div>
+            </li>
+            <li class="fright">
+                <div style="display: none" id="collections_button" class="header-icon view-icon" title="View Collections" data-enabled="false"></div>
+            </li>
+            <li class="fright">
+                <div id="search_button" class="header-icon search-icon" title="Search ChronoZoom" data-enabled="true"></div>
+            </li>
+            <li class="fright">
+                <div id="tours_index" class="header-icon tour-icon" title="Take a guided tour" data-enabled="true"></div>
+            </li>
         </ul>
     </div>
-
+    <div id="tour_control" class="tour_control fright">
+        <img id="tour_prev" src="/images/tour_prev_off.jpg" alt="previous" />
+        <img id="tour_playpause" src="/images/tour_pause_off.jpg" alt="play/pause" />
+        <img id="tour_next" src="/images/tour_next_off.jpg" alt="next" />
+        <img id="tour_exit" src="/images/tour_exit_off.jpg" alt="exit" />
+    </div>
+    <div class="fleft header-breadcrumbs">
+        <div class="breadcrumbs-nav fleft">
+            <div id="breadcrumbs-nav-left">&#171;</div>
+        </div>
+        <div class="breadcrumbs-container fleft">
+            <table id="breadcrumbs-table">
+                <tr></tr>
+            </table>
+        </div>
+        <div class="breadcrumbs-nav fleft">
+            <div id="breadcrumbs-nav-right" class="">&#187;</div>
+        </div>
+    </div>
     <div id="content" class="fleft">
         <div id="axis" style="position: relative;">
         </div>
@@ -275,23 +272,25 @@
 
     <div class="fleft navigation footer-credits">
         <ul>
-            <li class="fleft footer-text">
-                Created By:
+            <li class="fleft">
+                <a class="footer-link-credits" target="_blank" href="http://research.microsoft.com/en-us/collaboration/">
+                    <img src="images/credits/microsoft-research.png" />
+                </a>
             </li>
             <li class="fleft">
-                <a class="footer-link-credits" target="_blank" href="http://research.microsoft.com/en-us/collaboration/default.aspx">Microsoft</a>
+                <a class="footer-link-credits" target="_blank" href="http://eps.berkeley.edu/">
+                    <img src="images/credits/berkeley.png" />
+                </a>
             </li>
             <li class="fleft">
-                <a class="footer-link-credits" target="_blank" href="http://eps.berkeley.edu/">Berkeley EPS</a>
+                <a class="footer-link-credits" target="_blank" href="http://www.msu.ru/en/">
+                    <img src="images/credits/mstlab.png" />
+                </a>
             </li>
             <li class="fleft">
-                <a class="footer-link-credits" target="_blank" href="http://www.msu.ru/en/">MSU</a>
-            </li>
-            <li class="fleft">
-                <a class="footer-link-credits" target="_blank" href="http://ischool.uw.edu/ ">UW-IS</a>
-            </li>
-            <li class="fleft">
-                <a class="footer-link-credits" target="_blank" href="http://cwds.uw.edu/">UW-WDS</a>
+                <a class="footer-link-credits" target="_blank" href="http://join.chronozoom.com/university-of-washington/">
+                    <img src="images/credits/university-of-washington.png" />
+                </a>
             </li>
         </ul>
     </div>

@@ -3,8 +3,12 @@
 
 @headerHeight: 36px; /* The height of the page header */
 @headerLogoWidth: 170px; /* The width of the logo area */
-@headerIconsWidth: 150px; /* The width of the action icons area */
-@headerTourWidth: 190px; /* The width of the tour player area */
+@headerIconsWidth: 200px; /* The width of the action icons area */
+@headerTourWidth: 140px; /* The width of the tour player area */
+@headerRegimesWidth: 420px; /* The width of the regimes area */
+@headerBreadcrumbsHeight: 25px; /* The height of the breadcrumbs area */
+@headerBreadcrumbsTopMargin:8px;  /* The top margin of the breadcrumbs area */
+@headerBreadcrumbsScrollWidth: 25px; /* The breadcrumbs scroller area */
 
 @footerHeight: 25px; /* The height of the page footer */
 @footerLinksWidth: 350px; /* The width of the footers links area */
@@ -167,10 +171,12 @@ a
     background-repeat: no-repeat;
     background-position: center;
     background-image: url('../images/chronozoom.png');
+    margin-left: 10px;
 }
 
 .header-controls
 {
+    min-width: @headerTourWidth;
     height: @headerHeight;
     width: calc(~"100% -" @headerLogoWidth ~"-" @headerIconsWidth);
     width: -moz-calc(~"100% -" @headerLogoWidth ~"-" @headerIconsWidth);
@@ -181,16 +187,16 @@ a
 .header-regimes
 {
     height: @headerHeight;
-    width: 100%;
+    width: @headerRegimesWidth;
     display: none;
 }
 
 .header-breadcrumbs
 {
-    height: @headerHeight;
+    height: @headerBreadcrumbsHeight;
     width: 100%;
     display: none;
-    margin-top: 5px;
+    margin-top: -@headerBreadcrumbsTopMargin;
 }
 
 .header-icons
@@ -282,10 +288,10 @@ a
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     width: 100%;
-    height: calc(~"100% -" @headerHeight ~"-" @footerHeight);
-    height: -moz-calc(~"100% -" @headerHeight ~"-" @footerHeight);
-    height: -webkit-calc(~"100% -" @headerHeight ~"-" @footerHeight);
-    height: -o-calc(~"100% -" @headerHeight ~"-" @footerHeight);
+    height: calc(~"100% -" @headerHeight ~"-" @footerHeight ~"-" @headerBreadcrumbsHeight ~"+" @headerBreadcrumbsTopMargin);
+    height: -moz-calc(~"100% -" @headerHeight ~"-" @footerHeight ~"-" @headerBreadcrumbsHeight ~"+" @headerBreadcrumbsTopMargin);
+    height: -webkit-calc(~"100% -" @headerHeight ~"-" @footerHeight ~"-" @headerBreadcrumbsHeight ~"+" @headerBreadcrumbsTopMargin);
+    height: -o-calc(~"100% -" @headerHeight ~"-" @footerHeight ~"-" @headerBreadcrumbsHeight ~"+" @headerBreadcrumbsTopMargin);
 }
 
 #vc-container
@@ -375,7 +381,6 @@ a
     display: none;
     cursor: pointer;
     margin-top: 5px;
-    margin-left: 10px;
 }
 
 /***********************************************************
@@ -1240,13 +1245,12 @@ img.fallbackBackground
 
 .breadcrumbs-nav
 {
-    width: 25px;
+    width: @headerBreadcrumbsScrollWidth;
     height: 25px;
     color: #555;
     text-align: center;
     font-size: 14px;
     line-height: 100%;
-    display: none;
 }
 
     .breadcrumbs-nav:hover
@@ -1256,26 +1260,23 @@ img.fallbackBackground
 
 #breadcrumbs-nav-left
 {
-    display: none;
     cursor: pointer;
 }
 
 #breadcrumbs-nav-right
 {
-    display: none;
     cursor: pointer;
 }
 
 .breadcrumbs-container
 {
     overflow: hidden;
-    width: calc(~"100% - 25px - 25px");
-    width: -moz-calc(~"100% - 25px - 25px");
-    width: -webkit-calc(~"100% - 25px - 25px");
-    width: -o-calc(~"100% - 25px - 25px");
+    width: calc(~"100% - " 2 * @headerBreadcrumbsScrollWidth);
+    width: -moz-calc(~"100% - " 2 * @headerBreadcrumbsScrollWidth);
+    width: -webkit-calc(~"100% - " 2 * @headerBreadcrumbsScrollWidth);
+    width: -o-calc(~"100% - " 2 * @headerBreadcrumbsScrollWidth);
     height: 100%;
     line-height: 100%;
-    margin-left: 20px;
 }
 
 #breadcrumbs-table
