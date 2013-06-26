@@ -377,6 +377,7 @@ var CZ;
                                 profileForm.close();
                             }
                         } else {
+                            $("#login-panel").hide();
                             $("#profile-panel").show();
                             $(".auth-panel-login").html(data.DisplayName);
                         }
@@ -803,7 +804,8 @@ var CZ;
                 if(feature.JQueryReference) {
                     if(!_featureMap[idxFeature].IsEnabled) {
                         $(feature.JQueryReference).css("display", "none");
-                    } else {
+                    } else if(!_featureMap[idxFeature].HasBeenActivated) {
+                        _featureMap[idxFeature].HasBeenActivated = true;
                         $(feature.JQueryReference).css("display", "block");
                     }
                 }
