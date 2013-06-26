@@ -1,4 +1,5 @@
-﻿.cz-timescale {
+/* The height of the page header */
+.cz-timescale {
   padding-bottom: 0px;
   font-size: large;
   font-weight: 500;
@@ -162,6 +163,10 @@
 /* The width of the logo area */
 /* The width of the action icons area */
 /* The width of the tour player area */
+/* The width of the regimes area */
+/* The height of the breadcrumbs area */
+/* The top margin of the breadcrumbs area */
+/* The breadcrumbs scroller area */
 /* The height of the page footer */
 /* The width of the footers links area */
 html,
@@ -275,28 +280,30 @@ a:visited {
   background-repeat: no-repeat;
   background-position: center;
   background-image: url('../images/chronozoom.png');
+  margin-left: 10px;
 }
 .header-controls {
+  min-width: 140px;
   height: 36px;
-  width: calc(100% - 170px - 150px);
-  width: -moz-calc(100% - 170px - 150px);
-  width: -webkit-calc(100% - 170px - 150px);
-  width: -o-calc(100% - 170px - 150px);
+  width: calc(100% - 170px - 200px);
+  width: -moz-calc(100% - 170px - 200px);
+  width: -webkit-calc(100% - 170px - 200px);
+  width: -o-calc(100% - 170px - 200px);
 }
 .header-regimes {
   height: 36px;
-  width: 100%;
+  width: 420px;
   display: none;
 }
 .header-breadcrumbs {
-  height: 36px;
+  height: 25px;
   width: 100%;
   display: none;
-  margin-top: 5px;
+  margin-top: -8px;
 }
 .header-icons {
   height: 36px;
-  width: 150px;
+  width: 200px;
 }
 .header-icon {
   height: 36px;
@@ -356,10 +363,10 @@ a:visited {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   width: 100%;
-  height: calc(100% - 36px - 25px);
-  height: -moz-calc(100% - 36px - 25px);
-  height: -webkit-calc(100% - 36px - 25px);
-  height: -o-calc(100% - 36px - 25px);
+  height: calc(100% - 36px - 25px - 25px + 8px);
+  height: -moz-calc(100% - 36px - 25px - 25px + 8px);
+  height: -webkit-calc(100% - 36px - 25px - 25px + 8px);
+  height: -o-calc(100% - 36px - 25px - 25px + 8px);
 }
 #vc-container {
   -webkit-box-sizing: border-box;
@@ -426,11 +433,10 @@ a:visited {
 }
 .tour_control {
   height: 36px;
-  width: 190px;
+  width: 140px;
   display: none;
   cursor: pointer;
   margin-top: 5px;
-  margin-left: 10px;
 }
 /***********************************************************
 
@@ -583,7 +589,7 @@ a:visited {
   vertical-align: middle;
   font-size: 19px;
   cursor: default;
-  filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#FDFDFD', EndColorStr='#424242', GradientType=1);
+  filter: progid:dximagetransform.microsoft.gradient(StartColorStr='#FDFDFD', EndColorStr='#424242', GradientType=1);
   /* MSIE */
 
 }
@@ -1144,28 +1150,24 @@ img.fallbackBackground {
   text-align: center;
   font-size: 14px;
   line-height: 100%;
-  display: none;
 }
 .breadcrumbs-nav:hover {
   color: #999;
 }
 #breadcrumbs-nav-left {
-  display: none;
   cursor: pointer;
 }
 #breadcrumbs-nav-right {
-  display: none;
   cursor: pointer;
 }
 .breadcrumbs-container {
   overflow: hidden;
-  width: calc(100% - 25px - 25px);
-  width: -moz-calc(100% - 25px - 25px);
-  width: -webkit-calc(100% - 25px - 25px);
-  width: -o-calc(100% - 25px - 25px);
+  width: calc(100% -  50px);
+  width: -moz-calc(100% -  50px);
+  width: -webkit-calc(100% -  50px);
+  width: -o-calc(100% -  50px);
   height: 100%;
   line-height: 100%;
-  margin-left: 20px;
 }
 #breadcrumbs-table {
   position: relative;
@@ -1331,7 +1333,7 @@ img.fallbackBackground {
   padding: 0 5px;
   /* IE9 */
 
-  filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#1B6AAB', EndColorStr='#0E4073', GradientType=0);
+  filter: progid:dximagetransform.microsoft.gradient(StartColorStr='#1B6AAB', EndColorStr='#0E4073', GradientType=0);
   /* IE10 Consumer Preview */
 
   background-image: -ms-linear-gradient(bottom, #0e4073 0%, #1b6aab 100%);
