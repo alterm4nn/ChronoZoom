@@ -3865,6 +3865,7 @@ var CZ;
             createExhibit: {
                 mousemove: function () {
                     if(CZ.Authoring.isDragging && _hovered.type === "timeline") {
+                        updateNewCircle();
                     }
                 },
                 mouseup: function () {
@@ -4003,7 +4004,7 @@ var CZ;
                     newExhibit = renewExhibit(newExhibit);
                     newExhibit.id = "e" + response.ExhibitId;
                     CZ.Common.vc.virtualCanvas("requestInvalidate");
-                    deferred.resolve();
+                    deferred.resolve(newExhibit);
                 }, function (error) {
                     console.log("Error connecting to service: update exhibit.\n" + error.responseText);
                     deferred.reject();
@@ -10023,18 +10024,6 @@ var CZ;
             }, 'slow');
         }
         Common.showFooter = showFooter;
-        function startExploring() {
-            if($('#welcomeScreenCheckbox').is(':checked')) {
-                setCookie("welcomeScreenDisallowed", "1", 365);
-            }
-            hideWelcomeScreen();
-        }
-        Common.startExploring = startExploring;
-        function hideWelcomeScreen() {
-            $('#welcomeScreen').remove();
-            $('#welcomeScreenBack').css("display", "none");
-        }
-        Common.hideWelcomeScreen = hideWelcomeScreen;
         Common.animationTooltipRunning = null;
         Common.tooltipMode = "default";
         function stopAnimationTooltip() {
@@ -10593,6 +10582,12 @@ var CZ;
                     this.hide(true);
                     CZ.Authoring.contentItemMode = "createContentItem";
                     CZ.Authoring.showEditContentItemForm(newContentItem, this.exhibit, this, true);
+                } else {
+                    var self = this;
+                    var origMsg = this.errorMessage.text();
+                    this.errorMessage.text("Sorry, only 10 artifacts are allowed in one exhibit").show().delay(7000).fadeOut(function () {
+                        return self.errorMessage.text(origMsg);
+                    });
                 }
             };
             FormEditExhibit.prototype.onSave = function () {
@@ -10614,6 +10609,8 @@ var CZ;
                     CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(function (success) {
                         _this.isCancel = false;
                         _this.close();
+                        _this.exhibit.id = arguments[0].id;
+                        _this.exhibit.onmouseclick();
                     }, function (error) {
                         alert("Unable to save changes. Please try again later.");
                     }).always(function () {
@@ -11343,17 +11340,21 @@ var CZ;
             {
                 Name: "Regimes",
                 Activation: FeatureActivation.RootCollection,
-                JQueryReference: ".regime-link"
+                JQueryReference: ".header-regimes"
             }, 
             {
                 Name: "TimeSeries",
-                Activation: FeatureActivation.Enabled,
-                JQueryReference: "#timeSeriesContainer"
+                Activation: FeatureActivation.Enabled
             }, 
             {
                 Name: "ManageCollections",
                 Activation: FeatureActivation.Disabled,
                 JQueryReference: "#collections_button"
+            }, 
+            {
+                Name: "BreadCrumbs",
+                Activation: FeatureActivation.Enabled,
+                JQueryReference: ".header-breadcrumbs"
             }, 
             
         ];
@@ -11743,23 +11744,6 @@ var CZ;
             }).mouseover(function () {
                 CZ.Common.toggleOnImage('biblCloseButton', 'png');
             });
-            $('#welcomeScreenCloseButton').mouseover(function () {
-                CZ.Common.toggleOnImage('welcomeScreenCloseButton', 'png');
-            }).mouseout(function () {
-                CZ.Common.toggleOffImage('welcomeScreenCloseButton', 'png');
-            }).click(CZ.Common.startExploring);
-            $('#welcomeScreenStartButton').click(CZ.Common.startExploring);
-            var wlcmScrnCookie = CZ.Common.getCookie("welcomeScreenDisallowed");
-            if(wlcmScrnCookie != null) {
-                CZ.Common.hideWelcomeScreen();
-            } else {
-                $("#welcomeScreenOut").click(function (e) {
-                    e.stopPropagation();
-                });
-                $("#welcomeScreenBack").click(function () {
-                    CZ.Common.startExploring();
-                });
-            }
             ApplyFeatureActivation();
             if(navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
                 document.addEventListener('touchmove', function (e) {
@@ -12087,8 +12071,12 @@ var CZ;
                     }
                     _featureMap[idxFeature].IsEnabled = enabled;
                 }
-                if(!_featureMap[idxFeature].IsEnabled && feature.JQueryReference) {
-                    $(feature.JQueryReference).css("display", "none");
+                if(feature.JQueryReference) {
+                    if(!_featureMap[idxFeature].IsEnabled) {
+                        $(feature.JQueryReference).css("display", "none");
+                    } else {
+                        $(feature.JQueryReference).css("display", "block");
+                    }
                 }
             }
         }

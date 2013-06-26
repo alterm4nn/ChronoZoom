@@ -110,74 +110,77 @@
     <title>ChronoZoom</title>
 </head>
 <body>
-    <div id="header" class="unselectable">
-        <div class="fleft">
-            <ul>
-                <li class="fleft">
-                    <div class="header-logo"></div>
-                </li>
-                <li class="fleft">
-                    <div id="regime-link-cosmos" class="regime-link">Cosmos</div>
-                </li>
-                <li class="fleft">
-                    <div id="regime-link-earth" class="regime-link">Earth</div>
-                </li>
-                <li class="fleft">
-                    <div id="regime-link-life" class="regime-link">Life</div>
-                </li>
-                <li class="fleft">
-                    <div id="regime-link-prehistory" class="regime-link">Prehistory</div>
-                </li>
-                <li class="fleft">
-                    <div id="regime-link-humanity" class="regime-link">Humanity</div>
-                </li>
-            </ul>
+    <div class="fleft navigation header-logo"></div>
+    <div class="fleft navigation header-regimes">
+        <ul>
+            <li class="fleft">
+                <div id="regime-link-cosmos" class="regime-link">Cosmos</div>
+            </li>
+            <li class="fleft">
+                <div id="regime-link-earth" class="regime-link">Earth</div>
+            </li>
+            <li class="fleft">
+                <div id="regime-link-life" class="regime-link">Life</div>
+            </li>
+            <li class="fleft">
+                <div id="regime-link-prehistory" class="regime-link">Prehistory</div>
+            </li>
+            <li class="fleft">
+                <div id="regime-link-humanity" class="regime-link">Humanity</div>
+            </li>
+        </ul>
+    </div>
+    <div class="fright navigation header-icons">
+        <ul>
+            <li class="fleft">
+                <div style="display: none" id="profile-panel" data-enabled="true" title="Signed on">
+                    <label for="edit_profile_button" class="auth-panel-login"></label>
+                    <div id="edit_profile_button" class="header-icon profile-icon"></div>
+                </div>
+            </li>
+            <li class="fright">
+                <div style="display: none" id="login-panel" title="Sign in to ChronoZoom" data-enabled="true">
+                    <label for="login-button" class="header-icon-label"></label>
+                    <div id="login-button" class="header-icon profile-icon"></div>
+                </div>
+            </li>
+            <li class="fright">
+                <div class="header-icon edit-icon" title="Create your events" data-enabled="true"></div>
+            </li>
+            <li class="fright">
+                <div id="timeSeries_button" class="header-icon timeSeries-icon" title="Show/Hide Time Series" data-enabled="true"></div>
+            </li>
+            <li class="fright">
+                <div style="display: none" id="collections_button" class="header-icon view-icon" title="View Collections" data-enabled="false"></div>
+            </li>
+            <li class="fright">
+                <div id="search_button" class="header-icon search-icon" title="Search ChronoZoom" data-enabled="true"></div>
+            </li>
+            <li class="fright">
+                <div id="tours_index" class="header-icon tour-icon" title="Take a guided tour" data-enabled="true"></div>
+            </li>
+        </ul>
+    </div>
+    <div id="tour_control" class="tour_control fright">
+        <img id="tour_prev" src="/images/tour_prev_off.jpg" alt="previous" />
+        <img id="tour_playpause" src="/images/tour_pause_off.jpg" alt="play/pause" />
+        <img id="tour_next" src="/images/tour_next_off.jpg" alt="next" />
+        <img id="tour_exit" src="/images/tour_exit_off.jpg" alt="exit" />
+    </div>
+    <div class="fleft header-breadcrumbs">
+        <div class="breadcrumbs-nav fleft">
+            <div id="breadcrumbs-nav-left">&#171;</div>
         </div>
-        <div class="fright">
-            <ul>
-                <li class="fleft">
-                    <div id="tours_index" class="header-icon tour-icon" title="Take a guided tour" data-enabled="true"></div>
-                </li>
-                <li class="fleft">
-                    <div id="search_button" class="header-icon search-icon" title="Search ChronoZoom" data-enabled="true"></div>
-                </li>
-                <li class="fleft">
-                    <div style="display: none" id="collections_button" class="header-icon view-icon" title="View Collections" data-enabled="false"></div>
-                </li>
-                <li class="fleft">
-                    <div id="timeSeries_button" class="header-icon timeSeries-icon" title="Show/Hide Time Series" data-enabled="true"></div>
-                </li>
-                <li class="fleft">
-                    <div class="header-icon edit-icon" title="Create your events" data-enabled="true"></div>
-                </li>
-                <li class="fleft">
-                    <div style="display: none" id="login-panel" title="Sign in to ChronoZoom" data-enabled="true">
-                        <label for="login-button" class="header-icon-label"></label>
-                        <div id="login-button" class="header-icon profile-icon"></div>
-                    </div>
-                </li>
-                <li class="fleft">
-                    <div style="display: none" id="profile-panel" data-enabled="true" title="Signed on">
-                        <label for="edit_profile_button" class="auth-panel-login"></label>
-                        <div id="edit_profile_button" class="header-icon profile-icon"></div>
-                    </div>
-                </li>
-            </ul>
+        <div class="breadcrumbs-container fleft">
+            <table id="breadcrumbs-table">
+                <tr></tr>
+            </table>
         </div>
-
-
-        <div id="tour_control" class="tour_control fleft">
-            <img id="tour_prev" src="/images/tour_prev_off.jpg" alt="previous" />
-            <img style="margin: 0 0 0 16px"
-                id="tour_playpause" src="/images/tour_pause_off.jpg" alt="play/pause" />
-            <img
-                style="margin: 0 0 0 16px" id="tour_next" src="/images/tour_next_off.jpg" alt="next" />
-            <img style="margin: 0 0 0 10px" id="tour_exit" src="/images/tour_exit_off.jpg"
-                alt="exit" />
+        <div class="breadcrumbs-nav fleft">
+            <div id="breadcrumbs-nav-right" class="">&#187;</div>
         </div>
     </div>
-
-    <div id="content">
+    <div id="content" class="fleft">
         <div id="axis" style="position: relative;">
         </div>
 
@@ -266,69 +269,46 @@
     </div>
 
     <script src="https://cz-nodelete-chronozoom-test.accesscontrol.windows.net/v2/metadata/IdentityProviders.js?protocol=wsfederation&amp;realm=http%3a%2f%2ftest.chronozoomproject.org%2f&amp;reply_to=&amp;context=&amp;request_id=&amp;version=1.0&amp;callback=ShowSigninPage" type="text/javascript"></script>
-    <div id="welcomeScreenBack" class="welcomeScreenBack">
-        <div id="welcomeScreenOut" class="welcomeScreenOuterWindow">
-            <div id="welcomeScreen" class="welcomeScreen">
-                <div class="titleArea">
-                    <img class="closeButton unselectable" id="welcomeScreenCloseButton" src="/images/close_off.png"
-                        alt="Close" />
-                    <div class="title unselectable">
-                        <span>Welcome to ChronoZoom beta!</span>
-                    </div>
-                </div>
-                <div class="content">
-                    <div class="description">
-                        ChronoZoom is an interactive timeline for all of history.
-                        <p>Explore all of the past - from the Big Bang, to the dinosours, to ancient and modern history.</p>
-                        Click or scroll to navigate through events and timelines. Watch our introduction video for a quick overview of this project.
 
-                        <div style="position: absolute; bottom: 0px;">
-                            <button class="button" id="welcomeScreenStartButton">Start Exploring!</button>
-                            <div>
-                                <input type="checkbox" id="welcomeScreenCheckbox" name="welcomeScreenCheckbox" />
-                                <label for="welcomeScreenCheckbox" unselectable="on" style="font-family: Arial; font-size: 16px;">Don't Show Again</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="media" id="welcomeScreenMedia">
-                        <iframe class="player" id="welcomeVideo" src="http://www.youtube.com/embed/3jvJD8Qv5ec" frameborder="0"></iframe>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="fleft navigation footer-credits">
+        <ul>
+            <li class="fleft">
+                <a class="footer-link-credits" target="_blank" href="http://research.microsoft.com/en-us/collaboration/">
+                    <img src="images/credits/microsoft-research.png" />
+                </a>
+            </li>
+            <li class="fleft">
+                <a class="footer-link-credits" target="_blank" href="http://eps.berkeley.edu/">
+                    <img src="images/credits/berkeley.png" />
+                </a>
+            </li>
+            <li class="fleft">
+                <a class="footer-link-credits" target="_blank" href="http://www.msu.ru/en/">
+                    <img src="images/credits/mstlab.png" />
+                </a>
+            </li>
+            <li class="fleft">
+                <a class="footer-link-credits" target="_blank" href="http://join.chronozoom.com/university-of-washington/">
+                    <img src="images/credits/university-of-washington.png" />
+                </a>
+            </li>
+        </ul>
     </div>
-
-    <div id="footer">
-        <div class="breadcrumbs-nav fleft">
-            <div id="breadcrumbs-nav-left">&#171;</div>
-        </div>
-        <div class="breadcrumbs-container fleft">
-            <table id="breadcrumbs-table">
-                <tr></tr>
-            </table>
-        </div>
-        <div class="breadcrumbs-nav fleft">
-            <div id="breadcrumbs-nav-right" class="">&#187;</div>
-        </div>
-
-        <div class="fright">
-            <ul>
-                <li class="fright">
-                    <a class="footer-link" href="http://join.chronozoom.com/develop/">Developers</a>
-                </li>
-                <li class="fright">
-                    <a class="footer-link" href="http://join.chronozoom.com/notices">Notices</a>
-                </li>
-                <li class="fright">
-                    <a class="footer-link" href="http://join.chronozoom.com/forum/forums/">Feedback</a>
-                </li>
-                <li class="fright">
-                    <a class="footer-link" href="http://help.chronozoom.com/">Help</a>
-                </li>
-            </ul>
-        </div>
-        <div class="clearer"></div>
+    <div class="fright navigation footer-links">
+        <ul>
+            <li class="fright">
+                <a class="footer-link" href="http://join.chronozoom.com/develop/">Developers</a>
+            </li>
+            <li class="fright">
+                <a class="footer-link" href="http://join.chronozoom.com/notices">Notices</a>
+            </li>
+            <li class="fright">
+                <a class="footer-link" href="http://join.chronozoom.com/forum/forums/">Feedback</a>
+            </li>
+            <li class="fright">
+                <a class="footer-link" href="http://help.chronozoom.com/">Help</a>
+            </li>
+        </ul>
     </div>
-
 </body>
 </html>

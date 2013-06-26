@@ -400,14 +400,14 @@ module CZ {
             createExhibit: {
                 mousemove: function () {
                     if (CZ.Authoring.isDragging && _hovered.type === "timeline") {
-                        
+                        updateNewCircle();
                     }
                 },
 
                 mouseup: function () {
                     if (_hovered.type === "timeline") {
                         updateNewCircle();
-                        
+
                         selectedExhibit = createNewExhibit();
                         showCreateExhibitForm(selectedExhibit);
                     }
@@ -549,7 +549,7 @@ module CZ {
             var deferred = $.Deferred();
 
             CZ.Service.deleteTimeline(t).then(
-                    updateCanvas => {                        
+                    updateCanvas => {
                         CZ.Common.vc.virtualCanvas("requestInvalidate");
                         deferred.resolve();
                     })
@@ -588,13 +588,14 @@ module CZ {
                         newExhibit = renewExhibit(newExhibit);
                         newExhibit.id = "e" + response.ExhibitId;
 
-                                CZ.Common.vc.virtualCanvas("requestInvalidate");
-                                deferred.resolve();
-                            },
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                        
+                        deferred.resolve(newExhibit);
+                    },
                             error => {
-                        console.log("Error connecting to service: update exhibit.\n" + error.responseText);
-                        deferred.reject();
-                    }
+                                console.log("Error connecting to service: update exhibit.\n" + error.responseText);
+                                deferred.reject();
+                            }
                 );
 
             } else {
@@ -735,8 +736,8 @@ module CZ {
          * Validates,if timeline size is not negative or null
         */
         export function isIntervalPositive(start, end) {
-            return (parseFloat(start) + 1/366 <= parseFloat(end));
-                
+            return (parseFloat(start) + 1 / 366 <= parseFloat(end));
+
         }
 
         /**
