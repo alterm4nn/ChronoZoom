@@ -1678,14 +1678,18 @@ var CZ;
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
         function CanvasPdfItem(vc, layerid, id, pdfSrc, vx, vy, vw, vh, z) {
+            var pdfViewer = "http://docs.google.com/viewer?url=";
             this.base = CanvasDomItem;
             this.base(vc, layerid, id, vx, vy, vw, vh, z);
             var elem = document.createElement('iframe');
             elem.setAttribute("id", id);
+            if(!pdfSrc.match("/^" + pdfViewer + "/")) {
+                pdfSrc = pdfViewer + pdfSrc;
+            }
             if(pdfSrc.indexOf('?') == -1) {
-                pdfSrc += '?wmode=opaque';
+                pdfSrc += '?&embedded=true&wmode=opaque';
             } else {
-                pdfSrc += '&wmode=opaque';
+                pdfSrc += '&embedded=true&wmode=opaque';
             }
             elem.setAttribute("src", pdfSrc);
             elem.setAttribute("visible", 'true');
@@ -4137,11 +4141,7 @@ var CZ;
                     }
                 } else if(ci.mediaType.toLowerCase() === "pdf") {
                     var pdf = /\.(pdf)$/i;
-                    var docs = /\S+docs.google.com\S+$/i;
-                    if(pdf.test(ci.uri)) {
-                        ci.uri = "http://docs.google.com/viewer?url=" + encodeURI(ci.uri) + "&embedded=true";
-                    } else if(docs.test(ci.uri)) {
-                    } else {
+                    if(!pdf.test(ci.uri)) {
                         alert("Sorry, only PDF extension is supported");
                         isValid = false;
                     }
