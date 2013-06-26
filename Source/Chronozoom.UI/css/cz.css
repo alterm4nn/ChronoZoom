@@ -1,4 +1,5 @@
-﻿.cz-timescale {
+/* The height of the page header */
+.cz-timescale {
   padding-bottom: 0px;
   font-size: large;
   font-weight: 500;
@@ -163,7 +164,7 @@
 /* The width of the tour player area */
 /* The width of the regimes area */
 /* The height of the breadcrumbs area */
-/* The top margin of the breadcrumbs area */
+/* The top margin of the bref.adcrumbs area */
 /* The breadcrumbs scroller area */
 /* The height of the page footer */
 /* The width of the footers links area */
@@ -296,7 +297,7 @@ a:visited {
   height: 25px;
   width: 100%;
   display: none;
-  margin-top: -4px;
+  margin-top: -8px;
 }
 .header-icons {
   height: 36px;
@@ -366,10 +367,10 @@ a:visited {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   width: 100%;
-  height: calc(100% - 36px - 25px - 25px + 4px);
-  height: -moz-calc(100% - 36px - 25px - 25px + 4px);
-  height: -webkit-calc(100% - 36px - 25px - 25px + 4px);
-  height: -o-calc(100% - 36px - 25px - 25px + 4px);
+  height: calc(100% - 36px - 25px - 25px + 8px);
+  height: -moz-calc(100% - 36px - 25px - 25px + 8px);
+  height: -webkit-calc(100% - 36px - 25px - 25px + 8px);
+  height: -o-calc(100% - 36px - 25px - 25px + 8px);
 }
 #vc-container {
   -webkit-box-sizing: border-box;
@@ -384,7 +385,6 @@ a:visited {
   overflow: hidden;
   width: 100%;
   height: 100%;
-  background-image: url('/images/background.jpg');
   background-position: center center;
   -webkit-background-size: cover;
   -moz-background-size: cover;
@@ -592,7 +592,7 @@ a:visited {
   vertical-align: middle;
   font-size: 19px;
   cursor: default;
-  filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#FDFDFD', EndColorStr='#424242', GradientType=1);
+  filter: progid:dximagetransform.microsoft.gradient(StartColorStr='#FDFDFD', EndColorStr='#424242', GradientType=1);
   /* MSIE */
 
 }
@@ -1344,7 +1344,7 @@ img.fallbackBackground {
   padding: 0 5px;
   /* IE9 */
 
-  filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#1B6AAB', EndColorStr='#0E4073', GradientType=0);
+  filter: progid:dximagetransform.microsoft.gradient(StartColorStr='#1B6AAB', EndColorStr='#0E4073', GradientType=0);
   /* IE10 Consumer Preview */
 
   background-image: -ms-linear-gradient(bottom, #0e4073 0%, #1b6aab 100%);
