@@ -15,6 +15,7 @@
 /// <reference path='../ui/header-edit-form.ts' />
 /// <reference path='../ui/header-edit-profile-form.ts'/>
 /// <reference path='../ui/header-login-form.ts'/>
+/// <reference path='../ui/header-search-form.ts' />
 /// <reference path='../ui/timeseries-graph-form.ts'/>
 /// <reference path='../ui/timeseries-data-form.ts'/>
 /// <reference path='../ui/tourslist-form.ts'/>
@@ -44,7 +45,8 @@ module CZ {
             "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html", // 10
             "#timeSeriesContainer": "/ui/timeseries-graph-form.html", //11
             "#timeSeriesDataForm": "/ui/timeseries-data-form.html", //12
-            "#message-window": "/ui/message-window.html" // 13
+            "#message-window": "/ui/message-window.html", // 13
+            "#header-search-form": "/ui/header-search-form.html" // 14
         };
 
         export enum FeatureActivation {
@@ -241,6 +243,34 @@ module CZ {
                         else {
                             closeAllForms();
                             editForm.show();
+                        }
+                    }
+                });
+
+                $(".header-icon.search-icon").click(function () {
+                    var searchForm = getFormById("#header-search-form");
+                    if (searchForm === false) {
+                        closeAllForms();
+                        var form = new CZ.UI.FormHeaderSearch(forms[14], {
+                            activationSource: $(this),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            searchTextbox: ".cz-form-search-input",
+                            searchResultsBox: ".cz-form-search-results",
+                            progressBar: ".cz-form-progress-bar",
+                            resultSections: ".cz-form-search-results > .cz-form-search-section",
+                            resultsCountTextblock: ".cz-form-search-results-count"
+                        });
+                        form.show();
+                    }
+                    else {
+                        if (searchForm.isFormVisible) {
+                            searchForm.close();
+                        }
+                        else {
+                            closeAllForms();
+                            searchForm.show();
                         }
                     }
                 });
@@ -477,31 +507,6 @@ module CZ {
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
-
-            $('#search_button')
-                .mouseup(CZ.Search.onSearchClicked);
-
-            $('#human_rect')
-                .click(() => { CZ.Search.navigateToBookmark(CZ.Common.humanityVisible); });
-            $('#prehuman_rect')
-                .click(() => { CZ.Search.navigateToBookmark(CZ.Common.prehistoryVisible); });
-            $('#life_rect')
-                .click(() => { CZ.Search.navigateToBookmark(CZ.Common.lifeVisible); });
-            $('#earth_rect')
-                .click(() => { CZ.Search.navigateToBookmark(CZ.Common.earthVisible); });
-            $('#cosmos_rect')
-                .click(() => { CZ.Search.navigateToBookmark(CZ.Common.cosmosVisible); });
-
-            $('#humanBookmark')
-                .click(() => { CZ.Search.navigateToBookmark(CZ.Common.humanityVisible); });
-            $('#prehistoryBookmark')
-                .click(() => { CZ.Search.navigateToBookmark(CZ.Common.prehistoryVisible); });
-            $('#lifeBookmark')
-                .click(() => { CZ.Search.navigateToBookmark(CZ.Common.lifeVisible); });
-            $('#earthBookmark')
-                .click(() => { CZ.Search.navigateToBookmark(CZ.Common.earthVisible); });
-            $('#cosmosBookmark')
-                .click(() => { CZ.Search.navigateToBookmark(CZ.Common.cosmosVisible); });
 
             $('#breadcrumbs-nav-left')
                 .click(CZ.BreadCrumbs.breadCrumbNavLeft);

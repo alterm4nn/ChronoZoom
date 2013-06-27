@@ -62,15 +62,15 @@ module CZ {
                     direction: "right",
                     duration: 500,
                     complete: () => {
+                        this.container.find("cz-form-errormsg").hide();
+                        this.container.find("#tours").empty();
+                        this.toursListBox.container.empty();
                     }
                 });
 
                 CZ.Authoring.isActive = false;
 
                 this.activationSource.removeClass("active");
-                this.container.find("cz-form-errormsg").hide();
-                this.container.find("#tours").empty();
-                this.toursListBox.container.empty();
             }
 
             private onTakeTour(tour) {

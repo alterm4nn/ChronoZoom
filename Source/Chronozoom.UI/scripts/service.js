@@ -337,6 +337,24 @@ var CZ;
             });
         }
         Service.getTours = getTours;
+        function getSearch(query) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("Search");
+            var data = {
+                searchTerm: query,
+                supercollection: CZ.Service.superCollectionName,
+                collection: CZ.Service.collectionName
+            };
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data
+            });
+        }
+        Service.getSearch = getSearch;
         function getServiceInformation() {
             var request = new Request(_serviceUrl);
             request.addToPath("info");
@@ -362,7 +380,6 @@ var CZ;
             });
         }
         Service.getContentPath = getContentPath;
-        getContentPath;
         function putExhibitContent(e, oldContentItems) {
             var newGuids = e.contentItems.map(function (ci) {
                 return ci.guid;
