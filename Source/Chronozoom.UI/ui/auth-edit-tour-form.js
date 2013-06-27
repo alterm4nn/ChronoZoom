@@ -296,11 +296,13 @@ var CZ;
                     };
                     self.hide();
                     setTimeout(function () {
-                        CZ.Authoring.showMessageWindow("Click an element to select it as a tour stop.", "New tour stop", function () {
-                            if(CZ.Authoring.mode == "editTour-selectTarget") {
-                                self.onTargetElementSelected(null);
-                            }
-                        });
+                        if(CZ.Authoring.mode == "editTour-selectTarget") {
+                            CZ.Authoring.showMessageWindow("Click an element to select it as a tour stop.", "New tour stop", function () {
+                                if(CZ.Authoring.mode == "editTour-selectTarget") {
+                                    self.onTargetElementSelected(null);
+                                }
+                            });
+                        }
                     }, 500);
                 });
                 this.saveButton.click(function (event) {

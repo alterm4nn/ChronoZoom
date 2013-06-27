@@ -309,12 +309,14 @@ module CZ {
                     self.hide();
                     setTimeout(() =>
                     {
-                        CZ.Authoring.showMessageWindow("Click an element to select it as a tour stop.", "New tour stop",
-                            () => // on close/cancel
-                            {
-                                if (CZ.Authoring.mode == "editTour-selectTarget")
-                                    self.onTargetElementSelected(null);
-                            });
+                        if (CZ.Authoring.mode == "editTour-selectTarget") { // due to animation delay, the window can already be closed when the delay completed, so we do this check.
+                            CZ.Authoring.showMessageWindow("Click an element to select it as a tour stop.", "New tour stop",
+                                () => // on close/cancel
+                                {
+                                    if (CZ.Authoring.mode == "editTour-selectTarget")
+                                        self.onTargetElementSelected(null);
+                                });
+                        }
                     }, 500);
                 });
                 this.saveButton.click(event =>

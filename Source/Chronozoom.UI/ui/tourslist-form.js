@@ -27,9 +27,7 @@ var CZ;
             };
             FormToursList.prototype.show = function () {
                 var self = this;
-                $(window).resize(function (e) {
-                    return self.onWindowResize(e);
-                });
+                $(window).resize(this.onWindowResize);
                 this.onWindowResize(null);
                 _super.prototype.show.call(this, {
                     effect: "slide",
@@ -39,7 +37,7 @@ var CZ;
                 this.activationSource.addClass("active");
             };
             FormToursList.prototype.close = function () {
-                $(window).unbind("resize");
+                $(window).unbind("resize", this.onWindowResize);
                 _super.prototype.close.call(this, {
                     effect: "slide",
                     direction: "right",
