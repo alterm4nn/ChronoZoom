@@ -2906,11 +2906,13 @@ var CZ;
                     };
                     self.hide();
                     setTimeout(function () {
-                        CZ.Authoring.showMessageWindow("Click an element to select it as a tour stop.", "New tour stop", function () {
-                            if(CZ.Authoring.mode == "editTour-selectTarget") {
-                                self.onTargetElementSelected(null);
-                            }
-                        });
+                        if(CZ.Authoring.mode == "editTour-selectTarget") {
+                            CZ.Authoring.showMessageWindow("Click an element to select it as a tour stop.", "New tour stop", function () {
+                                if(CZ.Authoring.mode == "editTour-selectTarget") {
+                                    self.onTargetElementSelected(null);
+                                }
+                            });
+                        }
                     }, 500);
                 });
                 this.saveButton.click(function (event) {
@@ -4268,9 +4270,7 @@ var CZ;
             };
             FormToursList.prototype.show = function () {
                 var self = this;
-                $(window).resize(function (e) {
-                    return self.onWindowResize(e);
-                });
+                $(window).resize(this.onWindowResize);
                 this.onWindowResize(null);
                 _super.prototype.show.call(this, {
                     effect: "slide",
@@ -4280,7 +4280,7 @@ var CZ;
                 this.activationSource.addClass("active");
             };
             FormToursList.prototype.close = function () {
-                $(window).unbind("resize");
+                $(window).unbind("resize", this.onWindowResize);
                 _super.prototype.close.call(this, {
                     effect: "slide",
                     direction: "right",

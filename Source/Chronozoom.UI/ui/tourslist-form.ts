@@ -42,7 +42,7 @@ module CZ {
 
             public show(): void {
                 var self = this;
-                $(window).resize(e => self.onWindowResize(e));
+                $(window).resize(this.onWindowResize);
                 this.onWindowResize(null);
 
                 super.show({
@@ -55,7 +55,7 @@ module CZ {
             }
 
             public close() {
-                $(window).unbind("resize");
+                $(window).unbind("resize", this.onWindowResize);
 
                 super.close({
                     effect: "slide",
