@@ -173,11 +173,19 @@ a
     margin-left: 10px;
 }
 
-.header-regimes
-{
+.header-regimes {
     height: @headerHeight;
     width: @headerRegimesWidth;
     display: none;
+}
+
+// Disable regimes if they don't fit devices.
+@media only screen and (max-width: 780px) {
+    .header-regimes {
+        height: @headerHeight;
+        width: 0px;
+        display: none;
+    }
 }
 
 .header-breadcrumbs
@@ -191,6 +199,15 @@ a
 .header-icons
 {
     height: @headerHeight;
+}
+
+// Disable header icons in really-small mobile devices.
+@media only screen and (max-width: 340px) {
+    .header-icons {
+        height: @headerHeight;
+        width: 0;
+        display: none;
+    }
 }
 
 .header-icon
