@@ -286,6 +286,13 @@ a:visited {
   width: 420px;
   display: none;
 }
+@media only screen and (max-width: 780px) {
+  .header-regimes {
+    height: 36px;
+    width: 0px;
+    display: none;
+  }
+}
 .header-breadcrumbs {
   height: 25px;
   width: 100%;
@@ -294,6 +301,13 @@ a:visited {
 }
 .header-icons {
   height: 36px;
+}
+@media only screen and (max-width: 340px) {
+  .header-icons {
+    height: 36px;
+    width: 0;
+    display: none;
+  }
 }
 .header-icon {
   height: 36px;
