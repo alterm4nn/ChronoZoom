@@ -168,7 +168,7 @@ module CZ {
                             this.close();
                             
                             this.exhibit.id = arguments[0].id;
-
+                            
                             this.exhibit.onmouseclick();
 
                         },

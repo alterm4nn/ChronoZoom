@@ -88,7 +88,6 @@ module CZ {
             switch (obj.type) {
                 case "infodot":
                     return (tp.x <= obj.infodotDescription.date &&
-                            tp.y <= obj.y &&
                             tp.x + tp.width >= obj.infodotDescription.date &&
                             tp.y + tp.height >= obj.y + obj.height);
                     break;
@@ -96,7 +95,6 @@ module CZ {
                 case "rectangle":
                 case "circle":
                     return (tp.x <= obj.x + CZ.Settings.allowedMathImprecision &&
-                            tp.y <= obj.y + CZ.Settings.allowedMathImprecision &&
                             tp.x + tp.width >= obj.x + obj.width - CZ.Settings.allowedMathImprecision &&
                             tp.y + tp.height >= obj.y + obj.height - CZ.Settings.allowedMathImprecision);
                 default:
