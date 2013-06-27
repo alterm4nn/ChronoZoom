@@ -93,24 +93,25 @@ var CZ;
         Dates.convertCoordinateToYear = convertCoordinateToYear;
         function convertYearToCoordinate(year, regime) {
             var coordinate = year;
-            var localPresent = CZ.Dates.getPresent();
+            var localPresent = getPresent();
+            var presentDate = getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
             switch(regime.toLowerCase()) {
                 case "ga":
-                    coordinate = year * (-1000000000) + 1;
+                    coordinate = year * (-1000000000) + presentDate + 1;
                     if(year == 0) {
-                        coordinate = CZ.Dates.getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+                        coordinate = 9999;
                     }
                     break;
                 case "ma":
-                    coordinate = year * (-1000000) + 1;
+                    coordinate = year * (-1000000) + presentDate + 1;
                     if(year == 0) {
-                        coordinate = CZ.Dates.getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+                        coordinate = 9999;
                     }
                     break;
                 case "ka":
-                    coordinate = year * (-1000) + 1;
+                    coordinate = year * (-1000) + presentDate + 1;
                     if(year == 0) {
-                        coordinate = CZ.Dates.getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+                        coordinate = 9999;
                     }
                     break;
                 case "bce":
