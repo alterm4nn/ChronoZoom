@@ -598,7 +598,7 @@ namespace Chronozoom.UI
                     SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.SandboxSuperCollectionNotFound);
                     return new Uri(string.Format(
                         CultureInfo.InvariantCulture,
-                        @"{0}\{1}\",
+                        @"{0}/{1}/",
                         String.Empty,
                         String.Empty), UriKind.Relative);
                 }
@@ -606,7 +606,7 @@ namespace Chronozoom.UI
                 {
                     return new Uri(string.Format(
                         CultureInfo.InvariantCulture,
-                        @"{0}\{1}\",
+                        @"{0}/{1}/",
                         FriendlyUrlReplacements(sandboxSuperCollection.Title),
                         _sandboxCollectionName), UriKind.Relative);
                 }
@@ -647,7 +647,7 @@ namespace Chronozoom.UI
 
             return new Uri(string.Format(
                 CultureInfo.InvariantCulture,
-                @"{0}\{1}\",
+                @"{0}/{1}/",
                 FriendlyUrlReplacements(superCollection.Title),
                 FriendlyUrlReplacements(superCollection.Title)), UriKind.Relative);
         }
@@ -680,7 +680,7 @@ namespace Chronozoom.UI
 
             return new Uri(string.Format(
                 CultureInfo.InvariantCulture,
-                @"{0}\{1}\",
+                @"{0}/{1}/",
                 FriendlyUrl.FriendlyUrlEncode(superCollection.Title),
                 FriendlyUrl.FriendlyUrlEncode(superCollection.Title)), UriKind.Relative);
         }
@@ -765,7 +765,9 @@ namespace Chronozoom.UI
                     return Guid.Empty;
                 }
 
-                if (user == null)
+                Guid superCollectionId = CollectionIdFromText(superCollectionName);
+                SuperCollection superCollection = RetrieveSuperCollection(storage, superCollectionId);
+                if (user == null || superCollection.User != user)
                 {
                     // No ACS so treat as an anonymous user who cannot add or modify a collection.
                     SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);

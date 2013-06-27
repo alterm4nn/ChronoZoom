@@ -1,4 +1,5 @@
-﻿using Chronozoom.Entities;
+﻿using System.Diagnostics;
+using Chronozoom.Entities;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -13,10 +14,12 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
+
 namespace Chronozoom.UI
 {
     public class PageInformation
     {
+        
         public PageInformation()
         {
             AnalyticsServiceId = ConfigurationManager.AppSettings["AnalyticsServiceId"];
@@ -44,25 +47,27 @@ namespace Chronozoom.UI
     public class DefaultHttpHandler : IHttpHandler
     {
         private const string _mainPageName = @"cz.html";
+        private static readonly Storage _storage = new Storage();
+
         private static readonly Lazy<string> _mainPage = new Lazy<string>(() =>
-        {
-            PageInformation pageInforamtion = new PageInformation();
-            return GenerateDefaultPage(pageInforamtion);
-        });
+            {
+                PageInformation pageInforamtion = new PageInformation();
+                return GenerateDefaultPage(pageInforamtion);
+            });
 
         private static Lazy<string> _hostPath = new Lazy<string>(() =>
-        {
-            Uri uri = HttpContext.Current.Request.Url;
-            return uri.Scheme + Uri.SchemeDelimiter + uri.Host + ":" + uri.Port;
-        });
+            {
+                Uri uri = HttpContext.Current.Request.Url;
+                return uri.Scheme + Uri.SchemeDelimiter + uri.Host + ":" + uri.Port;
+            });
 
         private static Lazy<string> _baseDirectory = new Lazy<string>(() =>
-        {
-            if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["BaseDirectory"]))
-                return ConfigurationManager.AppSettings["BaseDirectory"];
+            {
+                if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["BaseDirectory"]))
+                    return ConfigurationManager.AppSettings["BaseDirectory"];
 
-            return AppDomain.CurrentDomain.BaseDirectory;
-        });
+                return AppDomain.CurrentDomain.BaseDirectory;
+            });
 
         public void ProcessRequest(HttpContext context)
         {
@@ -85,7 +90,8 @@ namespace Chronozoom.UI
         private static bool PageIsDynamic(Uri pageUrl, out PageInformation pageInformation)
         {
             pageInformation = new PageInformation();
-            if (pageUrl.Segments.Length <= 1 || pageUrl.ToString().EndsWith("default.ashx", StringComparison.OrdinalIgnoreCase))
+            if (pageUrl.Segments.Length <= 1 ||
+                pageUrl.ToString().EndsWith("default.ashx", StringComparison.OrdinalIgnoreCase))
                 return false;
 
             string superCollection = string.Empty;
@@ -96,26 +102,50 @@ namespace Chronozoom.UI
             if (pageUrl.Segments.Length >= 3)
                 collection = pageUrl.Segments[2].Split('/')[0];
 
-            Timeline timeline = ChronozoomSVC.Instance.GetTimelines(superCollection, collection, null, null, null, null, null, "1");
-            if (timeline != null)
+            if (IsSuperCollectionPresent(superCollection))
             {
-                pageInformation.Title = timeline.Title;
 
-                foreach (Exhibit exhibit in timeline.Exhibits)
+               Timeline timeline = ChronozoomSVC.Instance.GetTimelines(superCollection, collection, null, null, null,null, null, "1");
+                if (timeline != null)
                 {
-                    foreach (ContentItem contentItem in exhibit.ContentItems)
+
+                    pageInformation.Title = timeline.Title;
+
+                    foreach (Exhibit exhibit in timeline.Exhibits)
                     {
-                        if (contentItem.Uri.ToString().EndsWith(".jpg", StringComparison.OrdinalIgnoreCase))
+                        foreach (ContentItem contentItem in exhibit.ContentItems)
                         {
-                            pageInformation.Images.Add(contentItem.Uri);
+                            if (contentItem.Uri.ToString().EndsWith(".jpg", StringComparison.OrdinalIgnoreCase))
+                            {
+                                pageInformation.Images.Add(contentItem.Uri);
+                            }
                         }
                     }
-                }
 
+                    return true;
+                }
+            }
+            
+            return false;
+
+        }
+
+        /// <summary>
+        /// Validates if a supercollection is present.
+        /// </summary>
+        /// <param name="superCollection"></param>
+        /// <returns>Boolean value</returns>
+        public static bool IsSuperCollectionPresent(string superCollection)
+        {
+            if (_storage.SuperCollections.Any(candidate => candidate.Title == superCollection))
+            {
                 return true;
             }
-
-            return false;
+            else
+            {
+                HttpContext.Current.Response.Redirect("/");
+                return false;
+            }
         }
 
         public bool IsReusable

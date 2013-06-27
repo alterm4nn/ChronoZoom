@@ -45,6 +45,9 @@ module CZ {
                 this.loginPanelLogin = $(document.body).find(formInfo.loginPanelLogin).first();
                 this.allowRedirect = formInfo.allowRedirect;
 
+                this.usernameInput.off("keypress");
+                this.emailInput.off("keypress");
+
                 this.initialize();
             }
 
@@ -113,7 +116,7 @@ module CZ {
                                 success => {
                                     // Redirect to personal collection.
                                     if (this.allowRedirect) {
-                                        window.location.assign("\\" + success);
+                                        window.location.assign("/" + success);
                                     }
                                     else {
                                         this.close();
@@ -126,13 +129,21 @@ module CZ {
                             );
                         });
                     });
-
                 });
 
                 this.logoutButton.click(event =>
                 {
                     window.location.assign("/pages/logoff.aspx");
                 });
+
+                // Prevent default behavior of Enter key for input elements.
+                var preventEnterKeyPress = event => {
+                    if (event.which == 13) {
+                        event.preventDefault();
+                    }
+                };
+                this.usernameInput.keypress(preventEnterKeyPress);
+                this.emailInput.keypress(preventEnterKeyPress);
             }
 
             public show(): void {

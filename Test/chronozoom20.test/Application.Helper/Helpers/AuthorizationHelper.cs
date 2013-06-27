@@ -54,7 +54,7 @@ namespace Application.Helper.Helpers
             Logger.Log("<-");
             if (!IsElementDisplayed(By.Id("profile-form")))
             {
-                Click(By.Id("edit_profile_button"));
+                OpenEditProfileForm();
             }
             MoveToElementAndClick(By.Id("cz-form-logout"));
             Logger.Log("->");
@@ -114,6 +114,42 @@ namespace Application.Helper.Helpers
             {
                 DeleteCookieByName(userCookieName);
             }
+        } 
+
+        public void ClickOnUserName()
+        {
+            Logger.Log("<-");
+            Click(By.ClassName("auth-panel-login"));
+            Logger.Log("->");
+        }
+
+
+        public bool IsEditProfileFormDisplayed()
+        {
+            Logger.Log("<-");
+            bool result = IsElementDisplayed(By.Id("profile-form"));
+            Logger.Log("-> result: " + result);
+            return result;
+        }
+
+
+        public void ProvideEmail(string email)
+        {
+            Logger.Log("<-");
+            OpenEditProfileForm();
+            SetEmail(email);
+            PressEnter(By.Id("email"));
+            AcceptAlert();
+        }
+
+        public bool IsAlertDispalyed()
+        {
+            return IsAlertPresented();
+        }
+
+        public bool IsUserNamePresented()
+        {
+            return IsElementExisted(By.ClassName("auth-panel-login"));
         }
 
         protected User FillUserCredentials(User user)
@@ -227,6 +263,25 @@ namespace Application.Helper.Helpers
                     break;
             }
             Logger.Log("->");
+        }
+
+        private void OpenEditProfileForm()
+        {
+            Logger.Log("<-");
+            Click(By.Id("edit_profile_button"));
+            Logger.Log("->");
+        }
+
+        private void SetEmail(string email)
+        {
+            Logger.Log("<- email: " + email);
+            TypeText(By.Id("email"),email);
+            Logger.Log("->");
+        }
+
+        public void LogoutByUrl()
+        {
+            OpenUrl("http://test.chronozoom.com/pages/logoff.aspx");
         }
     }
 }

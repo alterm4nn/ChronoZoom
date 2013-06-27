@@ -400,14 +400,14 @@ module CZ {
             createExhibit: {
                 mousemove: function () {
                     if (CZ.Authoring.isDragging && _hovered.type === "timeline") {
-                        
+                        updateNewCircle();
                     }
                 },
 
                 mouseup: function () {
                     if (_hovered.type === "timeline") {
                         updateNewCircle();
-                        
+
                         selectedExhibit = createNewExhibit();
                         showCreateExhibitForm(selectedExhibit);
                     }
@@ -549,7 +549,7 @@ module CZ {
             var deferred = $.Deferred();
 
             CZ.Service.deleteTimeline(t).then(
-                    updateCanvas => {                        
+                    updateCanvas => {
                         CZ.Common.vc.virtualCanvas("requestInvalidate");
                         deferred.resolve();
                     })
@@ -588,13 +588,14 @@ module CZ {
                         newExhibit = renewExhibit(newExhibit);
                         newExhibit.id = "e" + response.ExhibitId;
 
-                                CZ.Common.vc.virtualCanvas("requestInvalidate");
-                                deferred.resolve();
-                            },
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                        
+                        deferred.resolve(newExhibit);
+                    },
                             error => {
-                        console.log("Error connecting to service: update exhibit.\n" + error.responseText);
-                        deferred.reject();
-                    }
+                                console.log("Error connecting to service: update exhibit.\n" + error.responseText);
+                                deferred.reject();
+                            }
                 );
 
             } else {
@@ -735,8 +736,8 @@ module CZ {
          * Validates,if timeline size is not negative or null
         */
         export function isIntervalPositive(start, end) {
-            return (parseFloat(start) + 1/366 <= parseFloat(end));
-                
+            return (parseFloat(start) + 1 / 366 <= parseFloat(end));
+
         }
 
         /**
@@ -780,13 +781,7 @@ module CZ {
                     //Google PDF viewer
                     //Example: http://docs.google.com/viewer?url=http%3A%2F%2Fwww.selab.isti.cnr.it%2Fws-mate%2Fexample.pdf&embedded=true
                     var pdf = /\.(pdf)$/i;
-                    var docs = /\S+docs.google.com\S+$/i;
-                    if (pdf.test(ci.uri)) {
-                        ci.uri = "http://docs.google.com/viewer?url=" + encodeURI(ci.uri) + "&embedded=true";
-                    }
-                    else if (docs.test(ci.uri)) {
-                    }
-                    else {
+                    if (!pdf.test(ci.uri)) {
                         alert("Sorry, only PDF extension is supported");
                         isValid = false;
                     }

@@ -60,6 +60,7 @@ module CZ {
             Activation: FeatureActivation;
             JQueryReference: string;
             IsEnabled: bool;
+            HasBeenActivated: bool;
         }
 
         // Basic Flight-Control (Tracks the features that are enabled)
@@ -102,17 +103,21 @@ module CZ {
             {
                 Name: "Regimes",
                 Activation: FeatureActivation.RootCollection,
-                JQueryReference: ".regime-link"
+                JQueryReference: ".header-regimes"
             },
             {
                 Name: "TimeSeries",
-                Activation: FeatureActivation.Enabled,
-                JQueryReference: "#timeSeriesContainer"
+                Activation: FeatureActivation.Enabled
             },
             {
                 Name: "ManageCollections",
                 Activation: FeatureActivation.Disabled,
                 JQueryReference: "#collections_button"
+            },
+            {
+                Name: "BreadCrumbs",
+                Activation: FeatureActivation.Enabled,
+                JQueryReference: ".header-breadcrumbs"
             },
         ];
 
@@ -137,23 +142,31 @@ module CZ {
                 CZ.Tours.initializeToursUI();
                 $("#tours_index").click(function () { // show form
                     CZ.Tours.removeActiveTour();
-                    var form = new CZ.UI.FormToursList(forms[9], {
-                        activationSource: $(this),
-                        navButton: ".cz-form-nav",
-                        closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        titleTextblock: ".cz-form-title",
-                        tourTemplate: forms[10],
-                        tours: CZ.Tours.tours,
-                        takeTour: tour => {
-                            CZ.Tours.removeActiveTour();
-                            CZ.Tours.activateTour(tour, undefined);
-                        },
-                        editTour: allowEditing ? tour => {
-                            if (CZ.Authoring.showEditTourForm)
-                                CZ.Authoring.showEditTourForm(tour);
-                        } : null
-                    });
-                    form.show();
+                    var toursListForm = getFormById("#toursList");
+
+                    if (toursListForm.isFormVisible) {
+                        toursListForm.close();
+                    }
+                    else {
+                        closeAllForms();
+                        var form = new CZ.UI.FormToursList(forms[9], {
+                            activationSource: $(this),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            tourTemplate: forms[10],
+                            tours: CZ.Tours.tours,
+                            takeTour: tour => {
+                                CZ.Tours.removeActiveTour();
+                                CZ.Tours.activateTour(tour, undefined);
+                            },
+                            editTour: allowEditing ? tour => {
+                                if (CZ.Authoring.showEditTourForm)
+                                    CZ.Authoring.showEditTourForm(tour);
+                            } : null
+                        });
+                        form.show();
+                    }
                 });
             };
             if (CZ.Tours.tours)
@@ -396,7 +409,6 @@ module CZ {
                     else {
                         profileForm.close();
                     }
-
                 });
 
                 if (IsFeatureEnabled(_featureMap, "Login")) {
@@ -419,6 +431,7 @@ module CZ {
                             }
                         }
                         else {
+                            $("#login-panel").hide();
                             $("#profile-panel").show();
                             $(".auth-panel-login").html(data.DisplayName);
                         }
@@ -437,7 +450,8 @@ module CZ {
                     });
                 }
 
-                $("#login-panel").click(function () {
+                $("#login-panel").click(function (event) {
+                    event.preventDefault();
                     if (!loginForm.isFormVisible) {
                         closeAllForms();
                         loginForm.show();
@@ -518,29 +532,6 @@ module CZ {
             $('#biblCloseButton')
                 .mouseout(() => { CZ.Common.toggleOffImage('biblCloseButton', 'png'); })
                 .mouseover(() => { CZ.Common.toggleOnImage('biblCloseButton', 'png'); })
-
-
-            $('#welcomeScreenCloseButton')
-                .mouseover(() => { CZ.Common.toggleOnImage('welcomeScreenCloseButton', 'png'); })
-                .mouseout(() => { CZ.Common.toggleOffImage('welcomeScreenCloseButton', 'png'); })
-                .click(CZ.Common.startExploring);
-            $('#welcomeScreenStartButton')
-                .click(CZ.Common.startExploring);
-
-            var wlcmScrnCookie = CZ.Common.getCookie("welcomeScreenDisallowed");
-            if (wlcmScrnCookie != null) {
-                CZ.Common.hideWelcomeScreen();
-            }
-            else {
-                // click on gray area hides welcome screen
-                $("#welcomeScreenOut").click(function (e) {
-                    e.stopPropagation();
-                });
-
-                $("#welcomeScreenBack").click(function () {
-                    CZ.Common.startExploring();
-                });
-            }
 
             ApplyFeatureActivation();
 
@@ -924,8 +915,14 @@ module CZ {
                     _featureMap[idxFeature].IsEnabled = enabled;
                 }
 
-                if (!_featureMap[idxFeature].IsEnabled && feature.JQueryReference) {
-                    $(feature.JQueryReference).css("display", "none");
+                if (feature.JQueryReference) {
+                    if (!_featureMap[idxFeature].IsEnabled) {
+                        $(feature.JQueryReference).css("display", "none");
+                    }
+                    else if (!_featureMap[idxFeature].HasBeenActivated) {
+                        _featureMap[idxFeature].HasBeenActivated = true;
+                        $(feature.JQueryReference).css("display", "block");
+                    }
                 }
             }
         }

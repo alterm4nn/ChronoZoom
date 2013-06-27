@@ -1678,14 +1678,18 @@ var CZ;
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
         function CanvasPdfItem(vc, layerid, id, pdfSrc, vx, vy, vw, vh, z) {
+            var pdfViewer = "http://docs.google.com/viewer?url=";
             this.base = CanvasDomItem;
             this.base(vc, layerid, id, vx, vy, vw, vh, z);
             var elem = document.createElement('iframe');
             elem.setAttribute("id", id);
+            if(!pdfSrc.match("/^" + pdfViewer + "/")) {
+                pdfSrc = pdfViewer + pdfSrc;
+            }
             if(pdfSrc.indexOf('?') == -1) {
-                pdfSrc += '?wmode=opaque';
+                pdfSrc += '?&embedded=true&wmode=opaque';
             } else {
-                pdfSrc += '&wmode=opaque';
+                pdfSrc += '&embedded=true&wmode=opaque';
             }
             elem.setAttribute("src", pdfSrc);
             elem.setAttribute("visible", 'true');
@@ -3867,6 +3871,7 @@ var CZ;
             createExhibit: {
                 mousemove: function () {
                     if(CZ.Authoring.isDragging && _hovered.type === "timeline") {
+                        updateNewCircle();
                     }
                 },
                 mouseup: function () {
@@ -4005,7 +4010,7 @@ var CZ;
                     newExhibit = renewExhibit(newExhibit);
                     newExhibit.id = "e" + response.ExhibitId;
                     CZ.Common.vc.virtualCanvas("requestInvalidate");
-                    deferred.resolve();
+                    deferred.resolve(newExhibit);
                 }, function (error) {
                     console.log("Error connecting to service: update exhibit.\n" + error.responseText);
                     deferred.reject();
@@ -4138,11 +4143,7 @@ var CZ;
                     }
                 } else if(ci.mediaType.toLowerCase() === "pdf") {
                     var pdf = /\.(pdf)$/i;
-                    var docs = /\S+docs.google.com\S+$/i;
-                    if(pdf.test(ci.uri)) {
-                        ci.uri = "http://docs.google.com/viewer?url=" + encodeURI(ci.uri) + "&embedded=true";
-                    } else if(docs.test(ci.uri)) {
-                    } else {
+                    if(!pdf.test(ci.uri)) {
                         alert("Sorry, only PDF extension is supported");
                         isValid = false;
                     }
@@ -10023,18 +10024,6 @@ var CZ;
             }, 'slow');
         }
         Common.showFooter = showFooter;
-        function startExploring() {
-            if($('#welcomeScreenCheckbox').is(':checked')) {
-                setCookie("welcomeScreenDisallowed", "1", 365);
-            }
-            hideWelcomeScreen();
-        }
-        Common.startExploring = startExploring;
-        function hideWelcomeScreen() {
-            $('#welcomeScreen').remove();
-            $('#welcomeScreenBack').css("display", "none");
-        }
-        Common.hideWelcomeScreen = hideWelcomeScreen;
         Common.animationTooltipRunning = null;
         Common.tooltipMode = "default";
         function stopAnimationTooltip() {
@@ -10593,6 +10582,12 @@ var CZ;
                     this.hide(true);
                     CZ.Authoring.contentItemMode = "createContentItem";
                     CZ.Authoring.showEditContentItemForm(newContentItem, this.exhibit, this, true);
+                } else {
+                    var self = this;
+                    var origMsg = this.errorMessage.text();
+                    this.errorMessage.text("Sorry, only 10 artifacts are allowed in one exhibit").show().delay(7000).fadeOut(function () {
+                        return self.errorMessage.text(origMsg);
+                    });
                 }
             };
             FormEditExhibit.prototype.onSave = function () {
@@ -10614,6 +10609,8 @@ var CZ;
                     CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(function (success) {
                         _this.isCancel = false;
                         _this.close();
+                        _this.exhibit.id = arguments[0].id;
+                        _this.exhibit.onmouseclick();
                     }, function (error) {
                         alert("Unable to save changes. Please try again later.");
                     }).always(function () {
@@ -10955,6 +10952,8 @@ var CZ;
                 this.profilePanel = $(document.body).find(formInfo.profilePanel).first();
                 this.loginPanelLogin = $(document.body).find(formInfo.loginPanelLogin).first();
                 this.allowRedirect = formInfo.allowRedirect;
+                this.usernameInput.off("keypress");
+                this.emailInput.off("keypress");
                 this.initialize();
             }
             FormEditProfile.prototype.validEmail = function (e) {
@@ -11012,7 +11011,7 @@ var CZ;
                             }
                             CZ.Service.putProfile(_this.usernameInput.val(), emailAddress).then(function (success) {
                                 if(_this.allowRedirect) {
-                                    window.location.assign("\\" + success);
+                                    window.location.assign("/" + success);
                                 } else {
                                     _this.close();
                                 }
@@ -11026,6 +11025,13 @@ var CZ;
                 this.logoutButton.click(function (event) {
                     window.location.assign("/pages/logoff.aspx");
                 });
+                var preventEnterKeyPress = function (event) {
+                    if(event.which == 13) {
+                        event.preventDefault();
+                    }
+                };
+                this.usernameInput.keypress(preventEnterKeyPress);
+                this.emailInput.keypress(preventEnterKeyPress);
             };
             FormEditProfile.prototype.show = function () {
                 _super.prototype.show.call(this, {
@@ -11334,17 +11340,21 @@ var CZ;
             {
                 Name: "Regimes",
                 Activation: FeatureActivation.RootCollection,
-                JQueryReference: ".regime-link"
+                JQueryReference: ".header-regimes"
             }, 
             {
                 Name: "TimeSeries",
-                Activation: FeatureActivation.Enabled,
-                JQueryReference: "#timeSeriesContainer"
+                Activation: FeatureActivation.Enabled
             }, 
             {
                 Name: "ManageCollections",
                 Activation: FeatureActivation.Disabled,
                 JQueryReference: "#collections_button"
+            }, 
+            {
+                Name: "BreadCrumbs",
+                Activation: FeatureActivation.Enabled,
+                JQueryReference: ".header-breadcrumbs"
             }, 
             
         ];
@@ -11364,24 +11374,30 @@ var CZ;
                 CZ.Tours.initializeToursUI();
                 $("#tours_index").click(function () {
                     CZ.Tours.removeActiveTour();
-                    var form = new CZ.UI.FormToursList(forms[9], {
-                        activationSource: $(this),
-                        navButton: ".cz-form-nav",
-                        closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        titleTextblock: ".cz-form-title",
-                        tourTemplate: forms[10],
-                        tours: CZ.Tours.tours,
-                        takeTour: function (tour) {
-                            CZ.Tours.removeActiveTour();
-                            CZ.Tours.activateTour(tour, undefined);
-                        },
-                        editTour: allowEditing ? function (tour) {
-                            if(CZ.Authoring.showEditTourForm) {
-                                CZ.Authoring.showEditTourForm(tour);
-                            }
-                        } : null
-                    });
-                    form.show();
+                    var toursListForm = getFormById("#toursList");
+                    if(toursListForm.isFormVisible) {
+                        toursListForm.close();
+                    } else {
+                        closeAllForms();
+                        var form = new CZ.UI.FormToursList(forms[9], {
+                            activationSource: $(this),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            tourTemplate: forms[10],
+                            tours: CZ.Tours.tours,
+                            takeTour: function (tour) {
+                                CZ.Tours.removeActiveTour();
+                                CZ.Tours.activateTour(tour, undefined);
+                            },
+                            editTour: allowEditing ? function (tour) {
+                                if(CZ.Authoring.showEditTourForm) {
+                                    CZ.Authoring.showEditTourForm(tour);
+                                }
+                            } : null
+                        });
+                        form.show();
+                    }
                 });
             };
             if(CZ.Tours.tours) {
@@ -11632,6 +11648,7 @@ var CZ;
                                 profileForm.close();
                             }
                         } else {
+                            $("#login-panel").hide();
                             $("#profile-panel").show();
                             $(".auth-panel-login").html(data.DisplayName);
                         }
@@ -11647,7 +11664,8 @@ var CZ;
                         }
                     });
                 }
-                $("#login-panel").click(function () {
+                $("#login-panel").click(function (event) {
+                    event.preventDefault();
                     if(!loginForm.isFormVisible) {
                         closeAllForms();
                         loginForm.show();
@@ -11727,23 +11745,6 @@ var CZ;
             }).mouseover(function () {
                 CZ.Common.toggleOnImage('biblCloseButton', 'png');
             });
-            $('#welcomeScreenCloseButton').mouseover(function () {
-                CZ.Common.toggleOnImage('welcomeScreenCloseButton', 'png');
-            }).mouseout(function () {
-                CZ.Common.toggleOffImage('welcomeScreenCloseButton', 'png');
-            }).click(CZ.Common.startExploring);
-            $('#welcomeScreenStartButton').click(CZ.Common.startExploring);
-            var wlcmScrnCookie = CZ.Common.getCookie("welcomeScreenDisallowed");
-            if(wlcmScrnCookie != null) {
-                CZ.Common.hideWelcomeScreen();
-            } else {
-                $("#welcomeScreenOut").click(function (e) {
-                    e.stopPropagation();
-                });
-                $("#welcomeScreenBack").click(function () {
-                    CZ.Common.startExploring();
-                });
-            }
             ApplyFeatureActivation();
             if(navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
                 document.addEventListener('touchmove', function (e) {
@@ -12071,8 +12072,13 @@ var CZ;
                     }
                     _featureMap[idxFeature].IsEnabled = enabled;
                 }
-                if(!_featureMap[idxFeature].IsEnabled && feature.JQueryReference) {
-                    $(feature.JQueryReference).css("display", "none");
+                if(feature.JQueryReference) {
+                    if(!_featureMap[idxFeature].IsEnabled) {
+                        $(feature.JQueryReference).css("display", "none");
+                    } else if(!_featureMap[idxFeature].HasBeenActivated) {
+                        _featureMap[idxFeature].HasBeenActivated = true;
+                        $(feature.JQueryReference).css("display", "block");
+                    }
                 }
             }
         }

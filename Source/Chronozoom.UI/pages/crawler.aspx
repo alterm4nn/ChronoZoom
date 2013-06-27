@@ -1,10 +1,14 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="crawler.aspx.cs"
     Inherits="Chronozoom.UI.Crawler" %>
+
 <% Uri url = new Uri(Request.Url.ToString());%>
 
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+    <% if (Chronozoom.UI.Crawler.SearchEnabled().Equals(false)) { Response.Write("<meta name='ROBOTS' value='NOINDEX' /></head>"); }
+       else
+       { %>
     <title><% Response.Write(Chronozoom.UI.Crawler.GetTitle(url)); %></title>
     <%if (Chronozoom.UI.Crawler.IsGuid(Chronozoom.UI.Crawler.UrlGuid(url)).Equals(false)) { Response.Write("<meta name='description' content='ChronoZoom is an open-source community project dedicated to visualizing the history of everything' />"); } %>
     <%else
@@ -18,9 +22,9 @@
 <body>
     <form id="form1">
         <% //// #### IF GUID == TIMELINE ####
-            if (Chronozoom.UI.Crawler.IsTimeline(Chronozoom.UI.Crawler.UrlGuid(url)))
-            {
-                Chronozoom.Entities.Timeline timeline = Chronozoom.UI.Crawler.Timelines(Chronozoom.UI.Crawler.UrlGuid(url));%>
+      if (Chronozoom.UI.Crawler.IsTimeline(Chronozoom.UI.Crawler.UrlGuid(url)))
+      {
+          Chronozoom.Entities.Timeline timeline = Chronozoom.UI.Crawler.Timelines(Chronozoom.UI.Crawler.UrlGuid(url));%>
 
         <div>
             <h1><%Response.Write(timeline.Title); %></h1>
@@ -89,14 +93,16 @@
             <p>
                 <% //// Here we need a link to point to the Root Timeline of the collection, based on the FriendlyURL passed to the page %>
                 <%
-                    string rootTimelineId = Chronozoom.UI.Crawler.RootTimelineId(url);
-                    if (!string.IsNullOrEmpty(rootTimelineId))
-                    {
-                        Response.Write("<a href='" + Chronozoom.UI.Crawler.UrlForCollection(Chronozoom.UI.Crawler.UrlSuperCollection(url), Chronozoom.UI.Crawler.UrlCollection(url)) + Chronozoom.UI.Crawler.RootTimelineId(url) + "'>Home</a>");
-                    }
+            string rootTimelineId = Chronozoom.UI.Crawler.RootTimelineId(url);
+            if (!string.IsNullOrEmpty(rootTimelineId))
+            {
+                Response.Write("<a href='" + Chronozoom.UI.Crawler.UrlForCollection(Chronozoom.UI.Crawler.UrlSuperCollection(url), Chronozoom.UI.Crawler.UrlCollection(url)) + Chronozoom.UI.Crawler.RootTimelineId(url) + "'>Home</a>");
+            }
                 %>
             </p>
         </footer>
     </form>
 </body>
+<% } %>
 </html>
+

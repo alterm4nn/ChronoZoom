@@ -80,7 +80,7 @@ namespace Application.Helper.Helpers
         public void OpenLifeTimeline()
         {
             Logger.Log("<-");
-            HelperManager<NavigationHelper>.GetInstance.OpenLifePage();
+            HelperManager<NavigationHelper>.Instance.OpenLifePage();
             WaitAnimation();
             WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='Life']"));
             Logger.Log("->");
@@ -89,7 +89,7 @@ namespace Application.Helper.Helpers
         public void OpenHumanityTimeline()
         {
             Logger.Log("<-");
-            HelperManager<NavigationHelper>.GetInstance.OpenHumanityPage();
+            HelperManager<NavigationHelper>.Instance.OpenHumanityPage();
             WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='Humanity']"));
             WaitAnimation();
             Logger.Log("->");
@@ -99,7 +99,7 @@ namespace Application.Helper.Helpers
         public void OpenCosmosTimeline()
         {
             Logger.Log("<-");
-            HelperManager<NavigationHelper>.GetInstance.NavigateToCosmos();
+            HelperManager<NavigationHelper>.Instance.NavigateToCosmos();
             WaitCondition(() => GetItemsCount(By.XPath("//*[@id='breadcrumbs-table']//td")) == 1, 60);
             Logger.Log("->");
         }
@@ -116,7 +116,7 @@ namespace Application.Helper.Helpers
         public void OpenRomanHistoryTimeline()
         {
             Logger.Log("<-");
-            HelperManager<NavigationHelper>.GetInstance.NavigateToRomanHistoryTimeline();
+            HelperManager<NavigationHelper>.Instance.NavigateToRomanHistoryTimeline();
             WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='Roman History']"));
             WaitAnimation();
             Logger.Log("->");
@@ -125,7 +125,7 @@ namespace Application.Helper.Helpers
         public void OpenHistoryOfScienceTimeline()
         {
             Logger.Log("<-");
-            HelperManager<NavigationHelper>.GetInstance.NavigateToHistoryOfScienceTimeline();
+            HelperManager<NavigationHelper>.Instance.NavigateToHistoryOfScienceTimeline();
             WaitForElementIsDisplayed(By.XPath("//*[@id='breadcrumbs-table']//*[text()='History of Science']"));
             WaitAnimation();
             Logger.Log("->");

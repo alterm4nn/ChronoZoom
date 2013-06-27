@@ -1,6 +1,17 @@
 @import "timescale";
 @import "datepicker";
 
+@headerHeight: 36px; /* The height of the page header */
+@headerLogoWidth: 170px; /* The width of the logo area */
+@headerTourWidth: 140px; /* The width of the tour player area */
+@headerRegimesWidth: 420px; /* The width of the regimes area */
+@headerBreadcrumbsHeight: 25px; /* The height of the breadcrumbs area */
+@headerBreadcrumbsTopMargin:8px;  /* The top margin of the breadcrumbs area */
+@headerBreadcrumbsScrollWidth: 25px; /* The breadcrumbs scroller area */
+
+@footerHeight: 25px; /* The height of the page footer */
+@footerLinksWidth: 350px; /* The width of the footers links area */
+
 html, body
 {
     margin: 0;
@@ -11,7 +22,7 @@ html, body
 body
 {
     overflow: hidden;
-    min-width: 950px;
+    min-width: 250px;
     min-height: 250px;
     background-color: #232323;
     font-family: 'Segoe UI', Helvetica, Arial, 'Trebuchet MS', San Serif;
@@ -46,15 +57,18 @@ a
       
 ***********************************************************/
 
-#header
+.navigation
 {
     position: relative;
-    padding-right: 20px;
-    padding-left: 20px;
+    margin: 0;
+    padding: 0;
     height: 36px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 
-    #header ul
+    .navigation ul
     {
         overflow: hidden;
         margin: 0;
@@ -63,12 +77,12 @@ a
         height: 100%;
     }
 
-        #header ul li
+        .navigation ul li
         {
             height: 100%;
         }
 
-        #header ul:after
+        .navigation ul:after
         {
             clear: both;
         }
@@ -148,23 +162,42 @@ a
     background-color: #0464a2;
 }
 
-
 .header-logo
 {
-    height: 36px;
-    line-height: 36px;
-    width: 200px;
-    margin-right: 40px;
+    height: @headerHeight;
+    line-height: @headerHeight;
+    width: @headerLogoWidth;
     background-repeat: no-repeat;
     background-position: center;
-    background-image: url('../images/chronzoom-200px-white.png');
+    background-image: url('../images/chronozoom.png');
+    margin-left: 10px;
+}
+
+.header-regimes
+{
+    height: @headerHeight;
+    width: @headerRegimesWidth;
+    display: none;
+}
+
+.header-breadcrumbs
+{
+    height: @headerBreadcrumbsHeight;
+    width: 100%;
+    display: none;
+    margin-top: -@headerBreadcrumbsTopMargin;
+}
+
+.header-icons
+{
+    height: @headerHeight;
 }
 
 .header-icon
 {
-    height: 36px;
-    width: 36px;
-    line-height: 36px;
+    height: @headerHeight;
+    width: @headerHeight;
+    line-height: @headerHeight;
     background-repeat: no-repeat;
     background-position: center;
 }
@@ -237,18 +270,16 @@ a
                             Content
 
 ***********************************************************/
-
 #content
 {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    margin-top: -36px;
-    margin-bottom: -25px;
-    padding-top: 36px;
-    padding-bottom: 25px;
-    height: 100%;
-    min-height: 100%;
+    width: 100%;
+    height: calc(~"100% -" @headerHeight ~"-" @footerHeight ~"-" @headerBreadcrumbsHeight ~"+" @headerBreadcrumbsTopMargin);
+    height: -moz-calc(~"100% -" @headerHeight ~"-" @footerHeight ~"-" @headerBreadcrumbsHeight ~"+" @headerBreadcrumbsTopMargin);
+    height: -webkit-calc(~"100% -" @headerHeight ~"-" @footerHeight ~"-" @headerBreadcrumbsHeight ~"+" @headerBreadcrumbsTopMargin);
+    height: -o-calc(~"100% -" @headerHeight ~"-" @footerHeight ~"-" @headerBreadcrumbsHeight ~"+" @headerBreadcrumbsTopMargin);
 }
 
 #vc-container
@@ -334,10 +365,11 @@ a
 
 .tour_control
 {
+    height: @headerHeight;
+    width: @headerTourWidth;
     display: none;
-    margin: 5px 2px 2px 2px;
-    width: 190px;
     cursor: pointer;
+    margin-top: 5px;
 }
 
 /***********************************************************
@@ -1152,8 +1184,8 @@ img.fallbackBackground
 
 .footer-link
 {
-    margin-right: 20px;
-    margin-left: 20px;
+    margin-right: 10px;
+    margin-left: 10px;
     height: 100%;
     color: #FFF;
     white-space: nowrap;
@@ -1165,6 +1197,39 @@ img.fallbackBackground
         cursor: pointer;
     }
 
+.footer-links
+{
+    height: @footerHeight;
+    width: @footerLinksWidth;
+    color: #AAA;
+}
+
+.footer-credits
+{
+    height: @footerHeight;
+    width: calc(~"100%" - @footerLinksWidth);
+    width: -moz-calc(~"100%" - @footerLinksWidth);
+    width: -webkit-calc(~"100%" - @footerLinksWidth);
+    width: -o-calc(~"100%" - @footerLinksWidth);
+    color: #AAA;
+}
+
+    .footer-credits ul
+    {
+        margin-top: 4px;
+    }
+
+.footer-link-credits, .footer-link-credits:visited, .footer-link-credits:link
+{
+    margin-right: 6px;
+    margin-left: 6px;
+}
+
+.footer-text
+{
+    margin-left: 6px;
+    color: #AAA;
+}
 
 /***********************************************************
 
@@ -1174,35 +1239,36 @@ img.fallbackBackground
 
 .breadcrumbs-nav
 {
-    width: 25px;
+    width: @headerBreadcrumbsScrollWidth;
     height: 25px;
-    color: #BFBFBF;
+    color: #555;
     text-align: center;
-    font-size: 20px;
+    font-size: 14px;
     line-height: 100%;
 }
 
     .breadcrumbs-nav:hover
     {
-        color: #fff;
+        color: #999;
     }
 
 #breadcrumbs-nav-left
 {
-    display: none;
     cursor: pointer;
 }
 
 #breadcrumbs-nav-right
 {
-    display: none;
     cursor: pointer;
 }
 
 .breadcrumbs-container
 {
     overflow: hidden;
-    width: 50%;
+    width: calc(~"100% - " 2 * @headerBreadcrumbsScrollWidth);
+    width: -moz-calc(~"100% - " 2 * @headerBreadcrumbsScrollWidth);
+    width: -webkit-calc(~"100% - " 2 * @headerBreadcrumbsScrollWidth);
+    width: -o-calc(~"100% - " 2 * @headerBreadcrumbsScrollWidth);
     height: 100%;
     line-height: 100%;
 }
@@ -1242,7 +1308,7 @@ img.fallbackBackground
     margin-left: 3px;
     height: 100%;
     color: #bfbfbf;
-    font-size: 12.5px;
+    font-size: 16px;
     font-family: verdana;
     line-height: 100%;
     cursor: default;
@@ -1253,36 +1319,11 @@ img.fallbackBackground
     position: relative;
     display: inline-block;
     height: 25px;
-    font-size: 12.5px;
+    font-size: 14px;
     font-family: verdana;
     line-height: 25px;
     cursor: pointer;
-    color: lightgrey;
-}
-
-.breadcrumb-cosmos
-{
-    color: #986C9D;
-}
-
-.breadcrumb-earth
-{
-    color: #517F95;
-}
-
-.breadcrumb-life
-{
-    color: #499649;
-}
-
-.breadcrumb-prehistory
-{
-    color: #ED9132;
-}
-
-.breadcrumb-humanity
-{
-    color: #D45C46;
+    color: #FFF;
 }
 
 .breadcrumb-hover
@@ -1340,10 +1381,19 @@ img.fallbackBackground
 .cz-form
 {
     position: absolute;
-    top: 36px;
     z-index: 100000001;
     display: none;
     cursor: default;
+}
+
+.cz-form-right
+{
+    top: 36px;
+}
+
+.cz-form-left
+{
+    top: 53px;
 }
 
 .cz-form-header

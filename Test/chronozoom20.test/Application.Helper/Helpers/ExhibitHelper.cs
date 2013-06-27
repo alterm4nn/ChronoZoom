@@ -120,7 +120,7 @@ namespace Application.Helper.Helpers
         public string GetEukaryoticCellsDescription()
         {
             Logger.Log("<-");
-            HelperManager<NavigationHelper>.GetInstance.OpenExhibitEukaryoticCells();
+            HelperManager<NavigationHelper>.Instance.OpenExhibitEukaryoticCells();
             Logger.Log("ExhibitEukaryotic Cell is opened");
             string description = GetFirstContentItemDescription();
             Logger.Log("-> description: " + description);

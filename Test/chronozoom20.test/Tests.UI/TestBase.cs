@@ -22,26 +22,28 @@ namespace Tests
         public static SearchHelper SearchHelper { get; set; }
         public static BreadcrumbsHelper BreadcrumbsHelper { get; set; }
         public static ApiHelper ApiHelper { get; set; }
+        public static TimeSeriesHelper TimeSeriesHelper { get; set; }
 
         [AssemblyInitialize]
         public static void AssemblyInit(TestContext testContext)
         {
             IoC.Initialize(new UnityDependencyResolver());
 
-            NavigationHelper = HelperManager<NavigationHelper>.GetInstance;
-            BrowserStateManager = HelperManager<BrowserStateManager>.GetInstance;
-            HomePageHelper = HelperManager<HomePageHelper>.GetInstance;
-            TourHelper = HelperManager<TourHelper>.GetInstance;
-            BookmarkHelper = HelperManager<BookmarkHelper>.GetInstance;
-            TimescaleHelper = HelperManager<TimescaleHelper>.GetInstance;
-            ScreenshotManager = HelperManager<ScreenshotManager>.GetInstance;
-            WelcomeScreenHelper = HelperManager<WelcomeScreenHelper>.GetInstance;
-            TimelineHelper = HelperManager<TimelineHelper>.GetInstance;
-            ExhibitHelper = HelperManager<ExhibitHelper>.GetInstance;
-            SearchHelper = HelperManager<SearchHelper>.GetInstance;
-            AuthorizationHelper = HelperManager<AuthorizationHelper>.GetInstance;
-            BreadcrumbsHelper = HelperManager<BreadcrumbsHelper>.GetInstance;
-            ApiHelper = HelperManager<ApiHelper>.GetInstance;
+            NavigationHelper = HelperManager<NavigationHelper>.Instance;
+            BrowserStateManager = HelperManager<BrowserStateManager>.Instance;
+            HomePageHelper = HelperManager<HomePageHelper>.Instance;
+            TourHelper = HelperManager<TourHelper>.Instance;
+            BookmarkHelper = HelperManager<BookmarkHelper>.Instance;
+            TimescaleHelper = HelperManager<TimescaleHelper>.Instance;
+            ScreenshotManager = HelperManager<ScreenshotManager>.Instance;
+            WelcomeScreenHelper = HelperManager<WelcomeScreenHelper>.Instance;
+            TimelineHelper = HelperManager<TimelineHelper>.Instance;
+            ExhibitHelper = HelperManager<ExhibitHelper>.Instance;
+            SearchHelper = HelperManager<SearchHelper>.Instance;
+            AuthorizationHelper = HelperManager<AuthorizationHelper>.Instance;
+            BreadcrumbsHelper = HelperManager<BreadcrumbsHelper>.Instance;
+            ApiHelper = HelperManager<ApiHelper>.Instance;
+            TimeSeriesHelper = HelperManager<TimeSeriesHelper>.Instance;
         }
 
         [AssemblyCleanup]

@@ -1591,16 +1591,22 @@ module CZ {
         @param z            z-index
         */
         function CanvasPdfItem(vc, layerid, id, pdfSrc, vx, vy, vw, vh, z) {
+            var pdfViewer = "http://docs.google.com/viewer?url=";
             this.base = CanvasDomItem;
             this.base(vc, layerid, id, vx, vy, vw, vh, z);
 
             var elem = document.createElement('iframe');
             elem.setAttribute("id", id);
+
+            if (!pdfSrc.match("/^" + pdfViewer + "/")) {
+                pdfSrc = pdfViewer + pdfSrc;
+            }
             if (pdfSrc.indexOf('?') == -1)
-                pdfSrc += '?wmode=opaque';
+                pdfSrc += '?&embedded=true&wmode=opaque';
             else
-                pdfSrc += '&wmode=opaque';
+                pdfSrc += '&embedded=true&wmode=opaque';
             elem.setAttribute("src", pdfSrc);
+
             elem.setAttribute("visible", 'true');
             elem.setAttribute("controls", 'true');
 

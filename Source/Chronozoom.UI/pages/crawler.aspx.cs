@@ -20,6 +20,16 @@ namespace Chronozoom.UI
             return uri.Scheme + Uri.SchemeDelimiter + uri.Host + ":" + uri.Port;
         });
 
+        public static bool SearchEnabled()
+        {
+            if (ConfigurationManager.AppSettings["SearchEngineIndexing"] == "false")
+            {
+                return false;
+            }
+            return true;
+        }
+
+
         /// <summary>
         /// Parses the URL passed to the page to determine the SuperCollection.
         /// </summary>
