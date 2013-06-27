@@ -336,9 +336,10 @@ a
     user-select: none;
 }
 
-#timeSeriesContainer::selection {
-    cursor: pointer;
-}
+    #timeSeriesContainer::selection
+    {
+        cursor: pointer;
+    }
 
 .virtualCanvas
 {
@@ -1546,11 +1547,10 @@ img.fallbackBackground
         overflow-y: auto;
     }
 
+    
 .cz-form-tour-edit
 {
-    min-width: 380px;
-    max-width: 450px;
-    width: 30.2734375%; /* 310 / 1024 */
+    width: 415px;
     bottom: 25px;
     left: 0;
 }
@@ -1568,7 +1568,8 @@ img.fallbackBackground
 .cz-form-tour-contentitem-listitem-icon
 {
     display: inline-block;
-    width: 15%;
+    width: 50px;
+    height: 50px;
 }
 
     .cz-form-tour-contentitem-listitem-icon > img
@@ -1577,6 +1578,21 @@ img.fallbackBackground
         height: 50px;
     }
 
+.cz-contentitem-listitem-tourstop
+{
+    width: 210px;
+    display: inline-block;
+    margin: 0px 5px;
+    vertical-align: top;
+}
+
+.cz-tourstop-description
+{
+    display: block;
+    height: 100px;
+    width: 100%;
+    resize: none;
+}
 
 .cz-tourlist-form
 {
