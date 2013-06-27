@@ -355,7 +355,8 @@ var CZ;
                     titleInput: ".cz-form-item-title",
                     context: ""
                 });
-                $("#profile-panel").click(function () {
+                $("#profile-panel").click(function (event) {
+                    event.preventDefault();
                     if(!profileForm.isFormVisible) {
                         closeAllForms();
                         profileForm.show();
