@@ -29,5 +29,10 @@ namespace Application.Helper.BrowserImpl
         {
             //No alert by default (chrome and IE).
         }
+
+        public virtual void ClickOnTimeseriesButton()
+        {
+            MoveToElementAndClick(By.Id("timeSeries_button"));
+        }
     }
 }

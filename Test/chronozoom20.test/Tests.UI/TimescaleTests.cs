@@ -24,7 +24,6 @@ namespace Tests
         public static void ClassInitialize(TestContext testContext)
         {
             HomePageHelper.OpenPage();
-            WelcomeScreenHelper.CloseWelcomePopup();
         }
 
         [TestInitialize]
@@ -45,7 +44,6 @@ namespace Tests
             if (TestContext.CurrentTestOutcome != UnitTestOutcome.Passed && TestContext.CurrentTestOutcome != UnitTestOutcome.Inconclusive)
             {
                 HomePageHelper.OpenPage();
-                WelcomeScreenHelper.CloseWelcomePopup();
             }
         }
 
@@ -110,6 +108,7 @@ namespace Tests
         public void Mouse_Marker()
         {
             TimelineHelper.OpenHumanityTimeline();
+            HomePageHelper.MoveMouseToCenter();
             string mouseMarkerText = TimescaleHelper.GetMouseMarkerText();
             HomePageHelper.MoveMouseToLeft();
             string mouseMarkerLeftText = TimescaleHelper.GetMouseMarkerText();

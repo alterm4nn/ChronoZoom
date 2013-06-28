@@ -18,7 +18,6 @@ namespace Tests
         {
             BrowserStateManager.RefreshState();
             HomePageHelper.OpenPage();
-            WelcomeScreenHelper.CloseWelcomePopup();
             if (AuthorizationHelper.IsUserNamePresented())
             {
                 AuthorizationHelper.OpenLoginPage();
