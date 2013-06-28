@@ -36,6 +36,7 @@ var CZ;
             };
             var days = Dates.daysInMonth.reduce(sumDaysOfMonths, +(isLeap && month > 1)) + day;
             coord += (days - 1) / daysInYear;
+            coord = roundDecimal(coord, CZ.Settings.allowedMathImprecisionDecimals);
             return coord;
         }
         Dates.getCoordinateFromYMD = getCoordinateFromYMD;
@@ -139,6 +140,9 @@ var CZ;
             return years1;
         }
         Dates.numberofLeap = numberofLeap;
+        function roundDecimal(decimal, precision) {
+            return Math.round(decimal * Math.pow(10, precision)) / Math.pow(10, precision);
+        }
     })(CZ.Dates || (CZ.Dates = {}));
     var Dates = CZ.Dates;
 })(CZ || (CZ = {}));
