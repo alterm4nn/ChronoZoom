@@ -108,6 +108,7 @@ namespace Tests
         public void Mouse_Marker()
         {
             TimelineHelper.OpenHumanityTimeline();
+            HomePageHelper.MoveMouseToCenter();
             string mouseMarkerText = TimescaleHelper.GetMouseMarkerText();
             HomePageHelper.MoveMouseToLeft();
             string mouseMarkerLeftText = TimescaleHelper.GetMouseMarkerText();

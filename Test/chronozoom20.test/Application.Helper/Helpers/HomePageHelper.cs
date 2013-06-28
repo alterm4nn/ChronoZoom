@@ -23,7 +23,9 @@ namespace Application.Helper.Helpers
         public void MoveMouseToCenter()
         {
             Logger.Log("<-");
-            MoveToElementAndClick(By.Id("axis"));
+            IWebElement timescale = FindElement(By.Id("axis"));
+            double size = timescale.Size.Width;
+            MoveToElementCoordinates(By.Id("axis"), (int)Math.Round(size / 2), 0);
             Logger.Log("->");
         }
 
