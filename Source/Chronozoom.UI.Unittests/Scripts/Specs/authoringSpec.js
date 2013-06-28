@@ -1,4 +1,5 @@
-﻿/// <reference path="../../../Chronozoom.UI/scripts/authoring.js" />
+﻿/// <reference path="../../../Chronozoom.UI/scripts/settings.js" />
+/// <reference path="../../../Chronozoom.UI/scripts/authoring.js" />
 /// <reference path="../../../Chronozoom.UI/scripts/dates.js" />
 
 describe("CZ.Authoring part", function () {
