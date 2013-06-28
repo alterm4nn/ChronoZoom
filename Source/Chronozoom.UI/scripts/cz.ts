@@ -94,7 +94,7 @@ module CZ {
             },
             {
                 Name: "TourAuthoring",
-                Activation: FeatureActivation.Enabled,
+                Activation: FeatureActivation.NotProduction,
                 JQueryReference: ".cz-form-create-tour"
             },
             {
