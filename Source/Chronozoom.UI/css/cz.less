@@ -6,7 +6,7 @@
 @headerTourWidth: 140px; /* The width of the tour player area */
 @headerRegimesWidth: 420px; /* The width of the regimes area */
 @headerBreadcrumbsHeight: 25px; /* The height of the breadcrumbs area */
-@headerBreadcrumbsTopMargin:4px;  /* The top margin of the breadcrumbs area */
+@headerBreadcrumbsTopMargin: 4px;  /* The top margin of the breadcrumbs area */
 @headerBreadcrumbsScrollWidth: 25px; /* The breadcrumbs scroller area */
 
 @footerHeight: 25px; /* The height of the page footer */
@@ -1522,13 +1522,54 @@ img.fallbackBackground
     background-image: linear-gradient(to top, #0E4073 0%, #1B6AAB 100%);
 }
 
+.blocking-layer
+{
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    z-index: -1;
+    background-color: rgba(0,0,0,0.2);
+}
 
+.truncateText
+{
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.cz-form-errormsg
+{
+    color: #dd4b39;
+    display: block;
+}
+
+.cz-lightgray
+{
+    color: #aeaeae;
+}
+
+.cz-form-label
+{
+    margin: 5px 0;
+    display: inline-block;
+}
+
+/***********************************************************
+
+                        Custom Forms
+
+***********************************************************/
+
+/* Header Edit Form */
 .cz-header-edit-form
 {
     right: 0px;
     width: 330px;
 }
 
+/* Message Window */
 .cz-message-window
 {
     width: 330px;
@@ -1547,7 +1588,7 @@ img.fallbackBackground
         overflow-y: auto;
     }
 
-    
+/* Edit Tour Form */
 .cz-form-tour-edit
 {
     width: 415px;
@@ -1594,6 +1635,7 @@ img.fallbackBackground
     resize: none;
 }
 
+/* Tours List Form */
 .cz-tourlist-form
 {
     min-width: 380px;
@@ -1619,6 +1661,7 @@ img.fallbackBackground
             min-height: 200px;
         }
 
+/* Edit Timeline Form */
 .cz-form-timeline
 {
     min-width: 380px;
@@ -1638,6 +1681,7 @@ img.fallbackBackground
         overflow-y: auto;
     }
 
+/* Edit Exhibit Form */
 .cz-form-exhibit
 {
     min-width: 380px;
@@ -1657,6 +1701,7 @@ img.fallbackBackground
         overflow-y: auto;
     }
 
+/* Edit Content Item Form */
 .cz-form-contentitem
 {
     min-width: 380px;
@@ -1676,38 +1721,199 @@ img.fallbackBackground
         overflow-y: auto;
     }
 
-.blocking-layer
+/* Profile Form */
+#profile-form
 {
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
     right: 0;
-    z-index: -1;
-    background-color: rgba(0,0,0,0.2);
+    width: 304px;
+    background-color: #f5f5f5;
+    font-size: 14px;
 }
 
-.truncateText
+    #profile-form div.czform_cb_div label
+    {
+        margin-left: 2em;
+    }
+
+    #profile-form a:link
+    {
+        color: #25a1ea;
+    }
+
+    #profile-form a:visited
+    {
+        color: #25a1ea;
+    }
+
+    #profile-form div.czform_text
+    {
+        color: black;
+    }
+
+    #profile-form label
+    {
+        display: block;
+        margin-left: 2px;
+    }
+
+    #profile-form input[type=text]
+    {
+        min-width: 270px;
+    }
+
+    #profile-form input[type=checkbox]
+    {
+        float: left;
+        margin-left: 0px;
+        padding: 6px;
+        color: #fff;
+    }
+
+    #profile-form div.cz-form-content div
+    {
+        clear: both;
+        margin-bottom: 14px;
+        margin-left: 0px;
+    }
+
+    #profile-form button.cz-form-save
+    {
+        width: 134px;
+        color: #fff;
+    }
+
+.auth-panel-login
 {
+    display: inline-block;
+    margin-top: 8px;
+    margin-left: 10px;
+    color: #E9E9E9;
+    vertical-align: top;
+}
+
+/* Login Form */
+#login-form
+{
+    right: 0px;
+    width: 304px;
+    font-size: 14px;
+}
+
+    #login-form div.cz-form-content div
+    {
+        clear: both;
+        margin-bottom: 14px;
+        margin-left: 0;
+    }
+
+    #login-form div.cz-form-content
+    {
+        width: 304px;
+    }
+
+#cz-form-logout, #cz-form-save
+{
+    width: 134px;
+}
+
+/* TimSeries Data Form */
+#timeSeriesDataForm
+{
+    right: 0px;
+    width: 500px;
+}
+
+#existingTimeSeries
+{
+    padding: 0;
+}
+
+.cz-preloaded-timeseries
+{
+    margin: 2px;
+    padding: 0px;
+    text-align: left;
+    width: 200px;
+    color: #0388E5;
+}
+
+    .cz-preloaded-timeseries :hover
+    {
+        color: #58B7F9;
+    }
+
+/* Search Form */
+.cz-header-search-form
+{
+    min-width: 380px;
+    max-width: 450px;
+    width: 30.2734375%;
+    bottom: 25px;
+    left: 0;
+}
+
+    .cz-header-search-form > .cz-form-content
+    {
+        position: absolute;
+        top: 36px;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        overflow-y: hidden;
+    }
+
+.cz-form-progress-bar
+{
+    width: 100%;
+    height: 15px;
+    vertical-align: top;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.cz-form-content-box
+{
+    font-size: 14px;
+    font-family: 'Segoe UI', Helvetica, Arial, 'Trebuchet MS', 'San Serif';
+    vertical-align: top;
+    height: 100%;
+}
+
+.cz-form-search-results
+{
+    margin-top: 24px;
+    position: relative;
+    overflow-y: auto;
+    height: 100%;
+}
+
+.cz-form-search-section
+{
+    margin-top: 0px;
+    margin-bottom: 24px;
+}
+
+.cz-form-search-section-title
+{
+    margin-top: 0px;
+    color: #232323;
+    border-bottom: 1px solid #232323;
+}
+
+.cz-form-search-result
+{
+    margin: 8px 0;
+    width: auto;
+    color: #038ae6;
+    cursor: pointer;
+    white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
 }
 
-.cz-form-errormsg
+.cz-form-search-results-count
 {
-    color: #dd4b39;
-    display: block;
-}
-
-.cz-lightgray
-{
-    color: #aeaeae;
-}
-
-.cz-form-label
-{
-    margin: 5px 0;
-    display: inline-block;
+    color: #232323;
 }
 
 /***********************************************************
@@ -1835,130 +2041,3 @@ img.fallbackBackground
     width: auto;
     display: inline;
 }
-
-/***********************************************************
-
-                Registration Forms
-
-***********************************************************/
-
-/* Profile Form */
-#profile-form
-{
-    right: 0;
-    width: 304px;
-    background-color: #f5f5f5;
-    font-size: 14px;
-}
-
-    #profile-form div.czform_cb_div label
-    {
-        margin-left: 2em;
-    }
-
-    #profile-form a:link
-    {
-        color: #25a1ea;
-    }
-
-    #profile-form a:visited
-    {
-        color: #25a1ea;
-    }
-
-    #profile-form div.czform_text
-    {
-        color: black;
-    }
-
-    #profile-form label
-    {
-        display: block;
-        margin-left: 2px;
-    }
-
-    #profile-form input[type=text]
-    {
-        min-width: 270px;
-    }
-
-    #profile-form input[type=checkbox]
-    {
-        float: left;
-        margin-left: 0px;
-        padding: 6px;
-        color: #fff;
-    }
-
-    #profile-form div.cz-form-content div
-    {
-        clear: both;
-        margin-bottom: 14px;
-        margin-left: 0px;
-    }
-
-    #profile-form button.cz-form-save
-    {
-        width: 134px;
-        color: #fff;
-    }
-
-.auth-panel-login
-{
-    display: inline-block;
-    margin-top: 8px;
-    margin-left: 10px;
-    color: #E9E9E9;
-    vertical-align: top;
-}
-
-/* Login Form */
-#login-form
-{
-    right: 0px;
-    width: 304px;
-    font-size: 14px;
-}
-
-    #login-form div.cz-form-content div
-    {
-        clear: both;
-        margin-bottom: 14px;
-        margin-left: 0;
-    }
-
-    #login-form div.cz-form-content
-    {
-        width: 304px;
-    }
-
-#cz-form-logout, #cz-form-save
-{
-    width: 134px;
-}
-
-/* TimSeries Data Form */
-#timeSeriesDataForm
-{
-    right: 0px;
-    width: 500px;
-}
-
-#existingTimeSeries
-{
-    padding: 0;
-}
-
-.cz-preloaded-timeseries
-{
-    margin: 2px;
-    padding: 0px;
-    text-align: left;
-    width: 200px;
-    color: #0388E5;
-}
-
-    .cz-preloaded-timeseries :hover
-    {
-        color: #58B7F9;
-    }

@@ -166,6 +166,13 @@
         Settings.signinUrlGoogle = "";
         Settings.signinUrlYahoo = "";
         Settings.guidEmpty = "00000000-0000-0000-0000-000000000000";
+        Settings.ie = ((function () {
+            var v = 3, div = document.createElement('div'), a = div.all || [];
+            while(div.innerHTML = '<!--[if gt IE ' + (++v) + ']><br><![endif]-->' , a[0]) {
+                ;
+            }
+            return (v > 4) ? v : undefined;
+        })());
     })(CZ.Settings || (CZ.Settings = {}));
     var Settings = CZ.Settings;
 })(CZ || (CZ = {}));
@@ -3403,6 +3410,24 @@ var CZ;
             });
         }
         Service.getTours = getTours;
+        function getSearch(query) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("Search");
+            var data = {
+                searchTerm: query,
+                supercollection: CZ.Service.superCollectionName,
+                collection: CZ.Service.collectionName
+            };
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data
+            });
+        }
+        Service.getSearch = getSearch;
         function getServiceInformation() {
             var request = new Request(_serviceUrl);
             request.addToPath("info");
@@ -3428,7 +3453,6 @@ var CZ;
             });
         }
         Service.getContentPath = getContentPath;
-        getContentPath;
         function putExhibitContent(e, oldContentItems) {
             var newGuids = e.contentItems.map(function (ci) {
                 return ci.guid;
@@ -4281,19 +4305,20 @@ var CZ;
                 this.activationSource.addClass("active");
             };
             FormToursList.prototype.close = function () {
+                var _this = this;
                 $(window).unbind("resize", this.onWindowResize);
                 _super.prototype.close.call(this, {
                     effect: "slide",
                     direction: "right",
                     duration: 500,
                     complete: function () {
+                        _this.container.find("cz-form-errormsg").hide();
+                        _this.container.find("#tours").empty();
+                        _this.toursListBox.container.empty();
                     }
                 });
                 CZ.Authoring.isActive = false;
                 this.activationSource.removeClass("active");
-                this.container.find("cz-form-errormsg").hide();
-                this.container.find("#tours").empty();
-                this.toursListBox.container.empty();
             };
             FormToursList.prototype.onTakeTour = function (tour) {
                 this.close();
@@ -11088,6 +11113,186 @@ var CZ;
 var CZ;
 (function (CZ) {
     (function (UI) {
+        var FormHeaderSearch = (function (_super) {
+            __extends(FormHeaderSearch, _super);
+            function FormHeaderSearch(container, formInfo) {
+                        _super.call(this, container, formInfo);
+                this.searchTextbox = container.find(formInfo.searchTextbox);
+                this.searchResultsBox = container.find(formInfo.searchResultsBox);
+                this.progressBar = container.find(formInfo.progressBar);
+                this.resultSections = container.find(formInfo.resultSections);
+                this.resultsCountTextblock = container.find(formInfo.resultsCountTextblock);
+                this.initialize();
+            }
+            FormHeaderSearch.prototype.initialize = function () {
+                var _this = this;
+                this.fillFormWithSearchResults();
+                this.searchResults = [];
+                this.progressBar.css("opacity", 0);
+                this.hideResultsCount();
+                this.clearResultSections();
+                this.hideSearchResults();
+                this.searchTextbox.off();
+                var onSearchQueryChanged = function (event) {
+                    clearTimeout(_this.delayedSearchRequest);
+                    _this.delayedSearchRequest = setTimeout(function () {
+                        var query = _this.searchTextbox.val();
+                        query = _this.escapeSearchQuery(query);
+                        _this.showProgressBar();
+                        _this.sendSearchQuery(query).then(function (response) {
+                            _this.hideProgressBar();
+                            _this.searchResults = response ? response.d : response;
+                            _this.updateSearchResults();
+                        }, function (error) {
+                            console.log("Error connecting to service: search.\n" + error.responseText);
+                        });
+                    }, 300);
+                };
+                this.searchTextbox.on("input search", onSearchQueryChanged);
+                var isIE9 = (CZ.Settings.ie === 9);
+                if(isIE9) {
+                    this.searchTextbox.on("keyup", function (event) {
+                        switch(event.which) {
+                            case 8:
+                            case 46:
+                                onSearchQueryChanged(event);
+                                break;
+                        }
+                    });
+                    this.searchTextbox.on("cut", onSearchQueryChanged);
+                }
+            };
+            FormHeaderSearch.prototype.sendSearchQuery = function (query) {
+                return (query === "") ? $.Deferred().resolve(null).promise() : CZ.Service.getSearch(query);
+            };
+            FormHeaderSearch.prototype.updateSearchResults = function () {
+                this.clearResultSections();
+                if(this.searchResults === null) {
+                    this.hideSearchResults();
+                    return;
+                }
+                if(this.searchResults.length === 0) {
+                    this.showNoResults();
+                    return;
+                }
+                var resultTypes = {
+                    0: "exhibit",
+                    1: "timeline",
+                    2: "contentItem"
+                };
+                var sections = {
+                    exhibit: $(this.resultSections[1]),
+                    timeline: $(this.resultSections[0]),
+                    contentItem: $(this.resultSections[2])
+                };
+                var idPrefixes = {
+                    exhibit: "e",
+                    timeline: "t",
+                    contentItem: ""
+                };
+                this.searchResults.forEach(function (item) {
+                    var resultType = resultTypes[item.objectType];
+                    var resultId = idPrefixes[resultType] + item.id;
+                    var resultTitle = item.title;
+                    sections[resultType].append($("<div></div>", {
+                        class: "cz-form-search-result",
+                        text: resultTitle,
+                        "result-id": resultId,
+                        "result-type": resultType,
+                        click: function () {
+                            var self = $(this);
+                            CZ.Search.goToSearchResult(self.attr("result-id"), self.attr("result-type"));
+                        }
+                    }));
+                });
+                this.showResultsCount();
+                this.showNonEmptySections();
+            };
+            FormHeaderSearch.prototype.fillFormWithSearchResults = function () {
+                this.container.show();
+                this.searchResultsBox.css("height", "calc(100% - 150px)");
+                this.searchResultsBox.css("height", "-moz-calc(100% - 150px)");
+                this.searchResultsBox.css("height", "-webkit-calc(100% - 150px)");
+                this.searchResultsBox.css("height", "-o-calc(100% - 150px)");
+                this.container.hide();
+            };
+            FormHeaderSearch.prototype.clearResultSections = function () {
+                this.resultSections.find("div").remove();
+            };
+            FormHeaderSearch.prototype.escapeSearchQuery = function (query) {
+                return query ? query.replace(/"/g, "") : "";
+            };
+            FormHeaderSearch.prototype.getResultsCountString = function () {
+                var count = this.searchResults.length;
+                return count + ((count === 1) ? " result" : " results");
+            };
+            FormHeaderSearch.prototype.showProgressBar = function () {
+                this.progressBar.animate({
+                    opacity: 1
+                });
+            };
+            FormHeaderSearch.prototype.hideProgressBar = function () {
+                this.progressBar.animate({
+                    opacity: 0
+                });
+            };
+            FormHeaderSearch.prototype.showNonEmptySections = function () {
+                this.searchResultsBox.show();
+                this.resultSections.show();
+                this.resultSections.each(function (i, item) {
+                    var results = $(item).find("div");
+                    if(results.length === 0) {
+                        $(item).hide();
+                    }
+                });
+            };
+            FormHeaderSearch.prototype.showNoResults = function () {
+                this.searchResultsBox.show();
+                this.resultSections.hide();
+                this.resultsCountTextblock.show();
+                this.resultsCountTextblock.text("No results");
+            };
+            FormHeaderSearch.prototype.showResultsCount = function () {
+                this.searchResultsBox.show();
+                this.resultsCountTextblock.show();
+                this.resultsCountTextblock.text(this.getResultsCountString());
+            };
+            FormHeaderSearch.prototype.hideResultsCount = function () {
+                this.resultsCountTextblock.hide();
+            };
+            FormHeaderSearch.prototype.hideSearchResults = function () {
+                this.hideResultsCount();
+                this.searchResultsBox.hide();
+            };
+            FormHeaderSearch.prototype.show = function () {
+                var _this = this;
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500,
+                    complete: function () {
+                        _this.searchTextbox.focus();
+                    }
+                });
+                this.activationSource.addClass("active");
+            };
+            FormHeaderSearch.prototype.close = function () {
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
+                this.activationSource.removeClass("active");
+            };
+            return FormHeaderSearch;
+        })(CZ.UI.FormBase);
+        UI.FormHeaderSearch = FormHeaderSearch;        
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
         var TimeSeriesDataForm = (function (_super) {
             __extends(TimeSeriesDataForm, _super);
             function TimeSeriesDataForm(container, formInfo) {
@@ -11290,7 +11495,8 @@ var CZ;
             "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html",
             "#timeSeriesContainer": "/ui/timeseries-graph-form.html",
             "#timeSeriesDataForm": "/ui/timeseries-data-form.html",
-            "#message-window": "/ui/message-window.html"
+            "#message-window": "/ui/message-window.html",
+            "#header-search-form": "/ui/header-search-form.html"
         };
         (function (FeatureActivation) {
             FeatureActivation._map = [];
@@ -11469,6 +11675,31 @@ var CZ;
                         } else {
                             closeAllForms();
                             editForm.show();
+                        }
+                    }
+                });
+                $(".header-icon.search-icon").click(function () {
+                    var searchForm = getFormById("#header-search-form");
+                    if(searchForm === false) {
+                        closeAllForms();
+                        var form = new CZ.UI.FormHeaderSearch(forms[14], {
+                            activationSource: $(this),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            searchTextbox: ".cz-form-search-input",
+                            searchResultsBox: ".cz-form-search-results",
+                            progressBar: ".cz-form-progress-bar",
+                            resultSections: ".cz-form-search-results > .cz-form-search-section",
+                            resultsCountTextblock: ".cz-form-search-results-count"
+                        });
+                        form.show();
+                    } else {
+                        if(searchForm.isFormVisible) {
+                            searchForm.close();
+                        } else {
+                            closeAllForms();
+                            searchForm.show();
                         }
                     }
                 });
@@ -11687,37 +11918,6 @@ var CZ;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
-            $('#search_button').mouseup(CZ.Search.onSearchClicked);
-            $('#human_rect').click(function () {
-                CZ.Search.navigateToBookmark(CZ.Common.humanityVisible);
-            });
-            $('#prehuman_rect').click(function () {
-                CZ.Search.navigateToBookmark(CZ.Common.prehistoryVisible);
-            });
-            $('#life_rect').click(function () {
-                CZ.Search.navigateToBookmark(CZ.Common.lifeVisible);
-            });
-            $('#earth_rect').click(function () {
-                CZ.Search.navigateToBookmark(CZ.Common.earthVisible);
-            });
-            $('#cosmos_rect').click(function () {
-                CZ.Search.navigateToBookmark(CZ.Common.cosmosVisible);
-            });
-            $('#humanBookmark').click(function () {
-                CZ.Search.navigateToBookmark(CZ.Common.humanityVisible);
-            });
-            $('#prehistoryBookmark').click(function () {
-                CZ.Search.navigateToBookmark(CZ.Common.prehistoryVisible);
-            });
-            $('#lifeBookmark').click(function () {
-                CZ.Search.navigateToBookmark(CZ.Common.lifeVisible);
-            });
-            $('#earthBookmark').click(function () {
-                CZ.Search.navigateToBookmark(CZ.Common.earthVisible);
-            });
-            $('#cosmosBookmark').click(function () {
-                CZ.Search.navigateToBookmark(CZ.Common.cosmosVisible);
-            });
             $('#breadcrumbs-nav-left').click(CZ.BreadCrumbs.breadCrumbNavLeft);
             $('#breadcrumbs-nav-right').click(CZ.BreadCrumbs.breadCrumbNavRight);
             $('#tour_prev').mouseout(function () {
