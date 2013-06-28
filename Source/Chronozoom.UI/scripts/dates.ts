@@ -106,17 +106,20 @@ module CZ {
                 regime: "CE"
             }
 
+            var localPresent = getPresent();
+            var presentDate = getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+
             if (coordinate < -999999999) {
-                year.year = (year.year ) / (-1000000000);
+                year.year = (year.year - presentDate) / (-1000000000);
                 year.regime = 'Ga';
             } else if (coordinate < -999999) {
                 year.year = (year.year) / (-1000000);
                 year.regime = 'Ma';
             } else if (coordinate < -9999) {
-                year.year = (year.year) / (-1000);
+                year.year = (year.year - presentDate ) / (-1000);
                 year.regime = 'Ka';
             } else if (coordinate < 1) {
-                year.year = (year.year) / (-1);
+                year.year = (year.year - presentDate) / (-1);
                 // remove fraction part of year
                 year.year = Math.ceil(year.year);
                 year.regime = 'BCE';
@@ -138,20 +141,30 @@ module CZ {
 
         export function convertYearToCoordinate(year: number, regime: string) {
             var coordinate = year;
+            var localPresent = getPresent();
+            var presentDate = getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
 
             switch (regime.toLowerCase()) {
                 case "ga":
-                    coordinate = year * (-1000000000) + 1;
+                    coordinate = year * (-1000000000) + presentDate + 1;
+                    if (year == 0) {
+                        coordinate = 9999;
+                    }
                     break;
                 case "ma":
-                    coordinate = year * (-1000000) + 1;
+                    coordinate = year * (-1000000) + presentDate + 1;
+                    if (year == 0) {
+                        coordinate = 9999; 
+                    }
                     break;
                 case "ka":
-                    coordinate = year * (-1000) + 1;
+                    coordinate = year * (-1000) + presentDate + 1;
+                    if (year == 0) {
+                        coordinate = 9999; 
+                    }
                     break;
                 case "bce":
                     coordinate = year * (-1) + 1;
-                    //coordinate += 1;
                     break;
             }
 

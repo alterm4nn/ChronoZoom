@@ -46,7 +46,7 @@ var CZ;
             switch(obj.type) {
                 case "timeline":
                 case "infodot":
-                    return (te.x + te.width > obj.x && te.x < obj.x + obj.width && te.y + te.height > obj.y && te.y < obj.y + obj.height);
+                    return (te.x + te.width >= obj.x && te.x <= obj.x + obj.width && te.y + te.height >= obj.y && te.y <= obj.y + obj.height);
                 default:
                     return false;
             }
