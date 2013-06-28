@@ -3,6 +3,7 @@
 namespace Tests
 {
     [TestClass]
+    [Ignore]
     public class WelcomeScreenTests : TestBase
     {
         #region Initialize and Cleanup

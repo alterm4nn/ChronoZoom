@@ -79,7 +79,7 @@ namespace Application.Helper.Helpers
         private void InitUploadFileForm()
         {
             Logger.Log("<-");
-            Click(By.Id("timeSeries_button"));
+            ClickOnTimeseriesButton();
             Logger.Log("->");
         }
 

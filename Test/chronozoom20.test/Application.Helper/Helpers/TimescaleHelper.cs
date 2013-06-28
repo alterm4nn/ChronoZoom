@@ -57,7 +57,7 @@ namespace Application.Helper.Helpers
         public string GetMouseMarkerText()
         {
             Logger.Log("<-");
-            string textMouseMarker = GetText(By.Id("timescale_marker"));
+            string textMouseMarker = GetText(By.Id("marker-text"));
             Logger.Log("-> text: " + textMouseMarker);
             return textMouseMarker;
         }

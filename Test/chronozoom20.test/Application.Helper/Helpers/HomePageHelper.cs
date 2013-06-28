@@ -19,11 +19,13 @@ namespace Application.Helper.Helpers
             HelperManager<NavigationHelper>.Instance.OpenSandboxPage();
             WaitWhileHomePageIsLoaded();
         }
-        
+
         public void MoveMouseToCenter()
         {
             Logger.Log("<-");
-            MoveToElementAndClick(By.Id("axis"));
+            IWebElement timescale = FindElement(By.Id("axis"));
+            double size = timescale.Size.Width;
+            MoveToElementCoordinates(By.Id("axis"), (int)Math.Round(size / 2), 0);
             Logger.Log("->");
         }
 
@@ -43,7 +45,7 @@ namespace Application.Helper.Helpers
             Logger.Log("-> title: " + title);
             return title;
         }
-        
+
         public string GetUrl()
         {
             Logger.Log("<-");
@@ -55,28 +57,28 @@ namespace Application.Helper.Helpers
         public void OpenHelpLink()
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@id='footer']//a[text()='Help']"));
+            ClickOnRightFooter("Help");
             Logger.Log("->");
         }
 
         public void OpenFeedbackLink()
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@id='footer']//a[text()='Feedback']"));
+            ClickOnRightFooter("Feedback");
             Logger.Log("->");
         }
 
         public void OpenNoticeLink()
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@id='footer']//a[text()='Notices']"));
+            ClickOnRightFooter("Notices");
             Logger.Log("->");
         }
 
         public void OpenDevelopersLink()
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@id='footer']//a[text()='Developers']"));
+            ClickOnRightFooter("Developers");
             Logger.Log("->");
         }
 
@@ -99,6 +101,11 @@ namespace Application.Helper.Helpers
             WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("CZ.Common.cosmosVisible != undefined")), 60);
             Sleep(2);
             WaitAjaxComplete(10);
+        }
+
+        private void ClickOnRightFooter(string name)
+        {
+            Click(By.XPath(String.Format("//a[@class='footer-link' and text()='{0}']", name)));
         }
     }
 }
