@@ -22,11 +22,11 @@ namespace Chronozoom.UI
 
         public static bool SearchEnabled()
         {
-            if (ConfigurationManager.AppSettings["SearchEngineIndexing"] == "false")
+            if (ConfigurationManager.AppSettings["SearchEngineIndexing"] == "true")
             {
-                return false;
+                return true;
             }
-            return true;
+            return false;
         }
 
 
