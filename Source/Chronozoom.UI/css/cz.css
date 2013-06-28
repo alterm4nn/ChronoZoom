@@ -161,7 +161,6 @@
 }
 /* The height of the page header */
 /* The width of the logo area */
-/* The width of the action icons area */
 /* The width of the tour player area */
 /* The width of the regimes area */
 /* The height of the breadcrumbs area */
@@ -282,28 +281,33 @@ a:visited {
   background-image: url('../images/chronozoom.png');
   margin-left: 10px;
 }
-.header-controls {
-  min-width: 140px;
-  height: 36px;
-  width: calc(100% - 170px - 200px);
-  width: -moz-calc(100% - 170px - 200px);
-  width: -webkit-calc(100% - 170px - 200px);
-  width: -o-calc(100% - 170px - 200px);
-}
 .header-regimes {
   height: 36px;
   width: 420px;
   display: none;
 }
+@media only screen and (max-width: 780px) {
+  .header-regimes {
+    height: 36px;
+    width: 0px;
+    display: none;
+  }
+}
 .header-breadcrumbs {
   height: 25px;
   width: 100%;
   display: none;
-  margin-top: -8px;
+  margin-top: -4px;
 }
 .header-icons {
   height: 36px;
-  width: 200px;
+}
+@media only screen and (max-width: 340px) {
+  .header-icons {
+    height: 36px;
+    width: 0;
+    display: none;
+  }
 }
 .header-icon {
   height: 36px;
@@ -363,10 +367,10 @@ a:visited {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   width: 100%;
-  height: calc(100% - 36px - 25px - 25px + 8px);
-  height: -moz-calc(100% - 36px - 25px - 25px + 8px);
-  height: -webkit-calc(100% - 36px - 25px - 25px + 8px);
-  height: -o-calc(100% - 36px - 25px - 25px + 8px);
+  height: calc(100% - 36px - 25px - 25px + 4px);
+  height: -moz-calc(100% - 36px - 25px - 25px + 4px);
+  height: -webkit-calc(100% - 36px - 25px - 25px + 4px);
+  height: -o-calc(100% - 36px - 25px - 25px + 4px);
 }
 #vc-container {
   -webkit-box-sizing: border-box;
@@ -1128,6 +1132,9 @@ img.fallbackBackground {
   width: -o-calc(100% - 350px);
   color: #AAA;
 }
+.footer-credits ul {
+  margin-top: 4px;
+}
 .footer-link-credits,
 .footer-link-credits:visited,
 .footer-link-credits:link {
@@ -1252,10 +1259,15 @@ img.fallbackBackground {
 ***********************************************************/
 .cz-form {
   position: absolute;
-  top: 36px;
   z-index: 100000001;
   display: none;
   cursor: default;
+}
+.cz-form-right {
+  top: 36px;
+}
+.cz-form-left {
+  top: 57px;
 }
 .cz-form-header {
   position: relative;
@@ -1372,11 +1384,7 @@ img.fallbackBackground {
   overflow-y: auto;
 }
 .cz-form-tour-edit {
-  min-width: 380px;
-  max-width: 450px;
-  width: 30.2734375%;
-  /* 310 / 1024 */
-
+  width: 415px;
   bottom: 25px;
   left: 0;
 }
@@ -1390,11 +1398,24 @@ img.fallbackBackground {
 }
 .cz-form-tour-contentitem-listitem-icon {
   display: inline-block;
-  width: 15%;
+  width: 50px;
+  height: 50px;
 }
 .cz-form-tour-contentitem-listitem-icon > img {
   width: 50px;
   height: 50px;
+}
+.cz-contentitem-listitem-tourstop {
+  width: 210px;
+  display: inline-block;
+  margin: 0px 5px;
+  vertical-align: top;
+}
+.cz-tourstop-description {
+  display: block;
+  height: 100px;
+  width: 100%;
+  resize: none;
 }
 .cz-tourlist-form {
   min-width: 380px;

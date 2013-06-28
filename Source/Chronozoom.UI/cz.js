@@ -1678,14 +1678,18 @@ var CZ;
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
         function CanvasPdfItem(vc, layerid, id, pdfSrc, vx, vy, vw, vh, z) {
+            var pdfViewer = "http://docs.google.com/viewer?url=";
             this.base = CanvasDomItem;
             this.base(vc, layerid, id, vx, vy, vw, vh, z);
             var elem = document.createElement('iframe');
             elem.setAttribute("id", id);
+            if(!pdfSrc.match("/^" + pdfViewer + "/")) {
+                pdfSrc = pdfViewer + pdfSrc;
+            }
             if(pdfSrc.indexOf('?') == -1) {
-                pdfSrc += '?wmode=opaque';
+                pdfSrc += '?&embedded=true&wmode=opaque';
             } else {
-                pdfSrc += '&wmode=opaque';
+                pdfSrc += '&embedded=true&wmode=opaque';
             }
             elem.setAttribute("src", pdfSrc);
             elem.setAttribute("visible", 'true');
@@ -2906,11 +2910,13 @@ var CZ;
                     };
                     self.hide();
                     setTimeout(function () {
-                        CZ.Authoring.showMessageWindow("Click an element to select it as a tour stop.", "New tour stop", function () {
-                            if(CZ.Authoring.mode == "editTour-selectTarget") {
-                                self.onTargetElementSelected(null);
-                            }
-                        });
+                        if(CZ.Authoring.mode == "editTour-selectTarget") {
+                            CZ.Authoring.showMessageWindow("Click an element to select it as a tour stop.", "New tour stop", function () {
+                                if(CZ.Authoring.mode == "editTour-selectTarget") {
+                                    self.onTargetElementSelected(null);
+                                }
+                            });
+                        }
                     }, 500);
                 });
                 this.saveButton.click(function (event) {
@@ -3693,12 +3699,12 @@ var CZ;
         function isIncluded(tp, obj) {
             switch(obj.type) {
                 case "infodot":
-                    return (tp.x <= obj.infodotDescription.date && tp.y <= obj.y && tp.x + tp.width >= obj.infodotDescription.date && tp.y + tp.height >= obj.y + obj.height);
+                    return (tp.x <= obj.infodotDescription.date && tp.x + tp.width >= obj.infodotDescription.date && tp.y + tp.height >= obj.y + obj.height);
                     break;
                 case "timeline":
                 case "rectangle":
                 case "circle":
-                    return (tp.x <= obj.x + CZ.Settings.allowedMathImprecision && tp.y <= obj.y + CZ.Settings.allowedMathImprecision && tp.x + tp.width >= obj.x + obj.width - CZ.Settings.allowedMathImprecision && tp.y + tp.height >= obj.y + obj.height - CZ.Settings.allowedMathImprecision);
+                    return (tp.x <= obj.x + CZ.Settings.allowedMathImprecision && tp.x + tp.width >= obj.x + obj.width - CZ.Settings.allowedMathImprecision && tp.y + tp.height >= obj.y + obj.height - CZ.Settings.allowedMathImprecision);
                 default:
                     return true;
             }
@@ -4137,11 +4143,7 @@ var CZ;
                     }
                 } else if(ci.mediaType.toLowerCase() === "pdf") {
                     var pdf = /\.(pdf)$/i;
-                    var docs = /\S+docs.google.com\S+$/i;
-                    if(pdf.test(ci.uri)) {
-                        ci.uri = "http://docs.google.com/viewer?url=" + encodeURI(ci.uri) + "&embedded=true";
-                    } else if(docs.test(ci.uri)) {
-                    } else {
+                    if(!pdf.test(ci.uri)) {
                         alert("Sorry, only PDF extension is supported");
                         isValid = false;
                     }
@@ -4269,9 +4271,7 @@ var CZ;
             };
             FormToursList.prototype.show = function () {
                 var self = this;
-                $(window).resize(function (e) {
-                    return self.onWindowResize(e);
-                });
+                $(window).resize(this.onWindowResize);
                 this.onWindowResize(null);
                 _super.prototype.show.call(this, {
                     effect: "slide",
@@ -4281,7 +4281,7 @@ var CZ;
                 this.activationSource.addClass("active");
             };
             FormToursList.prototype.close = function () {
-                $(window).unbind("resize");
+                $(window).unbind("resize", this.onWindowResize);
                 _super.prototype.close.call(this, {
                     effect: "slide",
                     direction: "right",
@@ -11011,7 +11011,7 @@ var CZ;
                             }
                             CZ.Service.putProfile(_this.usernameInput.val(), emailAddress).then(function (success) {
                                 if(_this.allowRedirect) {
-                                    window.location.assign("\\" + success);
+                                    window.location.assign("/" + success);
                                 } else {
                                     _this.close();
                                 }
@@ -11329,7 +11329,7 @@ var CZ;
             }, 
             {
                 Name: "TourAuthoring",
-                Activation: FeatureActivation.NotProduction,
+                Activation: FeatureActivation.Enabled,
                 JQueryReference: ".cz-form-create-tour"
             }, 
             {
@@ -11626,7 +11626,8 @@ var CZ;
                     titleInput: ".cz-form-item-title",
                     context: ""
                 });
-                $("#profile-panel").click(function () {
+                $("#profile-panel").click(function (event) {
+                    event.preventDefault();
                     if(!profileForm.isFormVisible) {
                         closeAllForms();
                         profileForm.show();
@@ -11639,6 +11640,7 @@ var CZ;
                         if(data == "") {
                             $("#login-panel").show();
                         } else if(data != "" && data.DisplayName == null) {
+                            $("#login-panel").hide();
                             $("#profile-panel").show();
                             $("#profile-panel input#username").focus();
                             if(!profileForm.isFormVisible) {
@@ -11648,6 +11650,7 @@ var CZ;
                                 profileForm.close();
                             }
                         } else {
+                            $("#login-panel").hide();
                             $("#profile-panel").show();
                             $(".auth-panel-login").html(data.DisplayName);
                         }
@@ -12074,7 +12077,8 @@ var CZ;
                 if(feature.JQueryReference) {
                     if(!_featureMap[idxFeature].IsEnabled) {
                         $(feature.JQueryReference).css("display", "none");
-                    } else {
+                    } else if(!_featureMap[idxFeature].HasBeenActivated) {
+                        _featureMap[idxFeature].HasBeenActivated = true;
                         $(feature.JQueryReference).css("display", "block");
                     }
                 }

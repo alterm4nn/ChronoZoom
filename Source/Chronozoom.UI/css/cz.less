@@ -3,11 +3,10 @@
 
 @headerHeight: 36px; /* The height of the page header */
 @headerLogoWidth: 170px; /* The width of the logo area */
-@headerIconsWidth: 200px; /* The width of the action icons area */
 @headerTourWidth: 140px; /* The width of the tour player area */
 @headerRegimesWidth: 420px; /* The width of the regimes area */
 @headerBreadcrumbsHeight: 25px; /* The height of the breadcrumbs area */
-@headerBreadcrumbsTopMargin:8px;  /* The top margin of the breadcrumbs area */
+@headerBreadcrumbsTopMargin:4px;  /* The top margin of the breadcrumbs area */
 @headerBreadcrumbsScrollWidth: 25px; /* The breadcrumbs scroller area */
 
 @footerHeight: 25px; /* The height of the page footer */
@@ -174,21 +173,19 @@ a
     margin-left: 10px;
 }
 
-.header-controls
-{
-    min-width: @headerTourWidth;
-    height: @headerHeight;
-    width: calc(~"100% -" @headerLogoWidth ~"-" @headerIconsWidth);
-    width: -moz-calc(~"100% -" @headerLogoWidth ~"-" @headerIconsWidth);
-    width: -webkit-calc(~"100% -" @headerLogoWidth ~"-" @headerIconsWidth);
-    width: -o-calc(~"100% -" @headerLogoWidth ~"-" @headerIconsWidth);
-}
-
-.header-regimes
-{
+.header-regimes {
     height: @headerHeight;
     width: @headerRegimesWidth;
     display: none;
+}
+
+// Disable regimes if they don't fit devices.
+@media only screen and (max-width: 780px) {
+    .header-regimes {
+        height: @headerHeight;
+        width: 0px;
+        display: none;
+    }
 }
 
 .header-breadcrumbs
@@ -202,7 +199,15 @@ a
 .header-icons
 {
     height: @headerHeight;
-    width: @headerIconsWidth;
+}
+
+// Disable header icons in really-small mobile devices.
+@media only screen and (max-width: 340px) {
+    .header-icons {
+        height: @headerHeight;
+        width: 0;
+        display: none;
+    }
 }
 
 .header-icon
@@ -331,9 +336,10 @@ a
     user-select: none;
 }
 
-#timeSeriesContainer::selection {
-    cursor: pointer;
-}
+    #timeSeriesContainer::selection
+    {
+        cursor: pointer;
+    }
 
 .virtualCanvas
 {
@@ -1225,6 +1231,11 @@ img.fallbackBackground
     color: #AAA;
 }
 
+    .footer-credits ul
+    {
+        margin-top: 4px;
+    }
+
 .footer-link-credits, .footer-link-credits:visited, .footer-link-credits:link
 {
     margin-right: 6px;
@@ -1387,10 +1398,19 @@ img.fallbackBackground
 .cz-form
 {
     position: absolute;
-    top: 36px;
     z-index: 100000001;
     display: none;
     cursor: default;
+}
+
+.cz-form-right
+{
+    top: 36px;
+}
+
+.cz-form-left
+{
+    top: 57px;
 }
 
 .cz-form-header
@@ -1527,11 +1547,10 @@ img.fallbackBackground
         overflow-y: auto;
     }
 
+    
 .cz-form-tour-edit
 {
-    min-width: 380px;
-    max-width: 450px;
-    width: 30.2734375%; /* 310 / 1024 */
+    width: 415px;
     bottom: 25px;
     left: 0;
 }
@@ -1549,7 +1568,8 @@ img.fallbackBackground
 .cz-form-tour-contentitem-listitem-icon
 {
     display: inline-block;
-    width: 15%;
+    width: 50px;
+    height: 50px;
 }
 
     .cz-form-tour-contentitem-listitem-icon > img
@@ -1558,6 +1578,21 @@ img.fallbackBackground
         height: 50px;
     }
 
+.cz-contentitem-listitem-tourstop
+{
+    width: 210px;
+    display: inline-block;
+    margin: 0px 5px;
+    vertical-align: top;
+}
+
+.cz-tourstop-description
+{
+    display: block;
+    height: 100px;
+    width: 100%;
+    resize: none;
+}
 
 .cz-tourlist-form
 {

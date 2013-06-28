@@ -88,7 +88,6 @@ module CZ {
             switch (obj.type) {
                 case "infodot":
                     return (tp.x <= obj.infodotDescription.date &&
-                            tp.y <= obj.y &&
                             tp.x + tp.width >= obj.infodotDescription.date &&
                             tp.y + tp.height >= obj.y + obj.height);
                     break;
@@ -96,7 +95,6 @@ module CZ {
                 case "rectangle":
                 case "circle":
                     return (tp.x <= obj.x + CZ.Settings.allowedMathImprecision &&
-                            tp.y <= obj.y + CZ.Settings.allowedMathImprecision &&
                             tp.x + tp.width >= obj.x + obj.width - CZ.Settings.allowedMathImprecision &&
                             tp.y + tp.height >= obj.y + obj.height - CZ.Settings.allowedMathImprecision);
                 default:
@@ -781,13 +779,7 @@ module CZ {
                     //Google PDF viewer
                     //Example: http://docs.google.com/viewer?url=http%3A%2F%2Fwww.selab.isti.cnr.it%2Fws-mate%2Fexample.pdf&embedded=true
                     var pdf = /\.(pdf)$/i;
-                    var docs = /\S+docs.google.com\S+$/i;
-                    if (pdf.test(ci.uri)) {
-                        ci.uri = "http://docs.google.com/viewer?url=" + encodeURI(ci.uri) + "&embedded=true";
-                    }
-                    else if (docs.test(ci.uri)) {
-                    }
-                    else {
+                    if (!pdf.test(ci.uri)) {
                         alert("Sorry, only PDF extension is supported");
                         isValid = false;
                     }

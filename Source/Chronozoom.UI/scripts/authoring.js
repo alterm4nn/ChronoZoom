@@ -54,12 +54,12 @@ var CZ;
         function isIncluded(tp, obj) {
             switch(obj.type) {
                 case "infodot":
-                    return (tp.x <= obj.infodotDescription.date && tp.y <= obj.y && tp.x + tp.width >= obj.infodotDescription.date && tp.y + tp.height >= obj.y + obj.height);
+                    return (tp.x <= obj.infodotDescription.date && tp.x + tp.width >= obj.infodotDescription.date && tp.y + tp.height >= obj.y + obj.height);
                     break;
                 case "timeline":
                 case "rectangle":
                 case "circle":
-                    return (tp.x <= obj.x + CZ.Settings.allowedMathImprecision && tp.y <= obj.y + CZ.Settings.allowedMathImprecision && tp.x + tp.width >= obj.x + obj.width - CZ.Settings.allowedMathImprecision && tp.y + tp.height >= obj.y + obj.height - CZ.Settings.allowedMathImprecision);
+                    return (tp.x <= obj.x + CZ.Settings.allowedMathImprecision && tp.x + tp.width >= obj.x + obj.width - CZ.Settings.allowedMathImprecision && tp.y + tp.height >= obj.y + obj.height - CZ.Settings.allowedMathImprecision);
                 default:
                     return true;
             }
@@ -365,7 +365,7 @@ var CZ;
                     newExhibit = renewExhibit(newExhibit);
                     newExhibit.id = "e" + response.ExhibitId;
                     CZ.Common.vc.virtualCanvas("requestInvalidate");
-                    deferred.resolve();
+                    deferred.resolve(newExhibit);
                 }, function (error) {
                     console.log("Error connecting to service: update exhibit.\n" + error.responseText);
                     deferred.reject();
@@ -498,11 +498,7 @@ var CZ;
                     }
                 } else if(ci.mediaType.toLowerCase() === "pdf") {
                     var pdf = /\.(pdf)$/i;
-                    var docs = /\S+docs.google.com\S+$/i;
-                    if(pdf.test(ci.uri)) {
-                        ci.uri = "http://docs.google.com/viewer?url=" + encodeURI(ci.uri) + "&embedded=true";
-                    } else if(docs.test(ci.uri)) {
-                    } else {
+                    if(!pdf.test(ci.uri)) {
                         alert("Sorry, only PDF extension is supported");
                         isValid = false;
                     }

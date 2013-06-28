@@ -355,7 +355,8 @@ var CZ;
                     titleInput: ".cz-form-item-title",
                     context: ""
                 });
-                $("#profile-panel").click(function () {
+                $("#profile-panel").click(function (event) {
+                    event.preventDefault();
                     if(!profileForm.isFormVisible) {
                         closeAllForms();
                         profileForm.show();
@@ -368,6 +369,7 @@ var CZ;
                         if(data == "") {
                             $("#login-panel").show();
                         } else if(data != "" && data.DisplayName == null) {
+                            $("#login-panel").hide();
                             $("#profile-panel").show();
                             $("#profile-panel input#username").focus();
                             if(!profileForm.isFormVisible) {
@@ -377,6 +379,7 @@ var CZ;
                                 profileForm.close();
                             }
                         } else {
+                            $("#login-panel").hide();
                             $("#profile-panel").show();
                             $(".auth-panel-login").html(data.DisplayName);
                         }
@@ -803,7 +806,8 @@ var CZ;
                 if(feature.JQueryReference) {
                     if(!_featureMap[idxFeature].IsEnabled) {
                         $(feature.JQueryReference).css("display", "none");
-                    } else {
+                    } else if(!_featureMap[idxFeature].HasBeenActivated) {
+                        _featureMap[idxFeature].HasBeenActivated = true;
                         $(feature.JQueryReference).css("display", "block");
                     }
                 }

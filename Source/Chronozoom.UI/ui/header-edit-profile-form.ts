@@ -116,7 +116,7 @@ module CZ {
                                 success => {
                                     // Redirect to personal collection.
                                     if (this.allowRedirect) {
-                                        window.location.assign("\\" + success);
+                                        window.location.assign("/" + success);
                                     }
                                     else {
                                         this.close();

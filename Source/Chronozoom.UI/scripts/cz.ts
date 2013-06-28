@@ -60,6 +60,7 @@ module CZ {
             Activation: FeatureActivation;
             JQueryReference: string;
             IsEnabled: bool;
+            HasBeenActivated: bool;
         }
 
         // Basic Flight-Control (Tracks the features that are enabled)
@@ -91,7 +92,7 @@ module CZ {
             },
             {
                 Name: "TourAuthoring",
-                Activation: FeatureActivation.NotProduction,
+                Activation: FeatureActivation.Enabled,
                 JQueryReference: ".cz-form-create-tour"
             },
             {
@@ -400,7 +401,8 @@ module CZ {
                     context: ""
                 });
 
-                $("#profile-panel").click(function () {
+                $("#profile-panel").click(function (event) {
+                    event.preventDefault();
                     if (!profileForm.isFormVisible) {
                         closeAllForms();
                         profileForm.show();
@@ -418,6 +420,7 @@ module CZ {
                         }
                             //Authorized for a first time
                         else if (data != "" && data.DisplayName == null) {
+                            $("#login-panel").hide();
                             $("#profile-panel").show();
                             $("#profile-panel input#username").focus();
 
@@ -430,6 +433,7 @@ module CZ {
                             }
                         }
                         else {
+                            $("#login-panel").hide();
                             $("#profile-panel").show();
                             $(".auth-panel-login").html(data.DisplayName);
                         }
@@ -917,7 +921,8 @@ module CZ {
                     if (!_featureMap[idxFeature].IsEnabled) {
                         $(feature.JQueryReference).css("display", "none");
                     }
-                    else {
+                    else if (!_featureMap[idxFeature].HasBeenActivated) {
+                        _featureMap[idxFeature].HasBeenActivated = true;
                         $(feature.JQueryReference).css("display", "block");
                     }
                 }
