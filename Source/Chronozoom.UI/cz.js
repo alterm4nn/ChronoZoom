@@ -10,6 +10,7 @@
         Settings.zoomLevelFactor = 1.4;
         Settings.allowedVisibileImprecision = 0.00001;
         Settings.allowedMathImprecision = 0.0000001;
+        Settings.allowedMathImprecisionDecimals = parseInt(Settings.allowedMathImprecision.toExponential().split("-")[1]);
         Settings.canvasElementAnimationTime = 1300;
         Settings.canvasElementFadeInTime = 400;
         Settings.contentScaleMargin = 20;
@@ -3537,6 +3538,7 @@ var CZ;
             };
             var days = Dates.daysInMonth.reduce(sumDaysOfMonths, +(isLeap && month > 1)) + day;
             coord += (days - 1) / daysInYear;
+            coord = roundDecimal(coord, CZ.Settings.allowedMathImprecisionDecimals);
             return coord;
         }
         Dates.getCoordinateFromYMD = getCoordinateFromYMD;
@@ -3640,6 +3642,9 @@ var CZ;
             return years1;
         }
         Dates.numberofLeap = numberofLeap;
+        function roundDecimal(decimal, precision) {
+            return Math.round(decimal * Math.pow(10, precision)) / Math.pow(10, precision);
+        }
     })(CZ.Dates || (CZ.Dates = {}));
     var Dates = CZ.Dates;
 })(CZ || (CZ = {}));

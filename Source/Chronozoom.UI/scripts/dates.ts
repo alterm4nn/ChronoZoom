@@ -1,3 +1,5 @@
+/// <reference path='settings.ts'/>
+
 module CZ {
     export module Dates {
 
@@ -45,6 +47,8 @@ module CZ {
             var days = daysInMonth.reduce(sumDaysOfMonths, +(isLeap && month > 1)) + day;
 
             coord += (days - 1) / daysInYear;
+
+            coord = roundDecimal(coord, CZ.Settings.allowedMathImprecisionDecimals);
 
             return coord;
         }
@@ -182,6 +186,10 @@ module CZ {
             years1 += Math.floor(year / 400) - Math.floor(startLeap / 400);
             if (isLeapYear(year)) years1--;
             return years1;
+        }
+
+        function roundDecimal(decimal, precision) {
+            return Math.round(decimal * Math.pow(10, precision)) / Math.pow(10, precision);
         }
     }
 }

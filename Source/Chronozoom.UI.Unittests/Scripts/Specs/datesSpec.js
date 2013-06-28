@@ -1,4 +1,5 @@
-﻿/// <reference path="../../../Chronozoom.UI/scripts/dates.js" />
+﻿/// <reference path="../../../Chronozoom.UI/scripts/settings.js" />
+/// <reference path="../../../Chronozoom.UI/scripts/dates.js" />
 
 describe("convertYearToCoordinate method should return", function () {
 
@@ -253,6 +254,12 @@ describe("isLeapYear() method", function () {
     });
 });
 
+describe("getCoordinateFromYMD() roundtrips with getYMDFromCoordinate()", function () {
+    var coordinate = CZ.Dates.getCoordinateFromYMD(500, 1, 1);
+    var date = CZ.Dates.getYMDFromCoordinate(coordinate);
+    expect(500).toEqual(date.year);
+});
+
 function convertCoordinateToYear(coordinate) {
     return CZ.Dates.convertCoordinateToYear(coordinate);
 }
@@ -279,6 +286,7 @@ function usingDMY(name, values, func) {
         jasmine.currentEnv_.currentSpec.description += name;
     }
 }
+
 //describe("loadDataUrl() method", function () {
 //Bug: https://github.com/alterm4nn/ChronoZoom/issues/281
 //    describe("should return", function () {
