@@ -11640,6 +11640,7 @@ var CZ;
                         if(data == "") {
                             $("#login-panel").show();
                         } else if(data != "" && data.DisplayName == null) {
+                            $("#login-panel").hide();
                             $("#profile-panel").show();
                             $("#profile-panel input#username").focus();
                             if(!profileForm.isFormVisible) {

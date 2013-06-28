@@ -420,6 +420,7 @@ module CZ {
                         }
                             //Authorized for a first time
                         else if (data != "" && data.DisplayName == null) {
+                            $("#login-panel").hide();
                             $("#profile-panel").show();
                             $("#profile-panel input#username").focus();
 
