@@ -37,19 +37,20 @@ var CZ;
                 this.activationSource.addClass("active");
             };
             FormToursList.prototype.close = function () {
+                var _this = this;
                 $(window).unbind("resize", this.onWindowResize);
                 _super.prototype.close.call(this, {
                     effect: "slide",
                     direction: "right",
                     duration: 500,
                     complete: function () {
+                        _this.container.find("cz-form-errormsg").hide();
+                        _this.container.find("#tours").empty();
+                        _this.toursListBox.container.empty();
                     }
                 });
                 CZ.Authoring.isActive = false;
                 this.activationSource.removeClass("active");
-                this.container.find("cz-form-errormsg").hide();
-                this.container.find("#tours").empty();
-                this.toursListBox.container.empty();
             };
             FormToursList.prototype.onTakeTour = function (tour) {
                 this.close();

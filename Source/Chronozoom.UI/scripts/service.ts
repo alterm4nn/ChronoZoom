@@ -408,6 +408,27 @@ module CZ {
             });
         }
 
+        // .../search
+        export function getSearch(query) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("Search");
+
+            var data = {
+                searchTerm: query,
+                supercollection: CZ.Service.superCollectionName,
+                collection: CZ.Service.collectionName
+            };
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data
+            });
+        }
+
         // .../{supercollection}/{collection}/structure?start=&end=&minspan=&lca=
         export function getServiceInformation() {
             var request = new Request(_serviceUrl);
@@ -435,7 +456,7 @@ module CZ {
                 dataType: "json",
                 url: request.url
             });
-        } getContentPath
+        }
 
         /**
         * Auxiliary Methods.
