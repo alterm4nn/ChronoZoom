@@ -247,7 +247,7 @@
     <Content Include="images\chronozoom.png" />
     <Content Include="images\credits\Berkeley.png" />
     <Content Include="images\credits\Microsoft-Research.png" />
-    <Content Include="images\credits\MSTLab.png" />
+    <Content Include="images\credits\MSU.png" />
     <Content Include="images\credits\University-of-Washington.png" />
     <Content Include="images\edit-icon.png" />
     <Content Include="images\profile-icon.png" />
