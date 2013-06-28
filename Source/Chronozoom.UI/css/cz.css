@@ -297,7 +297,7 @@ a:visited {
   height: 25px;
   width: 100%;
   display: none;
-  margin-top: -8px;
+  margin-top: -4px;
 }
 .header-icons {
   height: 36px;
@@ -367,10 +367,10 @@ a:visited {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   width: 100%;
-  height: calc(100% - 36px - 25px - 25px + 8px);
-  height: -moz-calc(100% - 36px - 25px - 25px + 8px);
-  height: -webkit-calc(100% - 36px - 25px - 25px + 8px);
-  height: -o-calc(100% - 36px - 25px - 25px + 8px);
+  height: calc(100% - 36px - 25px - 25px + 4px);
+  height: -moz-calc(100% - 36px - 25px - 25px + 4px);
+  height: -webkit-calc(100% - 36px - 25px - 25px + 4px);
+  height: -o-calc(100% - 36px - 25px - 25px + 4px);
 }
 #vc-container {
   -webkit-box-sizing: border-box;
@@ -1267,7 +1267,7 @@ img.fallbackBackground {
   top: 36px;
 }
 .cz-form-left {
-  top: 53px;
+  top: 57px;
 }
 .cz-form-header {
   position: relative;
@@ -1372,6 +1372,7 @@ img.fallbackBackground {
 .cz-message-window {
   width: 330px;
   height: 100px;
+  top: 36px;
   left: 0;
 }
 .cz-message-window > .cz-form-content {
