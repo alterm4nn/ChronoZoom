@@ -30,20 +30,20 @@ namespace Chronozoom.UI
         /// <param name="minspan">Filters the search results to a particular time scale.</param>
         /// <param name="commonAncestor">Least Common Ancestor, a timeline identifier used to hint the server to retrieve timelines close to this location.</param>
         /// <param name="maxElements">The maximum number of elements to return.</param>
-        /// <param name="depth">The max depth for children timelines.</param>
+        /// <param name="fromRoot">Append path from root to commonAncestor.</param>
         /// <returns>Timeline data in JSON format.</returns>
         /// <example><![CDATA[ 
         /// HTTP verb: GET
         ///
         /// URL:
-        /// http://{URL}/api/{supercollection}/{collection}/timelines?start={year}&end={year}
+        /// http://{URL}/api/{supercollection}/{collection}/timelines?start={year}&end={year}&minspan={year}&commonAncestor={guid}&maxElements={number}&fromRoot={bool}
         /// ]]>
         /// </example>
         [SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "End")]
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "minspan")]
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        Timeline GetTimelines(string superCollection, string collection, string start, string end, string minspan, string commonAncestor, string maxElements, string depth);
+        Timeline GetTimelines(string superCollection, string collection, string start, string end, string minspan, string commonAncestor, string maxElements, string fromRoot);
 
         /// <summary>
         /// Performs a search for a specific term within a collection or a superCollection.
@@ -103,6 +103,26 @@ namespace Chronozoom.UI
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/{collection}/tours")]
         BaseJsonResult<IEnumerable<Tour>> GetTours(string superCollection, string collection);
+
+        /// <summary>
+        /// Returns the timelines belonging to a tour for a given collection or superCollection.
+        /// </summary>
+        /// <param name="superCollection">Name of the superCollection to query.</param>
+        /// <param name="collection">Name of the collection to query.</param>
+        /// <param name="tourId">Id of the tour to retrieve.</param>
+        /// <param name="viewportWidth">Width of the viewport in pixels.</param>
+        /// <param name="minTimelineSize">Minimal width of timeline in pixels.</param>
+        /// <returns>A list of tours in JSON format.</returns>
+        /// <example><![CDATA[ 
+        /// HTTP verb: GET
+        ///
+        /// URL: 
+        /// http://{URL}/api/{supercollection}/{collection}/tourtimelines
+        /// ]]>
+        /// </example>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        Timeline GetTourTimelines(string superCollection, string collection, string tourId, string viewportWidth, string minTimelineSize);
 
         /// <summary>
         /// Creates a new user, or updates an existing user's information and associated personal collection.

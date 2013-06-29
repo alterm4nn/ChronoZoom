@@ -319,22 +319,6 @@ var CZ;
                 }
                 vcElem = vcElem.parent;
             }
-            if(nav && nav !== '' && vp) {
-                var rx = (vp.visible.centerX - (el.x + el.width / 2)) / el.width;
-                var ry = (vp.visible.centerY - (el.y + el.height / 2)) / el.height;
-                var rw = vp.widthScreenToVirtual(vp.width) / el.width;
-                var rh = vp.heightScreenToVirtual(vp.height) / el.height;
-                var URL = getURL();
-                nav += '@x=' + rx + "&y=" + ry + "&w=" + rw + "&h=" + rh;
-                if(typeof URL.hash.params != 'undefined') {
-                    if(typeof URL.hash.params['tour'] != 'undefined') {
-                        nav += "&tour=" + URL.hash.params["tour"];
-                    }
-                    if(typeof URL.hash.params['bookmark'] != 'undefined') {
-                        nav += "&bookmark=" + URL.hash.params["bookmark"];
-                    }
-                }
-            }
             return nav;
         }
         UrlNav.vcelementToNavString = vcelementToNavString;
@@ -461,14 +445,14 @@ var CZ;
                 if(result[4] != "") {
                     url.path = result[4].split("/");
                     if(url.path.length >= 1 && url.path[0].length > 0 && url.path[0] !== "cz.html") {
-                        url.superCollectionName = url.path[0];
+                        url.superCollectionName = decodeURIComponent(url.path[0]);
                         url.collectionName = url.superCollectionName;
                     }
                     if(url.path.length >= 2 && url.path[1].length > 0) {
-                        url.collectionName = url.path[1];
+                        url.collectionName = decodeURIComponent(url.path[1]);
                     }
                     if(url.path.length >= 3 && url.path[url.path.length - 1].length > 0) {
-                        url.content = url.path[url.path.length - 1];
+                        url.content = decodeURIComponent(url.path[url.path.length - 1]);
                     }
                 }
                 if(result[5] != "") {
@@ -523,7 +507,9 @@ var CZ;
             for(var key in url.hash.params) {
                 hash_params.push(key + "=" + url.hash.params[key]);
             }
-            hash += ("@" + hash_params.join("&"));
+            if(hash_params.length > 0) {
+                hash += ("@" + hash_params.join("&"));
+            }
             var loc = path + "#" + hash;
             if(reload == true) {
                 window.location.href = loc;
@@ -922,9 +908,11 @@ var CZ;
             for(var i = 0; i < n; i++) {
                 var child = parent.children[i];
                 if(child.id == id) {
-                    if(typeof CZ.Layout.animatingElements[child.id] !== 'undefined') {
-                        delete CZ.Layout.animatingElements[child.id];
-                        CZ.Layout.animatingElements.length--;
+                    var matches = CZ.Layout.animatingElements.filter(function (el) {
+                        return el.id === child.id && (el.animation && child.animation) ? el.animation.startTime === child.animation.startTime : false;
+                    });
+                    for(var k = 0; k < matches.length; k++) {
+                        CZ.Layout.animatingElements.splice(CZ.Layout.animatingElements.indexOf(matches[k]), 1);
                     }
                     parent.children.splice(i, 1);
                     clear(child);
@@ -952,9 +940,11 @@ var CZ;
             var n = element.children.length;
             for(var i = 0; i < n; i++) {
                 var child = element.children[i];
-                if(typeof CZ.Layout.animatingElements[child.id] !== 'undefined') {
-                    delete CZ.Layout.animatingElements[child.id];
-                    CZ.Layout.animatingElements.length--;
+                var matches = CZ.Layout.animatingElements.filter(function (el) {
+                    return el.id === child.id && (el.animation && child.animation) ? el.animation.startTime === child.animation.startTime : false;
+                });
+                for(var k = 0; k < matches.length; k++) {
+                    CZ.Layout.animatingElements.splice(CZ.Layout.animatingElements.indexOf(matches[k]), 1);
                 }
                 clear(child);
                 if(child.onRemove) {
@@ -964,6 +954,7 @@ var CZ;
             }
             element.children = [];
         }
+        VCContent.clear = clear;
         ;
         function getChild(element, id) {
             var n = element.children.length;
@@ -3602,6 +3593,20 @@ var CZ;
             });
         }
         Service.getTours = getTours;
+        function getTourTimelines(r) {
+            var request = new Request(_serviceUrl);
+            request.addToPath("gettourtimelines");
+            request.addParameter("supercollection", Service.superCollectionName);
+            request.addParameter("collection", Service.collectionName);
+            request.addParameters(r);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getTourTimelines = getTourTimelines;
         function getSearch(query) {
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
@@ -5116,7 +5121,7 @@ var CZ;
             if(isAudioEnabled == undefined) {
                 isAudioEnabled = Tours.isNarrationOn;
             }
-            if(newTour != undefined) {
+            function startTour() {
                 Tours.tour = newTour;
                 Tours.tour.tour_TourFinished.push(function (tour) {
                     hideBookmark(tour);
@@ -5133,6 +5138,29 @@ var CZ;
                     Tours.tour.isAudioLoaded = true;
                 }
                 tourResume();
+            }
+            if(newTour != undefined) {
+                if(newTour.isBuffered) {
+                    startTour();
+                } else {
+                    var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                    CZ.Common.IncreaseRequestsCount();
+                    CZ.Service.getTourTimelines({
+                        tourId: newTour.id,
+                        viewportwidth: vp.width,
+                        minTimelineSize: CZ.Settings.minTimelineWidth
+                    }).then(function (response) {
+                        CZ.Common.DecreaseRequestsCount();
+                        var root = CZ.Common.vc.virtualCanvas("getLayerContent");
+                        CZ.Layout.merge(response, root.children[0], false, function () {
+                            newTour.isBuffered = true;
+                            startTour();
+                        });
+                    }, function (error) {
+                        CZ.Common.DecreaseRequestsCount();
+                        console.log("Error connecting to service:\n" + error.responseText);
+                    });
+                }
             }
         }
         Tours.activateTour = activateTour;
@@ -5197,8 +5225,12 @@ var CZ;
             $("#bookmarks").hide();
             Tours.isBookmarksWindowVisible = false;
             var curURL = CZ.UrlNav.getURL();
-            delete curURL.hash.params["tour"];
-            delete curURL.hash.params["bookmark"];
+            if(curURL.hash && curURL.hash.params && curURL.hash.params["tour"]) {
+                delete curURL.hash.params["tour"];
+            }
+            if(curURL.hash && curURL.hash.params && curURL.hash.params["bookmark"]) {
+                delete curURL.hash.params["bookmark"];
+            }
             CZ.UrlNav.setURL(curURL);
         }
         Tours.tourAbort = tourAbort;
@@ -5452,11 +5484,55 @@ var CZ;
             }
         }
         Search.navigateToBookmark = navigateToBookmark;
-        function goToSearchResult(resultId, elementType) {
+        function goToSearchResult(searchResult) {
+            var resultId, elementType;
+            switch(searchResult.objectType) {
+                case 0:
+                    resultId = 'e' + searchResult.id;
+                    elementType = "exhibit";
+                    break;
+                case 1:
+                    resultId = 't' + searchResult.id;
+                    elementType = "timeline";
+                    break;
+                case 2:
+                    resultId = searchResult.id;
+                    elementType = "contentItem";
+                    break;
+            }
             var element = findVCElement(CZ.Common.vc.virtualCanvas("getLayerContent"), resultId, elementType);
-            var navStringElement = CZ.UrlNav.vcelementToNavString(element);
-            var visible = CZ.UrlNav.navStringToVisible(navStringElement, CZ.Common.vc);
-            CZ.Common.controller.moveToVisible(visible);
+            if(element) {
+                var navStringElement = CZ.UrlNav.vcelementToNavString(element);
+                var visible = CZ.UrlNav.navStringToVisible(navStringElement, CZ.Common.vc);
+                CZ.Common.controller.moveToVisible(visible);
+            } else {
+                var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                var a = Math.min(0, searchResult.enclosingTimelineStart);
+                var b = Math.min(0, searchResult.enclosingTimelineEnd);
+                var c = Math.max(0, searchResult.enclosingTimelineStart);
+                var d = Math.max(0, searchResult.enclosingTimelineEnd);
+                var scale = ((b - a) + (d - c)) / vp.width;
+                CZ.Common.IncreaseRequestsCount();
+                CZ.Service.getTimelines({
+                    start: searchResult.enclosingTimelineStart,
+                    end: searchResult.enclosingTimelineEnd,
+                    minspan: CZ.Settings.minTimelineWidth * scale,
+                    commonAncestor: searchResult.enclosingTimelineId,
+                    fromRoot: 1
+                }).then(function (response) {
+                    CZ.Common.DecreaseRequestsCount();
+                    var root = CZ.Common.vc.virtualCanvas("getLayerContent");
+                    CZ.Layout.merge(response, root.children[0], false, function () {
+                        var element = findVCElement(CZ.Common.vc.virtualCanvas("getLayerContent"), resultId, elementType);
+                        var navStringElement = CZ.UrlNav.vcelementToNavString(element);
+                        var visible = CZ.UrlNav.navStringToVisible(navStringElement, CZ.Common.vc);
+                        CZ.Common.controller.moveToVisible(visible);
+                    });
+                }, function (error) {
+                    CZ.Common.DecreaseRequestsCount();
+                    console.log("Error connecting to service:\n" + error.responseText);
+                });
+            }
         }
         Search.goToSearchResult = goToSearchResult;
         function findVCElement(root, id, elementType) {
@@ -5540,7 +5616,7 @@ var CZ;
                                 resultId: resultId,
                                 text: results[i].title,
                                 click: function () {
-                                    goToSearchResult(this.getAttribute("resultId"), this.getAttribute("data-element-type"));
+                                    goToSearchResult(item);
                                 }
                             }).attr("data-element-type", elementType).appendTo(output);
                         }
@@ -5620,37 +5696,37 @@ var CZ;
         var hiddenFromLeft = [];
         var hiddenFromRight = [];
         BreadCrumbs.visibleAreaWidth = 0;
-        var breadCrumbs;
+        BreadCrumbs.breadCrumbs;
         function updateBreadCrumbsLabels(newBreadCrumbs) {
             if(newBreadCrumbs) {
-                if(breadCrumbs == null) {
-                    breadCrumbs = newBreadCrumbs;
-                    for(var i = 0; i < breadCrumbs.length; i++) {
-                        addBreadCrumb(breadCrumbs[i].vcElement);
+                if(BreadCrumbs.breadCrumbs == null) {
+                    BreadCrumbs.breadCrumbs = newBreadCrumbs;
+                    for(var i = 0; i < BreadCrumbs.breadCrumbs.length; i++) {
+                        addBreadCrumb(BreadCrumbs.breadCrumbs[i].vcElement);
                     }
                     moveToRightEdge();
                     return;
                 }
-                for(var i = 0; i < breadCrumbs.length; i++) {
+                for(var i = 0; i < BreadCrumbs.breadCrumbs.length; i++) {
                     if(newBreadCrumbs[i] == null) {
                         removeBreadCrumb();
-                    } else if(newBreadCrumbs[i].vcElement.id != breadCrumbs[i].vcElement.id) {
-                        for(var j = i; j < breadCrumbs.length; j++) {
+                    } else if(newBreadCrumbs[i].vcElement.id != BreadCrumbs.breadCrumbs[i].vcElement.id) {
+                        for(var j = i; j < BreadCrumbs.breadCrumbs.length; j++) {
                             removeBreadCrumb();
                         }
                         for(var j = i; j < newBreadCrumbs.length; j++) {
                             addBreadCrumb(newBreadCrumbs[j].vcElement);
                         }
-                        breadCrumbs = newBreadCrumbs;
+                        BreadCrumbs.breadCrumbs = newBreadCrumbs;
                         return;
                     }
                 }
                 moveToRightEdge();
-                for(var i = breadCrumbs.length; i < newBreadCrumbs.length; i++) {
+                for(var i = BreadCrumbs.breadCrumbs.length; i < newBreadCrumbs.length; i++) {
                     addBreadCrumb(newBreadCrumbs[i].vcElement);
                 }
                 moveToRightEdge();
-                breadCrumbs = newBreadCrumbs;
+                BreadCrumbs.breadCrumbs = newBreadCrumbs;
             }
         }
         BreadCrumbs.updateBreadCrumbsLabels = updateBreadCrumbsLabels;
@@ -5869,7 +5945,10 @@ var CZ;
         }
         BreadCrumbs.breadCrumbNavRight = breadCrumbNavRight;
         function clickOverBreadCrumb(timelineID, breadCrumbLinkID) {
-            CZ.Search.goToSearchResult(timelineID);
+            var element = CZ.Common.vc.virtualCanvas("findElement", timelineID);
+            var navStringElement = CZ.UrlNav.vcelementToNavString(element);
+            var visible = CZ.UrlNav.navStringToVisible(navStringElement, CZ.Common.vc);
+            CZ.Common.controller.moveToVisible(visible);
             var selector = "#bc_" + breadCrumbLinkID;
             var tableOffset = $("#breadcrumbs-table tr").position().left;
             var elementOffset = $(selector).position().left + tableOffset;
@@ -6150,10 +6229,12 @@ var CZ;
 var CZ;
 (function (CZ) {
     (function (Layout) {
-        var isLayoutAnimation = true;
-        Layout.animatingElements = {
-            length: 0
-        };
+        Layout.animatingElements = [];
+        Layout.visibleForce = 0;
+        Layout.animationStartTime;
+        Layout.viewportSyncRequired = false;
+        Layout.startViewport;
+        Layout.startVisible;
         function Timeline(title, left, right, childTimelines, exhibits) {
             this.Title = title;
             this.left = left;
@@ -6260,7 +6341,6 @@ var CZ;
                     var fullHeight = contentHeight / (1 - headerPercent);
                     var titleObject = GenerateTitleObject(fullHeight, timeline, measureContext);
                     timeline.height = fullHeight;
-                } else {
                 }
                 timeline.titleRect = titleObject;
             } else {
@@ -6639,7 +6719,7 @@ var CZ;
             });
         }
         function calculateForceOnChildren(tsg) {
-            var eps = tsg.height / 10;
+            var eps = tsg.width / 20.0;
             var v = [];
             for(var i = 0, el; i < tsg.children.length; i++) {
                 el = tsg.children[i];
@@ -6660,7 +6740,7 @@ var CZ;
                         var b = el.y + el.newHeight + eps;
                         for(var j = i + 1; j < v.length; j++) {
                             var ael = v[j];
-                            if(ael.x > l && ael.x < r || ael.x + ael.width > l && ael.x + ael.width < r || ael.x + ael.width > l && ael.x + ael.width === 0 && r === 0) {
+                            if(!(ael.x <= l && ael.x + ael.width <= l || ael.x >= r && ael.x + ael.width >= r)) {
                                 if(ael.y < b) {
                                     ael.force += el.delta;
                                     l = Math.min(l, ael.x);
@@ -6675,7 +6755,7 @@ var CZ;
                 }
             }
         }
-        function animateElement(elem) {
+        function animateElement(elem, noAnimation, callback) {
             var duration = CZ.Settings.canvasElementAnimationTime;
             var args = [];
             if(elem.fadeIn == false && typeof elem.animation === 'undefined') {
@@ -6685,19 +6765,22 @@ var CZ;
                     elem.baseline = elem.newBaseline;
                 }
             }
-            if(elem.newY != elem.y && !elem.id.match("__header__")) {
+            if(elem.newY != elem.y) {
                 args.push({
                     property: "y",
                     startValue: elem.y,
                     targetValue: elem.newY
                 });
             }
-            if(elem.newHeight != elem.height && !elem.id.match("__header__")) {
+            if(elem.newHeight != elem.height) {
                 args.push({
                     property: "height",
                     startValue: elem.height,
                     targetValue: elem.newHeight
                 });
+            }
+            if(Layout.startViewport.Left && !(elem.x + elem.width < Layout.startViewport.Left || elem.x > Layout.startViewport.Right) && elem.y + elem.height < Layout.startViewport.Top) {
+                Layout.visibleForce += elem.newHeight - elem.height;
             }
             if(elem.opacity != 1 && elem.fadeIn == false) {
                 args.push({
@@ -6707,23 +6790,23 @@ var CZ;
                 });
                 duration = CZ.Settings.canvasElementFadeInTime;
             }
-            if(isLayoutAnimation == false || args.length == 0) {
+            if(noAnimation || args.length == 0) {
                 duration = 0;
             }
-            initializeAnimation(elem, duration, args);
+            initializeAnimation(elem, duration, args, callback);
             if(elem.fadeIn == true) {
                 for(var i = 0; i < elem.children.length; i++) {
                     if(elem.children[i].fadeIn == true) {
-                        animateElement(elem.children[i]);
+                        animateElement(elem.children[i], noAnimation, callback);
                     }
                 }
             } else {
                 for(var i = 0; i < elem.children.length; i++) {
-                    animateElement(elem.children[i]);
+                    animateElement(elem.children[i], noAnimation, callback);
                 }
             }
         }
-        function initializeAnimation(elem, duration, args) {
+        function initializeAnimation(elem, duration, args, callback) {
             var startTime = (new Date()).getTime();
             elem.animation = {
                 isAnimating: true,
@@ -6731,10 +6814,7 @@ var CZ;
                 startTime: startTime,
                 args: args
             };
-            if(typeof Layout.animatingElements[elem.id] === 'undefined') {
-                Layout.animatingElements[elem.id] = elem;
-                Layout.animatingElements.length++;
-            }
+            Layout.animatingElements.push(elem);
             elem.calculateNewFrame = function () {
                 var curTime = (new Date()).getTime();
                 var t;
@@ -6752,14 +6832,18 @@ var CZ;
                 if(t == 1.0) {
                     elem.animation.isAnimating = false;
                     elem.animation.args = [];
-                    delete Layout.animatingElements[elem.id];
-                    Layout.animatingElements.length--;
+                    Layout.animatingElements.splice(Layout.animatingElements.indexOf(elem), 1);
                     if(elem.fadeIn == false) {
                         elem.fadeIn = true;
                     }
                     for(var i = 0; i < elem.children.length; i++) {
                         if(typeof elem.children[i].animation === 'undefined') {
-                            animateElement(elem.children[i]);
+                            animateElement(elem.children[i], duration === 0, callback);
+                        }
+                    }
+                    if(Layout.animatingElements.length === 0) {
+                        if(callback && typeof (callback) === "function") {
+                            callback();
                         }
                     }
                     return;
@@ -6770,17 +6854,52 @@ var CZ;
             var parts = n.toString().split(".");
             return parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (parts[1] ? "." + parts[1] : "");
         }
-        function merge(src, dest) {
+        function extendLcaPathToRoot(tl, lca) {
+            if(tl.guid == lca.id) {
+                return lca;
+            } else {
+                for(var i = 0; i < tl.children.length; i++) {
+                    if(tl.children[i].type === 'timeline') {
+                        var child = extendLcaPathToRoot(tl.children[i], lca);
+                        if(child) {
+                            var t = {
+                                id: tl.guid,
+                                title: tl.title,
+                                timelines: []
+                            };
+                            for(var i = 0; i < tl.children.length; i++) {
+                                if(tl.children[i].type === 'timeline') {
+                                    if(tl.children[i].guid === child.id) {
+                                        t.timelines.push(child);
+                                    } else {
+                                        var c = {
+                                            id: tl.children[i].guid,
+                                            title: tl.children[i].title,
+                                            timelines: null
+                                        };
+                                        t.timelines.push(c);
+                                    }
+                                }
+                            }
+                            return t;
+                        }
+                    }
+                }
+            }
+        }
+        function mergeTimelines(src, dest) {
             if(src.id === dest.guid) {
                 var srcChildTimelines = (src.timelines instanceof Array) ? src.timelines : [];
                 var destChildTimelines = [];
+                var destChildTimelinesMap = {
+                };
                 for(var i = 0; i < dest.children.length; i++) {
                     if(dest.children[i].type && dest.children[i].type === "timeline") {
                         destChildTimelines.push(dest.children[i]);
+                        destChildTimelinesMap[dest.children[i].guid] = dest.children[i];
                     }
                 }
-                if(srcChildTimelines.length === destChildTimelines.length) {
-                    dest.isBuffered = dest.isBuffered || (src.timelines instanceof Array);
+                if(dest.isBuffered) {
                     var origTop = Number.MAX_VALUE;
                     var origBottom = Number.MIN_VALUE;
                     for(var i = 0; i < dest.children.length; i++) {
@@ -6793,9 +6912,17 @@ var CZ;
                             }
                         }
                     }
-                    dest.delta = 0;
+                    for(var i = 0; i < destChildTimelines.length; i++) {
+                        destChildTimelines[i].delta = 0;
+                    }
                     for(var i = 0; i < srcChildTimelines.length; i++) {
-                        merge(srcChildTimelines[i], destChildTimelines[i]);
+                        var srcTimeline = srcChildTimelines[i];
+                        var destTimeline = destChildTimelinesMap[srcChildTimelines[i].id];
+                        if(srcTimeline && destTimeline) {
+                            mergeTimelines(srcTimeline, destTimeline);
+                        } else {
+                            throw "error: Cannot find matching destination timeline for source timeline.";
+                        }
                     }
                     var haveChildTimelineExpanded = false;
                     for(var i = 0; i < destChildTimelines.length; i++) {
@@ -6835,64 +6962,84 @@ var CZ;
                         dest.titleObject.opacity = 0;
                         dest.titleObject.fadeIn = false;
                         delete dest.titleObject.animation;
-                        if(bottom > dest.titleObject.newY) {
-                            var msg = bottomElementName + " EXCEEDS " + dest.title + ".\n" + "bottom: " + numberWithCommas(bottom) + "\n" + "   top: " + numberWithCommas(dest.titleObject.newY) + "\n";
-                            console.log(msg);
-                        }
-                        for(var i = 1; i < dest.children.length; i++) {
-                            var el = dest.children[i];
-                            for(var j = 1; j < dest.children.length; j++) {
-                                var ael = dest.children[j];
-                                if(el.id !== ael.id) {
-                                    if(!(ael.x <= el.x && ael.x + ael.width <= el.x || ael.x >= el.x + el.width && ael.x + ael.width >= el.x + el.width || ael.newY <= el.newY && ael.newY + ael.newHeight <= el.newY || ael.newY >= el.newY + el.newHeight && ael.newY + ael.newHeight >= el.newY + el.newHeight)) {
-                                        var msg = el.title + " OVERLAPS " + ael.title + ".\n";
-                                        console.log(msg);
-                                    }
-                                }
-                            }
-                        }
                     }
-                } else if(srcChildTimelines.length > 0 && destChildTimelines.length === 0) {
+                } else {
+                    if(!src.timelines) {
+                        return;
+                    }
                     var t = generateLayout(src, dest);
                     var margin = Math.min(t.width, t.newHeight) * CZ.Settings.timelineHeaderMargin;
                     dest.delta = Math.max(0, t.newHeight - dest.newHeight);
-                    dest.children.splice(0);
+                    CZ.VCContent.clear(dest);
                     for(var i = 0; i < t.children.length; i++) {
                         dest.children.push(t.children[i]);
+                        t.children[i].parent = dest;
                     }
                     dest.titleObject = dest.children[0];
-                    dest.isBuffered = dest.isBuffered || (src.timelines instanceof Array);
+                    dest.isBuffered = t.isBuffered;
                     for(var i = 0; i < dest.children.length; i++) {
                         convertRelativeToAbsoluteCoords(dest.children[i], dest.newY);
                     }
-                } else {
-                    dest.delta = 0;
                 }
             } else {
                 throw "error: Cannot merge timelines. Src and dest node ids differ.";
             }
         }
-        function Merge(src, dest) {
-            if(typeof CZ.Authoring !== 'undefined' && CZ.Authoring.isActive) {
-                return;
-            }
+        function merge(src, dest, noAnimation, callback) {
+            if (typeof noAnimation === "undefined") { noAnimation = false; }
+            if (typeof callback === "undefined") { callback = function () {
+            }; }
             if(src && dest) {
-                if(dest.id === "__root__") {
-                    src.AspectRatio = 10;
-                    var t = generateLayout(src, dest);
-                    convertRelativeToAbsoluteCoords(t, 0);
-                    dest.children.push(t);
-                    animateElement(dest);
-                    CZ.Common.vc.virtualCanvas("requestInvalidate");
-                } else {
-                    merge(src, dest);
-                    dest.newHeight += dest.delta;
-                    animateElement(dest);
-                    CZ.Common.vc.virtualCanvas("requestInvalidate");
+                try  {
+                    Layout.viewportSyncRequired = true;
+                    Layout.visibleForce = 0;
+                    Layout.startVisible = CZ.Common.vc.virtualCanvas("getViewport").visible;
+                    Layout.startViewport = CZ.Common.vc.virtualCanvas("visibleToViewBox", Layout.startVisible);
+                    if(dest.id === "__root__") {
+                        src.AspectRatio = 10;
+                        var t = generateLayout(src, dest);
+                        convertRelativeToAbsoluteCoords(t, 0);
+                        dest.children.push(t);
+                        animateElement(dest, noAnimation, callback);
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    } else {
+                        if(CZ.Authoring && CZ.Authoring.isEnabled) {
+                            return;
+                        }
+                        if(CZ.Common.controller.activeAnimation && CZ.Common.controller.activeAnimation.type === "EllipticalZoom") {
+                            return;
+                        }
+                        var root = CZ.Common.vc.virtualCanvas("getLayerContent");
+                        src = extendLcaPathToRoot(root.children[0], src);
+                        dest = root.children[0];
+                        dest.delta = 0;
+                        mergeTimelines(src, dest);
+                        dest.newHeight += dest.delta;
+                        animateElement(dest, noAnimation, callback);
+                        Layout.animationStartTime = (new Date()).getTime();
+                        setTimeout(function () {
+                            var newVisible = new CZ.Viewport.VisibleRegion2d(Layout.startVisible.centerX, Layout.startVisible.centerY, Layout.startVisible.scale);
+                            newVisible.centerY += Layout.visibleForce;
+                            CZ.Common.setVisible(newVisible);
+                        }, CZ.Settings.canvasElementAnimationTime);
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    }
+                } catch (error) {
+                    console.log(error);
                 }
             }
         }
-        Layout.Merge = Merge;
+        Layout.merge = merge;
+        function syncViewport() {
+            if(Layout.viewportSyncRequired === false) {
+                return;
+            }
+            var newVisible = new CZ.Viewport.VisibleRegion2d(Layout.startVisible.centerX, Layout.startVisible.centerY, Layout.startVisible.scale);
+            var t = Math.min(1, ((new Date()).getTime() - Layout.animationStartTime) / CZ.Settings.canvasElementAnimationTime);
+            newVisible.centerY = Layout.startVisible.centerY + t * Layout.visibleForce;
+            CZ.Common.controller.moveToVisible(newVisible, true);
+        }
+        Layout.syncViewport = syncViewport;
     })(CZ.Layout || (CZ.Layout = {}));
     var Layout = CZ.Layout;
 })(CZ || (CZ = {}));
@@ -7030,65 +7177,6 @@ var CZ;
                 var vis = vp.visible;
                 self.recentViewport = new CZ.Viewport.Viewport2d(vp.aspectRatio, vp.width, vp.height, new CZ.Viewport.VisibleRegion2d(vis.centerX, vis.centerY, vis.scale));
             };
-            var requestTimer = null;
-            this.getMissingData = function (vbox, lca) {
-                if(typeof CZ.Authoring === 'undefined' || CZ.Authoring.isActive === false) {
-                    window.clearTimeout(requestTimer);
-                    requestTimer = window.setTimeout(function () {
-                        getMissingTimelines(vbox, lca);
-                    }, 1000);
-                }
-            };
-            function getMissingTimelines(vbox, lca) {
-                CZ.Data.getTimelines({
-                    lca: lca.guid,
-                    start: vbox.left,
-                    end: vbox.right,
-                    minspan: CZ.Settings.minTimelineWidth * vbox.scale
-                }).then(function (response) {
-                    CZ.Layout.Merge(response, lca);
-                }, function (error) {
-                    console.log("Error connecting to service:\n" + error.responseText);
-                });
-            }
-            function getMissingExhibits(vbox, lca, exhibitIds) {
-                CZ.Service.postData({
-                    ids: exhibitIds
-                }).then(function (response) {
-                    MergeContentItems(lca, exhibitIds, response.exhibits);
-                }, function (error) {
-                    console.log("Error connecting to service:\n" + error.responseText);
-                });
-            }
-            function extractExhibitIds(timeline) {
-                var ids = [];
-                if(timeline.exhibits instanceof Array) {
-                    timeline.exhibits.forEach(function (childExhibit) {
-                        ids.push(childExhibit.id);
-                    });
-                }
-                if(timeline.timelines instanceof Array) {
-                    timeline.timelines.forEach(function (childTimeline) {
-                        ids = ids.concat(extractExhibitIds(childTimeline));
-                    });
-                }
-                return ids;
-            }
-            function MergeContentItems(timeline, exhibitIds, exhibits) {
-                timeline.children.forEach(function (child) {
-                    if(child.type === "infodot") {
-                        var idx = exhibitIds.indexOf(child.guid);
-                        if(idx !== -1) {
-                            child.contentItems = exhibits[idx].contentItems;
-                        }
-                    }
-                });
-                timeline.children.forEach(function (child) {
-                    if(child.type === "timeline") {
-                        MergeContentItems(child, exhibitIds, exhibits);
-                    }
-                });
-            }
             gesturesSource.Subscribe(function (gesture) {
                 if(typeof gesture != "undefined" && !CZ.Authoring.isActive) {
                     var isAnimationActive = self.activeAnimation;
@@ -7100,9 +7188,8 @@ var CZ;
                         return;
                     }
                     if(gesture.Type == "Pan" || gesture.Type == "Zoom") {
+                        window.clearTimeout(CZ.Common.missingDataRequestsTimer);
                         var newlyEstimatedViewport = calculateTargetViewport(latestViewport, gesture, self.estimatedViewport);
-                        var vbox = CZ.Common.viewportToViewBox(newlyEstimatedViewport);
-                        var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
                         if(!self.estimatedViewport) {
                             self.activeAnimation = new CZ.ViewportAnimation.PanZoomAnimation(latestViewport);
                             self.saveScreenParameters(latestViewport);
@@ -7186,10 +7273,6 @@ var CZ;
             }, 1000);
             this.PanViewportAccessor = PanViewport;
             this.moveToVisible = function (visible, noAnimation) {
-                var currentViewport = getViewport();
-                var targetViewport = new CZ.Viewport.Viewport2d(currentViewport.aspectRatio, currentViewport.width, currentViewport.height, visible);
-                var vbox = CZ.Common.viewportToViewBox(targetViewport);
-                var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
                 if(noAnimation) {
                     self.stopAnimation();
                     self.setVisible(visible);
@@ -8707,7 +8790,7 @@ var CZ;
                     this._layersContent = undefined;
                     return this;
                 },
-                _visibleToViewBox: function (visible) {
+                visibleToViewBox: function (visible) {
                     var view = this.getViewport();
                     var w = view.widthScreenToVirtual(view.width);
                     var h = view.heightScreenToVirtual(view.height);
@@ -8724,7 +8807,7 @@ var CZ;
                     delete this.viewport;
                     this.options.visible = newVisible;
                     this.isInAnimation = isInAnimation && isInAnimation.isActive;
-                    var viewbox_v = this._visibleToViewBox(newVisible);
+                    var viewbox_v = this.visibleToViewBox(newVisible);
                     var viewport = this.getViewport();
                     this._renderCanvas(this._layersContent, viewbox_v, viewport);
                 },
@@ -8776,7 +8859,7 @@ var CZ;
                     elementsRoot.render(contexts, visibleBox_v, viewport);
                 },
                 invalidate: function () {
-                    var viewbox_v = this._visibleToViewBox(this.options.visible);
+                    var viewbox_v = this.visibleToViewBox(this.options.visible);
                     var viewport = this.getViewport();
                     this._renderCanvas(this._layersContent, viewbox_v, viewport);
                 },
@@ -8787,9 +8870,12 @@ var CZ;
                 requestInvalidate: function () {
                     this.requestNewFrame = false;
                     if(CZ.Layout.animatingElements.length != 0) {
-                        for(var id in CZ.Layout.animatingElements) {
-                            if(CZ.Layout.animatingElements[id].animation && CZ.Layout.animatingElements[id].animation.isAnimating) {
-                                CZ.Layout.animatingElements[id].calculateNewFrame();
+                        for(var i = 0; i < CZ.Layout.animatingElements.length; i++) {
+                            var el = CZ.Layout.animatingElements[i];
+                            if(!el) {
+                                CZ.Layout.animatingElements.splice(i, 1);
+                            } else if(el.animation && el.animation.isAnimating) {
+                                el.calculateNewFrame();
                                 this.requestNewFrame = true;
                             }
                         }
@@ -9914,15 +10000,9 @@ var CZ;
         Common.axis;
         Common.vc;
         var visReg;
-        Common.cosmosVisible;
-        Common.earthVisible;
-        Common.lifeVisible;
-        Common.prehistoryVisible;
-        Common.humanityVisible;
         var content;
         var breadCrumbs;
         var firstTimeWelcomeChecked = true;
-        var regimes = [];
         var k = 1000000000;
         Common.setNavigationStringTo;
         Common.hashHandle = true;
@@ -9930,6 +10010,8 @@ var CZ;
         Common.supercollection = "";
         Common.collection = "";
         Common.initialContent = null;
+        Common.missingDataRequestsTimer;
+        var missingDataRequestsCount = 0;
         function initialize() {
             Common.ax = ($)('#axis');
             Common.axis = new CZ.Timescale(Common.ax);
@@ -10046,114 +10128,195 @@ var CZ;
             }
         }
         function loadData() {
-            return CZ.Data.getTimelines(null).then(function (response) {
-                if(!response) {
-                    return;
-                }
-                ProcessContent(response);
-                Common.vc.virtualCanvas("updateViewport");
-                if(CZ.Common.initialContent) {
-                    CZ.Service.getContentPath(CZ.Common.initialContent).then(function (response) {
-                        window.location.hash = response;
+            var args;
+            if(!CZ.Service.superCollectionName && !CZ.Service.collectionName) {
+                args = {
+                    start: -400,
+                    end: 9999,
+                    minspan: 13700000000,
+                    commonAncestor: CZ.Settings.humanityTimelineID,
+                    fromRoot: 1
+                };
+            } else {
+                args = null;
+            }
+            if(CZ.Authoring && CZ.Authoring.isEnabled) {
+                args = {
+                    minspan: 0
+                };
+            }
+            return CZ.Service.getTimelines(args).then(function (response) {
+                var root = Common.vc.virtualCanvas("getLayerContent");
+                CZ.Layout.merge(response, root, true, function () {
+                    var root = Common.vc.virtualCanvas("findElement", 't' + response.id);
+                    CZ.UrlNav.navigationAnchor = root;
+                    CZ.Settings.maxPermitedTimeRange = {
+                        left: root.x,
+                        right: root.x + root.width
+                    };
+                    if(CZ.HomePageViewModel.IsFeatureEnabled("Regimes")) {
+                        initializeRegimes();
+                    }
+                    if(Common.startHash) {
+                        processHash();
+                    } else {
+                        displayRootTimeline();
+                    }
+                });
+                if(CZ.HomePageViewModel.IsFeatureEnabled("Tours")) {
+                    CZ.Service.getTours().then(function (response) {
+                        CZ.Tours.parseTours(response);
                     }, function (error) {
                         console.log("Error connecting to service:\n" + error.responseText);
                     });
                 }
-                CZ.Service.getTours().then(function (response) {
-                    CZ.Tours.parseTours(response);
-                    CZ.Tours.initializeToursContent();
-                }, function (error) {
-                    console.log("Error connecting to service:\n" + error.responseText);
-                });
             }, function (error) {
                 console.log("Error connecting to service:\n" + error.responseText);
             });
         }
         Common.loadData = loadData;
-        function ProcessContent(content) {
-            var root = Common.vc.virtualCanvas("getLayerContent");
-            root.beginEdit();
-            CZ.Layout.Merge(content, root);
-            root.endEdit(true);
-            InitializeRegimes(content);
-            if(Common.startHash) {
-                visReg = CZ.UrlNav.navStringToVisible(Common.startHash.substring(1), Common.vc);
+        function getTimelineVisible(id) {
+            var tl = Common.vc.virtualCanvas("findElement", 't' + id);
+            if(!tl) {
+                return;
             }
-            if(!visReg && Common.cosmosVisible) {
-                window.location.hash = Common.cosmosVisible;
-                visReg = CZ.UrlNav.navStringToVisible(Common.cosmosVisible, Common.vc);
+            var tlNavString = CZ.UrlNav.vcelementToNavString(tl);
+            if(!tlNavString) {
+                return;
             }
+            var tlVisible = CZ.UrlNav.navStringToVisible(tlNavString, Common.vc);
+            if(!tlVisible) {
+                return;
+            }
+            return tlVisible;
+        }
+        Common.getTimelineVisible = getTimelineVisible;
+        function initializeRegimes() {
+            $("#regime-link-cosmos").click(function () {
+                var cosmosVisible = CZ.Common.getTimelineVisible(CZ.Settings.cosmosTimelineID);
+                setVisible(cosmosVisible);
+            });
+            $("#regime-link-earth").click(function () {
+                var earthVisible = CZ.Common.getTimelineVisible(CZ.Settings.earthTimelineID);
+                setVisible(earthVisible);
+            });
+            $("#regime-link-life").click(function () {
+                var lifeVisible = CZ.Common.getTimelineVisible(CZ.Settings.lifeTimelineID);
+                setVisible(lifeVisible);
+            });
+            $("#regime-link-prehistory").click(function () {
+                var prehistoryVisible = CZ.Common.getTimelineVisible(CZ.Settings.prehistoryTimelineID);
+                setVisible(prehistoryVisible);
+            });
+            $("#regime-link-humanity").click(function () {
+                var humanityVisible = CZ.Common.getTimelineVisible(CZ.Settings.humanityTimelineID);
+                setVisible(humanityVisible);
+            });
+        }
+        function displayRootTimeline() {
+            var root = CZ.Common.vc.virtualCanvas("getLayerContent").children[0];
+            if(!root) {
+                return;
+            }
+            var rootVisible = getTimelineVisible(root.guid);
+            if(!rootVisible) {
+                return;
+            }
+            Common.controller.moveToVisible(rootVisible, true);
+            updateAxis(Common.vc, Common.ax);
+        }
+        function processHash() {
+            visReg = CZ.UrlNav.navStringToVisible(Common.startHash.substring(1), Common.vc);
             if(visReg) {
                 Common.controller.moveToVisible(visReg, true);
                 updateAxis(Common.vc, Common.ax);
-                var vp = Common.vc.virtualCanvas("getViewport");
-                if(Common.startHash && window.location.hash !== Common.startHash) {
-                    hashChangeFromOutside = false;
-                    window.location.hash = Common.startHash;
-                }
-            }
-        }
-        function InitializeRegimes(content) {
-            var f = function (timeline) {
-                if(!timeline) {
-                    return null;
-                }
-                var v = Common.vc.virtualCanvas("findElement", 't' + timeline.id);
-                regimes.push(v);
-                if(v) {
-                    v = CZ.UrlNav.vcelementToNavString(v);
-                }
-                return v;
-            };
-            var cosmosTimeline = content;
-            Common.cosmosVisible = f(cosmosTimeline);
-            CZ.UrlNav.navigationAnchor = Common.vc.virtualCanvas("findElement", 't' + cosmosTimeline.id);
-            $("#regime-link-cosmos").click(function () {
-                var visible = CZ.UrlNav.navStringToVisible(Common.cosmosVisible, Common.vc);
-                setVisible(visible);
-            });
-            var earthTimeline = CZ.Layout.FindChildTimeline(cosmosTimeline, CZ.Settings.earthTimelineID, true);
-            if(typeof earthTimeline !== "undefined") {
-                Common.earthVisible = f(earthTimeline);
-                $("#regime-link-earth").click(function () {
-                    var visible = CZ.UrlNav.navStringToVisible(Common.earthVisible, Common.vc);
-                    setVisible(visible);
-                });
-                var lifeTimeline = CZ.Layout.FindChildTimeline(earthTimeline, CZ.Settings.lifeTimelineID);
-                if(typeof lifeTimeline !== "undefined") {
-                    Common.lifeVisible = f(lifeTimeline);
-                    $("#regime-link-life").click(function () {
-                        var visible = CZ.UrlNav.navStringToVisible(Common.lifeVisible, Common.vc);
-                        setVisible(visible);
-                    });
-                    var prehistoryTimeline = CZ.Layout.FindChildTimeline(lifeTimeline, CZ.Settings.prehistoryTimelineID);
-                    if(typeof prehistoryTimeline !== "undefined") {
-                        Common.prehistoryVisible = f(prehistoryTimeline);
-                        $("#regime-link-prehistory").click(function () {
-                            var visible = CZ.UrlNav.navStringToVisible(Common.prehistoryVisible, Common.vc);
-                            setVisible(visible);
-                        });
-                        var humanityTimeline = CZ.Layout.FindChildTimeline(prehistoryTimeline, CZ.Settings.humanityTimelineID, true);
-                        if(typeof humanityTimeline !== "undefined") {
-                            Common.humanityVisible = f(humanityTimeline);
-                            $("#regime-link-humanity").click(function () {
-                                var visible = CZ.UrlNav.navStringToVisible(Common.humanityVisible, Common.vc);
-                                setVisible(visible);
-                            });
-                        }
+            } else {
+                var startPos, endPos, timelineID;
+                startPos = Common.startHash.lastIndexOf("/t");
+                if(startPos !== -1) {
+                    startPos += 2;
+                    var pos = [];
+                    pos.push(Common.startHash.indexOf("/", startPos));
+                    pos.push(Common.startHash.indexOf("\\", startPos));
+                    pos.push(Common.startHash.indexOf("@", startPos));
+                    pos.push(Common.startHash.indexOf("&", startPos));
+                    pos = pos.filter(function (v) {
+                        return v >= 0;
+                    }).sort();
+                    endPos = (pos.length > 0) ? pos[0] - 1 : Common.startHash.length - 1;
+                    if(startPos >= 0 && endPos >= 0 && endPos >= startPos) {
+                        timelineID = Common.startHash.substring(startPos, endPos + 1);
                     }
                 }
+                if(!timelineID) {
+                    displayRootTimeline();
+                    return;
+                }
+                CZ.Service.getTimelines({
+                    start: -13700000000,
+                    end: 9999,
+                    minspan: 13700000000,
+                    commonAncestor: timelineID,
+                    fromRoot: 1
+                }).then(function (response) {
+                    var root = Common.vc.virtualCanvas("getLayerContent");
+                    CZ.Layout.merge(response, root.children[0], true, function () {
+                        visReg = CZ.UrlNav.navStringToVisible(Common.startHash.substring(1), Common.vc);
+                        if(visReg) {
+                            Common.controller.moveToVisible(visReg, true);
+                            updateAxis(Common.vc, Common.ax);
+                        }
+                    });
+                }, function (error) {
+                    displayRootTimeline();
+                });
             }
-            Common.maxPermitedVerticalRange = {
-                top: cosmosTimeline.y,
-                bottom: cosmosTimeline.y + cosmosTimeline.height
-            };
-            CZ.Settings.maxPermitedTimeRange = {
-                left: cosmosTimeline.left,
-                right: cosmosTimeline.right
-            };
-            Common.maxPermitedScale = CZ.UrlNav.navStringToVisible(Common.cosmosVisible, Common.vc).scale * 1.1;
         }
+        function IncreaseRequestsCount() {
+            missingDataRequestsCount++;
+            if(missingDataRequestsCount === 1) {
+                var vp = Common.vc.virtualCanvas("getViewport");
+                var footer = $(".footer-links");
+                $("#progressImage").css({
+                    top: (footer.offset().top - 30),
+                    left: (vp.width / 2) - ($('#progressImage').width() / 2)
+                }).show();
+            }
+        }
+        Common.IncreaseRequestsCount = IncreaseRequestsCount;
+        function DecreaseRequestsCount() {
+            missingDataRequestsCount--;
+            if(missingDataRequestsCount === 0) {
+                $("#progressImage").hide();
+            }
+        }
+        Common.DecreaseRequestsCount = DecreaseRequestsCount;
+        function getMissingData(vbox, lca) {
+            if(typeof CZ.Authoring === 'undefined' || CZ.Authoring.isActive === false) {
+                var root = CZ.Common.vc.virtualCanvas("getLayerContent");
+                if(root.children.length > 0) {
+                    window.clearTimeout(Common.missingDataRequestsTimer);
+                    Common.missingDataRequestsTimer = window.setTimeout(function () {
+                        IncreaseRequestsCount();
+                        CZ.Service.getTimelines({
+                            start: vbox.left,
+                            end: vbox.right,
+                            minspan: CZ.Settings.minTimelineWidth * vbox.scale,
+                            commonAncestor: lca.guid,
+                            maxElements: 2000
+                        }).then(function (response) {
+                            DecreaseRequestsCount();
+                            CZ.Layout.merge(response, lca);
+                        }, function (error) {
+                            DecreaseRequestsCount();
+                            console.log("Error connecting to service:\n" + error.responseText);
+                        });
+                    }, 1000);
+                }
+            }
+        }
+        Common.getMissingData = getMissingData;
+        ;
         function updateLayout() {
             CZ.BreadCrumbs.visibleAreaWidth = $(".breadcrumbs-container").width();
             CZ.BreadCrumbs.updateHiddenBreadCrumbs();
@@ -11170,8 +11333,7 @@ var CZ;
                         "result-id": resultId,
                         "result-type": resultType,
                         click: function () {
-                            var self = $(this);
-                            CZ.Search.goToSearchResult(self.attr("result-id"), self.attr("result-type"));
+                            CZ.Search.goToSearchResult(item);
                             form.close();
                         }
                     }));
@@ -11566,8 +11728,8 @@ var CZ;
             }, 
             {
                 Name: "Tours",
-                Activation: FeatureActivation.Enabled,
-                JQueryReference: "#tours-index"
+                Activation: FeatureActivation.RootCollection,
+                JQueryReference: "#tours_index"
             }, 
             {
                 Name: "Authoring",
@@ -11609,6 +11771,13 @@ var CZ;
             }, 
             
         ];
+        function IsFeatureEnabled(featureName) {
+            var feature = $.grep(_featureMap, function (e) {
+                return e.Name === featureName;
+            });
+            return feature[0].IsEnabled;
+        }
+        HomePageViewModel.IsFeatureEnabled = IsFeatureEnabled;
         HomePageViewModel.rootCollection;
         function UserCanEditCollection(profile) {
             if(CZ.Service.superCollectionName && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
@@ -11621,7 +11790,7 @@ var CZ;
         }
         function InitializeToursUI(profile, forms) {
             CZ.Tours.tourCaptionFormContainer = forms[16];
-            var allowEditing = IsFeatureEnabled(_featureMap, "TourAuthoring") && UserCanEditCollection(profile);
+            var allowEditing = IsFeatureEnabled("TourAuthoring") && UserCanEditCollection(profile);
             var onTakeTour = function (tour) {
                 CZ.HomePageViewModel.closeAllForms();
                 CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption(CZ.Tours.tourCaptionFormContainer, {
@@ -11927,10 +12096,10 @@ var CZ;
                     profilePanel: "#profile-panel",
                     loginPanelLogin: "#profile-panel.auth-panel-login",
                     context: "",
-                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring"),
+                    allowRedirect: IsFeatureEnabled("Authoring"),
                     collectionTheme: CZ.Settings.theme,
                     collectionThemeInput: "#collection-theme",
-                    collectionThemeWrapper: IsFeatureEnabled(_featureMap, "Themes") ? "#collection-theme-wrapper" : null
+                    collectionThemeWrapper: IsFeatureEnabled("Themes") ? "#collection-theme-wrapper" : null
                 });
                 var loginForm = new CZ.UI.FormLogin(forms[6], {
                     activationSource: $("#login-panel"),
@@ -11950,7 +12119,7 @@ var CZ;
                         profileForm.close();
                     }
                 });
-                if(IsFeatureEnabled(_featureMap, "Login")) {
+                if(IsFeatureEnabled("Login")) {
                     CZ.Service.getProfile().done(function (data) {
                         if(data == "") {
                             $("#login-panel").show();
@@ -12036,16 +12205,27 @@ var CZ;
             if(window.location.hash) {
                 CZ.Common.startHash = window.location.hash;
             }
-            CZ.Common.loadData().then(function (response) {
-                if(!response) {
-                    canvasIsEmpty = true;
-                    if(CZ.Authoring.showCreateTimelineForm) {
-                        CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
-                    }
+            CZ.Service.getProfile().done(function (data) {
+                CZ.Authoring.isEnabled = UserCanEditCollection(data);
+            }).fail(function (error) {
+                CZ.Authoring.isEnabled = UserCanEditCollection(null);
+            }).always(function () {
+                if(!CZ.Authoring.isEnabled) {
+                    $(".edit-icon").hide();
+                } else {
+                    $(".edit-icon").show();
                 }
+                CZ.Common.loadData().then(function (response) {
+                    if(!response) {
+                        canvasIsEmpty = true;
+                        if(CZ.Authoring.showCreateTimelineForm) {
+                            CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
+                        }
+                    }
+                });
+                CZ.Search.initializeSearch();
+                CZ.Bibliography.initializeBibliography();
             });
-            CZ.Search.initializeSearch();
-            CZ.Bibliography.initializeBibliography();
             var canvasGestures = CZ.Gestures.getGesturesStream(CZ.Common.vc);
             var axisGestures = CZ.Gestures.applyAxisBehavior(CZ.Gestures.getGesturesStream(CZ.Common.ax));
             var timeSeriesGestures = CZ.Gestures.getPanPinGesturesStream($("#timeSeriesContainer"));
@@ -12076,13 +12256,24 @@ var CZ;
                 hashChangeFromOutside = false;
                 if(CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.bookmark) {
                     CZ.UrlNav.navigationAnchor = CZ.UrlNav.navStringTovcElement(CZ.Common.setNavigationStringTo.bookmark, CZ.Common.vc.virtualCanvas("getLayerContent"));
-                    window.location.hash = CZ.Common.setNavigationStringTo.bookmark;
-                } else {
-                    if(CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.id == id) {
-                        CZ.UrlNav.navigationAnchor = CZ.Common.setNavigationStringTo.element;
+                    var newURL = CZ.UrlNav.getURL();
+                    newURL.hash.path = CZ.Common.setNavigationStringTo.bookmark;
+                    CZ.UrlNav.setURL(newURL);
+                } else if(CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.id == id) {
+                    CZ.UrlNav.navigationAnchor = CZ.Common.setNavigationStringTo.element;
+                    var newURL = CZ.UrlNav.getURL();
+                    newURL.hash.path = CZ.UrlNav.vcelementToNavString(CZ.UrlNav.navigationAnchor, CZ.Common.vc.virtualCanvas("getViewport"));
+                    CZ.UrlNav.setURL(newURL);
+                } else if(CZ.BreadCrumbs.breadCrumbs) {
+                    var newHash = "";
+                    for(var i = 0; i < CZ.BreadCrumbs.breadCrumbs.length; i++) {
+                        newHash += "/" + CZ.BreadCrumbs.breadCrumbs[i].vcElement.id;
                     }
-                    var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                    window.location.hash = CZ.UrlNav.vcelementToNavString(CZ.UrlNav.navigationAnchor, vp);
+                    if(newHash !== window.location.hash) {
+                        var newURL = CZ.UrlNav.getURL();
+                        newURL.hash.path = newHash;
+                        CZ.UrlNav.setURL(newURL);
+                    }
                 }
                 CZ.Common.setNavigationStringTo = null;
             });
@@ -12134,6 +12325,18 @@ var CZ;
                     }
                 }
             });
+            CZ.Common.controller.onAnimationComplete.push(function () {
+                if(CZ.Authoring && CZ.Authoring.isEnabled) {
+                    return;
+                }
+                var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                var vbox = CZ.Common.viewportToViewBox(vp);
+                var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
+                if(!CZ.Common.vc.virtualCanvas("inBuffer", wnd, vp.visible.scale)) {
+                    var lca = CZ.Common.vc.virtualCanvas("findLca", wnd);
+                    CZ.Common.getMissingData(vbox, lca);
+                }
+            });
             CZ.Common.updateLayout();
             CZ.Common.vc.bind("elementclick", function (e) {
                 CZ.Search.navigateToElement(e);
@@ -12177,13 +12380,6 @@ var CZ;
                 $("#bibliographyBack").css("display", "block");
             }
         });
-        function IsFeatureEnabled(featureMap, featureName) {
-            var feature = $.grep(featureMap, function (e) {
-                return e.Name === featureName;
-            });
-            return feature[0].IsEnabled;
-        }
-        HomePageViewModel.IsFeatureEnabled = IsFeatureEnabled;
         function closeAllForms() {
             $('.cz-major-form').each(function (i, f) {
                 var form = $(f).data('form');
