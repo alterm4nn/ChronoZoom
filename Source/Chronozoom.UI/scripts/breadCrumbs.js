@@ -253,7 +253,10 @@
         }
         BreadCrumbs.breadCrumbNavRight = breadCrumbNavRight;
         function clickOverBreadCrumb(timelineID, breadCrumbLinkID) {
-            CZ.Search.goToSearchResult(timelineID);
+            var element = CZ.Common.vc.virtualCanvas("findElement", timelineID);
+            var navStringElement = CZ.UrlNav.vcelementToNavString(element);
+            var visible = CZ.UrlNav.navStringToVisible(navStringElement, CZ.Common.vc);
+            CZ.Common.controller.moveToVisible(visible);
             var selector = "#bc_" + breadCrumbLinkID;
             var tableOffset = $("#breadcrumbs-table tr").position().left;
             var elementOffset = $(selector).position().left + tableOffset;
