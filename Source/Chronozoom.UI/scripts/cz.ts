@@ -692,6 +692,21 @@ module CZ {
                                 }
             );
 
+            /*
+            // Progessive Loading: fetch misssing data
+            CZ.Common.controller.onAnimationComplete.push(
+                function () {
+                    var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                    var vbox = CZ.Common.viewportToViewBox(vp);
+                    var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
+                    if (!CZ.Common.vc.virtualCanvas("inBuffer", wnd, vp.visible.scale)) { // check if data is missing for the current viewport
+                        var lca = CZ.Common.vc.virtualCanvas("findLca", wnd);
+                        CZ.Common.getMissingData(vbox, lca); // queue up a request to fetch the missing data from the server
+                    }
+                }
+            );
+            */
+
             CZ.Common.updateLayout();
 
             CZ.Common.vc.bind("elementclick", function (e) {

@@ -156,9 +156,11 @@ var CZ;
             for(var i = 0; i < n; i++) {
                 var child = parent.children[i];
                 if(child.id == id) {
-                    if(typeof CZ.Layout.animatingElements[child.id] !== 'undefined') {
-                        delete CZ.Layout.animatingElements[child.id];
-                        CZ.Layout.animatingElements.length--;
+                    var matches = CZ.Layout.animatingElements.filter(function (el) {
+                        return el.id === child.id;
+                    });
+                    for(var k = 0; k < matches.length; k++) {
+                        CZ.Layout.animatingElements.splice(CZ.Layout.animatingElements.indexOf(matches[k]), 1);
                     }
                     parent.children.splice(i, 1);
                     clear(child);
@@ -186,9 +188,11 @@ var CZ;
             var n = element.children.length;
             for(var i = 0; i < n; i++) {
                 var child = element.children[i];
-                if(typeof CZ.Layout.animatingElements[child.id] !== 'undefined') {
-                    delete CZ.Layout.animatingElements[child.id];
-                    CZ.Layout.animatingElements.length--;
+                var matches = CZ.Layout.animatingElements.filter(function (el) {
+                    return el.id === child.id;
+                });
+                for(var k = 0; k < matches.length; k++) {
+                    CZ.Layout.animatingElements.splice(CZ.Layout.animatingElements.indexOf(matches[k]), 1);
                 }
                 clear(child);
                 if(child.onRemove) {

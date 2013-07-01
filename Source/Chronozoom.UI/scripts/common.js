@@ -171,7 +171,7 @@ var CZ;
         function ProcessContent(content) {
             var root = Common.vc.virtualCanvas("getLayerContent");
             root.beginEdit();
-            CZ.Layout.Merge(content, root);
+            CZ.Layout.merge(content, root);
             root.endEdit(true);
             InitializeRegimes(content);
             if(Common.startHash) {
@@ -252,6 +252,36 @@ var CZ;
             };
             Common.maxPermitedScale = CZ.UrlNav.navStringToVisible(Common.cosmosVisible, Common.vc).scale * 1.1;
         }
+        Common.requestMissingDataTimer;
+        function getMissingData(vbox, lca) {
+            if(typeof CZ.Authoring === 'undefined' || CZ.Authoring.isActive === false) {
+                var root = CZ.Common.vc.virtualCanvas("getLayerContent");
+                if(root.children.length > 0) {
+                    window.clearTimeout(Common.requestMissingDataTimer);
+                    Common.requestMissingDataTimer = window.setTimeout(function () {
+                        CZ.Service.getTimelines({
+                            start: vbox.left,
+                            end: vbox.right,
+                            minspan: CZ.Settings.minTimelineWidth * vbox.scale,
+                            commonAncestor: lca.guid,
+                            maxElements: 2000
+                        }).then(function (response) {
+                            if(!response) {
+                                return;
+                            }
+                            if(Common.controller.activeAnimation && Common.controller.activeAnimation.type === "EllipticalZoom") {
+                                return;
+                            }
+                            CZ.Layout.merge(response, lca);
+                        }, function (error) {
+                            console.log("Error connecting to service:\n" + error.responseText);
+                        });
+                    }, 1000);
+                }
+            }
+        }
+        Common.getMissingData = getMissingData;
+        ;
         function updateLayout() {
             CZ.BreadCrumbs.visibleAreaWidth = $(".breadcrumbs-container").width();
             CZ.BreadCrumbs.updateHiddenBreadCrumbs();

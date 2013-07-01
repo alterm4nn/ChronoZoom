@@ -761,9 +761,11 @@ var CZ;
             for(var i = 0; i < n; i++) {
                 var child = parent.children[i];
                 if(child.id == id) {
-                    if(typeof CZ.Layout.animatingElements[child.id] !== 'undefined') {
-                        delete CZ.Layout.animatingElements[child.id];
-                        CZ.Layout.animatingElements.length--;
+                    var matches = CZ.Layout.animatingElements.filter(function (el) {
+                        return el.id === child.id;
+                    });
+                    for(var k = 0; k < matches.length; k++) {
+                        CZ.Layout.animatingElements.splice(CZ.Layout.animatingElements.indexOf(matches[k]), 1);
                     }
                     parent.children.splice(i, 1);
                     clear(child);
@@ -791,9 +793,11 @@ var CZ;
             var n = element.children.length;
             for(var i = 0; i < n; i++) {
                 var child = element.children[i];
-                if(typeof CZ.Layout.animatingElements[child.id] !== 'undefined') {
-                    delete CZ.Layout.animatingElements[child.id];
-                    CZ.Layout.animatingElements.length--;
+                var matches = CZ.Layout.animatingElements.filter(function (el) {
+                    return el.id === child.id;
+                });
+                for(var k = 0; k < matches.length; k++) {
+                    CZ.Layout.animatingElements.splice(CZ.Layout.animatingElements.indexOf(matches[k]), 1);
                 }
                 clear(child);
                 if(child.onRemove) {
@@ -5520,7 +5524,10 @@ var CZ;
         }
         BreadCrumbs.breadCrumbNavRight = breadCrumbNavRight;
         function clickOverBreadCrumb(timelineID, breadCrumbLinkID) {
-            CZ.Search.goToSearchResult(timelineID);
+            var element = CZ.Common.vc.virtualCanvas("findElement", timelineID);
+            var navStringElement = CZ.UrlNav.vcelementToNavString(element);
+            var visible = CZ.UrlNav.navStringToVisible(navStringElement, CZ.Common.vc);
+            CZ.Common.controller.moveToVisible(visible);
             var selector = "#bc_" + breadCrumbLinkID;
             var tableOffset = $("#breadcrumbs-table tr").position().left;
             var elementOffset = $(selector).position().left + tableOffset;
@@ -5801,10 +5808,7 @@ var CZ;
 var CZ;
 (function (CZ) {
     (function (Layout) {
-        var isLayoutAnimation = true;
-        Layout.animatingElements = {
-            length: 0
-        };
+        Layout.animatingElements = [];
         function Timeline(title, left, right, childTimelines, exhibits) {
             this.Title = title;
             this.left = left;
@@ -6287,7 +6291,7 @@ var CZ;
             });
         }
         function calculateForceOnChildren(tsg) {
-            var eps = tsg.height / 10;
+            var eps = tsg.width / 20.0;
             var v = [];
             for(var i = 0, el; i < tsg.children.length; i++) {
                 el = tsg.children[i];
@@ -6308,7 +6312,7 @@ var CZ;
                         var b = el.y + el.newHeight + eps;
                         for(var j = i + 1; j < v.length; j++) {
                             var ael = v[j];
-                            if(ael.x > l && ael.x < r || ael.x + ael.width > l && ael.x + ael.width < r || ael.x + ael.width > l && ael.x + ael.width === 0 && r === 0) {
+                            if(!(ael.x <= l && ael.x + ael.width <= l || ael.x >= r && ael.x + ael.width >= r)) {
                                 if(ael.y < b) {
                                     ael.force += el.delta;
                                     l = Math.min(l, ael.x);
@@ -6323,7 +6327,7 @@ var CZ;
                 }
             }
         }
-        function animateElement(elem) {
+        function animateElement(elem, noAnimation, callback) {
             var duration = CZ.Settings.canvasElementAnimationTime;
             var args = [];
             if(elem.fadeIn == false && typeof elem.animation === 'undefined') {
@@ -6333,14 +6337,14 @@ var CZ;
                     elem.baseline = elem.newBaseline;
                 }
             }
-            if(elem.newY != elem.y && !elem.id.match("__header__")) {
+            if(elem.newY != elem.y) {
                 args.push({
                     property: "y",
                     startValue: elem.y,
                     targetValue: elem.newY
                 });
             }
-            if(elem.newHeight != elem.height && !elem.id.match("__header__")) {
+            if(elem.newHeight != elem.height) {
                 args.push({
                     property: "height",
                     startValue: elem.height,
@@ -6355,23 +6359,23 @@ var CZ;
                 });
                 duration = CZ.Settings.canvasElementFadeInTime;
             }
-            if(isLayoutAnimation == false || args.length == 0) {
+            if(noAnimation || args.length == 0) {
                 duration = 0;
             }
-            initializeAnimation(elem, duration, args);
+            initializeAnimation(elem, duration, args, callback);
             if(elem.fadeIn == true) {
                 for(var i = 0; i < elem.children.length; i++) {
                     if(elem.children[i].fadeIn == true) {
-                        animateElement(elem.children[i]);
+                        animateElement(elem.children[i], noAnimation, callback);
                     }
                 }
             } else {
                 for(var i = 0; i < elem.children.length; i++) {
-                    animateElement(elem.children[i]);
+                    animateElement(elem.children[i], noAnimation, callback);
                 }
             }
         }
-        function initializeAnimation(elem, duration, args) {
+        function initializeAnimation(elem, duration, args, callback) {
             var startTime = (new Date()).getTime();
             elem.animation = {
                 isAnimating: true,
@@ -6379,10 +6383,7 @@ var CZ;
                 startTime: startTime,
                 args: args
             };
-            if(typeof Layout.animatingElements[elem.id] === 'undefined') {
-                Layout.animatingElements[elem.id] = elem;
-                Layout.animatingElements.length++;
-            }
+            Layout.animatingElements.push(elem);
             elem.calculateNewFrame = function () {
                 var curTime = (new Date()).getTime();
                 var t;
@@ -6400,14 +6401,18 @@ var CZ;
                 if(t == 1.0) {
                     elem.animation.isAnimating = false;
                     elem.animation.args = [];
-                    delete Layout.animatingElements[elem.id];
-                    Layout.animatingElements.length--;
+                    Layout.animatingElements.splice(Layout.animatingElements.indexOf(elem), 1);
                     if(elem.fadeIn == false) {
                         elem.fadeIn = true;
                     }
                     for(var i = 0; i < elem.children.length; i++) {
                         if(typeof elem.children[i].animation === 'undefined') {
-                            animateElement(elem.children[i]);
+                            animateElement(elem.children[i], duration === 0, callback);
+                        }
+                    }
+                    if(Layout.animatingElements.length === 0) {
+                        if(callback && typeof (callback) === "function") {
+                            callback();
                         }
                     }
                     return;
@@ -6418,7 +6423,40 @@ var CZ;
             var parts = n.toString().split(".");
             return parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (parts[1] ? "." + parts[1] : "");
         }
-        function merge(src, dest) {
+        function extendLcaPathToRoot(tl, lca) {
+            if(tl.guid == lca.id) {
+                return lca;
+            } else {
+                for(var i = 0; i < tl.children.length; i++) {
+                    if(tl.children[i].type === 'timeline') {
+                        var child = extendLcaPathToRoot(tl.children[i], lca);
+                        if(child) {
+                            var t = {
+                                id: tl.guid,
+                                title: tl.title,
+                                timelines: []
+                            };
+                            for(var i = 0; i < tl.children.length; i++) {
+                                if(tl.children[i].type === 'timeline') {
+                                    if(tl.children[i].guid === child.id) {
+                                        t.timelines.push(child);
+                                    } else {
+                                        var c = {
+                                            id: tl.children[i].guid,
+                                            title: tl.children[i].title,
+                                            timelines: null
+                                        };
+                                        t.timelines.push(c);
+                                    }
+                                }
+                            }
+                            return t;
+                        }
+                    }
+                }
+            }
+        }
+        function mergeTimelines(src, dest) {
             if(src.id === dest.guid) {
                 var srcChildTimelines = (src.timelines instanceof Array) ? src.timelines : [];
                 var destChildTimelines = [];
@@ -6427,8 +6465,7 @@ var CZ;
                         destChildTimelines.push(dest.children[i]);
                     }
                 }
-                if(srcChildTimelines.length === destChildTimelines.length) {
-                    dest.isBuffered = dest.isBuffered || (src.timelines instanceof Array);
+                if(dest.isBuffered) {
                     var origTop = Number.MAX_VALUE;
                     var origBottom = Number.MIN_VALUE;
                     for(var i = 0; i < dest.children.length; i++) {
@@ -6441,9 +6478,11 @@ var CZ;
                             }
                         }
                     }
-                    dest.delta = 0;
+                    for(var i = 0; i < destChildTimelines.length; i++) {
+                        destChildTimelines[i].delta = 0;
+                    }
                     for(var i = 0; i < srcChildTimelines.length; i++) {
-                        merge(srcChildTimelines[i], destChildTimelines[i]);
+                        mergeTimelines(srcChildTimelines[i], destChildTimelines[i]);
                     }
                     var haveChildTimelineExpanded = false;
                     for(var i = 0; i < destChildTimelines.length; i++) {
@@ -6483,64 +6522,61 @@ var CZ;
                         dest.titleObject.opacity = 0;
                         dest.titleObject.fadeIn = false;
                         delete dest.titleObject.animation;
-                        if(bottom > dest.titleObject.newY) {
-                            var msg = bottomElementName + " EXCEEDS " + dest.title + ".\n" + "bottom: " + numberWithCommas(bottom) + "\n" + "   top: " + numberWithCommas(dest.titleObject.newY) + "\n";
-                            console.log(msg);
-                        }
-                        for(var i = 1; i < dest.children.length; i++) {
-                            var el = dest.children[i];
-                            for(var j = 1; j < dest.children.length; j++) {
-                                var ael = dest.children[j];
-                                if(el.id !== ael.id) {
-                                    if(!(ael.x <= el.x && ael.x + ael.width <= el.x || ael.x >= el.x + el.width && ael.x + ael.width >= el.x + el.width || ael.newY <= el.newY && ael.newY + ael.newHeight <= el.newY || ael.newY >= el.newY + el.newHeight && ael.newY + ael.newHeight >= el.newY + el.newHeight)) {
-                                        var msg = el.title + " OVERLAPS " + ael.title + ".\n";
-                                        console.log(msg);
-                                    }
-                                }
-                            }
-                        }
                     }
-                } else if(srcChildTimelines.length > 0 && destChildTimelines.length === 0) {
+                } else {
+                    if(!src.timelines) {
+                        return;
+                    }
                     var t = generateLayout(src, dest);
                     var margin = Math.min(t.width, t.newHeight) * CZ.Settings.timelineHeaderMargin;
                     dest.delta = Math.max(0, t.newHeight - dest.newHeight);
                     dest.children.splice(0);
                     for(var i = 0; i < t.children.length; i++) {
                         dest.children.push(t.children[i]);
+                        t.children[i].parent = dest;
                     }
                     dest.titleObject = dest.children[0];
-                    dest.isBuffered = dest.isBuffered || (src.timelines instanceof Array);
+                    dest.isBuffered = t.isBuffered;
                     for(var i = 0; i < dest.children.length; i++) {
                         convertRelativeToAbsoluteCoords(dest.children[i], dest.newY);
                     }
-                } else {
-                    dest.delta = 0;
                 }
             } else {
                 throw "error: Cannot merge timelines. Src and dest node ids differ.";
             }
         }
-        function Merge(src, dest) {
+        function merge(src, dest, noAnimation, callback) {
+            if (typeof noAnimation === "undefined") { noAnimation = false; }
+            if (typeof callback === "undefined") { callback = function () {
+            }; }
             if(typeof CZ.Authoring !== 'undefined' && CZ.Authoring.isActive) {
                 return;
             }
             if(src && dest) {
-                if(dest.id === "__root__") {
-                    src.AspectRatio = 10;
-                    var t = generateLayout(src, dest);
-                    convertRelativeToAbsoluteCoords(t, 0);
-                    dest.children.push(t);
-                    animateElement(dest);
-                    CZ.Common.vc.virtualCanvas("requestInvalidate");
-                } else {
-                    merge(src, dest);
-                    dest.newHeight += dest.delta;
-                    animateElement(dest);
-                    CZ.Common.vc.virtualCanvas("requestInvalidate");
+                try  {
+                    if(dest.id === "__root__") {
+                        src.AspectRatio = 10;
+                        var t = generateLayout(src, dest);
+                        convertRelativeToAbsoluteCoords(t, 0);
+                        dest.children.push(t);
+                        animateElement(dest, noAnimation, callback);
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    } else {
+                        var root = CZ.Common.vc.virtualCanvas("getLayerContent");
+                        src = extendLcaPathToRoot(root.children[0], src);
+                        dest = root.children[0];
+                        dest.delta = 0;
+                        mergeTimelines(src, dest);
+                        dest.newHeight += dest.delta;
+                        animateElement(dest, noAnimation, callback);
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    }
+                } catch (error) {
+                    console.log(error);
                 }
             }
         }
-        Layout.Merge = Merge;
+        Layout.merge = merge;
     })(CZ.Layout || (CZ.Layout = {}));
     var Layout = CZ.Layout;
 })(CZ || (CZ = {}));
@@ -6678,65 +6714,6 @@ var CZ;
                 var vis = vp.visible;
                 self.recentViewport = new CZ.Viewport.Viewport2d(vp.aspectRatio, vp.width, vp.height, new CZ.Viewport.VisibleRegion2d(vis.centerX, vis.centerY, vis.scale));
             };
-            var requestTimer = null;
-            this.getMissingData = function (vbox, lca) {
-                if(typeof CZ.Authoring === 'undefined' || CZ.Authoring.isActive === false) {
-                    window.clearTimeout(requestTimer);
-                    requestTimer = window.setTimeout(function () {
-                        getMissingTimelines(vbox, lca);
-                    }, 1000);
-                }
-            };
-            function getMissingTimelines(vbox, lca) {
-                CZ.Data.getTimelines({
-                    lca: lca.guid,
-                    start: vbox.left,
-                    end: vbox.right,
-                    minspan: CZ.Settings.minTimelineWidth * vbox.scale
-                }).then(function (response) {
-                    CZ.Layout.Merge(response, lca);
-                }, function (error) {
-                    console.log("Error connecting to service:\n" + error.responseText);
-                });
-            }
-            function getMissingExhibits(vbox, lca, exhibitIds) {
-                CZ.Service.postData({
-                    ids: exhibitIds
-                }).then(function (response) {
-                    MergeContentItems(lca, exhibitIds, response.exhibits);
-                }, function (error) {
-                    console.log("Error connecting to service:\n" + error.responseText);
-                });
-            }
-            function extractExhibitIds(timeline) {
-                var ids = [];
-                if(timeline.exhibits instanceof Array) {
-                    timeline.exhibits.forEach(function (childExhibit) {
-                        ids.push(childExhibit.id);
-                    });
-                }
-                if(timeline.timelines instanceof Array) {
-                    timeline.timelines.forEach(function (childTimeline) {
-                        ids = ids.concat(extractExhibitIds(childTimeline));
-                    });
-                }
-                return ids;
-            }
-            function MergeContentItems(timeline, exhibitIds, exhibits) {
-                timeline.children.forEach(function (child) {
-                    if(child.type === "infodot") {
-                        var idx = exhibitIds.indexOf(child.guid);
-                        if(idx !== -1) {
-                            child.contentItems = exhibits[idx].contentItems;
-                        }
-                    }
-                });
-                timeline.children.forEach(function (child) {
-                    if(child.type === "timeline") {
-                        MergeContentItems(child, exhibitIds, exhibits);
-                    }
-                });
-            }
             gesturesSource.Subscribe(function (gesture) {
                 if(typeof gesture != "undefined" && !CZ.Authoring.isActive) {
                     var isAnimationActive = self.activeAnimation;
@@ -6748,9 +6725,8 @@ var CZ;
                         return;
                     }
                     if(gesture.Type == "Pan" || gesture.Type == "Zoom") {
+                        window.clearTimeout(CZ.Common.requestMissingDataTimer);
                         var newlyEstimatedViewport = calculateTargetViewport(latestViewport, gesture, self.estimatedViewport);
-                        var vbox = CZ.Common.viewportToViewBox(newlyEstimatedViewport);
-                        var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
                         if(!self.estimatedViewport) {
                             self.activeAnimation = new CZ.ViewportAnimation.PanZoomAnimation(latestViewport);
                             self.saveScreenParameters(latestViewport);
@@ -6834,10 +6810,6 @@ var CZ;
             }, 1000);
             this.PanViewportAccessor = PanViewport;
             this.moveToVisible = function (visible, noAnimation) {
-                var currentViewport = getViewport();
-                var targetViewport = new CZ.Viewport.Viewport2d(currentViewport.aspectRatio, currentViewport.width, currentViewport.height, visible);
-                var vbox = CZ.Common.viewportToViewBox(targetViewport);
-                var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
                 if(noAnimation) {
                     self.stopAnimation();
                     self.setVisible(visible);
@@ -8853,9 +8825,12 @@ var CZ;
                 requestInvalidate: function () {
                     this.requestNewFrame = false;
                     if(CZ.Layout.animatingElements.length != 0) {
-                        for(var id in CZ.Layout.animatingElements) {
-                            if(CZ.Layout.animatingElements[id].animation && CZ.Layout.animatingElements[id].animation.isAnimating) {
-                                CZ.Layout.animatingElements[id].calculateNewFrame();
+                        for(var i = 0; i < CZ.Layout.animatingElements.length; i++) {
+                            var el = CZ.Layout.animatingElements[i];
+                            if(!el) {
+                                CZ.Layout.animatingElements.splice(i, 1);
+                            } else if(el.animation && el.animation.isAnimating) {
+                                el.calculateNewFrame();
                                 this.requestNewFrame = true;
                             }
                         }
@@ -10136,7 +10111,7 @@ var CZ;
         function ProcessContent(content) {
             var root = Common.vc.virtualCanvas("getLayerContent");
             root.beginEdit();
-            CZ.Layout.Merge(content, root);
+            CZ.Layout.merge(content, root);
             root.endEdit(true);
             InitializeRegimes(content);
             if(Common.startHash) {
@@ -10217,6 +10192,36 @@ var CZ;
             };
             Common.maxPermitedScale = CZ.UrlNav.navStringToVisible(Common.cosmosVisible, Common.vc).scale * 1.1;
         }
+        Common.requestMissingDataTimer;
+        function getMissingData(vbox, lca) {
+            if(typeof CZ.Authoring === 'undefined' || CZ.Authoring.isActive === false) {
+                var root = CZ.Common.vc.virtualCanvas("getLayerContent");
+                if(root.children.length > 0) {
+                    window.clearTimeout(Common.requestMissingDataTimer);
+                    Common.requestMissingDataTimer = window.setTimeout(function () {
+                        CZ.Service.getTimelines({
+                            start: vbox.left,
+                            end: vbox.right,
+                            minspan: CZ.Settings.minTimelineWidth * vbox.scale,
+                            commonAncestor: lca.guid,
+                            maxElements: 2000
+                        }).then(function (response) {
+                            if(!response) {
+                                return;
+                            }
+                            if(Common.controller.activeAnimation && Common.controller.activeAnimation.type === "EllipticalZoom") {
+                                return;
+                            }
+                            CZ.Layout.merge(response, lca);
+                        }, function (error) {
+                            console.log("Error connecting to service:\n" + error.responseText);
+                        });
+                    }, 1000);
+                }
+            }
+        }
+        Common.getMissingData = getMissingData;
+        ;
         function updateLayout() {
             CZ.BreadCrumbs.visibleAreaWidth = $(".breadcrumbs-container").width();
             CZ.BreadCrumbs.updateHiddenBreadCrumbs();

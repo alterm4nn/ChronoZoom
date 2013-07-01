@@ -259,79 +259,6 @@ module CZ {
                     ));
             };
 
-            var requestTimer = null;
-            this.getMissingData = function (vbox, lca) {
-                // request new data only in case if authoring is not active
-                if (typeof CZ.Authoring === 'undefined' || CZ.Authoring.isActive === false) {
-                    window.clearTimeout(requestTimer);
-                    requestTimer = window.setTimeout(function () { getMissingTimelines(vbox, lca); }, 1000);
-                }
-            };
-
-            function getMissingTimelines(vbox, lca) {
-                CZ.Data.getTimelines({
-                    lca: lca.guid,
-                    start: vbox.left,
-                    end: vbox.right,
-                    minspan: CZ.Settings.minTimelineWidth * vbox.scale
-                }).then(
-                    function (response) {
-                        CZ.Layout.Merge(response, lca);
-
-                        // NYI: Server currently does not support incremental data. Consider/Future:
-                        //      var exhibitIds = extractExhibitIds(response);
-                        //      getMissingExhibits(vbox, lca, exhibitIds);
-                    },
-                    function (error) {
-                        console.log("Error connecting to service:\n" + error.responseText);
-                    }
-                );
-            }
-
-            function getMissingExhibits(vbox, lca, exhibitIds) {
-                CZ.Service.postData({
-                    ids: exhibitIds
-                }).then(
-                    function (response) {
-                        MergeContentItems(lca, exhibitIds, response.exhibits);
-                    },
-                    function (error) {
-                        console.log("Error connecting to service:\n" + error.responseText);
-                    }
-                );
-            }
-
-            function extractExhibitIds(timeline) {
-                var ids = [];
-                if (timeline.exhibits instanceof Array) {
-                    timeline.exhibits.forEach(function (childExhibit) {
-                        ids.push(childExhibit.id);
-                    });
-                }
-                if (timeline.timelines instanceof Array) {
-                    timeline.timelines.forEach(function (childTimeline) {
-                        ids = ids.concat(extractExhibitIds(childTimeline));
-                    });
-                }
-                return ids;
-            }
-
-            function MergeContentItems(timeline, exhibitIds, exhibits) {
-                timeline.children.forEach(function (child) {
-                    if (child.type === "infodot") {
-                        var idx = exhibitIds.indexOf(child.guid);
-                        if (idx !== -1) {
-                            child.contentItems = exhibits[idx].contentItems;
-                        }
-                    }
-                });
-
-                timeline.children.forEach(function (child) {
-                    if (child.type === "timeline")
-                        MergeContentItems(child, exhibitIds, exhibits);
-                });
-            }
-
             gesturesSource.Subscribe(function (gesture) {
                 if (typeof gesture != "undefined" && !CZ.Authoring.isActive) {
                     var isAnimationActive = self.activeAnimation;
@@ -346,15 +273,9 @@ module CZ {
                     }
 
                     if (gesture.Type == "Pan" || gesture.Type == "Zoom") {
+                        window.clearTimeout(CZ.Common.requestMissingDataTimer); //stops any pending requests to the server for missing data
+
                         var newlyEstimatedViewport = calculateTargetViewport(latestViewport, gesture, self.estimatedViewport);
-
-                        var vbox = CZ.Common.viewportToViewBox(newlyEstimatedViewport);
-                        var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
-
-                        //if (!CZ.Common.vc.virtualCanvas("inBuffer", wnd, newlyEstimatedViewport.visible.scale)) {
-                        //    var lca = CZ.Common.vc.virtualCanvas("findLca", wnd);
-                        //    self.getMissingData(vbox, lca);
-                        //}
 
                         if (!self.estimatedViewport) { //if there is no ongoing PanZoom animation create it
                             self.activeAnimation = new CZ.ViewportAnimation.PanZoomAnimation(latestViewport);
@@ -471,16 +392,6 @@ module CZ {
             //param visible (Visible2D) a visible region to zoom into
             //param noAnimation (bool) - method performs instant transition without any animation if true
             this.moveToVisible = function (visible, noAnimation) {
-                var currentViewport = getViewport();
-                var targetViewport = new CZ.Viewport.Viewport2d(currentViewport.aspectRatio, currentViewport.width, currentViewport.height, visible);
-                var vbox = CZ.Common.viewportToViewBox(targetViewport);
-                var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
-
-                //if (!CZ.Common.vc.virtualCanvas("inBuffer", wnd, targetViewport.visible.scale)) {
-                //    var lca = CZ.Common.vc.virtualCanvas("findLca", wnd);
-                //    self.getMissingData(vbox, lca);
-                //}
-
                 if (noAnimation) {
                     self.stopAnimation();
                     self.setVisible(visible);

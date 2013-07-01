@@ -7,11 +7,11 @@
 module CZ {
     export module Layout {
 
-        var isLayoutAnimation = true; // temp variable for debugging
-
-        export var animatingElements = { // hashmap of animating elements in ongoing dynamic layout animation
-            length: 0 // length of hashmap
-        };
+        // array containing the elements of an ongoing merge animation
+        // can contain multiple objects with same id
+        // e.g. during content item zoom level changes, exhibits can contain
+        // the same content item at different zoom levels, all having the same id
+        export var animatingElements = [];
 
         function Timeline(title, left, right, childTimelines, exhibits) {
             this.Title = title;
@@ -553,7 +553,6 @@ module CZ {
 
         // takes a metadata timeline (FromTimeUnit, FromYear, FromMonth, FromDay, ToTimeUnit, ToYear, ToMonth, ToDay)
         // and returns a corresponding scenegraph (x, y, width, height)
-        // todo: remove dependency on virtual canvas (vc)
         function generateLayout(tmd, tsg) {
             try {
                 if (!tmd.AspectRatio) tmd.height = tsg.height;
@@ -594,7 +593,7 @@ module CZ {
         // calculates the net force excerted on each child timeline and infodot
         // after expansion of child timelines to fit the newly added content
         function calculateForceOnChildren(tsg) {
-            var eps = tsg.height / 10;
+            var eps = tsg.width / 20.0;
 
             var v = [];
             for (var i = 0, el; i < tsg.children.length; i++) {
@@ -616,7 +615,7 @@ module CZ {
                         var b = el.y + el.newHeight + eps;
                         for (var j = i + 1; j < v.length; j++) {
                             var ael = v[j];
-                            if (ael.x > l && ael.x < r || ael.x + ael.width > l && ael.x + ael.width < r || ael.x + ael.width > l && ael.x + ael.width === 0 && r === 0) {
+                            if (!(ael.x <= l && ael.x + ael.width <= l || ael.x >= r && ael.x + ael.width >= r)) {
                                 // ael intersects (l, r)
                                 if (ael.y < b) {
                                     // ael overlaps with el
@@ -637,7 +636,7 @@ module CZ {
         }
 
 
-        function animateElement(elem) {
+        function animateElement(elem, noAnimation, callback) {
             var duration = CZ.Settings.canvasElementAnimationTime;
             var args = [];
 
@@ -649,18 +648,21 @@ module CZ {
                     elem.baseline = elem.newBaseline;
             }
 
-            if (elem.newY != elem.y && !elem.id.match("__header__"))
+            if (elem.newY != elem.y) {
                 args.push({
                     property: "y",
                     startValue: elem.y,
                     targetValue: elem.newY
                 });
-            if (elem.newHeight != elem.height && !elem.id.match("__header__"))
+            }
+
+            if (elem.newHeight != elem.height) {
                 args.push({
                     property: "height",
                     startValue: elem.height,
                     targetValue: elem.newHeight
                 });
+            }
 
             if (elem.opacity != 1 && elem.fadeIn == false) {
                 args.push({
@@ -671,23 +673,27 @@ module CZ {
                 duration = CZ.Settings.canvasElementFadeInTime;
             }
 
-            if (isLayoutAnimation == false || args.length == 0)
+            if (noAnimation || args.length == 0) {
                 duration = 0;
+            }
 
-            initializeAnimation(elem, duration, args);
+            initializeAnimation(elem, duration, args, callback);
 
             // first animate resize/transition of buffered content. skip new content
             if (elem.fadeIn == true) {
-                for (var i = 0; i < elem.children.length; i++)
-                    if (elem.children[i].fadeIn == true)
-                        animateElement(elem.children[i]);
+                for (var i = 0; i < elem.children.length; i++) {
+                    if (elem.children[i].fadeIn == true) {
+                        animateElement(elem.children[i], noAnimation, callback);
+                    }
+                }
+            } else { // animate new content (fadeIn = false)
+                for (var i = 0; i < elem.children.length; i++) {
+                    animateElement(elem.children[i], noAnimation, callback);
+                }
             }
-            else // animate new content (fadeIn = false)
-                for (var i = 0; i < elem.children.length; i++)
-                    animateElement(elem.children[i]);
         }
 
-        function initializeAnimation(elem, duration, args) {
+        function initializeAnimation(elem, duration, args, callback) {
             var startTime = (new Date()).getTime();
 
             elem.animation = {
@@ -697,11 +703,8 @@ module CZ {
                 args: args // arguments of canvas element that should be animated
             };
 
-            // add elem to hash map
-            if (typeof animatingElements[elem.id] === 'undefined') {
-                animatingElements[elem.id] = elem;
-                animatingElements.length++;
-            }
+            // add elem to array of animating elements
+            animatingElements.push(elem);
 
             // calculates new animation frame of element
             elem.calculateNewFrame = function () {
@@ -725,8 +728,7 @@ module CZ {
                     elem.animation.isAnimating = false;
                     elem.animation.args = [];
 
-                    delete animatingElements[elem.id];
-                    animatingElements.length--;
+                    animatingElements.splice(animatingElements.indexOf(elem), 1);
 
                     if (elem.fadeIn == false)
                         elem.fadeIn = true;
@@ -734,7 +736,14 @@ module CZ {
                     // animate newly added content of this element
                     for (var i = 0; i < elem.children.length; i++)
                         if (typeof elem.children[i].animation === 'undefined')
-                            animateElement(elem.children[i]);
+                            animateElement(elem.children[i], duration === 0, callback);
+
+                    // merge animations are over
+                    if (animatingElements.length === 0) {
+                        if (callback && typeof(callback) === "function") {
+                            callback();
+                        }
+                    }
 
                     return;
                 }
@@ -747,16 +756,47 @@ module CZ {
             return parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (parts[1] ? "." + parts[1] : "");
         }
 
-        // src = metadata tree (responsedump.txt + isBuffered)
-        // dest = scenegraph tree (tree of CanvasTimelines) 
-        // returns void. 
-        // mutates scenegraph tree (dest) by appending missing data from metadata tree (src).
+        function extendLcaPathToRoot(tl, lca) {
+            if (tl.guid == lca.id) {
+                return lca;
+            } else {
+                for (var i = 0; i < tl.children.length; i++) {
+                    if (tl.children[i].type === 'timeline') {
+                        var child = extendLcaPathToRoot(tl.children[i], lca);
 
-        // dest timelines can be in 1 of 3 states
-        // 1. No Metadata.  (isBuffered == false)
-        // 2. All Metadata. (isBuffered == false)
-        // 3. All Content.  (isBuffered == true)
-        function merge(src, dest) {
+                        if (child) {
+                            var t = {
+                                id: tl.guid,
+                                title: tl.title,
+                                timelines: []
+                            };
+
+                            for (var i = 0; i < tl.children.length; i++) {
+                                if (tl.children[i].type === 'timeline') {
+                                    if (tl.children[i].guid === child.id) {
+                                        t.timelines.push(child)
+                                    } else {
+                                        var c = {
+                                            id: tl.children[i].guid,
+                                            title: tl.children[i].title,
+                                            timelines: null
+                                        };
+                                        t.timelines.push(c);
+                                    }
+                                }
+                            }
+
+                            return t;
+                        }
+                    }
+                }
+            }
+        }
+
+        // src = metadata object tree
+        // dest = scenegraph object tree
+        // mutates the scenegraph tree (dest) by appending missing data from metadata tree (src).
+        function mergeTimelines(src, dest) {
             if (src.id === dest.guid) {
                 var srcChildTimelines = (src.timelines instanceof Array) ? src.timelines : [];
                 var destChildTimelines = [];
@@ -764,10 +804,7 @@ module CZ {
                     if (dest.children[i].type && dest.children[i].type === "timeline")
                         destChildTimelines.push(dest.children[i]);
 
-
-                if (srcChildTimelines.length === destChildTimelines.length) { // dest contains all src children
-                    dest.isBuffered = dest.isBuffered || (src.timelines instanceof Array);
-
+                if (dest.isBuffered) { // dest contains all its child timelines
                     // cal bbox (top, bottom) for child timelines and infodots
                     var origTop = Number.MAX_VALUE;
                     var origBottom = Number.MIN_VALUE;
@@ -781,9 +818,11 @@ module CZ {
                     }
 
                     // merge child timelines
-                    dest.delta = 0;
+                    for (var i = 0; i < destChildTimelines.length; i++)
+                        destChildTimelines[i].delta = 0;
+
                     for (var i = 0; i < srcChildTimelines.length; i++)
-                        merge(srcChildTimelines[i], destChildTimelines[i]);
+                        mergeTimelines(srcChildTimelines[i], destChildTimelines[i]);
 
                     // check if child timelines have expanded
                     var haveChildTimelineExpanded = false;
@@ -828,13 +867,16 @@ module CZ {
                         dest.titleObject.fadeIn = false;
                         delete dest.titleObject.animation;
 
-                        // assert: child content cannot exceed parent
+                        /*
+                        // assert: children don't exceed parent
                         if (bottom > dest.titleObject.newY) {
                             var msg = bottomElementName + " EXCEEDS " + dest.title + ".\n" + "bottom: " + numberWithCommas(bottom) + "\n" + "   top: " + numberWithCommas(dest.titleObject.newY) + "\n";
                             console.log(msg);
                         }
-
-                        // assert: child content doesnot overlap
+                        */
+                        
+                        /*
+                        // assert: children don't overlap
                         for (var i = 1; i < dest.children.length; i++) {
                             var el = dest.children[i];
                             for (var j = 1; j < dest.children.length; j++) {
@@ -851,51 +893,62 @@ module CZ {
                                 }
                             }
                         }
+                        */
                     }
-                } else if (srcChildTimelines.length > 0 && destChildTimelines.length === 0) { // dest does not contain any src children
+
+                } else { // dest does not contain all its child timelines
+                    if (!src.timelines) return;
                     var t = generateLayout(src, dest);
                     var margin = Math.min(t.width, t.newHeight) * CZ.Settings.timelineHeaderMargin;
                     dest.delta = Math.max(0, t.newHeight - dest.newHeight); // timelines can only grow, never shrink
 
                     // replace dest.children (timelines, infodots, titleObject) with matching t.children
                     dest.children.splice(0);
-                    for (var i = 0; i < t.children.length; i++)
+                    for (var i = 0; i < t.children.length; i++) {
                         dest.children.push(t.children[i]);
+                        t.children[i].parent = dest;
+                    }
                     dest.titleObject = dest.children[0];
-
-                    dest.isBuffered = dest.isBuffered || (src.timelines instanceof Array);
+                    dest.isBuffered = t.isBuffered;
 
                     // dest now contains all src children
                     for (var i = 0; i < dest.children.length; i++)
                         convertRelativeToAbsoluteCoords(dest.children[i], dest.newY);
-                } else {
-                    dest.delta = 0;
                 }
             } else {
                 throw "error: Cannot merge timelines. Src and dest node ids differ.";
             }
         }
 
-        export function Merge(src, dest) {
+        export function merge(src, dest, noAnimation? = false, callback? = () => { }) {
             // skip dynamic layout during active authoring session
             if (typeof CZ.Authoring !== 'undefined' && CZ.Authoring.isActive)
                 return;
 
             if (src && dest) {
-                if (dest.id === "__root__") {
-                    src.AspectRatio = 10;
-                    var t = generateLayout(src, dest);
-                    convertRelativeToAbsoluteCoords(t, 0);
-                    dest.children.push(t);
-                    animateElement(dest);
-                    CZ.Common.vc.virtualCanvas("requestInvalidate");
-                } else {
-                    merge(src, dest);
-                    dest.newHeight += dest.delta;
-                    animateElement(dest);
-                    CZ.Common.vc.virtualCanvas("requestInvalidate");
+                try {
+                    if (dest.id === "__root__") {
+                        src.AspectRatio = 10;
+                        var t = generateLayout(src, dest);
+                        convertRelativeToAbsoluteCoords(t, 0);
+                        dest.children.push(t);
+                        animateElement(dest, noAnimation, callback);
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    } else {
+                        var root = CZ.Common.vc.virtualCanvas("getLayerContent");
+                        src = extendLcaPathToRoot(root.children[0], src);
+                        dest = root.children[0];
+                        dest.delta = 0;
+                        mergeTimelines(src, dest);
+                        dest.newHeight += dest.delta;
+                        animateElement(dest, noAnimation, callback);
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    }
+                } catch (error) {
+                    console.log(error);
                 }
             }
         }
+
     }
 }

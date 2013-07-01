@@ -70,8 +70,8 @@ module CZ {
             vc = (<any>$)('#vc');
             vc.virtualCanvas();
         }
-        
-        
+
+
         /* Calculates local offset of mouse cursor in specified jQuery element.
         @param jqelement  (JQuery to Dom element) jQuery element to get local offset for.
         @param event   (Mouse event args) mouse event args describing mouse cursor.
@@ -246,7 +246,7 @@ module CZ {
         function ProcessContent(content) {
             var root = vc.virtualCanvas("getLayerContent");
             root.beginEdit();
-            CZ.Layout.Merge(content, root);
+            CZ.Layout.merge(content, root);
             root.endEdit(true);
 
             InitializeRegimes(content);
@@ -337,6 +337,38 @@ module CZ {
             };
             maxPermitedScale = CZ.UrlNav.navStringToVisible(cosmosVisible, vc).scale * 1.1;
         }
+
+        // throttles requests to the server such that 
+        // min interval between request >= 1 sec
+        export var requestMissingDataTimer;
+
+        // request missing timeline data from the server
+        export function getMissingData(vbox, lca) {
+            // request new data only in case if authoring is not active
+            if (typeof CZ.Authoring === 'undefined' || CZ.Authoring.isActive === false) {
+                var root = CZ.Common.vc.virtualCanvas("getLayerContent");
+                if (root.children.length > 0) {
+                    window.clearTimeout(requestMissingDataTimer);
+                    requestMissingDataTimer = window.setTimeout(function () {
+                        CZ.Service.getTimelines({
+                            start: vbox.left,
+                            end: vbox.right,
+                            minspan: CZ.Settings.minTimelineWidth * vbox.scale,
+                            commonAncestor: lca.guid,
+                            maxElements: 2000
+                        }).then(
+                        function (response) {
+                            if (!response) return;
+                            if (controller.activeAnimation && controller.activeAnimation.type === "EllipticalZoom") return;
+                            CZ.Layout.merge(response, lca);
+                        },
+                        function (error) {
+                            console.log("Error connecting to service:\n" + error.responseText);
+                        });
+                    }, 1000);
+                }
+            }
+        };
 
         export function updateLayout() {
             CZ.BreadCrumbs.visibleAreaWidth = $(".breadcrumbs-container").width();

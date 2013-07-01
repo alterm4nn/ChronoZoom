@@ -386,9 +386,12 @@ var CZ;
                 requestInvalidate: function () {
                     this.requestNewFrame = false;
                     if(CZ.Layout.animatingElements.length != 0) {
-                        for(var id in CZ.Layout.animatingElements) {
-                            if(CZ.Layout.animatingElements[id].animation && CZ.Layout.animatingElements[id].animation.isAnimating) {
-                                CZ.Layout.animatingElements[id].calculateNewFrame();
+                        for(var i = 0; i < CZ.Layout.animatingElements.length; i++) {
+                            var el = CZ.Layout.animatingElements[i];
+                            if(!el) {
+                                CZ.Layout.animatingElements.splice(i, 1);
+                            } else if(el.animation && el.animation.isAnimating) {
+                                el.calculateNewFrame();
                                 this.requestNewFrame = true;
                             }
                         }
