@@ -178,7 +178,7 @@ namespace Application.Helper.Helpers
         private void InitTimelineCreationMode()
         {
             Logger.Log("<-");
-            MoveToElementAndClick(By.XPath("//*[@title='Create your events']"));
+            MoveToElementAndClick(By.XPath("//*[@title='Create Your Events']"));
             MoveToElementAndClick(By.XPath("//button[text()='create timeline']"));
             Logger.Log("->");
         }
