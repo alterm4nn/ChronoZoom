@@ -52,13 +52,13 @@ namespace Tests
         }
 
         [TestMethod]
-        public void new_timline_should_not_have_null_id()
+        public void new_timeline_should_not_have_null_id()
         {
             Assert.IsNotNull(_newTimeline.TimelineId);
         }
 
         [TestMethod]
-        public void new_timline_should_be_deleted()
+        public void new_timeline_should_be_deleted()
         {
             TimelineHelper.DeleteTimeline(_newTimeline);
             Assert.IsFalse(TimelineHelper.IsTimelineFound(_newTimeline));

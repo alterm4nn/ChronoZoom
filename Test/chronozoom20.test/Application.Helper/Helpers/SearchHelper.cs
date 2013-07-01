@@ -9,7 +9,7 @@ namespace Application.Helper.Helpers
         public void InitSearchWindow()
         {
             Logger.Log("<-");
-            Click(By.Id("search_button"));
+            Click(By.XPath("//*[@class='header-icon search-icon']"));
             Logger.Log("->");
         }
 
@@ -46,21 +46,21 @@ namespace Application.Helper.Helpers
         private void TypeSearchString(string searchText)
         {
             Logger.Log("<- text: " + searchText);
-            TypeText(By.Id("searchTextBox"),searchText);
+            TypeText(By.XPath("//input[@type='search']"), searchText);
             Logger.Log("->");
         }
 
         private void WaitSearchProcess()
         {
             Logger.Log("<-");
-            WaitForElementIsNotDisplayed(By.Id("loadingImage"));
+            WaitForElementIsNotDisplayed(By.ClassName("cz-form-progress-bar"));
             Logger.Log("->");
         }
 
         private void NavigateToSearchResult(string name)
         {
             Logger.Log("<- result: " + name);
-            MoveToElementAndClick(By.XPath(string.Format("//*[@class='searchResult' and text()='{0}']",name)));
+            MoveToElementAndClick(By.XPath(string.Format("//*[@class='cz-form-search-result' and text()='{0}']", name)));
             Logger.Log("->");
         }
 
