@@ -23,6 +23,8 @@
 *.sbr
 *.sdf
 *.opensdf
+*.mdf
+*.ldf
 *.unsuccessfulbuild
 *.pubxml
 ipch/
