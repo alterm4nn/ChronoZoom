@@ -74,7 +74,8 @@ module CZ {
                 }
                 this.saveButton.click(event => {
                     
-
+                    this.startDate.setDate("d");
+                    var result = this.startDate.getDate();
                     this.errorMessage.empty();
                     var isDataValid = false;
                     isDataValid = CZ.Authoring.validateTimelineData(this.startDate.getDate(), this.endDate.getDate(), this.titleInput.val());

@@ -109,25 +109,28 @@ module CZ {
                 year: coordinate,
                 regime: "CE"
             }
-
+            var eps_const = 100000;
             if (coordinate < -999999999) {
-                year.year = (year.year ) / (-1000000000);
+                year.year = (year.year - 1) / (-1000000000);
+                year.year = Math.round(year.year * eps_const) / eps_const;
                 year.regime = 'Ga';
             } else if (coordinate < -999999) {
-                year.year = (year.year) / (-1000000);
+                year.year = (year.year - 1) / (-1000000);
+                year.year = Math.round(year.year * eps_const) / eps_const;
                 year.regime = 'Ma';
             } else if (coordinate < -9999) {
-                year.year = (year.year) / (-1000);
+                year.year = (year.year - 1) / (-1000);
+                year.year = Math.round(year.year * eps_const) / eps_const;
                 year.regime = 'Ka';
             } else if (coordinate < 1) {
-                year.year = (year.year) / (-1);
+                year.year = (year.year - 1) / (-1);
                 // remove fraction part of year
                 year.year = Math.ceil(year.year);
                 year.regime = 'BCE';
             }
             else {
                 // remove fraction part of year
-                year.year = Math.floor(year.year);
+                 year.year = Math.floor(year.year);
             }
             //if (year.regime === 'BCE') {
             //    year.year += 2;
