@@ -1458,6 +1458,7 @@ namespace Chronozoom.UI
                 }
 
                 storage.SaveChanges();
+                Cache.Remove(string.Format(CultureInfo.InvariantCulture, "Tour {0}", collection.Id));
                 return returnValue;
             });
         }
@@ -1604,6 +1605,7 @@ namespace Chronozoom.UI
                 DeleteBookmarks(storage, deleteTour);
                 storage.Tours.Remove(deleteTour);
                 storage.SaveChanges();
+                Cache.Remove(string.Format(CultureInfo.InvariantCulture, "Tour {0}", collection.Id));
             });
         }
 
