@@ -190,7 +190,7 @@ namespace Application.Helper.Helpers
         private void InitExhibitCreationMode()
         {
             Logger.Log("<-");
-            MoveToElementAndClick(By.XPath("//*[@title='Create your events']"));
+            MoveToElementAndClick(By.XPath("//*[@title='Create Your Events']"));
             MoveToElementAndClick(By.XPath("//button[text()='create exhibit']"));
             Logger.Log("->");
         }
