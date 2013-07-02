@@ -94,7 +94,7 @@ namespace Chronozoom.UI
         /// HTTP verb: GET
         ///
         /// URL: 
-        /// http://{URL}/api//{supercollection}/{collection}/tours
+        /// http://{URL}/api/{supercollection}/{collection}/tours
         /// ]]>
         /// </example>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
@@ -103,6 +103,26 @@ namespace Chronozoom.UI
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/{collection}/tours")]
         BaseJsonResult<IEnumerable<Tour>> GetTours(string superCollection, string collection);
+
+        /// <summary>
+        /// Returns the timelines belonging to a tour for a given collection or superCollection.
+        /// </summary>
+        /// <param name="superCollection">Name of the superCollection to query.</param>
+        /// <param name="collection">Name of the collection to query.</param>
+        /// <param name="tourId">Id of the tour to retrieve.</param>
+        /// <param name="viewportWidth">Width of the viewport in pixels.</param>
+        /// <param name="minTimelineSize">Minimal width of timeline in pixels.</param>
+        /// <returns>A list of tours in JSON format.</returns>
+        /// <example><![CDATA[ 
+        /// HTTP verb: GET
+        ///
+        /// URL: 
+        /// http://{URL}/api/{supercollection}/{collection}/tour
+        /// ]]>
+        /// </example>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        Timeline GetTour(string superCollection, string collection, string tourId, string viewportWidth, string minTimelineSize);
 
         /// <summary>
         /// Creates a new user, or updates an existing user's information and associated personal collection.

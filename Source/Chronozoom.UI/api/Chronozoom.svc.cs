@@ -434,6 +434,121 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1307:SpecifyStringComparison", MessageId = "System.String.LastIndexOf(System.String)"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
+        public Timeline GetTour(string superCollection, string collection, string tourId, string viewportWidth, string minTimelineSize)
+        {
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                Trace.TraceInformation("Get Tour");
+
+                Guid collectionId;
+                Guid tourid;
+                Tour tour;
+                decimal width;
+                decimal minsz;
+
+                try
+                {
+                    collectionId = CollectionIdOrDefault(storage, superCollection, collection);
+                    tourid = Guid.Parse(tourId);
+                    tour = storage.Tours.Where(candidate => candidate.Collection.Id == collectionId && candidate.Id == tourid).First();
+                    storage.Entry(tour).Collection(x => x.Bookmarks).Load();
+                    width = decimal.Parse(viewportWidth, CultureInfo.InvariantCulture);
+                    minsz = decimal.Parse(minTimelineSize, CultureInfo.InvariantCulture);
+                }
+                catch (Exception)
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.TourNotFound);
+                    return null;
+                }
+
+                if (width <= 0 || minsz <= 0)
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.TourNotFound);
+                    return null;
+                }
+
+                string id;
+                var paths = new Collection<Timeline>();
+                foreach (var bookmark in tour.Bookmarks)
+                {
+                    var url = bookmark.Url;
+                    Guid timelineId;
+                    Timeline timeline;
+                    try
+                    {
+                        id = url.Substring(url.LastIndexOf(@"/t") + 2);
+                        if (id.Contains('/'))
+                        {
+                            id = id.Substring(0, id.IndexOf('/'));
+                        }
+                        timelineId = Guid.Parse(id);
+                        timeline = storage.Timelines.Where(candidate => candidate.Id == timelineId).First();
+                    }
+                    catch (Exception)
+                    {
+                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TourNotFound);
+                        return null;
+                    }
+                    
+                    var a = Math.Min(0, timeline.FromYear);
+                    var b = Math.Min(0, timeline.ToYear);
+                    var c = Math.Max(0, timeline.FromYear);
+                    var d = Math.Max(0, timeline.ToYear);
+                    var scale = minsz * (((b - a) + (d - c)) / width);
+                    paths.Add(this.GetTimelines(null, null, 
+                        timeline.FromYear.ToString(CultureInfo.InvariantCulture), 
+                        timeline.ToYear.ToString(CultureInfo.InvariantCulture), 
+                        scale.ToString(CultureInfo.InvariantCulture), 
+                        timelineId.ToString(), 
+                        _maxElements.Value.ToString(CultureInfo.InvariantCulture), 
+                        "1")
+                    );
+                }
+
+                if (paths.Count == 0)
+                {
+                    SetStatusCode(HttpStatusCode.NoContent, ErrorDescription.TourNotFound);
+                    return null;
+                }
+
+                var path = paths[0];
+                for (var i = 1; i < paths.Count; i++)
+                {
+                    if (paths[i] != null && path != null)
+                    {
+                        MergeTourTimelines(paths[i], path);
+                    }
+                }
+
+                return path;
+            });
+        }
+
+        private void MergeTourTimelines(Timeline src, Timeline dest)
+        {
+            if (src.Id == dest.Id)
+            {
+                if (dest.ChildTimelines == null)
+                {
+                    dest.ChildTimelines = src.ChildTimelines;
+                    dest.Exhibits = src.Exhibits;
+                }
+                else
+                {
+                    if (src.ChildTimelines != null)
+                        if (src.ChildTimelines.Count == dest.ChildTimelines.Count)
+                            for (var i = 0; i < src.ChildTimelines.Count; i++)
+                                MergeTourTimelines(src.ChildTimelines[i], dest.ChildTimelines[i]);
+                        else
+                            throw new InvalidOperationException("Source and Destination timelines have different number of child timeline.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
         public String PutUser(User userRequest)
         {
             return ApiOperation<String>(delegate(User user, Storage storage)
