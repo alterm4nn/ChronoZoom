@@ -329,16 +329,52 @@ namespace Chronozoom.UI
                 searchTerm = searchTerm.ToUpperInvariant();
 
                 var timelines = storage.Timelines.Where(_ => _.Title.ToUpper().Contains(searchTerm) && _.Collection.Id == collectionId).Take(MaxSearchLimit).ToList();
-                var searchResults = timelines.Select(timeline => new SearchResult { Id = timeline.Id, Title = timeline.Title, ObjectType = ObjectType.Timeline }).ToList();
+                var searchResults = timelines.Select(timeline =>
+                {
+                    return new SearchResult 
+                    { 
+                        Id = timeline.Id, 
+                        Title = timeline.Title, 
+                        ObjectType = ObjectType.Timeline,
+                        EnclosingTimelineId = timeline.Id,
+                        EnclosingTimelineStart = timeline.FromYear,
+                        EnclosingTimelineEnd = timeline.ToYear
+                    };
+                }).ToList();
 
                 var exhibits = storage.Exhibits.Where(_ => _.Title.ToUpper().Contains(searchTerm) && _.Collection.Id == collectionId).Take(MaxSearchLimit).ToList();
-                searchResults.AddRange(exhibits.Select(exhibit => new SearchResult { Id = exhibit.Id, Title = exhibit.Title, ObjectType = ObjectType.Exhibit }));
+                searchResults.AddRange(exhibits.Select(exhibit => 
+                {
+                    var enclosingTimeline = storage.Timelines.Where(_ => _.Exhibits.Select(e => e.Id).Contains(exhibit.Id)).First();
+                    return new SearchResult 
+                    { 
+                        Id = exhibit.Id, 
+                        Title = exhibit.Title, 
+                        ObjectType = ObjectType.Exhibit,
+                        EnclosingTimelineId = enclosingTimeline.Id,
+                        EnclosingTimelineStart = enclosingTimeline.FromYear,
+                        EnclosingTimelineEnd = enclosingTimeline.ToYear
+                    }; 
+                }));
 
                 var contentItems = storage.ContentItems.Where(_ =>
                     (_.Title.ToUpper().Contains(searchTerm) || _.Caption.ToUpper().Contains(searchTerm))
                      && _.Collection.Id == collectionId
                     ).Take(MaxSearchLimit).ToList();
-                searchResults.AddRange(contentItems.Select(contentItem => new SearchResult { Id = contentItem.Id, Title = contentItem.Title, ObjectType = ObjectType.ContentItem }));
+                searchResults.AddRange(contentItems.Select(contentItem => 
+                {
+                    var enclosingExhibit = storage.Exhibits.Where(_ => _.ContentItems.Select(ci => ci.Id).Contains(contentItem.Id)).First();
+                    var enclosingTimeline = storage.Timelines.Where(_ => _.Exhibits.Select(e => e.Id).Contains(enclosingExhibit.Id)).First();
+                    return new SearchResult
+                    {
+                        Id = contentItem.Id,
+                        Title = contentItem.Title,
+                        ObjectType = ObjectType.ContentItem,
+                        EnclosingTimelineId = enclosingTimeline.Id,
+                        EnclosingTimelineStart = enclosingTimeline.FromYear,
+                        EnclosingTimelineEnd = enclosingTimeline.ToYear
+                    };
+                }));
 
                 Trace.TraceInformation("Search called for search term {0}", searchTerm);
                 return new BaseJsonResult<IEnumerable<SearchResult>>(searchResults);
