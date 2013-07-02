@@ -152,6 +152,25 @@ namespace Application.Helper.Helpers
             return description;
         }
 
+        public void OpenExhibit()
+        {
+            Logger.Log("<-");
+            HelperManager<NavigationHelper>.Instance.OpenExhibitEukaryoticCells();
+            Logger.Log("->");
+        }
+
+        public void OpenBibliography()
+        {
+            Logger.Log("<-");
+            HelperManager<ImageHelper>.Instance.ClickOnBibliographyImage();
+            Logger.Log("->");
+        }
+
+        public bool IsBibliographyOpened()
+        {
+            return IsElementDisplayed(By.Id("bibliography"));
+        }
+
         private void ConfirmDeletion()
         {
             AcceptAlert();

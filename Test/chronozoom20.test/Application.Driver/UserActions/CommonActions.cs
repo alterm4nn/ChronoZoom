@@ -271,6 +271,11 @@ namespace Application.Driver.UserActions
         {
             IWebElement element = FindElement(by);
             InvokeChain(() => Builder.MoveToElement(element, x, y));
+        }  
+        
+        protected void ClickByCoordinates(int x, int y)
+        {
+            InvokeChain(() => Builder.MoveToElement(FindElement(By.XPath("//body")),0,0).MoveByOffset(x,y).Click());
         }
 
         protected string GetAttributeValue(By by, string attributeName)
