@@ -653,6 +653,110 @@ var CZ;
 ;
 var CZ;
 (function (CZ) {
+    (function (Extensions) {
+        (function (RIN) {
+            function getScript() {
+                return "http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjs/lib/rin-core-1.0.js";
+            }
+            RIN.getScript = getScript;
+            function getExtension(vc, parent, layerid, id, contentSource, vx, vy, vw, vh, z, onload) {
+                var rinDiv;
+                if(!rinDiv) {
+                    rinDiv = document.createElement('div');
+                    rinDiv.setAttribute("id", id);
+                    rinDiv.setAttribute("class", "rinPlayer");
+                    rinDiv.addEventListener("mousemove", CZ.Common.preventbubble, false);
+                    rinDiv.addEventListener("mousedown", CZ.Common.preventbubble, false);
+                    rinDiv.addEventListener("DOMMouseScroll", CZ.Common.preventbubble, false);
+                    rinDiv.addEventListener("mousewheel", CZ.Common.preventbubble, false);
+                    rin.processAll(null, 'http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjs/').then(function () {
+                        var playerElement = document.getElementById(id);
+                        var playerControl = rin.getPlayerControl(rinDiv);
+                        var deepstateUrl = playerControl.resolveDeepstateUrlFromAbsoluteUrl(window.location.href);
+                        playerControl.load(contentSource);
+                    });
+                } else {
+                    rinDiv.isAdded = false;
+                }
+                return new RINPlayer(vc, parent, layerid, id, contentSource, vx, vy, vw, vh, z, onload, rinDiv);
+            }
+            RIN.getExtension = getExtension;
+            function RINPlayer(vc, parent, layerid, id, contentSource, vx, vy, vw, vh, z, onload, rinDiv) {
+                this.base = CZ.VCContent.CanvasDomItem;
+                this.base(vc, layerid, id, vx, vy, vw, vh, z);
+                this.initializeContent(rinDiv);
+                this.onRemove = function () {
+                    var rinplayerControl = rin.getPlayerControl(rinDiv);
+                    if(rinplayerControl) {
+                        rinplayerControl.pause();
+                        if(rinplayerControl.unload) {
+                            rinplayerControl.unload();
+                        }
+                        rinplayerControl = null;
+                    }
+                    this.prototype.onRemove.call(this);
+                };
+                this.prototype = new CZ.VCContent.CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
+            }
+        })(Extensions.RIN || (Extensions.RIN = {}));
+        var RIN = Extensions.RIN;
+    })(CZ.Extensions || (CZ.Extensions = {}));
+    var Extensions = CZ.Extensions;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (Extensions) {
+        var extensions = [];
+        function mediaTypeIsExtension(mediaType) {
+            return mediaType.toLowerCase().indexOf('extension-') === 0;
+        }
+        Extensions.mediaTypeIsExtension = mediaTypeIsExtension;
+        function registerExtensions() {
+            registerExtension("RIN", CZ.Extensions.RIN.getExtension, "http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjs/lib/rin-core-1.0.js");
+        }
+        Extensions.registerExtensions = registerExtensions;
+        function registerExtension(name, initializer, script) {
+            extensions[name.toLowerCase()] = {
+                "initializer": initializer,
+                "script": script
+            };
+        }
+        function activateExtension(mediaType) {
+            if(!mediaTypeIsExtension(mediaType)) {
+                return;
+            }
+            var extensionName = extensionNameFromMediaType(mediaType);
+            addScript(extensionName, getScriptFromExtensionName(extensionName));
+        }
+        Extensions.activateExtension = activateExtension;
+        function getInitializer(mediaType) {
+            var extensionName = extensionNameFromMediaType(mediaType);
+            return extensions[extensionName.toLowerCase()].initializer;
+        }
+        Extensions.getInitializer = getInitializer;
+        function extensionNameFromMediaType(mediaType) {
+            var extensionIndex = 'extension-'.length;
+            return mediaType.substring(extensionIndex, mediaType.length);
+        }
+        function addScript(extensionName, scriptPath) {
+            var scriptId = "extension-" + extensionName;
+            if(document.getElementById(scriptId)) {
+                return;
+            }
+            var script = document.createElement("script");
+            script.type = "text/javascript";
+            script.src = scriptPath;
+            script.id = scriptId;
+            document.getElementsByTagName("head")[0].appendChild(script);
+        }
+        function getScriptFromExtensionName(name) {
+            return extensions[name.toLowerCase()].script;
+        }
+    })(CZ.Extensions || (CZ.Extensions = {}));
+    var Extensions = CZ.Extensions;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
     (function (VCContent) {
         var elementclick = ($).Event("elementclick");
         function getVisibleForElement(element, scale, viewport, use_margin) {
@@ -730,6 +834,13 @@ var CZ;
                 throw "Image size must be positive";
             }
             return VCContent.addChild(element, new SeadragonImage(element.vc, element, layerid, id, imgSrc, vx, vy, vw, vh, z, onload), false);
+        };
+        VCContent.addExtension = function (extensionName, element, layerid, id, vx, vy, vw, vh, z, imgSrc, onload) {
+            if(vw <= 0 || vh <= 0) {
+                throw "Extension size must be positive";
+            }
+            var initializer = CZ.Extensions.getInitializer(extensionName);
+            return VCContent.addChild(element, initializer(element.vc, element, layerid, id, imgSrc, vx, vy, vw, vh, z, onload), false);
         };
         VCContent.addVideo = function (element, layerid, id, videoSource, vx, vy, vw, vh, z) {
             return VCContent.addChild(element, new CanvasVideoItem(element.vc, layerid, id, videoSource, vx, vy, vw, vh, z), false);
@@ -1708,6 +1819,7 @@ var CZ;
             };
             this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
         }
+        VCContent.CanvasDomItem = CanvasDomItem;
         function CanvasScrollTextItem(vc, layerid, id, vx, vy, vw, vh, text, z) {
             this.base = CanvasDomItem;
             this.base(vc, layerid, id, vx, vy, vw, vh, z);
@@ -1951,6 +2063,8 @@ var CZ;
                         addAudio(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     } else if(this.contentItem.mediaType.toLowerCase() === 'pdf') {
                         VCContent.addPdf(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
+                    } else if(CZ.Extensions.mediaTypeIsExtension(contentItem.mediaType)) {
+                        VCContent.addExtension(contentItem.mediaType, container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);
                     }
                     var titleText = this.contentItem.title;
                     addText(container, layerid, id + "__title__", vx + leftOffset, titleTop, titleTop + titleHeight / 2.0, 0.9 * titleHeight, titleText, {
@@ -5879,6 +5993,9 @@ var CZ;
             if(timeline.exhibits instanceof Array) {
                 timeline.exhibits.forEach(function (exhibit) {
                     exhibit.x = CZ.Dates.getCoordinateFromDecimalYear(exhibit.time);
+                    exhibit.contentItems.forEach(function (contentItem) {
+                        CZ.Extensions.activateExtension(contentItem.mediaType);
+                    });
                 });
             }
             if(timeline.timelines instanceof Array) {
@@ -11716,6 +11833,7 @@ var CZ;
             })();
             $('.bubbleInfo').hide();
             var canvasIsEmpty;
+            CZ.Extensions.registerExtensions();
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;

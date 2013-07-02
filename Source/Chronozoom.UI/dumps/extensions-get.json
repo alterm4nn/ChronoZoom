@@ -1,0 +1,19 @@
+[ { "Height" : null,
+    "start" : 2000.0,
+    "end" : 9999.0,
+    "exhibits" : [ { "contentItems" : [ { "Order" : 1,
+                "Year" : 2005.0,
+                "description" : "This content item is a sample of the RIN extension for ChronoZoom.",
+                "id" : "B192934D-41F0-490D-A340-CE863C30B8AC",
+                "mediaType" : "Extension-Rin",
+                "title" : "RIN Extension",
+                "uri" : "/dumps/extensions/rin-sample.js"
+              }
+            ],
+          "id" : "5659A2C5-4ACA-48BD-BFEC-FD4EF2B55CC2",
+          "time" : 1993.0,
+          "title" : "RIN Extension"
+        }],
+	"id" : "1855E5B7-4B79-4BED-A531-B52EEAA2860B",
+    "title" : "Extension Samples"
+  } ]
