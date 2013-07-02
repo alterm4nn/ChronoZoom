@@ -541,6 +541,7 @@ module CZ {
 
                     // update parameters of animating elements and require new frame if needed
                     if (CZ.Layout.animatingElements.length != 0) {
+                        console.log("Animating " + CZ.Layout.animatingElements.length);
                         for (var i = 0; i < CZ.Layout.animatingElements.length; i++) {
                             var el = CZ.Layout.animatingElements[i];
                             if (!el) {
@@ -561,8 +562,9 @@ module CZ {
                         self.isInAnimation = false;
                         self.invalidate();
 
-                        if (self.requestNewFrame)
+                        if (self.requestNewFrame) {
                             self.requestInvalidate();
+                        }
                     }, 1000.0 / CZ.Settings.targetFps); // 1/targetFps sec (targetFps is defined in a settings.js)
                 },
 

@@ -386,6 +386,7 @@ var CZ;
                 requestInvalidate: function () {
                     this.requestNewFrame = false;
                     if(CZ.Layout.animatingElements.length != 0) {
+                        console.log("Animating " + CZ.Layout.animatingElements.length);
                         for(var i = 0; i < CZ.Layout.animatingElements.length; i++) {
                             var el = CZ.Layout.animatingElements[i];
                             if(!el) {

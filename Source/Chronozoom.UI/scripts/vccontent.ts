@@ -314,7 +314,10 @@ module CZ {
                 var child = parent.children[i];
                 if (child.id == id) {
                     // remove element from array of animating elements in dynamic layout animation
-                    var matches = CZ.Layout.animatingElements.filter((el) => { return el.id === child.id; });
+                    var matches = CZ.Layout.animatingElements.filter((el) => {
+                        return el.id === child.id &&
+                            (el.animation && child.animation) ? el.animation.startTime === child.animation.startTime : false;
+                    });
                     for (var k = 0; k < matches.length; k++) {
                         CZ.Layout.animatingElements.splice(CZ.Layout.animatingElements.indexOf(matches[k]), 1);
                     }
@@ -351,7 +354,10 @@ module CZ {
                 var child = element.children[i];
 
                 // remove element from array of animating elements in dynamic layout animation
-                var matches = CZ.Layout.animatingElements.filter((el) => { return el.id === child.id; });
+                var matches = CZ.Layout.animatingElements.filter((el) => {
+                    return el.id === child.id &&
+                        (el.animation && child.animation) ? el.animation.startTime === child.animation.startTime : false;
+                });
                 for (var k = 0; k < matches.length; k++) {
                     CZ.Layout.animatingElements.splice(CZ.Layout.animatingElements.indexOf(matches[k]), 1);
                 }
