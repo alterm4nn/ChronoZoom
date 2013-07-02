@@ -86,6 +86,10 @@ var CZ;
                 Activation: FeatureActivation.Enabled,
                 JQueryReference: ".header-breadcrumbs"
             }, 
+            {
+                Name: "Themes",
+                Activation: FeatureActivation.NotProduction
+            }, 
             
         ];
         HomePageViewModel.rootCollection;
@@ -371,7 +375,10 @@ var CZ;
                     profilePanel: "#profile-panel",
                     loginPanelLogin: "#profile-panel.auth-panel-login",
                     context: "",
-                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring")
+                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring"),
+                    collectionTheme: CZ.Settings.theme,
+                    collectionThemeInput: "#collection-theme",
+                    collectionThemeWrapper: IsFeatureEnabled(_featureMap, "Themes") ? "#collection-theme-wrapper" : null
                 });
                 var loginForm = new CZ.UI.FormLogin(forms[6], {
                     activationSource: $("#login-panel"),
@@ -385,6 +392,7 @@ var CZ;
                     event.preventDefault();
                     if(!profileForm.isFormVisible) {
                         closeAllForms();
+                        profileForm.setTheme(CZ.Settings.theme);
                         profileForm.show();
                     } else {
                         profileForm.close();
@@ -400,6 +408,7 @@ var CZ;
                             $("#profile-panel input#username").focus();
                             if(!profileForm.isFormVisible) {
                                 closeAllForms();
+                                profileForm.setTheme(CZ.Settings.theme);
                                 profileForm.show();
                             } else {
                                 profileForm.close();
@@ -442,6 +451,14 @@ var CZ;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
+            CZ.Settings.applyTheme(null);
+            CZ.Service.getCollections(CZ.Service.superCollectionName).then(function (response) {
+                $(response).each(function (index) {
+                    if(response[index] && response[index].Title.toLowerCase() === CZ.Service.collectionName.toLowerCase()) {
+                        CZ.Settings.applyTheme(response[index].theme);
+                    }
+                });
+            });
             $('#breadcrumbs-nav-left').click(CZ.BreadCrumbs.breadCrumbNavLeft);
             $('#breadcrumbs-nav-right').click(CZ.BreadCrumbs.breadCrumbNavRight);
             $('#tour_prev').mouseout(function () {

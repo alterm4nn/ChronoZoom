@@ -194,6 +194,33 @@ namespace Chronozoom.UI
         /// </summary>
         /// <remarks>
         /// If a collection of the specified name does not exist then a new collection is created. 
+        /// The title field can't be modified because it is part of the URL (the URL can be indexed).
+        /// </remarks>
+        /// <param name="superCollectionName">The name of the parent supercollection.</param>
+        /// <param name="collectionName">The name of the collection to create.</param>
+        /// <param name="collectionRequest">[Collection](#collection) data in JSON format.</param>
+        /// <returns></returns>
+        /// <example><![CDATA[ 
+        /// HTTP verb: PUT
+        ///
+        /// URL:
+        /// http://{URL}/api/{supercollection}/{collection}
+        ///
+        /// Request body (JSON):
+        /// {
+        ///      id: "{id}",
+        ///      title: "{title}"
+        /// }
+        /// ]]>
+        /// </example>
+        [OperationContract]
+        [WebInvoke(Method = "POST", UriTemplate = "/{superCollectionName}/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        Guid PostCollection(string superCollectionName, string collectionName, Collection collectionRequest);
+
+        /// <summary>
+        /// Modifies an existing collection.
+        /// </summary>
+        /// <remarks>
         /// If the collection exists and the authenticated user is the author then the collection is modified. 
         /// If no author is registered then the authenticated user is set as the author. 
         /// The title field can't be modified because it is part of the URL (the URL can be indexed).
@@ -217,7 +244,7 @@ namespace Chronozoom.UI
         /// </example>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        Guid PutCollectionName(string superCollectionName, string collectionName, Collection collectionRequest);
+        Guid PutCollection(string superCollectionName, string collectionName, Collection collectionRequest);
 
         /// <summary>
         /// Deletes the specified collection.
@@ -572,18 +599,33 @@ namespace Chronozoom.UI
         string GetContentPath(string superCollection, string collection, string reference);
         
         /// <summary>
+        /// Retrieve the list of all supercollections.
+        /// </summary>
+        /// <example><![CDATA[ 
+        /// HTTP verb: GET
+        ///
+        /// URL:
+        /// http://{URL}/api/supercollections
+        /// ]]>
+        /// </example>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        [OperationContract]
+        [WebGet(UriTemplate = "/supercollections", ResponseFormat = WebMessageFormat.Json)]
+        IEnumerable<SuperCollection> GetSuperCollections();
+
+        /// <summary>
         /// Retrieve the list of all collections.
         /// </summary>
         /// <example><![CDATA[ 
         /// HTTP verb: GET
         ///
         /// URL:
-        /// http://{URL}/api/collections
+        /// http://{URL}/api/{superCollection}/collections
         /// ]]>
         /// </example>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         [OperationContract]
-        [WebGet(UriTemplate = "/collections", ResponseFormat = WebMessageFormat.Json)]
-        IEnumerable<SuperCollection> GetCollections();
+        [WebGet(UriTemplate = "/{superCollectionName}/collections", ResponseFormat = WebMessageFormat.Json)]
+        IEnumerable<Collection> GetCollections(string superCollectionName);
     }
 }
