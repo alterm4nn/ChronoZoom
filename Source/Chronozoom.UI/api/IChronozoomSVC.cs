@@ -94,7 +94,7 @@ namespace Chronozoom.UI
         /// HTTP verb: GET
         ///
         /// URL: 
-        /// http://{URL}/api//{supercollection}/{collection}/tours
+        /// http://{URL}/api/{supercollection}/{collection}/tours
         /// ]]>
         /// </example>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
@@ -124,7 +124,7 @@ namespace Chronozoom.UI
         /// HTTP verb: PUT
         ///
         /// URL:
-        /// http://{URL}/api//{supercollection}/{collection}/user
+        /// http://{URL}/api/{supercollection}/{collection}/user
         /// 
         /// Request body (JSON):
         /// {
@@ -156,7 +156,7 @@ namespace Chronozoom.UI
         /// HTTP verb: DELETE
         /// 
         /// URL:
-        /// http://{URL}/api//{supercollection}/{collection}/user
+        /// http://{URL}/api/{supercollection}/{collection}/user
         /// 
         /// Request body (JSON):
         /// {
@@ -280,7 +280,7 @@ namespace Chronozoom.UI
         /// HTTP verb: PUT
         ///
         /// URL:
-        /// http://{URL}/api//{supercollection}/{collection}/timeline
+        /// http://{URL}/api/{supercollection}/{collection}/timeline
         ///
         /// Request body (JSON):
         /// {
@@ -303,7 +303,7 @@ namespace Chronozoom.UI
         /// HTTP verb: DELETE
         ///
         /// URL:
-        /// http://{URL}/api//{supercollection}/{collection}/timeline
+        /// http://{URL}/api/{supercollection}/{collection}/timeline
         ///
         /// Request body (JSON):
         /// {
@@ -316,7 +316,7 @@ namespace Chronozoom.UI
         void DeleteTimeline(string superCollectionName, string collectionName, Timeline timelineRequest);
         
         /// <summary>
-        /// Creates or updates the exhibit and its content items in a given collection. If the collection does not exist, then the command will silently fail.
+        /// Creates or updates the exhibit and its content items in a given collection. If the collection does not exist, then the command will fail. Prior to running this command, you will need to create the associated content items.
         /// </summary>
         /// <remarks>
         /// If an exhibit id is not specified, a new exhibit is added to the collection. 
@@ -334,7 +334,7 @@ namespace Chronozoom.UI
         /// HTTP verb: PUT
         ///
         /// URL:
-        /// http://{URL}/api//{supercollection}/{collection}/exhibit
+        /// http://{URL}/api/{supercollection}/{collection}/exhibit
         ///
         /// Request body (JSON):
         /// {
@@ -361,7 +361,7 @@ namespace Chronozoom.UI
         /// HTTP verb: DELETE
         ///
         /// URL:
-        /// http://{URL}/api//{supercollection}/{collection}/exhibit
+        /// http://{URL}/api/{supercollection}/{collection}/exhibit
         ///
         /// Request body:
         /// {
@@ -383,7 +383,7 @@ namespace Chronozoom.UI
         /// HTTP verb: PUT
         ///
         /// URL:
-        /// http://{URL}/api//{supercollection}/{collection}/contentitem
+        /// http://{URL}/api/{supercollection}/{collection}/contentitem
         ///
         /// Request body:
         /// {
