@@ -1,6 +1,6 @@
 # ChronoZoom REST API Reference #
 
-The ChronoZoom Representational State Transfer (REST) API makes it possible to programmatically access content within a given ChronoZoom deployment. All request data is in JavaScript Object Notation (JSON) format. This document describes how to make REST requests against ChronoZoom.
+The ChronoZoom Representational State Transfer (REST) API makes it possible to programmatically access content within a given ChronoZoom deployment. All request data is in JavaScript Object Notation (JSON) format. This document describes how to make calls against the ChronoZoom REST API .
 
 ## Using the REST API ##
 ChronoZoom REST requests use standard HTTP verbs (GET, PUT, DELETE). The request URL syntax is as follows:
@@ -18,7 +18,7 @@ Use JSON for the request body:
 
 ## Contents ##
 - [ChronoZoom Entities](#chronozoom-entities)
-- [ChronoZoom REST Commands](#chronozoom-rest-commands)
+- [ChronoZoom REST Operations](#chronozoom-rest-operations)
 
 ## ChronoZoom Entities ##
 - [BookmarkType](#bookmarktype)
@@ -272,7 +272,7 @@ A registered user.
 ----------
  
 
-## ChronoZoom REST Commands ##
+## ChronoZoom REST Operations ##
 - [GetTimelines](#gettimelines)
 - [Search](#search)
 - [GetDefaultTours](#getdefaulttours)
@@ -494,7 +494,7 @@ HTTP response code.
             
             Request body (JSON):
             {
-       displayName: "Neil"
+                displayName: "Neil"
             }
             
 
@@ -1058,18 +1058,18 @@ Delete a list of bookmarks belonging to the same tour.
  
 Retrieves a path to the given content id.
             
-            For t48fbb8a8-7c5d-49c3-83e1-98939ae2ae6, this API retrieves /t00000000-0000-0000-0000-000000000000/t48fbb8a8-7c5d-49c3-83e1-98939ae2ae67
+For t48fbb8a8-7c5d-49c3-83e1-98939ae2ae6, this API retrieves /00000000-0000-0000-0000-000000000000/t48fbb8a8-7c5d-49c3-83e1-98939ae2ae67
  
 **Returns**
 The full path to the content.
  
 **Example**
 
-            HTTP verb: GET
-            
-            URL:
-            http://{URL}/api/{supercollection}/{collection}/{reference}/contentpath
-            
+        HTTP verb: GET
+        
+        URL:
+        http://{URL}/api/{supercollection}/{collection}/{reference}/contentpath
+        
 
  
 **Parameters**
