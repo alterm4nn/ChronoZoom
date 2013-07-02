@@ -60,10 +60,7 @@ namespace Chronozoom.Entities
         public Storage()
         {
             base.Configuration.ProxyCreationEnabled = false;
-            if (System.Configuration.ConfigurationManager.ConnectionStrings[0].ProviderName.Equals("System.Data.​SqlClient"))
-            {
-                ((IObjectContextAdapter)this).ObjectContext.CommandTimeout = _storageTimeout.Value;
-            }
+            ((IObjectContextAdapter)this).ObjectContext.CommandTimeout = _storageTimeout.Value;
         }
 
         public static TraceSource Trace { get; private set; }
@@ -122,25 +119,10 @@ namespace Chronozoom.Entities
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
-        public IEnumerable<Timeline> TimelineSubtreeQuery(Guid collectionId, Guid? leastCommonAncestor, decimal startTime, decimal endTime, decimal minSpan, int maxElements)
+        public Timeline TimelineSubtreeQuery(Guid collectionId, Guid? leastCommonAncestor, decimal startTime, decimal endTime, decimal minSpan, int maxElements, int fromRoot)
         {
-            int maxAllElements = 0;
-            Dictionary<Guid, Timeline> timelinesMap = new Dictionary<Guid, Timeline>();
-            IEnumerable<TimelineRaw> allTimelines = null;
-
-            if (System.Configuration.ConfigurationManager.ConnectionStrings[0].ProviderName.Equals("System.Data.SqlClient"))
-            {
-                allTimelines = Database.SqlQuery<TimelineRaw>("EXEC TimelineSubtreeQuery {0}, {1}, {2}, {3}, {4}, {5}", collectionId, leastCommonAncestor, minSpan, startTime, endTime, maxElements);
-            }
-            else
-            {
-                allTimelines = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Collection_ID = {0}", collectionId);
-            }
-
-            IEnumerable<Timeline> rootTimelines = FillTimelinesFromFlatList(allTimelines, timelinesMap, null, ref maxAllElements);
-            FillTimelineRelations(timelinesMap, int.MaxValue);
-
-            return rootTimelines;
+            return Database.SqlQuery<TimelineRaw>("EXEC TimelineSubtreeQuery {0}, {1}, {2}, {3}, {4}, {5}, {6}",
+                        collectionId, startTime, endTime, minSpan, leastCommonAncestor, maxElements, fromRoot).FirstOrDefault();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "FromYear+13700000001"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "ToYear+13700000001")]
