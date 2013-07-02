@@ -128,8 +128,6 @@ namespace Chronozoom.UI
 
         private static readonly TraceSource Trace = new TraceSource("Service", SourceLevels.All) { Listeners = { Global.SignalRTraceListener } };
         private static MD5 _md5Hasher = MD5.Create();
-        private const decimal _minYear = -13700000000;
-        private const decimal _maxYear = 9999;
         private const int _defaultDepth = 30;
         private const string _defaultUserCollectionName = "default";
         private const string _defaultUserName = "anonymous";
@@ -195,6 +193,7 @@ namespace Chronozoom.UI
         private const int MaxSearchLimit = 50;
 
         // Is default progressive load enabled?
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         private static Lazy<bool> _progressiveLoadEnabled = new Lazy<bool>(() =>
         {
             string progressiveLoadEnabled = ConfigurationManager.AppSettings["ProgressiveLoadEnabled"];
@@ -254,7 +253,7 @@ namespace Chronozoom.UI
         /// Documentation under IChronozoomSVC
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "minspan")]
-        public Timeline GetTimelines(string superCollection, string collection, string start, string end, string minspan, string commonAncestor, string maxElements, string depth)
+        public Timeline GetTimelines(string superCollection, string collection, string start, string end, string minspan, string commonAncestor, string maxElements, string fromRoot)
         {
             return ApiOperation(delegate(User user, Storage storage)
             {
@@ -265,7 +264,7 @@ namespace Chronozoom.UI
                 // If available, retrieve from cache.
                 if (CanCacheGetTimelines(storage, user, collectionId))
                 {
-                    Timeline cachedTimeline = GetCachedGetTimelines(collectionId, start, end, minspan, commonAncestor, maxElements, depth);
+                    Timeline cachedTimeline = GetCachedGetTimelines(collectionId, start, end, minspan, commonAncestor, maxElements, fromRoot);
                     if (cachedTimeline != null)
                     {
                         return cachedTimeline;
@@ -273,37 +272,26 @@ namespace Chronozoom.UI
                 }
 
                 // initialize filters
-                decimal startTime = string.IsNullOrWhiteSpace(start) ? _minYear : decimal.Parse(start, CultureInfo.InvariantCulture);
-                decimal endTime = string.IsNullOrWhiteSpace(end) ? _maxYear : decimal.Parse(end, CultureInfo.InvariantCulture);
-                decimal span = string.IsNullOrWhiteSpace(minspan) ? 0 : decimal.Parse(minspan, CultureInfo.InvariantCulture);
-                Guid lcaParsed = string.IsNullOrWhiteSpace(commonAncestor) ? Guid.Empty : Guid.Parse(commonAncestor);
+                Timeline rootTimeline = storage.GetRootTimelines(collectionId);
+                decimal startTime = string.IsNullOrWhiteSpace(start) ? rootTimeline.FromYear : decimal.Parse(start, CultureInfo.InvariantCulture);
+                decimal endTime = string.IsNullOrWhiteSpace(end) ? rootTimeline.ToYear : decimal.Parse(end, CultureInfo.InvariantCulture);
+                decimal span = string.IsNullOrWhiteSpace(minspan) ? rootTimeline.ToYear - rootTimeline.FromYear : decimal.Parse(minspan, CultureInfo.InvariantCulture);
+                Guid lcaParsed = string.IsNullOrWhiteSpace(commonAncestor) ? rootTimeline.Id : Guid.Parse(commonAncestor);
                 int maxElementsParsed = string.IsNullOrWhiteSpace(maxElements) ? _maxElements.Value : int.Parse(maxElements, CultureInfo.InvariantCulture);
-                int depthParsed = string.IsNullOrWhiteSpace(depth) ? _defaultDepth : int.Parse(depth, CultureInfo.InvariantCulture);
+                int fromRootParsed = string.IsNullOrWhiteSpace(fromRoot) ? 0 : int.Parse(fromRoot, CultureInfo.InvariantCulture);
 
-                IEnumerable<Timeline> timelines = null;
-                if (!_progressiveLoadEnabled.Value || !string.IsNullOrWhiteSpace(depth))
-                    timelines = storage.TimelinesQuery(collectionId, startTime, endTime, span, lcaParsed == Guid.Empty ? (Guid?)null : lcaParsed, maxElementsParsed, depthParsed);
+                IEnumerable<Timeline> timelines = storage.TimelineSubtreeQuery(collectionId, lcaParsed, startTime, endTime, span, maxElementsParsed, fromRootParsed);
+                if (timelines.Any())
+                {
+                    Timeline timeline = timelines.First();
+                    CacheGetTimelines(timeline, collectionId, start, end, minspan, commonAncestor, maxElements, fromRoot);
+                    return timeline;
+                }
                 else
                 {
-                    if (ShouldRetrieveAllTimelines(storage, commonAncestor, collectionId, maxElementsParsed))
-                    {
-                        timelines = storage.RetrieveAllTimelines(collectionId);
-                    }
-                    else
-                    {
-                        Trace.TraceInformation("Get Timelines - Using Progressive Load");
-                        timelines = storage.TimelineSubtreeQuery(collectionId, lcaParsed, startTime, endTime, span, maxElementsParsed);
-                    }
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineNotFound);
+                    return null;
                 }
-
-                Timeline timeline = timelines.Where(candidate => candidate.Id == lcaParsed).FirstOrDefault();
-
-                if (timeline == null)
-                    timeline = timelines.FirstOrDefault();
-
-                CacheGetTimelines(timeline, collectionId, start, end, minspan, commonAncestor, maxElements, depth);
-
-                return timeline;
             });
         }
 
@@ -1921,16 +1909,16 @@ namespace Chronozoom.UI
             return (string)Cache[cacheKey] != userNameIdentifier;
         }
 
-        private static string GetTimelinesCacheKey(Guid collectionId, string start, string end, string minspan, string lca, string maxElements, string depth)
+        private static string GetTimelinesCacheKey(Guid collectionId, string start, string end, string minspan, string lca, string maxElements, string fromRoot)
         {
-            return string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}|{5}|{6}", collectionId, start, end, minspan, lca, maxElements, depth);
+            return string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}|{5}|{6}", collectionId, start, end, minspan, lca, maxElements, fromRoot);
         }
 
         // Retrieves the cached timeline.
         // Null if not cached.
-        private static Timeline GetCachedGetTimelines(Guid collectionId, string start, string end, string minspan, string lca, string maxElements, string depth)
+        private static Timeline GetCachedGetTimelines(Guid collectionId, string start, string end, string minspan, string lca, string maxElements, string fromRoot)
         {
-            string cacheKey = GetTimelinesCacheKey(collectionId, start, end, minspan, lca, maxElements, depth);
+            string cacheKey = GetTimelinesCacheKey(collectionId, start, end, minspan, lca, maxElements, fromRoot);
             if (Cache.Contains(cacheKey))
             {
                 return (Timeline)Cache[cacheKey];
@@ -1940,9 +1928,9 @@ namespace Chronozoom.UI
         }
 
         // Caches the given timeline for the given GetTimelines request.
-        private static void CacheGetTimelines(Timeline timeline, Guid collectionId, string start, string end, string minspan, string lca, string maxElements, string depth)
+        private static void CacheGetTimelines(Timeline timeline, Guid collectionId, string start, string end, string minspan, string lca, string maxElements, string fromRoot)
         {
-            string cacheKey = GetTimelinesCacheKey(collectionId, start, end, minspan, lca, maxElements, depth);
+            string cacheKey = GetTimelinesCacheKey(collectionId, start, end, minspan, lca, maxElements, fromRoot);
             if (!Cache.Contains(cacheKey) && timeline != null)
             {
                 Cache.Add(cacheKey, timeline);

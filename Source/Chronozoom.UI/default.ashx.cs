@@ -105,7 +105,7 @@ namespace Chronozoom.UI
             if (IsSuperCollectionPresent(superCollection))
             {
 
-               Timeline timeline = ChronozoomSVC.Instance.GetTimelines(superCollection, collection, null, null, null,null, null, "1");
+               Timeline timeline = ChronozoomSVC.Instance.GetTimelines(superCollection, collection, null, null, null,null, null, null);
                 if (timeline != null)
                 {
 

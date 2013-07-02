@@ -30,20 +30,20 @@ namespace Chronozoom.UI
         /// <param name="minspan">Filters the search results to a particular time scale.</param>
         /// <param name="commonAncestor">Least Common Ancestor, a timeline identifier used to hint the server to retrieve timelines close to this location.</param>
         /// <param name="maxElements">The maximum number of elements to return.</param>
-        /// <param name="depth">The max depth for children timelines.</param>
+        /// <param name="fromRoot">Append path from root to commonAncestor.</param>
         /// <returns>Timeline data in JSON format.</returns>
         /// <example><![CDATA[ 
         /// HTTP verb: GET
         ///
         /// URL:
-        /// http://{URL}/api/{supercollection}/{collection}/timelines?start={year}&end={year}
+        /// http://{URL}/api/{supercollection}/{collection}/timelines?start={year}&end={year}&minspan={year}&commonAncestor={guid}&maxElements={number}&fromRoot={bool}
         /// ]]>
         /// </example>
         [SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "End")]
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "minspan")]
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        Timeline GetTimelines(string superCollection, string collection, string start, string end, string minspan, string commonAncestor, string maxElements, string depth);
+        Timeline GetTimelines(string superCollection, string collection, string start, string end, string minspan, string commonAncestor, string maxElements, string fromRoot);
 
         /// <summary>
         /// Performs a search for a specific term within a collection or a superCollection.

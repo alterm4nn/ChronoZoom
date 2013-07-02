@@ -119,10 +119,19 @@ namespace Chronozoom.Entities
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
-        public Timeline TimelineSubtreeQuery(Guid collectionId, Guid? leastCommonAncestor, decimal startTime, decimal endTime, decimal minSpan, int maxElements, int fromRoot)
+        public IEnumerable<Timeline> TimelineSubtreeQuery(Guid collectionId, Guid? leastCommonAncestor, decimal startTime, decimal endTime, decimal minSpan, int maxElements, int fromRoot)
         {
-            return Database.SqlQuery<TimelineRaw>("EXEC TimelineSubtreeQuery {0}, {1}, {2}, {3}, {4}, {5}, {6}",
-                        collectionId, startTime, endTime, minSpan, leastCommonAncestor, maxElements, fromRoot).FirstOrDefault();
+            int maxAllElements = 0;
+            Dictionary<Guid, Timeline> timelinesMap = new Dictionary<Guid, Timeline>();
+            IEnumerable<TimelineRaw> allTimelines = null;
+
+            allTimelines = Database.SqlQuery<TimelineRaw>("EXEC TimelineSubtreeQuery {0}, {1}, {2}, {3}, {4}, {5}, {6}",
+                                            collectionId, startTime, endTime, minSpan, leastCommonAncestor, maxElements, fromRoot);
+
+            IEnumerable<Timeline> rootTimelines = FillTimelinesFromFlatList(allTimelines, timelinesMap, null, ref maxAllElements);
+            FillTimelineRelations(timelinesMap, int.MaxValue);
+
+            return rootTimelines;
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "FromYear+13700000001"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "ToYear+13700000001")]
@@ -160,7 +169,8 @@ namespace Chronozoom.Entities
                 if (exhibitRaw.ContentItems == null)
                     exhibitRaw.ContentItems = new System.Collections.ObjectModel.Collection<ContentItem>();
 
-                if (timelinesMap.Keys.Contains(exhibitRaw.Timeline_ID))
+                if (timelinesMap.Keys.Contains(exhibitRaw.Timeline_ID) 
+                    && timelinesMap[exhibitRaw.Timeline_ID].Exhibits != null)
                 {
                     timelinesMap[exhibitRaw.Timeline_ID].Exhibits.Add(exhibitRaw);
                     exhibits[exhibitRaw.Id] = exhibitRaw;
@@ -277,9 +287,6 @@ namespace Chronozoom.Entities
 
             foreach (TimelineRaw timelineRaw in timelinesRaw)
             {
-                if (timelineRaw.Exhibits == null)
-                    timelineRaw.Exhibits = new System.Collections.ObjectModel.Collection<Exhibit>();
-
                 timelinesParents[timelineRaw.Id] = timelineRaw.Timeline_ID;
                 timelinesMap[timelineRaw.Id] = timelineRaw;
 
@@ -299,8 +306,16 @@ namespace Chronozoom.Entities
                 else
                 {
                     Timeline parentTimeline = timelinesMap[(Guid)parentId];
+
                     if (parentTimeline.ChildTimelines == null)
+                    {
                         parentTimeline.ChildTimelines = new System.Collections.ObjectModel.Collection<Timeline>();
+                    }
+
+                    if (parentTimeline.Exhibits == null)
+                    {
+                        parentTimeline.Exhibits = new System.Collections.ObjectModel.Collection<Exhibit>();
+                    }
 
                     parentTimeline.ChildTimelines.Add(timeline);
                 }
