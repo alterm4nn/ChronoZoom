@@ -762,7 +762,7 @@ var CZ;
                 var child = parent.children[i];
                 if(child.id == id) {
                     var matches = CZ.Layout.animatingElements.filter(function (el) {
-                        return el.id === child.id;
+                        return el.id === child.id && (el.animation && child.animation) ? el.animation.startTime === child.animation.startTime : false;
                     });
                     for(var k = 0; k < matches.length; k++) {
                         CZ.Layout.animatingElements.splice(CZ.Layout.animatingElements.indexOf(matches[k]), 1);
@@ -8825,6 +8825,7 @@ var CZ;
                 requestInvalidate: function () {
                     this.requestNewFrame = false;
                     if(CZ.Layout.animatingElements.length != 0) {
+                        console.log("Animating");
                         for(var i = 0; i < CZ.Layout.animatingElements.length; i++) {
                             var el = CZ.Layout.animatingElements[i];
                             if(!el) {

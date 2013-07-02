@@ -711,10 +711,12 @@ module CZ {
                 var curTime = (new Date()).getTime();
                 var t;
 
-                if (elem.animation.duration > 0)
+                if (elem.animation.duration > 0) {
                     t = Math.min(1.0, (curTime - elem.animation.startTime) / elem.animation.duration); //projecting current time to the [0;1] interval of the animation parameter
-                else
+                }
+                else {
                     t = 1.0;
+                }
 
                 t = CZ.ViewportAnimation.animationEase(t);
 
