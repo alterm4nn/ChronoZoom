@@ -252,6 +252,7 @@
     <Content Include="images\edit-icon.png" />
     <Content Include="images\profile-icon.png" />
     <Content Include="images\search-icon.png" />
+    <Content Include="images\Temp-Thumbnail-Aqua.png" />
     <Content Include="images\timeseries-icon.png" />
     <Content Include="images\tour-icon.png" />
     <Content Include="images\view-icon.png" />

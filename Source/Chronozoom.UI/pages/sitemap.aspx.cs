@@ -21,7 +21,7 @@ namespace Chronozoom.UI
 
         protected static IEnumerable<SuperCollection> Collections()
         {
-            return ChronozoomSVC.Instance.GetCollections();
+            return ChronozoomSVC.Instance.GetSuperCollections();
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase")]
