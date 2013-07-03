@@ -58,7 +58,7 @@ describe("convertCoordinateToYear method should return", function () {
         it("regime BCE ", function () {
             var coordinate = value;
             var result = convertCoordinateToYear(coordinate);
-            expect(result.year).toEqual((coordinate) / -1);
+            expect(result.year).toEqual((coordinate - 1) / -1);
             expect(result.regime).toEqual('BCE');
         });
     });
@@ -67,7 +67,7 @@ describe("convertCoordinateToYear method should return", function () {
         it("regime Ka ", function () {
             var coordinate = value;
             var result = convertCoordinateToYear(coordinate);
-            expect(result.year).toEqual((coordinate) / -1000);
+            expect(result.year).toEqual((coordinate - 1) / -1000);
             expect(result.regime).toEqual('Ka');
         });
     });
@@ -75,7 +75,7 @@ describe("convertCoordinateToYear method should return", function () {
         it("regime Ma ", function () {
             var coordinate = value;
             var result = convertCoordinateToYear(coordinate);
-            expect(result.year).toEqual((coordinate) / -1000000);
+            expect(result.year).toEqual((coordinate - 1) / -1000000);
             expect(result.regime).toEqual('Ma');
         });
     });
@@ -84,7 +84,7 @@ describe("convertCoordinateToYear method should return", function () {
         it("regime Ga ", function () {
             var coordinate = value;
             var result = convertCoordinateToYear(coordinate);
-            expect(result.year).toEqual((coordinate) / -1000000000);
+            expect(result.year).toEqual(Math.round(((coordinate / -1000000000)) * 100000000) / 100000000);//;(coordinate) / -1000000000);
             expect(result.regime).toEqual('Ga');
         });
     });

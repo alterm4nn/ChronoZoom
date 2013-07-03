@@ -2309,7 +2309,14 @@ var CZ;
                     var title = '';
                     if(infodotDescription && infodotDescription.title && infodotDescription.date) {
                         var exhibitDate = CZ.Dates.convertCoordinateToYear(infodotDescription.date);
-                        title = infodotDescription.title + '\n(' + parseFloat(exhibitDate.year.toFixed(2)) + ' ' + exhibitDate.regime + ')';
+                        if((exhibitDate.regime == "CE") || (exhibitDate.regime == "BCE")) {
+                            var date_number = Number(infodotDescription.date);
+                            var exhibitDate = CZ.Dates.convertCoordinateToYear(date_number);
+                            date_number = Math.abs(date_number);
+                            title = infodotDescription.title + '\n(' + parseFloat((date_number).toFixed(2)) + ' ' + exhibitDate.regime + ')';
+                        } else {
+                            title = infodotDescription.title + '\n(' + parseFloat(exhibitDate.year.toFixed(2)) + ' ' + exhibitDate.regime + ')';
+                        }
                     }
                     var infodotTitle = addText(contentItem, layerid, id + "__title", time - titleWidth / 2, titleTop, titleTop, titleHeight, title, {
                         fontName: CZ.Settings.contentItemHeaderFontName,
@@ -3766,17 +3773,21 @@ var CZ;
                 year: coordinate,
                 regime: "CE"
             };
+            var eps_const = 100000;
             if(coordinate < -999999999) {
-                year.year = (year.year) / (-1000000000);
+                year.year = (year.year - 1) / (-1000000000);
+                year.year = Math.round(year.year * eps_const) / eps_const;
                 year.regime = 'Ga';
             } else if(coordinate < -999999) {
-                year.year = (year.year) / (-1000000);
+                year.year = (year.year - 1) / (-1000000);
+                year.year = Math.round(year.year * eps_const) / eps_const;
                 year.regime = 'Ma';
             } else if(coordinate < -9999) {
-                year.year = (year.year) / (-1000);
+                year.year = (year.year - 1) / (-1000);
+                year.year = Math.round(year.year * eps_const) / eps_const;
                 year.regime = 'Ka';
             } else if(coordinate < 1) {
-                year.year = (year.year) / (-1);
+                year.year = (year.year - 1) / (-1);
                 year.year = Math.ceil(year.year);
                 year.regime = 'BCE';
             } else {
@@ -8751,8 +8762,9 @@ var CZ;
                 var optionIntinite = $("<option value='infinite'>Infinite</option>");
                 this.modeSelector.append(optionIntinite);
             };
-            DatePicker.prototype.setDate = function (coordinate, InfinityConvertation) {
+            DatePicker.prototype.setDate = function (coordinate, InfinityConvertation, ZeroYearConversation) {
                 if (typeof InfinityConvertation === "undefined") { InfinityConvertation = false; }
+                if (typeof ZeroYearConversation === "undefined") { ZeroYearConversation = false; }
                 if(!this.validateNumber(coordinate)) {
                     return false;
                 }
@@ -8776,7 +8788,7 @@ var CZ;
                 }
                 switch(mode) {
                     case "year":
-                        this.setDate_YearMode(coordinate);
+                        this.setDate_YearMode(coordinate, ZeroYearConversation);
                         break;
                     case "date":
                         this.setDate_DateMode(coordinate);
@@ -8868,8 +8880,11 @@ var CZ;
                     this.yearSelector.val(parseFloat(this.yearSelector.val()).toFixed());
                 }
             };
-            DatePicker.prototype.setDate_YearMode = function (coordinate) {
+            DatePicker.prototype.setDate_YearMode = function (coordinate, ZeroYearConversation) {
                 var date = CZ.Dates.convertCoordinateToYear(coordinate);
+                if((date.regime.toLowerCase() == "bce") && (ZeroYearConversation)) {
+                    date.year--;
+                }
                 this.yearSelector.val(date.year);
                 this.regimeSelector.find(":selected").attr("selected", "false");
                 this.regimeSelector.find("option").each(function () {
@@ -10099,6 +10114,8 @@ var CZ;
                     this.endDate.setDate(this.timeline.x + this.timeline.width, true);
                 }
                 this.saveButton.click(function (event) {
+                    _this.startDate.setDate("d");
+                    var result = _this.startDate.getDate();
                     _this.errorMessage.empty();
                     var isDataValid = false;
                     isDataValid = CZ.Authoring.validateTimelineData(_this.startDate.getDate(), _this.endDate.getDate(), _this.titleInput.val());
@@ -10287,7 +10304,8 @@ var CZ;
                     this.titleTextblock.text("Create Exhibit");
                     this.saveButton.text("create exhibit");
                     this.titleInput.val(this.exhibit.title || "");
-                    this.datePicker.setDate(this.exhibit.infodotDescription.date || "");
+                    this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", false, true);
+                    console.log("this.datePicker.");
                     this.closeButton.show();
                     this.createArtifactButton.show();
                     this.saveButton.show();
@@ -10313,7 +10331,7 @@ var CZ;
                     this.titleTextblock.text("Edit Exhibit");
                     this.saveButton.text("update exhibit");
                     this.titleInput.val(this.exhibit.title || "");
-                    this.datePicker.setDate(this.exhibit.infodotDescription.date || "");
+                    this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", false, true);
                     this.closeButton.show();
                     this.createArtifactButton.show();
                     this.saveButton.show();
