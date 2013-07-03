@@ -11,13 +11,8 @@ var CZ;
                 }
                 vcElem = vcElem.parent;
             }
-            if(nav && nav !== '' && vp) {
-                var rx = (vp.visible.centerX - (el.x + el.width / 2)) / el.width;
-                var ry = (vp.visible.centerY - (el.y + el.height / 2)) / el.height;
-                var rw = vp.widthScreenToVirtual(vp.width) / el.width;
-                var rh = vp.heightScreenToVirtual(vp.height) / el.height;
+            if(nav && nav !== '') {
                 var URL = getURL();
-                nav += '@x=' + rx + "&y=" + ry + "&w=" + rw + "&h=" + rh;
                 if(typeof URL.hash.params != 'undefined') {
                     if(typeof URL.hash.params['tour'] != 'undefined') {
                         nav += "&tour=" + URL.hash.params["tour"];

@@ -37,17 +37,11 @@ module CZ {
         export var axis;
         export var vc;
         var visReg;
-        export var cosmosVisible;
-        export var earthVisible;
-        export var lifeVisible;
-        export var prehistoryVisible;
-        export var humanityVisible;
         var content;
         var breadCrumbs; //titles and visibles of the recent breadcrumbs
 
         var firstTimeWelcomeChecked = true; // if welcome screen checkbox checked or not
 
-        var regimes = [];
 
         var k = 1000000000;
         export var setNavigationStringTo; // { element or bookmark, id } identifies that we zoom into this element and when (if) finish the zoom, we should put the element's path into navigation string
@@ -213,142 +207,147 @@ module CZ {
         }
 
         //loading the data from the service
-        export function loadData() {            
-            return CZ.Data.getTimelines({
+        export function loadData() {
+            // load the initial skeleton timelines for regimes
+            return CZ.Service.getTimelines({
                 start: -400,
                 end: 9999,
                 minspan: 13700000000,
                 commonAncestor: CZ.Settings.humanityTimelineID,
                 fromRoot: 1
-            }).then(
-                function (response) {
-                    if (!response) {
-                        return;
+            })
+            .then(function (response) {
+                var root = vc.virtualCanvas("getLayerContent");
+                CZ.Layout.merge(response, root, true, () => {
+                    CZ.UrlNav.navigationAnchor = vc.virtualCanvas("findElement", 't' + response.id);
+                    initializeRegimes();
+                    if (startHash) {
+                        processHash();
+                    } else {
+                        displayRootTimeline();
                     }
+                });
 
-                    ProcessContent(response);
-                    vc.virtualCanvas("updateViewport");
-
-                    if (CZ.Common.initialContent) {
-                        CZ.Service.getContentPath(CZ.Common.initialContent).then(
-                            function (response) {
-                                window.location.hash = response;
-                            },
-                            function (error) {
-                                console.log("Error connecting to service:\n" + error.responseText);
-                            }
-                        );
-                    }
-
-                    CZ.Service.getTours().then(
-                        function (response) {
-                            CZ.Tours.parseTours(response);
-                            CZ.Tours.initializeToursContent();
-                        },
-                        function (error) {
-                            console.log("Error connecting to service:\n" + error.responseText);
-                        }
-                    );
-                },
-                function (error) {
+                CZ.Service.getTours()
+                .then(function (response) {
+                    CZ.Tours.parseTours(response);
+                }, function (error) {
                     console.log("Error connecting to service:\n" + error.responseText);
-                }
-            );
+                });
+            }, function (error) {
+                console.log("Error connecting to service:\n" + error.responseText);
+            });
         }
 
-        function ProcessContent(content) {
-            var root = vc.virtualCanvas("getLayerContent");
-            root.beginEdit();
-            CZ.Layout.merge(content, root);
-            root.endEdit(true);
+        export function getTimelineVisible(id) {
+            var tl = vc.virtualCanvas("findElement", 't' + id);
+            if (!tl) return;
+            var tlNavString = CZ.UrlNav.vcelementToNavString(tl);
+            if (!tlNavString) return;
+            var tlVisible = CZ.UrlNav.navStringToVisible(tlNavString, vc);
+            if (!tlVisible) return;
+            return tlVisible;
+        }
 
-            InitializeRegimes(content);
+        function initializeRegimes() {
+            $("#regime-link-cosmos").click(function () {
+                var cosmosVisible = CZ.Common.getTimelineVisible(CZ.Settings.cosmosTimelineID);
+                setVisible(cosmosVisible);
+            });
 
-            if (startHash) { // restoring the window's hash as it was on the page loading
-                visReg = CZ.UrlNav.navStringToVisible(startHash.substring(1), vc);
-            }
+            $("#regime-link-earth").click(function () {
+                var earthVisible = CZ.Common.getTimelineVisible(CZ.Settings.earthTimelineID);
+                setVisible(earthVisible);
+            });
 
-            if (!visReg && cosmosVisible) {
-                window.location.hash = cosmosVisible;
-                visReg = CZ.UrlNav.navStringToVisible(cosmosVisible, vc);
-            }
+            $("#regime-link-life").click(function () {
+                var lifeVisible = CZ.Common.getTimelineVisible(CZ.Settings.lifeTimelineID);
+                setVisible(lifeVisible);
+            });
 
+            $("#regime-link-prehistory").click(function () {
+                var prehistoryVisible = CZ.Common.getTimelineVisible(CZ.Settings.prehistoryTimelineID);
+                setVisible(prehistoryVisible);
+            });
+
+            $("#regime-link-humanity").click(function () {
+                var humanityVisible = CZ.Common.getTimelineVisible(CZ.Settings.humanityTimelineID);
+                setVisible(humanityVisible);
+            });
+        }
+
+        function displayRootTimeline() {
+            var tl = CZ.UrlNav.navigationAnchor || CZ.Common.vc.virtualCanvas("getLayerContent").children[0];
+            if (!tl) return;
+            var tlNavString = CZ.UrlNav.vcelementToNavString(tl);
+            if (!tlNavString) return;
+            var tlVisible = CZ.UrlNav.navStringToVisible(tlNavString, vc);
+            if (!tlVisible) return;
+            controller.moveToVisible(tlVisible, true);
+        }
+
+        function processHash() {
+            visReg = CZ.UrlNav.navStringToVisible(startHash.substring(1), vc);
             if (visReg) {
                 controller.moveToVisible(visReg, true);
                 updateAxis(vc, ax);
-                var vp = vc.virtualCanvas("getViewport");
 
-                if (startHash && window.location.hash !== startHash) {
-                    hashChangeFromOutside = false;
-                    window.location.hash = startHash; // synchronizing
-                }
-            }
-        }
-
-        function InitializeRegimes(content) {
-            var f = function (timeline) {
-                if (!timeline) return null;
-                var v = vc.virtualCanvas("findElement", 't' + timeline.id);
-                regimes.push(v);
-                if (v) v = CZ.UrlNav.vcelementToNavString(v);
-                return v;
-            }
-
-            var cosmosTimeline = content;
-            cosmosVisible = f(cosmosTimeline);
-            CZ.UrlNav.navigationAnchor = vc.virtualCanvas("findElement", 't' + cosmosTimeline.id);
-            $("#regime-link-cosmos").click(function () {
-                var visible = CZ.UrlNav.navStringToVisible(cosmosVisible, vc);
-                setVisible(visible);
-            });
-
-            var earthTimeline = CZ.Layout.FindChildTimeline(cosmosTimeline, CZ.Settings.earthTimelineID, true);
-            if (typeof earthTimeline !== "undefined") {
-                earthVisible = f(earthTimeline);
-                $("#regime-link-earth").click(function () {
-                    var visible = CZ.UrlNav.navStringToVisible(earthVisible, vc);
-                    setVisible(visible);
-                });
-
-                var lifeTimeline = CZ.Layout.FindChildTimeline(earthTimeline, CZ.Settings.lifeTimelineID);
-                if (typeof lifeTimeline !== "undefined") {
-                    lifeVisible = f(lifeTimeline);
-                    $("#regime-link-life").click(function () {
-                        var visible = CZ.UrlNav.navStringToVisible(lifeVisible, vc);
-                        setVisible(visible);
-                    });
-
-                    var prehistoryTimeline = CZ.Layout.FindChildTimeline(lifeTimeline, CZ.Settings.prehistoryTimelineID);
-                    if (typeof prehistoryTimeline !== "undefined") {
-                        prehistoryVisible = f(prehistoryTimeline);
-                        $("#regime-link-prehistory").click(function () {
-                            var visible = CZ.UrlNav.navStringToVisible(prehistoryVisible, vc);
-                            setVisible(visible);
-                        });
-
-                        var humanityTimeline = CZ.Layout.FindChildTimeline(prehistoryTimeline, CZ.Settings.humanityTimelineID, true);
-                        if (typeof humanityTimeline !== "undefined") {
-                            humanityVisible = f(humanityTimeline);
-                            $("#regime-link-humanity").click(function () {
-                                var visible = CZ.UrlNav.navStringToVisible(humanityVisible, vc);
-                                setVisible(visible);
-                            });
-                        }
+                //if (startHash && window.location.hash !== startHash) {
+                //    hashChangeFromOutside = false;
+                //    window.location.hash = startHash; // synchronizing
+                //}
+            } else {
+                var startPos, endPos, timelineID;
+                startPos = startHash.lastIndexOf("/t");
+                if (startPos !== -1) {
+                    startPos += 2;
+                    var idx1 = startHash.indexOf("/", startPos);
+                    var idx2 = startHash.indexOf("\\", startPos);
+                    var idx3 = startHash.indexOf("@", startPos);
+                    var idx4 = startHash.indexOf("&", startPos);
+                    endPos = Math.min(idx1, idx2, idx3, idx4);
+                    if (endPos === -1) {
+                        endPos = startHash.length - 1;
+                    } else {
+                        endPos -= 1;
+                    }
+                    if (startPos >= 0 && endPos >= 0 && endPos >= startPos) {
+                        timelineID = startHash.substring(startPos, endPos + 1);
                     }
                 }
+
+                if (!timelineID) {
+                    displayRootTimeline();
+                    return;
+                }
+
+                CZ.Service.getTimelines({
+                    // load the timelines for the hash
+                    start: -13700000000,
+                    end: 9999,
+                    minspan: 13700000000,
+                    commonAncestor: timelineID,
+                    fromRoot: 1
+                }).then(
+                function (response) {
+                    var root = vc.virtualCanvas("getLayerContent");
+                    CZ.Layout.merge(response, root.children[0], true, () => {
+                        visReg = CZ.UrlNav.navStringToVisible(startHash.substring(1), vc);
+                        if (visReg) {
+                            controller.moveToVisible(visReg, true);
+                            updateAxis(vc, ax);
+
+                            //if (startHash && window.location.hash !== startHash) {
+                            //    hashChangeFromOutside = false;
+                            //    window.location.hash = startHash; // synchronizing
+                            //}
+                        }
+                    });
+                },
+                function (error) {
+                    displayRootTimeline();
+                });
             }
-
-            maxPermitedVerticalRange = {    //setting top and bottom observation constraints according to cosmos timeline
-                top: cosmosTimeline.y,
-                bottom: cosmosTimeline.y + cosmosTimeline.height
-            };
-
-            // update virtual canvas horizontal borders
-            CZ.Settings.maxPermitedTimeRange = {
-                left: cosmosTimeline.left,
-                right: cosmosTimeline.right
-            };
-            maxPermitedScale = CZ.UrlNav.navStringToVisible(cosmosVisible, vc).scale * 1.1;
         }
 
         export function IncreaseRequestsCount() {

@@ -12,13 +12,11 @@ module CZ {
         @scale          (number) Optional scale (default is 1.0) that is a factor on the element size.
         
         Remarks:
-        Example of the navigation string is '/t10/t24/e12/c10@w=1.5&h=1.0&x=0.33&y=0.25' which means
+        Example of the navigation string is '/t10/t24/e12/c10' which means
         timeline with id 10 
         which has child timeline with id 25 
         which has child infodot with id 12 
         which has child contentItem with id 10
-        with position (0.33,0.255) of the visible region center so left-upper corner is (0,0), right-bottom is (1,1)
-        with width 1.5x size of the element width so height 1.0 shows entire element vertically.
         */
         export function vcelementToNavString(vcElem, vp?) {
             var nav = '';
@@ -29,15 +27,8 @@ module CZ {
                 }
                 vcElem = vcElem.parent;
             }
-            if (nav && nav !== '' && vp) {
-                var rx = (vp.visible.centerX - (el.x + el.width / 2)) / el.width;
-                var ry = (vp.visible.centerY - (el.y + el.height / 2)) / el.height;
-                var rw = vp.widthScreenToVirtual(vp.width) / el.width;
-                var rh = vp.heightScreenToVirtual(vp.height) / el.height;
+            if (nav && nav !== '') {
                 var URL = getURL();
-
-                nav += '@x=' + rx + "&y=" + ry + "&w=" + rw + "&h=" + rh;
-
                 if (typeof URL.hash.params != 'undefined') {
                     if (typeof URL.hash.params['tour'] != 'undefined')
                         nav += "&tour=" + URL.hash.params["tour"];
