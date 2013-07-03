@@ -93,8 +93,7 @@ var CZ;
                         "result-id": resultId,
                         "result-type": resultType,
                         click: function () {
-                            var self = $(this);
-                            CZ.Search.goToSearchResult(self.attr("result-id"), self.attr("result-type"));
+                            CZ.Search.goToSearchResult(item);
                         }
                     }));
                 });
