@@ -802,9 +802,13 @@ module CZ {
             if (src.id === dest.guid) {
                 var srcChildTimelines = (src.timelines instanceof Array) ? src.timelines : [];
                 var destChildTimelines = [];
-                for (var i = 0; i < dest.children.length; i++)
-                    if (dest.children[i].type && dest.children[i].type === "timeline")
+                var destChildTimelinesMap = {}; // src and dest child timelines need not be in the same order
+                for (var i = 0; i < dest.children.length; i++) {
+                    if (dest.children[i].type && dest.children[i].type === "timeline") {
                         destChildTimelines.push(dest.children[i]);
+                        destChildTimelinesMap[dest.children[i].guid] = dest.children[i];
+                    }
+                }
 
                 if (dest.isBuffered) { // dest contains all its child timelines
                     // cal bbox (top, bottom) for child timelines and infodots
@@ -821,10 +825,17 @@ module CZ {
 
                     // merge child timelines
                     for (var i = 0; i < destChildTimelines.length; i++)
-                        destChildTimelines[i].delta = 0;
+                        destChildTimelines[i].delta = 0;    
 
-                    for (var i = 0; i < srcChildTimelines.length; i++)
-                        mergeTimelines(srcChildTimelines[i], destChildTimelines[i]);
+                    for (var i = 0; i < srcChildTimelines.length; i++) {
+                        var srcTimeline = srcChildTimelines[i];
+                        var destTimeline = destChildTimelinesMap[srcChildTimelines[i].id];
+                        if (srcTimeline && destTimeline) {
+                            mergeTimelines(srcTimeline, destTimeline);
+                        } else {
+                            throw "error: Cannot find matching destination timeline for source timeline.";
+                        }
+                    }
 
                     // check if child timelines have expanded
                     var haveChildTimelineExpanded = false;

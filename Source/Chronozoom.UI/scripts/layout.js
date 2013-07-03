@@ -653,9 +653,12 @@ var CZ;
             if(src.id === dest.guid) {
                 var srcChildTimelines = (src.timelines instanceof Array) ? src.timelines : [];
                 var destChildTimelines = [];
+                var destChildTimelinesMap = {
+                };
                 for(var i = 0; i < dest.children.length; i++) {
                     if(dest.children[i].type && dest.children[i].type === "timeline") {
                         destChildTimelines.push(dest.children[i]);
+                        destChildTimelinesMap[dest.children[i].guid] = dest.children[i];
                     }
                 }
                 if(dest.isBuffered) {
@@ -675,7 +678,13 @@ var CZ;
                         destChildTimelines[i].delta = 0;
                     }
                     for(var i = 0; i < srcChildTimelines.length; i++) {
-                        mergeTimelines(srcChildTimelines[i], destChildTimelines[i]);
+                        var srcTimeline = srcChildTimelines[i];
+                        var destTimeline = destChildTimelinesMap[srcChildTimelines[i].id];
+                        if(srcTimeline && destTimeline) {
+                            mergeTimelines(srcTimeline, destTimeline);
+                        } else {
+                            throw "error: Cannot find matching destination timeline for source timeline.";
+                        }
                     }
                     var haveChildTimelineExpanded = false;
                     for(var i = 0; i < destChildTimelines.length; i++) {

@@ -280,7 +280,7 @@ namespace Chronozoom.Entities
                 ref maxElements);
         }
 
-        private static List<Timeline> FillTimelinesFromFlatList(IEnumerable<TimelineRaw> timelinesRaw, Dictionary<Guid, Timeline> timelinesMap, Guid? commonAncestor, ref int maxElements)
+        private List<Timeline> FillTimelinesFromFlatList(IEnumerable<TimelineRaw> timelinesRaw, Dictionary<Guid, Timeline> timelinesMap, Guid? commonAncestor, ref int maxElements)
         {
             List<Timeline> timelines = new List<Timeline>();
             Dictionary<Guid, Guid?> timelinesParents = new Dictionary<Guid, Guid?>();
@@ -318,6 +318,18 @@ namespace Chronozoom.Entities
                     }
 
                     parentTimeline.ChildTimelines.Add(timeline);
+                }
+            }
+
+            foreach (Timeline timeline in timelinesMap.Values)
+            {
+                if (timeline.ChildTimelines == null)
+                {
+                    var ChildrenCount = GetChildTimelinesIds(timeline.Id).Count();
+                    if (ChildrenCount == 0)
+                    {
+                        timeline.ChildTimelines = new System.Collections.ObjectModel.Collection<Timeline>();
+                    }
                 }
             }
 
