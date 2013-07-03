@@ -273,7 +273,7 @@ module CZ {
                     }
 
                     if (gesture.Type == "Pan" || gesture.Type == "Zoom") {
-                        window.clearTimeout(CZ.Common.requestMissingDataTimer); //stops any pending requests to the server for missing data
+                        window.clearTimeout(CZ.Common.missingDataRequestsTimer); //stops any pending requests to the server for missing data
 
                         var newlyEstimatedViewport = calculateTargetViewport(latestViewport, gesture, self.estimatedViewport);
 

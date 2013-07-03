@@ -414,17 +414,20 @@ var CZ;
                     startTour();
                 } else {
                     var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                    CZ.Common.IncreaseRequestsCount();
                     CZ.Service.getTourTimelines({
                         tourId: newTour.id,
                         viewportwidth: vp.width,
                         minTimelineSize: CZ.Settings.minTimelineWidth
                     }).then(function (response) {
+                        CZ.Common.DecreaseRequestsCount();
                         var root = CZ.Common.vc.virtualCanvas("getLayerContent");
                         CZ.Layout.merge(response, root.children[0], false, function () {
                             newTour.isBuffered = true;
                             startTour();
                         });
                     }, function (error) {
+                        CZ.Common.DecreaseRequestsCount();
                         console.log("Error connecting to service:\n" + error.responseText);
                     });
                 }

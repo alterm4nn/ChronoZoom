@@ -938,6 +938,10 @@ module CZ {
             if (typeof CZ.Authoring !== 'undefined' && CZ.Authoring.isActive)
                 return;
 
+            // skip dynamic layout during elliptical zoom animations
+            if (CZ.Common.controller.activeAnimation && CZ.Common.controller.activeAnimation.type === "EllipticalZoom")
+                return;
+
             if (src && dest) {
                 try {
                     if (dest.id === "__root__") {

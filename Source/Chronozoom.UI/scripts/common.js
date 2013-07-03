@@ -27,6 +27,8 @@ var CZ;
         Common.supercollection = "";
         Common.collection = "";
         Common.initialContent = null;
+        Common.missingDataRequestsTimer;
+        var missingDataRequestsCount = 0;
         function initialize() {
             Common.ax = ($)('#axis');
             Common.axis = new CZ.Timescale(Common.ax);
@@ -258,13 +260,32 @@ var CZ;
             };
             Common.maxPermitedScale = CZ.UrlNav.navStringToVisible(Common.cosmosVisible, Common.vc).scale * 1.1;
         }
-        Common.requestMissingDataTimer;
+        function IncreaseRequestsCount() {
+            missingDataRequestsCount++;
+            if(missingDataRequestsCount === 1) {
+                var vp = Common.vc.virtualCanvas("getViewport");
+                var footer = $(".footer-links");
+                $("#progressImage").css({
+                    top: (footer.offset().top - 30),
+                    left: (vp.width / 2) - ($('#progressImage').width() / 2)
+                }).show();
+            }
+        }
+        Common.IncreaseRequestsCount = IncreaseRequestsCount;
+        function DecreaseRequestsCount() {
+            missingDataRequestsCount--;
+            if(missingDataRequestsCount === 0) {
+                $("#progressImage").hide();
+            }
+        }
+        Common.DecreaseRequestsCount = DecreaseRequestsCount;
         function getMissingData(vbox, lca) {
             if(typeof CZ.Authoring === 'undefined' || CZ.Authoring.isActive === false) {
                 var root = CZ.Common.vc.virtualCanvas("getLayerContent");
                 if(root.children.length > 0) {
-                    window.clearTimeout(Common.requestMissingDataTimer);
-                    Common.requestMissingDataTimer = window.setTimeout(function () {
+                    window.clearTimeout(Common.missingDataRequestsTimer);
+                    Common.missingDataRequestsTimer = window.setTimeout(function () {
+                        IncreaseRequestsCount();
                         CZ.Service.getTimelines({
                             start: vbox.left,
                             end: vbox.right,
@@ -272,14 +293,10 @@ var CZ;
                             commonAncestor: lca.guid,
                             maxElements: 2000
                         }).then(function (response) {
-                            if(!response) {
-                                return;
-                            }
-                            if(Common.controller.activeAnimation && Common.controller.activeAnimation.type === "EllipticalZoom") {
-                                return;
-                            }
+                            DecreaseRequestsCount();
                             CZ.Layout.merge(response, lca);
                         }, function (error) {
+                            DecreaseRequestsCount();
                             console.log("Error connecting to service:\n" + error.responseText);
                         });
                     }, 1000);

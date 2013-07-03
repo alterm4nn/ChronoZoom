@@ -143,7 +143,7 @@ var CZ;
                         return;
                     }
                     if(gesture.Type == "Pan" || gesture.Type == "Zoom") {
-                        window.clearTimeout(CZ.Common.requestMissingDataTimer);
+                        window.clearTimeout(CZ.Common.missingDataRequestsTimer);
                         var newlyEstimatedViewport = calculateTargetViewport(latestViewport, gesture, self.estimatedViewport);
                         if(!self.estimatedViewport) {
                             self.activeAnimation = new CZ.ViewportAnimation.PanZoomAnimation(latestViewport);

@@ -3415,6 +3415,20 @@ var CZ;
             });
         }
         Service.getTours = getTours;
+        function getTourTimelines(r) {
+            var request = new Request(_serviceUrl);
+            request.addToPath("gettourtimelines");
+            request.addParameter("supercollection", Service.superCollectionName);
+            request.addParameter("collection", Service.collectionName);
+            request.addParameters(r);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getTourTimelines = getTourTimelines;
         function getSearch(query) {
             var request = new Service.Request(_serviceUrl);
             request.addToPath("Search");
@@ -4739,7 +4753,7 @@ var CZ;
             if(isAudioEnabled == undefined) {
                 isAudioEnabled = Tours.isNarrationOn;
             }
-            if(newTour != undefined) {
+            function startTour() {
                 var tourControlDiv = document.getElementById("tour_control");
                 tourControlDiv.style.display = "block";
                 Tours.tour = newTour;
@@ -4758,6 +4772,29 @@ var CZ;
                     Tours.tour.isAudioLoaded = true;
                 }
                 tourResume();
+            }
+            if(newTour != undefined) {
+                if(newTour.isBuffered) {
+                    startTour();
+                } else {
+                    var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                    CZ.Common.IncreaseRequestsCount();
+                    CZ.Service.getTourTimelines({
+                        tourId: newTour.id,
+                        viewportwidth: vp.width,
+                        minTimelineSize: CZ.Settings.minTimelineWidth
+                    }).then(function (response) {
+                        CZ.Common.DecreaseRequestsCount();
+                        var root = CZ.Common.vc.virtualCanvas("getLayerContent");
+                        CZ.Layout.merge(response, root.children[0], false, function () {
+                            newTour.isBuffered = true;
+                            startTour();
+                        });
+                    }, function (error) {
+                        CZ.Common.DecreaseRequestsCount();
+                        console.log("Error connecting to service:\n" + error.responseText);
+                    });
+                }
             }
         }
         Tours.activateTour = activateTour;
@@ -5107,11 +5144,55 @@ var CZ;
             }
         }
         Search.navigateToBookmark = navigateToBookmark;
-        function goToSearchResult(resultId, elementType) {
+        function goToSearchResult(searchResult) {
+            var resultId, elementType;
+            switch(searchResult.objectType) {
+                case 0:
+                    resultId = 'e' + searchResult.id;
+                    elementType = "exhibit";
+                    break;
+                case 1:
+                    resultId = 't' + searchResult.id;
+                    elementType = "timeline";
+                    break;
+                case 2:
+                    resultId = searchResult.id;
+                    elementType = "contentItem";
+                    break;
+            }
             var element = findVCElement(CZ.Common.vc.virtualCanvas("getLayerContent"), resultId, elementType);
-            var navStringElement = CZ.UrlNav.vcelementToNavString(element);
-            var visible = CZ.UrlNav.navStringToVisible(navStringElement, CZ.Common.vc);
-            CZ.Common.controller.moveToVisible(visible);
+            if(element) {
+                var navStringElement = CZ.UrlNav.vcelementToNavString(element);
+                var visible = CZ.UrlNav.navStringToVisible(navStringElement, CZ.Common.vc);
+                CZ.Common.controller.moveToVisible(visible);
+            } else {
+                var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                var a = Math.min(0, searchResult.enclosingTimelineStart);
+                var b = Math.min(0, searchResult.enclosingTimelineEnd);
+                var c = Math.max(0, searchResult.enclosingTimelineStart);
+                var d = Math.max(0, searchResult.enclosingTimelineEnd);
+                var scale = ((b - a) + (d - c)) / vp.width;
+                CZ.Common.IncreaseRequestsCount();
+                CZ.Service.getTimelines({
+                    start: searchResult.enclosingTimelineStart,
+                    end: searchResult.enclosingTimelineEnd,
+                    minspan: CZ.Settings.minTimelineWidth * scale,
+                    commonAncestor: searchResult.enclosingTimelineId,
+                    fromRoot: 1
+                }).then(function (response) {
+                    CZ.Common.DecreaseRequestsCount();
+                    var root = CZ.Common.vc.virtualCanvas("getLayerContent");
+                    CZ.Layout.merge(response, root.children[0], false, function () {
+                        var element = findVCElement(CZ.Common.vc.virtualCanvas("getLayerContent"), resultId, elementType);
+                        var navStringElement = CZ.UrlNav.vcelementToNavString(element);
+                        var visible = CZ.UrlNav.navStringToVisible(navStringElement, CZ.Common.vc);
+                        CZ.Common.controller.moveToVisible(visible);
+                    });
+                }, function (error) {
+                    CZ.Common.DecreaseRequestsCount();
+                    console.log("Error connecting to service:\n" + error.responseText);
+                });
+            }
         }
         Search.goToSearchResult = goToSearchResult;
         function findVCElement(root, id, elementType) {
@@ -5195,7 +5276,7 @@ var CZ;
                                 resultId: resultId,
                                 text: results[i].title,
                                 click: function () {
-                                    goToSearchResult(this.getAttribute("resultId"), this.getAttribute("data-element-type"));
+                                    goToSearchResult(item);
                                 }
                             }).attr("data-element-type", elementType).appendTo(output);
                         }
@@ -6561,6 +6642,9 @@ var CZ;
             if(typeof CZ.Authoring !== 'undefined' && CZ.Authoring.isActive) {
                 return;
             }
+            if(CZ.Common.controller.activeAnimation && CZ.Common.controller.activeAnimation.type === "EllipticalZoom") {
+                return;
+            }
             if(src && dest) {
                 try  {
                     if(dest.id === "__root__") {
@@ -6734,7 +6818,7 @@ var CZ;
                         return;
                     }
                     if(gesture.Type == "Pan" || gesture.Type == "Zoom") {
-                        window.clearTimeout(CZ.Common.requestMissingDataTimer);
+                        window.clearTimeout(CZ.Common.missingDataRequestsTimer);
                         var newlyEstimatedViewport = calculateTargetViewport(latestViewport, gesture, self.estimatedViewport);
                         if(!self.estimatedViewport) {
                             self.activeAnimation = new CZ.ViewportAnimation.PanZoomAnimation(latestViewport);
@@ -9977,6 +10061,8 @@ var CZ;
         Common.supercollection = "";
         Common.collection = "";
         Common.initialContent = null;
+        Common.missingDataRequestsTimer;
+        var missingDataRequestsCount = 0;
         function initialize() {
             Common.ax = ($)('#axis');
             Common.axis = new CZ.Timescale(Common.ax);
@@ -10208,13 +10294,32 @@ var CZ;
             };
             Common.maxPermitedScale = CZ.UrlNav.navStringToVisible(Common.cosmosVisible, Common.vc).scale * 1.1;
         }
-        Common.requestMissingDataTimer;
+        function IncreaseRequestsCount() {
+            missingDataRequestsCount++;
+            if(missingDataRequestsCount === 1) {
+                var vp = Common.vc.virtualCanvas("getViewport");
+                var footer = $(".footer-links");
+                $("#progressImage").css({
+                    top: (footer.offset().top - 30),
+                    left: (vp.width / 2) - ($('#progressImage').width() / 2)
+                }).show();
+            }
+        }
+        Common.IncreaseRequestsCount = IncreaseRequestsCount;
+        function DecreaseRequestsCount() {
+            missingDataRequestsCount--;
+            if(missingDataRequestsCount === 0) {
+                $("#progressImage").hide();
+            }
+        }
+        Common.DecreaseRequestsCount = DecreaseRequestsCount;
         function getMissingData(vbox, lca) {
             if(typeof CZ.Authoring === 'undefined' || CZ.Authoring.isActive === false) {
                 var root = CZ.Common.vc.virtualCanvas("getLayerContent");
                 if(root.children.length > 0) {
-                    window.clearTimeout(Common.requestMissingDataTimer);
-                    Common.requestMissingDataTimer = window.setTimeout(function () {
+                    window.clearTimeout(Common.missingDataRequestsTimer);
+                    Common.missingDataRequestsTimer = window.setTimeout(function () {
+                        IncreaseRequestsCount();
                         CZ.Service.getTimelines({
                             start: vbox.left,
                             end: vbox.right,
@@ -10222,14 +10327,10 @@ var CZ;
                             commonAncestor: lca.guid,
                             maxElements: 2000
                         }).then(function (response) {
-                            if(!response) {
-                                return;
-                            }
-                            if(Common.controller.activeAnimation && Common.controller.activeAnimation.type === "EllipticalZoom") {
-                                return;
-                            }
+                            DecreaseRequestsCount();
                             CZ.Layout.merge(response, lca);
                         }, function (error) {
+                            DecreaseRequestsCount();
                             console.log("Error connecting to service:\n" + error.responseText);
                         });
                     }, 1000);
@@ -11226,8 +11327,7 @@ var CZ;
                         "result-id": resultId,
                         "result-type": resultType,
                         click: function () {
-                            var self = $(this);
-                            CZ.Search.goToSearchResult(self.attr("result-id"), self.attr("result-type"));
+                            CZ.Search.goToSearchResult(item);
                         }
                     }));
                 });

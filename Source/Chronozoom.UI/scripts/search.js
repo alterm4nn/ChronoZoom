@@ -108,6 +108,7 @@ var CZ;
                 var c = Math.max(0, searchResult.enclosingTimelineStart);
                 var d = Math.max(0, searchResult.enclosingTimelineEnd);
                 var scale = ((b - a) + (d - c)) / vp.width;
+                CZ.Common.IncreaseRequestsCount();
                 CZ.Service.getTimelines({
                     start: searchResult.enclosingTimelineStart,
                     end: searchResult.enclosingTimelineEnd,
@@ -115,6 +116,7 @@ var CZ;
                     commonAncestor: searchResult.enclosingTimelineId,
                     fromRoot: 1
                 }).then(function (response) {
+                    CZ.Common.DecreaseRequestsCount();
                     var root = CZ.Common.vc.virtualCanvas("getLayerContent");
                     CZ.Layout.merge(response, root.children[0], false, function () {
                         var element = findVCElement(CZ.Common.vc.virtualCanvas("getLayerContent"), resultId, elementType);
@@ -123,6 +125,7 @@ var CZ;
                         CZ.Common.controller.moveToVisible(visible);
                     });
                 }, function (error) {
+                    CZ.Common.DecreaseRequestsCount();
                     console.log("Error connecting to service:\n" + error.responseText);
                 });
             }

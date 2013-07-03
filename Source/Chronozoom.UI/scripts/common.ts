@@ -60,6 +60,13 @@ module CZ {
         // Initial Content contains the identifier (e.g. ID or Title) of the content that should be loaded initially.
         export var initialContent = null;
 
+        // Throttles requests to the server such that 
+        // min interval between request >= 1 sec
+        export var missingDataRequestsTimer;
+
+        // Stores the number of outgoing requests to the server for missing timeline data
+        var missingDataRequestsCount = 0;
+
         /* Initialize the JQuery UI Widgets
         */
         export function initialize() {
@@ -206,7 +213,7 @@ module CZ {
         }
 
         //loading the data from the service
-        export function loadData() {
+        export function loadData() {            
             return CZ.Data.getTimelines({
                 start: -400,
                 end: 9999,
@@ -344,9 +351,24 @@ module CZ {
             maxPermitedScale = CZ.UrlNav.navStringToVisible(cosmosVisible, vc).scale * 1.1;
         }
 
-        // throttles requests to the server such that 
-        // min interval between request >= 1 sec
-        export var requestMissingDataTimer;
+        export function IncreaseRequestsCount() {
+            missingDataRequestsCount++;
+            if (missingDataRequestsCount === 1) {
+                var vp = vc.virtualCanvas("getViewport");
+                var footer = $(".footer-links");
+                $("#progressImage").css({
+                    top: (footer.offset().top - 30),
+                    left: (vp.width / 2) - ($('#progressImage').width() / 2)
+                }).show();
+            }
+        }
+
+        export function DecreaseRequestsCount() {
+            missingDataRequestsCount--;
+            if (missingDataRequestsCount === 0) {
+                $("#progressImage").hide();
+            }
+        }
 
         // request missing timeline data from the server
         export function getMissingData(vbox, lca) {
@@ -354,8 +376,9 @@ module CZ {
             if (typeof CZ.Authoring === 'undefined' || CZ.Authoring.isActive === false) {
                 var root = CZ.Common.vc.virtualCanvas("getLayerContent");
                 if (root.children.length > 0) {
-                    window.clearTimeout(requestMissingDataTimer);
-                    requestMissingDataTimer = window.setTimeout(function () {
+                    window.clearTimeout(missingDataRequestsTimer);
+                    missingDataRequestsTimer = window.setTimeout(function () {
+                        IncreaseRequestsCount();
                         CZ.Service.getTimelines({
                             start: vbox.left,
                             end: vbox.right,
@@ -364,11 +387,11 @@ module CZ {
                             maxElements: 2000
                         }).then(
                         function (response) {
-                            if (!response) return;
-                            if (controller.activeAnimation && controller.activeAnimation.type === "EllipticalZoom") return;
+                            DecreaseRequestsCount();
                             CZ.Layout.merge(response, lca);
                         },
                         function (error) {
+                            DecreaseRequestsCount();
                             console.log("Error connecting to service:\n" + error.responseText);
                         });
                     }, 1000);

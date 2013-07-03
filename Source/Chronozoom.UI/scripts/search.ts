@@ -123,6 +123,7 @@ module CZ {
                 var d = Math.max(0, searchResult.enclosingTimelineEnd);
                 var scale = ((b - a) + (d - c)) / vp.width;
 
+                CZ.Common.IncreaseRequestsCount();
                 CZ.Service.getTimelines({
                     start: searchResult.enclosingTimelineStart,
                     end: searchResult.enclosingTimelineEnd,
@@ -130,6 +131,7 @@ module CZ {
                     commonAncestor: searchResult.enclosingTimelineId,
                     fromRoot: 1
                 }).then(function (response) {
+                    CZ.Common.DecreaseRequestsCount();
                     var root = CZ.Common.vc.virtualCanvas("getLayerContent");
                     CZ.Layout.merge(response, root.children[0], false, () => {
                         // navigate to search result
@@ -139,6 +141,7 @@ module CZ {
                         CZ.Common.controller.moveToVisible(visible);
                     });
                 }, function (error) {
+                    CZ.Common.DecreaseRequestsCount();
                     console.log("Error connecting to service:\n" + error.responseText);
                 });
             }

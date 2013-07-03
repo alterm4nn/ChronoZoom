@@ -754,6 +754,9 @@ var CZ;
             if(typeof CZ.Authoring !== 'undefined' && CZ.Authoring.isActive) {
                 return;
             }
+            if(CZ.Common.controller.activeAnimation && CZ.Common.controller.activeAnimation.type === "EllipticalZoom") {
+                return;
+            }
             if(src && dest) {
                 try  {
                     if(dest.id === "__root__") {
