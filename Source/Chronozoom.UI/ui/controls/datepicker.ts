@@ -95,7 +95,7 @@ module CZ {
             /**
             * Sets date corresponding to given virtual coordinate
             */
-            public setDate(coordinate: any, InfinityConvertation = false) {
+            public setDate(coordinate: any, InfinityConvertation = false, ZeroYearConversation = false) {
                 // invalid input
                 if (!this.validateNumber(coordinate)) {
                     return false;
@@ -123,7 +123,7 @@ module CZ {
 
                 switch (mode) {
                     case "year":
-                        this.setDate_YearMode(coordinate);
+                        this.setDate_YearMode(coordinate, ZeroYearConversation);
                         break;
                     case "date":
                         this.setDate_DateMode(coordinate);
@@ -138,7 +138,6 @@ module CZ {
             */
             public getDate() {
                 var mode = this.modeSelector.find(":selected").val();
-
                 switch (mode) {
                     case "year":
                         return this.getDate_YearMode();
@@ -261,9 +260,9 @@ module CZ {
             /**
             * Sets year corresponding to given virtual coordinate
             */
-            private setDate_YearMode(coordinate: number): void {
+            private setDate_YearMode(coordinate: number, ZeroYearConversation): void {
                 var date = CZ.Dates.convertCoordinateToYear(coordinate);
-                
+                if ((date.regime.toLowerCase() == "bce") && (ZeroYearConversation)) date.year--;
                 this.yearSelector.val(date.year);
                 // reset selected regime
                 this.regimeSelector.find(":selected").attr("selected", "false");
