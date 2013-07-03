@@ -587,6 +587,15 @@ var CZ;
                     }
                 }
             });
+            CZ.Common.controller.onAnimationComplete.push(function () {
+                var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                var vbox = CZ.Common.viewportToViewBox(vp);
+                var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
+                if(!CZ.Common.vc.virtualCanvas("inBuffer", wnd, vp.visible.scale)) {
+                    var lca = CZ.Common.vc.virtualCanvas("findLca", wnd);
+                    CZ.Common.getMissingData(vbox, lca);
+                }
+            });
             CZ.Common.updateLayout();
             CZ.Common.vc.bind("elementclick", function (e) {
                 CZ.Search.navigateToElement(e);

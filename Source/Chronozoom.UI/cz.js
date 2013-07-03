@@ -794,7 +794,7 @@ var CZ;
             for(var i = 0; i < n; i++) {
                 var child = element.children[i];
                 var matches = CZ.Layout.animatingElements.filter(function (el) {
-                    return el.id === child.id;
+                    return el.id === child.id && (el.animation && child.animation) ? el.animation.startTime === child.animation.startTime : false;
                 });
                 for(var k = 0; k < matches.length; k++) {
                     CZ.Layout.animatingElements.splice(CZ.Layout.animatingElements.indexOf(matches[k]), 1);
@@ -6460,9 +6460,12 @@ var CZ;
             if(src.id === dest.guid) {
                 var srcChildTimelines = (src.timelines instanceof Array) ? src.timelines : [];
                 var destChildTimelines = [];
+                var destChildTimelinesMap = {
+                };
                 for(var i = 0; i < dest.children.length; i++) {
                     if(dest.children[i].type && dest.children[i].type === "timeline") {
                         destChildTimelines.push(dest.children[i]);
+                        destChildTimelinesMap[dest.children[i].guid] = dest.children[i];
                     }
                 }
                 if(dest.isBuffered) {
@@ -6482,7 +6485,13 @@ var CZ;
                         destChildTimelines[i].delta = 0;
                     }
                     for(var i = 0; i < srcChildTimelines.length; i++) {
-                        mergeTimelines(srcChildTimelines[i], destChildTimelines[i]);
+                        var srcTimeline = srcChildTimelines[i];
+                        var destTimeline = destChildTimelinesMap[srcChildTimelines[i].id];
+                        if(srcTimeline && destTimeline) {
+                            mergeTimelines(srcTimeline, destTimeline);
+                        } else {
+                            throw "error: Cannot find matching destination timeline for source timeline.";
+                        }
                     }
                     var haveChildTimelineExpanded = false;
                     for(var i = 0; i < destChildTimelines.length; i++) {
@@ -8825,7 +8834,7 @@ var CZ;
                 requestInvalidate: function () {
                     this.requestNewFrame = false;
                     if(CZ.Layout.animatingElements.length != 0) {
-                        console.log("Animating");
+                        console.log("Animating " + CZ.Layout.animatingElements.length);
                         for(var i = 0; i < CZ.Layout.animatingElements.length; i++) {
                             var el = CZ.Layout.animatingElements[i];
                             if(!el) {
@@ -10085,7 +10094,13 @@ var CZ;
             }
         }
         function loadData() {
-            return CZ.Data.getTimelines(null).then(function (response) {
+            return CZ.Data.getTimelines({
+                start: -400,
+                end: 9999,
+                minspan: 13700000000,
+                commonAncestor: CZ.Settings.humanityTimelineID,
+                fromRoot: 1
+            }).then(function (response) {
                 if(!response) {
                     return;
                 }
@@ -12072,6 +12087,15 @@ var CZ;
                         }
                         CZ.Common.setNavigationStringTo = null;
                     }
+                }
+            });
+            CZ.Common.controller.onAnimationComplete.push(function () {
+                var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                var vbox = CZ.Common.viewportToViewBox(vp);
+                var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
+                if(!CZ.Common.vc.virtualCanvas("inBuffer", wnd, vp.visible.scale)) {
+                    var lca = CZ.Common.vc.virtualCanvas("findLca", wnd);
+                    CZ.Common.getMissingData(vbox, lca);
                 }
             });
             CZ.Common.updateLayout();

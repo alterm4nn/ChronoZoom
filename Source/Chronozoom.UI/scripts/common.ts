@@ -207,7 +207,13 @@ module CZ {
 
         //loading the data from the service
         export function loadData() {
-            return CZ.Data.getTimelines(null).then(
+            return CZ.Data.getTimelines({
+                start: -400,
+                end: 9999,
+                minspan: 13700000000,
+                commonAncestor: CZ.Settings.humanityTimelineID,
+                fromRoot: 1
+            }).then(
                 function (response) {
                     if (!response) {
                         return;

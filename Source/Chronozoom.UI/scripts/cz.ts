@@ -692,7 +692,6 @@ module CZ {
                                 }
             );
 
-            /*
             // Progessive Loading: fetch misssing data
             CZ.Common.controller.onAnimationComplete.push(
                 function () {
@@ -705,7 +704,6 @@ module CZ {
                     }
                 }
             );
-            */
 
             CZ.Common.updateLayout();
 
