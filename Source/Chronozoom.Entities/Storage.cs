@@ -330,6 +330,7 @@ namespace Chronozoom.Entities
                     {
                         timeline.ChildTimelines = new System.Collections.ObjectModel.Collection<Timeline>();
                     }
+                    timeline.Exhibits = new System.Collections.ObjectModel.Collection<Exhibit>();
                 }
             }
 
