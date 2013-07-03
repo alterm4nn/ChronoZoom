@@ -53,7 +53,9 @@
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="dumps\extensions\rin-sample.js" />
     <Content Include="dumps\sample.csv" />
+    <Content Include="dumps\extensions-get.json" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -252,6 +254,7 @@
     <Content Include="images\edit-icon.png" />
     <Content Include="images\profile-icon.png" />
     <Content Include="images\search-icon.png" />
+    <Content Include="images\Temp-Thumbnail-Aqua.png" />
     <Content Include="images\timeseries-icon.png" />
     <Content Include="images\tour-icon.png" />
     <Content Include="images\view-icon.png" />
@@ -259,6 +262,14 @@
     <Content Include="pages\crawler.aspx" />
     <Content Include="pages\logoff.aspx" />
     <Content Include="pages\sitemap.aspx" />
+    <TypeScriptCompile Include="scripts\extensions\rinplayer.ts" />
+    <TypeScriptCompile Include="scripts\extensions\extensions.ts" />
+    <Content Include="scripts\extensions\extensions.js">
+      <DependentUpon>extensions.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\extensions\rinplayer.js">
+      <DependentUpon>rinplayer.ts</DependentUpon>
+    </Content>
     <Content Include="scripts\external\ACS.js" />
     <Content Include="scripts\authoring.ts" />
     <Content Include="scripts\authoring.js">

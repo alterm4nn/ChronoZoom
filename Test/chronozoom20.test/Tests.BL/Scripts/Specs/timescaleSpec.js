@@ -6,7 +6,8 @@
 /// <reference path="../Js/cz.settings.js" />
 /// <reference path="../Js/settings.js" />
 
-var oneDay = 0.0027397260274;
+var oneDay = 0.002739699999892764;
+
 var currentDate = new Date();
 var curY = currentDate.getFullYear();
 var curM = currentDate.getMonth();
@@ -139,6 +140,7 @@ describe("Axis", function () {
                 end += oneDay;
                 var range = { min: start, max: end };
                 var ticks = dateTickSource.getTicks(range);
+                expect(ticks.length).not.toEqual(0);
                 var minors = dateTickSource.createSmallTicks(ticks);
                 expect(minors.length).toEqual(3);
                 expect(minors[0]).not.toEqual(minors[1]);

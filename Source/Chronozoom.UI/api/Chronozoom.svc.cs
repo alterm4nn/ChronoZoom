@@ -890,7 +890,7 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
-        public Guid PutCollectionName(string superCollectionName, string collectionName, Collection collectionRequest)
+        public Guid PostCollection(string superCollectionName, string collectionName, Collection collectionRequest)
         {
             return ApiOperation(delegate(User user, Storage storage)
             {
@@ -906,7 +906,7 @@ namespace Chronozoom.UI
 
                 Guid superCollectionId = CollectionIdFromText(superCollectionName);
                 SuperCollection superCollection = RetrieveSuperCollection(storage, superCollectionId);
-                if (user == null || superCollection.User != user)
+                if (user == null || superCollection.User == null || superCollection.User.NameIdentifier != user.NameIdentifier)
                 {
                     // No ACS so treat as an anonymous user who cannot add or modify a collection.
                     SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
@@ -921,18 +921,25 @@ namespace Chronozoom.UI
                     storage.Collections.Add(collection);
                     returnValue = collectionGuid;
                 }
-                else
-                {
-                    if (collection.User != user)
-                    {
-                        SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                        return Guid.Empty;
-                    }
 
-                    // Modify collection fields. However, title can't be modified since it would change the URL and break indexing.
-                }
                 storage.SaveChanges();
                 return returnValue;
+            });
+        }
+
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        public Guid PutCollection(string superCollectionName, string collectionName, Collection collectionRequest)
+        {
+            return ApiOperationUnderCollection(collectionRequest, superCollectionName, collectionName, delegate(User user, Storage storage, Collection collection)
+            {
+                Trace.TraceInformation("Put Collection {0} from user {1} in superCollection {2}", collectionName, user, superCollectionName);
+
+                collection.Theme = collectionRequest.Theme;
+                
+                storage.SaveChanges();
+                return collection.Id;
             });
         }
 
@@ -1597,6 +1604,7 @@ namespace Chronozoom.UI
                 }
 
                 storage.SaveChanges();
+                Cache.Remove(string.Format(CultureInfo.InvariantCulture, "Tour {0}", collection.Id));
                 return returnValue;
             });
         }
@@ -1743,6 +1751,7 @@ namespace Chronozoom.UI
                 DeleteBookmarks(storage, deleteTour);
                 storage.Tours.Remove(deleteTour);
                 storage.SaveChanges();
+                Cache.Remove(string.Format(CultureInfo.InvariantCulture, "Tour {0}", collection.Id));
             });
         }
 
@@ -1901,7 +1910,7 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
-        public IEnumerable<SuperCollection> GetCollections()
+        public IEnumerable<SuperCollection> GetSuperCollections()
         {
             return ApiOperation(delegate(User user, Storage storage)
             {
@@ -1917,6 +1926,26 @@ namespace Chronozoom.UI
                 }
 
                 return superCollections;
+            });
+        }
+
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        public IEnumerable<Collection> GetCollections(string superCollectionName)
+        {
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                Guid superCollectionId = CollectionIdFromText(superCollectionName);
+                SuperCollection superCollection = storage.SuperCollections.FirstOrDefault(candidate => candidate.Id == superCollectionId);
+
+                if (superCollection == null)
+                {
+                    return null;
+                }
+
+                storage.Entry(superCollection).Collection(x => x.Collections).Load();
+                return superCollection.Collections;
             });
         }
 

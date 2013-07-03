@@ -183,7 +183,6 @@ module CZ {
 
         export function updateMarker() {
             axis.setTimeMarker(vc.virtualCanvas("getCursorPosition"));
-            axis.setTimeBorders();
         }
 
         // Retrieves the URL to download the data from

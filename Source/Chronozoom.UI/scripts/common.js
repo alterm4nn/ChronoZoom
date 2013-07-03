@@ -119,7 +119,6 @@ var CZ;
         Common.setVisible = setVisible;
         function updateMarker() {
             Common.axis.setTimeMarker(Common.vc.virtualCanvas("getCursorPosition"));
-            Common.axis.setTimeBorders();
         }
         Common.updateMarker = updateMarker;
         function loadDataUrl() {

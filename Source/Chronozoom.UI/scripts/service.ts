@@ -157,9 +157,8 @@ module CZ {
             * Information Retrieval.
             */
 
-        // .../{supercollection}/collections
-        // NOTE: Not implemented in current API.
-        export function getCollections () {
+        // .../{superCollectionName}/collections
+        export function getCollections (superCollectionName : string) {
             var request = new Request(_serviceUrl);
             request.addToPath(superCollectionName);
             request.addToPath("collections");
@@ -212,10 +211,10 @@ module CZ {
         */
 
         // .../{supercollection}/{collection}
-        export function putCollection (c) {
+        export function putCollection(superCollectionName : string, collectionName : string, c) {
             var request = new Request(_serviceUrl);
             request.addToPath(superCollectionName);
-            request.addToPath(c.name);
+            request.addToPath(collectionName);
 
             return $.ajax({
                 type: "PUT",

@@ -3,6 +3,7 @@
 /// <reference path='bibliography.ts'/>
 /// <reference path='urlnav.ts'/>
 /// <reference path='cz.ts'/>
+/// <reference path='extensions/extensions.ts'/>
 
 declare var Seadragon: any;
 
@@ -148,6 +149,13 @@ module CZ {
         export var addSeadragonImage = function (element, layerid, id, vx, vy, vw, vh, z, imgSrc, onload?) {
             if (vw <= 0 || vh <= 0) throw "Image size must be positive";
             return addChild(element, new SeadragonImage(element.vc, /*parent*/element, layerid, id, imgSrc, vx, vy, vw, vh, z, onload), false);
+        };
+
+        export var addExtension = function (extensionName, element, layerid, id, vx, vy, vw, vh, z, imgSrc, onload?) {
+            if (vw <= 0 || vh <= 0) throw "Extension size must be positive";
+            var initializer = CZ.Extensions.getInitializer(extensionName);
+
+            return addChild(element, initializer(element.vc, /*parent*/element, layerid, id, imgSrc, vx, vy, vw, vh, z, onload), false);
         };
 
         /* Adds a video as a child of the given virtual canvas element.
@@ -785,7 +793,12 @@ module CZ {
             this.title = this.titleObject.text;
             this.regime = timelineinfo.regime;
             this.settings.gradientOpacity = 0;
-            this.settings.gradientFillStyle = timelineinfo.gradientFillStyle || timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
+
+            if (CZ.Settings.timelineGradientFillStyle) {
+                this.settings.gradientFillStyle = CZ.Settings.timelineGradientFillStyle;
+            } else {
+                this.settings.gradientFillStyle = timelineinfo.gradientFillStyle || timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
+            }
             //this.opacity = timelineinfo.opacity;
 
             this.reactsOnMouse = true;
@@ -814,7 +827,7 @@ module CZ {
                 this.settings.strokeStyle = CZ.Settings.timelineHoveredBoxBorderColor;
                 this.settings.lineWidth = CZ.Settings.timelineHoveredLineWidth;
                 this.titleObject.settings.fillStyle = CZ.Settings.timelineHoveredHeaderFontColor;
-                this.settings.hoverAnimationDelta = 3 / 60.0;
+                this.settings.hoverAnimationDelta = CZ.Settings.timelineHoverAnimation;
                 this.vc.requestInvalidate();
 
                 //if title is not in visible region, try to eval its screenFontSize using 
@@ -883,7 +896,7 @@ module CZ {
                 this.settings.strokeStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
                 this.settings.lineWidth = CZ.Settings.timelineLineWidth;
                 this.titleObject.settings.fillStyle = CZ.Settings.timelineHeaderFontColor;
-                this.settings.hoverAnimationDelta = -3 / 60.0;
+                this.settings.hoverAnimationDelta = -CZ.Settings.timelineHoverAnimation;;
                 this.vc.requestInvalidate();
             };
 
@@ -1440,7 +1453,7 @@ module CZ {
         @param vh        (number)   height of in virtual space
         @param z         (number) z-index
         */
-        function CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z) {
+        export function CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z) {
             this.base = CanvasElement;
             this.base(vc, layerid, id, vx, vy, vw, vh);
 
@@ -1803,7 +1816,7 @@ module CZ {
                                     width, timelineinfo.height, {
                                         strokeStyle: timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineStrokeStyle,
                                         lineWidth: CZ.Settings.timelineLineWidth,
-                                        fillStyle: timelineinfo.fillStyle,
+                                        fillStyle: CZ.Settings.timelineColor ? CZ.Settings.timelineColor : timelineinfo.fillStyle,
                                         opacity: typeof timelineinfo.opacity !== 'undefined' ? timelineinfo.opacity : 1
                                     }, timelineinfo), true);
             return timeline;
@@ -1902,6 +1915,9 @@ module CZ {
                     }
                     else if (this.contentItem.mediaType.toLowerCase() === 'pdf') {
                         addPdf(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
+                    }
+                    else if (CZ.Extensions.mediaTypeIsExtension(contentItem.mediaType)) {
+                        addExtension(contentItem.mediaType, container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);
                     }
 
                     // Title
@@ -2209,9 +2225,15 @@ module CZ {
 
                     if (infodotDescription && infodotDescription.title && infodotDescription.date) {
                         var exhibitDate = CZ.Dates.convertCoordinateToYear(infodotDescription.date);
-
-                        // Format year title with fixed precision
-                        title = infodotDescription.title + '\n(' + parseFloat(exhibitDate.year.toFixed(2)) + ' ' + exhibitDate.regime + ')';
+                        if ((exhibitDate.regime == "CE") || (exhibitDate.regime == "BCE")) {
+                            var date_number = Number(infodotDescription.date);
+                            var exhibitDate = CZ.Dates.convertCoordinateToYear(date_number);
+                            date_number = Math.abs(date_number);
+                            title = infodotDescription.title + '\n(' + parseFloat((date_number).toFixed(2)) + ' ' + exhibitDate.regime + ')';
+                        } else {
+                            // Format year title with fixed precision
+                            title = infodotDescription.title + '\n(' + parseFloat(exhibitDate.year.toFixed(2)) + ' ' + exhibitDate.regime + ')';
+                        }
                     }
 
                     var infodotTitle = addText(contentItem, layerid, id + "__title", time - titleWidth / 2, titleTop, titleTop, titleHeight,

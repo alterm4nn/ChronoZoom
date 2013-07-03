@@ -78,6 +78,13 @@ var CZ;
             }
             return VCContent.addChild(element, new SeadragonImage(element.vc, element, layerid, id, imgSrc, vx, vy, vw, vh, z, onload), false);
         };
+        VCContent.addExtension = function (extensionName, element, layerid, id, vx, vy, vw, vh, z, imgSrc, onload) {
+            if(vw <= 0 || vh <= 0) {
+                throw "Extension size must be positive";
+            }
+            var initializer = CZ.Extensions.getInitializer(extensionName);
+            return VCContent.addChild(element, initializer(element.vc, element, layerid, id, imgSrc, vx, vy, vw, vh, z, onload), false);
+        };
         VCContent.addVideo = function (element, layerid, id, videoSource, vx, vy, vw, vh, z) {
             return VCContent.addChild(element, new CanvasVideoItem(element.vc, layerid, id, videoSource, vx, vy, vw, vh, z), false);
         };
@@ -500,7 +507,11 @@ var CZ;
             this.title = this.titleObject.text;
             this.regime = timelineinfo.regime;
             this.settings.gradientOpacity = 0;
-            this.settings.gradientFillStyle = timelineinfo.gradientFillStyle || timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
+            if(CZ.Settings.timelineGradientFillStyle) {
+                this.settings.gradientFillStyle = CZ.Settings.timelineGradientFillStyle;
+            } else {
+                this.settings.gradientFillStyle = timelineinfo.gradientFillStyle || timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
+            }
             this.reactsOnMouse = true;
             this.tooltipEnabled = true;
             this.tooltipIsShown = false;
@@ -520,7 +531,7 @@ var CZ;
                 this.settings.strokeStyle = CZ.Settings.timelineHoveredBoxBorderColor;
                 this.settings.lineWidth = CZ.Settings.timelineHoveredLineWidth;
                 this.titleObject.settings.fillStyle = CZ.Settings.timelineHoveredHeaderFontColor;
-                this.settings.hoverAnimationDelta = 3 / 60.0;
+                this.settings.hoverAnimationDelta = CZ.Settings.timelineHoverAnimation;
                 this.vc.requestInvalidate();
                 if(this.titleObject.initialized == false) {
                     var vp = this.vc.getViewport();
@@ -577,7 +588,8 @@ var CZ;
                 this.settings.strokeStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
                 this.settings.lineWidth = CZ.Settings.timelineLineWidth;
                 this.titleObject.settings.fillStyle = CZ.Settings.timelineHeaderFontColor;
-                this.settings.hoverAnimationDelta = -3 / 60.0;
+                this.settings.hoverAnimationDelta = -CZ.Settings.timelineHoverAnimation;
+                ;
                 this.vc.requestInvalidate();
             };
             this.base_render = this.render;
@@ -1054,6 +1066,7 @@ var CZ;
             };
             this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
         }
+        VCContent.CanvasDomItem = CanvasDomItem;
         function CanvasScrollTextItem(vc, layerid, id, vx, vy, vw, vh, text, z) {
             this.base = CanvasDomItem;
             this.base(vc, layerid, id, vx, vy, vw, vh, z);
@@ -1227,7 +1240,7 @@ var CZ;
             var timeline = VCContent.addChild(element, new CanvasTimeline(element.vc, layerid, id, timelineinfo.timeStart, timelineinfo.top, width, timelineinfo.height, {
                 strokeStyle: timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineStrokeStyle,
                 lineWidth: CZ.Settings.timelineLineWidth,
-                fillStyle: timelineinfo.fillStyle,
+                fillStyle: CZ.Settings.timelineColor ? CZ.Settings.timelineColor : timelineinfo.fillStyle,
                 opacity: typeof timelineinfo.opacity !== 'undefined' ? timelineinfo.opacity : 1
             }, timelineinfo), true);
             return timeline;
@@ -1297,6 +1310,8 @@ var CZ;
                         addAudio(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     } else if(this.contentItem.mediaType.toLowerCase() === 'pdf') {
                         VCContent.addPdf(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
+                    } else if(CZ.Extensions.mediaTypeIsExtension(contentItem.mediaType)) {
+                        VCContent.addExtension(contentItem.mediaType, container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);
                     }
                     var titleText = this.contentItem.title;
                     addText(container, layerid, id + "__title__", vx + leftOffset, titleTop, titleTop + titleHeight / 2.0, 0.9 * titleHeight, titleText, {
@@ -1541,7 +1556,14 @@ var CZ;
                     var title = '';
                     if(infodotDescription && infodotDescription.title && infodotDescription.date) {
                         var exhibitDate = CZ.Dates.convertCoordinateToYear(infodotDescription.date);
-                        title = infodotDescription.title + '\n(' + parseFloat(exhibitDate.year.toFixed(2)) + ' ' + exhibitDate.regime + ')';
+                        if((exhibitDate.regime == "CE") || (exhibitDate.regime == "BCE")) {
+                            var date_number = Number(infodotDescription.date);
+                            var exhibitDate = CZ.Dates.convertCoordinateToYear(date_number);
+                            date_number = Math.abs(date_number);
+                            title = infodotDescription.title + '\n(' + parseFloat((date_number).toFixed(2)) + ' ' + exhibitDate.regime + ')';
+                        } else {
+                            title = infodotDescription.title + '\n(' + parseFloat(exhibitDate.year.toFixed(2)) + ' ' + exhibitDate.regime + ')';
+                        }
                     }
                     var infodotTitle = addText(contentItem, layerid, id + "__title", time - titleWidth / 2, titleTop, titleTop, titleHeight, title, {
                         fontName: CZ.Settings.contentItemHeaderFontName,

@@ -23,6 +23,9 @@ var CZ;
             if(timeline.exhibits instanceof Array) {
                 timeline.exhibits.forEach(function (exhibit) {
                     exhibit.x = CZ.Dates.getCoordinateFromDecimalYear(exhibit.time);
+                    exhibit.contentItems.forEach(function (contentItem) {
+                        CZ.Extensions.activateExtension(contentItem.mediaType);
+                    });
                 });
             }
             if(timeline.timelines instanceof Array) {

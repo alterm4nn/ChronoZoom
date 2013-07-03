@@ -39,5 +39,11 @@ namespace Chronozoom.Entities
         /// </summary>
         [DataMember]
         public User User { get; set; }
+
+        /// <summary>
+        /// The theme (i.e. space, blue, etc) associated to this collection.
+        /// </summary>
+        [DataMember(Name="theme")]
+        public string Theme { get; set; }
     }
 }

@@ -144,7 +144,7 @@ namespace Chronozoom.UI
         /// HTTP verb: PUT
         ///
         /// URL:
-        /// http://{URL}/api//{supercollection}/{collection}/user
+        /// http://{URL}/api/{supercollection}/{collection}/user
         /// 
         /// Request body (JSON):
         /// {
@@ -176,7 +176,7 @@ namespace Chronozoom.UI
         /// HTTP verb: DELETE
         /// 
         /// URL:
-        /// http://{URL}/api//{supercollection}/{collection}/user
+        /// http://{URL}/api/{supercollection}/{collection}/user
         /// 
         /// Request body (JSON):
         /// {
@@ -214,6 +214,33 @@ namespace Chronozoom.UI
         /// </summary>
         /// <remarks>
         /// If a collection of the specified name does not exist then a new collection is created. 
+        /// The title field can't be modified because it is part of the URL (the URL can be indexed).
+        /// </remarks>
+        /// <param name="superCollectionName">The name of the parent supercollection.</param>
+        /// <param name="collectionName">The name of the collection to create.</param>
+        /// <param name="collectionRequest">[Collection](#collection) data in JSON format.</param>
+        /// <returns></returns>
+        /// <example><![CDATA[ 
+        /// HTTP verb: PUT
+        ///
+        /// URL:
+        /// http://{URL}/api/{supercollection}/{collection}
+        ///
+        /// Request body (JSON):
+        /// {
+        ///      id: "{id}",
+        ///      title: "{title}"
+        /// }
+        /// ]]>
+        /// </example>
+        [OperationContract]
+        [WebInvoke(Method = "POST", UriTemplate = "/{superCollectionName}/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        Guid PostCollection(string superCollectionName, string collectionName, Collection collectionRequest);
+
+        /// <summary>
+        /// Modifies an existing collection.
+        /// </summary>
+        /// <remarks>
         /// If the collection exists and the authenticated user is the author then the collection is modified. 
         /// If no author is registered then the authenticated user is set as the author. 
         /// The title field can't be modified because it is part of the URL (the URL can be indexed).
@@ -237,7 +264,7 @@ namespace Chronozoom.UI
         /// </example>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        Guid PutCollectionName(string superCollectionName, string collectionName, Collection collectionRequest);
+        Guid PutCollection(string superCollectionName, string collectionName, Collection collectionRequest);
 
         /// <summary>
         /// Deletes the specified collection.
@@ -273,7 +300,7 @@ namespace Chronozoom.UI
         /// HTTP verb: PUT
         ///
         /// URL:
-        /// http://{URL}/api//{supercollection}/{collection}/timeline
+        /// http://{URL}/api/{supercollection}/{collection}/timeline
         ///
         /// Request body (JSON):
         /// {
@@ -296,7 +323,7 @@ namespace Chronozoom.UI
         /// HTTP verb: DELETE
         ///
         /// URL:
-        /// http://{URL}/api//{supercollection}/{collection}/timeline
+        /// http://{URL}/api/{supercollection}/{collection}/timeline
         ///
         /// Request body (JSON):
         /// {
@@ -309,7 +336,7 @@ namespace Chronozoom.UI
         void DeleteTimeline(string superCollectionName, string collectionName, Timeline timelineRequest);
         
         /// <summary>
-        /// Creates or updates the exhibit and its content items in a given collection. If the collection does not exist, then the command will silently fail.
+        /// Creates or updates the exhibit and its content items in a given collection. If the collection does not exist, then the command will fail. Prior to running this command, you will need to create the associated content items.
         /// </summary>
         /// <remarks>
         /// If an exhibit id is not specified, a new exhibit is added to the collection. 
@@ -327,7 +354,7 @@ namespace Chronozoom.UI
         /// HTTP verb: PUT
         ///
         /// URL:
-        /// http://{URL}/api//{supercollection}/{collection}/exhibit
+        /// http://{URL}/api/{supercollection}/{collection}/exhibit
         ///
         /// Request body (JSON):
         /// {
@@ -354,7 +381,7 @@ namespace Chronozoom.UI
         /// HTTP verb: DELETE
         ///
         /// URL:
-        /// http://{URL}/api//{supercollection}/{collection}/exhibit
+        /// http://{URL}/api/{supercollection}/{collection}/exhibit
         ///
         /// Request body:
         /// {
@@ -376,7 +403,7 @@ namespace Chronozoom.UI
         /// HTTP verb: PUT
         ///
         /// URL:
-        /// http://{URL}/api//{supercollection}/{collection}/contentitem
+        /// http://{URL}/api/{supercollection}/{collection}/contentitem
         ///
         /// Request body:
         /// {
@@ -592,18 +619,33 @@ namespace Chronozoom.UI
         string GetContentPath(string superCollection, string collection, string reference);
         
         /// <summary>
+        /// Retrieve the list of all supercollections.
+        /// </summary>
+        /// <example><![CDATA[ 
+        /// HTTP verb: GET
+        ///
+        /// URL:
+        /// http://{URL}/api/supercollections
+        /// ]]>
+        /// </example>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        [OperationContract]
+        [WebGet(UriTemplate = "/supercollections", ResponseFormat = WebMessageFormat.Json)]
+        IEnumerable<SuperCollection> GetSuperCollections();
+
+        /// <summary>
         /// Retrieve the list of all collections.
         /// </summary>
         /// <example><![CDATA[ 
         /// HTTP verb: GET
         ///
         /// URL:
-        /// http://{URL}/api/collections
+        /// http://{URL}/api/{superCollection}/collections
         /// ]]>
         /// </example>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         [OperationContract]
-        [WebGet(UriTemplate = "/collections", ResponseFormat = WebMessageFormat.Json)]
-        IEnumerable<SuperCollection> GetCollections();
+        [WebGet(UriTemplate = "/{superCollectionName}/collections", ResponseFormat = WebMessageFormat.Json)]
+        IEnumerable<Collection> GetCollections(string superCollectionName);
     }
 }

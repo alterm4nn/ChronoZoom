@@ -53,8 +53,9 @@ var CZ;
                 var optionIntinite = $("<option value='infinite'>Infinite</option>");
                 this.modeSelector.append(optionIntinite);
             };
-            DatePicker.prototype.setDate = function (coordinate, InfinityConvertation) {
+            DatePicker.prototype.setDate = function (coordinate, InfinityConvertation, ZeroYearConversation) {
                 if (typeof InfinityConvertation === "undefined") { InfinityConvertation = false; }
+                if (typeof ZeroYearConversation === "undefined") { ZeroYearConversation = false; }
                 if(!this.validateNumber(coordinate)) {
                     return false;
                 }
@@ -78,7 +79,7 @@ var CZ;
                 }
                 switch(mode) {
                     case "year":
-                        this.setDate_YearMode(coordinate);
+                        this.setDate_YearMode(coordinate, ZeroYearConversation);
                         break;
                     case "date":
                         this.setDate_DateMode(coordinate);
@@ -170,8 +171,11 @@ var CZ;
                     this.yearSelector.val(parseFloat(this.yearSelector.val()).toFixed());
                 }
             };
-            DatePicker.prototype.setDate_YearMode = function (coordinate) {
+            DatePicker.prototype.setDate_YearMode = function (coordinate, ZeroYearConversation) {
                 var date = CZ.Dates.convertCoordinateToYear(coordinate);
+                if((date.regime.toLowerCase() == "bce") && (ZeroYearConversation)) {
+                    date.year--;
+                }
                 this.yearSelector.val(date.year);
                 this.regimeSelector.find(":selected").attr("selected", "false");
                 this.regimeSelector.find("option").each(function () {

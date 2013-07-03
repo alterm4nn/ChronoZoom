@@ -40,6 +40,11 @@ module CZ {
             if (timeline.exhibits instanceof Array) {
                 timeline.exhibits.forEach(function (exhibit) {
                     exhibit.x = CZ.Dates.getCoordinateFromDecimalYear(exhibit.time);
+
+                    exhibit.contentItems.forEach(function (contentItem) {
+                        // For content items that contain an extension, activate it.
+                        CZ.Extensions.activateExtension(contentItem.mediaType);
+                    });
                 });
             }
 
