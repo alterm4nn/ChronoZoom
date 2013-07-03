@@ -117,12 +117,12 @@ namespace Chronozoom.UI
         /// HTTP verb: GET
         ///
         /// URL: 
-        /// http://{URL}/api/{supercollection}/{collection}/tour
+        /// http://{URL}/api/{supercollection}/{collection}/tourtimelines
         /// ]]>
         /// </example>
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        Timeline GetTour(string superCollection, string collection, string tourId, string viewportWidth, string minTimelineSize);
+        Timeline GetTourTimelines(string superCollection, string collection, string tourId, string viewportWidth, string minTimelineSize);
 
         /// <summary>
         /// Creates a new user, or updates an existing user's information and associated personal collection.

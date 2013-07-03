@@ -435,11 +435,11 @@ namespace Chronozoom.UI
         /// Documentation under IChronozoomSVC
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1307:SpecifyStringComparison", MessageId = "System.String.LastIndexOf(System.String)"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        public Timeline GetTour(string superCollection, string collection, string tourId, string viewportWidth, string minTimelineSize)
+        public Timeline GetTourTimelines(string superCollection, string collection, string tourId, string viewportWidth, string minTimelineSize)
         {
             return ApiOperation(delegate(User user, Storage storage)
             {
-                Trace.TraceInformation("Get Tour");
+                Trace.TraceInformation("Get Tour Timelines");
 
                 Guid collectionId;
                 Guid tourid;

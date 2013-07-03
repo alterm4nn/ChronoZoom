@@ -389,7 +389,7 @@ var CZ;
             if(isAudioEnabled == undefined) {
                 isAudioEnabled = Tours.isNarrationOn;
             }
-            if(newTour != undefined) {
+            function startTour() {
                 var tourControlDiv = document.getElementById("tour_control");
                 tourControlDiv.style.display = "block";
                 Tours.tour = newTour;
@@ -408,6 +408,26 @@ var CZ;
                     Tours.tour.isAudioLoaded = true;
                 }
                 tourResume();
+            }
+            if(newTour != undefined) {
+                if(newTour.isBuffered) {
+                    startTour();
+                } else {
+                    var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                    CZ.Service.getTourTimelines({
+                        tourId: newTour.id,
+                        viewportwidth: vp.width,
+                        minTimelineSize: CZ.Settings.minTimelineWidth
+                    }).then(function (response) {
+                        var root = CZ.Common.vc.virtualCanvas("getLayerContent");
+                        CZ.Layout.merge(response, root.children[0], false, function () {
+                            newTour.isBuffered = true;
+                            startTour();
+                        });
+                    }, function (error) {
+                        console.log("Error connecting to service:\n" + error.responseText);
+                    });
+                }
             }
         }
         Tours.activateTour = activateTour;
