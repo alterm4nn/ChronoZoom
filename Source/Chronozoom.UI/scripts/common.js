@@ -151,7 +151,7 @@ var CZ;
             } else {
                 args = null;
             }
-            if(typeof CZ.Authoring !== 'undefined' && CZ.Authoring.isActive) {
+            if(CZ.Authoring && CZ.Authoring.isEnabled) {
                 args = {
                     minspan: 0
                 };

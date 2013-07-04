@@ -514,16 +514,27 @@ var CZ;
             if(window.location.hash) {
                 CZ.Common.startHash = window.location.hash;
             }
-            CZ.Common.loadData().then(function (response) {
-                if(!response) {
-                    canvasIsEmpty = true;
-                    if(CZ.Authoring.showCreateTimelineForm) {
-                        CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
-                    }
+            CZ.Service.getProfile().done(function (data) {
+                CZ.Authoring.isEnabled = UserCanEditCollection(data);
+            }).fail(function (error) {
+                CZ.Authoring.isEnabled = UserCanEditCollection(null);
+            }).always(function () {
+                if(!CZ.Authoring.isEnabled) {
+                    $(".edit-icon").hide();
+                } else {
+                    $(".edit-icon").show();
                 }
+                CZ.Common.loadData().then(function (response) {
+                    if(!response) {
+                        canvasIsEmpty = true;
+                        if(CZ.Authoring.showCreateTimelineForm) {
+                            CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
+                        }
+                    }
+                });
+                CZ.Search.initializeSearch();
+                CZ.Bibliography.initializeBibliography();
             });
-            CZ.Search.initializeSearch();
-            CZ.Bibliography.initializeBibliography();
             var canvasGestures = CZ.Gestures.getGesturesStream(CZ.Common.vc);
             var axisGestures = CZ.Gestures.applyAxisBehavior(CZ.Gestures.getGesturesStream(CZ.Common.ax));
             var timeSeriesGestures = CZ.Gestures.getPanPinGesturesStream($("#timeSeriesContainer"));
@@ -624,6 +635,9 @@ var CZ;
                 }
             });
             CZ.Common.controller.onAnimationComplete.push(function () {
+                if(CZ.Authoring && CZ.Authoring.isEnabled) {
+                    return;
+                }
                 var vp = CZ.Common.vc.virtualCanvas("getViewport");
                 var vbox = CZ.Common.viewportToViewBox(vp);
                 var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);

@@ -939,14 +939,6 @@ module CZ {
         }
 
         export function merge(src, dest, noAnimation? = false, callback? = () => { }) {
-            // skip dynamic layout during active authoring session
-            if (typeof CZ.Authoring !== 'undefined' && CZ.Authoring.isActive)
-                return;
-
-            // skip dynamic layout during elliptical zoom animations
-            if (CZ.Common.controller.activeAnimation && CZ.Common.controller.activeAnimation.type === "EllipticalZoom")
-                return;
-
             if (src && dest) {
                 try {
                     if (dest.id === "__root__") {
@@ -957,6 +949,14 @@ module CZ {
                         animateElement(dest, noAnimation, callback);
                         CZ.Common.vc.virtualCanvas("requestInvalidate");
                     } else {
+                        // skip dynamic layout during active authoring session
+                        if (CZ.Authoring && CZ.Authoring.isEnabled)
+                            return;
+
+                        // skip dynamic layout during elliptical zoom animation
+                        if (CZ.Common.controller.activeAnimation && CZ.Common.controller.activeAnimation.type === "EllipticalZoom")
+                            return;
+
                         var root = CZ.Common.vc.virtualCanvas("getLayerContent");
                         src = extendLcaPathToRoot(root.children[0], src);
                         dest = root.children[0];

@@ -222,9 +222,10 @@ module CZ {
                 // load only the root timelime and its immediate children
                 args = null;
             }
-            
-            if (typeof CZ.Authoring !== 'undefined' && CZ.Authoring.isActive) { // download the whole collection if in authoring mode
-                // load all data in the collection
+
+            // disable progressive loading in authoring mode
+            if (CZ.Authoring && CZ.Authoring.isEnabled) {
+                // load the whole collection at once if in authoring mode
                 args = {
                     minspan: 0
                 };

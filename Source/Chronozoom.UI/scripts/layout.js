@@ -754,12 +754,6 @@ var CZ;
             if (typeof noAnimation === "undefined") { noAnimation = false; }
             if (typeof callback === "undefined") { callback = function () {
             }; }
-            if(typeof CZ.Authoring !== 'undefined' && CZ.Authoring.isActive) {
-                return;
-            }
-            if(CZ.Common.controller.activeAnimation && CZ.Common.controller.activeAnimation.type === "EllipticalZoom") {
-                return;
-            }
             if(src && dest) {
                 try  {
                     if(dest.id === "__root__") {
@@ -770,6 +764,12 @@ var CZ;
                         animateElement(dest, noAnimation, callback);
                         CZ.Common.vc.virtualCanvas("requestInvalidate");
                     } else {
+                        if(CZ.Authoring && CZ.Authoring.isEnabled) {
+                            return;
+                        }
+                        if(CZ.Common.controller.activeAnimation && CZ.Common.controller.activeAnimation.type === "EllipticalZoom") {
+                            return;
+                        }
                         var root = CZ.Common.vc.virtualCanvas("getLayerContent");
                         src = extendLcaPathToRoot(root.children[0], src);
                         dest = root.children[0];

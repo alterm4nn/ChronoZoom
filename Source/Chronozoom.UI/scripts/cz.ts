@@ -589,18 +589,33 @@ module CZ {
             if (window.location.hash)
                 CZ.Common.startHash = window.location.hash; // to be processes after the data is loaded
 
-            CZ.Common.loadData().then(function (response) {
-                if (!response) {
-                    canvasIsEmpty = true;
-                    if (CZ.Authoring.showCreateTimelineForm) {
-                        CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
-                    }
+            // load collection data (based on mode)
+            CZ.Service.getProfile()
+            .done(data => {
+                CZ.Authoring.isEnabled = UserCanEditCollection(data);
+            })
+            .fail(error => {
+                CZ.Authoring.isEnabled = UserCanEditCollection(null);
+            })
+            .always(() => {
+                if (!CZ.Authoring.isEnabled) {
+                    $(".edit-icon").hide();
+                } else {
+                    $(".edit-icon").show();
                 }
-            }); //retrieving the data
 
-            CZ.Search.initializeSearch();
-            CZ.Bibliography.initializeBibliography();
-
+                CZ.Common.loadData().then(function (response) {
+                    if (!response) {
+                        canvasIsEmpty = true;
+                        if (CZ.Authoring.showCreateTimelineForm) {
+                            CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
+                        }
+                    }
+                }); //retrieving the data
+                CZ.Search.initializeSearch();
+                CZ.Bibliography.initializeBibliography();
+            });
+            
             var canvasGestures = CZ.Gestures.getGesturesStream(CZ.Common.vc); //gesture sequence of the virtual canvas
             var axisGestures = CZ.Gestures.applyAxisBehavior(CZ.Gestures.getGesturesStream(CZ.Common.ax)); //gesture sequence of axis (tranformed according to axis behavior logic)
             var timeSeriesGestures = CZ.Gestures.getPanPinGesturesStream($("#timeSeriesContainer"));
@@ -735,6 +750,7 @@ module CZ {
             // Progessive Loading: fetch misssing data
             CZ.Common.controller.onAnimationComplete.push(
                 function () {
+                    if (CZ.Authoring && CZ.Authoring.isEnabled) return;
                     var vp = CZ.Common.vc.virtualCanvas("getViewport");
                     var vbox = CZ.Common.viewportToViewBox(vp);
                     var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
