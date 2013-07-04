@@ -454,14 +454,14 @@ var CZ;
                 if(result[4] != "") {
                     url.path = result[4].split("/");
                     if(url.path.length >= 1 && url.path[0].length > 0 && url.path[0] !== "cz.html") {
-                        url.superCollectionName = url.path[0];
+                        url.superCollectionName = decodeURIComponent(url.path[0]);
                         url.collectionName = url.superCollectionName;
                     }
                     if(url.path.length >= 2 && url.path[1].length > 0) {
-                        url.collectionName = url.path[1];
+                        url.collectionName = decodeURIComponent(url.path[1]);
                     }
                     if(url.path.length >= 3 && url.path[url.path.length - 1].length > 0) {
-                        url.content = url.path[url.path.length - 1];
+                        url.content = decodeURIComponent(url.path[url.path.length - 1]);
                     }
                 }
                 if(result[5] != "") {
@@ -8676,7 +8676,6 @@ var CZ;
                 requestInvalidate: function () {
                     this.requestNewFrame = false;
                     if(CZ.Layout.animatingElements.length != 0) {
-                        console.log("Animating " + CZ.Layout.animatingElements.length);
                         for(var i = 0; i < CZ.Layout.animatingElements.length; i++) {
                             var el = CZ.Layout.animatingElements[i];
                             if(!el) {
@@ -9935,28 +9934,43 @@ var CZ;
             }
         }
         function loadData() {
-            return CZ.Service.getTimelines({
-                start: -400,
-                end: 9999,
-                minspan: 13700000000,
-                commonAncestor: CZ.Settings.humanityTimelineID,
-                fromRoot: 1
-            }).then(function (response) {
+            var args;
+            if(!CZ.Service.superCollectionName && !CZ.Service.collectionName) {
+                args = {
+                    start: -400,
+                    end: 9999,
+                    minspan: 13700000000,
+                    commonAncestor: CZ.Settings.humanityTimelineID,
+                    fromRoot: 1
+                };
+            } else {
+                args = null;
+            }
+            return CZ.Service.getTimelines(args).then(function (response) {
                 var root = Common.vc.virtualCanvas("getLayerContent");
                 CZ.Layout.merge(response, root, true, function () {
-                    CZ.UrlNav.navigationAnchor = Common.vc.virtualCanvas("findElement", 't' + response.id);
-                    initializeRegimes();
+                    var root = Common.vc.virtualCanvas("findElement", 't' + response.id);
+                    CZ.UrlNav.navigationAnchor = root;
+                    CZ.Settings.maxPermitedTimeRange = {
+                        left: root.x,
+                        right: root.x + root.width
+                    };
+                    if(CZ.HomePageViewModel.IsFeatureEnabled("Regimes")) {
+                        initializeRegimes();
+                    }
                     if(Common.startHash) {
                         processHash();
                     } else {
                         displayRootTimeline();
                     }
                 });
-                CZ.Service.getTours().then(function (response) {
-                    CZ.Tours.parseTours(response);
-                }, function (error) {
-                    console.log("Error connecting to service:\n" + error.responseText);
-                });
+                if(CZ.HomePageViewModel.IsFeatureEnabled("Tours")) {
+                    CZ.Service.getTours().then(function (response) {
+                        CZ.Tours.parseTours(response);
+                    }, function (error) {
+                        console.log("Error connecting to service:\n" + error.responseText);
+                    });
+                }
             }, function (error) {
                 console.log("Error connecting to service:\n" + error.responseText);
             });
@@ -10001,19 +10015,15 @@ var CZ;
             });
         }
         function displayRootTimeline() {
-            var tl = CZ.UrlNav.navigationAnchor || CZ.Common.vc.virtualCanvas("getLayerContent").children[0];
-            if(!tl) {
+            var root = CZ.Common.vc.virtualCanvas("getLayerContent").children[0];
+            if(!root) {
                 return;
             }
-            var tlNavString = CZ.UrlNav.vcelementToNavString(tl);
-            if(!tlNavString) {
+            var rootVisible = getTimelineVisible(root.guid);
+            if(!rootVisible) {
                 return;
             }
-            var tlVisible = CZ.UrlNav.navStringToVisible(tlNavString, Common.vc);
-            if(!tlVisible) {
-                return;
-            }
-            Common.controller.moveToVisible(tlVisible, true);
+            Common.controller.moveToVisible(rootVisible, true);
         }
         function processHash() {
             visReg = CZ.UrlNav.navStringToVisible(Common.startHash.substring(1), Common.vc);
@@ -11446,8 +11456,8 @@ var CZ;
             }, 
             {
                 Name: "Tours",
-                Activation: FeatureActivation.Enabled,
-                JQueryReference: "#tours-index"
+                Activation: FeatureActivation.RootCollection,
+                JQueryReference: "#tours_index"
             }, 
             {
                 Name: "Authoring",
@@ -11500,7 +11510,7 @@ var CZ;
             return true;
         }
         function InitializeToursUI(profile, forms) {
-            var allowEditing = IsFeatureEnabled(_featureMap, "TourAuthoring") && UserCanEditCollection(profile);
+            var allowEditing = IsFeatureEnabled("TourAuthoring") && UserCanEditCollection(profile);
             var onToursInitialized = function () {
                 CZ.Tours.initializeToursUI();
                 $("#tours_index").click(function () {
@@ -11773,10 +11783,10 @@ var CZ;
                     profilePanel: "#profile-panel",
                     loginPanelLogin: "#profile-panel.auth-panel-login",
                     context: "",
-                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring"),
+                    allowRedirect: IsFeatureEnabled("Authoring"),
                     collectionTheme: CZ.Settings.theme,
                     collectionThemeInput: "#collection-theme",
-                    collectionThemeWrapper: IsFeatureEnabled(_featureMap, "Themes") ? "#collection-theme-wrapper" : null
+                    collectionThemeWrapper: IsFeatureEnabled("Themes") ? "#collection-theme-wrapper" : null
                 });
                 var loginForm = new CZ.UI.FormLogin(forms[6], {
                     activationSource: $("#login-panel"),
@@ -11796,7 +11806,7 @@ var CZ;
                         profileForm.close();
                     }
                 });
-                if(IsFeatureEnabled(_featureMap, "Login")) {
+                if(IsFeatureEnabled("Login")) {
                     CZ.Service.getProfile().done(function (data) {
                         if(data == "") {
                             $("#login-panel").show();
@@ -12054,8 +12064,8 @@ var CZ;
                 $("#bibliographyBack").css("display", "block");
             }
         });
-        function IsFeatureEnabled(featureMap, featureName) {
-            var feature = $.grep(featureMap, function (e) {
+        function IsFeatureEnabled(featureName) {
+            var feature = $.grep(_featureMap, function (e) {
                 return e.Name === featureName;
             });
             return feature[0].IsEnabled;

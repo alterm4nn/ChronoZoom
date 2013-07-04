@@ -85,8 +85,8 @@ module CZ {
             },
             {
                 Name: "Tours",
-                Activation: FeatureActivation.Enabled,
-                JQueryReference: "#tours-index"
+                Activation: FeatureActivation.RootCollection,
+                JQueryReference: "#tours_index"
             },
             {
                 Name: "Authoring",
@@ -143,7 +143,7 @@ module CZ {
         }
 
         function InitializeToursUI(profile, forms) {
-            var allowEditing = IsFeatureEnabled(_featureMap, "TourAuthoring") && UserCanEditCollection(profile);
+            var allowEditing = IsFeatureEnabled("TourAuthoring") && UserCanEditCollection(profile);
 
             var onToursInitialized = function () {
                 CZ.Tours.initializeToursUI();
@@ -427,10 +427,10 @@ module CZ {
                     profilePanel: "#profile-panel",
                     loginPanelLogin: "#profile-panel.auth-panel-login",
                     context: "",
-                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring"),
+                    allowRedirect: IsFeatureEnabled("Authoring"),
                     collectionTheme: CZ.Settings.theme,
                     collectionThemeInput: "#collection-theme",
-                    collectionThemeWrapper: IsFeatureEnabled(_featureMap, "Themes") ? "#collection-theme-wrapper" : null
+                    collectionThemeWrapper: IsFeatureEnabled("Themes") ? "#collection-theme-wrapper" : null
                 });
 
                 var loginForm = new CZ.UI.FormLogin(forms[6], {
@@ -454,7 +454,7 @@ module CZ {
                     }
                 });
 
-                if (IsFeatureEnabled(_featureMap, "Login")) {
+                if (IsFeatureEnabled("Login")) {
                     CZ.Service.getProfile().done(data => {
                         //Not authorized
                         if (data == "") {
@@ -785,8 +785,8 @@ module CZ {
             }
         });
 
-        export function IsFeatureEnabled(featureMap: FeatureInfo[], featureName: string) {
-            var feature: FeatureInfo[] = $.grep(featureMap, function (e) { return e.Name === featureName; });
+        export function IsFeatureEnabled(featureName: string) {
+            var feature: FeatureInfo[] = $.grep(_featureMap, function (e) { return e.Name === featureName; });
             return feature[0].IsEnabled;
         }
 

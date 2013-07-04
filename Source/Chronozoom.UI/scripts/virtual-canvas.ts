@@ -541,7 +541,7 @@ module CZ {
 
                     // update parameters of animating elements and require new frame if needed
                     if (CZ.Layout.animatingElements.length != 0) {
-                        console.log("Animating " + CZ.Layout.animatingElements.length);
+                        // console.log("Animating " + CZ.Layout.animatingElements.length);
                         for (var i = 0; i < CZ.Layout.animatingElements.length; i++) {
                             var el = CZ.Layout.animatingElements[i];
                             if (!el) {

@@ -231,14 +231,14 @@ module CZ {
                     url.path = result[4].split("/");
 
                     if (url.path.length >= 1 && url.path[0].length > 0 && url.path[0] !== "cz.html") {
-                        url.superCollectionName = url.path[0];
+                        url.superCollectionName = decodeURIComponent(url.path[0]);
                         url.collectionName = url.superCollectionName;
                     }
                     if (url.path.length >= 2 && url.path[1].length > 0) {
-                        url.collectionName = url.path[1];
+                        url.collectionName = decodeURIComponent(url.path[1]);
                     }
                     if (url.path.length >= 3 && url.path[url.path.length - 1].length > 0) {
-                        url.content = url.path[url.path.length - 1];
+                        url.content = decodeURIComponent(url.path[url.path.length - 1]);
                     }
                 }
 

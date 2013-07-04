@@ -139,28 +139,43 @@ var CZ;
             }
         }
         function loadData() {
-            return CZ.Service.getTimelines({
-                start: -400,
-                end: 9999,
-                minspan: 13700000000,
-                commonAncestor: CZ.Settings.humanityTimelineID,
-                fromRoot: 1
-            }).then(function (response) {
+            var args;
+            if(!CZ.Service.superCollectionName && !CZ.Service.collectionName) {
+                args = {
+                    start: -400,
+                    end: 9999,
+                    minspan: 13700000000,
+                    commonAncestor: CZ.Settings.humanityTimelineID,
+                    fromRoot: 1
+                };
+            } else {
+                args = null;
+            }
+            return CZ.Service.getTimelines(args).then(function (response) {
                 var root = Common.vc.virtualCanvas("getLayerContent");
                 CZ.Layout.merge(response, root, true, function () {
-                    CZ.UrlNav.navigationAnchor = Common.vc.virtualCanvas("findElement", 't' + response.id);
-                    initializeRegimes();
+                    var root = Common.vc.virtualCanvas("findElement", 't' + response.id);
+                    CZ.UrlNav.navigationAnchor = root;
+                    CZ.Settings.maxPermitedTimeRange = {
+                        left: root.x,
+                        right: root.x + root.width
+                    };
+                    if(CZ.HomePageViewModel.IsFeatureEnabled("Regimes")) {
+                        initializeRegimes();
+                    }
                     if(Common.startHash) {
                         processHash();
                     } else {
                         displayRootTimeline();
                     }
                 });
-                CZ.Service.getTours().then(function (response) {
-                    CZ.Tours.parseTours(response);
-                }, function (error) {
-                    console.log("Error connecting to service:\n" + error.responseText);
-                });
+                if(CZ.HomePageViewModel.IsFeatureEnabled("Tours")) {
+                    CZ.Service.getTours().then(function (response) {
+                        CZ.Tours.parseTours(response);
+                    }, function (error) {
+                        console.log("Error connecting to service:\n" + error.responseText);
+                    });
+                }
             }, function (error) {
                 console.log("Error connecting to service:\n" + error.responseText);
             });
@@ -205,19 +220,15 @@ var CZ;
             });
         }
         function displayRootTimeline() {
-            var tl = CZ.UrlNav.navigationAnchor || CZ.Common.vc.virtualCanvas("getLayerContent").children[0];
-            if(!tl) {
+            var root = CZ.Common.vc.virtualCanvas("getLayerContent").children[0];
+            if(!root) {
                 return;
             }
-            var tlNavString = CZ.UrlNav.vcelementToNavString(tl);
-            if(!tlNavString) {
+            var rootVisible = getTimelineVisible(root.guid);
+            if(!rootVisible) {
                 return;
             }
-            var tlVisible = CZ.UrlNav.navStringToVisible(tlNavString, Common.vc);
-            if(!tlVisible) {
-                return;
-            }
-            Common.controller.moveToVisible(tlVisible, true);
+            Common.controller.moveToVisible(rootVisible, true);
         }
         function processHash() {
             visReg = CZ.UrlNav.navStringToVisible(Common.startHash.substring(1), Common.vc);

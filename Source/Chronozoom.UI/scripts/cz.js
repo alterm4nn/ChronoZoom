@@ -49,8 +49,8 @@ var CZ;
             }, 
             {
                 Name: "Tours",
-                Activation: FeatureActivation.Enabled,
-                JQueryReference: "#tours-index"
+                Activation: FeatureActivation.RootCollection,
+                JQueryReference: "#tours_index"
             }, 
             {
                 Name: "Authoring",
@@ -103,7 +103,7 @@ var CZ;
             return true;
         }
         function InitializeToursUI(profile, forms) {
-            var allowEditing = IsFeatureEnabled(_featureMap, "TourAuthoring") && UserCanEditCollection(profile);
+            var allowEditing = IsFeatureEnabled("TourAuthoring") && UserCanEditCollection(profile);
             var onToursInitialized = function () {
                 CZ.Tours.initializeToursUI();
                 $("#tours_index").click(function () {
@@ -376,10 +376,10 @@ var CZ;
                     profilePanel: "#profile-panel",
                     loginPanelLogin: "#profile-panel.auth-panel-login",
                     context: "",
-                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring"),
+                    allowRedirect: IsFeatureEnabled("Authoring"),
                     collectionTheme: CZ.Settings.theme,
                     collectionThemeInput: "#collection-theme",
-                    collectionThemeWrapper: IsFeatureEnabled(_featureMap, "Themes") ? "#collection-theme-wrapper" : null
+                    collectionThemeWrapper: IsFeatureEnabled("Themes") ? "#collection-theme-wrapper" : null
                 });
                 var loginForm = new CZ.UI.FormLogin(forms[6], {
                     activationSource: $("#login-panel"),
@@ -399,7 +399,7 @@ var CZ;
                         profileForm.close();
                     }
                 });
-                if(IsFeatureEnabled(_featureMap, "Login")) {
+                if(IsFeatureEnabled("Login")) {
                     CZ.Service.getProfile().done(function (data) {
                         if(data == "") {
                             $("#login-panel").show();
@@ -657,8 +657,8 @@ var CZ;
                 $("#bibliographyBack").css("display", "block");
             }
         });
-        function IsFeatureEnabled(featureMap, featureName) {
-            var feature = $.grep(featureMap, function (e) {
+        function IsFeatureEnabled(featureName) {
+            var feature = $.grep(_featureMap, function (e) {
                 return e.Name === featureName;
             });
             return feature[0].IsEnabled;

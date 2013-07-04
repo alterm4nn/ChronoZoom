@@ -207,19 +207,31 @@ module CZ {
 
         //loading the data from the service
         export function loadData() {
-            // load the initial skeleton timelines for regimes
-            return CZ.Service.getTimelines({
-                start: -400,
-                end: 9999,
-                minspan: 13700000000,
-                commonAncestor: CZ.Settings.humanityTimelineID,
-                fromRoot: 1
-            })
+            var args;
+            if (!CZ.Service.superCollectionName && !CZ.Service.collectionName) {
+                // load the initial skeleton timelines for regimes
+                args = {
+                    start: -400,
+                    end: 9999,
+                    minspan: 13700000000,
+                    commonAncestor: CZ.Settings.humanityTimelineID,
+                    fromRoot: 1
+                };
+            } else {
+                args = null;
+            }
+
+            return CZ.Service.getTimelines(args)
             .then(function (response) {
                 var root = vc.virtualCanvas("getLayerContent");
                 CZ.Layout.merge(response, root, true, () => {
-                    CZ.UrlNav.navigationAnchor = vc.virtualCanvas("findElement", 't' + response.id);
-                    initializeRegimes();
+                    var root = vc.virtualCanvas("findElement", 't' + response.id);
+                    CZ.UrlNav.navigationAnchor = root;
+                    CZ.Settings.maxPermitedTimeRange = { left: root.x, right: root.x + root.width };
+
+                    if (CZ.HomePageViewModel.IsFeatureEnabled("Regimes")) {
+                        initializeRegimes();
+                    }
                     if (startHash) {
                         processHash();
                     } else {
@@ -227,12 +239,14 @@ module CZ {
                     }
                 });
 
-                CZ.Service.getTours()
-                .then(function (response) {
-                    CZ.Tours.parseTours(response);
-                }, function (error) {
-                    console.log("Error connecting to service:\n" + error.responseText);
-                });
+                if (CZ.HomePageViewModel.IsFeatureEnabled("Tours")) {
+                    CZ.Service.getTours()
+                    .then(function (response) {
+                        CZ.Tours.parseTours(response);
+                    }, function (error) {
+                        console.log("Error connecting to service:\n" + error.responseText);
+                    });
+                }
             }, function (error) {
                 console.log("Error connecting to service:\n" + error.responseText);
             });
@@ -276,13 +290,11 @@ module CZ {
         }
 
         function displayRootTimeline() {
-            var tl = CZ.UrlNav.navigationAnchor || CZ.Common.vc.virtualCanvas("getLayerContent").children[0];
-            if (!tl) return;
-            var tlNavString = CZ.UrlNav.vcelementToNavString(tl);
-            if (!tlNavString) return;
-            var tlVisible = CZ.UrlNav.navStringToVisible(tlNavString, vc);
-            if (!tlVisible) return;
-            controller.moveToVisible(tlVisible, true);
+            var root = CZ.Common.vc.virtualCanvas("getLayerContent").children[0];
+            if (!root) return;
+            var rootVisible = getTimelineVisible(root.guid);
+            if (!rootVisible) return;
+            controller.moveToVisible(rootVisible, true);
         }
 
         function processHash() {
