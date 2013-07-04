@@ -151,6 +151,11 @@ var CZ;
             } else {
                 args = null;
             }
+            if(typeof CZ.Authoring !== 'undefined' && CZ.Authoring.isActive) {
+                args = {
+                    minspan: 0
+                };
+            }
             return CZ.Service.getTimelines(args).then(function (response) {
                 var root = Common.vc.virtualCanvas("getLayerContent");
                 CZ.Layout.merge(response, root, true, function () {

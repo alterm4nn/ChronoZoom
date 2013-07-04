@@ -9941,6 +9941,11 @@ var CZ;
             } else {
                 args = null;
             }
+            if(typeof CZ.Authoring !== 'undefined' && CZ.Authoring.isActive) {
+                args = {
+                    minspan: 0
+                };
+            }
             return CZ.Service.getTimelines(args).then(function (response) {
                 var root = Common.vc.virtualCanvas("getLayerContent");
                 CZ.Layout.merge(response, root, true, function () {
@@ -11495,6 +11500,13 @@ var CZ;
             }, 
             
         ];
+        function IsFeatureEnabled(featureName) {
+            var feature = $.grep(_featureMap, function (e) {
+                return e.Name === featureName;
+            });
+            return feature[0].IsEnabled;
+        }
+        HomePageViewModel.IsFeatureEnabled = IsFeatureEnabled;
         HomePageViewModel.rootCollection;
         function UserCanEditCollection(profile) {
             if(CZ.Service.superCollectionName && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
@@ -12071,13 +12083,6 @@ var CZ;
                 $("#bibliographyBack").css("display", "block");
             }
         });
-        function IsFeatureEnabled(featureName) {
-            var feature = $.grep(_featureMap, function (e) {
-                return e.Name === featureName;
-            });
-            return feature[0].IsEnabled;
-        }
-        HomePageViewModel.IsFeatureEnabled = IsFeatureEnabled;
         function closeAllForms() {
             $('.cz-major-form').each(function (i, f) {
                 var form = $(f).data('form');

@@ -92,6 +92,13 @@ var CZ;
             }, 
             
         ];
+        function IsFeatureEnabled(featureName) {
+            var feature = $.grep(_featureMap, function (e) {
+                return e.Name === featureName;
+            });
+            return feature[0].IsEnabled;
+        }
+        HomePageViewModel.IsFeatureEnabled = IsFeatureEnabled;
         HomePageViewModel.rootCollection;
         function UserCanEditCollection(profile) {
             if(CZ.Service.superCollectionName && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
@@ -668,13 +675,6 @@ var CZ;
                 $("#bibliographyBack").css("display", "block");
             }
         });
-        function IsFeatureEnabled(featureName) {
-            var feature = $.grep(_featureMap, function (e) {
-                return e.Name === featureName;
-            });
-            return feature[0].IsEnabled;
-        }
-        HomePageViewModel.IsFeatureEnabled = IsFeatureEnabled;
         function closeAllForms() {
             $('.cz-major-form').each(function (i, f) {
                 var form = $(f).data('form');

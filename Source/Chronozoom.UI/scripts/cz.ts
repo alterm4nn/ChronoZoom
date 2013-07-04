@@ -128,6 +128,11 @@ module CZ {
             },
         ];
 
+        export function IsFeatureEnabled(featureName: string) {
+            var feature: FeatureInfo[] = $.grep(_featureMap, function (e) { return e.Name === featureName; });
+            return feature[0].IsEnabled;
+        }
+
         export var rootCollection: bool;
 
         function UserCanEditCollection(profile) {
@@ -796,11 +801,6 @@ module CZ {
                 $("#bibliographyBack").css("display", "block");
             }
         });
-
-        export function IsFeatureEnabled(featureName: string) {
-            var feature: FeatureInfo[] = $.grep(_featureMap, function (e) { return e.Name === featureName; });
-            return feature[0].IsEnabled;
-        }
 
         function closeAllForms() {
             $('.cz-major-form').each((i, f) => { var form = $(f).data('form'); if (form) { form.close(); } });

@@ -205,11 +205,12 @@ module CZ {
             }
         }
 
-        //loading the data from the service
+        // loading the data from the service
         export function loadData() {
             var args;
-            if (!CZ.Service.superCollectionName && !CZ.Service.collectionName) {
-                // load the initial skeleton timelines for regimes
+            if (!CZ.Service.superCollectionName && !CZ.Service.collectionName) { // default collection (Big History)
+                // load the minimal set of timelines to enable regimes
+                // i.e. timelines on the path from Cosmos to Humanity (for default collection)
                 args = {
                     start: -400,
                     end: 9999,
@@ -217,10 +218,18 @@ module CZ {
                     commonAncestor: CZ.Settings.humanityTimelineID,
                     fromRoot: 1
                 };
-            } else {
+            } else { // user specified collection
+                // load only the root timelime and its immediate children
                 args = null;
             }
-
+            
+            if (typeof CZ.Authoring !== 'undefined' && CZ.Authoring.isActive) { // download the whole collection if in authoring mode
+                // load all data in the collection
+                args = {
+                    minspan: 0
+                };
+            }
+            
             return CZ.Service.getTimelines(args)
             .then(function (response) {
                 var root = vc.virtualCanvas("getLayerContent");
