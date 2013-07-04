@@ -667,8 +667,12 @@ module CZ {
             isBookmarksWindowVisible = false;
 
             var curURL = CZ.UrlNav.getURL();
-            delete curURL.hash.params["tour"];
-            delete curURL.hash.params["bookmark"];
+            if (curURL.hash && curURL.hash.params && curURL.hash.params["tour"]) {
+                delete curURL.hash.params["tour"];
+            }
+            if (curURL.hash && curURL.hash.params && curURL.hash.params["bookmark"]) {
+                delete curURL.hash.params["bookmark"];
+            }
             CZ.UrlNav.setURL(curURL);
         }
 

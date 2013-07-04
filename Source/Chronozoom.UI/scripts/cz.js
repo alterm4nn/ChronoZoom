@@ -547,13 +547,24 @@ var CZ;
                 hashChangeFromOutside = false;
                 if(CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.bookmark) {
                     CZ.UrlNav.navigationAnchor = CZ.UrlNav.navStringTovcElement(CZ.Common.setNavigationStringTo.bookmark, CZ.Common.vc.virtualCanvas("getLayerContent"));
-                    window.location.hash = CZ.Common.setNavigationStringTo.bookmark;
-                } else {
-                    if(CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.id == id) {
-                        CZ.UrlNav.navigationAnchor = CZ.Common.setNavigationStringTo.element;
+                    var newURL = CZ.UrlNav.getURL();
+                    newURL.hash.path = CZ.Common.setNavigationStringTo.bookmark;
+                    CZ.UrlNav.setURL(newURL);
+                } else if(CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.id == id) {
+                    CZ.UrlNav.navigationAnchor = CZ.Common.setNavigationStringTo.element;
+                    var newURL = CZ.UrlNav.getURL();
+                    newURL.hash.path = CZ.UrlNav.vcelementToNavString(CZ.UrlNav.navigationAnchor, CZ.Common.vc.virtualCanvas("getViewport"));
+                    CZ.UrlNav.setURL(newURL);
+                } else if(CZ.BreadCrumbs.breadCrumbs) {
+                    var newHash = "";
+                    for(var i = 0; i < CZ.BreadCrumbs.breadCrumbs.length; i++) {
+                        newHash += "/" + CZ.BreadCrumbs.breadCrumbs[i].vcElement.id;
                     }
-                    var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                    window.location.hash = CZ.UrlNav.vcelementToNavString(CZ.UrlNav.navigationAnchor, vp);
+                    if(newHash !== window.location.hash) {
+                        var newURL = CZ.UrlNav.getURL();
+                        newURL.hash.path = newHash;
+                        CZ.UrlNav.setURL(newURL);
+                    }
                 }
                 CZ.Common.setNavigationStringTo = null;
             });

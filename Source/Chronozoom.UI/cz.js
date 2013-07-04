@@ -317,17 +317,6 @@ var CZ;
                 }
                 vcElem = vcElem.parent;
             }
-            if(nav && nav !== '') {
-                var URL = getURL();
-                if(typeof URL.hash.params != 'undefined') {
-                    if(typeof URL.hash.params['tour'] != 'undefined') {
-                        nav += "&tour=" + URL.hash.params["tour"];
-                    }
-                    if(typeof URL.hash.params['bookmark'] != 'undefined') {
-                        nav += "&bookmark=" + URL.hash.params["bookmark"];
-                    }
-                }
-            }
             return nav;
         }
         UrlNav.vcelementToNavString = vcelementToNavString;
@@ -516,7 +505,9 @@ var CZ;
             for(var key in url.hash.params) {
                 hash_params.push(key + "=" + url.hash.params[key]);
             }
-            hash += ("@" + hash_params.join("&"));
+            if(hash_params.length > 0) {
+                hash += ("@" + hash_params.join("&"));
+            }
             var loc = path + "#" + hash;
             if(reload == true) {
                 window.location.href = loc;
@@ -5029,8 +5020,12 @@ var CZ;
             $("#bookmarks").hide();
             Tours.isBookmarksWindowVisible = false;
             var curURL = CZ.UrlNav.getURL();
-            delete curURL.hash.params["tour"];
-            delete curURL.hash.params["bookmark"];
+            if(curURL.hash && curURL.hash.params && curURL.hash.params["tour"]) {
+                delete curURL.hash.params["tour"];
+            }
+            if(curURL.hash && curURL.hash.params && curURL.hash.params["bookmark"]) {
+                delete curURL.hash.params["bookmark"];
+            }
             CZ.UrlNav.setURL(curURL);
         }
         Tours.tourAbort = tourAbort;
@@ -5529,37 +5524,37 @@ var CZ;
         var hiddenFromLeft = [];
         var hiddenFromRight = [];
         BreadCrumbs.visibleAreaWidth = 0;
-        var breadCrumbs;
+        BreadCrumbs.breadCrumbs;
         function updateBreadCrumbsLabels(newBreadCrumbs) {
             if(newBreadCrumbs) {
-                if(breadCrumbs == null) {
-                    breadCrumbs = newBreadCrumbs;
-                    for(var i = 0; i < breadCrumbs.length; i++) {
-                        addBreadCrumb(breadCrumbs[i].vcElement);
+                if(BreadCrumbs.breadCrumbs == null) {
+                    BreadCrumbs.breadCrumbs = newBreadCrumbs;
+                    for(var i = 0; i < BreadCrumbs.breadCrumbs.length; i++) {
+                        addBreadCrumb(BreadCrumbs.breadCrumbs[i].vcElement);
                     }
                     moveToRightEdge();
                     return;
                 }
-                for(var i = 0; i < breadCrumbs.length; i++) {
+                for(var i = 0; i < BreadCrumbs.breadCrumbs.length; i++) {
                     if(newBreadCrumbs[i] == null) {
                         removeBreadCrumb();
-                    } else if(newBreadCrumbs[i].vcElement.id != breadCrumbs[i].vcElement.id) {
-                        for(var j = i; j < breadCrumbs.length; j++) {
+                    } else if(newBreadCrumbs[i].vcElement.id != BreadCrumbs.breadCrumbs[i].vcElement.id) {
+                        for(var j = i; j < BreadCrumbs.breadCrumbs.length; j++) {
                             removeBreadCrumb();
                         }
                         for(var j = i; j < newBreadCrumbs.length; j++) {
                             addBreadCrumb(newBreadCrumbs[j].vcElement);
                         }
-                        breadCrumbs = newBreadCrumbs;
+                        BreadCrumbs.breadCrumbs = newBreadCrumbs;
                         return;
                     }
                 }
                 moveToRightEdge();
-                for(var i = breadCrumbs.length; i < newBreadCrumbs.length; i++) {
+                for(var i = BreadCrumbs.breadCrumbs.length; i < newBreadCrumbs.length; i++) {
                     addBreadCrumb(newBreadCrumbs[i].vcElement);
                 }
                 moveToRightEdge();
-                breadCrumbs = newBreadCrumbs;
+                BreadCrumbs.breadCrumbs = newBreadCrumbs;
             }
         }
         BreadCrumbs.updateBreadCrumbsLabels = updateBreadCrumbsLabels;
@@ -11954,13 +11949,24 @@ var CZ;
                 hashChangeFromOutside = false;
                 if(CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.bookmark) {
                     CZ.UrlNav.navigationAnchor = CZ.UrlNav.navStringTovcElement(CZ.Common.setNavigationStringTo.bookmark, CZ.Common.vc.virtualCanvas("getLayerContent"));
-                    window.location.hash = CZ.Common.setNavigationStringTo.bookmark;
-                } else {
-                    if(CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.id == id) {
-                        CZ.UrlNav.navigationAnchor = CZ.Common.setNavigationStringTo.element;
+                    var newURL = CZ.UrlNav.getURL();
+                    newURL.hash.path = CZ.Common.setNavigationStringTo.bookmark;
+                    CZ.UrlNav.setURL(newURL);
+                } else if(CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.id == id) {
+                    CZ.UrlNav.navigationAnchor = CZ.Common.setNavigationStringTo.element;
+                    var newURL = CZ.UrlNav.getURL();
+                    newURL.hash.path = CZ.UrlNav.vcelementToNavString(CZ.UrlNav.navigationAnchor, CZ.Common.vc.virtualCanvas("getViewport"));
+                    CZ.UrlNav.setURL(newURL);
+                } else if(CZ.BreadCrumbs.breadCrumbs) {
+                    var newHash = "";
+                    for(var i = 0; i < CZ.BreadCrumbs.breadCrumbs.length; i++) {
+                        newHash += "/" + CZ.BreadCrumbs.breadCrumbs[i].vcElement.id;
                     }
-                    var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                    window.location.hash = CZ.UrlNav.vcelementToNavString(CZ.UrlNav.navigationAnchor, vp);
+                    if(newHash !== window.location.hash) {
+                        var newURL = CZ.UrlNav.getURL();
+                        newURL.hash.path = newHash;
+                        CZ.UrlNav.setURL(newURL);
+                    }
                 }
                 CZ.Common.setNavigationStringTo = null;
             });

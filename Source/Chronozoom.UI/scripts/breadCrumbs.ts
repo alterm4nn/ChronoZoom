@@ -8,7 +8,7 @@ module CZ {
         var hiddenFromRight = []; // hidden breadcrumbs from the right side
         export var visibleAreaWidth = 0;
         
-        var breadCrumbs;
+        export var breadCrumbs;
 
         // Updates current breadcrumbs path, raised when breadcrumbs path has changed.
         // @param  newBreadCrumbs       (array) new breadcrumbs path.

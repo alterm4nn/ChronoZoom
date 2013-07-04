@@ -4,37 +4,37 @@
         var hiddenFromLeft = [];
         var hiddenFromRight = [];
         BreadCrumbs.visibleAreaWidth = 0;
-        var breadCrumbs;
+        BreadCrumbs.breadCrumbs;
         function updateBreadCrumbsLabels(newBreadCrumbs) {
             if(newBreadCrumbs) {
-                if(breadCrumbs == null) {
-                    breadCrumbs = newBreadCrumbs;
-                    for(var i = 0; i < breadCrumbs.length; i++) {
-                        addBreadCrumb(breadCrumbs[i].vcElement);
+                if(BreadCrumbs.breadCrumbs == null) {
+                    BreadCrumbs.breadCrumbs = newBreadCrumbs;
+                    for(var i = 0; i < BreadCrumbs.breadCrumbs.length; i++) {
+                        addBreadCrumb(BreadCrumbs.breadCrumbs[i].vcElement);
                     }
                     moveToRightEdge();
                     return;
                 }
-                for(var i = 0; i < breadCrumbs.length; i++) {
+                for(var i = 0; i < BreadCrumbs.breadCrumbs.length; i++) {
                     if(newBreadCrumbs[i] == null) {
                         removeBreadCrumb();
-                    } else if(newBreadCrumbs[i].vcElement.id != breadCrumbs[i].vcElement.id) {
-                        for(var j = i; j < breadCrumbs.length; j++) {
+                    } else if(newBreadCrumbs[i].vcElement.id != BreadCrumbs.breadCrumbs[i].vcElement.id) {
+                        for(var j = i; j < BreadCrumbs.breadCrumbs.length; j++) {
                             removeBreadCrumb();
                         }
                         for(var j = i; j < newBreadCrumbs.length; j++) {
                             addBreadCrumb(newBreadCrumbs[j].vcElement);
                         }
-                        breadCrumbs = newBreadCrumbs;
+                        BreadCrumbs.breadCrumbs = newBreadCrumbs;
                         return;
                     }
                 }
                 moveToRightEdge();
-                for(var i = breadCrumbs.length; i < newBreadCrumbs.length; i++) {
+                for(var i = BreadCrumbs.breadCrumbs.length; i < newBreadCrumbs.length; i++) {
                     addBreadCrumb(newBreadCrumbs[i].vcElement);
                 }
                 moveToRightEdge();
-                breadCrumbs = newBreadCrumbs;
+                BreadCrumbs.breadCrumbs = newBreadCrumbs;
             }
         }
         BreadCrumbs.updateBreadCrumbsLabels = updateBreadCrumbsLabels;

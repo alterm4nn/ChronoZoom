@@ -11,17 +11,6 @@ var CZ;
                 }
                 vcElem = vcElem.parent;
             }
-            if(nav && nav !== '') {
-                var URL = getURL();
-                if(typeof URL.hash.params != 'undefined') {
-                    if(typeof URL.hash.params['tour'] != 'undefined') {
-                        nav += "&tour=" + URL.hash.params["tour"];
-                    }
-                    if(typeof URL.hash.params['bookmark'] != 'undefined') {
-                        nav += "&bookmark=" + URL.hash.params["bookmark"];
-                    }
-                }
-            }
             return nav;
         }
         UrlNav.vcelementToNavString = vcelementToNavString;
@@ -210,7 +199,9 @@ var CZ;
             for(var key in url.hash.params) {
                 hash_params.push(key + "=" + url.hash.params[key]);
             }
-            hash += ("@" + hash_params.join("&"));
+            if(hash_params.length > 0) {
+                hash += ("@" + hash_params.join("&"));
+            }
             var loc = path + "#" + hash;
             if(reload == true) {
                 window.location.href = loc;
