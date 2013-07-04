@@ -10036,16 +10036,15 @@ var CZ;
                 startPos = Common.startHash.lastIndexOf("/t");
                 if(startPos !== -1) {
                     startPos += 2;
-                    var idx1 = Common.startHash.indexOf("/", startPos);
-                    var idx2 = Common.startHash.indexOf("\\", startPos);
-                    var idx3 = Common.startHash.indexOf("@", startPos);
-                    var idx4 = Common.startHash.indexOf("&", startPos);
-                    endPos = Math.min(idx1, idx2, idx3, idx4);
-                    if(endPos === -1) {
-                        endPos = Common.startHash.length - 1;
-                    } else {
-                        endPos -= 1;
-                    }
+                    var pos = [];
+                    pos.push(Common.startHash.indexOf("/", startPos));
+                    pos.push(Common.startHash.indexOf("\\", startPos));
+                    pos.push(Common.startHash.indexOf("@", startPos));
+                    pos.push(Common.startHash.indexOf("&", startPos));
+                    pos = pos.filter(function (v) {
+                        return v >= 0;
+                    }).sort();
+                    endPos = (pos.length > 0) ? pos[0] - 1 : Common.startHash.length - 1;
                     if(startPos >= 0 && endPos >= 0 && endPos >= startPos) {
                         timelineID = Common.startHash.substring(startPos, endPos + 1);
                     }
