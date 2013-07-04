@@ -229,6 +229,7 @@ var CZ;
                 return;
             }
             Common.controller.moveToVisible(rootVisible, true);
+            updateAxis(Common.vc, Common.ax);
         }
         function processHash() {
             visReg = CZ.UrlNav.navStringToVisible(Common.startHash.substring(1), Common.vc);

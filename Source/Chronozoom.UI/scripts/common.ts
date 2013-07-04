@@ -295,6 +295,7 @@ module CZ {
             var rootVisible = getTimelineVisible(root.guid);
             if (!rootVisible) return;
             controller.moveToVisible(rootVisible, true);
+            updateAxis(vc, ax);
         }
 
         function processHash() {
@@ -302,11 +303,6 @@ module CZ {
             if (visReg) {
                 controller.moveToVisible(visReg, true);
                 updateAxis(vc, ax);
-
-                //if (startHash && window.location.hash !== startHash) {
-                //    hashChangeFromOutside = false;
-                //    window.location.hash = startHash; // synchronizing
-                //}
             } else {
                 var startPos, endPos, timelineID;
                 startPos = startHash.lastIndexOf("/t");
@@ -347,11 +343,6 @@ module CZ {
                         if (visReg) {
                             controller.moveToVisible(visReg, true);
                             updateAxis(vc, ax);
-
-                            //if (startHash && window.location.hash !== startHash) {
-                            //    hashChangeFromOutside = false;
-                            //    window.location.hash = startHash; // synchronizing
-                            //}
                         }
                     });
                 },
