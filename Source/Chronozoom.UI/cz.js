@@ -33,6 +33,9 @@
         Settings.timelineHoveredBoxBorderColor = 'rgb(232,232,232)';
         Settings.timelineBreadCrumbBorderOffset = 50;
         Settings.timelineCenterOffsetAcceptableImplicity = 0.00001;
+        Settings.timelineColor = null;
+        Settings.timelineHoverAnimation = 3 / 60.0;
+        Settings.timelineGradientFillStyle = null;
         Settings.infodotShowContentZoomLevel = 9;
         Settings.infodotShowContentThumbZoomLevel = 2;
         Settings.infoDotHoveredBorderWidth = 40.0 / 450;
@@ -175,6 +178,51 @@
             }
             return (v > 4) ? v : undefined;
         })());
+        Settings.theme;
+        function applyTheme(theme) {
+            if(!theme) {
+                theme = "cosmos";
+            }
+            this.theme = theme;
+            var themeData = {
+                "cosmos": {
+                    "background": "url('/images/background.jpg')",
+                    "backgroundColor": "#232323",
+                    "timelineColor": null,
+                    "timelineHoverAnimation": 3 / 60.0,
+                    "infoDotFillColor": 'rgb(92,92,92)',
+                    "fallbackImageUri": '/images/Temp-Thumbnail2.png',
+                    "timelineGradientFillStyle": null
+                },
+                "gray": {
+                    "background": "none",
+                    "backgroundColor": "#bebebe",
+                    "timelineColor": null,
+                    "timelineHoverAnimation": 3 / 60.0,
+                    "infoDotFillColor": 'rgb(92,92,92)',
+                    "fallbackImageUri": '/images/Temp-Thumbnail2.png',
+                    "timelineGradientFillStyle": "#9e9e9e"
+                },
+                "aqua": {
+                    "background": "none",
+                    "backgroundColor": "rgb(238, 238, 238)",
+                    "timelineColor": "rgba(52, 76, 130, 0.5)",
+                    "timelineHoverAnimation": 3 / 60.0,
+                    "infoDotFillColor": 'rgb(55,84,123)',
+                    "fallbackImageUri": '/images/Temp-Thumbnail-Aqua.png',
+                    "timelineGradientFillStyle": "rgb(80,123,175)"
+                }
+            };
+            var themeSettings = themeData[theme];
+            $('#vc').css('background-image', themeSettings.background);
+            $('#vc').css('background-color', themeSettings.backgroundColor);
+            CZ.Settings.timelineColor = themeSettings.timelineColor;
+            CZ.Settings.timelineHoverAnimation = themeSettings.timelineHoverAnimation;
+            CZ.Settings.infoDotFillColor = themeSettings.infoDotFillColor;
+            CZ.Settings.fallbackImageUri = themeSettings.fallbackImageUri;
+            CZ.Settings.timelineGradientFillStyle = themeSettings.timelineGradientFillStyle;
+        }
+        Settings.applyTheme = applyTheme;
     })(CZ.Settings || (CZ.Settings = {}));
     var Settings = CZ.Settings;
 })(CZ || (CZ = {}));
@@ -1102,7 +1150,11 @@ var CZ;
             this.title = this.titleObject.text;
             this.regime = timelineinfo.regime;
             this.settings.gradientOpacity = 0;
-            this.settings.gradientFillStyle = timelineinfo.gradientFillStyle || timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
+            if(CZ.Settings.timelineGradientFillStyle) {
+                this.settings.gradientFillStyle = CZ.Settings.timelineGradientFillStyle;
+            } else {
+                this.settings.gradientFillStyle = timelineinfo.gradientFillStyle || timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
+            }
             this.reactsOnMouse = true;
             this.tooltipEnabled = true;
             this.tooltipIsShown = false;
@@ -1122,7 +1174,7 @@ var CZ;
                 this.settings.strokeStyle = CZ.Settings.timelineHoveredBoxBorderColor;
                 this.settings.lineWidth = CZ.Settings.timelineHoveredLineWidth;
                 this.titleObject.settings.fillStyle = CZ.Settings.timelineHoveredHeaderFontColor;
-                this.settings.hoverAnimationDelta = 3 / 60.0;
+                this.settings.hoverAnimationDelta = CZ.Settings.timelineHoverAnimation;
                 this.vc.requestInvalidate();
                 if(this.titleObject.initialized == false) {
                     var vp = this.vc.getViewport();
@@ -1179,7 +1231,8 @@ var CZ;
                 this.settings.strokeStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
                 this.settings.lineWidth = CZ.Settings.timelineLineWidth;
                 this.titleObject.settings.fillStyle = CZ.Settings.timelineHeaderFontColor;
-                this.settings.hoverAnimationDelta = -3 / 60.0;
+                this.settings.hoverAnimationDelta = -CZ.Settings.timelineHoverAnimation;
+                ;
                 this.vc.requestInvalidate();
             };
             this.base_render = this.render;
@@ -1829,7 +1882,7 @@ var CZ;
             var timeline = VCContent.addChild(element, new CanvasTimeline(element.vc, layerid, id, timelineinfo.timeStart, timelineinfo.top, width, timelineinfo.height, {
                 strokeStyle: timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineStrokeStyle,
                 lineWidth: CZ.Settings.timelineLineWidth,
-                fillStyle: timelineinfo.fillStyle,
+                fillStyle: CZ.Settings.timelineColor ? CZ.Settings.timelineColor : timelineinfo.fillStyle,
                 opacity: typeof timelineinfo.opacity !== 'undefined' ? timelineinfo.opacity : 1
             }, timelineinfo), true);
             return timeline;
@@ -3205,10 +3258,10 @@ var CZ;
             });
         }
         Service.getTimelines = getTimelines;
-        function getCollections() {
+        function getCollections(superCollectionName) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
+            request.addToPath(superCollectionName);
             request.addToPath("collections");
             return $.ajax({
                 type: "GET",
@@ -3249,11 +3302,11 @@ var CZ;
             });
         }
         Service.postData = postData;
-        function putCollection(c) {
+        function putCollection(superCollectionName, collectionName, c) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
-            request.addToPath(c.name);
+            request.addToPath(superCollectionName);
+            request.addToPath(collectionName);
             return $.ajax({
                 type: "PUT",
                 cache: false,
@@ -11019,6 +11072,9 @@ var CZ;
                 this.profilePanel = $(document.body).find(formInfo.profilePanel).first();
                 this.loginPanelLogin = $(document.body).find(formInfo.loginPanelLogin).first();
                 this.allowRedirect = formInfo.allowRedirect;
+                this.collectionTheme = formInfo.collectionTheme;
+                this.collectionThemeInput = container.find(formInfo.collectionThemeInput);
+                this.collectionThemeWrapper = container.find(formInfo.collectionThemeWrapper);
                 this.usernameInput.off("keypress");
                 this.emailInput.off("keypress");
                 this.initialize();
@@ -11037,6 +11093,9 @@ var CZ;
             FormEditProfile.prototype.initialize = function () {
                 var _this = this;
                 var profile = CZ.Service.getProfile();
+                if(this.collectionThemeWrapper) {
+                    this.collectionThemeWrapper.show();
+                }
                 profile.done(function (data) {
                     if(data.DisplayName != null) {
                         _this.usernameInput.val(data.DisplayName);
@@ -11070,6 +11129,7 @@ var CZ;
                         }
                         emailAddress = _this.emailInput.val();
                     }
+                    _this.collectionTheme = _this.collectionThemeInput.val();
                     CZ.Service.getProfile().done(function (curUser) {
                         CZ.Service.getProfile(_this.usernameInput.val()).done(function (getUser) {
                             if(curUser.DisplayName == null && typeof getUser.DisplayName != "undefined") {
@@ -11077,10 +11137,22 @@ var CZ;
                                 return;
                             }
                             CZ.Service.putProfile(_this.usernameInput.val(), emailAddress).then(function (success) {
-                                if(_this.allowRedirect) {
-                                    window.location.assign("/" + success);
+                                if(_this.collectionTheme) {
+                                    CZ.Service.putCollection(_this.usernameInput.val(), _this.usernameInput.val(), {
+                                        theme: _this.collectionTheme
+                                    }).then(function () {
+                                        if(_this.allowRedirect) {
+                                            window.location.assign("/" + success);
+                                        } else {
+                                            _this.close();
+                                        }
+                                    });
                                 } else {
-                                    _this.close();
+                                    if(_this.allowRedirect) {
+                                        window.location.assign("/" + success);
+                                    } else {
+                                        _this.close();
+                                    }
                                 }
                             }, function (error) {
                                 alert("Unable to save changes. Please try again later.");
@@ -11106,6 +11178,7 @@ var CZ;
                     direction: "right",
                     duration: 500
                 });
+                this.collectionThemeInput.val(this.collectionTheme);
                 this.activationSource.addClass("active");
             };
             FormEditProfile.prototype.close = function () {
@@ -11115,6 +11188,9 @@ var CZ;
                     duration: 500
                 });
                 this.activationSource.removeClass("active");
+            };
+            FormEditProfile.prototype.setTheme = function (theme) {
+                this.collectionTheme = theme;
             };
             return FormEditProfile;
         })(CZ.UI.FormUpdateEntity);
@@ -11673,6 +11749,10 @@ var CZ;
                 Activation: FeatureActivation.Enabled,
                 JQueryReference: ".header-breadcrumbs"
             }, 
+            {
+                Name: "Themes",
+                Activation: FeatureActivation.NotProduction
+            }, 
             
         ];
         HomePageViewModel.rootCollection;
@@ -11976,7 +12056,10 @@ var CZ;
                     profilePanel: "#profile-panel",
                     loginPanelLogin: "#profile-panel.auth-panel-login",
                     context: "",
-                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring")
+                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring"),
+                    collectionTheme: CZ.Settings.theme,
+                    collectionThemeInput: "#collection-theme",
+                    collectionThemeWrapper: IsFeatureEnabled(_featureMap, "Themes") ? "#collection-theme-wrapper" : null
                 });
                 var loginForm = new CZ.UI.FormLogin(forms[6], {
                     activationSource: $("#login-panel"),
@@ -11990,6 +12073,7 @@ var CZ;
                     event.preventDefault();
                     if(!profileForm.isFormVisible) {
                         closeAllForms();
+                        profileForm.setTheme(CZ.Settings.theme);
                         profileForm.show();
                     } else {
                         profileForm.close();
@@ -12005,6 +12089,7 @@ var CZ;
                             $("#profile-panel input#username").focus();
                             if(!profileForm.isFormVisible) {
                                 closeAllForms();
+                                profileForm.setTheme(CZ.Settings.theme);
                                 profileForm.show();
                             } else {
                                 profileForm.close();
@@ -12047,6 +12132,14 @@ var CZ;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
+            CZ.Settings.applyTheme(null);
+            CZ.Service.getCollections(CZ.Service.superCollectionName).then(function (response) {
+                $(response).each(function (index) {
+                    if(response[index] && response[index].Title.toLowerCase() === CZ.Service.collectionName.toLowerCase()) {
+                        CZ.Settings.applyTheme(response[index].theme);
+                    }
+                });
+            });
             $('#breadcrumbs-nav-left').click(CZ.BreadCrumbs.breadCrumbNavLeft);
             $('#breadcrumbs-nav-right').click(CZ.BreadCrumbs.breadCrumbNavRight);
             $('#tour_prev').mouseout(function () {

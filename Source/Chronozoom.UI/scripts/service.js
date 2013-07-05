@@ -130,10 +130,10 @@ var CZ;
             });
         }
         Service.getTimelines = getTimelines;
-        function getCollections() {
+        function getCollections(superCollectionName) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
+            request.addToPath(superCollectionName);
             request.addToPath("collections");
             return $.ajax({
                 type: "GET",
@@ -174,11 +174,11 @@ var CZ;
             });
         }
         Service.postData = postData;
-        function putCollection(c) {
+        function putCollection(superCollectionName, collectionName, c) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
-            request.addToPath(c.name);
+            request.addToPath(superCollectionName);
+            request.addToPath(collectionName);
             return $.ajax({
                 type: "PUT",
                 cache: false,

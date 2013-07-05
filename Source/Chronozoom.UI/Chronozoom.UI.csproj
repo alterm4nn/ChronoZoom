@@ -254,6 +254,7 @@
     <Content Include="images\edit-icon.png" />
     <Content Include="images\profile-icon.png" />
     <Content Include="images\search-icon.png" />
+    <Content Include="images\Temp-Thumbnail-Aqua.png" />
     <Content Include="images\timeseries-icon.png" />
     <Content Include="images\tour-icon.png" />
     <Content Include="images\view-icon.png" />
@@ -609,7 +610,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>False</AutoAssignPort>
-          <DevelopmentServerPort>80</DevelopmentServerPort>
+          <DevelopmentServerPort>4949</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:4949/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

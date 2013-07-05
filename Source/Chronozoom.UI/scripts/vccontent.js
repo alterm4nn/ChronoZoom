@@ -496,7 +496,11 @@ var CZ;
             this.title = this.titleObject.text;
             this.regime = timelineinfo.regime;
             this.settings.gradientOpacity = 0;
-            this.settings.gradientFillStyle = timelineinfo.gradientFillStyle || timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
+            if(CZ.Settings.timelineGradientFillStyle) {
+                this.settings.gradientFillStyle = CZ.Settings.timelineGradientFillStyle;
+            } else {
+                this.settings.gradientFillStyle = timelineinfo.gradientFillStyle || timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
+            }
             this.reactsOnMouse = true;
             this.tooltipEnabled = true;
             this.tooltipIsShown = false;
@@ -516,7 +520,7 @@ var CZ;
                 this.settings.strokeStyle = CZ.Settings.timelineHoveredBoxBorderColor;
                 this.settings.lineWidth = CZ.Settings.timelineHoveredLineWidth;
                 this.titleObject.settings.fillStyle = CZ.Settings.timelineHoveredHeaderFontColor;
-                this.settings.hoverAnimationDelta = 3 / 60.0;
+                this.settings.hoverAnimationDelta = CZ.Settings.timelineHoverAnimation;
                 this.vc.requestInvalidate();
                 if(this.titleObject.initialized == false) {
                     var vp = this.vc.getViewport();
@@ -573,7 +577,8 @@ var CZ;
                 this.settings.strokeStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
                 this.settings.lineWidth = CZ.Settings.timelineLineWidth;
                 this.titleObject.settings.fillStyle = CZ.Settings.timelineHeaderFontColor;
-                this.settings.hoverAnimationDelta = -3 / 60.0;
+                this.settings.hoverAnimationDelta = -CZ.Settings.timelineHoverAnimation;
+                ;
                 this.vc.requestInvalidate();
             };
             this.base_render = this.render;
@@ -1223,7 +1228,7 @@ var CZ;
             var timeline = VCContent.addChild(element, new CanvasTimeline(element.vc, layerid, id, timelineinfo.timeStart, timelineinfo.top, width, timelineinfo.height, {
                 strokeStyle: timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineStrokeStyle,
                 lineWidth: CZ.Settings.timelineLineWidth,
-                fillStyle: timelineinfo.fillStyle,
+                fillStyle: CZ.Settings.timelineColor ? CZ.Settings.timelineColor : timelineinfo.fillStyle,
                 opacity: typeof timelineinfo.opacity !== 'undefined' ? timelineinfo.opacity : 1
             }, timelineinfo), true);
             return timeline;
