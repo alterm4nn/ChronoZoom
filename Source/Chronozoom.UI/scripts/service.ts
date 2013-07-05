@@ -6,8 +6,7 @@ module CZ {
     export module Service {
 
         module Map {
-            function bookmark(ts: CZ.UI.TourStop) : any
-            {
+            function bookmark(ts: CZ.UI.TourStop): any {
                 return {
                     name: ts.Title,
                     url: ts.NavigationUrl,
@@ -16,11 +15,9 @@ module CZ {
                 };
             }
 
-            export function tour(t : CZ.UI.Tour) : any
-            {
+            export function tour(t: CZ.UI.Tour): any {
                 var bookmarks = new Array(t.Stops.length);
-                for (var i = 0, n = t.Stops.length; i < n; i++)
-                {
+                for (var i = 0, n = t.Stops.length; i < n; i++) {
                     bookmarks[i] = bookmark(t.Stops[i]);
                 }
 
@@ -92,7 +89,7 @@ module CZ {
 
         var _serviceUrl = CZ.Settings.serverUrlHost + "/api/";
 
-        export function Request (urlBase) {
+        export function Request(urlBase) {
             var _url = urlBase;
             var _hasParameters = false;
 
@@ -126,7 +123,7 @@ module CZ {
             };
         };
 
-        
+
         // NOTE: Clear collections to let the server decide what to load.
         export var collectionName = "";
         export var superCollectionName = "";
@@ -136,7 +133,8 @@ module CZ {
         */
 
         // .../gettimelines?supercollection=&collection=&start=&end=&minspan=&lca=
-        export function getTimelines (r) {
+        export function getTimelines(r) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath("gettimelines");
             request.addParameter("supercollection", superCollectionName);
@@ -157,9 +155,10 @@ module CZ {
             * Information Retrieval.
             */
 
-        // .../{supercollection}/collections
+        // .../{superCollectionName}/collections
         // NOTE: Not implemented in current API.
-        export function getCollections () {
+        export function getCollections (superCollectionName : string) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(superCollectionName);
             request.addToPath("collections");
@@ -174,7 +173,8 @@ module CZ {
 
         // .../{supercollection}/{collection}/structure?start=&end=&minspan=&lca=
         // NOTE: Not implemented in current API.
-        export function getStructure (r) {
+        export function getStructure(r) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(superCollectionName);
             request.addToPath(collectionName);
@@ -191,7 +191,8 @@ module CZ {
 
         // .../{supercollection}/{collection}/data
         // NOTE: Not implemented in current API.
-        export function postData (r) {
+        export function postData(r) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(superCollectionName);
             request.addToPath(collectionName);
@@ -212,10 +213,11 @@ module CZ {
         */
 
         // .../{supercollection}/{collection}
-        export function putCollection (c) {
+        export function putCollection(superCollectionName : string, collectionName : string, c) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(superCollectionName);
-            request.addToPath(c.name);
+            request.addToPath(collectionName);
 
             return $.ajax({
                 type: "PUT",
@@ -228,7 +230,8 @@ module CZ {
         }
 
         // .../{supercollection}/{collection}
-        export function deleteCollection (c) {
+        export function deleteCollection(c) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(superCollectionName);
             request.addToPath(c.name);
@@ -243,7 +246,8 @@ module CZ {
         }
 
         // .../{supercollection}/{collection}/timeline
-        export function putTimeline (t) {
+        export function putTimeline(t) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(superCollectionName);
             request.addToPath(collectionName);
@@ -262,7 +266,8 @@ module CZ {
         }
 
         // .../{supercollection}/{collection}/timeline
-        export function deleteTimeline (t) {
+        export function deleteTimeline(t) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(superCollectionName);
             request.addToPath(collectionName);
@@ -280,7 +285,8 @@ module CZ {
         }
 
         // .../{supercollection}/{collection}/exhibit
-        export function putExhibit (e) {
+        export function putExhibit(e) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(superCollectionName);
             request.addToPath(collectionName);
@@ -299,7 +305,8 @@ module CZ {
         }
 
         // .../{supercollection}/{collection}/exhibit
-        export function deleteExhibit (e) {
+        export function deleteExhibit(e) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(superCollectionName);
             request.addToPath(collectionName);
@@ -317,7 +324,8 @@ module CZ {
         }
 
         // .../{supercollection}/{collection}/contentitem
-        export function putContentItem (ci) {
+        export function putContentItem(ci) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(superCollectionName);
             request.addToPath(collectionName);
@@ -336,7 +344,8 @@ module CZ {
         }
 
         // .../{supercollection}/{collection}/contentitem
-        export function deleteContentItem (ci) {
+        export function deleteContentItem(ci) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(superCollectionName);
             request.addToPath(collectionName);
@@ -353,9 +362,10 @@ module CZ {
             });
         }
 
-           // .../{supercollection}/{collection}/tour
+        // .../{supercollection}/{collection}/tour
         // Creates or updates a tour
         export function putTour2(t: CZ.UI.Tour) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(superCollectionName);
             request.addToPath(collectionName);
@@ -376,6 +386,7 @@ module CZ {
         // .../{supercollection}/{collection}/tour
         // Deletes a tour
         export function deleteTour(tourId: string) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(superCollectionName);
             request.addToPath(collectionName);
@@ -392,9 +403,10 @@ module CZ {
                 data: JSON.stringify({ id: tourId })
             });
         }
-        
+
         // .../{supercollection}/{collection}/tours
-        export function getTours () {
+        export function getTours() {
+            CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath(superCollectionName);
             request.addToPath(collectionName);
@@ -410,6 +422,7 @@ module CZ {
 
         // .../search
         export function getSearch(query) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("Search");
 
@@ -431,6 +444,7 @@ module CZ {
 
         // .../{supercollection}/{collection}/structure?start=&end=&minspan=&lca=
         export function getServiceInformation() {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath("info");
 
@@ -444,6 +458,7 @@ module CZ {
 
         // .../{supercollection}/{collection}/{reference}/contentpath
         export function getContentPath(reference: string) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath(superCollectionName);
             request.addToPath(collectionName);
@@ -462,7 +477,8 @@ module CZ {
         * Auxiliary Methods.
         */
 
-        export function putExhibitContent (e, oldContentItems) : JQueryPromise {
+        export function putExhibitContent(e, oldContentItems): JQueryPromise {
+            CZ.Authoring.resetSessionTimer();
             var newGuids = e.contentItems.map(function (ci) {
                 return ci.guid;
             });
@@ -495,6 +511,7 @@ module CZ {
         * @param  {Object} email .
         */
         export function putProfile(displayName, email) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("user");
             var user = {
@@ -515,6 +532,7 @@ module CZ {
         * @param  {Object} username .
         */
         export function deleteProfile(displayName) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("user");
             var user = {
@@ -530,9 +548,10 @@ module CZ {
         }
 
         export function getProfile(displayName = "") {
+            CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("user");
-            if(displayName != "")
+            if (displayName != "")
                 request.addParameter("name", displayName);
             return $.ajax({
                 type: "GET",
@@ -542,7 +561,7 @@ module CZ {
             }).done(profile => {
                 if (!profile.id)
                     return null;
-                
+
                 return profile;
             });
         }

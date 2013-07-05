@@ -33,6 +33,9 @@ var CZ;
         Settings.timelineHoveredBoxBorderColor = 'rgb(232,232,232)';
         Settings.timelineBreadCrumbBorderOffset = 50;
         Settings.timelineCenterOffsetAcceptableImplicity = 0.00001;
+        Settings.timelineColor = null;
+        Settings.timelineHoverAnimation = 3 / 60.0;
+        Settings.timelineGradientFillStyle = null;
         Settings.infodotShowContentZoomLevel = 9;
         Settings.infodotShowContentThumbZoomLevel = 2;
         Settings.infoDotHoveredBorderWidth = 40.0 / 450;
@@ -166,6 +169,7 @@ var CZ;
         Settings.signinUrlMicrosoft = "";
         Settings.signinUrlGoogle = "";
         Settings.signinUrlYahoo = "";
+        Settings.sessionTime = 70;
         Settings.guidEmpty = "00000000-0000-0000-0000-000000000000";
         Settings.ie = ((function () {
             var v = 3, div = document.createElement('div'), a = div.all || [];
@@ -174,6 +178,51 @@ var CZ;
             }
             return (v > 4) ? v : undefined;
         })());
+        Settings.theme;
+        function applyTheme(theme) {
+            if(!theme) {
+                theme = "cosmos";
+            }
+            this.theme = theme;
+            var themeData = {
+                "cosmos": {
+                    "background": "url('/images/background.jpg')",
+                    "backgroundColor": "#232323",
+                    "timelineColor": null,
+                    "timelineHoverAnimation": 3 / 60.0,
+                    "infoDotFillColor": 'rgb(92,92,92)',
+                    "fallbackImageUri": '/images/Temp-Thumbnail2.png',
+                    "timelineGradientFillStyle": null
+                },
+                "gray": {
+                    "background": "none",
+                    "backgroundColor": "#bebebe",
+                    "timelineColor": null,
+                    "timelineHoverAnimation": 3 / 60.0,
+                    "infoDotFillColor": 'rgb(92,92,92)',
+                    "fallbackImageUri": '/images/Temp-Thumbnail2.png',
+                    "timelineGradientFillStyle": "#9e9e9e"
+                },
+                "aqua": {
+                    "background": "none",
+                    "backgroundColor": "rgb(238, 238, 238)",
+                    "timelineColor": "rgba(52, 76, 130, 0.5)",
+                    "timelineHoverAnimation": 3 / 60.0,
+                    "infoDotFillColor": 'rgb(55,84,123)',
+                    "fallbackImageUri": '/images/Temp-Thumbnail-Aqua.png',
+                    "timelineGradientFillStyle": "rgb(80,123,175)"
+                }
+            };
+            var themeSettings = themeData[theme];
+            $('#vc').css('background-image', themeSettings.background);
+            $('#vc').css('background-color', themeSettings.backgroundColor);
+            CZ.Settings.timelineColor = themeSettings.timelineColor;
+            CZ.Settings.timelineHoverAnimation = themeSettings.timelineHoverAnimation;
+            CZ.Settings.infoDotFillColor = themeSettings.infoDotFillColor;
+            CZ.Settings.fallbackImageUri = themeSettings.fallbackImageUri;
+            CZ.Settings.timelineGradientFillStyle = themeSettings.timelineGradientFillStyle;
+        }
+        Settings.applyTheme = applyTheme;
     })(CZ.Settings || (CZ.Settings = {}));
     var Settings = CZ.Settings;
 })(CZ || (CZ = {}));

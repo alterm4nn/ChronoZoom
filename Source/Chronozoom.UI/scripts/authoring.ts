@@ -58,7 +58,7 @@ module CZ {
         // Generic callback function set by the form when waits user's input (e.g. mouse click) to continue.
         export var callback: (...args: any[]) => any = null;
 
-
+        export var timer;
         /**
          * Tests a timeline/exhibit on intersection with another virtual canvas object.
          * @param  {Object}  te   A timeline/exhibit to test.
@@ -587,7 +587,7 @@ module CZ {
                         newExhibit.id = "e" + response.ExhibitId;
 
                         CZ.Common.vc.virtualCanvas("requestInvalidate");
-                        
+
                         deferred.resolve(newExhibit);
                     },
                             error => {
@@ -788,6 +788,23 @@ module CZ {
                 i++;
             }
             return isValid;
+        }
+
+        /**
+        * Opens "session ends" form
+        */
+        export function showSessionForm() {
+            //CZ.HomePageViewModel.sessionForm.show();
+        }
+
+        /**
+        * Resets timer to default
+        */
+        export function resetSessionTimer() {
+            if (CZ.Authoring.timer != null) {
+                clearTimeout(CZ.Authoring.timer);
+                //CZ.Authoring.timer = setTimeout(() => { showSessionForm() }, (CZ.Settings.sessionTime - 60) * 1000);
+            }
         }
     }
 }

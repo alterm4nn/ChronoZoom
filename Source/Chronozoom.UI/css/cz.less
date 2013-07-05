@@ -6,7 +6,7 @@
 @headerTourWidth: 140px; /* The width of the tour player area */
 @headerRegimesWidth: 420px; /* The width of the regimes area */
 @headerBreadcrumbsHeight: 25px; /* The height of the breadcrumbs area */
-@headerBreadcrumbsTopMargin: 4px;  /* The top margin of the breadcrumbs area */
+@headerBreadcrumbsTopMargin:8px;  /* The top margin of the bref.adcrumbs area */
 @headerBreadcrumbsScrollWidth: 25px; /* The breadcrumbs scroller area */
 
 @footerHeight: 25px; /* The height of the page footer */
@@ -315,7 +315,6 @@ a
     overflow: hidden;
     width: 100%;
     height: 100%;
-    background-image: url('/images/background.jpg');
     background-position: center center;
     -webkit-background-size: cover;
     -moz-background-size: cover;
@@ -1461,6 +1460,16 @@ img.fallbackBackground
     line-height: 36px;
 }
 
+.cz-form-min-btn
+{
+    float: right;
+    margin-right: 15px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 36px;
+}
+
 .cz-form-btn
 {
     cursor: pointer;
@@ -1842,6 +1851,31 @@ img.fallbackBackground
         color: #58B7F9;
     }
 
+
+/* Session expired */
+.cz-session-expired {
+    height: 140px;
+    width: 330px;
+}
+
+.cz-session-expired > .cz-form-content{
+    width: 300px;
+}
+
+
+.cz-session-expired a:link
+{
+    color: #465c71;
+    text-decoration: none;
+}
+
+.cz-session-expired a:visited
+{
+    color: #465c71;
+    text-decoration: none;
+}
+
+
 /* Search Form */
 .cz-header-search-form
 {
@@ -1914,6 +1948,94 @@ img.fallbackBackground
 .cz-form-search-results-count
 {
     color: #232323;
+}
+
+/* Tour Caption Form */
+.cz-tour-caption-form
+{
+    width: 300px;
+    height: 450px;
+    top: 91px;
+    left: 0;
+    z-index: 100000000;
+}
+
+    .cz-tour-caption-form > .cz-form-content
+    {
+        position: absolute;
+        top: 36px;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        overflow-y: hidden;
+    }
+
+.cz-form-tour-caption
+{
+    padding-right: 10px;
+    width: 100%;
+    height: 285px;
+    overflow-y: auto;
+    text-align: left;
+}
+
+.cz-form-tour-bookmarks-count
+{
+    margin-top: 10px;
+    text-align: center;
+}
+
+.cz-form-tour-player
+{
+    padding: 5px;
+    background-color: #e9e9e9;
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: auto;
+    height: 36px;
+    width: 70%;
+}
+
+.cz-form-tour-player-icon
+{
+    width: 36px;
+    height: 36px;
+}
+
+/* Tour Player Icons. */
+.cz-form-prev-icon
+{
+    background-image: url(../images/tour-prev.png);
+}
+
+.cz-form-play-pause-icon[state=play]
+{
+    margin-left: 15px;
+    background-image: url(../images/tour-play.png);
+}
+
+.cz-form-play-pause-icon[state=pause]
+{
+    margin-left: 15px;
+    background-image: url(../images/tour-pause.png);
+}
+
+.cz-form-next-icon
+{
+    margin-left: 15px;
+    background-image: url(../images/tour-next.png);
+}
+
+.cz-form-vol-icon[state=on]
+{
+    margin-left: 15px;
+    background-image: url(../images/narration-on.png);
+}
+
+.cz-form-vol-icon[state=off]
+{
+    margin-left: 15px;
+    background-image: url(../images/narration-off.png);
 }
 
 /***********************************************************

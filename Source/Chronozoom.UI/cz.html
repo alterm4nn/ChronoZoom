@@ -77,6 +77,9 @@
                 AddScript("/scripts/uiloader.js");
                 AddScript("/scripts/dates.js");
 
+                AddScript("/scripts/extensions/extensions.js");
+                AddScript("/scripts/extensions/rinplayer.js");
+
                 AddScript("/ui/controls/datepicker.js");
                 AddScript("/ui/controls/listboxbase.js");
                 AddScript("/ui/controls/formbase.js");
@@ -95,8 +98,9 @@
                 AddScript("/ui/tour-listbox.js");
                 AddScript("/ui/tourslist-form.js");
                 AddScript("/ui/tourstop-listbox.js");
+                AddScript("/ui/tour-caption-form.js");
                 AddScript("/ui/message-window.js");
-                
+                AddScript("/ui/header-session-expired-form.js");
                 AddScript("/scripts/cz.js");
             }
             else {
@@ -263,10 +267,12 @@
         <div id="header-search-form" class="cz-form cz-form-left cz-major-form cz-header-search-form unselectable"></div>
         <div id="timeSeriesDataForm" class="cz-form cz-form-right cz-major-form unselectable"></div>
         <div id="toursList" class="cz-form cz-form-right cz-major-form cz-tourlist-form unselectable"></div>
+        <div id="tour-caption-form" class="cz-form cz-form-left cz-tour-caption-form unselectable"></div>
         <div id="auth-edit-timeline-form" class="cz-form cz-form-left cz-form-timeline unselectable"></div>
         <div id="auth-edit-exhibit-form" class="cz-form cz-form-left cz-form-exhibit unselectable"></div>
         <div id="auth-edit-contentitem-form" class="cz-form cz-form-left cz-form-contentitem unselectable"></div>
         <div id="message-window" class="cz-form cz-form-left cz-message-window"></div>
+        <div id="header-session-expired-form" class="cz-form cz-form-left cz-session-expired"></div>
     </div>
 
     <script src="https://cz-nodelete-chronozoom-prod.accesscontrol.windows.net/v2/metadata/IdentityProviders.js?protocol=wsfederation&amp;realm=http%3a%2f%2fwww.chronozoom.com%2f&amp;reply_to=&amp;context=&amp;request_id=&amp;version=1.0&amp;callback=ShowSigninPage" type="text/javascript"></script>
