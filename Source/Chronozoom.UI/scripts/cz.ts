@@ -145,31 +145,34 @@ module CZ {
         }
 
         function InitializeToursUI(profile, forms) {
-            // var tourCaptionForm = getFormById("#tour-caption-form");
-            // if (tourCaptionForm.isFormVisible) {
-            //     tourCaptionForm.close();
-            // } else {
-            //     closeAllForms();
-            //     var form = new CZ.UI.FormTourCaption(forms[15], {
-            //         activationSource: $(".tour-icon"),
-            //         navButton: ".cz-form-nav",
-            //         closeButton: ".cz-form-close-btn > .cz-form-btn",
-            //         titleTextblock: ".cz-form-title",
-            //         captionTextarea: ".cz-form-tour-caption",
-            //         tourPlayerContainer: ".cz-form-tour-player",
-            //         bookmarksCount: ".cz-form-tour-bookmarks-count",
-            //         narrationToggle: ".cz-toggle-narration > input",
-            //         context: tour
-            //     });
-            //     form.show();
-            // }
             CZ.Tours.tourCaptionFormContainer = forms[15];
             var allowEditing = IsFeatureEnabled(_featureMap, "TourAuthoring") && UserCanEditCollection(profile);
+
+            var onTakeTour = tour => {
+                //CZ.Tours.tourCaptionForm = CZ.HomePageViewModel.getFormById("#tour-caption-form");
+                CZ.HomePageViewModel.closeAllForms();
+                CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption(CZ.Tours.tourCaptionFormContainer, {
+                    activationSource: $(".tour-icon"),
+                    navButton: ".cz-form-nav",
+                    closeButton: ".cz-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-form-title",
+                    contentContainer: ".cz-form-content",
+                    minButton: ".cz-form-min-btn > .cz-form-btn",
+                    captionTextarea: ".cz-form-tour-caption",
+                    tourPlayerContainer: ".cz-form-tour-player",
+                    bookmarksCount: ".cz-form-tour-bookmarks-count",
+                    narrationToggle: ".cz-toggle-narration",
+                    context: tour
+                });
+                CZ.Tours.tourCaptionForm.show();
+
+                CZ.Tours.removeActiveTour();
+                CZ.Tours.activateTour(tour, undefined);
+            };
 
             var onToursInitialized = function () {
                 CZ.Tours.initializeToursUI();
                 $("#tours_index").click(function () { // show form
-                    CZ.Tours.removeActiveTour();
                     var toursListForm = getFormById("#toursList");
 
                     if (toursListForm.isFormVisible) {
@@ -184,10 +187,7 @@ module CZ {
                             titleTextblock: ".cz-form-title",
                             tourTemplate: forms[10],
                             tours: CZ.Tours.tours,
-                            takeTour: tour => {
-                                CZ.Tours.removeActiveTour();
-                                CZ.Tours.activateTour(tour, undefined);
-                            },
+                            takeTour: onTakeTour,
                             editTour: allowEditing ? tour => {
                                 if (CZ.Authoring.showEditTourForm)
                                     CZ.Authoring.showEditTourForm(tour);
@@ -557,29 +557,6 @@ module CZ {
             $('#breadcrumbs-nav-right')
                 .click(CZ.BreadCrumbs.breadCrumbNavRight);
 
-            $('#tour_prev')
-                .mouseout(() => { CZ.Common.toggleOffImage('tour_prev'); })
-                .mouseover(() => { CZ.Common.toggleOnImage('tour_prev'); })
-                .click(CZ.Tours.tourPrev);
-            $('#tour_playpause')
-                .mouseout(() => { CZ.Common.toggleOffImage('tour_playpause'); })
-                .mouseover(() => { CZ.Common.toggleOnImage('tour_playpause'); })
-                .click(CZ.Tours.tourPlayPause);
-            $('#tour_next')
-                .mouseout(() => { CZ.Common.toggleOffImage('tour_next'); })
-                .mouseover(() => { CZ.Common.toggleOnImage('tour_next'); })
-                .click(CZ.Tours.tourNext);
-            $('#tour_exit')
-                .mouseout(() => { CZ.Common.toggleOffImage('tour_exit'); })
-                .mouseover(() => { CZ.Common.toggleOnImage('tour_exit'); })
-                .click(CZ.Tours.tourAbort);
-
-            $('#tours-narration')
-                .click(CZ.Tours.onNarrationClick);
-
-            $('#bookmarksCollapse')
-                .click(CZ.Tours.onBookmarksCollapse);
-
             $('#biblCloseButton')
                 .mouseout(() => { CZ.Common.toggleOffImage('biblCloseButton', 'png'); })
                 .mouseover(() => { CZ.Common.toggleOnImage('biblCloseButton', 'png'); })
@@ -796,7 +773,7 @@ module CZ {
             return feature[0].IsEnabled;
         }
 
-        function closeAllForms() {
+        export function closeAllForms() {
             $('.cz-major-form').each((i, f) => { var form = $(f).data('form'); if (form) { form.close(); } });
 
         }

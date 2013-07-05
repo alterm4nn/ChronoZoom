@@ -392,8 +392,6 @@ var CZ;
                 isAudioEnabled = Tours.isNarrationOn;
             }
             if(newTour != undefined) {
-                var tourControlDiv = document.getElementById("tour_control");
-                tourControlDiv.style.display = "block";
                 Tours.tour = newTour;
                 Tours.tour.tour_TourFinished.push(function (tour) {
                     hideBookmark(tour);
@@ -443,6 +441,7 @@ var CZ;
         }
         Tours.tourNext = tourNext;
         function tourPause() {
+            Tours.tourCaptionForm.setPlayPauseButtonState("play");
             if(Tours.tour != undefined) {
                 $("#tour_playpause").attr("src", "/images/tour_play_off.jpg");
                 Tours.tour.pause();
@@ -453,9 +452,11 @@ var CZ;
         }
         Tours.tourPause = tourPause;
         function tourResume() {
+            Tours.tourCaptionForm.setPlayPauseButtonState("pause");
             $("#tour_playpause").attr("src", "/images/tour_pause_off.jpg");
             Tours.tour.play();
         }
+        Tours.tourResume = tourResume;
         function tourPlayPause() {
             if(Tours.tour != undefined) {
                 if(Tours.tour.state == "pause") {
@@ -488,43 +489,10 @@ var CZ;
         }
         Tours.initializeToursContent = initializeToursContent;
         function hideBookmark(tour) {
-            if(Tours.isBookmarksWindowExpanded && Tours.isBookmarksTextShown) {
-                if(Tours.bookmarkAnimation) {
-                    Tours.bookmarkAnimation.stop(true, true);
-                }
-                Tours.bookmarkAnimation = $("#bookmarks .slideText").hide("drop", {
-                }, 'slow', function () {
-                    Tours.bookmarkAnimation = undefined;
-                });
-                $("#bookmarks .slideHeader").text("");
-                Tours.isBookmarksTextShown = false;
-            }
+            Tours.tourCaptionForm.hideBookmark();
         }
         function showBookmark(tour, bookmark) {
-            if(!Tours.isBookmarksWindowVisible) {
-                Tours.isBookmarksWindowVisible = true;
-                $("#bookmarks .slideText").text(bookmark.text);
-                $("#bookmarks").show('slide', {
-                }, 'slow');
-            }
-            $("#bookmarks .header").text(tour.title);
-            $("#bookmarks .slideHeader").text(bookmark.caption);
-            $("#bookmarks .slideFooter").text(bookmark.number + '/' + tour.bookmarks.length);
-            if(Tours.isBookmarksWindowExpanded) {
-                $("#bookmarks .slideText").text(bookmark.text);
-                if(!Tours.isBookmarksTextShown) {
-                    if(Tours.bookmarkAnimation) {
-                        Tours.bookmarkAnimation.stop(true, true);
-                    }
-                    Tours.bookmarkAnimation = $("#bookmarks .slideText").show("drop", {
-                    }, 'slow', function () {
-                        Tours.bookmarkAnimation = undefined;
-                    });
-                    Tours.isBookmarksTextShown = true;
-                }
-            } else {
-                $("#bookmarks .slideText").text(bookmark.text);
-            }
+            Tours.tourCaptionForm.showBookmark(bookmark);
         }
         function hideBookmarks() {
             $("#bookmarks").hide();

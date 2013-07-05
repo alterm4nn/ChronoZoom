@@ -1,8 +1,8 @@
-.cz-timescale {
+﻿.cz-timescale {
   padding-bottom: 0px;
   font-size: large;
   font-weight: 500;
-  background-color: #0388e5;
+  background-color: #0388E5;
   overflow: hidden;
   cursor: default;
   width: 100%;
@@ -26,13 +26,13 @@
   top: 0px;
   height: 100%;
   width: 185px;
-  background-color: #0388e5;
+  background-color: #0388E5;
   font-size: large;
   text-align: center;
 }
 .cz-timescale-left {
   left: 0px;
-  border-right: 5px solid #58b7f9;
+  border-right: 5px solid #58B7F9;
 }
 .cz-timescale-left p {
   display: table-cell;
@@ -45,7 +45,7 @@
 .timescale_right_border_input {
   color: white;
   display: table-cell;
-  background-color: #0388e5;
+  background-color: #0388E5;
   width: 185px;
   font-family: sans-serif;
   font-size: 25px;
@@ -56,7 +56,7 @@
 .timescale_left_border_input {
   color: white;
   display: table-cell;
-  background-color: #0388e5;
+  background-color: #0388E5;
   width: 185px;
   font-family: sans-serif;
   font-size: 25px;
@@ -66,7 +66,7 @@
 }
 .cz-timescale-right {
   right: 0px;
-  border-left: 5px solid #58b7f9;
+  border-left: 5px solid #58B7F9;
 }
 .cz-timescale-right p {
   display: table-cell;
@@ -101,14 +101,14 @@
   box-sizing: border-box;
   height: 24px;
   padding: 5px 15px;
-  background-color: #00538d;
+  background-color: #00538D;
   line-height: 100%;
   font-size: 15px;
 }
 .cz-timescale-marker-triangle {
   position: absolute;
   bottom: 0;
-  border-top: 14px solid #00538d;
+  border-top: 14px solid   #00538D;
   border-left: 14px solid transparent;
   border-right: 14px solid transparent;
   width: 0;
@@ -167,7 +167,6 @@
 /* The breadcrumbs scroller area */
 /* The height of the page footer */
 /* The width of the footers links area */
-
 html,
 body {
   margin: 0;
@@ -183,17 +182,17 @@ body {
   -ms-touch-action: none;
 }
 a {
-  color: white;
+  color: #fff;
   text-decoration: none;
 }
 a:hover {
-  color: white;
+  color: #fff;
 }
 a:active {
-  color: white;
+  color: #fff;
 }
 a:visited {
-  color: white;
+  color: #fff;
   text-decoration: none;
 }
 /***********************************************************
@@ -201,7 +200,6 @@ a:visited {
                             Header            
       
 ***********************************************************/
-
 .navigation {
   position: relative;
   margin: 0;
@@ -235,30 +233,30 @@ a:visited {
   cursor: pointer;
 }
 #regime-link-cosmos {
-  color: #ff5bee;
+  color: #FF5BEE;
 }
 #regime-link-earth {
-  color: #c874f4;
+  color: #C874F4;
 }
 #regime-link-life {
-  color: #a8b3fe;
+  color: #A8B3FE;
 }
 #regime-link-prehistory {
-  color: #83baff;
+  color: #83BAFF;
 }
 #regime-link-humanity {
-  color: #66d5bf;
+  color: #66D5BF;
 }
 #login-panel {
   height: 100%;
-  color: #e9e9e9 !important;
+  color: #E9E9E9 !important;
   font-size: medium 14px;
 }
 #login-panel label {
   display: inline-block;
   margin-top: 8px;
   margin-left: 10px;
-  color: #e9e9e9;
+  color: #E9E9E9;
   vertical-align: top;
 }
 #login-panel[data-enabled~="true"]:hover {
@@ -363,7 +361,6 @@ a:visited {
                             Content
 
 ***********************************************************/
-
 #content {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -409,7 +406,7 @@ a:visited {
 }
 .virtualCanvas {
   position: relative;
-  -webkit-tap-highlight-color: transparent;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 .virtualCanvasLayerDiv {
   position: absolute;
@@ -448,7 +445,6 @@ a:visited {
                         Bibliography
                    
 ***********************************************************/
-
 .biblBack {
   display: none;
   position: fixed;
@@ -479,7 +475,7 @@ a:visited {
   overflow: hidden;
   border-radius: 8px;
   background-color: #434343;
-  color: white;
+  color: #fff;
   vertical-align: middle;
   font-size: 18.5px;
   font-family: Arial;
@@ -499,8 +495,8 @@ a:visited {
   margin-left: 32px;
   padding-top: 22px;
   padding-bottom: 7px;
-  border-bottom: 1px solid #dbdbdb;
-  color: white;
+  border-bottom: 1px solid #DBDBDB;
+  color: #fff;
   -ms-text-overflow: ellipsis;
   -o-text-overflow: ellipsis;
   text-overflow: ellipsis;
@@ -525,14 +521,14 @@ a:visited {
 .biblWindow .sources .source {
   margin: 0;
   padding: 0 5px 0 5px;
-  border-bottom: 1px solid #dbdbdb;
+  border-bottom: 1px solid #DBDBDB;
 }
 .biblWindow .sources .sectionTitle {
   overflow: hidden;
   margin: 0;
   padding-top: 20px;
-  border-bottom: 1px solid #dbdbdb;
-  color: white;
+  border-bottom: 1px solid #DBDBDB;
+  color: #fff;
   text-align: left;
   -ms-text-overflow: ellipsis;
   -o-text-overflow: ellipsis;
@@ -546,7 +542,7 @@ a:visited {
   margin-right: 50px;
   padding-top: 20px;
   padding-bottom: 12px;
-  color: #dbdbdb;
+  color: #DBDBDB;
   text-align: left;
   -ms-text-overflow: ellipsis;
   -o-text-overflow: ellipsis;
@@ -559,7 +555,7 @@ a:visited {
   margin: 0 50px 25px 12px;
   padding: 12px;
   border-radius: 8px;
-  background-color: #dbdbdb;
+  background-color: #DBDBDB;
   color: #424242;
   text-align: left;
   font-size: 15px;
@@ -575,7 +571,7 @@ a:visited {
   width: 220px;
   border-bottom-right-radius: 8px;
   background-color: #424242;
-  color: #bfbfbf;
+  color: #BFBFBF;
   font-size: 14.5px;
   font-family: Arial;
 }
@@ -584,10 +580,13 @@ a:visited {
   width: 167px;
   background: #515151;
   /* for non-css3 browsers */
+
   background: -moz-linear-gradient(left, #fdfdfd, #515151);
   /* Mozilla: */
+
   background: -webkit-gradient(linear, left top, right top, from(#fdfdfd), to(#424242));
   /* Chrome, Safari:*/
+
   color: #424242;
   vertical-align: middle;
   font-size: 19px;
@@ -599,17 +598,17 @@ a:visited {
 .czWindow .czTextBox {
   margin: 3px 5px 3px 5px;
   height: 20px;
-  border: 1px solid #bfbfbf;
+  border: 1px solid #BFBFBF;
   background-color: #424242;
-  color: white;
+  color: #fff;
   font-size: 12px;
   font-family: Arial;
 }
 .czWindow .czTextBox:focus {
-  border: 1px solid white;
+  border: 1px solid #fff;
 }
 .czWindow .emptyTextBox {
-  color: #bfbfbf;
+  color: #BFBFBF;
   font-style: italic;
   font-size: 12px;
   font-family: Arial;
@@ -621,12 +620,13 @@ a:visited {
   width: 181px;
   border-bottom: none;
   /*1px solid #424242;*/
+
   text-align: center;
   font-size: 13px;
   cursor: pointer;
 }
 .czWindow .narration-selected {
-  color: white;
+  color: #fff;
 }
 .czWindow .content {
   margin: 10px 13px 0 10px;
@@ -637,12 +637,12 @@ a:visited {
   margin-right: 13px;
   margin-bottom: 10px;
   width: 196px;
-  border-bottom: 2px solid #bfbfbf;
+  border-bottom: 2px solid #BFBFBF;
   vertical-align: middle;
   cursor: pointer;
 }
 .czWindow .content .category:hover {
-  color: white;
+  color: #fff;
 }
 .czWindow .content .collapseButton {
   position: absolute;
@@ -657,7 +657,7 @@ a:visited {
   cursor: pointer;
 }
 .czWindow .content .categorySelected:hover {
-  color: white;
+  color: #fff;
 }
 .czWindow .content .itemContainer {
   margin-right: 15px;
@@ -677,10 +677,10 @@ a:visited {
   cursor: pointer;
 }
 .czWindow .content .itemContainer .item:hover {
-  color: white;
+  color: #fff;
 }
 .czWindow .content .itemContainer .touritem-selected {
-  color: white;
+  color: #fff;
 }
 .czWindow .searchResults {
   overflow-x: hidden;
@@ -694,7 +694,7 @@ a:visited {
   overflow: hidden;
   margin: 5px 10px 5px 0;
   padding: 0;
-  border-bottom: 1px solid #bfbfbf;
+  border-bottom: 1px solid #BFBFBF;
   text-align: left;
   -ms-text-overflow: ellipsis;
   -o-text-overflow: ellipsis;
@@ -710,6 +710,7 @@ a:visited {
   padding: 0;
   border-bottom: none;
   /*1px solid #424242;*/
+
   text-align: left;
   -ms-text-overflow: ellipsis;
   -o-text-overflow: ellipsis;
@@ -719,7 +720,7 @@ a:visited {
   cursor: pointer;
 }
 .czWindow .searchResults .searchResult:hover {
-  color: white;
+  color: #fff;
 }
 .czWindow .searchResults .searchNoResult {
   overflow: hidden;
@@ -727,6 +728,7 @@ a:visited {
   padding: 0;
   border-bottom: none;
   /*1px solid #424242;*/
+
   text-align: left;
   -ms-text-overflow: ellipsis;
   -o-text-overflow: ellipsis;
@@ -747,7 +749,7 @@ a:visited {
   max-height: 410px;
   border-top-right-radius: 8px;
   background-color: #424242;
-  color: #bfbfbf;
+  color: #BFBFBF;
   font-size: 14.5px;
   font-family: Arial;
 }
@@ -755,8 +757,8 @@ a:visited {
   padding: 10px 6px 9px 5px;
   padding-right: 6px;
   padding-left: 5px;
-  border-bottom: 2px solid #bfbfbf;
-  color: white;
+  border-bottom: 2px solid #BFBFBF;
+  color: #fff;
   font-size: 14.5px;
   cursor: default;
 }
@@ -780,15 +782,15 @@ a:visited {
   margin-left: 15px;
   padding: 5px 3px 5px 3px;
   max-height: 250px;
-  color: #bfbfbf;
+  color: #BFBFBF;
   font-size: 13px;
 }
 .bookmarksWindow .slideFooter {
   margin: 20px 19px 0 10px;
   padding: 5px 0 13px 4px;
   height: 15px;
-  border-top: 1px solid #bfbfbf;
-  color: white;
+  border-top: 1px solid #BFBFBF;
+  color: #fff;
   text-align: right;
   font-size: 12px;
   cursor: default;
@@ -798,7 +800,6 @@ a:visited {
                         Tooltip
 
 ***********************************************************/
-
 .bubbleInfo {
   position: absolute;
   float: left;
@@ -834,14 +835,14 @@ a:visited {
   background-position: center;
 }
 .bubbleInfo span {
-  color: white;
+  color: #fff;
   font-size: 14px;
   font-family: Verdana, Arial, Helvetica, sans-serif;
 }
 .block {
   position: relative;
   display: block;
-  background-color: #aabbcc;
+  background-color: #abc;
   white-space: nowrap;
 }
 /***********************************************************
@@ -849,7 +850,6 @@ a:visited {
                         Welcome Screen
        
 ***********************************************************/
-
 .welcomeScreenBack {
   position: absolute;
   top: 0;
@@ -885,8 +885,8 @@ a:visited {
   height: auto;
   min-height: 411px;
   border-radius: 8px;
-  background-color: #3c5f96;
-  color: white;
+  background-color: #3C5F96;
+  color: #fff;
   vertical-align: middle;
   font-size: 18.5px;
   font-family: Arial;
@@ -895,7 +895,7 @@ a:visited {
 .welcomeScreen .titleArea {
   margin-right: 22px;
   margin-left: 32px;
-  border-bottom: 1px solid #dbdbdb;
+  border-bottom: 1px solid #DBDBDB;
 }
 .welcomeScreen .titleArea .closeButton {
   position: absolute;
@@ -910,7 +910,7 @@ a:visited {
   margin-right: 60px;
   padding-top: 22px;
   padding-bottom: 7px;
-  color: white;
+  color: #fff;
   -ms-text-overflow: ellipsis;
   -o-text-overflow: ellipsis;
   text-overflow: ellipsis;
@@ -945,9 +945,9 @@ a:visited {
   margin-bottom: 10px;
   width: 220px;
   height: 36px;
-  border: 1px solid #ef4136;
-  background: #ea7134;
-  color: white;
+  border: 1px solid #EF4136;
+  background: #EA7134;
+  color: #fff;
   font-weight: bold;
   font-size: 18px;
   font-family: Arial;
@@ -970,7 +970,6 @@ a:visited {
                         Fallbackpage
 
 ***********************************************************/
-
 img.fallbackBackground {
   position: fixed;
   top: 0;
@@ -978,9 +977,12 @@ img.fallbackBackground {
   width: 100%;
   height: auto;
   /* Set up positioning */
+
   min-width: 1024px;
   /* Set up proportionate scaling */
+
   /* Set rules to fill background */
+
   min-height: 100%;
 }
 @media screen and (max-width: 1024px) {
@@ -1007,7 +1009,7 @@ img.fallbackBackground {
   margin: 25px auto 0 auto;
   width: 864px;
   height: 432px;
-  background-color: #3c5f96;
+  background-color: #3C5F96;
   color: White;
   vertical-align: middle;
   font-size: 18.5px;
@@ -1017,14 +1019,14 @@ img.fallbackBackground {
 .fallbackContent .titleArea {
   margin-right: 22px;
   margin-left: 32px;
-  border-bottom: 1px solid #dbdbdb;
+  border-bottom: 1px solid #DBDBDB;
 }
 .fallbackContent .titleArea .title {
   overflow: hidden;
   margin-right: 60px;
   padding-top: 22px;
   padding-bottom: 7px;
-  color: white;
+  color: #fff;
   -ms-text-overflow: ellipsis;
   -o-text-overflow: ellipsis;
   text-overflow: ellipsis;
@@ -1056,7 +1058,7 @@ img.fallbackBackground {
   height: 315px;
 }
 .fallbackContent .content .description a {
-  color: white;
+  color: #fff;
   text-decoration: underline;
   font-size: 16px;
   font-family: Arial;
@@ -1064,8 +1066,8 @@ img.fallbackBackground {
 .fallbackContent .content .description .button {
   width: 220px;
   height: 36px;
-  border: 1px solid #ef4136;
-  background: #ea7134;
+  border: 1px solid #EF4136;
+  background: #EA7134;
   color: White;
   vertical-align: middle;
   text-align: center;
@@ -1091,7 +1093,6 @@ img.fallbackBackground {
                             Footer
 
 ***********************************************************/
-
 #footer {
   position: relative;
   height: 25px;
@@ -1109,7 +1110,7 @@ img.fallbackBackground {
   margin-right: 10px;
   margin-left: 10px;
   height: 100%;
-  color: white;
+  color: #FFF;
   white-space: nowrap;
   line-height: 25px;
 }
@@ -1119,7 +1120,7 @@ img.fallbackBackground {
 .footer-links {
   height: 25px;
   width: 350px;
-  color: #aaaaaa;
+  color: #AAA;
 }
 .footer-credits {
   height: 25px;
@@ -1127,7 +1128,7 @@ img.fallbackBackground {
   width: -moz-calc(100% - 350px);
   width: -webkit-calc(100% - 350px);
   width: -o-calc(100% - 350px);
-  color: #aaaaaa;
+  color: #AAA;
 }
 .footer-credits ul {
   margin-top: 4px;
@@ -1140,24 +1141,23 @@ img.fallbackBackground {
 }
 .footer-text {
   margin-left: 6px;
-  color: #aaaaaa;
+  color: #AAA;
 }
 /***********************************************************
 
                         Breadcrumbs
 
 ***********************************************************/
-
 .breadcrumbs-nav {
   width: 25px;
   height: 25px;
-  color: #555555;
+  color: #555;
   text-align: center;
   font-size: 14px;
   line-height: 100%;
 }
 .breadcrumbs-nav:hover {
-  color: #999999;
+  color: #999;
 }
 #breadcrumbs-nav-left {
   cursor: pointer;
@@ -1215,17 +1215,16 @@ img.fallbackBackground {
   font-family: verdana;
   line-height: 25px;
   cursor: pointer;
-  color: white;
+  color: #FFF;
 }
 .breadcrumb-hover {
-  color: white;
+  color: #fff;
 }
 /***********************************************************
 
                             Auxiliary
 
 ***********************************************************/
-
 .fleft {
   float: left;
 }
@@ -1256,7 +1255,6 @@ img.fallbackBackground {
                         Form Base
 
 ***********************************************************/
-
 .cz-form {
   position: absolute;
   z-index: 100000001;
@@ -1273,7 +1271,7 @@ img.fallbackBackground {
   position: relative;
   width: 100%;
   height: 36px;
-  background-color: #0464a2;
+  background-color: #0464A2;
 }
 .cz-form-header > ul {
   margin: 0;
@@ -1286,7 +1284,7 @@ img.fallbackBackground {
   float: left;
   margin-left: 15px;
   height: 100%;
-  color: white;
+  color: #fff;
   font-size: 18px;
   line-height: 36px;
   cursor: pointer;
@@ -1295,14 +1293,22 @@ img.fallbackBackground {
   float: left;
   margin-left: 15px;
   height: 100%;
-  color: white;
+  color: #fff;
   font-size: 18px;
   line-height: 36px;
 }
 .cz-form-close-btn {
   float: right;
   margin-right: 15px;
-  color: white;
+  color: #fff;
+  font-weight: bold;
+  font-size: 18px;
+  line-height: 36px;
+}
+.cz-form-min-btn {
+  float: right;
+  margin-right: 15px;
+  color: #fff;
   font-weight: bold;
   font-size: 18px;
   line-height: 36px;
@@ -1310,18 +1316,18 @@ img.fallbackBackground {
 .cz-form-btn {
   cursor: pointer;
   border: none;
-  color: white;
+  color: #fff;
 }
 .cz-form-content {
   position: absolute;
   padding: 15px;
-  background-color: white;
+  background-color: #fff;
   text-align: justify;
 }
 .cz-input {
   color: #232323;
-  background-color: #e9e9e9;
-  border: 1px solid #d5d5d5;
+  background-color: #E9E9E9;
+  border: 1px solid #D5D5D5;
   padding: 5px;
   font-size: 12px;
   font-family: 'Segoe UI', Helvetica, Arial, 'Trebuchet MS', 'San Serif';
@@ -1338,24 +1344,31 @@ img.fallbackBackground {
   margin: 5px 0;
   cursor: pointer;
   border: none;
-  color: white;
+  color: #fff;
   min-width: 150px;
   font-size: 12px;
   line-height: 36px;
   padding: 0 5px;
   /* IE9 */
+
   filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#1B6AAB', EndColorStr='#0E4073', GradientType=0);
   /* IE10 Consumer Preview */
+
   background-image: -ms-linear-gradient(bottom, #0e4073 0%, #1b6aab 100%);
   /* Mozilla Firefox */
+
   background-image: -moz-linear-gradient(bottom, #0e4073 0%, #1b6aab 100%);
   /* Opera */
+
   background-image: -o-linear-gradient(bottom, #0e4073 0%, #1b6aab 100%);
   /* Webkit (Safari/Chrome 10) */
+
   background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #0e4073), color-stop(1, #1b6aab));
   /* Webkit (Chrome 11+) */
+
   background-image: -webkit-linear-gradient(bottom, #0e4073 0%, #1b6aab 100%);
   /* W3C Markup, IE10 Release Preview */
+
   background-image: linear-gradient(to top, #0e4073 0%, #1b6aab 100%);
 }
 .blocking-layer {
@@ -1387,15 +1400,12 @@ img.fallbackBackground {
                         Custom Forms
 
 ***********************************************************/
-
 /* Header Edit Form */
-
 .cz-header-edit-form {
   right: 0px;
   width: 330px;
 }
 /* Message Window */
-
 .cz-message-window {
   width: 330px;
   height: 100px;
@@ -1411,7 +1421,6 @@ img.fallbackBackground {
   overflow-y: auto;
 }
 /* Edit Tour Form */
-
 .cz-form-tour-edit {
   width: 415px;
   bottom: 25px;
@@ -1447,12 +1456,12 @@ img.fallbackBackground {
   resize: none;
 }
 /* Tours List Form */
-
 .cz-tourlist-form {
   min-width: 380px;
   max-width: 450px;
   width: 30.2734375%;
   /* 310 / 1024 */
+
   right: 0px;
   bottom: 25px;
 }
@@ -1469,12 +1478,12 @@ img.fallbackBackground {
   min-height: 200px;
 }
 /* Edit Timeline Form */
-
 .cz-form-timeline {
   min-width: 380px;
   max-width: 450px;
   width: 30.2734375%;
   /* 310 / 1024 */
+
   bottom: 25px;
   left: 0;
 }
@@ -1487,12 +1496,12 @@ img.fallbackBackground {
   overflow-y: auto;
 }
 /* Edit Exhibit Form */
-
 .cz-form-exhibit {
   min-width: 380px;
   max-width: 450px;
   width: 30.2734375%;
   /* 310 / 1024 */
+
   bottom: 25px;
   left: 0;
 }
@@ -1505,12 +1514,12 @@ img.fallbackBackground {
   overflow-y: auto;
 }
 /* Edit Content Item Form */
-
 .cz-form-contentitem {
   min-width: 380px;
   max-width: 450px;
   width: 30.2734375%;
   /* 310 / 1024 */
+
   bottom: 25px;
   left: 0;
 }
@@ -1523,11 +1532,10 @@ img.fallbackBackground {
   overflow-y: auto;
 }
 /* Profile Form */
-
 #profile-form {
   right: 0;
   width: 304px;
-  background-color: whitesmoke;
+  background-color: #f5f5f5;
   font-size: 14px;
 }
 #profile-form div.czform_cb_div label {
@@ -1553,7 +1561,7 @@ img.fallbackBackground {
   float: left;
   margin-left: 0px;
   padding: 6px;
-  color: white;
+  color: #fff;
 }
 #profile-form div.cz-form-content div {
   clear: both;
@@ -1562,17 +1570,16 @@ img.fallbackBackground {
 }
 #profile-form button.cz-form-save {
   width: 134px;
-  color: white;
+  color: #fff;
 }
 .auth-panel-login {
   display: inline-block;
   margin-top: 8px;
   margin-left: 10px;
-  color: #e9e9e9;
+  color: #E9E9E9;
   vertical-align: top;
 }
 /* Login Form */
-
 #login-form {
   right: 0px;
   width: 304px;
@@ -1591,7 +1598,6 @@ img.fallbackBackground {
   width: 134px;
 }
 /* TimSeries Data Form */
-
 #timeSeriesDataForm {
   right: 0px;
   width: 500px;
@@ -1604,13 +1610,12 @@ img.fallbackBackground {
   padding: 0px;
   text-align: left;
   width: 200px;
-  color: #0388e5;
+  color: #0388E5;
 }
 .cz-preloaded-timeseries :hover {
-  color: #58b7f9;
+  color: #58B7F9;
 }
 /* Search Form */
-
 .cz-header-search-form {
   min-width: 380px;
   max-width: 450px;
@@ -1667,12 +1672,12 @@ img.fallbackBackground {
   color: #232323;
 }
 /* Tour Caption Form */
-
 .cz-tour-caption-form {
   width: 300px;
   height: 450px;
   top: 91px;
   left: 0;
+  z-index: 100000000;
 }
 .cz-tour-caption-form > .cz-form-content {
   position: absolute;
@@ -1682,44 +1687,59 @@ img.fallbackBackground {
   left: 0;
   overflow-y: hidden;
 }
-.cz-form-tour-player {
-  height: 36px;
+.cz-form-tour-caption {
+  padding-right: 10px;
   width: 100%;
+  height: 285px;
+  overflow-y: auto;
+  text-align: left;
+}
+.cz-form-tour-bookmarks-count {
+  margin-top: 10px;
+  text-align: center;
+}
+.cz-form-tour-player {
+  padding: 5px;
+  background-color: #e9e9e9;
+  margin-top: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  height: 36px;
+  width: 70%;
 }
 .cz-form-tour-player-icon {
   width: 36px;
   height: 36px;
 }
+/* Tour Player Icons. */
 .cz-form-prev-icon {
   background-image: url(../images/tour-prev.png);
 }
-.cz-form-prev-icon:hover {
-  background-image: url(../images/tour-prev-hover.png);
-}
 .cz-form-play-pause-icon[state=play] {
+  margin-left: 15px;
   background-image: url(../images/tour-play.png);
 }
-.cz-form-play-pause-icon:hover[state=play] {
-  background-image: url(../images/tour-play-hover.png);
-}
 .cz-form-play-pause-icon[state=pause] {
+  margin-left: 15px;
   background-image: url(../images/tour-pause.png);
 }
-.cz-form-play-pause-icon:hover[state=pause] {
-  background-image: url(../images/tour-pause-hover.png);
-}
 .cz-form-next-icon {
+  margin-left: 15px;
   background-image: url(../images/tour-next.png);
 }
-.cz-form-next-icon:hover {
-  background-image: url(/images/tour-next-hover.png);
+.cz-form-vol-icon[state=on] {
+  margin-left: 15px;
+  background-image: url(../images/narration-on.png);
+}
+.cz-form-vol-icon[state=off] {
+  margin-left: 15px;
+  background-image: url(../images/narration-off.png);
 }
 /***********************************************************
 
                     ListBox Base
 
 ***********************************************************/
-
 .cz-listbox {
   margin: 15px 0;
   padding: 10px;
@@ -1747,14 +1767,14 @@ img.fallbackBackground {
   margin: 5px 10px;
   padding: 10px;
   height: auto;
-  background-color: white;
+  background-color: #fff;
   border: solid 2px #c7c7c7;
-  background-image: -ms-linear-gradient(bottom, #e9e9e9 0%, white 100%);
-  background-image: -moz-linear-gradient(bottom, #e9e9e9 0%, white 100%);
-  background-image: -o-linear-gradient(bottom, #e9e9e9 0%, white 100%);
-  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #e9e9e9), color-stop(1, white));
-  background-image: -webkit-linear-gradient(bottom, #e9e9e9 0%, white 100%);
-  background-image: linear-gradient(to top, #e9e9e9 0%, white 100%);
+  background-image: -ms-linear-gradient(bottom, #e9e9e9 0%, #ffffff 100%);
+  background-image: -moz-linear-gradient(bottom, #e9e9e9 0%, #ffffff 100%);
+  background-image: -o-linear-gradient(bottom, #e9e9e9 0%, #ffffff 100%);
+  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #e9e9e9), color-stop(1, #ffffff));
+  background-image: -webkit-linear-gradient(bottom, #e9e9e9 0%, #ffffff 100%);
+  background-image: linear-gradient(to top, #e9e9e9 0%, #ffffff 100%);
 }
 .cz-listitem-close-btn {
   width: 10px;
@@ -1767,7 +1787,6 @@ img.fallbackBackground {
                 ContentItem ListBox
 
 ***********************************************************/
-
 .cz-contentitem-listitem-icon {
   display: inline-block;
   width: 15%;

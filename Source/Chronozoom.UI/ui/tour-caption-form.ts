@@ -5,10 +5,10 @@
 module CZ {
     export module UI {
         export interface IFormTourCaptionInfo extends CZ.UI.IFormBaseInfo {
+            minButton: string;
             captionTextarea: string;
             tourPlayerContainer: string;
             bookmarksCount: string;
-            narrationToggle: string;
             context: CZ.Tours.Tour;
         }
 
@@ -16,17 +16,17 @@ module CZ {
             playPauseButton: string;
             nextButton: string;
             prevButton: string;
+            volButton: string;
             context: CZ.Tours.Tour;
         }
 
         export class TourPlayer {
             private container: JQuery;
-            private playPauseButton: JQuery;
             private nextButton: JQuery;
             private prevButton: JQuery;
+            private volButton: JQuery;
             private tour: CZ.Tours.Tour;
-
-            private isAudioLoaded: bool;
+            public playPauseButton: JQuery;
 
             constructor(container: JQuery, playerInfo: ITourPlayerInfo) {
                 this.container = container;
@@ -35,25 +35,28 @@ module CZ {
                 this.playPauseButton = this.container.find(playerInfo.playPauseButton);
                 this.nextButton = this.container.find(playerInfo.nextButton);
                 this.prevButton = this.container.find(playerInfo.prevButton);
+                this.volButton = this.container.find(playerInfo.volButton);
 
                 this.playPauseButton.off();
                 this.nextButton.off();
                 this.prevButton.off();
+                this.volButton.off();
 
                 this.initialize();
             }
 
             private initialize(): void {
+                this.playPauseButton.attr("state", "pause");
+                this.volButton.attr("state", "on");
+
                 this.playPauseButton.click(event => {
                     var state = this.playPauseButton.attr("state");
 
                     var stateHandlers = {
                         play: () => {
-                            this.playPauseButton.attr("state", "pause");
                             this.play();
                         },
                         pause: () => {
-                            this.playPauseButton.attr("state", "play");
                             this.pause();
                         }
                     };
@@ -68,39 +71,74 @@ module CZ {
                 this.prevButton.click(event => {
                     this.prev();
                 });
+
+                this.volButton.click(event => {
+                    var state = this.volButton.attr("state");
+
+                    var stateHandlers = {
+                        on: () => {
+                            this.volumeOff();
+                        },
+                        off: () => {
+                            this.volumeOn();
+                        }
+                    };
+
+                    stateHandlers[state]();
+                });
             }
 
             public play(): void {
+                this.playPauseButton.attr("state", "pause");
+                CZ.Tours.tourResume();
             }
 
             public pause(): void {
+                this.playPauseButton.attr("state", "play");
+                CZ.Tours.tourPause();
             }
 
             public next(): void {
+                CZ.Tours.tourNext();
             }
 
             public prev(): void {
+                CZ.Tours.tourPrev();
             }
 
             public exit(): void {
+                CZ.Tours.tourAbort();
+            }
+
+            private volumeOn(): void {
+                this.volButton.attr("state", "on")
+                CZ.Tours.isNarrationOn = true;
+                this.tour.audioElement.volume = 1;
+            }
+
+            private volumeOff(): void {
+                this.volButton.attr("state", "off")
+                CZ.Tours.isNarrationOn = false;
+                this.tour.audioElement.volume = 0;
             }
         }
 
         export class FormTourCaption extends CZ.UI.FormBase {
+            private minButton: JQuery;
             private captionTextarea: JQuery;
             private tourPlayerContainer: JQuery;
             private bookmarksCount: JQuery;
-            private narrationToggle: JQuery;
             private tourPlayer: CZ.UI.TourPlayer;
             private tour: CZ.Tours.Tour;
+            private isMinimized: bool;
 
             constructor(container: JQuery, formInfo: IFormTourCaptionInfo) {
                 super(container, formInfo);
 
+                this.minButton = this.container.find(formInfo.minButton);
                 this.captionTextarea = this.container.find(formInfo.captionTextarea);
                 this.tourPlayerContainer = this.container.find(formInfo.tourPlayerContainer);
                 this.bookmarksCount = this.container.find(formInfo.bookmarksCount);
-                this.narrationToggle = this.container.find(formInfo.narrationToggle);
                 this.tour = formInfo.context;
                 this.tourPlayer = new CZ.UI.TourPlayer(
                     this.tourPlayerContainer,
@@ -108,31 +146,42 @@ module CZ {
                         playPauseButton: "div:nth-child(2)",
                         nextButton: "div:nth-child(3)",
                         prevButton: "div:nth-child(1)",
+                        volButton: "div:nth-child(4)",
                         context: this.tour
                     }
                 );
 
-                this.narrationToggle.off();
+                this.minButton.off();
 
                 this.initialize();
             }
 
             private initialize(): void {
-                this.narrationToggle.click(event => {
-                    CZ.Tours.isNarrationOn = !CZ.Tours.isNarrationOn;
+                this.titleTextblock.text(this.tour.title);
+                this.bookmarksCount.text("Slide 1 of " + this.tour.bookmarks.length);
+                this.captionTextarea.css("opacity", 0);
+                this.isMinimized = false;
+
+                this.minButton.click(event => {
+                    this.minimize();
                 });
             }
 
-            private hideBookmark(): void {
-                this.captionTextarea.animate({
-                    opacity: 0
-                });
+            public hideBookmark(): void {
+                this.captionTextarea.css("opacity", 0);
             }
 
-            private showBookmark(): void {
+            public showBookmark(bookmark: CZ.Tours.TourBookmark): void {
+                this.captionTextarea.text(bookmark.text);
+                this.bookmarksCount.text("Slide " + bookmark.number + " of " + this.tour.bookmarks.length);
+                this.captionTextarea.stop();
                 this.captionTextarea.animate({
                     opacity: 1
                 });
+            }
+
+            public setPlayPauseButtonState(state: string) {
+                this.tourPlayer.playPauseButton.attr("state", state);
             }
 
             public show(): void {
@@ -150,9 +199,30 @@ module CZ {
                     effect: "slide",
                     direction: "left",
                     duration: 500,
+                    complete: () => {
+                        this.tourPlayer.exit();
+                    }
                 });
 
                 this.activationSource.removeClass("active");
+            }
+
+            public minimize() {
+                if (this.isMinimized) {
+                    this.contentContainer.show({
+                        effect: "slide",
+                        direction: "up",
+                        duration: 500
+                    });
+                } else {
+                    this.contentContainer.hide({
+                        effect: "slide",
+                        direction: "up",
+                        duration: 500
+                    });
+                }
+
+                this.isMinimized = !this.isMinimized;
             }
         }
     }
