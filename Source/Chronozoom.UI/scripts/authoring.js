@@ -42,6 +42,7 @@ var CZ;
         Authoring.showMessageWindow = null;
         Authoring.hideMessageWindow = null;
         Authoring.callback = null;
+        Authoring.timer;
         function isIntersecting(te, obj) {
             switch(obj.type) {
                 case "timeline":
@@ -511,6 +512,19 @@ var CZ;
             return isValid;
         }
         Authoring.validateContentItems = validateContentItems;
+        function showSessionForm() {
+            CZ.HomePageViewModel.sessionForm.show();
+        }
+        Authoring.showSessionForm = showSessionForm;
+        function resetSessionTimer() {
+            if(CZ.Authoring.timer != null) {
+                clearTimeout(CZ.Authoring.timer);
+                CZ.Authoring.timer = setTimeout(function () {
+                    showSessionForm();
+                }, (CZ.Settings.sessionTime - 60) * 1000);
+            }
+        }
+        Authoring.resetSessionTimer = resetSessionTimer;
     })(CZ.Authoring || (CZ.Authoring = {}));
     var Authoring = CZ.Authoring;
 })(CZ || (CZ = {}));

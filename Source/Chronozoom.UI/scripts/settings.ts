@@ -157,6 +157,7 @@
         export var signinUrlMicrosoft = "";
         export var signinUrlGoogle = "";
         export var signinUrlYahoo = "";
+        export var sessionTime = 70; //seconds
 
         // General constants
         export var guidEmpty = "00000000-0000-0000-0000-000000000000";
@@ -167,6 +168,8 @@
             var v = 3, div = document.createElement('div'), a = div.all || [];
             while (div.innerHTML = '<!--[if gt IE '+(++v)+']><br><![endif]-->', a[0]); 
             return (v > 4) ? v : undefined;
-        }());
+        } ());
+
+
     }
 }
