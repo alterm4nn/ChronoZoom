@@ -4389,15 +4389,11 @@ var CZ;
         }
         Authoring.validateContentItems = validateContentItems;
         function showSessionForm() {
-            CZ.HomePageViewModel.sessionForm.show();
         }
         Authoring.showSessionForm = showSessionForm;
         function resetSessionTimer() {
             if(CZ.Authoring.timer != null) {
                 clearTimeout(CZ.Authoring.timer);
-                CZ.Authoring.timer = setTimeout(function () {
-                    showSessionForm();
-                }, (CZ.Settings.sessionTime - 60) * 1000);
             }
         }
         Authoring.resetSessionTimer = resetSessionTimer;
