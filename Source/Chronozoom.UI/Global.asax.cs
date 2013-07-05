@@ -102,14 +102,12 @@ namespace Chronozoom.UI
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         void SessionAuthenticationModule_SessionSecurityTokenReceived(object sender, SessionSecurityTokenReceivedEventArgs e)
         {
-            int minutes = 90;
+            int minutes = 60;
             DateTime now = DateTime.UtcNow;
             DateTime validFrom = e.SessionToken.ValidFrom;
             DateTime validTo = e.SessionToken.ValidTo;
 
-            //This can reduce token updates count
-            //&& (now > validFrom.AddMinutes(((validTo - validFrom).TotalMinutes) / 2 * 3))
-            if ((now < validTo) )
+            if (now < validTo)
             {
                 SessionAuthenticationModule sam = sender as SessionAuthenticationModule;
                 e.SessionToken = sam.CreateSessionSecurityToken(e.SessionToken.ClaimsPrincipal, e.SessionToken.Context, now, now.AddMinutes(minutes), e.SessionToken.IsPersistent);
