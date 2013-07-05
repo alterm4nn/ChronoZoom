@@ -13,6 +13,8 @@ var CZ;
         Tours.pauseTourAtAnyAnimation = false;
         Tours.bookmarkAnimation;
         var isToursDebugEnabled = false;
+        Tours.tourCaptionFormContainer;
+        Tours.tourCaptionForm;
         var TourBookmark = (function () {
             function TourBookmark(url, caption, lapseTime, text) {
                 this.url = url;

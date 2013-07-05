@@ -1,5 +1,6 @@
 ﻿/// <reference path='typings/jqueryui/jqueryui.d.ts'/>
 /// <reference path='../ui/tourslist-form.ts' />
+/// <reference path='../ui/tour-caption-form.ts' />
 /// <reference path='urlnav.ts'/>
 /// <reference path='common.ts'/>
 
@@ -10,7 +11,7 @@ module CZ {
         private isBookmarksWindowVisible = false;
         private isBookmarksWindowExpanded = true;
         private isBookmarksTextShown = true;
-        private isNarrationOn = true;
+        export var isNarrationOn = true;
 
         export var tours; // list of loaded tours
         export var tour; //an active tour. Undefined if no tour is active
@@ -22,6 +23,9 @@ module CZ {
         private bookmarkAnimation; // current animation of bookmark' description text sliding
 
         var isToursDebugEnabled = false; // enables rebug output
+
+        export var tourCaptionFormContainer: JQuery;
+        export var tourCaptionForm: CZ.UI.FormTourCaption;
 
         /* TourBookmark represents a place in the virtual space with associated audio.
         @param url  (string) Url that contains a state of the virtual canvas

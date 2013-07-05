@@ -1,0 +1,148 @@
+<style>
+    /* ------------------------------------------
+    CSS TOGGLE SWITCHES (Ionuț Colceriu)
+    Licensed under Unlicense 
+    https://github.com/ghinda/css-toggle-switch
+    ------------------------------------------ */
+
+    .cz-toggle {
+        position: relative;
+        padding: 0;
+        margin-left: 100px;
+        display: block;
+        height: 30px;
+    }
+
+    .cz-toggle label {
+        position: relative;
+        z-index: 3;
+
+        display: block;
+        width: 100%;
+    }
+
+    .cz-toggle input {
+        position: absolute;
+        opacity: 0;
+        z-index: 5;
+    }
+
+    .cz-toggle p {
+        position: absolute;
+        left: -100px;
+
+        width: 100%;
+        margin: 0;
+        padding-right: 100px;
+
+        text-align: left;
+    }
+
+    .cz-toggle p span {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 5;
+
+        display: block;
+        width: 50%;
+        margin-left: 100px;
+
+        text-align: center;
+    }
+
+    .cz-toggle p span:last-child {
+        left: 50%;
+    }
+
+    .cz-toggle .cz-toggle-slide-button {
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 4;
+
+        display: block;
+        width: 50%;
+        height: 100%;
+        padding: 0;
+    }
+
+    .cz-toggle * {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -ms-box-sizing: border-box;
+        -o-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+
+    .cz-toggle label,
+    .cz-toggle p {
+        line-height: 30px;
+        vertical-align: middle;
+    }
+
+    .cz-toggle input:checked ~ .cz-toggle-slide-button {
+        left: 50%;
+    }
+
+    .cz-toggle-narration {
+        width: 100px;
+        background-color: #e9e9e9;
+        color: #232323;
+        text-align: center;
+    }
+
+    .cz-toggle-narration .cz-toggle-slide-button {
+        background-color: #0464a2;
+    }
+
+    .cz-toggle-narration p span:first-child {
+        color: #fff;
+    }
+
+    .cz-toggle-narration p span:last-child {
+        color: #232323;
+    }
+
+    .cz-toggle input:checked ~ p span:first-child {
+        color: #232323;
+    }
+
+    .cz-toggle input:checked ~ p span:last-child {
+        color: #fff;
+    }
+</style>
+
+<div class="cz-form-header">
+    <ul>
+        <li class="cz-form-nav">
+            &lt;
+        </li>
+        <li class="cz-form-title">
+            Tour
+        </li>
+        <li class="cz-form-close-btn">
+            <a class="cz-form-btn">
+                X
+            </a>
+        </li>
+    </ul>
+</div>
+<div class="cz-form-content">
+    <div class="cz-form-tour-caption"></div>
+    <div class="cz-form-tour-player">
+        <div class="cz-form-prev-icon cz-form-tour-player-icon fleft" alt="previous" title="previous" />
+        <div class="cz-form-play-pause-icon cz-form-tour-player-icon fleft" alt="play/pause" title="play/pause" state="pause" />
+        <div class="cz-form-next-icon cz-form-tour-player-icon fleft" alt="next" title="next" />
+    </div>
+    <label class="cz-toggle cz-toggle-narration">
+        <input type="checkbox" checked="true"/>
+        <p class="cz-lightgray">
+            Narration
+            <span>Off</span>
+            <span>On</span>
+        </p>        
+        <a class="cz-toggle-slide-button"></a>
+    </label>
+    <div class="cz-form-tour-bookmarks-count"></div>
+</div>

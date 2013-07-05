@@ -20,7 +20,8 @@ var CZ;
             "#timeSeriesContainer": "/ui/timeseries-graph-form.html",
             "#timeSeriesDataForm": "/ui/timeseries-data-form.html",
             "#message-window": "/ui/message-window.html",
-            "#header-search-form": "/ui/header-search-form.html"
+            "#header-search-form": "/ui/header-search-form.html",
+            "#tour-caption-form": "/ui/tour-caption-form.html"
         };
         (function (FeatureActivation) {
             FeatureActivation._map = [];
@@ -103,6 +104,7 @@ var CZ;
             return true;
         }
         function InitializeToursUI(profile, forms) {
+            CZ.Tours.tourCaptionFormContainer = forms[15];
             var allowEditing = IsFeatureEnabled(_featureMap, "TourAuthoring") && UserCanEditCollection(profile);
             var onToursInitialized = function () {
                 CZ.Tours.initializeToursUI();
@@ -671,6 +673,7 @@ var CZ;
                 return false;
             }
         }
+        HomePageViewModel.getFormById = getFormById;
         function showTimeSeriesChart() {
             $('#timeSeriesContainer').height('30%');
             $('#timeSeriesContainer').show();

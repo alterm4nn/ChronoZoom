@@ -19,6 +19,7 @@
 /// <reference path='../ui/timeseries-graph-form.ts'/>
 /// <reference path='../ui/timeseries-data-form.ts'/>
 /// <reference path='../ui/tourslist-form.ts'/>
+/// <reference path='../ui/tour-caption-form.ts'/>
 /// <reference path='../ui/message-window.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
 /// <reference path='extensions/extensions.ts'/>
@@ -47,7 +48,8 @@ module CZ {
             "#timeSeriesContainer": "/ui/timeseries-graph-form.html", //11
             "#timeSeriesDataForm": "/ui/timeseries-data-form.html", //12
             "#message-window": "/ui/message-window.html", // 13
-            "#header-search-form": "/ui/header-search-form.html" // 14
+            "#header-search-form": "/ui/header-search-form.html", // 14
+            "#tour-caption-form": "/ui/tour-caption-form.html" // 15
         };
 
         export enum FeatureActivation {
@@ -143,6 +145,25 @@ module CZ {
         }
 
         function InitializeToursUI(profile, forms) {
+            // var tourCaptionForm = getFormById("#tour-caption-form");
+            // if (tourCaptionForm.isFormVisible) {
+            //     tourCaptionForm.close();
+            // } else {
+            //     closeAllForms();
+            //     var form = new CZ.UI.FormTourCaption(forms[15], {
+            //         activationSource: $(".tour-icon"),
+            //         navButton: ".cz-form-nav",
+            //         closeButton: ".cz-form-close-btn > .cz-form-btn",
+            //         titleTextblock: ".cz-form-title",
+            //         captionTextarea: ".cz-form-tour-caption",
+            //         tourPlayerContainer: ".cz-form-tour-player",
+            //         bookmarksCount: ".cz-form-tour-bookmarks-count",
+            //         narrationToggle: ".cz-toggle-narration > input",
+            //         context: tour
+            //     });
+            //     form.show();
+            // }
+            CZ.Tours.tourCaptionFormContainer = forms[15];
             var allowEditing = IsFeatureEnabled(_featureMap, "TourAuthoring") && UserCanEditCollection(profile);
 
             var onToursInitialized = function () {
@@ -602,33 +623,34 @@ module CZ {
             var jointGesturesStream = canvasGestures.Merge(axisGestures.Merge(timeSeriesGestures));
 
             CZ.Common.controller = new CZ.ViewportController.ViewportController2(
-                            function (visible) {
-                                var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                                var markerPos = CZ.Common.axis.MarkerPosition();
-                                var oldMarkerPosInScreen = vp.pointVirtualToScreen(markerPos, 0).x;
+                function (visible) {
+                    var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                    var markerPos = CZ.Common.axis.MarkerPosition();
+                    var oldMarkerPosInScreen = vp.pointVirtualToScreen(markerPos, 0).x;
 
-                                CZ.Common.vc.virtualCanvas("setVisible", visible, CZ.Common.controller.activeAnimation);
-                                CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
-                                vp = CZ.Common.vc.virtualCanvas("getViewport");
-                                if (CZ.Tours.pauseTourAtAnyAnimation) { //watch for the user animation during playing of some tour bookmark
-                                    CZ.Tours.tourPause();
-                                    CZ.Tours.pauseTourAtAnyAnimation = false;
-                                }
+                    CZ.Common.vc.virtualCanvas("setVisible", visible, CZ.Common.controller.activeAnimation);
+                    CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
+                    vp = CZ.Common.vc.virtualCanvas("getViewport");
+                    if (CZ.Tours.pauseTourAtAnyAnimation) { //watch for the user animation during playing of some tour bookmark
+                        CZ.Tours.tourPause();
+                        CZ.Tours.pauseTourAtAnyAnimation = false;
+                    }
 
-                                var hoveredInfodot = CZ.Common.vc.virtualCanvas("getHoveredInfodot");
-                                var actAni = CZ.Common.controller.activeAnimation != undefined;
+                    var hoveredInfodot = CZ.Common.vc.virtualCanvas("getHoveredInfodot");
+                    var actAni = CZ.Common.controller.activeAnimation != undefined;
 
-                                if (actAni && !hoveredInfodot.id) {
-                                    var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
-                                    CZ.Common.updateMarker();
-                                }
+                    if (actAni && !hoveredInfodot.id) {
+                        var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
+                        CZ.Common.updateMarker();
+                    }
 
-                                updateTimeSeriesChart(vp);
-                            },
-                            function () {
-                                return CZ.Common.vc.virtualCanvas("getViewport");
-                            },
-                            jointGesturesStream);
+                    updateTimeSeriesChart(vp);
+                },
+                function () {
+                    return CZ.Common.vc.virtualCanvas("getViewport");
+                },
+                jointGesturesStream
+            );
 
             var hashChangeFromOutside = true; // True if url is changed externally
 
@@ -690,30 +712,27 @@ module CZ {
             });
 
             //Tour: notifyng tour that the bookmark is reached
-            CZ.Common.controller.onAnimationComplete.push(
-                                function (id) {
-                                    if (CZ.Tours.tourBookmarkTransitionCompleted != undefined)
-                                        CZ.Tours.tourBookmarkTransitionCompleted(id);
-                                    if (CZ.Tours.tour != undefined && CZ.Tours.tour.state != "finished") //enabling wathcing for user activity while playing the bookmark
-                                        CZ.Tours.pauseTourAtAnyAnimation = true;
-                                });
+            CZ.Common.controller.onAnimationComplete.push(function (id) {
+                if (CZ.Tours.tourBookmarkTransitionCompleted != undefined)
+                    CZ.Tours.tourBookmarkTransitionCompleted(id);
+                if (CZ.Tours.tour != undefined && CZ.Tours.tour.state != "finished") //enabling wathcing for user activity while playing the bookmark
+                    CZ.Tours.pauseTourAtAnyAnimation = true;
+            });
             //Tour: notifyng tour that the transition was interrupted
-            CZ.Common.controller.onAnimationUpdated.push(
-                                function (oldId, newId) {
-                                    if (CZ.Tours.tour != undefined) {
-                                        if (CZ.Tours.tourBookmarkTransitionInterrupted != undefined) { //in transition
-                                            var prevState = CZ.Tours.tour.state;
-                                            CZ.Tours.tourBookmarkTransitionInterrupted(oldId);
-                                            var alteredState = CZ.Tours.tour.state;
+            CZ.Common.controller.onAnimationUpdated.push(function (oldId, newId) {
+                if (CZ.Tours.tour != undefined) {
+                    if (CZ.Tours.tourBookmarkTransitionInterrupted != undefined) { //in transition
+                        var prevState = CZ.Tours.tour.state;
+                        CZ.Tours.tourBookmarkTransitionInterrupted(oldId);
+                        var alteredState = CZ.Tours.tour.state;
 
-                                            if (prevState == "play" && alteredState == "pause") //interruption caused toue pausing. stop any animations, updating UI as well
-                                                CZ.Tours.tourPause();
+                        if (prevState == "play" && alteredState == "pause") //interruption caused toue pausing. stop any animations, updating UI as well
+                            CZ.Tours.tourPause();
 
-                                            CZ.Common.setNavigationStringTo = null;
-                                        }
-                                    }
-                                }
-            );
+                        CZ.Common.setNavigationStringTo = null;
+                    }
+                }
+            });
 
             CZ.Common.updateLayout();
 
@@ -782,7 +801,7 @@ module CZ {
 
         }
 
-        function getFormById(name) {
+        export function getFormById(name) {
             var form = $(name).data("form");
             if (form)
                 return form;
