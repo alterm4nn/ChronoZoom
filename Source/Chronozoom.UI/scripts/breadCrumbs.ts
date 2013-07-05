@@ -8,7 +8,7 @@ module CZ {
         var hiddenFromRight = []; // hidden breadcrumbs from the right side
         export var visibleAreaWidth = 0;
         
-        var breadCrumbs;
+        export var breadCrumbs;
 
         // Updates current breadcrumbs path, raised when breadcrumbs path has changed.
         // @param  newBreadCrumbs       (array) new breadcrumbs path.
@@ -326,7 +326,11 @@ module CZ {
         // @param   timelineID          (string) id of timeline to navigate.
         // @param   breadCrumbLinkID    (string) id of table element which breadcrumb link was cliked.
         export function clickOverBreadCrumb(timelineID, breadCrumbLinkID) {
-            CZ.Search.goToSearchResult(timelineID); // start EllipticalZoom to element
+            // start EllipticalZoom to element
+            var element = CZ.Common.vc.virtualCanvas("findElement", timelineID);
+            var navStringElement = CZ.UrlNav.vcelementToNavString(element);
+            var visible = CZ.UrlNav.navStringToVisible(navStringElement, CZ.Common.vc);
+            CZ.Common.controller.moveToVisible(visible);
 
             var selector = "#bc_" + breadCrumbLinkID;
 

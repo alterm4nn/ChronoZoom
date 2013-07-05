@@ -306,7 +306,7 @@ var CZ;
                     this._layersContent = undefined;
                     return this;
                 },
-                _visibleToViewBox: function (visible) {
+                visibleToViewBox: function (visible) {
                     var view = this.getViewport();
                     var w = view.widthScreenToVirtual(view.width);
                     var h = view.heightScreenToVirtual(view.height);
@@ -323,7 +323,7 @@ var CZ;
                     delete this.viewport;
                     this.options.visible = newVisible;
                     this.isInAnimation = isInAnimation && isInAnimation.isActive;
-                    var viewbox_v = this._visibleToViewBox(newVisible);
+                    var viewbox_v = this.visibleToViewBox(newVisible);
                     var viewport = this.getViewport();
                     this._renderCanvas(this._layersContent, viewbox_v, viewport);
                 },
@@ -375,7 +375,7 @@ var CZ;
                     elementsRoot.render(contexts, visibleBox_v, viewport);
                 },
                 invalidate: function () {
-                    var viewbox_v = this._visibleToViewBox(this.options.visible);
+                    var viewbox_v = this.visibleToViewBox(this.options.visible);
                     var viewport = this.getViewport();
                     this._renderCanvas(this._layersContent, viewbox_v, viewport);
                 },
@@ -386,9 +386,13 @@ var CZ;
                 requestInvalidate: function () {
                     this.requestNewFrame = false;
                     if(CZ.Layout.animatingElements.length != 0) {
-                        for(var id in CZ.Layout.animatingElements) {
-                            if(CZ.Layout.animatingElements[id].animation && CZ.Layout.animatingElements[id].animation.isAnimating) {
-                                CZ.Layout.animatingElements[id].calculateNewFrame();
+                        CZ.Layout.syncViewport();
+                        for(var i = 0; i < CZ.Layout.animatingElements.length; i++) {
+                            var el = CZ.Layout.animatingElements[i];
+                            if(!el) {
+                                CZ.Layout.animatingElements.splice(i, 1);
+                            } else if(el.animation && el.animation.isAnimating) {
+                                el.calculateNewFrame();
                                 this.requestNewFrame = true;
                             }
                         }

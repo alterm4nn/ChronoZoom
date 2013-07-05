@@ -321,10 +321,13 @@ module CZ {
             for (var i = 0; i < n; i++) {
                 var child = parent.children[i];
                 if (child.id == id) {
-                    // remove element from hash map of animating elements in dynamic layout animation
-                    if (typeof CZ.Layout.animatingElements[child.id] !== 'undefined') {
-                        delete CZ.Layout.animatingElements[child.id];
-                        CZ.Layout.animatingElements.length--;
+                    // remove element from array of animating elements in dynamic layout animation
+                    var matches = CZ.Layout.animatingElements.filter((el) => {
+                        return el.id === child.id &&
+                            (el.animation && child.animation) ? el.animation.startTime === child.animation.startTime : false;
+                    });
+                    for (var k = 0; k < matches.length; k++) {
+                        CZ.Layout.animatingElements.splice(CZ.Layout.animatingElements.indexOf(matches[k]), 1);
                     }
 
                     parent.children.splice(i, 1);
@@ -358,10 +361,13 @@ module CZ {
             for (var i = 0; i < n; i++) {
                 var child = element.children[i];
 
-                // remove element from hash map of animating elements in dynamic layout animation
-                if (typeof CZ.Layout.animatingElements[child.id] !== 'undefined') {
-                    delete CZ.Layout.animatingElements[child.id];
-                    CZ.Layout.animatingElements.length--;
+                // remove element from array of animating elements in dynamic layout animation
+                var matches = CZ.Layout.animatingElements.filter((el) => {
+                    return el.id === child.id &&
+                        (el.animation && child.animation) ? el.animation.startTime === child.animation.startTime : false;
+                });
+                for (var k = 0; k < matches.length; k++) {
+                    CZ.Layout.animatingElements.splice(CZ.Layout.animatingElements.indexOf(matches[k]), 1);
                 }
 
                 clear(child);

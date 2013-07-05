@@ -37,17 +37,11 @@ module CZ {
         export var axis;
         export var vc;
         var visReg;
-        export var cosmosVisible;
-        export var earthVisible;
-        export var lifeVisible;
-        export var prehistoryVisible;
-        export var humanityVisible;
         var content;
         var breadCrumbs; //titles and visibles of the recent breadcrumbs
 
         var firstTimeWelcomeChecked = true; // if welcome screen checkbox checked or not
 
-        var regimes = [];
 
         var k = 1000000000;
         export var setNavigationStringTo; // { element or bookmark, id } identifies that we zoom into this element and when (if) finish the zoom, we should put the element's path into navigation string
@@ -60,6 +54,13 @@ module CZ {
         // Initial Content contains the identifier (e.g. ID or Title) of the content that should be loaded initially.
         export var initialContent = null;
 
+        // Throttles requests to the server such that 
+        // min interval between request >= 1 sec
+        export var missingDataRequestsTimer;
+
+        // Stores the number of outgoing requests to the server for missing timeline data
+        var missingDataRequestsCount = 0;
+
         /* Initialize the JQuery UI Widgets
         */
         export function initialize() {
@@ -70,8 +71,8 @@ module CZ {
             vc = (<any>$)('#vc');
             vc.virtualCanvas();
         }
-        
-        
+
+
         /* Calculates local offset of mouse cursor in specified jQuery element.
         @param jqelement  (JQuery to Dom element) jQuery element to get local offset for.
         @param event   (Mouse event args) mouse event args describing mouse cursor.
@@ -204,138 +205,207 @@ module CZ {
             }
         }
 
-        //loading the data from the service
+        // loading the data from the service
         export function loadData() {
-            return CZ.Data.getTimelines(null).then(
-                function (response) {
-                    if (!response) {
-                        return;
+            var args;
+            if (!CZ.Service.superCollectionName && !CZ.Service.collectionName) { // default collection (Big History)
+                // load the minimal set of timelines to enable regimes
+                // i.e. timelines on the path from Cosmos to Humanity (for default collection)
+                args = {
+                    start: -400,
+                    end: 9999,
+                    minspan: 13700000000,
+                    commonAncestor: CZ.Settings.humanityTimelineID,
+                    fromRoot: 1
+                };
+            } else { // user specified collection
+                // load only the root timelime and its immediate children
+                args = null;
+            }
+
+            // disable progressive loading in authoring mode
+            if (CZ.Authoring && CZ.Authoring.isEnabled) {
+                // load the whole collection at once if in authoring mode
+                args = {
+                    minspan: 0
+                };
+            }
+            
+            return CZ.Service.getTimelines(args)
+            .then(function (response) {
+                var root = vc.virtualCanvas("getLayerContent");
+                CZ.Layout.merge(response, root, true, () => {
+                    var root = vc.virtualCanvas("findElement", 't' + response.id);
+                    CZ.UrlNav.navigationAnchor = root;
+                    CZ.Settings.maxPermitedTimeRange = { left: root.x, right: root.x + root.width };
+
+                    if (CZ.HomePageViewModel.IsFeatureEnabled("Regimes")) {
+                        initializeRegimes();
                     }
-
-                    ProcessContent(response);
-                    vc.virtualCanvas("updateViewport");
-
-                    if (CZ.Common.initialContent) {
-                        CZ.Service.getContentPath(CZ.Common.initialContent).then(
-                            function (response) {
-                                window.location.hash = response;
-                            },
-                            function (error) {
-                                console.log("Error connecting to service:\n" + error.responseText);
-                            }
-                        );
+                    if (startHash) {
+                        processHash();
+                    } else {
+                        displayRootTimeline();
                     }
+                });
 
-                    CZ.Service.getTours().then(
-                        function (response) {
-                            CZ.Tours.parseTours(response);
-                            CZ.Tours.initializeToursContent();
-                        },
-                        function (error) {
-                            console.log("Error connecting to service:\n" + error.responseText);
-                        }
-                    );
-                },
-                function (error) {
-                    console.log("Error connecting to service:\n" + error.responseText);
+                if (CZ.HomePageViewModel.IsFeatureEnabled("Tours")) {
+                    CZ.Service.getTours()
+                    .then(function (response) {
+                        CZ.Tours.parseTours(response);
+                    }, function (error) {
+                        console.log("Error connecting to service:\n" + error.responseText);
+                    });
                 }
-            );
+            }, function (error) {
+                console.log("Error connecting to service:\n" + error.responseText);
+            });
         }
 
-        function ProcessContent(content) {
-            var root = vc.virtualCanvas("getLayerContent");
-            root.beginEdit();
-            CZ.Layout.Merge(content, root);
-            root.endEdit(true);
+        export function getTimelineVisible(id) {
+            var tl = vc.virtualCanvas("findElement", 't' + id);
+            if (!tl) return;
+            var tlNavString = CZ.UrlNav.vcelementToNavString(tl);
+            if (!tlNavString) return;
+            var tlVisible = CZ.UrlNav.navStringToVisible(tlNavString, vc);
+            if (!tlVisible) return;
+            return tlVisible;
+        }
 
-            InitializeRegimes(content);
+        function initializeRegimes() {
+            $("#regime-link-cosmos").click(function () {
+                var cosmosVisible = CZ.Common.getTimelineVisible(CZ.Settings.cosmosTimelineID);
+                setVisible(cosmosVisible);
+            });
 
-            if (startHash) { // restoring the window's hash as it was on the page loading
-                visReg = CZ.UrlNav.navStringToVisible(startHash.substring(1), vc);
-            }
+            $("#regime-link-earth").click(function () {
+                var earthVisible = CZ.Common.getTimelineVisible(CZ.Settings.earthTimelineID);
+                setVisible(earthVisible);
+            });
 
-            if (!visReg && cosmosVisible) {
-                window.location.hash = cosmosVisible;
-                visReg = CZ.UrlNav.navStringToVisible(cosmosVisible, vc);
-            }
+            $("#regime-link-life").click(function () {
+                var lifeVisible = CZ.Common.getTimelineVisible(CZ.Settings.lifeTimelineID);
+                setVisible(lifeVisible);
+            });
 
+            $("#regime-link-prehistory").click(function () {
+                var prehistoryVisible = CZ.Common.getTimelineVisible(CZ.Settings.prehistoryTimelineID);
+                setVisible(prehistoryVisible);
+            });
+
+            $("#regime-link-humanity").click(function () {
+                var humanityVisible = CZ.Common.getTimelineVisible(CZ.Settings.humanityTimelineID);
+                setVisible(humanityVisible);
+            });
+        }
+
+        function displayRootTimeline() {
+            var root = CZ.Common.vc.virtualCanvas("getLayerContent").children[0];
+            if (!root) return;
+            var rootVisible = getTimelineVisible(root.guid);
+            if (!rootVisible) return;
+            controller.moveToVisible(rootVisible, true);
+            updateAxis(vc, ax);
+        }
+
+        function processHash() {
+            visReg = CZ.UrlNav.navStringToVisible(startHash.substring(1), vc);
             if (visReg) {
                 controller.moveToVisible(visReg, true);
                 updateAxis(vc, ax);
-                var vp = vc.virtualCanvas("getViewport");
-
-                if (startHash && window.location.hash !== startHash) {
-                    hashChangeFromOutside = false;
-                    window.location.hash = startHash; // synchronizing
-                }
-            }
-        }
-
-        function InitializeRegimes(content) {
-            var f = function (timeline) {
-                if (!timeline) return null;
-                var v = vc.virtualCanvas("findElement", 't' + timeline.id);
-                regimes.push(v);
-                if (v) v = CZ.UrlNav.vcelementToNavString(v);
-                return v;
-            }
-
-            var cosmosTimeline = content;
-            cosmosVisible = f(cosmosTimeline);
-            CZ.UrlNav.navigationAnchor = vc.virtualCanvas("findElement", 't' + cosmosTimeline.id);
-            $("#regime-link-cosmos").click(function () {
-                var visible = CZ.UrlNav.navStringToVisible(cosmosVisible, vc);
-                setVisible(visible);
-            });
-
-            var earthTimeline = CZ.Layout.FindChildTimeline(cosmosTimeline, CZ.Settings.earthTimelineID, true);
-            if (typeof earthTimeline !== "undefined") {
-                earthVisible = f(earthTimeline);
-                $("#regime-link-earth").click(function () {
-                    var visible = CZ.UrlNav.navStringToVisible(earthVisible, vc);
-                    setVisible(visible);
-                });
-
-                var lifeTimeline = CZ.Layout.FindChildTimeline(earthTimeline, CZ.Settings.lifeTimelineID);
-                if (typeof lifeTimeline !== "undefined") {
-                    lifeVisible = f(lifeTimeline);
-                    $("#regime-link-life").click(function () {
-                        var visible = CZ.UrlNav.navStringToVisible(lifeVisible, vc);
-                        setVisible(visible);
-                    });
-
-                    var prehistoryTimeline = CZ.Layout.FindChildTimeline(lifeTimeline, CZ.Settings.prehistoryTimelineID);
-                    if (typeof prehistoryTimeline !== "undefined") {
-                        prehistoryVisible = f(prehistoryTimeline);
-                        $("#regime-link-prehistory").click(function () {
-                            var visible = CZ.UrlNav.navStringToVisible(prehistoryVisible, vc);
-                            setVisible(visible);
-                        });
-
-                        var humanityTimeline = CZ.Layout.FindChildTimeline(prehistoryTimeline, CZ.Settings.humanityTimelineID, true);
-                        if (typeof humanityTimeline !== "undefined") {
-                            humanityVisible = f(humanityTimeline);
-                            $("#regime-link-humanity").click(function () {
-                                var visible = CZ.UrlNav.navStringToVisible(humanityVisible, vc);
-                                setVisible(visible);
-                            });
-                        }
+            } else {
+                var startPos, endPos, timelineID;
+                startPos = startHash.lastIndexOf("/t");
+                if (startPos !== -1) {
+                    startPos += 2;
+                    var pos = [];
+                    pos.push(startHash.indexOf("/", startPos));
+                    pos.push(startHash.indexOf("\\", startPos));
+                    pos.push(startHash.indexOf("@", startPos));
+                    pos.push(startHash.indexOf("&", startPos));
+                    pos = pos.filter(v => v >= 0).sort();
+                    endPos = (pos.length > 0) ? pos[0] - 1 : startHash.length - 1;
+                    if (startPos >= 0 && endPos >= 0 && endPos >= startPos) {
+                        timelineID = startHash.substring(startPos, endPos + 1);
                     }
                 }
+
+                if (!timelineID) {
+                    displayRootTimeline();
+                    return;
+                }
+
+                CZ.Service.getTimelines({
+                    // load the timelines for the hash
+                    start: -13700000000,
+                    end: 9999,
+                    minspan: 13700000000,
+                    commonAncestor: timelineID,
+                    fromRoot: 1
+                }).then(
+                function (response) {
+                    var root = vc.virtualCanvas("getLayerContent");
+                    CZ.Layout.merge(response, root.children[0], true, () => {
+                        visReg = CZ.UrlNav.navStringToVisible(startHash.substring(1), vc);
+                        if (visReg) {
+                            controller.moveToVisible(visReg, true);
+                            updateAxis(vc, ax);
+                        }
+                    });
+                },
+                function (error) {
+                    displayRootTimeline();
+                });
             }
-
-            maxPermitedVerticalRange = {    //setting top and bottom observation constraints according to cosmos timeline
-                top: cosmosTimeline.y,
-                bottom: cosmosTimeline.y + cosmosTimeline.height
-            };
-
-            // update virtual canvas horizontal borders
-            CZ.Settings.maxPermitedTimeRange = {
-                left: cosmosTimeline.left,
-                right: cosmosTimeline.right
-            };
-            maxPermitedScale = CZ.UrlNav.navStringToVisible(cosmosVisible, vc).scale * 1.1;
         }
+
+        export function IncreaseRequestsCount() {
+            missingDataRequestsCount++;
+            if (missingDataRequestsCount === 1) {
+                var vp = vc.virtualCanvas("getViewport");
+                var footer = $(".footer-links");
+                $("#progressImage").css({
+                    top: (footer.offset().top - 30),
+                    left: (vp.width / 2) - ($('#progressImage').width() / 2)
+                }).show();
+            }
+        }
+
+        export function DecreaseRequestsCount() {
+            missingDataRequestsCount--;
+            if (missingDataRequestsCount === 0) {
+                $("#progressImage").hide();
+            }
+        }
+
+        // request missing timeline data from the server
+        export function getMissingData(vbox, lca) {
+            // request new data only in case if authoring is not active
+            if (typeof CZ.Authoring === 'undefined' || CZ.Authoring.isActive === false) {
+                var root = CZ.Common.vc.virtualCanvas("getLayerContent");
+                if (root.children.length > 0) {
+                    window.clearTimeout(missingDataRequestsTimer);
+                    missingDataRequestsTimer = window.setTimeout(function () {
+                        IncreaseRequestsCount();
+                        CZ.Service.getTimelines({
+                            start: vbox.left,
+                            end: vbox.right,
+                            minspan: CZ.Settings.minTimelineWidth * vbox.scale,
+                            commonAncestor: lca.guid,
+                            maxElements: 2000
+                        }).then(
+                        function (response) {
+                            DecreaseRequestsCount();
+                            CZ.Layout.merge(response, lca);
+                        },
+                        function (error) {
+                            DecreaseRequestsCount();
+                            console.log("Error connecting to service:\n" + error.responseText);
+                        });
+                    }, 1000);
+                }
+            }
+        };
 
         export function updateLayout() {
             CZ.BreadCrumbs.visibleAreaWidth = $(".breadcrumbs-container").width();
