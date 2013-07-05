@@ -104,7 +104,6 @@ namespace Chronozoom.UI
         {
             int minutes = 60;
             DateTime now = DateTime.UtcNow;
-            DateTime validFrom = e.SessionToken.ValidFrom;
             DateTime validTo = e.SessionToken.ValidTo;
 
             //This can reduce token updates count
