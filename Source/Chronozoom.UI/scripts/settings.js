@@ -169,6 +169,7 @@ var CZ;
         Settings.signinUrlMicrosoft = "";
         Settings.signinUrlGoogle = "";
         Settings.signinUrlYahoo = "";
+        Settings.sessionTime = 70;
         Settings.guidEmpty = "00000000-0000-0000-0000-000000000000";
         Settings.ie = ((function () {
             var v = 3, div = document.createElement('div'), a = div.all || [];

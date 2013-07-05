@@ -21,6 +21,7 @@
 /// <reference path='../ui/tourslist-form.ts'/>
 /// <reference path='../ui/tour-caption-form.ts'/>
 /// <reference path='../ui/message-window.ts'/>
+/// <reference path='../ui/header-session-expired-form.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
 /// <reference path='extensions/extensions.ts'/>
 
@@ -30,6 +31,7 @@ module CZ {
     export var timeSeriesChart: CZ.UI.LineChart;
     export var leftDataSet: CZ.Data.DataSet;
     export var rightDataSet: CZ.Data.DataSet;
+
 
     export module HomePageViewModel {
         // Contains mapping: CSS selector -> html file.
@@ -49,7 +51,8 @@ module CZ {
             "#timeSeriesDataForm": "/ui/timeseries-data-form.html", //12
             "#message-window": "/ui/message-window.html", // 13
             "#header-search-form": "/ui/header-search-form.html", // 14
-            "#tour-caption-form": "/ui/tour-caption-form.html" // 15
+            "#header-session-expired-form": "/ui/header-session-expired-form.html", // 15
+            "#tour-caption-form": "/ui/tour-caption-form.html" // 16
         };
 
         export enum FeatureActivation {
@@ -67,6 +70,8 @@ module CZ {
             IsEnabled: bool;
             HasBeenActivated: bool;
         }
+
+        export var sessionForm: CZ.UI.FormHeaderSessionExpired;
 
         // Basic Flight-Control (Tracks the features that are enabled)
         //
@@ -136,7 +141,7 @@ module CZ {
             if (CZ.Service.superCollectionName && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
                 return true;
             }
-            
+
             if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName || profile.DisplayName.toLowerCase() !== CZ.Service.superCollectionName.toLowerCase()) {
                 return false
             }
@@ -145,7 +150,7 @@ module CZ {
         }
 
         function InitializeToursUI(profile, forms) {
-            CZ.Tours.tourCaptionFormContainer = forms[15];
+            CZ.Tours.tourCaptionFormContainer = forms[16];
             var allowEditing = IsFeatureEnabled(_featureMap, "TourAuthoring") && UserCanEditCollection(profile);
 
             var onTakeTour = tour => {
@@ -432,6 +437,25 @@ module CZ {
                 if (canvasIsEmpty) {
                     CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
                 }
+
+
+                sessionForm = new CZ.UI.FormHeaderSessionExpired(forms[15], {
+                    activationSource: $("#header-session-expired-form"),
+                    navButton: ".cz-form-nav",
+                    closeButton: ".cz-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-form-title",
+                    titleInput: ".cz-form-item-title",
+                    context: "",
+                    sessionTimeSpan: "#session-time",
+                    sessionButton: "#session-button"
+                });
+
+                CZ.Service.getProfile().done(data => {
+                    //Authorized
+                    if (data != "") {
+                        CZ.Authoring.timer = setTimeout(() => { CZ.Authoring.showSessionForm(); }, (CZ.Settings.sessionTime - 60) * 1000);
+                    }
+                }).fail((error) => {  });
 
                 var profileForm = new CZ.UI.FormEditProfile(forms[5], {
                     activationSource: $("#login-panel"),

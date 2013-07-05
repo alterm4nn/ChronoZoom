@@ -21,6 +21,7 @@ var CZ;
             "#timeSeriesDataForm": "/ui/timeseries-data-form.html",
             "#message-window": "/ui/message-window.html",
             "#header-search-form": "/ui/header-search-form.html",
+            "#header-session-expired-form": "/ui/header-session-expired-form.html",
             "#tour-caption-form": "/ui/tour-caption-form.html"
         };
         (function (FeatureActivation) {
@@ -37,6 +38,7 @@ var CZ;
             FeatureActivation.NotProduction = 4;
         })(HomePageViewModel.FeatureActivation || (HomePageViewModel.FeatureActivation = {}));
         var FeatureActivation = HomePageViewModel.FeatureActivation;
+        HomePageViewModel.sessionForm;
         var _featureMap = [
             {
                 Name: "Login",
@@ -104,7 +106,7 @@ var CZ;
             return true;
         }
         function InitializeToursUI(profile, forms) {
-            CZ.Tours.tourCaptionFormContainer = forms[15];
+            CZ.Tours.tourCaptionFormContainer = forms[16];
             var allowEditing = IsFeatureEnabled(_featureMap, "TourAuthoring") && UserCanEditCollection(profile);
             var onTakeTour = function (tour) {
                 CZ.HomePageViewModel.closeAllForms();
@@ -378,6 +380,24 @@ var CZ;
                 if(canvasIsEmpty) {
                     CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
                 }
+                HomePageViewModel.sessionForm = new CZ.UI.FormHeaderSessionExpired(forms[15], {
+                    activationSource: $("#header-session-expired-form"),
+                    navButton: ".cz-form-nav",
+                    closeButton: ".cz-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-form-title",
+                    titleInput: ".cz-form-item-title",
+                    context: "",
+                    sessionTimeSpan: "#session-time",
+                    sessionButton: "#session-button"
+                });
+                CZ.Service.getProfile().done(function (data) {
+                    if(data != "") {
+                        CZ.Authoring.timer = setTimeout(function () {
+                            CZ.Authoring.showSessionForm();
+                        }, (CZ.Settings.sessionTime - 60) * 1000);
+                    }
+                }).fail(function (error) {
+                });
                 var profileForm = new CZ.UI.FormEditProfile(forms[5], {
                     activationSource: $("#login-panel"),
                     navButton: ".cz-form-nav",

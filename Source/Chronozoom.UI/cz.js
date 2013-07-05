@@ -169,6 +169,7 @@
         Settings.signinUrlMicrosoft = "";
         Settings.signinUrlGoogle = "";
         Settings.signinUrlYahoo = "";
+        Settings.sessionTime = 70;
         Settings.guidEmpty = "00000000-0000-0000-0000-000000000000";
         Settings.ie = ((function () {
             var v = 3, div = document.createElement('div'), a = div.all || [];
@@ -3364,6 +3365,7 @@ var CZ;
         Service.collectionName = "";
         Service.superCollectionName = "";
         function getTimelines(r) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath("gettimelines");
             request.addParameter("supercollection", Service.superCollectionName);
@@ -3379,6 +3381,7 @@ var CZ;
         }
         Service.getTimelines = getTimelines;
         function getCollections(superCollectionName) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(superCollectionName);
             request.addToPath("collections");
@@ -3391,6 +3394,7 @@ var CZ;
         }
         Service.getCollections = getCollections;
         function getStructure(r) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -3405,6 +3409,7 @@ var CZ;
         }
         Service.getStructure = getStructure;
         function postData(r) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -3420,6 +3425,7 @@ var CZ;
         }
         Service.postData = postData;
         function putCollection(superCollectionName, collectionName, c) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(superCollectionName);
             request.addToPath(collectionName);
@@ -3434,6 +3440,7 @@ var CZ;
         }
         Service.putCollection = putCollection;
         function deleteCollection(c) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(c.name);
@@ -3447,6 +3454,7 @@ var CZ;
         }
         Service.deleteCollection = deleteCollection;
         function putTimeline(t) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -3463,6 +3471,7 @@ var CZ;
         }
         Service.putTimeline = putTimeline;
         function deleteTimeline(t) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -3478,6 +3487,7 @@ var CZ;
         }
         Service.deleteTimeline = deleteTimeline;
         function putExhibit(e) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -3494,6 +3504,7 @@ var CZ;
         }
         Service.putExhibit = putExhibit;
         function deleteExhibit(e) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -3509,6 +3520,7 @@ var CZ;
         }
         Service.deleteExhibit = deleteExhibit;
         function putContentItem(ci) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -3525,6 +3537,7 @@ var CZ;
         }
         Service.putContentItem = putContentItem;
         function deleteContentItem(ci) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -3540,6 +3553,7 @@ var CZ;
         }
         Service.deleteContentItem = deleteContentItem;
         function putTour2(t) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -3556,6 +3570,7 @@ var CZ;
         }
         Service.putTour2 = putTour2;
         function deleteTour(tourId) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -3574,6 +3589,7 @@ var CZ;
         }
         Service.deleteTour = deleteTour;
         function getTours() {
+            CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -3587,6 +3603,7 @@ var CZ;
         }
         Service.getTours = getTours;
         function getSearch(query) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("Search");
             var data = {
@@ -3605,6 +3622,7 @@ var CZ;
         }
         Service.getSearch = getSearch;
         function getServiceInformation() {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath("info");
             return $.ajax({
@@ -3616,6 +3634,7 @@ var CZ;
         }
         Service.getServiceInformation = getServiceInformation;
         function getContentPath(reference) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -3630,6 +3649,7 @@ var CZ;
         }
         Service.getContentPath = getContentPath;
         function putExhibitContent(e, oldContentItems) {
+            CZ.Authoring.resetSessionTimer();
             var newGuids = e.contentItems.map(function (ci) {
                 return ci.guid;
             });
@@ -3646,6 +3666,7 @@ var CZ;
         }
         Service.putExhibitContent = putExhibitContent;
         function putProfile(displayName, email) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("user");
             var user = {
@@ -3662,6 +3683,7 @@ var CZ;
         }
         Service.putProfile = putProfile;
         function deleteProfile(displayName) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("user");
             var user = {
@@ -3678,6 +3700,7 @@ var CZ;
         Service.deleteProfile = deleteProfile;
         function getProfile(displayName) {
             if (typeof displayName === "undefined") { displayName = ""; }
+            CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("user");
             if(displayName != "") {
@@ -3895,6 +3918,7 @@ var CZ;
         Authoring.showMessageWindow = null;
         Authoring.hideMessageWindow = null;
         Authoring.callback = null;
+        Authoring.timer;
         function isIntersecting(te, obj) {
             switch(obj.type) {
                 case "timeline":
@@ -4364,6 +4388,19 @@ var CZ;
             return isValid;
         }
         Authoring.validateContentItems = validateContentItems;
+        function showSessionForm() {
+            CZ.HomePageViewModel.sessionForm.show();
+        }
+        Authoring.showSessionForm = showSessionForm;
+        function resetSessionTimer() {
+            if(CZ.Authoring.timer != null) {
+                clearTimeout(CZ.Authoring.timer);
+                CZ.Authoring.timer = setTimeout(function () {
+                    showSessionForm();
+                }, (CZ.Settings.sessionTime - 60) * 1000);
+            }
+        }
+        Authoring.resetSessionTimer = resetSessionTimer;
     })(CZ.Authoring || (CZ.Authoring = {}));
     var Authoring = CZ.Authoring;
 })(CZ || (CZ = {}));
@@ -11412,6 +11449,73 @@ var CZ;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var FormHeaderSessionExpired = (function (_super) {
+            __extends(FormHeaderSessionExpired, _super);
+            function FormHeaderSessionExpired(container, formInfo) {
+                        _super.call(this, container, formInfo);
+                this.time = 60;
+                this.sessionTimeSpan = container.find(formInfo.sessionTimeSpan);
+                this.sessionButton = container.find(formInfo.sessionButton);
+                this.initialize();
+            }
+            FormHeaderSessionExpired.prototype.initialize = function () {
+                var _this = this;
+                this.sessionButton.click(function () {
+                    CZ.Service.getProfile();
+                    clearTimeout(_this.timer);
+                    _this.time = 60;
+                    _this.close();
+                    _this.sessionTimeSpan.html(_this.time.toString());
+                    CZ.Authoring.resetSessionTimer();
+                    return false;
+                });
+            };
+            FormHeaderSessionExpired.prototype.onTimer = function () {
+                var _this = this;
+                if(this.time > 0) {
+                    this.time--;
+                    this.sessionTimeSpan.html(this.time.toString());
+                    clearTimeout(this.timer);
+                    this.timer = setTimeout(function () {
+                        _this.onTimer();
+                    }, 1000);
+                } else {
+                    clearTimeout(this.timer);
+                    this.close();
+                    document.location.href = "/account/logout";
+                }
+            };
+            FormHeaderSessionExpired.prototype.show = function () {
+                var _this = this;
+                this.timer = setTimeout(function () {
+                    _this.onTimer();
+                }, 1000);
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500,
+                    complete: function () {
+                    }
+                });
+                this.activationSource.addClass("active");
+            };
+            FormHeaderSessionExpired.prototype.close = function () {
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
+                this.activationSource.removeClass("active");
+            };
+            return FormHeaderSessionExpired;
+        })(CZ.UI.FormBase);
+        UI.FormHeaderSessionExpired = FormHeaderSessionExpired;        
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
 var constants;
 var CZ;
 (function (CZ) {
@@ -11435,6 +11539,7 @@ var CZ;
             "#timeSeriesDataForm": "/ui/timeseries-data-form.html",
             "#message-window": "/ui/message-window.html",
             "#header-search-form": "/ui/header-search-form.html",
+            "#header-session-expired-form": "/ui/header-session-expired-form.html",
             "#tour-caption-form": "/ui/tour-caption-form.html"
         };
         (function (FeatureActivation) {
@@ -11451,6 +11556,7 @@ var CZ;
             FeatureActivation.NotProduction = 4;
         })(HomePageViewModel.FeatureActivation || (HomePageViewModel.FeatureActivation = {}));
         var FeatureActivation = HomePageViewModel.FeatureActivation;
+        HomePageViewModel.sessionForm;
         var _featureMap = [
             {
                 Name: "Login",
@@ -11518,7 +11624,7 @@ var CZ;
             return true;
         }
         function InitializeToursUI(profile, forms) {
-            CZ.Tours.tourCaptionFormContainer = forms[15];
+            CZ.Tours.tourCaptionFormContainer = forms[16];
             var allowEditing = IsFeatureEnabled(_featureMap, "TourAuthoring") && UserCanEditCollection(profile);
             var onTakeTour = function (tour) {
                 CZ.HomePageViewModel.closeAllForms();
@@ -11792,6 +11898,24 @@ var CZ;
                 if(canvasIsEmpty) {
                     CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
                 }
+                HomePageViewModel.sessionForm = new CZ.UI.FormHeaderSessionExpired(forms[15], {
+                    activationSource: $("#header-session-expired-form"),
+                    navButton: ".cz-form-nav",
+                    closeButton: ".cz-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-form-title",
+                    titleInput: ".cz-form-item-title",
+                    context: "",
+                    sessionTimeSpan: "#session-time",
+                    sessionButton: "#session-button"
+                });
+                CZ.Service.getProfile().done(function (data) {
+                    if(data != "") {
+                        CZ.Authoring.timer = setTimeout(function () {
+                            CZ.Authoring.showSessionForm();
+                        }, (CZ.Settings.sessionTime - 60) * 1000);
+                    }
+                }).fail(function (error) {
+                });
                 var profileForm = new CZ.UI.FormEditProfile(forms[5], {
                     activationSource: $("#login-panel"),
                     navButton: ".cz-form-nav",
