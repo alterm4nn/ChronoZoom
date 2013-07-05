@@ -254,11 +254,17 @@
     <Content Include="images\credits\MSU.png" />
     <Content Include="images\credits\University-of-Washington.png" />
     <Content Include="images\edit-icon.png" />
+    <Content Include="images\narration-off.png" />
+    <Content Include="images\narration-on.png" />
     <Content Include="images\profile-icon.png" />
     <Content Include="images\search-icon.png" />
     <Content Include="images\Temp-Thumbnail-Aqua.png" />
     <Content Include="images\timeseries-icon.png" />
     <Content Include="images\tour-icon.png" />
+    <Content Include="images\tour-next.png" />
+    <Content Include="images\tour-pause.png" />
+    <Content Include="images\tour-play.png" />
+    <Content Include="images\tour-prev.png" />
     <Content Include="images\view-icon.png" />
     <Content Include="images\edit.svg" />
     <Content Include="pages\crawler.aspx" />
@@ -537,6 +543,11 @@
       <DependentUpon>timeseries-graph-form.ts</DependentUpon>
     </Content>
     <Content Include="ui\timeseries-graph-form.ts" />
+    <Content Include="ui\tour-caption-form.html" />
+    <Content Include="ui\tour-caption-form.js">
+      <DependentUpon>tour-caption-form.ts</DependentUpon>
+    </Content>
+    <Content Include="ui\tour-caption-form.ts" />
     <Content Include="ui\tour-listbox.html" />
     <TypeScriptCompile Include="ui\tour-listbox.ts" />
     <Content Include="ui\tour-listbox.js">

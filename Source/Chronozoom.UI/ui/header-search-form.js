@@ -59,6 +59,7 @@ var CZ;
                 return (query === "") ? $.Deferred().resolve(null).promise() : CZ.Service.getSearch(query);
             };
             FormHeaderSearch.prototype.updateSearchResults = function () {
+                var _this = this;
                 this.clearResultSections();
                 if(this.searchResults === null) {
                     this.hideSearchResults();
@@ -84,6 +85,7 @@ var CZ;
                     contentItem: ""
                 };
                 this.searchResults.forEach(function (item) {
+                    var form = _this;
                     var resultType = resultTypes[item.objectType];
                     var resultId = idPrefixes[resultType] + item.id;
                     var resultTitle = item.title;
@@ -95,6 +97,7 @@ var CZ;
                         click: function () {
                             var self = $(this);
                             CZ.Search.goToSearchResult(self.attr("result-id"), self.attr("result-type"));
+                            form.close();
                         }
                     }));
                 });

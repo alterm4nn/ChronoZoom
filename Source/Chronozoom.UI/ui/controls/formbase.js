@@ -19,6 +19,7 @@ var CZ;
                 this.navButton = this.container.find(formInfo.navButton);
                 this.closeButton = this.container.find(formInfo.closeButton);
                 this.titleTextblock = this.container.find(formInfo.titleTextblock);
+                this.contentContainer = this.container.find(formInfo.contentContainer);
                 this.container.data("form", this);
                 if(this.prevForm) {
                     this.navButton.show();
