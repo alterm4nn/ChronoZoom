@@ -6,12 +6,17 @@
 
 module CZ {
     export module Layout {
-
         // array containing the elements of an ongoing merge animation
         // can contain multiple objects with same id
         // e.g. during content item zoom level changes, exhibits can contain
         // the same content item at different zoom levels, all having the same id
         export var animatingElements = [];
+
+        export var visibleForce = 0; // vertical offset for viewport after merge animation
+        export var animationStartTime; // start time of merge animation
+        export var viewportSyncRequired: bool = false; // indicates if viewport need to be synced during merge animation
+        export var startViewport; // viewport (bounding box of the screen, virtual coordinates) before merge animation
+        export var startVisible; // visible (center point of the screen, virtual coordinates) region before merge animation
 
         function Timeline(title, left, right, childTimelines, exhibits) {
             this.Title = title;
@@ -669,6 +674,12 @@ module CZ {
                 });
             }
 
+            // calculating viewport offset: sum vertical offsets of every element that is above (in virtual coordinates)
+            // initial viewport and horizontally intersects with initial viewport (vertical coordinates are ignored)
+            if (!(elem.x + elem.width < startViewport.Left || elem.x > startViewport.Right) && elem.y + elem.height < startViewport.Top) {
+                visibleForce += elem.newHeight - elem.height;
+            }
+
             if (elem.opacity != 1 && elem.fadeIn == false) {
                 args.push({
                     property: "opacity",
@@ -941,6 +952,13 @@ module CZ {
         export function merge(src, dest, noAnimation? = false, callback? = () => { }) {
             if (src && dest) {
                 try {
+                    viewportSyncRequired = true;
+                    // resetting viewport offset
+                    visibleForce = 0;
+                    // saving initial viewport
+                    startVisible = CZ.Common.vc.virtualCanvas("getViewport").visible;
+                    startViewport = CZ.Common.vc.virtualCanvas("visibleToViewBox", startVisible);
+
                     if (dest.id === "__root__") {
                         src.AspectRatio = 10;
                         var t = generateLayout(src, dest);
@@ -964,6 +982,9 @@ module CZ {
                         mergeTimelines(src, dest);
                         dest.newHeight += dest.delta;
                         animateElement(dest, noAnimation, callback);
+
+                        // "global" merge animation start
+                        animationStartTime = (new Date()).getTime();
                         CZ.Common.vc.virtualCanvas("requestInvalidate");
                     }
                 } catch (error) {
@@ -972,5 +993,23 @@ module CZ {
             }
         }
 
+        /*
+        * synchronizes viewport and canvas visible area that was viewed by user before merge animation start
+        */
+        export function syncViewport() {
+            // TODO: stop viewport synchronization in case if animation was interrupted by user
+            if (viewportSyncRequired === false) {
+                return;
+            }
+
+            var newVisible = new CZ.Viewport.VisibleRegion2d(startVisible.centerX,
+                startVisible.centerY,
+                startVisible.scale);
+            // calculate animation time: 0 <= t <= 1
+            var t = Math.min(1, ((new Date()).getTime() - animationStartTime) / CZ.Settings.canvasElementAnimationTime);
+
+            newVisible.centerY = startVisible.centerY + t * visibleForce;
+            CZ.Common.controller.moveToVisible(newVisible, true);
+        }
     }
 }

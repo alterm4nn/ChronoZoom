@@ -2,6 +2,11 @@ var CZ;
 (function (CZ) {
     (function (Layout) {
         Layout.animatingElements = [];
+        Layout.visibleForce = 0;
+        Layout.animationStartTime;
+        Layout.viewportSyncRequired = false;
+        Layout.startViewport;
+        Layout.startVisible;
         function Timeline(title, left, right, childTimelines, exhibits) {
             this.Title = title;
             this.left = left;
@@ -547,6 +552,9 @@ var CZ;
                     targetValue: elem.newHeight
                 });
             }
+            if(!(elem.x + elem.width < Layout.startViewport.Left || elem.x > Layout.startViewport.Right) && elem.y + elem.height < Layout.startViewport.Top) {
+                Layout.visibleForce += elem.newHeight - elem.height;
+            }
             if(elem.opacity != 1 && elem.fadeIn == false) {
                 args.push({
                     property: "opacity",
@@ -756,6 +764,10 @@ var CZ;
             }; }
             if(src && dest) {
                 try  {
+                    Layout.viewportSyncRequired = true;
+                    Layout.visibleForce = 0;
+                    Layout.startVisible = CZ.Common.vc.virtualCanvas("getViewport").visible;
+                    Layout.startViewport = CZ.Common.vc.virtualCanvas("visibleToViewBox", Layout.startVisible);
                     if(dest.id === "__root__") {
                         src.AspectRatio = 10;
                         var t = generateLayout(src, dest);
@@ -777,6 +789,7 @@ var CZ;
                         mergeTimelines(src, dest);
                         dest.newHeight += dest.delta;
                         animateElement(dest, noAnimation, callback);
+                        Layout.animationStartTime = (new Date()).getTime();
                         CZ.Common.vc.virtualCanvas("requestInvalidate");
                     }
                 } catch (error) {
@@ -785,6 +798,16 @@ var CZ;
             }
         }
         Layout.merge = merge;
+        function syncViewport() {
+            if(Layout.viewportSyncRequired === false) {
+                return;
+            }
+            var newVisible = new CZ.Viewport.VisibleRegion2d(Layout.startVisible.centerX, Layout.startVisible.centerY, Layout.startVisible.scale);
+            var t = Math.min(1, ((new Date()).getTime() - Layout.animationStartTime) / CZ.Settings.canvasElementAnimationTime);
+            newVisible.centerY = Layout.startVisible.centerY + t * Layout.visibleForce;
+            CZ.Common.controller.moveToVisible(newVisible, true);
+        }
+        Layout.syncViewport = syncViewport;
     })(CZ.Layout || (CZ.Layout = {}));
     var Layout = CZ.Layout;
 })(CZ || (CZ = {}));
