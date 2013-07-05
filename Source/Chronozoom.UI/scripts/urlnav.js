@@ -11,22 +11,6 @@ var CZ;
                 }
                 vcElem = vcElem.parent;
             }
-            if(nav && nav !== '' && vp) {
-                var rx = (vp.visible.centerX - (el.x + el.width / 2)) / el.width;
-                var ry = (vp.visible.centerY - (el.y + el.height / 2)) / el.height;
-                var rw = vp.widthScreenToVirtual(vp.width) / el.width;
-                var rh = vp.heightScreenToVirtual(vp.height) / el.height;
-                var URL = getURL();
-                nav += '@x=' + rx + "&y=" + ry + "&w=" + rw + "&h=" + rh;
-                if(typeof URL.hash.params != 'undefined') {
-                    if(typeof URL.hash.params['tour'] != 'undefined') {
-                        nav += "&tour=" + URL.hash.params["tour"];
-                    }
-                    if(typeof URL.hash.params['bookmark'] != 'undefined') {
-                        nav += "&bookmark=" + URL.hash.params["bookmark"];
-                    }
-                }
-            }
             return nav;
         }
         UrlNav.vcelementToNavString = vcelementToNavString;
@@ -153,14 +137,14 @@ var CZ;
                 if(result[4] != "") {
                     url.path = result[4].split("/");
                     if(url.path.length >= 1 && url.path[0].length > 0 && url.path[0] !== "cz.html") {
-                        url.superCollectionName = url.path[0];
+                        url.superCollectionName = decodeURIComponent(url.path[0]);
                         url.collectionName = url.superCollectionName;
                     }
                     if(url.path.length >= 2 && url.path[1].length > 0) {
-                        url.collectionName = url.path[1];
+                        url.collectionName = decodeURIComponent(url.path[1]);
                     }
                     if(url.path.length >= 3 && url.path[url.path.length - 1].length > 0) {
-                        url.content = url.path[url.path.length - 1];
+                        url.content = decodeURIComponent(url.path[url.path.length - 1]);
                     }
                 }
                 if(result[5] != "") {
@@ -215,7 +199,9 @@ var CZ;
             for(var key in url.hash.params) {
                 hash_params.push(key + "=" + url.hash.params[key]);
             }
-            hash += ("@" + hash_params.join("&"));
+            if(hash_params.length > 0) {
+                hash += ("@" + hash_params.join("&"));
+            }
             var loc = path + "#" + hash;
             if(reload == true) {
                 window.location.href = loc;

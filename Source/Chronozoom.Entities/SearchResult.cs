@@ -49,5 +49,30 @@ namespace Chronozoom.Entities
         /// </summary>
         [DataMember(Name = "objectType")]
         public ObjectType ObjectType { get; set; }
+
+        /// <summary>
+        /// Id of the timeline enclosing the search result.
+        /// </summary>
+        /// <remarks>
+        /// If the search result is a timeline then 
+        /// the enclosing timeline is same as the searched timeline.
+        /// Else If seach result is an exhibit or a content item then 
+        /// the enclosing timeline is a timeline containing the 
+        /// searched exhibit or content item.
+        /// </remarks>
+        [DataMember(Name = "enclosingTimelineId")]
+        public Guid EnclosingTimelineId { get; set; }
+
+        /// <summary>
+        /// Start time of the timeline enclosing the search result.
+        /// </summary>
+        [DataMember(Name = "enclosingTimelineStart")]
+        public decimal EnclosingTimelineStart { get; set; }
+
+        /// <summary>
+        /// End time of the timeline enclosing the search result.
+        /// </summary>
+        [DataMember(Name = "enclosingTimelineEnd")]
+        public decimal EnclosingTimelineEnd { get; set; }
     }
 }
