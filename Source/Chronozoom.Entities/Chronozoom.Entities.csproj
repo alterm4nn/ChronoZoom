@@ -128,6 +128,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="SQL\Minimum.sql" />
     <Content Include="SQL\TimelineSubtreeQuery.sql" />
   </ItemGroup>
   <ItemGroup />

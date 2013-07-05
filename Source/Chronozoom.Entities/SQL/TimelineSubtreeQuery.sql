@@ -8,6 +8,7 @@ CREATE PROCEDURE TimelineSubtreeQuery
 	@path_from_root BIT
 AS
 BEGIN
+	DECLARE @next_year decimal
 	DECLARE @cid UNIQUEIDENTIFIER -- current timeline id
 	DECLARE @pid UNIQUEIDENTIFIER -- parent  timeline id
 	DECLARE @path TABLE (Id UNIQUEIDENTIFIER, Depth INT) -- path from root to lca
@@ -28,6 +29,9 @@ BEGIN
 	DECLARE @lca_end_time DECIMAL
 	DECLARE @quit BIT
 	DECLARE @temp INT
+
+	SET @next_year = year(getdate());
+
 	-- validate the supplied procedure parameters
 	IF NOT(EXISTS(SELECT Id FROM Timelines WHERE Id = @lca_id AND Collection_Id = @collection_id)) RETURN
 	SELECT @lca_start_time = FromYear, @lca_end_time = ToYear FROM Timelines WHERE Id = @lca_id AND Collection_Id = @collection_id
@@ -96,7 +100,7 @@ BEGIN
 						SELECT Id FROM Timelines
 							WHERE Timeline_ID = @current_id 
 							AND Collection_Id = @collection_id 
-							AND ToYear - FromYear >= @min_span
+							AND dbo.Minimum(ToYear, @next_year) - FromYear >= @min_span
 							AND NOT(FromYear < @start_time AND ToYear < @start_time
 									OR FromYear > @end_time AND ToYear > @end_time)
 
@@ -105,7 +109,7 @@ BEGIN
 						SELECT Id FROM Timelines 
 						WHERE Timeline_ID = @current_id 
 							AND Collection_Id = @collection_id 
-							AND NOT(ToYear - FromYear >= @min_span
+							AND NOT(dbo.Minimum(ToYear, @next_year) - FromYear >= @min_span
 							AND NOT(FromYear < @start_time AND ToYear < @start_time
 									OR FromYear > @end_time AND ToYear > @end_time))
 					

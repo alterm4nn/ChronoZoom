@@ -7,12 +7,14 @@ namespace Chronozoom.Entities
     {
         public override void Up()
         {
+            this.Sql(Properties.Resources.Minimum);
             this.Sql(Properties.Resources.TimelineSubtreeQuery);
         }
         
         public override void Down()
         {
             this.Sql("DROP PROCEDURE TimelineSubtreeQuery");
+            this.Sql("DROP FUNCTION Minimum");
         }
     }
 }
