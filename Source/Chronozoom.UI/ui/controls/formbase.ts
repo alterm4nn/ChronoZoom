@@ -9,6 +9,7 @@ module CZ {
             navButton: string;
             closeButton: string;
             titleTextblock: string;
+            contentContainer?: string;
         }
 
         export class FormBase {
@@ -17,6 +18,7 @@ module CZ {
             public navButton: JQuery;
             public closeButton: JQuery;
             public titleTextblock: JQuery;
+            public contentContainer: JQuery;
 
             public container: JQuery;
             public prevForm: FormBase;
@@ -32,6 +34,7 @@ module CZ {
                 this.navButton = this.container.find(formInfo.navButton);
                 this.closeButton = this.container.find(formInfo.closeButton);
                 this.titleTextblock = this.container.find(formInfo.titleTextblock);
+                this.contentContainer = this.container.find(formInfo.contentContainer);
 
                 this.container.data("form", this);
 

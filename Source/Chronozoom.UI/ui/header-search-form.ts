@@ -123,6 +123,7 @@ module CZ {
                 };
 
                 this.searchResults.forEach(item => {
+                    var form = this;
                     var resultType = resultTypes[item.objectType];
                     var resultId = idPrefixes[resultType] + item.id;
                     var resultTitle = item.title;
@@ -135,6 +136,7 @@ module CZ {
                         click: function () {
                             var self = $(this);
                             CZ.Search.goToSearchResult(self.attr("result-id"), self.attr("result-type"));
+                            form.close();
                         }
                     }));
                 });

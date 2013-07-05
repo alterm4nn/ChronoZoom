@@ -57,9 +57,10 @@ namespace Chronozoom.Entities.Migration
         public void Migrate()
         {
             MigrateRiTree();
-            LoadDataFromDump("Beta Content", "beta-get.json", "beta-gettours.json", false, _baseContentAdmin.Value);
-            LoadDataFromDump("Sandbox", "beta-get.json", "beta-gettours.json", true, null);
-            LoadDataFromDump("AIDS Timeline", "aidstimeline-get.json", "aidstimeline-gettours.json", false, _baseContentAdmin.Value);
+            LoadDataFromDump("Beta Content", "Beta Content", "beta-get.json", "beta-gettours.json", false, _baseContentAdmin.Value);
+            LoadDataFromDump("Sandbox", "Sandbox", "beta-get.json", null, true, null);
+            LoadDataFromDump("Sandbox", "Extensions", "extensions-get.json", null, true, null);
+            LoadDataFromDump("AIDS Timeline", "AIDS Timeline", "aidstimeline-get.json", "aidstimeline-gettours.json", false, _baseContentAdmin.Value);
        }
 
         private void MigrateRiTree()
@@ -85,12 +86,21 @@ namespace Chronozoom.Entities.Migration
             }
         }
 
-        private void LoadDataFromDump(string superCollectionName, string getFileName, string getToursFileName, bool replaceGuids, string contentAdminId)
+        private void LoadDataFromDump(string superCollectionName, string collectionName, string getFileName, string getToursFileName, bool replaceGuids, string contentAdminId)
         {
-            if (_storage.SuperCollections.Find(CollectionIdFromText(superCollectionName)) == null)
+            SuperCollection superCollection = _storage.SuperCollections.Find(CollectionIdFromText(superCollectionName));
+            bool createCollection = true;
+
+            if (superCollection != null)
+            {
+                _storage.Entry(superCollection).Collection(_ => _.Collections).Load();
+                createCollection = !superCollection.Collections.Any(candidate => candidate.Title == collectionName);
+            }
+
+            if (superCollection == null || createCollection)
             {
                 // Load the Beta Content collection
-                Collection collection = LoadCollections(superCollectionName, superCollectionName, contentAdminId);
+                Collection collection = LoadCollections(superCollectionName, collectionName, contentAdminId);
                 using (Stream getData = File.OpenRead(_baseDirectory.Value + @"Dumps\" + getFileName))
                 using (Stream getToursData = getToursFileName == null ? null : File.OpenRead(_baseDirectory.Value + @"Dumps\" + getToursFileName))
                 {
@@ -128,14 +138,23 @@ namespace Chronozoom.Entities.Migration
             collection.User = user;
 
             // Load SuperCollection
-            SuperCollection superCollection = new SuperCollection();
-            superCollection.Title = superCollectionName;
-            superCollection.Id = CollectionIdFromText(superCollectionName);
-            superCollection.User = user;
+            SuperCollection superCollection = _storage.SuperCollections.FirstOrDefault(candidate => candidate.Title == superCollectionName);
 
-            superCollection.Collections = new System.Collections.ObjectModel.Collection<Collection>();
+            if (superCollection == null)
+            {
+                superCollection = new SuperCollection();
+                superCollection.Title = superCollectionName;
+                superCollection.Id = CollectionIdFromText(superCollectionName);
+                superCollection.User = user;
+                _storage.SuperCollections.Add(superCollection);
+            }
+
+            if (superCollection.Collections == null)
+            {
+                superCollection.Collections = new System.Collections.ObjectModel.Collection<Collection>();
+            }
+
             superCollection.Collections.Add(collection);
-            _storage.SuperCollections.Add(superCollection);
 
             return collection;
         }
