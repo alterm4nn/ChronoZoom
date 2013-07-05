@@ -541,7 +541,8 @@ module CZ {
 
                     // update parameters of animating elements and require new frame if needed
                     if (CZ.Layout.animatingElements.length != 0) {
-                        CZ.Layout.syncViewport();
+                        // TODO: temporary disabled
+                        //CZ.Layout.syncViewport();
                        
                         for (var i = 0; i < CZ.Layout.animatingElements.length; i++) {
                             var el = CZ.Layout.animatingElements[i];
