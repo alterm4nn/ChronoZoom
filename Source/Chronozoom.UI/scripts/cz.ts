@@ -20,6 +20,7 @@
 /// <reference path='../ui/timeseries-data-form.ts'/>
 /// <reference path='../ui/tourslist-form.ts'/>
 /// <reference path='../ui/message-window.ts'/>
+/// <reference path='../ui/header-session-expired-form.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
 /// <reference path='extensions/extensions.ts'/>
 
@@ -29,6 +30,7 @@ module CZ {
     export var timeSeriesChart: CZ.UI.LineChart;
     export var leftDataSet: CZ.Data.DataSet;
     export var rightDataSet: CZ.Data.DataSet;
+
 
     export module HomePageViewModel {
         // Contains mapping: CSS selector -> html file.
@@ -47,7 +49,8 @@ module CZ {
             "#timeSeriesContainer": "/ui/timeseries-graph-form.html", //11
             "#timeSeriesDataForm": "/ui/timeseries-data-form.html", //12
             "#message-window": "/ui/message-window.html", // 13
-            "#header-search-form": "/ui/header-search-form.html" // 14
+            "#header-search-form": "/ui/header-search-form.html", // 14
+            "#header-session-expired-form": "/ui/header-session-expired-form.html" // 15
         };
 
         export enum FeatureActivation {
@@ -65,6 +68,8 @@ module CZ {
             IsEnabled: bool;
             HasBeenActivated: bool;
         }
+
+        export var sessionForm: CZ.UI.FormHeaderSessionExpired;
 
         // Basic Flight-Control (Tracks the features that are enabled)
         //
@@ -134,7 +139,7 @@ module CZ {
             if (CZ.Service.superCollectionName && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
                 return true;
             }
-            
+
             if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName || profile.DisplayName.toLowerCase() !== CZ.Service.superCollectionName.toLowerCase()) {
                 return false
             }
@@ -411,6 +416,25 @@ module CZ {
                 if (canvasIsEmpty) {
                     CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
                 }
+
+
+                sessionForm = new CZ.UI.FormHeaderSessionExpired(forms[15], {
+                    activationSource: $("#header-session-expired-form"),
+                    navButton: ".cz-form-nav",
+                    closeButton: ".cz-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-form-title",
+                    titleInput: ".cz-form-item-title",
+                    context: "",
+                    sessionTimeSpan: "#session-time",
+                    sessionButton: "#session-button"
+                });
+
+                CZ.Service.getProfile().done(data => {
+                    //Authorized
+                    if (data != "") {
+                        CZ.Authoring.timer = setTimeout(() => { CZ.Authoring.showSessionForm(); }, (CZ.Settings.sessionTime - 60) * 1000);
+                    }
+                }).fail((error) => {  });
 
                 var profileForm = new CZ.UI.FormEditProfile(forms[5], {
                     activationSource: $("#login-panel"),

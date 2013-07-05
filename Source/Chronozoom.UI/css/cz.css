@@ -1,5 +1,4 @@
-/* The height of the page header */
-.cz-timescale {
+﻿.cz-timescale {
   padding-bottom: 0px;
   font-size: large;
   font-weight: 500;
@@ -592,7 +591,7 @@ a:visited {
   vertical-align: middle;
   font-size: 19px;
   cursor: default;
-  filter: progid:dximagetransform.microsoft.gradient(StartColorStr='#FDFDFD', EndColorStr='#424242', GradientType=1);
+  filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#FDFDFD', EndColorStr='#424242', GradientType=1);
   /* MSIE */
 
 }
@@ -1344,7 +1343,7 @@ img.fallbackBackground {
   padding: 0 5px;
   /* IE9 */
 
-  filter: progid:dximagetransform.microsoft.gradient(StartColorStr='#1B6AAB', EndColorStr='#0E4073', GradientType=0);
+  filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#1B6AAB', EndColorStr='#0E4073', GradientType=0);
   /* IE10 Consumer Preview */
 
   background-image: -ms-linear-gradient(bottom, #0e4073 0%, #1b6aab 100%);
@@ -1607,6 +1606,22 @@ img.fallbackBackground {
 }
 .cz-preloaded-timeseries :hover {
   color: #58B7F9;
+}
+/* Session expired */
+.cz-session-expired {
+  height: 140px;
+  width: 330px;
+}
+.cz-session-expired > .cz-form-content {
+  width: 300px;
+}
+.cz-session-expired a:link {
+  color: #465c71;
+  text-decoration: none;
+}
+.cz-session-expired a:visited {
+  color: #465c71;
+  text-decoration: none;
 }
 /* Search Form */
 .cz-header-search-form {
