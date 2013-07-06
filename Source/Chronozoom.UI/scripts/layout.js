@@ -552,7 +552,7 @@ var CZ;
                     targetValue: elem.newHeight
                 });
             }
-            if(!(elem.x + elem.width < Layout.startViewport.Left || elem.x > Layout.startViewport.Right) && elem.y + elem.height < Layout.startViewport.Top) {
+            if(Layout.startViewport.Left && !(elem.x + elem.width < Layout.startViewport.Left || elem.x > Layout.startViewport.Right) && elem.y + elem.height < Layout.startViewport.Top) {
                 Layout.visibleForce += elem.newHeight - elem.height;
             }
             if(elem.opacity != 1 && elem.fadeIn == false) {
@@ -790,6 +790,11 @@ var CZ;
                         dest.newHeight += dest.delta;
                         animateElement(dest, noAnimation, callback);
                         Layout.animationStartTime = (new Date()).getTime();
+                        setTimeout(function () {
+                            var newVisible = new CZ.Viewport.VisibleRegion2d(Layout.startVisible.centerX, Layout.startVisible.centerY, Layout.startVisible.scale);
+                            newVisible.centerY += Layout.visibleForce;
+                            CZ.Common.setVisible(newVisible);
+                        }, CZ.Settings.canvasElementAnimationTime);
                         CZ.Common.vc.virtualCanvas("requestInvalidate");
                     }
                 } catch (error) {

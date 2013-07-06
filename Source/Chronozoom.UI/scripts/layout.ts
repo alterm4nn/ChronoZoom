@@ -676,7 +676,7 @@ module CZ {
 
             // calculating viewport offset: sum vertical offsets of every element that is above (in virtual coordinates)
             // initial viewport and horizontally intersects with initial viewport (vertical coordinates are ignored)
-            if (!(elem.x + elem.width < startViewport.Left || elem.x > startViewport.Right) && elem.y + elem.height < startViewport.Top) {
+            if (startViewport.Left && !(elem.x + elem.width < startViewport.Left || elem.x > startViewport.Right) && elem.y + elem.height < startViewport.Top) {
                 visibleForce += elem.newHeight - elem.height;
             }
 
@@ -985,6 +985,14 @@ module CZ {
 
                         // "global" merge animation start
                         animationStartTime = (new Date()).getTime();
+                        // TODO: temporary fix of page crash bug
+                        setTimeout(function () {
+                            var newVisible = new CZ.Viewport.VisibleRegion2d(startVisible.centerX,
+                              startVisible.centerY,
+                              startVisible.scale);
+                            newVisible.centerY += visibleForce;
+                            CZ.Common.setVisible(newVisible);
+                        }, CZ.Settings.canvasElementAnimationTime);
                         CZ.Common.vc.virtualCanvas("requestInvalidate");
                     }
                 } catch (error) {
