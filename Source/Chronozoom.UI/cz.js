@@ -952,6 +952,7 @@ var CZ;
             }
             element.children = [];
         }
+        VCContent.clear = clear;
         ;
         function getChild(element, id) {
             var n = element.children.length;
@@ -6799,7 +6800,7 @@ var CZ;
                     var t = generateLayout(src, dest);
                     var margin = Math.min(t.width, t.newHeight) * CZ.Settings.timelineHeaderMargin;
                     dest.delta = Math.max(0, t.newHeight - dest.newHeight);
-                    dest.children.splice(0);
+                    CZ.VCContent.clear(dest);
                     for(var i = 0; i < t.children.length; i++) {
                         dest.children.push(t.children[i]);
                         t.children[i].parent = dest;
@@ -6846,6 +6847,11 @@ var CZ;
                         dest.newHeight += dest.delta;
                         animateElement(dest, noAnimation, callback);
                         Layout.animationStartTime = (new Date()).getTime();
+                        setTimeout(function () {
+                            var newVisible = new CZ.Viewport.VisibleRegion2d(Layout.startVisible.centerX, Layout.startVisible.centerY, Layout.startVisible.scale);
+                            newVisible.centerY += Layout.visibleForce;
+                            CZ.Common.setVisible(newVisible);
+                        }, CZ.Settings.canvasElementAnimationTime);
                         CZ.Common.vc.virtualCanvas("requestInvalidate");
                     }
                 } catch (error) {
@@ -8694,7 +8700,6 @@ var CZ;
                 requestInvalidate: function () {
                     this.requestNewFrame = false;
                     if(CZ.Layout.animatingElements.length != 0) {
-                        CZ.Layout.syncViewport();
                         for(var i = 0; i < CZ.Layout.animatingElements.length; i++) {
                             var el = CZ.Layout.animatingElements[i];
                             if(!el) {

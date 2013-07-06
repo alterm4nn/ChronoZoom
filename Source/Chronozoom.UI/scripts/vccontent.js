@@ -209,6 +209,7 @@ var CZ;
             }
             element.children = [];
         }
+        VCContent.clear = clear;
         ;
         function getChild(element, id) {
             var n = element.children.length;

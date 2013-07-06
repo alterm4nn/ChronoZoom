@@ -743,7 +743,7 @@ var CZ;
                     var t = generateLayout(src, dest);
                     var margin = Math.min(t.width, t.newHeight) * CZ.Settings.timelineHeaderMargin;
                     dest.delta = Math.max(0, t.newHeight - dest.newHeight);
-                    dest.children.splice(0);
+                    CZ.VCContent.clear(dest);
                     for(var i = 0; i < t.children.length; i++) {
                         dest.children.push(t.children[i]);
                         t.children[i].parent = dest;

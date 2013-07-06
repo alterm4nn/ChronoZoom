@@ -932,7 +932,7 @@ module CZ {
                     dest.delta = Math.max(0, t.newHeight - dest.newHeight); // timelines can only grow, never shrink
 
                     // replace dest.children (timelines, infodots, titleObject) with matching t.children
-                    dest.children.splice(0);
+                    CZ.VCContent.clear(dest);
                     for (var i = 0; i < t.children.length; i++) {
                         dest.children.push(t.children[i]);
                         t.children[i].parent = dest;

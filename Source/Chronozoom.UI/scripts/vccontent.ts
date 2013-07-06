@@ -356,7 +356,7 @@ module CZ {
         @remarks    The method must be called within the BeginEdit/EndEdit of the root item.
         For each descendant element that has onRemove() method, the method is called right after its removing and clearing of all its children (recursively).
         */
-        function clear(element) {
+        export function clear(element) {
             var n = element.children.length;
             for (var i = 0; i < n; i++) {
                 var child = element.children[i];
