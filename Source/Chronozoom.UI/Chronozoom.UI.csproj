@@ -293,6 +293,7 @@
     <Content Include="scripts\external\csvToArray.v2.1.js" />
     <Content Include="scripts\external\jquery-1.7.2.min.js" />
     <Content Include="scripts\external\jquery-ui.js" />
+    <Content Include="scripts\external\jquery.mousewheel.js" />
     <Content Include="ui\auth-edit-tour-form.html" />
     <Content Include="ui\auth-edit-tour-form.js">
       <DependentUpon>auth-edit-tour-form.ts</DependentUpon>
@@ -327,7 +328,6 @@
     <Content Include="scripts\external\flash_detect.js" />
     <Content Include="scripts\external\jquery.cookie.js" />
     <Content Include="scripts\external\jquery.signalR-1.0.0-rc2.js" />
-    <Content Include="scripts\external\mouseWheelPlugin.js" />
     <Content Include="scripts\external\rx.jQuery.js" />
     <Content Include="scripts\external\rx.js" />
     <Content Include="scripts\gestures.ts" />

@@ -72,11 +72,11 @@ module CZ {
         //Subject that converts input mouse events into Zoom gestures 
         function createZoomSubject(vc) {
 
-            vc.mousewheel(function (objEvent, intDelta) {
-                var event = (<any>$).Event("xbrowserwheel");
-                event.delta = intDelta;
-                event.origin = CZ.Common.getXBrowserMouseOrigin(vc, objEvent)
-                vc.trigger(event);
+            vc.mousewheel(function (event, delta, deltaX, deltaY) {
+                var xevent = (<any>$).Event("xbrowserwheel");
+                xevent.delta = delta;
+                xevent.origin = CZ.Common.getXBrowserMouseOrigin(vc, event)
+                vc.trigger(xevent);
             });
 
             var mouseWheel = vc.toObservable("xbrowserwheel");
