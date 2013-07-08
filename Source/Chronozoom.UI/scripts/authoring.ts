@@ -794,7 +794,7 @@ module CZ {
         * Opens "session ends" form
         */
         export function showSessionForm() {
-            //CZ.HomePageViewModel.sessionForm.show();
+            CZ.HomePageViewModel.sessionForm.show();
         }
 
         /**
@@ -803,7 +803,7 @@ module CZ {
         export function resetSessionTimer() {
             if (CZ.Authoring.timer != null) {
                 clearTimeout(CZ.Authoring.timer);
-                //CZ.Authoring.timer = setTimeout(() => { showSessionForm() }, (CZ.Settings.sessionTime - 60) * 1000);
+                CZ.Authoring.timer = setTimeout(() => { showSessionForm() }, (CZ.Settings.sessionTime - 60) * 1000);
             }
         }
     }

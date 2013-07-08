@@ -169,7 +169,7 @@
         Settings.signinUrlMicrosoft = "";
         Settings.signinUrlGoogle = "";
         Settings.signinUrlYahoo = "";
-        Settings.sessionTime = 70;
+        Settings.sessionTime = 3600;
         Settings.guidEmpty = "00000000-0000-0000-0000-000000000000";
         Settings.ie = ((function () {
             var v = 3, div = document.createElement('div'), a = div.all || [];
@@ -4389,11 +4389,15 @@ var CZ;
         }
         Authoring.validateContentItems = validateContentItems;
         function showSessionForm() {
+            CZ.HomePageViewModel.sessionForm.show();
         }
         Authoring.showSessionForm = showSessionForm;
         function resetSessionTimer() {
             if(CZ.Authoring.timer != null) {
                 clearTimeout(CZ.Authoring.timer);
+                CZ.Authoring.timer = setTimeout(function () {
+                    showSessionForm();
+                }, (CZ.Settings.sessionTime - 60) * 1000);
             }
         }
         Authoring.resetSessionTimer = resetSessionTimer;
@@ -11486,9 +11490,6 @@ var CZ;
             };
             FormHeaderSessionExpired.prototype.show = function () {
                 var _this = this;
-                this.timer = setTimeout(function () {
-                    _this.onTimer();
-                }, 1000);
                 _super.prototype.show.call(this, {
                     effect: "slide",
                     direction: "left",
@@ -11496,6 +11497,9 @@ var CZ;
                     complete: function () {
                     }
                 });
+                this.timer = setTimeout(function () {
+                    _this.onTimer();
+                }, 1000);
                 this.activationSource.addClass("active");
             };
             FormHeaderSessionExpired.prototype.close = function () {
