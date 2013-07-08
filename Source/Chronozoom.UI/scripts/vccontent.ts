@@ -321,10 +321,13 @@ module CZ {
             for (var i = 0; i < n; i++) {
                 var child = parent.children[i];
                 if (child.id == id) {
-                    // remove element from hash map of animating elements in dynamic layout animation
-                    if (typeof CZ.Layout.animatingElements[child.id] !== 'undefined') {
-                        delete CZ.Layout.animatingElements[child.id];
-                        CZ.Layout.animatingElements.length--;
+                    // remove element from array of animating elements in dynamic layout animation
+                    var matches = CZ.Layout.animatingElements.filter((el) => {
+                        return el.id === child.id &&
+                            (el.animation && child.animation) ? el.animation.startTime === child.animation.startTime : false;
+                    });
+                    for (var k = 0; k < matches.length; k++) {
+                        CZ.Layout.animatingElements.splice(CZ.Layout.animatingElements.indexOf(matches[k]), 1);
                     }
 
                     parent.children.splice(i, 1);
@@ -353,15 +356,18 @@ module CZ {
         @remarks    The method must be called within the BeginEdit/EndEdit of the root item.
         For each descendant element that has onRemove() method, the method is called right after its removing and clearing of all its children (recursively).
         */
-        function clear(element) {
+        export function clear(element) {
             var n = element.children.length;
             for (var i = 0; i < n; i++) {
                 var child = element.children[i];
 
-                // remove element from hash map of animating elements in dynamic layout animation
-                if (typeof CZ.Layout.animatingElements[child.id] !== 'undefined') {
-                    delete CZ.Layout.animatingElements[child.id];
-                    CZ.Layout.animatingElements.length--;
+                // remove element from array of animating elements in dynamic layout animation
+                var matches = CZ.Layout.animatingElements.filter((el) => {
+                    return el.id === child.id &&
+                        (el.animation && child.animation) ? el.animation.startTime === child.animation.startTime : false;
+                });
+                for (var k = 0; k < matches.length; k++) {
+                    CZ.Layout.animatingElements.splice(CZ.Layout.animatingElements.indexOf(matches[k]), 1);
                 }
 
                 clear(child);

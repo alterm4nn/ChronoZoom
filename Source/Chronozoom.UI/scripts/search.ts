@@ -93,12 +93,58 @@ module CZ {
             }
         }
 
-        export function goToSearchResult(resultId, elementType?) {
-            var element = findVCElement(CZ.Common.vc.virtualCanvas("getLayerContent"), resultId, elementType);
-            var navStringElement = CZ.UrlNav.vcelementToNavString(element);
+        export function goToSearchResult(searchResult) {
+            var resultId, elementType;
+            switch (searchResult.objectType) {
+                case 0:  // exhibit
+                    resultId = 'e' + searchResult.id;
+                    elementType = "exhibit";
+                    break;
+                case 1: // timeline
+                    resultId = 't' + searchResult.id;
+                    elementType = "timeline";
+                    break;
+                case 2: // content item
+                    resultId = searchResult.id;
+                    elementType = "contentItem";
+                    break;
+            }
 
-            var visible = CZ.UrlNav.navStringToVisible(navStringElement, CZ.Common.vc);
-            CZ.Common.controller.moveToVisible(visible)
+            var element = findVCElement(CZ.Common.vc.virtualCanvas("getLayerContent"), resultId, elementType);
+            if (element) {
+                var navStringElement = CZ.UrlNav.vcelementToNavString(element);
+                var visible = CZ.UrlNav.navStringToVisible(navStringElement, CZ.Common.vc);
+                CZ.Common.controller.moveToVisible(visible)
+            } else {
+                var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                var a = Math.min(0, searchResult.enclosingTimelineStart);
+                var b = Math.min(0, searchResult.enclosingTimelineEnd);
+                var c = Math.max(0, searchResult.enclosingTimelineStart);
+                var d = Math.max(0, searchResult.enclosingTimelineEnd);
+                var scale = ((b - a) + (d - c)) / vp.width;
+
+                CZ.Common.IncreaseRequestsCount();
+                CZ.Service.getTimelines({
+                    start: searchResult.enclosingTimelineStart,
+                    end: searchResult.enclosingTimelineEnd,
+                    minspan: CZ.Settings.minTimelineWidth * scale,
+                    commonAncestor: searchResult.enclosingTimelineId,
+                    fromRoot: 1
+                }).then(function (response) {
+                    CZ.Common.DecreaseRequestsCount();
+                    var root = CZ.Common.vc.virtualCanvas("getLayerContent");
+                    CZ.Layout.merge(response, root.children[0], false, () => {
+                        // navigate to search result
+                        var element = findVCElement(CZ.Common.vc.virtualCanvas("getLayerContent"), resultId, elementType);
+                        var navStringElement = CZ.UrlNav.vcelementToNavString(element);
+                        var visible = CZ.UrlNav.navStringToVisible(navStringElement, CZ.Common.vc);
+                        CZ.Common.controller.moveToVisible(visible);
+                    });
+                }, function (error) {
+                    CZ.Common.DecreaseRequestsCount();
+                    console.log("Error connecting to service:\n" + error.responseText);
+                });
+            }
         }
 
         // Recursively finds and returns an element with given id.
@@ -182,7 +228,7 @@ module CZ {
                                 resultId: resultId,
                                 text: results[i].title,
                                 click: function () {
-                                    goToSearchResult(this.getAttribute("resultId"), this.getAttribute("data-element-type"));
+                                    goToSearchResult(item);
                                 }
                             })
                             .attr("data-element-type", elementType)

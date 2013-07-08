@@ -128,8 +128,6 @@ namespace Chronozoom.UI
 
         private static readonly TraceSource Trace = new TraceSource("Service", SourceLevels.All) { Listeners = { Global.SignalRTraceListener } };
         private static MD5 _md5Hasher = MD5.Create();
-        private const decimal _minYear = -13700000000;
-        private const decimal _maxYear = 9999;
         private const int _defaultDepth = 30;
         private const string _defaultUserCollectionName = "default";
         private const string _defaultUserName = "anonymous";
@@ -195,6 +193,7 @@ namespace Chronozoom.UI
         private const int MaxSearchLimit = 50;
 
         // Is default progressive load enabled?
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         private static Lazy<bool> _progressiveLoadEnabled = new Lazy<bool>(() =>
         {
             string progressiveLoadEnabled = ConfigurationManager.AppSettings["ProgressiveLoadEnabled"];
@@ -254,7 +253,7 @@ namespace Chronozoom.UI
         /// Documentation under IChronozoomSVC
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "minspan")]
-        public Timeline GetTimelines(string superCollection, string collection, string start, string end, string minspan, string commonAncestor, string maxElements, string depth)
+        public Timeline GetTimelines(string superCollection, string collection, string start, string end, string minspan, string commonAncestor, string maxElements, string fromRoot)
         {
             return ApiOperation(delegate(User user, Storage storage)
             {
@@ -265,7 +264,7 @@ namespace Chronozoom.UI
                 // If available, retrieve from cache.
                 if (CanCacheGetTimelines(storage, user, collectionId))
                 {
-                    Timeline cachedTimeline = GetCachedGetTimelines(collectionId, start, end, minspan, commonAncestor, maxElements, depth);
+                    Timeline cachedTimeline = GetCachedGetTimelines(collectionId, start, end, minspan, commonAncestor, maxElements, fromRoot);
                     if (cachedTimeline != null)
                     {
                         return cachedTimeline;
@@ -273,37 +272,26 @@ namespace Chronozoom.UI
                 }
 
                 // initialize filters
-                decimal startTime = string.IsNullOrWhiteSpace(start) ? _minYear : decimal.Parse(start, CultureInfo.InvariantCulture);
-                decimal endTime = string.IsNullOrWhiteSpace(end) ? _maxYear : decimal.Parse(end, CultureInfo.InvariantCulture);
-                decimal span = string.IsNullOrWhiteSpace(minspan) ? 0 : decimal.Parse(minspan, CultureInfo.InvariantCulture);
-                Guid lcaParsed = string.IsNullOrWhiteSpace(commonAncestor) ? Guid.Empty : Guid.Parse(commonAncestor);
+                Timeline rootTimeline = storage.GetRootTimelines(collectionId);
+                decimal startTime = string.IsNullOrWhiteSpace(start) ? rootTimeline.FromYear : decimal.Parse(start, CultureInfo.InvariantCulture);
+                decimal endTime = string.IsNullOrWhiteSpace(end) ? rootTimeline.ToYear : decimal.Parse(end, CultureInfo.InvariantCulture);
+                decimal span = string.IsNullOrWhiteSpace(minspan) ? rootTimeline.ToYear - rootTimeline.FromYear : decimal.Parse(minspan, CultureInfo.InvariantCulture);
+                Guid lcaParsed = string.IsNullOrWhiteSpace(commonAncestor) ? rootTimeline.Id : Guid.Parse(commonAncestor);
                 int maxElementsParsed = string.IsNullOrWhiteSpace(maxElements) ? _maxElements.Value : int.Parse(maxElements, CultureInfo.InvariantCulture);
-                int depthParsed = string.IsNullOrWhiteSpace(depth) ? _defaultDepth : int.Parse(depth, CultureInfo.InvariantCulture);
+                int fromRootParsed = string.IsNullOrWhiteSpace(fromRoot) ? 0 : int.Parse(fromRoot, CultureInfo.InvariantCulture);
 
-                IEnumerable<Timeline> timelines = null;
-                if (!_progressiveLoadEnabled.Value || !string.IsNullOrWhiteSpace(depth))
-                    timelines = storage.TimelinesQuery(collectionId, startTime, endTime, span, lcaParsed == Guid.Empty ? (Guid?)null : lcaParsed, maxElementsParsed, depthParsed);
+                IEnumerable<Timeline> timelines = storage.TimelineSubtreeQuery(collectionId, lcaParsed, startTime, endTime, span, maxElementsParsed, fromRootParsed);
+                if (timelines.Any())
+                {
+                    Timeline timeline = timelines.First();
+                    CacheGetTimelines(timeline, collectionId, start, end, minspan, commonAncestor, maxElements, fromRoot);
+                    return timeline;
+                }
                 else
                 {
-                    if (ShouldRetrieveAllTimelines(storage, commonAncestor, collectionId, maxElementsParsed))
-                    {
-                        timelines = storage.RetrieveAllTimelines(collectionId);
-                    }
-                    else
-                    {
-                        Trace.TraceInformation("Get Timelines - Using Progressive Load");
-                        timelines = storage.TimelineSubtreeQuery(collectionId, lcaParsed, startTime, endTime, span, maxElementsParsed);
-                    }
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TimelineNotFound);
+                    return null;
                 }
-
-                Timeline timeline = timelines.Where(candidate => candidate.Id == lcaParsed).FirstOrDefault();
-
-                if (timeline == null)
-                    timeline = timelines.FirstOrDefault();
-
-                CacheGetTimelines(timeline, collectionId, start, end, minspan, commonAncestor, maxElements, depth);
-
-                return timeline;
             });
         }
 
@@ -341,16 +329,52 @@ namespace Chronozoom.UI
                 searchTerm = searchTerm.ToUpperInvariant();
 
                 var timelines = storage.Timelines.Where(_ => _.Title.ToUpper().Contains(searchTerm) && _.Collection.Id == collectionId).Take(MaxSearchLimit).ToList();
-                var searchResults = timelines.Select(timeline => new SearchResult { Id = timeline.Id, Title = timeline.Title, ObjectType = ObjectType.Timeline }).ToList();
+                var searchResults = timelines.Select(timeline =>
+                {
+                    return new SearchResult 
+                    { 
+                        Id = timeline.Id, 
+                        Title = timeline.Title, 
+                        ObjectType = ObjectType.Timeline,
+                        EnclosingTimelineId = timeline.Id,
+                        EnclosingTimelineStart = timeline.FromYear,
+                        EnclosingTimelineEnd = timeline.ToYear
+                    };
+                }).ToList();
 
                 var exhibits = storage.Exhibits.Where(_ => _.Title.ToUpper().Contains(searchTerm) && _.Collection.Id == collectionId).Take(MaxSearchLimit).ToList();
-                searchResults.AddRange(exhibits.Select(exhibit => new SearchResult { Id = exhibit.Id, Title = exhibit.Title, ObjectType = ObjectType.Exhibit }));
+                searchResults.AddRange(exhibits.Select(exhibit => 
+                {
+                    var enclosingTimeline = storage.Timelines.Where(_ => _.Exhibits.Select(e => e.Id).Contains(exhibit.Id)).First();
+                    return new SearchResult 
+                    { 
+                        Id = exhibit.Id, 
+                        Title = exhibit.Title, 
+                        ObjectType = ObjectType.Exhibit,
+                        EnclosingTimelineId = enclosingTimeline.Id,
+                        EnclosingTimelineStart = enclosingTimeline.FromYear,
+                        EnclosingTimelineEnd = enclosingTimeline.ToYear
+                    }; 
+                }));
 
                 var contentItems = storage.ContentItems.Where(_ =>
                     (_.Title.ToUpper().Contains(searchTerm) || _.Caption.ToUpper().Contains(searchTerm))
                      && _.Collection.Id == collectionId
                     ).Take(MaxSearchLimit).ToList();
-                searchResults.AddRange(contentItems.Select(contentItem => new SearchResult { Id = contentItem.Id, Title = contentItem.Title, ObjectType = ObjectType.ContentItem }));
+                searchResults.AddRange(contentItems.Select(contentItem => 
+                {
+                    var enclosingExhibit = storage.Exhibits.Where(_ => _.ContentItems.Select(ci => ci.Id).Contains(contentItem.Id)).First();
+                    var enclosingTimeline = storage.Timelines.Where(_ => _.Exhibits.Select(e => e.Id).Contains(enclosingExhibit.Id)).First();
+                    return new SearchResult
+                    {
+                        Id = contentItem.Id,
+                        Title = contentItem.Title,
+                        ObjectType = ObjectType.ContentItem,
+                        EnclosingTimelineId = enclosingTimeline.Id,
+                        EnclosingTimelineStart = enclosingTimeline.FromYear,
+                        EnclosingTimelineEnd = enclosingTimeline.ToYear
+                    };
+                }));
 
                 Trace.TraceInformation("Search called for search term {0}", searchTerm);
                 return new BaseJsonResult<IEnumerable<SearchResult>>(searchResults);
@@ -405,6 +429,121 @@ namespace Chronozoom.UI
                     return new BaseJsonResult<IEnumerable<Tour>>((List<Tour>)Cache[toursCacheKey]);
                 }
             });
+        }
+
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1307:SpecifyStringComparison", MessageId = "System.String.LastIndexOf(System.String)"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
+        public Timeline GetTourTimelines(string superCollection, string collection, string tourId, string viewportWidth, string minTimelineSize)
+        {
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                Trace.TraceInformation("Get Tour Timelines");
+
+                Guid collectionId;
+                Guid tourid;
+                Tour tour;
+                decimal width;
+                decimal minsz;
+
+                try
+                {
+                    collectionId = CollectionIdOrDefault(storage, superCollection, collection);
+                    tourid = Guid.Parse(tourId);
+                    tour = storage.Tours.Where(candidate => candidate.Collection.Id == collectionId && candidate.Id == tourid).First();
+                    storage.Entry(tour).Collection(x => x.Bookmarks).Load();
+                    width = decimal.Parse(viewportWidth, CultureInfo.InvariantCulture);
+                    minsz = decimal.Parse(minTimelineSize, CultureInfo.InvariantCulture);
+                }
+                catch (Exception)
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.TourNotFound);
+                    return null;
+                }
+
+                if (width <= 0 || minsz <= 0)
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.TourNotFound);
+                    return null;
+                }
+
+                string id;
+                var paths = new Collection<Timeline>();
+                foreach (var bookmark in tour.Bookmarks)
+                {
+                    var url = bookmark.Url;
+                    Guid timelineId;
+                    Timeline timeline;
+                    try
+                    {
+                        id = url.Substring(url.LastIndexOf(@"/t") + 2);
+                        if (id.Contains('/'))
+                        {
+                            id = id.Substring(0, id.IndexOf('/'));
+                        }
+                        timelineId = Guid.Parse(id);
+                        timeline = storage.Timelines.Where(candidate => candidate.Id == timelineId).First();
+                    }
+                    catch (Exception)
+                    {
+                        SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.TourNotFound);
+                        return null;
+                    }
+                    
+                    var a = Math.Min(0, timeline.FromYear);
+                    var b = Math.Min(0, timeline.ToYear);
+                    var c = Math.Max(0, timeline.FromYear);
+                    var d = Math.Max(0, timeline.ToYear);
+                    var scale = minsz * (((b - a) + (d - c)) / width);
+                    paths.Add(this.GetTimelines(null, null, 
+                        timeline.FromYear.ToString(CultureInfo.InvariantCulture), 
+                        timeline.ToYear.ToString(CultureInfo.InvariantCulture), 
+                        scale.ToString(CultureInfo.InvariantCulture), 
+                        timelineId.ToString(), 
+                        _maxElements.Value.ToString(CultureInfo.InvariantCulture), 
+                        "1")
+                    );
+                }
+
+                if (paths.Count == 0)
+                {
+                    SetStatusCode(HttpStatusCode.NoContent, ErrorDescription.TourNotFound);
+                    return null;
+                }
+
+                var path = paths[0];
+                for (var i = 1; i < paths.Count; i++)
+                {
+                    if (paths[i] != null && path != null)
+                    {
+                        MergeTourTimelines(paths[i], path);
+                    }
+                }
+
+                return path;
+            });
+        }
+
+        private void MergeTourTimelines(Timeline src, Timeline dest)
+        {
+            if (src.Id == dest.Id)
+            {
+                if (dest.ChildTimelines == null)
+                {
+                    dest.ChildTimelines = src.ChildTimelines;
+                    dest.Exhibits = src.Exhibits;
+                }
+                else
+                {
+                    if (src.ChildTimelines != null)
+                        if (src.ChildTimelines.Count == dest.ChildTimelines.Count)
+                            for (var i = 0; i < src.ChildTimelines.Count; i++)
+                                MergeTourTimelines(src.ChildTimelines[i], dest.ChildTimelines[i]);
+                        else
+                            throw new InvalidOperationException("Source and Destination timelines have different number of child timeline.");
+                }
+            }
         }
 
         /// <summary>
@@ -1950,16 +2089,16 @@ namespace Chronozoom.UI
             return (string)Cache[cacheKey] != userNameIdentifier;
         }
 
-        private static string GetTimelinesCacheKey(Guid collectionId, string start, string end, string minspan, string lca, string maxElements, string depth)
+        private static string GetTimelinesCacheKey(Guid collectionId, string start, string end, string minspan, string lca, string maxElements, string fromRoot)
         {
-            return string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}|{5}|{6}", collectionId, start, end, minspan, lca, maxElements, depth);
+            return string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}|{5}|{6}", collectionId, start, end, minspan, lca, maxElements, fromRoot);
         }
 
         // Retrieves the cached timeline.
         // Null if not cached.
-        private static Timeline GetCachedGetTimelines(Guid collectionId, string start, string end, string minspan, string lca, string maxElements, string depth)
+        private static Timeline GetCachedGetTimelines(Guid collectionId, string start, string end, string minspan, string lca, string maxElements, string fromRoot)
         {
-            string cacheKey = GetTimelinesCacheKey(collectionId, start, end, minspan, lca, maxElements, depth);
+            string cacheKey = GetTimelinesCacheKey(collectionId, start, end, minspan, lca, maxElements, fromRoot);
             if (Cache.Contains(cacheKey))
             {
                 return (Timeline)Cache[cacheKey];
@@ -1969,9 +2108,9 @@ namespace Chronozoom.UI
         }
 
         // Caches the given timeline for the given GetTimelines request.
-        private static void CacheGetTimelines(Timeline timeline, Guid collectionId, string start, string end, string minspan, string lca, string maxElements, string depth)
+        private static void CacheGetTimelines(Timeline timeline, Guid collectionId, string start, string end, string minspan, string lca, string maxElements, string fromRoot)
         {
-            string cacheKey = GetTimelinesCacheKey(collectionId, start, end, minspan, lca, maxElements, depth);
+            string cacheKey = GetTimelinesCacheKey(collectionId, start, end, minspan, lca, maxElements, fromRoot);
             if (!Cache.Contains(cacheKey) && timeline != null)
             {
                 Cache.Add(cacheKey, timeline);

@@ -352,6 +352,20 @@ var CZ;
             });
         }
         Service.getTours = getTours;
+        function getTourTimelines(r) {
+            var request = new Request(_serviceUrl);
+            request.addToPath("gettourtimelines");
+            request.addParameter("supercollection", Service.superCollectionName);
+            request.addParameter("collection", Service.collectionName);
+            request.addParameters(r);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getTourTimelines = getTourTimelines;
         function getSearch(query) {
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);

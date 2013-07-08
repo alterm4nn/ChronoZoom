@@ -92,8 +92,8 @@ module CZ {
             },
             {
                 Name: "Tours",
-                Activation: FeatureActivation.Enabled,
-                JQueryReference: "#tours-index"
+                Activation: FeatureActivation.RootCollection,
+                JQueryReference: "#tours_index"
             },
             {
                 Name: "Authoring",
@@ -135,13 +135,18 @@ module CZ {
             },
         ];
 
+        export function IsFeatureEnabled(featureName: string) {
+            var feature: FeatureInfo[] = $.grep(_featureMap, function (e) { return e.Name === featureName; });
+            return feature[0].IsEnabled;
+        }
+
         export var rootCollection: bool;
 
         function UserCanEditCollection(profile) {
             if (CZ.Service.superCollectionName && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
                 return true;
             }
-
+            
             if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName || profile.DisplayName.toLowerCase() !== CZ.Service.superCollectionName.toLowerCase()) {
                 return false
             }
@@ -151,7 +156,7 @@ module CZ {
 
         function InitializeToursUI(profile, forms) {
             CZ.Tours.tourCaptionFormContainer = forms[16];
-            var allowEditing = IsFeatureEnabled(_featureMap, "TourAuthoring") && UserCanEditCollection(profile);
+            var allowEditing = IsFeatureEnabled("TourAuthoring") && UserCanEditCollection(profile);
 
             var onTakeTour = tour => {
                 //CZ.Tours.tourCaptionForm = CZ.HomePageViewModel.getFormById("#tour-caption-form");
@@ -472,10 +477,10 @@ module CZ {
                     profilePanel: "#profile-panel",
                     loginPanelLogin: "#profile-panel.auth-panel-login",
                     context: "",
-                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring"),
+                    allowRedirect: IsFeatureEnabled("Authoring"),
                     collectionTheme: CZ.Settings.theme,
                     collectionThemeInput: "#collection-theme",
-                    collectionThemeWrapper: IsFeatureEnabled(_featureMap, "Themes") ? "#collection-theme-wrapper" : null
+                    collectionThemeWrapper: IsFeatureEnabled("Themes") ? "#collection-theme-wrapper" : null
                 });
 
                 var loginForm = new CZ.UI.FormLogin(forms[6], {
@@ -499,7 +504,7 @@ module CZ {
                     }
                 });
 
-                if (IsFeatureEnabled(_featureMap, "Login")) {
+                if (IsFeatureEnabled("Login")) {
                     CZ.Service.getProfile().done(data => {
                         //Not authorized
                         if (data == "") {
@@ -606,50 +611,65 @@ module CZ {
             if (window.location.hash)
                 CZ.Common.startHash = window.location.hash; // to be processes after the data is loaded
 
-            CZ.Common.loadData().then(function (response) {
-                if (!response) {
-                    canvasIsEmpty = true;
-                    if (CZ.Authoring.showCreateTimelineForm) {
-                        CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
-                    }
+            // load collection data (based on mode)
+            CZ.Service.getProfile()
+            .done(data => {
+                CZ.Authoring.isEnabled = UserCanEditCollection(data);
+            })
+            .fail(error => {
+                CZ.Authoring.isEnabled = UserCanEditCollection(null);
+            })
+            .always(() => {
+                if (!CZ.Authoring.isEnabled) {
+                    $(".edit-icon").hide();
+                } else {
+                    $(".edit-icon").show();
                 }
-            }); //retrieving the data
 
-            CZ.Search.initializeSearch();
-            CZ.Bibliography.initializeBibliography();
-
+                CZ.Common.loadData().then(function (response) {
+                    if (!response) {
+                        canvasIsEmpty = true;
+                        if (CZ.Authoring.showCreateTimelineForm) {
+                            CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
+                        }
+                    }
+                }); //retrieving the data
+                CZ.Search.initializeSearch();
+                CZ.Bibliography.initializeBibliography();
+            });
+            
             var canvasGestures = CZ.Gestures.getGesturesStream(CZ.Common.vc); //gesture sequence of the virtual canvas
             var axisGestures = CZ.Gestures.applyAxisBehavior(CZ.Gestures.getGesturesStream(CZ.Common.ax)); //gesture sequence of axis (tranformed according to axis behavior logic)
             var timeSeriesGestures = CZ.Gestures.getPanPinGesturesStream($("#timeSeriesContainer"));
             var jointGesturesStream = canvasGestures.Merge(axisGestures.Merge(timeSeriesGestures));
 
             CZ.Common.controller = new CZ.ViewportController.ViewportController2(
-                function (visible) {
-                    var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                    var markerPos = CZ.Common.axis.MarkerPosition();
-                    var oldMarkerPosInScreen = vp.pointVirtualToScreen(markerPos, 0).x;
+                            function (visible) {
+                                var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                                var markerPos = CZ.Common.axis.MarkerPosition();
+                                var oldMarkerPosInScreen = vp.pointVirtualToScreen(markerPos, 0).x;
 
-                    CZ.Common.vc.virtualCanvas("setVisible", visible, CZ.Common.controller.activeAnimation);
-                    CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
-                    vp = CZ.Common.vc.virtualCanvas("getViewport");
-                    if (CZ.Tours.pauseTourAtAnyAnimation) { //watch for the user animation during playing of some tour bookmark
-                        CZ.Tours.tourPause();
-                        CZ.Tours.pauseTourAtAnyAnimation = false;
-                    }
+                                CZ.Common.vc.virtualCanvas("setVisible", visible, CZ.Common.controller.activeAnimation);
+                                CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
+                                vp = CZ.Common.vc.virtualCanvas("getViewport");
+                                if (CZ.Tours.pauseTourAtAnyAnimation) { //watch for the user animation during playing of some tour bookmark
+                                    CZ.Tours.tourPause();
+                                    CZ.Tours.pauseTourAtAnyAnimation = false;
+                                }
 
-                    var hoveredInfodot = CZ.Common.vc.virtualCanvas("getHoveredInfodot");
-                    var actAni = CZ.Common.controller.activeAnimation != undefined;
+                                var hoveredInfodot = CZ.Common.vc.virtualCanvas("getHoveredInfodot");
+                                var actAni = CZ.Common.controller.activeAnimation != undefined;
 
-                    if (actAni && !hoveredInfodot.id) {
-                        var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
-                        CZ.Common.updateMarker();
-                    }
+                                if (actAni && !hoveredInfodot.id) {
+                                    var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
+                                    CZ.Common.updateMarker();
+                                }
 
-                    updateTimeSeriesChart(vp);
-                },
-                function () {
-                    return CZ.Common.vc.virtualCanvas("getViewport");
-                },
+                                updateTimeSeriesChart(vp);
+                            },
+                            function () {
+                                return CZ.Common.vc.virtualCanvas("getViewport");
+                            },
                 jointGesturesStream
             );
 
@@ -660,14 +680,26 @@ module CZ {
                 hashChangeFromOutside = false;
                 if (CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.bookmark) { // go to search result
                     CZ.UrlNav.navigationAnchor = CZ.UrlNav.navStringTovcElement(CZ.Common.setNavigationStringTo.bookmark, CZ.Common.vc.virtualCanvas("getLayerContent"));
-                    window.location.hash = CZ.Common.setNavigationStringTo.bookmark;
+                    var newURL = CZ.UrlNav.getURL();
+                    newURL.hash.path = CZ.Common.setNavigationStringTo.bookmark;
+                    CZ.UrlNav.setURL(newURL);
                 }
-                else {
-                    if (CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.id == id)
-                        CZ.UrlNav.navigationAnchor = CZ.Common.setNavigationStringTo.element;
-
-                    var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                    window.location.hash = CZ.UrlNav.vcelementToNavString(CZ.UrlNav.navigationAnchor, vp);
+                else if (CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.id == id) {
+                    CZ.UrlNav.navigationAnchor = CZ.Common.setNavigationStringTo.element;
+                    var newURL = CZ.UrlNav.getURL();
+                    newURL.hash.path = CZ.UrlNav.vcelementToNavString(CZ.UrlNav.navigationAnchor, CZ.Common.vc.virtualCanvas("getViewport"));
+                    CZ.UrlNav.setURL(newURL);
+                }
+                else if (CZ.BreadCrumbs.breadCrumbs) {
+                    var newHash = "";
+                    for (var i = 0; i < CZ.BreadCrumbs.breadCrumbs.length; i++) {
+                        newHash += "/" + CZ.BreadCrumbs.breadCrumbs[i].vcElement.id;
+                    }
+                    if (newHash !== window.location.hash) {
+                        var newURL = CZ.UrlNav.getURL();
+                        newURL.hash.path = newHash;
+                        CZ.UrlNav.setURL(newURL);
+                    }
                 }
                 CZ.Common.setNavigationStringTo = null;
             });
@@ -714,26 +746,40 @@ module CZ {
 
             //Tour: notifyng tour that the bookmark is reached
             CZ.Common.controller.onAnimationComplete.push(function (id) {
-                if (CZ.Tours.tourBookmarkTransitionCompleted != undefined)
-                    CZ.Tours.tourBookmarkTransitionCompleted(id);
-                if (CZ.Tours.tour != undefined && CZ.Tours.tour.state != "finished") //enabling wathcing for user activity while playing the bookmark
-                    CZ.Tours.pauseTourAtAnyAnimation = true;
-            });
+                                    if (CZ.Tours.tourBookmarkTransitionCompleted != undefined)
+                                        CZ.Tours.tourBookmarkTransitionCompleted(id);
+                                    if (CZ.Tours.tour != undefined && CZ.Tours.tour.state != "finished") //enabling wathcing for user activity while playing the bookmark
+                                        CZ.Tours.pauseTourAtAnyAnimation = true;
+                                });
             //Tour: notifyng tour that the transition was interrupted
             CZ.Common.controller.onAnimationUpdated.push(function (oldId, newId) {
-                if (CZ.Tours.tour != undefined) {
-                    if (CZ.Tours.tourBookmarkTransitionInterrupted != undefined) { //in transition
-                        var prevState = CZ.Tours.tour.state;
-                        CZ.Tours.tourBookmarkTransitionInterrupted(oldId);
-                        var alteredState = CZ.Tours.tour.state;
+                                    if (CZ.Tours.tour != undefined) {
+                                        if (CZ.Tours.tourBookmarkTransitionInterrupted != undefined) { //in transition
+                                            var prevState = CZ.Tours.tour.state;
+                                            CZ.Tours.tourBookmarkTransitionInterrupted(oldId);
+                                            var alteredState = CZ.Tours.tour.state;
 
-                        if (prevState == "play" && alteredState == "pause") //interruption caused toue pausing. stop any animations, updating UI as well
-                            CZ.Tours.tourPause();
+                                            if (prevState == "play" && alteredState == "pause") //interruption caused toue pausing. stop any animations, updating UI as well
+                                                CZ.Tours.tourPause();
 
-                        CZ.Common.setNavigationStringTo = null;
+                                            CZ.Common.setNavigationStringTo = null;
+                                        }
+                                    }
+            });
+
+            // Progessive Loading: fetch misssing data
+            CZ.Common.controller.onAnimationComplete.push(
+                function () {
+                    if (CZ.Authoring && CZ.Authoring.isEnabled) return;
+                    var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                    var vbox = CZ.Common.viewportToViewBox(vp);
+                    var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
+                    if (!CZ.Common.vc.virtualCanvas("inBuffer", wnd, vp.visible.scale)) { // check if data is missing for the current viewport
+                        var lca = CZ.Common.vc.virtualCanvas("findLca", wnd);
+                        CZ.Common.getMissingData(vbox, lca); // queue up a request to fetch the missing data from the server
                     }
                 }
-            });
+            );
 
             CZ.Common.updateLayout();
 
@@ -791,11 +837,6 @@ module CZ {
                 $("#bibliographyBack").css("display", "block");
             }
         });
-
-        export function IsFeatureEnabled(featureMap: FeatureInfo[], featureName: string) {
-            var feature: FeatureInfo[] = $.grep(featureMap, function (e) { return e.Name === featureName; });
-            return feature[0].IsEnabled;
-        }
 
         export function closeAllForms() {
             $('.cz-major-form').each((i, f) => { var form = $(f).data('form'); if (form) { form.close(); } });
