@@ -160,7 +160,7 @@
         export var signinUrlMicrosoft = "";
         export var signinUrlGoogle = "";
         export var signinUrlYahoo = "";
-        export var sessionTime = 70; //seconds
+        export var sessionTime = 3600; //seconds
 
         // General constants
         export var guidEmpty = "00000000-0000-0000-0000-000000000000";
