@@ -81,30 +81,6 @@ namespace Tests
         }
 
         [TestMethod]
-        public void Roman_History_TimeLine_Borders()
-        {
-            TimelineHelper.OpenHumanityTimeline();
-            TimelineHelper.OpenRomanHistoryTimeline();
-            const double expected = 943;
-            double leftBorder = TimescaleHelper.GetLeftBorderDate();
-            double rightBorder = TimescaleHelper.GetRightBorderDate();
-            Assert.AreEqual(expected, rightBorder - leftBorder);
-        }   
-
-        [TestMethod]
-        public void Roman_History_TimeLine_Borders_Ages()
-        {
-            TimelineHelper.OpenHumanityTimeline();
-            TimelineHelper.OpenRomanHistoryTimeline();
-            const string leftBorderAge = "BCE";
-            const string righBorderAge = "CE";
-            string leftBorder = TimescaleHelper.GetLeftBorderDateAge();
-            string rightBorder = TimescaleHelper.GetRightBorderDateAge();
-            Assert.AreEqual(leftBorderAge, leftBorder);
-            Assert.AreEqual(righBorderAge, rightBorder);
-        }
-
-        [TestMethod]
         public void Mouse_Marker()
         {
             TimelineHelper.OpenHumanityTimeline();
