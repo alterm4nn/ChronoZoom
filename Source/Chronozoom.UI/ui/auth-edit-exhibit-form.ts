@@ -69,7 +69,7 @@ module CZ {
                     this.saveButton.text("create exhibit");
 
                     this.titleInput.val(this.exhibit.title || "");
-                    this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "",false,true);
+                    this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
                     console.log("this.datePicker.");
                     this.closeButton.show();
                     this.createArtifactButton.show();
@@ -91,8 +91,7 @@ module CZ {
                     this.saveButton.text("update exhibit");
 
                     this.titleInput.val(this.exhibit.title || "");
-                    this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", false, true);
-                    //this.datePicker.setDate(this.exhibit.infodotDescription.date || "");
+                    this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
 
                     this.closeButton.show();
                     this.createArtifactButton.show();

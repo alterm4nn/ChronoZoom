@@ -24,7 +24,7 @@ var CZ;
                     switch(mode) {
                         case "year":
                             _this.editModeYear();
-                            _this.setDate(_this.coordinate, false);
+                            _this.setDate_YearMode(_this.coordinate, false);
                             break;
                         case "date":
                             _this.editModeDate();
@@ -53,38 +53,50 @@ var CZ;
                 var optionIntinite = $("<option value='infinite'>Infinite</option>");
                 this.modeSelector.append(optionIntinite);
             };
-            DatePicker.prototype.setDate = function (coordinate, InfinityConvertation, ZeroYearConversation) {
-                if (typeof InfinityConvertation === "undefined") { InfinityConvertation = false; }
+            DatePicker.prototype.setDate = function (coordinate, ZeroYearConversation) {
                 if (typeof ZeroYearConversation === "undefined") { ZeroYearConversation = false; }
                 if(!this.validateNumber(coordinate)) {
                     return false;
                 }
                 coordinate = Number(coordinate);
                 this.coordinate = coordinate;
-                var mode = this.modeSelector.find(":selected").val();
+                var regime = CZ.Dates.convertCoordinateToYear(this.coordinate).regime;
                 if(this.coordinate === this.INFINITY_VALUE) {
-                    if(InfinityConvertation) {
+                    this.regimeSelector.find(":selected").attr("selected", "false");
+                    this.modeSelector.find("option").each(function () {
+                        if($(this).val() === "infinite") {
+                            $(this).attr("selected", "selected");
+                            return;
+                        }
+                    });
+                    this.editModeInfinite();
+                    return;
+                }
+                switch(regime.toLowerCase()) {
+                    case "ga":
+                    case "ma":
+                    case "ka":
                         this.regimeSelector.find(":selected").attr("selected", "false");
                         this.modeSelector.find("option").each(function () {
-                            if($(this).val() === "infinite") {
+                            if($(this).val() === "year") {
                                 $(this).attr("selected", "selected");
                                 return;
                             }
                         });
-                        this.editModeInfinite();
-                    } else {
-                        var localPresent = CZ.Dates.getPresent();
-                        coordinate = CZ.Dates.getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
-                    }
-                }
-                switch(mode) {
-                    case "year":
+                        this.editModeYear();
                         this.setDate_YearMode(coordinate, ZeroYearConversation);
                         break;
-                    case "date":
+                    case "bce":
+                    case "ce":
+                        this.regimeSelector.find(":selected").attr("selected", "false");
+                        this.modeSelector.find("option").each(function () {
+                            if($(this).val() === "date") {
+                                $(this).attr("selected", "selected");
+                                return;
+                            }
+                        });
+                        this.editModeDate();
                         this.setDate_DateMode(coordinate);
-                        break;
-                    case "infinite":
                         break;
                 }
             };
