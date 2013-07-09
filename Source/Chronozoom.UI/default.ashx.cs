@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Chronozoom.Entities;
+using Chronozoom.UI;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -19,7 +20,7 @@ namespace Chronozoom.UI
 {
     public class PageInformation
     {
-        
+
         public PageInformation()
         {
             AnalyticsServiceId = ConfigurationManager.AppSettings["AnalyticsServiceId"];
@@ -105,7 +106,7 @@ namespace Chronozoom.UI
             if (IsSuperCollectionPresent(superCollection))
             {
 
-               Timeline timeline = ChronozoomSVC.Instance.GetTimelines(superCollection, collection, null, null, null,null, null, "1");
+                Timeline timeline = ChronozoomSVC.Instance.GetTimelines(superCollection, collection, null, null, null, null, null, "1");
                 if (timeline != null)
                 {
 
@@ -125,7 +126,7 @@ namespace Chronozoom.UI
                     return true;
                 }
             }
-            
+
             return false;
 
         }
@@ -137,7 +138,8 @@ namespace Chronozoom.UI
         /// <returns>Boolean value</returns>
         public static bool IsSuperCollectionPresent(string superCollection)
         {
-            if (_storage.SuperCollections.Any(candidate => candidate.Title == superCollection))
+            string _superCollection = FriendlyUrl.FriendlyUrlDecode( superCollection);
+            if (_storage.SuperCollections.Any(candidate => candidate.Title.ToLower() == _superCollection ))
             {
                 return true;
             }

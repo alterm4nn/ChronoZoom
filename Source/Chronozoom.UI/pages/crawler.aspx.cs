@@ -315,9 +315,12 @@ namespace Chronozoom.UI
             title.Append("ChronoZoom");
 
             if (!string.IsNullOrEmpty(UrlSuperCollection(url)))
-                title.Append(FriendlyUrl.FriendlyUrlDecode(" (" + UrlSuperCollection(url)) + ") ");
+            {
+                if (UrlSuperCollection(url) != ConfigurationManager.AppSettings["DefaultSuperCollection"])
+                    title.Append(FriendlyUrl.FriendlyUrlDecode(" (" + UrlSuperCollection(url)) + ")");
+            }
             else if (!string.IsNullOrEmpty(UrlCollection(url)))
-                title.Append(FriendlyUrl.FriendlyUrlDecode(" (" + UrlCollection(url)) + ") ");
+                title.Append(FriendlyUrl.FriendlyUrlDecode(" (" + UrlCollection(url)) + ")");
 
             return title.ToString();
         }
