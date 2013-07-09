@@ -3798,15 +3798,15 @@ var CZ;
                 regime: "CE"
             };
             var eps_const = 100000;
-            if(coordinate < -999999999) {
+            if(coordinate <= -999999999) {
                 year.year = (year.year - 1) / (-1000000000);
                 year.year = Math.round(year.year * eps_const) / eps_const;
                 year.regime = 'Ga';
-            } else if(coordinate < -999999) {
+            } else if(coordinate <= -999999) {
                 year.year = (year.year - 1) / (-1000000);
                 year.year = Math.round(year.year * eps_const) / eps_const;
                 year.regime = 'Ma';
-            } else if(coordinate < -9999) {
+            } else if(coordinate <= -9999) {
                 year.year = (year.year - 1) / (-1000);
                 year.year = Math.round(year.year * eps_const) / eps_const;
                 year.regime = 'Ka';
@@ -8904,7 +8904,7 @@ var CZ;
                     switch(mode) {
                         case "year":
                             _this.editModeYear();
-                            _this.setDate(_this.coordinate, false);
+                            _this.setDate_YearMode(_this.coordinate, false);
                             break;
                         case "date":
                             _this.editModeDate();
@@ -8933,38 +8933,50 @@ var CZ;
                 var optionIntinite = $("<option value='infinite'>Infinite</option>");
                 this.modeSelector.append(optionIntinite);
             };
-            DatePicker.prototype.setDate = function (coordinate, InfinityConvertation, ZeroYearConversation) {
-                if (typeof InfinityConvertation === "undefined") { InfinityConvertation = false; }
+            DatePicker.prototype.setDate = function (coordinate, ZeroYearConversation) {
                 if (typeof ZeroYearConversation === "undefined") { ZeroYearConversation = false; }
                 if(!this.validateNumber(coordinate)) {
                     return false;
                 }
                 coordinate = Number(coordinate);
                 this.coordinate = coordinate;
-                var mode = this.modeSelector.find(":selected").val();
+                var regime = CZ.Dates.convertCoordinateToYear(this.coordinate).regime;
                 if(this.coordinate === this.INFINITY_VALUE) {
-                    if(InfinityConvertation) {
+                    this.regimeSelector.find(":selected").attr("selected", "false");
+                    this.modeSelector.find("option").each(function () {
+                        if($(this).val() === "infinite") {
+                            $(this).attr("selected", "selected");
+                            return;
+                        }
+                    });
+                    this.editModeInfinite();
+                    return;
+                }
+                switch(regime.toLowerCase()) {
+                    case "ga":
+                    case "ma":
+                    case "ka":
                         this.regimeSelector.find(":selected").attr("selected", "false");
                         this.modeSelector.find("option").each(function () {
-                            if($(this).val() === "infinite") {
+                            if($(this).val() === "year") {
                                 $(this).attr("selected", "selected");
                                 return;
                             }
                         });
-                        this.editModeInfinite();
-                    } else {
-                        var localPresent = CZ.Dates.getPresent();
-                        coordinate = CZ.Dates.getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
-                    }
-                }
-                switch(mode) {
-                    case "year":
+                        this.editModeYear();
                         this.setDate_YearMode(coordinate, ZeroYearConversation);
                         break;
-                    case "date":
+                    case "bce":
+                    case "ce":
+                        this.regimeSelector.find(":selected").attr("selected", "false");
+                        this.modeSelector.find("option").each(function () {
+                            if($(this).val() === "date") {
+                                $(this).attr("selected", "selected");
+                                return;
+                            }
+                        });
+                        this.editModeDate();
                         this.setDate_DateMode(coordinate);
-                        break;
-                    case "infinite":
                         break;
                 }
             };
@@ -10475,7 +10487,7 @@ var CZ;
                     this.titleTextblock.text("Create Exhibit");
                     this.saveButton.text("create exhibit");
                     this.titleInput.val(this.exhibit.title || "");
-                    this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", false, true);
+                    this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
                     console.log("this.datePicker.");
                     this.closeButton.show();
                     this.createArtifactButton.show();
@@ -10502,7 +10514,7 @@ var CZ;
                     this.titleTextblock.text("Edit Exhibit");
                     this.saveButton.text("update exhibit");
                     this.titleInput.val(this.exhibit.title || "");
-                    this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", false, true);
+                    this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
                     this.closeButton.show();
                     this.createArtifactButton.show();
                     this.saveButton.show();

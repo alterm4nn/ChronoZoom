@@ -110,15 +110,15 @@ module CZ {
                 regime: "CE"
             }
             var eps_const = 100000;
-            if (coordinate < -999999999) {
+            if (coordinate <= -999999999) {
                 year.year = (year.year - 1) / (-1000000000);
                 year.year = Math.round(year.year * eps_const) / eps_const;
                 year.regime = 'Ga';
-            } else if (coordinate < -999999) {
+            } else if (coordinate <= -999999) {
                 year.year = (year.year - 1) / (-1000000);
                 year.year = Math.round(year.year * eps_const) / eps_const;
                 year.regime = 'Ma';
-            } else if (coordinate < -9999) {
+            } else if (coordinate <= -9999) {
                 year.year = (year.year - 1) / (-1000);
                 year.year = Math.round(year.year * eps_const) / eps_const;
                 year.regime = 'Ka';
