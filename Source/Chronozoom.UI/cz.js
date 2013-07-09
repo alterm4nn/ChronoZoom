@@ -7258,6 +7258,7 @@ var CZ;
         var _width;
         var _height;
         var _canvasHeight;
+        var _markerPosition;
         var _tickSources = {
             "cosmos": new CZ.CosmosTickSource(),
             "calendar": new CZ.CalendarTickSource(),
@@ -7324,6 +7325,12 @@ var CZ;
                 configurable: false,
                 get: function () {
                     return _tickSources[_mode];
+                }
+            },
+            markerPosition: {
+                configurable: false,
+                get: function () {
+                    return _markerPosition;
                 }
             }
         });
@@ -7633,7 +7640,6 @@ var CZ;
             var time = _range.max - k * (_width - point.x);
             that.setTimeMarker(time);
         }
-        this.markerPosition = -1;
         this.setTimeMarker = function (time) {
             if(time > CZ.Settings.maxPermitedTimeRange.right) {
                 time = CZ.Settings.maxPermitedTimeRange.right;
@@ -7643,14 +7649,10 @@ var CZ;
             }
             var k = (_range.max - _range.min) / _width;
             var point = (time - _range.max) / k + _width;
-            this.markerPosition = point;
-            var markerWidth = parseFloat($('#timescale_marker').css("width"));
-            $('#timescale_marker').css("left", point - markerWidth / 2);
             var text = _tickSources[_mode].getMarkerLabel(_range, time);
-            document.getElementById('marker-text').innerHTML = text;
-        };
-        this.MarkerPosition = function () {
-            return this.markerPosition;
+            _markerPosition = point;
+            markerText.text(text);
+            marker.css("left", point - marker.width() / 2);
         };
         function render() {
             setMode();
@@ -12052,7 +12054,7 @@ var CZ;
             var jointGesturesStream = canvasGestures.Merge(axisGestures.Merge(timeSeriesGestures));
             CZ.Common.controller = new CZ.ViewportController.ViewportController2(function (visible) {
                 var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                var markerPos = CZ.Common.axis.MarkerPosition();
+                var markerPos = CZ.Common.axis.markerPosition;
                 var oldMarkerPosInScreen = vp.pointVirtualToScreen(markerPos, 0).x;
                 CZ.Common.vc.virtualCanvas("setVisible", visible, CZ.Common.controller.activeAnimation);
                 CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
