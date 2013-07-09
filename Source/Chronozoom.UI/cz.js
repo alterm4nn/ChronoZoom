@@ -9361,11 +9361,11 @@ var CZ;
             });
         }
         function createZoomSubject(vc) {
-            vc.mousewheel(function (objEvent, intDelta) {
-                var event = ($).Event("xbrowserwheel");
-                event.delta = intDelta;
-                event.origin = CZ.Common.getXBrowserMouseOrigin(vc, objEvent);
-                vc.trigger(event);
+            vc.mousewheel(function (event, delta, deltaX, deltaY) {
+                var xevent = ($).Event("xbrowserwheel");
+                xevent.delta = delta;
+                xevent.origin = CZ.Common.getXBrowserMouseOrigin(vc, event);
+                vc.trigger(xevent);
             });
             var mouseWheel = vc.toObservable("xbrowserwheel");
             var mouseWheels = mouseWheel.Zip(mouseWheel, function (arg) {
