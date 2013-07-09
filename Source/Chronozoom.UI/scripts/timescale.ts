@@ -40,6 +40,7 @@ module CZ {
         var _width;
         var _height;
         var _canvasHeight;
+        var _markerPosition;
 
         var _tickSources = {
             "cosmos": new CZ.CosmosTickSource(),
@@ -54,7 +55,7 @@ module CZ {
         var marker = $("<div id='timescale_marker' class='cz-timescale-marker'></div>");
         var markerText = $("<div id='marker-text'></div>");
         var markertriangle = $("<div id='marker-triangle'></div>");
-  
+
         var canvasSize = CZ.Settings.tickLength + CZ.Settings.timescaleThickness;
         var text_size;
         var fontSize;
@@ -117,6 +118,12 @@ module CZ {
                     return _tickSources[_mode];
                 }
             },
+            markerPosition: {
+                configurable: false,
+                get: function () {
+                    return _markerPosition;
+                }
+            }
         });
 
  
@@ -522,7 +529,6 @@ module CZ {
             that.setTimeMarker(time);
         }
 
-        this.markerPosition = -1
         /**
          * Renders marker.
         */
@@ -531,18 +537,11 @@ module CZ {
             if (time < CZ.Settings.maxPermitedTimeRange.left) time = CZ.Settings.maxPermitedTimeRange.left;
             var k = (_range.max - _range.min) / _width;
             var point = (time - _range.max) / k + _width;
-            this.markerPosition = point;
-            var markerWidth = parseFloat($('#timescale_marker').css("width"));
-            $('#timescale_marker').css("left", point - markerWidth/2);
             var text = _tickSources[_mode].getMarkerLabel(_range, time);
-            document.getElementById('marker-text').innerHTML = text;
+            _markerPosition = point;
+            markerText.text(text);
+            marker.css("left", point - marker.width() / 2);
         }
-
-         this.MarkerPosition = function () {
-            return this.markerPosition;
-        }
-
-
 
         /**
         * Main function for timescale rendering.
