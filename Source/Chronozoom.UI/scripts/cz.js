@@ -538,7 +538,7 @@ var CZ;
             var jointGesturesStream = canvasGestures.Merge(axisGestures.Merge(timeSeriesGestures));
             CZ.Common.controller = new CZ.ViewportController.ViewportController2(function (visible) {
                 var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                var markerPos = CZ.Common.axis.MarkerPosition();
+                var markerPos = CZ.Common.axis.markerPosition;
                 var oldMarkerPosInScreen = vp.pointVirtualToScreen(markerPos, 0).x;
                 CZ.Common.vc.virtualCanvas("setVisible", visible, CZ.Common.controller.activeAnimation);
                 CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
