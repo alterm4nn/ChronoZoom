@@ -1139,6 +1139,9 @@ img.fallbackBackground {
   margin-right: 6px;
   margin-left: 6px;
 }
+.footer-link-credits img {
+  margin-bottom: 3px;
+}
 .footer-text {
   margin-left: 6px;
   color: #AAA;
