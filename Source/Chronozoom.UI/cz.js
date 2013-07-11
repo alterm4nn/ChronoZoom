@@ -4182,6 +4182,7 @@ var CZ;
         }
         Authoring.initialize = initialize;
         function updateTimeline(t, prop) {
+            var deffered = new jQuery.Deferred();
             var temp = {
                 x: Number(prop.start),
                 y: t.y,
@@ -4193,22 +4194,28 @@ var CZ;
                 t.x = temp.x;
                 t.width = temp.width;
                 t.endDate = prop.end;
+                t.title = prop.title;
+                updateTimelineTitle(t);
+                CZ.Service.putTimeline(t).then(function (success) {
+                    t.id = "t" + success;
+                    t.guid = success;
+                    t.titleObject.id = "t" + success + "__header__";
+                    if(!t.parent.guid) {
+                        document.location.reload(true);
+                    } else {
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    }
+                    deffered.resolve(t);
+                }, function (error) {
+                    deffered.reject(error);
+                });
+            } else {
+                deffered.reject('Timeline intersects with parent timeline or other siblings');
             }
-            t.title = prop.title;
-            updateTimelineTitle(t);
-            return CZ.Service.putTimeline(t).then(function (success) {
-                t.id = "t" + success;
-                t.guid = success;
-                t.titleObject.id = "t" + success + "__header__";
-                if(!t.parent.guid) {
-                    document.location.reload(true);
-                } else {
-                    CZ.Common.vc.virtualCanvas("requestInvalidate");
-                }
-            }, function (error) {
-            });
+            return deffered.promise();
         }
         Authoring.updateTimeline = updateTimeline;
+        ;
         function removeTimeline(t) {
             var deferred = $.Deferred();
             CZ.Service.deleteTimeline(t).then(function (updateCanvas) {
@@ -10324,7 +10331,11 @@ var CZ;
                             self.close();
                             self.timeline.onmouseclick();
                         }, function (error) {
-                            alert("Unable to save changes. Please try again later.");
+                            if(error !== undefined && error !== null) {
+                                self.errorMessage.text(error);
+                            } else {
+                                alert("Unable to save changes. Please try again later.");
+                            }
                             console.log(error);
                         }).always(function () {
                             _this.saveButton.prop('disabled', false);
