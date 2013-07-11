@@ -249,10 +249,11 @@
     <Content Include="fallback.html" />
     <Content Include="Global.asax" />
     <Content Include="images\chronozoom.png" />
-    <Content Include="images\credits\Berkeley.png" />
-    <Content Include="images\credits\Microsoft-Research.png" />
-    <Content Include="images\credits\MSU.png" />
-    <Content Include="images\credits\University-of-Washington.png" />
+    <Content Include="images\credits\github.png" />
+    <Content Include="images\credits\msr.png" />
+    <Content Include="images\credits\msu.png" />
+    <Content Include="images\credits\ucb.png" />
+    <Content Include="images\credits\uw.png" />
     <Content Include="images\edit-icon.png" />
     <Content Include="images\narration-off.png" />
     <Content Include="images\narration-on.png" />
