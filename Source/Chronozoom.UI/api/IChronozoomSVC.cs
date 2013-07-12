@@ -628,4 +628,57 @@ namespace Chronozoom.UI
         [WebGet(UriTemplate = "/{superCollectionName}/collections", ResponseFormat = WebMessageFormat.Json)]
         IEnumerable<Collection> GetCollections(string superCollectionName);
     }
+
+    [ServiceContract(Namespace = "")]
+    public interface IBingSearchAPI
+    {
+        /// <summary>
+        /// Performs images search for a search query via Bing Search API.
+        /// </summary>
+        /// <param name="query">The query to search for.</param>
+        /// <returns>Search results (images) in JSON format.</returns>
+        /// <example><![CDATA[ 
+        /// HTTP verb: GET
+        ///
+        /// URL:
+        /// http://{URL}/api/bing/getImages?query={query}
+        /// ]]>
+        /// </example>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        BaseJsonResult<IEnumerable<BingSearchImageResult>> GetImages(string query);
+
+        /// <summary>
+        /// Performs videos search for a search query via Bing Search API.
+        /// </summary>
+        /// <param name="query">The query to search for.</param>
+        /// <returns>Search results (videos) in JSON format.</returns>
+        /// <example><![CDATA[ 
+        /// HTTP verb: GET
+        ///
+        /// URL:
+        /// http://{URL}/api/bing/getVideos?query={query}
+        /// ]]>
+        /// </example>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        BaseJsonResult<IEnumerable<BingSearchVideoResult>> GetVideos(string query);
+
+        /// <summary>
+        /// Performs documents web search for a search query via Bing Search API.
+        /// </summary>
+        /// <param name="query">The query to search for.</param>
+        /// <param name="doctype">The filetype to search for.</param>
+        /// <returns>Search results (documents) in JSON format.</returns>
+        /// /// <example><![CDATA[ 
+        /// HTTP verb: GET
+        ///
+        /// URL:
+        /// http://{URL}/api/bing/getDocuments?query={query}&doctype={doctype}
+        /// ]]>
+        /// </example>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        BaseJsonResult<IEnumerable<BingSearchDocumentResult>> GetDocuments(string query, string doctype);
+    }
 }
