@@ -10341,6 +10341,96 @@ var CZ;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
+    (function (Media) {
+        var _mediaPickers = {
+        };
+        var _mediaPickersViews = {
+        };
+        Object.defineProperties(CZ.Media, {
+            mediaPickers: {
+                get: function () {
+                    return _mediaPickers;
+                }
+            },
+            mediaPickersViews: {
+                get: function () {
+                    return _mediaPickersViews;
+                }
+            }
+        });
+        function initialize() {
+        }
+        Media.initialize = initialize;
+        function registerMediaPicker(title, iconUrl, viewUrl, type, selector) {
+            var order = Object.keys(_mediaPickers).length;
+            var setup = type.setup;
+            selector = selector || "$('<div></div>')";
+            return CZ.UILoader.loadHtml(selector, viewUrl).always(function (view) {
+                _mediaPickersViews[title] = view;
+                _mediaPickers[title] = {
+                    title: title,
+                    iconUrl: iconUrl,
+                    order: order,
+                    setup: setup
+                };
+            });
+        }
+        Media.registerMediaPicker = registerMediaPicker;
+    })(CZ.Media || (CZ.Media = {}));
+    var Media = CZ.Media;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var MediaList = (function () {
+            function MediaList(container, mediaPickers, context) {
+                this.container = container;
+                this.mediaPickers = mediaPickers;
+                this.context = context;
+                this.container.addClass("cz-medialist");
+                this.fillListOfLinks();
+            }
+            MediaList.prototype.fillListOfLinks = function () {
+                var _this = this;
+                var sortedMediaPickersKeys = Object.keys(this.mediaPickers).sort(function (key1, key2) {
+                    return (_this.mediaPickers[key1].order - _this.mediaPickers[key2].order) > 0;
+                });
+                sortedMediaPickersKeys.forEach(function (key) {
+                    if(_this.mediaPickers.hasOwnProperty(key)) {
+                        var mp = _this.mediaPickers[key];
+                        var link = _this.createMediaPickerLink(mp);
+                        _this.container.append(link);
+                    }
+                });
+            };
+            MediaList.prototype.createMediaPickerLink = function (mp) {
+                var _this = this;
+                var container = $("<div></div>", {
+                    class: "cz-medialist-item",
+                    "media-type": mp.title
+                });
+                var icon = $("<img></img>", {
+                    class: "cz-medialist-item-icon",
+                    src: mp.iconUrl
+                });
+                container.click(function (event) {
+                    mp.setup(_this.context);
+                });
+                container.append(icon);
+                return container;
+            };
+            MediaList.prototype.remove = function () {
+                this.container.empty();
+                this.container.removeClass("cz-medialist");
+            };
+            return MediaList;
+        })();
+        UI.MediaList = MediaList;        
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
     (function (UI) {
         var FormEditTimeline = (function (_super) {
             __extends(FormEditTimeline, _super);
