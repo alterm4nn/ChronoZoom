@@ -31,9 +31,8 @@ namespace Chronozoom.UI
     [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
     public partial class ChronozoomSVC : IBingSearchAPI
     {
-        // Windows Azure Marketplace account key.
-        // TODO: place it in web.config
-        private const string BingAccountKey = "My5xvmJSMoyO/kNepgjPEN6kConuJhfPeqJgvuQRo0o=";
+        // Azure Datamarket account key
+        private string BingAccountKey = null;
         // Default Bing API url.
         private const string BingAPIRootUrl = "https://api.datamarket.azure.com/Bing/Search";
         // Default search results limit.
@@ -51,8 +50,21 @@ namespace Chronozoom.UI
         BaseJsonResult<IEnumerable<BingSearchImageResult>> IBingSearchAPI.GetImages(string query)
         {
             return ApiOperation<BaseJsonResult<IEnumerable<BingSearchImageResult>>>(delegate(User user, Storage storage)
-            {            
+            {
                 var searchResults = new List<BingSearchImageResult>();
+
+                if (string.IsNullOrEmpty(BingAccountKey) && !string.IsNullOrEmpty(ConfigurationManager.AppSettings["AzureMarketplaceAccountKey"]))
+                {
+                    BingAccountKey = ConfigurationManager.AppSettings["AzureMarketplaceAccountKey"];
+                }
+
+                //if (user == null)
+                //{
+                //    // Setting status code to 403 to prevent redirection to authentication resource if status code is 401.
+                //    SetStatusCode(HttpStatusCode.Forbidden, ErrorDescription.UnauthorizedUser);
+                //    return new BaseJsonResult<IEnumerable<BingSearchImageResult>>(searchResults);
+                //}
+
                 try
                 {
                     var bingContainer = new Bing.BingSearchContainer(new Uri(BingAPIRootUrl));
@@ -89,6 +101,19 @@ namespace Chronozoom.UI
             return ApiOperation<BaseJsonResult<IEnumerable<BingSearchVideoResult>>>(delegate(User user, Storage storage)
             {
                 var searchResults = new List<BingSearchVideoResult>();
+
+                if (string.IsNullOrEmpty(BingAccountKey) && !string.IsNullOrEmpty(ConfigurationManager.AppSettings["AzureMarketplaceAccountKey"]))
+                {
+                    BingAccountKey = ConfigurationManager.AppSettings["AzureMarketplaceAccountKey"];
+                }
+
+                //if (user == null)
+                //{
+                //    // Setting status code to 403 to prevent redirection to authentication resource if status code is 401.
+                //    SetStatusCode(HttpStatusCode.Forbidden, ErrorDescription.UnauthorizedUser);
+                //    return new BaseJsonResult<IEnumerable<BingSearchVideoResult>>(searchResults);
+                //}
+
                 try
                 {
                     var bingContainer = new Bing.BingSearchContainer(new Uri(BingAPIRootUrl));
@@ -125,6 +150,19 @@ namespace Chronozoom.UI
             return ApiOperation<BaseJsonResult<IEnumerable<BingSearchDocumentResult>>>(delegate(User user, Storage storage)
             {
                 var searchResults = new List<BingSearchDocumentResult>();
+
+                if (string.IsNullOrEmpty(BingAccountKey) && !string.IsNullOrEmpty(ConfigurationManager.AppSettings["AzureMarketplaceAccountKey"]))
+                {
+                    BingAccountKey = ConfigurationManager.AppSettings["AzureMarketplaceAccountKey"];
+                }
+
+                //if (user == null)
+                //{
+                //    // Setting status code to 403 to prevent redirection to authentication resource if status code is 401.
+                //    SetStatusCode(HttpStatusCode.Forbidden, ErrorDescription.UnauthorizedUser);
+                //    return new BaseJsonResult<IEnumerable<BingSearchDocumentResult>>(searchResults);
+                //}
+
                 try
                 {
                     var bingContainer = new Bing.BingSearchContainer(new Uri(BingAPIRootUrl));
