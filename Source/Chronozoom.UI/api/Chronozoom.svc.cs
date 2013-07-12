@@ -122,7 +122,7 @@ namespace Chronozoom.UI
 
     [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
     [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
-    public class ChronozoomSVC : IChronozoomSVC
+    public partial class ChronozoomSVC : IChronozoomSVC
     {
         private static readonly StorageCache Cache = new StorageCache();
 
@@ -205,7 +205,7 @@ namespace Chronozoom.UI
         private static Guid _defaultSuperCollectionId = Guid.Empty;
 
         // error code descriptions
-        private static class ErrorDescription
+        private static partial class ErrorDescription
         {
             public const string RequestBodyEmpty = "Request body empty";
             public const string UnauthorizedUser = "Unauthorized User";
