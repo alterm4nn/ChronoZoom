@@ -97,16 +97,16 @@ namespace Chronozoom.UI
 
             string superCollection = string.Empty;
             if (pageUrl.Segments.Length >= 2)
-                superCollection = pageUrl.Segments[1].Split('/')[0];
+                superCollection = HttpUtility.UrlDecode(pageUrl.Segments[1].Split('/')[0]);
 
             string collection = superCollection;
             if (pageUrl.Segments.Length >= 3)
-                collection = pageUrl.Segments[2].Split('/')[0];
+                collection = HttpUtility.UrlDecode(pageUrl.Segments[2].Split('/')[0]);
 
             if (IsSuperCollectionPresent(superCollection))
             {
 
-                Timeline timeline = ChronozoomSVC.Instance.GetTimelines(superCollection, collection, null, null, null, null, null, "1");
+               Timeline timeline = ChronozoomSVC.Instance.GetTimelines(superCollection, collection, null, null, null,null, null, null);
                 if (timeline != null)
                 {
 

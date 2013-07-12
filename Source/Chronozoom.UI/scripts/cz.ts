@@ -135,13 +135,18 @@ module CZ {
             },
         ];
 
+        export function IsFeatureEnabled(featureName: string) {
+            var feature: FeatureInfo[] = $.grep(_featureMap, function (e) { return e.Name === featureName; });
+            return feature[0].IsEnabled;
+        }
+
         export var rootCollection: bool;
 
         function UserCanEditCollection(profile) {
             if (CZ.Service.superCollectionName && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
                 return true;
             }
-
+            
             if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName || profile.DisplayName.toLowerCase() !== CZ.Service.superCollectionName.toLowerCase()) {
                 return false
             }
@@ -606,18 +611,33 @@ module CZ {
             if (window.location.hash)
                 CZ.Common.startHash = window.location.hash; // to be processes after the data is loaded
 
-            CZ.Common.loadData().then(function (response) {
-                if (!response) {
-                    canvasIsEmpty = true;
-                    if (CZ.Authoring.showCreateTimelineForm) {
-                        CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
-                    }
+            // load collection data (based on mode)
+            CZ.Service.getProfile()
+            .done(data => {
+                CZ.Authoring.isEnabled = UserCanEditCollection(data);
+            })
+            .fail(error => {
+                CZ.Authoring.isEnabled = UserCanEditCollection(null);
+            })
+            .always(() => {
+                if (!CZ.Authoring.isEnabled) {
+                    $(".edit-icon").hide();
+                } else {
+                    $(".edit-icon").show();
                 }
-            }); //retrieving the data
 
-            CZ.Search.initializeSearch();
-            CZ.Bibliography.initializeBibliography();
-
+                CZ.Common.loadData().then(function (response) {
+                    if (!response) {
+                        canvasIsEmpty = true;
+                        if (CZ.Authoring.showCreateTimelineForm) {
+                            CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
+                        }
+                    }
+                }); //retrieving the data
+                CZ.Search.initializeSearch();
+                CZ.Bibliography.initializeBibliography();
+            });
+            
             var canvasGestures = CZ.Gestures.getGesturesStream(CZ.Common.vc); //gesture sequence of the virtual canvas
             var axisGestures = CZ.Gestures.applyAxisBehavior(CZ.Gestures.getGesturesStream(CZ.Common.ax)); //gesture sequence of axis (tranformed according to axis behavior logic)
             var timeSeriesGestures = CZ.Gestures.getPanPinGesturesStream($("#timeSeriesContainer"));
@@ -660,14 +680,26 @@ module CZ {
                 hashChangeFromOutside = false;
                 if (CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.bookmark) { // go to search result
                     CZ.UrlNav.navigationAnchor = CZ.UrlNav.navStringTovcElement(CZ.Common.setNavigationStringTo.bookmark, CZ.Common.vc.virtualCanvas("getLayerContent"));
-                    window.location.hash = CZ.Common.setNavigationStringTo.bookmark;
+                    var newURL = CZ.UrlNav.getURL();
+                    newURL.hash.path = CZ.Common.setNavigationStringTo.bookmark;
+                    CZ.UrlNav.setURL(newURL);
                 }
-                else {
-                    if (CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.id == id)
-                        CZ.UrlNav.navigationAnchor = CZ.Common.setNavigationStringTo.element;
-
-                    var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                    window.location.hash = CZ.UrlNav.vcelementToNavString(CZ.UrlNav.navigationAnchor, vp);
+                else if (CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.id == id) {
+                    CZ.UrlNav.navigationAnchor = CZ.Common.setNavigationStringTo.element;
+                    var newURL = CZ.UrlNav.getURL();
+                    newURL.hash.path = CZ.UrlNav.vcelementToNavString(CZ.UrlNav.navigationAnchor, CZ.Common.vc.virtualCanvas("getViewport"));
+                    CZ.UrlNav.setURL(newURL);
+                }
+                else if (CZ.BreadCrumbs.breadCrumbs) {
+                    var newHash = "";
+                    for (var i = 0; i < CZ.BreadCrumbs.breadCrumbs.length; i++) {
+                        newHash += "/" + CZ.BreadCrumbs.breadCrumbs[i].vcElement.id;
+                    }
+                    if (newHash !== window.location.hash) {
+                        var newURL = CZ.UrlNav.getURL();
+                        newURL.hash.path = newHash;
+                        CZ.UrlNav.setURL(newURL);
+                    }
                 }
                 CZ.Common.setNavigationStringTo = null;
             });
@@ -735,6 +767,20 @@ module CZ {
                 }
             });
 
+            // Progessive Loading: fetch misssing data
+            CZ.Common.controller.onAnimationComplete.push(
+                function () {
+                    if (CZ.Authoring && CZ.Authoring.isEnabled) return;
+                    var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                    var vbox = CZ.Common.viewportToViewBox(vp);
+                    var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
+                    if (!CZ.Common.vc.virtualCanvas("inBuffer", wnd, vp.visible.scale)) { // check if data is missing for the current viewport
+                        var lca = CZ.Common.vc.virtualCanvas("findLca", wnd);
+                        CZ.Common.getMissingData(vbox, lca); // queue up a request to fetch the missing data from the server
+                    }
+                }
+            );
+
             CZ.Common.updateLayout();
 
             CZ.Common.vc.bind("elementclick", function (e) {
@@ -791,11 +837,6 @@ module CZ {
                 $("#bibliographyBack").css("display", "block");
             }
         });
-
-        export function IsFeatureEnabled(featureMap: FeatureInfo[], featureName: string) {
-            var feature: FeatureInfo[] = $.grep(featureMap, function (e) { return e.Name === featureName; });
-            return feature[0].IsEnabled;
-        }
 
         export function closeAllForms() {
             $('.cz-major-form').each((i, f) => { var form = $(f).data('form'); if (form) { form.close(); } });

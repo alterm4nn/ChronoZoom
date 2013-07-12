@@ -52,8 +52,8 @@ var CZ;
             }, 
             {
                 Name: "Tours",
-                Activation: FeatureActivation.Enabled,
-                JQueryReference: "#tours-index"
+                Activation: FeatureActivation.RootCollection,
+                JQueryReference: "#tours_index"
             }, 
             {
                 Name: "Authoring",
@@ -95,6 +95,13 @@ var CZ;
             }, 
             
         ];
+        function IsFeatureEnabled(featureName) {
+            var feature = $.grep(_featureMap, function (e) {
+                return e.Name === featureName;
+            });
+            return feature[0].IsEnabled;
+        }
+        HomePageViewModel.IsFeatureEnabled = IsFeatureEnabled;
         HomePageViewModel.rootCollection;
         function UserCanEditCollection(profile) {
             if(CZ.Service.superCollectionName && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
@@ -107,7 +114,7 @@ var CZ;
         }
         function InitializeToursUI(profile, forms) {
             CZ.Tours.tourCaptionFormContainer = forms[16];
-            var allowEditing = IsFeatureEnabled(_featureMap, "TourAuthoring") && UserCanEditCollection(profile);
+            var allowEditing = IsFeatureEnabled("TourAuthoring") && UserCanEditCollection(profile);
             var onTakeTour = function (tour) {
                 CZ.HomePageViewModel.closeAllForms();
                 CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption(CZ.Tours.tourCaptionFormContainer, {
@@ -413,10 +420,10 @@ var CZ;
                     profilePanel: "#profile-panel",
                     loginPanelLogin: "#profile-panel.auth-panel-login",
                     context: "",
-                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring"),
+                    allowRedirect: IsFeatureEnabled("Authoring"),
                     collectionTheme: CZ.Settings.theme,
                     collectionThemeInput: "#collection-theme",
-                    collectionThemeWrapper: IsFeatureEnabled(_featureMap, "Themes") ? "#collection-theme-wrapper" : null
+                    collectionThemeWrapper: IsFeatureEnabled("Themes") ? "#collection-theme-wrapper" : null
                 });
                 var loginForm = new CZ.UI.FormLogin(forms[6], {
                     activationSource: $("#login-panel"),
@@ -436,7 +443,7 @@ var CZ;
                         profileForm.close();
                     }
                 });
-                if(IsFeatureEnabled(_featureMap, "Login")) {
+                if(IsFeatureEnabled("Login")) {
                     CZ.Service.getProfile().done(function (data) {
                         if(data == "") {
                             $("#login-panel").show();
@@ -522,16 +529,27 @@ var CZ;
             if(window.location.hash) {
                 CZ.Common.startHash = window.location.hash;
             }
-            CZ.Common.loadData().then(function (response) {
-                if(!response) {
-                    canvasIsEmpty = true;
-                    if(CZ.Authoring.showCreateTimelineForm) {
-                        CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
-                    }
+            CZ.Service.getProfile().done(function (data) {
+                CZ.Authoring.isEnabled = UserCanEditCollection(data);
+            }).fail(function (error) {
+                CZ.Authoring.isEnabled = UserCanEditCollection(null);
+            }).always(function () {
+                if(!CZ.Authoring.isEnabled) {
+                    $(".edit-icon").hide();
+                } else {
+                    $(".edit-icon").show();
                 }
+                CZ.Common.loadData().then(function (response) {
+                    if(!response) {
+                        canvasIsEmpty = true;
+                        if(CZ.Authoring.showCreateTimelineForm) {
+                            CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
+                        }
+                    }
+                });
+                CZ.Search.initializeSearch();
+                CZ.Bibliography.initializeBibliography();
             });
-            CZ.Search.initializeSearch();
-            CZ.Bibliography.initializeBibliography();
             var canvasGestures = CZ.Gestures.getGesturesStream(CZ.Common.vc);
             var axisGestures = CZ.Gestures.applyAxisBehavior(CZ.Gestures.getGesturesStream(CZ.Common.ax));
             var timeSeriesGestures = CZ.Gestures.getPanPinGesturesStream($("#timeSeriesContainer"));
@@ -562,13 +580,24 @@ var CZ;
                 hashChangeFromOutside = false;
                 if(CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.bookmark) {
                     CZ.UrlNav.navigationAnchor = CZ.UrlNav.navStringTovcElement(CZ.Common.setNavigationStringTo.bookmark, CZ.Common.vc.virtualCanvas("getLayerContent"));
-                    window.location.hash = CZ.Common.setNavigationStringTo.bookmark;
-                } else {
-                    if(CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.id == id) {
-                        CZ.UrlNav.navigationAnchor = CZ.Common.setNavigationStringTo.element;
+                    var newURL = CZ.UrlNav.getURL();
+                    newURL.hash.path = CZ.Common.setNavigationStringTo.bookmark;
+                    CZ.UrlNav.setURL(newURL);
+                } else if(CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.id == id) {
+                    CZ.UrlNav.navigationAnchor = CZ.Common.setNavigationStringTo.element;
+                    var newURL = CZ.UrlNav.getURL();
+                    newURL.hash.path = CZ.UrlNav.vcelementToNavString(CZ.UrlNav.navigationAnchor, CZ.Common.vc.virtualCanvas("getViewport"));
+                    CZ.UrlNav.setURL(newURL);
+                } else if(CZ.BreadCrumbs.breadCrumbs) {
+                    var newHash = "";
+                    for(var i = 0; i < CZ.BreadCrumbs.breadCrumbs.length; i++) {
+                        newHash += "/" + CZ.BreadCrumbs.breadCrumbs[i].vcElement.id;
                     }
-                    var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                    window.location.hash = CZ.UrlNav.vcelementToNavString(CZ.UrlNav.navigationAnchor, vp);
+                    if(newHash !== window.location.hash) {
+                        var newURL = CZ.UrlNav.getURL();
+                        newURL.hash.path = newHash;
+                        CZ.UrlNav.setURL(newURL);
+                    }
                 }
                 CZ.Common.setNavigationStringTo = null;
             });
@@ -620,6 +649,18 @@ var CZ;
                     }
                 }
             });
+            CZ.Common.controller.onAnimationComplete.push(function () {
+                if(CZ.Authoring && CZ.Authoring.isEnabled) {
+                    return;
+                }
+                var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                var vbox = CZ.Common.viewportToViewBox(vp);
+                var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
+                if(!CZ.Common.vc.virtualCanvas("inBuffer", wnd, vp.visible.scale)) {
+                    var lca = CZ.Common.vc.virtualCanvas("findLca", wnd);
+                    CZ.Common.getMissingData(vbox, lca);
+                }
+            });
             CZ.Common.updateLayout();
             CZ.Common.vc.bind("elementclick", function (e) {
                 CZ.Search.navigateToElement(e);
@@ -663,13 +704,6 @@ var CZ;
                 $("#bibliographyBack").css("display", "block");
             }
         });
-        function IsFeatureEnabled(featureMap, featureName) {
-            var feature = $.grep(featureMap, function (e) {
-                return e.Name === featureName;
-            });
-            return feature[0].IsEnabled;
-        }
-        HomePageViewModel.IsFeatureEnabled = IsFeatureEnabled;
         function closeAllForms() {
             $('.cz-major-form').each(function (i, f) {
                 var form = $(f).data('form');

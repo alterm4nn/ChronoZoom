@@ -132,65 +132,6 @@ var CZ;
                 var vis = vp.visible;
                 self.recentViewport = new CZ.Viewport.Viewport2d(vp.aspectRatio, vp.width, vp.height, new CZ.Viewport.VisibleRegion2d(vis.centerX, vis.centerY, vis.scale));
             };
-            var requestTimer = null;
-            this.getMissingData = function (vbox, lca) {
-                if(typeof CZ.Authoring === 'undefined' || CZ.Authoring.isActive === false) {
-                    window.clearTimeout(requestTimer);
-                    requestTimer = window.setTimeout(function () {
-                        getMissingTimelines(vbox, lca);
-                    }, 1000);
-                }
-            };
-            function getMissingTimelines(vbox, lca) {
-                CZ.Data.getTimelines({
-                    lca: lca.guid,
-                    start: vbox.left,
-                    end: vbox.right,
-                    minspan: CZ.Settings.minTimelineWidth * vbox.scale
-                }).then(function (response) {
-                    CZ.Layout.Merge(response, lca);
-                }, function (error) {
-                    console.log("Error connecting to service:\n" + error.responseText);
-                });
-            }
-            function getMissingExhibits(vbox, lca, exhibitIds) {
-                CZ.Service.postData({
-                    ids: exhibitIds
-                }).then(function (response) {
-                    MergeContentItems(lca, exhibitIds, response.exhibits);
-                }, function (error) {
-                    console.log("Error connecting to service:\n" + error.responseText);
-                });
-            }
-            function extractExhibitIds(timeline) {
-                var ids = [];
-                if(timeline.exhibits instanceof Array) {
-                    timeline.exhibits.forEach(function (childExhibit) {
-                        ids.push(childExhibit.id);
-                    });
-                }
-                if(timeline.timelines instanceof Array) {
-                    timeline.timelines.forEach(function (childTimeline) {
-                        ids = ids.concat(extractExhibitIds(childTimeline));
-                    });
-                }
-                return ids;
-            }
-            function MergeContentItems(timeline, exhibitIds, exhibits) {
-                timeline.children.forEach(function (child) {
-                    if(child.type === "infodot") {
-                        var idx = exhibitIds.indexOf(child.guid);
-                        if(idx !== -1) {
-                            child.contentItems = exhibits[idx].contentItems;
-                        }
-                    }
-                });
-                timeline.children.forEach(function (child) {
-                    if(child.type === "timeline") {
-                        MergeContentItems(child, exhibitIds, exhibits);
-                    }
-                });
-            }
             gesturesSource.Subscribe(function (gesture) {
                 if(typeof gesture != "undefined" && !CZ.Authoring.isActive) {
                     var isAnimationActive = self.activeAnimation;
@@ -202,9 +143,8 @@ var CZ;
                         return;
                     }
                     if(gesture.Type == "Pan" || gesture.Type == "Zoom") {
+                        window.clearTimeout(CZ.Common.missingDataRequestsTimer);
                         var newlyEstimatedViewport = calculateTargetViewport(latestViewport, gesture, self.estimatedViewport);
-                        var vbox = CZ.Common.viewportToViewBox(newlyEstimatedViewport);
-                        var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
                         if(!self.estimatedViewport) {
                             self.activeAnimation = new CZ.ViewportAnimation.PanZoomAnimation(latestViewport);
                             self.saveScreenParameters(latestViewport);
@@ -288,10 +228,6 @@ var CZ;
             }, 1000);
             this.PanViewportAccessor = PanViewport;
             this.moveToVisible = function (visible, noAnimation) {
-                var currentViewport = getViewport();
-                var targetViewport = new CZ.Viewport.Viewport2d(currentViewport.aspectRatio, currentViewport.width, currentViewport.height, visible);
-                var vbox = CZ.Common.viewportToViewBox(targetViewport);
-                var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
                 if(noAnimation) {
                     self.stopAnimation();
                     self.setVisible(visible);

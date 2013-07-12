@@ -420,6 +420,22 @@ module CZ {
             });
         }
 
+        // .../gettourtimelines?supercollection=&collection=&tourid=&viewportwidth=&mintimelinesize=
+        export function getTourTimelines(r) {
+            var request = new Request(_serviceUrl);
+            request.addToPath("gettourtimelines");
+            request.addParameter("supercollection", superCollectionName);
+            request.addParameter("collection", collectionName);
+            request.addParameters(r);
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+
         // .../search
         export function getSearch(query) {
             CZ.Authoring.resetSessionTimer();

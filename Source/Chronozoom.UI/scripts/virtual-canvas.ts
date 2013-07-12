@@ -420,7 +420,7 @@ module CZ {
 
                 /* Produces {Left,Right,Top,Bottom} object which corresponds to visible region in virtual space, using current viewport.
                 */
-                _visibleToViewBox: function (visible) {
+                visibleToViewBox: function (visible) {
                     var view = this.getViewport();
                     var w = view.widthScreenToVirtual(view.width);
                     var h = view.heightScreenToVirtual(view.height);
@@ -439,7 +439,7 @@ module CZ {
                     this.isInAnimation = isInAnimation && isInAnimation.isActive;
                     //console.log("newvs",newVisible);
                     // rendering canvas (we should update the image because of new visible region)
-                    var viewbox_v = this._visibleToViewBox(newVisible); // visible region in appropriate format
+                    var viewbox_v = this.visibleToViewBox(newVisible); // visible region in appropriate format
                     //console.log(viewbox_v);
                     var viewport = this.getViewport();
                     this._renderCanvas(this._layersContent, viewbox_v, viewport);
@@ -520,7 +520,7 @@ module CZ {
                 /* Renders the virtual canvas content.
                 */
                 invalidate: function () {
-                    var viewbox_v = this._visibleToViewBox(this.options.visible);
+                    var viewbox_v = this.visibleToViewBox(this.options.visible);
                     var viewport = this.getViewport();
 
                     this._renderCanvas(this._layersContent, viewbox_v, viewport);
@@ -541,11 +541,19 @@ module CZ {
 
                     // update parameters of animating elements and require new frame if needed
                     if (CZ.Layout.animatingElements.length != 0) {
-                        for (var id in CZ.Layout.animatingElements)
-                            if (CZ.Layout.animatingElements[id].animation && CZ.Layout.animatingElements[id].animation.isAnimating) {
-                                CZ.Layout.animatingElements[id].calculateNewFrame();
+                        // TODO: temporary disabled
+                        //CZ.Layout.syncViewport();
+                       
+                        for (var i = 0; i < CZ.Layout.animatingElements.length; i++) {
+                            var el = CZ.Layout.animatingElements[i];
+                            if (!el) {
+                                CZ.Layout.animatingElements.splice(i, 1);
+                            } else if (el.animation && el.animation.isAnimating) {
+
+                                el.calculateNewFrame();
                                 this.requestNewFrame = true;
                             }
+                        }
                     }
 
                     if (this.isInAnimation)
@@ -557,8 +565,9 @@ module CZ {
                         self.isInAnimation = false;
                         self.invalidate();
 
-                        if (self.requestNewFrame)
+                        if (self.requestNewFrame) {
                             self.requestInvalidate();
+                        }
                     }, 1000.0 / CZ.Settings.targetFps); // 1/targetFps sec (targetFps is defined in a settings.js)
                 },
 
