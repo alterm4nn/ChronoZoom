@@ -338,9 +338,8 @@ module CZ {
                         // Add the tour to the local tours collection
                         this.putTourAsync(CZ.Tours.tours.length).done(tour => {
                             self.tour = tour;
-                            CZ.Tours.tours.push(tour);
-                            self.initializeAsEdit();
-                            alert("Tour created.");
+                            CZ.Tours.tours.push(tour);                            
+                            this.hide();
                         }).fail(f => {
                             if (console && console.error) {
                                 console.error("Failed to create a tour: " + f.status + " " + f.statusText);
@@ -355,7 +354,7 @@ module CZ {
                             if (CZ.Tours.tours[i] === this.tour) {
                                 this.putTourAsync(i).done(tour => {
                                     this.tour = CZ.Tours.tours[i] = tour;
-                                    alert("Tour updated.");
+                                    this.hide();
                                 }).fail(f => {
                                     if (console && console.error) {
                                         console.error("Failed to update a tour: " + f.status + " " + f.statusText);
