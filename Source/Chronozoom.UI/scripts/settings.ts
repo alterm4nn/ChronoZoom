@@ -220,5 +220,9 @@
             CZ.Settings.fallbackImageUri = themeSettings.fallbackImageUri;
             CZ.Settings.timelineGradientFillStyle = themeSettings.timelineGradientFillStyle;
         }
+
+        // Bing search API constants
+        export var defaultBingSearchTop = 50; // the number of the results to return
+        export var defaultBingSearchSkip = 0; // offset requested for the srarting point of returned results
     }
 }
