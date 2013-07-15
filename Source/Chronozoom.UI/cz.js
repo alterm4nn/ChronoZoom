@@ -9095,7 +9095,7 @@ var CZ;
                 this.coordinate = coordinate;
                 var regime = CZ.Dates.convertCoordinateToYear(this.coordinate).regime;
                 if(this.coordinate === this.INFINITY_VALUE) {
-                    this.regimeSelector.find(":selected").attr("selected", "false");
+                    this.modeSelector.find(":selected").attr("selected", "false");
                     this.modeSelector.find("option").each(function () {
                         if($(this).val() === "infinite") {
                             $(this).attr("selected", "selected");
@@ -9109,7 +9109,7 @@ var CZ;
                     case "ga":
                     case "ma":
                     case "ka":
-                        this.regimeSelector.find(":selected").attr("selected", "false");
+                        this.modeSelector.find(":selected").attr("selected", "false");
                         this.modeSelector.find("option").each(function () {
                             if($(this).val() === "year") {
                                 $(this).attr("selected", "selected");
@@ -9121,7 +9121,7 @@ var CZ;
                         break;
                     case "bce":
                     case "ce":
-                        this.regimeSelector.find(":selected").attr("selected", "false");
+                        this.modeSelector.find(":selected").attr("selected", "false");
                         this.modeSelector.find("option").each(function () {
                             if($(this).val() === "date") {
                                 $(this).attr("selected", "selected");
