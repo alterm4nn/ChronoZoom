@@ -223,6 +223,8 @@ var CZ;
             CZ.Settings.timelineGradientFillStyle = themeSettings.timelineGradientFillStyle;
         }
         Settings.applyTheme = applyTheme;
+        Settings.defaultBingSearchTop = 50;
+        Settings.defaultBingSearchSkip = 0;
     })(CZ.Settings || (CZ.Settings = {}));
     var Settings = CZ.Settings;
 })(CZ || (CZ = {}));
