@@ -35,7 +35,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DocumentationFile>
@@ -205,7 +205,11 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="api\Bing.svc.cs">
+      <DependentUpon>chronozoom.svc</DependentUpon>
+    </Compile>
     <Compile Include="api\errorhandler.cs" />
+    <Compile Include="api\external\BingSearchContainer.cs" />
     <Compile Include="api\storagecache.cs" />
     <Compile Include="default.ashx.cs">
       <DependentUpon>default.ashx</DependentUpon>
@@ -249,10 +253,11 @@
     <Content Include="fallback.html" />
     <Content Include="Global.asax" />
     <Content Include="images\chronozoom.png" />
-    <Content Include="images\credits\Berkeley.png" />
-    <Content Include="images\credits\Microsoft-Research.png" />
-    <Content Include="images\credits\MSU.png" />
-    <Content Include="images\credits\University-of-Washington.png" />
+    <Content Include="images\credits\github.png" />
+    <Content Include="images\credits\msr.png" />
+    <Content Include="images\credits\msu.png" />
+    <Content Include="images\credits\ucb.png" />
+    <Content Include="images\credits\uw.png" />
     <Content Include="images\edit-icon.png" />
     <Content Include="images\narration-off.png" />
     <Content Include="images\narration-on.png" />

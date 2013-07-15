@@ -442,6 +442,73 @@ module CZ {
             });
         }
 
+        // .../bing/getImages
+        export function getBingImages(query) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getImages");
+
+            var data = {
+                query: query
+            };
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                    console.log(response.d);
+                }
+            });
+        }
+
+        // .../bing/getVideos
+        export function getBingVideos(query) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getVideos");
+
+            var data = {
+                query: query
+            };
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                    console.log(response.d);
+                }
+            });
+        }
+
+        // .../bing/getDocuments
+        export function getBingDocuments(query, doctype) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getDocuments");
+
+            var data = {
+                query: query,
+                doctype: doctype
+            };
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                    console.log(response.d);
+                }
+            });
+        }
+
         // .../{supercollection}/{collection}/structure?start=&end=&minspan=&lca=
         export function getServiceInformation() {
             CZ.Authoring.resetSessionTimer();

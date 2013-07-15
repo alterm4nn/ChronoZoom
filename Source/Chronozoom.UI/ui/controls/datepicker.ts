@@ -110,22 +110,22 @@ module CZ {
                 
                 // set edit mode to infinite in case if coordinate is infinity
                 if (this.coordinate === this.INFINITY_VALUE) {
-                        this.regimeSelector.find(":selected").attr("selected", "false");
-                        this.modeSelector.find("option").each(function () {
-                            if ($(this).val() === "infinite") {
-                                $(this).attr("selected", "selected");
-                                return;
-                            }
-                        }); 
-                        this.editModeInfinite();
-                        return;
+                    this.modeSelector.find(":selected").attr("selected", "false");
+                    this.modeSelector.find("option").each(function () {
+                        if ($(this).val() === "infinite") {
+                            $(this).attr("selected", "selected");
+                            return;
+                        }
+                    }); 
+                    this.editModeInfinite();
+                    return;
                 }
 
                 switch (regime.toLowerCase()) {
                     case "ga":
                     case "ma":
                     case "ka":
-                        this.regimeSelector.find(":selected").attr("selected", "false");
+                        this.modeSelector.find(":selected").attr("selected", "false");
                         this.modeSelector.find("option").each(function () {
                             if ($(this).val() === "year") {
                                 $(this).attr("selected", "selected");
@@ -137,7 +137,7 @@ module CZ {
                         break;
                     case "bce":
                     case "ce":
-                        this.regimeSelector.find(":selected").attr("selected", "false");
+                        this.modeSelector.find(":selected").attr("selected", "false");
                         this.modeSelector.find("option").each(function () {
                             if ($(this).val() === "date") {
                                 $(this).attr("selected", "selected");

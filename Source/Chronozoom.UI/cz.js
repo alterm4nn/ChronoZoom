@@ -3621,6 +3621,64 @@ var CZ;
             });
         }
         Service.getSearch = getSearch;
+        function getBingImages(query) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getImages");
+            var data = {
+                query: query
+            };
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                    console.log(response.d);
+                }
+            });
+        }
+        Service.getBingImages = getBingImages;
+        function getBingVideos(query) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getVideos");
+            var data = {
+                query: query
+            };
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                    console.log(response.d);
+                }
+            });
+        }
+        Service.getBingVideos = getBingVideos;
+        function getBingDocuments(query, doctype) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getDocuments");
+            var data = {
+                query: query,
+                doctype: doctype
+            };
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                    console.log(response.d);
+                }
+            });
+        }
+        Service.getBingDocuments = getBingDocuments;
         function getServiceInformation() {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -4182,6 +4240,7 @@ var CZ;
         }
         Authoring.initialize = initialize;
         function updateTimeline(t, prop) {
+            var deffered = new jQuery.Deferred();
             var temp = {
                 x: Number(prop.start),
                 y: t.y,
@@ -4193,22 +4252,28 @@ var CZ;
                 t.x = temp.x;
                 t.width = temp.width;
                 t.endDate = prop.end;
+                t.title = prop.title;
+                updateTimelineTitle(t);
+                CZ.Service.putTimeline(t).then(function (success) {
+                    t.id = "t" + success;
+                    t.guid = success;
+                    t.titleObject.id = "t" + success + "__header__";
+                    if(!t.parent.guid) {
+                        document.location.reload(true);
+                    } else {
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    }
+                    deffered.resolve(t);
+                }, function (error) {
+                    deffered.reject(error);
+                });
+            } else {
+                deffered.reject('Timeline intersects with parent timeline or other siblings');
             }
-            t.title = prop.title;
-            updateTimelineTitle(t);
-            return CZ.Service.putTimeline(t).then(function (success) {
-                t.id = "t" + success;
-                t.guid = success;
-                t.titleObject.id = "t" + success + "__header__";
-                if(!t.parent.guid) {
-                    document.location.reload(true);
-                } else {
-                    CZ.Common.vc.virtualCanvas("requestInvalidate");
-                }
-            }, function (error) {
-            });
+            return deffered.promise();
         }
         Authoring.updateTimeline = updateTimeline;
+        ;
         function removeTimeline(t) {
             var deferred = $.Deferred();
             CZ.Service.deleteTimeline(t).then(function (updateCanvas) {
@@ -8944,7 +9009,7 @@ var CZ;
                 this.coordinate = coordinate;
                 var regime = CZ.Dates.convertCoordinateToYear(this.coordinate).regime;
                 if(this.coordinate === this.INFINITY_VALUE) {
-                    this.regimeSelector.find(":selected").attr("selected", "false");
+                    this.modeSelector.find(":selected").attr("selected", "false");
                     this.modeSelector.find("option").each(function () {
                         if($(this).val() === "infinite") {
                             $(this).attr("selected", "selected");
@@ -8958,7 +9023,7 @@ var CZ;
                     case "ga":
                     case "ma":
                     case "ka":
-                        this.regimeSelector.find(":selected").attr("selected", "false");
+                        this.modeSelector.find(":selected").attr("selected", "false");
                         this.modeSelector.find("option").each(function () {
                             if($(this).val() === "year") {
                                 $(this).attr("selected", "selected");
@@ -8970,7 +9035,7 @@ var CZ;
                         break;
                     case "bce":
                     case "ce":
-                        this.regimeSelector.find(":selected").attr("selected", "false");
+                        this.modeSelector.find(":selected").attr("selected", "false");
                         this.modeSelector.find("option").each(function () {
                             if($(this).val() === "date") {
                                 $(this).attr("selected", "selected");
@@ -10324,7 +10389,11 @@ var CZ;
                             self.close();
                             self.timeline.onmouseclick();
                         }, function (error) {
-                            alert("Unable to save changes. Please try again later.");
+                            if(error !== undefined && error !== null) {
+                                self.errorMessage.text(error);
+                            } else {
+                                alert("Unable to save changes. Please try again later.");
+                            }
                             console.log(error);
                         }).always(function () {
                             _this.saveButton.prop('disabled', false);
@@ -10576,9 +10645,16 @@ var CZ;
             };
             FormEditExhibit.prototype.onSave = function () {
                 var _this = this;
+                var exhibit_x = this.datePicker.getDate() - this.exhibit.width / 2;
+                if(exhibit_x + this.exhibit.width / 2 >= this.exhibit.parent.x + this.exhibit.parent.width) {
+                    exhibit_x -= this.exhibit.width / 2;
+                }
+                if(exhibit_x <= this.exhibit.parent.x) {
+                    exhibit_x += this.exhibit.width / 2;
+                }
                 var newExhibit = {
                     title: this.titleInput.val() || "",
-                    x: this.datePicker.getDate() - this.exhibit.width / 2,
+                    x: exhibit_x,
                     y: this.exhibit.y,
                     height: this.exhibit.height,
                     width: this.exhibit.width,
