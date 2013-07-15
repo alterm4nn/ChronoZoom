@@ -37,6 +37,8 @@ namespace Chronozoom.UI
         private const string BingAPIRootUrl = "https://api.datamarket.azure.com/Bing/Search";
         // Default search results limit.
         private const int BingDefaultSearchLimit = 50;
+        // Default offset for starting point of returned search results.
+        private const int BingDefaultOffset = 0;
 
         // Error code descriptions
         private static partial class ErrorDescription
@@ -47,7 +49,7 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
-        BaseJsonResult<IEnumerable<BingSearchImageResult>> IBingSearchAPI.GetImages(string query)
+        BaseJsonResult<IEnumerable<BingSearchImageResult>> IBingSearchAPI.GetImages(string query, string top, string skip)
         {
             return ApiOperation<BaseJsonResult<IEnumerable<BingSearchImageResult>>>(delegate(User user, Storage storage)
             {
@@ -58,12 +60,15 @@ namespace Chronozoom.UI
                     BingAccountKey = ConfigurationManager.AppSettings["AzureMarketplaceAccountKey"];
                 }
 
-                //if (user == null)
-                //{
-                //    // Setting status code to 403 to prevent redirection to authentication resource if status code is 401.
-                //    SetStatusCode(HttpStatusCode.Forbidden, ErrorDescription.UnauthorizedUser);
-                //    return new BaseJsonResult<IEnumerable<BingSearchImageResult>>(searchResults);
-                //}
+                if (user == null)
+                {
+                    // Setting status code to 403 to prevent redirection to authentication resource if status code is 401.
+                    SetStatusCode(HttpStatusCode.Forbidden, ErrorDescription.UnauthorizedUser);
+                    return new BaseJsonResult<IEnumerable<BingSearchImageResult>>(searchResults);
+                }
+
+                int resultsCount = int.TryParse(top, out resultsCount) ? resultsCount : BingDefaultSearchLimit;
+                int offset = int.TryParse(skip, out offset) ? offset : BingDefaultOffset;
 
                 try
                 {
@@ -71,7 +76,8 @@ namespace Chronozoom.UI
                     bingContainer.Credentials = new NetworkCredential(BingAccountKey, BingAccountKey);
 
                     var imageQuery = bingContainer.Image(query, null, null, null, null, null, null);
-                    imageQuery = imageQuery.AddQueryOption("$top", BingDefaultSearchLimit);
+                    imageQuery = imageQuery.AddQueryOption("$top", resultsCount);
+                    imageQuery = imageQuery.AddQueryOption("$skip", offset);
 
                     var webResults = imageQuery.Execute();
 
@@ -96,7 +102,7 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
-        BaseJsonResult<IEnumerable<BingSearchVideoResult>> IBingSearchAPI.GetVideos(string query)
+        BaseJsonResult<IEnumerable<BingSearchVideoResult>> IBingSearchAPI.GetVideos(string query, string top, string skip)
         {
             return ApiOperation<BaseJsonResult<IEnumerable<BingSearchVideoResult>>>(delegate(User user, Storage storage)
             {
@@ -107,12 +113,15 @@ namespace Chronozoom.UI
                     BingAccountKey = ConfigurationManager.AppSettings["AzureMarketplaceAccountKey"];
                 }
 
-                //if (user == null)
-                //{
-                //    // Setting status code to 403 to prevent redirection to authentication resource if status code is 401.
-                //    SetStatusCode(HttpStatusCode.Forbidden, ErrorDescription.UnauthorizedUser);
-                //    return new BaseJsonResult<IEnumerable<BingSearchVideoResult>>(searchResults);
-                //}
+                if (user == null)
+                {
+                    // Setting status code to 403 to prevent redirection to authentication resource if status code is 401.
+                    SetStatusCode(HttpStatusCode.Forbidden, ErrorDescription.UnauthorizedUser);
+                    return new BaseJsonResult<IEnumerable<BingSearchVideoResult>>(searchResults);
+                }
+
+                int resultsCount = int.TryParse(top, out resultsCount) ? resultsCount : BingDefaultSearchLimit;
+                int offset = int.TryParse(skip, out offset) ? offset : BingDefaultOffset;
 
                 try
                 {
@@ -120,7 +129,8 @@ namespace Chronozoom.UI
                     bingContainer.Credentials = new NetworkCredential(BingAccountKey, BingAccountKey);
 
                     var videoQuery = bingContainer.Video(query, null, null, null, null, null, null, null);
-                    videoQuery = videoQuery.AddQueryOption("$top", BingDefaultSearchLimit);
+                    videoQuery = videoQuery.AddQueryOption("$top", resultsCount);
+                    videoQuery = videoQuery.AddQueryOption("$skip", offset);
 
                     var webResults = videoQuery.Execute();
 
@@ -145,7 +155,7 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
-        BaseJsonResult<IEnumerable<BingSearchDocumentResult>> IBingSearchAPI.GetDocuments(string query, string doctype)
+        BaseJsonResult<IEnumerable<BingSearchDocumentResult>> IBingSearchAPI.GetDocuments(string query, string doctype, string top, string skip)
         {
             return ApiOperation<BaseJsonResult<IEnumerable<BingSearchDocumentResult>>>(delegate(User user, Storage storage)
             {
@@ -156,12 +166,15 @@ namespace Chronozoom.UI
                     BingAccountKey = ConfigurationManager.AppSettings["AzureMarketplaceAccountKey"];
                 }
 
-                //if (user == null)
-                //{
-                //    // Setting status code to 403 to prevent redirection to authentication resource if status code is 401.
-                //    SetStatusCode(HttpStatusCode.Forbidden, ErrorDescription.UnauthorizedUser);
-                //    return new BaseJsonResult<IEnumerable<BingSearchDocumentResult>>(searchResults);
-                //}
+                if (user == null)
+                {
+                    // Setting status code to 403 to prevent redirection to authentication resource if status code is 401.
+                    SetStatusCode(HttpStatusCode.Forbidden, ErrorDescription.UnauthorizedUser);
+                    return new BaseJsonResult<IEnumerable<BingSearchDocumentResult>>(searchResults);
+                }
+
+                int resultsCount = int.TryParse(top, out resultsCount) ? resultsCount : BingDefaultSearchLimit;
+                int offset = int.TryParse(skip, out offset) ? offset : BingDefaultOffset;
 
                 try
                 {
@@ -169,7 +182,8 @@ namespace Chronozoom.UI
                     bingContainer.Credentials = new NetworkCredential(BingAccountKey, BingAccountKey);
 
                     var webQuery = bingContainer.Web(query, null, null, null, null, null, null, doctype);
-                    webQuery = webQuery.AddQueryOption("$top", BingDefaultSearchLimit);
+                    webQuery = webQuery.AddQueryOption("$top", resultsCount);
+                    webQuery = webQuery.AddQueryOption("$skip", offset);
 
                     var webResults = webQuery.Execute();
                 

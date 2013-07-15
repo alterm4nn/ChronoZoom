@@ -24,6 +24,8 @@ If you are new to GitHub, we recommend reading [Learning to use GitHub for Chron
 
 [Deploy ChronoZoom to Azure](#deploy-chronozoom-to-azure)
 
+[How to set up Bing search API](#how-to-set-up-bing-search-api)
+
 ----------
 
 ##  Install the ChronoZoom Development Environment Tools ##
@@ -161,3 +163,20 @@ Open the Git command prompt and use the following command. You will be prompted 
 ### Preview Your Site! ###
 
 Browse to http://**mycz**.azurewebsites.net/ and behold your own copy of ChronoZoom! Your site URL is listed in the **quick glance** column of the Azure dashboard. For operational management details, see [Chronozoom Operations Guide](Doc/ChronoZoom_Operations_Guide.md).
+
+## How to set up Bing search API ##
+Bing search API is used in Authoring Tool, you need to provide Windows Azure Marketplace Account Key to be able to use it.
+
+1. Login to [Windows Azure Marketplace] (https://datamarket.azure.com).
+
+1. Subscribe to [Bing search API] (https://datamarket.azure.com/dataset/bing/search).
+
+1. Go to [Account Keys] (https://datamarket.azure.com/account/keys) in [My Account] (https://datamarket.azure.com/account).
+
+1. Create a new **Account Key** and copy it.
+
+1. In **web.config** file of **Chronozoom.UI** find
+	```
+	<add key="AzureMarketplaceAccountKey" value="" />
+	```
+and paste your copied **Account Key** in **value** field.
