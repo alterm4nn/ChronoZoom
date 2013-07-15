@@ -125,9 +125,16 @@ var CZ;
             };
             FormEditExhibit.prototype.onSave = function () {
                 var _this = this;
+                var exhibit_x = this.datePicker.getDate() - this.exhibit.width / 2;
+                if(exhibit_x + this.exhibit.width >= this.exhibit.parent.x + this.exhibit.parent.width) {
+                    exhibit_x = this.exhibit.parent.x + this.exhibit.parent.width - this.exhibit.width;
+                }
+                if(exhibit_x <= this.exhibit.parent.x) {
+                    exhibit_x = this.exhibit.parent.x;
+                }
                 var newExhibit = {
                     title: this.titleInput.val() || "",
-                    x: this.datePicker.getDate() - this.exhibit.width / 2,
+                    x: exhibit_x,
                     y: this.exhibit.y,
                     height: this.exhibit.height,
                     width: this.exhibit.width,
