@@ -3122,8 +3122,7 @@ var CZ;
                         _this.putTourAsync(CZ.Tours.tours.length).done(function (tour) {
                             self.tour = tour;
                             CZ.Tours.tours.push(tour);
-                            self.initializeAsEdit();
-                            alert("Tour created.");
+                            _this.hide();
                         }).fail(function (f) {
                             if(console && console.error) {
                                 console.error("Failed to create a tour: " + f.status + " " + f.statusText);
@@ -3137,7 +3136,7 @@ var CZ;
                             if(CZ.Tours.tours[i] === _this.tour) {
                                 _this.putTourAsync(i).done(function (tour) {
                                     _this.tour = CZ.Tours.tours[i] = tour;
-                                    alert("Tour updated.");
+                                    _this.hide();
                                 }).fail(function (f) {
                                     if(console && console.error) {
                                         console.error("Failed to update a tour: " + f.status + " " + f.statusText);
@@ -11031,7 +11030,7 @@ var CZ;
                 if(String(e).length > 254) {
                     return false;
                 }
-                var filter = /^([\w^_]+(?:([-_\.\+][\w^_]+)|)|(xn--[\w^_]+))@([\w^_]+(?:(-+[\w^_]+)|)|(xn--[\w^_]+))(?:\.([\w^_]+(?:([\w-_\.\+][\w^_]+)|)|(xn--[\w^_]+)))$/i;
+                var filter = /^([\w^_]+((?:([-_.\+][\w^_]+)|))+|(xn--[\w^_]+))@([\w^_]+(?:(-+[\w^_]+)|)|(xn--[\w^_]+))(?:\.([\w^_]+(?:([\w-_\.\+][\w^_]+)|)|(xn--[\w^_]+)))$/i;
                 return String(e).search(filter) != -1;
             };
             FormEditProfile.prototype.validUsername = function (e) {
