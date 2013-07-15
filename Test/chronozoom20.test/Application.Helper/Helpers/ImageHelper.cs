@@ -15,21 +15,8 @@ namespace Application.Helper.Helpers
             Screenshot screenshotString = ScreenshotManager.GetScreenshot();
             MemoryStream streamBitmap = new MemoryStream(screenshotString.AsByteArray);
             Bitmap sourceImage = new Bitmap(Image.FromStream(streamBitmap));
-            //Point coordinate = ImageSearchEngine.ImageCoordinateFinder.GetTargetImagePosition(sourceImage, targetImagePath);
-            Rectangle searchArea = GetBibliographySearchArea();
-            Point coordinate = ImageSearchEngine.AForgeImageCoordinateFinder.FindImage(sourceImage, targetImagePath, searchArea);
+            Point coordinate = ImageSearchEngine.ImageCoordinateFinder.GetTargetImagePosition(sourceImage, targetImagePath);
             ClickByCoordinates(coordinate.X + 1, coordinate.Y + 1);
-        }
-
-        private Rectangle GetBibliographySearchArea()
-        {
-            IWebElement screen = FindElement(By.TagName("body"));
-            int x = screen.Size.Width / 3;
-            int y = 2 * screen.Size.Height / 3;
-            int width = x;
-            int height = screen.Size.Height / 3;
-            Rectangle searchArea = new Rectangle(x, y, width, height);
-            return searchArea;
         }
     }
 }

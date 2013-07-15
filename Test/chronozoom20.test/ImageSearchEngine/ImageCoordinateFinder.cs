@@ -79,7 +79,7 @@ namespace ImageSearchEngine
             sourceImage.UnlockBits(mainImageData);
             if (startAndEndPoints.Count == 0)
             {
-                throw new NoSuchImageException("Target image is not found.");
+                throw new ImageNotFoundException("Target image is not found.");
             }
             return startAndEndPoints[0];
 
