@@ -109,6 +109,19 @@ namespace Chronozoom.Entities
             return new Collection<Timeline>(timelines);
         }
 
+        /// <summary>
+        /// This required for override default precision and scale of decimal/numeric type
+        /// </summary>
+        /// <param name="modelBuilder"></param>
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Timeline>().Property(x => x.FromYear).HasPrecision(18, 7);
+            modelBuilder.Entity<Timeline>().Property(x => x.ToYear).HasPrecision(18, 7);
+            modelBuilder.Entity<Exhibit>().Property(x => x.Year).HasPrecision(18, 7);
+            modelBuilder.Entity<ContentItem>().Property(x => x.Year).HasPrecision(18, 7);
+        }
+
         public IEnumerable<Timeline> RetrieveAllTimelines(Guid collectionId)
         {
             int maxAllElements = 0;
