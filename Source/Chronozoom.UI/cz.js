@@ -10786,6 +10786,10 @@ var CZ;
             FormEditExhibit.prototype.close = function (noAnimation) {
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
                 var _this = this;
+                var r = window.confirm("Are you sure you want to close?");
+                if(r != true) {
+                    return;
+                }
                 _super.prototype.close.call(this, noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",

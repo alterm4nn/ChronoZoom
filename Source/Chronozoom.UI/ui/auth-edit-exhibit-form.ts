@@ -22,14 +22,14 @@ module CZ {
             private titleInput: JQuery;
             private datePicker: DatePicker;
             private createArtifactButton: JQuery;
-            public  contentItemsListBox: ContentItemListBox;
+            public contentItemsListBox: ContentItemListBox;
             private errorMessage: JQuery;
             private saveButton: JQuery;
             private deleteButton: JQuery;
 
             private contentItemsTemplate: JQuery;
 
-            public  exhibit: any; // CanvasInfodot
+            public exhibit: any; // CanvasInfodot
             private exhibitCopy: any;
 
             private mode; // create | edit
@@ -55,7 +55,7 @@ module CZ {
                 this.exhibitCopy = $.extend({}, formInfo.context, { children: null }); // shallow copy of exhibit (without children)
                 this.exhibitCopy = $.extend(true, {}, this.exhibitCopy); // deep copy of exhibit
                 delete this.exhibitCopy.children;
-                
+
                 this.mode = CZ.Authoring.mode; // deep copy mode. it never changes throughout the lifecycle of the form.
                 this.isCancel = true;
 
@@ -149,13 +149,13 @@ module CZ {
 
                 var exhibit_x = this.datePicker.getDate() - this.exhibit.width / 2;
 
-               if (exhibit_x + this.exhibit.width  >= this.exhibit.parent.x + this.exhibit.parent.width) {
-                   exhibit_x = this.exhibit.parent.x + this.exhibit.parent.width - this.exhibit.width;
-               }
-               if (exhibit_x <= this.exhibit.parent.x) {
-                   exhibit_x = this.exhibit.parent.x; 
-               }
-               var newExhibit = {
+                if (exhibit_x + this.exhibit.width >= this.exhibit.parent.x + this.exhibit.parent.width) {
+                    exhibit_x = this.exhibit.parent.x + this.exhibit.parent.width - this.exhibit.width;
+                }
+                if (exhibit_x <= this.exhibit.parent.x) {
+                    exhibit_x = this.exhibit.parent.x;
+                }
+                var newExhibit = {
                     title: this.titleInput.val() || "",
                     x: exhibit_x,
                     y: this.exhibit.y,
@@ -172,12 +172,12 @@ module CZ {
 
                     this.saveButton.prop('disabled', true);
                     CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(
-                        success => { 
+                        success => {
                             this.isCancel = false;
                             this.close();
-                            
+
                             this.exhibit.id = arguments[0].id;
-                            
+
                             this.exhibit.onmouseclick();
 
                         },
@@ -278,6 +278,10 @@ module CZ {
             }
 
             public close(noAnimation?: bool = false) {
+                var r = window.confirm("Are you sure you want to close?");
+                if (r != true) {
+                    return;
+                }
                 super.close(noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",
