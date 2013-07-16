@@ -10657,11 +10657,18 @@ var CZ;
                 delete this.exhibitCopy.children;
                 this.mode = CZ.Authoring.mode;
                 this.isCancel = true;
+                this.isModified = false;
                 this.initUI();
             }
             FormEditExhibit.prototype.initUI = function () {
                 var _this = this;
                 this.saveButton.prop('disabled', false);
+                this.titleInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.datePicker.datePicker.change(function () {
+                    _this.isModified = true;
+                });
                 if(this.mode === "createExhibit") {
                     this.titleTextblock.text("Create Exhibit");
                     this.saveButton.text("create exhibit");
@@ -10724,6 +10731,7 @@ var CZ;
                 }
             };
             FormEditExhibit.prototype.onCreateArtifact = function () {
+                this.isModified = true;
                 if(this.exhibit.contentItems.length < CZ.Settings.infodotMaxContentItemsCount) {
                     this.exhibit.title = this.titleInput.val() || "";
                     this.exhibit.x = this.datePicker.getDate() - this.exhibit.width / 2;
@@ -10783,6 +10791,7 @@ var CZ;
                     this.saveButton.prop('disabled', true);
                     CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(function (success) {
                         _this.isCancel = false;
+                        _this.isModified = false;
                         _this.close();
                         _this.exhibit.id = arguments[0].id;
                         _this.exhibit.onmouseclick();
@@ -10805,6 +10814,7 @@ var CZ;
                 if(confirm("Are you sure want to delete the exhibit and all of its content items? Delete can't be undone!")) {
                     CZ.Authoring.removeExhibit(this.exhibit);
                     this.isCancel = false;
+                    this.isModified = true;
                     this.close();
                 }
             };
@@ -10833,6 +10843,7 @@ var CZ;
             };
             FormEditExhibit.prototype.onContentItemRemoved = function (item, _) {
                 var idx;
+                this.isModified = true;
                 if(typeof item.data.order !== 'undefined' && item.data.order !== null && item.data.order >= 0 && item.data.order < CZ.Settings.infodotMaxContentItemsCount) {
                     idx = item.data.order;
                 } else if(typeof item.data.guid !== 'undefined' && item.data.guid !== null) {
@@ -10852,6 +10863,7 @@ var CZ;
                 }
             };
             FormEditExhibit.prototype.onContentItemMove = function (item, indexStart, indexStop) {
+                this.isModified = true;
                 var ci = this.exhibit.contentItems.splice(indexStart, 1)[0];
                 this.exhibit.contentItems.splice(indexStop, 0, ci);
                 for(var i = 0; i < this.exhibit.contentItems.length; i++) {
@@ -10883,6 +10895,13 @@ var CZ;
             FormEditExhibit.prototype.close = function (noAnimation) {
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
                 var _this = this;
+                if(this.isModified) {
+                    var r = window.confirm("There is unsaved data. Do you want to close without saving?");
+                    if(r != true) {
+                        return;
+                    }
+                    this.isModified = false;
+                }
                 _super.prototype.close.call(this, noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",
@@ -10933,11 +10952,30 @@ var CZ;
                 this.contentItem = formInfo.context.contentItem;
                 this.mode = CZ.Authoring.mode;
                 this.isCancel = true;
+                this.isModified = false;
                 this.initUI();
             }
             FormEditCI.prototype.initUI = function () {
                 var _this = this;
                 this.saveButton.prop('disabled', false);
+                this.titleInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.mediaInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.mediaSourceInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.mediaTypeInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.attributionInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.descriptionInput.change(function () {
+                    _this.isModified = true;
+                });
                 if(CZ.Authoring.contentItemMode === "createContentItem") {
                     this.titleTextblock.text("Create New");
                     this.saveButton.text("create artifiact");
@@ -11009,12 +11047,15 @@ var CZ;
                             clickedListItem.descrTextblock.text(newContentItem.description);
                             $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
                             (this.prevForm).exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
+                            (this.prevForm).isModified = true;
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
+                            this.isModified = false;
                             this.back();
                         } else {
                             this.saveButton.prop('disabled', true);
                             CZ.Authoring.updateContentItem(this.exhibit, this.contentItem, newContentItem).then(function (response) {
                                 _this.isCancel = false;
+                                _this.isModified = false;
                                 _this.close();
                             }, function (error) {
                                 alert("Unable to save changes. Please try again later.");
@@ -11040,6 +11081,13 @@ var CZ;
             };
             FormEditCI.prototype.close = function (noAnimation) {
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
+                if(this.isModified) {
+                    var r = window.confirm("There is unsaved data. Do you want to close without saving?");
+                    if(r != true) {
+                        return;
+                    }
+                    this.isModified = false;
+                }
                 _super.prototype.close.call(this, noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",

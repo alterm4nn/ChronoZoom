@@ -24,11 +24,30 @@ var CZ;
                 this.contentItem = formInfo.context.contentItem;
                 this.mode = CZ.Authoring.mode;
                 this.isCancel = true;
+                this.isModified = false;
                 this.initUI();
             }
             FormEditCI.prototype.initUI = function () {
                 var _this = this;
                 this.saveButton.prop('disabled', false);
+                this.titleInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.mediaInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.mediaSourceInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.mediaTypeInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.attributionInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.descriptionInput.change(function () {
+                    _this.isModified = true;
+                });
                 if(CZ.Authoring.contentItemMode === "createContentItem") {
                     this.titleTextblock.text("Create New");
                     this.saveButton.text("create artifiact");
@@ -100,12 +119,15 @@ var CZ;
                             clickedListItem.descrTextblock.text(newContentItem.description);
                             $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
                             (this.prevForm).exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
+                            (this.prevForm).isModified = true;
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
+                            this.isModified = false;
                             this.back();
                         } else {
                             this.saveButton.prop('disabled', true);
                             CZ.Authoring.updateContentItem(this.exhibit, this.contentItem, newContentItem).then(function (response) {
                                 _this.isCancel = false;
+                                _this.isModified = false;
                                 _this.close();
                             }, function (error) {
                                 alert("Unable to save changes. Please try again later.");
@@ -131,6 +153,13 @@ var CZ;
             };
             FormEditCI.prototype.close = function (noAnimation) {
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
+                if(this.isModified) {
+                    var r = window.confirm("There is unsaved data. Do you want to close without saving?");
+                    if(r != true) {
+                        return;
+                    }
+                    this.isModified = false;
+                }
                 _super.prototype.close.call(this, noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",
