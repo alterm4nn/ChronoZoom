@@ -223,6 +223,8 @@
             CZ.Settings.timelineGradientFillStyle = themeSettings.timelineGradientFillStyle;
         }
         Settings.applyTheme = applyTheme;
+        Settings.defaultBingSearchTop = 50;
+        Settings.defaultBingSearchSkip = 0;
     })(CZ.Settings || (CZ.Settings = {}));
     var Settings = CZ.Settings;
 })(CZ || (CZ = {}));
@@ -3111,8 +3113,7 @@ var CZ;
                         _this.putTourAsync(CZ.Tours.tours.length).done(function (tour) {
                             self.tour = tour;
                             CZ.Tours.tours.push(tour);
-                            self.initializeAsEdit();
-                            alert("Tour created.");
+                            _this.hide();
                         }).fail(function (f) {
                             if(console && console.error) {
                                 console.error("Failed to create a tour: " + f.status + " " + f.statusText);
@@ -3126,7 +3127,7 @@ var CZ;
                             if(CZ.Tours.tours[i] === _this.tour) {
                                 _this.putTourAsync(i).done(function (tour) {
                                     _this.tour = CZ.Tours.tours[i] = tour;
-                                    alert("Tour updated.");
+                                    _this.hide();
                                 }).fail(function (f) {
                                     if(console && console.error) {
                                         console.error("Failed to update a tour: " + f.status + " " + f.statusText);
@@ -3626,11 +3627,15 @@ var CZ;
             });
         }
         Service.getSearch = getSearch;
-        function getBingImages(query) {
+        function getBingImages(query, top, skip) {
+            if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
+            if (typeof skip === "undefined") { skip = CZ.Settings.defaultBingSearchSkip; }
             var request = new Service.Request(_serviceUrl);
             request.addToPath("bing/getImages");
             var data = {
-                query: query
+                query: query,
+                top: top,
+                skip: skip
             };
             return $.ajax({
                 type: "GET",
@@ -3645,11 +3650,15 @@ var CZ;
             });
         }
         Service.getBingImages = getBingImages;
-        function getBingVideos(query) {
+        function getBingVideos(query, top, skip) {
+            if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
+            if (typeof skip === "undefined") { skip = CZ.Settings.defaultBingSearchSkip; }
             var request = new Service.Request(_serviceUrl);
             request.addToPath("bing/getVideos");
             var data = {
-                query: query
+                query: query,
+                top: top,
+                skip: skip
             };
             return $.ajax({
                 type: "GET",
@@ -3664,12 +3673,17 @@ var CZ;
             });
         }
         Service.getBingVideos = getBingVideos;
-        function getBingDocuments(query, doctype) {
+        function getBingDocuments(query, doctype, top, skip) {
+            if (typeof doctype === "undefined") { doctype = undefined; }
+            if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
+            if (typeof skip === "undefined") { skip = CZ.Settings.defaultBingSearchSkip; }
             var request = new Service.Request(_serviceUrl);
             request.addToPath("bing/getDocuments");
             var data = {
                 query: query,
-                doctype: doctype
+                doctype: doctype,
+                top: top,
+                skip: skip
             };
             return $.ajax({
                 type: "GET",
@@ -11179,7 +11193,7 @@ var CZ;
                 if(String(e).length > 254) {
                     return false;
                 }
-                var filter = /^([\w^_]+(?:([-_\.\+][\w^_]+)|)|(xn--[\w^_]+))@([\w^_]+(?:(-+[\w^_]+)|)|(xn--[\w^_]+))(?:\.([\w^_]+(?:([\w-_\.\+][\w^_]+)|)|(xn--[\w^_]+)))$/i;
+                var filter = /^([\w^_]+((?:([-_.\+][\w^_]+)|))+|(xn--[\w^_]+))@([\w^_]+(?:(-+[\w^_]+)|)|(xn--[\w^_]+))(?:\.([\w^_]+(?:([\w-_\.\+][\w^_]+)|)|(xn--[\w^_]+)))$/i;
                 return String(e).search(filter) != -1;
             };
             FormEditProfile.prototype.validUsername = function (e) {

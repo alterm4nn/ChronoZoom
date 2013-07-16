@@ -459,12 +459,14 @@ module CZ {
         }
 
         // .../bing/getImages
-        export function getBingImages(query) {
+        export function getBingImages(query, top = CZ.Settings.defaultBingSearchTop, skip = CZ.Settings.defaultBingSearchSkip) {
             var request = new Service.Request(_serviceUrl);
             request.addToPath("bing/getImages");
 
             var data = {
-                query: query
+                query: query,
+                top: top,
+                skip: skip
             };
 
             return $.ajax({
@@ -481,12 +483,14 @@ module CZ {
         }
 
         // .../bing/getVideos
-        export function getBingVideos(query) {
+        export function getBingVideos(query, top = CZ.Settings.defaultBingSearchTop, skip = CZ.Settings.defaultBingSearchSkip) {
             var request = new Service.Request(_serviceUrl);
             request.addToPath("bing/getVideos");
 
             var data = {
-                query: query
+                query: query,
+                top: top,
+                skip: skip
             };
 
             return $.ajax({
@@ -503,13 +507,16 @@ module CZ {
         }
 
         // .../bing/getDocuments
-        export function getBingDocuments(query, doctype) {
+        // set doctype to undefined if you want it to be omited
+        export function getBingDocuments(query, doctype = undefined, top = CZ.Settings.defaultBingSearchTop, skip = CZ.Settings.defaultBingSearchSkip) {
             var request = new Service.Request(_serviceUrl);
             request.addToPath("bing/getDocuments");
 
             var data = {
                 query: query,
-                doctype: doctype
+                doctype: doctype,
+                top: top,
+                skip: skip
             };
 
             return $.ajax({

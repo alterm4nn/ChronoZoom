@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants\ApiConstants.cs" />
+    <Compile Include="Constants\ImageTemplateFilesLocations.cs" />
     <Compile Include="Constants\Javascripts.cs" />
     <Compile Include="Entities\ContentItem.cs" />
     <Compile Include="Entities\Exhibit.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="Helpers\DateTimeHelper.cs" />
     <Compile Include="Helpers\ExhibitHelper.cs" />
     <Compile Include="Helpers\HomePageHelper.cs" />
+    <Compile Include="Helpers\ImageHelper.cs" />
     <Compile Include="Helpers\NavigationHelper.cs" />
     <Compile Include="Helpers\SearchHelper.cs" />
     <Compile Include="Helpers\TimelineHelper.cs" />
@@ -98,6 +100,10 @@
     <ProjectReference Include="..\Application.Driver\Application.Driver.csproj">
       <Project>{ac1310bd-eacc-4b45-bcaf-2d8a0260e2d1}</Project>
       <Name>Application.Driver</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ImageSearchEngine\ImageSearchEngine.csproj">
+      <Project>{6899b01e-ee1e-45cd-acd3-b44d0790975c}</Project>
+      <Name>ImageSearchEngine</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
