@@ -37,6 +37,11 @@ namespace Application.Driver
             Screenshot ss = ((ITakesScreenshot)WebDriver).GetScreenshot();
             AddScreenshot(guid.ToString(), ss);
         }
+
+        public static Screenshot GetScreenshot()
+        {
+            return ((ITakesScreenshot)WebDriver).GetScreenshot();
+        }
     }
 
     public class TempScreenshot

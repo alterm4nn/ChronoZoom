@@ -371,6 +371,77 @@ var CZ;
             });
         }
         Service.getSearch = getSearch;
+        function getBingImages(query, top, skip) {
+            if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
+            if (typeof skip === "undefined") { skip = CZ.Settings.defaultBingSearchSkip; }
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getImages");
+            var data = {
+                query: query,
+                top: top,
+                skip: skip
+            };
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                    console.log(response.d);
+                }
+            });
+        }
+        Service.getBingImages = getBingImages;
+        function getBingVideos(query, top, skip) {
+            if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
+            if (typeof skip === "undefined") { skip = CZ.Settings.defaultBingSearchSkip; }
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getVideos");
+            var data = {
+                query: query,
+                top: top,
+                skip: skip
+            };
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                    console.log(response.d);
+                }
+            });
+        }
+        Service.getBingVideos = getBingVideos;
+        function getBingDocuments(query, doctype, top, skip) {
+            if (typeof doctype === "undefined") { doctype = undefined; }
+            if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
+            if (typeof skip === "undefined") { skip = CZ.Settings.defaultBingSearchSkip; }
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getDocuments");
+            var data = {
+                query: query,
+                doctype: doctype,
+                top: top,
+                skip: skip
+            };
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                    console.log(response.d);
+                }
+            });
+        }
+        Service.getBingDocuments = getBingDocuments;
         function getServiceInformation() {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
