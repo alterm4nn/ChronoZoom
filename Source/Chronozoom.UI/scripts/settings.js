@@ -9,7 +9,7 @@ var CZ;
         Settings.zoomSpeedFactor = 2.0;
         Settings.zoomLevelFactor = 1.4;
         Settings.allowedVisibileImprecision = 0.00001;
-        Settings.allowedMathImprecision = 0.0000001;
+        Settings.allowedMathImprecision = 0.000001;
         Settings.allowedMathImprecisionDecimals = parseInt(Settings.allowedMathImprecision.toExponential().split("-")[1]);
         Settings.canvasElementAnimationTime = 1300;
         Settings.canvasElementFadeInTime = 400;
