@@ -549,7 +549,7 @@ var CZ;
                 }
                 var hoveredInfodot = CZ.Common.vc.virtualCanvas("getHoveredInfodot");
                 var actAni = CZ.Common.controller.activeAnimation != undefined;
-                if(actAni && !hoveredInfodot.id) {
+                if(actAni) {
                     var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
                     CZ.Common.updateMarker();
                 }
