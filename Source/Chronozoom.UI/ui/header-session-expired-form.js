@@ -44,9 +44,6 @@ var CZ;
             };
             FormHeaderSessionExpired.prototype.show = function () {
                 var _this = this;
-                this.timer = setTimeout(function () {
-                    _this.onTimer();
-                }, 1000);
                 _super.prototype.show.call(this, {
                     effect: "slide",
                     direction: "left",
@@ -54,6 +51,9 @@ var CZ;
                     complete: function () {
                     }
                 });
+                this.timer = setTimeout(function () {
+                    _this.onTimer();
+                }, 1000);
                 this.activationSource.addClass("active");
             };
             FormHeaderSessionExpired.prototype.close = function () {

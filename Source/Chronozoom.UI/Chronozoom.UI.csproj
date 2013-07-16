@@ -392,6 +392,9 @@
     <Content Include="ui\header-session-expired-form.js">
       <DependentUpon>header-session-expired-form.ts</DependentUpon>
     </Content>
+    <Content Include="ui\header-session-expired-form.min.js">
+      <DependentUpon>header-session-expired-form.ts</DependentUpon>
+    </Content>
     <Content Include="ui\header-session-expired-form.ts" />
     <Content Include="ui\header-search-form.html" />
     <Content Include="ui\header-search-form.js">
