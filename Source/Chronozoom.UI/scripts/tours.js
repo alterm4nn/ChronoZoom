@@ -391,7 +391,7 @@ var CZ;
             if(isAudioEnabled == undefined) {
                 isAudioEnabled = Tours.isNarrationOn;
             }
-            if(newTour != undefined) {
+            function startTour() {
                 Tours.tour = newTour;
                 Tours.tour.tour_TourFinished.push(function (tour) {
                     hideBookmark(tour);
@@ -408,6 +408,29 @@ var CZ;
                     Tours.tour.isAudioLoaded = true;
                 }
                 tourResume();
+            }
+            if(newTour != undefined) {
+                if(newTour.isBuffered) {
+                    startTour();
+                } else {
+                    var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                    CZ.Common.IncreaseRequestsCount();
+                    CZ.Service.getTourTimelines({
+                        tourId: newTour.id,
+                        viewportwidth: vp.width,
+                        minTimelineSize: CZ.Settings.minTimelineWidth
+                    }).then(function (response) {
+                        CZ.Common.DecreaseRequestsCount();
+                        var root = CZ.Common.vc.virtualCanvas("getLayerContent");
+                        CZ.Layout.merge(response, root.children[0], false, function () {
+                            newTour.isBuffered = true;
+                            startTour();
+                        });
+                    }, function (error) {
+                        CZ.Common.DecreaseRequestsCount();
+                        console.log("Error connecting to service:\n" + error.responseText);
+                    });
+                }
             }
         }
         Tours.activateTour = activateTour;
@@ -472,8 +495,12 @@ var CZ;
             $("#bookmarks").hide();
             Tours.isBookmarksWindowVisible = false;
             var curURL = CZ.UrlNav.getURL();
-            delete curURL.hash.params["tour"];
-            delete curURL.hash.params["bookmark"];
+            if(curURL.hash && curURL.hash.params && curURL.hash.params["tour"]) {
+                delete curURL.hash.params["tour"];
+            }
+            if(curURL.hash && curURL.hash.params && curURL.hash.params["bookmark"]) {
+                delete curURL.hash.params["bookmark"];
+            }
             CZ.UrlNav.setURL(curURL);
         }
         Tours.tourAbort = tourAbort;
