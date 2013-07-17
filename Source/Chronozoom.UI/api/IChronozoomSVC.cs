@@ -648,7 +648,7 @@ namespace Chronozoom.UI
         /// </example>
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        BaseJsonResult<IEnumerable<BingSearchImageResult>> GetImages(string query, string top, string skip);
+        BaseJsonResult<IEnumerable<Bing.ImageResult>> GetImages(string query, string top, string skip);
 
         /// <summary>
         /// Performs videos search for a search query via Bing Search API.
@@ -666,7 +666,7 @@ namespace Chronozoom.UI
         /// </example>
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        BaseJsonResult<IEnumerable<BingSearchVideoResult>> GetVideos(string query, string top, string skip);
+        BaseJsonResult<IEnumerable<Bing.VideoResult>> GetVideos(string query, string top, string skip);
 
         /// <summary>
         /// Performs documents web search for a search query via Bing Search API.
@@ -685,6 +685,6 @@ namespace Chronozoom.UI
         /// </example>
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        BaseJsonResult<IEnumerable<BingSearchDocumentResult>> GetDocuments(string query, string doctype, string top, string skip);
+        BaseJsonResult<IEnumerable<Bing.WebResult>> GetDocuments(string query, string doctype, string top, string skip);
     }
 }
