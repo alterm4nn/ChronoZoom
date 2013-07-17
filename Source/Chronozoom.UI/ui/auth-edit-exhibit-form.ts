@@ -34,7 +34,7 @@ module CZ {
 
             private mode; // create | edit
             private isCancel: bool; // is form closed without saving changes
-            private isModified: bool;
+            public isModified: bool;
 
             public clickedListItem: ContentItemListItem; // the contentitem on which the user dbl clicked
 
@@ -290,7 +290,7 @@ module CZ {
 
             public close(noAnimation?: bool = false) {
                 if (this.isModified) {
-                    var r = window.confirm("Are you sure you want to close?");
+                    var r = window.confirm("There is unsaved data. Do you want to close without saving?");
                     if (r != true) {
                         return;
                     }
