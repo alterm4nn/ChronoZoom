@@ -23,7 +23,23 @@ module CZ {
             throw "Container parameter is invalid! It should be DIV, or ID of DIV, or jQuery instance of DIV.";
         }
 
-        container.mousemove(function (e) { mouseMove(e) });
+        var mouse_clicked = false;
+        var mouse_hovered = false;
+
+        container.mouseup(function (e) {
+            mouse_clicked = false;
+        });
+        container.mousedown(function (e) {
+            mouse_clicked = true;
+        });
+        container.mousemove(function (e) {
+            mouse_hovered = true;
+            mouseMove(e);
+        });
+        container.mouseleave(function (e) {
+            mouse_hovered = false;
+            mouse_clicked = false;
+        });
 
         /**
          * Private variables of timescale.
@@ -126,7 +142,7 @@ module CZ {
             }
         });
 
- 
+
         /**
          * Initializes timescale.
          */
@@ -532,15 +548,17 @@ module CZ {
         /**
          * Renders marker.
         */
-        this.setTimeMarker = function (time) {
-            if (time > CZ.Settings.maxPermitedTimeRange.right) time = CZ.Settings.maxPermitedTimeRange.right;
-            if (time < CZ.Settings.maxPermitedTimeRange.left) time = CZ.Settings.maxPermitedTimeRange.left;
-            var k = (_range.max - _range.min) / _width;
-            var point = (time - _range.max) / k + _width;
-            var text = _tickSources[_mode].getMarkerLabel(_range, time);
-            _markerPosition = point;
-            markerText.text(text);
-            marker.css("left", point - marker.width() / 2);
+        this.setTimeMarker = function (time, vcGesture = false) {
+            if ((!mouse_clicked) && (((!vcGesture) || ((vcGesture) && (!mouse_hovered))))) {
+                if (time > CZ.Settings.maxPermitedTimeRange.right) time = CZ.Settings.maxPermitedTimeRange.right;
+                if (time < CZ.Settings.maxPermitedTimeRange.left) time = CZ.Settings.maxPermitedTimeRange.left;
+                var k = (_range.max - _range.min) / _width;
+                var point = (time - _range.max) / k + _width;
+                var text = _tickSources[_mode].getMarkerLabel(_range, time);
+                _markerPosition = point;
+                markerText.text(text);
+                marker.css("left", point - marker.width() / 2);
+            }
         }
 
         /**
@@ -573,11 +591,11 @@ module CZ {
             renderSmallTicks();
         }
 
-         /**
-         * Get screen coordinates of tick.
-         * @param  {number} x [description]
-         * @return {[type]}   [description]
-         */
+        /**
+        * Get screen coordinates of tick.
+        * @param  {number} x [description]
+        * @return {[type]}   [description]
+        */
         this.getCoordinateFromTick = function (x) {
             var delta = _deltaRange;
             var k = _size / (_range.max - _range.min);
@@ -611,9 +629,6 @@ module CZ {
         this.update = function (range) {
             _range = range;
             render();
-            var k = (_range.max - _range.min) / _width;
-            var time = _range.max - k * (_width / 2);
-            that.setTimeMarker(time);
         };
 
         /**
@@ -827,7 +842,7 @@ module CZ {
             var localPresent = CZ.Dates.getPresent();
             this.present = { year: localPresent.getUTCFullYear(), month: localPresent.getUTCMonth(), day: localPresent.getUTCDate() };
 
-             // set default constant for arranging ticks
+            // set default constant for arranging ticks
             this.delta = 1;
             this.beta = Math.floor(Math.log(this.range.max - this.range.min) * this.log10);
 
@@ -907,10 +922,10 @@ module CZ {
 
             for (var i = 0; i < ticks.length - 1; i++) {
                 var t = ticks[i].position;
-                    for (var k = 1; k <= n; k++) {
-                        tick = t + step * k;
-                        minors.push(tick);
-                    }
+                for (var k = 1; k <= n; k++) {
+                    tick = t + step * k;
+                    minors.push(tick);
+                }
             }
 
             // create little ticks after last big tick
@@ -931,7 +946,7 @@ module CZ {
             return labelText;
         };
 
-         this.getVisibleForElement = function (element, scale, viewport, use_margin) {
+        this.getVisibleForElement = function (element, scale, viewport, use_margin) {
             var margin = 2 * (CZ.Settings.contentScaleMargin && use_margin ? CZ.Settings.contentScaleMargin : 0);
             var width = viewport.width - margin;
             if (width < 0)
@@ -1039,7 +1054,7 @@ module CZ {
         this.createSmallTicks = function (ticks) {
             // function to create minor ticks
             var minors = new Array();
-             //the amount of small ticks
+            //the amount of small ticks
             var n = 4;
 
             var beta1 = Math.floor(Math.log(this.range.max - this.range.min) * this.log10);
@@ -1209,10 +1224,10 @@ module CZ {
                     year++;
                 }
 
-        
+
                 if ((this.regime == "Quarters_Month") || (this.regime == "Month_Weeks")) {
-                      var tick = CZ.Dates.getCoordinateFromYMD(year, month, 1);
-                      if (tick >= this.range.min && tick <= this.range.max) {
+                    var tick = CZ.Dates.getCoordinateFromYMD(year, month, 1);
+                    if (tick >= this.range.min && tick <= this.range.max) {
                         if (tempDays != 1) {
                             if ((month % 3 == 0) || (this.regime == "Month_Weeks")) {
                                 ticks[num] = { position: tick, label: this.getDiv(tick) };
@@ -1257,7 +1272,7 @@ module CZ {
 
             var step;
 
-            var n;       
+            var n;
             var tick = ticks[0].position;
             var date = CZ.Dates.getYMDFromCoordinate(tick);
 
@@ -1357,10 +1372,11 @@ module CZ {
             var vs = {
                 centerX: element.x + element.width / 2.0,
                 centerY: element.y + element.height / 2.0,
-                scale: Math.min(scaleX,scaleY)
+                scale: Math.min(scaleX, scaleY)
             };
             return vs;
         };
-};
+    };
     CZ.DateTickSource.prototype = new CZ.TickSource;
 }
+
