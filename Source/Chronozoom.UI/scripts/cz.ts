@@ -6,8 +6,10 @@
 /// <reference path='tours.ts'/>
 /// <reference path='virtual-canvas.ts'/>
 /// <reference path='uiloader.ts'/>
+/// <reference path='media.ts'/>
 /// <reference path='../ui/controls/formbase.ts'/>
 /// <reference path='../ui/controls/datepicker.ts'/>
+/// <reference path='../ui/controls/medialist.ts'/>
 /// <reference path='../ui/auth-edit-timeline-form.ts'/>
 /// <reference path='../ui/auth-edit-exhibit-form.ts'/>
 /// <reference path='../ui/auth-edit-contentitem-form.ts'/>
