@@ -36,6 +36,7 @@ module CZ {
 
             private mode; // create | edit
             private isCancel: bool; // is form closed without saving changes
+            private isModified: bool;
 
             constructor(container: JQuery, formInfo: IFormEditCIInfo) {
                 super(container, formInfo);
@@ -57,12 +58,20 @@ module CZ {
 
                 this.mode = CZ.Authoring.mode; // deep copy mode. it never changes throughout the lifecycle of the form.
                 this.isCancel = true;
-
+                this.isModified = false;
                 this.initUI();
             }
 
             private initUI() {
                 this.saveButton.prop('disabled', false);
+
+                this.titleInput.change(() => { this.isModified = true; });
+                this.mediaInput.change(() => { this.isModified = true; });
+                this.mediaSourceInput.change(() => { this.isModified = true; });
+                this.mediaTypeInput.change(() => { this.isModified = true; });
+                this.attributionInput.change(() => { this.isModified = true; });
+                this.descriptionInput.change(() => { this.isModified = true; });
+
                 if (CZ.Authoring.contentItemMode === "createContentItem") {
                     this.titleTextblock.text("Create New");
                     this.saveButton.text("create artifiact");
@@ -136,13 +145,16 @@ module CZ {
                             clickedListItem.descrTextblock.text(newContentItem.description);
                             $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
                             (<FormEditExhibit>this.prevForm).exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
+                            (<FormEditExhibit>this.prevForm).isModified = true;
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
+                            this.isModified = false;
                             this.back();
                         } else {
                             this.saveButton.prop('disabled', true);
                             CZ.Authoring.updateContentItem(this.exhibit, this.contentItem, newContentItem).then(
                                 response => {
                                     this.isCancel = false;
+                                    this.isModified = false;
                                     this.close();
                                 },
                                 error => {
@@ -170,6 +182,14 @@ module CZ {
             }
 
             public close(noAnimation?: bool = false) {
+                if (this.isModified) {
+                    var r = window.confirm("There is unsaved data. Do you want to close without saving?");
+                    if (r != true) {
+                        return;
+                    }
+                    this.isModified = false;
+                }
+
                 super.close(noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",

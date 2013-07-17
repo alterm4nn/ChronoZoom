@@ -22,18 +22,19 @@ module CZ {
             private titleInput: JQuery;
             private datePicker: DatePicker;
             private createArtifactButton: JQuery;
-            public  contentItemsListBox: ContentItemListBox;
+            public contentItemsListBox: ContentItemListBox;
             private errorMessage: JQuery;
             private saveButton: JQuery;
             private deleteButton: JQuery;
 
             private contentItemsTemplate: JQuery;
 
-            public  exhibit: any; // CanvasInfodot
+            public exhibit: any; // CanvasInfodot
             private exhibitCopy: any;
 
             private mode; // create | edit
             private isCancel: bool; // is form closed without saving changes
+            public isModified: bool;
 
             public clickedListItem: ContentItemListItem; // the contentitem on which the user dbl clicked
 
@@ -55,15 +56,19 @@ module CZ {
                 this.exhibitCopy = $.extend({}, formInfo.context, { children: null }); // shallow copy of exhibit (without children)
                 this.exhibitCopy = $.extend(true, {}, this.exhibitCopy); // deep copy of exhibit
                 delete this.exhibitCopy.children;
-                
+
                 this.mode = CZ.Authoring.mode; // deep copy mode. it never changes throughout the lifecycle of the form.
                 this.isCancel = true;
-
+                this.isModified = false;
                 this.initUI();
             }
 
             private initUI() {
                 this.saveButton.prop('disabled', false);
+
+                this.titleInput.change(() => { this.isModified = true; });
+                this.datePicker.datePicker.change(() => { this.isModified = true; });
+
                 if (this.mode === "createExhibit") {
                     this.titleTextblock.text("Create Exhibit");
                     this.saveButton.text("create exhibit");
@@ -116,6 +121,7 @@ module CZ {
             }
 
             private onCreateArtifact() {
+                this.isModified = true;
                 if (this.exhibit.contentItems.length < CZ.Settings.infodotMaxContentItemsCount) {
                     this.exhibit.title = this.titleInput.val() || "";
                     this.exhibit.x = this.datePicker.getDate() - this.exhibit.width / 2;
@@ -146,16 +152,16 @@ module CZ {
             }
 
             private onSave() {
-
+                
                 var exhibit_x = this.datePicker.getDate() - this.exhibit.width / 2;
 
-               if (exhibit_x + this.exhibit.width  >= this.exhibit.parent.x + this.exhibit.parent.width) {
-                   exhibit_x = this.exhibit.parent.x + this.exhibit.parent.width - this.exhibit.width;
-               }
-               if (exhibit_x <= this.exhibit.parent.x) {
-                   exhibit_x = this.exhibit.parent.x; 
-               }
-               var newExhibit = {
+                if (exhibit_x + this.exhibit.width >= this.exhibit.parent.x + this.exhibit.parent.width) {
+                    exhibit_x = this.exhibit.parent.x + this.exhibit.parent.width - this.exhibit.width;
+                }
+                if (exhibit_x <= this.exhibit.parent.x) {
+                    exhibit_x = this.exhibit.parent.x;
+                }
+                var newExhibit = {
                     title: this.titleInput.val() || "",
                     x: exhibit_x,
                     y: this.exhibit.y,
@@ -172,12 +178,13 @@ module CZ {
 
                     this.saveButton.prop('disabled', true);
                     CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(
-                        success => { 
+                        success => {
                             this.isCancel = false;
+                            this.isModified = false;
                             this.close();
-                            
+
                             this.exhibit.id = arguments[0].id;
-                            
+
                             this.exhibit.onmouseclick();
 
                         },
@@ -204,8 +211,10 @@ module CZ {
                 if (confirm("Are you sure want to delete the exhibit and all of its content items? Delete can't be undone!")) {
                     CZ.Authoring.removeExhibit(this.exhibit);
                     this.isCancel = false;
+                    this.isModified = true;
                     this.close();
                 }
+                
             }
 
             private onContentItemDblClick(item: ListItemBase, _: number) {
@@ -232,6 +241,7 @@ module CZ {
 
             private onContentItemRemoved(item: ListItemBase, _: number) {
                 var idx;
+                this.isModified = true;
                 if (typeof item.data.order !== 'undefined' && item.data.order !== null
                     && item.data.order >= 0 && item.data.order < CZ.Settings.infodotMaxContentItemsCount) {
                     idx = item.data.order;
@@ -250,6 +260,7 @@ module CZ {
             }
 
             public onContentItemMove(item: ListItemBase, indexStart: number, indexStop: number) {
+                this.isModified = true;
                 var ci = this.exhibit.contentItems.splice(indexStart, 1)[0];
                 this.exhibit.contentItems.splice(indexStop, 0, ci);
                 for (var i = 0; i < this.exhibit.contentItems.length; i++) this.exhibit.contentItems[i].order = i;
@@ -278,6 +289,14 @@ module CZ {
             }
 
             public close(noAnimation?: bool = false) {
+                if (this.isModified) {
+                    var r = window.confirm("There is unsaved data. Do you want to close without saving?");
+                    if (r != true) {
+                        return;
+                    }
+                    this.isModified = false;
+                }
+
                 super.close(noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",
