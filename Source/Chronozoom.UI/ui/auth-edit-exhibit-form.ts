@@ -148,17 +148,26 @@ module CZ {
             private onSave() {
 
                 var exhibit_x = this.datePicker.getDate() - this.exhibit.width / 2;
+                var exhibit_y = this.exhibit.y;
 
-               if (exhibit_x + this.exhibit.width  >= this.exhibit.parent.x + this.exhibit.parent.width) {
-                   exhibit_x = this.exhibit.parent.x + this.exhibit.parent.width - this.exhibit.width;
-               }
-               if (exhibit_x <= this.exhibit.parent.x) {
-                   exhibit_x = this.exhibit.parent.x; 
-               }
+                if (exhibit_x + this.exhibit.width >= this.exhibit.parent.x + this.exhibit.parent.width) {
+                    exhibit_x = this.exhibit.parent.x + this.exhibit.parent.width - this.exhibit.width;
+                }
+                if (exhibit_x <= this.exhibit.parent.x) {
+                    exhibit_x = this.exhibit.parent.x;
+                }
+
+                if (exhibit_y + this.exhibit.height >= this.exhibit.parent.y + this.exhibit.parent.height) {
+                    exhibit_y = this.exhibit.parent.y + this.exhibit.parent.height - this.exhibit.height;
+                }
+                if (exhibit_y <= this.exhibit.parent.y) {
+                    exhibit_y = this.exhibit.parent.y;
+                }
+
                var newExhibit = {
                     title: this.titleInput.val() || "",
                     x: exhibit_x,
-                    y: this.exhibit.y,
+                    y: exhibit_y,
                     height: this.exhibit.height,
                     width: this.exhibit.width,
                     infodotDescription: { date: CZ.Dates.getDecimalYearFromCoordinate(this.datePicker.getDate()) },
