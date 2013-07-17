@@ -1,4 +1,4 @@
-![](images/CZ_beta_logo.png)
+![](images/CZ_logo.png)
 <center><h1>Developer's Guide</h1></center>
 
 ## Introduction ##
@@ -24,24 +24,24 @@ If you are new to GitHub, we recommend reading [Learning to use GitHub for Chron
 
 [Deploy ChronoZoom to Azure](#deploy-chronozoom-to-azure)
 
+[How to set up Bing search API](#how-to-set-up-bing-search-api)
+
 ----------
 
 ##  Install the ChronoZoom Development Environment Tools ##
 
 ### Minimum Requirements ###
 - [Visual Studio 2012 Ultimate](http://www.microsoft.com/visualstudio/eng/products/visual-studio-overview) or [Visual Studio Express for Web](http://www.microsoft.com/visualstudio/eng/products/visual-studio-express-for-web)
-- [Visual Studio 2012.2 CTP 3](http://www.microsoft.com/en-us/download/details.aspx?id=36833)
-- [Visual Studio Tools for Git](http://visualstudiogallery.msdn.microsoft.com/abafc7d6-dcaa-40f4-8a5e-d6724bdb980c)
-- [Chutzpah Test Adapter for Visual Studio 2012] (http://visualstudiogallery.msdn.microsoft.com/f8741f04-bae4-4900-81c7-7c9bfb9ed1fe)
-- [Git for Windows](http://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git)
- - Be sure to select 'Run Git from the Windows Command Prompt' during installation.
-- Install Windows Identity Foundation (Control Panel, Programs and Features, Turn Windows Feature on or off, Turn on Windows Identity Foundation 3.5)
+- [Visual Studio 2012 Update 3](http://www.microsoft.com/en-us/download/details.aspx?id=39305)
+- [Visual Studio Tools for Git](http://visualstudiogallery.msdn.microsoft.com/abafc7d6-dcaa-40f4-8a5e-d6724bdb980c) or [Git for Windows](http://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git) (be sure to select 'Run Git from the Windows Command Prompt' during installation).
+- [Chutzpah Test Adapter for Visual Studio 2012](http://visualstudiogallery.msdn.microsoft.com/f8741f04-bae4-4900-81c7-7c9bfb9ed1fe)
+- Windows Identity Foundation (Install via: Control Panel, Programs and Features, Turn Windows Feature on or off, Turn on Windows Identity Foundation 3.5)
 - [Stylecop](http://stylecop.codeplex.com/)
 
 ### Recommended ###
 - [Beyond Compare](http://www.scootersoftware.com/moreinfo.php)
  - [Using Beyond Compare with Git](http://www.scootersoftware.com/support.php?zz=kb_vcs)
-- [Markdown Pad for Windows](http://markdownpad.com/)
+- [MarkdownPad for Windows](http://markdownpad.com/)
 - [Web Essentials 2012](http://visualstudiogallery.msdn.microsoft.com/07d54d12-7133-4e15-becb-6f451ea3bea6) 
     - Note: This now requires ASP.NET and Web Tools 2012.2.
 - [Jetbrains Resharper](http://www.jetbrains.com/resharper)
@@ -161,3 +161,20 @@ Open the Git command prompt and use the following command. You will be prompted 
 ### Preview Your Site! ###
 
 Browse to http://**mycz**.azurewebsites.net/ and behold your own copy of ChronoZoom! Your site URL is listed in the **quick glance** column of the Azure dashboard. For operational management details, see [Chronozoom Operations Guide](Doc/ChronoZoom_Operations_Guide.md).
+
+## How to set up Bing search API ##
+Bing search API is used in Authoring Tool, you need to provide Windows Azure Marketplace Account Key to be able to use it.
+
+1. Login to [Windows Azure Marketplace] (https://datamarket.azure.com).
+
+1. Subscribe to [Bing search API] (https://datamarket.azure.com/dataset/bing/search).
+
+1. Go to [Account Keys] (https://datamarket.azure.com/account/keys) in [My Account] (https://datamarket.azure.com/account).
+
+1. Create a new **Account Key** and copy it.
+
+1. In **web.config** file of **Chronozoom.UI** find
+	```
+	<add key="AzureMarketplaceAccountKey" value="" />
+	```
+and paste your copied **Account Key** in **value** field.

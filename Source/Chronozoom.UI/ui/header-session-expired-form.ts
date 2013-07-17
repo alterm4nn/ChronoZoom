@@ -47,26 +47,12 @@ module CZ {
                     }, 1000);
                 } else {
                     clearTimeout(this.timer);
+
                     this.close();
                     document.location.href = "/account/logout";
                 }
             }
             public show(): void {
-                //this.timer = setInterval(() => {
-                //    if (this.time > 0) {
-                //        this.time--;
-                //        this.sessionTimeSpan.html(this.time.toString());
-                //    } else {
-                //        clearInterval(this.timer);
-                //        this.close();
-                //        document.location.href = "/account/logout";
-                //    }
-                //}, 1000);
-
-                this.timer = setTimeout(() => {
-                    this.onTimer();
-                }, 1000);
-
                 super.show({
                     effect: "slide",
                     direction: "left",
@@ -74,6 +60,10 @@ module CZ {
                     complete: () => {
                     }
                 });
+
+                this.timer = setTimeout(() => {
+                    this.onTimer();
+                }, 1000);
                 this.activationSource.addClass("active");
             }
 

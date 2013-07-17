@@ -104,11 +104,16 @@ module CZ {
                                 self.isCancel = false;
                                 self.close();
                                 
-                                //Move to new created timeline                              
+                                //Move to new created timeline
                                 self.timeline.onmouseclick();
                             },
                             function (error) {
-                                alert("Unable to save changes. Please try again later.");
+                                if (error !== undefined && error !== null) {
+                                    self.errorMessage.text(error);
+                                }
+                                else {
+                                    alert("Unable to save changes. Please try again later.");
+                                }
                                 console.log(error);
                             }
                         ).always(() => {

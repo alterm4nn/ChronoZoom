@@ -628,4 +628,63 @@ namespace Chronozoom.UI
         [WebGet(UriTemplate = "/{superCollectionName}/collections", ResponseFormat = WebMessageFormat.Json)]
         IEnumerable<Collection> GetCollections(string superCollectionName);
     }
+
+    [ServiceContract(Namespace = "")]
+    public interface IBingSearchAPI
+    {
+        /// <summary>
+        /// Performs images search for a search query via Bing Search API.
+        /// </summary>
+        /// <param name="query">The query to search for.</param>
+        /// <param name="top">The number of the results to return.</param>
+        /// <param name="skip">The offset requested for the srarting point of returned results.</param>
+        /// <returns>Search results (images) in JSON format.</returns>
+        /// <example><![CDATA[ 
+        /// HTTP verb: GET
+        ///
+        /// URL:
+        /// http://{URL}/api/bing/getImages?query={query}&top={top}&skip={skip}
+        /// ]]>
+        /// </example>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        BaseJsonResult<IEnumerable<BingSearchImageResult>> GetImages(string query, string top, string skip);
+
+        /// <summary>
+        /// Performs videos search for a search query via Bing Search API.
+        /// </summary>
+        /// <param name="query">The query to search for.</param>
+        /// <param name="top">The number of the results to return.</param>
+        /// <param name="skip">The offset requested for the srarting point of returned results.</param>
+        /// <returns>Search results (videos) in JSON format.</returns>
+        /// <example><![CDATA[ 
+        /// HTTP verb: GET
+        ///
+        /// URL:
+        /// http://{URL}/api/bing/getVideos?query={query}&top={top}&skip={skip}
+        /// ]]>
+        /// </example>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        BaseJsonResult<IEnumerable<BingSearchVideoResult>> GetVideos(string query, string top, string skip);
+
+        /// <summary>
+        /// Performs documents web search for a search query via Bing Search API.
+        /// </summary>
+        /// <param name="query">The query to search for.</param>
+        /// <param name="doctype">The filetype to search for.</param>
+        /// <param name="top">The number of the results to return.</param>
+        /// <param name="skip">The offset requested for the srarting point of returned results.</param>
+        /// <returns>Search results (documents) in JSON format.</returns>
+        /// <example><![CDATA[ 
+        /// HTTP verb: GET
+        ///
+        /// URL:
+        /// http://{URL}/api/bing/getDocuments?query={query}&doctype={doctype}&top={top}&skip={skip}
+        /// ]]>
+        /// </example>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        BaseJsonResult<IEnumerable<BingSearchDocumentResult>> GetDocuments(string query, string doctype, string top, string skip);
+    }
 }

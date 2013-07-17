@@ -113,10 +113,10 @@ var CZ;
                 CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption(CZ.Tours.tourCaptionFormContainer, {
                     activationSource: $(".tour-icon"),
                     navButton: ".cz-form-nav",
-                    closeButton: ".cz-form-close-btn > .cz-form-btn",
-                    titleTextblock: ".cz-form-title",
+                    closeButton: ".cz-tour-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-tour-form-title",
                     contentContainer: ".cz-form-content",
-                    minButton: ".cz-form-min-btn > .cz-form-btn",
+                    minButton: ".cz-tour-form-min-btn > .cz-form-btn",
                     captionTextarea: ".cz-form-tour-caption",
                     tourPlayerContainer: ".cz-form-tour-player",
                     bookmarksCount: ".cz-form-tour-bookmarks-count",
@@ -549,7 +549,7 @@ var CZ;
                 }
                 var hoveredInfodot = CZ.Common.vc.virtualCanvas("getHoveredInfodot");
                 var actAni = CZ.Common.controller.activeAnimation != undefined;
-                if(actAni && !hoveredInfodot.id) {
+                if(actAni) {
                     var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
                     CZ.Common.updateMarker();
                 }

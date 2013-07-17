@@ -442,6 +442,80 @@ module CZ {
             });
         }
 
+        // .../bing/getImages
+        export function getBingImages(query, top = CZ.Settings.defaultBingSearchTop, skip = CZ.Settings.defaultBingSearchSkip) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getImages");
+
+            var data = {
+                query: query,
+                top: top,
+                skip: skip
+            };
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                    console.log(response.d);
+                }
+            });
+        }
+
+        // .../bing/getVideos
+        export function getBingVideos(query, top = CZ.Settings.defaultBingSearchTop, skip = CZ.Settings.defaultBingSearchSkip) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getVideos");
+
+            var data = {
+                query: query,
+                top: top,
+                skip: skip
+            };
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                    console.log(response.d);
+                }
+            });
+        }
+
+        // .../bing/getDocuments
+        // set doctype to undefined if you want it to be omited
+        export function getBingDocuments(query, doctype = undefined, top = CZ.Settings.defaultBingSearchTop, skip = CZ.Settings.defaultBingSearchSkip) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getDocuments");
+
+            var data = {
+                query: query,
+                doctype: doctype,
+                top: top,
+                skip: skip
+            };
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                    console.log(response.d);
+                }
+            });
+        }
+
         // .../{supercollection}/{collection}/structure?start=&end=&minspan=&lca=
         export function getServiceInformation() {
             CZ.Authoring.resetSessionTimer();
