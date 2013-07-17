@@ -12,6 +12,7 @@ module CZ {
             attributionInput: string;
             descriptionInput: string;
             errorMessage: string;
+            mediaListContainer: string;
             context: {
                 exhibit: Object;
                 contentItem: Object;
@@ -28,8 +29,10 @@ module CZ {
             private descriptionInput: JQuery;
             private errorMessage: JQuery;
             private saveButton: JQuery;
+            private mediaListContainer: JQuery;
 
             private prevForm: FormBase;
+            private mediaList: CZ.UI.MediaList;
 
             private exhibit: any; // CanvasInfodot
             private contentItem: any; // ContentItem Metadata
@@ -50,6 +53,7 @@ module CZ {
                 this.descriptionInput = container.find(formInfo.descriptionInput);
                 this.errorMessage = container.find(formInfo.errorMessage);
                 this.saveButton = container.find(formInfo.saveButton);
+                this.mediaListContainer = container.find(formInfo.mediaListContainer);
 
                 this.prevForm = formInfo.prevForm;
 
@@ -63,6 +67,7 @@ module CZ {
             }
 
             private initUI() {
+                this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem);
                 this.saveButton.prop('disabled', false);
 
                 this.titleInput.change(() => { this.isModified = true; });
@@ -194,7 +199,10 @@ module CZ {
                 super.close(noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",
-                    duration: 500
+                    duration: 500,
+                    complete: () => {
+                        this.mediaList.remove();
+                    }
                 });
                 if (this.isCancel) {
                     if (CZ.Authoring.contentItemMode === "createContentItem") {

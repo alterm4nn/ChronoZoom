@@ -24,6 +24,7 @@
 /// <reference path='../ui/tour-caption-form.ts'/>
 /// <reference path='../ui/message-window.ts'/>
 /// <reference path='../ui/header-session-expired-form.ts'/>
+/// <reference path='../ui/mediapicker-form.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
 /// <reference path='extensions/extensions.ts'/>
 
@@ -54,7 +55,8 @@ module CZ {
             "#message-window": "/ui/message-window.html", // 13
             "#header-search-form": "/ui/header-search-form.html", // 14
             "#header-session-expired-form": "/ui/header-session-expired-form.html", // 15
-            "#tour-caption-form": "/ui/tour-caption-form.html" // 16
+            "#tour-caption-form": "/ui/tour-caption-form.html", // 16
+            "#mediapicker-form": "/ui/mediapicker-form.html" // 17
         };
 
         export enum FeatureActivation {
@@ -226,6 +228,9 @@ module CZ {
 
             // Register ChronoZoom Extensions
             CZ.Extensions.registerExtensions();
+
+            // Register ChronoZoom Media Pickers.
+            CZ.Media.initialize();
 
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
@@ -427,6 +432,7 @@ module CZ {
                             descriptionInput: ".cz-form-item-descr",
                             attributionInput: ".cz-form-item-attribution",
                             mediaTypeInput: ".cz-form-item-media-type",
+                            mediaListContainer: ".cz-form-medialist",
                             context: {
                                 exhibit: e,
                                 contentItem: ci

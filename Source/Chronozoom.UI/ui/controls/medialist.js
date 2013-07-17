@@ -26,7 +26,8 @@ var CZ;
                 var _this = this;
                 var container = $("<div></div>", {
                     class: "cz-medialist-item",
-                    "media-type": mp.title
+                    title: mp.title,
+                    "media-picker": mp.title
                 });
                 var icon = $("<img></img>", {
                     class: "cz-medialist-item-icon",

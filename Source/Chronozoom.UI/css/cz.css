@@ -1,4 +1,4 @@
-﻿.cz-timescale {
+.cz-timescale {
   padding-bottom: 0px;
   font-size: large;
   font-weight: 500;
@@ -157,6 +157,43 @@
 }
 .cz-datepicker-errormsg {
   color: #dd4b39;
+}
+/***********************************************************
+
+                        Media List
+      
+***********************************************************/
+.cz-medialist {
+  padding: 5px;
+  border: solid 2px #c7c7c7;
+  background-color: #e9e9e9;
+}
+.cz-medialist-item {
+  display: inline-block;
+  margin: 5px;
+}
+.cz-medialist-item-icon {
+  display: block;
+  width: 48px;
+  height: 48px;
+}
+/***********************************************************
+
+                    Custom Media Pickers
+      
+***********************************************************/
+.cz-form-bing-mediapicker {
+  width: 820px;
+  bottom: 25px;
+  left: 0;
+}
+.cz-form-bing-mediapicker > .cz-form-content {
+  position: absolute;
+  top: 36px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow-y: auto;
 }
 /* The height of the page header */
 /* The width of the logo area */
@@ -1883,28 +1920,4 @@ img.fallbackBackground {
   cursor: pointer;
   width: auto;
   display: inline;
-}
-/***********************************************************
-
-                        MediaList
-
-***********************************************************/
-.cz-medialist {
-  width: 150px;
-  height: 200px;
-  padding: 10px;
-  border: solid 2px #c7c7c7;
-  background-color: #e9e9e9;
-}
-.cz-medialist-item {
-  width: 36px;
-  height: 36px;
-}
-.cz-medialist-item:hover {
-  border: solid 2px #0464a2;
-  background-color: #0464a2;
-}
-.cz-medialist-item-icon {
-  width: 36px;
-  height: 36px;
 }
