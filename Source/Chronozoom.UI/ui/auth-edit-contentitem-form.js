@@ -19,6 +19,7 @@ var CZ;
                 this.descriptionInput = container.find(formInfo.descriptionInput);
                 this.errorMessage = container.find(formInfo.errorMessage);
                 this.saveButton = container.find(formInfo.saveButton);
+                this.mediaListContainer = container.find(formInfo.mediaListContainer);
                 this.prevForm = formInfo.prevForm;
                 this.exhibit = formInfo.context.exhibit;
                 this.contentItem = formInfo.context.contentItem;
@@ -29,6 +30,7 @@ var CZ;
             }
             FormEditCI.prototype.initUI = function () {
                 var _this = this;
+                this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem);
                 this.saveButton.prop('disabled', false);
                 this.titleInput.change(function () {
                     _this.isModified = true;
@@ -153,6 +155,7 @@ var CZ;
             };
             FormEditCI.prototype.close = function (noAnimation) {
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
+                var _this = this;
                 if(this.isModified) {
                     var r = window.confirm("There is unsaved data. Do you want to close without saving?");
                     if(r != true) {
@@ -163,7 +166,10 @@ var CZ;
                 _super.prototype.close.call(this, noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",
-                    duration: 500
+                    duration: 500,
+                    complete: function () {
+                        _this.mediaList.remove();
+                    }
                 });
                 if(this.isCancel) {
                     if(CZ.Authoring.contentItemMode === "createContentItem") {

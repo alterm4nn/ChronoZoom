@@ -10355,6 +10355,43 @@ var CZ;
 var CZ;
 (function (CZ) {
     (function (Media) {
+        var BingMediaPicker = (function () {
+            function BingMediaPicker(container, context) {
+                this.container = container;
+                this.contentItem = context;
+                this.searchTextbox = this.container.find(".cz-form-search-input");
+                this.mediaTypeRadioButtons = this.container.find(":radio");
+            }
+            BingMediaPicker.setup = function setup(context) {
+                var container = CZ.Media.mediaPickersViews["bing"];
+                var picker = new BingMediaPicker(container, context);
+                var formContainer = $(".cz-form-bing-mediapicker");
+                if(formContainer.length === 0) {
+                    formContainer = $("#mediapicker-form").clone().removeAttr("id").addClass("cz-form-bing-mediapicker").appendTo($("#content"));
+                }
+                var form = new CZ.UI.FormMediaPicker(formContainer, {
+                    activationSource: $(),
+                    navButton: ".cz-form-nav",
+                    closeButton: ".cz-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-form-title",
+                    contentContainer: ".cz-form-content"
+                });
+                form.titleTextblock.text("Import from Bing");
+                form.contentContainer.append(container);
+                form.show();
+            };
+            BingMediaPicker.prototype.getMediaType = function () {
+                return this.mediaTypeRadioButtons.find(":checked").val();
+            };
+            return BingMediaPicker;
+        })();
+        Media.BingMediaPicker = BingMediaPicker;        
+    })(CZ.Media || (CZ.Media = {}));
+    var Media = CZ.Media;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (Media) {
         var _mediaPickers = {
         };
         var _mediaPickersViews = {
@@ -10372,12 +10409,22 @@ var CZ;
             }
         });
         function initialize() {
+            registerMediaPicker("bing", "/images/media/bing-icon.png", "/ui/media/bing-mediapicker.html", CZ.Media.BingMediaPicker);
+            registerMediaPicker("bing1", "/images/media/bing-icon.png", "/ui/media/bing-mediapicker.html", CZ.Media.BingMediaPicker);
+            registerMediaPicker("bing2", "/images/media/bing-icon.png", "/ui/media/bing-mediapicker.html", CZ.Media.BingMediaPicker);
+            registerMediaPicker("bing3", "/images/media/bing-icon.png", "/ui/media/bing-mediapicker.html", CZ.Media.BingMediaPicker);
+            registerMediaPicker("bing4", "/images/media/bing-icon.png", "/ui/media/bing-mediapicker.html", CZ.Media.BingMediaPicker);
+            registerMediaPicker("bing5", "/images/media/bing-icon.png", "/ui/media/bing-mediapicker.html", CZ.Media.BingMediaPicker);
+            registerMediaPicker("bing6", "/images/media/bing-icon.png", "/ui/media/bing-mediapicker.html", CZ.Media.BingMediaPicker);
+            registerMediaPicker("bing7", "/images/media/bing-icon.png", "/ui/media/bing-mediapicker.html", CZ.Media.BingMediaPicker);
         }
         Media.initialize = initialize;
         function registerMediaPicker(title, iconUrl, viewUrl, type, selector) {
             var order = Object.keys(_mediaPickers).length;
             var setup = type.setup;
             selector = selector || "$('<div></div>')";
+            _mediaPickers[title] = {
+            };
             return CZ.UILoader.loadHtml(selector, viewUrl).always(function (view) {
                 _mediaPickersViews[title] = view;
                 _mediaPickers[title] = {
@@ -10420,7 +10467,8 @@ var CZ;
                 var _this = this;
                 var container = $("<div></div>", {
                     class: "cz-medialist-item",
-                    "media-type": mp.title
+                    title: mp.title,
+                    "media-picker": mp.title
                 });
                 var icon = $("<img></img>", {
                     class: "cz-medialist-item-icon",
@@ -10960,6 +11008,7 @@ var CZ;
                 this.descriptionInput = container.find(formInfo.descriptionInput);
                 this.errorMessage = container.find(formInfo.errorMessage);
                 this.saveButton = container.find(formInfo.saveButton);
+                this.mediaListContainer = container.find(formInfo.mediaListContainer);
                 this.prevForm = formInfo.prevForm;
                 this.exhibit = formInfo.context.exhibit;
                 this.contentItem = formInfo.context.contentItem;
@@ -10970,6 +11019,7 @@ var CZ;
             }
             FormEditCI.prototype.initUI = function () {
                 var _this = this;
+                this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem);
                 this.saveButton.prop('disabled', false);
                 this.titleInput.change(function () {
                     _this.isModified = true;
@@ -11094,6 +11144,7 @@ var CZ;
             };
             FormEditCI.prototype.close = function (noAnimation) {
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
+                var _this = this;
                 if(this.isModified) {
                     var r = window.confirm("There is unsaved data. Do you want to close without saving?");
                     if(r != true) {
@@ -11104,7 +11155,10 @@ var CZ;
                 _super.prototype.close.call(this, noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",
-                    duration: 500
+                    duration: 500,
+                    complete: function () {
+                        _this.mediaList.remove();
+                    }
                 });
                 if(this.isCancel) {
                     if(CZ.Authoring.contentItemMode === "createContentItem") {
@@ -11778,6 +11832,36 @@ var CZ;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var FormMediaPicker = (function (_super) {
+            __extends(FormMediaPicker, _super);
+            function FormMediaPicker(container, formInfo) {
+                        _super.call(this, container, formInfo);
+            }
+            FormMediaPicker.prototype.show = function () {
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
+                this.activationSource.addClass("active");
+            };
+            FormMediaPicker.prototype.close = function () {
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
+                this.activationSource.removeClass("active");
+            };
+            return FormMediaPicker;
+        })(CZ.UI.FormBase);
+        UI.FormMediaPicker = FormMediaPicker;        
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
 var constants;
 var CZ;
 (function (CZ) {
@@ -11802,7 +11886,8 @@ var CZ;
             "#message-window": "/ui/message-window.html",
             "#header-search-form": "/ui/header-search-form.html",
             "#header-session-expired-form": "/ui/header-session-expired-form.html",
-            "#tour-caption-form": "/ui/tour-caption-form.html"
+            "#tour-caption-form": "/ui/tour-caption-form.html",
+            "#mediapicker-form": "/ui/mediapicker-form.html"
         };
         (function (FeatureActivation) {
             FeatureActivation._map = [];
@@ -11959,6 +12044,7 @@ var CZ;
             $('.bubbleInfo').hide();
             var canvasIsEmpty;
             CZ.Extensions.registerExtensions();
+            CZ.Media.initialize();
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
@@ -12149,6 +12235,7 @@ var CZ;
                             descriptionInput: ".cz-form-item-descr",
                             attributionInput: ".cz-form-item-attribution",
                             mediaTypeInput: ".cz-form-item-media-type",
+                            mediaListContainer: ".cz-form-medialist",
                             context: {
                                 exhibit: e,
                                 contentItem: ci
