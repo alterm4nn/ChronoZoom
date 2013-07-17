@@ -3640,7 +3640,6 @@ var CZ;
                 url: request.url,
                 data: data,
                 success: function (response) {
-                    console.log(response.d);
                 }
             });
         }
@@ -3663,7 +3662,6 @@ var CZ;
                 url: request.url,
                 data: data,
                 success: function (response) {
-                    console.log(response.d);
                 }
             });
         }
@@ -3688,7 +3686,6 @@ var CZ;
                 url: request.url,
                 data: data,
                 success: function (response) {
-                    console.log(response.d);
                 }
             });
         }

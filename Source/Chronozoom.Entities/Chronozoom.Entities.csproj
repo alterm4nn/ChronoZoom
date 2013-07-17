@@ -65,7 +65,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BingSearchResult.cs" />
     <Compile Include="Bitmask.cs" />
     <Compile Include="Bookmark.cs" />
     <Compile Include="Collection.cs" />

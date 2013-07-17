@@ -49,11 +49,11 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
-        BaseJsonResult<IEnumerable<BingSearchImageResult>> IBingSearchAPI.GetImages(string query, string top, string skip)
+        BaseJsonResult<IEnumerable<Bing.ImageResult>> IBingSearchAPI.GetImages(string query, string top, string skip)
         {
-            return ApiOperation<BaseJsonResult<IEnumerable<BingSearchImageResult>>>(delegate(User user, Storage storage)
+            return ApiOperation<BaseJsonResult<IEnumerable<Bing.ImageResult>>>(delegate(User user, Storage storage)
             {
-                var searchResults = new List<BingSearchImageResult>();
+                var searchResults = new List<Bing.ImageResult>();
 
                 if (string.IsNullOrEmpty(BingAccountKey) && !string.IsNullOrEmpty(ConfigurationManager.AppSettings["AzureMarketplaceAccountKey"]))
                 {
@@ -64,7 +64,7 @@ namespace Chronozoom.UI
                 {
                     // Setting status code to 403 to prevent redirection to authentication resource if status code is 401.
                     SetStatusCode(HttpStatusCode.Forbidden, ErrorDescription.UnauthorizedUser);
-                    return new BaseJsonResult<IEnumerable<BingSearchImageResult>>(searchResults);
+                    return new BaseJsonResult<IEnumerable<Bing.ImageResult>>(searchResults);
                 }
 
                 int resultsCount = int.TryParse(top, out resultsCount) ? resultsCount : BingDefaultSearchLimit;
@@ -79,11 +79,11 @@ namespace Chronozoom.UI
                     imageQuery = imageQuery.AddQueryOption("$top", resultsCount);
                     imageQuery = imageQuery.AddQueryOption("$skip", offset);
 
-                    var webResults = imageQuery.Execute();
+                    var imageResults = imageQuery.Execute();
 
-                    foreach (var result in webResults)
+                    foreach (var result in imageResults)
                     {
-                        searchResults.Add(new BingSearchImageResult(result.MediaUrl, result.Title));
+                        searchResults.Add(result);
                     }
                 }
                 catch (ArgumentNullException)
@@ -95,18 +95,18 @@ namespace Chronozoom.UI
                     SetStatusCode(HttpStatusCode.InternalServerError, ex.Message);
                 }
 
-                return new BaseJsonResult<IEnumerable<BingSearchImageResult>>(searchResults);
+                return new BaseJsonResult<IEnumerable<Bing.ImageResult>>(searchResults);
             });
         }
 
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
-        BaseJsonResult<IEnumerable<BingSearchVideoResult>> IBingSearchAPI.GetVideos(string query, string top, string skip)
+        BaseJsonResult<IEnumerable<Bing.VideoResult>> IBingSearchAPI.GetVideos(string query, string top, string skip)
         {
-            return ApiOperation<BaseJsonResult<IEnumerable<BingSearchVideoResult>>>(delegate(User user, Storage storage)
+            return ApiOperation<BaseJsonResult<IEnumerable<Bing.VideoResult>>>(delegate(User user, Storage storage)
             {
-                var searchResults = new List<BingSearchVideoResult>();
+                var searchResults = new List<Bing.VideoResult>();
 
                 if (string.IsNullOrEmpty(BingAccountKey) && !string.IsNullOrEmpty(ConfigurationManager.AppSettings["AzureMarketplaceAccountKey"]))
                 {
@@ -117,7 +117,7 @@ namespace Chronozoom.UI
                 {
                     // Setting status code to 403 to prevent redirection to authentication resource if status code is 401.
                     SetStatusCode(HttpStatusCode.Forbidden, ErrorDescription.UnauthorizedUser);
-                    return new BaseJsonResult<IEnumerable<BingSearchVideoResult>>(searchResults);
+                    return new BaseJsonResult<IEnumerable<Bing.VideoResult>>(searchResults);
                 }
 
                 int resultsCount = int.TryParse(top, out resultsCount) ? resultsCount : BingDefaultSearchLimit;
@@ -132,11 +132,11 @@ namespace Chronozoom.UI
                     videoQuery = videoQuery.AddQueryOption("$top", resultsCount);
                     videoQuery = videoQuery.AddQueryOption("$skip", offset);
 
-                    var webResults = videoQuery.Execute();
+                    var videoResults = videoQuery.Execute();
 
-                    foreach (var result in webResults)
+                    foreach (var result in videoResults)
                     {
-                        searchResults.Add(new BingSearchVideoResult(result.MediaUrl, result.Title));
+                        searchResults.Add(result);
                     }                                
                 }
                 catch (ArgumentNullException)
@@ -148,18 +148,18 @@ namespace Chronozoom.UI
                     SetStatusCode(HttpStatusCode.InternalServerError, ex.Message);
                 }
 
-                return new BaseJsonResult<IEnumerable<BingSearchVideoResult>>(searchResults);
+                return new BaseJsonResult<IEnumerable<Bing.VideoResult>>(searchResults);
             });
         }
 
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
-        BaseJsonResult<IEnumerable<BingSearchDocumentResult>> IBingSearchAPI.GetDocuments(string query, string doctype, string top, string skip)
+        BaseJsonResult<IEnumerable<Bing.WebResult>> IBingSearchAPI.GetDocuments(string query, string doctype, string top, string skip)
         {
-            return ApiOperation<BaseJsonResult<IEnumerable<BingSearchDocumentResult>>>(delegate(User user, Storage storage)
+            return ApiOperation<BaseJsonResult<IEnumerable<Bing.WebResult>>>(delegate(User user, Storage storage)
             {
-                var searchResults = new List<BingSearchDocumentResult>();
+                var searchResults = new List<Bing.WebResult>();
 
                 if (string.IsNullOrEmpty(BingAccountKey) && !string.IsNullOrEmpty(ConfigurationManager.AppSettings["AzureMarketplaceAccountKey"]))
                 {
@@ -170,7 +170,7 @@ namespace Chronozoom.UI
                 {
                     // Setting status code to 403 to prevent redirection to authentication resource if status code is 401.
                     SetStatusCode(HttpStatusCode.Forbidden, ErrorDescription.UnauthorizedUser);
-                    return new BaseJsonResult<IEnumerable<BingSearchDocumentResult>>(searchResults);
+                    return new BaseJsonResult<IEnumerable<Bing.WebResult>>(searchResults);
                 }
 
                 int resultsCount = int.TryParse(top, out resultsCount) ? resultsCount : BingDefaultSearchLimit;
@@ -189,7 +189,7 @@ namespace Chronozoom.UI
                 
                     foreach (var result in webResults)
                     {
-                        searchResults.Add(new BingSearchDocumentResult(result.Url, result.Title));
+                        searchResults.Add(result);
                     }
                 }
                 catch (ArgumentNullException)
@@ -212,7 +212,7 @@ namespace Chronozoom.UI
                     SetStatusCode(HttpStatusCode.InternalServerError, ex.Message);
                 }
 
-                return new BaseJsonResult<IEnumerable<BingSearchDocumentResult>>(searchResults);
+                return new BaseJsonResult<IEnumerable<Bing.WebResult>>(searchResults);
             });
         }        
     }
