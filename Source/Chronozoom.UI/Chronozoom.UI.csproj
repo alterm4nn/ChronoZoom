@@ -283,6 +283,7 @@
       <DependentUpon>mediapicker-example.ts</DependentUpon>
     </Content>
     <Content Include="samples\custom-mediapicker\mediapicker-example.ts" />
+    <Content Include="samples\bingSearchSample.html" />
     <Content Include="scripts\extensions\extensions.js">
       <DependentUpon>extensions.ts</DependentUpon>
     </Content>
@@ -606,6 +607,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
