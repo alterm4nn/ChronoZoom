@@ -122,7 +122,7 @@ var CZ;
         }
         Common.setVisible = setVisible;
         function updateMarker() {
-            Common.axis.setTimeMarker(Common.vc.virtualCanvas("getCursorPosition"));
+            Common.axis.setTimeMarker(Common.vc.virtualCanvas("getCursorPosition"), true);
         }
         Common.updateMarker = updateMarker;
         function loadDataUrl() {
