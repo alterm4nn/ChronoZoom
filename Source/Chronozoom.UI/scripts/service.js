@@ -344,6 +344,7 @@ var CZ;
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
             request.addToPath("tours");
+            console.log("[GET] " + request.url);
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -361,6 +362,7 @@ var CZ;
                 supercollection: CZ.Service.superCollectionName,
                 collection: CZ.Service.collectionName
             };
+            console.log("[GET] " + request.url);
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -381,6 +383,7 @@ var CZ;
                 top: top,
                 skip: skip
             };
+            console.log("[GET] " + request.url);
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -403,6 +406,7 @@ var CZ;
                 top: top,
                 skip: skip
             };
+            console.log("[GET] " + request.url);
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -427,6 +431,7 @@ var CZ;
                 top: top,
                 skip: skip
             };
+            console.log("[GET] " + request.url);
             return $.ajax({
                 type: "GET",
                 cache: false,

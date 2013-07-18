@@ -182,8 +182,9 @@
                     Custom Media Pickers
       
 ***********************************************************/
+/* Bing Media Picker */
 .cz-form-bing-mediapicker {
-  width: 820px;
+  width: 75%;
   bottom: 25px;
   left: 0;
 }
@@ -194,6 +195,42 @@
   bottom: 0;
   left: 0;
   overflow-y: auto;
+}
+.cz-form-bing-search-results {
+  color: #232323;
+}
+.cz-bing-result-container {
+  display: inline-block;
+  overflow: hidden;
+  margin: 15px 5px;
+}
+.cz-bing-result-title {
+  color: #232323;
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cz-bing-result-description,
+a.cz-bing-result-description:visited,
+a.cz-bing-result-description:link {
+  color: #aeaeae;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+}
+a.cz-bing-result-description:hover {
+  color: #0464a2;
+}
+.cz-bing-result-doc-description {
+  color: #aeaeae;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+}
+.cz-bing-result-thumbnail {
+  display: block;
 }
 /* The height of the page header */
 /* The width of the logo area */
@@ -1411,6 +1448,9 @@ img.fallbackBackground {
 
   background-image: linear-gradient(to top, #0e4073 0%, #1b6aab 100%);
 }
+.cz-radiobutton + label {
+  margin-right: 25px;
+}
 .blocking-layer {
   position: fixed;
   left: 0;
@@ -1430,6 +1470,18 @@ img.fallbackBackground {
 }
 .cz-lightgray {
   color: #aeaeae;
+}
+.cz-gray {
+  color: #e9e9e9;
+}
+.cz-darkgray {
+  color: #232323;
+}
+.cz-darkblue {
+  color: #0464a2;
+}
+.cz-lightblue {
+  color: #038ae6;
 }
 .cz-form-label {
   margin: 5px 0;
@@ -1680,6 +1732,7 @@ img.fallbackBackground {
   overflow-y: hidden;
 }
 .cz-form-progress-bar {
+  display: block;
   width: 100%;
   height: 15px;
   vertical-align: top;

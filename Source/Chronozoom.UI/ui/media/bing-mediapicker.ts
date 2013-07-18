@@ -1,3 +1,4 @@
+/// <reference path='../../scripts/cz.ts'/>
 /// <reference path='../../scripts/media.ts'/>
 /// <reference path='../../ui/controls/formbase.ts'/>
 /// <reference path='../../scripts/typings/jquery/jquery.d.ts'/>
@@ -6,8 +7,8 @@ module CZ {
     export module Media {
         export class BingMediaPicker {
             public static setup(context: any) {
-                var container = CZ.Media.mediaPickersViews["bing"];
-                var picker = new BingMediaPicker(container, context);
+                var mediaPickerContainer = CZ.Media.mediaPickersViews["bing"];
+                var mediaPicker = new BingMediaPicker(mediaPickerContainer, context);
                 var formContainer = $(".cz-form-bing-mediapicker");
 
                 // Create container for Media Picker's form if it doesn't exist.
@@ -20,24 +21,38 @@ module CZ {
                 }
 
                 // Create form for Media Picker and append Media Picker to it.
-                var form = new CZ.UI.FormMediaPicker(formContainer, {
-                    activationSource: $(),
-                    navButton: ".cz-form-nav",
-                    closeButton: ".cz-form-close-btn > .cz-form-btn",
-                    titleTextblock: ".cz-form-title",
-                    contentContainer: ".cz-form-content"
+                var form = new CZ.UI.FormMediaPicker(
+                    formContainer,
+                    mediaPickerContainer, 
+                    "Import from Bing",
+                    {
+                        activationSource: $(),
+                        navButton: ".cz-form-nav",
+                        closeButton: ".cz-form-close-btn > .cz-form-btn",
+                        titleTextblock: ".cz-form-title",
+                        contentContainer: ".cz-form-content"
+                    }
+                );
+
+                $(form).on("showcompleted", event => {
+                    mediaPicker.searchTextbox.focus();
                 });
 
-                form.titleTextblock.text("Import from Bing");
-                form.contentContainer.append(container);
+                $(mediaPicker).on("resultclick", event => {
+                    form.close();
+                });
+
                 form.show();
             }
 
             private container: JQuery;
             private contentItem: any;
 
-            private searchTextbox: JQuery;
             private mediaTypeRadioButtons: JQuery;
+            private progressBar: JQuery;
+            private searchResultsBox: JQuery;
+            private searchButton: JQuery;
+            public searchTextbox: JQuery;
 
             constructor(container: JQuery, context: any) {
                 this.container = container;
@@ -45,10 +60,266 @@ module CZ {
 
                 this.searchTextbox = this.container.find(".cz-form-search-input");
                 this.mediaTypeRadioButtons = this.container.find(":radio");
+                this.progressBar = this.container.find(".cz-form-progress-bar");
+                this.searchResultsBox = this.container.find(".cz-form-bing-search-results");
+                this.searchButton = this.container.find(".cz-form-search-button");
+
+                this.initialize();
+            }
+
+            private initialize(): void {
+                this.progressBar.css("opacity", 0);
+                this.searchResultsBox.empty();
+                this.searchTextbox.val("");
+                this.mediaTypeRadioButtons.first().attr("checked", "true");
+                this.searchTextbox.off();
+                this.searchButton.off();
+                $(this).off();
+
+                this.searchTextbox.keypress(event => {
+                    var code = event.which || event.keyCode;
+
+                    // If Enter button is pressed.
+                    if (code === 13) {
+                        event.preventDefault();
+                        this.search();
+                    }
+                });
+
+                this.searchButton.click(event => {
+                    this.search();
+                });
+
+                $(this).on("resultclick", (event, mediaInfo) => {
+                    this.onSearchResultClick(mediaInfo);
+                });
+            }
+
+            private onSearchResultClick(mediaInfo: CZ.Media.MediaInfo): void {
+                // NOTE: Is there a better way to handle this? Possible solution: pass host form to Media List.
+                var editContentItemForm = CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
+                $.extend(this.contentItem, mediaInfo);
+                editContentItemForm.updateMediaInfo();
             }
 
             private getMediaType(): string {
-                return this.mediaTypeRadioButtons.find(":checked").val();
+                return this.mediaTypeRadioButtons.filter(":checked").val();
+            }
+
+            private convertResultToMediaInfo(result: any, mediaType: string): CZ.Media.MediaInfo {
+                return <CZ.Media.MediaInfo> {
+                    uri: result.MediaUrl || result.Url,
+                    mediaType: mediaType,
+                    mediaSource: result.SourceUrl,
+                    attribution: result.SourceUrl
+                };
+            }
+
+            private search(): void {
+                var query = this.searchTextbox.val();
+                var mediaType = this.getMediaType();
+                this.searchResultsBox.empty();
+                this.showProgressBar();
+
+                switch (mediaType) {
+                    case "image":
+                        this.searchImages(query);
+                        break;
+                    case "video":
+                        this.searchVideos(query);
+                        break;
+                    case "document":
+                        this.searchDocuments(query);
+                        break;
+                }
+            }
+
+            private searchImages(query: string): void {
+                CZ.Service.getBingImages(query).done(response => {
+                    this.hideProgressBar();
+
+                    if (response.d.length === 0) {
+                        this.showNoResults();
+                        return;
+                    }
+
+                    for (var i = 0, len = response.d.length; i < len; ++i) {
+                        var result = response.d[i];
+                        var resultContainer = this.createImageResult(result);
+                        this.searchResultsBox.append(resultContainer);
+                    }
+                });
+            }
+
+            private searchVideos(query: string): void {
+                CZ.Service.getBingVideos(query).done(response => {
+                    this.hideProgressBar();
+
+                    if (response.d.length === 0) {
+                        this.showNoResults();
+                        return;
+                    }
+
+                    for (var i = 0, len = response.d.length; i < len; ++i) {
+                        var result = response.d[i];
+                        var resultContainer = this.createVideoResult(result);
+                        this.searchResultsBox.append(resultContainer);
+                    }
+                });
+            }
+
+            private searchDocuments(query: string): void {
+                // NOTE: Currently only PDF is supported.
+                CZ.Service.getBingDocuments(query, "pdf").done(response => {
+                    this.hideProgressBar();
+
+                    if (response.d.length === 0) {
+                        this.showNoResults();
+                        return;
+                    }
+
+                    for (var i = 0, len = response.d.length; i < len; ++i) {
+                        var result = response.d[i];
+                        var resultContainer = this.createDocumentResult(result);
+                        this.searchResultsBox.append(resultContainer);
+                    }
+                });
+            }
+
+            private createImageResult(result: any): JQuery {
+                var container = $("<div></div>", {
+                    class: "cz-bing-result-container",
+                    width: 183 * result.Thumbnail.Width / result.Thumbnail.Height
+                });
+
+                var title = $("<div></div>", {
+                    class: "cz-bing-result-title cz-darkgray",
+                    text: result.Title
+                });
+
+                var size = $("<div></div>", {
+                    class: "cz-bing-result-description cz-lightgray",
+                    text: result.Width + "x" + result.Height + " - " +
+                          Math.round(result.FileSize / 8 / 1024) + " KB"
+                });
+
+                var url = $("<a></a>", {
+                    class: "cz-bing-result-description cz-lightgray",
+                    text: result.DisplayUrl,
+                    href: result.MediaUrl,
+                    target: "_blank"
+                });
+
+                var thumbnail = $("<img></img>", {
+                    src: result.Thumbnail.MediaUrl,
+                    height: 183,
+                    width: 183 * result.Thumbnail.Width / result.Thumbnail.Height,
+                    class: "cz-bing-result-thumbnail"
+                });
+
+                thumbnail.add(title)
+                    .add(size)
+                    .click(event => {
+                        $(this).trigger("resultclick", this.convertResultToMediaInfo(result, "image"));
+                    });
+
+                return container.append(thumbnail)
+                    .append(title)
+                    .append(size)
+                    .append(url);
+            }
+
+            private createVideoResult(result: any): JQuery {
+                var container = $("<div></div>", {
+                    class: "cz-bing-result-container",
+                    width: 140 * result.Thumbnail.Width / result.Thumbnail.Height
+                });
+
+                var title = $("<div></div>", {
+                    class: "cz-bing-result-title cz-darkgray",
+                    text: result.Title
+                });
+
+                var size = $("<div></div>", {
+                    class: "cz-bing-result-description cz-lightgray",
+                    text: "Duration - " + (result.RunTime / 1000) + " seconds"
+                });
+
+                var url = $("<a></a>", {
+                    class: "cz-bing-result-description cz-lightgray",
+                    text: result.DisplayUrl,
+                    href: result.MediaUrl,
+                    target: "_blank"
+                });
+
+                var thumbnail = $("<img></img>", {
+                    src: result.Thumbnail.MediaUrl,
+                    height: 140,
+                    width: 140 * result.Thumbnail.Width / result.Thumbnail.Height,
+                    class: "cz-bing-result-thumbnail"
+                });
+
+                thumbnail.add(title)
+                    .add(size)
+                    .click(event => {
+                        $(this).trigger("resultclick", this.convertResultToMediaInfo(result, "video"));
+                    });
+
+                return container.append(thumbnail)
+                    .append(title)
+                    .append(size)
+                    .append(url);
+            }
+
+            private createDocumentResult(result: any): JQuery {
+                var container = $("<div></div>", {
+                    class: "cz-bing-result-container",
+                    width: 300
+                });
+
+                var title = $("<div></div>", {
+                    class: "cz-bing-result-title cz-darkgray",
+                    text: result.Title
+                });
+
+                var descr = $("<div></div>", {
+                    class: "cz-bing-result-doc-description cz-lightgray",
+                    height: 100,
+                    text: result.Description
+                });
+
+                var url = $("<a></a>", {
+                    class: "cz-bing-result-description cz-lightgray",
+                    text: result.DisplayUrl,
+                    href: result.Url,
+                    target: "_blank"
+                });
+
+                // NOTE: Currently only PDF is supported.
+                title.add(descr)
+                    .click(event => {
+                        $(this).trigger("resultclick", this.convertResultToMediaInfo(result, "pdf"));
+                    });
+
+                return container.append(title)
+                    .append(descr)
+                    .append(url);
+            }
+
+            private showProgressBar(): void {
+                this.progressBar.animate({
+                    opacity: 1
+                });
+            }
+
+            private hideProgressBar(): void {
+                this.progressBar.animate({
+                    opacity: 0
+                });
+            }
+
+            private showNoResults(): void {
+                this.searchResultsBox.text("No results.");
             }
         }
     }
