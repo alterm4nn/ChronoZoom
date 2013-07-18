@@ -108,6 +108,7 @@ var CZ;
                             $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
                             (this.prevForm).exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
+                            this.isModified = false;
                             this.back();
                         }
                     } else if(CZ.Authoring.contentItemMode === "editContentItem") {
