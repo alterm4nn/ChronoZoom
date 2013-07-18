@@ -4,15 +4,22 @@
 module CZ {
     export module UI {
         export class FormMediaPicker extends CZ.UI.FormBase {
-            constructor(container: JQuery, formInfo: IFormBaseInfo) {
+            constructor(container: JQuery, mediaPickerContainer: JQuery, title: string, formInfo: IFormBaseInfo) {
                 super(container, formInfo);
+
+                this.titleTextblock.text(title);
+                this.contentContainer.append(mediaPickerContainer);
+                $(this).off();
             }
 
             public show(): void {
                 super.show({
                     effect: "slide",
                     direction: "left",
-                    duration: 500
+                    duration: 500,
+                    complete: () => {
+                        $(this).trigger("showcompleted");
+                    }
                 });
 
                 this.activationSource.addClass("active");
@@ -23,6 +30,9 @@ module CZ {
                     effect: "slide",
                     direction: "left",
                     duration: 500,
+                    complete: () => {
+                        $(this).trigger("closecompleted");
+                    }
                 });
 
                 this.activationSource.removeClass("active");

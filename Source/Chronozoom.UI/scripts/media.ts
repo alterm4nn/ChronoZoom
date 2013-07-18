@@ -5,6 +5,13 @@
 module CZ {
     export module Media {
 
+        export interface MediaInfo {
+            uri: string;
+            mediaType: string;
+            mediaSource: string;
+            attribution: string;
+        }
+
         export interface MediaPickerInfo {
             title: string;
             iconUrl: string;
@@ -34,48 +41,6 @@ module CZ {
             // TODO: Register media pickers. The order is essential for MediaList.
             registerMediaPicker(
                 "bing",
-                "/images/media/bing-icon.png",
-                "/ui/media/bing-mediapicker.html",
-                CZ.Media.BingMediaPicker
-            );
-            registerMediaPicker(
-                "bing1",
-                "/images/media/bing-icon.png",
-                "/ui/media/bing-mediapicker.html",
-                CZ.Media.BingMediaPicker
-            );
-            registerMediaPicker(
-                "bing2",
-                "/images/media/bing-icon.png",
-                "/ui/media/bing-mediapicker.html",
-                CZ.Media.BingMediaPicker
-            );
-            registerMediaPicker(
-                "bing3",
-                "/images/media/bing-icon.png",
-                "/ui/media/bing-mediapicker.html",
-                CZ.Media.BingMediaPicker
-            );
-            registerMediaPicker(
-                "bing4",
-                "/images/media/bing-icon.png",
-                "/ui/media/bing-mediapicker.html",
-                CZ.Media.BingMediaPicker
-            );
-            registerMediaPicker(
-                "bing5",
-                "/images/media/bing-icon.png",
-                "/ui/media/bing-mediapicker.html",
-                CZ.Media.BingMediaPicker
-            );
-            registerMediaPicker(
-                "bing6",
-                "/images/media/bing-icon.png",
-                "/ui/media/bing-mediapicker.html",
-                CZ.Media.BingMediaPicker
-            );
-            registerMediaPicker(
-                "bing7",
                 "/images/media/bing-icon.png",
                 "/ui/media/bing-mediapicker.html",
                 CZ.Media.BingMediaPicker

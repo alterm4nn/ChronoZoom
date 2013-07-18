@@ -68,6 +68,7 @@ module CZ {
 
             private initUI() {
                 this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem);
+                
                 this.saveButton.prop('disabled', false);
 
                 this.titleInput.change(() => { this.isModified = true; });
@@ -77,48 +78,34 @@ module CZ {
                 this.attributionInput.change(() => { this.isModified = true; });
                 this.descriptionInput.change(() => { this.isModified = true; });
 
+                this.titleInput.val(this.contentItem.title || "");
+                this.mediaInput.val(this.contentItem.uri || "");
+                this.mediaSourceInput.val(this.contentItem.mediaSource || "");
+                this.mediaTypeInput.val(this.contentItem.mediaType || "");
+                this.attributionInput.val(this.contentItem.attribution || "")
+                this.descriptionInput.val(this.contentItem.description || "");
+                this.saveButton.off();
+                this.saveButton.click(() => this.onSave());
+
                 if (CZ.Authoring.contentItemMode === "createContentItem") {
                     this.titleTextblock.text("Create New");
                     this.saveButton.text("create artifiact");
 
-                    this.titleInput.val(this.contentItem.title || "");
-                    this.mediaInput.val(this.contentItem.uri || "");
-                    this.mediaSourceInput.val(this.contentItem.mediaSource || "");
-                    this.mediaTypeInput.val(this.contentItem.mediaType || "");
-                    this.attributionInput.val(this.contentItem.attribution || "")
-                    this.descriptionInput.val(this.contentItem.description || "");
-
                     this.closeButton.hide();
-                    this.saveButton.show();
-
-                    this.saveButton.off();
-                    this.saveButton.click(() => this.onSave());
-
                 } else if (CZ.Authoring.contentItemMode === "editContentItem") {
                     this.titleTextblock.text("Edit");
                     this.saveButton.text("update artifact");
-
-                    this.titleInput.val(this.contentItem.title || "");
-                    this.mediaInput.val(this.contentItem.uri || "");
-                    this.mediaSourceInput.val(this.contentItem.mediaSource || "");
-                    this.mediaTypeInput.val(this.contentItem.mediaType || "");
-                    this.attributionInput.val(this.contentItem.attribution || "")
-                    this.descriptionInput.val(this.contentItem.description || "");
 
                     if (this.prevForm && this.prevForm instanceof FormEditExhibit)
                         this.closeButton.hide();
                     else
                         this.closeButton.show();
-
-                    this.saveButton.show();
-
-                    // this.closeButton.click() is handled by base
-                    this.saveButton.off();
-                    this.saveButton.click(() => this.onSave());
                 } else {
                     console.log("Unexpected authoring mode in content item form.");
                     this.close();
                 }
+
+                this.saveButton.show();
             }
 
             private onSave() {
@@ -173,6 +160,13 @@ module CZ {
                 } else {
                     this.errorMessage.show().delay(7000).fadeOut();
                 }
+            }
+
+            public updateMediaInfo() {
+                this.mediaInput.val(this.contentItem.uri || "");
+                this.mediaSourceInput.val(this.contentItem.mediaSource || "");
+                this.mediaTypeInput.val(this.contentItem.mediaType || "");
+                this.attributionInput.val(this.contentItem.attribution || "");
             }
 
             public show(noAnimation?: bool = false) {

@@ -50,44 +50,33 @@ var CZ;
                 this.descriptionInput.change(function () {
                     _this.isModified = true;
                 });
+                this.titleInput.val(this.contentItem.title || "");
+                this.mediaInput.val(this.contentItem.uri || "");
+                this.mediaSourceInput.val(this.contentItem.mediaSource || "");
+                this.mediaTypeInput.val(this.contentItem.mediaType || "");
+                this.attributionInput.val(this.contentItem.attribution || "");
+                this.descriptionInput.val(this.contentItem.description || "");
+                this.saveButton.off();
+                this.saveButton.click(function () {
+                    return _this.onSave();
+                });
                 if(CZ.Authoring.contentItemMode === "createContentItem") {
                     this.titleTextblock.text("Create New");
                     this.saveButton.text("create artifiact");
-                    this.titleInput.val(this.contentItem.title || "");
-                    this.mediaInput.val(this.contentItem.uri || "");
-                    this.mediaSourceInput.val(this.contentItem.mediaSource || "");
-                    this.mediaTypeInput.val(this.contentItem.mediaType || "");
-                    this.attributionInput.val(this.contentItem.attribution || "");
-                    this.descriptionInput.val(this.contentItem.description || "");
                     this.closeButton.hide();
-                    this.saveButton.show();
-                    this.saveButton.off();
-                    this.saveButton.click(function () {
-                        return _this.onSave();
-                    });
                 } else if(CZ.Authoring.contentItemMode === "editContentItem") {
                     this.titleTextblock.text("Edit");
                     this.saveButton.text("update artifact");
-                    this.titleInput.val(this.contentItem.title || "");
-                    this.mediaInput.val(this.contentItem.uri || "");
-                    this.mediaSourceInput.val(this.contentItem.mediaSource || "");
-                    this.mediaTypeInput.val(this.contentItem.mediaType || "");
-                    this.attributionInput.val(this.contentItem.attribution || "");
-                    this.descriptionInput.val(this.contentItem.description || "");
                     if(this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
                         this.closeButton.hide();
                     } else {
                         this.closeButton.show();
                     }
-                    this.saveButton.show();
-                    this.saveButton.off();
-                    this.saveButton.click(function () {
-                        return _this.onSave();
-                    });
                 } else {
                     console.log("Unexpected authoring mode in content item form.");
                     this.close();
                 }
+                this.saveButton.show();
             };
             FormEditCI.prototype.onSave = function () {
                 var _this = this;
@@ -141,6 +130,12 @@ var CZ;
                 } else {
                     this.errorMessage.show().delay(7000).fadeOut();
                 }
+            };
+            FormEditCI.prototype.updateMediaInfo = function () {
+                this.mediaInput.val(this.contentItem.uri || "");
+                this.mediaSourceInput.val(this.contentItem.mediaSource || "");
+                this.mediaTypeInput.val(this.contentItem.mediaType || "");
+                this.attributionInput.val(this.contentItem.attribution || "");
             };
             FormEditCI.prototype.show = function (noAnimation) {
                 if (typeof noAnimation === "undefined") { noAnimation = false; }

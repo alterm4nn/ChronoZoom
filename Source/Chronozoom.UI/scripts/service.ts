@@ -412,6 +412,8 @@ module CZ {
             request.addToPath(collectionName);
             request.addToPath("tours");
 
+            console.log("[GET] " + request.url);
+
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -431,6 +433,8 @@ module CZ {
                 supercollection: CZ.Service.superCollectionName,
                 collection: CZ.Service.collectionName
             };
+
+            console.log("[GET] " + request.url);
 
             return $.ajax({
                 type: "GET",
@@ -452,6 +456,8 @@ module CZ {
                 top: top,
                 skip: skip
             };
+
+            console.log("[GET] " + request.url);
 
             return $.ajax({
                 type: "GET",
@@ -475,6 +481,8 @@ module CZ {
                 top: top,
                 skip: skip
             };
+
+            console.log("[GET] " + request.url);
 
             return $.ajax({
                 type: "GET",
@@ -500,6 +508,8 @@ module CZ {
                 top: top,
                 skip: skip
             };
+
+            console.log("[GET] " + request.url);
 
             return $.ajax({
                 type: "GET",
