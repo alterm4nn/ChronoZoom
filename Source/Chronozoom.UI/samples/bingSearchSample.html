@@ -1,0 +1,282 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Bing Image Search Sample</title>
+
+    <script type="text/javascript" src="/scripts/external/jquery-1.7.2.min.js"></script>
+
+    <script type="text/javascript" src="/scripts/settings.js"></script>
+    <script type="text/javascript" src="/scripts/service.js"></script>
+
+    <script type="text/javascript" src="http://fgnass.github.io/spin.js/dist/spin.min.js"></script>
+
+    <style type="text/css">
+        .thumbnail {
+            display: block;
+        }
+
+        .title {
+            font-weight: bold;            
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .description {
+            color: #808080;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 12px;
+        }
+
+        .doc-description {
+            color: #808080;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 12px;
+        }
+
+        .element {
+            display: inline-block;
+            overflow: hidden;            
+            margin: 15px 5px;
+            background-color: #FCFCFC;
+        }
+    </style>
+
+    <script type="text/javascript">
+        var spinner;
+        var opts = {
+            lines: 13, // The number of lines to draw
+            length: 5, // The length of each line
+            width: 5, // The line thickness
+            radius: 15, // The radius of the inner circle
+            corners: 1, // Corner roundness (0..1)
+            rotate: 0, // The rotation offset
+            direction: 1, // 1: clockwise, -1: counterclockwise
+            color: '#000', // #rgb or #rrggbb
+            speed: 1, // Rounds per second
+            trail: 60, // Afterglow percentage
+            shadow: false, // Whether to render a shadow
+            hwaccel: false, // Whether to use hardware acceleration
+            className: 'spinner', // The CSS class to assign to the spinner
+            zIndex: 2e9, // The z-index (defaults to 2000000000)
+            top: '20px', // Top position relative to parent in px
+            left: 'auto' // Left position relative to parent in px
+        };
+        
+
+        function pageOnLoad() {
+            $("#search").click(function () {
+                search();
+            });
+
+            $("#q, #count").keypress(function (event) {
+                var code = (event.keyCode ? event.keyCode : event.which);
+                if (code == 13) { //Enter keycode                        
+                    event.preventDefault();
+                    search();
+                }
+            });
+        }
+
+        function search() {
+            var type = $("[name='type']:checked").val();            
+
+            if (spinner) {
+                spinner.stop();
+            }
+            spinner = new Spinner(opts).spin(document.getElementById("progressbar"));
+            $("#container").empty();
+
+            var query = $("#q").val();
+            var top = $("#count").val();
+
+
+            switch (type) {
+                case "image":
+                    searchImages(query, top);
+                    break;
+                case "video":
+                    searchVideos(query, top);
+                    break;
+                case "document":
+                    searchDocuments(query, top);
+                    break;
+            }
+        }
+
+        function searchImages(query, top) {
+            CZ.Service.getBingImages(query, top).then(
+                function (response) {
+                    spinner.stop();
+
+                    if (response.d.length === 0) {
+                        $("<span></span>", {
+                            text: "No results found."
+                        }).appendTo($("#container"));
+                        return;
+                    }
+
+                    for (var i = 0; i < response.d.length; i++) {
+                        var container = $("#container");
+
+                        var result = response.d[i];
+
+                        var element = $("<div></div>", {
+                            class: "element",
+                            width: 183 * result.Thumbnail.Width / result.Thumbnail.Height
+                        });
+
+                        var title = $("<div></div>", {
+                            class: "title",
+                            text: result.Title
+                        });
+                        var size = $("<div></div>", {
+                            class: "description",
+                            text: result.Width + "x" + result.Height + " - " + Math.round(result.FileSize / 8 / 1024) + " KB"
+                        });
+                        var url = $("<a></a>", {
+                            class: "description",
+                            text: result.DisplayUrl,
+                            href: result.MediaUrl
+                        });
+
+                        var thumbnail = $("<img></img>", {
+                            src: result.Thumbnail.MediaUrl,
+                            height: 183,
+                            width: 183 * result.Thumbnail.Width / result.Thumbnail.Height,
+                            class: "thumbnail"
+                        });
+
+                        element.append(thumbnail);
+                        element.append(title)
+                            .append(size)
+                            .append(url);
+
+                        container.append(element);
+                    }
+                });
+        }
+
+        function searchVideos(query, top) {
+            CZ.Service.getBingVideos(query, top).then(
+                function (response) {
+                    spinner.stop();
+
+                    if (response.d.length === 0) {
+                        $("<span></span>", {
+                            text: "No results found."
+                        }).appendTo($("#container"));
+                        return;
+                    }
+
+                    for (var i = 0; i < response.d.length; i++) {
+                        var container = $("#container");
+
+                        var result = response.d[i];
+
+                        var element = $("<div></div>", {
+                            class: "element",
+                            width: 140 * result.Thumbnail.Width / result.Thumbnail.Height
+                        });
+
+                        var title = $("<div></div>", {
+                            class: "title",
+                            text: result.Title
+                        });
+                        var size = $("<div></div>", {
+                            class: "description",
+                            text: "Duration - " + (result.RunTime / 1000) + " seconds"
+                        });
+                        var url = $("<a></a>", {
+                            class: "description",
+                            text: result.DisplayUrl,
+                            href: result.MediaUrl
+                        });
+
+                        var thumbnail = $("<img></img>", {
+                            src: result.Thumbnail.MediaUrl,
+                            height: 140,
+                            width: 140 * result.Thumbnail.Width / result.Thumbnail.Height,
+                            class: "thumbnail"
+                        });
+
+                        element.append(thumbnail);
+                        element.append(title)
+                            .append(size)
+                            .append(url);
+
+                        container.append(element);
+                    }
+                });
+        }
+
+        function searchDocuments(query, top) {
+            CZ.Service.getBingDocuments(query, "pdf", top).then(
+               function (response) {
+                   spinner.stop();
+
+                   if (response.d.length === 0) {
+                       $("<span></span>", {
+                           text: "No results found."
+                       }).appendTo($("#container"));
+                       return;
+                   }
+
+                   for (var i = 0; i < response.d.length; i++) {
+                       var container = $("#container");
+
+                       var result = response.d[i];
+
+                       var element = $("<div></div>", {
+                           class: "element",
+                           width: 300
+                       });
+
+                       var title = $("<div></div>", {
+                           class: "title",
+                           text: result.Title
+                       });
+                       var size = $("<div></div>", {
+                           class: "doc-description",
+                           height: 100,
+                           text: result.Description
+                       });
+                       var url = $("<a></a>", {
+                           class: "description",
+                           text: result.DisplayUrl,
+                           href: result.Url
+                       });
+
+                       element.append(title)
+                           .append(size)
+                           .append(url);
+
+                       container.append(element);
+                   }
+               });
+        }
+    </script>
+</head>
+<body onload="pageOnLoad()"> 
+    <span>Search for: </span>   
+    <input type="text" id="q" style="display: inline-block;" />
+    <div style="margin: 20px 10px 20px 10px; display: inline-block">
+        <button id="search">Search</button>
+    </div>
+
+    <input type="radio" value="image" name="type" checked="checked" />Images
+    <input type="radio" value="video" name="type" />Videos
+    <input type="radio" value="document" name="type" />Documents
+
+    <br />
+    <span>Number of results (50 is max): </span>
+    <input type="text" id="count" value="50" />
+
+    <div id="progressbar"></div>
+
+    <div id="container"></div>
+</body>
+</html>
