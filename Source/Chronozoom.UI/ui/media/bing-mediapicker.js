@@ -5,11 +5,12 @@ var CZ;
             function BingMediaPicker(container, context) {
                 this.container = container;
                 this.contentItem = context;
-                this.searchTextbox = this.container.find(".cz-form-search-input");
+                this.editContentItemForm = CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
+                this.searchTextbox = this.container.find(".cz-bing-search-input");
                 this.mediaTypeRadioButtons = this.container.find(":radio");
                 this.progressBar = this.container.find(".cz-form-progress-bar");
-                this.searchResultsBox = this.container.find(".cz-form-bing-search-results");
-                this.searchButton = this.container.find(".cz-form-search-button");
+                this.searchResultsBox = this.container.find(".cz-bing-search-results");
+                this.searchButton = this.container.find(".cz-bing-search-button");
                 this.initialize();
             }
             BingMediaPicker.setup = function setup(context) {
@@ -58,24 +59,41 @@ var CZ;
                 });
             };
             BingMediaPicker.prototype.onSearchResultClick = function (mediaInfo) {
-                var editContentItemForm = CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
                 $.extend(this.contentItem, mediaInfo);
-                editContentItemForm.updateMediaInfo();
+                this.editContentItemForm.updateMediaInfo();
             };
             BingMediaPicker.prototype.getMediaType = function () {
                 return this.mediaTypeRadioButtons.filter(":checked").val();
             };
             BingMediaPicker.prototype.convertResultToMediaInfo = function (result, mediaType) {
-                return {
-                    uri: result.MediaUrl || result.Url,
-                    mediaType: mediaType,
-                    mediaSource: result.SourceUrl,
-                    attribution: result.SourceUrl
+                var mediaInfoMap = {
+                    image: {
+                        uri: result.MediaUrl,
+                        mediaType: mediaType,
+                        mediaSource: result.SourceUrl,
+                        attribution: result.SourceUrl
+                    },
+                    video: {
+                        uri: result.MediaUrl,
+                        mediaType: mediaType,
+                        mediaSource: result.MediaUrl,
+                        attribution: result.MediaUrl
+                    },
+                    pdf: {
+                        uri: result.Url,
+                        mediaType: mediaType,
+                        mediaSource: result.Url,
+                        attribution: result.Url
+                    }
                 };
+                return mediaInfoMap[mediaType];
             };
             BingMediaPicker.prototype.search = function () {
                 var query = this.searchTextbox.val();
                 var mediaType = this.getMediaType();
+                if(query.trim() === "") {
+                    return;
+                }
                 this.searchResultsBox.empty();
                 this.showProgressBar();
                 switch(mediaType) {
@@ -143,7 +161,8 @@ var CZ;
                 });
                 var title = $("<div></div>", {
                     class: "cz-bing-result-title cz-darkgray",
-                    text: result.Title
+                    text: result.Title,
+                    title: result.Title
                 });
                 var size = $("<div></div>", {
                     class: "cz-bing-result-description cz-lightgray",
@@ -153,6 +172,7 @@ var CZ;
                     class: "cz-bing-result-description cz-lightgray",
                     text: result.DisplayUrl,
                     href: result.MediaUrl,
+                    title: result.DisplayUrl,
                     target: "_blank"
                 });
                 var thumbnail = $("<img></img>", {
@@ -168,13 +188,15 @@ var CZ;
             };
             BingMediaPicker.prototype.createVideoResult = function (result) {
                 var _this = this;
+                result.Thumbnail = result.Thumbnail || this.createDefaultThumbnail();
                 var container = $("<div></div>", {
                     class: "cz-bing-result-container",
                     width: 140 * result.Thumbnail.Width / result.Thumbnail.Height
                 });
                 var title = $("<div></div>", {
                     class: "cz-bing-result-title cz-darkgray",
-                    text: result.Title
+                    text: result.Title,
+                    title: result.Title
                 });
                 var size = $("<div></div>", {
                     class: "cz-bing-result-description cz-lightgray",
@@ -182,8 +204,9 @@ var CZ;
                 });
                 var url = $("<a></a>", {
                     class: "cz-bing-result-description cz-lightgray",
-                    text: result.DisplayUrl,
+                    text: result.MediaUrl,
                     href: result.MediaUrl,
+                    title: result.MediaUrl,
                     target: "_blank"
                 });
                 var thumbnail = $("<img></img>", {
@@ -205,7 +228,8 @@ var CZ;
                 });
                 var title = $("<div></div>", {
                     class: "cz-bing-result-title cz-darkgray",
-                    text: result.Title
+                    text: result.Title,
+                    title: result.Title
                 });
                 var descr = $("<div></div>", {
                     class: "cz-bing-result-doc-description cz-lightgray",
@@ -216,6 +240,7 @@ var CZ;
                     class: "cz-bing-result-description cz-lightgray",
                     text: result.DisplayUrl,
                     href: result.Url,
+                    title: result.DisplayUrl,
                     target: "_blank"
                 });
                 title.add(descr).click(function (event) {
@@ -235,6 +260,15 @@ var CZ;
             };
             BingMediaPicker.prototype.showNoResults = function () {
                 this.searchResultsBox.text("No results.");
+            };
+            BingMediaPicker.prototype.createDefaultThumbnail = function () {
+                return {
+                    ContentType: "image/png",
+                    FileSize: 4638,
+                    Width: 500,
+                    Height: 500,
+                    MediaUrl: "/images/Temp-Thumbnail2.png"
+                };
             };
             return BingMediaPicker;
         })();

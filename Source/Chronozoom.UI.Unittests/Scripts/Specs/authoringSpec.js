@@ -66,7 +66,7 @@ describe("CZ.Authoring part", function () {
                 contentItems = [{ mediaType: 'Image', uri: 'www.example.com/image', title: 'Title' }];
                 var isValid = validateContentItems(contentItems);
                 expect(false).toEqual(isValid);
-                expect('Sorry, only JPG/PNG images are supported').toEqual(alertMessage);
+                expect('Sorry, only JPG/PNG/GIF images are supported').toEqual(alertMessage);
             });
 
             //Video

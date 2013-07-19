@@ -60,12 +60,14 @@ namespace Chronozoom.UI
                     BingAccountKey = ConfigurationManager.AppSettings["AzureMarketplaceAccountKey"];
                 }
 
+#if RELEASE
                 if (user == null)
                 {
                     // Setting status code to 403 to prevent redirection to authentication resource if status code is 401.
                     SetStatusCode(HttpStatusCode.Forbidden, ErrorDescription.UnauthorizedUser);
                     return new BaseJsonResult<IEnumerable<Bing.ImageResult>>(searchResults);
                 }
+#endif
 
                 int resultsCount = int.TryParse(top, out resultsCount) ? resultsCount : BingDefaultSearchLimit;
                 int offset = int.TryParse(skip, out offset) ? offset : BingDefaultOffset;
@@ -113,12 +115,14 @@ namespace Chronozoom.UI
                     BingAccountKey = ConfigurationManager.AppSettings["AzureMarketplaceAccountKey"];
                 }
 
+#if RELEASE
                 if (user == null)
                 {
                     // Setting status code to 403 to prevent redirection to authentication resource if status code is 401.
                     SetStatusCode(HttpStatusCode.Forbidden, ErrorDescription.UnauthorizedUser);
                     return new BaseJsonResult<IEnumerable<Bing.VideoResult>>(searchResults);
                 }
+#endif
 
                 int resultsCount = int.TryParse(top, out resultsCount) ? resultsCount : BingDefaultSearchLimit;
                 int offset = int.TryParse(skip, out offset) ? offset : BingDefaultOffset;
@@ -166,12 +170,14 @@ namespace Chronozoom.UI
                     BingAccountKey = ConfigurationManager.AppSettings["AzureMarketplaceAccountKey"];
                 }
 
+#if RELEASE
                 if (user == null)
                 {
                     // Setting status code to 403 to prevent redirection to authentication resource if status code is 401.
                     SetStatusCode(HttpStatusCode.Forbidden, ErrorDescription.UnauthorizedUser);
                     return new BaseJsonResult<IEnumerable<Bing.WebResult>>(searchResults);
                 }
+#endif
 
                 int resultsCount = int.TryParse(top, out resultsCount) ? resultsCount : BingDefaultSearchLimit;
                 int offset = int.TryParse(skip, out offset) ? offset : BingDefaultOffset;

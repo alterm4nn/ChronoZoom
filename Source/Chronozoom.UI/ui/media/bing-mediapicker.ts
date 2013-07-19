@@ -45,6 +45,7 @@ module CZ {
                 form.show();
             }
 
+            private editContentItemForm: CZ.UI.FormEditCI;
             private container: JQuery;
             private contentItem: any;
 
@@ -58,11 +59,12 @@ module CZ {
                 this.container = container;
                 this.contentItem = context;
 
-                this.searchTextbox = this.container.find(".cz-form-search-input");
+                this.editContentItemForm = CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
+                this.searchTextbox = this.container.find(".cz-bing-search-input");
                 this.mediaTypeRadioButtons = this.container.find(":radio");
                 this.progressBar = this.container.find(".cz-form-progress-bar");
-                this.searchResultsBox = this.container.find(".cz-form-bing-search-results");
-                this.searchButton = this.container.find(".cz-form-search-button");
+                this.searchResultsBox = this.container.find(".cz-bing-search-results");
+                this.searchButton = this.container.find(".cz-bing-search-button");
 
                 this.initialize();
             }
@@ -96,10 +98,8 @@ module CZ {
             }
 
             private onSearchResultClick(mediaInfo: CZ.Media.MediaInfo): void {
-                // NOTE: Is there a better way to handle this? Possible solution: pass host form to Media List.
-                var editContentItemForm = CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
                 $.extend(this.contentItem, mediaInfo);
-                editContentItemForm.updateMediaInfo();
+                this.editContentItemForm.updateMediaInfo();
             }
 
             private getMediaType(): string {
@@ -107,17 +107,38 @@ module CZ {
             }
 
             private convertResultToMediaInfo(result: any, mediaType: string): CZ.Media.MediaInfo {
-                return <CZ.Media.MediaInfo> {
-                    uri: result.MediaUrl || result.Url,
-                    mediaType: mediaType,
-                    mediaSource: result.SourceUrl,
-                    attribution: result.SourceUrl
+                var mediaInfoMap = {
+                    image: <CZ.Media.MediaInfo> {
+                        uri: result.MediaUrl,
+                        mediaType: mediaType,
+                        mediaSource: result.SourceUrl,
+                        attribution: result.SourceUrl
+                    },
+                    video: <CZ.Media.MediaInfo> {
+                        uri: result.MediaUrl,
+                        mediaType: mediaType,
+                        mediaSource: result.MediaUrl,
+                        attribution: result.MediaUrl
+                    },
+                    pdf: <CZ.Media.MediaInfo> {
+                        uri: result.Url,
+                        mediaType: mediaType,
+                        mediaSource: result.Url,
+                        attribution: result.Url
+                    }
                 };
+                
+                return mediaInfoMap[mediaType];
             }
 
             private search(): void {
                 var query = this.searchTextbox.val();
                 var mediaType = this.getMediaType();
+
+                if (query.trim() === "") {
+                    return;
+                }
+
                 this.searchResultsBox.empty();
                 this.showProgressBar();
 
@@ -194,7 +215,8 @@ module CZ {
 
                 var title = $("<div></div>", {
                     class: "cz-bing-result-title cz-darkgray",
-                    text: result.Title
+                    text: result.Title,
+                    title: result.Title
                 });
 
                 var size = $("<div></div>", {
@@ -207,6 +229,7 @@ module CZ {
                     class: "cz-bing-result-description cz-lightgray",
                     text: result.DisplayUrl,
                     href: result.MediaUrl,
+                    title: result.DisplayUrl,
                     target: "_blank"
                 });
 
@@ -230,6 +253,9 @@ module CZ {
             }
 
             private createVideoResult(result: any): JQuery {
+                // Set default thumbnail if there is no any.
+                result.Thumbnail = result.Thumbnail || this.createDefaultThumbnail();
+
                 var container = $("<div></div>", {
                     class: "cz-bing-result-container",
                     width: 140 * result.Thumbnail.Width / result.Thumbnail.Height
@@ -237,7 +263,8 @@ module CZ {
 
                 var title = $("<div></div>", {
                     class: "cz-bing-result-title cz-darkgray",
-                    text: result.Title
+                    text: result.Title,
+                    title: result.Title
                 });
 
                 var size = $("<div></div>", {
@@ -247,8 +274,9 @@ module CZ {
 
                 var url = $("<a></a>", {
                     class: "cz-bing-result-description cz-lightgray",
-                    text: result.DisplayUrl,
+                    text: result.MediaUrl,
                     href: result.MediaUrl,
+                    title: result.MediaUrl,
                     target: "_blank"
                 });
 
@@ -279,7 +307,8 @@ module CZ {
 
                 var title = $("<div></div>", {
                     class: "cz-bing-result-title cz-darkgray",
-                    text: result.Title
+                    text: result.Title,
+                    title: result.Title
                 });
 
                 var descr = $("<div></div>", {
@@ -292,6 +321,7 @@ module CZ {
                     class: "cz-bing-result-description cz-lightgray",
                     text: result.DisplayUrl,
                     href: result.Url,
+                    title: result.DisplayUrl,
                     target: "_blank"
                 });
 
@@ -320,6 +350,16 @@ module CZ {
 
             private showNoResults(): void {
                 this.searchResultsBox.text("No results.");
+            }
+
+            private createDefaultThumbnail() {
+                return {
+                    ContentType: "image/png",
+                    FileSize: 4638,
+                    Width: 500,
+                    Height: 500,
+                    MediaUrl: "/images/Temp-Thumbnail2.png"
+                };
             }
         }
     }
