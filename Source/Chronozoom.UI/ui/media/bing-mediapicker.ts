@@ -42,8 +42,13 @@ module CZ {
                     form.close();
                 });
 
-                $(mediaPicker).on("closecompleted", event => {
-                    $(window).off("resize", mediaPicker.onResizeHandler());
+                // Align search results on window resize.
+                var onWindowResize = () => mediaPicker.onWindowResize();
+
+                $(window).on("resize", onWindowResize);
+
+                $(form).on("closecompleted", event => {
+                    $(window).off("resize", onWindowResize);
                 });
 
                 form.show();
@@ -75,9 +80,6 @@ module CZ {
 
             private initialize(): void {
                 this.progressBar.css("opacity", 0);
-                this.searchResultsBox.empty();
-                this.searchTextbox.val("");
-                this.mediaTypeRadioButtons.first().attr("checked", "true");
                 this.searchTextbox.off();
                 this.searchButton.off();
                 $(this).off();
@@ -99,8 +101,6 @@ module CZ {
                 $(this).on("resultclick", (event, mediaInfo) => {
                     this.onSearchResultClick(mediaInfo);
                 });
-
-                $(window).on("resize", this.onResizeHandler);
             }
 
             private onSearchResultClick(mediaInfo: CZ.Media.MediaInfo): void {
@@ -174,12 +174,14 @@ module CZ {
                         var result = response.d[i];
                         var resultContainer = this.createImageResult(result);
                         this.searchResultsBox.append(resultContainer);
-                        BingMediaPicker.alignThumbnails($(".cz-bing-search-results"), ".cz-bing-result-container");
+                        this.alignThumbnails();
                     }
                 });
             }
 
             private searchVideos(query: string): void {
+                // NOTE: Only YouTube and Vimeo videos are supported.
+                query += " (+site:youtube.com OR +site:vimeo.com)";
                 CZ.Service.getBingVideos(query).done(response => {
                     this.hideProgressBar();
 
@@ -192,7 +194,7 @@ module CZ {
                         var result = response.d[i];
                         var resultContainer = this.createVideoResult(result);
                         this.searchResultsBox.append(resultContainer);
-                        BingMediaPicker.alignThumbnails($(".cz-bing-search-results"), ".cz-bing-result-container");
+                        this.alignThumbnails();
                     }
                 });
             }
@@ -372,12 +374,13 @@ module CZ {
                 };
             }
 
-            public onResizeHandler() {
-                BingMediaPicker.alignThumbnails($(".cz-bing-search-results"), ".cz-bing-result-container");
+            public onWindowResize() {
+                this.alignThumbnails();
             }
 
-            public static alignThumbnails(container, elementSelector) {
-                var elements = $(elementSelector);
+            public alignThumbnails() {
+                var container = this.searchResultsBox;
+                var elements = container.children();
 
                 if (elements.length === 0) {
                     return;
@@ -389,26 +392,33 @@ module CZ {
                     width: 0
                 };
 
-                for (var i = 0; i < elements.length; i++) {
+                for (var i = 0, len = elements.length; i < len; i++) {
+                    var curElement = $(elements[i]);
+                    var curElementActualWidth = +curElement.attr("data-actual-width");
+                    var curElementOuterWidth = curElement.outerWidth(true);
+                    var curElementInnerWidth = curElement.innerWidth();
+
                     // next thumbnail exceed row width
-                    if (rowWidth < currentRow.width + parseFloat($(elements[i]).attr(("data-actual-width")))) {
+                    if (rowWidth < currentRow.width + curElementActualWidth) {
                         var delta = rowWidth - currentRow.width; // available free space in row
-                        for (var j = 0; j < currentRow.elements.length; j++) {
-                            currentRow.elements[j].width(parseFloat(currentRow.elements[j].attr("data-actual-width")) + delta / currentRow.elements.length);
+                        for (var j = 0, rowLen = currentRow.elements.length; j < rowLen; j++) {
+                            var rowElement = currentRow.elements[j];
+                            var rowElementActualWidth = +rowElement.attr("data-actual-width");
+                            rowElement.width(rowElementActualWidth + delta / rowLen);
                         }
                         currentRow.elements = [];
-                        currentRow.elements.push($(elements[i]));
-                        currentRow.width = Math.ceil(parseFloat($(elements[i]).attr("data-actual-width")) + // content width
-                            $(elements[i]).outerWidth(true) - $(elements[i]).innerWidth()); // margin + padding + border width
+                        currentRow.elements.push(curElement);
+                        // content width + margin + padding + border width
+                        currentRow.width = Math.ceil(curElementActualWidth + curElementOuterWidth - curElementInnerWidth);
                     }
                     // next thumbnail is within row width
                     else {
-                        currentRow.elements.push($(elements[i]));
-                        currentRow.width += Math.ceil(parseFloat($(elements[i]).attr("data-actual-width")) +
-                            $(elements[i]).outerWidth(true) - $(elements[i]).innerWidth());
+                        currentRow.elements.push(curElement);
+                        // content width + margin + padding + border width
+                        currentRow.width += Math.ceil(curElementActualWidth + curElementOuterWidth - curElementInnerWidth);
                     }
                 }
-            }            
+            }
         }
     }
 }

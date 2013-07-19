@@ -18,7 +18,7 @@ var CZ;
             }
         });
         function initialize() {
-            registerMediaPicker("bing", "/images/media/bing-icon.png", "/ui/media/bing-mediapicker.html", CZ.Media.BingMediaPicker);
+            registerMediaPicker("bing", "/images/media/bing-import-50x150.png", "/ui/media/bing-mediapicker.html", CZ.Media.BingMediaPicker);
         }
         Media.initialize = initialize;
         function registerMediaPicker(title, iconUrl, viewUrl, type, selector) {

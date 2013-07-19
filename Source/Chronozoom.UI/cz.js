@@ -10389,17 +10389,18 @@ var CZ;
                 $(mediaPicker).on("resultclick", function (event) {
                     form.close();
                 });
-                $(mediaPicker).on("closecompleted", function (event) {
-                    $(window).off("resize", mediaPicker.onResizeHandler());
+                var onWindowResize = function () {
+                    return mediaPicker.onWindowResize();
+                };
+                $(window).on("resize", onWindowResize);
+                $(form).on("closecompleted", function (event) {
+                    $(window).off("resize", onWindowResize);
                 });
                 form.show();
             };
             BingMediaPicker.prototype.initialize = function () {
                 var _this = this;
                 this.progressBar.css("opacity", 0);
-                this.searchResultsBox.empty();
-                this.searchTextbox.val("");
-                this.mediaTypeRadioButtons.first().attr("checked", "true");
                 this.searchTextbox.off();
                 this.searchButton.off();
                 $(this).off();
@@ -10416,7 +10417,6 @@ var CZ;
                 $(this).on("resultclick", function (event, mediaInfo) {
                     _this.onSearchResultClick(mediaInfo);
                 });
-                $(window).on("resize", this.onResizeHandler);
             };
             BingMediaPicker.prototype.onSearchResultClick = function (mediaInfo) {
                 $.extend(this.contentItem, mediaInfo);
@@ -10480,12 +10480,13 @@ var CZ;
                         var result = response.d[i];
                         var resultContainer = _this.createImageResult(result);
                         _this.searchResultsBox.append(resultContainer);
-                        BingMediaPicker.alignThumbnails($(".cz-bing-search-results"), ".cz-bing-result-container");
+                        _this.alignThumbnails();
                     }
                 });
             };
             BingMediaPicker.prototype.searchVideos = function (query) {
                 var _this = this;
+                query += " (+site:youtube.com OR +site:vimeo.com)";
                 CZ.Service.getBingVideos(query).done(function (response) {
                     _this.hideProgressBar();
                     if(response.d.length === 0) {
@@ -10496,7 +10497,7 @@ var CZ;
                         var result = response.d[i];
                         var resultContainer = _this.createVideoResult(result);
                         _this.searchResultsBox.append(resultContainer);
-                        BingMediaPicker.alignThumbnails($(".cz-bing-search-results"), ".cz-bing-result-container");
+                        _this.alignThumbnails();
                     }
                 });
             };
@@ -10634,11 +10635,12 @@ var CZ;
                     MediaUrl: "/images/Temp-Thumbnail2.png"
                 };
             };
-            BingMediaPicker.prototype.onResizeHandler = function () {
-                BingMediaPicker.alignThumbnails($(".cz-bing-search-results"), ".cz-bing-result-container");
+            BingMediaPicker.prototype.onWindowResize = function () {
+                this.alignThumbnails();
             };
-            BingMediaPicker.alignThumbnails = function alignThumbnails(container, elementSelector) {
-                var elements = $(elementSelector);
+            BingMediaPicker.prototype.alignThumbnails = function () {
+                var container = this.searchResultsBox;
+                var elements = container.children();
                 if(elements.length === 0) {
                     return;
                 }
@@ -10647,18 +10649,24 @@ var CZ;
                     elements: [],
                     width: 0
                 };
-                for(var i = 0; i < elements.length; i++) {
-                    if(rowWidth < currentRow.width + parseFloat($(elements[i]).attr(("data-actual-width")))) {
+                for(var i = 0, len = elements.length; i < len; i++) {
+                    var curElement = $(elements[i]);
+                    var curElementActualWidth = +curElement.attr("data-actual-width");
+                    var curElementOuterWidth = curElement.outerWidth(true);
+                    var curElementInnerWidth = curElement.innerWidth();
+                    if(rowWidth < currentRow.width + curElementActualWidth) {
                         var delta = rowWidth - currentRow.width;
-                        for(var j = 0; j < currentRow.elements.length; j++) {
-                            currentRow.elements[j].width(parseFloat(currentRow.elements[j].attr("data-actual-width")) + delta / currentRow.elements.length);
+                        for(var j = 0, rowLen = currentRow.elements.length; j < rowLen; j++) {
+                            var rowElement = currentRow.elements[j];
+                            var rowElementActualWidth = +rowElement.attr("data-actual-width");
+                            rowElement.width(rowElementActualWidth + delta / rowLen);
                         }
                         currentRow.elements = [];
-                        currentRow.elements.push($(elements[i]));
-                        currentRow.width = Math.ceil(parseFloat($(elements[i]).attr("data-actual-width")) + $(elements[i]).outerWidth(true) - $(elements[i]).innerWidth());
+                        currentRow.elements.push(curElement);
+                        currentRow.width = Math.ceil(curElementActualWidth + curElementOuterWidth - curElementInnerWidth);
                     } else {
-                        currentRow.elements.push($(elements[i]));
-                        currentRow.width += Math.ceil(parseFloat($(elements[i]).attr("data-actual-width")) + $(elements[i]).outerWidth(true) - $(elements[i]).innerWidth());
+                        currentRow.elements.push(curElement);
+                        currentRow.width += Math.ceil(curElementActualWidth + curElementOuterWidth - curElementInnerWidth);
                     }
                 }
             };
@@ -10688,7 +10696,7 @@ var CZ;
             }
         });
         function initialize() {
-            registerMediaPicker("bing", "/images/media/bing-icon.png", "/ui/media/bing-mediapicker.html", CZ.Media.BingMediaPicker);
+            registerMediaPicker("bing", "/images/media/bing-import-50x150.png", "/ui/media/bing-mediapicker.html", CZ.Media.BingMediaPicker);
         }
         Media.initialize = initialize;
         function registerMediaPicker(title, iconUrl, viewUrl, type, selector) {

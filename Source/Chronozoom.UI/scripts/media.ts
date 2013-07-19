@@ -41,7 +41,7 @@ module CZ {
             // TODO: Register media pickers. The order is essential for MediaList.
             registerMediaPicker(
                 "bing",
-                "/images/media/bing-icon.png",
+                "/images/media/bing-import-50x150.png",
                 "/ui/media/bing-mediapicker.html",
                 CZ.Media.BingMediaPicker
             );
