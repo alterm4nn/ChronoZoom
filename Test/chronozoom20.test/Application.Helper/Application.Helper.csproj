@@ -60,6 +60,7 @@
     <Compile Include="Constants\ApiConstants.cs" />
     <Compile Include="Constants\ImageTemplateFilesLocations.cs" />
     <Compile Include="Constants\Javascripts.cs" />
+    <Compile Include="Entities\Bibliography.cs" />
     <Compile Include="Entities\ContentItem.cs" />
     <Compile Include="Entities\Exhibit.cs" />
     <Compile Include="Entities\NewExhibitApiResponse.cs" />
