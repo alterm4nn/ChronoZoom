@@ -6,7 +6,6 @@ using Application.Helper.Entities;
 using Application.Helper.UserActions;
 using System.IO;
 using System.Runtime.Serialization.Json;
-using Chronozoom.Entities;
 using Exhibit = Application.Helper.Entities.Exhibit;
 using Timeline = Application.Helper.Entities.Timeline;
 
