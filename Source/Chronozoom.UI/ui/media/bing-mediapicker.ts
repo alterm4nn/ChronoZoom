@@ -42,6 +42,10 @@ module CZ {
                     form.close();
                 });
 
+                $(mediaPicker).on("closecompleted", event => {
+                    $(window).off("resize", mediaPicker.onResizeHandler());
+                });
+
                 form.show();
             }
 
@@ -95,6 +99,8 @@ module CZ {
                 $(this).on("resultclick", (event, mediaInfo) => {
                     this.onSearchResultClick(mediaInfo);
                 });
+
+                $(window).on("resize", this.onResizeHandler);
             }
 
             private onSearchResultClick(mediaInfo: CZ.Media.MediaInfo): void {
@@ -168,6 +174,7 @@ module CZ {
                         var result = response.d[i];
                         var resultContainer = this.createImageResult(result);
                         this.searchResultsBox.append(resultContainer);
+                        BingMediaPicker.alignThumbnails($(".cz-bing-search-results"), ".cz-bing-result-container");
                     }
                 });
             }
@@ -185,6 +192,7 @@ module CZ {
                         var result = response.d[i];
                         var resultContainer = this.createVideoResult(result);
                         this.searchResultsBox.append(resultContainer);
+                        BingMediaPicker.alignThumbnails($(".cz-bing-search-results"), ".cz-bing-result-container");
                     }
                 });
             }
@@ -210,7 +218,8 @@ module CZ {
             private createImageResult(result: any): JQuery {
                 var container = $("<div></div>", {
                     class: "cz-bing-result-container",
-                    width: 183 * result.Thumbnail.Width / result.Thumbnail.Height
+                    width: 183 * result.Thumbnail.Width / result.Thumbnail.Height,
+                    "data-actual-width": 183 * result.Thumbnail.Width / result.Thumbnail.Height
                 });
 
                 var title = $("<div></div>", {
@@ -236,7 +245,7 @@ module CZ {
                 var thumbnail = $("<img></img>", {
                     src: result.Thumbnail.MediaUrl,
                     height: 183,
-                    width: 183 * result.Thumbnail.Width / result.Thumbnail.Height,
+                    width: "100%",
                     class: "cz-bing-result-thumbnail"
                 });
 
@@ -258,7 +267,8 @@ module CZ {
 
                 var container = $("<div></div>", {
                     class: "cz-bing-result-container",
-                    width: 140 * result.Thumbnail.Width / result.Thumbnail.Height
+                    width: 140 * result.Thumbnail.Width / result.Thumbnail.Height,
+                    "data-actual-width": 140 * result.Thumbnail.Width / result.Thumbnail.Height
                 });
 
                 var title = $("<div></div>", {
@@ -283,7 +293,7 @@ module CZ {
                 var thumbnail = $("<img></img>", {
                     src: result.Thumbnail.MediaUrl,
                     height: 140,
-                    width: 140 * result.Thumbnail.Width / result.Thumbnail.Height,
+                    width: "100%",
                     class: "cz-bing-result-thumbnail"
                 });
 
@@ -361,6 +371,44 @@ module CZ {
                     MediaUrl: "/images/Temp-Thumbnail2.png"
                 };
             }
+
+            public onResizeHandler() {
+                BingMediaPicker.alignThumbnails($(".cz-bing-search-results"), ".cz-bing-result-container");
+            }
+
+            public static alignThumbnails(container, elementSelector) {
+                var elements = $(elementSelector);
+
+                if (elements.length === 0) {
+                    return;
+                }
+
+                var rowWidth = container.width(); // current width of search results row
+                var currentRow = { // current row
+                    elements: [],
+                    width: 0
+                };
+
+                for (var i = 0; i < elements.length; i++) {
+                    // next thumbnail exceed row width
+                    if (rowWidth < currentRow.width + parseFloat($(elements[i]).attr(("data-actual-width")))) {
+                        var delta = rowWidth - currentRow.width; // available free space in row
+                        for (var j = 0; j < currentRow.elements.length; j++) {
+                            currentRow.elements[j].width(parseFloat(currentRow.elements[j].attr("data-actual-width")) + delta / currentRow.elements.length);
+                        }
+                        currentRow.elements = [];
+                        currentRow.elements.push($(elements[i]));
+                        currentRow.width = Math.ceil(parseFloat($(elements[i]).attr("data-actual-width")) + // content width
+                            $(elements[i]).outerWidth(true) - $(elements[i]).innerWidth()); // margin + padding + border width
+                    }
+                    // next thumbnail is within row width
+                    else {
+                        currentRow.elements.push($(elements[i]));
+                        currentRow.width += Math.ceil(parseFloat($(elements[i]).attr("data-actual-width")) +
+                            $(elements[i]).outerWidth(true) - $(elements[i]).innerWidth());
+                    }
+                }
+            }            
         }
     }
 }

@@ -10389,6 +10389,9 @@ var CZ;
                 $(mediaPicker).on("resultclick", function (event) {
                     form.close();
                 });
+                $(mediaPicker).on("closecompleted", function (event) {
+                    $(window).off("resize", mediaPicker.onResizeHandler());
+                });
                 form.show();
             };
             BingMediaPicker.prototype.initialize = function () {
@@ -10413,6 +10416,7 @@ var CZ;
                 $(this).on("resultclick", function (event, mediaInfo) {
                     _this.onSearchResultClick(mediaInfo);
                 });
+                $(window).on("resize", this.onResizeHandler);
             };
             BingMediaPicker.prototype.onSearchResultClick = function (mediaInfo) {
                 $.extend(this.contentItem, mediaInfo);
@@ -10476,6 +10480,7 @@ var CZ;
                         var result = response.d[i];
                         var resultContainer = _this.createImageResult(result);
                         _this.searchResultsBox.append(resultContainer);
+                        BingMediaPicker.alignThumbnails($(".cz-bing-search-results"), ".cz-bing-result-container");
                     }
                 });
             };
@@ -10491,6 +10496,7 @@ var CZ;
                         var result = response.d[i];
                         var resultContainer = _this.createVideoResult(result);
                         _this.searchResultsBox.append(resultContainer);
+                        BingMediaPicker.alignThumbnails($(".cz-bing-search-results"), ".cz-bing-result-container");
                     }
                 });
             };
@@ -10513,7 +10519,8 @@ var CZ;
                 var _this = this;
                 var container = $("<div></div>", {
                     class: "cz-bing-result-container",
-                    width: 183 * result.Thumbnail.Width / result.Thumbnail.Height
+                    width: 183 * result.Thumbnail.Width / result.Thumbnail.Height,
+                    "data-actual-width": 183 * result.Thumbnail.Width / result.Thumbnail.Height
                 });
                 var title = $("<div></div>", {
                     class: "cz-bing-result-title cz-darkgray",
@@ -10534,7 +10541,7 @@ var CZ;
                 var thumbnail = $("<img></img>", {
                     src: result.Thumbnail.MediaUrl,
                     height: 183,
-                    width: 183 * result.Thumbnail.Width / result.Thumbnail.Height,
+                    width: "100%",
                     class: "cz-bing-result-thumbnail"
                 });
                 thumbnail.add(title).add(size).click(function (event) {
@@ -10547,7 +10554,8 @@ var CZ;
                 result.Thumbnail = result.Thumbnail || this.createDefaultThumbnail();
                 var container = $("<div></div>", {
                     class: "cz-bing-result-container",
-                    width: 140 * result.Thumbnail.Width / result.Thumbnail.Height
+                    width: 140 * result.Thumbnail.Width / result.Thumbnail.Height,
+                    "data-actual-width": 140 * result.Thumbnail.Width / result.Thumbnail.Height
                 });
                 var title = $("<div></div>", {
                     class: "cz-bing-result-title cz-darkgray",
@@ -10568,7 +10576,7 @@ var CZ;
                 var thumbnail = $("<img></img>", {
                     src: result.Thumbnail.MediaUrl,
                     height: 140,
-                    width: 140 * result.Thumbnail.Width / result.Thumbnail.Height,
+                    width: "100%",
                     class: "cz-bing-result-thumbnail"
                 });
                 thumbnail.add(title).add(size).click(function (event) {
@@ -10625,6 +10633,34 @@ var CZ;
                     Height: 500,
                     MediaUrl: "/images/Temp-Thumbnail2.png"
                 };
+            };
+            BingMediaPicker.prototype.onResizeHandler = function () {
+                BingMediaPicker.alignThumbnails($(".cz-bing-search-results"), ".cz-bing-result-container");
+            };
+            BingMediaPicker.alignThumbnails = function alignThumbnails(container, elementSelector) {
+                var elements = $(elementSelector);
+                if(elements.length === 0) {
+                    return;
+                }
+                var rowWidth = container.width();
+                var currentRow = {
+                    elements: [],
+                    width: 0
+                };
+                for(var i = 0; i < elements.length; i++) {
+                    if(rowWidth < currentRow.width + parseFloat($(elements[i]).attr(("data-actual-width")))) {
+                        var delta = rowWidth - currentRow.width;
+                        for(var j = 0; j < currentRow.elements.length; j++) {
+                            currentRow.elements[j].width(parseFloat(currentRow.elements[j].attr("data-actual-width")) + delta / currentRow.elements.length);
+                        }
+                        currentRow.elements = [];
+                        currentRow.elements.push($(elements[i]));
+                        currentRow.width = Math.ceil(parseFloat($(elements[i]).attr("data-actual-width")) + $(elements[i]).outerWidth(true) - $(elements[i]).innerWidth());
+                    } else {
+                        currentRow.elements.push($(elements[i]));
+                        currentRow.width += Math.ceil(parseFloat($(elements[i]).attr("data-actual-width")) + $(elements[i]).outerWidth(true) - $(elements[i]).innerWidth());
+                    }
+                }
             };
             return BingMediaPicker;
         })();
