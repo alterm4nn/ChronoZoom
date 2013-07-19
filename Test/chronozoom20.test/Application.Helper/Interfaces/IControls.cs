@@ -4,5 +4,7 @@
     {
         void ClickCloseButton();
         void NavigateBceToCeEra();
+        void SecurityWarningAccept();
+        void ClickOnTimeseriesButton();
     }
 }

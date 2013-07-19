@@ -1,6 +1,7 @@
 ﻿using Application.Driver;
 using Application.Driver.UserActions;
 using Application.Helper.Interfaces;
+using OpenQA.Selenium;
 
 namespace Application.Helper.UserActions
 {
@@ -21,6 +22,19 @@ namespace Application.Helper.UserActions
         protected void NavigateBceToCeEra()
         {
             _controls.NavigateBceToCeEra();
+        }
+
+        protected void AcceptSecurityWarning()
+        {
+            _controls.SecurityWarningAccept();
+        }
+
+
+        protected void ClickOnTimeseriesButton()
+        {
+            Logger.Log("<-");
+            _controls.ClickOnTimeseriesButton();
+            Logger.Log("->");
         }
     }
 }

@@ -1,7 +1,7 @@
 # ChronoZoom Operations Guide #
 You can use the [Azure Management Portal](https://manage.windowsazure.com/) to configure and monitor your ChronoZoom site (and any other sites or resources that you have created on Azure). This guide summarizes the most common tasks that you will need to perform on Azure.
  
-## Common Operational Procedures ## 
+## Common Operational Procedures ##
 
 **To Monitor Performance Data:** Use the [Azure Management Portal](https://manage.windowsazure.com/) **DASHBOARD** management page. Here you can access performance data such as current service load, data flow, connections and requests. You can also download diagnostics logs under the quick glance section. Note that the option to generate logs must first be enabled from the **CONFIGURE** management page.
 
@@ -13,9 +13,66 @@ You can use the [Azure Management Portal](https://manage.windowsazure.com/) to c
 
 **To Add a Staged Deployment:** TBD.
 
-
-
 See the [Windows Azure Documentation](http://www.windowsazure.com/en-us/documentation/) for more detailed information.
+
+## Weekly Deployment to Production ##
+**Wednesday:** stabilization day. Only hot-fixes are accepted to alterm4nn.
+
+**Thursday:** ChronoZoom teams sign off on test.chronozoomproject.org build and proceeds with deployment to production.
+
+The process for deployment consists of the following steps:
+- Read-Only Mode
+- Database Copy
+- Database Upgrade 
+- Website Deployment
+
+The following rollback procedures are available for failed deployments:
+- Website Roll Back
+- Data Roll Back
+
+#### Read-Only Mode ####
+To prevent any data loss for authors conencted to the site, set the database to read-only mode using:
+
+`ALTER DATABASE [cz-nodelete-chronozoom-prod-YYYYMMDD] SET READ_ONLY`
+
+YYYYMMDD needs to match the current production database. This command must be run from the production master database (not the ChronoZoom database).
+
+#### Database Copy ####
+To copy the new production database, call [CREATE DATABASE](http://msdn.microsoft.com/en-us/library/windowsazure/ee336274.aspx) using the following syntax:
+
+`CREATE DATABASE [cz-nodelete-chronozoom-prod-YYYYMMDD] AS COPY OF [cz-nodelete-chronozoom-prod-########]`
+
+YYYYMMDD is set to the current date, ######## is set to the date of the previous deployment. All the commands form this section must be run from the production master database (not the ChronoZoom database).
+
+Wait for the copy to complete by monitoring progress in Windows Azure management portal. Once its complete, trigger:
+
+`ALTER DATABASE [cz-nodelete-chronozoom-prod-YYYYMMDD] SET READ_WRITE`
+
+#### Database Upgrade ####
+Extract database upgrade script and execute it.
+
+1. Launch Visual Studio.
+2. Click **Tools**, **Library Package Manager**, **Package Manager Console**.
+    `Update-Database -V -ProjectName Chronozoom.Entities -ConnectionString "<connection>" -ConnectionProviderName System.Data.SqlClient` -script   
+If data loss is expected, add the `-Force` parameter.
+3. Run the generated script in the ChronoZoom database using SQL Server Management Studio.
+
+#### Website Deployment ####
+
+1. Merge alterm4nn:main into alterm4nn:production. Windows Azure automatically picks the production branch and deploys the update.
+2. Change the connection string from the old database to the new database using Windows Azure Management Portal.
+
+#### Website Roll Back ####
+
+1. From the Azure Management Console, click the **DEPLOYMENTS** tab.
+2. Select the previous deployment and redeploy.
+3. Restart the Azure Website.
+
+#### Data Roll Back ####
+1. Perform a website roll back.
+2. Swap with the previous database.
+    - In the Azure Management Console, click the **DEPLOYMENTS** tab.
+    - Point the **Storage** parameter to the previous database.
 
 ## Azure Management Portal ##
 

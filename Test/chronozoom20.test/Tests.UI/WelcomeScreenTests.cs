@@ -3,6 +3,7 @@
 namespace Tests
 {
     [TestClass]
+    [Ignore]
     public class WelcomeScreenTests : TestBase
     {
         #region Initialize and Cleanup
@@ -18,7 +19,8 @@ namespace Tests
         public void TestInitialize()
         {
             BrowserStateManager.RefreshState();
-            NavigationHelper.OpenHomePage();
+            WelcomeScreenHelper.ResetPopupState();
+            HomePageHelper.OpenPage();
         }
 
         [ClassCleanup]

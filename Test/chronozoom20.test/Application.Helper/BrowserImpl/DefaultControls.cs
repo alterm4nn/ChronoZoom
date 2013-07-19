@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Globalization;
 using Application.Driver;
 using Application.Driver.UserActions;
-using Application.Helper.Helpers;
 using OpenQA.Selenium;
 
 namespace Application.Helper.BrowserImpl
@@ -25,6 +23,16 @@ namespace Application.Helper.BrowserImpl
             Logger.Log("- script: " + script);
             ExecuteJavaScript(script);
             Logger.Log("->");
+        }
+
+        public virtual void SecurityWarningAccept()
+        {
+            //No alert by default (chrome and IE).
+        }
+
+        public virtual void ClickOnTimeseriesButton()
+        {
+            MoveToElementAndClick(By.Id("timeSeries_button"));
         }
     }
 }

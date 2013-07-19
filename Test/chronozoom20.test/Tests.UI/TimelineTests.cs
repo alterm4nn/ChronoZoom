@@ -1,5 +1,4 @@
-﻿using System;
-using Application.Helper.Entities;
+﻿using Application.Helper.Entities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Tests
@@ -16,9 +15,8 @@ namespace Tests
         public static void ClassInitialize(TestContext testContext)
         {
             BrowserStateManager.RefreshState();
-            NavigationHelper.OpenHomePage();
-            WelcomeScreenHelper.CloseWelcomePopup();
-
+            HomePageHelper.OpenSandboxPage();
+            
             _timeline = new Timeline { Title = "WebdriverTitle" };
             HomePageHelper.DeleteAllElementsLocally();
             TimelineHelper.AddTimeline(_timeline);
@@ -54,13 +52,13 @@ namespace Tests
         }
 
         [TestMethod]
-        public void new_timline_should_not_have_null_id()
+        public void new_timeline_should_not_have_null_id()
         {
             Assert.IsNotNull(_newTimeline.TimelineId);
         }
 
         [TestMethod]
-        public void new_timline_should_be_deleted()
+        public void new_timeline_should_be_deleted()
         {
             TimelineHelper.DeleteTimeline(_newTimeline);
             Assert.IsFalse(TimelineHelper.IsTimelineFound(_newTimeline));

@@ -1,0 +1,27 @@
+<div>
+    <div>
+        <input type="search" class="cz-input cz-form-search-input"
+             style="display: inline-block; width: 400px;" maxlength="200" />
+        <button class="cz-form-search-button cz-button"
+                style="display: inline-block; margin: 0 25px;">search</button>
+    </div>
+    <div>
+        <input id="bing-media-type-image" class="cz-radiobutton" style="display: inline-block;"
+               type="radio" name="media-type" value="image" checked="true" />
+        <label for="bing-media-type-image">Images</label>
+
+        <input id="bing-media-type-video" class="cz-radiobutton" style="display: inline-block;"
+               type="radio" name="media-type" value="video" />
+        <label for="bing-media-type-video">Videos</label>
+
+        <input id="bing-media-type-document" class="cz-radiobutton" style="display: inline-block;"
+               type="radio" name="media-type" value="document" />
+        <label for="bing-media-type-document">PDF</label>
+    </div>
+
+    <img class="cz-form-progress-bar" style="width: 400px"
+         src="/images/loading.gif" alt="searching..." />
+</div>
+
+<div class="cz-form-bing-search-results">
+</div>

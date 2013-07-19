@@ -19,7 +19,6 @@ namespace Tests
         {
             BrowserStateManager.RefreshState();
             NavigationHelper.OpenHomePage();
-            WelcomeScreenHelper.CloseWelcomePopupWithOutWaiting();
         }
 
         [ClassCleanup]
@@ -38,28 +37,29 @@ namespace Tests
         public void HelpLink()
         {
             HomePageHelper.OpenHelpLink();
-            Assert.AreEqual("Develop |", HomePageHelper.GetTitle());
+            Assert.AreEqual("User Guide – ChronoZoom Project", HomePageHelper.GetTitle());
+            Assert.AreEqual("http://join.chronozoom.com/user-guide/", HomePageHelper.GetUrl());
         }
 
         [TestMethod]
         public void FeedbackLink()
         {
             HomePageHelper.OpenFeedbackLink();
-            Assert.AreEqual("Forum: ChronoZoom Beta Feedback |", HomePageHelper.GetTitle());
+            Assert.AreEqual("Forum: Discuss - ChronoZoom Project", HomePageHelper.GetTitle());
         }
 
         [TestMethod]
-        public void AboutLink()
+        public void NoticeLink()
         {
-            HomePageHelper.OpenAboutLink();
-            Assert.AreEqual("Home", HomePageHelper.GetTitle());
+            HomePageHelper.OpenNoticeLink();
+            Assert.AreEqual("Notices – ChronoZoom Project", HomePageHelper.GetTitle());
         }
 
         [TestMethod]
-        public void PrivacyLink()
+        public void DevelopersLink()
         {
-            HomePageHelper.OpenPrivacyLink();
-            Assert.AreEqual("Notices |", HomePageHelper.GetTitle());
+            HomePageHelper.OpenDevelopersLink();
+            Assert.AreEqual("Develop – ChronoZoom Project", HomePageHelper.GetTitle());
         }
 
     }

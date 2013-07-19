@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Xml;
 using Application.Driver;
 using Application.Helper.Entities;
@@ -10,55 +13,38 @@ namespace Application.Helper.Helpers
 {
     public class AuthorizationHelper : DependentActions
     {
+
+        public void OpenLoginPage()
+        {
+            Logger.Log("<-");
+            Click(By.Id("login-button"));
+            Logger.Log("->");
+        }
+
         public void AuthenticateAsGoogleUser()
         {
             Logger.Log("<-");
-
-            if (!IsElementExists(By.XPath("//*[@name='Google']")))
-            {
-                Click(By.XPath("//*[@id='MoreOptions']/a"));
-            }
-            Click(By.XPath("//*[@name='Google']"));
-
             var user = new User { Type = UserType.Google };
-            FillUserCredentials(user);
-            Logger.Log(user.ToString());
-            SetUserInfoAndSubmit(user);
-            Sleep(10);
+            OpenIdentityProviderPage(user);
+            LoginUser(user);
             Logger.Log("->");
         }
 
         public void AuthenticateAsYahooUser()
         {
             Logger.Log("<-");
-
-            if (!IsElementExists(By.XPath("//*[@name='Yahoo!']")))
-            {
-                Click(By.XPath("//*[@id='MoreOptions']/a"));
-            }
-            Click(By.XPath("//*[@name='Yahoo!']"));
-
             var user = new User { Type = UserType.Yahoo };
-            FillUserCredentials(user);
-            Logger.Log(user.ToString());
-            SetUserInfoAndSubmit(user);
+            OpenIdentityProviderPage(user);
+            LoginUser(user);
             Logger.Log("->");
         }
 
         public void AuthenticateAsMicrosoftUser()
         {
             Logger.Log("<-");
-
-            if (!IsElementExists(By.XPath("//*[@name='Windows Live™ ID']")))
-            {
-                Click(By.XPath("//*[@id='MoreOptions']/a"));
-            }
-            Click(By.XPath("//*[@name='Windows Live™ ID']"));
-
             var user = new User { Type = UserType.Microsoft };
-            FillUserCredentials(user);
-            Logger.Log(user.ToString());
-            SetUserInfoAndSubmit(user);
+            OpenIdentityProviderPage(user);
+            LoginUser(user);
             Logger.Log("->");
         }
 
@@ -66,49 +52,104 @@ namespace Application.Helper.Helpers
         public void Logout()
         {
             Logger.Log("<-");
-            if (FindElement(By.XPath("//*[@id='LoginPanel']/a")).Text == "Logout")
+            if (!IsElementDisplayed(By.Id("profile-form")))
             {
-                Click(By.XPath("//*[@id='LoginPanel']/a"));
+                OpenEditProfileForm();
             }
+            MoveToElementAndClick(By.Id("cz-form-logout"));
             Logger.Log("->");
         }
 
-        public bool IsUserAuthenticated()
+        public bool IsUserLogout()
         {
             Logger.Log("<-");
+            By loginButton = By.Id("login-button");
+            WaitForElementIsDisplayed(loginButton);
+            bool isUserLogout = IsElementDisplayed(loginButton);
+            Logger.Log("-> isUserLogout :" + isUserLogout);
+            return isUserLogout;
+        }
 
-            var isLogoutPresent = FindElement(By.XPath("//*[@id='LoginPanel']/a")).Text == "Logout";
-            Logger.Log("isLogoutPresent: " + isLogoutPresent);
-
-            //WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("CZ.Common.cosmosVisible != undefined")), 60);
-            //OpenUrl(GetParentUriString(new Uri(Configuration.BaseUrl)) + "account/isauth");
-            //WaitForElementIsExisted(By.TagName("body"));
-            //var isApiAuth = bool.Parse(GetText(By.TagName("body")));
-            //Logger.Log("isApiAuth: " + isApiAuth);
-
-            var isCookieExist = IsUserCookieExist();
-            Logger.Log("isCookieExist: " + isCookieExist);
-
-            var result = isLogoutPresent && isCookieExist;
+        public bool IsExistedUserAuthenticated()
+        {
+            Logger.Log("<-");
+            By loginButton = By.Id("edit_profile_button");
+            WaitForElementIsDisplayed(loginButton);
+            Click(loginButton);
+            bool result = IsUserAuthenticated();
             Logger.Log("-> result: " + result);
-
             return result;
         }
 
-        protected bool IsUserCookieExist()
+        public bool IsNewUserAuthenticated()
         {
-            var result = false;
-            var userCookieNames = new[] { "FedAuth", "FedAuth1" };
+            Logger.Log("<-");
+            WaitForElementIsDisplayed(By.XPath("//*[@id='profile-form']//*[@class='cz-form-content']"));
+            bool result = IsUserAuthenticated();
+            Logger.Log("-> result: " + result);
+            return result;
+        }
 
-            var cookies = GetAllCookies();
-            foreach (var cookie in cookies)
+        public bool IsUserCookieExist()
+        {
+            var userCookieNames = new[] { "FedAuth", "FedAuth1" };
+            int index = 0;
+            ReadOnlyCollection<Cookie> cookies = GetAllCookies();
+            Dictionary<string, int> cookiesDictionary = cookies.ToDictionary(cookie => cookie.Name, value => 1);
+
+            foreach (string userCookieName in userCookieNames)
             {
-                if (userCookieNames[0] == cookie.Name || userCookieNames[1] == cookie.Name)
+                if (cookiesDictionary.ContainsKey(userCookieName))
                 {
-                    result = true;
+                    index++;
                 }
             }
+            return index == userCookieNames.Length;
+        }
+
+        public void DeleteAuthenticatedCookies()
+        {
+            var userCookieNames = new[] { "FedAuth", "FedAuth1" };
+            foreach (string userCookieName in userCookieNames)
+            {
+                DeleteCookieByName(userCookieName);
+            }
+        } 
+
+        public void ClickOnUserName()
+        {
+            Logger.Log("<-");
+            Click(By.ClassName("auth-panel-login"));
+            Logger.Log("->");
+        }
+
+
+        public bool IsEditProfileFormDisplayed()
+        {
+            Logger.Log("<-");
+            bool result = IsElementDisplayed(By.Id("profile-form"));
+            Logger.Log("-> result: " + result);
             return result;
+        }
+
+
+        public void ProvideEmail(string email)
+        {
+            Logger.Log("<-");
+            OpenEditProfileForm();
+            SetEmail(email);
+            PressEnter(By.Id("email"));
+            AcceptAlert();
+        }
+
+        public bool IsAlertDispalyed()
+        {
+            return IsAlertPresented();
+        }
+
+        public bool IsUserNamePresented()
+        {
+            return IsElementExisted(By.ClassName("auth-panel-login"));
         }
 
         protected User FillUserCredentials(User user)
@@ -123,8 +164,8 @@ namespace Application.Helper.Helpers
                     user.Password = document.SelectSingleNode("//Accounts/google/password").InnerText;
                     break;
                 case UserType.Microsoft:
-                    user.Login = document.SelectSingleNode("//Accounts/micorsoft/login").InnerText;
-                    user.Password = document.SelectSingleNode("//Accounts/micorsoft/password").InnerText;
+                    user.Login = document.SelectSingleNode("//Accounts/microsoft/login").InnerText;
+                    user.Password = document.SelectSingleNode("//Accounts/microsoft/password").InnerText;
                     break;
                 case UserType.Yahoo:
                     user.Login = document.SelectSingleNode("//Accounts/yahoo/login").InnerText;
@@ -152,7 +193,6 @@ namespace Application.Helper.Helpers
                     TypeText(By.Id("username"), user.Login);
                     TypeText(By.Id("passwd"), user.Password);
                     Click(By.Id(".save"));
-                    WaitForElementIsDisplayed(By.XPath("//*[@id='LoginPanel']/a"));
                     break;
                 case UserType.Microsoft:
                     ClickElementAndType(By.Id("idDiv_PWD_UsernameExample"), user.Login);
@@ -165,20 +205,83 @@ namespace Application.Helper.Helpers
 
         private string GetValidAcountsXmlPath()
         {
-            var lavidFilePath = string.Empty;
+            var validFilePath = string.Empty;
 
-            const string accountsPathVsRun = @".\..\..\Constants\Accounts.xml";
-            const string accountsPathConsoleRun = @"..\..\..\Application.Helper\Constants\Accounts.xml";
+            const string accountsPathVsRun = @".\..\..\..\Application.Helper\Constants\Accounts.xml";
+            const string accountsPathConsoleRun = @".\..\..\..\..\Application.Helper\Constants\Accounts.xml";
 
             if (File.Exists(accountsPathVsRun))
-                lavidFilePath = accountsPathVsRun;
+                validFilePath = accountsPathVsRun;
             if (File.Exists(accountsPathConsoleRun))
-                lavidFilePath = accountsPathConsoleRun;
-            if (string.IsNullOrEmpty(lavidFilePath))
+                validFilePath = accountsPathConsoleRun;
+            if (string.IsNullOrEmpty(validFilePath))
             {
                 throw new Exception("Cannot find Accounts.xml file");
             }
-            return lavidFilePath;
+
+            return validFilePath;
+        }
+
+        private bool IsUserAuthenticated()
+        {
+            Logger.Log("<-");
+            var isLogoutPresent = IsElementDisplayed(By.Id("cz-form-logout"));
+            Logger.Log("isLogoutPresent: " + isLogoutPresent);
+
+            var isCookieExist = IsUserCookieExist();
+            Logger.Log("isCookieExist: " + isCookieExist);
+
+            var result = isLogoutPresent && isCookieExist;
+            Logger.Log("-> result: " + result);
+
+            return result;
+        }
+
+        private void LoginUser(User user)
+        {
+            Logger.Log("<-");
+            FillUserCredentials(user);
+            Logger.Log(user.ToString());
+            SetUserInfoAndSubmit(user);
+            AcceptSecurityWarning();
+            Logger.Log("->");
+        }
+
+        private void OpenIdentityProviderPage(User user)
+        {
+            Logger.Log("<- user type: " + user.Type);
+            switch (user.Type)
+            {
+                case UserType.Google:
+                    Click(By.XPath("//*[@name='Google']"));
+                    break;
+                case UserType.Yahoo:
+                    Click(By.XPath("//*[@name='Yahoo!']"));
+                    break;
+                case UserType.Microsoft:
+                    Click(By.XPath("//*[@name='Windows Live™ ID']"));
+                    break;
+            }
+            Logger.Log("->");
+        }
+
+        private void OpenEditProfileForm()
+        {
+            Logger.Log("<-");
+            Click(By.Id("edit_profile_button"));
+            Logger.Log("->");
+        }
+
+        private void SetEmail(string email)
+        {
+            Logger.Log("<- email: " + email);
+            TypeText(By.Id("email"),email);
+            Logger.Log("->");
+        }
+
+        public void LogoutByUrl()
+        {
+            OpenUrl("http://test.chronozoom.com/pages/logoff.aspx");
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using Application.Driver;
+﻿using Application.Driver;
 using Application.Helper.UserActions;
 using OpenQA.Selenium;
 
@@ -7,9 +6,14 @@ namespace Application.Helper.Helpers
 {
     public class NavigationHelper : DependentActions
     {
-        public void OpenHomePage(bool wait = true)
+        public void OpenHomePage()
         {
             OpenUrl(Configuration.BaseUrl);
+        }  
+        
+        public void OpenSandboxPage()
+        {
+            OpenUrl(Configuration.BaseUrl + "/sandbox/sandbox/");
         }
 
         public void OpenExhibitEukaryoticCells()
@@ -51,6 +55,13 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
+        public void NavigateToHistoryOfScienceTimeline()
+        {
+            Logger.Log("<-");
+            ExecuteJavaScript("CZ.Search.goToSearchResult('t0c12100b-2ba1-4208-9523-d38224624068')");
+            Logger.Log("->");
+        }
+
         private void NavigateToProterozoic()
         {
             Logger.Log("<-");
@@ -63,7 +74,5 @@ namespace Application.Helper.Helpers
             WaitForElementEnabled(by);
             Click(by);
         }
-
-
     }
 }

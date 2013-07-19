@@ -36,29 +36,34 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Source\Chronozoom.Entities\bin\Chronozoom.Entities.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Practices.Unity, Version=3.0.1208.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Unity.3.0.1208-Preview\lib\Net45\Microsoft.Practices.Unity.dll</HintPath>
+    <Reference Include="Microsoft.Practices.Unity">
+      <HintPath>..\packages\Unity.3.0.1304.0\lib\Net45\Microsoft.Practices.Unity.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Practices.Unity.Configuration">
-      <HintPath>..\packages\Unity.3.0.1208-Preview\lib\Net45\Microsoft.Practices.Unity.Configuration.dll</HintPath>
+      <HintPath>..\packages\Unity.3.0.1304.0\lib\Net45\Microsoft.Practices.Unity.Configuration.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="WebDriver">
-      <HintPath>..\packages\Selenium.WebDriver.2.31.2\lib\net40\WebDriver.dll</HintPath>
+      <HintPath>..\packages\Selenium.WebDriver.2.33.0\lib\net40\WebDriver.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants\ApiConstants.cs" />
+    <Compile Include="Constants\ImageTemplateFilesLocations.cs" />
     <Compile Include="Constants\Javascripts.cs" />
+    <Compile Include="Entities\Bibliography.cs" />
     <Compile Include="Entities\ContentItem.cs" />
     <Compile Include="Entities\Exhibit.cs" />
+    <Compile Include="Entities\NewExhibitApiResponse.cs" />
     <Compile Include="Entities\Timeline.cs" />
     <Compile Include="Entities\User.cs" />
     <Compile Include="HelperManager.cs" />
@@ -67,14 +72,19 @@
     <Compile Include="BrowserImpl\FirefoxControls.cs" />
     <Compile Include="BrowserImpl\IeControls.cs" />
     <Compile Include="BrowserImpl\SafariControls.cs" />
+    <Compile Include="Helpers\ApiHelper.cs" />
     <Compile Include="Helpers\AuthorizationHelper.cs" />
     <Compile Include="Helpers\BookmarkHelper.cs" />
+    <Compile Include="Helpers\BreadcrumbsHelper.cs" />
     <Compile Include="Helpers\DateTimeHelper.cs" />
     <Compile Include="Helpers\ExhibitHelper.cs" />
     <Compile Include="Helpers\HomePageHelper.cs" />
+    <Compile Include="Helpers\ImageHelper.cs" />
     <Compile Include="Helpers\NavigationHelper.cs" />
+    <Compile Include="Helpers\SearchHelper.cs" />
     <Compile Include="Helpers\TimelineHelper.cs" />
     <Compile Include="Helpers\TimescaleHelper.cs" />
+    <Compile Include="Helpers\TimeSeriesHelper.cs" />
     <Compile Include="Helpers\TourHelper.cs" />
     <Compile Include="Helpers\WelcomeScreenHelper.cs" />
     <Compile Include="Interfaces\IControls.cs" />
@@ -83,12 +93,18 @@
     <Compile Include="UserActions\DependentActions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Constants\Accounts.xml" />
+    <Resource Include="Constants\Accounts.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Application.Driver\Application.Driver.csproj">
       <Project>{ac1310bd-eacc-4b45-bcaf-2d8a0260e2d1}</Project>
       <Name>Application.Driver</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ImageSearchEngine\ImageSearchEngine.csproj">
+      <Project>{6899b01e-ee1e-45cd-acd3-b44d0790975c}</Project>
+      <Name>ImageSearchEngine</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

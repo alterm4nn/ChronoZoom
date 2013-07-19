@@ -18,7 +18,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.Driver", "Appli
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.Helper", "Application.Helper\Application.Helper.csproj", "{5BDF5DC6-03B4-4A08-8861-51EBAF9742DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Unit", "Tests.Unit\Tests.Unit.csproj", "{369C9F1A-4CC1-42B0-9581-D6EE736EB19C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageSearchEngine", "ImageSearchEngine\ImageSearchEngine.csproj", "{6899B01E-EE1E-45CD-ACD3-B44D0790975C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,10 +42,10 @@ Global
 		{5BDF5DC6-03B4-4A08-8861-51EBAF9742DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5BDF5DC6-03B4-4A08-8861-51EBAF9742DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5BDF5DC6-03B4-4A08-8861-51EBAF9742DE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{369C9F1A-4CC1-42B0-9581-D6EE736EB19C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{369C9F1A-4CC1-42B0-9581-D6EE736EB19C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{369C9F1A-4CC1-42B0-9581-D6EE736EB19C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{369C9F1A-4CC1-42B0-9581-D6EE736EB19C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6899B01E-EE1E-45CD-ACD3-B44D0790975C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6899B01E-EE1E-45CD-ACD3-B44D0790975C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6899B01E-EE1E-45CD-ACD3-B44D0790975C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6899B01E-EE1E-45CD-ACD3-B44D0790975C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -6,7 +6,7 @@
 
 using System;
 
-namespace UI
+namespace Chronozoom.UI
 {
     public partial class SiteMaster : System.Web.UI.MasterPage
     {

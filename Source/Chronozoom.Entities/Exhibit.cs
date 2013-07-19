@@ -12,57 +12,49 @@ using System.Runtime.Serialization;
 
 namespace Chronozoom.Entities
 {
+    /// <summary>
+    /// Contains a set of content items, and is contained by a timeline or a collection.
+    /// </summary>
     [KnownType(typeof(ContentItemRaw))]
-    [KnownType(typeof(ReferenceRaw))]
     [DataContract]
     public class Exhibit
     {
+        /// <summary>
+        /// The ID of the exhibit.
+        /// </summary>
         [Key]
-        [DataMember(Name="id")]
+        [DataMember(Name = "id")]
         public Guid Id { get; set; }
+        
+        /// <summary>
+        /// The depth of the exhibit in the timeline tree
+        /// </summary>
+        public int Depth { get; set; }
 
+        /// <summary>
+        /// The title of the exhibit.
+        /// </summary>
         [DataMember(Name = "title")]
+        [MaxLength(200)]
+        [Column(TypeName = "nvarchar")]
         public string Title { get; set; }
 
-        [DataMember]
-        public string Threshold { get; set; }
-
-        [DataMember]
-        public string Regime { get; set; }
-
-        [NotMapped]
-        [DataMember]
-        public string TimeUnit { get; set; }
-
-        [NotMapped]
-        [DataMember]
-        public int? Day { get; set; }
-
-        [NotMapped]
-        [DataMember]
-        public int? Month { get; set; }
-
-        [DataMember]
+        /// <summary>
+        /// The year in which the exhibit appears.
+        /// </summary
+        [DataMember(Name = "time")]
         public decimal Year { get; set; }
 
-        [NotMapped]
-        [DataMember(Name = "time")]
-        public decimal Time { get; set; }
-
-        [DataMember(Name="UniqueID")]
-        public int UniqueId { get; set; }
-
-        [DataMember]
-        public int? Sequence { get; set; }
-
+        /// <summary>
+        /// Specifies the collection of content items that is associated with the exhibit.
+        /// </summary>
         [DataMember(Name = "contentItems")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification="Object property needs to be initialized externally")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Object property needs to be initialized externally")]
         public virtual Collection<ContentItem> ContentItems { get; set; }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification="Object property needs to be initialized externally")]
-        public virtual Collection<Reference> References { get; set; }
-
-        [DataMember(Name = "collection")]
+        /// <summary>
+        /// Specifies the collection that is associated with the exhibit.
+        /// </summary>
         public virtual Entities.Collection Collection { get; set; }
     }
 
@@ -72,7 +64,7 @@ namespace Chronozoom.Entities
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "Needs to match storage column name")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "ID", Justification = "Needs to match storage column name")]
-        [DataMember(Name="ParentTimelineId")]
+        [DataMember(Name = "ParentTimelineId")]
         public Guid Timeline_ID { get; set; }
     }
 }

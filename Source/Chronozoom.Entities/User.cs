@@ -9,20 +9,41 @@ using System.Threading.Tasks;
 
 namespace Chronozoom.Entities
 {
+    /// <summary>
+    /// A registered user.
+    /// </summary>
     [DataContract]
     public class User
     {
+        /// <summary>
+        /// The ID of the user.
+        /// </summary>
         [Key]
-        [DataMember]
+        [DataMember(EmitDefaultValue=false)]
         public Guid Id { get; set; }
 
-        [DataMember]
+        /// <summary>
+        /// The display name of the user.
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         public string DisplayName { get; set; }
 
-        [DataMember]
+        /// <summary>
+        /// The email address of the user.
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         public string Email { get; set; }
 
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         public string NameIdentifier { get; set; }
+
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
         public string IdentityProvider { get; set; }
     }
 }

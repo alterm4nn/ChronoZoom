@@ -19,8 +19,7 @@ namespace Tests
         public void TestInitialize()
         {
             BrowserStateManager.RefreshState();
-            NavigationHelper.OpenHomePage();
-            WelcomeScreenHelper.CloseWelcomePopup();
+            HomePageHelper.OpenPage();
         }
 
         [ClassCleanup]
