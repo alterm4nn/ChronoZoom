@@ -14,8 +14,21 @@ var CZ;
         } else if(!(container instanceof jQuery && container.is("div"))) {
             throw "Container parameter is invalid! It should be DIV, or ID of DIV, or jQuery instance of DIV.";
         }
+        var mouse_clicked = false;
+        var mouse_hovered = false;
+        container.mouseup(function (e) {
+            mouse_clicked = false;
+        });
+        container.mousedown(function (e) {
+            mouse_clicked = true;
+        });
         container.mousemove(function (e) {
+            mouse_hovered = true;
             mouseMove(e);
+        });
+        container.mouseleave(function (e) {
+            mouse_hovered = false;
+            mouse_clicked = false;
         });
         var that = this;
         var _container = container;
@@ -32,6 +45,7 @@ var CZ;
         var _width;
         var _height;
         var _canvasHeight;
+        var _markerPosition;
         var _tickSources = {
             "cosmos": new CZ.CosmosTickSource(),
             "calendar": new CZ.CalendarTickSource(),
@@ -98,6 +112,12 @@ var CZ;
                 configurable: false,
                 get: function () {
                     return _tickSources[_mode];
+                }
+            },
+            markerPosition: {
+                configurable: false,
+                get: function () {
+                    return _markerPosition;
                 }
             }
         });
@@ -407,24 +427,22 @@ var CZ;
             var time = _range.max - k * (_width - point.x);
             that.setTimeMarker(time);
         }
-        this.markerPosition = -1;
-        this.setTimeMarker = function (time) {
-            if(time > CZ.Settings.maxPermitedTimeRange.right) {
-                time = CZ.Settings.maxPermitedTimeRange.right;
+        this.setTimeMarker = function (time, vcGesture) {
+            if (typeof vcGesture === "undefined") { vcGesture = false; }
+            if((!mouse_clicked) && ((!vcGesture) || ((vcGesture) && (!mouse_hovered)))) {
+                if(time > CZ.Settings.maxPermitedTimeRange.right) {
+                    time = CZ.Settings.maxPermitedTimeRange.right;
+                }
+                if(time < CZ.Settings.maxPermitedTimeRange.left) {
+                    time = CZ.Settings.maxPermitedTimeRange.left;
+                }
+                var k = (_range.max - _range.min) / _width;
+                var point = (time - _range.max) / k + _width;
+                var text = _tickSources[_mode].getMarkerLabel(_range, time);
+                _markerPosition = point;
+                markerText.text(text);
+                marker.css("left", point - marker.width() / 2);
             }
-            if(time < CZ.Settings.maxPermitedTimeRange.left) {
-                time = CZ.Settings.maxPermitedTimeRange.left;
-            }
-            var k = (_range.max - _range.min) / _width;
-            var point = (time - _range.max) / k + _width;
-            this.markerPosition = point;
-            var markerWidth = parseFloat($('#timescale_marker').css("width"));
-            $('#timescale_marker').css("left", point - markerWidth / 2);
-            var text = _tickSources[_mode].getMarkerLabel(_range, time);
-            document.getElementById('marker-text').innerHTML = text;
-        };
-        this.MarkerPosition = function () {
-            return this.markerPosition;
         };
         function render() {
             setMode();
@@ -465,9 +483,6 @@ var CZ;
         this.update = function (range) {
             _range = range;
             render();
-            var k = (_range.max - _range.min) / _width;
-            var time = _range.max - k * (_width / 2);
-            that.setTimeMarker(time);
         };
         this.destroy = function () {
             _container[0].innerHTML = "";

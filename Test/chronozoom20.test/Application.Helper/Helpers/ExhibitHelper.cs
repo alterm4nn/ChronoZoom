@@ -95,6 +95,7 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<- title: " + exhibit.Title);
             NavigateToExhibit(exhibit);
+            MoveToElementAndClick(By.ClassName("virtualCanvasLayerCanvas"));
             InitEditExhibitForm();
             ClickDeleteButton();
             ConfirmDeletion();
@@ -140,7 +141,6 @@ namespace Application.Helper.Helpers
             Logger.Log("<- title: " + exhibit.Title);
             ExecuteJavaScript(string.Format("CZ.Search.goToSearchResult('e{0}')", exhibit.Id));
             WaitAnimation();
-            MoveToElementAndClick(By.ClassName("virtualCanvasLayerCanvas"));
             Logger.Log("->");
         }
 
@@ -150,6 +150,45 @@ namespace Application.Helper.Helpers
             string description = GetText(By.XPath("//*[@id='vc']/*[@class='contentItemDescription']/div"));
             Logger.Log("-> description: " + description);
             return description;
+        }
+
+        public void OpenBibliography()
+        {
+            Logger.Log("<-");
+            HelperManager<ImageHelper>.Instance.ClickOnBibliographyImage();
+            Logger.Log("->");
+        }
+
+        public bool IsBibliographyOpened()
+        {
+            return IsElementDisplayed(By.Id("bibliography"));
+        }
+
+
+        public Bibliography GetBibliography()
+        {
+            Logger.Log("<-");
+            OpenBibliography();
+            Bibliography bibliography = new Bibliography();
+            bibliography.Sources = new List<Source>();
+            Source bibliographySource = new Source();
+            ReadOnlyCollection<IWebElement> sources = FindElements(By.ClassName("source"));
+            foreach (IWebElement source in sources)
+            {
+                bibliographySource.Name = source.FindElement(By.ClassName("sourceName")).Text;
+                bibliographySource.Description = source.FindElement(By.ClassName("sourceDescr")).Text;
+                bibliography.Sources.Add(bibliographySource);
+            }
+            Logger.Log("->");
+            return bibliography;
+        }
+
+
+        public void CloseBibliography()
+        {
+            Logger.Log("<-");
+            Click(By.Id("biblCloseButton"));
+            Logger.Log("->");
         }
 
         private void ConfirmDeletion()
@@ -250,7 +289,7 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
             foreach (ContentItem contentItem in contentItems)
             {
-                Logger.Log("-- " + contentItem.ToString());
+                Logger.Log("-- " + contentItem);
                 By createArtifactButton = By.XPath("//*[@class='cz-form-create-artifact cz-button']");
                 WaitForElementEnabled(createArtifactButton);
                 Click(createArtifactButton);
@@ -259,5 +298,6 @@ namespace Application.Helper.Helpers
             }
             Logger.Log("<-");
         }
+
     }
 }

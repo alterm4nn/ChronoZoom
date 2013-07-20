@@ -1,4 +1,4 @@
-﻿.cz-timescale {
+.cz-timescale {
   padding-bottom: 0px;
   font-size: large;
   font-weight: 500;
@@ -157,6 +157,97 @@
 }
 .cz-datepicker-errormsg {
   color: #dd4b39;
+}
+/***********************************************************
+
+                        Media List
+      
+***********************************************************/
+.cz-medialist {
+  padding: 5px;
+  border: solid 2px #c7c7c7;
+  background-color: #e9e9e9;
+}
+.cz-medialist-item {
+  display: inline-block;
+  margin: 5px;
+}
+.cz-medialist-item-icon {
+  display: block;
+}
+/***********************************************************
+
+                    Custom Media Pickers
+      
+***********************************************************/
+/* Bing Media Picker */
+.cz-form-bing-mediapicker {
+  width: 75%;
+  bottom: 25px;
+  left: 0;
+}
+.cz-form-bing-mediapicker > .cz-form-content {
+  position: absolute;
+  top: 36px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow-y: auto;
+}
+.cz-bing-search-input {
+  display: inline-block;
+  width: 400px;
+  margin: 0 25px 10px 0;
+}
+.cz-bing-search-button {
+  display: inline-block;
+  margin: 0 0 10px 0 !important;
+  padding: 5px !important;
+  border: 1px solid #0464a2 !important;
+}
+/*
+Fix for Firefox (same height for search input and button).
+NOTE: http://christophzillgens.com/en/articles/equal-height-input-and-button-elements-in-firefox-and-safari
+*/
+.cz-bing-search-button::-moz-focus-inner {
+  border: 0;
+}
+.cz-bing-search-results {
+  color: #232323;
+}
+.cz-bing-result-container {
+  display: inline-block;
+  overflow: hidden;
+  margin: 15px 5px;
+}
+.cz-bing-result-title {
+  color: #232323;
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cz-bing-result-description,
+a.cz-bing-result-description:visited,
+a.cz-bing-result-description:link {
+  display: block;
+  color: #aeaeae;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+}
+a.cz-bing-result-description:hover {
+  color: #0464a2;
+}
+.cz-bing-result-doc-description {
+  color: #aeaeae;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+}
+.cz-bing-result-thumbnail {
+  display: block;
 }
 /* The height of the page header */
 /* The width of the logo area */
@@ -1139,6 +1230,9 @@ img.fallbackBackground {
   margin-right: 6px;
   margin-left: 6px;
 }
+.footer-link-credits img {
+  margin-bottom: 3px;
+}
 .footer-text {
   margin-left: 6px;
   color: #AAA;
@@ -1347,8 +1441,8 @@ img.fallbackBackground {
   color: #fff;
   min-width: 150px;
   font-size: 12px;
-  line-height: 36px;
-  padding: 0 5px;
+  padding: 10px 5px;
+  font-family: 'Segoe UI', Helvetica, Arial, 'Trebuchet MS', 'San Serif';
   /* IE9 */
 
   filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#1B6AAB', EndColorStr='#0E4073', GradientType=0);
@@ -1371,6 +1465,9 @@ img.fallbackBackground {
 
   background-image: linear-gradient(to top, #0e4073 0%, #1b6aab 100%);
 }
+.cz-radiobutton + label {
+  margin-right: 25px;
+}
 .blocking-layer {
   position: fixed;
   left: 0;
@@ -1390,6 +1487,18 @@ img.fallbackBackground {
 }
 .cz-lightgray {
   color: #aeaeae;
+}
+.cz-gray {
+  color: #e9e9e9;
+}
+.cz-darkgray {
+  color: #232323;
+}
+.cz-darkblue {
+  color: #0464a2;
+}
+.cz-lightblue {
+  color: #038ae6;
 }
 .cz-form-label {
   margin: 5px 0;
@@ -1497,11 +1606,7 @@ img.fallbackBackground {
 }
 /* Edit Exhibit Form */
 .cz-form-exhibit {
-  min-width: 380px;
-  max-width: 450px;
-  width: 30.2734375%;
-  /* 310 / 1024 */
-
+  width: 420px;
   bottom: 25px;
   left: 0;
 }
@@ -1515,11 +1620,7 @@ img.fallbackBackground {
 }
 /* Edit Content Item Form */
 .cz-form-contentitem {
-  min-width: 380px;
-  max-width: 450px;
-  width: 30.2734375%;
-  /* 310 / 1024 */
-
+  width: 420px;
   bottom: 25px;
   left: 0;
 }
@@ -1648,6 +1749,7 @@ img.fallbackBackground {
   overflow-y: hidden;
 }
 .cz-form-progress-bar {
+  display: block;
   width: 100%;
   height: 15px;
   vertical-align: top;
@@ -1726,6 +1828,44 @@ img.fallbackBackground {
 .cz-form-tour-player-icon {
   width: 36px;
   height: 36px;
+}
+.cz-tour-form-title {
+  width: 100%;
+  height: 100%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding-right: 80px;
+  margin-right: 80px;
+  margin-left: 15px;
+  overflow: hidden;
+  -ms-text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #fff;
+  font-size: 18px;
+  line-height: 36px;
+}
+.cz-tour-form-close-btn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin-right: 15px;
+  color: #fff;
+  font-weight: bold;
+  font-size: 18px;
+  line-height: 36px;
+}
+.cz-tour-form-min-btn {
+  position: absolute;
+  right: 25px;
+  top: 0;
+  margin-right: 15px;
+  color: #fff;
+  font-weight: bold;
+  font-size: 18px;
+  line-height: 36px;
 }
 /* Tour Player Icons. */
 .cz-form-prev-icon {

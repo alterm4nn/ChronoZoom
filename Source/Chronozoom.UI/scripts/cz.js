@@ -22,7 +22,8 @@ var CZ;
             "#message-window": "/ui/message-window.html",
             "#header-search-form": "/ui/header-search-form.html",
             "#header-session-expired-form": "/ui/header-session-expired-form.html",
-            "#tour-caption-form": "/ui/tour-caption-form.html"
+            "#tour-caption-form": "/ui/tour-caption-form.html",
+            "#mediapicker-form": "/ui/mediapicker-form.html"
         };
         (function (FeatureActivation) {
             FeatureActivation._map = [];
@@ -113,10 +114,10 @@ var CZ;
                 CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption(CZ.Tours.tourCaptionFormContainer, {
                     activationSource: $(".tour-icon"),
                     navButton: ".cz-form-nav",
-                    closeButton: ".cz-form-close-btn > .cz-form-btn",
-                    titleTextblock: ".cz-form-title",
+                    closeButton: ".cz-tour-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-tour-form-title",
                     contentContainer: ".cz-form-content",
-                    minButton: ".cz-form-min-btn > .cz-form-btn",
+                    minButton: ".cz-tour-form-min-btn > .cz-form-btn",
                     captionTextarea: ".cz-form-tour-caption",
                     tourPlayerContainer: ".cz-form-tour-player",
                     bookmarksCount: ".cz-form-tour-bookmarks-count",
@@ -179,6 +180,7 @@ var CZ;
             $('.bubbleInfo').hide();
             var canvasIsEmpty;
             CZ.Extensions.registerExtensions();
+            CZ.Media.initialize();
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
@@ -369,6 +371,7 @@ var CZ;
                             descriptionInput: ".cz-form-item-descr",
                             attributionInput: ".cz-form-item-attribution",
                             mediaTypeInput: ".cz-form-item-media-type",
+                            mediaListContainer: ".cz-form-medialist",
                             context: {
                                 exhibit: e,
                                 contentItem: ci
@@ -538,7 +541,7 @@ var CZ;
             var jointGesturesStream = canvasGestures.Merge(axisGestures.Merge(timeSeriesGestures));
             CZ.Common.controller = new CZ.ViewportController.ViewportController2(function (visible) {
                 var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                var markerPos = CZ.Common.axis.MarkerPosition();
+                var markerPos = CZ.Common.axis.markerPosition;
                 var oldMarkerPosInScreen = vp.pointVirtualToScreen(markerPos, 0).x;
                 CZ.Common.vc.virtualCanvas("setVisible", visible, CZ.Common.controller.activeAnimation);
                 CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
@@ -549,7 +552,7 @@ var CZ;
                 }
                 var hoveredInfodot = CZ.Common.vc.virtualCanvas("getHoveredInfodot");
                 var actAni = CZ.Common.controller.activeAnimation != undefined;
-                if(actAni && !hoveredInfodot.id) {
+                if(actAni) {
                     var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
                     CZ.Common.updateMarker();
                 }

@@ -6,7 +6,7 @@
 /// <reference path="../Js/cz.settings.js" />
 /// <reference path="../Js/settings.js" />
 
-var oneDay = 0.002739699999892764;
+var oneDay = 0.00274;
 
 var currentDate = new Date();
 var curY = currentDate.getFullYear();

@@ -1,7 +1,7 @@
 ChronoZoom
 ==========
 
-ChronoZoom is an interactive timeline for all of history: [http://www.chronozoomproject.org](http://www.chronozoomproject.org)
+ChronoZoom is an interactive timeline for all of history: [http://www.chronozoom.com](http://www.chronozoom.com)
 
 Explore all of the past - from the Big Bang, to the dinosaurs, to ancient and modern history.
 

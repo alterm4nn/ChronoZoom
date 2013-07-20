@@ -1,0 +1,124 @@
+@lightgray: #aeaeae;
+@gray: #e9e9e9;
+@darkgray: #232323;
+@darkblue: #0464a2;
+@lightblue: #038ae6;
+
+/***********************************************************
+
+                        Media List
+      
+***********************************************************/
+
+.cz-medialist
+{
+    padding: 5px;
+    border: solid 2px #c7c7c7;
+    background-color: #e9e9e9;
+}
+
+.cz-medialist-item
+{
+    display: inline-block;
+    margin: 5px;
+}
+
+.cz-medialist-item-icon
+{
+    display: block;
+}
+
+/***********************************************************
+
+                    Custom Media Pickers
+      
+***********************************************************/
+
+/* Bing Media Picker */
+.cz-form-bing-mediapicker
+{
+    width: 75%;
+    bottom: 25px;
+    left: 0;
+}
+
+    .cz-form-bing-mediapicker > .cz-form-content
+    {
+        position: absolute;
+        top: 36px;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        overflow-y: auto;
+    }
+
+.cz-bing-search-input
+{
+    display: inline-block;
+    width: 400px;
+    margin: 0 25px 10px 0;
+}
+
+.cz-bing-search-button
+{
+    display: inline-block;
+    margin: 0 0 10px 0 !important;
+    padding: 5px !important;
+    border: 1px solid @darkblue !important;
+}
+
+/*
+Fix for Firefox (same height for search input and button).
+NOTE: http://christophzillgens.com/en/articles/equal-height-input-and-button-elements-in-firefox-and-safari
+*/
+.cz-bing-search-button::-moz-focus-inner { border: 0; }
+
+.cz-bing-search-results
+{
+    color: @darkgray;
+}
+
+.cz-bing-result-container
+{
+    display: inline-block;
+    overflow: hidden;   
+    margin: 15px 5px;
+}
+
+.cz-bing-result-title
+{
+    color: @darkgray;
+    font-weight: bold;            
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cz-bing-result-description,
+a.cz-bing-result-description:visited,
+a.cz-bing-result-description:link
+{
+    display: block;
+    color: @lightgray;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+}
+
+a.cz-bing-result-description:hover
+{
+    color: @darkblue;
+}
+
+.cz-bing-result-doc-description {
+    color: @lightgray;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 12px;
+}
+
+.cz-bing-result-thumbnail
+{
+    display: block;
+}

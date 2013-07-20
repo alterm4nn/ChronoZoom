@@ -39,7 +39,7 @@
     <script type="text/javascript" src="/scripts/external/jquery.cookie.js"></script>
     <script type="text/javascript" src="/scripts/external/rx.js"></script>
     <script type="text/javascript" src="/scripts/external/rx.jQuery.js"></script>
-    <script type="text/javascript" src="/scripts/external/mouseWheelPlugin.js"></script>
+    <script type="text/javascript" src="/scripts/external/jquery.mousewheel.js"></script>
     <script type="text/javascript" src="/scripts/external/csvToArray.v2.1.js"></script>
     <script type="text/javascript" src="/scripts/external/ACS.js"></script>
     <script type="text/javascript" src="/scripts/external/seadragon-min.js"></script>
@@ -76,6 +76,7 @@
                 AddScript("/scripts/timescale.js");
                 AddScript("/scripts/uiloader.js");
                 AddScript("/scripts/dates.js");
+                AddScript("/scripts/media.js");
 
                 AddScript("/scripts/extensions/extensions.js");
                 AddScript("/scripts/extensions/rinplayer.js");
@@ -83,6 +84,10 @@
                 AddScript("/ui/controls/datepicker.js");
                 AddScript("/ui/controls/listboxbase.js");
                 AddScript("/ui/controls/formbase.js");
+                AddScript("/ui/controls/medialist.js");
+
+                AddScript("/ui/media/bing-mediapicker.js");
+
                 AddScript("/ui/contentitem-listbox.js");
                 AddScript("/ui/auth-edit-timeline-form.js");
                 AddScript("/ui/auth-edit-exhibit-form.js");
@@ -101,6 +106,8 @@
                 AddScript("/ui/tour-caption-form.js");
                 AddScript("/ui/message-window.js");
                 AddScript("/ui/header-session-expired-form.js");
+                AddScript("/ui/mediapicker-form.js");
+
                 AddScript("/scripts/cz.js");
             }
             else {
@@ -273,6 +280,7 @@
         <div id="auth-edit-contentitem-form" class="cz-form cz-form-left cz-form-contentitem unselectable"></div>
         <div id="message-window" class="cz-form cz-form-left cz-message-window"></div>
         <div id="header-session-expired-form" class="cz-form cz-form-left cz-session-expired"></div>
+        <div id="mediapicker-form" class="cz-form cz-form-left unselectable"></div>
     </div>
 
     <script src="https://cz-nodelete-chronozoom-prod.accesscontrol.windows.net/v2/metadata/IdentityProviders.js?protocol=wsfederation&amp;realm=http%3a%2f%2fwww.chronozoom.com%2f&amp;reply_to=&amp;context=&amp;request_id=&amp;version=1.0&amp;callback=ShowSigninPage" type="text/javascript"></script>
@@ -281,12 +289,12 @@
         <ul>
             <li class="fleft">
                 <a class="footer-link-credits" target="_blank" href="http://research.microsoft.com/en-us/collaboration/">
-                    <img src="/images/credits/microsoft-research.png" border="0" />
+                    <img src="/images/credits/msr.png" border="0" />
                 </a>
             </li>
             <li class="fleft">
                 <a class="footer-link-credits" target="_blank" href="http://eps.berkeley.edu/">
-                    <img src="/images/credits/berkeley.png" border="0"  />
+                    <img src="/images/credits/ucb.png" border="0"  />
                 </a>
             </li>
             <li class="fleft">
@@ -296,7 +304,12 @@
             </li>
             <li class="fleft">
                 <a class="footer-link-credits" target="_blank" href="http://join.chronozoom.com/university-of-washington/">
-                    <img src="/images/credits/university-of-washington.png" border="0"  />
+                    <img src="/images/credits/uw.png" border="0"  />
+                </a>
+            </li>
+            <li class="fleft">
+                <a class="footer-link-credits" target="_blank" href="https://github.com/alterm4nn/ChronoZoom/">
+                    <img src="/images/credits/github.png" border="0"  />
                 </a>
             </li>
         </ul>
