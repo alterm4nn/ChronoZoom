@@ -38,7 +38,7 @@ module CZ {
                         link.css("float", "left");
                         link.text(preloaded.name);
 
-                        var div = $("<div></div>").addClass("cz-form-preloadedrecord").appendTo(li);
+                        var div = $("<span></span>").addClass("cz-form-preloadedrecord").appendTo(li);
                         div.text("Source:");
 
                         var sourceDiv = $("<a></a>").addClass("cz-form-preloadedrecord").appendTo(li);

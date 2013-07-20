@@ -35,7 +35,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DocumentationFile>
@@ -45,7 +45,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;RELEASE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -53,9 +53,13 @@
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="css\media.css">
+      <DependentUpon>media.less</DependentUpon>
+    </Content>
     <Content Include="dumps\extensions\rin-sample.js" />
     <Content Include="dumps\sample.csv" />
     <Content Include="dumps\extensions-get.json" />
+    <Content Include="css\media.less" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -205,7 +209,11 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="api\Bing.svc.cs">
+      <DependentUpon>chronozoom.svc</DependentUpon>
+    </Compile>
     <Compile Include="api\errorhandler.cs" />
+    <Compile Include="api\external\BingSearchContainer.cs" />
     <Compile Include="api\storagecache.cs" />
     <Compile Include="default.ashx.cs">
       <DependentUpon>default.ashx</DependentUpon>
@@ -249,11 +257,14 @@
     <Content Include="fallback.html" />
     <Content Include="Global.asax" />
     <Content Include="images\chronozoom.png" />
-    <Content Include="images\credits\Berkeley.png" />
-    <Content Include="images\credits\Microsoft-Research.png" />
-    <Content Include="images\credits\MSU.png" />
-    <Content Include="images\credits\University-of-Washington.png" />
+    <Content Include="images\credits\github.png" />
+    <Content Include="images\credits\msr.png" />
+    <Content Include="images\credits\msu.png" />
+    <Content Include="images\credits\ucb.png" />
+    <Content Include="images\credits\uw.png" />
     <Content Include="images\edit-icon.png" />
+    <Content Include="images\media\bing-import-50x150.png" />
+    <Content Include="images\media\bing-import-50x50.png" />
     <Content Include="images\narration-off.png" />
     <Content Include="images\narration-on.png" />
     <Content Include="images\profile-icon.png" />
@@ -272,6 +283,13 @@
     <Content Include="pages\sitemap.aspx" />
     <TypeScriptCompile Include="scripts\extensions\rinplayer.ts" />
     <TypeScriptCompile Include="scripts\extensions\extensions.ts" />
+    <Content Include="samples\custom-mediapicker\main.html" />
+    <Content Include="samples\custom-mediapicker\mediapicker-example.html" />
+    <Content Include="samples\custom-mediapicker\mediapicker-example.js">
+      <DependentUpon>mediapicker-example.ts</DependentUpon>
+    </Content>
+    <Content Include="samples\custom-mediapicker\mediapicker-example.ts" />
+    <Content Include="samples\bingSearchSample.html" />
     <Content Include="scripts\extensions\extensions.js">
       <DependentUpon>extensions.ts</DependentUpon>
     </Content>
@@ -293,6 +311,11 @@
     <Content Include="scripts\external\csvToArray.v2.1.js" />
     <Content Include="scripts\external\jquery-1.7.2.min.js" />
     <Content Include="scripts\external\jquery-ui.js" />
+    <Content Include="scripts\external\jquery.mousewheel.js" />
+    <Content Include="scripts\media.js">
+      <DependentUpon>media.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\media.ts" />
     <Content Include="ui\auth-edit-tour-form.html" />
     <Content Include="ui\auth-edit-tour-form.js">
       <DependentUpon>auth-edit-tour-form.ts</DependentUpon>
@@ -327,7 +350,6 @@
     <Content Include="scripts\external\flash_detect.js" />
     <Content Include="scripts\external\jquery.cookie.js" />
     <Content Include="scripts\external\jquery.signalR-1.0.0-rc2.js" />
-    <Content Include="scripts\external\mouseWheelPlugin.js" />
     <Content Include="scripts\external\rx.jQuery.js" />
     <Content Include="scripts\external\rx.js" />
     <Content Include="scripts\gestures.ts" />
@@ -389,6 +411,10 @@
     </Content>
     <Content Include="ui\contentitem-listbox.ts" />
     <Content Include="ui\auth-edit-tour-form.ts" />
+    <Content Include="ui\controls\medialist.js">
+      <DependentUpon>medialist.ts</DependentUpon>
+    </Content>
+    <Content Include="ui\controls\medialist.ts" />
     <Content Include="ui\header-session-expired-form.js">
       <DependentUpon>header-session-expired-form.ts</DependentUpon>
     </Content>
@@ -399,6 +425,16 @@
     </Content>
     <Content Include="ui\header-search-form.ts" />
     <Content Include="ui\header-session-expired-form.html" />
+    <Content Include="ui\mediapicker-form.html" />
+    <Content Include="ui\mediapicker-form.js">
+      <DependentUpon>mediapicker-form.ts</DependentUpon>
+    </Content>
+    <Content Include="ui\mediapicker-form.ts" />
+    <Content Include="ui\media\bing-mediapicker.html" />
+    <Content Include="ui\media\bing-mediapicker.js">
+      <DependentUpon>bing-mediapicker.ts</DependentUpon>
+    </Content>
+    <Content Include="ui\media\bing-mediapicker.ts" />
     <Content Include="ui\message-window.js">
       <DependentUpon>message-window.ts</DependentUpon>
     </Content>
@@ -587,6 +623,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

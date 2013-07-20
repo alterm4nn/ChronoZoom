@@ -9,7 +9,7 @@
         Settings.zoomSpeedFactor = 2.0;
         Settings.zoomLevelFactor = 1.4;
         Settings.allowedVisibileImprecision = 0.00001;
-        Settings.allowedMathImprecision = 0.0000001;
+        Settings.allowedMathImprecision = 0.000001;
         Settings.allowedMathImprecisionDecimals = parseInt(Settings.allowedMathImprecision.toExponential().split("-")[1]);
         Settings.canvasElementAnimationTime = 1300;
         Settings.canvasElementFadeInTime = 400;
@@ -169,7 +169,7 @@
         Settings.signinUrlMicrosoft = "";
         Settings.signinUrlGoogle = "";
         Settings.signinUrlYahoo = "";
-        Settings.sessionTime = 70;
+        Settings.sessionTime = 3600;
         Settings.guidEmpty = "00000000-0000-0000-0000-000000000000";
         Settings.ie = ((function () {
             var v = 3, div = document.createElement('div'), a = div.all || [];
@@ -223,6 +223,8 @@
             CZ.Settings.timelineGradientFillStyle = themeSettings.timelineGradientFillStyle;
         }
         Settings.applyTheme = applyTheme;
+        Settings.defaultBingSearchTop = 50;
+        Settings.defaultBingSearchSkip = 0;
     })(CZ.Settings || (CZ.Settings = {}));
     var Settings = CZ.Settings;
 })(CZ || (CZ = {}));
@@ -3120,8 +3122,7 @@ var CZ;
                         _this.putTourAsync(CZ.Tours.tours.length).done(function (tour) {
                             self.tour = tour;
                             CZ.Tours.tours.push(tour);
-                            self.initializeAsEdit();
-                            alert("Tour created.");
+                            _this.hide();
                         }).fail(function (f) {
                             if(console && console.error) {
                                 console.error("Failed to create a tour: " + f.status + " " + f.statusText);
@@ -3135,7 +3136,7 @@ var CZ;
                             if(CZ.Tours.tours[i] === _this.tour) {
                                 _this.putTourAsync(i).done(function (tour) {
                                     _this.tour = CZ.Tours.tours[i] = tour;
-                                    alert("Tour updated.");
+                                    _this.hide();
                                 }).fail(function (f) {
                                     if(console && console.error) {
                                         console.error("Failed to update a tour: " + f.status + " " + f.statusText);
@@ -3594,6 +3595,7 @@ var CZ;
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
             request.addToPath("tours");
+            console.log("[GET] " + request.url);
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -3611,6 +3613,7 @@ var CZ;
                 supercollection: CZ.Service.superCollectionName,
                 collection: CZ.Service.collectionName
             };
+            console.log("[GET] " + request.url);
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -3621,6 +3624,77 @@ var CZ;
             });
         }
         Service.getSearch = getSearch;
+        function getBingImages(query, top, skip) {
+            if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
+            if (typeof skip === "undefined") { skip = CZ.Settings.defaultBingSearchSkip; }
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getImages");
+            var data = {
+                query: query,
+                top: top,
+                skip: skip
+            };
+            console.log("[GET] " + request.url);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                }
+            });
+        }
+        Service.getBingImages = getBingImages;
+        function getBingVideos(query, top, skip) {
+            if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
+            if (typeof skip === "undefined") { skip = CZ.Settings.defaultBingSearchSkip; }
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getVideos");
+            var data = {
+                query: query,
+                top: top,
+                skip: skip
+            };
+            console.log("[GET] " + request.url);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                }
+            });
+        }
+        Service.getBingVideos = getBingVideos;
+        function getBingDocuments(query, doctype, top, skip) {
+            if (typeof doctype === "undefined") { doctype = undefined; }
+            if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
+            if (typeof skip === "undefined") { skip = CZ.Settings.defaultBingSearchSkip; }
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getDocuments");
+            var data = {
+                query: query,
+                doctype: doctype,
+                top: top,
+                skip: skip
+            };
+            console.log("[GET] " + request.url);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                }
+            });
+        }
+        Service.getBingDocuments = getBingDocuments;
         function getServiceInformation() {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -3798,15 +3872,15 @@ var CZ;
                 regime: "CE"
             };
             var eps_const = 100000;
-            if(coordinate < -999999999) {
+            if(coordinate <= -999999999) {
                 year.year = (year.year - 1) / (-1000000000);
                 year.year = Math.round(year.year * eps_const) / eps_const;
                 year.regime = 'Ga';
-            } else if(coordinate < -999999) {
+            } else if(coordinate <= -999999) {
                 year.year = (year.year - 1) / (-1000000);
                 year.year = Math.round(year.year * eps_const) / eps_const;
                 year.regime = 'Ma';
-            } else if(coordinate < -9999) {
+            } else if(coordinate <= -9999) {
                 year.year = (year.year - 1) / (-1000);
                 year.year = Math.round(year.year * eps_const) / eps_const;
                 year.regime = 'Ka';
@@ -4182,6 +4256,7 @@ var CZ;
         }
         Authoring.initialize = initialize;
         function updateTimeline(t, prop) {
+            var deffered = new jQuery.Deferred();
             var temp = {
                 x: Number(prop.start),
                 y: t.y,
@@ -4193,22 +4268,28 @@ var CZ;
                 t.x = temp.x;
                 t.width = temp.width;
                 t.endDate = prop.end;
+                t.title = prop.title;
+                updateTimelineTitle(t);
+                CZ.Service.putTimeline(t).then(function (success) {
+                    t.id = "t" + success;
+                    t.guid = success;
+                    t.titleObject.id = "t" + success + "__header__";
+                    if(!t.parent.guid) {
+                        document.location.reload(true);
+                    } else {
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    }
+                    deffered.resolve(t);
+                }, function (error) {
+                    deffered.reject(error);
+                });
+            } else {
+                deffered.reject('Timeline intersects with parent timeline or other siblings');
             }
-            t.title = prop.title;
-            updateTimelineTitle(t);
-            return CZ.Service.putTimeline(t).then(function (success) {
-                t.id = "t" + success;
-                t.guid = success;
-                t.titleObject.id = "t" + success + "__header__";
-                if(!t.parent.guid) {
-                    document.location.reload(true);
-                } else {
-                    CZ.Common.vc.virtualCanvas("requestInvalidate");
-                }
-            }, function (error) {
-            });
+            return deffered.promise();
         }
         Authoring.updateTimeline = updateTimeline;
+        ;
         function removeTimeline(t) {
             var deferred = $.Deferred();
             CZ.Service.deleteTimeline(t).then(function (updateCanvas) {
@@ -4353,9 +4434,9 @@ var CZ;
                 var ci = contentItems[i];
                 isValid = isValid && CZ.Authoring.isNotEmpty(ci.title) && CZ.Authoring.isNotEmpty(ci.uri) && CZ.Authoring.isNotEmpty(ci.mediaType);
                 if(ci.mediaType.toLowerCase() === "image") {
-                    var imageReg = /\.(jpg|jpeg|png)$/i;
+                    var imageReg = /\.(jpg|jpeg|png|gif)$/i;
                     if(!imageReg.test(ci.uri)) {
-                        alert("Sorry, only JPG/PNG images are supported");
+                        alert("Sorry, only JPG/PNG/GIF images are supported");
                         isValid = false;
                     }
                 } else if(ci.mediaType.toLowerCase() === "video") {
@@ -4374,7 +4455,7 @@ var CZ;
                         isValid = false;
                     }
                 } else if(ci.mediaType.toLowerCase() === "pdf") {
-                    var pdf = /\.(pdf)$/i;
+                    var pdf = /\.(pdf)$|\.(pdf)\?/i;
                     if(!pdf.test(ci.uri)) {
                         alert("Sorry, only PDF extension is supported");
                         isValid = false;
@@ -4389,11 +4470,15 @@ var CZ;
         }
         Authoring.validateContentItems = validateContentItems;
         function showSessionForm() {
+            CZ.HomePageViewModel.sessionForm.show();
         }
         Authoring.showSessionForm = showSessionForm;
         function resetSessionTimer() {
             if(CZ.Authoring.timer != null) {
                 clearTimeout(CZ.Authoring.timer);
+                CZ.Authoring.timer = setTimeout(function () {
+                    showSessionForm();
+                }, (CZ.Settings.sessionTime - 60) * 1000);
             }
         }
         Authoring.resetSessionTimer = resetSessionTimer;
@@ -7240,8 +7325,21 @@ var CZ;
         } else if(!(container instanceof jQuery && container.is("div"))) {
             throw "Container parameter is invalid! It should be DIV, or ID of DIV, or jQuery instance of DIV.";
         }
+        var mouse_clicked = false;
+        var mouse_hovered = false;
+        container.mouseup(function (e) {
+            mouse_clicked = false;
+        });
+        container.mousedown(function (e) {
+            mouse_clicked = true;
+        });
         container.mousemove(function (e) {
+            mouse_hovered = true;
             mouseMove(e);
+        });
+        container.mouseleave(function (e) {
+            mouse_hovered = false;
+            mouse_clicked = false;
         });
         var that = this;
         var _container = container;
@@ -7258,6 +7356,7 @@ var CZ;
         var _width;
         var _height;
         var _canvasHeight;
+        var _markerPosition;
         var _tickSources = {
             "cosmos": new CZ.CosmosTickSource(),
             "calendar": new CZ.CalendarTickSource(),
@@ -7324,6 +7423,12 @@ var CZ;
                 configurable: false,
                 get: function () {
                     return _tickSources[_mode];
+                }
+            },
+            markerPosition: {
+                configurable: false,
+                get: function () {
+                    return _markerPosition;
                 }
             }
         });
@@ -7633,24 +7738,22 @@ var CZ;
             var time = _range.max - k * (_width - point.x);
             that.setTimeMarker(time);
         }
-        this.markerPosition = -1;
-        this.setTimeMarker = function (time) {
-            if(time > CZ.Settings.maxPermitedTimeRange.right) {
-                time = CZ.Settings.maxPermitedTimeRange.right;
+        this.setTimeMarker = function (time, vcGesture) {
+            if (typeof vcGesture === "undefined") { vcGesture = false; }
+            if((!mouse_clicked) && ((!vcGesture) || ((vcGesture) && (!mouse_hovered)))) {
+                if(time > CZ.Settings.maxPermitedTimeRange.right) {
+                    time = CZ.Settings.maxPermitedTimeRange.right;
+                }
+                if(time < CZ.Settings.maxPermitedTimeRange.left) {
+                    time = CZ.Settings.maxPermitedTimeRange.left;
+                }
+                var k = (_range.max - _range.min) / _width;
+                var point = (time - _range.max) / k + _width;
+                var text = _tickSources[_mode].getMarkerLabel(_range, time);
+                _markerPosition = point;
+                markerText.text(text);
+                marker.css("left", point - marker.width() / 2);
             }
-            if(time < CZ.Settings.maxPermitedTimeRange.left) {
-                time = CZ.Settings.maxPermitedTimeRange.left;
-            }
-            var k = (_range.max - _range.min) / _width;
-            var point = (time - _range.max) / k + _width;
-            this.markerPosition = point;
-            var markerWidth = parseFloat($('#timescale_marker').css("width"));
-            $('#timescale_marker').css("left", point - markerWidth / 2);
-            var text = _tickSources[_mode].getMarkerLabel(_range, time);
-            document.getElementById('marker-text').innerHTML = text;
-        };
-        this.MarkerPosition = function () {
-            return this.markerPosition;
         };
         function render() {
             setMode();
@@ -7691,9 +7794,6 @@ var CZ;
         this.update = function (range) {
             _range = range;
             render();
-            var k = (_range.max - _range.min) / _width;
-            var time = _range.max - k * (_width / 2);
-            that.setTimeMarker(time);
         };
         this.destroy = function () {
             _container[0].innerHTML = "";
@@ -8904,7 +9004,7 @@ var CZ;
                     switch(mode) {
                         case "year":
                             _this.editModeYear();
-                            _this.setDate(_this.coordinate, false);
+                            _this.setDate_YearMode(_this.coordinate, false);
                             break;
                         case "date":
                             _this.editModeDate();
@@ -8933,38 +9033,50 @@ var CZ;
                 var optionIntinite = $("<option value='infinite'>Infinite</option>");
                 this.modeSelector.append(optionIntinite);
             };
-            DatePicker.prototype.setDate = function (coordinate, InfinityConvertation, ZeroYearConversation) {
-                if (typeof InfinityConvertation === "undefined") { InfinityConvertation = false; }
+            DatePicker.prototype.setDate = function (coordinate, ZeroYearConversation) {
                 if (typeof ZeroYearConversation === "undefined") { ZeroYearConversation = false; }
                 if(!this.validateNumber(coordinate)) {
                     return false;
                 }
                 coordinate = Number(coordinate);
                 this.coordinate = coordinate;
-                var mode = this.modeSelector.find(":selected").val();
+                var regime = CZ.Dates.convertCoordinateToYear(this.coordinate).regime;
                 if(this.coordinate === this.INFINITY_VALUE) {
-                    if(InfinityConvertation) {
-                        this.regimeSelector.find(":selected").attr("selected", "false");
+                    this.modeSelector.find(":selected").attr("selected", "false");
+                    this.modeSelector.find("option").each(function () {
+                        if($(this).val() === "infinite") {
+                            $(this).attr("selected", "selected");
+                            return;
+                        }
+                    });
+                    this.editModeInfinite();
+                    return;
+                }
+                switch(regime.toLowerCase()) {
+                    case "ga":
+                    case "ma":
+                    case "ka":
+                        this.modeSelector.find(":selected").attr("selected", "false");
                         this.modeSelector.find("option").each(function () {
-                            if($(this).val() === "infinite") {
+                            if($(this).val() === "year") {
                                 $(this).attr("selected", "selected");
                                 return;
                             }
                         });
-                        this.editModeInfinite();
-                    } else {
-                        var localPresent = CZ.Dates.getPresent();
-                        coordinate = CZ.Dates.getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
-                    }
-                }
-                switch(mode) {
-                    case "year":
+                        this.editModeYear();
                         this.setDate_YearMode(coordinate, ZeroYearConversation);
                         break;
-                    case "date":
+                    case "bce":
+                    case "ce":
+                        this.modeSelector.find(":selected").attr("selected", "false");
+                        this.modeSelector.find("option").each(function () {
+                            if($(this).val() === "date") {
+                                $(this).attr("selected", "selected");
+                                return;
+                            }
+                        });
+                        this.editModeDate();
                         this.setDate_DateMode(coordinate);
-                        break;
-                    case "infinite":
                         break;
                 }
             };
@@ -9347,11 +9459,11 @@ var CZ;
             });
         }
         function createZoomSubject(vc) {
-            vc.mousewheel(function (objEvent, intDelta) {
-                var event = ($).Event("xbrowserwheel");
-                event.delta = intDelta;
-                event.origin = CZ.Common.getXBrowserMouseOrigin(vc, objEvent);
-                vc.trigger(event);
+            vc.mousewheel(function (event, delta, deltaX, deltaY) {
+                var xevent = ($).Event("xbrowserwheel");
+                xevent.delta = delta;
+                xevent.origin = CZ.Common.getXBrowserMouseOrigin(vc, event);
+                vc.trigger(xevent);
             });
             var mouseWheel = vc.toObservable("xbrowserwheel");
             var mouseWheels = mouseWheel.Zip(mouseWheel, function (arg) {
@@ -10025,7 +10137,7 @@ var CZ;
         }
         Common.setVisible = setVisible;
         function updateMarker() {
-            Common.axis.setTimeMarker(Common.vc.virtualCanvas("getCursorPosition"));
+            Common.axis.setTimeMarker(Common.vc.virtualCanvas("getCursorPosition"), true);
         }
         Common.updateMarker = updateMarker;
         function loadDataUrl() {
@@ -10244,6 +10356,422 @@ var CZ;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
+    (function (Media) {
+        var BingMediaPicker = (function () {
+            function BingMediaPicker(container, context) {
+                this.container = container;
+                this.contentItem = context;
+                this.editContentItemForm = CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
+                this.searchTextbox = this.container.find(".cz-bing-search-input");
+                this.mediaTypeRadioButtons = this.container.find(":radio");
+                this.progressBar = this.container.find(".cz-form-progress-bar");
+                this.searchResultsBox = this.container.find(".cz-bing-search-results");
+                this.searchButton = this.container.find(".cz-bing-search-button");
+                this.initialize();
+            }
+            BingMediaPicker.setup = function setup(context) {
+                var mediaPickerContainer = CZ.Media.mediaPickersViews["bing"];
+                var mediaPicker = new BingMediaPicker(mediaPickerContainer, context);
+                var formContainer = $(".cz-form-bing-mediapicker");
+                if(formContainer.length === 0) {
+                    formContainer = $("#mediapicker-form").clone().removeAttr("id").addClass("cz-form-bing-mediapicker").appendTo($("#content"));
+                }
+                var form = new CZ.UI.FormMediaPicker(formContainer, mediaPickerContainer, "Import from Bing", {
+                    activationSource: $(),
+                    navButton: ".cz-form-nav",
+                    closeButton: ".cz-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-form-title",
+                    contentContainer: ".cz-form-content"
+                });
+                $(form).on("showcompleted", function (event) {
+                    mediaPicker.searchTextbox.focus();
+                });
+                $(mediaPicker).on("resultclick", function (event) {
+                    form.close();
+                });
+                var onWindowResize = function () {
+                    return mediaPicker.onWindowResize();
+                };
+                $(window).on("resize", onWindowResize);
+                $(form).on("closecompleted", function (event) {
+                    $(window).off("resize", onWindowResize);
+                });
+                form.show();
+            };
+            BingMediaPicker.prototype.initialize = function () {
+                var _this = this;
+                this.progressBar.css("opacity", 0);
+                this.searchTextbox.off();
+                this.searchButton.off();
+                $(this).off();
+                this.searchTextbox.keypress(function (event) {
+                    var code = event.which || event.keyCode;
+                    if(code === 13) {
+                        event.preventDefault();
+                        _this.search();
+                    }
+                });
+                this.searchButton.click(function (event) {
+                    _this.search();
+                });
+                $(this).on("resultclick", function (event, mediaInfo) {
+                    _this.onSearchResultClick(mediaInfo);
+                });
+            };
+            BingMediaPicker.prototype.onSearchResultClick = function (mediaInfo) {
+                $.extend(this.contentItem, mediaInfo);
+                this.editContentItemForm.updateMediaInfo();
+            };
+            BingMediaPicker.prototype.getMediaType = function () {
+                return this.mediaTypeRadioButtons.filter(":checked").val();
+            };
+            BingMediaPicker.prototype.convertResultToMediaInfo = function (result, mediaType) {
+                var mediaInfoMap = {
+                    image: {
+                        uri: result.MediaUrl,
+                        mediaType: mediaType,
+                        mediaSource: result.SourceUrl,
+                        attribution: result.SourceUrl
+                    },
+                    video: {
+                        uri: result.MediaUrl,
+                        mediaType: mediaType,
+                        mediaSource: result.MediaUrl,
+                        attribution: result.MediaUrl
+                    },
+                    pdf: {
+                        uri: result.Url,
+                        mediaType: mediaType,
+                        mediaSource: result.Url,
+                        attribution: result.Url
+                    }
+                };
+                return mediaInfoMap[mediaType];
+            };
+            BingMediaPicker.prototype.search = function () {
+                var query = this.searchTextbox.val();
+                var mediaType = this.getMediaType();
+                if(query.trim() === "") {
+                    return;
+                }
+                this.searchResultsBox.empty();
+                this.showProgressBar();
+                switch(mediaType) {
+                    case "image":
+                        this.searchImages(query);
+                        break;
+                    case "video":
+                        this.searchVideos(query);
+                        break;
+                    case "document":
+                        this.searchDocuments(query);
+                        break;
+                }
+            };
+            BingMediaPicker.prototype.searchImages = function (query) {
+                var _this = this;
+                CZ.Service.getBingImages(query).done(function (response) {
+                    _this.hideProgressBar();
+                    if(response.d.length === 0) {
+                        _this.showNoResults();
+                        return;
+                    }
+                    for(var i = 0, len = response.d.length; i < len; ++i) {
+                        var result = response.d[i];
+                        var resultContainer = _this.createImageResult(result);
+                        _this.searchResultsBox.append(resultContainer);
+                        _this.alignThumbnails();
+                    }
+                });
+            };
+            BingMediaPicker.prototype.searchVideos = function (query) {
+                var _this = this;
+                query += " (+site:youtube.com OR +site:vimeo.com)";
+                CZ.Service.getBingVideos(query).done(function (response) {
+                    _this.hideProgressBar();
+                    if(response.d.length === 0) {
+                        _this.showNoResults();
+                        return;
+                    }
+                    for(var i = 0, len = response.d.length; i < len; ++i) {
+                        var result = response.d[i];
+                        var resultContainer = _this.createVideoResult(result);
+                        _this.searchResultsBox.append(resultContainer);
+                        _this.alignThumbnails();
+                    }
+                });
+            };
+            BingMediaPicker.prototype.searchDocuments = function (query) {
+                var _this = this;
+                CZ.Service.getBingDocuments(query, "pdf").done(function (response) {
+                    _this.hideProgressBar();
+                    if(response.d.length === 0) {
+                        _this.showNoResults();
+                        return;
+                    }
+                    for(var i = 0, len = response.d.length; i < len; ++i) {
+                        var result = response.d[i];
+                        var resultContainer = _this.createDocumentResult(result);
+                        _this.searchResultsBox.append(resultContainer);
+                    }
+                });
+            };
+            BingMediaPicker.prototype.createImageResult = function (result) {
+                var _this = this;
+                var container = $("<div></div>", {
+                    class: "cz-bing-result-container",
+                    width: 183 * result.Thumbnail.Width / result.Thumbnail.Height,
+                    "data-actual-width": 183 * result.Thumbnail.Width / result.Thumbnail.Height
+                });
+                var title = $("<div></div>", {
+                    class: "cz-bing-result-title cz-darkgray",
+                    text: result.Title,
+                    title: result.Title
+                });
+                var size = $("<div></div>", {
+                    class: "cz-bing-result-description cz-lightgray",
+                    text: result.Width + "x" + result.Height + " - " + Math.round(result.FileSize / 8 / 1024) + " KB"
+                });
+                var url = $("<a></a>", {
+                    class: "cz-bing-result-description cz-lightgray",
+                    text: result.DisplayUrl,
+                    href: result.MediaUrl,
+                    title: result.DisplayUrl,
+                    target: "_blank"
+                });
+                var thumbnail = $("<img></img>", {
+                    src: result.Thumbnail.MediaUrl,
+                    height: 183,
+                    width: "100%",
+                    class: "cz-bing-result-thumbnail"
+                });
+                thumbnail.add(title).add(size).click(function (event) {
+                    $(_this).trigger("resultclick", _this.convertResultToMediaInfo(result, "image"));
+                });
+                return container.append(thumbnail).append(title).append(size).append(url);
+            };
+            BingMediaPicker.prototype.createVideoResult = function (result) {
+                var _this = this;
+                result.Thumbnail = result.Thumbnail || this.createDefaultThumbnail();
+                var container = $("<div></div>", {
+                    class: "cz-bing-result-container",
+                    width: 140 * result.Thumbnail.Width / result.Thumbnail.Height,
+                    "data-actual-width": 140 * result.Thumbnail.Width / result.Thumbnail.Height
+                });
+                var title = $("<div></div>", {
+                    class: "cz-bing-result-title cz-darkgray",
+                    text: result.Title,
+                    title: result.Title
+                });
+                var size = $("<div></div>", {
+                    class: "cz-bing-result-description cz-lightgray",
+                    text: "Duration - " + (result.RunTime / 1000) + " seconds"
+                });
+                var url = $("<a></a>", {
+                    class: "cz-bing-result-description cz-lightgray",
+                    text: result.MediaUrl,
+                    href: result.MediaUrl,
+                    title: result.MediaUrl,
+                    target: "_blank"
+                });
+                var thumbnail = $("<img></img>", {
+                    src: result.Thumbnail.MediaUrl,
+                    height: 140,
+                    width: "100%",
+                    class: "cz-bing-result-thumbnail"
+                });
+                thumbnail.add(title).add(size).click(function (event) {
+                    $(_this).trigger("resultclick", _this.convertResultToMediaInfo(result, "video"));
+                });
+                return container.append(thumbnail).append(title).append(size).append(url);
+            };
+            BingMediaPicker.prototype.createDocumentResult = function (result) {
+                var _this = this;
+                var container = $("<div></div>", {
+                    class: "cz-bing-result-container",
+                    width: 300
+                });
+                var title = $("<div></div>", {
+                    class: "cz-bing-result-title cz-darkgray",
+                    text: result.Title,
+                    title: result.Title
+                });
+                var descr = $("<div></div>", {
+                    class: "cz-bing-result-doc-description cz-lightgray",
+                    height: 100,
+                    text: result.Description
+                });
+                var url = $("<a></a>", {
+                    class: "cz-bing-result-description cz-lightgray",
+                    text: result.DisplayUrl,
+                    href: result.Url,
+                    title: result.DisplayUrl,
+                    target: "_blank"
+                });
+                title.add(descr).click(function (event) {
+                    $(_this).trigger("resultclick", _this.convertResultToMediaInfo(result, "pdf"));
+                });
+                return container.append(title).append(descr).append(url);
+            };
+            BingMediaPicker.prototype.showProgressBar = function () {
+                this.progressBar.animate({
+                    opacity: 1
+                });
+            };
+            BingMediaPicker.prototype.hideProgressBar = function () {
+                this.progressBar.animate({
+                    opacity: 0
+                });
+            };
+            BingMediaPicker.prototype.showNoResults = function () {
+                this.searchResultsBox.text("No results.");
+            };
+            BingMediaPicker.prototype.createDefaultThumbnail = function () {
+                return {
+                    ContentType: "image/png",
+                    FileSize: 4638,
+                    Width: 500,
+                    Height: 500,
+                    MediaUrl: "/images/Temp-Thumbnail2.png"
+                };
+            };
+            BingMediaPicker.prototype.onWindowResize = function () {
+                this.alignThumbnails();
+            };
+            BingMediaPicker.prototype.alignThumbnails = function () {
+                var container = this.searchResultsBox;
+                var elements = container.children();
+                if(elements.length === 0) {
+                    return;
+                }
+                var rowWidth = container.width();
+                var currentRow = {
+                    elements: [],
+                    width: 0
+                };
+                for(var i = 0, len = elements.length; i < len; i++) {
+                    var curElement = $(elements[i]);
+                    var curElementActualWidth = +curElement.attr("data-actual-width");
+                    var curElementOuterWidth = curElement.outerWidth(true);
+                    var curElementInnerWidth = curElement.innerWidth();
+                    if(rowWidth < currentRow.width + curElementActualWidth) {
+                        var delta = rowWidth - currentRow.width;
+                        for(var j = 0, rowLen = currentRow.elements.length; j < rowLen; j++) {
+                            var rowElement = currentRow.elements[j];
+                            var rowElementActualWidth = +rowElement.attr("data-actual-width");
+                            rowElement.width(rowElementActualWidth + delta / rowLen);
+                        }
+                        currentRow.elements = [];
+                        currentRow.elements.push(curElement);
+                        currentRow.width = Math.ceil(curElementActualWidth + curElementOuterWidth - curElementInnerWidth);
+                    } else {
+                        currentRow.elements.push(curElement);
+                        currentRow.width += Math.ceil(curElementActualWidth + curElementOuterWidth - curElementInnerWidth);
+                    }
+                }
+            };
+            return BingMediaPicker;
+        })();
+        Media.BingMediaPicker = BingMediaPicker;        
+    })(CZ.Media || (CZ.Media = {}));
+    var Media = CZ.Media;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (Media) {
+        var _mediaPickers = {
+        };
+        var _mediaPickersViews = {
+        };
+        Object.defineProperties(CZ.Media, {
+            mediaPickers: {
+                get: function () {
+                    return _mediaPickers;
+                }
+            },
+            mediaPickersViews: {
+                get: function () {
+                    return _mediaPickersViews;
+                }
+            }
+        });
+        function initialize() {
+            registerMediaPicker("bing", "/images/media/bing-import-50x150.png", "/ui/media/bing-mediapicker.html", CZ.Media.BingMediaPicker);
+        }
+        Media.initialize = initialize;
+        function registerMediaPicker(title, iconUrl, viewUrl, type, selector) {
+            var order = Object.keys(_mediaPickers).length;
+            var setup = type.setup;
+            selector = selector || "$('<div></div>')";
+            _mediaPickers[title] = {
+            };
+            return CZ.UILoader.loadHtml(selector, viewUrl).always(function (view) {
+                _mediaPickersViews[title] = view;
+                _mediaPickers[title] = {
+                    title: title,
+                    iconUrl: iconUrl,
+                    order: order,
+                    setup: setup
+                };
+            });
+        }
+        Media.registerMediaPicker = registerMediaPicker;
+    })(CZ.Media || (CZ.Media = {}));
+    var Media = CZ.Media;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var MediaList = (function () {
+            function MediaList(container, mediaPickers, context) {
+                this.container = container;
+                this.mediaPickers = mediaPickers;
+                this.context = context;
+                this.container.addClass("cz-medialist");
+                this.fillListOfLinks();
+            }
+            MediaList.prototype.fillListOfLinks = function () {
+                var _this = this;
+                var sortedMediaPickersKeys = Object.keys(this.mediaPickers).sort(function (key1, key2) {
+                    return (_this.mediaPickers[key1].order - _this.mediaPickers[key2].order) > 0;
+                });
+                sortedMediaPickersKeys.forEach(function (key) {
+                    if(_this.mediaPickers.hasOwnProperty(key)) {
+                        var mp = _this.mediaPickers[key];
+                        var link = _this.createMediaPickerLink(mp);
+                        _this.container.append(link);
+                    }
+                });
+            };
+            MediaList.prototype.createMediaPickerLink = function (mp) {
+                var _this = this;
+                var container = $("<div></div>", {
+                    class: "cz-medialist-item",
+                    title: mp.title,
+                    "media-picker": mp.title
+                });
+                var icon = $("<img></img>", {
+                    class: "cz-medialist-item-icon",
+                    src: mp.iconUrl
+                });
+                container.click(function (event) {
+                    mp.setup(_this.context);
+                });
+                container.append(icon);
+                return container;
+            };
+            MediaList.prototype.remove = function () {
+                this.container.empty();
+                this.container.removeClass("cz-medialist");
+            };
+            return MediaList;
+        })();
+        UI.MediaList = MediaList;        
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
     (function (UI) {
         var FormEditTimeline = (function (_super) {
             __extends(FormEditTimeline, _super);
@@ -10310,7 +10838,11 @@ var CZ;
                             self.close();
                             self.timeline.onmouseclick();
                         }, function (error) {
-                            alert("Unable to save changes. Please try again later.");
+                            if(error !== undefined && error !== null) {
+                                self.errorMessage.text(error);
+                            } else {
+                                alert("Unable to save changes. Please try again later.");
+                            }
                             console.log(error);
                         }).always(function () {
                             _this.saveButton.prop('disabled', false);
@@ -10466,16 +10998,23 @@ var CZ;
                 delete this.exhibitCopy.children;
                 this.mode = CZ.Authoring.mode;
                 this.isCancel = true;
+                this.isModified = false;
                 this.initUI();
             }
             FormEditExhibit.prototype.initUI = function () {
                 var _this = this;
                 this.saveButton.prop('disabled', false);
+                this.titleInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.datePicker.datePicker.change(function () {
+                    _this.isModified = true;
+                });
                 if(this.mode === "createExhibit") {
                     this.titleTextblock.text("Create Exhibit");
                     this.saveButton.text("create exhibit");
                     this.titleInput.val(this.exhibit.title || "");
-                    this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", false, true);
+                    this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
                     console.log("this.datePicker.");
                     this.closeButton.show();
                     this.createArtifactButton.show();
@@ -10502,7 +11041,7 @@ var CZ;
                     this.titleTextblock.text("Edit Exhibit");
                     this.saveButton.text("update exhibit");
                     this.titleInput.val(this.exhibit.title || "");
-                    this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", false, true);
+                    this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
                     this.closeButton.show();
                     this.createArtifactButton.show();
                     this.saveButton.show();
@@ -10533,6 +11072,7 @@ var CZ;
                 }
             };
             FormEditExhibit.prototype.onCreateArtifact = function () {
+                this.isModified = true;
                 if(this.exhibit.contentItems.length < CZ.Settings.infodotMaxContentItemsCount) {
                     this.exhibit.title = this.titleInput.val() || "";
                     this.exhibit.x = this.datePicker.getDate() - this.exhibit.width / 2;
@@ -10562,10 +11102,24 @@ var CZ;
             };
             FormEditExhibit.prototype.onSave = function () {
                 var _this = this;
+                var exhibit_x = this.datePicker.getDate() - this.exhibit.width / 2;
+                var exhibit_y = this.exhibit.y;
+                if(exhibit_x + this.exhibit.width >= this.exhibit.parent.x + this.exhibit.parent.width) {
+                    exhibit_x = this.exhibit.parent.x + this.exhibit.parent.width - this.exhibit.width;
+                }
+                if(exhibit_x <= this.exhibit.parent.x) {
+                    exhibit_x = this.exhibit.parent.x;
+                }
+                if(exhibit_y + this.exhibit.height >= this.exhibit.parent.y + this.exhibit.parent.height) {
+                    exhibit_y = this.exhibit.parent.y + this.exhibit.parent.height - this.exhibit.height;
+                }
+                if(exhibit_y <= this.exhibit.parent.y) {
+                    exhibit_y = this.exhibit.parent.y;
+                }
                 var newExhibit = {
                     title: this.titleInput.val() || "",
-                    x: this.datePicker.getDate() - this.exhibit.width / 2,
-                    y: this.exhibit.y,
+                    x: exhibit_x,
+                    y: exhibit_y,
                     height: this.exhibit.height,
                     width: this.exhibit.width,
                     infodotDescription: {
@@ -10578,6 +11132,7 @@ var CZ;
                     this.saveButton.prop('disabled', true);
                     CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(function (success) {
                         _this.isCancel = false;
+                        _this.isModified = false;
                         _this.close();
                         _this.exhibit.id = arguments[0].id;
                         _this.exhibit.onmouseclick();
@@ -10600,6 +11155,7 @@ var CZ;
                 if(confirm("Are you sure want to delete the exhibit and all of its content items? Delete can't be undone!")) {
                     CZ.Authoring.removeExhibit(this.exhibit);
                     this.isCancel = false;
+                    this.isModified = true;
                     this.close();
                 }
             };
@@ -10628,6 +11184,7 @@ var CZ;
             };
             FormEditExhibit.prototype.onContentItemRemoved = function (item, _) {
                 var idx;
+                this.isModified = true;
                 if(typeof item.data.order !== 'undefined' && item.data.order !== null && item.data.order >= 0 && item.data.order < CZ.Settings.infodotMaxContentItemsCount) {
                     idx = item.data.order;
                 } else if(typeof item.data.guid !== 'undefined' && item.data.guid !== null) {
@@ -10647,6 +11204,7 @@ var CZ;
                 }
             };
             FormEditExhibit.prototype.onContentItemMove = function (item, indexStart, indexStop) {
+                this.isModified = true;
                 var ci = this.exhibit.contentItems.splice(indexStart, 1)[0];
                 this.exhibit.contentItems.splice(indexStop, 0, ci);
                 for(var i = 0; i < this.exhibit.contentItems.length; i++) {
@@ -10678,6 +11236,13 @@ var CZ;
             FormEditExhibit.prototype.close = function (noAnimation) {
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
                 var _this = this;
+                if(this.isModified) {
+                    var r = window.confirm("There is unsaved data. Do you want to close without saving?");
+                    if(r != true) {
+                        return;
+                    }
+                    this.isModified = false;
+                }
                 _super.prototype.close.call(this, noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",
@@ -10723,54 +11288,64 @@ var CZ;
                 this.descriptionInput = container.find(formInfo.descriptionInput);
                 this.errorMessage = container.find(formInfo.errorMessage);
                 this.saveButton = container.find(formInfo.saveButton);
+                this.mediaListContainer = container.find(formInfo.mediaListContainer);
                 this.prevForm = formInfo.prevForm;
                 this.exhibit = formInfo.context.exhibit;
                 this.contentItem = formInfo.context.contentItem;
                 this.mode = CZ.Authoring.mode;
                 this.isCancel = true;
+                this.isModified = false;
                 this.initUI();
             }
             FormEditCI.prototype.initUI = function () {
                 var _this = this;
+                this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem);
                 this.saveButton.prop('disabled', false);
+                this.titleInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.mediaInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.mediaSourceInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.mediaTypeInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.attributionInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.descriptionInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.titleInput.val(this.contentItem.title || "");
+                this.mediaInput.val(this.contentItem.uri || "");
+                this.mediaSourceInput.val(this.contentItem.mediaSource || "");
+                this.mediaTypeInput.val(this.contentItem.mediaType || "");
+                this.attributionInput.val(this.contentItem.attribution || "");
+                this.descriptionInput.val(this.contentItem.description || "");
+                this.saveButton.off();
+                this.saveButton.click(function () {
+                    return _this.onSave();
+                });
                 if(CZ.Authoring.contentItemMode === "createContentItem") {
                     this.titleTextblock.text("Create New");
                     this.saveButton.text("create artifiact");
-                    this.titleInput.val(this.contentItem.title || "");
-                    this.mediaInput.val(this.contentItem.uri || "");
-                    this.mediaSourceInput.val(this.contentItem.mediaSource || "");
-                    this.mediaTypeInput.val(this.contentItem.mediaType || "");
-                    this.attributionInput.val(this.contentItem.attribution || "");
-                    this.descriptionInput.val(this.contentItem.description || "");
                     this.closeButton.hide();
-                    this.saveButton.show();
-                    this.saveButton.off();
-                    this.saveButton.click(function () {
-                        return _this.onSave();
-                    });
                 } else if(CZ.Authoring.contentItemMode === "editContentItem") {
                     this.titleTextblock.text("Edit");
                     this.saveButton.text("update artifact");
-                    this.titleInput.val(this.contentItem.title || "");
-                    this.mediaInput.val(this.contentItem.uri || "");
-                    this.mediaSourceInput.val(this.contentItem.mediaSource || "");
-                    this.mediaTypeInput.val(this.contentItem.mediaType || "");
-                    this.attributionInput.val(this.contentItem.attribution || "");
-                    this.descriptionInput.val(this.contentItem.description || "");
                     if(this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
                         this.closeButton.hide();
                     } else {
                         this.closeButton.show();
                     }
-                    this.saveButton.show();
-                    this.saveButton.off();
-                    this.saveButton.click(function () {
-                        return _this.onSave();
-                    });
                 } else {
                     console.log("Unexpected authoring mode in content item form.");
                     this.close();
                 }
+                this.saveButton.show();
             };
             FormEditCI.prototype.onSave = function () {
                 var _this = this;
@@ -10793,6 +11368,7 @@ var CZ;
                             $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
                             (this.prevForm).exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
+                            this.isModified = false;
                             this.back();
                         }
                     } else if(CZ.Authoring.contentItemMode === "editContentItem") {
@@ -10804,12 +11380,15 @@ var CZ;
                             clickedListItem.descrTextblock.text(newContentItem.description);
                             $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
                             (this.prevForm).exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
+                            (this.prevForm).isModified = true;
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
+                            this.isModified = false;
                             this.back();
                         } else {
                             this.saveButton.prop('disabled', true);
                             CZ.Authoring.updateContentItem(this.exhibit, this.contentItem, newContentItem).then(function (response) {
                                 _this.isCancel = false;
+                                _this.isModified = false;
                                 _this.close();
                             }, function (error) {
                                 alert("Unable to save changes. Please try again later.");
@@ -10821,6 +11400,12 @@ var CZ;
                 } else {
                     this.errorMessage.show().delay(7000).fadeOut();
                 }
+            };
+            FormEditCI.prototype.updateMediaInfo = function () {
+                this.mediaInput.val(this.contentItem.uri || "");
+                this.mediaSourceInput.val(this.contentItem.mediaSource || "");
+                this.mediaTypeInput.val(this.contentItem.mediaType || "");
+                this.attributionInput.val(this.contentItem.attribution || "");
             };
             FormEditCI.prototype.show = function (noAnimation) {
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
@@ -10835,10 +11420,21 @@ var CZ;
             };
             FormEditCI.prototype.close = function (noAnimation) {
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
+                var _this = this;
+                if(this.isModified) {
+                    var r = window.confirm("There is unsaved data. Do you want to close without saving?");
+                    if(r != true) {
+                        return;
+                    }
+                    this.isModified = false;
+                }
                 _super.prototype.close.call(this, noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",
-                    duration: 500
+                    duration: 500,
+                    complete: function () {
+                        _this.mediaList.remove();
+                    }
                 });
                 if(this.isCancel) {
                     if(CZ.Authoring.contentItemMode === "createContentItem") {
@@ -10933,7 +11529,7 @@ var CZ;
                 if(String(e).length > 254) {
                     return false;
                 }
-                var filter = /^([\w^_]+(?:([-_\.\+][\w^_]+)|)|(xn--[\w^_]+))@([\w^_]+(?:(-+[\w^_]+)|)|(xn--[\w^_]+))(?:\.([\w^_]+(?:([\w-_\.\+][\w^_]+)|)|(xn--[\w^_]+)))$/i;
+                var filter = /^([\w^_]+((?:([-_.\+][\w^_]+)|))+|(xn--[\w^_]+))@([\w^_]+(?:(-+[\w^_]+)|)|(xn--[\w^_]+))(?:\.([\w^_]+(?:([\w-_\.\+][\w^_]+)|)|(xn--[\w^_]+)))$/i;
                 return String(e).search(filter) != -1;
             };
             FormEditProfile.prototype.validUsername = function (e) {
@@ -11290,7 +11886,7 @@ var CZ;
                         link.css("color", "#25a1ea");
                         link.css("float", "left");
                         link.text(preloaded.name);
-                        var div = $("<div></div>").addClass("cz-form-preloadedrecord").appendTo(li);
+                        var div = $("<span></span>").addClass("cz-form-preloadedrecord").appendTo(li);
                         div.text("Source:");
                         var sourceDiv = $("<a></a>").addClass("cz-form-preloadedrecord").appendTo(li);
                         sourceDiv.css("color", "blue");
@@ -11486,9 +12082,6 @@ var CZ;
             };
             FormHeaderSessionExpired.prototype.show = function () {
                 var _this = this;
-                this.timer = setTimeout(function () {
-                    _this.onTimer();
-                }, 1000);
                 _super.prototype.show.call(this, {
                     effect: "slide",
                     direction: "left",
@@ -11496,6 +12089,9 @@ var CZ;
                     complete: function () {
                     }
                 });
+                this.timer = setTimeout(function () {
+                    _this.onTimer();
+                }, 1000);
                 this.activationSource.addClass("active");
             };
             FormHeaderSessionExpired.prototype.close = function () {
@@ -11509,6 +12105,47 @@ var CZ;
             return FormHeaderSessionExpired;
         })(CZ.UI.FormBase);
         UI.FormHeaderSessionExpired = FormHeaderSessionExpired;        
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var FormMediaPicker = (function (_super) {
+            __extends(FormMediaPicker, _super);
+            function FormMediaPicker(container, mediaPickerContainer, title, formInfo) {
+                        _super.call(this, container, formInfo);
+                this.titleTextblock.text(title);
+                this.contentContainer.append(mediaPickerContainer);
+                $(this).off();
+            }
+            FormMediaPicker.prototype.show = function () {
+                var _this = this;
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500,
+                    complete: function () {
+                        $(_this).trigger("showcompleted");
+                    }
+                });
+                this.activationSource.addClass("active");
+            };
+            FormMediaPicker.prototype.close = function () {
+                var _this = this;
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500,
+                    complete: function () {
+                        $(_this).trigger("closecompleted");
+                    }
+                });
+                this.activationSource.removeClass("active");
+            };
+            return FormMediaPicker;
+        })(CZ.UI.FormBase);
+        UI.FormMediaPicker = FormMediaPicker;        
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
@@ -11536,7 +12173,8 @@ var CZ;
             "#message-window": "/ui/message-window.html",
             "#header-search-form": "/ui/header-search-form.html",
             "#header-session-expired-form": "/ui/header-session-expired-form.html",
-            "#tour-caption-form": "/ui/tour-caption-form.html"
+            "#tour-caption-form": "/ui/tour-caption-form.html",
+            "#mediapicker-form": "/ui/mediapicker-form.html"
         };
         (function (FeatureActivation) {
             FeatureActivation._map = [];
@@ -11627,10 +12265,10 @@ var CZ;
                 CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption(CZ.Tours.tourCaptionFormContainer, {
                     activationSource: $(".tour-icon"),
                     navButton: ".cz-form-nav",
-                    closeButton: ".cz-form-close-btn > .cz-form-btn",
-                    titleTextblock: ".cz-form-title",
+                    closeButton: ".cz-tour-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-tour-form-title",
                     contentContainer: ".cz-form-content",
-                    minButton: ".cz-form-min-btn > .cz-form-btn",
+                    minButton: ".cz-tour-form-min-btn > .cz-form-btn",
                     captionTextarea: ".cz-form-tour-caption",
                     tourPlayerContainer: ".cz-form-tour-player",
                     bookmarksCount: ".cz-form-tour-bookmarks-count",
@@ -11693,6 +12331,7 @@ var CZ;
             $('.bubbleInfo').hide();
             var canvasIsEmpty;
             CZ.Extensions.registerExtensions();
+            CZ.Media.initialize();
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
@@ -11883,6 +12522,7 @@ var CZ;
                             descriptionInput: ".cz-form-item-descr",
                             attributionInput: ".cz-form-item-attribution",
                             mediaTypeInput: ".cz-form-item-media-type",
+                            mediaListContainer: ".cz-form-medialist",
                             context: {
                                 exhibit: e,
                                 contentItem: ci
@@ -12052,7 +12692,7 @@ var CZ;
             var jointGesturesStream = canvasGestures.Merge(axisGestures.Merge(timeSeriesGestures));
             CZ.Common.controller = new CZ.ViewportController.ViewportController2(function (visible) {
                 var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                var markerPos = CZ.Common.axis.MarkerPosition();
+                var markerPos = CZ.Common.axis.markerPosition;
                 var oldMarkerPosInScreen = vp.pointVirtualToScreen(markerPos, 0).x;
                 CZ.Common.vc.virtualCanvas("setVisible", visible, CZ.Common.controller.activeAnimation);
                 CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
@@ -12063,7 +12703,7 @@ var CZ;
                 }
                 var hoveredInfodot = CZ.Common.vc.virtualCanvas("getHoveredInfodot");
                 var actAni = CZ.Common.controller.activeAnimation != undefined;
-                if(actAni && !hoveredInfodot.id) {
+                if(actAni) {
                     var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
                     CZ.Common.updateMarker();
                 }

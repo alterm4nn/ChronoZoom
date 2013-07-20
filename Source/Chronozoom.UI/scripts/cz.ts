@@ -6,8 +6,10 @@
 /// <reference path='tours.ts'/>
 /// <reference path='virtual-canvas.ts'/>
 /// <reference path='uiloader.ts'/>
+/// <reference path='media.ts'/>
 /// <reference path='../ui/controls/formbase.ts'/>
 /// <reference path='../ui/controls/datepicker.ts'/>
+/// <reference path='../ui/controls/medialist.ts'/>
 /// <reference path='../ui/auth-edit-timeline-form.ts'/>
 /// <reference path='../ui/auth-edit-exhibit-form.ts'/>
 /// <reference path='../ui/auth-edit-contentitem-form.ts'/>
@@ -22,6 +24,7 @@
 /// <reference path='../ui/tour-caption-form.ts'/>
 /// <reference path='../ui/message-window.ts'/>
 /// <reference path='../ui/header-session-expired-form.ts'/>
+/// <reference path='../ui/mediapicker-form.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
 /// <reference path='extensions/extensions.ts'/>
 
@@ -52,7 +55,8 @@ module CZ {
             "#message-window": "/ui/message-window.html", // 13
             "#header-search-form": "/ui/header-search-form.html", // 14
             "#header-session-expired-form": "/ui/header-session-expired-form.html", // 15
-            "#tour-caption-form": "/ui/tour-caption-form.html" // 16
+            "#tour-caption-form": "/ui/tour-caption-form.html", // 16
+            "#mediapicker-form": "/ui/mediapicker-form.html" // 17
         };
 
         export enum FeatureActivation {
@@ -159,10 +163,10 @@ module CZ {
                 CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption(CZ.Tours.tourCaptionFormContainer, {
                     activationSource: $(".tour-icon"),
                     navButton: ".cz-form-nav",
-                    closeButton: ".cz-form-close-btn > .cz-form-btn",
-                    titleTextblock: ".cz-form-title",
+                    closeButton: ".cz-tour-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-tour-form-title",
                     contentContainer: ".cz-form-content",
-                    minButton: ".cz-form-min-btn > .cz-form-btn",
+                    minButton: ".cz-tour-form-min-btn > .cz-form-btn",
                     captionTextarea: ".cz-form-tour-caption",
                     tourPlayerContainer: ".cz-form-tour-player",
                     bookmarksCount: ".cz-form-tour-bookmarks-count",
@@ -224,6 +228,9 @@ module CZ {
 
             // Register ChronoZoom Extensions
             CZ.Extensions.registerExtensions();
+
+            // Register ChronoZoom Media Pickers.
+            CZ.Media.initialize();
 
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
@@ -425,6 +432,7 @@ module CZ {
                             descriptionInput: ".cz-form-item-descr",
                             attributionInput: ".cz-form-item-attribution",
                             mediaTypeInput: ".cz-form-item-media-type",
+                            mediaListContainer: ".cz-form-medialist",
                             context: {
                                 exhibit: e,
                                 contentItem: ci
@@ -626,7 +634,7 @@ module CZ {
             CZ.Common.controller = new CZ.ViewportController.ViewportController2(
                 function (visible) {
                     var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                    var markerPos = CZ.Common.axis.MarkerPosition();
+                    var markerPos = CZ.Common.axis.markerPosition;
                     var oldMarkerPosInScreen = vp.pointVirtualToScreen(markerPos, 0).x;
 
                     CZ.Common.vc.virtualCanvas("setVisible", visible, CZ.Common.controller.activeAnimation);
@@ -640,7 +648,7 @@ module CZ {
                     var hoveredInfodot = CZ.Common.vc.virtualCanvas("getHoveredInfodot");
                     var actAni = CZ.Common.controller.activeAnimation != undefined;
 
-                    if (actAni && !hoveredInfodot.id) {
+                    if (actAni) {
                         var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
                         CZ.Common.updateMarker();
                     }

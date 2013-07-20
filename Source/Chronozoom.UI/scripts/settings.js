@@ -9,7 +9,7 @@ var CZ;
         Settings.zoomSpeedFactor = 2.0;
         Settings.zoomLevelFactor = 1.4;
         Settings.allowedVisibileImprecision = 0.00001;
-        Settings.allowedMathImprecision = 0.0000001;
+        Settings.allowedMathImprecision = 0.000001;
         Settings.allowedMathImprecisionDecimals = parseInt(Settings.allowedMathImprecision.toExponential().split("-")[1]);
         Settings.canvasElementAnimationTime = 1300;
         Settings.canvasElementFadeInTime = 400;
@@ -169,7 +169,7 @@ var CZ;
         Settings.signinUrlMicrosoft = "";
         Settings.signinUrlGoogle = "";
         Settings.signinUrlYahoo = "";
-        Settings.sessionTime = 70;
+        Settings.sessionTime = 3600;
         Settings.guidEmpty = "00000000-0000-0000-0000-000000000000";
         Settings.ie = ((function () {
             var v = 3, div = document.createElement('div'), a = div.all || [];
@@ -223,6 +223,8 @@ var CZ;
             CZ.Settings.timelineGradientFillStyle = themeSettings.timelineGradientFillStyle;
         }
         Settings.applyTheme = applyTheme;
+        Settings.defaultBingSearchTop = 50;
+        Settings.defaultBingSearchSkip = 0;
     })(CZ.Settings || (CZ.Settings = {}));
     var Settings = CZ.Settings;
 })(CZ || (CZ = {}));

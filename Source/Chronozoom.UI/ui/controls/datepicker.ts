@@ -1,6 +1,9 @@
 /// <reference path='../../scripts/dates.ts'/>
 /// <reference path='../../scripts/typings/jquery/jquery.d.ts'/>
 
+/* TODO: implement public get/set functions for edit mode
+
+*/
 module CZ {
     export module UI {
 
@@ -48,7 +51,7 @@ module CZ {
                     switch (mode) {
                         case "year":
                             this.editModeYear();
-                            this.setDate(this.coordinate, false);
+                            this.setDate_YearMode(this.coordinate, false);
                             break;
                         case "date":
                             this.editModeDate();
@@ -95,7 +98,7 @@ module CZ {
             /**
             * Sets date corresponding to given virtual coordinate
             */
-            public setDate(coordinate: any, InfinityConvertation = false, ZeroYearConversation = false) {
+            public setDate(coordinate: any, ZeroYearConversation = false) {
                 // invalid input
                 if (!this.validateNumber(coordinate)) {
                     return false;
@@ -103,32 +106,46 @@ module CZ {
 
                 coordinate = Number(coordinate);
                 this.coordinate = coordinate;
-                var mode = this.modeSelector.find(":selected").val();
+                var regime = CZ.Dates.convertCoordinateToYear(this.coordinate).regime;
+                
                 // set edit mode to infinite in case if coordinate is infinity
                 if (this.coordinate === this.INFINITY_VALUE) {
-                    if (InfinityConvertation) {
-                        this.regimeSelector.find(":selected").attr("selected", "false");
+                    this.modeSelector.find(":selected").attr("selected", "false");
+                    this.modeSelector.find("option").each(function () {
+                        if ($(this).val() === "infinite") {
+                            $(this).attr("selected", "selected");
+                            return;
+                        }
+                    }); 
+                    this.editModeInfinite();
+                    return;
+                }
+
+                switch (regime.toLowerCase()) {
+                    case "ga":
+                    case "ma":
+                    case "ka":
+                        this.modeSelector.find(":selected").attr("selected", "false");
                         this.modeSelector.find("option").each(function () {
-                            if ($(this).val() === "infinite") {
+                            if ($(this).val() === "year") {
                                 $(this).attr("selected", "selected");
                                 return;
                             }
-                        }); 
-                        this.editModeInfinite();
-                    } else {
-                        var localPresent = CZ.Dates.getPresent();
-                        coordinate = CZ.Dates.getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
-                    } 
-                }
-
-                switch (mode) {
-                    case "year":
+                        });
+                        this.editModeYear();
                         this.setDate_YearMode(coordinate, ZeroYearConversation);
                         break;
-                    case "date":
+                    case "bce":
+                    case "ce":
+                        this.modeSelector.find(":selected").attr("selected", "false");
+                        this.modeSelector.find("option").each(function () {
+                            if ($(this).val() === "date") {
+                                $(this).attr("selected", "selected");
+                                return;
+                            }
+                        });
+                        this.editModeDate();
                         this.setDate_DateMode(coordinate);
-                        break;
-                    case "infinite":
                         break;
                 }
             }

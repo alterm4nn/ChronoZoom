@@ -412,6 +412,8 @@ module CZ {
             request.addToPath(collectionName);
             request.addToPath("tours");
 
+            console.log("[GET] " + request.url);
+
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -432,6 +434,8 @@ module CZ {
                 collection: CZ.Service.collectionName
             };
 
+            console.log("[GET] " + request.url);
+
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -439,6 +443,83 @@ module CZ {
                 dataType: "json",
                 url: request.url,
                 data: data
+            });
+        }
+
+        // .../bing/getImages
+        export function getBingImages(query, top = CZ.Settings.defaultBingSearchTop, skip = CZ.Settings.defaultBingSearchSkip) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getImages");
+
+            var data = {
+                query: query,
+                top: top,
+                skip: skip
+            };
+
+            console.log("[GET] " + request.url);
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                }
+            });
+        }
+
+        // .../bing/getVideos
+        export function getBingVideos(query, top = CZ.Settings.defaultBingSearchTop, skip = CZ.Settings.defaultBingSearchSkip) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getVideos");
+
+            var data = {
+                query: query,
+                top: top,
+                skip: skip
+            };
+
+            console.log("[GET] " + request.url);
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                }
+            });
+        }
+
+        // .../bing/getDocuments
+        // set doctype to undefined if you want it to be omited
+        export function getBingDocuments(query, doctype = undefined, top = CZ.Settings.defaultBingSearchTop, skip = CZ.Settings.defaultBingSearchSkip) {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getDocuments");
+
+            var data = {
+                query: query,
+                doctype: doctype,
+                top: top,
+                skip: skip
+            };
+
+            console.log("[GET] " + request.url);
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                }
             });
         }
 

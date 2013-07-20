@@ -9,6 +9,7 @@ describe("csvToDataSet() method", function () {
     var validcsv1 = ["x y\r\n-13000000000 500000\r\n-12000000000 600000\r\n-11000000000 700000", ' '];
     var validcsv2 = ["x;y\r\n-13000000000;500000\r\n-12000000000;600000\r\n-11000000000;700000", ';'];
     var validcsv3 = ["x	y\r\n-13000000000	500000\r\n-12000000000	600000\r\n-11000000000	700000", '	'];
+    var validcsv4 = ["x,y\r\n-13000000000,500000\r\n-12000000000,600000\r\n-11000000000,700000\r\n\r\n\r\n\r\n", ','];
     
     var equalsCsv0 = ["x,equal\r\n-1200,100\r\n-1100,100\r\n-1400,100\r\n-1200,100\r\n-1450,100", 100];
     var equalsCsv1 = ["x,equal\r\n-1200,10\r\n-1100,10\r\n-1400,10\r\n-1200,10\r\n-1450,10", 10];
@@ -22,7 +23,7 @@ describe("csvToDataSet() method", function () {
 
     var validData = [
         validcsv, validcsv1,
-        validcsv2, validcsv3
+        validcsv2, validcsv3, validcsv4
     ];
 
     var equalsCsv = [equalsCsv0,equalsCsv1,equalsCsv2,equalsCsv3];

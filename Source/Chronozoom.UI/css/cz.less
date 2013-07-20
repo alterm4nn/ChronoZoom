@@ -1,5 +1,6 @@
 @import "timescale";
 @import "datepicker";
+@import "media";
 
 @headerHeight: 36px; /* The height of the page header */
 @headerLogoWidth: 170px; /* The width of the logo area */
@@ -1241,6 +1242,11 @@ img.fallbackBackground
     margin-left: 6px;
 }
 
+    .footer-link-credits img
+    {
+        margin-bottom: 3px;
+    }
+
 .footer-text
 {
     margin-left: 6px;
@@ -1513,8 +1519,8 @@ img.fallbackBackground
     color: #fff;
     min-width: 150px;
     font-size: 12px;
-    line-height: 36px;
-    padding: 0 5px;
+    padding: 10px 5px;
+    font-family: 'Segoe UI', Helvetica, Arial, 'Trebuchet MS', 'San Serif';
     /* IE9 */
     filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#1B6AAB', EndColorStr='#0E4073', GradientType=0);
     /* IE10 Consumer Preview */
@@ -1529,6 +1535,11 @@ img.fallbackBackground
     background-image: -webkit-linear-gradient(bottom, #0E4073 0%, #1B6AAB 100%);
     /* W3C Markup, IE10 Release Preview */
     background-image: linear-gradient(to top, #0E4073 0%, #1B6AAB 100%);
+}
+
+.cz-radiobutton + label
+{
+    margin-right: 25px;
 }
 
 .blocking-layer
@@ -1557,6 +1568,25 @@ img.fallbackBackground
 .cz-lightgray
 {
     color: #aeaeae;
+}
+
+.cz-gray {
+    color: #e9e9e9;
+}
+
+.cz-darkgray
+{
+    color: #232323;
+}
+
+.cz-darkblue
+{
+    color: #0464a2;
+}
+
+.cz-lightblue
+{
+    color: #038ae6;
 }
 
 .cz-form-label
@@ -1693,9 +1723,7 @@ img.fallbackBackground
 /* Edit Exhibit Form */
 .cz-form-exhibit
 {
-    min-width: 380px;
-    max-width: 450px;
-    width: 30.2734375%; /* 310 / 1024 */
+    width: 420px;
     bottom: 25px;
     left: 0;
 }
@@ -1713,9 +1741,7 @@ img.fallbackBackground
 /* Edit Content Item Form */
 .cz-form-contentitem
 {
-    min-width: 380px;
-    max-width: 450px;
-    width: 30.2734375%; /* 310 / 1024 */
+    width: 420px;
     bottom: 25px;
     left: 0;
 }
@@ -1898,6 +1924,7 @@ img.fallbackBackground
 
 .cz-form-progress-bar
 {
+    display: block;
     width: 100%;
     height: 15px;
     vertical-align: top;
@@ -2000,6 +2027,49 @@ img.fallbackBackground
 {
     width: 36px;
     height: 36px;
+}
+
+.cz-tour-form-title {
+    width: 100%;    
+    height: 100%;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding-right: 80px;
+    margin-right: 80px;    
+    margin-left: 15px;
+    
+    overflow: hidden;    
+    -ms-text-overflow: ellipsis;    
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #fff;
+    font-size: 18px;
+    line-height: 36px;
+}
+
+.cz-tour-form-close-btn {
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin-right: 15px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 36px;
+}
+
+.cz-tour-form-min-btn {
+    position: absolute;
+    right: 25px;
+    top: 0;
+    margin-right: 15px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 36px;
 }
 
 /* Tour Player Icons. */
