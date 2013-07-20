@@ -26,8 +26,6 @@
 .cz-medialist-item-icon
 {
     display: block;
-    width: 48px;
-    height: 48px;
 }
 
 /***********************************************************
@@ -54,7 +52,28 @@
         overflow-y: auto;
     }
 
-.cz-form-bing-search-results
+.cz-bing-search-input
+{
+    display: inline-block;
+    width: 400px;
+    margin: 0 25px 10px 0;
+}
+
+.cz-bing-search-button
+{
+    display: inline-block;
+    margin: 0 0 10px 0 !important;
+    padding: 5px !important;
+    border: 1px solid @darkblue !important;
+}
+
+/*
+Fix for Firefox (same height for search input and button).
+NOTE: http://christophzillgens.com/en/articles/equal-height-input-and-button-elements-in-firefox-and-safari
+*/
+.cz-bing-search-button::-moz-focus-inner { border: 0; }
+
+.cz-bing-search-results
 {
     color: @darkgray;
 }
@@ -79,6 +98,7 @@
 a.cz-bing-result-description:visited,
 a.cz-bing-result-description:link
 {
+    display: block;
     color: @lightgray;
     overflow: hidden;
     text-overflow: ellipsis;

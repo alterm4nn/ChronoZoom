@@ -11,6 +11,10 @@
     <script type="text/javascript" src="http://fgnass.github.io/spin.js/dist/spin.min.js"></script>
 
     <style type="text/css">
+        .content {
+            border: 1px solid black;
+        }
+
         .thumbnail {
             display: block;
         }
@@ -65,6 +69,9 @@
             top: '20px', // Top position relative to parent in px
             left: 'auto' // Left position relative to parent in px
         };
+
+
+        var container, rowWidth, currentRow;
         
 
         function pageOnLoad() {
@@ -78,6 +85,10 @@
                     event.preventDefault();
                     search();
                 }
+            });
+
+            $(window).resize(function (event) {
+                alignThumbnails($("#container"), ".element");
             });
         }
 
@@ -119,15 +130,23 @@
                         return;
                     }
 
-                    for (var i = 0; i < response.d.length; i++) {
-                        var container = $("#container");
 
+                    container = $("#container");
+                    rowWidth = container.outerWidth(true);
+                    currentRow = {
+                        elements: [],
+                        width: 0
+                    };
+
+                    for (var i = 0; i < response.d.length; i++) {
                         var result = response.d[i];
 
                         var element = $("<div></div>", {
                             class: "element",
-                            width: 183 * result.Thumbnail.Width / result.Thumbnail.Height
+                            width: 150 * result.Thumbnail.Width / result.Thumbnail.Height
                         });
+                        element.attr("data-actual-width", 150 * result.Thumbnail.Width / result.Thumbnail.Height);
+                        
 
                         var title = $("<div></div>", {
                             class: "title",
@@ -145,8 +164,8 @@
 
                         var thumbnail = $("<img></img>", {
                             src: result.Thumbnail.MediaUrl,
-                            height: 183,
-                            width: 183 * result.Thumbnail.Width / result.Thumbnail.Height,
+                            height: 150,
+                            width: "100%",
                             class: "thumbnail"
                         });
 
@@ -156,6 +175,8 @@
                             .append(url);
 
                         container.append(element);
+
+                        alignThumbnails($("#container"), ".element");
                     }
                 });
         }
@@ -181,6 +202,7 @@
                             class: "element",
                             width: 140 * result.Thumbnail.Width / result.Thumbnail.Height
                         });
+                        element.attr("data-actual-width", 150 * result.Thumbnail.Width / result.Thumbnail.Height);
 
                         var title = $("<div></div>", {
                             class: "title",
@@ -199,7 +221,7 @@
                         var thumbnail = $("<img></img>", {
                             src: result.Thumbnail.MediaUrl,
                             height: 140,
-                            width: 140 * result.Thumbnail.Width / result.Thumbnail.Height,
+                            width: "100%",
                             class: "thumbnail"
                         });
 
@@ -209,6 +231,8 @@
                             .append(url);
 
                         container.append(element);
+
+                        alignThumbnails($("#container"), ".element");
                     }
                 });
         }
@@ -258,6 +282,40 @@
                    }
                });
         }
+
+        function alignThumbnails(container, elementSelector) {
+            //var container = $("#container");
+            var elements = $(elementSelector);
+
+            if (elements.length === 0) {
+                return;
+            }
+
+            rowWidth = container.width();// - 20;
+            currentRow = {
+                elements: [],
+                width: 0
+            };
+
+            for (var i = 0; i < elements.length; i++) {
+                if (rowWidth < currentRow.width +
+                    parseFloat($(elements[i]).attr(("data-actual-width"))) ){//+ Math.ceil($(elements[i]).outerWidth(true) - $(elements[i]).innerWidth())) {
+                    var delta = rowWidth - currentRow.width;
+                    for (var j = 0; j < currentRow.elements.length; j++) {
+                        currentRow.elements[j].width(parseFloat(currentRow.elements[j].attr("data-actual-width")) + delta / currentRow.elements.length);
+                    }
+                    currentRow.elements = [];
+                    currentRow.elements.push($(elements[i]));
+                    currentRow.width = Math.ceil(parseFloat($(elements[i]).attr("data-actual-width")) +
+                        $(elements[i]).outerWidth(true) - $(elements[i]).innerWidth());
+                }
+                else {
+                    currentRow.elements.push($(elements[i]));
+                    currentRow.width += Math.ceil(parseFloat($(elements[i]).attr("data-actual-width")) +
+                        $(elements[i]).outerWidth(true) - $(elements[i]).innerWidth());//Math.ceil($(elements[i]).outerWidth(true));
+                }
+            }
+        }
     </script>
 </head>
 <body onload="pageOnLoad()"> 
@@ -277,6 +335,6 @@
 
     <div id="progressbar"></div>
 
-    <div id="container"></div>
+    <div id="container" class="content"></div>
 </body>
 </html>

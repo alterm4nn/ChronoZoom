@@ -4434,9 +4434,9 @@ var CZ;
                 var ci = contentItems[i];
                 isValid = isValid && CZ.Authoring.isNotEmpty(ci.title) && CZ.Authoring.isNotEmpty(ci.uri) && CZ.Authoring.isNotEmpty(ci.mediaType);
                 if(ci.mediaType.toLowerCase() === "image") {
-                    var imageReg = /\.(jpg|jpeg|png)$/i;
+                    var imageReg = /\.(jpg|jpeg|png|gif)$/i;
                     if(!imageReg.test(ci.uri)) {
-                        alert("Sorry, only JPG/PNG images are supported");
+                        alert("Sorry, only JPG/PNG/GIF images are supported");
                         isValid = false;
                     }
                 } else if(ci.mediaType.toLowerCase() === "video") {
@@ -4455,7 +4455,7 @@ var CZ;
                         isValid = false;
                     }
                 } else if(ci.mediaType.toLowerCase() === "pdf") {
-                    var pdf = /\.(pdf)$/i;
+                    var pdf = /\.(pdf)$|\.(pdf)\?/i;
                     if(!pdf.test(ci.uri)) {
                         alert("Sorry, only PDF extension is supported");
                         isValid = false;
@@ -10361,11 +10361,12 @@ var CZ;
             function BingMediaPicker(container, context) {
                 this.container = container;
                 this.contentItem = context;
-                this.searchTextbox = this.container.find(".cz-form-search-input");
+                this.editContentItemForm = CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
+                this.searchTextbox = this.container.find(".cz-bing-search-input");
                 this.mediaTypeRadioButtons = this.container.find(":radio");
                 this.progressBar = this.container.find(".cz-form-progress-bar");
-                this.searchResultsBox = this.container.find(".cz-form-bing-search-results");
-                this.searchButton = this.container.find(".cz-form-search-button");
+                this.searchResultsBox = this.container.find(".cz-bing-search-results");
+                this.searchButton = this.container.find(".cz-bing-search-button");
                 this.initialize();
             }
             BingMediaPicker.setup = function setup(context) {
@@ -10388,14 +10389,18 @@ var CZ;
                 $(mediaPicker).on("resultclick", function (event) {
                     form.close();
                 });
+                var onWindowResize = function () {
+                    return mediaPicker.onWindowResize();
+                };
+                $(window).on("resize", onWindowResize);
+                $(form).on("closecompleted", function (event) {
+                    $(window).off("resize", onWindowResize);
+                });
                 form.show();
             };
             BingMediaPicker.prototype.initialize = function () {
                 var _this = this;
                 this.progressBar.css("opacity", 0);
-                this.searchResultsBox.empty();
-                this.searchTextbox.val("");
-                this.mediaTypeRadioButtons.first().attr("checked", "true");
                 this.searchTextbox.off();
                 this.searchButton.off();
                 $(this).off();
@@ -10414,24 +10419,41 @@ var CZ;
                 });
             };
             BingMediaPicker.prototype.onSearchResultClick = function (mediaInfo) {
-                var editContentItemForm = CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
                 $.extend(this.contentItem, mediaInfo);
-                editContentItemForm.updateMediaInfo();
+                this.editContentItemForm.updateMediaInfo();
             };
             BingMediaPicker.prototype.getMediaType = function () {
                 return this.mediaTypeRadioButtons.filter(":checked").val();
             };
             BingMediaPicker.prototype.convertResultToMediaInfo = function (result, mediaType) {
-                return {
-                    uri: result.MediaUrl || result.Url,
-                    mediaType: mediaType,
-                    mediaSource: result.SourceUrl,
-                    attribution: result.SourceUrl
+                var mediaInfoMap = {
+                    image: {
+                        uri: result.MediaUrl,
+                        mediaType: mediaType,
+                        mediaSource: result.SourceUrl,
+                        attribution: result.SourceUrl
+                    },
+                    video: {
+                        uri: result.MediaUrl,
+                        mediaType: mediaType,
+                        mediaSource: result.MediaUrl,
+                        attribution: result.MediaUrl
+                    },
+                    pdf: {
+                        uri: result.Url,
+                        mediaType: mediaType,
+                        mediaSource: result.Url,
+                        attribution: result.Url
+                    }
                 };
+                return mediaInfoMap[mediaType];
             };
             BingMediaPicker.prototype.search = function () {
                 var query = this.searchTextbox.val();
                 var mediaType = this.getMediaType();
+                if(query.trim() === "") {
+                    return;
+                }
                 this.searchResultsBox.empty();
                 this.showProgressBar();
                 switch(mediaType) {
@@ -10458,11 +10480,13 @@ var CZ;
                         var result = response.d[i];
                         var resultContainer = _this.createImageResult(result);
                         _this.searchResultsBox.append(resultContainer);
+                        _this.alignThumbnails();
                     }
                 });
             };
             BingMediaPicker.prototype.searchVideos = function (query) {
                 var _this = this;
+                query += " (+site:youtube.com OR +site:vimeo.com)";
                 CZ.Service.getBingVideos(query).done(function (response) {
                     _this.hideProgressBar();
                     if(response.d.length === 0) {
@@ -10473,6 +10497,7 @@ var CZ;
                         var result = response.d[i];
                         var resultContainer = _this.createVideoResult(result);
                         _this.searchResultsBox.append(resultContainer);
+                        _this.alignThumbnails();
                     }
                 });
             };
@@ -10495,11 +10520,13 @@ var CZ;
                 var _this = this;
                 var container = $("<div></div>", {
                     class: "cz-bing-result-container",
-                    width: 183 * result.Thumbnail.Width / result.Thumbnail.Height
+                    width: 183 * result.Thumbnail.Width / result.Thumbnail.Height,
+                    "data-actual-width": 183 * result.Thumbnail.Width / result.Thumbnail.Height
                 });
                 var title = $("<div></div>", {
                     class: "cz-bing-result-title cz-darkgray",
-                    text: result.Title
+                    text: result.Title,
+                    title: result.Title
                 });
                 var size = $("<div></div>", {
                     class: "cz-bing-result-description cz-lightgray",
@@ -10509,12 +10536,13 @@ var CZ;
                     class: "cz-bing-result-description cz-lightgray",
                     text: result.DisplayUrl,
                     href: result.MediaUrl,
+                    title: result.DisplayUrl,
                     target: "_blank"
                 });
                 var thumbnail = $("<img></img>", {
                     src: result.Thumbnail.MediaUrl,
                     height: 183,
-                    width: 183 * result.Thumbnail.Width / result.Thumbnail.Height,
+                    width: "100%",
                     class: "cz-bing-result-thumbnail"
                 });
                 thumbnail.add(title).add(size).click(function (event) {
@@ -10524,13 +10552,16 @@ var CZ;
             };
             BingMediaPicker.prototype.createVideoResult = function (result) {
                 var _this = this;
+                result.Thumbnail = result.Thumbnail || this.createDefaultThumbnail();
                 var container = $("<div></div>", {
                     class: "cz-bing-result-container",
-                    width: 140 * result.Thumbnail.Width / result.Thumbnail.Height
+                    width: 140 * result.Thumbnail.Width / result.Thumbnail.Height,
+                    "data-actual-width": 140 * result.Thumbnail.Width / result.Thumbnail.Height
                 });
                 var title = $("<div></div>", {
                     class: "cz-bing-result-title cz-darkgray",
-                    text: result.Title
+                    text: result.Title,
+                    title: result.Title
                 });
                 var size = $("<div></div>", {
                     class: "cz-bing-result-description cz-lightgray",
@@ -10538,14 +10569,15 @@ var CZ;
                 });
                 var url = $("<a></a>", {
                     class: "cz-bing-result-description cz-lightgray",
-                    text: result.DisplayUrl,
+                    text: result.MediaUrl,
                     href: result.MediaUrl,
+                    title: result.MediaUrl,
                     target: "_blank"
                 });
                 var thumbnail = $("<img></img>", {
                     src: result.Thumbnail.MediaUrl,
                     height: 140,
-                    width: 140 * result.Thumbnail.Width / result.Thumbnail.Height,
+                    width: "100%",
                     class: "cz-bing-result-thumbnail"
                 });
                 thumbnail.add(title).add(size).click(function (event) {
@@ -10561,7 +10593,8 @@ var CZ;
                 });
                 var title = $("<div></div>", {
                     class: "cz-bing-result-title cz-darkgray",
-                    text: result.Title
+                    text: result.Title,
+                    title: result.Title
                 });
                 var descr = $("<div></div>", {
                     class: "cz-bing-result-doc-description cz-lightgray",
@@ -10572,6 +10605,7 @@ var CZ;
                     class: "cz-bing-result-description cz-lightgray",
                     text: result.DisplayUrl,
                     href: result.Url,
+                    title: result.DisplayUrl,
                     target: "_blank"
                 });
                 title.add(descr).click(function (event) {
@@ -10591,6 +10625,50 @@ var CZ;
             };
             BingMediaPicker.prototype.showNoResults = function () {
                 this.searchResultsBox.text("No results.");
+            };
+            BingMediaPicker.prototype.createDefaultThumbnail = function () {
+                return {
+                    ContentType: "image/png",
+                    FileSize: 4638,
+                    Width: 500,
+                    Height: 500,
+                    MediaUrl: "/images/Temp-Thumbnail2.png"
+                };
+            };
+            BingMediaPicker.prototype.onWindowResize = function () {
+                this.alignThumbnails();
+            };
+            BingMediaPicker.prototype.alignThumbnails = function () {
+                var container = this.searchResultsBox;
+                var elements = container.children();
+                if(elements.length === 0) {
+                    return;
+                }
+                var rowWidth = container.width();
+                var currentRow = {
+                    elements: [],
+                    width: 0
+                };
+                for(var i = 0, len = elements.length; i < len; i++) {
+                    var curElement = $(elements[i]);
+                    var curElementActualWidth = +curElement.attr("data-actual-width");
+                    var curElementOuterWidth = curElement.outerWidth(true);
+                    var curElementInnerWidth = curElement.innerWidth();
+                    if(rowWidth < currentRow.width + curElementActualWidth) {
+                        var delta = rowWidth - currentRow.width;
+                        for(var j = 0, rowLen = currentRow.elements.length; j < rowLen; j++) {
+                            var rowElement = currentRow.elements[j];
+                            var rowElementActualWidth = +rowElement.attr("data-actual-width");
+                            rowElement.width(rowElementActualWidth + delta / rowLen);
+                        }
+                        currentRow.elements = [];
+                        currentRow.elements.push(curElement);
+                        currentRow.width = Math.ceil(curElementActualWidth + curElementOuterWidth - curElementInnerWidth);
+                    } else {
+                        currentRow.elements.push(curElement);
+                        currentRow.width += Math.ceil(curElementActualWidth + curElementOuterWidth - curElementInnerWidth);
+                    }
+                }
             };
             return BingMediaPicker;
         })();
@@ -10618,7 +10696,7 @@ var CZ;
             }
         });
         function initialize() {
-            registerMediaPicker("bing", "/images/media/bing-icon.png", "/ui/media/bing-mediapicker.html", CZ.Media.BingMediaPicker);
+            registerMediaPicker("bing", "/images/media/bing-import-50x150.png", "/ui/media/bing-mediapicker.html", CZ.Media.BingMediaPicker);
         }
         Media.initialize = initialize;
         function registerMediaPicker(title, iconUrl, viewUrl, type, selector) {
