@@ -744,7 +744,7 @@ var CZ;
             var labelText;
             this.getRegime(range.min, range.max);
             var numOfDigits = Math.max(Math.floor(Math.log(this.delta * Math.pow(10, this.beta) / this.level) * this.log10), -4) - 1;
-            labelText = (-time / this.level).toFixed(Math.abs(numOfDigits));
+            labelText = (Math.abs(time / this.level)).toFixed(Math.abs(numOfDigits));
             labelText += " " + this.regime;
             return labelText;
         };
