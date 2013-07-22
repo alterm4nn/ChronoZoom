@@ -1,4 +1,4 @@
-.cz-timescale {
+﻿.cz-timescale {
   padding-bottom: 0px;
   font-size: large;
   font-weight: 500;
@@ -248,6 +248,7 @@ a.cz-bing-result-description:hover {
 }
 .cz-bing-result-thumbnail {
   display: block;
+  margin: auto;
 }
 /* The height of the page header */
 /* The width of the logo area */

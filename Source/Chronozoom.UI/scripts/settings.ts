@@ -224,5 +224,12 @@
         // Bing search API constants
         export var defaultBingSearchTop = 50; // the number of the results to return
         export var defaultBingSearchSkip = 0; // offset requested for the srarting point of returned results
+
+        // Authoring mediapicker constants
+        export var mediapickerImageThumbnailMaxWidth = 240; // the max allowed width of thumbnail
+        export var mediapickerImageThumbnailMaxHeight = 155; // the max allowed height of thumbnail
+
+        export var mediapickerVideoThumbnailMaxWidth = 190; // the max allowed width of thumbnail
+        export var mediapickerVideoThumbnailMaxHeight = 130; // the max allowed height of thumbnail
     }
 }
