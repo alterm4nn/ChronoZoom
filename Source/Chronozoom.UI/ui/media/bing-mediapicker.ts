@@ -176,6 +176,9 @@ module CZ {
                         this.searchResultsBox.append(resultContainer);
                         this.alignThumbnails();
                     }
+                }).fail(error => {
+                    this.hideProgressBar();
+                    this.showErrorMessage(error);
                 });
             }
 
@@ -196,6 +199,9 @@ module CZ {
                         this.searchResultsBox.append(resultContainer);
                         this.alignThumbnails();
                     }
+                }).fail(error => {
+                    this.hideProgressBar();
+                    this.showErrorMessage(error);
                 });
             }
 
@@ -214,6 +220,9 @@ module CZ {
                         var resultContainer = this.createDocumentResult(result);
                         this.searchResultsBox.append(resultContainer);
                     }
+                }).fail(error => {
+                    this.hideProgressBar();
+                    this.showErrorMessage(error);
                 });
             }
 
@@ -372,6 +381,21 @@ module CZ {
                     Height: 500,
                     MediaUrl: "/images/Temp-Thumbnail2.png"
                 };
+            }
+
+            private showErrorMessage(error: any): void {
+                var errorMessagesByStatus = {
+                    "400": "The search request is formed badly. Please contact developers about the error.",
+                    "403": "Please sign in to ChronoZoom to use Bing search.",
+                    "500": "We are sorry, but something went wrong. Please try again later."
+                };
+
+                var errorMessage = $("<span></span>", {
+                    class: "cz-red",
+                    text: errorMessagesByStatus[error.status]
+                });
+
+                this.searchResultsBox.append(errorMessage);
             }
 
             public onWindowResize() {
