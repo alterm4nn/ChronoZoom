@@ -225,6 +225,10 @@
         Settings.applyTheme = applyTheme;
         Settings.defaultBingSearchTop = 50;
         Settings.defaultBingSearchSkip = 0;
+        Settings.mediapickerImageThumbnailMaxWidth = 240;
+        Settings.mediapickerImageThumbnailMaxHeight = 155;
+        Settings.mediapickerVideoThumbnailMaxWidth = 190;
+        Settings.mediapickerVideoThumbnailMaxHeight = 130;
     })(CZ.Settings || (CZ.Settings = {}));
     var Settings = CZ.Settings;
 })(CZ || (CZ = {}));
@@ -10527,10 +10531,12 @@ var CZ;
             };
             BingMediaPicker.prototype.createImageResult = function (result) {
                 var _this = this;
+                var rectangle = this.fitThumbnailToContainer(result.Thumbnail.Width / result.Thumbnail.Height, CZ.Settings.mediapickerImageThumbnailMaxWidth, CZ.Settings.mediapickerImageThumbnailMaxHeight);
+                var imageOffset = (CZ.Settings.mediapickerImageThumbnailMaxHeight - rectangle.height) / 2;
                 var container = $("<div></div>", {
                     class: "cz-bing-result-container",
-                    width: 183 * result.Thumbnail.Width / result.Thumbnail.Height,
-                    "data-actual-width": 183 * result.Thumbnail.Width / result.Thumbnail.Height
+                    width: rectangle.width,
+                    "data-actual-width": rectangle.width
                 });
                 var title = $("<div></div>", {
                     class: "cz-bing-result-title cz-darkgray",
@@ -10548,24 +10554,32 @@ var CZ;
                     title: result.DisplayUrl,
                     target: "_blank"
                 });
-                var thumbnail = $("<img></img>", {
-                    src: result.Thumbnail.MediaUrl,
-                    height: 183,
+                var thumbnailContainer = $("<div></div>", {
                     width: "100%",
-                    class: "cz-bing-result-thumbnail"
+                    height: CZ.Settings.mediapickerImageThumbnailMaxHeight
                 });
-                thumbnail.add(title).add(size).click(function (event) {
+                var thumbnail = $("<img></img>", {
+                    class: "cz-bing-result-thumbnail",
+                    src: result.Thumbnail.MediaUrl,
+                    height: rectangle.height,
+                    width: "100%"
+                });
+                thumbnail.css("padding-top", imageOffset + "px");
+                thumbnailContainer.add(title).add(size).click(function (event) {
                     $(_this).trigger("resultclick", _this.convertResultToMediaInfo(result, "image"));
                 });
-                return container.append(thumbnail).append(title).append(size).append(url);
+                thumbnailContainer.append(thumbnail);
+                return container.append(thumbnailContainer).append(title).append(size).append(url);
             };
             BingMediaPicker.prototype.createVideoResult = function (result) {
                 var _this = this;
                 result.Thumbnail = result.Thumbnail || this.createDefaultThumbnail();
+                var rectangle = this.fitThumbnailToContainer(result.Thumbnail.Width / result.Thumbnail.Height, CZ.Settings.mediapickerVideoThumbnailMaxWidth, CZ.Settings.mediapickerVideoThumbnailMaxHeight);
+                var imageOffset = (CZ.Settings.mediapickerVideoThumbnailMaxHeight - rectangle.height) / 2;
                 var container = $("<div></div>", {
                     class: "cz-bing-result-container",
-                    width: 140 * result.Thumbnail.Width / result.Thumbnail.Height,
-                    "data-actual-width": 140 * result.Thumbnail.Width / result.Thumbnail.Height
+                    width: rectangle.width,
+                    "data-actual-width": rectangle.width
                 });
                 var title = $("<div></div>", {
                     class: "cz-bing-result-title cz-darkgray",
@@ -10583,16 +10597,22 @@ var CZ;
                     title: result.MediaUrl,
                     target: "_blank"
                 });
-                var thumbnail = $("<img></img>", {
-                    src: result.Thumbnail.MediaUrl,
-                    height: 140,
+                var thumbnailContainer = $("<div></div>", {
                     width: "100%",
-                    class: "cz-bing-result-thumbnail"
+                    height: CZ.Settings.mediapickerVideoThumbnailMaxHeight
                 });
-                thumbnail.add(title).add(size).click(function (event) {
+                var thumbnail = $("<img></img>", {
+                    class: "cz-bing-result-thumbnail",
+                    src: result.Thumbnail.MediaUrl,
+                    height: rectangle.height,
+                    width: "100%"
+                });
+                thumbnail.css("padding-top", imageOffset + "px");
+                thumbnailContainer.add(title).add(size).click(function (event) {
                     $(_this).trigger("resultclick", _this.convertResultToMediaInfo(result, "video"));
                 });
-                return container.append(thumbnail).append(title).append(size).append(url);
+                thumbnailContainer.append(thumbnail);
+                return container.append(thumbnailContainer).append(title).append(size).append(url);
             };
             BingMediaPicker.prototype.createDocumentResult = function (result) {
                 var _this = this;
@@ -10690,6 +10710,18 @@ var CZ;
                         currentRow.width += Math.ceil(curElementActualWidth + curElementOuterWidth - curElementInnerWidth);
                     }
                 }
+            };
+            BingMediaPicker.prototype.fitThumbnailToContainer = function (aspectRatio, maxWidth, maxHeight) {
+                var maxAspectRatio = maxWidth / maxHeight;
+                var output = {
+                    width: maxHeight * aspectRatio,
+                    height: maxHeight
+                };
+                if(aspectRatio > maxAspectRatio) {
+                    output.width = maxWidth;
+                    output.height = maxWidth / aspectRatio;
+                }
+                return output;
             };
             return BingMediaPicker;
         })();

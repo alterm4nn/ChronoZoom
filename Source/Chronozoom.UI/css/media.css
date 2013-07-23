@@ -88,4 +88,5 @@ a.cz-bing-result-description:hover {
 }
 .cz-bing-result-thumbnail {
   display: block;
+  margin: auto;
 }
