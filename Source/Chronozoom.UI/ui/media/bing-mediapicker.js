@@ -126,6 +126,9 @@ var CZ;
                         _this.searchResultsBox.append(resultContainer);
                         _this.alignThumbnails();
                     }
+                }).fail(function (error) {
+                    _this.hideProgressBar();
+                    _this.showErrorMessage(error);
                 });
             };
             BingMediaPicker.prototype.searchVideos = function (query) {
@@ -143,6 +146,9 @@ var CZ;
                         _this.searchResultsBox.append(resultContainer);
                         _this.alignThumbnails();
                     }
+                }).fail(function (error) {
+                    _this.hideProgressBar();
+                    _this.showErrorMessage(error);
                 });
             };
             BingMediaPicker.prototype.searchDocuments = function (query) {
@@ -158,6 +164,9 @@ var CZ;
                         var resultContainer = _this.createDocumentResult(result);
                         _this.searchResultsBox.append(resultContainer);
                     }
+                }).fail(function (error) {
+                    _this.hideProgressBar();
+                    _this.showErrorMessage(error);
                 });
             };
             BingMediaPicker.prototype.createImageResult = function (result) {
@@ -278,6 +287,18 @@ var CZ;
                     Height: 500,
                     MediaUrl: "/images/Temp-Thumbnail2.png"
                 };
+            };
+            BingMediaPicker.prototype.showErrorMessage = function (error) {
+                var errorMessagesByStatus = {
+                    "400": "The search request is formed badly. Please contact developers about the error.",
+                    "403": "Please sign in to ChronoZoom to use Bing search.",
+                    "500": "We are sorry, but something went wrong. Please try again later."
+                };
+                var errorMessage = $("<span></span>", {
+                    class: "cz-red",
+                    text: errorMessagesByStatus[error.status]
+                });
+                this.searchResultsBox.append(errorMessage);
             };
             BingMediaPicker.prototype.onWindowResize = function () {
                 this.alignThumbnails();
