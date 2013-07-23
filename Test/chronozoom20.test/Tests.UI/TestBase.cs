@@ -23,7 +23,6 @@ namespace Tests
         public static BreadcrumbsHelper BreadcrumbsHelper { get; set; }
         public static ApiHelper ApiHelper { get; set; }
         public static TimeSeriesHelper TimeSeriesHelper { get; set; }
-        public static ImageHelper ImageHelper { get; set; }
 
         [AssemblyInitialize]
         public static void AssemblyInit(TestContext testContext)
@@ -45,7 +44,6 @@ namespace Tests
             BreadcrumbsHelper = HelperManager<BreadcrumbsHelper>.Instance;
             ApiHelper = HelperManager<ApiHelper>.Instance;
             TimeSeriesHelper = HelperManager<TimeSeriesHelper>.Instance;
-            ImageHelper = HelperManager<ImageHelper>.Instance;
         }
 
         [AssemblyCleanup]

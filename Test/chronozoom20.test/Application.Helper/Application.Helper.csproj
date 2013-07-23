@@ -32,8 +32,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Chronozoom.Entities, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Chronozoom.Entities">
       <HintPath>..\..\..\Source\Chronozoom.Entities\bin\Chronozoom.Entities.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Practices.Unity">
@@ -61,10 +60,12 @@
     <Compile Include="Constants\ImageTemplateFilesLocations.cs" />
     <Compile Include="Constants\Javascripts.cs" />
     <Compile Include="Entities\Bibliography.cs" />
+    <Compile Include="Entities\Bookmark.cs" />
     <Compile Include="Entities\ContentItem.cs" />
     <Compile Include="Entities\Exhibit.cs" />
     <Compile Include="Entities\NewExhibitApiResponse.cs" />
     <Compile Include="Entities\Timeline.cs" />
+    <Compile Include="Entities\Tour.cs" />
     <Compile Include="Entities\User.cs" />
     <Compile Include="HelperManager.cs" />
     <Compile Include="BrowserImpl\ChromeControls.cs" />
