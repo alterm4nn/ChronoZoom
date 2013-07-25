@@ -24,6 +24,8 @@ module CZ {
 
         var isToursDebugEnabled = false; // enables rebug output
 
+        export var TourEndMessage = "Thank you for watching this tour!"; // message for user in the end of tour
+
         export var tourCaptionFormContainer: JQuery;
         export var tourCaptionForm: CZ.UI.FormTourCaption;
 
@@ -535,7 +537,7 @@ module CZ {
 
                 // add new tourFinished callback function
                 tour.tour_TourFinished.push(function (tour) {
-                    hideBookmark(tour);
+                    showTourEndMessage();
                     tourPause();
                     hideBookmarks();
                 });
@@ -683,6 +685,10 @@ module CZ {
         */
         function hideBookmark(tour) {
             tourCaptionForm.hideBookmark();
+        }
+
+        function showTourEndMessage() {
+            tourCaptionForm.showTourEndMessage();
         }
 
         /*

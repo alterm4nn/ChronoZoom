@@ -4767,6 +4767,10 @@ var CZ;
                     opacity: 1
                 });
             };
+            FormTourCaption.prototype.showTourEndMessage = function () {
+                this.captionTextarea.text(CZ.Tours.TourEndMessage);
+                this.bookmarksCount.text("Start a tour");
+            };
             FormTourCaption.prototype.setPlayPauseButtonState = function (state) {
                 this.tourPlayer.playPauseButton.attr("state", state);
             };
@@ -4826,7 +4830,8 @@ var CZ;
         Tours.tourBookmarkTransitionInterrupted;
         Tours.pauseTourAtAnyAnimation = false;
         Tours.bookmarkAnimation;
-        var isToursDebugEnabled = true;
+        var isToursDebugEnabled = false;
+        Tours.TourEndMessage = "Thank you for watching this tour!";
         Tours.tourCaptionFormContainer;
         Tours.tourCaptionForm;
         var TourBookmark = (function () {
@@ -5219,7 +5224,7 @@ var CZ;
             if(newTour != undefined) {
                 Tours.tour = newTour;
                 Tours.tour.tour_TourFinished.push(function (tour) {
-                    hideBookmark(tour);
+                    showTourEndMessage();
                     tourPause();
                     hideBookmarks();
                 });
@@ -5315,6 +5320,9 @@ var CZ;
         Tours.initializeToursContent = initializeToursContent;
         function hideBookmark(tour) {
             Tours.tourCaptionForm.hideBookmark();
+        }
+        function showTourEndMessage() {
+            Tours.tourCaptionForm.showTourEndMessage();
         }
         function showBookmark(tour, bookmark) {
             Tours.tourCaptionForm.showBookmark(bookmark);
