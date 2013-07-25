@@ -21,11 +21,37 @@ namespace Application.Helper.Helpers
             TypeSearchQwery("test");
             ClickSearchButton();
             WaitWhileResultsIsRender();
-            int imagesCount = GetResultsCount();
-            int randomImageIndex = Random.Next(1, imagesCount);
-            ClickByImage(randomImageIndex);
-            imageUrl = GetImageUrlByIndex(randomImageIndex);
+            int resultsCount = GetResultsCount();
+            int randomImageIndex = Random.Next(1, resultsCount);
             imageSource = GetMediaSourceByIndex(randomImageIndex);
+            imageUrl = GetResultUrlByIndex(randomImageIndex);
+            ClickByResult(randomImageIndex);
+        }
+
+        public void FindAndSelectRandomVideo(out string videoUrlFromSearchResult)
+        {
+            ClickByBingSearch();
+            SelectVideoFilter();
+            TypeSearchQwery("test");
+            ClickSearchButton();
+            WaitWhileResultsIsRender();
+            int resultsCount = GetResultsCount();
+            int randomVideoIndex = Random.Next(1, resultsCount);
+            videoUrlFromSearchResult = GetResultUrlByIndex(randomVideoIndex);
+            ClickByResult(randomVideoIndex);
+        }
+
+        public void FindAndSelectRandomPdf(out string pdfUrlFromSearchResult)
+        {
+            ClickByBingSearch();
+            SelectPdfFilter();
+            TypeSearchQwery("test");
+            ClickSearchButton();
+            WaitWhileResultsIsRender();
+            int resultsCount = GetResultsCount();
+            int randomPdfIndex = Random.Next(1, resultsCount);
+            pdfUrlFromSearchResult = GetResultUrlByIndex(randomPdfIndex);
+            ClickByResult(randomPdfIndex);
         }
 
         private string GetMediaSourceByIndex(int index)
@@ -36,7 +62,7 @@ namespace Application.Helper.Helpers
             return url;
         }
 
-        private string GetImageUrlByIndex(int index)
+        private string GetResultUrlByIndex(int index)
         {
             Logger.Log("<-");
             string url = FindElement(By.XPath("//*[@id='content']/div[21]/div[2]/div/div[2]/div[" + index + "]/a")).GetAttribute("href");
@@ -52,10 +78,10 @@ namespace Application.Helper.Helpers
             return count;
         }
 
-        private void ClickByImage(int randomImageIndex)
+        private void ClickByResult(int randomResultIndex)
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@id='content']/div[21]/div[2]/div/div[2]/div[" + randomImageIndex + "]/div[1]/img"));
+            Click(By.XPath("//*[@id='content']/div[21]/div[2]/div/div[2]/div[" + randomResultIndex + "]/div[1]"));
             Logger.Log("->");
         }
 
@@ -105,6 +131,8 @@ namespace Application.Helper.Helpers
             WaitForElementIsNotDisplayed(By.XPath("//*[@id='content']/div[21]/div[2]/div/div[1]/img"));
             Logger.Log("->");
         }
+
+
         
     }
 }

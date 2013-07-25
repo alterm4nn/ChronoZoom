@@ -207,7 +207,7 @@ namespace Application.Helper.Helpers
             Logger.Log("<-");
         }
 
-        public string GetImageUrl()
+        public string GetCurrentImageOrVideoUrl()
         {
             Logger.Log("->");
             string imageUrl = FindElement(By.XPath("//*[@id='auth-edit-contentitem-form']/div[3]/input[2]")).GetAttribute("value");
@@ -215,11 +215,27 @@ namespace Application.Helper.Helpers
             return imageUrl;
         }
 
-        public string GetMediaSource()
+        public string GetCurrentMediaSource()
         {
             Logger.Log("->");
             string mediaSource = FindElement(By.XPath("//*[@id='auth-edit-contentitem-form']/div[3]/input[3]")).GetAttribute("value");
             Logger.Log("<- mediaSource: " + mediaSource);
+            return mediaSource;
+        }
+
+        public string GetCurrentAttribution()
+        {
+            Logger.Log("->");
+            string mediaSource = FindElement(By.XPath("//*[@id='auth-edit-contentitem-form']/div[3]/input[4]")).GetAttribute("value");
+            Logger.Log("<- attribution: " + mediaSource);
+            return mediaSource;
+        }
+
+        public string GetCurrentMediaType()
+        {
+            Logger.Log("->");
+            string mediaSource = FindElement(By.XPath("//*[@id='auth-edit-contentitem-form']/div[3]/select")).GetAttribute("value");
+            Logger.Log("<- attribution: " + mediaSource);
             return mediaSource;
         }
 
