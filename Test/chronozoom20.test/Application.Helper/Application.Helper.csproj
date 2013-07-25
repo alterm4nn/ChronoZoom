@@ -74,6 +74,7 @@
     <Compile Include="BrowserImpl\IeControls.cs" />
     <Compile Include="BrowserImpl\SafariControls.cs" />
     <Compile Include="Helpers\ApiHelper.cs" />
+    <Compile Include="Helpers\ArtifactSearchHelper.cs" />
     <Compile Include="Helpers\AuthorizationHelper.cs" />
     <Compile Include="Helpers\BookmarkHelper.cs" />
     <Compile Include="Helpers\BreadcrumbsHelper.cs" />
