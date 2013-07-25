@@ -4767,6 +4767,10 @@ var CZ;
                     opacity: 1
                 });
             };
+            FormTourCaption.prototype.showTourEndMessage = function () {
+                this.captionTextarea.text(CZ.Tours.TourEndMessage);
+                this.bookmarksCount.text("Start a tour");
+            };
             FormTourCaption.prototype.setPlayPauseButtonState = function (state) {
                 this.tourPlayer.playPauseButton.attr("state", state);
             };
@@ -4827,6 +4831,7 @@ var CZ;
         Tours.pauseTourAtAnyAnimation = false;
         Tours.bookmarkAnimation;
         var isToursDebugEnabled = false;
+        Tours.TourEndMessage = "Thank you for watching this tour!";
         Tours.tourCaptionFormContainer;
         Tours.tourCaptionForm;
         var TourBookmark = (function () {
@@ -4932,7 +4937,7 @@ var CZ;
                     });
                     self.audioElement.addEventListener("progress", function () {
                         if(self.audioElement && self.audioElement.buffered.length > 0) {
-                            if(isToursDebugEnabled && window.console && console.log("Tour " + self.title + " downloaded " + (self.audio.buffered.end(self.audio.buffered.length - 1) / self.audio.duration))) {
+                            if(isToursDebugEnabled && window.console && console.log("Tour " + self.title + " downloaded " + (self.audioElement.buffered.end(self.audioElement.buffered.length - 1) / self.audioElement.duration))) {
                                 ;
                             }
                         }
@@ -4992,13 +4997,21 @@ var CZ;
                     if(isToursDebugEnabled && window.console && console.log("Transitioning to the bm index " + newBookmark)) {
                         ;
                     }
+                    var targetVisible = getBookmarkVisible(bookmark);
+                    if(!targetVisible) {
+                        if(isToursDebugEnabled && window.console && console.log("bookmark index " + newBookmark + " references to nonexistent item")) {
+                            ;
+                        }
+                        goBack ? self.prev() : self.next();
+                        return;
+                    }
                     self.currentPlace.animationId = self.zoomTo(getBookmarkVisible(bookmark), self.onGoToSuccess, self.onGoToFailure, bookmark.url);
                 };
                 self.startBookmarkAudio = function startBookmarkAudio(bookmark) {
                     if(!self.audio) {
                         return;
                     }
-                    if(isToursDebugEnabled && window.console && console.log("playing source: " + self.audio.currentSrc)) {
+                    if(isToursDebugEnabled && window.console && console.log("playing source: " + self.audioElement.currentSrc)) {
                         ;
                     }
                     self.audioElement.pause();
@@ -5082,7 +5095,12 @@ var CZ;
                     }
                     self.state = 'play';
                     var visible = self.vc.virtualCanvas("getViewport").visible;
-                    if(self.currentPlace != null && self.currentPlace.bookmark != null && CZ.Common.compareVisibles(visible, getBookmarkVisible(self.bookmarks[self.currentPlace.bookmark]))) {
+                    var bookmarkVisible = getBookmarkVisible(self.bookmarks[self.currentPlace.bookmark]);
+                    if(bookmarkVisible === null) {
+                        self.next();
+                        return;
+                    }
+                    if(self.currentPlace != null && self.currentPlace.bookmark != null && CZ.Common.compareVisibles(visible, bookmarkVisible)) {
                         self.currentPlace = {
                             type: 'bookmark',
                             bookmark: self.currentPlace.bookmark
@@ -5145,15 +5163,13 @@ var CZ;
                     }
                 };
                 self.next = function next() {
-                    if(self.currentPlace.bookmark != self.bookmarks.length - 1) {
-                        if(self.state === 'play') {
-                            if(self.timerOnBookmarkIsOver) {
-                                clearTimeout(self.timerOnBookmarkIsOver);
-                            }
-                            self.timerOnBookmarkIsOver = undefined;
+                    if(self.state === 'play') {
+                        if(self.timerOnBookmarkIsOver) {
+                            clearTimeout(self.timerOnBookmarkIsOver);
                         }
-                        self.onBookmarkIsOver(false);
+                        self.timerOnBookmarkIsOver = undefined;
                     }
+                    self.onBookmarkIsOver(false);
                 };
                 self.prev = function prev() {
                     if(self.currentPlace.bookmark == 0) {
@@ -5208,7 +5224,7 @@ var CZ;
             if(newTour != undefined) {
                 Tours.tour = newTour;
                 Tours.tour.tour_TourFinished.push(function (tour) {
-                    hideBookmark(tour);
+                    showTourEndMessage();
                     tourPause();
                     hideBookmarks();
                 });
@@ -5304,6 +5320,9 @@ var CZ;
         Tours.initializeToursContent = initializeToursContent;
         function hideBookmark(tour) {
             Tours.tourCaptionForm.hideBookmark();
+        }
+        function showTourEndMessage() {
+            Tours.tourCaptionForm.showTourEndMessage();
         }
         function showBookmark(tour, bookmark) {
             Tours.tourCaptionForm.showBookmark(bookmark);
