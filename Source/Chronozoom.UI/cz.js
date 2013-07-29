@@ -10571,6 +10571,7 @@ var CZ;
                     text: result.DisplayUrl,
                     href: result.MediaUrl,
                     title: result.DisplayUrl,
+                    "media-source": result.SourceUrl,
                     target: "_blank"
                 });
                 var thumbnailContainer = $("<div></div>", {
