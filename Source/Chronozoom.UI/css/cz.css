@@ -1948,11 +1948,12 @@ img.fallbackBackground {
 
 ***********************************************************/
 .cz-contentitem-listitem-icon {
-  display: inline-block;
   width: 15%;
+  display: inline-block;
 }
 .cz-contentitem-listitem-icon > img {
-  max-width: 100%;
+  width: 100%;
+  height: auto;
 }
 .cz-contentitem-listitem-content {
   display: inline-block;
