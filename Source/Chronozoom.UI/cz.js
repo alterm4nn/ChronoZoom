@@ -10926,6 +10926,7 @@ var CZ;
                 });
                 this.deleteButton.click(function (event) {
                     if(confirm("Are you sure want to delete timeline and all of its nested timelines and exhibits? Delete can't be undone!")) {
+                        var isDataValid = true;
                         CZ.Authoring.removeTimeline(_this.timeline);
                         _this.close();
                     }
@@ -11230,7 +11231,7 @@ var CZ;
                 if(confirm("Are you sure want to delete the exhibit and all of its content items? Delete can't be undone!")) {
                     CZ.Authoring.removeExhibit(this.exhibit);
                     this.isCancel = false;
-                    this.isModified = true;
+                    this.isModified = false;
                     this.close();
                 }
             };
@@ -11312,11 +11313,11 @@ var CZ;
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
                 var _this = this;
                 if(this.isModified) {
-                    var r = window.confirm("There is unsaved data. Do you want to close without saving?");
-                    if(r != true) {
+                    if(window.confirm("There is unsaved data. Do you want to close without saving?")) {
+                        this.isModified = false;
+                    } else {
                         return;
                     }
-                    this.isModified = false;
                 }
                 _super.prototype.close.call(this, noAnimation ? undefined : {
                     effect: "slide",
@@ -11497,11 +11498,11 @@ var CZ;
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
                 var _this = this;
                 if(this.isModified) {
-                    var r = window.confirm("There is unsaved data. Do you want to close without saving?");
-                    if(r != true) {
+                    if(window.confirm("There is unsaved data. Do you want to close without saving?")) {
+                        this.isModified = false;
+                    } else {
                         return;
                     }
-                    this.isModified = false;
                 }
                 _super.prototype.close.call(this, noAnimation ? undefined : {
                     effect: "slide",

@@ -183,11 +183,12 @@ module CZ {
 
             public close(noAnimation?: bool = false) {
                 if (this.isModified) {
-                    var r = window.confirm("There is unsaved data. Do you want to close without saving?");
-                    if (r != true) {
-                        return;
+                    if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
+                        this.isModified = false;
                     }
-                    this.isModified = false;
+                    else {
+                        return;
+                    }                    
                 }
 
                 super.close(noAnimation ? undefined : {
