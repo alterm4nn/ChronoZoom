@@ -129,7 +129,6 @@ var CZ;
                 CZ.Tours.activateTour(tour, undefined);
             };
             var onToursInitialized = function () {
-                CZ.Tours.initializeToursUI();
                 $("#tours_index").click(function () {
                     var toursListForm = getFormById("#toursList");
                     if(toursListForm.isFormVisible) {
