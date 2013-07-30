@@ -9263,6 +9263,14 @@ var CZ;
                 if(CZ.Layout.animatingElements.length != 0) {
                     return;
                 }
+                CZ.Authoring.showMessageWindow("Please click and drag with mouse or finger in the canvas to create the TimeLine.", "Create Timeline");
+                var prevIsActive = CZ.Authoring.isActive;
+                var prevMode = CZ.Authoring.mode;
+                var messageForm = CZ.HomePageViewModel.getFormById("#message-window");
+                messageForm.closeButton.click(function (event) {
+                    CZ.Authoring.isActive = prevIsActive;
+                    CZ.Authoring.mode = prevMode;
+                });
                 CZ.Authoring.isActive = true;
                 CZ.Authoring.mode = "createTimeline";
             }
@@ -9279,6 +9287,14 @@ var CZ;
                 if(CZ.Layout.animatingElements.length != 0) {
                     return;
                 }
+                CZ.Authoring.showMessageWindow("Please click inside a timeline to create the Exhibit.", "Create Exhibit");
+                var prevIsActive = CZ.Authoring.isActive;
+                var prevMode = CZ.Authoring.mode;
+                var messageForm = CZ.HomePageViewModel.getFormById("#message-window");
+                messageForm.closeButton.click(function (event) {
+                    CZ.Authoring.isActive = prevIsActive;
+                    CZ.Authoring.mode = prevMode;
+                });
                 CZ.Authoring.isActive = true;
                 CZ.Authoring.mode = "createExhibit";
             }
@@ -11963,7 +11979,6 @@ var CZ;
                         link.css("font-size", "16px");
                         link.css("float", "left");
                         link.css("width", "140px");
-                        link.css("width", "140px");
                         link.css("cursor", "pointer");
                         link.text(preloaded.name);
                         var div = $("<span></span>").addClass("cz-form-preloadedrecord").appendTo(li);
@@ -12086,35 +12101,47 @@ var CZ;
             prevForm: null,
             navButton: ".cz-form-nav",
             closeButton: ".cz-form-close-btn > .cz-form-btn",
-            titleTextblock: ".cz-form-title"
+            titleTextblock: ".cz-form-title",
+            contentContainer: ".cz-form-content"
         });
-                var tourTitleInput = this.container.find(".cz-form-label");
-                tourTitleInput.text(message);
+                this.tourTitleInput = this.container.find(".cz-form-label");
                 this.titleTextblock.text(title || "ChronoZoom");
+                this.tourTitleInput.text(message);
+                this.setHeight();
             }
             MessageWindow.prototype.show = function () {
+                var _this = this;
                 _super.prototype.show.call(this, {
                     effect: "slide",
                     direction: "left",
-                    duration: 500
+                    duration: 300,
+                    complete: function () {
+                        $(document).on("keyup", _this, _this.onDocumentKeyPress);
+                    }
                 });
-                $(document).bind("keypress", this, this.onDocumentKeyPress);
             };
             MessageWindow.prototype.close = function () {
-                $(document).unbind("keypress", this.onDocumentKeyPress);
+                var _this = this;
                 _super.prototype.close.call(this, {
                     effect: "slide",
                     direction: "left",
-                    duration: 100,
+                    duration: 300,
                     complete: function () {
+                        $(document).off("keyup", _this.onDocumentKeyPress);
                     }
                 });
             };
             MessageWindow.prototype.onDocumentKeyPress = function (e) {
                 var self = e.data;
                 if(e.which == 27 && self.isFormVisible) {
-                    self.close();
+                    self.closeButton.click();
                 }
+            };
+            MessageWindow.prototype.setHeight = function () {
+                this.container.show();
+                var messageHeight = this.tourTitleInput.outerHeight(true);
+                this.contentContainer.height(messageHeight);
+                this.container.hide();
             };
             return MessageWindow;
         })(CZ.UI.FormBase);
@@ -12520,6 +12547,7 @@ var CZ;
                         form.show();
                     },
                     showCreateTimelineForm: function (timeline) {
+                        CZ.Authoring.hideMessageWindow();
                         CZ.Authoring.mode = "createTimeline";
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
                             activationSource: $(".header-icon.edit-icon"),
@@ -12553,6 +12581,7 @@ var CZ;
                         form.show();
                     },
                     showCreateExhibitForm: function (exhibit) {
+                        CZ.Authoring.hideMessageWindow();
                         var form = new CZ.UI.FormEditExhibit(forms[2], {
                             activationSource: $(".header-icon.edit-icon"),
                             navButton: ".cz-form-nav",

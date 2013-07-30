@@ -4,36 +4,42 @@
 module CZ {
     export module UI {
         export class MessageWindow extends CZ.UI.FormBase {
+            private tourTitleInput;
+
             constructor(container: JQuery, message: string, title?: string) {
                 super(container, {
                     activationSource: null,
                     prevForm: null,
                     navButton: ".cz-form-nav",
                     closeButton: ".cz-form-close-btn > .cz-form-btn",
-                    titleTextblock: ".cz-form-title"
+                    titleTextblock: ".cz-form-title",
+                    contentContainer: ".cz-form-content"
                 });
 
-                var tourTitleInput = this.container.find(".cz-form-label");
-                tourTitleInput.text(message);
+                this.tourTitleInput = this.container.find(".cz-form-label");
                 this.titleTextblock.text(title || "ChronoZoom");
+                this.tourTitleInput.text(message);
+                this.setHeight();
             }
 
             public show(): void {
                 super.show({
                     effect: "slide",
                     direction: "left",
-                    duration: 500
+                    duration: 300,
+                    complete: () => {
+                        $(document).on("keyup", this, this.onDocumentKeyPress);                        
+                    }
                 });
-                $(document).bind("keypress", this, this.onDocumentKeyPress);
             }
 
             public close() {
-                $(document).unbind("keypress", this.onDocumentKeyPress);
                 super.close({
                     effect: "slide",
                     direction: "left",
-                    duration: 100,
+                    duration: 300,
                     complete: () => {
+                        $(document).off("keyup", this.onDocumentKeyPress);                        
                     }
                 });
             }
@@ -42,8 +48,15 @@ module CZ {
             {
                 var self = e.data;
                 if (e.which == 27 /*esc*/ && self.isFormVisible) {
-                    self.close();
+                    self.closeButton.click();
                 }
+            }
+
+            private setHeight() {
+                this.container.show();
+                var messageHeight = this.tourTitleInput.outerHeight(true);
+                this.contentContainer.height(messageHeight);
+                this.container.hide();
             }
         }
     }
