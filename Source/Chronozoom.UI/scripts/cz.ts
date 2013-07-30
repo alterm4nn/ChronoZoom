@@ -158,7 +158,6 @@ module CZ {
             var allowEditing = IsFeatureEnabled(_featureMap, "TourAuthoring") && UserCanEditCollection(profile);
 
             var onTakeTour = tour => {
-                //CZ.Tours.tourCaptionForm = CZ.HomePageViewModel.getFormById("#tour-caption-form");
                 CZ.HomePageViewModel.closeAllForms();
                 CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption(CZ.Tours.tourCaptionFormContainer, {
                     activationSource: $(".tour-icon"),
