@@ -11963,7 +11963,6 @@ var CZ;
                         link.css("font-size", "16px");
                         link.css("float", "left");
                         link.css("width", "140px");
-                        link.css("width", "140px");
                         link.css("cursor", "pointer");
                         link.text(preloaded.name);
                         var div = $("<span></span>").addClass("cz-form-preloadedrecord").appendTo(li);
@@ -12361,7 +12360,6 @@ var CZ;
                 CZ.Tours.activateTour(tour, undefined);
             };
             var onToursInitialized = function () {
-                CZ.Tours.initializeToursUI();
                 $("#tours_index").click(function () {
                     var toursListForm = getFormById("#toursList");
                     if(toursListForm.isFormVisible) {

@@ -179,7 +179,6 @@ module CZ {
             };
 
             var onToursInitialized = function () {
-                CZ.Tours.initializeToursUI();
                 $("#tours_index").click(function () { // show form
                     var toursListForm = getFormById("#toursList");
 
