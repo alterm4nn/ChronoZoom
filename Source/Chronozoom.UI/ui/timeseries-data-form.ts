@@ -33,16 +33,20 @@ module CZ {
                     preloadedlist.forEach(function (preloaded) {
                         var li = $('<li></li>').css("margin-left", 10).css("margin-bottom", "3px").height(22).appendTo(existingTimSeriesList);
 
-                        var link = $('<a></a>').addClass("cz-form-btn").appendTo(li);
-                        link.css("color", "#25a1ea");
+                        var link = $('<a></a>').addClass("cz-form-preloadedrecord").appendTo(li);
+                        link.css("color", "#0464a2");
+                        link.css("font-size", "16px");
                         link.css("float", "left");
+                        link.css("width", "140px");
+                        link.css("cursor", "pointer");
                         link.text(preloaded.name);
 
                         var div = $("<span></span>").addClass("cz-form-preloadedrecord").appendTo(li);
                         div.text("Source:");
-
+                        
                         var sourceDiv = $("<a></a>").addClass("cz-form-preloadedrecord").appendTo(li);
-                        sourceDiv.css("color", "blue");
+                        sourceDiv.css("color", "#0464a2");
+                        sourceDiv.css("cursor", "pointer");
                         sourceDiv.text(preloaded.source);
                         sourceDiv.prop("href", preloaded.link);
 
