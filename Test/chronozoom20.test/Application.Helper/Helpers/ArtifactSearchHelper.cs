@@ -16,7 +16,7 @@ namespace Application.Helper.Helpers
 
         public void FindAndSelectRandomImage(out string imageUrl, out string imageSource)
         {
-            ClickByBingSearch();
+            SelectBingSearch();
             SelectImageFilter();
             TypeSearchQwery("test");
             ClickSearchButton();
@@ -30,7 +30,7 @@ namespace Application.Helper.Helpers
 
         public void FindAndSelectRandomVideo(out string videoUrlFromSearchResult)
         {
-            ClickByBingSearch();
+            SelectBingSearch();
             SelectVideoFilter();
             TypeSearchQwery("test");
             ClickSearchButton();
@@ -43,7 +43,7 @@ namespace Application.Helper.Helpers
 
         public void FindAndSelectRandomPdf(out string pdfUrlFromSearchResult)
         {
-            ClickByBingSearch();
+            SelectBingSearch();
             SelectPdfFilter();
             TypeSearchQwery("test");
             ClickSearchButton();
@@ -57,7 +57,7 @@ namespace Application.Helper.Helpers
         private string GetMediaSourceByIndex(int index)
         {
             Logger.Log("<-");
-            string url = FindElement(By.XPath("//*[@id='content']/div[21]/div[2]/div/div[2]/div[" + index + "]/a")).GetAttribute("title");
+            string url = FindElement(By.XPath("//*[@id='content']/div[21]/div[2]/div/div[2]/div[" + index + "]/a")).GetAttribute("media-source");
             Logger.Log("-> imageUrl: " + url);
             return url;
         }
@@ -85,7 +85,7 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
-        private void ClickByBingSearch()
+        private void SelectBingSearch()
         {
             Logger.Log("<-");
             Click(By.XPath("//*[@id='auth-edit-contentitem-form']/div[3]/div[1]/div/img"));
@@ -115,13 +115,13 @@ namespace Application.Helper.Helpers
 
         private void TypeSearchQwery(string text)
         {
-            TypeText(By.XPath("//*[@id='content']/div[21]/div[2]/div/div[1]/div[1]/input"), text);
+            TypeText(By.Id("bing-search-input"), text);
         }
 
         private void ClickSearchButton()
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@id='content']/div[21]/div[2]/div/div[1]/div[1]/button"));
+            Click(By.Id("bing-search-button"));
             Logger.Log("->");
         }
 
@@ -132,7 +132,5 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
-
-        
     }
 }
