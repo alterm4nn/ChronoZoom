@@ -859,6 +859,9 @@ var CZ;
         var addAudio = function (element, layerid, id, audioSource, vx, vy, vw, vh, z) {
             return VCContent.addChild(element, new CanvasAudioItem(element.vc, layerid, id, audioSource, vx, vy, vw, vh, z), false);
         };
+        VCContent.addSkydrive = function (element, layerid, id, embededSource, vx, vy, vw, vh, z) {
+            return VCContent.addChild(element, new CanvasSkydriveItem(element.vc, layerid, id, embededSource, vx, vy, vw, vh, z), false);
+        };
         function addText(element, layerid, id, vx, vy, baseline, vh, text, settings, vw) {
             return VCContent.addChild(element, new CanvasText(element.vc, layerid, id, vx, vy, baseline, vh, text, settings, vw), false);
         }
@@ -1905,6 +1908,15 @@ var CZ;
             this.initializeContent(elem);
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
+        function CanvasSkydriveItem(vc, layerid, id, embededSrc, vx, vy, vw, vh, z) {
+            this.base = CanvasDomItem;
+            this.base(vc, layerid, id, vx, vy, vw, vh, z);
+            var elem = document.createElement('iframe');
+            elem.setAttribute("id", id);
+            elem.setAttribute("src", embededSrc);
+            this.initializeContent(elem);
+            this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
+        }
         function SeadragonImage(vc, parent, layerid, id, imageSource, vx, vy, vw, vh, z, onload) {
             var self = this;
             this.base = CanvasDomItem;
@@ -2071,6 +2083,8 @@ var CZ;
                         addAudio(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     } else if(this.contentItem.mediaType.toLowerCase() === 'pdf') {
                         VCContent.addPdf(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
+                    } else if(this.contentItem.mediaType.toLowerCase() === 'skydrive') {
+                        VCContent.addSkydrive(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     } else if(CZ.Extensions.mediaTypeIsExtension(contentItem.mediaType)) {
                         VCContent.addExtension(contentItem.mediaType, container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);
                     }
