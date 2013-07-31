@@ -1,5 +1,6 @@
 /// <reference path='uiloader.ts'/>
 /// <reference path='../ui/media/bing-mediapicker.ts'/>
+/// <reference path='../ui/media/skydrive-mediapicker.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
 
 module CZ {
@@ -44,6 +45,12 @@ module CZ {
                 "/images/media/bing-import-50x150.png",
                 "/ui/media/bing-mediapicker.html",
                 CZ.Media.BingMediaPicker
+            );
+            registerMediaPicker(
+                "skydrive",
+                "/images/media/skydrive-import-50x50.png",
+                "/ui/media/skydrive-mediapicker.html",
+                CZ.Media.SkyDriveMediaPicker
             );
         }
 
