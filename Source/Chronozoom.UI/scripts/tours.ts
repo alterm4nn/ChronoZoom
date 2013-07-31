@@ -572,8 +572,6 @@ module CZ {
             }
 
             // hide tour' UI
-            var tourControlDiv = document.getElementById("tour_control");
-            tourControlDiv.style.display = "none";
             if (tour) {
                 hideBookmarks();
                 $("#bookmarks .header").text("");

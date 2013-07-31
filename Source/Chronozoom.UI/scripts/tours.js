@@ -428,8 +428,6 @@ var CZ;
                 tourPause();
                 Tours.tour.isTourPlayRequested = false;
             }
-            var tourControlDiv = document.getElementById("tour_control");
-            tourControlDiv.style.display = "none";
             if(Tours.tour) {
                 hideBookmarks();
                 $("#bookmarks .header").text("");
