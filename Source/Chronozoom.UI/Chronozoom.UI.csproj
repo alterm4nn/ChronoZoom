@@ -265,6 +265,7 @@
     <Content Include="images\edit-icon.png" />
     <Content Include="images\media\bing-import-50x150.png" />
     <Content Include="images\media\bing-import-50x50.png" />
+    <Content Include="images\media\skydrive-import-50x50.png" />
     <Content Include="images\narration-off.png" />
     <Content Include="images\narration-on.png" />
     <Content Include="images\profile-icon.png" />
@@ -435,6 +436,11 @@
       <DependentUpon>bing-mediapicker.ts</DependentUpon>
     </Content>
     <Content Include="ui\media\bing-mediapicker.ts" />
+    <Content Include="ui\media\skydrive-mediapicker.html" />
+    <Content Include="ui\media\skydrive-mediapicker.js">
+      <DependentUpon>skydrive-mediapicker.ts</DependentUpon>
+    </Content>
+    <Content Include="ui\media\skydrive-mediapicker.ts" />
     <Content Include="ui\message-window.js">
       <DependentUpon>message-window.ts</DependentUpon>
     </Content>
