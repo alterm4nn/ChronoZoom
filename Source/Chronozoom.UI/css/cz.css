@@ -1116,10 +1116,10 @@ img.fallbackBackground {
   cursor: default;
 }
 .cz-form-right {
-  top: 36px;
+  top: 53px;
 }
 .cz-form-left {
-  top: 57px;
+  top: 53px;
 }
 .cz-form-header {
   position: relative;
@@ -1280,8 +1280,7 @@ img.fallbackBackground {
 /* Message Window */
 .cz-message-window {
   width: 330px;
-  height: 100px;
-  top: 36px;
+  height: auto;
   left: 0;
 }
 .cz-message-window > .cz-form-content {
@@ -1290,7 +1289,7 @@ img.fallbackBackground {
   right: 0;
   bottom: 0;
   left: 0;
-  overflow-y: auto;
+  overflow: hidden;
 }
 /* Edit Tour Form */
 .cz-form-tour-edit {

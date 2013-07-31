@@ -1121,12 +1121,12 @@ img.fallbackBackground
 
 .cz-form-right
 {
-    top: 36px;
+    top: @headerHeight + @headerBreadcrumbsHeight - @headerBreadcrumbsTopMargin;
 }
 
 .cz-form-left
 {
-    top: 57px;
+    top: @headerHeight + @headerBreadcrumbsHeight - @headerBreadcrumbsTopMargin;
 }
 
 .cz-form-header
@@ -1328,8 +1328,7 @@ img.fallbackBackground
 .cz-message-window
 {
     width: 330px;
-    height: 100px;
-    top: 36px;
+    height: auto;
     left: 0;
 }
 
@@ -1340,7 +1339,7 @@ img.fallbackBackground
         right: 0;
         bottom: 0;
         left: 0;
-        overflow-y: auto;
+        overflow: hidden;
     }
 
 /* Edit Tour Form */
