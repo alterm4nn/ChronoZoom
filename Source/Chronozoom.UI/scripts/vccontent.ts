@@ -203,6 +203,22 @@ module CZ {
             return addChild(element, new CanvasAudioItem(element.vc, layerid, id, audioSource, vx, vy, vw, vh, z), false);
         };
 
+        /* Adds a embeded skydrive document as a child of the given virtual canvas element.
+        @param element   (CanvasElement) Parent element, whose children is to be new element.
+        @param layerid   (any type) id of the layer for this element
+        @param id   (any type) id of an element
+        @param embededSource (string) embeded document URI
+        @param vx   (number) x of left top corner in virtual space
+        @param vy   (number) y of left top corner in virtual space
+        @param vw   (number) width of a bounding box in virtual space
+        @param vh   (number) height of a bounding box in virtual space
+        @param z (number) z-index
+        */
+        export var addSkydrive = function (element, layerid, id, embededSource, vx, vy, vw, vh, z) {
+            return addChild(element, new CanvasSkydriveItem(element.vc, layerid, id, embededSource, vx, vy, vw, vh, z), false);
+        };
+
+
         /*  Adds a text element as a child of the given virtual canvas element.
         @param element   (CanvasElement) Parent element, whose children is to be new element.
         @param layerid   (any type) id of the layer for this element
@@ -1679,6 +1695,26 @@ module CZ {
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
 
+        /*Represents skydrive embeded document
+        @param embededSrc   embeded document source
+        @param vx           x of left top corner in virtual space
+        @param vy           y of left top corner in virtual space
+        @param vw           width of in virtual space
+        @param vh           height of in virtual space
+        @param z            z-index
+        */
+        function CanvasSkydriveItem(vc, layerid, id, embededSrc, vx, vy, vw, vh, z) {
+            this.base = CanvasDomItem;
+            this.base(vc, layerid, id, vx, vy, vw, vh, z);
+            
+            var elem = document.createElement('iframe');
+            elem.setAttribute("id", id);
+            elem.setAttribute("src", embededSrc);
+            this.initializeContent(elem);
+            
+            this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
+        }
+
         /*Represents a Seadragon based image
         @param imageSource  image source
         @param vx           x of left top corner in virtual space
@@ -1909,6 +1945,9 @@ module CZ {
                     }
                     else if (this.contentItem.mediaType.toLowerCase() === 'pdf') {
                         addPdf(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
+                    }
+                    else if (this.contentItem.mediaType.toLowerCase() === 'skydrive') {
+                        addSkydrive(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     }
                     else if (CZ.Extensions.mediaTypeIsExtension(contentItem.mediaType)) {
                         addExtension(contentItem.mediaType, container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);
