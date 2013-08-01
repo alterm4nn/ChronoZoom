@@ -10852,7 +10852,9 @@ var CZ;
         });
         function initialize() {
             registerMediaPicker("bing", "/images/media/bing-import-50x150.png", "/ui/media/bing-mediapicker.html", CZ.Media.BingMediaPicker);
-            registerMediaPicker("skydrive", "/images/media/skydrive-import-50x50.png", "/ui/media/skydrive-mediapicker.html", CZ.Media.SkyDriveMediaPicker);
+            if(CZ.Media.SkyDriveMediaPicker.prototype.isEnabled === true) {
+                registerMediaPicker("skydrive", "/images/media/skydrive-import-50x50.png", "/ui/media/skydrive-mediapicker.html", CZ.Media.SkyDriveMediaPicker);
+            }
         }
         Media.initialize = initialize;
         function registerMediaPicker(title, iconUrl, viewUrl, type, selector) {
@@ -11476,6 +11478,12 @@ var CZ;
                 this.descriptionInput.change(function () {
                     _this.isModified = true;
                 });
+                if(CZ.Media.SkyDriveMediaPicker.prototype.isEnabled === true) {
+                    $("<option></option>", {
+                        value: "skydrive",
+                        text: " Skydrive "
+                    }).appendTo(this.mediaTypeInput);
+                }
                 this.titleInput.val(this.contentItem.title || "");
                 this.mediaInput.val(this.contentItem.uri || "");
                 this.mediaSourceInput.val(this.contentItem.mediaSource || "");
@@ -12418,6 +12426,10 @@ var CZ;
                 Name: "Themes",
                 Activation: FeatureActivation.NotProduction
             }, 
+            {
+                Name: "Skydrive",
+                Activation: FeatureActivation.NotProduction
+            }, 
             
         ];
         HomePageViewModel.rootCollection;
@@ -12502,7 +12514,9 @@ var CZ;
             })();
             $('.bubbleInfo').hide();
             var canvasIsEmpty;
+            ApplyFeatureActivation();
             CZ.Extensions.registerExtensions();
+            CZ.Media.SkyDriveMediaPicker.prototype.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
             CZ.Media.initialize();
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
@@ -12832,7 +12846,6 @@ var CZ;
             }).mouseover(function () {
                 CZ.Common.toggleOnImage('biblCloseButton', 'png');
             });
-            ApplyFeatureActivation();
             if(navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
                 document.addEventListener('touchmove', function (e) {
                     e.preventDefault();

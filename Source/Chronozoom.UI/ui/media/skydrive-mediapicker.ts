@@ -54,6 +54,8 @@ module CZ {
             private browseButton: JQuery;
             private previewContainer: JQuery;
 
+            public isEnabled: bool;
+
             constructor(container: JQuery, context: any) {
                 this.container = container;
                 this.contentItem = context;

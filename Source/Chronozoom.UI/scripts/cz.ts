@@ -27,6 +27,7 @@
 /// <reference path='../ui/mediapicker-form.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
 /// <reference path='extensions/extensions.ts'/>
+/// <reference path='../ui/media/skydrive-mediapicker.ts'/>
 
 var constants: any;
 
@@ -137,6 +138,10 @@ module CZ {
                 Name: "Themes",
                 Activation: FeatureActivation.NotProduction
             },
+            {
+                Name: "Skydrive",
+                Activation: FeatureActivation.NotProduction
+            },
         ];
 
         export var rootCollection: bool;
@@ -224,10 +229,14 @@ module CZ {
             $('.bubbleInfo').hide();
             var canvasIsEmpty;
 
+            // Apply features
+            ApplyFeatureActivation();
+
             // Register ChronoZoom Extensions
             CZ.Extensions.registerExtensions();
 
             // Register ChronoZoom Media Pickers.
+            CZ.Media.SkyDriveMediaPicker.prototype.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
             CZ.Media.initialize();
 
             CZ.Common.initialize();
@@ -446,7 +455,6 @@ module CZ {
                     CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
                 }
 
-
                 sessionForm = new CZ.UI.FormHeaderSessionExpired(forms[15], {
                     activationSource: $("#header-session-expired-form"),
                     navButton: ".cz-form-nav",
@@ -592,8 +600,6 @@ module CZ {
             $('#biblCloseButton')
                 .mouseout(() => { CZ.Common.toggleOffImage('biblCloseButton', 'png'); })
                 .mouseover(() => { CZ.Common.toggleOnImage('biblCloseButton', 'png'); })
-
-            ApplyFeatureActivation();
 
             if (navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
                 // Suppress the default iOS elastic pan/zoom actions.

@@ -94,6 +94,10 @@ var CZ;
                 Name: "Themes",
                 Activation: FeatureActivation.NotProduction
             }, 
+            {
+                Name: "Skydrive",
+                Activation: FeatureActivation.NotProduction
+            }, 
             
         ];
         HomePageViewModel.rootCollection;
@@ -178,7 +182,9 @@ var CZ;
             })();
             $('.bubbleInfo').hide();
             var canvasIsEmpty;
+            ApplyFeatureActivation();
             CZ.Extensions.registerExtensions();
+            CZ.Media.SkyDriveMediaPicker.prototype.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
             CZ.Media.initialize();
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
@@ -508,7 +514,6 @@ var CZ;
             }).mouseover(function () {
                 CZ.Common.toggleOnImage('biblCloseButton', 'png');
             });
-            ApplyFeatureActivation();
             if(navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
                 document.addEventListener('touchmove', function (e) {
                     e.preventDefault();
