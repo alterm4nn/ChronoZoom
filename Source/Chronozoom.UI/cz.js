@@ -7984,11 +7984,11 @@ var CZ;
         this.getLabel = function (x) {
             var text;
             var n = Math.max(Math.floor(Math.log(this.delta * Math.pow(10, this.beta) / this.level) * this.log10), -4);
-            text = -x / this.level;
+            text = Math.abs(x) / this.level;
             if(n < 0) {
                 text = (new Number(text)).toFixed(-n);
             }
-            text += " " + this.regime;
+            text += " " + (x < 0 ? this.regime : String(this.regime).charAt(0));
             return text;
         };
         this.getRegime = function (l, r) {
@@ -8093,7 +8093,7 @@ var CZ;
             this.getRegime(range.min, range.max);
             var numOfDigits = Math.max(Math.floor(Math.log(this.delta * Math.pow(10, this.beta) / this.level) * this.log10), -4) - 1;
             labelText = (Math.abs(time / this.level)).toFixed(Math.abs(numOfDigits));
-            labelText += " " + this.regime;
+            labelText += " " + (time < 0 ? this.regime : String(this.regime).charAt(0));
             return labelText;
         };
         this.getVisibleForElement = function (element, scale, viewport, use_margin) {
