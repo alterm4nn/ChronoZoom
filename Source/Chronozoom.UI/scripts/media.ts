@@ -46,12 +46,15 @@ module CZ {
                 "/ui/media/bing-mediapicker.html",
                 CZ.Media.BingMediaPicker
             );
-            registerMediaPicker(
-                "skydrive",
-                "/images/media/skydrive-import-50x50.png",
-                "/ui/media/skydrive-mediapicker.html",
-                CZ.Media.SkyDriveMediaPicker
-            );
+
+            if (CZ.Media.SkyDriveMediaPicker.prototype.isEnabled === true) {
+                registerMediaPicker(
+                    "skydrive",
+                    "/images/media/skydrive-import-50x50.png",
+                    "/ui/media/skydrive-mediapicker.html",
+                    CZ.Media.SkyDriveMediaPicker
+                );
+            }
         }
 
         export function registerMediaPicker(title: string, iconUrl: string, viewUrl: string, type: any, selector?: string): JQueryPromise {

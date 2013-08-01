@@ -19,7 +19,9 @@ var CZ;
         });
         function initialize() {
             registerMediaPicker("bing", "/images/media/bing-import-50x150.png", "/ui/media/bing-mediapicker.html", CZ.Media.BingMediaPicker);
-            registerMediaPicker("skydrive", "/images/media/skydrive-import-50x50.png", "/ui/media/skydrive-mediapicker.html", CZ.Media.SkyDriveMediaPicker);
+            if(CZ.Media.SkyDriveMediaPicker.prototype.isEnabled === true) {
+                registerMediaPicker("skydrive", "/images/media/skydrive-import-50x50.png", "/ui/media/skydrive-mediapicker.html", CZ.Media.SkyDriveMediaPicker);
+            }
         }
         Media.initialize = initialize;
         function registerMediaPicker(title, iconUrl, viewUrl, type, selector) {
