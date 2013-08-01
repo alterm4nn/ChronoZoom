@@ -10852,7 +10852,9 @@ var CZ;
         });
         function initialize() {
             registerMediaPicker("bing", "/images/media/bing-import-50x150.png", "/ui/media/bing-mediapicker.html", CZ.Media.BingMediaPicker);
-            registerMediaPicker("skydrive", "/images/media/skydrive-import-50x50.png", "/ui/media/skydrive-mediapicker.html", CZ.Media.SkyDriveMediaPicker);
+            if(CZ.Media.SkyDriveMediaPicker.prototype.isEnabled === true) {
+                registerMediaPicker("skydrive", "/images/media/skydrive-import-50x50.png", "/ui/media/skydrive-mediapicker.html", CZ.Media.SkyDriveMediaPicker);
+            }
         }
         Media.initialize = initialize;
         function registerMediaPicker(title, iconUrl, viewUrl, type, selector) {
@@ -12418,6 +12420,10 @@ var CZ;
                 Name: "Themes",
                 Activation: FeatureActivation.NotProduction
             }, 
+            {
+                Name: "Skydrive",
+                IsEnabled: false
+            }, 
             
         ];
         HomePageViewModel.rootCollection;
@@ -12708,6 +12714,7 @@ var CZ;
                 if(canvasIsEmpty) {
                     CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
                 }
+                CZ.Media.SkyDriveMediaPicker.prototype.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
                 HomePageViewModel.sessionForm = new CZ.UI.FormHeaderSessionExpired(forms[15], {
                     activationSource: $("#header-session-expired-form"),
                     navButton: ".cz-form-nav",

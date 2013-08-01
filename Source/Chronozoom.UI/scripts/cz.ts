@@ -27,6 +27,7 @@
 /// <reference path='../ui/mediapicker-form.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
 /// <reference path='extensions/extensions.ts'/>
+/// <reference path='../ui/media/skydrive-mediapicker.ts'/>
 
 var constants: any;
 
@@ -137,6 +138,10 @@ module CZ {
                 Name: "Themes",
                 Activation: FeatureActivation.NotProduction
             },
+            {
+                Name: "Skydrive",
+                IsEnabled: false
+            },
         ];
 
         export var rootCollection: bool;
@@ -228,6 +233,7 @@ module CZ {
             CZ.Extensions.registerExtensions();
 
             // Register ChronoZoom Media Pickers.
+            CZ.Media.SkyDriveMediaPicker.prototype.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
             CZ.Media.initialize();
 
             CZ.Common.initialize();
@@ -445,7 +451,6 @@ module CZ {
                 if (canvasIsEmpty) {
                     CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
                 }
-
 
                 sessionForm = new CZ.UI.FormHeaderSessionExpired(forms[15], {
                     activationSource: $("#header-session-expired-form"),

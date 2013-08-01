@@ -50,6 +50,12 @@ var CZ;
                 this.descriptionInput.change(function () {
                     _this.isModified = true;
                 });
+                if(CZ.Media.SkyDriveMediaPicker.prototype.isEnabled === true) {
+                    $("<option></option>", {
+                        value: "skydrive",
+                        text: " Skydrive "
+                    }).appendTo(this.mediaTypeInput);
+                }
                 this.titleInput.val(this.contentItem.title || "");
                 this.mediaInput.val(this.contentItem.uri || "");
                 this.mediaSourceInput.val(this.contentItem.mediaSource || "");

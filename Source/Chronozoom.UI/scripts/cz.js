@@ -94,6 +94,10 @@ var CZ;
                 Name: "Themes",
                 Activation: FeatureActivation.NotProduction
             }, 
+            {
+                Name: "Skydrive",
+                IsEnabled: false
+            }, 
             
         ];
         HomePageViewModel.rootCollection;
@@ -179,6 +183,7 @@ var CZ;
             $('.bubbleInfo').hide();
             var canvasIsEmpty;
             CZ.Extensions.registerExtensions();
+            CZ.Media.SkyDriveMediaPicker.prototype.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
             CZ.Media.initialize();
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
