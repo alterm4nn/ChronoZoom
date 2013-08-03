@@ -50,7 +50,7 @@ var CZ;
                 this.descriptionInput.change(function () {
                     _this.isModified = true;
                 });
-                if(CZ.Media.SkyDriveMediaPicker.prototype.isEnabled === true) {
+                if(CZ.Media.SkyDriveMediaPicker.isEnabled) {
                     $("<option></option>", {
                         value: "skydrive",
                         text: " Skydrive "

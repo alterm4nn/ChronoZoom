@@ -10385,7 +10385,11 @@ var CZ;
         function loadHtml(selector, filepath) {
             var container = $(selector);
             var promise = new $.Deferred();
-            if(!selector || !filepath || !container.length) {
+            if(!filepath) {
+                promise.resolve(container);
+                return promise;
+            }
+            if(!selector || !container.length) {
                 throw "Unable to load " + filepath + " " + selector;
             }
             container.load(filepath, function () {
@@ -10782,52 +10786,113 @@ var CZ;
 var CZ;
 (function (CZ) {
     (function (Media) {
-        var SkyDriveMediaPicker = (function () {
-            function SkyDriveMediaPicker(container, context) {
-                this.container = container;
-                this.contentItem = context;
-                this.editContentItemForm = CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
-                this.loginButton = this.container.find("#skydrive-login-button");
-                this.browseButton = this.container.find("#skydrive-browse-button");
-                this.previewContainer = this.container.find("#skydrive-preview-container");
-                this.initialize();
+        (function (SkyDriveMediaPicker) {
+            var editContentItemForm;
+            var contentItem;
+            SkyDriveMediaPicker.filePicker;
+            SkyDriveMediaPicker.filePickerIframe;
+            SkyDriveMediaPicker.logoutButton;
+            SkyDriveMediaPicker.isEnabled;
+            function setup(context) {
+                contentItem = context;
+                editContentItemForm = CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
+                SkyDriveMediaPicker.logoutButton = $("<button></button>", {
+                    text: "Logout",
+                    class: "cz-skydrive-logout-button",
+                    click: onLogout
+                });
+                SkyDriveMediaPicker.filePicker = showFilePicker().then(onFilePick, onError);
             }
-            SkyDriveMediaPicker.setup = function setup(context) {
-                var mediaPickerContainer = CZ.Media.mediaPickersViews["skydrive"];
-                var mediaPicker = new SkyDriveMediaPicker(mediaPickerContainer, context);
-                var formContainer = $(".cz-form-skydrive-mediapicker");
-                if(formContainer.length === 0) {
-                    formContainer = $("#mediapicker-form").clone().removeAttr("id").addClass("cz-form-skydrive-mediapicker").appendTo($("#content"));
+            SkyDriveMediaPicker.setup = setup;
+            function showFilePicker() {
+                watchFilePicker(onFilePickerLoad);
+                return WL.fileDialog({
+                    mode: "open",
+                    select: "single"
+                });
+            }
+            function onFilePick(response) {
+                onFilePickerClose();
+                getEmbed(response).then(onContentReceive, onError);
+            }
+            function getEmbed(response) {
+                return WL.api({
+                    path: response.data.files[0].id + "/embed",
+                    method: "GET"
+                });
+            }
+            function onContentReceive(response) {
+                var src = response.embed_html.match(/src=\"(.*?)\"/i)[1];
+                var mediaInfo = {
+                    uri: src,
+                    mediaType: "skydrive",
+                    mediaSource: src,
+                    attribution: src
+                };
+                $.extend(contentItem, mediaInfo);
+                editContentItemForm.updateMediaInfo();
+            }
+            function onError(response) {
+                var error = response.error;
+                if(error.code === "user_canceled" || error.code === "request_canceled") {
+                    onFilePickerClose();
+                } else {
+                    console.log(error.message);
                 }
-                var form = new CZ.UI.FormMediaPicker(formContainer, mediaPickerContainer, "Import from SkyDrive", {
-                    activationSource: $(),
-                    navButton: ".cz-form-nav",
-                    closeButton: ".cz-form-close-btn > .cz-form-btn",
-                    titleTextblock: ".cz-form-title",
-                    contentContainer: ".cz-form-content"
+            }
+            function onLogout() {
+                var isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
+                SkyDriveMediaPicker.logoutButton.hide();
+                SkyDriveMediaPicker.filePicker.cancel();
+                WL.logout();
+                if(isFirefox) {
+                    setTimeout(setup, 500, contentItem);
+                } else {
+                    var start = +new Date();
+                    while(+new Date() - start < 500) {
+                        ;
+                    }
+                    setup(contentItem);
+                }
+            }
+            function watchFilePicker(callback) {
+                SkyDriveMediaPicker.filePickerIframe = $("iframe[sutra=picker]");
+                if(SkyDriveMediaPicker.filePickerIframe.length > 0) {
+                    callback();
+                } else {
+                    setTimeout(watchFilePicker, 50, callback);
+                }
+            }
+            function onFilePickerLoad() {
+                SkyDriveMediaPicker.logoutButton.appendTo("body");
+                $(window).on("resize", onWindowResize);
+                SkyDriveMediaPicker.filePickerIframe.load(function () {
+                    onWindowResize();
+                    SkyDriveMediaPicker.filePickerIframe.animate({
+                        opacity: 1
+                    });
+                    SkyDriveMediaPicker.logoutButton.animate({
+                        opacity: 1
+                    });
                 });
-                $(form).on("showcompleted", function (event) {
+            }
+            function onFilePickerClose() {
+                SkyDriveMediaPicker.logoutButton.remove();
+                $(window).off("resize", onWindowResize);
+            }
+            function onWindowResize() {
+                var skyDriveFooterHeight = 56;
+                var iframeOffset = SkyDriveMediaPicker.filePickerIframe.offset();
+                var iframeHeight = SkyDriveMediaPicker.filePickerIframe.outerHeight(true);
+                var buttonLeftMargin = parseInt(SkyDriveMediaPicker.logoutButton.css("margin-left"), 10);
+                var buttonTopMargin = parseInt(SkyDriveMediaPicker.logoutButton.css("margin-top"), 10);
+                SkyDriveMediaPicker.logoutButton.offset({
+                    top: iframeOffset.top + iframeHeight - skyDriveFooterHeight + buttonTopMargin,
+                    left: iframeOffset.left + buttonLeftMargin
                 });
-                $(mediaPicker).on("resultclick", function (event) {
-                });
-                $(form).on("closecompleted", function (event) {
-                });
-                form.show();
-            };
-            SkyDriveMediaPicker.prototype.initialize = function () {
-                this.loginButton.off();
-                this.browseButton.off();
-                $(this).off();
-                this.loginButton.click(function (event) {
-                });
-                this.browseButton.click(function (event) {
-                });
-                $(this).on("resultclick", function (event, mediaInfo) {
-                });
-            };
-            return SkyDriveMediaPicker;
-        })();
-        Media.SkyDriveMediaPicker = SkyDriveMediaPicker;        
+            }
+        })(Media.SkyDriveMediaPicker || (Media.SkyDriveMediaPicker = {}));
+        var SkyDriveMediaPicker = Media.SkyDriveMediaPicker;
     })(CZ.Media || (CZ.Media = {}));
     var Media = CZ.Media;
 })(CZ || (CZ = {}));
@@ -10851,13 +10916,20 @@ var CZ;
             }
         });
         function initialize() {
-            registerMediaPicker("bing", "/images/media/bing-import-50x150.png", "/ui/media/bing-mediapicker.html", CZ.Media.BingMediaPicker);
-            if(CZ.Media.SkyDriveMediaPicker.prototype.isEnabled === true) {
-                registerMediaPicker("skydrive", "/images/media/skydrive-import-50x50.png", "/ui/media/skydrive-mediapicker.html", CZ.Media.SkyDriveMediaPicker);
+            registerMediaPicker("bing", "/images/media/bing-import-50x150.png", CZ.Media.BingMediaPicker, "/ui/media/bing-mediapicker.html");
+            if(CZ.Media.SkyDriveMediaPicker.isEnabled) {
+                registerMediaPicker("skydrive", "/images/media/skydrive-import-50x50.png", CZ.Media.SkyDriveMediaPicker).done(function () {
+                    WL.init({
+                        client_id: "0000000040101FFA",
+                        redirect_uri: "http://test.chronozoom.com/",
+                        response_type: "token",
+                        scope: "wl.signin,wl.photos,wl.skydrive,wl.skydrive_update"
+                    });
+                });
             }
         }
         Media.initialize = initialize;
-        function registerMediaPicker(title, iconUrl, viewUrl, type, selector) {
+        function registerMediaPicker(title, iconUrl, type, viewUrl, selector) {
             var order = Object.keys(_mediaPickers).length;
             var setup = type.setup;
             selector = selector || "$('<div></div>')";
@@ -11478,7 +11550,7 @@ var CZ;
                 this.descriptionInput.change(function () {
                     _this.isModified = true;
                 });
-                if(CZ.Media.SkyDriveMediaPicker.prototype.isEnabled === true) {
+                if(CZ.Media.SkyDriveMediaPicker.isEnabled) {
                     $("<option></option>", {
                         value: "skydrive",
                         text: " Skydrive "
@@ -12516,7 +12588,7 @@ var CZ;
             var canvasIsEmpty;
             ApplyFeatureActivation();
             CZ.Extensions.registerExtensions();
-            CZ.Media.SkyDriveMediaPicker.prototype.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
+            CZ.Media.SkyDriveMediaPicker.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
             CZ.Media.initialize();
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
@@ -12832,13 +12904,15 @@ var CZ;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
             CZ.Settings.applyTheme(null);
-            CZ.Service.getCollections(CZ.Service.superCollectionName).then(function (response) {
-                $(response).each(function (index) {
-                    if(response[index] && response[index].Title.toLowerCase() === CZ.Service.collectionName.toLowerCase()) {
-                        CZ.Settings.applyTheme(response[index].theme);
-                    }
+            if(CZ.Service.superCollectionName) {
+                CZ.Service.getCollections(CZ.Service.superCollectionName).then(function (response) {
+                    $(response).each(function (index) {
+                        if(response[index] && response[index].Title.toLowerCase() === CZ.Service.collectionName.toLowerCase()) {
+                            CZ.Settings.applyTheme(response[index].theme);
+                        }
+                    });
                 });
-            });
+            }
             $('#breadcrumbs-nav-left').click(CZ.BreadCrumbs.breadCrumbNavLeft);
             $('#breadcrumbs-nav-right').click(CZ.BreadCrumbs.breadCrumbNavRight);
             $('#biblCloseButton').mouseout(function () {

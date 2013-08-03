@@ -436,7 +436,6 @@
       <DependentUpon>bing-mediapicker.ts</DependentUpon>
     </Content>
     <Content Include="ui\media\bing-mediapicker.ts" />
-    <Content Include="ui\media\skydrive-mediapicker.html" />
     <Content Include="ui\media\skydrive-mediapicker.js">
       <DependentUpon>skydrive-mediapicker.ts</DependentUpon>
     </Content>
@@ -629,7 +628,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

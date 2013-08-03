@@ -236,7 +236,7 @@ module CZ {
             CZ.Extensions.registerExtensions();
 
             // Register ChronoZoom Media Pickers.
-            CZ.Media.SkyDriveMediaPicker.prototype.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
+            CZ.Media.SkyDriveMediaPicker.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
             CZ.Media.initialize();
 
             CZ.Common.initialize();
@@ -583,14 +583,17 @@ module CZ {
             CZ.Common.initialContent = url.content;
 
             CZ.Settings.applyTheme(null);
-            CZ.Service.getCollections(CZ.Service.superCollectionName).then(
-                function (response) {
+
+            // If not the root URL.
+            if (CZ.Service.superCollectionName) {
+                CZ.Service.getCollections(CZ.Service.superCollectionName).then(response => {
                     $(response).each((index) => {
                         if (response[index] && response[index].Title.toLowerCase() === CZ.Service.collectionName.toLowerCase()) {
                             CZ.Settings.applyTheme(response[index].theme);
                         }
                     });
                 });
+            }
 
             $('#breadcrumbs-nav-left')
                 .click(CZ.BreadCrumbs.breadCrumbNavLeft);
