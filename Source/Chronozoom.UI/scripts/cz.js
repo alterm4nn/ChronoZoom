@@ -184,7 +184,7 @@ var CZ;
             var canvasIsEmpty;
             ApplyFeatureActivation();
             CZ.Extensions.registerExtensions();
-            CZ.Media.SkyDriveMediaPicker.prototype.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
+            CZ.Media.SkyDriveMediaPicker.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
             CZ.Media.initialize();
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
@@ -500,13 +500,15 @@ var CZ;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
             CZ.Settings.applyTheme(null);
-            CZ.Service.getCollections(CZ.Service.superCollectionName).then(function (response) {
-                $(response).each(function (index) {
-                    if(response[index] && response[index].Title.toLowerCase() === CZ.Service.collectionName.toLowerCase()) {
-                        CZ.Settings.applyTheme(response[index].theme);
-                    }
+            if(CZ.Service.superCollectionName) {
+                CZ.Service.getCollections(CZ.Service.superCollectionName).then(function (response) {
+                    $(response).each(function (index) {
+                        if(response[index] && response[index].Title.toLowerCase() === CZ.Service.collectionName.toLowerCase()) {
+                            CZ.Settings.applyTheme(response[index].theme);
+                        }
+                    });
                 });
-            });
+            }
             $('#breadcrumbs-nav-left').click(CZ.BreadCrumbs.breadCrumbNavLeft);
             $('#breadcrumbs-nav-right').click(CZ.BreadCrumbs.breadCrumbNavRight);
             $('#biblCloseButton').mouseout(function () {

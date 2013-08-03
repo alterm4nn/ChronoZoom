@@ -18,13 +18,20 @@ var CZ;
             }
         });
         function initialize() {
-            registerMediaPicker("bing", "/images/media/bing-import-50x150.png", "/ui/media/bing-mediapicker.html", CZ.Media.BingMediaPicker);
-            if(CZ.Media.SkyDriveMediaPicker.prototype.isEnabled === true) {
-                registerMediaPicker("skydrive", "/images/media/skydrive-import-50x50.png", "/ui/media/skydrive-mediapicker.html", CZ.Media.SkyDriveMediaPicker);
+            registerMediaPicker("bing", "/images/media/bing-import-50x150.png", CZ.Media.BingMediaPicker, "/ui/media/bing-mediapicker.html");
+            if(CZ.Media.SkyDriveMediaPicker.isEnabled) {
+                registerMediaPicker("skydrive", "/images/media/skydrive-import-50x50.png", CZ.Media.SkyDriveMediaPicker).done(function () {
+                    WL.init({
+                        client_id: "0000000040101FFA",
+                        redirect_uri: "http://test.chronozoom.com/",
+                        response_type: "token",
+                        scope: "wl.signin,wl.photos,wl.skydrive,wl.skydrive_update"
+                    });
+                });
             }
         }
         Media.initialize = initialize;
-        function registerMediaPicker(title, iconUrl, viewUrl, type, selector) {
+        function registerMediaPicker(title, iconUrl, type, viewUrl, selector) {
             var order = Object.keys(_mediaPickers).length;
             var setup = type.setup;
             selector = selector || "$('<div></div>')";

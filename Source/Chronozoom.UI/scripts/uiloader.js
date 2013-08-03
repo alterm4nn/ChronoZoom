@@ -4,7 +4,11 @@ var CZ;
         function loadHtml(selector, filepath) {
             var container = $(selector);
             var promise = new $.Deferred();
-            if(!selector || !filepath || !container.length) {
+            if(!filepath) {
+                promise.resolve(container);
+                return promise;
+            }
+            if(!selector || !container.length) {
                 throw "Unable to load " + filepath + " " + selector;
             }
             container.load(filepath, function () {

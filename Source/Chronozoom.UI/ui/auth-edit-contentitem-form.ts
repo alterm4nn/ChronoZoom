@@ -79,7 +79,7 @@ module CZ {
                 this.attributionInput.change(() => { this.isModified = true; });
                 this.descriptionInput.change(() => { this.isModified = true; });
 
-                if (CZ.Media.SkyDriveMediaPicker.prototype.isEnabled === true) {
+                if (CZ.Media.SkyDriveMediaPicker.isEnabled) {
                     $("<option></option>", {
                         value: "skydrive",
                         text: " Skydrive "

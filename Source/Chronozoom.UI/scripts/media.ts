@@ -2,9 +2,9 @@
 /// <reference path='../ui/media/bing-mediapicker.ts'/>
 /// <reference path='../ui/media/skydrive-mediapicker.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
-
 module CZ {
     export module Media {
+        declare var WL: any;
 
         export interface MediaInfo {
             uri: string;
@@ -43,21 +43,27 @@ module CZ {
             registerMediaPicker(
                 "bing",
                 "/images/media/bing-import-50x150.png",
-                "/ui/media/bing-mediapicker.html",
-                CZ.Media.BingMediaPicker
+                CZ.Media.BingMediaPicker,
+                "/ui/media/bing-mediapicker.html"
             );
 
-            if (CZ.Media.SkyDriveMediaPicker.prototype.isEnabled === true) {
+            if (CZ.Media.SkyDriveMediaPicker.isEnabled) {
                 registerMediaPicker(
                     "skydrive",
                     "/images/media/skydrive-import-50x50.png",
-                    "/ui/media/skydrive-mediapicker.html",
                     CZ.Media.SkyDriveMediaPicker
-                );
+                ).done(() => {
+                    WL.init({
+                        client_id: "0000000040101FFA",
+                        redirect_uri: "http://test.chronozoom.com/",
+                        response_type: "token",
+                        scope: "wl.signin,wl.photos,wl.skydrive,wl.skydrive_update"
+                    });
+                });
             }
         }
 
-        export function registerMediaPicker(title: string, iconUrl: string, viewUrl: string, type: any, selector?: string): JQueryPromise {
+        export function registerMediaPicker(title: string, iconUrl: string, type: any, viewUrl?: string, selector?: string): JQueryPromise {
             var order = Object.keys(_mediaPickers).length;
             var setup = type.setup;
             selector = selector || "$('<div></div>')";
