@@ -248,6 +248,42 @@ a.cz-bing-result-description:hover {
 }
 .cz-bing-result-thumbnail {
   display: block;
+  margin: auto;
+}
+/* SkyDrive Media Picker */
+iframe[sutra=picker] {
+  opacity: 0;
+  z-index: 100000003 !important;
+}
+iframe[sutra=picker] + div {
+  z-index: 100000002 !important;
+}
+/* Source: CSS from SkyDrive */
+.cz-skydrive-logout-button {
+  opacity: 0;
+  z-index: 100000003;
+  position: fixed;
+  height: 2.142em;
+  min-width: 6em;
+  font-family: "Segoe UI Semibold", "Segoe UI Web Semibold", "Segoe UI Web Regular", "Segoe UI", "Segoe UI Symbol", "HelveticaNeue-Medium", "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  background-color: rgba(182, 182, 182, 0.7);
+  color: #212121;
+  padding: 3px 12px 5px;
+  border: 0;
+  margin-left: 20px;
+  margin-top: 15px;
+  outline: none;
+  line-height: 142%;
+}
+/* Source: CSS from SkyDrive */
+.cz-skydrive-logout-button:hover {
+  background-color: rgba(205, 205, 205, 0.82);
+}
+/* Source: CSS from SkyDrive */
+.cz-skydrive-logout-button:active {
+  background-color: #212121;
+  color: #fff;
 }
 /* The height of the page header */
 /* The width of the logo area */
@@ -524,13 +560,6 @@ a:visited {
   overflow-y: auto;
   height: inherit;
 }
-.tour_control {
-  height: 36px;
-  width: 140px;
-  display: none;
-  cursor: pointer;
-  margin-top: 5px;
-}
 /***********************************************************
 
                         Bibliography
@@ -651,240 +680,6 @@ a:visited {
   text-align: left;
   font-size: 15px;
   cursor: auto;
-}
-.czWindow {
-  position: absolute;
-  top: 144px;
-  left: 0;
-  z-index: 2000;
-  margin-bottom: 0;
-  margin-left: 0;
-  width: 220px;
-  border-bottom-right-radius: 8px;
-  background-color: #424242;
-  color: #BFBFBF;
-  font-size: 14.5px;
-  font-family: Arial;
-}
-.czWindow .header {
-  padding: 4px 0 2px 14px;
-  width: 167px;
-  background: #515151;
-  /* for non-css3 browsers */
-
-  background: -moz-linear-gradient(left, #fdfdfd, #515151);
-  /* Mozilla: */
-
-  background: -webkit-gradient(linear, left top, right top, from(#fdfdfd), to(#424242));
-  /* Chrome, Safari:*/
-
-  color: #424242;
-  vertical-align: middle;
-  font-size: 19px;
-  cursor: default;
-  filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#FDFDFD', EndColorStr='#424242', GradientType=1);
-  /* MSIE */
-
-}
-.czWindow .czTextBox {
-  margin: 3px 5px 3px 5px;
-  height: 20px;
-  border: 1px solid #BFBFBF;
-  background-color: #424242;
-  color: #fff;
-  font-size: 12px;
-  font-family: Arial;
-}
-.czWindow .czTextBox:focus {
-  border: 1px solid #fff;
-}
-.czWindow .emptyTextBox {
-  color: #BFBFBF;
-  font-style: italic;
-  font-size: 12px;
-  font-family: Arial;
-}
-.czWindow .narration {
-  margin-right: 15px;
-  margin-left: 5px;
-  padding-top: 10px;
-  width: 181px;
-  border-bottom: none;
-  /*1px solid #424242;*/
-
-  text-align: center;
-  font-size: 13px;
-  cursor: pointer;
-}
-.czWindow .narration-selected {
-  color: #fff;
-}
-.czWindow .content {
-  margin: 10px 13px 0 10px;
-  width: 196px;
-  border-bottom: 1px solid #424242;
-}
-.czWindow .content .category {
-  margin-right: 13px;
-  margin-bottom: 10px;
-  width: 196px;
-  border-bottom: 2px solid #BFBFBF;
-  vertical-align: middle;
-  cursor: pointer;
-}
-.czWindow .content .category:hover {
-  color: #fff;
-}
-.czWindow .content .collapseButton {
-  position: absolute;
-  left: 194px;
-}
-.czWindow .content .categorySelected {
-  margin-right: 13px;
-  margin-bottom: 10px;
-  width: 196px;
-  border-bottom: none;
-  vertical-align: middle;
-  cursor: pointer;
-}
-.czWindow .content .categorySelected:hover {
-  color: #fff;
-}
-.czWindow .content .itemContainer {
-  margin-right: 15px;
-  margin-left: 5px;
-  padding-bottom: 10px;
-  width: 181px;
-  border-bottom: none;
-  /*1px solid #424242;*/
-
-}
-.czWindow .content .itemContainer .item {
-  overflow: hidden;
-  -ms-text-overflow: ellipsis;
-  -o-text-overflow: ellipsis;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  cursor: pointer;
-}
-.czWindow .content .itemContainer .item:hover {
-  color: #fff;
-}
-.czWindow .content .itemContainer .touritem-selected {
-  color: #fff;
-}
-.czWindow .searchResults {
-  overflow-x: hidden;
-  overflow-y: auto;
-  margin: 0 15px 10px 10px;
-  border-bottom: none;
-  /*1px solid #424242;*/
-
-}
-.czWindow .searchResults .searchResultSection {
-  overflow: hidden;
-  margin: 5px 10px 5px 0;
-  padding: 0;
-  border-bottom: 1px solid #BFBFBF;
-  text-align: left;
-  -ms-text-overflow: ellipsis;
-  -o-text-overflow: ellipsis;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 13px;
-  cursor: default;
-}
-.czWindow .searchResults .searchResult {
-  overflow: hidden;
-  margin-right: 10px;
-  margin-left: 7px;
-  padding: 0;
-  border-bottom: none;
-  /*1px solid #424242;*/
-
-  text-align: left;
-  -ms-text-overflow: ellipsis;
-  -o-text-overflow: ellipsis;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 13px;
-  cursor: pointer;
-}
-.czWindow .searchResults .searchResult:hover {
-  color: #fff;
-}
-.czWindow .searchResults .searchNoResult {
-  overflow: hidden;
-  margin-right: 10px;
-  padding: 0;
-  border-bottom: none;
-  /*1px solid #424242;*/
-
-  text-align: left;
-  -ms-text-overflow: ellipsis;
-  -o-text-overflow: ellipsis;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-style: italic;
-  font-size: 13px;
-  cursor: default;
-}
-.bookmarksWindow {
-  position: absolute;
-  bottom: 44px;
-  left: 0;
-  z-index: 1999;
-  margin-left: 0;
-  width: 200px;
-  min-height: 200px;
-  max-height: 410px;
-  border-top-right-radius: 8px;
-  background-color: #424242;
-  color: #BFBFBF;
-  font-size: 14.5px;
-  font-family: Arial;
-}
-.bookmarksWindow .header {
-  padding: 10px 6px 9px 5px;
-  padding-right: 6px;
-  padding-left: 5px;
-  border-bottom: 2px solid #BFBFBF;
-  color: #fff;
-  font-size: 14.5px;
-  cursor: default;
-}
-.bookmarksWindow .headerButton {
-  position: absolute;
-  top: 9px;
-  right: 12px;
-}
-.bookmarksWindow .slideHeader {
-  margin-right: 19px;
-  margin-left: 10px;
-  padding: 5px 6px 10px 4px;
-  color: White;
-  font-size: 14.5px;
-  cursor: default;
-}
-.bookmarksWindow .slideText {
-  overflow-x: hidden;
-  overflow-y: auto;
-  margin-right: 19px;
-  margin-left: 15px;
-  padding: 5px 3px 5px 3px;
-  max-height: 250px;
-  color: #BFBFBF;
-  font-size: 13px;
-}
-.bookmarksWindow .slideFooter {
-  margin: 20px 19px 0 10px;
-  padding: 5px 0 13px 4px;
-  height: 15px;
-  border-top: 1px solid #BFBFBF;
-  color: #fff;
-  text-align: right;
-  font-size: 12px;
-  cursor: default;
 }
 /***********************************************************
 
@@ -1356,10 +1151,10 @@ img.fallbackBackground {
   cursor: default;
 }
 .cz-form-right {
-  top: 36px;
+  top: 53px;
 }
 .cz-form-left {
-  top: 57px;
+  top: 53px;
 }
 .cz-form-header {
   position: relative;
@@ -1500,6 +1295,9 @@ img.fallbackBackground {
 .cz-lightblue {
   color: #038ae6;
 }
+.cz-red {
+  color: #dd4b39;
+}
 .cz-form-label {
   margin: 5px 0;
   display: inline-block;
@@ -1517,8 +1315,7 @@ img.fallbackBackground {
 /* Message Window */
 .cz-message-window {
   width: 330px;
-  height: 100px;
-  top: 36px;
+  height: auto;
   left: 0;
 }
 .cz-message-window > .cz-form-content {
@@ -1527,7 +1324,7 @@ img.fallbackBackground {
   right: 0;
   bottom: 0;
   left: 0;
-  overflow-y: auto;
+  overflow: hidden;
 }
 /* Edit Tour Form */
 .cz-form-tour-edit {
@@ -1944,11 +1741,12 @@ img.fallbackBackground {
 
 ***********************************************************/
 .cz-contentitem-listitem-icon {
-  display: inline-block;
   width: 15%;
+  display: inline-block;
 }
 .cz-contentitem-listitem-icon > img {
-  max-width: 100%;
+  width: 100%;
+  height: auto;
 }
 .cz-contentitem-listitem-content {
   display: inline-block;

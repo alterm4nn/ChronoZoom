@@ -7,7 +7,13 @@ module CZ {
             var container = $(selector);
             var promise = new $.Deferred();
 
-            if (!selector || !filepath || !container.length) {
+            // NOTE: Allow undefined filepath. The method will return initial container.
+            if (!filepath) {
+                promise.resolve(container);
+                return promise;
+            }
+            
+            if (!selector || !container.length) {
                 throw "Unable to load " + filepath + " " + selector;
             }
 

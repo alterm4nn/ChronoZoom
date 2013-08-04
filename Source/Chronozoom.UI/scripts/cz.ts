@@ -27,6 +27,7 @@
 /// <reference path='../ui/mediapicker-form.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
 /// <reference path='extensions/extensions.ts'/>
+/// <reference path='../ui/media/skydrive-mediapicker.ts'/>
 
 var constants: any;
 
@@ -137,6 +138,10 @@ module CZ {
                 Name: "Themes",
                 Activation: FeatureActivation.NotProduction
             },
+            {
+                Name: "Skydrive",
+                Activation: FeatureActivation.NotProduction
+            },
         ];
 
         export var rootCollection: bool;
@@ -158,7 +163,6 @@ module CZ {
             var allowEditing = IsFeatureEnabled(_featureMap, "TourAuthoring") && UserCanEditCollection(profile);
 
             var onTakeTour = tour => {
-                //CZ.Tours.tourCaptionForm = CZ.HomePageViewModel.getFormById("#tour-caption-form");
                 CZ.HomePageViewModel.closeAllForms();
                 CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption(CZ.Tours.tourCaptionFormContainer, {
                     activationSource: $(".tour-icon"),
@@ -180,7 +184,6 @@ module CZ {
             };
 
             var onToursInitialized = function () {
-                CZ.Tours.initializeToursUI();
                 $("#tours_index").click(function () { // show form
                     var toursListForm = getFormById("#toursList");
 
@@ -226,10 +229,14 @@ module CZ {
             $('.bubbleInfo').hide();
             var canvasIsEmpty;
 
+            // Apply features
+            ApplyFeatureActivation();
+
             // Register ChronoZoom Extensions
             CZ.Extensions.registerExtensions();
 
             // Register ChronoZoom Media Pickers.
+            CZ.Media.SkyDriveMediaPicker.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
             CZ.Media.initialize();
 
             CZ.Common.initialize();
@@ -349,6 +356,7 @@ module CZ {
                         form.show();
                     },
                     showCreateTimelineForm: function (timeline) {
+                        CZ.Authoring.hideMessageWindow();
                         CZ.Authoring.mode = "createTimeline";
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
                             activationSource: $(".header-icon.edit-icon"),
@@ -382,6 +390,7 @@ module CZ {
                         form.show();
                     },
                     showCreateExhibitForm: function (exhibit) {
+                        CZ.Authoring.hideMessageWindow();
                         var form = new CZ.UI.FormEditExhibit(forms[2], {
                             activationSource: $(".header-icon.edit-icon"),
                             navButton: ".cz-form-nav",
@@ -445,7 +454,6 @@ module CZ {
                 if (canvasIsEmpty) {
                     CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
                 }
-
 
                 sessionForm = new CZ.UI.FormHeaderSessionExpired(forms[15], {
                     activationSource: $("#header-session-expired-form"),
@@ -575,14 +583,17 @@ module CZ {
             CZ.Common.initialContent = url.content;
 
             CZ.Settings.applyTheme(null);
-            CZ.Service.getCollections(CZ.Service.superCollectionName).then(
-                function (response) {
+
+            // If not the root URL.
+            if (CZ.Service.superCollectionName) {
+                CZ.Service.getCollections(CZ.Service.superCollectionName).then(response => {
                     $(response).each((index) => {
                         if (response[index] && response[index].Title.toLowerCase() === CZ.Service.collectionName.toLowerCase()) {
                             CZ.Settings.applyTheme(response[index].theme);
                         }
                     });
                 });
+            }
 
             $('#breadcrumbs-nav-left')
                 .click(CZ.BreadCrumbs.breadCrumbNavLeft);
@@ -592,8 +603,6 @@ module CZ {
             $('#biblCloseButton')
                 .mouseout(() => { CZ.Common.toggleOffImage('biblCloseButton', 'png'); })
                 .mouseover(() => { CZ.Common.toggleOnImage('biblCloseButton', 'png'); })
-
-            ApplyFeatureActivation();
 
             if (navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
                 // Suppress the default iOS elastic pan/zoom actions.

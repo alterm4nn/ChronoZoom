@@ -121,4 +121,45 @@ a.cz-bing-result-description:hover
 .cz-bing-result-thumbnail
 {
     display: block;
+    margin: auto;
+}
+
+/* SkyDrive Media Picker */
+iframe[sutra=picker] {
+    opacity: 0;
+    z-index: 100000003 !important;
+}
+
+iframe[sutra=picker] + div {
+    z-index: 100000002 !important;
+}
+
+/* Source: CSS from SkyDrive */
+.cz-skydrive-logout-button {
+    opacity: 0;
+    z-index: 100000003;
+    position: fixed;
+    height: 2.142em;
+    min-width: 6em;
+    font-family: "Segoe UI Semibold", "Segoe UI Web Semibold", "Segoe UI Web Regular", "Segoe UI", "Segoe UI Symbol", "HelveticaNeue-Medium", "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+    background-color: rgba(182, 182, 182, .7);
+    color: #212121;
+    padding: 3px 12px 5px;
+    border: 0;
+    margin-left: 20px;
+    margin-top: 15px;
+    outline: none;
+    line-height: 142%;
+}
+
+/* Source: CSS from SkyDrive */
+.cz-skydrive-logout-button:hover {
+    background-color: rgba(205, 205, 205, .82);
+}
+
+/* Source: CSS from SkyDrive */
+.cz-skydrive-logout-button:active {
+    background-color: #212121;
+    color: #fff;
 }

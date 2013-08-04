@@ -225,6 +225,10 @@
         Settings.applyTheme = applyTheme;
         Settings.defaultBingSearchTop = 50;
         Settings.defaultBingSearchSkip = 0;
+        Settings.mediapickerImageThumbnailMaxWidth = 240;
+        Settings.mediapickerImageThumbnailMaxHeight = 155;
+        Settings.mediapickerVideoThumbnailMaxWidth = 190;
+        Settings.mediapickerVideoThumbnailMaxHeight = 130;
     })(CZ.Settings || (CZ.Settings = {}));
     var Settings = CZ.Settings;
 })(CZ || (CZ = {}));
@@ -854,6 +858,9 @@ var CZ;
         };
         var addAudio = function (element, layerid, id, audioSource, vx, vy, vw, vh, z) {
             return VCContent.addChild(element, new CanvasAudioItem(element.vc, layerid, id, audioSource, vx, vy, vw, vh, z), false);
+        };
+        VCContent.addSkydrive = function (element, layerid, id, embededSource, vx, vy, vw, vh, z) {
+            return VCContent.addChild(element, new CanvasSkydriveItem(element.vc, layerid, id, embededSource, vx, vy, vw, vh, z), false);
         };
         function addText(element, layerid, id, vx, vy, baseline, vh, text, settings, vw) {
             return VCContent.addChild(element, new CanvasText(element.vc, layerid, id, vx, vy, baseline, vh, text, settings, vw), false);
@@ -1901,6 +1908,15 @@ var CZ;
             this.initializeContent(elem);
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
+        function CanvasSkydriveItem(vc, layerid, id, embededSrc, vx, vy, vw, vh, z) {
+            this.base = CanvasDomItem;
+            this.base(vc, layerid, id, vx, vy, vw, vh, z);
+            var elem = document.createElement('iframe');
+            elem.setAttribute("id", id);
+            elem.setAttribute("src", embededSrc);
+            this.initializeContent(elem);
+            this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
+        }
         function SeadragonImage(vc, parent, layerid, id, imageSource, vx, vy, vw, vh, z, onload) {
             var self = this;
             this.base = CanvasDomItem;
@@ -2067,6 +2083,8 @@ var CZ;
                         addAudio(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     } else if(this.contentItem.mediaType.toLowerCase() === 'pdf') {
                         VCContent.addPdf(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
+                    } else if(this.contentItem.mediaType.toLowerCase() === 'skydrive') {
+                        VCContent.addSkydrive(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     } else if(CZ.Extensions.mediaTypeIsExtension(contentItem.mediaType)) {
                         VCContent.addExtension(contentItem.mediaType, container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);
                     }
@@ -4763,6 +4781,10 @@ var CZ;
                     opacity: 1
                 });
             };
+            FormTourCaption.prototype.showTourEndMessage = function () {
+                this.captionTextarea.text(CZ.Tours.TourEndMessage);
+                this.bookmarksCount.text("Start a tour");
+            };
             FormTourCaption.prototype.setPlayPauseButtonState = function (state) {
                 this.tourPlayer.playPauseButton.attr("state", state);
             };
@@ -4823,6 +4845,7 @@ var CZ;
         Tours.pauseTourAtAnyAnimation = false;
         Tours.bookmarkAnimation;
         var isToursDebugEnabled = false;
+        Tours.TourEndMessage = "Thank you for watching this tour!";
         Tours.tourCaptionFormContainer;
         Tours.tourCaptionForm;
         var TourBookmark = (function () {
@@ -4928,7 +4951,7 @@ var CZ;
                     });
                     self.audioElement.addEventListener("progress", function () {
                         if(self.audioElement && self.audioElement.buffered.length > 0) {
-                            if(isToursDebugEnabled && window.console && console.log("Tour " + self.title + " downloaded " + (self.audio.buffered.end(self.audio.buffered.length - 1) / self.audio.duration))) {
+                            if(isToursDebugEnabled && window.console && console.log("Tour " + self.title + " downloaded " + (self.audioElement.buffered.end(self.audioElement.buffered.length - 1) / self.audioElement.duration))) {
                                 ;
                             }
                         }
@@ -4988,13 +5011,21 @@ var CZ;
                     if(isToursDebugEnabled && window.console && console.log("Transitioning to the bm index " + newBookmark)) {
                         ;
                     }
+                    var targetVisible = getBookmarkVisible(bookmark);
+                    if(!targetVisible) {
+                        if(isToursDebugEnabled && window.console && console.log("bookmark index " + newBookmark + " references to nonexistent item")) {
+                            ;
+                        }
+                        goBack ? self.prev() : self.next();
+                        return;
+                    }
                     self.currentPlace.animationId = self.zoomTo(getBookmarkVisible(bookmark), self.onGoToSuccess, self.onGoToFailure, bookmark.url);
                 };
                 self.startBookmarkAudio = function startBookmarkAudio(bookmark) {
                     if(!self.audio) {
                         return;
                     }
-                    if(isToursDebugEnabled && window.console && console.log("playing source: " + self.audio.currentSrc)) {
+                    if(isToursDebugEnabled && window.console && console.log("playing source: " + self.audioElement.currentSrc)) {
                         ;
                     }
                     self.audioElement.pause();
@@ -5078,7 +5109,12 @@ var CZ;
                     }
                     self.state = 'play';
                     var visible = self.vc.virtualCanvas("getViewport").visible;
-                    if(self.currentPlace != null && self.currentPlace.bookmark != null && CZ.Common.compareVisibles(visible, getBookmarkVisible(self.bookmarks[self.currentPlace.bookmark]))) {
+                    var bookmarkVisible = getBookmarkVisible(self.bookmarks[self.currentPlace.bookmark]);
+                    if(bookmarkVisible === null) {
+                        self.next();
+                        return;
+                    }
+                    if(self.currentPlace != null && self.currentPlace.bookmark != null && CZ.Common.compareVisibles(visible, bookmarkVisible)) {
                         self.currentPlace = {
                             type: 'bookmark',
                             bookmark: self.currentPlace.bookmark
@@ -5141,15 +5177,13 @@ var CZ;
                     }
                 };
                 self.next = function next() {
-                    if(self.currentPlace.bookmark != self.bookmarks.length - 1) {
-                        if(self.state === 'play') {
-                            if(self.timerOnBookmarkIsOver) {
-                                clearTimeout(self.timerOnBookmarkIsOver);
-                            }
-                            self.timerOnBookmarkIsOver = undefined;
+                    if(self.state === 'play') {
+                        if(self.timerOnBookmarkIsOver) {
+                            clearTimeout(self.timerOnBookmarkIsOver);
                         }
-                        self.onBookmarkIsOver(false);
+                        self.timerOnBookmarkIsOver = undefined;
                     }
+                    self.onBookmarkIsOver(false);
                 };
                 self.prev = function prev() {
                     if(self.currentPlace.bookmark == 0) {
@@ -5204,7 +5238,7 @@ var CZ;
             if(newTour != undefined) {
                 Tours.tour = newTour;
                 Tours.tour.tour_TourFinished.push(function (tour) {
-                    hideBookmark(tour);
+                    showTourEndMessage();
                     tourPause();
                     hideBookmarks();
                 });
@@ -5226,8 +5260,6 @@ var CZ;
                 tourPause();
                 Tours.tour.isTourPlayRequested = false;
             }
-            var tourControlDiv = document.getElementById("tour_control");
-            tourControlDiv.style.display = "none";
             if(Tours.tour) {
                 hideBookmarks();
                 $("#bookmarks .header").text("");
@@ -5300,6 +5332,9 @@ var CZ;
         Tours.initializeToursContent = initializeToursContent;
         function hideBookmark(tour) {
             Tours.tourCaptionForm.hideBookmark();
+        }
+        function showTourEndMessage() {
+            Tours.tourCaptionForm.showTourEndMessage();
         }
         function showBookmark(tour, bookmark) {
             Tours.tourCaptionForm.showBookmark(bookmark);
@@ -6138,8 +6173,8 @@ var CZ;
                 return sinh(x) / cosh(x);
             }
             this.u = function (s) {
-                var val = this.startScale / Math.pow(this.ro, 2) * cosh(this.r0) * tanh(this.ro * s + this.r0) - this.startScale / Math.pow(this.ro, 2) * sinh(this.r0) + this.u0;
-                return val;
+                var val = this.startScale / (this.ro * this.ro) * (this.coshR0 * tanh(this.ro * s + this.r0) - this.sinhR0) + this.u0;
+                return Math.min(val, this.pathLen);
             };
             this.scale = function (t) {
                 return this.startScale * cosh(this.r0) / cosh(this.ro * (t * this.S) + this.r0);
@@ -6223,6 +6258,8 @@ var CZ;
                     return this.startScale + (this.endScale - this.startScale) * s;
                 };
             }
+            this.coshR0 = cosh(this.r0);
+            this.sinhR0 = sinh(this.r0);
         }
         ViewportAnimation.EllipticalZoom = EllipticalZoom;
         function animationEase(t) {
@@ -7947,11 +7984,11 @@ var CZ;
         this.getLabel = function (x) {
             var text;
             var n = Math.max(Math.floor(Math.log(this.delta * Math.pow(10, this.beta) / this.level) * this.log10), -4);
-            text = -x / this.level;
+            text = Math.abs(x) / this.level;
             if(n < 0) {
                 text = (new Number(text)).toFixed(-n);
             }
-            text += " " + this.regime;
+            text += " " + (x < 0 ? this.regime : String(this.regime).charAt(0));
             return text;
         };
         this.getRegime = function (l, r) {
@@ -8055,8 +8092,8 @@ var CZ;
             var labelText;
             this.getRegime(range.min, range.max);
             var numOfDigits = Math.max(Math.floor(Math.log(this.delta * Math.pow(10, this.beta) / this.level) * this.log10), -4) - 1;
-            labelText = (-time / this.level).toFixed(Math.abs(numOfDigits));
-            labelText += " " + this.regime;
+            labelText = (Math.abs(time / this.level)).toFixed(Math.abs(numOfDigits));
+            labelText += " " + (time < 0 ? this.regime : String(this.regime).charAt(0));
             return labelText;
         };
         this.getVisibleForElement = function (element, scale, viewport, use_margin) {
@@ -9238,6 +9275,14 @@ var CZ;
                 if(CZ.Layout.animatingElements.length != 0) {
                     return;
                 }
+                CZ.Authoring.showMessageWindow("Please click and drag with mouse or finger in the canvas to create the TimeLine.", "Create Timeline");
+                var prevIsActive = CZ.Authoring.isActive;
+                var prevMode = CZ.Authoring.mode;
+                var messageForm = CZ.HomePageViewModel.getFormById("#message-window");
+                messageForm.closeButton.click(function (event) {
+                    CZ.Authoring.isActive = prevIsActive;
+                    CZ.Authoring.mode = prevMode;
+                });
                 CZ.Authoring.isActive = true;
                 CZ.Authoring.mode = "createTimeline";
             }
@@ -9254,6 +9299,14 @@ var CZ;
                 if(CZ.Layout.animatingElements.length != 0) {
                     return;
                 }
+                CZ.Authoring.showMessageWindow("Please click inside a timeline to create the Exhibit.", "Create Exhibit");
+                var prevIsActive = CZ.Authoring.isActive;
+                var prevMode = CZ.Authoring.mode;
+                var messageForm = CZ.HomePageViewModel.getFormById("#message-window");
+                messageForm.closeButton.click(function (event) {
+                    CZ.Authoring.isActive = prevIsActive;
+                    CZ.Authoring.mode = prevMode;
+                });
                 CZ.Authoring.isActive = true;
                 CZ.Authoring.mode = "createExhibit";
             }
@@ -10332,7 +10385,11 @@ var CZ;
         function loadHtml(selector, filepath) {
             var container = $(selector);
             var promise = new $.Deferred();
-            if(!selector || !filepath || !container.length) {
+            if(!filepath) {
+                promise.resolve(container);
+                return promise;
+            }
+            if(!selector || !container.length) {
                 throw "Unable to load " + filepath + " " + selector;
             }
             container.load(filepath, function () {
@@ -10482,6 +10539,9 @@ var CZ;
                         _this.searchResultsBox.append(resultContainer);
                         _this.alignThumbnails();
                     }
+                }).fail(function (error) {
+                    _this.hideProgressBar();
+                    _this.showErrorMessage(error);
                 });
             };
             BingMediaPicker.prototype.searchVideos = function (query) {
@@ -10499,6 +10559,9 @@ var CZ;
                         _this.searchResultsBox.append(resultContainer);
                         _this.alignThumbnails();
                     }
+                }).fail(function (error) {
+                    _this.hideProgressBar();
+                    _this.showErrorMessage(error);
                 });
             };
             BingMediaPicker.prototype.searchDocuments = function (query) {
@@ -10514,14 +10577,19 @@ var CZ;
                         var resultContainer = _this.createDocumentResult(result);
                         _this.searchResultsBox.append(resultContainer);
                     }
+                }).fail(function (error) {
+                    _this.hideProgressBar();
+                    _this.showErrorMessage(error);
                 });
             };
             BingMediaPicker.prototype.createImageResult = function (result) {
                 var _this = this;
+                var rectangle = this.fitThumbnailToContainer(result.Thumbnail.Width / result.Thumbnail.Height, CZ.Settings.mediapickerImageThumbnailMaxWidth, CZ.Settings.mediapickerImageThumbnailMaxHeight);
+                var imageOffset = (CZ.Settings.mediapickerImageThumbnailMaxHeight - rectangle.height) / 2;
                 var container = $("<div></div>", {
                     class: "cz-bing-result-container",
-                    width: 183 * result.Thumbnail.Width / result.Thumbnail.Height,
-                    "data-actual-width": 183 * result.Thumbnail.Width / result.Thumbnail.Height
+                    width: rectangle.width,
+                    "data-actual-width": rectangle.width
                 });
                 var title = $("<div></div>", {
                     class: "cz-bing-result-title cz-darkgray",
@@ -10537,26 +10605,35 @@ var CZ;
                     text: result.DisplayUrl,
                     href: result.MediaUrl,
                     title: result.DisplayUrl,
+                    "media-source": result.SourceUrl,
                     target: "_blank"
                 });
-                var thumbnail = $("<img></img>", {
-                    src: result.Thumbnail.MediaUrl,
-                    height: 183,
+                var thumbnailContainer = $("<div></div>", {
                     width: "100%",
-                    class: "cz-bing-result-thumbnail"
+                    height: CZ.Settings.mediapickerImageThumbnailMaxHeight
                 });
-                thumbnail.add(title).add(size).click(function (event) {
+                var thumbnail = $("<img></img>", {
+                    class: "cz-bing-result-thumbnail",
+                    src: result.Thumbnail.MediaUrl,
+                    height: rectangle.height,
+                    width: "100%"
+                });
+                thumbnail.css("padding-top", imageOffset + "px");
+                thumbnailContainer.add(title).add(size).click(function (event) {
                     $(_this).trigger("resultclick", _this.convertResultToMediaInfo(result, "image"));
                 });
-                return container.append(thumbnail).append(title).append(size).append(url);
+                thumbnailContainer.append(thumbnail);
+                return container.append(thumbnailContainer).append(title).append(size).append(url);
             };
             BingMediaPicker.prototype.createVideoResult = function (result) {
                 var _this = this;
                 result.Thumbnail = result.Thumbnail || this.createDefaultThumbnail();
+                var rectangle = this.fitThumbnailToContainer(result.Thumbnail.Width / result.Thumbnail.Height, CZ.Settings.mediapickerVideoThumbnailMaxWidth, CZ.Settings.mediapickerVideoThumbnailMaxHeight);
+                var imageOffset = (CZ.Settings.mediapickerVideoThumbnailMaxHeight - rectangle.height) / 2;
                 var container = $("<div></div>", {
                     class: "cz-bing-result-container",
-                    width: 140 * result.Thumbnail.Width / result.Thumbnail.Height,
-                    "data-actual-width": 140 * result.Thumbnail.Width / result.Thumbnail.Height
+                    width: rectangle.width,
+                    "data-actual-width": rectangle.width
                 });
                 var title = $("<div></div>", {
                     class: "cz-bing-result-title cz-darkgray",
@@ -10574,16 +10651,22 @@ var CZ;
                     title: result.MediaUrl,
                     target: "_blank"
                 });
-                var thumbnail = $("<img></img>", {
-                    src: result.Thumbnail.MediaUrl,
-                    height: 140,
+                var thumbnailContainer = $("<div></div>", {
                     width: "100%",
-                    class: "cz-bing-result-thumbnail"
+                    height: CZ.Settings.mediapickerVideoThumbnailMaxHeight
                 });
-                thumbnail.add(title).add(size).click(function (event) {
+                var thumbnail = $("<img></img>", {
+                    class: "cz-bing-result-thumbnail",
+                    src: result.Thumbnail.MediaUrl,
+                    height: rectangle.height,
+                    width: "100%"
+                });
+                thumbnail.css("padding-top", imageOffset + "px");
+                thumbnailContainer.add(title).add(size).click(function (event) {
                     $(_this).trigger("resultclick", _this.convertResultToMediaInfo(result, "video"));
                 });
-                return container.append(thumbnail).append(title).append(size).append(url);
+                thumbnailContainer.append(thumbnail);
+                return container.append(thumbnailContainer).append(title).append(size).append(url);
             };
             BingMediaPicker.prototype.createDocumentResult = function (result) {
                 var _this = this;
@@ -10635,6 +10718,18 @@ var CZ;
                     MediaUrl: "/images/Temp-Thumbnail2.png"
                 };
             };
+            BingMediaPicker.prototype.showErrorMessage = function (error) {
+                var errorMessagesByStatus = {
+                    "400": "The search request is formed badly. Please contact developers about the error.",
+                    "403": "Please sign in to ChronoZoom to use Bing search.",
+                    "500": "We are sorry, but something went wrong. Please try again later."
+                };
+                var errorMessage = $("<span></span>", {
+                    class: "cz-red",
+                    text: errorMessagesByStatus[error.status]
+                });
+                this.searchResultsBox.append(errorMessage);
+            };
             BingMediaPicker.prototype.onWindowResize = function () {
                 this.alignThumbnails();
             };
@@ -10670,9 +10765,134 @@ var CZ;
                     }
                 }
             };
+            BingMediaPicker.prototype.fitThumbnailToContainer = function (aspectRatio, maxWidth, maxHeight) {
+                var maxAspectRatio = maxWidth / maxHeight;
+                var output = {
+                    width: maxHeight * aspectRatio,
+                    height: maxHeight
+                };
+                if(aspectRatio > maxAspectRatio) {
+                    output.width = maxWidth;
+                    output.height = maxWidth / aspectRatio;
+                }
+                return output;
+            };
             return BingMediaPicker;
         })();
         Media.BingMediaPicker = BingMediaPicker;        
+    })(CZ.Media || (CZ.Media = {}));
+    var Media = CZ.Media;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (Media) {
+        (function (SkyDriveMediaPicker) {
+            var editContentItemForm;
+            var contentItem;
+            SkyDriveMediaPicker.filePicker;
+            SkyDriveMediaPicker.filePickerIframe;
+            SkyDriveMediaPicker.logoutButton;
+            SkyDriveMediaPicker.isEnabled;
+            function setup(context) {
+                contentItem = context;
+                editContentItemForm = CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
+                SkyDriveMediaPicker.logoutButton = $("<button></button>", {
+                    text: "Logout",
+                    class: "cz-skydrive-logout-button",
+                    click: onLogout
+                });
+                SkyDriveMediaPicker.filePicker = showFilePicker().then(onFilePick, onError);
+            }
+            SkyDriveMediaPicker.setup = setup;
+            function showFilePicker() {
+                watchFilePicker(onFilePickerLoad);
+                return WL.fileDialog({
+                    mode: "open",
+                    select: "single"
+                });
+            }
+            function onFilePick(response) {
+                onFilePickerClose();
+                getEmbed(response).then(onContentReceive, onError);
+            }
+            function getEmbed(response) {
+                return WL.api({
+                    path: response.data.files[0].id + "/embed",
+                    method: "GET"
+                });
+            }
+            function onContentReceive(response) {
+                var src = response.embed_html.match(/src=\"(.*?)\"/i)[1];
+                var mediaInfo = {
+                    uri: src,
+                    mediaType: "skydrive",
+                    mediaSource: src,
+                    attribution: src
+                };
+                $.extend(contentItem, mediaInfo);
+                editContentItemForm.updateMediaInfo();
+            }
+            function onError(response) {
+                var error = response.error;
+                if(error.code === "user_canceled" || error.code === "request_canceled") {
+                    onFilePickerClose();
+                } else {
+                    console.log(error.message);
+                }
+            }
+            function onLogout() {
+                var isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
+                SkyDriveMediaPicker.logoutButton.hide();
+                SkyDriveMediaPicker.filePicker.cancel();
+                WL.logout();
+                if(isFirefox) {
+                    setTimeout(setup, 500, contentItem);
+                } else {
+                    var start = +new Date();
+                    while(+new Date() - start < 500) {
+                        ;
+                    }
+                    setup(contentItem);
+                }
+            }
+            function watchFilePicker(callback) {
+                SkyDriveMediaPicker.filePickerIframe = $("iframe[sutra=picker]");
+                if(SkyDriveMediaPicker.filePickerIframe.length > 0) {
+                    callback();
+                } else {
+                    setTimeout(watchFilePicker, 50, callback);
+                }
+            }
+            function onFilePickerLoad() {
+                SkyDriveMediaPicker.logoutButton.appendTo("body");
+                $(window).on("resize", onWindowResize);
+                SkyDriveMediaPicker.filePickerIframe.load(function () {
+                    onWindowResize();
+                    SkyDriveMediaPicker.filePickerIframe.animate({
+                        opacity: 1
+                    });
+                    SkyDriveMediaPicker.logoutButton.animate({
+                        opacity: 1
+                    });
+                });
+            }
+            function onFilePickerClose() {
+                SkyDriveMediaPicker.logoutButton.remove();
+                $(window).off("resize", onWindowResize);
+            }
+            function onWindowResize() {
+                var skyDriveFooterHeight = 56;
+                var iframeOffset = SkyDriveMediaPicker.filePickerIframe.offset();
+                var iframeHeight = SkyDriveMediaPicker.filePickerIframe.outerHeight(true);
+                var buttonLeftMargin = parseInt(SkyDriveMediaPicker.logoutButton.css("margin-left"), 10);
+                var buttonTopMargin = parseInt(SkyDriveMediaPicker.logoutButton.css("margin-top"), 10);
+                SkyDriveMediaPicker.logoutButton.offset({
+                    top: iframeOffset.top + iframeHeight - skyDriveFooterHeight + buttonTopMargin,
+                    left: iframeOffset.left + buttonLeftMargin
+                });
+            }
+        })(Media.SkyDriveMediaPicker || (Media.SkyDriveMediaPicker = {}));
+        var SkyDriveMediaPicker = Media.SkyDriveMediaPicker;
     })(CZ.Media || (CZ.Media = {}));
     var Media = CZ.Media;
 })(CZ || (CZ = {}));
@@ -10696,10 +10916,20 @@ var CZ;
             }
         });
         function initialize() {
-            registerMediaPicker("bing", "/images/media/bing-import-50x150.png", "/ui/media/bing-mediapicker.html", CZ.Media.BingMediaPicker);
+            registerMediaPicker("bing", "/images/media/bing-import-50x150.png", CZ.Media.BingMediaPicker, "/ui/media/bing-mediapicker.html");
+            if(CZ.Media.SkyDriveMediaPicker.isEnabled) {
+                registerMediaPicker("skydrive", "/images/media/skydrive-import-50x50.png", CZ.Media.SkyDriveMediaPicker).done(function () {
+                    WL.init({
+                        client_id: "0000000040101FFA",
+                        redirect_uri: "http://test.chronozoom.com/",
+                        response_type: "token",
+                        scope: "wl.signin,wl.photos,wl.skydrive,wl.skydrive_update"
+                    });
+                });
+            }
         }
         Media.initialize = initialize;
-        function registerMediaPicker(title, iconUrl, viewUrl, type, selector) {
+        function registerMediaPicker(title, iconUrl, type, viewUrl, selector) {
             var order = Object.keys(_mediaPickers).length;
             var setup = type.setup;
             selector = selector || "$('<div></div>')";
@@ -10851,6 +11081,7 @@ var CZ;
                 });
                 this.deleteButton.click(function (event) {
                     if(confirm("Are you sure want to delete timeline and all of its nested timelines and exhibits? Delete can't be undone!")) {
+                        var isDataValid = true;
                         CZ.Authoring.removeTimeline(_this.timeline);
                         _this.close();
                     }
@@ -11155,7 +11386,7 @@ var CZ;
                 if(confirm("Are you sure want to delete the exhibit and all of its content items? Delete can't be undone!")) {
                     CZ.Authoring.removeExhibit(this.exhibit);
                     this.isCancel = false;
-                    this.isModified = true;
+                    this.isModified = false;
                     this.close();
                 }
             };
@@ -11237,11 +11468,11 @@ var CZ;
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
                 var _this = this;
                 if(this.isModified) {
-                    var r = window.confirm("There is unsaved data. Do you want to close without saving?");
-                    if(r != true) {
+                    if(window.confirm("There is unsaved data. Do you want to close without saving?")) {
+                        this.isModified = false;
+                    } else {
                         return;
                     }
-                    this.isModified = false;
                 }
                 _super.prototype.close.call(this, noAnimation ? undefined : {
                     effect: "slide",
@@ -11319,6 +11550,12 @@ var CZ;
                 this.descriptionInput.change(function () {
                     _this.isModified = true;
                 });
+                if(CZ.Media.SkyDriveMediaPicker.isEnabled) {
+                    $("<option></option>", {
+                        value: "skydrive",
+                        text: " Skydrive "
+                    }).appendTo(this.mediaTypeInput);
+                }
                 this.titleInput.val(this.contentItem.title || "");
                 this.mediaInput.val(this.contentItem.uri || "");
                 this.mediaSourceInput.val(this.contentItem.mediaSource || "");
@@ -11422,11 +11659,11 @@ var CZ;
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
                 var _this = this;
                 if(this.isModified) {
-                    var r = window.confirm("There is unsaved data. Do you want to close without saving?");
-                    if(r != true) {
+                    if(window.confirm("There is unsaved data. Do you want to close without saving?")) {
+                        this.isModified = false;
+                    } else {
                         return;
                     }
-                    this.isModified = false;
                 }
                 _super.prototype.close.call(this, noAnimation ? undefined : {
                     effect: "slide",
@@ -11882,14 +12119,18 @@ var CZ;
                     });
                     preloadedlist.forEach(function (preloaded) {
                         var li = $('<li></li>').css("margin-left", 10).css("margin-bottom", "3px").height(22).appendTo(existingTimSeriesList);
-                        var link = $('<a></a>').addClass("cz-form-btn").appendTo(li);
-                        link.css("color", "#25a1ea");
+                        var link = $('<a></a>').addClass("cz-form-preloadedrecord").appendTo(li);
+                        link.css("color", "#0464a2");
+                        link.css("font-size", "16px");
                         link.css("float", "left");
+                        link.css("width", "140px");
+                        link.css("cursor", "pointer");
                         link.text(preloaded.name);
                         var div = $("<span></span>").addClass("cz-form-preloadedrecord").appendTo(li);
                         div.text("Source:");
                         var sourceDiv = $("<a></a>").addClass("cz-form-preloadedrecord").appendTo(li);
-                        sourceDiv.css("color", "blue");
+                        sourceDiv.css("color", "#0464a2");
+                        sourceDiv.css("cursor", "pointer");
                         sourceDiv.text(preloaded.source);
                         sourceDiv.prop("href", preloaded.link);
                         link.click(function (e) {
@@ -12005,35 +12246,47 @@ var CZ;
             prevForm: null,
             navButton: ".cz-form-nav",
             closeButton: ".cz-form-close-btn > .cz-form-btn",
-            titleTextblock: ".cz-form-title"
+            titleTextblock: ".cz-form-title",
+            contentContainer: ".cz-form-content"
         });
-                var tourTitleInput = this.container.find(".cz-form-label");
-                tourTitleInput.text(message);
+                this.tourTitleInput = this.container.find(".cz-form-label");
                 this.titleTextblock.text(title || "ChronoZoom");
+                this.tourTitleInput.text(message);
+                this.setHeight();
             }
             MessageWindow.prototype.show = function () {
+                var _this = this;
                 _super.prototype.show.call(this, {
                     effect: "slide",
                     direction: "left",
-                    duration: 500
+                    duration: 300,
+                    complete: function () {
+                        $(document).on("keyup", _this, _this.onDocumentKeyPress);
+                    }
                 });
-                $(document).bind("keypress", this, this.onDocumentKeyPress);
             };
             MessageWindow.prototype.close = function () {
-                $(document).unbind("keypress", this.onDocumentKeyPress);
+                var _this = this;
                 _super.prototype.close.call(this, {
                     effect: "slide",
                     direction: "left",
-                    duration: 100,
+                    duration: 300,
                     complete: function () {
+                        $(document).off("keyup", _this.onDocumentKeyPress);
                     }
                 });
             };
             MessageWindow.prototype.onDocumentKeyPress = function (e) {
                 var self = e.data;
                 if(e.which == 27 && self.isFormVisible) {
-                    self.close();
+                    self.closeButton.click();
                 }
+            };
+            MessageWindow.prototype.setHeight = function () {
+                this.container.show();
+                var messageHeight = this.tourTitleInput.outerHeight(true);
+                this.contentContainer.height(messageHeight);
+                this.container.hide();
             };
             return MessageWindow;
         })(CZ.UI.FormBase);
@@ -12245,6 +12498,10 @@ var CZ;
                 Name: "Themes",
                 Activation: FeatureActivation.NotProduction
             }, 
+            {
+                Name: "Skydrive",
+                Activation: FeatureActivation.NotProduction
+            }, 
             
         ];
         HomePageViewModel.rootCollection;
@@ -12280,7 +12537,6 @@ var CZ;
                 CZ.Tours.activateTour(tour, undefined);
             };
             var onToursInitialized = function () {
-                CZ.Tours.initializeToursUI();
                 $("#tours_index").click(function () {
                     var toursListForm = getFormById("#toursList");
                     if(toursListForm.isFormVisible) {
@@ -12330,7 +12586,9 @@ var CZ;
             })();
             $('.bubbleInfo').hide();
             var canvasIsEmpty;
+            ApplyFeatureActivation();
             CZ.Extensions.registerExtensions();
+            CZ.Media.SkyDriveMediaPicker.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
             CZ.Media.initialize();
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
@@ -12439,6 +12697,7 @@ var CZ;
                         form.show();
                     },
                     showCreateTimelineForm: function (timeline) {
+                        CZ.Authoring.hideMessageWindow();
                         CZ.Authoring.mode = "createTimeline";
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
                             activationSource: $(".header-icon.edit-icon"),
@@ -12472,6 +12731,7 @@ var CZ;
                         form.show();
                     },
                     showCreateExhibitForm: function (exhibit) {
+                        CZ.Authoring.hideMessageWindow();
                         var form = new CZ.UI.FormEditExhibit(forms[2], {
                             activationSource: $(".header-icon.edit-icon"),
                             navButton: ".cz-form-nav",
@@ -12644,13 +12904,15 @@ var CZ;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
             CZ.Settings.applyTheme(null);
-            CZ.Service.getCollections(CZ.Service.superCollectionName).then(function (response) {
-                $(response).each(function (index) {
-                    if(response[index] && response[index].Title.toLowerCase() === CZ.Service.collectionName.toLowerCase()) {
-                        CZ.Settings.applyTheme(response[index].theme);
-                    }
+            if(CZ.Service.superCollectionName) {
+                CZ.Service.getCollections(CZ.Service.superCollectionName).then(function (response) {
+                    $(response).each(function (index) {
+                        if(response[index] && response[index].Title.toLowerCase() === CZ.Service.collectionName.toLowerCase()) {
+                            CZ.Settings.applyTheme(response[index].theme);
+                        }
+                    });
                 });
-            });
+            }
             $('#breadcrumbs-nav-left').click(CZ.BreadCrumbs.breadCrumbNavLeft);
             $('#breadcrumbs-nav-right').click(CZ.BreadCrumbs.breadCrumbNavRight);
             $('#biblCloseButton').mouseout(function () {
@@ -12658,7 +12920,6 @@ var CZ;
             }).mouseover(function () {
                 CZ.Common.toggleOnImage('biblCloseButton', 'png');
             });
-            ApplyFeatureActivation();
             if(navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
                 document.addEventListener('touchmove', function (e) {
                     e.preventDefault();

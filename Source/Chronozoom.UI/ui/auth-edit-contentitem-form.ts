@@ -1,6 +1,7 @@
 /// <reference path='../ui/controls/formbase.ts'/>
 /// <reference path='../scripts/authoring.ts'/>
 /// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
+/// <reference path='../ui/media/skydrive-mediapicker.ts'/>
 
 module CZ {
     export module UI {
@@ -77,6 +78,13 @@ module CZ {
                 this.mediaTypeInput.change(() => { this.isModified = true; });
                 this.attributionInput.change(() => { this.isModified = true; });
                 this.descriptionInput.change(() => { this.isModified = true; });
+
+                if (CZ.Media.SkyDriveMediaPicker.isEnabled) {
+                    $("<option></option>", {
+                        value: "skydrive",
+                        text: " Skydrive "
+                    }).appendTo(this.mediaTypeInput);
+                }
 
                 this.titleInput.val(this.contentItem.title || "");
                 this.mediaInput.val(this.contentItem.uri || "");
@@ -183,11 +191,12 @@ module CZ {
 
             public close(noAnimation?: bool = false) {
                 if (this.isModified) {
-                    var r = window.confirm("There is unsaved data. Do you want to close without saving?");
-                    if (r != true) {
+                    if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
+                        this.isModified = false;
+                    }
+                    else {
                         return;
                     }
-                    this.isModified = false;
                 }
 
                 super.close(noAnimation ? undefined : {

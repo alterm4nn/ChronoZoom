@@ -1,7 +1,7 @@
 <div>
     <div>
-        <input type="search" class="cz-input cz-bing-search-input" maxlength="200" />
-        <button class="cz-bing-search-button cz-button">search</button>
+        <input id="bing-search-input" type="search" class="cz-input cz-bing-search-input" maxlength="200" />
+        <button id="bing-search-button" class="cz-bing-search-button cz-button">search</button>
     </div>
     <div>
         <input id="bing-media-type-image" class="cz-radiobutton" style="display: inline-block;"
@@ -17,9 +17,9 @@
         <label for="bing-media-type-document">PDF</label>
     </div>
 
-    <img class="cz-form-progress-bar" style="width: 400px"
+    <img id="bing-search-progress-bar" class="cz-form-progress-bar" style="width: 400px"
          src="/images/loading.gif" alt="searching..." />
 </div>
 
-<div class="cz-bing-search-results">
+<div id="bing-search-results" class="cz-bing-search-results">
 </div>

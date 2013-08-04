@@ -50,6 +50,12 @@ var CZ;
                 this.descriptionInput.change(function () {
                     _this.isModified = true;
                 });
+                if(CZ.Media.SkyDriveMediaPicker.isEnabled) {
+                    $("<option></option>", {
+                        value: "skydrive",
+                        text: " Skydrive "
+                    }).appendTo(this.mediaTypeInput);
+                }
                 this.titleInput.val(this.contentItem.title || "");
                 this.mediaInput.val(this.contentItem.uri || "");
                 this.mediaSourceInput.val(this.contentItem.mediaSource || "");
@@ -153,11 +159,11 @@ var CZ;
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
                 var _this = this;
                 if(this.isModified) {
-                    var r = window.confirm("There is unsaved data. Do you want to close without saving?");
-                    if(r != true) {
+                    if(window.confirm("There is unsaved data. Do you want to close without saving?")) {
+                        this.isModified = false;
+                    } else {
                         return;
                     }
-                    this.isModified = false;
                 }
                 _super.prototype.close.call(this, noAnimation ? undefined : {
                     effect: "slide",
