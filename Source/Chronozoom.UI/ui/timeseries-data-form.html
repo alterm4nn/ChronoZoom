@@ -1,6 +1,6 @@
 ﻿<div class="cz-form-header" style="width: 500px;">
     <ul>
-        <li class="cz-form-nav"></li>
+        <li class="cz-form-nav" style="display: none;"></li>
         <li class="cz-form-title">Charts
         </li>
         <li class="cz-form-close-btn">
@@ -15,17 +15,10 @@
     </ul>
 
     <div id="uploadDataCnt">
-        <div style="margin-bottom: 16px;">Upload and view your own</div>
-
-        <div class="cz-timeseries-data-btn" style="float:left; position: relative; overflow: hidden;">
-            <div style="color: white;">Select file</div>
-            <input type="file" accept="text/csv" id="fileLoader" class="cz-form-input-file" >
-        </div>
-
-        <div id="selectedFile" class="cz-form-selectedfileinfo"></div>
-
-        <div style="float: left; margin-right: 4px;">
-            <div style="margin-right: 4px; margin-left: 4px; float: left; height: 24px; padding: 1px;">delimiter</div>
+        <div style="margin-bottom: 6px;">View your own</div>
+        <div style="float: left; margin-right: 4px;"><input style="height: 26px; text-align: center;" type="file" accept="text/csv" id="fileLoader" class="cz-form-input-file"></div>
+        <div style="float: left; margin-right: 4px;height=18px;">
+            <div style="margin-left: 14px;  margin-right: 4px; float: left; height: 26px; padding: 1px;">delimiter:</div>
             <select id="delim" style="width: 65px; height: 26px; text-align: center; margin-right: 4px;">
                 <option>,</option>
                 <option>;</option>
@@ -33,50 +26,11 @@
                 <option>tab</option>
             </select>
         </div>
-        <div id="loadDataBtn" class="cz-timeseries-data-btn">Load</div>
+        <input style=" height: 26px; text-align: center;" type="button" class="cz-timeseries-data-btn" id="loadDataBtn" value="Load" />
     </div>
 </div>
 
 <style>
-    .cz-timeseries-data-btn {
-        width: 70px;
-        height: 24px;
-        background-color: #0464a2;
-        color: white;  
-        display: inline-block;
-        text-align: center;
-        padding: 1px;
-    }
-
-    .cz-timeseries-data-btn:hover {
-        background-color: #079CF9;
-    }
-
-    .cz-form-input-file {
-        position: absolute;
-        top: 0px;
-        left: 0px; 
-        -moz-opacity: 0; 
-        filter: alpha(opacity=0); 
-        opacity: 0; 
-        font-size: 150px; 
-        height: 24px; 
-        width: 70px;
-    }
-
-    .cz-form-selectedfileinfo {
-        border: 1px solid black; 
-        width: 150px; 
-        height: 24px; 
-        margin-left: 8px; 
-        float: left; 
-        overflow: hidden; 
-        white-space: nowrap;
-        -o-text-overflow: ellipsis;
-        -ms-text-overflow: ellipsis;
-        text-overflow: ellipsis; 
-    }
-
     .cz-form-preloadedrecord {
         display: inline;
         vertical-align: bottom;
@@ -84,11 +38,15 @@
         padding-right: 2px;
         padding-left: 2px;
         height: 22px;
+        overflow: hidden; 
+        text-overflow: ellipsis; 
+        -o-text-overflow: ellipsis; 
+        white-space: pre-wrap; 
+        width: 100%;
     }
 
-    #existingTimeSeries a.cz-form-btn{
-        height:22px;
-        padding-top:1px;        
+    #existingTimeSeries a.cz-form-btn {
+        height: 22px;
+        padding-top: 1px;
     }
-    
 </style>

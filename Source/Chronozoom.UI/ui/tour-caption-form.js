@@ -125,6 +125,10 @@ var CZ;
                     opacity: 1
                 });
             };
+            FormTourCaption.prototype.showTourEndMessage = function () {
+                this.captionTextarea.text(CZ.Tours.TourEndMessage);
+                this.bookmarksCount.text("Start a tour");
+            };
             FormTourCaption.prototype.setPlayPauseButtonState = function (state) {
                 this.tourPlayer.playPauseButton.attr("state", state);
             };

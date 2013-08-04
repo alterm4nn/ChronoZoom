@@ -124,6 +124,7 @@ module CZ {
 
                 this.deleteButton.click(event => {
                     if (confirm("Are you sure want to delete timeline and all of its nested timelines and exhibits? Delete can't be undone!")) {
+                        var isDataValid = true;
                         CZ.Authoring.removeTimeline(this.timeline);
                         this.close();
                     }

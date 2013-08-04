@@ -98,8 +98,8 @@ var CZ;
                 return sinh(x) / cosh(x);
             }
             this.u = function (s) {
-                var val = this.startScale / Math.pow(this.ro, 2) * cosh(this.r0) * tanh(this.ro * s + this.r0) - this.startScale / Math.pow(this.ro, 2) * sinh(this.r0) + this.u0;
-                return val;
+                var val = this.startScale / (this.ro * this.ro) * (this.coshR0 * tanh(this.ro * s + this.r0) - this.sinhR0) + this.u0;
+                return Math.min(val, this.pathLen);
             };
             this.scale = function (t) {
                 return this.startScale * cosh(this.r0) / cosh(this.ro * (t * this.S) + this.r0);
@@ -183,6 +183,8 @@ var CZ;
                     return this.startScale + (this.endScale - this.startScale) * s;
                 };
             }
+            this.coshR0 = cosh(this.r0);
+            this.sinhR0 = sinh(this.r0);
         }
         ViewportAnimation.EllipticalZoom = EllipticalZoom;
         function animationEase(t) {

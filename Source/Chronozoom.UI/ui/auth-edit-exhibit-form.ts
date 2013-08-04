@@ -220,7 +220,7 @@ module CZ {
                 if (confirm("Are you sure want to delete the exhibit and all of its content items? Delete can't be undone!")) {
                     CZ.Authoring.removeExhibit(this.exhibit);
                     this.isCancel = false;
-                    this.isModified = true;
+                    this.isModified = false;
                     this.close();
                 }
                 
@@ -299,11 +299,13 @@ module CZ {
 
             public close(noAnimation?: bool = false) {
                 if (this.isModified) {
-                    var r = window.confirm("There is unsaved data. Do you want to close without saving?");
-                    if (r != true) {
+                    if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
+                        this.isModified = false;
+                    }
+                    else {
                         return;
                     }
-                    this.isModified = false;
+                    
                 }
 
                 super.close(noAnimation ? undefined : {

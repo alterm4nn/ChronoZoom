@@ -180,6 +180,11 @@ module CZ {
                 });
             }
 
+            public showTourEndMessage(): void {
+                this.captionTextarea.text(CZ.Tours.TourEndMessage);
+                this.bookmarksCount.text("Start a tour");
+            }
+
             public setPlayPauseButtonState(state: string) {
                 this.tourPlayer.playPauseButton.attr("state", state);
             }
