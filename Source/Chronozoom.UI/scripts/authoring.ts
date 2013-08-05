@@ -792,7 +792,30 @@ module CZ {
                         alert("Sorry, only PDF extension is supported");
                         isValid = false;
                     }
-                }
+                } else if (ci.mediaType.toLowerCase() === "skydrive-document") {
+                    // Skydrive embed link
+                    var skydrive = /skydrive\.live\.com\/embed/;
+
+                    if (!skydrive.test(ci.uri)) {
+                        alert("This is not a Skydrive embed link");
+                        isValid = false;
+                    }
+                } else if (ci.mediaType.toLowerCase() === "skydrive-image") {
+                    // uri pattern is - {url} {width} {height}
+                    var splited = ci.uri.split(' ');
+                    // Skydrive embed link
+                    var skydrive = /skydrive\.live\.com\/embed/;
+
+                    // validate width
+                    var width = /[0-9]/;
+                    // validate height
+                    var height = /[0-9]/;
+
+                    if (!skydrive.test(splited[0]) || !width.test(splited[1]) || !height.test(splited[2])) {
+                        alert("This is not a Skydrive embed link");
+                        isValid = false;
+                    }
+                }                
                 if (!isValid) return false;
                 i++;
             }
