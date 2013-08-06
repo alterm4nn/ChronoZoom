@@ -79,7 +79,7 @@ namespace Application.Helper.Helpers
         private int GetResultsCount()
         {
             Logger.Log("<-");
-            int count = FindElements(By.XPath("//div[@class='cz-bing-result-container']")).Count;
+            int count = GetItemsCount(By.XPath("//div[@class='cz-bing-result-container']"));
             Logger.Log("-> count: " + count);
             return count;
         }

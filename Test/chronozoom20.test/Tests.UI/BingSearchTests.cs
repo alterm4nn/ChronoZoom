@@ -20,7 +20,7 @@ namespace Tests
             BrowserStateManager.RefreshState();
             HomePageHelper.OpenPage();
             AuthorizationHelper.OpenLoginPage();
-            AuthorizationHelper.AuthenticateAsMicrosoftUser();
+            AuthorizationHelper.AuthenticateAsMicrosoftUser(); //authenticate as existing cz user
             HomePageHelper.DeleteAllElementsLocally();
             var exhibit = new Exhibit { Title = "WebdriverExhibitWithContent" };
             ExhibitHelper.AddExhibitWithoutFormClosing(exhibit);
