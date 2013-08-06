@@ -15,6 +15,8 @@ module CZ {
             export var logoutButton: JQuery;
             export var isEnabled: bool;
 
+            var mediaType: string;
+
             export function setup(context: any) {
                 contentItem = context;
                 editContentItemForm = CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
@@ -55,6 +57,15 @@ module CZ {
              * @return {Promise}          Request's promise.
              */
             function getEmbed(response) {
+                switch (response.data.files[0].type) {
+                    case "photo":
+                        mediaType = "skydrive-image";
+                        break;
+                    default:
+                        mediaType = "skydrive-document";
+                        break;
+                }
+
                 return WL.api({
                     path: response.data.files[0].id + "/embed",
                     method: "GET"
@@ -67,9 +78,18 @@ module CZ {
              */
             function onContentReceive(response) {
                 var src = response.embed_html.match(/src=\"(.*?)\"/i)[1];
+                
+                var uri = src;
+
+                if (mediaType === "skydrive-image") {
+                    var width = parseFloat(response.embed_html.match(/width="[0-9]+"/)[0].match(/[0-9]+/)[0]);
+                    var height = parseFloat(response.embed_html.match(/height="[0-9]+"/)[0].match(/[0-9]+/)[0]);
+                    uri += ' ' + width + ' ' + height;
+                }
+
                 var mediaInfo = <CZ.Media.MediaInfo> {
-                    uri: src,
-                    mediaType: "skydrive",
+                    uri: uri,
+                    mediaType: mediaType,
                     mediaSource: src,
                     attribution: src
                 };

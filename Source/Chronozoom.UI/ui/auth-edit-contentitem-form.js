@@ -50,10 +50,14 @@ var CZ;
                 this.descriptionInput.change(function () {
                     _this.isModified = true;
                 });
-                if(CZ.Media.SkyDriveMediaPicker.isEnabled) {
+                if(CZ.Media.SkyDriveMediaPicker.isEnabled && this.mediaTypeInput.find("option[value='skydrive-image']").length === 0) {
                     $("<option></option>", {
-                        value: "skydrive",
-                        text: " Skydrive "
+                        value: "skydrive-image",
+                        text: " Skydrive Image "
+                    }).appendTo(this.mediaTypeInput);
+                    $("<option></option>", {
+                        value: "skydrive-document",
+                        text: " Skydrive Document "
                     }).appendTo(this.mediaTypeInput);
                 }
                 this.titleInput.val(this.contentItem.title || "");
