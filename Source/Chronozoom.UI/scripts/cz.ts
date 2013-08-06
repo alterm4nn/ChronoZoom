@@ -229,6 +229,12 @@ module CZ {
             $('.bubbleInfo').hide();
             var canvasIsEmpty;
 
+            var url = CZ.UrlNav.getURL();
+            rootCollection = url.superCollectionName === undefined;
+            CZ.Service.superCollectionName = url.superCollectionName;
+            CZ.Service.collectionName = url.collectionName;
+            CZ.Common.initialContent = url.content;
+
             // Apply features
             ApplyFeatureActivation();
 
@@ -575,12 +581,6 @@ module CZ {
                     CZ.Settings.signinUrlGoogle = response.signinUrlGoogle;
                     CZ.Settings.signinUrlYahoo = response.signinUrlYahoo;
                 });
-
-            var url = CZ.UrlNav.getURL();
-            rootCollection = url.superCollectionName === undefined;
-            CZ.Service.superCollectionName = url.superCollectionName;
-            CZ.Service.collectionName = url.collectionName;
-            CZ.Common.initialContent = url.content;
 
             CZ.Settings.applyTheme(null);
 
