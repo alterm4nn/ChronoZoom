@@ -182,6 +182,11 @@ var CZ;
             })();
             $('.bubbleInfo').hide();
             var canvasIsEmpty;
+            var url = CZ.UrlNav.getURL();
+            HomePageViewModel.rootCollection = url.superCollectionName === undefined;
+            CZ.Service.superCollectionName = url.superCollectionName;
+            CZ.Service.collectionName = url.collectionName;
+            CZ.Common.initialContent = url.content;
             ApplyFeatureActivation();
             CZ.Extensions.registerExtensions();
             CZ.Media.SkyDriveMediaPicker.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
@@ -494,11 +499,6 @@ var CZ;
                 CZ.Settings.signinUrlGoogle = response.signinUrlGoogle;
                 CZ.Settings.signinUrlYahoo = response.signinUrlYahoo;
             });
-            var url = CZ.UrlNav.getURL();
-            HomePageViewModel.rootCollection = url.superCollectionName === undefined;
-            CZ.Service.superCollectionName = url.superCollectionName;
-            CZ.Service.collectionName = url.collectionName;
-            CZ.Common.initialContent = url.content;
             CZ.Settings.applyTheme(null);
             if(CZ.Service.superCollectionName) {
                 CZ.Service.getCollections(CZ.Service.superCollectionName).then(function (response) {

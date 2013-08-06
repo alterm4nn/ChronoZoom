@@ -164,7 +164,6 @@ namespace Application.Helper.Helpers
             return IsElementDisplayed(By.Id("bibliography"));
         }
 
-
         public Bibliography GetBibliography()
         {
             Logger.Log("<-");
@@ -183,12 +182,61 @@ namespace Application.Helper.Helpers
             return bibliography;
         }
 
-
         public void CloseBibliography()
         {
             Logger.Log("<-");
             Click(By.Id("biblCloseButton"));
             Logger.Log("->");
+        }
+
+        public void AddExhibitWithoutFormClosing(Exhibit exhibit)
+        {
+            Logger.Log("<- " + exhibit);
+            InitExhibitCreationMode();
+            SetExhibitPoint();
+            SetExhibitTitle(exhibit.Title);
+            Logger.Log("->");
+        }
+
+        public void ClickByAddArtifact()
+        {
+            Logger.Log("->");
+            By createArtifactButton = By.XPath("//*[@class='cz-form-create-artifact cz-button']");
+            WaitForElementEnabled(createArtifactButton);
+            Click(createArtifactButton);
+            Logger.Log("<-");
+        }
+
+        public string GetCurrentImageOrVideoUrl()
+        {
+            Logger.Log("->");
+            string imageUrl = FindElement(By.XPath("//*[@id='auth-edit-contentitem-form']/div[3]/input[2]")).GetAttribute("value");
+            Logger.Log("<- imageUrl: " + imageUrl);
+            return imageUrl;
+        }
+
+        public string GetCurrentMediaSource()
+        {
+            Logger.Log("->");
+            string mediaSource = FindElement(By.XPath("//*[@id='auth-edit-contentitem-form']/div[3]/input[3]")).GetAttribute("value");
+            Logger.Log("<- mediaSource: " + mediaSource);
+            return mediaSource;
+        }
+
+        public string GetCurrentAttribution()
+        {
+            Logger.Log("->");
+            string mediaSource = FindElement(By.XPath("//*[@id='auth-edit-contentitem-form']/div[3]/input[4]")).GetAttribute("value");
+            Logger.Log("<- attribution: " + mediaSource);
+            return mediaSource;
+        }
+
+        public string GetCurrentMediaType()
+        {
+            Logger.Log("->");
+            string mediaSource = FindElement(By.XPath("//*[@id='auth-edit-contentitem-form']/div[3]/select")).GetAttribute("value");
+            Logger.Log("<- attribution: " + mediaSource);
+            return mediaSource;
         }
 
         private void ConfirmDeletion()
@@ -298,6 +346,8 @@ namespace Application.Helper.Helpers
             }
             Logger.Log("<-");
         }
+
+
 
     }
 }
