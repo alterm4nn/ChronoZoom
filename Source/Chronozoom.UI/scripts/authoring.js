@@ -486,7 +486,7 @@ var CZ;
                 if(ci.mediaType.toLowerCase() === "image") {
                     var imageReg = /\.(jpg|jpeg|png|gif)$/i;
                     if(!imageReg.test(ci.uri)) {
-                        alert("Sorry, only JPG/PNG/GIF images are supported");
+                        alert("Sorry, only JPG/PNG/GIF images are supported.");
                         isValid = false;
                     }
                 } else if(ci.mediaType.toLowerCase() === "video") {
@@ -501,7 +501,7 @@ var CZ;
                         ci.uri = "http://player.vimeo.com/video/" + vimeoVideoId;
                     } else if(vimeoEmbed.test(ci.uri)) {
                     } else {
-                        alert("Sorry, only YouTube or Vimeo videos are supported");
+                        alert("Sorry, only YouTube or Vimeo videos are supported.");
                         isValid = false;
                     }
                 } else if(ci.mediaType.toLowerCase() === "pdf") {
@@ -513,7 +513,7 @@ var CZ;
                 } else if(ci.mediaType.toLowerCase() === "skydrive-document") {
                     var skydrive = /skydrive\.live\.com\/embed/;
                     if(!skydrive.test(ci.uri)) {
-                        alert("This is not a Skydrive embed link");
+                        alert("This is not a Skydrive embed link.");
                         isValid = false;
                     }
                 } else if(ci.mediaType.toLowerCase() === "skydrive-image") {
@@ -522,7 +522,7 @@ var CZ;
                     var width = /[0-9]/;
                     var height = /[0-9]/;
                     if(!skydrive.test(splited[0]) || !width.test(splited[1]) || !height.test(splited[2])) {
-                        alert("This is not a Skydrive embed link");
+                        alert("This is not a Skydrive embed link.");
                         isValid = false;
                     }
                 }
