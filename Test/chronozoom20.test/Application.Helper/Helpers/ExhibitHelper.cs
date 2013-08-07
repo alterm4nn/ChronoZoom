@@ -210,7 +210,7 @@ namespace Application.Helper.Helpers
         public string GetCurrentImageOrVideoUrl()
         {
             Logger.Log("->");
-            string imageUrl = FindElement(By.XPath("//*[@id='auth-edit-contentitem-form']/div[3]/input[2]")).GetAttribute("value");
+            string imageUrl = FindElement(By.XPath("//*[@id='auth-edit-contentitem-form']/div[@class='cz-form-content']/input[@class='cz-form-item-mediaurl cz-input']")).GetAttribute("value");
             Logger.Log("<- imageUrl: " + imageUrl);
             return imageUrl;
         }
@@ -218,7 +218,7 @@ namespace Application.Helper.Helpers
         public string GetCurrentMediaSource()
         {
             Logger.Log("->");
-            string mediaSource = FindElement(By.XPath("//*[@id='auth-edit-contentitem-form']/div[3]/input[3]")).GetAttribute("value");
+            string mediaSource = FindElement(By.XPath("//*[@id='auth-edit-contentitem-form']/div[@class='cz-form-content']/input[@class='cz-form-item-mediasource cz-input']")).GetAttribute("value");
             Logger.Log("<- mediaSource: " + mediaSource);
             return mediaSource;
         }
@@ -226,7 +226,7 @@ namespace Application.Helper.Helpers
         public string GetCurrentAttribution()
         {
             Logger.Log("->");
-            string mediaSource = FindElement(By.XPath("//*[@id='auth-edit-contentitem-form']/div[3]/input[4]")).GetAttribute("value");
+            string mediaSource = FindElement(By.XPath("//*[@id='auth-edit-contentitem-form']/div[@class='cz-form-content']/input[@class='cz-form-item-attribution cz-input']")).GetAttribute("value");
             Logger.Log("<- attribution: " + mediaSource);
             return mediaSource;
         }
@@ -234,7 +234,7 @@ namespace Application.Helper.Helpers
         public string GetCurrentMediaType()
         {
             Logger.Log("->");
-            string mediaSource = FindElement(By.XPath("//*[@id='auth-edit-contentitem-form']/div[3]/select")).GetAttribute("value");
+            string mediaSource = FindElement(By.XPath("//*[@id='auth-edit-contentitem-form']/div[@class='cz-form-content']/select[@class='cz-form-item-media-type cz-input']")).GetAttribute("value");
             Logger.Log("<- attribution: " + mediaSource);
             return mediaSource;
         }
