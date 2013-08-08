@@ -66,7 +66,7 @@ describe("CZ.Authoring part", function () {
                 contentItems = [{ mediaType: 'Image', uri: 'www.example.com/image', title: 'Title' }];
                 var isValid = validateContentItems(contentItems);
                 expect(false).toEqual(isValid);
-                expect('Sorry, only JPG/PNG/GIF images are supported').toEqual(alertMessage);
+                expect('Sorry, only JPG/PNG/GIF images are supported.').toEqual(alertMessage);
             });
 
             //Video
@@ -94,7 +94,7 @@ describe("CZ.Authoring part", function () {
                 contentItems = [{ mediaType: 'Video', uri: 'http://video.com/video.php&id=65535', title: 'Title' }];
                 var isValid = validateContentItems(contentItems);
                 expect(false).toEqual(isValid);
-                expect('Sorry, only YouTube or Vimeo videos are supported').toEqual(alertMessage);
+                expect('Sorry, only YouTube or Vimeo videos are supported.').toEqual(alertMessage);
             });
             //Vimeo copy video url at current time
             it("true, if 'mediaType' equal 'Video' and 'uri' equal 'http://vimeo.com/37284939#t=18'", function () {
@@ -137,7 +137,7 @@ describe("CZ.Authoring part", function () {
                 contentItems = [{ mediaType: 'PDF', uri: 'http://site.com/mypdffile', title: 'Title' }];
                 var isValid = validateContentItems(contentItems);
                 expect(false).toEqual(isValid);
-                expect('Sorry, only PDF extension is supported').toEqual(alertMessage);
+                expect('Sorry, only PDF extension is supported.').toEqual(alertMessage);
             });
 
         });
