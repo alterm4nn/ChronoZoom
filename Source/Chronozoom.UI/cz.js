@@ -4515,7 +4515,7 @@ var CZ;
                 } else if(ci.mediaType.toLowerCase() === "pdf") {
                     var pdf = /\.(pdf)$|\.(pdf)\?/i;
                     if(!pdf.test(ci.uri)) {
-                        alert("Sorry, only PDF extension is supported");
+                        alert("Sorry, only PDF extension is supported.");
                         isValid = false;
                     }
                 } else if(ci.mediaType.toLowerCase() === "skydrive-document") {
