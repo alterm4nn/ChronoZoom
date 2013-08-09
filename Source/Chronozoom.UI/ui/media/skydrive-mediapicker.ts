@@ -14,7 +14,7 @@ module CZ {
             export var filePickerIframe: JQuery;
             export var logoutButton: JQuery;
             export var isEnabled: bool;
-
+            export var helperText: JQuery;
             var mediaType: string;
 
             export function setup(context: any) {
@@ -25,6 +25,11 @@ module CZ {
                     text: "Logout",
                     class: "cz-skydrive-logout-button",
                     click: onLogout
+                });
+                
+                helperText = $("<label></label>", {
+                    text: "Selected items will be automatically shared",
+                    class: "cz-skydrive-help-text",
                 });
 
                 filePicker = showFilePicker().then(onFilePick, onError);
@@ -117,6 +122,7 @@ module CZ {
             function onLogout() {
                 var isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
                 logoutButton.hide();
+                helperText.hide();
                 filePicker.cancel();
                 WL.logout();
 
@@ -153,6 +159,8 @@ module CZ {
                 // Append logout button to file picker.
                 logoutButton.appendTo("body");
 
+                helperText.appendTo("body");
+
                 $(window).on("resize", onWindowResize);
 
                 filePickerIframe.load(() => {
@@ -163,6 +171,9 @@ module CZ {
                     logoutButton.animate({
                         opacity: 1
                     });
+                    helperText.animate({
+                        opacity: 1
+                    });
                 });
             }
 
@@ -171,6 +182,7 @@ module CZ {
              */
             function onFilePickerClose() {
                 logoutButton.remove();
+                helperText.remove();
                 $(window).off("resize", onWindowResize);                
             }
 
@@ -188,6 +200,10 @@ module CZ {
                 logoutButton.offset({
                     top: iframeOffset.top + iframeHeight - skyDriveFooterHeight + buttonTopMargin,
                     left: iframeOffset.left + buttonLeftMargin
+                });
+                helperText.offset({
+                    top: iframeOffset.top + iframeHeight - skyDriveFooterHeight + buttonTopMargin + 1,
+                    left: iframeOffset.left + buttonLeftMargin + 90
                 });
             }
         }

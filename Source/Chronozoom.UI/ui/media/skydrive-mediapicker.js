@@ -8,6 +8,7 @@ var CZ;
             SkyDriveMediaPicker.filePickerIframe;
             SkyDriveMediaPicker.logoutButton;
             SkyDriveMediaPicker.isEnabled;
+            SkyDriveMediaPicker.helperText;
             var mediaType;
             function setup(context) {
                 contentItem = context;
@@ -16,6 +17,10 @@ var CZ;
                     text: "Logout",
                     class: "cz-skydrive-logout-button",
                     click: onLogout
+                });
+                SkyDriveMediaPicker.helperText = $("<label></label>", {
+                    text: "Selected items will be automatically shared",
+                    class: "cz-skydrive-help-text"
                 });
                 SkyDriveMediaPicker.filePicker = showFilePicker().then(onFilePick, onError);
             }
@@ -73,6 +78,7 @@ var CZ;
             function onLogout() {
                 var isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
                 SkyDriveMediaPicker.logoutButton.hide();
+                SkyDriveMediaPicker.helperText.hide();
                 SkyDriveMediaPicker.filePicker.cancel();
                 WL.logout();
                 if(isFirefox) {
@@ -95,6 +101,7 @@ var CZ;
             }
             function onFilePickerLoad() {
                 SkyDriveMediaPicker.logoutButton.appendTo("body");
+                SkyDriveMediaPicker.helperText.appendTo("body");
                 $(window).on("resize", onWindowResize);
                 SkyDriveMediaPicker.filePickerIframe.load(function () {
                     onWindowResize();
@@ -104,10 +111,14 @@ var CZ;
                     SkyDriveMediaPicker.logoutButton.animate({
                         opacity: 1
                     });
+                    SkyDriveMediaPicker.helperText.animate({
+                        opacity: 1
+                    });
                 });
             }
             function onFilePickerClose() {
                 SkyDriveMediaPicker.logoutButton.remove();
+                SkyDriveMediaPicker.helperText.remove();
                 $(window).off("resize", onWindowResize);
             }
             function onWindowResize() {
@@ -119,6 +130,10 @@ var CZ;
                 SkyDriveMediaPicker.logoutButton.offset({
                     top: iframeOffset.top + iframeHeight - skyDriveFooterHeight + buttonTopMargin,
                     left: iframeOffset.left + buttonLeftMargin
+                });
+                SkyDriveMediaPicker.helperText.offset({
+                    top: iframeOffset.top + iframeHeight - skyDriveFooterHeight + buttonTopMargin + 1,
+                    left: iframeOffset.left + buttonLeftMargin + 90
                 });
             }
         })(Media.SkyDriveMediaPicker || (Media.SkyDriveMediaPicker = {}));
