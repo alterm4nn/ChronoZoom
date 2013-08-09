@@ -229,6 +229,8 @@
         Settings.mediapickerImageThumbnailMaxHeight = 155;
         Settings.mediapickerVideoThumbnailMaxWidth = 190;
         Settings.mediapickerVideoThumbnailMaxHeight = 130;
+        Settings.WLAPIClientID = "0000000040101FFA";
+        Settings.WLAPIRedirectUrl = "http://test.chronozoom.com/";
     })(CZ.Settings || (CZ.Settings = {}));
     var Settings = CZ.Settings;
 })(CZ || (CZ = {}));
@@ -10916,19 +10918,12 @@ var CZ;
                 }
             }
             function onLogout() {
-                var isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
-                SkyDriveMediaPicker.logoutButton.hide();
-                SkyDriveMediaPicker.helperText.hide();
-                SkyDriveMediaPicker.filePicker.cancel();
-                WL.logout();
-                if(isFirefox) {
-                    setTimeout(setup, 500, contentItem);
-                } else {
-                    var start = +new Date();
-                    while(+new Date() - start < 500) {
-                        ;
-                    }
-                    setup(contentItem);
+                if(window.confirm("Are you sure want to logout from Skydrive? All your unsaved changes will be lost.")) {
+                    SkyDriveMediaPicker.logoutButton.hide();
+                    SkyDriveMediaPicker.helperText.hide();
+                    SkyDriveMediaPicker.filePicker.cancel();
+                    WL.logout();
+                    window.location.assign("https://login.live.com/oauth20_logout.srf?client_id=" + CZ.Settings.WLAPIClientID + "&redirect_uri=" + window.location.toString());
                 }
             }
             function watchFilePicker(callback) {
@@ -11005,8 +11000,8 @@ var CZ;
             if(CZ.Media.SkyDriveMediaPicker.isEnabled) {
                 registerMediaPicker("skydrive", "/images/media/skydrive-import-50x50.png", CZ.Media.SkyDriveMediaPicker).done(function () {
                     WL.init({
-                        client_id: "0000000040101FFA",
-                        redirect_uri: "http://test.chronozoom.com/",
+                        client_id: CZ.Settings.WLAPIClientID,
+                        redirect_uri: CZ.Settings.WLAPIRedirectUrl,
                         response_type: "token",
                         scope: "wl.signin,wl.photos,wl.skydrive,wl.skydrive_update"
                     });

@@ -1,6 +1,7 @@
 ﻿/// <reference path='../../scripts/cz.ts'/>
 /// <reference path='../../scripts/media.ts'/>
 /// <reference path='../../ui/controls/formbase.ts'/>
+/// <reference path='../../scripts/settings.ts'/>
 /// <reference path='../../scripts/typings/jquery/jquery.d.ts'/>
 
 module CZ {
@@ -120,22 +121,16 @@ module CZ {
              * Logout and closes file picker and opens login dialog.
              */
             function onLogout() {
-                var isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
-                logoutButton.hide();
+                if (window.confirm("Are you sure want to logout from Skydrive? All your unsaved changes will be lost.")) {
+                    logoutButton.hide();
                 helperText.hide();
-                filePicker.cancel();
-                WL.logout();
-
-                // Immediate call causes login with previous user without Sign In popup.
-                // NOTE: Async call causes popup to be blocked in Chrome and IE.
-                //       More info: http://stackoverflow.com/a/7060302/1211780
-                if (isFirefox) {
-                    setTimeout(setup, 500, contentItem);
-                } else {
-                    // Sync imitation of setTimeout 500ms.
-                    var start = + new Date();
-                    while (+ new Date() - start < 500);
-                    setup(contentItem);
+                    filePicker.cancel();
+                    WL.logout();
+                    
+                    // send response to login.live.com/oatuh20_logout.srf to logout from Skydrive
+                    // More info: http://social.msdn.microsoft.com/Forums/live/en-US/4fd9a484-54d7-4c59-91c4-081f4deee2c7/how-to-sign-out-by-rest-api
+                    window.location.assign("https://login.live.com/oauth20_logout.srf?client_id=" +
+                        CZ.Settings.WLAPIClientID + "&redirect_uri=" + window.location.toString());
                 }
             }
 

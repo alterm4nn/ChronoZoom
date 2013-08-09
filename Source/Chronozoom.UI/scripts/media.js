@@ -22,8 +22,8 @@ var CZ;
             if(CZ.Media.SkyDriveMediaPicker.isEnabled) {
                 registerMediaPicker("skydrive", "/images/media/skydrive-import-50x50.png", CZ.Media.SkyDriveMediaPicker).done(function () {
                     WL.init({
-                        client_id: "0000000040101FFA",
-                        redirect_uri: "http://test.chronozoom.com/",
+                        client_id: CZ.Settings.WLAPIClientID,
+                        redirect_uri: CZ.Settings.WLAPIRedirectUrl,
                         response_type: "token",
                         scope: "wl.signin,wl.photos,wl.skydrive,wl.skydrive_update"
                     });

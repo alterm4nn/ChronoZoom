@@ -76,19 +76,12 @@ var CZ;
                 }
             }
             function onLogout() {
-                var isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
-                SkyDriveMediaPicker.logoutButton.hide();
-                SkyDriveMediaPicker.helperText.hide();
-                SkyDriveMediaPicker.filePicker.cancel();
-                WL.logout();
-                if(isFirefox) {
-                    setTimeout(setup, 500, contentItem);
-                } else {
-                    var start = +new Date();
-                    while(+new Date() - start < 500) {
-                        ;
-                    }
-                    setup(contentItem);
+                if(window.confirm("Are you sure want to logout from Skydrive? All your unsaved changes will be lost.")) {
+                    SkyDriveMediaPicker.logoutButton.hide();
+                    SkyDriveMediaPicker.helperText.hide();
+                    SkyDriveMediaPicker.filePicker.cancel();
+                    WL.logout();
+                    window.location.assign("https://login.live.com/oauth20_logout.srf?client_id=" + CZ.Settings.WLAPIClientID + "&redirect_uri=" + window.location.toString());
                 }
             }
             function watchFilePicker(callback) {
