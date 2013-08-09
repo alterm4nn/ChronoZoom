@@ -229,6 +229,8 @@ var CZ;
         Settings.mediapickerImageThumbnailMaxHeight = 155;
         Settings.mediapickerVideoThumbnailMaxWidth = 190;
         Settings.mediapickerVideoThumbnailMaxHeight = 130;
+        Settings.WLAPIClientID = "0000000040101FFA";
+        Settings.WLAPIRedirectUrl = "http://test.chronozoom.com/";
     })(CZ.Settings || (CZ.Settings = {}));
     var Settings = CZ.Settings;
 })(CZ || (CZ = {}));
