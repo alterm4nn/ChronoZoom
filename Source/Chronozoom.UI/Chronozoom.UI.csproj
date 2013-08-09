@@ -291,6 +291,9 @@
     </Content>
     <Content Include="samples\custom-mediapicker\mediapicker-example.ts" />
     <Content Include="samples\bingSearchSample.html" />
+    <Content Include="scripts\authoring.min.js">
+      <DependentUpon>authoring.ts</DependentUpon>
+    </Content>
     <Content Include="scripts\extensions\extensions.js">
       <DependentUpon>extensions.ts</DependentUpon>
     </Content>

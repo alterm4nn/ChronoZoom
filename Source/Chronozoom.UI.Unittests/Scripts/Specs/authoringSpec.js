@@ -62,6 +62,12 @@ describe("CZ.Authoring part", function () {
                 var isValid = validateContentItems(contentItems);
                 expect(true).toEqual(isValid);
             });
+
+            it("true, if 'mediaType' equal 'Image' and 'uri' end with 'gif'", function () {
+                contentItems = [{ mediaType: 'Image', uri: 'www.example.com/image.gif', title: 'Title' }];
+                var isValid = validateContentItems(contentItems);
+                expect(true).toEqual(isValid);
+            });
             it("false, if 'mediaType' equal 'Image' and 'uri' does not end with 'png|jpg|jpeg' (and shown error alert)", function () {
                 contentItems = [{ mediaType: 'Image', uri: 'www.example.com/image', title: 'Title' }];
                 var isValid = validateContentItems(contentItems);
@@ -138,6 +144,60 @@ describe("CZ.Authoring part", function () {
                 var isValid = validateContentItems(contentItems);
                 expect(false).toEqual(isValid);
                 expect('Sorry, only PDF extension is supported.').toEqual(alertMessage);
+            });
+            
+            //SkyDrive document
+            it("true, if 'mediaType' equal 'skydrive-document' and 'uri' is skydrive embeded link", function () {
+                contentItems = [{ mediaType: 'skydrive-document', uri: 'https://skydrive.live.com/embed?cid=BD02F080F32F9129&resid=BD02F080F32F9129%21117&authkey=AG-1M6GDeVQmZvE&em=2', title: 'Title' }];
+                var isValid = validateContentItems(contentItems);
+                expect(true).toEqual(isValid);
+            });
+            
+            it("false, if 'mediaType' equal 'skydrive-document' and 'uri' is not skydrive embeded link (and shown error alert)", function () {
+                contentItems = [{ mediaType: 'skydrive-document', uri: 'http://site.com/mypdffile', title: 'Title' }];
+                var isValid = validateContentItems(contentItems);
+                expect(false).toEqual(isValid);
+                expect('This is not a Skydrive embed link.').toEqual(alertMessage);
+            });
+
+            //SkyDrive image
+            it("true, if 'mediaType' equal 'skydrive-image' and 'uri' is skydrive embeded link", function () {
+                contentItems = [{ mediaType: 'skydrive-image', uri: 'https://skydrive.live.com/embed?cid=BD02F080F32F9129&resid=BD02F080F32F9129%21107&authkey=AOCgBh3ykCqWIbc 308 319', title: 'Title' }];
+                var isValid = validateContentItems(contentItems);
+                expect(true).toEqual(isValid);
+            });
+            
+            it("false, if 'mediaType' equal 'skydrive-image' and 'uri' is not skydrive embeded link (and shown error alert)", function () {
+                contentItems = [{ mediaType: 'skydrive-image', uri: 'https://skydrive.live.com/embed?cid=BD02F080F32F9129&resid=BD02F080F32F9129%21107&authkey=AOCgBh3ykCqWIbc', title: 'Title' }];
+                var isValid = validateContentItems(contentItems);
+                expect(false).toEqual(isValid);
+                expect('This is not a Skydrive embed link.').toEqual(alertMessage);
+            });
+
+            it("false, if 'mediaType' equal 'skydrive-image' and 'uri' is not skydrive embeded link (and shown error alert)", function () {
+                contentItems = [{ mediaType: 'skydrive-image', uri: 'https://skydrive.ru/resid=BD02F080F32F9129%21107 150 200', title: 'Title' }];
+                var isValid = validateContentItems(contentItems);
+                expect(false).toEqual(isValid);
+                expect('This is not a Skydrive embed link.').toEqual(alertMessage);
+            });
+            
+            it("false, if 'mediaType' equal 'skydrive-image' and 'uri' is not skydrive embeded link (and shown error alert)", function () {
+                contentItems = [{ mediaType: 'skydrive-image', uri: 'https://skydrive.live.com/embed?cid=BD02F080F32F9129&resid=BD02F080F32F9129%21107&authkey=AOCgBh3ykCqWIbc 250', title: 'Title' }];
+                var isValid = validateContentItems(contentItems);
+                expect(false).toEqual(isValid);
+                expect('This is not a Skydrive embed link.').toEqual(alertMessage);
+            });
+            it("false, if 'mediaType' equal 'skydrive-image' and 'uri' is not skydrive embeded link (and shown error alert)", function () {
+                contentItems = [{ mediaType: 'skydrive-image', uri: 'https://skydrive.live.com/embed?cid=BD02F080F32F9129&resid=BD02F080F32F9129%21107&authkey=AOCgBh3ykCqWIbc  ', title: 'Title' }];
+                var isValid = validateContentItems(contentItems);
+                expect(false).toEqual(isValid);
+                expect('This is not a Skydrive embed link.').toEqual(alertMessage);
+            });
+            it("false, if 'mediaType' equal 'skydrive-image' and 'uri' is not skydrive embeded link (and shown error alert)", function () {
+                contentItems = [{ mediaType: 'skydrive-image', uri: 'https://skydrive.live.com/embed?cid=BD02F080F32F9129&resid=BD02F080F32F9129%21107&authkey=AOCgBh3ykCqWIbc  7', title: 'Title' }];
+                var isValid = validateContentItems(contentItems);
+                expect(false).toEqual(isValid);
+                expect('This is not a Skydrive embed link.').toEqual(alertMessage);
             });
 
         });
