@@ -3898,9 +3898,13 @@ var CZ;
             return coord;
         }
         Dates.getCoordinateFromYMD = getCoordinateFromYMD;
-        function getYMDFromCoordinate(coord) {
+        function getYMDFromCoordinate(coord, MarkerCorrection) {
+            if (typeof MarkerCorrection === "undefined") { MarkerCorrection = false; }
             var absCoord = Math.abs(coord), floorCoord = Math.floor(coord), sign = (coord === 0) ? 1 : coord / absCoord, day = 0, month = 0, year = (coord >= 1) ? floorCoord : floorCoord - 1, isLeap = isLeapYear(year), daysInYear = isLeap ? 366 : 365, daysFraction = sign * (absCoord - Math.abs(floorCoord));
             day = Math.round(daysFraction * daysInYear);
+            if(MarkerCorrection) {
+                day = Math.floor(daysFraction * daysInYear);
+            }
             day += +(day < daysInYear);
             while(day > Dates.daysInMonth[month] + (+(isLeap && month === 1))) {
                 day -= Dates.daysInMonth[month];
@@ -8150,6 +8154,15 @@ var CZ;
             this.getRegime(range.min, range.max);
             var numOfDigits = Math.max(Math.floor(Math.log(this.delta * Math.pow(10, this.beta) / this.level) * this.log10), -4) - 1;
             labelText = (Math.abs(time / this.level)).toFixed(Math.abs(numOfDigits));
+            var localPresent = CZ.Dates.getPresent();
+            var presentDate = CZ.Dates.getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+            if(time == presentDate) {
+                if(this.regime !== "ka") {
+                    labelText = 0;
+                } else {
+                    labelText = 2;
+                }
+            }
             labelText += " " + (time < 0 ? this.regime : String(this.regime).charAt(0));
             return labelText;
         };
@@ -8565,7 +8578,7 @@ var CZ;
         };
         this.getMarkerLabel = function (range, time) {
             this.getRegime(range.min, range.max);
-            var date = CZ.Dates.getYMDFromCoordinate(time);
+            var date = CZ.Dates.getYMDFromCoordinate(time, true);
             var labelText = date.year + "." + (date.month + 1) + "." + date.day;
             return labelText;
         };
