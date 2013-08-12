@@ -4,12 +4,11 @@ using System.Collections.ObjectModel;
 using Application.Driver;
 using Application.Helper.Constants;
 using Application.Helper.Entities;
-using Application.Helper.UserActions;
 using OpenQA.Selenium;
 
 namespace Application.Helper.Helpers
 {
-    public class ExhibitHelper : DependentActions
+    public class ExhibitHelper : BaseExhibitHelper
     {
 
         public void AddExhibit(Exhibit exhibit)
@@ -29,6 +28,17 @@ namespace Application.Helper.Helpers
             SetExhibitPoint();
             SetExhibitTitle(exhibit.Title);
             AddArtifacts(exhibit.ContentItems);
+            SaveAndClose();
+            Logger.Log("->");
+        }
+
+        public void AddExhibitWithSkyDriveContentItem(Exhibit exhibit)
+        {
+            Logger.Log("<- " + exhibit);
+            InitExhibitCreationMode();
+            SetExhibitPoint();
+            SetExhibitTitle(exhibit.Title);
+            HelperManager<ExhibitSkyDriveHelper>.Instance.AddSkyDriveArtifacts(exhibit.ContentItems);
             SaveAndClose();
             Logger.Log("->");
         }
@@ -321,33 +331,17 @@ namespace Application.Helper.Helpers
             TypeText(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-mediaurl cz-input']"), mediaSourse);
         }
 
-        private void SetDescription(string description)
-        {
-            TypeText(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-descr cz-input']"), description);
-        }
-
-        private void SetTitle(string title)
-        {
-            TypeText(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-title cz-input']"), title);
-        }
-
-
         private void AddArtifacts(IEnumerable<Chronozoom.Entities.ContentItem> contentItems)
         {
             Logger.Log("->");
             foreach (ContentItem contentItem in contentItems)
             {
                 Logger.Log("-- " + contentItem);
-                By createArtifactButton = By.XPath("//*[@class='cz-form-create-artifact cz-button']");
-                WaitForElementEnabled(createArtifactButton);
-                Click(createArtifactButton);
+                InitArtifactForm();
                 FillArtifact(contentItem);
-                Click(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-save cz-button']"));
+                SaveArtifact();
             }
             Logger.Log("<-");
         }
-
-
-
     }
 }
