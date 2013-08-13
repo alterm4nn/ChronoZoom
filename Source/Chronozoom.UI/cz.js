@@ -4332,6 +4332,13 @@ var CZ;
                 t.x = temp.x;
                 t.width = temp.width;
                 t.endDate = prop.end;
+                if(t.children.length < 3) {
+                    t.height = Math.min.apply(Math, [
+                        t.parent.height * CZ.Layout.timelineHeightRate, 
+                        t.width * CZ.Settings.timelineMinAspect, 
+                        t.height
+                    ]);
+                }
                 t.title = prop.title;
                 updateTimelineTitle(t);
                 CZ.Service.putTimeline(t).then(function (success) {
@@ -6337,6 +6344,7 @@ var CZ;
         Layout.animatingElements = {
             length: 0
         };
+        Layout.timelineHeightRate = 0.4;
         function Timeline(title, left, right, childTimelines, exhibits) {
             this.Title = title;
             this.left = left;
@@ -6373,7 +6381,7 @@ var CZ;
             if(timeline.Height) {
                 timeline.Height /= 100;
             } else if(!timeline.AspectRatio && !timeline.Height) {
-                timeline.Height = 0.4;
+                timeline.Height = CZ.Layout.timelineHeightRate;
             }
         }
         function GenerateAspect(timeline) {
