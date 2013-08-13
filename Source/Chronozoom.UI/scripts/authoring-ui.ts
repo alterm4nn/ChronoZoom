@@ -31,7 +31,7 @@ module CZ {
                 }
 
                 CZ.Authoring.showMessageWindow(
-                    "Please click and drag with mouse or finger in the canvas to create the TimeLine.",
+                    "Click and drag to set the approximate length of the timeline.",
                     "Create Timeline"
                 );
 
@@ -65,7 +65,7 @@ module CZ {
                 }
 
                 CZ.Authoring.showMessageWindow(
-                    "Please click inside a timeline to create the Exhibit.",
+                    "Click inside a timeline to set the approximate date of the exhibit.",
                     "Create Exhibit"
                 );
 

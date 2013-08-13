@@ -9345,7 +9345,7 @@ var CZ;
                 if(CZ.Layout.animatingElements.length != 0) {
                     return;
                 }
-                CZ.Authoring.showMessageWindow("Please click and drag with mouse or finger in the canvas to create the TimeLine.", "Create Timeline");
+                CZ.Authoring.showMessageWindow("Click and drag to set the approximate length of the timeline.", "Create Timeline");
                 var prevIsActive = CZ.Authoring.isActive;
                 var prevMode = CZ.Authoring.mode;
                 var messageForm = CZ.HomePageViewModel.getFormById("#message-window");
@@ -9369,7 +9369,7 @@ var CZ;
                 if(CZ.Layout.animatingElements.length != 0) {
                     return;
                 }
-                CZ.Authoring.showMessageWindow("Please click inside a timeline to create the Exhibit.", "Create Exhibit");
+                CZ.Authoring.showMessageWindow("Click inside a timeline to set the approximate date of the exhibit.", "Create Exhibit");
                 var prevIsActive = CZ.Authoring.isActive;
                 var prevMode = CZ.Authoring.mode;
                 var messageForm = CZ.HomePageViewModel.getFormById("#message-window");
