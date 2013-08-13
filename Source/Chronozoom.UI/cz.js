@@ -6231,6 +6231,9 @@ var CZ;
             }
             this.u = function (s) {
                 var val = this.startScale / (this.ro * this.ro) * (this.coshR0 * tanh(this.ro * s + this.r0) - this.sinhR0) + this.u0;
+                if(this.uS < this.pathLen) {
+                    val = val * this.uSRatio;
+                }
                 return Math.min(val, this.pathLen);
             };
             this.scale = function (t) {
@@ -6317,6 +6320,8 @@ var CZ;
             }
             this.coshR0 = cosh(this.r0);
             this.sinhR0 = sinh(this.r0);
+            this.uS = this.u(this.S);
+            this.uSRatio = this.pathLen / this.uS;
         }
         ViewportAnimation.EllipticalZoom = EllipticalZoom;
         function animationEase(t) {
