@@ -76,7 +76,7 @@ var CZ;
                         return;
                     }
                     var vp = context.Target.vc.getViewport();
-                    var visible = VCContent.getVisibleForElement(context.Target, 1.0, vp, true);
+                    var visible = CZ.VCContent.getVisibleForElement(context.Target, 1.0, vp, true);
                     var target = {
                         newvisible: visible,
                         element: context.Target
