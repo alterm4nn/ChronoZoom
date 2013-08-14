@@ -48,7 +48,7 @@ namespace Application.Helper.Helpers
         public void PauseTour()
         {
             Logger.Log("<-");
-            Click(By.Id("tour_playpause"));
+            Click(By.XPath("//*[@title='play/pause']"));
             Logger.Log("->");
         }
 
