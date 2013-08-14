@@ -99,6 +99,7 @@
   <ItemGroup>
     <Resource Include="Constants\Accounts.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Resource>
   </ItemGroup>
   <ItemGroup>
