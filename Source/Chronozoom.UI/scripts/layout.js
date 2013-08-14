@@ -5,6 +5,7 @@ var CZ;
         Layout.animatingElements = {
             length: 0
         };
+        Layout.timelineHeightRate = 0.4;
         function Timeline(title, left, right, childTimelines, exhibits) {
             this.Title = title;
             this.left = left;
@@ -41,7 +42,7 @@ var CZ;
             if(timeline.Height) {
                 timeline.Height /= 100;
             } else if(!timeline.AspectRatio && !timeline.Height) {
-                timeline.Height = 0.4;
+                timeline.Height = CZ.Layout.timelineHeightRate;
             }
         }
         function GenerateAspect(timeline) {

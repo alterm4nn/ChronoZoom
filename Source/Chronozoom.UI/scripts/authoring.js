@@ -318,6 +318,13 @@ var CZ;
                 t.x = temp.x;
                 t.width = temp.width;
                 t.endDate = prop.end;
+                if(t.children.length < 3) {
+                    t.height = Math.min.apply(Math, [
+                        t.parent.height * CZ.Layout.timelineHeightRate, 
+                        t.width * CZ.Settings.timelineMinAspect, 
+                        t.height
+                    ]);
+                }
                 t.title = prop.title;
                 updateTimelineTitle(t);
                 CZ.Service.putTimeline(t).then(function (success) {

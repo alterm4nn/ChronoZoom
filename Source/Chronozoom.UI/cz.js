@@ -4342,6 +4342,13 @@ var CZ;
                 t.x = temp.x;
                 t.width = temp.width;
                 t.endDate = prop.end;
+                if(t.children.length < 3) {
+                    t.height = Math.min.apply(Math, [
+                        t.parent.height * CZ.Layout.timelineHeightRate, 
+                        t.width * CZ.Settings.timelineMinAspect, 
+                        t.height
+                    ]);
+                }
                 t.title = prop.title;
                 updateTimelineTitle(t);
                 CZ.Service.putTimeline(t).then(function (success) {
@@ -6245,6 +6252,9 @@ var CZ;
             }
             this.u = function (s) {
                 var val = this.startScale / (this.ro * this.ro) * (this.coshR0 * tanh(this.ro * s + this.r0) - this.sinhR0) + this.u0;
+                if(this.uS < this.pathLen) {
+                    val = val * this.uSRatio;
+                }
                 return Math.min(val, this.pathLen);
             };
             this.scale = function (t) {
@@ -6331,6 +6341,8 @@ var CZ;
             }
             this.coshR0 = cosh(this.r0);
             this.sinhR0 = sinh(this.r0);
+            this.uS = this.u(this.S);
+            this.uSRatio = this.pathLen / this.uS;
         }
         ViewportAnimation.EllipticalZoom = EllipticalZoom;
         function animationEase(t) {
@@ -6347,6 +6359,7 @@ var CZ;
         Layout.animatingElements = {
             length: 0
         };
+        Layout.timelineHeightRate = 0.4;
         function Timeline(title, left, right, childTimelines, exhibits) {
             this.Title = title;
             this.left = left;
@@ -6383,7 +6396,7 @@ var CZ;
             if(timeline.Height) {
                 timeline.Height /= 100;
             } else if(!timeline.AspectRatio && !timeline.Height) {
-                timeline.Height = 0.4;
+                timeline.Height = CZ.Layout.timelineHeightRate;
             }
         }
         function GenerateAspect(timeline) {
@@ -9355,7 +9368,7 @@ var CZ;
                 if(CZ.Layout.animatingElements.length != 0) {
                     return;
                 }
-                CZ.Authoring.showMessageWindow("Please click and drag with mouse or finger in the canvas to create the TimeLine.", "Create Timeline");
+                CZ.Authoring.showMessageWindow("Click and drag to set the approximate length of the timeline.", "Create Timeline");
                 var prevIsActive = CZ.Authoring.isActive;
                 var prevMode = CZ.Authoring.mode;
                 var messageForm = CZ.HomePageViewModel.getFormById("#message-window");
@@ -9379,7 +9392,7 @@ var CZ;
                 if(CZ.Layout.animatingElements.length != 0) {
                     return;
                 }
-                CZ.Authoring.showMessageWindow("Please click inside a timeline to create the Exhibit.", "Create Exhibit");
+                CZ.Authoring.showMessageWindow("Click inside a timeline to set the approximate date of the exhibit.", "Create Exhibit");
                 var prevIsActive = CZ.Authoring.isActive;
                 var prevMode = CZ.Authoring.mode;
                 var messageForm = CZ.HomePageViewModel.getFormById("#message-window");
