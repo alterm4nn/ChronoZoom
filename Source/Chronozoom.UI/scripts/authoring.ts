@@ -508,11 +508,23 @@ module CZ {
                 type: "rectangle"
             };
 
-            // TODO: Show error message in case of failed test!
             if (checkTimelineIntersections(t.parent, temp, true)) {
                 t.x = temp.x;
                 t.width = temp.width;
                 t.endDate = prop.end;
+
+                // Decrease height if possible to make better aspect ratio.
+                // Source: layout.js, LayoutTimeline method.
+                // NOTE: it won't cause intersection errors since height decreases
+                //       and the timeline has no any children (except CanvasImage
+                //       and CanvasText for edit button and title).
+                if (t.children.length < 3) {
+                    t.height = Math.min.apply(Math, [
+                        t.parent.height * CZ.Layout.timelineHeightRate,
+                        t.width * CZ.Settings.timelineMinAspect,
+                        t.height
+                    ]);
+                }
 
                 // Update title.
                 t.title = prop.title;
