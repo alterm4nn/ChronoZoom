@@ -953,10 +953,11 @@ module CZ {
                     this.editButton.reactsOnMouse = true;
 
                     this.editButton.onmouseclick = function () {
-                        CZ.Authoring.isActive = true;
-                        CZ.Authoring.mode = "editTimeline";
-                        CZ.Authoring.selectedTimeline = this.parent;
-
+                        if (CZ.Common.vc.virtualCanvas("getHoveredInfodot").x == undefined) {
+                            CZ.Authoring.isActive = true;
+                            CZ.Authoring.mode = "editTimeline";
+                            CZ.Authoring.selectedTimeline = this.parent;
+                        }
                         return true;
                     }
 
@@ -1175,7 +1176,6 @@ module CZ {
                             var mlines = this.text.split('\n');
                             var textHeight = 0;
                             var lines = [];
-
                             for (var il = 0; il < mlines.length; il++) {
                                 var words = mlines[il].split(' ');
                                 var lineWidth = 0;
@@ -1197,11 +1197,20 @@ module CZ {
                                         else currentLine += ' ' + words[iw];
                                         lineWidth = newWidth;
                                     }
+                                    var NewWordWidth;
+                                    if ((words.length == 1) && (wsize.width > size_p.x)) {
+                                        var NewWordWidth = wsize.width;
+                                        while (NewWordWidth > size_p.x) {
+                                                fontSize /= 1.5;
+                                                NewWordWidth /= 1.5;
+                                            }
+                                    }
                                 }
                                 lines.push(currentLine);
                                 textHeight += fontSize * k;
                             }
 
+                            
                             if (textHeight > size_p.y) { // we're out of vertical limit
                                 fontSize /= 1.5;
                             } else {
@@ -2191,6 +2200,7 @@ module CZ {
             this.tooltipEnabled = true; // indicates whether tooltip is enabled for this infodot at this moment or not
             this.tooltipIsShown = false; // indicates whether tooltip is shown or not
 
+
             this.onmousehover = function (pv, e) {
                 this.vc.currentlyHoveredInfodot = this;
                 this.vc.requestInvalidate();
@@ -2233,8 +2243,7 @@ module CZ {
             };
 
             this.onmouseleave = function (e) {
-                this.isMouseIn = false
-
+                this.isMouseIn = false;
                 this.settings.strokeStyle = CZ.Settings.infoDotBorderColor;
                 this.settings.lineWidth = CZ.Settings.infoDotBorderWidth * radv;
                 this.vc.requestInvalidate();
@@ -2368,8 +2377,8 @@ module CZ {
                             CZ.Authoring.isActive = true;
                             CZ.Authoring.mode = "editExhibit";
                             CZ.Authoring.selectedExhibit = infodot;
-
                             return true;
+                                
                         }
 
                         editButton.onmouseenter = function () {
