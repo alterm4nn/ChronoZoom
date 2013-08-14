@@ -76,10 +76,12 @@
     <Compile Include="Helpers\ApiHelper.cs" />
     <Compile Include="Helpers\ArtifactSearchHelper.cs" />
     <Compile Include="Helpers\AuthorizationHelper.cs" />
+    <Compile Include="Helpers\BaseExhibitHelper.cs" />
     <Compile Include="Helpers\BookmarkHelper.cs" />
     <Compile Include="Helpers\BreadcrumbsHelper.cs" />
     <Compile Include="Helpers\DateTimeHelper.cs" />
     <Compile Include="Helpers\ExhibitHelper.cs" />
+    <Compile Include="Helpers\ExhibitSkyDriveHelper.cs" />
     <Compile Include="Helpers\HomePageHelper.cs" />
     <Compile Include="Helpers\ImageHelper.cs" />
     <Compile Include="Helpers\NavigationHelper.cs" />

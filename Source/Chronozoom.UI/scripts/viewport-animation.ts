@@ -181,6 +181,11 @@ module CZ {
             this.u = function (s) {
                 var val = this.startScale / (this.ro * this.ro) * (this.coshR0 * tanh(this.ro * s + this.r0) - this.sinhR0) + this.u0;
 
+                // due to math imprecision val may not reach its max value which is pathLen 
+                if (this.uS < this.pathLen) {
+                    val = val * this.uSRatio;
+                }
+
                 // due to math imprecision calculated value might exceed path length, which is the max value
                 return Math.min(val, this.pathLen);
             }
@@ -308,6 +313,8 @@ module CZ {
             // calculate constants for optimization
             this.coshR0 = cosh(this.r0);
             this.sinhR0 = sinh(this.r0);
+            this.uS = this.u(this.S); // right boundary value of this.u
+            this.uSRatio = this.pathLen / this.uS; // ratio of max value of this.u to its actual right boundary value
         }
 
         //function to make animation EaseInOut. [0,1] -> [0,1]
