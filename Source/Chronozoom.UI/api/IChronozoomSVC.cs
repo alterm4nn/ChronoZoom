@@ -627,6 +627,21 @@ namespace Chronozoom.UI
         [OperationContract]
         [WebGet(UriTemplate = "/{superCollectionName}/collections", ResponseFormat = WebMessageFormat.Json)]
         IEnumerable<Collection> GetCollections(string superCollectionName);
+
+        /// <summary>
+        /// Retrieve file mime type by url
+        /// </summary>
+        /// <example><![CDATA[ 
+        /// HTTP verb: GET
+        ///
+        /// URL:
+        /// http://{URL}/api/getmimetypebyurl
+        /// ]]>
+        /// </example>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/getmimetypebyurl?url={url}", ResponseFormat = WebMessageFormat.Json)]
+        string GetMemiTypeByUrl(string url);
     }
 
     [ServiceContract(Namespace = "")]
