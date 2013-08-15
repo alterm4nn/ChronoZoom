@@ -542,6 +542,27 @@ var CZ;
             });
         }
         Service.getProfile = getProfile;
+        function getMimeTypeByUrl(url) {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("getmimetypebyurl");
+            if(url == "") {
+                return result;
+            }
+            request.addParameter("url", url);
+            $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                async: false
+            }).done(function (mime) {
+                result = mime;
+            });
+            return result;
+        }
+        Service.getMimeTypeByUrl = getMimeTypeByUrl;
     })(CZ.Service || (CZ.Service = {}));
     var Service = CZ.Service;
 })(CZ || (CZ = {}));

@@ -3853,6 +3853,27 @@ var CZ;
             });
         }
         Service.getProfile = getProfile;
+        function getMimeTypeByUrl(url) {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("getmimetypebyurl");
+            if(url == "") {
+                return result;
+            }
+            request.addParameter("url", url);
+            $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                async: false
+            }).done(function (mime) {
+                result = mime;
+            });
+            return result;
+        }
+        Service.getMimeTypeByUrl = getMimeTypeByUrl;
     })(CZ.Service || (CZ.Service = {}));
     var Service = CZ.Service;
 })(CZ || (CZ = {}));
@@ -4504,11 +4525,14 @@ var CZ;
             while(contentItems[i] != null) {
                 var ci = contentItems[i];
                 isValid = isValid && CZ.Authoring.isNotEmpty(ci.title) && CZ.Authoring.isNotEmpty(ci.uri) && CZ.Authoring.isNotEmpty(ci.mediaType);
+                var mime = CZ.Service.getMimeTypeByUrl(ci.uri);
                 if(ci.mediaType.toLowerCase() === "image") {
                     var imageReg = /\.(jpg|jpeg|png|gif)$/i;
                     if(!imageReg.test(ci.uri)) {
-                        alert("Sorry, only JPG/PNG/GIF images are supported.");
-                        isValid = false;
+                        if(mime != "application/jpg" && mime != "application/jpeg" && mime != "application/gif" && mime != "application/png") {
+                            alert("Sorry, only JPG/PNG/GIF images are supported.");
+                            isValid = false;
+                        }
                     }
                 } else if(ci.mediaType.toLowerCase() === "video") {
                     var youtube = /(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|[\S\?\&]+&v=|\/user\/\S+))([^\/&#]{10,12})/;
@@ -4528,8 +4552,10 @@ var CZ;
                 } else if(ci.mediaType.toLowerCase() === "pdf") {
                     var pdf = /\.(pdf)$|\.(pdf)\?/i;
                     if(!pdf.test(ci.uri)) {
-                        alert("Sorry, only PDF extension is supported.");
-                        isValid = false;
+                        if(mime != "application/pdf") {
+                            alert("Sorry, only PDF extension is supported.");
+                            isValid = false;
+                        }
                     }
                 } else if(ci.mediaType.toLowerCase() === "skydrive-document") {
                     var skydrive = /skydrive\.live\.com\/embed/;
