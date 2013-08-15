@@ -1372,9 +1372,11 @@ var CZ;
                     this.editButton = VCContent.addImage(this, layerid, id + "__edit", this.x + this.width - 1.15 * this.titleObject.height, this.titleObject.y, this.titleObject.height, this.titleObject.height, "/images/edit.svg");
                     this.editButton.reactsOnMouse = true;
                     this.editButton.onmouseclick = function () {
-                        CZ.Authoring.isActive = true;
-                        CZ.Authoring.mode = "editTimeline";
-                        CZ.Authoring.selectedTimeline = this.parent;
+                        if(CZ.Common.vc.virtualCanvas("getHoveredInfodot").x == undefined) {
+                            CZ.Authoring.isActive = true;
+                            CZ.Authoring.mode = "editTimeline";
+                            CZ.Authoring.selectedTimeline = this.parent;
+                        }
                         return true;
                     };
                     this.editButton.onmousehover = function () {
@@ -1536,6 +1538,14 @@ var CZ;
                                             currentLine += ' ' + words[iw];
                                         }
                                         lineWidth = newWidth;
+                                    }
+                                    var NewWordWidth;
+                                    if((words.length == 1) && (wsize.width > size_p.x)) {
+                                        var NewWordWidth = wsize.width;
+                                        while(NewWordWidth > size_p.x) {
+                                            fontSize /= 1.5;
+                                            NewWordWidth /= 1.5;
+                                        }
                                     }
                                 }
                                 lines.push(currentLine);
