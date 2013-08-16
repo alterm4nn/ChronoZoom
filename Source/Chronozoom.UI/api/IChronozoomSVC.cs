@@ -687,4 +687,23 @@ namespace Chronozoom.UI
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
         BaseJsonResult<IEnumerable<Bing.WebResult>> GetDocuments(string query, string doctype, string top, string skip);
     }
+
+    [ServiceContract(Namespace = "")]
+    public interface ITwitterAPI
+    {   
+        /// <summary>
+        /// Returns recent N timeline tweets of ChronoZoom Twitter account.
+        /// </summary>
+        /// <returns>Recent N timeline tweets of ChronoZoom Twitter account in JSON format.</returns>
+        /// <example><![CDATA[ 
+        /// HTTP verb: GET
+        ///
+        /// URL:
+        /// http://{URL}/api/twitter/getRecentTweets
+        /// ]]>
+        /// </example>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        BaseJsonResult<IEnumerable<TweetSharp.TwitterStatus>> GetRecentTweets();
+    }
 }
