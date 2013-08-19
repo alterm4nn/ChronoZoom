@@ -174,11 +174,11 @@ namespace Application.Driver.UserActions
         protected void WaitCondition(Func<bool> condition, int timeoutInSeconds, int pauseInSeconds = 1)
         {
             var finish = DateTime.Now.AddSeconds(timeoutInSeconds);
-            //IWebElement element = FindElement(By.TagName("body"));
-            //string color = element.GetPreviousAndChangeBackgroundColor("yellow");
+            IWebElement element = FindElement(By.TagName("body"));
+            string color = element.GetPreviousAndChangeBackgroundColor("yellow");
             while ((DateTime.Now < finish) && !condition.Invoke())
                 Sleep(pauseInSeconds);
-            //element.ChangeBackgroundColor(color);
+            element.ChangeBackgroundColor(color);
         }
 
         protected void ExecuteJavaScript(string script, object[] obj = null)
@@ -222,11 +222,6 @@ namespace Application.Driver.UserActions
             }
         }
 
-        protected void Refresh()
-        {
-            WebDriver.Navigate().Refresh();
-        }
-
         protected static void InvokeChain(Func<Actions> chain)
         {
             chain.Invoke().Build().Perform();
@@ -259,11 +254,6 @@ namespace Application.Driver.UserActions
                     break;
                 }
             }
-        }
-
-        protected string GetCurrentWindowTitle()
-        {
-            return WebDriver.Title;
         }
 
         protected void MoveToElementAndClick(By by)
@@ -326,33 +316,9 @@ namespace Application.Driver.UserActions
             return result;
         }
 
-        protected void CloseCurrentWindow()
-        {
-            WebDriver.Close();
-        }
-
         protected void Sleep(int sec)
         {
             Thread.Sleep(TimeSpan.FromSeconds(sec));
-        }
-
-        protected ReadOnlyCollection<string> GetHandles()
-        {
-            ReadOnlyCollection<string> handles;
-            try
-            {
-                handles = WebDriver.WindowHandles;
-            }
-            catch (Exception)
-            {
-                throw new Exception("Can not get browser handles");
-            }
-            return handles;
-        }
-
-        protected string GetCurrentHandle()
-        {
-            return WebDriver.CurrentWindowHandle;
         }
 
         protected void WaitAnimation()

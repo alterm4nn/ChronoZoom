@@ -53,7 +53,6 @@ namespace Tests
         [TestMethod]
         public void timeline_should_be_created_in_date_mode()
         {
-            Logger.Log("Bug: https://github.com/alterm4nn/ChronoZoom/issues/528", LogType.Debug);
             _timeline = new Timeline { Title = "WebdriverTitleDayMode" };
             TimelineHelper.AddTimelineWithDayMode(_timeline);
             _newTimeline = TimelineHelper.GetLastTimeline();
