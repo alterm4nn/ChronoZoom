@@ -37,6 +37,7 @@ namespace Tests
         public void TestCleanup()
         {
             CreateScreenshotsIfTestFail(TestContext);
+            AuthorizationHelper.LogoutByUrl();
         }
 
         #endregion
