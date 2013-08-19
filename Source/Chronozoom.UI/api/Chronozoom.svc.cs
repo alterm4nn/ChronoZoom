@@ -2042,8 +2042,28 @@ namespace Chronozoom.UI
                 SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.ParentTimelineCollectionMismatch);
                 return false;
             }
-
             return true;
+        }
+
+        public string GetMemiTypeByUrl(string url)
+        {
+            string contentType = "";
+            try
+            {
+                var request = HttpWebRequest.Create(url) as HttpWebRequest;
+                request.Method = "head";
+                if (request != null)
+                {
+                    var response = request.GetResponse() as HttpWebResponse;
+                    if (response != null)
+                        contentType = response.ContentType;
+                }
+                return contentType;
+            }
+            catch
+            {
+                return contentType;
+            }
         }
     }
 }
