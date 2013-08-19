@@ -1,4 +1,4 @@
-// --------------------------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright company="Outercurve Foundation">
 //   Copyright (c) 2013, The Outercurve Foundation
 // </copyright>
@@ -22,10 +22,10 @@ using System.ServiceModel.Web;
 using System.Text;
 using System.Web;
 using Chronozoom.Entities;
-
+using System.Text.RegularExpressions;
 using Chronozoom.UI.Utils;
 using System.ServiceModel.Description;
-using System.Text.RegularExpressions;
+
 
 namespace Chronozoom.UI
 {
@@ -154,7 +154,7 @@ namespace Chronozoom.UI
             return new Uri(ConfigurationManager.AppSettings["ThumbnailsPath"]);
         });
 
-                // The login URL to sign in with Microsoft account
+        // The login URL to sign in with Microsoft account
         private static Lazy<Uri> _signinUrlMicrosoft = new Lazy<Uri>(() =>
         {
             if (string.IsNullOrEmpty(ConfigurationManager.AppSettings["SignInUrlMicrosoft"]))
@@ -237,6 +237,7 @@ namespace Chronozoom.UI
             public const string BookmarkIdInvalid = "Bookmark sequence id is invalid";
             public const string ParentTimelineCollectionMismatch = "Parent timeline does not match collection timeline";
             public const string InvalidContentItemUrl = "Artifact URL is invalid";
+            public const string InvalidMimetype = "Mimetype is invalid";
             public const string InvalidMediaSourceUrl = "Media Source URL is invalid";
             public const string CollectionRootTimelineExists = "Root timeline for the collection already exists";
         }
@@ -528,7 +529,7 @@ namespace Chronozoom.UI
             return GetUser("");
         }
 
-        
+
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
@@ -539,16 +540,16 @@ namespace Chronozoom.UI
             {
                 if (String.IsNullOrEmpty(name))
                 {
-                
-                        Trace.TraceInformation("Get User");
-                        if (user == null)
-                        {
-                            SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.RequestBodyEmpty);
-                            return new User();
-                        }
-                        var u = storage.Users.Where(candidate => candidate.NameIdentifier == user.NameIdentifier).FirstOrDefault();
-                        if (u != null) return u;
-                        return user;
+
+                    Trace.TraceInformation("Get User");
+                    if (user == null)
+                    {
+                        SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.RequestBodyEmpty);
+                        return new User();
+                    }
+                    var u = storage.Users.Where(candidate => candidate.NameIdentifier == user.NameIdentifier).FirstOrDefault();
+                    if (u != null) return u;
+                    return user;
                 }
                 else
                 {
@@ -632,7 +633,7 @@ namespace Chronozoom.UI
                 superCollection.Collections.Add(personalCollection);
 
                 // Add root timeline Cosmos to the personal collection
-                Timeline rootTimeline = new Timeline { Id = Guid.NewGuid(), Title = "Cosmos" , Regime = "Cosmos" };
+                Timeline rootTimeline = new Timeline { Id = Guid.NewGuid(), Title = "Cosmos", Regime = "Cosmos" };
                 rootTimeline.FromYear = -13700000000;
                 rootTimeline.ToYear = 9999;
                 rootTimeline.Collection = personalCollection;
@@ -799,7 +800,7 @@ namespace Chronozoom.UI
                 Trace.TraceInformation("Put Collection {0} from user {1} in superCollection {2}", collectionName, user, superCollectionName);
 
                 collection.Theme = collectionRequest.Theme;
-                
+
                 storage.SaveChanges();
                 return collection.Id;
             });
@@ -896,7 +897,7 @@ namespace Chronozoom.UI
                         newTimeline.SubtreeSize = 1;
                     }
                     storage.Timelines.Add(newTimeline);
-                        
+
                     returnValue = newTimelineGuid;
                 }
                 else
@@ -998,7 +999,8 @@ namespace Chronozoom.UI
 
                 foreach (ContentItem contentItemRequest in exhibitRequest.ContentItems)
                 {
-                    if (!ValidateContentItemUrl(contentItemRequest))
+                    contentItemRequest.MediaType = ValidateContentItemUrl(contentItemRequest);
+                    if (contentItemRequest.MediaType == null)
                         return returnValue;
                 }
 
@@ -1031,7 +1033,7 @@ namespace Chronozoom.UI
                         parentTimeline.Exhibits = new System.Collections.ObjectModel.Collection<Exhibit>();
                     }
                     parentTimeline.Exhibits.Add(newExhibit);
-                        
+
                     storage.Exhibits.Add(newExhibit);
                     UpdateSubtreeSize(storage, parentTimeline, 1 + (newExhibit.ContentItems != null ? newExhibit.ContentItems.Count() : 0));
 
@@ -1143,12 +1145,54 @@ namespace Chronozoom.UI
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1304:SpecifyCultureInfo", MessageId = "System.String.ToLower")]
-        private static Boolean ValidateContentItemUrl(ContentItem contentitem)
+        private static string ValidateContentItemUrl(ContentItem contentitem)
         {
-            string contentitemURI = contentitem.Uri;
+            Uri uriResult;
+            string mime = null;
+            string skydriveURL = @"^(https?://)?skydrive\.live\.com/embed\?([a-zA-Z0-9=%&-_]+)";
+            string[] imageTypes = ConfigurationManager.AppSettings["​ImageMimetypes"].Split('§');
+            string[] PDFTypes = ConfigurationManager.AppSettings["​PDFMimetype"].Split('§');
+            string[] videoURLS = new string[2] { @"^(https?://)?youtu(?:\.be|be\.com)/(?:.*v(?:/|=​)|(?:.*/)?)([a-zA-Z0-9-_]+)", @"^(https?://)?vimeo\.com/(?:.*#|.*/videos/)?([​0-9]+)" };
 
-            // Custom validation for Skydrive images
-            if (contentitem.MediaType == "skydrive-image")
+            // If Media Source is present, validate that it is well formed
+            if (contentitem.MediaSource.Length > 0 && !(Uri.TryCreate(contentitem.MediaSource, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)))
+            {
+                SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidMediaSourceUrl);
+                return null;
+            }
+
+            // Check if valid url
+            try
+            {
+                HttpWebRequest request = WebRequest.Create(contentitem.Uri) as HttpWebRequest;
+                request.Method = "HEAD";
+                HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+                mime = response.ContentType;
+            }
+            catch
+            {
+                SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
+                return null;
+            }
+
+            if (imageTypes.Contains(mime))
+            {
+                return "image";
+            }
+            if (PDFTypes.Contains(mime))
+            {
+                return "pdf";
+            }
+            foreach (string regx in videoURLS)
+            {
+                Regex rgx = new Regex(regx);
+                if (rgx.IsMatch(contentitem.Uri))
+                {
+                    return "video";
+                }
+            }
+            Regex regX = new Regex(skydriveURL);
+            if (regX.IsMatch(contentitem.Uri))
             {
                 // Parse url parameters. url pattern is - {url} {width} {height}
                 var splited = contentitem.Uri.Split(' ');
@@ -1157,38 +1201,23 @@ namespace Chronozoom.UI
                 if (splited.Length != 3)
                 {
                     SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
-                    return false;
+                    return null;
                 }
-
-                contentitemURI = splited[0];
 
                 // Validate width and height are numbers
                 int value;
                 if (!Int32.TryParse(splited[1], out value) || !Int32.TryParse(splited[2], out value))
                 {
                     SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
-                    return false;
+                    return null;
                 }
+                return "skydrive-image";
             }
 
+            SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidMimetype);
+            return null;
+            // Custom validation for Skydrive images
 
-            Uri uriResult;
-
-            // If Media Source is present, validate it
-            if (contentitem.MediaSource.Length > 0 && !(Uri.TryCreate(contentitem.MediaSource, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)))
-            {
-                SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidMediaSourceUrl);
-                return false;
-            }
-
-            // Check if valid url
-            if (!(Uri.TryCreate(contentitemURI, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)))
-            {
-                SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
-                return false;
-            }
-
-            return true;
         }
 
         private static Guid AddContentItem(Storage storage, Collection collection, Exhibit newExhibit, ContentItem contentItemRequest)
@@ -1248,7 +1277,7 @@ namespace Chronozoom.UI
                 Timeline parentTimeline = storage.GetExhibitParentTimeline(deleteExhibit.Id);
 
                 storage.Entry(deleteExhibit).Collection(_ => _.ContentItems).Load();
-                UpdateSubtreeSize(storage, parentTimeline, (deleteExhibit.ContentItems != null ? - deleteExhibit.ContentItems.Count() : 0) - 1);
+                UpdateSubtreeSize(storage, parentTimeline, (deleteExhibit.ContentItems != null ? -deleteExhibit.ContentItems.Count() : 0) - 1);
 
                 storage.DeleteExhibit(exhibitRequest.Id);
                 storage.SaveChanges();
@@ -1264,7 +1293,8 @@ namespace Chronozoom.UI
             {
                 Trace.TraceInformation("Put Content Item");
 
-                if (!ValidateContentItemUrl(contentItemRequest))
+                contentItemRequest.MediaType = ValidateContentItemUrl(contentItemRequest);
+                if (contentItemRequest.MediaType == null)
                     return Guid.Empty;
 
                 Guid returnValue;
@@ -1296,7 +1326,7 @@ namespace Chronozoom.UI
                     contentItemRequest.Id = UpdateContentItem(storage, collection.Id, contentItemRequest);
                     returnValue = contentItemRequest.Id;
                 }
-                
+
                 storage.SaveChanges();
                 _thumbnailGenerator.Value.CreateThumbnails(contentItemRequest);
 
@@ -1527,9 +1557,9 @@ namespace Chronozoom.UI
                 returnValue.Add(newBookmarkGuid);
                 sequenceId++;
             }
-            
+
         }
-        
+
         private static Guid UpdateBookmark(Storage storage, Tour updateTour, Bookmark bookmarkRequest)
         {
             Bookmark updateBookmark = storage.Bookmarks.Find(bookmarkRequest.Id);
@@ -1795,7 +1825,7 @@ namespace Chronozoom.UI
                 return value;
             });
         }
-        
+
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
@@ -2021,7 +2051,7 @@ namespace Chronozoom.UI
         private static Collection RetrieveCollection(Storage storage, Guid collectionId)
         {
             Collection collection = storage.Collections.Find(collectionId);
-            if (collection != null)   
+            if (collection != null)
                 storage.Entry(collection).Reference("User").Load();
             return collection;
         }
