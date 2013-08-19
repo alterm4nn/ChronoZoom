@@ -1150,8 +1150,8 @@ namespace Chronozoom.UI
             Uri uriResult;
             string mime = null;
             string skydriveURL = @"^(https?://)?skydrive\.live\.com/embed\?([a-zA-Z0-9=%&-_]+)";
-            string[] imageTypes = ConfigurationManager.AppSettings["​ImageMimetypes"].Split('§');
-            string[] PDFTypes = ConfigurationManager.AppSettings["​PDFMimetype"].Split('§');
+            string[] imageTypes = ConfigurationManager.AppSettings["ImageMimetypes"].Split('§');
+            string[] PDFTypes = ConfigurationManager.AppSettings["PDFMimetype"].Split('§');
             string[] videoURLS = new string[2] { @"^(https?://)?youtu(?:\.be|be\.com)/(?:.*v(?:/|=​)|(?:.*/)?)([a-zA-Z0-9-_]+)", @"^(https?://)?vimeo\.com/(?:.*#|.*/videos/)?([​0-9]+)" };
 
             // If Media Source is present, validate that it is well formed
@@ -1216,7 +1216,6 @@ namespace Chronozoom.UI
 
             SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidMimetype);
             return null;
-            // Custom validation for Skydrive images
 
         }
 
