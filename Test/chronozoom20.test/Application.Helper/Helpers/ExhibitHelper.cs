@@ -72,6 +72,7 @@ namespace Application.Helper.Helpers
                 Logger.Log("- contentItem.Attribution: " + contentItem.Attribution, LogType.MessageWithoutScreenshot);
                 exhibit.ContentItems.Add(contentItem);
             }
+            WaitCondition(() => (GetJavaScriptExecutionResult(script + ".guid") != string.Empty), 15);
             exhibit.Id = new Guid(GetJavaScriptExecutionResult(script + ".guid"));
             Logger.Log("- exhibit.Id: " + exhibit.Id, LogType.MessageWithoutScreenshot);
             Logger.Log("->" + exhibit);

@@ -174,11 +174,11 @@ namespace Application.Driver.UserActions
         protected void WaitCondition(Func<bool> condition, int timeoutInSeconds, int pauseInSeconds = 1)
         {
             var finish = DateTime.Now.AddSeconds(timeoutInSeconds);
-            IWebElement element = FindElement(By.TagName("body"));
-            string color = element.GetPreviousAndChangeBackgroundColor("yellow");
+            //IWebElement element = FindElement(By.TagName("body"));
+            //string color = element.GetPreviousAndChangeBackgroundColor("yellow");
             while ((DateTime.Now < finish) && !condition.Invoke())
                 Sleep(pauseInSeconds);
-            element.ChangeBackgroundColor(color);
+            //element.ChangeBackgroundColor(color);
         }
 
         protected void ExecuteJavaScript(string script, object[] obj = null)
@@ -201,7 +201,12 @@ namespace Application.Driver.UserActions
 
         protected string GetJavaScriptExecutionResult(string script)
         {
-            return Executor.ExecuteScript("return " + script).ToString();
+            object executionResult = Executor.ExecuteScript("return " + script);
+            if (executionResult != null)
+            {
+                return executionResult.ToString();
+            }
+            return string.Empty;
         }
 
         protected bool IsElementExisted(By by)
