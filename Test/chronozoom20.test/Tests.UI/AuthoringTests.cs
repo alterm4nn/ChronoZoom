@@ -67,15 +67,17 @@ namespace Tests
             {
                 Title = "ContentItemImage",
                 MediaType = "Image",
-                Uri = "http://i.telegraph.co.uk/multimedia/archive/02429/eleanor_scriven_2429776k.jpg"
-
+                Uri = "http://i.telegraph.co.uk/multimedia/archive/02429/eleanor_scriven_2429776k.jpg",
+                Attribution = "Image",
+                Caption = "Description"
             };
             var contentItemMusic = new ContentItem
             {
                 Title = "ContentItemMusic",
                 MediaType = "Image",
-                Uri = "http://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Aeroflot_Airbus_A330_Kustov_edit.jpg/800px-Aeroflot_Airbus_A330_Kustov_edit.jpg"
-
+                Uri = "http://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Aeroflot_Airbus_A330_Kustov_edit.jpg/800px-Aeroflot_Airbus_A330_Kustov_edit.jpg",
+                Attribution = "Image2",
+                Caption = "Description2"
             };
             var exhibit = new Exhibit
             {
