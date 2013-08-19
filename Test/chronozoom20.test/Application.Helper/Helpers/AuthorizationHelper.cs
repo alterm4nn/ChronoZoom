@@ -121,7 +121,7 @@ namespace Application.Helper.Helpers
             {
                 DeleteCookieByName(userCookieName);
             }
-        } 
+        }
 
         public void ClickOnUserName()
         {
@@ -288,7 +288,7 @@ namespace Application.Helper.Helpers
 
         public void LogoutByUrl()
         {
-            OpenUrl("http://test.chronozoom.com/pages/logoff.aspx");
+            OpenUrl(Configuration.BaseUrl+"/pages/logoff.aspx");
         }
     }
 }
