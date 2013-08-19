@@ -558,7 +558,9 @@ var CZ;
                 url: request.url,
                 async: false
             }).done(function (mime) {
-                result = mime;
+                if(mime) {
+                    result = mime;
+                }
             });
             return result;
         }

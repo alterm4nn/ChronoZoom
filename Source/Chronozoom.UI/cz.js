@@ -3869,7 +3869,9 @@ var CZ;
                 url: request.url,
                 async: false
             }).done(function (mime) {
-                result = mime;
+                if(mime) {
+                    result = mime;
+                }
             });
             return result;
         }
@@ -4526,10 +4528,11 @@ var CZ;
                 var ci = contentItems[i];
                 isValid = isValid && CZ.Authoring.isNotEmpty(ci.title) && CZ.Authoring.isNotEmpty(ci.uri) && CZ.Authoring.isNotEmpty(ci.mediaType);
                 var mime = CZ.Service.getMimeTypeByUrl(ci.uri);
+                console.log("mime:" + mime);
                 if(ci.mediaType.toLowerCase() === "image") {
                     var imageReg = /\.(jpg|jpeg|png|gif)$/i;
                     if(!imageReg.test(ci.uri)) {
-                        if(mime != "application/jpg" && mime != "application/jpeg" && mime != "application/gif" && mime != "application/png") {
+                        if(mime != "image/jpg" && mime != "image/jpeg" && mime != "image/gif" && mime != "image/png") {
                             alert("Sorry, only JPG/PNG/GIF images are supported.");
                             isValid = false;
                         }

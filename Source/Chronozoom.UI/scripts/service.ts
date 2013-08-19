@@ -661,7 +661,8 @@ module CZ {
                 url: request.url,
                 async: false
             }).done(mime => {
-                result = mime;
+                if(mime)
+                    result = mime;
             });
             return result;
         }
