@@ -1,4 +1,4 @@
-// --------------------------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright company="Outercurve Foundation">
 //   Copyright (c) 2013, The Outercurve Foundation
 // </copyright>
@@ -22,10 +22,9 @@ using System.ServiceModel.Web;
 using System.Text;
 using System.Web;
 using Chronozoom.Entities;
-
+using System.Text.RegularExpressions;
 using Chronozoom.UI.Utils;
 using System.ServiceModel.Description;
-using System.Text.RegularExpressions;
 
 namespace Chronozoom.UI
 {
@@ -238,6 +237,7 @@ namespace Chronozoom.UI
             public const string ParentTimelineCollectionMismatch = "Parent timeline does not match collection timeline";
             public const string InvalidContentItemUrl = "Artifact URL is invalid";
             public const string InvalidMediaSourceUrl = "Media Source URL is invalid";
+            public const string InvalidMimeType = "Mimetype is invalid";
             public const string CollectionRootTimelineExists = "Root timeline for the collection already exists";
         }
 
@@ -998,7 +998,8 @@ namespace Chronozoom.UI
 
                 foreach (ContentItem contentItemRequest in exhibitRequest.ContentItems)
                 {
-                    if (!ValidateContentItemUrl(contentItemRequest))
+                    contentItemRequest.MediaType = ValidateContentItemUrl(contentItemRequest);
+                    if (contentItemRequest.MediaType == null)
                         return returnValue;
                 }
 
@@ -1130,7 +1131,6 @@ namespace Chronozoom.UI
                 SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
                 return Guid.Empty;
             }
-
             // Update the content item fields
             updateContentItem.Title = contentItemRequest.Title;
             updateContentItem.Caption = contentItemRequest.Caption;
@@ -1142,13 +1142,56 @@ namespace Chronozoom.UI
             return contentItemRequest.Id;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1304:SpecifyCultureInfo", MessageId = "System.String.ToLower")]
-        private static Boolean ValidateContentItemUrl(ContentItem contentitem)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1304:SpecifyCultureInfo", MessageId = "System.String.ToLower")]
+        private static string ValidateContentItemUrl(ContentItem contentitem)
         {
-            string contentitemURI = contentitem.Uri;
+            Uri uriResult;
+            string mime = null;
+            string[] imageTypes = ConfigurationManager.AppSettings["ImageMimetypes"].Split('|');
+            string[] PDFTypes = ConfigurationManager.AppSettings["PDFMimetype"].Split('|');
+            string[] videoURLS = new string[2] { @"^(https?://)?youtu(?:\.be|be\.com)/(?:.*v(?:/|=)|(?:.*/)?)([a-zA-Z0-9-_]+)", @"^(https?://)?vimeo\.com/(?:.*#|.*/videos/)?([0-9]+)" };
+            string skydriveDocURL = @"^(https?://)?skydrive\.live\.com/embed\?([a-zA-Z0-9=%&-_]+)";
+            string skydriveImageURL = @"^(https?://)?skydrive\.live\.com/embed\?([a-zA-Z0-9=%&-_]+) [0-9] [0-9]";
+            
+            // If Media Source is present, validate it
+            if (contentitem.MediaSource.Length > 0 && !(Uri.TryCreate(contentitem.MediaSource, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)))
+            {
+                SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidMediaSourceUrl);
+                return null;
+            }
+            
+            // Check if valid url
+            try
+            {
+                HttpWebRequest request = WebRequest.Create(contentitem.Uri) as HttpWebRequest;
+                request.Method = "HEAD";
+                HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+                mime = response.ContentType;
+            }
+            catch
+            {
+                SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
+                return null;
+            }
 
-            // Custom validation for Skydrive images
-            if (contentitem.MediaType == "skydrive-image")
+            if (imageTypes.Contains(mime))
+            {
+                return "image";
+            }
+            if (PDFTypes.Contains(mime))
+            {
+                return "pdf";
+            }
+            foreach (string regx in videoURLS)
+            {
+                Regex rgx = new Regex(regx);
+                if (rgx.IsMatch(contentitem.Uri))
+                {
+                    return "video";
+                }
+            }
+            Regex regX = new Regex(skydriveImageURL);
+            if (regX.IsMatch(contentitem.Uri))
             {
                 // Parse url parameters. url pattern is - {url} {width} {height}
                 var splited = contentitem.Uri.Split(' ');
@@ -1157,38 +1200,25 @@ namespace Chronozoom.UI
                 if (splited.Length != 3)
                 {
                     SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
-                    return false;
+                    return null;
                 }
-
-                contentitemURI = splited[0];
 
                 // Validate width and height are numbers
                 int value;
                 if (!Int32.TryParse(splited[1], out value) || !Int32.TryParse(splited[2], out value))
                 {
                     SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
-                    return false;
+                    return null;
                 }
+                return "skydrive-image";
             }
-
-
-            Uri uriResult;
-
-            // If Media Source is present, validate it
-            if (contentitem.MediaSource.Length > 0 && !(Uri.TryCreate(contentitem.MediaSource, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)))
+            Regex regeX = new Regex(skydriveDocURL);
+            if (regeX.IsMatch(contentitem.Uri))
             {
-                SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidMediaSourceUrl);
-                return false;
+                return "skydrive-document";
             }
-
-            // Check if valid url
-            if (!(Uri.TryCreate(contentitemURI, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)))
-            {
-                SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
-                return false;
-            }
-
-            return true;
+            SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidMimeType);
+            return null;
         }
 
         private static Guid AddContentItem(Storage storage, Collection collection, Exhibit newExhibit, ContentItem contentItemRequest)
@@ -1264,7 +1294,8 @@ namespace Chronozoom.UI
             {
                 Trace.TraceInformation("Put Content Item");
 
-                if (!ValidateContentItemUrl(contentItemRequest))
+                contentItemRequest.MediaType = ValidateContentItemUrl(contentItemRequest);
+                if (contentItemRequest.MediaType == null)
                     return Guid.Empty;
 
                 Guid returnValue;
