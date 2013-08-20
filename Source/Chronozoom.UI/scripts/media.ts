@@ -50,7 +50,7 @@ module CZ {
             if (CZ.Media.SkyDriveMediaPicker.isEnabled) {
                 registerMediaPicker(
                     "skydrive",
-                    "/images/media/skydrive-import-50x50.png",
+                    "/images/media/skydrive-import-50x150.png",
                     CZ.Media.SkyDriveMediaPicker
                 ).done(() => {
                     WL.init({

@@ -11079,7 +11079,7 @@ var CZ;
         function initialize() {
             registerMediaPicker("bing", "/images/media/bing-import-50x150.png", CZ.Media.BingMediaPicker, "/ui/media/bing-mediapicker.html");
             if(CZ.Media.SkyDriveMediaPicker.isEnabled) {
-                registerMediaPicker("skydrive", "/images/media/skydrive-import-50x50.png", CZ.Media.SkyDriveMediaPicker).done(function () {
+                registerMediaPicker("skydrive", "/images/media/skydrive-import-50x150.png", CZ.Media.SkyDriveMediaPicker).done(function () {
                     WL.init({
                         client_id: CZ.Settings.WLAPIClientID,
                         redirect_uri: CZ.Settings.WLAPIRedirectUrl,
