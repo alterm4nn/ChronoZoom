@@ -80,6 +80,7 @@ Represents a collection of timelines.
 |Id|The ID of the collection.|
 |Title|The title of the collection.|
 |User|The user ID for the collection owner.|
+|Theme|The theme (i.e. space, blue, etc) associated to this collection.|
  
 [top](#chronozoom-rest-api-reference)
  
@@ -281,7 +282,8 @@ A registered user.
 - [GetServiceInformation](#getserviceinformation)
 - [DeleteUser](#deleteuser)
 - [GetUser](#getuser)
-- [PutCollectionName](#putcollectionname)
+- [PostCollection](#postcollection)
+- [PutCollection](#putcollection)
 - [DeleteCollection](#deletecollection)
 - [PutTimeline](#puttimeline)
 - [DeleteTimeline](#deletetimeline)
@@ -289,13 +291,15 @@ A registered user.
 - [DeleteExhibit](#deleteexhibit)
 - [PutContentItem](#putcontentitem)
 - [DeleteContentItem](#deletecontentitem)
-- [PostTour](#posttour)
 - [PutTour](#puttour)
+- [PutTour2](#puttour2)
 - [DeleteTour](#deletetour)
 - [PutBookmarks](#putbookmarks)
 - [DeleteBookmarks](#deletebookmarks)
 - [GetContentPath](#getcontentpath)
+- [GetSuperCollections](#getsupercollections)
 - [GetCollections](#getcollections)
+- [GetMemiTypeByUrl](#getmemitypebyurl)
 
 ### GetTimelines ###
  
@@ -309,7 +313,7 @@ Timeline data in JSON format.
     HTTP verb: GET
             
     URL:
-    http://{URL}/api/{supercollection}/{collection}/timelines?start={year}&end={year}
+    http://{URL}/api/gettimelines?supercollection={supercollection}&collection={collection}&start={year}&end={year}
     
 
  
@@ -400,7 +404,7 @@ A list of tours in JSON format.
     HTTP verb: GET
             
     URL: 
-    http://{URL}/api//{supercollection}/{collection}/tours
+    http://{URL}/api/{supercollection}/{collection}/tours
     
 
  
@@ -428,7 +432,7 @@ The URL for the new user collection.
     HTTP verb: PUT
             
     URL:
-    http://{URL}/api//{supercollection}/{collection}/user
+    http://{URL}/api/{supercollection}/{collection}/user
     
     Request body (JSON):
     {
@@ -489,7 +493,7 @@ HTTP response code.
             HTTP verb: DELETE
             
             URL:
-            http://{URL}/api//{supercollection}/{collection}/user
+            http://{URL}/api/{supercollection}/{collection}/user
             
             Request body (JSON):
             {
@@ -536,7 +540,7 @@ JSON containing data for the current user.
  
 ----------
  
-### PutCollectionName ###
+### PostCollection ###
  
 Creates a new collection using the specified name.
  
@@ -568,7 +572,46 @@ Creates a new collection using the specified name.
  
 **Remarks**
 If a collection of the specified name does not exist then a new collection is created. 
-    If the collection exists and the authenticated user is the author then the collection is modified. 
+    The title field can't be modified because it is part of the URL (the URL can be indexed).
+
+ 
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+### PutCollection ###
+ 
+Modifies an existing collection.
+ 
+**Returns**
+
+ 
+**Example**
+ 
+    HTTP verb: PUT
+            
+    URL:
+    http://{URL}/api/{supercollection}/{collection}
+            
+    Request body (JSON):
+    {
+         id: "{id}",
+         title: "{title}"
+    }
+    
+
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|superCollectionName|The name of the parent supercollection.|
+|collectionName|The name of the collection to create.|
+|collectionRequest|[Collection](#collection) data in JSON format.|
+ 
+**Remarks**
+If the collection exists and the authenticated user is the author then the collection is modified. 
     If no author is registered then the authenticated user is set as the author. 
     The title field can't be modified because it is part of the URL (the URL can be indexed).
 
@@ -618,12 +661,15 @@ HTTP status code.
     HTTP verb: PUT
             
     URL:
-    http://{URL}/api//{supercollection}/{collection}/timeline
+    http://{URL}/api/{supercollection}/{collection}/timeline
             
     Request body (JSON):
     {
-         id: "0123456789",
-         title: "A New Title"
+         ParentTimelineId: "ff5214e1-1bf4-4af5-8835-96cff2ce2cfd",
+         Regime: null - optional,
+         end: -377.945205,
+         start: -597.542466,
+         title: "Timeline Title"
     }
     
 
@@ -657,7 +703,7 @@ Deletes the timeline with the specified ID.
     HTTP verb: DELETE
             
     URL:
-    http://{URL}/api//{supercollection}/{collection}/timeline
+    http://{URL}/api/{supercollection}/{collection}/timeline
             
     Request body (JSON):
     {
@@ -681,7 +727,7 @@ Deletes the timeline with the specified ID.
  
 ### PutExhibit ###
  
-Creates or updates the exhibit and its content items in a given collection. If the collection does not exist, then the command will silently fail.
+Creates or updates the exhibit and its content items in a given collection. If the collection does not exist, then the command will fail. Prior to running this command, you will need to create the associated content items.
  
 **Returns**
 [Exhibit](#exhibit) data in JSON format.
@@ -691,15 +737,15 @@ Creates or updates the exhibit and its content items in a given collection. If t
     HTTP verb: PUT
             
     URL:
-    http://{URL}/api//{supercollection}/{collection}/exhibit
+    http://{URL}/api/{supercollection}/{collection}/exhibit
             
     Request body (JSON):
     {
-         id: "0123456789",
-         title: "Mars Exploration",
-         threshold: "{threshold}",
-         regime: "{regime}",
-         contentItems: "{contentItems}" 
+        ParentTimelineId: "123456"
+        id: "0123456789",
+        title: "Mars Exploration",
+        contentItems: "{contentItems}" 
+        time: 565
     }
     
 
@@ -735,7 +781,7 @@ Deletes the specified exhibit from the specified collection.
     HTTP verb: DELETE
             
     URL:
-    http://{URL}/api//{supercollection}/{collection}/exhibit
+    http://{URL}/api/{supercollection}/{collection}/exhibit
             
     Request body:
     {
@@ -769,7 +815,7 @@ Creates or updates the content item in a given collection. If the collection doe
     HTTP verb: PUT
             
     URL:
-    http://{URL}/api//{supercollection}/{collection}/contentitem
+    http://{URL}/api/{supercollection}/{collection}/contentitem
             
     Request body:
     {
@@ -824,47 +870,6 @@ Delete the specified content item from the specified collection.
  
 ----------
  
-### PostTour ###
- 
-Creates a new tour with bookmark support.
- 
-**Returns**
-A list of guids of tour guid followed by bookmark guids in JSON format.
- 
-**Example**
- 
-    HTTP verb: POST
-            
-    URL:
-    http://{URL}/api/{supercollection}/{collection}/{collectionName}/tour
-            
-    Request body:
-    {
-             
-    }
-    
-
- 
-**Parameters**
- 
-|Parameter|Value|
-|:--------|:----|
-|superCollectionName|The name of the parent collection.|
-|collectionName|The name of the collection to modify.|
-|tourRequest|The tour data in JSON format.|
- 
-**Remarks**
-Do not specify the tour ID, this value is automatically generated.
-    All bookmarks in a tour must belong to the same collection and the user 
-    must have permission to modify that collection.
-    POST is used to create a new tour.
-
- 
- 
-[top](#chronozoom-rest-api-reference)
- 
-----------
- 
 ### PutTour ###
  
 Creates or updates a tour with bookmark support.
@@ -907,6 +912,56 @@ All bookmarks in a tour must belong to the same collection and the user
  
 ----------
  
+### PutTour2 ###
+ 
+Creates or updates a tour with bookmark support.
+ 
+**Returns**
+A list of guids of the tour guid followed by bookmark guids in JSON format.
+ 
+**Example**
+ 
+    HTTP verb: PUT
+            
+    URL:
+    http://{URL}/api/{supercollection}/{collection}/{collectionName}/tour2
+            
+    Request body:
+    {
+             
+    }
+    
+
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|superCollectionName|The name of the parent collection.|
+|collectionName|The name of the collection to modify.|
+|tourRequest|The tour data in JSON format.|
+ 
+**Remarks**
+All bookmarks in a tour must belong to the same collection and the user 
+    must have permission to modify that collection.
+    Supported operations include:
+    1. Create a new tour
+       Do not specify a tour id or bookmark ids for the new entities to be created.
+    2. Modify an existing tour
+       Specify the tour id and any of the tour fields (id, description, audio) that need to be modified.
+            If tour id is specified and it does not exist, a "not found" status is returned.
+            If tour id is specified and it exists, update any specified tour fields. 
+        Delete all existing bookmarks and for the bookmarks json object passed in add them to the tour.
+        The sequence ids of the bookmarks are automatically generated based on the order they are received.
+        
+    If an invalid tour Id, bookmark Id or bookmark sequence Id is specified then the request will fail.
+
+ 
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
 ### DeleteTour ###
  
 Deletes the specified tour.
@@ -916,7 +971,7 @@ Deletes the specified tour.
     HTTP verb: DELETE
             
     URL:
-    http://{URL}/api/{supercollection}/{collection}/{collectionName}/tour
+    http://{URL}/api/{supercollection}/{collection}/tour
             
     Request body:
     {
@@ -1029,6 +1084,27 @@ None.
  
 ----------
  
+### GetSuperCollections ###
+ 
+Retrieve the list of all supercollections.
+ 
+**Example**
+ 
+    HTTP verb: GET
+            
+    URL:
+    http://{URL}/api/supercollections
+    
+
+ 
+**Parameters**
+None.
+ 
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
 ### GetCollections ###
  
 Retrieve the list of all collections.
@@ -1038,7 +1114,28 @@ Retrieve the list of all collections.
     HTTP verb: GET
             
     URL:
-    http://{URL}/api/collections
+    http://{URL}/api/{superCollection}/collections
+    
+
+ 
+**Parameters**
+None.
+ 
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+### GetMemiTypeByUrl ###
+ 
+Retrieve file mime type by url
+ 
+**Example**
+ 
+    HTTP verb: GET
+            
+    URL:
+    http://{URL}/api/getmimetypebyurl
     
 
  
