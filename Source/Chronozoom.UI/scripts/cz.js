@@ -684,7 +684,7 @@ var CZ;
         function closeAllForms() {
             $('.cz-major-form').each(function (i, f) {
                 var form = $(f).data('form');
-                if(form) {
+                if(form && form.isFormVisible === true) {
                     form.close();
                 }
             });
