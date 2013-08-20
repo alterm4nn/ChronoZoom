@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Xml;
+using System.Runtime.Serialization.Json;
+using System.Text;
 using Application.Driver;
 using Application.Helper.Entities;
 using Application.Helper.UserActions;
@@ -24,34 +25,39 @@ namespace Application.Helper.Helpers
         public void AuthenticateAsGoogleUser()
         {
             Logger.Log("<-");
-            var user = new User { Type = UserType.Google };
-            OpenIdentityProviderPage(user);
-            LoginUser(user);
+            var user = new User { Login = "chronozoomtest@gmail.com" };
+            LoginToAcsProvider(user);
             Logger.Log("->");
         }
 
         public void AuthenticateAsYahooUser()
         {
             Logger.Log("<-");
-            var user = new User { Type = UserType.Yahoo };
-            OpenIdentityProviderPage(user);
-            LoginUser(user);
+            var user = new User { Login = "chronozoom@yahoo.com" };
+            LoginToAcsProvider(user);
             Logger.Log("->");
         }
 
         public void AuthenticateAsMicrosoftUser()
         {
             Logger.Log("<-");
-            var user = new User { Type = UserType.Microsoft };
+            var user = new User { Login = "chronozoom@outlook.com" };
+            LoginToAcsProvider(user);
+            Logger.Log("->");
+        }
+
+        private void LoginToAcsProvider(User user)
+        {
+            FillUserCredentials(user);
             OpenIdentityProviderPage(user);
             LoginUser(user);
-            Logger.Log("->");
         }
 
         public void AuthenticateAsMicrosoftUserToSkyDrive()
         {
             Logger.Log("<-");
-            var user = new User { Type = UserType.Microsoft };
+            var user = new User { Login = "chronozoom@outlook.com" };
+            FillUserCredentials(user);
             LoginUser(user);
             Logger.Log("->", LogType.MessageWithoutScreenshot);
         }
@@ -159,63 +165,40 @@ namespace Application.Helper.Helpers
             return IsElementExisted(By.ClassName("auth-panel-login"));
         }
 
-        protected User FillUserCredentials(User user)
+        private void FillUserCredentials(User user)
         {
-            var document = new XmlDocument();
-            document.Load(GetValidAcountsXmlPath());
-
-            switch (user.Type)
-            {
-                case UserType.Google:
-                    user.Login = document.SelectSingleNode("//Accounts/google/login").InnerText;
-                    user.Password = document.SelectSingleNode("//Accounts/google/password").InnerText;
-                    break;
-                case UserType.Microsoft:
-                    user.Login = document.SelectSingleNode("//Accounts/microsoft/login").InnerText;
-                    user.Password = document.SelectSingleNode("//Accounts/microsoft/password").InnerText;
-                    break;
-                case UserType.Yahoo:
-                    user.Login = document.SelectSingleNode("//Accounts/yahoo/login").InnerText;
-                    user.Password = document.SelectSingleNode("//Accounts/yahoo/password").InnerText;
-                    break;
-                default:
-                    throw new Exception("Can not find user credentials, user: " + user);
-            }
-
-            return user;
+            IEnumerable<User> users = GetUsersFromJson();
+            if (users != null)
+                foreach (User userData in users)
+                {
+                    if (userData.Login == user.Login)
+                    {
+                        user.Password = userData.Password;
+                        user.Type = userData.Type;
+                        break;
+                    }
+                }
         }
 
-        private void SetUserInfoAndSubmit(User user)
+        private IEnumerable<User> GetUsersFromJson()
         {
-            Logger.Log("<- user type: " + user.Type);
-
-            switch (user.Type)
-            {
-                case UserType.Google:
-                    TypeText(By.Id("Email"), user.Login);
-                    TypeText(By.Id("Passwd"), user.Password);
-                    Click(By.Id("signIn"));
-                    break;
-                case UserType.Yahoo:
-                    TypeText(By.Id("username"), user.Login);
-                    TypeText(By.Id("passwd"), user.Password);
-                    Click(By.Id(".save"));
-                    break;
-                case UserType.Microsoft:
-                    ClickElementAndType(By.Id("idDiv_PWD_UsernameExample"), user.Login);
-                    ClickElementAndType(By.Id("idDiv_PWD_PasswordExample"), user.Password);
-                    Click(By.XPath("//*[@id='idSIButton9']"));
-                    break;
-            }
-            Logger.Log("->",LogType.MessageWithoutScreenshot);
+            StreamReader stream = new StreamReader(GetValidAcountsJsonPath());
+            string text = stream.ReadToEnd();
+            stream.Close();
+            byte[] byteArray = Encoding.UTF8.GetBytes(text);
+            MemoryStream memoryStream = new MemoryStream(byteArray);
+            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(IEnumerable<User>));
+            IEnumerable<User> users = serializer.ReadObject(memoryStream) as IEnumerable<User>;
+            memoryStream.Close();
+            return users;
         }
 
-        private string GetValidAcountsXmlPath()
+        private string GetValidAcountsJsonPath()
         {
             var validFilePath = string.Empty;
 
-            const string accountsPathVsRun = @".\..\..\..\Application.Helper\Constants\Accounts.xml";
-            const string accountsPathConsoleRun = @".\..\..\..\..\Application.Helper\Constants\Accounts.xml";
+            const string accountsPathVsRun = @".\..\..\..\Application.Helper\Constants\Accounts.json";
+            const string accountsPathConsoleRun = @".\..\..\..\..\Application.Helper\Constants\Accounts.json";
 
             if (File.Exists(accountsPathVsRun))
                 validFilePath = accountsPathVsRun;
@@ -247,11 +230,35 @@ namespace Application.Helper.Helpers
         private void LoginUser(User user)
         {
             Logger.Log("<-");
-            FillUserCredentials(user);
             Logger.Log(user.ToString());
             SetUserInfoAndSubmit(user);
             AcceptSecurityWarning();
             Logger.Log("->",LogType.MessageWithoutScreenshot);
+        }
+
+        private void SetUserInfoAndSubmit(User user)
+        {
+            Logger.Log("<- user type: " + user.Type);
+
+            switch (user.Type)
+            {
+                case "google":
+                    TypeText(By.Id("Email"), user.Login);
+                    TypeText(By.Id("Passwd"), user.Password);
+                    Click(By.Id("signIn"));
+                    break;
+                case "yahoo":
+                    TypeText(By.Id("username"), user.Login);
+                    TypeText(By.Id("passwd"), user.Password);
+                    Click(By.Id(".save"));
+                    break;
+                case "microsoft":
+                    ClickElementAndType(By.Id("idDiv_PWD_UsernameExample"), user.Login);
+                    ClickElementAndType(By.Id("idDiv_PWD_PasswordExample"), user.Password);
+                    Click(By.XPath("//*[@id='idSIButton9']"));
+                    break;
+            }
+            Logger.Log("->", LogType.MessageWithoutScreenshot);
         }
 
         private void OpenIdentityProviderPage(User user)
@@ -259,13 +266,13 @@ namespace Application.Helper.Helpers
             Logger.Log("<- user type: " + user.Type);
             switch (user.Type)
             {
-                case UserType.Google:
+                case "google":
                     Click(By.XPath("//*[@name='Google']"));
                     break;
-                case UserType.Yahoo:
+                case "yahoo":
                     Click(By.XPath("//*[@name='Yahoo!']"));
                     break;
-                case UserType.Microsoft:
+                case "microsoft":
                     Click(By.XPath("//*[@name='Windows Live™ ID']"));
                     break;
             }
